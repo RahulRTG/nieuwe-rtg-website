@@ -308,7 +308,7 @@ niet vrij.
 | 0 | **De grens als code** ✅ | 18+, codenaam, spelvak — op één plek, zoals `grens.js` dat voor progressie doet | alle vier |
 | 1 | **Loondienst binnen één potje** ✅ | je kunt bij een andere speler werken, met een rol en een salaris uit zíjn kas. Niets blijft bewaard | geen permanentie, dus nog geen 18+-vraag |
 | 2 | **Het werkverleden dat het potje overleeft** ✅ | de melding *"hij werkte 3 jaar 2 maanden voor jou"*, en de vier keuzes van hoofdstuk 3 | hier begint 18+ |
-| 3 | **Het wereldvak onder de echte schermen** ✅ | spelers gebruiken het échte personeels-, rooster- en dossierscherm op spelgegevens | grens 2, structureel |
+| 3 | **Het wereldvak onder de echte schermen** 🔶 | het vak, de isolatie en de mount staan, en `routes/concern.js` draait erop. Maar: uit tenzij `RTG_SPELWERELD=1`, er is geen weg om een wereld te *maken*, en Magnaat opent er geen. De brug ligt er; er rijdt nog niets overheen | grens 2, structureel |
 | 4 | **De momenten** ✅ | wat onthouden wordt, en alleen als er een tweede persoon bij was | grens 4 |
 | 5 | **De terugblik** ✅ | hoofdstuk 13: geen cijfers, wel een geschiedenis | — |
 
@@ -387,7 +387,29 @@ blootlegde: `dienst-beeld.js` (wat een speler ziet, tegenover wat hij doet) en
 
 ---
 
-## 9. Stap 3 staat: de spelwereld
+## 9. Stap 3: de spelwereld staat, de brug nog niet
+
+> **Wat hier ontbreekt, en dat hoort bovenaan.** De machinerie hieronder werkt en
+> is getoetst, maar drie dingen staan tussen deze code en de belofte uit
+> hoofdstuk 0 (*in het spel gebruik je de échte RTG-software*):
+>
+> 1. **Hij staat uit.** `RTG_SPELWERELD=1` of er is geen spelwereld — bewust, en
+>    dezelfde vorm als `opzet/liegpoort.js`.
+> 2. **Er is geen weg om er een te máken.** `spelwereld.maak()` bestaat en is
+>    getoetst, maar geen enkele route roept hem aan. Ook met de vlag aan komt een
+>    speler er dus niet.
+> 3. **Magnaat weet er niet van.** Nergens in `kern/spellen/` wordt een wereld
+>    geopend of een link ernaartoe gelegd. Een potje en een wereld zijn twee
+>    dingen die niets van elkaar weten.
+>
+> En van de drie schermen die de tabel in §6 noemt, draait er één: `concern`
+> (personeel, vestigingen, rollen, organigram). Rooster en dossier niet, en
+> `routes/member/werk.js` — vacatures en solliciteren, hoofdstuk 1 — staat er
+> expliciet buiten omdat zijn `chatStuur` echte seintjes en pushmeldingen
+> verstuurt. Zie de kop van `kern/spelwereld-mount.js`.
+>
+> De brug is gebouwd en draagt gewicht. Er rijdt alleen nog niets overheen.
+
 
 `server/kern/spelwereld.js` (het vak en de doorkijk), `spelwereld-mount.js` (de
 routes), `server/opzet/spelwereld.js` (de bedrading) en

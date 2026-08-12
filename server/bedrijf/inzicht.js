@@ -143,7 +143,7 @@ module.exports = (sctx) => {
      over het dossier van EEN object; dat kijkt naar de verhoudingen tussen de
      soorten -- en houdt vast dat niet-gemeten iets anders is dan geen
      samenhang. */
-  require('./inzicht-graaf')(sctx);
+  require('./inzicht-graaf')(sctx, { laagVoor, zoeklaag, MEETGRENS });
 
   /* Deze laag geeft niets terug aan de gedeelde context. Dat is bewust: hij
      LEEST de soorten van de modules boven hem en heeft niets wat een andere

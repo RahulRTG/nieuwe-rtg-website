@@ -18,52 +18,15 @@
    Krijgt dezelfde sctx als ./inzicht.js. */
 'use strict';
 
-module.exports = (sctx) => {
-  const { app, db, schoon, werkPoort } = sctx;
+module.exports = (sctx, { laagVoor, zoeklaag, MEETGRENS }) => {
+  const { app, schoon, werkPoort } = sctx;
 
-  /* Het werkjournaal in de vorm die object.js van een journaal verwacht. Geen
-     tweede journaal: dit leest w.journaal, dat de modules zelf al vullen.
-
-     De regel wordt op `waarover` gevonden en dus op ID en niet op soort -- het
-     journaal legt de soort niet vast. Ids zijn per werkruimte willekeurig, dus
-     in de praktijk wijst dat goed; het staat hier omdat de aanroeper het hoort
-     te weten en niet omdat het onschuldig is. */
-  function journaalVan(w) {
-    return {
-      overObject(type, id) {
-        const sleutel = String(id);
-        return (w.journaal || [])
-          .filter(j => j && String(j.waarover || '') === sleutel)
-          .map(j => ({ at: j.at, actie: j.wat, actor: j.wie, reden: j.reden || null,
-            niveau: null, uitslag: null, id: j.id }));
-      }
-    };
-  }
-
-  /* HOE HARD IS DE SAMENHANG VAN EEN MENS? De afhankelijkhedenscan meldt per rij
-     het VELD waarop hij matchte, en dat veld verklapt precies wat we willen
-     weten: `wieId` en `eigenaarId` zijn sleutels (exact), `wie` en `eigenaar`
-     zijn namen (kan een naamgenoot zijn). Sinds bedrijf/wieis.js dragen nieuwe
-     rijen dat id, dus dit getal hoort te krimpen -- en zolang het niet nul is,
-     staat er hoeveel van dit dossier nog op een gok rust. */
-  function hardheid(d) {
-    const rijen = (d.afhankelijkheden || []).flatMap(gr => gr.rijen || []);
-    const opId = rijen.filter(r => /Id$/.test(String(r.via || ''))).length;
-    const opNaam = rijen.length - opId;
-    return { gevonden: { opId, opNaam,
-      let: opNaam
-        ? opNaam + ' van de ' + rijen.length + ' getoonde rijen zijn op NAAM gevonden en kunnen van een naamgenoot zijn; ' + opId + ' via een lid-id, en die zijn exact. Kijk per rij naar "via".'
-        : 'Alle getoonde rijen zijn via een lid-id gevonden; er zit geen naamgok in.' } };
-  }
-
-  /* De hele laag van één verzoek. `g` komt uit werkPoort, dus de werkruimte en
-     de rechten zijn al bewezen voordat hier iets wordt gebouwd. */
-  function laagVoor(g) {
-    const register = maakWerkRegister(g.w.code, g.rechten);
-    const kwaliteit = maakKwaliteit({ db, register });
-    const graaf = maakGraaf({ db, register, kwaliteit });
-    return { register, kwaliteit, graaf };
-  }
+  /* laagVoor, zoeklaag en de meetgrens komen van ./inzicht.js MEE. Ze hier
+     opnieuw opbouwen zou een tweede lezing van dezelfde laag maken, en
+     check.js weigert dat terecht: een deelbestand dat in de top-level van
+     een zuster grijpt, is geen deelbestand maar een tak.
+     (MEETGRENS: onder dit aantal rijen MAG een verwijzing niet gemeten
+     worden -- zie de kop.) */
 
   /* ---------- de samenhang: de vorm van het geheel ---------- */
   app.post('/api/bedrijf/samenhang', (req, res) => {

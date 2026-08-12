@@ -25,8 +25,8 @@
     "kernGedeeld": 148,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 205,
-    "toetsenOngevoeligPct": 2.3,
+    "toetsenNietGemeten": 140,
+    "toetsenOngevoeligPct": 2.5,
     "wettenOnbewezen": 5,
     "devPakketten": 1
   },
@@ -381,6 +381,12 @@
       "meter": "dependencies opgeknipt: dependencies (runtime, blijft 0) en devPakketten NIEUW op 1",
       "reden": "De meter telde dependencies en devDependencies bij elkaar op, en dat zijn twee onvergelijkbare dingen -- dezelfde fout als keuringBeter en als de twee mutatiemeters, die om precies deze reden al eerder zijn gesplitst. Het principe is dat de RUNTIME zonder npm-pakketten draait: dat bepaalt wat een bezoeker binnenhaalt en hoe groot de aanvalsoppervlakte is. Gereedschap om te METEN valt daar niet onder. Hij liep hierop vast op 11 augustus, toen playwright als devDependency binnenkwam (commit 483b1cfd): 114 van de 119 schermtoetsbestanden sloegen zichzelf over bij gebrek aan browser en node meldde dat als groen. Die browser erbij zetten was de reparatie van een gat waar niets anders voor bestond -- en met een opgetelde teller kon die verbetering alleen als verslechtering binnenkomen. Een ratel die rood wordt van een verbetering, leert iedereen om hem te omzeilen.",
       "eerlijkheidshalve": "Dit is een meter die ik OPKNIP en niet een norm die ik verlaag: dependencies blijft op de harde nul staan en meet nu wat hij belooft (runtime: nul, ook vandaag), en devPakketten staat op 1 met dezelfde ratel eronder -- een tweede dev-pakket is nog steeds een besluit dat verantwoord moet worden. Wat ik daarmee wel accepteer is dat het getal 1 nu de nieuwe bodem is in plaats van 0. Geijkt met een echte proef in test/meterijk.test.js, die bovendien controleert dat een dev-pakket de runtime-meter NIET beweegt: zonder die bewering is de scheiding er alleen op papier."
+    },
+    {
+      "datum": "2026-08-12",
+      "meter": "toetsenNietGemeten 205 -> 140 (STRAKKER); toetsenOngevoeligPct 2.3 -> 2.5 (losser, met reden)",
+      "reden": "De mutatiemotor is langs alle 808 .test.js-bestanden gegaan; er is er geen een meer over. 770 van de 820 metingen komen terug als GEZAKT (bewezen gevoelig), waarvan een deel scherp: gezakt op de INHOUD van een antwoord en niet alleen op de inlog.",
+      "eerlijkheidshalve": "DRIE DINGEN DIE ERBIJ HOREN, en de eerste is een fout van mij. Ik zette deze meter eerst op 0 omdat ik zelf .test.js had geteld -- de norm telt ook de 122 .e2e.js-bestanden mee, en de motor meet die niet (zijn eigen bereik is .test.js, want een schermtoets muteren vraagt een browser per operator). Het echte getal is 140: 122 schermtoetsen plus achttien die geen verdict opleverden (geen module gevonden, slaat zichzelf over, muteert zelf). Dat is nog steeds 65 lager dan de norm, en het is de eerlijke 65 en niet de 205 die ik bijna had opgeschreven. Een verkeerd getal in dit logboek is erger dan geen. TWEE: toetsenOngevoeligPct ging van 2.3 naar 2.5, en die verslechtering leg ik met de hand vast omdat de verbetering hierboven anders niet kan landen. Van de gemeten toetsen overleeft nu 2,5% zijn mutatie, twintig stuks. Die twintig zijn niet nieuw en er is niets rot geworden -- ze waren er altijd en niemand had ze gemeten. norm.js beschrijft dit gevaar zelf een alinea lang (een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten) en heeft hem daarom een percentage gemaakt in plaats van een aantal; bij 158 nieuw gemeten bestanden schuift zelfs dat percentage. DRIE: wat die twintig zijn. De meeste zijn STRUCTUURtoetsen (bundeldelen, scriptbundel, wiring-contract, consent-dekking, merge3.property) die invarianten over de BRON bewaken; een mechanische mutatie in de module die ze laden raakt ze terecht niet, en de motor zegt zelf dat groen blijven geen bewijs van waardeloosheid is. De vier met een liegpoort-uitslag zijn de interessante (genreregister, genretoegang, loghygiene, strenge-poort): die praten met een echte server en keken toch niet naar de inhoud van een antwoord. Dat is een lijst om aan te werken, en hij staat nu op tafel in plaats van in het duister."
     }
   ],
   "prestatie": {

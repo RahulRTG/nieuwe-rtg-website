@@ -663,6 +663,14 @@
       "gezakt": 1,
       "geprobeerd": 26
     },
+    "canoniek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ssrf.js",
+      "operator": "return-weg#2",
+      "gezakt": 4,
+      "geprobeerd": 23
+    },
     "care.test.js": {
       "soort": "server",
       "staat": "gezakt",

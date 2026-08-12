@@ -40,6 +40,10 @@
     "RTG-037": {
       "stand": "BEWEZEN",
       "uitleg": "scripts/uitzonderingen.js:   if (dagen < 0) return { stand: 'VERLOPEN', mist: [], dagen }; ->   if (false) return { stand: 'VERLOPEN', mist: [], dagen }; maakt uitzonderingen.test.js rood"
+    },
+    "RTG-038": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/ssrf.js:   const h = canoniekHost(host);   // EEN canonieke vorm, gedeeld met onveiligIpLiteral ->   const h = String(host || '').replace(/^\\[|\\]$/g, '').toLowerCase(); maakt canoniek.test.js rood"
     }
   }
 }

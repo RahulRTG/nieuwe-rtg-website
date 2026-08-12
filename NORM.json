@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs blijft 11 (38 wetten in plaats van 37)",
+      "reden": "RTG-038 legt de foutklasse achter RTG-003 breder vast: een security-beslissing vergelijkt bytes, dus zodra dezelfde betekenis in twee schrijfwijzen bestaat, bestaan er twee uitkomsten. Hij kwam BEWEZEN binnen via sabotage, en met een echte reparatie eronder: de lichte webhook-poort liet het cloud-metadata-endpoint door als IPv4-mapped IPv6.",
+      "eerlijkheidshalve": "test/canoniek.test.js kwam bij de MECHANISCHE mutatiemotor als overleefd binnen, terwijl ik hem met drie gerichte mutaties zelf drie keer heb zien zakken en de sabotagemotor hem BEWEZEN noemt. Dat is precies waarom overleefd twee dingen op een hoop gooit: de operator (===->!== op de eerste plek in ssrf.js) raakt de canonisatie-tak niet. Geen reden om de toets te wantrouwen, wel om het getal in MUTATIES.json niet als eindoordeel te lezen."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "wettenZonderBewijs blijft 11 (37 wetten in plaats van 36)",
       "reden": "RTG-037 erbij -- een uitzondering verloopt, of het is geen uitzondering -- en die kwam meteen BEWEZEN binnen via sabotage. Het register EXCEPTIONS.json legt de drie schulden vast die dit huis al benoemde: het unsafe-inline op style-src-attr, het PIN-slot dat per instance telt, en het sessietoken in de SSE-URL. Elk met risico, compenserende maatregel, eigenaar en vervaldatum.",
       "eerlijkheidshalve": "De mutatieproef ving een tandeloze bewering die ik zelf schreef: de toets liep met een lus over de geimporteerde VERPLICHT-lijst, dus die lijst leegmaken -- de controle volledig uitzetten -- liet de toets GROEN, want een lus over een lege verzameling voert geen enkele assertie uit. Precies de vorm die scripts/tandeloos.js jaagt. De veldnamen staan nu hard in de toets."

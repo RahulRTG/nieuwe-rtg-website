@@ -36,11 +36,62 @@ function privaatIpv4(o) {
   return false;
 }
 
+/* DE CANONIEKE VORM VAN EEN HOST, EN DIE STAAT OP EEN PLEK.
+
+   De foutklasse: zelfde betekenis, andere bytevorm, andere veiligheidsuitkomst.
+   Een security-identiteit die je vergelijkt, moet daarvoor eerst tot EEN vorm
+   worden teruggebracht -- anders vergelijk je de vorm en niet de betekenis.
+
+   Dit is hier geen theorie. metadataDoel() en onveiligIpLiteral() deden allebei
+   hun eigen normalisatie, en die twee liepen uiteen: onveiligIpLiteral pakte
+   `::ffff:169.254.169.254` netjes uit tot het IPv4-adres eronder, metadataDoel
+   niet. Gevolg was dat veiligeWebhookUrl(url, {intern:true}) -- de lichtere
+   poort, die alleen metadata en link-local hoort te weren -- het cloud-metadata-
+   endpoint gewoon doorliet zodra je het in IPv4-mapped IPv6 opschreef:
+
+       http://169.254.169.254/       geweigerd
+       http://[::ffff:169.254.169.254]/   DOOR
+
+   Hetzelfde geldt voor de sluitpunt (`169.254.169.254.`), die in DNS dezelfde
+   naam aanwijst maar niet als IPv4-literal wordt herkend.
+
+   De reparatie is niet "die ene controle erbij in metadataDoel" maar EEN
+   canonieke vorm die allebei de poorten gebruiken. Twee plekken die dezelfde
+   waarheid vasthouden lopen vroeg of laat uit elkaar (LAT.md regel 4), en dat is
+   precies wat hier gebeurd was.
+
+   Wat Node's URL-parser al doet, doen we hier NIET over: die zet decimale,
+   octale en hexadecimale IPv4-vormen (2852039166, 0251.0376.0251.0376,
+   0xa9fea9fe) zelf al om naar het punt-formaat. Wat hij NIET doet is een
+   IPv4-mapped IPv6-literal uitpakken, en dat gat zit hier. */
+function canoniekHost(host) {
+  let h = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
+  if (h.length > 1 && h.endsWith('.')) h = h.slice(0, -1); // sluitpunt: dezelfde naam
+  if (h.startsWith('::ffff:')) {
+    const rest = h.slice(7);
+    if (isIpv4(rest)) return rest;           // ::ffff:10.0.0.1 IS 10.0.0.1
+    /* EN DE DERDE VORM, die de parser zelf maakt. new URL() comprimeert
+       [::ffff:169.254.169.254] tot [::ffff:a9fe:a9fe] -- hetzelfde adres, in
+       hexadecimale woorden. Wie alleen de puntvorm uitpakt, mist dus precies de
+       vorm die er in de praktijk uitkomt: de eerste reparatie hier repareerde
+       metadataDoel() wel als functie, maar veiligeWebhookUrl() liet het
+       metadata-endpoint nog steeds door, omdat de hostname uit de parser al
+       omgezet was. Een canonieke vorm die de vorm van je eigen parser niet kent,
+       is geen canonieke vorm. */
+    const m = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(rest);
+    if (m) {
+      const n = ((parseInt(m[1], 16) * 65536) + parseInt(m[2], 16)) >>> 0;
+      return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+    }
+  }
+  return h;
+}
+
 // Een IP-literal (v4 of v6) die we voor uitgaand verkeer nooit vertrouwen.
 function onveiligIpLiteral(host) {
-  const v4 = isIpv4(host);
+  const h = canoniekHost(host);
+  const v4 = isIpv4(h);
   if (v4) return privaatIpv4(v4);
-  const h = host.replace(/^\[|\]$/g, '').toLowerCase(); // [::1] -> ::1
   if (h === '::1' || h === '::' || h === '::0') return true;       // loopback/onbepaald
   if (h.startsWith('fe80:')) return true;                          // link-local
   if (h.startsWith('fc') || h.startsWith('fd')) return true;       // unique-local fc00::/7
@@ -100,7 +151,7 @@ function veiligeExternalUrl(url) {
    log-endpoint) is een gangbaar en legitiem doel. Dit is het harde minimum dat
    overal geldt; de strengere veiligeExternalUrl blokkeert ook de privé-ranges. */
 function metadataDoel(host) {
-  const h = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
+  const h = canoniekHost(host);   // EEN canonieke vorm, gedeeld met onveiligIpLiteral
   const v4 = isIpv4(h);
   if (v4) return v4[0] === 169 && v4[1] === 254;   // 169.254.0.0/16 (IMDS + link-local)
   if (h.startsWith('fe80:')) return true;          // IPv6 link-local
@@ -123,4 +174,4 @@ function veiligeWebhookUrl(url, opts) {
   return { ok: true };
 }
 
-module.exports = { pushEndpointOk, veiligeExternalUrl, veiligeWebhookUrl, metadataDoel, onveiligIpLiteral };
+module.exports = { pushEndpointOk, veiligeExternalUrl, veiligeWebhookUrl, metadataDoel, onveiligIpLiteral, canoniekHost };

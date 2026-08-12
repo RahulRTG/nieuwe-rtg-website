@@ -13,7 +13,7 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 26 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **BEWEZEN** | 27 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
 | **ONBEPROEFD** | 7 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
@@ -456,6 +456,18 @@ Elk volwassen systeem wijkt ergens van zijn eigen regels af. Het verschil zit ni
 *Toets:* `test/uitzonderingen.test.js`
 
 *Breek hem zo:* zet BIJNA_DAGEN op 0, maak de VERPLICHT-lijst leeg, of laat een verlopen datum als GELDIG tellen
+
+### RTG-038 -- Een security-identiteit heeft voor vergelijking een canonieke vorm, of niet-canonieke vormen worden hard geweigerd
+
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/ssrf.js`
+
+De foutklasse achter RTG-003 is breder dan tokens: een security-beslissing vergelijkt BYTES, dus zodra dezelfde betekenis in twee schrijfwijzen bestaat, bestaan er twee uitkomsten -- en de tweede is de gaatjesroute. Twee keer echt gebeurd. Bij het sessietoken decodeerde ' <token>' naar dezelfde bytes terwijl de intreklijst de rauwe string bewaarde; daar is gekozen voor hard weigeren. Bij het cloud-metadata-adres normaliseerden metadataDoel() en onveiligIpLiteral() allebei zelf en liepen uiteen, waardoor de lichte webhook-poort http://[::ffff:169.254.169.254]/ doorliet terwijl http://169.254.169.254/ geweigerd werd; daar is gekozen voor EEN gedeelde canonieke vorm. En er bleek een derde schrijfwijze te bestaan die de eerste reparatie niet dekte: new URL() comprimeert dat adres zelf tot [::ffff:a9fe:a9fe]. Een canonieke vorm die de vorm van de eigen parser niet kent, is geen canonieke vorm. Waar deze wet nog NIET is nagelopen: e-mailnormalisatie (emailHash trimt en lowercased al), padnormalisatie, headerwaarden, bestandspaden en idempotency-sleutels.
+
+*Handhaver:* `server/kern/ssrf.js`, `server/accounts/tokens.js`
+
+*Toets:* `test/canoniek.test.js`, `test/tokenvorm.test.js`
+
+*Breek hem zo:* laat metadataDoel weer zijn eigen normalisatie doen in plaats van canoniekHost, of haal de ::ffff-hexomzetting eruit
 
 ## Hoe je dit bestand bijwerkt
 

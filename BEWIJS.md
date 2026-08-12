@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 5983 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 924 bestanden en 5987 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 923 |
-| losse beweringen (`test(...)`) | 5983 |
+| toetsbestanden | 924 |
+| losse beweringen (`test(...)`) | 5987 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 619 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 620 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 86 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-803 bestanden, 5768 beweringen.
+804 bestanden, 5772 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -136,6 +136,7 @@ toets omvalt.
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
 | `cache.test.js` | 6 | gezakt op `===->!==` | De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting, treffer/misser-telling, en de response-cache-middleware die een publiek JSON- antwoord memoiseert (miss -> hit) en een niet-200 juist NIET... |
 | `canary.test.js` | 11 | genoemd | De canary (kern/command/canary.js) en de verdeling die erbij hoort (inCanary in server/functies/toegang.js). WAT DEZE TOETS VOORAL BEWAAKT zijn drie dingen die allemaal stil kunnen omslaan en waarvan je het pas merkt... |
+| `canoniek.test.js` | 4 | gezakt op `return-weg#2` | ZELFDE BETEKENIS, ANDERE BYTEVORM, ANDERE VEILIGHEIDSUITKOMST. DE FOUTKLASSE. |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
 | `cdt.test.js` | 8 | -- | De CDT-laag: rittenregistratie en arbeids-, rij- en rusttijden voor het Nederlandse taxivervoer. Draai los: node --experimental-sqlite --test test/cdt.test.js Wat deze toetsen bewaken: 1. |
 | `chaos.pg.test.js` | 3 | slaat zichzelf over | Chaos-/concurrency-test: meerdere gelijktijdige schrijvers naar DEZELFDE Postgres-collectie, om te bewijzen dat er onder contentie niets verloren gaat. Elke "schrijver" is een eigen pg-adapterinstance (eigen... |

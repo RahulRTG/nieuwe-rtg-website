@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "geen meterverschuiving; RTG-038 uitgebreid naar paden",
+      "reden": "De vier categorieen van de canonisatieklasse afgelopen. Pad was raak: het WAF-patroon eiste .. met een letterlijke slash erachter, dus /..%2fetc/passwd, /..%5cx en /%252e%252e/x gingen er doorheen terwijl /../etc/passwd geblokkeerd werd. Nu gaat elk pad eerst door canoniekPad(): tot twee keer percent-decoderen, backslash naar slash, kleine letters, en de patronen kijken naar rauw EN canoniek.",
+      "eerlijkheidshalve": "Twee dingen gingen hier mis in mijn eigen meetopstelling. Eerst hergebruikte ik een schild over alle gevallen; dat bant een IP na vijf treffers, dus alles na het vijfde geval werd geblokkeerd en de probe meldde precies het antwoord dat ik wilde zien. En mijn eerste canoniekPad liet %25 met rust om %25 niet stilletjes tot % te maken -- juist die uitzondering verhinderde het dubbel gecodeerde geval waarvoor de lus bestond. Beide gecorrigeerd, en de toets draagt nu evenveel paden die er DOORHEEN moeten als paden die eruit moeten: een schild met valse alarmen wordt uitgezet en beschermt dan niets."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "wettenZonderBewijs blijft 11 (38 wetten in plaats van 37)",
       "reden": "RTG-038 legt de foutklasse achter RTG-003 breder vast: een security-beslissing vergelijkt bytes, dus zodra dezelfde betekenis in twee schrijfwijzen bestaat, bestaan er twee uitkomsten. Hij kwam BEWEZEN binnen via sabotage, en met een echte reparatie eronder: de lichte webhook-poort liet het cloud-metadata-endpoint door als IPv4-mapped IPv6.",
       "eerlijkheidshalve": "test/canoniek.test.js kwam bij de MECHANISCHE mutatiemotor als overleefd binnen, terwijl ik hem met drie gerichte mutaties zelf drie keer heb zien zakken en de sabotagemotor hem BEWEZEN noemt. Dat is precies waarom overleefd twee dingen op een hoop gooit: de operator (===->!== op de eerste plek in ssrf.js) raakt de canonisatie-tak niet. Geen reden om de toets te wantrouwen, wel om het getal in MUTATIES.json niet als eindoordeel te lezen."

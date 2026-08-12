@@ -2565,6 +2565,14 @@
       "gezakt": 18,
       "scherp": "gezakt"
     },
+    "padvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/schild.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "paginascripts.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"

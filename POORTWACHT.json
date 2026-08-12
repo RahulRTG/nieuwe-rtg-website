@@ -1,83 +1,10 @@
 {
- "open": [
-  {
-   "pad": "/api/fout/client",
-   "methode": "POST",
-   "status": 204,
-   "begin": ""
-  },
-  {
-   "pad": "/api/kantoor/gesprek/start",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"status\":200,\"id\":\"kg570a293f1f4ed849d2\",\"veld\":\"code\",\"verborgen\":true,\"tekst\":\"Welkom bij de RTG-Backoffice. Wat is d"
-  },
-  {
-   "pad": "/api/lab2/bewoner/labs",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"ok\":true,\"labs\":[]}"
-  },
-  {
-   "pad": "/api/lab2/bewoner/kader",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"ok\":true,\"cyclus\":[{\"stap\":\"vraagstuk\",\"naam\":\"Vraagstuk\",\"uitleg\":\"Wat speelt er werkelijk? Een vraag die je fout kun"
-  },
-  {
-   "pad": "/api/onderneming/rechtsvormen",
-   "methode": "GET",
-   "status": 200,
-   "begin": "{\"ok\":true,\"landen\":[\"BE\",\"DE\",\"ES\",\"FR\",\"GB\",\"NL\",\"US\"],\"rechtsvormen\":[{\"id\":\"eenmanszaak\",\"label\":\"Eenmanszaak\",\"kort"
-  },
-  {
-   "pad": "/api/rtfos/publiek/campagnes",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"ok\":true,\"campagnes\":[]}"
-  },
-  {
-   "pad": "/api/rtfos/publiek/jaarverslagen",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"ok\":true,\"aantal\":0,\"jaarverslagen\":[]}"
-  },
-  {
-   "pad": "/api/rtfos/publiek/steden",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"ok\":true,\"wat\":\"De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.\",\"st"
-  },
-  {
-   "pad": "/api/stad/algoritmes",
-   "methode": "GET",
-   "status": 200,
-   "begin": "{\"status\":200,\"wat\":\"De rekenregels die in RTG Stad meedraaien, met hun beslisruimte, hun gegevens en hun bekende beperk"
-  },
-  {
-   "pad": "/api/stad/besluiten",
-   "methode": "GET",
-   "status": 200,
-   "begin": "{\"status\":200,\"aantal\":0,\"besluiten\":[]}"
-  },
-  {
-   "pad": "/api/stad/algoritmes",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"status\":200,\"wat\":\"De rekenregels die in RTG Stad meedraaien, met hun beslisruimte, hun gegevens en hun bekende beperk"
-  },
-  {
-   "pad": "/api/stad/besluiten",
-   "methode": "POST",
-   "status": 200,
-   "begin": "{\"status\":200,\"aantal\":0,\"besluiten\":[]}"
-  }
- ],
+ "open": [],
  "dicht": 3650,
- "stil": 292,
- "publiek": 31,
+ "stil": 294,
+ "publiek": 43,
  "fout": 0,
- "totaal": 3985,
+ "totaal": 3987,
  "perRoute": [
   {
    "methode": "POST",
@@ -309,6 +236,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/avond/aanvragen",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/auth/login",
    "status": 401,
    "oordeel": "dicht"
@@ -352,12 +285,6 @@
   {
    "methode": "POST",
    "pad": "/api/avond",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/avond/aanvragen",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -1161,18 +1088,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/bedrijf/werkruimte",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bedrijf/werkruimte/maak",
-   "status": 400,
-   "oordeel": "stil"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/bedrijf/toen",
    "status": 403,
    "oordeel": "dicht"
@@ -1233,55 +1148,19 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/bedrijf/zoek",
+   "pad": "/api/bedrijf/werkruimte",
    "status": 403,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/bestanden/deel",
-   "status": 401,
-   "oordeel": "dicht"
+   "pad": "/api/bedrijf/werkruimte/maak",
+   "status": 400,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
-   "pad": "/api/bestanden/haal",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/herstel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/leeg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/map",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/mijn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/pdf/notitie",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/bestanden/pdf/notities",
+   "pad": "/api/bestanden/pdf/samenvoegen",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -1293,8 +1172,56 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/bestanden/pdf/samenvoegen",
+   "pad": "/api/bestanden/pdf/notities",
    "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/notitie",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/map",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/leeg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/herstel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/haal",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/deel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/zoek",
+   "status": 403,
    "oordeel": "dicht"
   },
   {
@@ -1707,6 +1634,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/code/scan",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/code/dyn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/chat/history",
    "status": 401,
    "oordeel": "dicht"
@@ -1794,18 +1733,6 @@
    "pad": "/api/cluster/:actie",
    "status": 404,
    "oordeel": "stil"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/code/dyn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/code/scan",
-   "status": 401,
-   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -2583,12 +2510,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/concern/vestiging/zaaklos",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/concern/overzicht",
    "status": 401,
    "oordeel": "dicht"
@@ -2672,27 +2593,9 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/doos/kloon",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/doos/rapport",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/doos/status",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/doos/update",
-   "status": 403,
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/zaaklos",
+   "status": 401,
    "oordeel": "dicht"
   },
   {
@@ -2816,6 +2719,30 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/doos/kloon",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/doos/rapport",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/doos/status",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/doos/update",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "POST",
    "pad": "/api/doos/rapport",
    "status": 403,
@@ -2828,6 +2755,12 @@
    "oordeel": "publiek"
   },
   {
+   "methode": "POST",
+   "pad": "/api/facturen/ai",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "GET",
    "pad": "/api/foundation/bord/:code",
    "status": 404,
@@ -2836,12 +2769,6 @@
   {
    "methode": "POST",
    "pad": "/api/event/rsvp/annuleer",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/facturen/ai",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -3543,13 +3470,13 @@
   },
   {
    "methode": "GET",
-   "pad": "/api/foundation/opgaven/:code",
+   "pad": "/api/foundation/school/belkanaal",
    "status": 404,
    "oordeel": "stil"
   },
   {
    "methode": "GET",
-   "pad": "/api/foundation/school/belkanaal",
+   "pad": "/api/foundation/opgaven/:code",
    "status": 404,
    "oordeel": "stil"
   },
@@ -4625,7 +4552,7 @@
    "methode": "POST",
    "pad": "/api/fout/client",
    "status": 204,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -5441,7 +5368,7 @@
    "methode": "POST",
    "pad": "/api/kantoor/gesprek/start",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -5789,13 +5716,7 @@
    "methode": "POST",
    "pad": "/api/lab2/bewoner/labs",
    "status": 200,
-   "oordeel": "open"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/bewoner/kader",
-   "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -5808,6 +5729,12 @@
    "pad": "/api/lab2/bewoner/paspoort",
    "status": 404,
    "oordeel": "stil"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewoner/kader",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -5991,67 +5918,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/studie/watnu",
-   "status": 401,
-   "oordeel": "dicht"
+   "pad": "/api/lab2/mijn/terugtrekken",
+   "status": 404,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/studie/vraagstuk",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/studie/stap",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/studie/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/studie/besluit",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/studie",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/plan/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/plan/hypothese",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/plan/bron-natrek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/plan/bron",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lab2/plan/advies",
+   "pad": "/api/lab2/opbrengst",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -6063,15 +5936,69 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/opbrengst",
+   "pad": "/api/lab2/plan/advies",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/lab2/mijn/terugtrekken",
-   "status": 404,
-   "oordeel": "stil"
+   "pad": "/api/lab2/plan/bron",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/bron-natrek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/hypothese",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/besluit",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/stap",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/vraagstuk",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/watnu",
+   "status": 401,
+   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -6423,97 +6350,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lucht/bagage/zet",
-   "status": 401,
-   "oordeel": "dicht"
+   "pad": "/api/mail/binnen",
+   "status": 400,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
-   "pad": "/api/lucht/bord",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/charter/beslis",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/charters",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/cockpit",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/draai/taak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/lounge",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/lounge/in",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/lounge/uit",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/security/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/toren/klaring",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/vip/lijst",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/vip/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/vip/taak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/vlucht/gate",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/lucht/vlucht/maak",
+   "pad": "/api/lucht/vlucht/vertraag",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -6525,15 +6368,99 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/lucht/vlucht/vertraag",
+   "pad": "/api/lucht/vlucht/maak",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/mail/binnen",
-   "status": 400,
-   "oordeel": "stil"
+   "pad": "/api/lucht/vlucht/gate",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/taak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/lijst",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/toren/klaring",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/security/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge/uit",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge/in",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/draai/taak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/cockpit",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/charters",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/charter/beslis",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/bord",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/bagage/zet",
+   "status": 401,
+   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -6777,6 +6704,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/mediaos/lijsten",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/maker",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/mall/wijzigingen",
    "status": 401,
    "oordeel": "dicht"
@@ -6838,18 +6777,6 @@
   {
    "methode": "POST",
    "pad": "/api/mediaos/lijst/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/mediaos/lijsten",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/mediaos/maker",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -9159,121 +9086,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/vluchten/bord",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vluchten/charter",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vluchten/incheck",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vluchten/mijn",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vooruit",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vooruit/post",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vooruit/post/neem",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/vooruit/post/negeer",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/wauw/stemming",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/wauw/stemming/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/wauw/terugblik",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/zzp",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/memo/samenvat",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/aanbeveling-intrekken",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/aanbeveling-verberg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/ai/brief",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/ai/oefen",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/ai/profiel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/beveel-aan",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/metier/ik",
+   "pad": "/api/metier/lid",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -9285,7 +9098,121 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/metier/lid",
+   "pad": "/api/metier/ik",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/beveel-aan",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/profiel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/oefen",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/brief",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/aanbeveling-verberg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/aanbeveling-intrekken",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/memo/samenvat",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/zzp",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/terugblik",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/stemming/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/stemming",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post/negeer",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post/neem",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/mijn",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/incheck",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/charter",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/bord",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -9300,6 +9227,12 @@
    "pad": "/api/metier/loon",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/metrics",
+   "status": 404,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
@@ -9432,12 +9365,6 @@
    "pad": "/api/mob/mijn",
    "status": 401,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/metrics",
-   "status": 404,
-   "oordeel": "stil"
   },
   {
    "methode": "GET",
@@ -10941,6 +10868,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/papieren",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/document",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/opvang/dossiers",
    "status": 401,
    "oordeel": "dicht"
@@ -10966,12 +10905,6 @@
   {
    "methode": "POST",
    "pad": "/api/office/paniek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -11032,12 +10965,6 @@
   {
    "methode": "POST",
    "pad": "/api/office/payroll/aangifte/lijst",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren/document",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -11187,37 +11114,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/payroll/runs",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/payroll/verval",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/podium",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/podium/beslis",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/rampbeeld",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/rampbeeld/ai",
+   "pad": "/api/office/rampbeeld/schaal",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -11229,7 +11126,37 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/rampbeeld/schaal",
+   "pad": "/api/office/rampbeeld/ai",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rampbeeld",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/podium/beslis",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/podium",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/payroll/verval",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/payroll/runs",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -11474,12 +11401,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/office/stream",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
    "pad": "/api/office/stad/regime",
    "status": 401,
@@ -11506,6 +11427,12 @@
   {
    "methode": "POST",
    "pad": "/api/office/stad/vloot",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/office/stream",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -12051,13 +11978,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/weefsel/telling",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/weefsel/terugval/zet",
+   "pad": "/api/office/weefsel/uitval",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -12069,7 +11990,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/weefsel/uitval",
+   "pad": "/api/office/weefsel/terugval/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/weefsel/telling",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -12479,7 +12406,7 @@
    "methode": "GET",
    "pad": "/api/onderneming/rechtsvormen",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -13059,13 +12986,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/stem",
+   "pad": "/api/overheid/rijbewijs/verleng",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/rijbewijs/verleng",
+   "pad": "/api/overheid/stem",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -13202,6 +13129,18 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/pasprijzen",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/pay/gezond",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
    "methode": "POST",
    "pad": "/api/overheid/water/meld",
    "status": 401,
@@ -13269,6 +13208,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/pasprijzen",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/partner",
    "status": 404,
    "oordeel": "stil"
@@ -13299,12 +13244,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/partnertrips",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/paspoort/mijn",
    "status": 401,
    "oordeel": "dicht"
@@ -13314,6 +13253,12 @@
    "pad": "/api/paspoort/trek-in",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/partnertrips",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -13334,80 +13279,8 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/pasprijzen",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/pay/gezond",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
    "methode": "POST",
-   "pad": "/api/pasprijzen",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/overzicht",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/saldo",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/stuur",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/tik",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/tikcode",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/tiks",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/verzoek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/verzoek/betaal",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pay/verzoek/intrek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/pin/check",
+   "pad": "/api/pin/status",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -13419,7 +13292,61 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/pin/status",
+   "pad": "/api/pin/check",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/verzoek/intrek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/verzoek/betaal",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/verzoek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tiks",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tikcode",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/tik",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/stuur",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/saldo",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/pay/overzicht",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -13508,12 +13435,6 @@
    "oordeel": "publiek"
   },
   {
-   "methode": "GET",
-   "pad": "/api/ready",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
    "methode": "POST",
    "pad": "/api/podium/live",
    "status": 401,
@@ -13524,6 +13445,12 @@
    "pad": "/api/podium/meld",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/ready",
+   "status": 200,
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -14649,19 +14576,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/spel/arcade-score",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/spel/dag",
-   "status": 403,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/spel/dag-klaar",
+   "pad": "/api/rtf/spel/kijk",
    "status": 403,
    "oordeel": "dicht"
   },
@@ -14673,7 +14588,19 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/spel/kijk",
+   "pad": "/api/rtf/spel/dag-klaar",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/dag",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/arcade-score",
    "status": 403,
    "oordeel": "dicht"
   },
@@ -14937,13 +14864,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/welzijn/stemming",
+   "pad": "/api/rtf/tiener/toets-weg",
    "status": 403,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/welzijn/dagboek",
+   "pad": "/api/rtf/tiener/toetsen",
    "status": 403,
    "oordeel": "dicht"
   },
@@ -14955,13 +14882,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/tiener/toetsen",
+   "pad": "/api/rtf/welzijn/dagboek",
    "status": 403,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtf/tiener/toets-weg",
+   "pad": "/api/rtf/welzijn/stemming",
    "status": 403,
    "oordeel": "dicht"
   },
@@ -15695,13 +15622,13 @@
    "methode": "POST",
    "pad": "/api/rtfos/publiek/campagnes",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/publiek/jaarverslagen",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -15713,7 +15640,7 @@
    "methode": "POST",
    "pad": "/api/rtfos/publiek/steden",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -15945,97 +15872,31 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/voorraad/binnen",
+   "pad": "/api/rtgid/wie",
+   "status": 403,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/weiger",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/voorraad/uit",
-   "status": 401,
-   "oordeel": "dicht"
+   "pad": "/api/rtgid/status",
+   "status": 404,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/code",
-   "status": 401,
-   "oordeel": "dicht"
+   "pad": "/api/rtgid/start",
+   "status": 400,
+   "oordeel": "stil"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/evaluatie",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/koppel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/uren",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/uren-bevestig",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilliger/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/vrijwilligers",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/zetel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/zetel/weg",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/bevestig",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/intrek",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/inzage",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/koppel",
+   "pad": "/api/rtgid/machtig/intrek",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -16047,32 +15908,98 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/machtig/intrek",
+   "pad": "/api/rtgid/koppel",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/start",
-   "status": 400,
-   "oordeel": "stil"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/status",
-   "status": 404,
-   "oordeel": "stil"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtgid/weiger",
+   "pad": "/api/rtgid/inzage",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/rtgid/wie",
-   "status": 403,
+   "pad": "/api/rtgid/intrek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgid/bevestig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/zetel/weg",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/zetel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilligers",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/uren-bevestig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/uren",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/koppel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/evaluatie",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/vrijwilliger/code",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/voorraad/uit",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/voorraad/binnen",
+   "status": 401,
    "oordeel": "dicht"
   },
   {
@@ -16256,12 +16183,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/scim/v2/Users",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
    "pad": "/api/samen/maak",
    "status": 401,
@@ -16359,12 +16280,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/scim/v2/Users",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/site/live",
    "status": 401,
    "oordeel": "dicht"
@@ -16383,7 +16298,19 @@
   },
   {
    "methode": "GET",
+   "pad": "/api/scim/v2/Users",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
    "pad": "/api/scim/v2/Users/:id",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/scim/v2/Users",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -16449,6 +16376,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/sleutelwoorden/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/sleutelwoorden/status",
    "status": 401,
    "oordeel": "dicht"
@@ -16470,12 +16403,6 @@
    "pad": "/api/sonde/melding",
    "status": 404,
    "oordeel": "stil"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/sleutelwoorden/zet",
-   "status": 401,
-   "oordeel": "dicht"
   },
   {
    "methode": "POST",
@@ -16557,15 +16484,15 @@
   },
   {
    "methode": "GET",
-   "pad": "/api/stad/algoritmes",
+   "pad": "/api/stad/besluiten",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "GET",
-   "pad": "/api/stad/besluiten",
+   "pad": "/api/stad/algoritmes",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -16683,21 +16610,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/stad/algoritmes",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/stad/bewoner",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/stad/algoritmes",
-   "status": 200,
-   "oordeel": "open"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/stad/besluiten",
    "status": 200,
-   "oordeel": "open"
+   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -16988,50 +16915,8 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/stream",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
-   "pad": "/api/staff/trust/send",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/staff/trust/thread",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/staff/voorspel",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/state",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/aanbieding",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/aandacht",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/aandacht/klaar",
+   "pad": "/api/supplier/aanwezig/leeg",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -17043,7 +16928,43 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/aanwezig/leeg",
+   "pad": "/api/supplier/aandacht/klaar",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/aandacht",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/aanbieding",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/state",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/voorspel",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/trust/thread",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/trust/send",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -17128,6 +17049,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/agenda/wijzig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/stream",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -18189,6 +18116,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/event/runsheet/done",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/facturen/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/finance",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkin",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/event/checkin",
    "status": 401,
    "oordeel": "dicht"
@@ -18213,12 +18164,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/event/runsheet/done",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/facturen/ai",
    "status": 401,
    "oordeel": "dicht"
@@ -18231,12 +18176,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/facturen/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/facturen/mijn",
    "status": 401,
    "oordeel": "dicht"
@@ -18244,12 +18183,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/facturen/pdf",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/finance",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -18268,12 +18201,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/baan",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/fitclub/checkin",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -18675,6 +18602,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/bezorg/zone",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/bezorg/check",
    "status": 401,
    "oordeel": "dicht"
@@ -18694,12 +18627,6 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/bezorg/sloten",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/horeca/bezorg/zone",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -19365,31 +19292,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/kantoorpakket/terug",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/kantoorpakket/uitslag",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/kantoorpakket/versies",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/kantoorpakket/vul",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/kantoorpakket/weg",
+   "pad": "/api/supplier/kassa/derving",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -19401,13 +19304,37 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/kassa/dagrapport",
+   "pad": "/api/supplier/kantoorpakket/weg",
    "status": 401,
    "oordeel": "dicht"
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/kassa/derving",
+   "pad": "/api/supplier/kantoorpakket/vul",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/versies",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/uitslag",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/terug",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kassa/dagrapport",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -19617,12 +19544,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/markt/antwoord",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/supplier/mall",
    "status": 401,
    "oordeel": "dicht"
@@ -19720,6 +19641,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/markt/ai",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/markt/antwoord",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -21308,12 +21235,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/supplier/stream",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
    "methode": "POST",
    "pad": "/api/supplier/staff/invites",
    "status": 401,
@@ -21334,6 +21255,12 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/staff/reset-pin",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/supplier/stream",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22029,25 +21956,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/zorg/seh/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/zorg/verwijs/maak",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/zorg/verwijs/zet",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/supplier/zorgpolis",
+   "pad": "/api/supplier/zorgpolis/declaratie/beslis",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22059,7 +21968,25 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/zorgpolis/declaratie/beslis",
+   "pad": "/api/supplier/zorgpolis",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/zorg/verwijs/zet",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/zorg/verwijs/maak",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/zorg/seh/zet",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22098,12 +22025,6 @@
    "pad": "/api/techniek/alarm/proef",
    "status": 401,
    "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/talen",
-   "status": 200,
-   "oordeel": "publiek"
   },
   {
    "methode": "POST",
@@ -22161,6 +22082,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/talen",
+   "status": 200,
+   "oordeel": "publiek"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/techniek/inloggen",
    "status": 401,
    "oordeel": "dicht"
@@ -22180,24 +22107,6 @@
   {
    "methode": "GET",
    "pad": "/api/techniek/papieren/document",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/techniek/sso",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/techniek/status",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/techniek/wacht/bord",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22238,6 +22147,36 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/techniek/sso",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/techniek/status",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/techniek/wacht/bord",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/document",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "POST",
    "pad": "/api/techniek/sso/scimsleutel",
    "status": 401,
@@ -22257,6 +22196,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/techniek/vingerafdruk",
+   "status": 404,
+   "oordeel": "stil"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/vingerafdruk/verschil",
+   "status": 404,
+   "oordeel": "stil"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/techniek/wacht/analyseer",
    "status": 401,
    "oordeel": "dicht"
@@ -22270,12 +22221,6 @@
   {
    "methode": "POST",
    "pad": "/api/techniek/wacht/beslis",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/sso",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22311,6 +22256,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/techniek/sso",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/theater/huisstijl",
    "status": 401,
    "oordeel": "dicht"
@@ -22318,24 +22269,6 @@
   {
    "methode": "POST",
    "pad": "/api/theater/kanaal/aanmeld",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren/document",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "GET",
-   "pad": "/api/theater/kijk/:id",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22353,12 +22286,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/theater/kijkplicht/stand",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
    "pad": "/api/theater/kijkplicht/zet",
    "status": 401,
    "oordeel": "dicht"
@@ -22371,7 +22298,13 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/theater/reacties",
+   "pad": "/api/theater/reactie",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/theater/kijkplicht/stand",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22384,6 +22317,12 @@
   {
    "methode": "POST",
    "pad": "/api/theater/thuis/aanwezig",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/theater/upload/:id",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22448,8 +22387,20 @@
    "oordeel": "dicht"
   },
   {
+   "methode": "GET",
+   "pad": "/api/theater/kijk/:id",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
    "methode": "POST",
    "pad": "/api/thuis/boek",
+   "status": 401,
+   "oordeel": "dicht"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/theater/reacties",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -22462,18 +22413,6 @@
   {
    "methode": "POST",
    "pad": "/api/thuis/checkin",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/theater/reactie",
-   "status": 401,
-   "oordeel": "dicht"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/theater/upload/:id",
    "status": 401,
    "oordeel": "dicht"
   },
@@ -23918,12 +23857,6 @@
    "oordeel": "dicht"
   },
   {
-   "methode": "GET",
-   "pad": "/api/zegel/sleutel",
-   "status": 200,
-   "oordeel": "publiek"
-  },
-  {
    "methode": "POST",
    "pad": "/api/zakelijk/kans/sluit",
    "status": 401,
@@ -23988,6 +23921,12 @@
    "pad": "/api/zorgprofiel/zet",
    "status": 401,
    "oordeel": "dicht"
+  },
+  {
+   "methode": "GET",
+   "pad": "/api/zegel/sleutel",
+   "status": 200,
+   "oordeel": "publiek"
   }
  ]
 }

@@ -66,6 +66,7 @@
     "rolproef": "node --experimental-sqlite scripts/rolproef-route.js",
     "invoerproef": "node --experimental-sqlite scripts/invoerproef-route.js",
     "idemproef": "node --experimental-sqlite scripts/idemproef-route.js",
+    "staatproef": "node --experimental-sqlite scripts/staatproef-route.js",
     "kosten": "node --experimental-sqlite scripts/duurzaamheidskosten.js",
     "verraadcatalogus": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\"",
     "verraad": "node --experimental-sqlite scripts/verraadronde.js",

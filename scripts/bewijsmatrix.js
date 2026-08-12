@@ -87,6 +87,7 @@ const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) |
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
+const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -111,19 +112,19 @@ const SCHAKELS = [
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
     bron: null, nodig: 'de liegpoort per ROUTE i.p.v. per toetsbestand (RTG_LIEG neemt nu /api/ in één keer)' },
   { id: 'STATE', uitleg: 'staat de toestand na afloop zoals beloofd',
-    bron: null, nvtBijLezen: true, nodig: 'een voor/na-vingerafdruk per route' },
+    bron: 'scripts/staatproef-route.js (vingerafdruk voor en na, per route geijkt)', nvtBijLezen: true },
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
-    bron: null, nvtBijLezen: true, nodig: 'de uitgaande kanalen aftappen tijdens de proef' },
+    bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
+    nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
     bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
-    bron: 'scripts/idemproef-route.js (drie oproepen, twee sleutels; de derde ijkt of een tweede effect hier zichtbaar zou zijn)',
-    nvtBijLezen: true,
-    nodig: 'de meeste routes blijven ongemeten tot er een per-route vingerafdruk is: van BUITEN is een stille tweede schrijfactie niet te zien' },
+    bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
+    nvtBijLezen: true },
   { id: 'FAILURE', uitleg: 'faalt hij netjes als er iets onder hem wegvalt',
     bron: 'scripts/ketenronde.js (echte sabotage op de keten waar deze route in zit)' },
   { id: 'ROLLBACK', uitleg: 'laat een half mislukte oproep niets half achter',
-    bron: 'scripts/ketenronde.js', nvtBijLezen: true },
+    bron: 'scripts/ketenronde.js + scripts/staatproef-route.js (geweigerd, en bleef de toestand gelijk)', nvtBijLezen: true },
   { id: 'PRIVACY', uitleg: 'lekt het antwoord een echte naam, IBAN of e-mailadres',
     bron: 'scripts/rolproef-route.js (op de WEIGERING; nog niet op een geslaagd antwoord)' }
 ];
@@ -290,6 +291,7 @@ function bouw(invoer) {
   const keten = inv.keten !== undefined ? inv.keten : ketenUitslag();
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
+  const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -330,6 +332,34 @@ function bouw(invoer) {
           cellen[s.id] = goed
             ? { staat: 'bewezen', bron: 'ketenronde' }
             : { staat: 'gezakt', bron: 'ketenronde', reden: k.stil ? 'stil verlies' : 'rollback niet bewezen' };
+          continue;
+        }
+        /* ROLLBACK HEEFT SINDS DE STAATPROEF EEN TWEEDE BRON, en de volgorde is
+           met opzet deze. De ketenronde is het ZWAARSTE bewijs: echte sabotage,
+           een herstart, en gemeten of het geld er daarna nog is -- maar hij dekt
+           drie routes. De staatproef is lichter (geweigerd, en bewoog de opslag
+           niet) en dekt er duizenden. Waar de zware spreekt, telt de zware; waar
+           hij zwijgt, mag de lichte iets zeggen. Elke cel noemt zijn bron, dus
+           het blijft leesbaar welke van de twee sprak. */
+        const st = s.id === 'ROLLBACK' && staat && staat.get(sleutel);
+        if (st && st.rollback === 'bewezen') {
+          cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: st.reden };
+        } else if (st && st.rollback === 'GEZAKT') {
+          cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: st.reden };
+        } else {
+          cellen[s.id] = { staat: 'ongemeten' };
+        }
+        continue;
+      }
+
+      if (s.id === 'STATE' || s.id === 'SIDE_EFFECT') {
+        const st = staat && staat.get(sleutel);
+        const veld = s.id === 'STATE' ? 'state' : 'sideEffect';
+        if (st && st[veld] === 'bewezen') {
+          cellen[s.id] = { staat: 'bewezen', bron: 'staatproef',
+            ...(s.id === 'SIDE_EFFECT' ? { collecties: st.collecties } : {}) };
+        } else if (st) {
+          cellen[s.id] = { staat: 'ongemeten', bron: 'staatproef', reden: st.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
@@ -364,6 +394,15 @@ function bouw(invoer) {
       }
 
       if (s.id === 'IDEMPOTENCY') {
+        /* TWEE INSTRUMENTEN, EEN VOLGORDE. De staatproef kijkt naar de TOESTAND en
+           is daarmee strikt sterker dan de idemproef, die het aan het ANTWOORD
+           moet aflezen. Waar de staatproef een oordeel heeft, telt dat; waar hij
+           zwijgt (de eerste oproep bewoog niets) mag de idemproef nog iets
+           zeggen -- die ziet soms een nieuw id in een antwoord waar de opslag
+           niet zichtbaar bewoog. Elke cel noemt zijn bron. */
+        const stI = staat && staat.get(sleutel);
+        if (stI && stI.idempotentie === 'bewezen') { cellen[s.id] = { staat: 'bewezen', bron: 'staatproef', reden: stI.idemReden }; continue; }
+        if (stI && stI.idempotentie === 'GEZAKT') { cellen[s.id] = { staat: 'gezakt', bron: 'staatproef', reden: stI.idemReden }; continue; }
         const id = idemKaart && idemKaart.get(sleutel);
         if (id && id.idempotentie === 'beschermd') cellen[s.id] = { staat: 'bewezen', bron: 'idemproef', reden: id.reden };
         /* ONBESCHERMD IS HIER GEZAKT, en dat vraagt uitleg. Het register houdt

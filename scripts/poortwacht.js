@@ -72,6 +72,21 @@ const PUBLIEK = new Map([
   ['/api/webauthn/opties', 'passkey-inlog begint voor je bent ingelogd'],
   ['/api/zegel/controleer', 'partners verifieren een zegel; de sleutel is toch al publiek'],
   ['/api/translate', 'de taalkiezer staat op het inlogscherm; met rem, en zonder inlog geen AI'],
+  /* DE TWAALF DIE DE RONDE VAN 12 AUGUSTUS AANWEES. Ze stonden alle twaalf al in
+     de bron beschreven als bewust open, maar niet hier -- en zolang dat zo was,
+     telde de AUTH-kolom ze als GEZAKT. Een deur die met opzet openstaat en
+     nergens als zodanig genoteerd is, is niet te onderscheiden van een deur die
+     iemand vergat te sluiten. Vandaar per regel de reden, uit de code zelf. */
+  ['/api/fout/client', 'een fout die het inloggen sloopt, komt nooit binnen achter een poort die inloggen vereist; met een lijfgrens van 4 kB en een rem per IP'],
+  ['/api/kantoor/gesprek/start', 'vervangt het codeveld van de backoffice-inlog en heeft dezelfde rem; er komt nooit iets terug wat de beller intypte'],
+  ['/api/lab2/bewoner/labs', 'het publieke beeld van een living lab: alleen naam, stad en land van de ACTIEVE labs, zonder budget, tekenaars of partners'],
+  ['/api/lab2/bewoner/kader', 'de spelregels van het onderzoek zelf; die horen juist openbaar te zijn'],
+  ['/api/onderneming/rechtsvormen', 'een vaste lijst rechtsvormen per land; algemene kennis, geen gegevens'],
+  ['/api/rtfos/publiek/campagnes', 'het publieke gezicht van de RTFoundation: welke campagnes lopen er'],
+  ['/api/rtfos/publiek/jaarverslagen', 'verantwoording van een goededoelenstichting hoort openbaar te zijn'],
+  ['/api/rtfos/publiek/steden', 'in welke steden de RTFoundation samenwerkt; geen personen'],
+  ['/api/stad/algoritmes', 'het transparantieregister: welke rekenregels meedraaien, met hun beslisruimte en hun bekende beperkingen'],
+  ['/api/stad/besluiten', 'het besluitenregister; er zitten geen personen in -- fracties stemmen met zetels en een collegestem draagt een functie'],
   ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
   ['/api/pasprijzen', 'de prijzen staan op de website'],
   ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],

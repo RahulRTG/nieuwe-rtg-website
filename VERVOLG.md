@@ -12,30 +12,36 @@ volgende handeling.
 ## De stand in getallen
 
 ```
-BEWIJSMATRIX     12.365 bewezen · 31.102 ongemeten · 108 gezakt  (43.835 cellen)
-                 instrument op 7 van de 11 kolommen
-                 nog leeg: OUTPUT  STATE  SIDE_EFFECT  AUDIT
+BEWIJSMATRIX     13.025 bewezen · 30.472 ongemeten  (43.857 cellen)
+                 instrument op 9 van de 11 kolommen
+                 nog leeg: OUTPUT  AUDIT
 DUURZAAM         geld · notities · agenda · bestanden · berichten
                  kosten: p50 x2,01 · p95 x1,49 · p99 x0,84 (controle x1,03)
-CONTROLS         11, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD) en
+CONTROLS         12, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD) en
                  1 hier niet meetbaar (UI-WAARHEID: geen browser in deze omgeving)
 VERRAADSMOTOR    4 / 9 ingebouwd
 KETENS           3 ketens · 9 scenarios · 4 voldoen aan de lat
                  GELDPROVEN 2/3 · rollback bewezen 2 · stilVerlies 0
+POORTWACHT       3.987 routes · 0 open · 43 publiek met een reden
 ROL-SCHEIDING    2.937 / 2.937 schrijfroutes · 0 doorbraken · 0 lekken
 INVOER           2.510 / 2.936 routes voorbij de poort · 0 breuken · 0 sporen
-IDEMPOTENTIE     12 beschermd · 94 onbeschermd · 106 van 2.936 beoordeeld
+IDEMPOTENTIE     12 beschermd · 94 onbeschermd · 106 van 2.936 (op het ANTWOORD)
+TOESTAND         555 / 2.936 beoordeeld (begrensde ronde) · 0 rollback gezakt
+                 STATE 58 · SIDE_EFFECT 58 · ROLLBACK 497 · IDEM 35/58
 KLOK             1.298 directe tijdsaanroepen · 2 modules op de klok
 ```
 
-De sprong van 5.984 naar 12.365 komt uit stap B: de rolproef over alle routes in
-plaats van een derde, plus twee nieuwe instrumenten (INVOER en IDEMPOTENCY).
+Van 5.972 naar 13.025 bewezen cellen in één dag: stap B (de rolproef over alle
+routes, plus INVOER en IDEMPOTENCY) en stap D (de toestandsvingerafdruk, die in
+zijn eentje STATE, SIDE_EFFECT en ROLLBACK opent).
 
-**De 108 gezakte cellen zijn geen nieuwe schade**, ze zijn nieuw ZICHTBAAR:
-12 routes waar de poortwacht zonder token binnenkwam (die stonden daarvoor als
-*bewezen* in de matrix — zie de valkuilen), en 94 routes waar een herhaalde
-opdracht het gewoon nog een keer doet. Dat laatste is een werklijst van routes
-die een idem-sleutel nodig hebben, geen lijst met bugs.
+**De twaalf open voordeuren zijn dicht** — niet met een poort maar met een
+besluit: alle twaalf stonden in de bron al beschreven als bewust publiek en staan
+nu met een reden per regel op de PUBLIEK-lijst (TAKEN 4.29).
+
+Wat er aan gezakte cellen overblijft, zijn de 94 routes waar een herhaalde
+opdracht het gewoon nog een keer doet. Dat is een werklijst voor idem-sleutels,
+geen buglijst.
 
 Alle poorten groen, werkboom schoon.
 
@@ -43,10 +49,11 @@ Alle poorten groen, werkboom schoon.
 
 1. **`saveDuurzaam()` gaat gelden voor geld én alles wat een lid zelf maakt** —
    notities, agenda, bestanden, berichten. Niet voor herbouwbare toestand. Zie
-   `GELDLAT.md`, paragraaf over de reikwijdte. **Geld en notities zijn
-   aangesloten; agenda, bestanden en berichten nog niet.**
+   `GELDLAT.md`, paragraaf over de reikwijdte. **Alle vijf aangesloten**; alleen
+   `kern/bestanden-delen.js` staat nog open.
 2. **De invariantenmotor is de volgende laag** (niveau 5 uit `TOEZICHT.md`), met
-   vijf kandidaat-wetten die daar al staan.
+   vijf kandidaat-wetten die daar al staan. De toestandsvingerafdruk uit stap D
+   is daarvan het meetdeel; wat er nog ontbreekt zijn de WETTEN zelf.
 
 ## De eerstvolgende handelingen, op volgorde
 
@@ -124,7 +131,37 @@ De schakelaar die de tweede meting mogelijk maakt (`RTG_DUURZAAM=uit`) weigert i
 productie en schreeuwt bij elke start. Het is letterlijk de knop die de belofte
 uitzet.
 
-### D. STATE, SIDE_EFFECT en ROLLBACK — NIET GEBOUWD, en dit is wat hem blokkeert
+### ~~D. STATE, SIDE_EFFECT en ROLLBACK~~ — GEBOUWD op 12 augustus
+
+`server/lib/vingerafdruk.js` + `/api/techniek/vingerafdruk` (achter techAuth) +
+`npm run staatproef`. Per collectie een aantal en een gezouten hash over de
+rij-hashes; nooit inhoud. Drie vingerafdrukken rond twee gelijke oproepen vullen
+vier kolommen tegelijk.
+
+**Drie regels die uit een echte valse bevinding zijn geboren**, en die alle drie
+in `test/staatproef.test.js` staan:
+
+1. **De per-route ijking.** Bewoog de eerste oproep niets, dan zegt "de herhaling
+   bewoog ook niets" niets. Ongemeten, met reden.
+2. **Omgevingsruis.** `doorgeefjournaal` en `rtgai` bewegen bij élk verzoek, ook
+   bij een 404 — het huis dat opschrijft dat er is aangeklopt. De eerste ronde
+   meldde negentien loze "geweigerd en toch veranderd" op rij. Ruis wordt nu
+   gemeten in plaats van geraden: wat in ELKE ijkronde beweegt, en niet wat er
+   één keer bewoog (dat verschil houdt `notities` in beeld).
+3. **Eerste aanraking.** Een kern die zijn la inricht (`bankregie` met
+   standaardwaarden) verandert de toestand ook als het verzoek daarna 403 geeft.
+   Inrichting gebeurt één keer; de tweede, even hard geweigerde oproep laat alles
+   met rust. Dát is het onderscheid, en het is meetbaar in plaats van geraden.
+
+**Wat er nog niet in zit.** De meting wordt duurder naarmate hij vordert: de
+proef maakt zelf data, en elke vingerafdruk hasht de hele opslag. Een volledige
+ronde over 2.936 routes loopt daardoor niet lineair. Zolang dat zo is, draait hij
+met een begrenzing die in het register staat (`gemeten.begrenzing`) — niet stil
+afgekapt. De goedkope reparatie is een vingerafdruk die alleen de collecties
+hasht die sinds de vorige aanroep van versie zijn veranderd; de opslag houdt die
+versienummers al bij.
+
+### ~~D-oud~~ — wat hem blokkeerde, voor de geschiedenis
 
 Niet als drie losse meters bouwen. Ze vragen alle drie een per-route
 vingerafdruk van "wat is er veranderd", en dat is precies de invariantenmotor.

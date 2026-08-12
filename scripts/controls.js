@@ -54,6 +54,7 @@ const BRONNEN = [
   'scripts/lib/rolproef.js',
   'scripts/lib/invoerproef.js',
   'scripts/lib/idemproef.js',
+  'scripts/lib/staatproef.js',
   'scripts/bewijsmatrix.js'
 ];
 

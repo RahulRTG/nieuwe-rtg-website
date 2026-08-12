@@ -54,7 +54,11 @@ const POOL = ['horeca', 'mobility', 'onderhoud', 'inkoper', 'toelever', 'keten',
      nooit door iemand gespeeld werd; zonder deze drie meet de tabel hierboven
      de balans van zijn eigen cast. Zie de uitleg bij PROFIELEN in
      ./magnaat-strateeg.js. */
-  'kantoorwijk', 'fabriek', 'uitgaan'];
+  'kantoorwijk', 'fabriek', 'uitgaan',
+  /* En de twee die loondienst spelen (VERHAAL.md stap 1). Zonder deze twee meet
+     het lab die laag helemaal niet -- dezelfde blinde vlek als de drie sectoren
+     hierboven, en om dezelfde reden erg. */
+  'werknemer', 'werkgever'];
 /* De drie tafels. Twee spelers op 144 kavels lopen elkaar nooit tegen het lijf;
    zes willen er samen meer dan er zijn. Dat verschil is zelf een meetas: een
    stijl die alleen aan een lege tafel wint, wint niet. */

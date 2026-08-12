@@ -83,6 +83,26 @@
    economieen. Wat de soorten betekenen en wat een handelseenheid kost staat in
    ./handel.js, bij de laag die ermee rekent. */
 
+/* WAT EEN EENHEID PER MAAND VAST KOST, en waarom kantoor en industrie zijn
+   bijgesteld. Dit is ijking 4 uit fase A, nog een keer en op twee andere
+   sectoren. Daar stond het over logistiek: "had vrijwel geen vaste lasten (41
+   per voertuig) en dus geen enkele hefboom -- leegstand deed er niet aan pijn.
+   Een vloot heeft verzekering, belasting en een depot."
+
+   Precies hetzelfde gold hier. Gemeten als deel van de steen:
+
+     logistiek 2,17%   vrije-tijd 0,95%   retail 0,67%   horeca 0,58%
+     hotel 0,19%       kantoor 0,08%      industrie 0,08%
+
+   Een werkplek van 36.966 die 28 per maand kost, en een productielijn van
+   71.831 die er 55 kost: dat is een orde van grootte onder de rest. Zulke
+   panden hebben energie, onderhoud, verzekering en schoonmaak, en zonder die
+   post doet leegstand geen pijn -- je kunt dertig kantoren aanhouden zonder
+   nadeel. Nu op 0,5% van de bouwsom, tussen hotel en horeca in.
+
+   Het scheelde in de sectorproef 8,9x naar 6,7x spreiding. De rest van die
+   spreiding komt ergens anders vandaan en staat als open bevinding in TAKEN.md;
+   dit is de post die aantoonbaar FOUT stond, niet de post die hem oplost. */
 const SECTOREN = {
   horeca: {
     naam: 'Restaurant', eenheid: 'stoelen', perMaand: 36, perMedewerker: 14, markt: 669, bouw: 5903,
@@ -121,14 +141,14 @@ const SECTOREN = {
   },
   kantoor: {
     naam: 'Zakelijke dienst', eenheid: 'werkplekken', perMaand: 2.6, perMedewerker: 1, markt: 31, bouw: 36966,
-    prijs: [1800, 3200, 5600], inkoop: 0.12, loon: 3600, vast: 28,
+    prijs: [1800, 3200, 5600], inkoop: 0.12, loon: 3600, vast: 185,
     trekt: { zakelijk: 2.6, gezinnen: 0.2, ouderen: 0.2, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1,
     levert: 'diensten', koopt: { diensten: 0.55, goederen: 0.30, vervoer: 0.15 }
   },
   industrie: {
     naam: 'Productie', eenheid: 'productielijnen', perMaand: 20, perMedewerker: 2, markt: 133, bouw: 71831,
-    prijs: [420, 760, 1350], inkoop: 0.45, loon: 2900, vast: 55,
+    prijs: [420, 760, 1350], inkoop: 0.45, loon: 2900, vast: 359,
     trekt: { zakelijk: 2.4, gezinnen: 0.1, ouderen: 0.1, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1,
     levert: 'productie', koopt: { productie: 0.40, goederen: 0.30, vervoer: 0.30 }

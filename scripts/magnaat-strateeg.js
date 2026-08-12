@@ -36,7 +36,7 @@ const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { VRAAGFACTOR, KOSTENSTAND } = require('../server/kern/spellen/magnaat/prijsstand');
 const { basisvraag, drukFactor } = require('../server/kern/spellen/magnaat/vraag');
-const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
+const { rendabelVanaf, personeelNodig } = require('../server/kern/spellen/magnaat/maat');
 const { MARKTPRIJS } = require('../server/kern/spellen/magnaat/handel');
 const ONDERZOEK = require('../server/kern/spellen/magnaat/onderzoek');
 
@@ -100,12 +100,30 @@ const PROFIELEN = {
     }
   },
   service: {
+    /* HOGE SERVICE: duur, ruim bemand, goed onderhouden.
+
+       DE BEZETTING WAS EEN LEK, en het is dezelfde fout als de allereerste in
+       de geschiedenis van dit spel -- in spiegelbeeld. Toen won de speler die
+       MINDER personeel aannam, omdat capaciteit niet de bindende factor was.
+       Hier stond `if (v.gemist > 0) personeel + 1`, elke maand opnieuw en
+       zonder dak. Maar `gemist` is vraag die je pand niet AANKAN, en de
+       capaciteit is `min(omvang, personeel * perMens)`: zodra je genoeg mensen
+       hebt, doet de volgende er niets meer. Dus bleef `gemist` staan en bleef
+       hij aannemen. Gemeten: een hotel van EEN kamer met ZES medewerkers,
+       vijftienduizend aan loon per maand voor een pand dat er twee kan dragen.
+       Dat profiel draaide -1,9x met 100% insolventie, en sleepte `niets doen`
+       mee naar een winrate van zeven procent.
+
+       Ruim bemannen is een stijl; boven wat er nodig is doorgaan is een
+       rekenfout. `personeelNodig` staat op het scherm en is dus het getal waar
+       een speler op zou kijken. */
     naam: 'hoge service', zones: ['boulevard', 'station'], prijs: 'hoog',
     doe(s) {
       if (!s.mijn.length) return s.open('hotel');
       for (const v of s.mijn) {
         s.beleid(v, { onderhoud: Math.round(v.omvang * 30) });
-        if (v.gemist > 0) s.beleid(v, { personeel: v.personeel + 1 });
+        if (v.gemist > 0 && v.personeel < v.personeelNodig)
+          s.beleid(v, { personeel: Math.min(v.personeelNodig, v.personeel + 1) });
       }
       s.open('hotel');
     }
@@ -287,6 +305,39 @@ const PROFIELEN = {
   uitgaan: {
     naam: 'vrije tijd', zones: ['boulevard'],
     doe(s) { s.open('vrije-tijd'); }
+  },
+
+  /* ---------- loondienst: de stijl die geen eigen zaak begint ----------
+     VERHAAL.md stap 1 gaf spelers de mogelijkheid om voor elkaar te werken, en
+     tot nu toe mat geen enkel profiel die laag -- het toernooi en het lab
+     speelden er dus omheen. Dat is dezelfde blinde vlek als de drie sectoren
+     die niemand speelde, en om dezelfde reden erg: een laag die niet gemeten
+     wordt, groeit stil scheef.
+
+     TWEE STIJLEN, want een alleen bewijst niets. `werknemer` begint nooit een
+     eigen zaak en leeft van zijn loon; `werkgever` bouwt en zet er meteen een
+     bedrijfsleider op. Samen beantwoorden ze de vraag waar de laag om draait:
+     is in dienst gaan een echte keuze naast ondernemen, of een manier om te
+     verliezen? */
+  werknemer: {
+    naam: 'in loondienst', zones: [],
+    doe(s) {
+      if (s.baan) return;                       // je hebt werk; doe je werk
+      const beste = (s.vacatures || []).sort((a, b) => b.loon - a.loon)[0];
+      if (beste) s.solliciteer(beste.id);
+    }
+  },
+  werkgever: {
+    naam: 'zaak met bedrijfsleider', zones: ['boulevard', 'centrum'],
+    doe(s) {
+      if (!s.mijn.length) return s.open('horeca');
+      /* Op elke zaak zonder leiding een functie openstellen, en aannemen wie er
+         reageert. Wie het hoogste vraagt binnen de band is niet per se de
+         beste, maar kiezen op prijs is wel wat een werkgever doet. */
+      for (const v of s.mijn) s.zoekBedrijfsleider(v);
+      s.neemAan();
+      s.open('horeca');
+    }
   }
 };
 const NAMEN = Object.keys(PROFIELEN);
@@ -301,7 +352,14 @@ function gereedschap(m, potje, mij, profiel, offset) {
     get mijn() {
       const laatste = (st.laatste[mij] || {}).regels || [];
       return (st.vestigingen[mij] || []).map(v =>
-        Object.assign({}, v, { gemist: (laatste.find(r => r.id === v.id) || {}).gemist || 0 }));
+        /* `personeelNodig` HOORT ERBIJ, want het staat ook op het scherm van een
+           speler (zie de kop van dat getal in ../server/kern/spellen/magnaat/
+           maat.js). Zonder dit getal moet een profiel zelf gaan rekenen hoeveel
+           mensen er nodig zijn, en dan meet dit script zijn eigen rekenwerk. */
+        Object.assign({}, v, {
+          gemist: (laatste.find(r => r.id === v.id) || {}).gemist || 0,
+          personeelNodig: personeelNodig(v, 0)
+        }));
     },
     // de sector die bij de zone van dit profiel hoort, zonder te rekenen
     beursSector() {
@@ -366,6 +424,31 @@ function gereedschap(m, potje, mij, profiel, offset) {
       return !!m.spel.zet(potje, mij, { actie: 'open', kavel: kavel.id, sector, omvang, prijs: stand }).ok;
     },
     uitbreiden(v, erbij) { m.spel.zet(potje, mij, { actie: 'uitbreiden', id: v.id, erbij }); },
+
+    /* ---------- loondienst (VERHAAL.md stap 1) ----------
+       Net als bij de contracten krijgt een profiel hier gereedschap en geen
+       slimmigheid: kijken wat er openstaat, solliciteren, een functie
+       openstellen en aannemen. Wie er wordt aangenomen is de goedkoopste die
+       reageerde -- dat is geen strategie maar een werkgever die rekent. */
+    get baan() { return (this.beeld.werk || {}).baan || null; },
+    get vacatures() { return (this.beeld.werk || {}).vacatures || []; },
+    solliciteer(id) { return !!m.spel.zet(potje, mij, { actie: 'solliciteren', id }).ok; },
+    zoekBedrijfsleider(v) {
+      const werk = this.beeld.werk || {};
+      if ((werk.mijnMensen || []).some(x => x.vestiging === v.id)) return false;
+      if ((werk.mijnFuncties || []).some(f => f.vestiging === v.id)) return false;
+      return !!m.spel.zet(potje, mij, { actie: 'functie-openen',
+        vestiging: v.id, rol: 'bedrijfsleider' }).ok;
+    },
+    neemAan() {
+      let n = 0;
+      for (const f of (this.beeld.werk || {}).mijnFuncties || []) {
+        const goedkoopste = (f.sollicitaties || []).sort((a, b) => a.loon - b.loon)[0];
+        if (goedkoopste && m.spel.zet(potje, mij,
+          { actie: 'aannemen', id: f.id, speler: goedkoopste.speler }).ok) n++;
+      }
+      return n;
+    },
     beleid(v, wat) { m.spel.zet(potje, mij, Object.assign({ actie: 'beleid', id: v.id }, wat)); },
 
     /* ---------- fase B: contracten ----------

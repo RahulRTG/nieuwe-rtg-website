@@ -63,10 +63,19 @@ const PADEN = Object.keys(PAD);
    de meter kwam. Eerst had elk pad EEN uitrolfractie voor alle zeven sectoren,
    en dat leek eerlijk -- tot scripts/magnaat-onderzoek.js het uitrekende. Een
    energiebesparing van dertig procent is bij een vervoerder honderden euro's per
-   maand en bij een kantoor negenenveertig, want `vast` is daar nul komma drie
-   procent van de omzet. Dezelfde prijs vragen voor allebei betekent dat de ene
-   sector een koopje krijgt en de andere een knoop die zich nooit terugverdient:
-   negentien van de vijfendertig stonden buiten de band, tot 581 maanden aan toe.
+   maand en bij een winkel een paar tientjes, want wat `vast` per maand kost
+   loopt tussen de sectoren een orde van grootte uiteen. Dezelfde prijs vragen
+   voor allebei betekent dat de ene sector een koopje krijgt en de andere een
+   knoop die zich nooit terugverdient: negentien van de vijfendertig stonden
+   buiten de band, tot 581 maanden aan toe.
+
+   EN DAT KOPPELT DEZE TABEL AAN ./sectoren.js, wat een keer is misgegaan en
+   waar een toets nu op staat. Toen `vast` daar voor kantoor en industrie werd
+   bijgesteld (van 0,08% van de bouwsom naar 0,5%, ijking 4 van fase A opnieuw),
+   verdiende hun energieknoop zich ineens in 1,3 maand terug in plaats van in
+   zeven -- de besparing werd zes keer zo groot en de prijs bleef staan. Wie aan
+   `vast` komt, hoort hier langs te gaan; `test/spelonderzoek.test.js` zakt
+   anders, en dat is precies hoe het hoort te knellen.
 
    Wat WEL gedeeld blijft is de vorm: welk veld omhoog gaat, welk veld de prijs
    is, wat het vereist en of het onzeker is. Een sector kan dus andere getallen
@@ -112,14 +121,14 @@ const SECTOREN = {
   kantoor: {
     automatisering: ['Werkstroomautomatisering', 1.38, 1.16, 0.187],
     kwaliteit: ['Dienstverlening', 1.16, 1.059, 0.015],
-    energie: ['Gebouwbeheer', 0.75, null, 0.001],
+    energie: ['Gebouwbeheer', 0.75, null, 0.0066],
     keten: ['Leveranciersregie', 0.88, 1.09, 0.022, 0.90],
     concept: ['Nieuwe dienst', 1.17, 1.08, 0.054, null, ['automatisering', 'kwaliteit']]
   },
   industrie: {
     automatisering: ['Productielijnrobotisering', 1.34, 1.14, 0.035],
     kwaliteit: ['Procesbeheersing', 1.12, 1.007, 0.007, 0.70],
-    energie: ['Warmteterugwinning', 0.68, null, 0.002],
+    energie: ['Warmteterugwinning', 0.68, null, 0.013],
     /* De enige plek waar een uitvinding de BOUWSOM raakt: een concern dat zijn
        eigen toelevering regelt, bouwt zijn eigen hallen goedkoper. Dat is de
        ene lange lijn in deze boom -- hij werkt op wat je NOG gaat bouwen en

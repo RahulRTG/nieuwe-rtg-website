@@ -70,6 +70,12 @@ const JONG_MAG = [
   /* meewerken in de zaak waar je in dienst bent; welke velden precies mag,
      bepaalt je ROL en niet je leeftijd (magnaat/dienst-rollen.js) */
   'werk-beleid',
+  /* JA ZEGGEN TEGEN EEN PROMOTIE, of hem afhouden. Hulp naar vakkracht is
+     vakinhoudelijk en precies wat een zestienjarige hoort te kunnen: je wordt
+     beter in je vak. Wat er dan NIET mag is de rol zelf -- bedrijfsleider is
+     werkgeverschap, en dat bewaakt `magRolAannemen` hieronder. Aanbieden staat
+     er met opzet niet bij: dat is de werkgeverskant. */
+  'promotie-antwoord', 'promotie-intrekken',
   /* meepraten over wat de Foundation in je eigen stad bouwt. Kost niets,
      levert niets op, en neemt niemand iets af -- zie magnaat/governance.js */
   'foundation-stem',

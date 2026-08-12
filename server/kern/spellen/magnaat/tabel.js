@@ -49,7 +49,13 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
   const dienen = L.maakDienst(ACTIES);
   Object.assign(ACTIES, dienen.ACTIES);
   VRIJE_ACTIES.push(...dienen.VRIJE_ACTIES);
+  /* PROMOTIE (VERHAAL.md hoofdstuk 2). Vrij, en om dezelfde reden als de rest
+     van de loondienst: een gesprek over je toekomst hoort niet op een beurt te
+     wachten. Hij staat NA de dienstacties omdat hij ze nodig heeft. */
+  const promotie = require('./promotie')({ ACTIES });
+  Object.assign(ACTIES, promotie.ACTIES);
+  VRIJE_ACTIES.push(...promotie.VRIJE_ACTIES);
   const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
 
-  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet };
+  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie };
 };

@@ -2,6 +2,8 @@
    rekken van anderen blijven verborgen), de ZETTEN-dispatch, een zet doen
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
+const poort = require('./poort');
+
 module.exports = (ctx) => {
   const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, ZICHT, ZETTEN, STATISCH, noteerUitslag, noteerZet, zijnVrienden, isGeblokkeerd, klok, beleid } = ctx;
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
@@ -54,15 +56,10 @@ module.exports = (ctx) => {
        antwoord en de vlag bewaakte niets. Zie de kop van spellen/schaak.js. */
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
     if (!beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
-    /* DE WERKGRENS, en hij staat HIER om dezelfde reden als de beurtbewaking:
-       spel-neutraal, en hij leest de descriptor. `volwassenLaag` noemt de acties
-       die bij de volwassen laag horen; wie 16 of 17 is mag de rest. Een spel dat
-       er niets over zegt, kent geen leeftijdslagen en komt hier ongehinderd
-       langs. Zie ./grens.js -- de lijst daar is WIT, dus een nieuwe actie is
-       vanzelf 18+ tot iemand besluit dat hij bij een bijbaan hoort. */
-    if (ctx.magHandeling && (SPEL[p.soort].volwassenLaag || []).includes(zet && zet.actie)
-      && !ctx.magHandeling(mij, zet.actie))
-      return { status: 403, error: ctx.TE_JONG || 'Dat hoort bij de volwassen laag.' };
+    /* DE LEEFTIJDSGRENZEN (./poort.js), spel-neutraal en uit de descriptor --
+       precies zoals de beurtbewaking hierboven. */
+    const dicht = poort(SPEL[p.soort], ctx, p, mij, zet);
+    if (dicht) return dicht;
     const r = ZETTEN[p.soort](p, mij, zet || {});
     // het verloop vastleggen, maar alleen van een zet die is GEACCEPTEERD:
     // een replay met afgekeurde zetten erin is geen verloop maar een logboek

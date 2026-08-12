@@ -234,3 +234,40 @@ test('een kind speelt door de echte deur ook alles', () => {
   assert.ok(open('tess').ok, 'een kind opent gewoon een zaak');
   assert.equal(p.staat.vestigingen.tess.length, 1);
 });
+
+test('een zestienjarige kan promotie krijgen, maar geen bedrijfsleider worden', () => {
+  /* De grens zit op het moment van AANVAARDEN. Een werkgever mag voorstellen wat
+     hij wil; verantwoordelijkheid aannemen waar je te jong voor bent kan niet.
+     Hulp naar vakkracht is vakinhoudelijk en hoort juist wel te kunnen. */
+  const { kern, p, open } = aanTafel({ rahul: 40, mo: 16 });
+  assert.ok(open('rahul').ok);
+  const zaak = p.staat.vestigingen.rahul[0];
+  const f = kern.spelZet('rahul', 'p1', { actie: 'functie-openen', vestiging: zaak.id, rol: 'hulp' });
+  kern.spelZet('mo', 'p1', { actie: 'solliciteren', id: f.id });
+  kern.spelZet('rahul', 'p1', { actie: 'aannemen', id: f.id, speler: 'mo' });
+  const d = require('../server/kern/spellen/magnaat/dienst').dienstVan(p.staat, 'mo');
+
+  const naarVak = kern.spelZet('rahul', 'p1', { actie: 'promotie-aanbieden', dienst: d.id, rol: 'vakkracht' });
+  assert.ok(naarVak.ok, JSON.stringify(naarVak));
+  assert.ok(kern.spelZet('mo', 'p1', { actie: 'promotie-antwoord', id: naarVak.id, antwoord: 'ja' }).ok,
+    'beter worden in je vak hoort te kunnen op je zestiende');
+  assert.equal(require('../server/kern/spellen/magnaat/dienst').dienstVan(p.staat, 'mo').rol, 'vakkracht');
+
+  const naarLeider = kern.spelZet('rahul', 'p1', { actie: 'promotie-aanbieden', dienst: d.id, rol: 'bedrijfsleider' });
+  assert.ok(naarLeider.ok, 'aanbieden mag de werkgever');
+  const r = kern.spelZet('mo', 'p1', { actie: 'promotie-antwoord', id: naarLeider.id, antwoord: 'ja' });
+  assert.equal(r.status, 403, 'maar aannemen kan hij niet: ' + JSON.stringify(r));
+  assert.equal(require('../server/kern/spellen/magnaat/dienst').dienstVan(p.staat, 'mo').rol, 'vakkracht');
+  /* En weigeren mag altijd -- dat is geen verantwoordelijkheid. */
+  assert.ok(kern.spelZet('mo', 'p1', { actie: 'promotie-antwoord', id: naarLeider.id, antwoord: 'nee' }).ok);
+});
+
+test('een zestienjarige solliciteert niet op een bedrijfsleidersvacature', () => {
+  const { kern, p, open } = aanTafel({ rahul: 40, mo: 16 });
+  assert.ok(open('rahul').ok);
+  const zaak = p.staat.vestigingen.rahul[0];
+  const f = kern.spelZet('rahul', 'p1', { actie: 'functie-openen', vestiging: zaak.id, rol: 'bedrijfsleider' });
+  assert.ok(f.ok);
+  const r = kern.spelZet('mo', 'p1', { actie: 'solliciteren', id: f.id });
+  assert.equal(r.status, 403, JSON.stringify(r));
+});

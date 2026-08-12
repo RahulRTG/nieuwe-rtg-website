@@ -37,6 +37,7 @@
 const D = require('./dienst');
 const { SECTOREN } = require('./sectoren');
 const { personeelNodig } = require('./stap');
+const P = require('./promotie');
 
 /* Hoeveel vacatures een bedrijf tegelijk open heeft staan. Twee, want een rij
    van tien openstaande functies bij dezelfde zaak is geen arbeidsmarkt maar een
@@ -52,12 +53,23 @@ module.exports = ({ ACTIES }) => {
     const open = D.functies(st).filter(f => f.status === 'open' && f.vestiging === v.id).map(f => f.rol);
     const heeft = new Set([...bezet, ...open]);
     const nodig = personeelNodig({ sector: v.sector, omvang: v.omvang, prijs: v.prijs, tech: v.tech || [] }, 0);
-    /* EEN KLEINE ZAAK HEEFT GEEN BEDRIJFSLEIDER NODIG, en een grote wel. De
-       drempel is de bezetting die de motor zelf rekent -- geen apart getal. */
+    /* EEN KLEINE ZAAK HEEFT GEEN BEDRIJFSLEIDER NODIG, en een grote wel.
+
+       DE DREMPELS ZIJN GEIJKT EN NIET GEKOZEN. `personeelNodig` levert voor een
+       restaurant van vijftig stoelen een man of vier en voor een hotel van
+       vijfentwintig kamers er drie; bij 4 en 10 kwam een gewone AI-zaak dus
+       NOOIT boven een hulpkracht uit, en promoveerde Sven nooit iemand. Dat was
+       niet zichtbaar tot de scene-toets erom vroeg -- precies waar zo'n toets
+       voor is.
+
+       Nu: wie twee paar handen nodig heeft, heeft iemand nodig die de kwaliteit
+       draagt; wie er vier nodig heeft, heeft iemand nodig die het runt. Dat
+       hangt aan de som die de motor zelf maakt en niet aan een aantal
+       vestigingen of een aantal maanden. */
     for (const rol of ['hulp', 'vakkracht', 'bedrijfsleider']) {
       if (heeft.has(rol)) continue;
-      if (rol === 'vakkracht' && nodig < 4) continue;
-      if (rol === 'bedrijfsleider' && nodig < 10) continue;
+      if (rol === 'vakkracht' && nodig < 2) continue;
+      if (rol === 'bedrijfsleider' && nodig < 4) continue;
       return rol;
     }
     return null;
@@ -101,16 +113,48 @@ module.exports = ({ ACTIES }) => {
     return uit;
   }
 
+  /* PROMOVEREN, EN LANGS DEZELFDE HANDELING ALS EEN MENS. Geen
+     `if diensttijd > x: rol++` hier: Sven doet letterlijk het voorstel dat een
+     menselijke werkgever ook zou doen, en de werknemer mag het weigeren. Anders
+     zijn er twee arbeidsmarkten en twee loopbaanmodellen. Zie ./promotie.js.
+
+     WANNEER. Als iemand lang genoeg meedraait EN de zaak de rol nodig heeft --
+     dezelfde vraag die ./promotie.js zelf stelt, hier alleen ongevraagd. Een AI
+     die na precies zes maanden altijd promoveert is een klok en geen werkgever;
+     daarom hangt het aan wat de ZAAK mist en niet alleen aan de tijd. */
+  const NA_MAANDEN = 8;
+
+  function promoveren(potje, h) {
+    const st = potje.staat;
+    const uit = [];
+    for (const d of D.lopend(st).filter(x => x.werkgever === h && x.vestiging)) {
+      if ((d.maanden || 0) < NA_MAANDEN) continue;
+      if ((st.promoties || []).some(p => p.dienst === d.id && (p.status === 'open' || p.status === 'tegenbod'))) continue;
+      const v = (st.vestigingen[h] || []).find(x => x.id === d.vestiging);
+      if (!v) continue;
+      /* WELKE TREDE ERBOVEN NOG LEEG IS. `ontbrekendeRol` kijkt van onder naar
+         boven; wat hij noemt is precies wat deze zaak mist -- en als dat boven
+         de rol van deze mens ligt, is het een promotie. */
+      const mist = ontbrekendeRol(st, v);
+      if (!mist || !(P.TRAP[mist] > P.TRAP[d.rol])) continue;
+      const r = ACTIES['promotie-aanbieden'](potje, h, { dienst: d.id, rol: mist });
+      if (r && r.ok) uit.push({ id: r.id, wie: d.werknemer, van: d.rol, naar: mist, soort: r.soort });
+    }
+    return uit;
+  }
+
   /* DE MAAND VAN EEN AI-WERKGEVER: eerst antwoorden op wie er stond, dan pas
      nieuwe vacatures. Andersom zou een kandidaat een maand langer wachten
      terwijl er al een plek voor hem was. */
   function maandVoorWerkgever(potje, h) {
     const genomen = reagerenOpSollicitaties(potje, h);
+    const bevorderd = promoveren(potje, h);
     const geopend = werven(potje, h);
-    return (genomen.length || geopend.length) ? { aangenomen: genomen, vacatures: geopend } : null;
+    return (genomen.length || geopend.length || bevorderd.length)
+      ? { aangenomen: genomen, vacatures: geopend, promoties: bevorderd } : null;
   }
 
-  return { MAX_OPEN, ontbrekendeRol, werven, reagerenOpSollicitaties, maandVoorWerkgever };
+  return { MAX_OPEN, NA_MAANDEN, ontbrekendeRol, werven, promoveren, reagerenOpSollicitaties, maandVoorWerkgever };
 };
 /* OOK OP DE FABRIEK, en dat is geen dubbeling maar een reparatie die dit
    bestand al eens elders heeft gekost: ./beheer.js schrijft in zijn kop op hoe
@@ -118,3 +162,4 @@ module.exports = ({ ACTIES }) => {
    `undefined` -- waarna het tarief `NaN` werd. Een toets die `MAX_OPEN` op de
    fabriek opvraagt hoort een getal te krijgen en geen stilte. */
 module.exports.MAX_OPEN = MAX_OPEN;
+module.exports.NA_MAANDEN = 8;

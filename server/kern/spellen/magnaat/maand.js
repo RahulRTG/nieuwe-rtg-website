@@ -137,6 +137,12 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          ./maand-lasten.js. Zie de uitleg bij `maandregels` in ./dienst.js: dat
          bestand gaat over geld dat de WERELD verlaat, en een salaris doet
          precies het omgekeerde. */
+      /* GEDEELDE TEGENSLAG (VERHAAL.md hoofdstuk 5). Leed deze werkgever deze
+         maand schade, dan gingen zijn mensen daar met hem doorheen. Het stempel
+         valt hier omdat dit de enige plek is waar de schaderegels en de lopende
+         dienstverbanden tegelijk bekend zijn. */
+      const schade = regels.find(r => r.soort === 'schade' || r.id === 'schade');
+      if (schade) DIENST.samenDoor(st, h, schade.naam || 'schade aan de zaak');
       for (const r of DIENST.maandregels(st, h, (van, naar, bedrag) => {
         st.geld[van] -= bedrag; st.geld[naar] += bedrag;
       })) regels.push(r);

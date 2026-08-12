@@ -58,17 +58,19 @@ const GOUD = {
     'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
     'overname-bod', 'overname-antwoord', 'overname-intrekken',
     'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
-    'dienst-opzeggen', 'werk-beleid', 'foundation-stem', 'bestuur-zet'],
+    'dienst-opzeggen', 'werk-beleid',
+    'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
+    'foundation-stem', 'bestuur-zet'],
     volwassenLaag: ['open', 'uitbreiden', 'sluiten', 'uitstappen',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien', 'functie-openen',
-      'functie-intrekken', 'aannemen', 'bestuur-zet', 'belang-voorstel',
-      'belang-antwoord', 'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
-      'overname-bod', 'overname-antwoord', 'overname-intrekken', 'veiling-start',
-      'veiling-bod', 'veiling-intrekken', 'polis-sluiten', 'polis-opzeggen',
-      'contract-voorstel', 'contract-antwoord', 'contract-opzeggen', 'onderzoek-starten',
-      'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie', 'beheer-aan',
-      'beheer-uit', 'beheer-regels', 'beleid', 'bouw',
-      'verkoop'],
+      'functie-intrekken', 'aannemen', 'bestuur-zet', 'promotie-aanbieden',
+      'belang-voorstel', 'belang-antwoord', 'beurs-aanbieden', 'beurs-kopen',
+      'beurs-intrekken', 'overname-bod', 'overname-antwoord', 'overname-intrekken',
+      'veiling-start', 'veiling-bod', 'veiling-intrekken', 'polis-sluiten',
+      'polis-opzeggen', 'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
+      'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
+      'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid',
+      'bouw', 'verkoop'],
     vormen: ['live', 'async'],
     varianten: { vorm: ['bord', 'economie'], stad: ['IJmuiden'], duur: ['quick', 'avond', 'weekend'],
       start: ['ondernemer', 'mens'] } }],
@@ -162,6 +164,14 @@ test('elk spel houdt zijn naam, spelersaantal, wereld en toegangsregels', () => 
        Wat hier telt is dat het VELD er is en zijn vorm klopt; dat de inhoud bij
        de leerstof past staat in test/spelquiz.test.js. */
     const echt = vervangAfgeleid(SPEL[sleutel]);
+    /* `rolVanZet` is een HAAK en geen eigenschap: hij vertelt de platformlaag
+       welke rol de handelende speler met een zet op zich neemt (../grens.js).
+       Een functie letterlijk in een gouden tabel zetten meet niets -- dat hij
+       er is en dat hij werkt, staat in test/spelleeftijd.test.js. */
+    const haak = echt.rolVanZet;
+    delete echt.rolVanZet;
+    if (sleutel === 'magnaat') assert.equal(typeof haak, 'function', 'magnaat hoort een rolhaak te hebben');
+    else assert.equal(haak, undefined, sleutel + ' heeft er ongevraagd een');
     assert.deepEqual(echt, Object.assign({ naam, max, wereld }, extra), 'spel ' + sleutel);
     assert.equal(SOORTEN[sleutel], naam, 'SOORTEN van ' + sleutel);
   }

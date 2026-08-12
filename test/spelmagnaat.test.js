@@ -570,7 +570,9 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'krediet-aflossen', 'krediet-herzien', 'krediet-opnemen',
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',
       'overname-antwoord', 'overname-bod', 'overname-intrekken',
-      'polis-opzeggen', 'polis-sluiten', 'solliciteren',
+      'polis-opzeggen', 'polis-sluiten',
+      'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
+      'solliciteren',
       /* UITSTAPPEN is de enige VRIJE zet die de kaart verandert, en dat volgt
          uit de zet zelf: wie ermee ophoudt komt per definitie niet meer op zijn
          beurt terug. Zou hij moeten wachten, dan wacht de tafel op iemand die

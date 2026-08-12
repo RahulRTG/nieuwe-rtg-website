@@ -89,6 +89,20 @@ function magAan(st, h, vestigingId, wat) {
    staan (de duurste rente die er is) en dat is precies de bedoeling. Een
    werkgever die zijn mensen niet betaalt omdat het even niet uitkomt, is een
    mechaniek die je niet wilt uitleggen. */
+/* WIE ER SAMEN DOOR IETS HEEN GING. Geen knop en geen "beiden waren aanwezig":
+   het stempel valt alleen in een maand waarin de werkgever ECHT schade leed --
+   storm, brand, een claim. Dat is de gedeelde tegenslag uit VERHAAL.md
+   hoofdstuk 5, en pas als het dienstverband die maand liep EN aan het eind nog
+   loopt, betekent "we hebben dit samen doorstaan" iets.
+
+   Dat tweede kan hier nog niet: of de zaak het haalde weet je pas later. Hier
+   wordt het FEIT gestempeld; ../loopbaan-noteren.js beslist achteraf of het een
+   moment werd. Precies de scheiding tussen een gebeurtenis en een uitleg. */
+function samenDoor(st, h, wat) {
+  for (const d of lopend(st).filter(x => x.werkgever === h))
+    (d.zwaar = d.zwaar || []).push({ maand: st.maand, wat });
+}
+
 function salarissen(st, h, betaal) {
   const uit = [];
   for (const d of lopend(st).filter(x => x.werkgever === h)) {
@@ -140,4 +154,4 @@ function maandregels(st, h, betaal) {
 
 module.exports = { ROLLEN, ROLLIJST, LOONBAND, FUNCTIE_MAANDEN,
   loonband, loonVoor, magRol, magAan, functies, dienstverbanden, lopend,
-  dienstVan, dienstenBij, salarissen, loonregels, maandregels, verlopen };
+  dienstVan, dienstenBij, salarissen, loonregels, maandregels, verlopen, samenDoor };

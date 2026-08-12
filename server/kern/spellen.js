@@ -113,7 +113,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet,
     noteerLoopbaan: loopbaan.noteerLoopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen,
-    magHandeling: grens.magHandeling, TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
+    magHandeling: grens.magHandeling, magRolAannemen: grens.magRolAannemen,
+    TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
     noteerKring: (p) => ondernemerskring.noteerKring(p, codenaamVan),
     noteerPand: pandgeheugen.onthoud };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);

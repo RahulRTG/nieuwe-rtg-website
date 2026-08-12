@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 940 bestanden en 6339 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 941 bestanden en 6354 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 940 |
-| losse beweringen (`test(...)`) | 6339 |
+| toetsbestanden | 941 |
+| losse beweringen (`test(...)`) | 6354 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 203 |
+| niets van beide | 204 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-820 bestanden, 6124 beweringen.
+821 bestanden, 6139 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -667,7 +667,7 @@ toets omvalt.
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
 | `spelkring-lokaal.test.js` | 14 | -- | DE LOKALE ONDERNEMERSKRING -- wie hier ooit een zaak had. Fase D. |
 | `spellab.test.js` | 15 | -- | MAGNAAT: HET BALANSLAB -- meet het wat het zegt te meten? Een meetopstelling is zelf software, en een kapotte meter is duurder dan geen meter: hij geeft een getal en je gelooft het. |
-| `spelleeftijd.test.js` | 15 | -- | DE TWEE GRENZEN -- wat er bewaard mag worden, en wat je mag doen. Hier stond er EEN, en dat was te weinig: "mag hier iets van bewaard worden" en "mag deze persoon dit doen" zijn verschillende vragen die hetzelfde... |
+| `spelleeftijd.test.js` | 17 | -- | DE TWEE GRENZEN -- wat er bewaard mag worden, en wat je mag doen. Hier stond er EEN, en dat was te weinig: "mag hier iets van bewaard worden" en "mag deze persoon dit doen" zijn verschillende vragen die hetzelfde... |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |
 | `spelloopbaan.test.js` | 20 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
 | `spelmaatje.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen voor een hint, een regel of een peptalk. |
@@ -683,6 +683,7 @@ toets omvalt.
 | `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |
 | `spelprestaties.test.js` | 8 | gezakt op `!==->===#0` | Prestaties, afgeleid uit de uitslagen. Drie keuzes maken dit anders dan een gewoon prestatiesysteem, en die staan hier alle drie als toets omdat ze anders stil terugdraaien: alleen wat BEHAALD is gaat terug (geen "7... |
 | `spelprojectie.test.js` | 12 | -- | De projectiekamer: een potje op een gedeeld scherm. Alles hier hangt aan één zin: EEN SCHERM IS EEN PROJECTIE EN GEEN DEELNEMER. |
+| `spelpromotie.test.js` | 13 | -- | DE PROMOTIE -- "Sven wil je spreken." VERHAAL.md hoofdstuk 2. Promoveren KON al: je zegt je baan op en solliciteert opnieuw. |
 | `spelquiz.test.js` | 12 | -- | HET QUIZDUEL: teams, schoolvragen, en wat er NIET over de lijn gaat. Dit is het eerste spel met varianten, en dat maakt het ook het eerste spel waar "dezelfde motor, andere bron" een bewering is in plaats van een plan. |
 | `spelregels-drift.test.js` | 17 | overleefd | Driftbewaking: twee spelregels bestaan bewust in tweevoud (server keurt, client geeft directe feedback): de Woordduel-premievelden en de Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt hem... |
 | `spelregister.test.js` | 32 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |

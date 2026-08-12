@@ -78,6 +78,10 @@ module.exports = (ctx) => {
          iemand met een rol in plaats van door de eigenaar. */
       'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
       'dienst-opzeggen', 'werk-beleid',
+      /* PROMOTIE (VERHAAL.md hoofdstuk 2) om dezelfde reden als de rest van de
+         loondienst: een gesprek over je toekomst hoort niet op een beurt te
+         wachten. */
+      'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
       /* STEMMEN over wat de Foundation bouwt (fase C, ./governance.js). Vrij,
          want een stemming met een beurt eraan vast is een deadline -- en dat is
          de kunstmatige urgentie die CLAUDE.md verbiedt. */
@@ -100,7 +104,7 @@ module.exports = (ctx) => {
        dus deze lijst is een tweede slot en geen enige. */
     volwassenLaag: ['open', 'uitbreiden', 'sluiten', 'uitstappen',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
-      'functie-openen', 'functie-intrekken', 'aannemen', 'bestuur-zet',
+      'functie-openen', 'functie-intrekken', 'aannemen', 'bestuur-zet', 'promotie-aanbieden',
       'belang-voorstel', 'belang-antwoord', 'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
       'overname-bod', 'overname-antwoord', 'overname-intrekken',
       'veiling-start', 'veiling-bod', 'veiling-intrekken',
@@ -108,6 +112,7 @@ module.exports = (ctx) => {
       'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
       'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
       'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid', 'bouw', 'verkoop'],
+    rolVanZet: require('./rolhaak'),
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

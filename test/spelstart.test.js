@@ -148,7 +148,7 @@ test('een kleine zaak zoekt handen, geen bedrijfsleider', () => {
   const W2 = maak({ ACTIES: { 'functie-openen': (p, h, z) => { geroepen.push(z); return { ok: true, id: 'f' + geroepen.length }; },
     aannemen: () => ({ ok: false }) } });
   const st = { maand: 0, functies: [], diensten: [],
-    vestigingen: { ai: [{ id: 'v1', sector: 'horeca', omvang: 4, prijs: 'midden', tech: [] }] } };
+    vestigingen: { ai: [{ id: 'v1', sector: 'retail', omvang: 10, prijs: 'midden', tech: [] }] } };
   assert.equal(W2.ontbrekendeRol(st, st.vestigingen.ai[0]), 'hulp', 'een kleine zaak zoekt handen');
   /* DE SCHERPE: een kleine zaak waar hulp EN vakkracht al zitten, zoekt daarna
      NIETS. Zonder de drempel zou hij een bedrijfsleider zoeken voor een zaak
@@ -157,7 +157,7 @@ test('een kleine zaak zoekt handen, geen bedrijfsleider', () => {
   st.diensten.push({ id: 'd1', status: 'loopt', vestiging: 'v1', rol: 'hulp', werkgever: 'ai', werknemer: 'x' },
     { id: 'd2', status: 'loopt', vestiging: 'v1', rol: 'vakkracht', werkgever: 'ai', werknemer: 'y' });
   assert.equal(W2.ontbrekendeRol(st, klein), null, 'een kleine zaak is dan klaar');
-  const groot = { id: 'v2', sector: 'hotel', omvang: 140, prijs: 'midden', tech: [] };
+  const groot = { id: 'v2', sector: 'hotel', omvang: 60, prijs: 'midden', tech: [] };
   st.vestigingen.ai.push(groot);
   st.diensten.push({ id: 'd3', status: 'loopt', vestiging: 'v2', rol: 'hulp', werkgever: 'ai', werknemer: 'p' },
     { id: 'd4', status: 'loopt', vestiging: 'v2', rol: 'vakkracht', werkgever: 'ai', werknemer: 'q' });

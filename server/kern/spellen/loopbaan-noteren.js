@@ -94,6 +94,24 @@ module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan }) => {
          geschiedenis. Hij krijgt geen `baan` -- hij had er geen -- maar wel het
          moment, want er was een tweede mens bij. */
       onthoud(d.werkgever, wg, 'eerste_mens', { samen: wn, wat: d.rol, potje: potje.id });
+      /* DE EERSTE PROMOTIE (hoofdstuk 2). Hij ontstaat vanzelf uit de eerste
+         geaccepteerde stijging BINNEN dezelfde arbeidsrelatie -- niet uit een
+         verhaal en niet uit een knop. Stond hij in de tabel zonder schrijver,
+         dan was de mooiste zin van deze laag een dode ingang; dat was hij tot
+         magnaat/promotie.js bestond. */
+      const eerste = (d.promoties || [])[0];
+      if (eerste)
+        onthoud(d.werknemer, wn, 'eerste_promotie', { samen: wg,
+          wat: (d.rolnaam || eerste.naar), potje: potje.id });
+      /* SAMEN DOORGEKOMEN (hoofdstuk 5), en met de strengste eis van de acht:
+         er moet ECHTE gedeelde tegenslag zijn geweest (magnaat/dienst.js
+         stempelt hem alleen bij schade), EN het dienstverband moet het gehaald
+         hebben. Wie wegging toen het tegenzat, ging er niet samen doorheen. */
+      const zwaar = (d.zwaar || [])[0];
+      if (zwaar && d.status === 'loopt') {
+        onthoud(d.werknemer, wn, 'samen_door', { samen: wg, wat: zwaar.wat, potje: potje.id });
+        onthoud(d.werkgever, wg, 'samen_door', { samen: wn, wat: zwaar.wat, potje: potje.id });
+      }
       /* DE LEERLING DIE ZELF BEGON (hoofdstuk 9, en de mooiste van de acht).
          Alleen als hij bij het einde van de partij ook echt een eigen zaak
          had -- anders is het een voornemen en geen moment. */

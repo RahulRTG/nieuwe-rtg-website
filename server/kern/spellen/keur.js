@@ -120,6 +120,10 @@ function keurPotje(naam, s) {
      hem, ./grens.js zegt wat een zestienjarige dan wel mag. Een spel zonder
      deze lijst kent geen leeftijdslagen en komt ongehinderd langs. */
   if (s.volwassenLaag) uit.volwassenLaag = s.volwassenLaag;
+  /* En de haak waarmee de platformlaag vraagt welke rol de handelende speler
+     met deze zet op zich neemt. Een functie in een descriptor is niet nieuw --
+     `init` en `zet` zijn het ook. */
+  if (typeof s.rolVanZet === 'function') uit.rolVanZet = s.rolVanZet;
   if (s.perTaal) uit.perTaal = true;
 
   /* NASPEELBAAR: kan een partij uit het bewaarde verloop worden herbouwd? Dat

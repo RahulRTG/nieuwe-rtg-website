@@ -250,6 +250,56 @@ een val. Zodra het werkscherm de hele keten draagt, wisselt de standaard.
 
 ---
 
+## 0e. De promotie: "Sven wil je spreken"
+
+Promoveren kón al: je zegt je baan op en solliciteert opnieuw. Maar dat is
+ontslag met een sollicitatie erachter. Het reset je dienstjaren, het breekt de
+arbeidsrelatie, en het voelt niet als wat het hoort te zijn — *iemand vond je
+goed genoeg.*
+
+`kern/spellen/magnaat/promotie.js`, en vier regels dragen hem:
+
+1. **Het is een interne overgang.** Dezelfde relatie, dezelfde `sinds`,
+   dezelfde dienstjaren. Zou het dienstverband breken, dan wordt *"hij werkte
+   drie jaar en twee maanden voor jou"* twee losse baantjes.
+2. **Het is een onderhandeling, geen toekenning.** Ja, nee, of een tegenbod dat
+   van kant wisselt binnen hetzelfde gesprek. Een promotie die je overkomt is
+   een veldwijziging met een feestje eromheen; een promotie die je kunt weigeren
+   is een keuze — en pas dan betekent accepteren iets.
+3. **De AI gebruikt dezelfde handeling.** Geen `if diensttijd > x: rol++`. Sven
+   doet letterlijk het voorstel dat een mens ook zou doen.
+4. **Een promotie gaat omhoog en betaalt meer.** Meer werk voor hetzelfde geld
+   met een mooiere titel is geen aanbod.
+
+### Drie soorten, en waarom dat uitmaakt
+
+| | |
+|---|---|
+| **vakinhoudelijk** | hulp → vakkracht. Je gaat de kwaliteit dragen. |
+| **leidinggevend** | vakkracht → bedrijfsleider. Je gaat over mensen. |
+| **bestuurlijk** | bedrijfsleider → een concernrol. Je gaat over het geheel. |
+
+Een rol is in deze motor een **lijst bevoegdheden**, dus een leidinggevende
+krijgt toegang tot handelingen waar hij gisteren niet bij mocht.
+
+> **Het systeem vertelt je niet dat je belangrijker bent geworden. Het geeft je
+> verantwoordelijkheid.**
+
+En daarom zit de 16+-grens op het moment van **aanvaarden** en niet van
+aanbieden: een werkgever mag voorstellen wat hij wil, maar verantwoordelijkheid
+aannemen waar je te jong voor bent kan niet. Hulp → vakkracht mag wel — beter
+worden in je vak is precies wat een zestienjarige hoort te kunnen.
+
+### De twee momenten die nooit geschreven werden
+
+`eerste_promotie` en `samen_door` stonden in de tabel, met een zin, en niets
+riep ze aan. Nu wel — en `samen_door` heeft de strengste eis van de acht: er
+moet **echte gedeelde tegenslag** zijn geweest (het stempel valt alleen in een
+maand met schade) **én** het dienstverband moet het gehaald hebben. Wie wegging
+toen het tegenzat, ging er niet samen doorheen.
+
+---
+
 ## 1. De grondwet van blijvende waarde
 
 Zodra iets tussen campagnes blijft bestaan, verandert de economische grondwet.

@@ -503,7 +503,8 @@
       "levenslijn"
     ],
     "levenband": [
-      "levensband"
+      "levensband",
+      "levensbeleid"
     ],
     "levenmentor": [
       "levenslijn"
@@ -1307,7 +1308,11 @@
       "swZet"
     ],
     "sociaal": [
-      "socialewereld"
+      "socialewereld",
+      "socialegraaf",
+      "objectlaag",
+      "socialecommand",
+      "socialebeleid"
     ],
     "social": [
       "blokkeer",

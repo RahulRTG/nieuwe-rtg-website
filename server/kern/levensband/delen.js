@@ -14,7 +14,7 @@
 
 module.exports = (ctx) => {
   const { pak, kijk, id, nuIso, vandaag, verlopen, levend, bandVan,
-    zichtDeling, save, MAX_DELINGEN } = ctx;
+    zichtDeling, save, MAX_DELINGEN, beleid } = ctx;
 
   const schoon = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 
@@ -63,6 +63,14 @@ module.exports = (ctx) => {
     const stuk = schoon(o.stuk, 40).toLowerCase();
     if (NOOIT.includes(stuk)) {
       return { status: 403, error: 'Dit is van u alleen en wordt met niemand gedeeld.' };
+    }
+    /* HET EIGEN SLOT NAAST HET HUISSLOT (kern/levensbeleid). NOOIT hierboven is
+       de vaste lijst die voor iedereen geldt; dit is wat deze mens er zelf bij
+       heeft gezet. Het kan alleen sluiten -- er is geen beleidsregel die iets
+       opent dat NOOIT verbiedt, en die volgorde is met opzet: de vaste lijst
+       staat eerst. Ontbreekt de beleidslaag, dan verandert er niets. */
+    if (beleid && !beleid.magDelen(w, stuk)) {
+      return { status: 403, error: 'U heeft dit stuk zelf op nooit-delen gezet.' };
     }
     if (!STUKKEN[stuk]) {
       return { status: 400, error: 'Dat kunt u niet delen. Wel: ' + Object.keys(STUKKEN).join(', ') + '.' };

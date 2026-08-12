@@ -79,5 +79,62 @@ Object.assign(kern, require('../kern/levenslijn')({ kern }));
    mee waar de levenslijn en de geldgraaf alleen kern krijgen. Wat hij schrijft
    is geen levensgegeven maar een TOESTEMMING; het leven zelf blijft in de
    domeinen die het beheren. */
-Object.assign(kern, require('../kern/levensband')({ db, save }));
+/* Het levensbeleid (kern/levensbeleid/): de regels van de mens zelf -- de
+   tweede laag van het wereldpatroon voor RTFoundation (LEVEN.md par. 3).
+
+   VOOR levensband gemount, want ./delen.js raadpleegt hem. Net als bij RTG
+   Sociaal kan dit beleid alleen VERSMALLEN: een stuk op nooit-delen zetten, of
+   een kortere standaardtermijn voorstellen. Er is geen veld dat vooraf deelt --
+   dat zou besluit 2 uit LEVEN.md par. 2.8 door de achterdeur ongedaan maken.
+
+   De stukkenlijst komt uit levensband/delen.js zelf en wordt niet overgetikt. */
+Object.assign(kern, require('../kern/levensbeleid')({ db, save,
+  stukken: Object.keys(require('../kern/levensband/delen')({
+    pak: () => ({ delingen: [] }), kijk: () => ({ delingen: [] }), save: () => {}
+  }).deelStukken()) }));
+Object.assign(kern, require('../kern/levensband')({ db, save, beleid: kern.levensbeleid }));
+/* De sociale graaf (kern/socialegraaf/): dezelfde projectielaag over de sociale
+   domeinen -- wat er tussen mensen speelt, en wat eraan komt (LIFE.md fase 1).
+
+   ACHTERAAN, EN DAT IS GEEN WILLEKEUR. Hij leest de kern LAAT zoals de geldgraaf,
+   dus de negen sociale domeinen mogen na hem komen. Wat NIET later mag komen is
+   de levensgraaf: zijn vooruitblik vraagt de Control Tower daar de termijnen van
+   Entourage en Attenties, in plaats van die datums zelf nog een keer uit te
+   rekenen. Twee berekeningen van "over hoeveel dagen" lopen stil uiteen, en dan
+   toont het ene scherm zeven dagen waar het andere er zes zegt (LAT.md regel 4).
+
+   SCHRIJFT NOOIT, en heeft geen eigen opslag: krijgt daarom alleen kern mee, en
+   met opzet geen db en geen save. */
+Object.assign(kern, require('../kern/socialegraaf')({ kern }));
+/* De objectlaag (kern/objectlaag/): niet apps maar objecten -- wat kan ik met
+   deze persoon, deze groep, deze bijeenkomst (LIFE.md fase 2).
+
+   Leest de kern LAAT, net als de twee lagen hierboven, dus de mountvolgorde van
+   genootschap, comm, vonk, wbw en de rest doet er niet toe. SCHRIJFT NOOIT en
+   heeft geen opslag: krijgt daarom alleen kern mee. Elke cap wijst naar de app
+   die het echte werk doet; deze laag handelt zelf niets af. */
+Object.assign(kern, require('../kern/objectlaag')({ kern }));
+/* Life Command (kern/socialecommand/): de vijfde laag van deze wereld, en de
+   eerste die iets MAG (LIFE.md fase 5). Staat NA de sociale graaf, want hij
+   leest diens beeld en diens lijn.
+
+   ALS ENIGE VAN DE VIJF SCHRIJFT HIJ, en daarom krijgt hij db EN save mee waar
+   de graaf en de objectlaag alleen kern krijgen. Wat hij schrijft is geen
+   sociaal gegeven maar het ACTIELOG: wat er gebeurde en waarom. Uitvoeren doet
+   hij nooit zelf -- dat gaat via het domein dat de waarheid beheert. */
+/* Het sociale beleid (kern/socialebeleid/): de regels van het LID over zijn
+   eigen sociale wereld -- de tweede laag van het wereldpatroon.
+
+   VOOR socialecommand gemount, want de voorstellen raadplegen hem. Hij krijgt de
+   soortenlijst mee uit ./socialecommand/voorstellen.js in plaats van hem over te
+   tikken: twee lijsten van wat een voorstel kan zijn, lopen uiteen zodra iemand
+   er een toevoegt.
+
+   Hij SCHRIJFT, en daarom db en save -- maar alleen de eigen regels van het lid,
+   en die kunnen uitsluitend VERSMALLEN. Er is met opzet geen niveau-veld zoals
+   bij geldbeleid: de grens van deze wereld is een ander mens, en die kent geen
+   automatische stand. */
+Object.assign(kern, require('../kern/socialebeleid')({ db, save,
+  soorten: Object.keys(require('../kern/socialecommand/voorstellen')({ kern: {} }).SOORTEN) }));
+Object.assign(kern, require('../kern/socialecommand')({ kern, db, save }));
 };

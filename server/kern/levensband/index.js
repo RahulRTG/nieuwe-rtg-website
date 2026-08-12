@@ -46,7 +46,7 @@ const MAX_DELINGEN = 200; // per mens; houdt de opslag begrensd
    ouder krijgt hier dus geen recht mee -- LEVEN.md par. 2.8. */
 const SOORTEN = ['ouder', 'kind', 'partner', 'familie', 'mentor', 'leerkracht', 'vertrouwenspersoon'];
 
-module.exports = ({ db, save, klok }) => {
+module.exports = ({ db, save, klok, beleid }) => {
   const nu = () => (klok ? klok() : new Date());
   const nuIso = () => nu().toISOString();
   const vandaag = () => nuIso().slice(0, 10);
@@ -99,8 +99,12 @@ module.exports = ({ db, save, klok }) => {
       vervalt: x.vervalt || '', at: x.at, verlopen: verlopen(x) };
   }
 
+  /* `beleid` is optioneel en komt van kern/levensbeleid: het eigen slot van
+     deze mens naast het huisslot. Ontbreekt hij (een oudere mount of een toets
+     die alleen deze laag opzet), dan verandert er niets aan het gedrag -- de
+     vaste NOOIT-lijst in ./delen.js blijft hoe dan ook gelden. */
   const ctx = { pak, kijk, id, nuIso, vandaag, isKant, andereKant, verlopen, levend,
-    zichtBand, zichtDeling, save, SOORTEN, MAX_BANDEN, MAX_DELINGEN };
+    zichtBand, zichtDeling, save, SOORTEN, MAX_BANDEN, MAX_DELINGEN, beleid };
 
   const banden = require('./banden')(ctx);
   const delen = require('./delen')(Object.assign({ bandVan: banden.bandVan }, ctx));

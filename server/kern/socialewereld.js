@@ -95,20 +95,31 @@ module.exports.maakSocialeWereld = ({ kern }) => {
         }));
     }, uit, stil);
 
+    /* HET DOMEIN LEVERT `wat`, NIET `titel`. Hier stond `x.titel`, en dat is
+       altijd undefined geweest: kern/genootschap/bijeenkomst.js bouwt zijn rijen
+       met publiek(), en die kent geen veld `titel`. Elke bijeenkomst stond dus
+       zonder titel op het scherm, zonder dat iets klaagde -- een lege string is
+       een geldige string. De toets miste het omdat zijn nagemaakte agenda wel
+       een `titel` teruggaf; die is meeverbeterd, want een namaakbron die niet op
+       de echte lijkt, bewijst niets (LAT.md regel 2). */
     bron('bijeenkomsten', () => {
       const b = kern.bijeenkomst.mijnAgenda({ key }) || {};
       return (b.komt || []).slice(0, 8).map(x => regel('bijeenkomst', {
-        titel: x.titel, wanneer: x.datum, tijd: x.tijd,
+        titel: x.wat, wanneer: x.datum, tijd: x.tijd,
         status: dag(x.datum) === nu ? 'vandaag' : 'open',
         door: x.groep, kenmerk: x.id, app: 'Genootschap', link: '/apps/genootschap.html'
       }));
     }, uit, stil);
 
+    /* En dezelfde fout stond hier: Pulse levert de afzender als `codenaam`
+       (kern/pulse/index.js, publiek()). `x.naam || x.door` was allebei
+       undefined, dus elk bericht in de kring stond zonder afzender -- terwijl
+       juist bij een sociaal bericht de afzender het halve bericht is. */
     bron('kring', () => {
       const p = kern.pulseFeed(key, 'volgend') || {};
       return (p.feed || []).slice(0, 5).map(x => regel('bericht', {
         titel: (x.tekst || '').slice(0, 70) || 'Bericht',
-        wanneer: x.at, status: 'rustig', door: x.naam || x.door || null,
+        wanneer: x.at, status: 'rustig', door: x.codenaam || null,
         kenmerk: x.id, app: 'Pulse', link: '/apps/pulse.html'
       }));
     }, uit, stil);

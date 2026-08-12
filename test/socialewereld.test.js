@@ -46,8 +46,8 @@ test('alleen gesprekken die op antwoord wachten, niet de hele inbox', () => {
 
 test('een bijeenkomst van vandaag vraagt aandacht, een van later niet', () => {
   const w = wereld({ bijeenkomst: { mijnAgenda: () => ({ komt: [
-    { id: 'b1', titel: 'Borrel', datum: VANDAAG, tijd: '20:00', groep: 'De Kring' },
-    { id: 'b2', titel: 'Lezing', datum: dagen(9), groep: 'De Kring' }
+    { id: 'b1', wat: 'Borrel', datum: VANDAAG, tijd: '20:00', groep: 'De Kring' },
+    { id: 'b2', wat: 'Lezing', datum: dagen(9), groep: 'De Kring' }
   ] }) } });
   const r = w.kring('k');
   const nu = r.regels.find(x => x.kenmerk === 'b1');
@@ -55,6 +55,34 @@ test('een bijeenkomst van vandaag vraagt aandacht, een van later niet', () => {
   assert.equal(nu.teken, '!', 'kleur alleen is niet genoeg');
   assert.equal(nu.door, 'De Kring', 'de groep hoort erbij te staan');
   assert.equal(r.regels.find(x => x.kenmerk === 'b2').sig, 'actief');
+});
+
+/* DE TOETS DIE ER NIET WAS, EN DIE EEN ECHTE FOUT AFDEKT.
+
+   Deze laag las `x.titel` van een bijeenkomst en `x.naam || x.door` van een
+   pulse-bericht. Geen van die drie velden bestaat: het domein levert `wat`
+   (kern/genootschap/bijeenkomst.js, publiek()) en `codenaam`
+   (kern/pulse/index.js, publiek()). Elke bijeenkomst stond dus zonder titel op
+   het scherm en elk bericht zonder afzender, en niets klaagde -- een lege
+   string is een geldige string.
+
+   Waarom de oude toetsen het niet zagen: hun namaakbronnen gaven `titel` en
+   `naam` terug. Een namaakbron die niet op de echte lijkt, bewijst niets; die
+   zijn hierboven meeverbeterd naar de vorm die de domeinen echt leveren.
+
+   DE MUTATIE: zet `x.wat` in socialewereld.js terug naar `x.titel`, of
+   `x.codenaam` terug naar `x.naam`. Deze toets hoort dan te zakken. */
+test('de velden heten zoals de domeinen ze echt leveren', () => {
+  const w = wereld({
+    bijeenkomst: { mijnAgenda: () => ({ komt: [
+      { id: 'b1', wat: 'Borrel', datum: VANDAAG, tijd: '20:00', groep: 'De Kring' }] }) },
+    pulseFeed: () => ({ feed: [{ id: 'p1', tekst: 'Mooie dag', at: VANDAAG, codenaam: 'Ux' }] })
+  });
+  const r = w.kring('k');
+  assert.equal(r.regels.find(x => x.kenmerk === 'b1').titel, 'Borrel',
+    'een bijeenkomst zonder titel is een lege regel op het scherm');
+  assert.equal(r.regels.find(x => x.kenmerk === 'p1').door, 'Ux',
+    'bij een sociaal bericht is de afzender het halve bericht');
 });
 
 /* DE BELANGRIJKSTE TOETS VAN DEZE LAAG.
@@ -65,7 +93,7 @@ test('een bron die stukgaat wordt gemeld en neemt de andere niet mee', () => {
   const w = wereld({
     comm: { inbox: () => { throw new Error('comm stuk'); } },
     bijeenkomst: { mijnAgenda: () => ({ komt: [
-      { id: 'b1', titel: 'Borrel', datum: dagen(2), groep: 'De Kring' }] }) }
+      { id: 'b1', wat: 'Borrel', datum: dagen(2), groep: 'De Kring' }] }) }
   });
   const r = w.kring('k');
   assert.deepEqual(r.stil, ['gesprekken']);
@@ -76,8 +104,8 @@ test('wat op u wacht staat boven wat alleen maar gebeurd is', () => {
   const w = wereld({
     comm: { inbox: () => ({ gesprekken: [{ id: 'g1', titel: 'Sam', ongelezen: 1, at: dagen(-1) }] }) },
     bijeenkomst: { mijnAgenda: () => ({ komt: [
-      { id: 'b1', titel: 'Vanavond', datum: VANDAAG, groep: 'K' }] }) },
-    pulseFeed: () => ({ feed: [{ id: 'p1', tekst: 'Mooie dag', at: VANDAAG, naam: 'Ux' }] })
+      { id: 'b1', wat: 'Vanavond', datum: VANDAAG, groep: 'K' }] }) },
+    pulseFeed: () => ({ feed: [{ id: 'p1', tekst: 'Mooie dag', at: VANDAAG, codenaam: 'Ux' }] })
   });
   assert.deepEqual(w.kring('k').regels.map(x => x.sig),
     ['aandacht', 'actief', 'gezond'],
@@ -88,8 +116,8 @@ test('elke toestand die deze laag kan maken, kent hij ook', () => {
   const w = wereld({
     comm: { inbox: () => ({ gesprekken: [{ id: 'g1', titel: 'Sam', ongelezen: 1, at: VANDAAG }] }) },
     bijeenkomst: { mijnAgenda: () => ({ komt: [
-      { id: 'b1', titel: 'Nu', datum: VANDAAG, groep: 'K' },
-      { id: 'b2', titel: 'Straks', datum: dagen(3), groep: 'K' }] }) },
+      { id: 'b1', wat: 'Nu', datum: VANDAAG, groep: 'K' },
+      { id: 'b2', wat: 'Straks', datum: dagen(3), groep: 'K' }] }) },
     pulseFeed: () => ({ feed: [{ id: 'p1', tekst: 'Hallo', at: VANDAAG }] })
   });
   const r = w.kring('k');
@@ -101,7 +129,7 @@ test('elke toestand die deze laag kan maken, kent hij ook', () => {
 test('elke regel wijst naar de app waar het echte werk gebeurt', () => {
   const w = wereld({
     comm: { inbox: () => ({ gesprekken: [{ id: 'g1', titel: 'S', ongelezen: 1, at: VANDAAG }] }) },
-    bijeenkomst: { mijnAgenda: () => ({ komt: [{ id: 'b1', titel: 'B', datum: VANDAAG, groep: 'K' }] }) },
+    bijeenkomst: { mijnAgenda: () => ({ komt: [{ id: 'b1', wat: 'B', datum: VANDAAG, groep: 'K' }] }) },
     pulseFeed: () => ({ feed: [{ id: 'p1', tekst: 'T', at: VANDAAG }] })
   });
   for (const r of w.kring('k').regels) {

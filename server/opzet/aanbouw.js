@@ -111,6 +111,12 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/geld')(grens('geld'));
   // het Life OS van de RTFoundation (LEVEN.md); leest alleen, schrijft nooit
   require('../routes/leven')(grens('leven'));
+  /* De rechten per relatie (LEVEN.md par. 2.8): de ENIGE schrijvende laag van
+     die wereld, en daarom met een eigen grens. Hij stond eerst in routes/leven.js
+     gemount en kreeg dus de alleen-lees-kern van dat domein mee -- waarop de
+     domeingrens terecht aansloeg en drie routes een 500 gaven. Zie de uitleg
+     onderaan routes/leven.js. */
+  require('../routes/levenband')(grens('levenband'));
   require('../routes/thuis')(grens('thuis'));
   require('../routes/werkvloer')(grens('werkvloer'));
   require('../routes/regering')(grens('regering'));

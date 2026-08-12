@@ -23,6 +23,68 @@
   .dag .uur{display:block;margin-top:.1rem;font-size:.66rem;letter-spacing:.1em;
     color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
   .kern .open{font-variant-numeric:var(--rtg-cijfers);}
+
+  /* HET OBJECTPANEEL (LIFE.md fase 2). Wat kan ik met deze persoon, groep of
+     bijeenkomst -- de caps komen van de server (/api/sociaal/object) en dit
+     scherm kent er geen enkele bij naam. Zou het er een kennen, dan wisten twee
+     plekken dezelfde waarheid, en dat is precies de fout die de PDA had voordat
+     kern/pda/modules.js er kwam. */
+  #objpaneel{background:var(--rtg-card,#fff);color:var(--rtg-txt);
+    border:1px solid var(--rtg-line);padding:1.1rem;max-width:26rem;width:92vw;margin:auto;}
+  #objpaneel::backdrop{background:rgba(0,0,0,.55);}
+  #objpaneel h2{margin:0;font-size:1.3rem;line-height:1.15;}
+  #objpaneel .soort{display:block;margin-bottom:.25rem;font-size:.62rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--rtg-soft);}
+  #objpaneel .over{margin:.4rem 0 0;font-size:.82rem;color:var(--rtg-muted);}
+  #objpaneel .caps{display:flex;flex-direction:column;gap:.4rem;margin:1rem 0 .8rem;}
+  #objpaneel .cap{display:flex;align-items:baseline;gap:.7rem;padding:.6rem .7rem;
+    border:1px solid var(--rtg-line);text-decoration:none;color:inherit;}
+  #objpaneel .cap b{font-size:.92rem;font-weight:600;}
+  #objpaneel .cap .waarom{margin-left:auto;text-align:right;font-size:.7rem;color:var(--rtg-soft);}
+  #objpaneel .cap .app{display:block;font-size:.62rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--rtg-soft);}
+  #objpaneel .samen{margin:.9rem 0 .2rem;}
+  #objpaneel .sam{display:flex;align-items:baseline;gap:.6rem;padding:.32rem 0;
+    border-bottom:1px solid var(--rtg-line);font-size:.82rem;}
+  #objpaneel .sam:last-child{border-bottom:0;}
+  #objpaneel .sam b{font-weight:600;}
+  #objpaneel .sam .bij{color:var(--rtg-soft);font-size:.7rem;}
+  #objpaneel .sam .wnr{margin-left:auto;color:var(--rtg-soft);font-size:.7rem;
+    font-variant-numeric:var(--rtg-cijfers);}
+  #objpaneel .sam[data-komt] b{color:var(--op-bordeaux);}
+  #objpaneel .stil{font-size:.78rem;color:var(--rtg-soft);}
+  .onder .watkan{margin-left:.5rem;}
+
+  /* Wat er klaarstaat. Bordeaux als accent op de kop, nooit als tekstkleur op
+     een donkere ondergrond (merkregel). */
+  .klaarkop{margin:1.2rem 0 .4rem;font-size:.64rem;letter-spacing:.19em;
+    text-transform:uppercase;color:var(--rtg-soft);font-weight:600;}
+  .vst{border:1px solid var(--rtg-line);padding:.75rem .8rem;margin-bottom:.5rem;}
+  .vst b{display:block;font-size:.95rem;}
+  .vst .wnr{display:block;margin-top:.15rem;font-size:.72rem;color:var(--rtg-soft);
+    font-variant-numeric:var(--rtg-cijfers);}
+  .vst .gevolg{display:block;margin:.45rem 0 .1rem;font-size:.76rem;color:var(--rtg-muted);}
+  .vst .keuzes{display:flex;gap:.4rem;margin-top:.55rem;flex-wrap:wrap;}
+  .vst .keuzes button{font:inherit;font-size:.8rem;padding:.34rem .8rem;cursor:pointer;
+    border:1px solid var(--rtg-line);background:transparent;color:inherit;}
+  .vst .keuzes button:hover{border-color:var(--op-bordeaux);}
+  .vst .keuzes button[disabled]{opacity:.5;cursor:default;}
+  .vst .waarom{display:block;margin-top:.5rem;font-size:.68rem;color:var(--rtg-soft);}
+
+  /* De momentlijn: vakken met een kop, en verder rust. Geen balk, geen teller
+     per vak en geen aftelklok -- dat is de taal van urgentie, en een verjaardag
+     over twee weken is geen deadline. */
+  .vak{margin:.9rem 0 0;}
+  .vak > h3{margin:0 0 .3rem;font-size:.64rem;letter-spacing:.19em;text-transform:uppercase;
+    color:var(--rtg-soft);font-weight:600;}
+  .vak .mom{display:flex;align-items:baseline;gap:.7rem;padding:.42rem 0;
+    border-bottom:1px solid var(--rtg-line);text-decoration:none;color:inherit;}
+  .vak .mom:last-child{border-bottom:0;}
+  .vak .mom b{font-weight:600;font-size:.9rem;}
+  .vak .mom .wie{color:var(--rtg-soft);font-size:.72rem;}
+  .vak .mom .uur{margin-left:auto;color:var(--rtg-soft);font-size:.72rem;
+    font-variant-numeric:var(--rtg-cijfers);}
+  #lijn .verder{margin:.7rem 0 0;font-size:.74rem;color:var(--rtg-soft);}
 </style>
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro">
@@ -65,15 +127,42 @@
 
   <div id="stilte"></div>
 
+  <!-- LIFE COMMAND (LIFE.md fase 5). Rahul zet klaar, u bevestigt. Elke knop
+       hieronder is een KEUZE en geen bevestiging van iets dat al ingevuld was:
+       er is geen enkele weg waarlangs dit scherm iets uitvoert zonder dat u
+       kiest. Wat er gebeurt staat er vooraf bij, want er zit een ander mens
+       achter. -->
+  <div id="klaar"></div>
+
   <div class="regkop">
     <h2>Uw kring</h2>
     <span class="tel" id="tel"></span>
   </div>
   <div id="kring"><p class="stil">Laden...</p></div>
 
+  <!-- DE MOMENTLIJN (LIFE.md fase 4). Geen stroom berichten maar wat er in uw
+       leven aankomt, in de tijdvakken waarin een mens denkt. Lege vakken bestaan
+       niet: een week zonder afspraken is geen gat om op te vullen. -->
+  <div class="regkop"><h2>Uw lijn</h2><span class="tel" id="lijntel"></span></div>
+  <div id="lijn"></div>
+
   <div class="regkop"><h2>De sociale wereld</h2></div>
   <div class="poorten" id="poorten"></div>
 </main>
+
+<!-- HET OBJECTPANEEL. Niet een app openen maar een ding uit uw leven: wat kan
+     ik met deze bijeenkomst, met deze codenaam. Alles erin komt van de server
+     en elke regel is een weg naar de app die het echte werk doet -- er staat
+     hier geen knop die namens u iets verstuurt (LIFE.md par. 3). -->
+<dialog id="objpaneel" aria-labelledby="objtitel">
+  <span class="soort" id="objsoort"></span>
+  <h2 class="rtg-ceremonie" id="objtitel">&nbsp;</h2>
+  <p class="over" id="objover"></p>
+  <div class="samen" id="objsamen"></div>
+  <div class="caps" id="objcaps"></div>
+  <p class="stil" id="objstil"></p>
+  <button class="rtg-ref" type="button" id="objdicht">Sluiten</button>
+</dialog>
 
 <script>
 (() => {
@@ -150,6 +239,29 @@
       : (t.regels ? 'geen actie nodig' : 'een rustige kring');
   }
 
+  /* WELKE REGEL EEN OBJECT IS. Niet elke regel is er een: een gesprek in
+     Berichten kan een groep van vier zijn, en dan is er geen persoon om te
+     openen. Alleen waar het domein een object ECHT aanwijst staat de knop --
+     een bijeenkomst is een event (kenmerk = zijn id), een bericht in de kring
+     hoort bij de codenaam die het plaatste.
+
+     Zou deze afbeelding groeien, dan hoort hij naar de server: dit is precies
+     het soort kennis dat aan twee kanten uiteen gaat lopen (LAT.md regel 4).
+     Bij twee regels is dat nog geen laag, en dat staat hier zodat de derde het
+     ziet aankomen. */
+  function objectVan(x) {
+    if (x.soort === 'bijeenkomst' && x.kenmerk) return { soort: 'event', id: x.kenmerk };
+    if (x.soort === 'bericht' && x.door) return { soort: 'persoon', id: x.door };
+    return null;
+  }
+
+  function objectKnop(x) {
+    const o = objectVan(x);
+    if (!o) return '';
+    return '<button class="rtg-ref watkan" type="button" data-obj="' + esc(o.soort) +
+      '" data-objid="' + esc(o.id) + '">wat kan hier</button>';
+  }
+
   function werkRegel(x) {
     const d = dagdeel(x.wanneer);
     const feiten = [];
@@ -177,6 +289,7 @@
           '<span class="onder">' +
             (x.kenmerk ? '<button class="rtg-ref" type="button" data-ref="' + esc(x.kenmerk) +
               '" title="Kopieer kenmerk">' + esc(x.kenmerk) + '</button>' : '') +
+            objectKnop(x) +
             '<span class="bron">' + esc(x.app) + '</span>' +
           '</span>' +
         '</span>' +
@@ -206,10 +319,101 @@
       '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
   }
 
+  const SOORTNAAM = { persoon: 'Persoon', groep: 'Genootschap', event: 'Bijeenkomst' };
+
+  /* Het paneel vullen. Het scherm kent GEEN cap bij naam: het toont wat de
+     server stuurt, in de volgorde waarin het komt. Een cap erbij is daarom een
+     regel in kern/objectlaag/caps.js en niets hier -- zoals de PDA schakelt op
+     de modulelijst van de server en niet op zijn eigen idee van de caps. */
+  function toonObject(d) {
+    $('#objsoort').textContent = SOORTNAAM[d.soort] || '';
+    $('#objtitel').textContent = d.titel || '';
+    /* De kop: feiten uit domeinen, in de volgorde waarin een mens ze wil lezen.
+       Wat hier NIET komt en nooit mag komen is een cijfer over de relatie zelf
+       -- een hechtheid, een reeks, "u sprak elkaar al drie maanden niet"
+       (LIFE.md par. 4.4). De server stuurt zoiets niet en dit scherm rekent
+       niets uit; het zet naast elkaar wat er is. */
+    const o = d.over || {};
+    const over = [];
+    if (o.aanwezig) over.push('nu online');
+    if (o.volgendeAfspraak) {
+      const v = o.volgendeAfspraak;
+      over.push('samen: ' + v.wat + ' op ' + v.datum + (v.tijd ? ' om ' + v.tijd : ''));
+    }
+    if (o.laatsteGesprek) over.push('laatste gesprek ' + String(o.laatsteGesprek).slice(0, 10));
+    if (o.datum) over.push(o.datum + (o.tijd ? ' om ' + o.tijd : ''));
+    if (o.waar) over.push(o.waar);
+    if (o.afgelast) over.push('afgelast');
+    if (o.leden) over.push(o.leden + (o.leden === 1 ? ' lid' : ' leden'));
+    if (o.gastheer) over.push('gastheer: ' + o.gastheer);
+    $('#objover').textContent = over.join(' · ');
+
+    $('#objcaps').innerHTML = (d.caps || []).length
+      ? d.caps.map(c =>
+        '<a class="cap" href="' + esc(c.link) + '">' +
+          '<span><b>' + esc(c.naam) + '</b><span class="app">' + esc(c.app) + '</span></span>' +
+          '<span class="waarom">' + esc(c.waarom) + '</span>' +
+        '</a>').join('')
+      /* Nul caps is een geldig antwoord en geen storing: een codenaam waar u
+         (nog) niets mee deelt. Dat hoort er te staan als een feit, niet als een
+         foutmelding en al helemaal niet als een uitnodiging om iets te
+         beginnen (LIFE.md par. 4.1: een relatie is geen trechter). */
+      : '<p class="stil">Hier deelt u nog niets mee.</p>';
+
+    /* DE RELATIERUIMTE (LIFE.md fase 3). Wat u samen heeft, boven wat u samen
+       kunt -- want dat is de volgorde waarin een mens aan iemand denkt. Alles
+       hierin komt uit domeinen waar u allebei in zit; er staat dus niets dat de
+       ander niet ook ziet. Geen bedragen, geen scores, geen aftelklok. */
+    $('#objsamen').innerHTML = (d.samen || []).length
+      ? '<span class="soort">Samen</span>' + d.samen.map(r =>
+        '<span class="sam"' + (r.komt ? ' data-komt=""' : '') + '>' +
+          '<b>' + esc(r.wat) + '</b>' +
+          '<span class="bij">' + esc([r.bron, r.waar].filter(Boolean).join(' · ')) + '</span>' +
+          '<span class="wnr">' + esc(r.wanneer || '') + '</span>' +
+        '</span>').join('')
+      : '';
+
+    $('#objstil').textContent = (d.stil || []).length
+      ? 'Niet opgehaald: ' + (d.stil || []).join(', ') + '. Dit beeld is dus niet compleet.'
+      : '';
+    const dlg = $('#objpaneel');
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+
+  async function open(soort, id) {
+    try {
+      const res = await fetch('/api/sociaal/object', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: JSON.stringify({ soort, id })
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      toonObject(d);
+    } catch (e) {
+      toonObject({ soort, titel: id, caps: [], stil: [], over: {} });
+      $('#objcaps').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
+    }
+  }
+
+  $('#objdicht').addEventListener('click', () => {
+    const dlg = $('#objpaneel');
+    if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
+  });
+
   // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
   // professional zoekt, dus hij staat er en is met een klik mee te nemen)
   document.addEventListener('click', (e) => {
-    const b = e.target.closest('.rtg-ref');
+    const obj = e.target.closest('[data-obj]');
+    if (obj) { e.preventDefault(); open(obj.dataset.obj, obj.dataset.objid); return; }
+    /* OP data-ref EN NIET OP DE KLASSE. `rtg-ref` is een VORM uit het
+       ontwerpsysteem, en er staan inmiddels knoppen in die vorm die geen
+       kenmerk dragen (sluiten, "wat kan hier"). Die vielen hier binnen, kregen
+       writeText(undefined) en toonden een tel lang "gekopieerd" -- gevonden
+       door test/objectpaneel.e2e.js, die op de console-fouten let. Kopieren
+       hoort te hangen aan het GEGEVEN dat gekopieerd wordt, niet aan hoe de
+       knop eruitziet. */
+    const b = e.target.closest('.rtg-ref[data-ref]');
     if (!b) return;
     e.preventDefault();
     try {
@@ -218,6 +422,106 @@
       setTimeout(() => { b.textContent = oud; }, 1200);
     } catch (err) {}
   });
+
+  /* De lijn tekenen. Het scherm bepaalt GEEN vakken en verzint geen labels: het
+     toont de vakken die de server stuurt, in de volgorde waarin ze komen. Zou
+     het zelf indelen, dan wisten twee plekken wanneer "volgende week" begint. */
+  function tekenLijn(d) {
+    const v = d.vakken || [];
+    $('#lijntel').textContent = '';
+    if (!v.length) {
+      $('#lijn').innerHTML = '<p class="stil">Er staat niets gepland. Dat is geen gat: het is een rustige week.</p>';
+      return;
+    }
+    $('#lijn').innerHTML = v.map(vak =>
+      '<div class="vak"><h3>' + esc(vak.label) + '</h3>' +
+      vak.regels.map(r =>
+        '<a class="mom" href="' + esc(r.link || '/apps/sociaal.html') + '">' +
+          '<b>' + esc(r.titel) + '</b>' +
+          (r.wie ? '<span class="wie">' + esc(r.wie) + '</span>' : '') +
+          (r.tijd ? '<span class="uur">' + esc(r.tijd) + '</span>' : '') +
+        '</a>').join('') +
+      '</div>').join('') +
+      /* Een telling en geen "meer laden": wie verder vooruit wil kijken, opent
+         de app die het bijhoudt. Een knop die de lijst blijft verlengen is
+         precies het patroon dat CLAUDE.md verbiedt. */
+      (d.later ? '<p class="verder">' + d.later + (d.later === 1 ? ' ding staat' : ' dingen staan') +
+        ' verder vooruit, in de app waar ze thuishoren.</p>' : '');
+  }
+
+  /* Wat er klaarstaat. Het scherm kent GEEN voorstelsoort en GEEN keuze bij
+     naam: het toont wat de server stuurt. Zou het de keuzes zelf kennen, dan
+     wisten twee plekken wat een voorstel mag worden. */
+  function tekenKlaar(d) {
+    const v = (d && d.voorstellen) || [];
+    if (!v.length) { $('#klaar').innerHTML = ''; return; }
+    $('#klaar').innerHTML = '<h2 class="klaarkop">Klaargezet · u beslist</h2>' + v.map(x =>
+      '<div class="vst" data-vst="' + esc(x.id) + '">' +
+        '<b>' + esc(x.wat) + ': ' + esc(x.titel) + '</b>' +
+        '<span class="wnr">' + esc([x.wie, x.wanneer, x.tijd].filter(Boolean).join(' · ')) + '</span>' +
+        (x.gevolg ? '<span class="gevolg">' + esc(x.gevolg) + '</span>' : '') +
+        '<span class="keuzes">' + (x.keuzes || []).map(k =>
+          '<button type="button" data-kies="' + esc(k) + '">' + esc(k) + '</button>').join('') + '</span>' +
+        /* De verantwoording staat erbij en niet achter een knop: waarop dit
+           voorstel rust, hoort te lezen zijn voordat iemand kiest. */
+        '<span class="waarom">' + esc((x.gegevens || []).join(' · ')) + '</span>' +
+      '</div>').join('');
+  }
+
+  async function bevestig(id, keuze, knoppen) {
+    for (const b of knoppen) b.disabled = true;
+    try {
+      const res = await fetch('/api/sociaal/voorstel/bevestig', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: JSON.stringify({ id, keuze })
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      /* Opnieuw ophalen in plaats van het scherm bijwerken: wat er nu geldt,
+         weet de server. Een scherm dat zelf de uitkomst invult, kan iets tonen
+         dat niet gebeurd is. */
+      laadKlaar();
+      laadLijn();
+    } catch (e) {
+      const doos = document.querySelector('[data-vst="' + id + '"] .waarom');
+      if (doos) doos.textContent = e.message;
+      for (const b of knoppen) b.disabled = false;
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const k = e.target.closest('[data-kies]');
+    if (!k) return;
+    e.preventDefault();
+    const doos = k.closest('[data-vst]');
+    if (!doos) return;
+    bevestig(doos.dataset.vst, k.dataset.kies, doos.querySelectorAll('[data-kies]'));
+  });
+
+  async function laadKlaar() {
+    try {
+      const res = await fetch('/api/sociaal/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) tekenKlaar(d);
+    } catch (e) { /* de kring staat er al; stil blijven is beter dan half tonen */ }
+  }
+
+  async function laadLijn() {
+    try {
+      const res = await fetch('/api/sociaal/lijn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) tekenLijn(d);
+    } catch (e) { /* de kring staat er al; een stille lijn is geen kapot scherm */ }
+  }
 
   (async function laad() {
     try {
@@ -229,6 +533,8 @@
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
+      laadKlaar();
+      laadLijn();
     } catch (e) {
       $('#balkKop').textContent = 'Niet ingelogd';
       $('#balkZin').textContent = '';

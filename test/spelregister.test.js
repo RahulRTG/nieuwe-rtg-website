@@ -19,6 +19,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+/* EN HIJ IS DE ROOKMELDER VAN DE HELE MAP. `maakRegister(stubCtx)` scant de
+   ECHTE spellenmap, dus een nieuw hulpbestand dat niet in GEEN_SPEL staat zakt
+   hier binnen een seconde -- zonder server, zonder database. Dat is precies de
+   fout die in augustus 2026 ruim twaalfhonderd toetsen liet zakken en die geen
+   enkele modulegerichte toets kon zien: die requiren hun module rechtstreeks en
+   starten nooit een server. Draai deze toets bij elk nieuw bestand in
+   server/kern/spellen/. */
 const maakRegister = require('../server/kern/spellen/register');
 const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDoor() {}, codenaamVan: (h) => h, nudge() {} };
 

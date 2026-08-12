@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 943 bestanden en 6404 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 944 bestanden en 6414 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 943 |
-| losse beweringen (`test(...)`) | 6404 |
+| toetsbestanden | 944 |
+| losse beweringen (`test(...)`) | 6414 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 93 |
+| alleen in de kop *genoemd*, nog niet gemeten | 94 |
 | niets van beide | 205 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-823 bestanden, 6189 beweringen.
+824 bestanden, 6199 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -679,6 +679,7 @@ toets omvalt.
 | `spelonderzoek.test.js` | 38 | genoemd | MAGNAAT: ONDERZOEK -- bedrijven die ANDERS worden in plaats van alleen groter. NEGEN BEWERINGEN, en ze zijn alle negen stil terug te draaien: 1. |
 | `spelovername.test.js` | 13 | genoemd | MAGNAAT: OVERNAMES -- een zaak rechtstreeks van een ander kopen. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelpand.test.js` | 14 | -- | HET PAND ALS PERSONAGE -- wat er op deze plek stond, over campagnes heen. De eerste wervel van de geschiedenislaag, en met opzet op het onderwerp met de minste uitzonderingen: een stuk grond. |
+| `spelpersonen.test.js` | 10 | genoemd | MENSEN BUITEN HET POTJE -- fase 5a uit SAMENLEVING.md. Tot nu toe was een mens een DEELNEMER van campagne X: hij bestond zolang het potje bestond. |
 | `spelpoort.test.js` | 3 | gezakt op `liegpoort /api/` | DE TWEE POORTEN VAN HET SPELDOMEIN. Elke spelactie hangt onder twee routes: `/api/member/spel/<actie>` met een Bearer-token, en `/api/rtf/spel/<actie>` met een gezinscode plus profieltoken (server/routes/spellen.js). |
 | `spelpraat.test.js` | 13 | gezakt op `liegpoort /api/` | Praten IN het potje. Twee dingen worden hier bewaakt, en het tweede is het belangrijkste. |
 | `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |

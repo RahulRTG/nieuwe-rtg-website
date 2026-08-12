@@ -96,7 +96,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      telemetrie, prestaties, loopbaan, stad, kring, panden. Een vraag -- wat
      blijft er staan als de partij voorbij is -- en dus een naad. */
   const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen } = require('./spellen/bewaren')({
+    spelPrestaties, loopbaan, personen, stadsgeheugen, daily, ondernemerskring, pandgeheugen } = require('./spellen/bewaren')({
     db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
     werkMag: grens.werkMag, GEEN_WERK: grens.GEEN_WERK,
     get SOORTEN() { return SOORTEN; } });
@@ -112,7 +112,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet,
-    noteerLoopbaan: loopbaan.noteerLoopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen,
+    noteerLoopbaan: loopbaan.noteerLoopbaan, noteerPersonen: personen.noteerPersonen,
+    stadsgeheugen, daily, ondernemerskring, pandgeheugen,
     magHandeling: grens.magHandeling, magRolAannemen: grens.magRolAannemen,
     TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
     noteerKring: (p) => ondernemerskring.noteerKring(p, codenaamVan),
@@ -123,7 +124,11 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     herkomst: {
       van: (h) => loopbaan.profiel(h, codenaamVan(h)),
       tussen: (h, ander) => loopbaan.tussen(h, codenaamVan(h), ander),
-      ervaringIn: (h, sector) => loopbaan.ervaringIn(h, codenaamVan(h), sector)
+      ervaringIn: (h, sector) => loopbaan.ervaringIn(h, codenaamVan(h), sector),
+      /* En DAT iemand bestaat, los van of hij ooit gewerkt heeft
+         (spellen/persoon.js). Zelfde grens: feiten, geen bedragen. */
+      persoon: (h) => personen.van(codenaamVan(h)),
+      wie: (codenaam) => personen.van(codenaam)
     } };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat

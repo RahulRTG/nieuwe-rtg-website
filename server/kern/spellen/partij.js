@@ -16,6 +16,10 @@ module.exports = (ctx) => {
   const naPotje = (p) => {
     noteerUitslag(p);
     if (ctx.noteerLoopbaan) ctx.noteerLoopbaan(p);
+    /* En DAT ze bestaan (SAMENLEVING.md fase 5a). Naast de loopbaan en om
+       dezelfde reden op deze ene plek: een afgelopen potje wordt op EEN moment
+       opgeschreven, niet op drie plekken met drie kansen om er een te vergeten. */
+    if (ctx.noteerPersonen) ctx.noteerPersonen(p);
     if (ctx.stadsgeheugen) ctx.stadsgeheugen.onthoud(p);
     if (ctx.noteerKring) ctx.noteerKring(p);
     if (ctx.noteerPand) ctx.noteerPand(p);

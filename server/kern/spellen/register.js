@@ -63,6 +63,19 @@ const { keurAlgemeen, keurArcade, keurPotje, keurZicht, keurVariant } = require(
 /* Deelmodules die geen spel zijn maar wel in deze map wonen. Bewust een
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
+/* ELK NIEUW BESTAND IN DEZE MAP HOORT HIER LANGS, en dat is geen formaliteit:
+   de scan hieronder laadt alles wat hij vindt en eist een `spel`-descriptor. Een
+   hulpbestand dat er niet in staat laat de SERVER NIET MEER OPSTARTEN.
+
+   Dat is een keer echt gebeurd (loopbaan-nalaten.js en loopbaan-profiel.js,
+   augustus 2026) en het kostte ruim twaalfhonderd zakkende toetsen om te vinden.
+   De les zat niet in de code maar in de KEUZE van toetsen: de modulegerichte
+   toetsen stonden groen, want die requiren hun module rechtstreeks en starten
+   nooit een server.
+
+   De goedkope rookmelder is test/spelregister.test.js -- die bouwt het register
+   op DEZE map en zakt binnen een seconde, zonder server. Wie hier een bestand
+   bijzet, draait die toets. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js', 'quiz-school.js',
   'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js', 'variant.js', 'wachtrij.js',
   /* De loopbaan (VERHAAL.md): wat er van een MENS overblijft als het potje
@@ -73,7 +86,7 @@ const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', '
      campagne. Zelfde reden, andere richting -- loopbaan-noteren.js schrijft aan
      het eind van een partij, loopbaan-profiel.js leest aan het begin van de
      volgende. Geen van beide is een spel. */
-  'loopbaan-profiel.js', 'bewaren.js', 'stadsgeheugen.js',
+  'loopbaan-profiel.js', 'persoon.js', 'bewaren.js', 'stadsgeheugen.js',
   'stadskrant.js', 'ondernemerskring.js', 'pandgeheugen.js', 'poort.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien

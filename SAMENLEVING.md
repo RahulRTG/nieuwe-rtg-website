@@ -6,7 +6,7 @@
 Dit document is de wegenkaart. `VERHAAL.md` beschrijft de verhaallaag zoals die
 nu gebouwd is; dit beschrijft waar hij heen gaat, en — belangrijker — **wat er
 al ligt**. Want dat viel bij het opschrijven gunstiger uit dan verwacht: van de
-veertien fasen staan er vijf grotendeels, en twee in de steigers.
+veertien fasen staan er zes grotendeels, en twee in de steigers.
 
 De regel eronder is niet nieuw en verandert niet:
 
@@ -24,7 +24,8 @@ De regel eronder is niet nieuw en verandert niet:
 | 2 | De eerste leider | **de motor wel, de laag niet** | `rush.js` draagt het patroon al |
 | 3 | De eerste ondernemer | **ja** | `loopbaan-profiel.js`, de overgang in `loopbaan-noteren.js` |
 | 4 | De levende stad | **ja** | `pandgeheugen.js`, `stadsgeheugen.js`, `ondernemerskring.js` |
-| 5 | Mensen krijgen een leven | nee | `concurrent.js` is de enige die initiatief neemt |
+| 5a | Mensen buiten het potje | **ja** | `persoon.js` |
+| 5b/5c | Intentie en zelfstandig handelen | nee | `concurrent.js` is de enige die initiatief neemt |
 | 6 | Organisaties krijgen karakter | nee | — |
 | 7 | Een echte economie | **half** | `cyclus.js`, `nieuws.js`, `vraag.js` |
 | 8 | De eerste crisis | **de haak wel** | `cyclus.js` kent al golven; een schok niet |
@@ -185,20 +186,77 @@ een persoon in).
 
 Wat ontbreekt is het **scherm**: de straat waar je op een pand klikt.
 
-### Fase 5 — Mensen krijgen een leven ✗
+### Fase 5a — Mensen buiten het potje ✅ ja
+
+> **Een potje gebruikt een mens tijdelijk. Het bezit hem niet.**
+
+Gebouwd: `spellen/persoon.js`. Tot nu toe was een mens een *deelnemer van
+campagne X* — hij bestond zolang het potje bestond. Alleen zijn loopbaan bleef
+staan, en die is geschiedenis en geen persoon: **wie nooit een baan had, liet
+niets achter en bestond nergens.** Precies de mens die in campagne vier ineens
+leverancier blijkt te zijn.
+
+De volgorde uit de opdracht wordt letterlijk aangehouden — *persoon, toestand,
+geschiedenis, intentie, handeling* — en elke stap leunt op de vorige. Wat er nu
+staat is de eerste twee; de geschiedenis lag er al.
+
+| | waar | wat |
+|---|---|---|
+| **persoon** | `persoon.js` | dat iemand bestaat, sinds wanneer, in hoeveel campagnes |
+| **toestand** | `persoon.js`, `stand` | hoe hij ervoor stond aan het eind van de laatste campagne: rol, vak, bij wie, eigen zaak |
+| **geschiedenis** | `loopbaan.js` | wat er aantoonbaar gebeurd is |
+| **intentie** | — | fase 5b |
+| **handeling** | — | fase 5c |
+
+**`stand` is een momentopname en geen lopende toestand,** en dat verschil is
+wezenlijk. Tussen twee campagnes werkt niemand ergens: de zaak waar hij werkte
+bestáát niet meer, want bedrijven blijven in het potje. Wat blijft is hoe het
+ervoor stond toen we hem het laatst zagen — en dat is genoeg om te weten dat
+iemand bedrijfsleider is geweest.
+
+**Geen tweede waarheid.** De geschiedenis wordt niet gekopieerd; twee registers
+met hetzelfde feit gaan uit elkaar lopen, en dan is *"hoe lang werkte hij daar"*
+op twee plekken beantwoord.
+
+**Geen bedrag.** Dezelfde grens als bij het loopbaanprofiel, want het is dezelfde
+grens.
+
+### Fase 5b en 5c — intentie en zelfstandig handelen ✗
 
 *"De wereld begint initiatief te nemen."*
 
 Vandaag neemt alleen `concurrent.js` initiatief, en die concurreert — hij wil
-niets. Een medewerker met ambities is nieuw.
+niets.
 
-Twee grenzen die vooraf vastliggen, want deze fase trekt ze allebei aan:
+**De vraag die eerst beantwoord moet worden**, en het is een besluit en geen
+detail: *wiens persona mag handelen?* Als de wereld Boris laat solliciteren
+terwijl de mens achter Boris niet aan tafel zit, dan handelt er iemand namens een
+speler die er niet is. Dat botst met de hardste absentieregel die dit huis kent —
+**weg zijn mag niets kosten** — en met zijn spiegelbeeld: weg zijn mag ook niets
+opleveren, want anders is minder spelen een strategie.
+
+Drie lezingen, en ze leiden tot verschillende architecturen:
+
+1. **Alleen niet-spelers handelen.** De persoon van een mens die niet meedoet
+   wordt een wereldactor; wie wél aan tafel zit beslist altijd zelf. Kost: "dat
+   is dezelfde Boris" wordt "dat is Boris' nalatenschap".
+2. **Iedereen handelt, ook aan tafel.** Kost: je persona kan iets doen wat jij
+   niet wilde.
+3. **Alleen op uitnodiging.** Een wereldactor doet niets tenzij een levende
+   speler hem aanspreekt. Kost: de wereld neemt geen initiatief, en dat was juist
+   de belofte.
+
+**En de twee grenzen die vooraf vastliggen**, want deze fase trekt ze allebei
+aan:
 
 - **Geen verslavende patronen** (`CLAUDE.md`). Een NPC die je blijft vragen is
-  een notificatietredmolen. Dezelfde wet als wet 4 van de werklaag: er niet zijn
-  mag niets kosten, dus een ambitie die verloopt omdat jij weg was, bestaat niet.
-- **Ambitie is geen chantage.** "Geef me promotie of ik vertrek" is een deadline,
-  en deadlines zijn kunstmatige urgentie.
+  een notificatietredmolen. Een ambitie die verloopt omdat jij weg was, bestaat
+  niet.
+- **Ambitie is geen chantage.** *"Geef me promotie of ik vertrek"* is een
+  deadline, en deadlines zijn kunstmatige urgentie.
+- En de regel uit de opdracht zelf: **geschiedenis mag de optie relevant maken,
+  nooit de uitkomst bepalen.** Geen `if oud_collega: solliciteer()` — dan is
+  geschiedenis alsnog een verborgen bonus.
 
 ### Fase 6 — Organisaties krijgen karakter ✗
 

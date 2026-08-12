@@ -44,6 +44,14 @@ module.exports = (ctx) => {
     db, save, codenaamVan, progressieMag: werkMag, GEEN_PROGRESSIE: GEEN_WERK
   });
 
+  /* EN DE MENSEN ZELF (SAMENLEVING.md fase 5a). De loopbaan bewaart wat er
+     GEBEURD is; dit bewaart DAT IEMAND BESTAAT en hoe hij ervoor stond. Dat
+     verschil is niet cosmetisch: wie meespeelt en nooit een baan had, liet tot
+     nu toe nergens een spoor achter -- en dat is precies de mens die in een
+     latere campagne ineens leverancier blijkt te zijn. Zelfde poort als de
+     loopbaan, want een bewaarde persoon is bewaarde progressie. */
+  const personen = require('./persoon')({ db, save, codenaamVan, mag: werkMag });
+
 
   /* Prestaties, ook afgeleid uit de uitslagen: alleen wat behaald is, geen
      voortgang naar wat je "nog moet", en geen reeksen. Zie de kop van
@@ -79,5 +87,5 @@ module.exports = (ctx) => {
   });
 
   return { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen };
+    spelPrestaties, loopbaan, personen, stadsgeheugen, daily, ondernemerskring, pandgeheugen };
 };

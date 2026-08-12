@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0d496cbc';
+var RTG_BOUW = '22089fcf';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3800,6 +3800,45 @@ var RTG_BOUW = '0d496cbc';
       localStorage.setItem('rtg_os_gebruik_' + pas, JSON.stringify(g));
     } catch (e) {}
   }
+  /* ---------- het ritme: WANNEER je iets opent ----------
+     De teller hierboven weet WAT je vaak opent; dit weet wanneer. Samen zijn ze
+     "normaal open je nu Kantoor". Zelfde principe als hierboven, en daarom
+     bewust dezelfde vorm: lokaal op het toestel, met verval per dag, zodat een
+     gewoonte die je loslaat vanzelf uitdooft in plaats van jaren mee te wegen.
+
+     ER GAAT NIETS NAAR DE SERVER. Niet je uren, niet je ritme, niets. Dat is
+     dezelfde afspraak als bij de codenamen: wat je niet verstuurt, kan ook niet
+     uitlekken.
+
+     De sleutel is wereld + uur. Uren zijn grof genoeg om een gewoonte te
+     vangen en te grof om een dag mee te reconstrueren -- dat is precies de
+     bedoeling. */
+  function ritmeLees() { try { return JSON.parse(localStorage.getItem('rtg_os_ritme_' + pas) || '{}'); } catch (e) { return {}; } }
+  function telRitme(sleutel) {
+    try {
+      const r = ritmeLees(), nu = Date.now(), k = sleutel + '|' + new Date().getHours();
+      const oud = r[k] || { n: 0, t: nu };
+      const dagen = Math.max(0, (nu - (oud.t || nu)) / 86400000);
+      r[k] = { n: (oud.n || 0) * Math.pow(0.85, dagen) + 1, t: nu };
+      localStorage.setItem('rtg_os_ritme_' + pas, JSON.stringify(r));
+    } catch (e) {}
+  }
+  /* Wat open je normaal OP DIT UUR? Alleen als het echt een patroon is:
+     minstens DREMPEL keer, en duidelijk vaker dan de nummer twee. Anders zwijgt
+     hij -- liever stil dan een gok die als inzicht klinkt. */
+  const RITME_DREMPEL = 3;
+  function ritmeNu() {
+    const r = ritmeLees(), nu = Date.now(), uur = new Date().getHours();
+    const scores = Object.entries(r)
+      .filter(([k]) => Number(k.split('|')[1]) === uur)
+      .map(([k, v]) => [k.split('|')[0], (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
+      .sort((a, b) => b[1] - a[1]);
+    if (!scores.length || scores[0][1] < RITME_DREMPEL) return null;
+    // een koploper die nauwelijks voorloopt is geen gewoonte maar een muntworp
+    if (scores[1] && scores[0][1] < scores[1][1] * 1.5) return null;
+    return scores[0][0];
+  }
+
   function topGebruik(k) {
     const g = gebruik(), nu = Date.now();
     return Object.entries(g)
@@ -4123,7 +4162,7 @@ var RTG_BOUW = '0d496cbc';
        indexeert ze en zonder die index is er halverwege de verhuizing van
        alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
        lijst vanzelf leeg. */
-    if (map.wereld) { location.href = map.wereld; return; }
+    if (map.wereld) { telRitme(map.sleutel); location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);
@@ -4640,7 +4679,12 @@ var RTG_BOUW = '0d496cbc';
   let draadOpen = false, rahulBegon = false;
   const gezegd = new Set();   // wat hij al gezegd heeft; nooit twee keer hetzelfde
 
-  function draadBel(tekst, wie) {
+  /* `leeg` betekent: dit is Rahuls terugvalzin, hij heeft niets gevonden. Dat is
+     geen detail maar precies het moment waarop het RITME iets mag zeggen -- "er
+     ligt niets dringends" is per definitie een lege ring. Zonder dit vlaggetje
+     wint zijn beleefde niets-zin het altijd van je gewoonte, en zie je het ritme
+     nooit. */
+  function draadBel(tekst, wie, leeg) {
     if (!aiDraad) return null;
     const b = document.createElement('div');
     b.className = 'os-bel van-' + (wie === 'mij' ? 'mij' : 'rahul');
@@ -4657,7 +4701,7 @@ var RTG_BOUW = '0d496cbc';
        Die zin is dus deze zin -- hij wordt daar niet opnieuw bedacht, want dan
        zouden er twee Rahuls zijn die net iets anders zeggen. Wat ik zelf typ is
        geen mededeling van hem, dus dat blijft eruit. */
-    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst);
+    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst, leeg === true);
     return b;
   }
 
@@ -4706,8 +4750,9 @@ var RTG_BOUW = '0d496cbc';
         if (s && s.wat) zin = T('os.ai.spar', 'We waren nog bezig met') + ': ' + s.wat + '.';
       } catch (e) { /* niets geparkeerd */ }
     }
+    var leeg = !zin;
     if (!zin) zin = T('os.ai.rustig', 'Er ligt niets dringends. Zeg het maar; ik zoek het op, zet het klaar of regel het.');
-    draadBel(zin, 'rahul');
+    draadBel(zin, 'rahul', leeg);
     tips.push({ tekst: T('os.ai.t.dag', 'Hoe ziet mijn dag eruit?'), vraag: T('os.ai.q.dag', 'hoe ziet mijn dag eruit') });
     tips.push({ tekst: T('os.ai.t.kun', 'Wat kun je?'), vraag: T('os.ai.q.kun', 'wat kun je') });
     draadTips(tips);
@@ -4848,6 +4893,57 @@ var RTG_BOUW = '0d496cbc';
         try { invoer.setSelectionRange(invoer.value.length, invoer.value.length); } catch (e) {}
       }
     });
+
+    /* ---------- de momenten van vandaag op de wijzerplaat ----------
+       Uit /agenda/mijn, dezelfde bron als het dagprogramma bij je reis
+       (app-main-45.js) -- er wordt hier niets bijgemaakt. Alleen VANDAAG, want
+       een wijzerplaat toont een dag; morgen om half tien heeft op deze klok
+       geen plek die van morgen is.
+
+       Heeft een lid vandaag niets, dan komen er GEEN stipjes. Een ring met
+       streepjes die suggereert dat er een dag is, is precies de verzonnen stand
+       waar CANVAS.md over gaat. */
+    async function momentenBij() {
+      if (!window.RTGWereld || !RTGWereld.momenten || !API.live || gast()) return;
+      var dagen = [];
+      try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch (e) { return; }
+      var nu = new Date();
+      var vandaag = nu.getFullYear() + '-' +
+        String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+      var dag = dagen.filter(function (d) { return d && d.datum === vandaag; })[0];
+      var items = (dag && dag.items) || [];
+      RTGWereld.momenten(items.map(function (it) {
+        // "hele dag" heeft geen plek op een wijzerplaat: zonder tijd geen stip
+        var m = /^(\d{1,2}):(\d{2})/.exec(String(it.tijd || ''));
+        if (!m) return null;
+        return {
+          tijd: it.tijd, uur: Number(m[1]), min: Number(m[2]),
+          titel: it.titel || '', sub: it.status ? tStatus(it.status) : ''
+        };
+      }).filter(Boolean));
+    }
+    momentenBij();
+    // en nog eens als je terugkomt: een dag verandert terwijl je weg bent
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) momentenBij(); });
+
+    /* ---------- wat je normaal op dit uur opent ----------
+       ritmeNu() (app-main-25b.js) leest de lokale telling en geeft alleen een
+       wereld terug als het ECHT een patroon is. Geeft hij niets, dan zegt Rahul
+       niets -- en dat is de normale uitkomst voor een lid dat hier net is.
+
+       De naam komt uit MAPPEN, net als overal: de ring krijgt een sleutel en een
+       naam en verzint er zelf niets bij. */
+    function ritmeBij() {
+      if (!window.RTGWereld || !RTGWereld.ritme) return;
+      var sleutel = ritmeNu();
+      if (!sleutel) { RTGWereld.ritme(null); return; }
+      var map = MAPPEN.filter(function (m) { return m.sleutel === sleutel; })[0];
+      if (!map || !map.wereld || !map.items.some(itemZichtbaar)) { RTGWereld.ritme(null); return; }
+      RTGWereld.ritme({ sleutel: map.sleutel, naam: mapNaam(map) });
+    }
+    ritmeBij();
+    // het uur verschuift terwijl de app openstaat; elk kwartier opnieuw kijken
+    setInterval(ritmeBij, 15 * 60 * 1000);
 
     /* De schakelaar in het bedieningspaneel. Hij zet niets zelf: hij vraagt de
        module om te wisselen en leest daarna terug wat de stand IS, zodat de

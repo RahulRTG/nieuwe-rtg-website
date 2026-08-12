@@ -81,7 +81,8 @@
      zou de tijd op twee plekken vandaan komen en op een dag uit elkaar lopen.
      De rasterstand krijgt hem zo ook gewoon terug als je terugschakelt. */
   var el = { vak: null, scherm: null, klok: null, kring: null, bezel: null, boog: null,
-    kern: null, naam: null, sub: null, wiel: null, rahul: null, grond: null };
+    kern: null, naam: null, sub: null, wiel: null, rahul: null, grond: null,
+    momenten: null, momentKaart: null };
 
   function bouwKring() {
     if (el.kring) return el.kring;

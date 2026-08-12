@@ -19,7 +19,12 @@
   let draadOpen = false, rahulBegon = false;
   const gezegd = new Set();   // wat hij al gezegd heeft; nooit twee keer hetzelfde
 
-  function draadBel(tekst, wie) {
+  /* `leeg` betekent: dit is Rahuls terugvalzin, hij heeft niets gevonden. Dat is
+     geen detail maar precies het moment waarop het RITME iets mag zeggen -- "er
+     ligt niets dringends" is per definitie een lege ring. Zonder dit vlaggetje
+     wint zijn beleefde niets-zin het altijd van je gewoonte, en zie je het ritme
+     nooit. */
+  function draadBel(tekst, wie, leeg) {
     if (!aiDraad) return null;
     const b = document.createElement('div');
     b.className = 'os-bel van-' + (wie === 'mij' ? 'mij' : 'rahul');
@@ -36,7 +41,7 @@
        Die zin is dus deze zin -- hij wordt daar niet opnieuw bedacht, want dan
        zouden er twee Rahuls zijn die net iets anders zeggen. Wat ik zelf typ is
        geen mededeling van hem, dus dat blijft eruit. */
-    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst);
+    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst, leeg === true);
     return b;
   }
 
@@ -85,8 +90,9 @@
         if (s && s.wat) zin = T('os.ai.spar', 'We waren nog bezig met') + ': ' + s.wat + '.';
       } catch (e) { /* niets geparkeerd */ }
     }
+    var leeg = !zin;
     if (!zin) zin = T('os.ai.rustig', 'Er ligt niets dringends. Zeg het maar; ik zoek het op, zet het klaar of regel het.');
-    draadBel(zin, 'rahul');
+    draadBel(zin, 'rahul', leeg);
     tips.push({ tekst: T('os.ai.t.dag', 'Hoe ziet mijn dag eruit?'), vraag: T('os.ai.q.dag', 'hoe ziet mijn dag eruit') });
     tips.push({ tekst: T('os.ai.t.kun', 'Wat kun je?'), vraag: T('os.ai.q.kun', 'wat kun je') });
     draadTips(tips);

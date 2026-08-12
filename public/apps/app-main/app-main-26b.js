@@ -160,7 +160,7 @@
        indexeert ze en zonder die index is er halverwege de verhuizing van
        alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
        lijst vanzelf leeg. */
-    if (map.wereld) { location.href = map.wereld; return; }
+    if (map.wereld) { telRitme(map.sleutel); location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);

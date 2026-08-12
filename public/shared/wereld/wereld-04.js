@@ -75,8 +75,15 @@
     r.className = 'os-wereld-rahul';
     r.id = 'osWereldRahul';
     r.setAttribute('data-toon', 'nee');
+    r.setAttribute('data-soort', 'rahul');
     r.innerHTML = '<b aria-hidden="true"></b><span></span>';
+    /* De ring draagt twee soorten. Wat RAHUL zegt komt van de server en opent
+       het gesprek; wat het RITME zegt komt van dit toestel en draait de bezel
+       naar de wereld die je normaal nu opent. Een knop die er hetzelfde uitziet
+       en twee dingen doet, hoort dat aan een attribuut af te lezen en niet aan
+       de volgorde waarin hij toevallig gevuld is. */
     r.addEventListener('click', function () {
+      if (r.getAttribute('data-soort') === 'ritme') { ritmeVolg(); return; }
       r.setAttribute('data-toon', 'nee');
       draadOpen();
     });
@@ -85,12 +92,30 @@
     el.rahul = r;
   }
 
-  function rahulZei(tekst) {
+  function rahulZei(tekst, leeg) {
     if (!st.aan || !el.rahul || !tekst) return;
     // staat het gesprek al open, dan LEEST hij daar al mee; dan is de ring
     // erbij precies de dubbeling die hij hoort te voorkomen
     if (draadStaatOpen()) return;
+    /* Zegt hij dat er niets is, dan HEEFT hij niets -- en dan mag je gewoonte de
+       ring hebben. Zonder deze tak wint zijn beleefde niets-zin het altijd van
+       het ritme en zie je dat nooit. */
+    /* "ER LIGT NIETS DRINGENDS" KRIJGT DE RING NIET.
+
+       De hele afspraak van deze ring is: hij is er niet, tot Rahul iets HEEFT.
+       Zijn terugvalzin is per definitie het tegenovergestelde -- dat is hem die
+       netjes meldt dat er niets is. Die zin in een gouden ring zetten is precies
+       het behang dat we van dit scherm af hebben gehaald.
+
+       Het bleef ook niet bij lelijk. Tik je het ritme weg, dan kwam zijn lege
+       zin er meteen voor in de plaats: je zegt "laat maar" en krijgt er iets
+       anders voor terug. Nu biedt een lege zin de ring alleen aan het ritme aan;
+       is dat er niet, dan blijft de ring dicht. In de DRAAD staat zijn zin
+       gewoon, voor wie het gesprek opent -- hij wordt niet ingeslikt, hij komt
+       alleen niet ongevraagd in beeld. */
+    if (leeg === true) { toonRitme(); return; }
     el.rahul.querySelector('span').textContent = String(tekst);
+    el.rahul.setAttribute('data-soort', 'rahul');
     el.rahul.setAttribute('data-toon', 'ja');
   }
 

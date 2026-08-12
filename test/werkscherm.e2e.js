@@ -232,16 +232,22 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       if (!RTGWereld.aan()) { RTGWereld.zet(true); await wacht(400); }
       const uit = [];
       const aantal = RTGWereld.stand().merken;
+      /* WACHTEN OP DE STAND, niet op een klok. Inzoomen is een VLUCHT van een
+         paar honderd milliseconde (wereld-05e.js); een vaste wachttijd die daar
+         net onder zit, leest de ring van vlak voor de landing. */
+      const tot = async (klaar) => { for (let n = 0; n < 120 && !klaar(); n++) await wacht(50); };
       for (let i = 0; i < aantal; i++) {
         RTGWereld.naar(i);
         await wacht(220);
         RTGWereld.zoom(true);
-        await wacht(220);
+        await tot(() => RTGWereld.stand().diep);
+        await wacht(120);
         for (const m of document.querySelectorAll('.os-wm[data-sleutel]')) {
           uit.push({ sleutel: m.dataset.sleutel || '', naam: (m.getAttribute('aria-label') || '').trim() });
         }
         RTGWereld.zoom(false);
-        await wacht(160);
+        await tot(() => !RTGWereld.stand().diep);
+        await wacht(120);
       }
       return uit;
     });

@@ -81,7 +81,8 @@
      zou de tijd op twee plekken vandaan komen en op een dag uit elkaar lopen.
      De rasterstand krijgt hem zo ook gewoon terug als je terugschakelt. */
   var el = { vak: null, scherm: null, klok: null, kring: null, bezel: null, boog: null,
-    kern: null, naam: null, sub: null, wiel: null, rahul: null, grond: null };
+    kern: null, naam: null, sub: null, wiel: null, rahul: null, grond: null,
+    momenten: null, momentKaart: null };
 
   function bouwKring() {
     if (el.kring) return el.kring;
@@ -175,12 +176,26 @@
        naam -- die verandert met het beleid mee ("Video" en niet "Clips"), en dan
        wijst alles wat op de naam leunt ineens nergens meer heen. */
     if (item.sleutel) b.dataset.sleutel = item.sleutel;
+    merkLicht(b, item);
     b.setAttribute('aria-label', item.naam);
+    /* WAT ER BINNENKOMT IS NIET ALTIJD EEN TEKEN.
+
+       tegelInhoud() levert drie soorten: een glyf-svg, de svg van een tabblad,
+       of -- als er geen van beide is -- een kaal opsommingsteken als TEKSTKNOOP.
+       Dat laatste is op een tegel met een naam eronder prima, maar een merk op
+       de ring heeft geen naam eronder: dan hangt er een lege schijf waar je
+       niets aan af kunt lezen. Twee daarvan stonden er, en een lege knop is
+       erger dan een lelijke.
+
+       Een tekstknoop is bovendien "truthy", dus de oude terugval sloeg juist bij
+       dit geval niet aan. We eisen daarom een ELEMENT; komt dat er niet, dan
+       maken we het monogram zelf. */
     var teken = item.teken && item.teken();
-    if (teken) b.appendChild(teken);
+    if (teken && teken.nodeType === 1) b.appendChild(teken);
     else {
       var mono = d.createElement('span');
-      mono.textContent = item.naam.replace(/^RTG /, '').slice(0, 2);
+      mono.className = 'os-monogram';
+      mono.textContent = String(item.naam || '?').replace(/^RTG /, '').slice(0, 2);
       b.appendChild(mono);
     }
     /* Tikken doet twee dingen, en welke hangt af van waar je staat. Op een merk
@@ -333,6 +348,10 @@
     k.addEventListener('click', function (ev) {
       ev.preventDefault();
       if (st.gesleept) return;
+      /* Staat er een moment open, dan is de klok DAT moment; een tik brengt je
+         eerst terug naar de klok. Meteen doorzoomen zou betekenen dat een tik
+         twee dingen tegelijk doet, en dan weet je na afloop niet waar je bent. */
+      if (momentStaatOpen()) { sluitMoment(); return; }
       zoom(!st.diep);
     });
     // rechtsklikken is op een muis wat lang drukken op een vinger is
@@ -347,6 +366,13 @@
      st.wereldIdx bestaat naast st.actief. */
   function zoom(naarBinnen) {
     if (!st.werelden.length) return;
+    if (naarBinnen && (!st.werelden[st.actief] || !(st.werelden[st.actief].delen || []).length)) return;
+    if (!naarBinnen && !st.diep) return;
+    // eerst wegvliegen, dan pas wisselen: anders wisselt de inhoud terwijl de
+    // oude nog in beeld staat, en dat is geen vlucht maar een flikkering
+    vlieg(naarBinnen, function () { zoomNu(naarBinnen); });
+  }
+  function zoomNu(naarBinnen) {
     if (naarBinnen) {
       var wereld = st.werelden[st.actief];
       if (!wereld || !(wereld.delen || []).length) return;   // niets om in te zoomen
@@ -362,6 +388,7 @@
     }
     el.kring.setAttribute('data-diep', st.diep ? 'ja' : 'nee');
     vulRing();
+    tekenMomenten();
     toonNaam();
     kernLabel();
     grondKies();
@@ -476,7 +503,7 @@
       var n = st.merken.length || 1;
       if (ev.key === 'ArrowRight') { ev.preventDefault(); naar((st.actief + 1) % n); }
       else if (ev.key === 'ArrowLeft') { ev.preventDefault(); naar((st.actief - 1 + n) % n); }
-      else if (ev.key === 'Escape') { if (wielOpen()) wiel(false); else if (st.diep) zoom(false); }
+      else if (ev.key === 'Escape') { if (wielOpen()) wiel(false); else if (momentStaatOpen()) sluitMoment(); else if (st.diep) zoom(false); }
       else if (ev.key === 'w' || ev.key === 'W') { ev.preventDefault(); wiel(!wielOpen()); }
     });
   }
@@ -557,8 +584,15 @@
     r.className = 'os-wereld-rahul';
     r.id = 'osWereldRahul';
     r.setAttribute('data-toon', 'nee');
+    r.setAttribute('data-soort', 'rahul');
     r.innerHTML = '<b aria-hidden="true"></b><span></span>';
+    /* De ring draagt twee soorten. Wat RAHUL zegt komt van de server en opent
+       het gesprek; wat het RITME zegt komt van dit toestel en draait de bezel
+       naar de wereld die je normaal nu opent. Een knop die er hetzelfde uitziet
+       en twee dingen doet, hoort dat aan een attribuut af te lezen en niet aan
+       de volgorde waarin hij toevallig gevuld is. */
     r.addEventListener('click', function () {
+      if (r.getAttribute('data-soort') === 'ritme') { ritmeVolg(); return; }
       r.setAttribute('data-toon', 'nee');
       draadOpen();
     });
@@ -567,12 +601,30 @@
     el.rahul = r;
   }
 
-  function rahulZei(tekst) {
+  function rahulZei(tekst, leeg) {
     if (!st.aan || !el.rahul || !tekst) return;
     // staat het gesprek al open, dan LEEST hij daar al mee; dan is de ring
     // erbij precies de dubbeling die hij hoort te voorkomen
     if (draadStaatOpen()) return;
+    /* Zegt hij dat er niets is, dan HEEFT hij niets -- en dan mag je gewoonte de
+       ring hebben. Zonder deze tak wint zijn beleefde niets-zin het altijd van
+       het ritme en zie je dat nooit. */
+    /* "ER LIGT NIETS DRINGENDS" KRIJGT DE RING NIET.
+
+       De hele afspraak van deze ring is: hij is er niet, tot Rahul iets HEEFT.
+       Zijn terugvalzin is per definitie het tegenovergestelde -- dat is hem die
+       netjes meldt dat er niets is. Die zin in een gouden ring zetten is precies
+       het behang dat we van dit scherm af hebben gehaald.
+
+       Het bleef ook niet bij lelijk. Tik je het ritme weg, dan kwam zijn lege
+       zin er meteen voor in de plaats: je zegt "laat maar" en krijgt er iets
+       anders voor terug. Nu biedt een lege zin de ring alleen aan het ritme aan;
+       is dat er niet, dan blijft de ring dicht. In de DRAAD staat zijn zin
+       gewoon, voor wie het gesprek opent -- hij wordt niet ingeslikt, hij komt
+       alleen niet ongevraagd in beeld. */
+    if (leeg === true) { toonRitme(); return; }
     el.rahul.querySelector('span').textContent = String(tekst);
+    el.rahul.setAttribute('data-soort', 'rahul');
     el.rahul.setAttribute('data-toon', 'ja');
   }
 
@@ -826,6 +878,8 @@
     var maat = Math.max(W, H);
     try {
       for (var i = 0; i < grond.motief.length; i++) gloed(ctx, W, H, maat, grond.motief[i], i, kracht);
+      // binnen een wereld sta je ergens: dan komt de horizon erbij
+      horizon(ctx, W, H, grond.t);
     } catch (e) { /* een motief mag het scherm nooit kosten */ }
     ctx.restore();
   }
@@ -876,6 +930,315 @@
   }
   function grondStop() { if (grond.tik) { w.cancelAnimationFrame(grond.tik); grond.tik = null; } }
 
+  /* ---------- de momenten van vandaag, op de wijzerplaat ----------
+
+     De klok droeg werelden. Nu draagt hij ook TIJD -- en dat is waar hij als
+     enige element goed in is: 09:30, 14:00, 19:00 staan op de plek waar ze
+     horen te staan, en je tikt ze aan om te zien wat er dan is.
+
+     ZE DRAAIEN NIET MEE, en dat is de hele reden dat ze een eigen laag hebben.
+     De bezel met werelden draait als je reist; een tijdstip dat meedraait is
+     geen tijdstip meer maar een versiering. Ze liggen daarom in een laag die
+     nooit roteert, tussen de wijzerplaat (straal 31) en de wereldmerken
+     (36 tot 46) in -- op straal 34, waar ze allebei niet raken.
+
+     ER WORDT HIER NIETS VERZONNEN. De momenten komen uit /agenda/mijn, dezelfde
+     bron als het dagprogramma bij je reis (app-main-45.js). Heeft een lid
+     vandaag niets, dan staan er GEEN stipjes -- geen lege ring met streepjes om
+     te suggereren dat er een dag is. Dat is dezelfde regel als bij de stand:
+     wat niet gemeten kan worden, wordt niet getoond (CANVAS.md). */
+  var momenten = [];        // [{tijd:'14:00', uur, min, titel, sub}]
+  var momentOpen = null;
+
+  /* Een tijd op de wijzerplaat is een hoek op een twaalfuursverdeling: elk uur
+     dertig graden, elke minuut een halve. 14:00 landt dus op twee uur, precies
+     waar de wijzer zou staan. */
+  function momentHoek(uur, min) { return (uur % 12) * 30 + min * 0.5; }
+
+  function bouwMomenten() {
+    if (el.momenten || !el.kring) return;
+    var laag = d.createElement('div');
+    laag.className = 'os-momenten';
+    laag.id = 'osMomenten';
+    // tussen de klok en de merken in: de klok mag hem niet afdekken
+    el.kring.appendChild(laag);
+    el.momenten = laag;
+
+    var kaart = d.createElement('div');
+    kaart.className = 'os-moment-kaart';
+    kaart.id = 'osMomentKaart';
+    kaart.setAttribute('role', 'status');
+    kaart.setAttribute('aria-live', 'polite');
+    kaart.hidden = true;
+    el.kring.appendChild(kaart);
+    el.momentKaart = kaart;
+  }
+
+  /* De momenten (opnieuw) aanreiken. Zelfde vorm als werelden(): de aanroeper
+     haalt ze op en deze laag tekent ze. Verandert er niets, dan gebeurt er
+     niets -- anders knippert de ring bij elke ronde. */
+  var vorigeMomenten = null;
+  function zetMomenten(lijst) {
+    lijst = (lijst || []).filter(function (m) { return m && typeof m.uur === 'number'; });
+    var vinger = lijst.map(function (m) { return m.uur + ':' + m.min + '~' + m.titel; }).join('|');
+    if (vinger === vorigeMomenten) return;
+    vorigeMomenten = vinger;
+    momenten = lijst;
+    if (st.aan) tekenMomenten();
+  }
+
+  function tekenMomenten() {
+    if (!el.momenten) return;
+    el.momenten.textContent = '';
+    sluitMoment();
+    /* Ingezoomd in een wereld hoort de klok bij DIE wereld; de dag van vandaag
+       eroverheen zou twee verhalen door elkaar zijn. */
+    if (st.diep || !momenten.length) return;
+    momenten.forEach(function (m, i) {
+      var b = d.createElement('button');
+      b.type = 'button';
+      b.className = 'os-moment';
+      b.dataset.i = String(i);
+      b.setAttribute('aria-label', m.tijd + ' ' + m.titel);
+      var a = (momentHoek(m.uur, m.min) - 90) * Math.PI / 180;
+      b.style.left = (50 + 34 * Math.cos(a)).toFixed(3) + '%';
+      b.style.top = (50 + 34 * Math.sin(a)).toFixed(3) + '%';
+      b.innerHTML = '<i></i><span>' + m.tijd + '</span>';
+      b.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        if (st.gesleept) return;
+        openMoment(Number(b.dataset.i));
+      });
+      el.momenten.appendChild(b);
+    });
+  }
+
+  /* ---------- de klok WORDT dat moment ----------
+     Niet een popup ernaast maar de wijzerplaat zelf: de klok zakt weg en het
+     moment staat in dezelfde cirkel. Zo blijf je op je plek -- je hebt niets
+     geopend, je kijkt naar een ander uur van dezelfde dag. */
+  function openMoment(i) {
+    var m = momenten[i];
+    if (!m || !el.momentKaart) return;
+    momentOpen = i;
+    el.momentKaart.innerHTML =
+      '<b class="os-moment-tijd">' + esc(m.tijd) + '</b>' +
+      '<span class="os-moment-titel">' + esc(m.titel) + '</span>' +
+      (m.sub ? '<span class="os-moment-sub">' + esc(m.sub) + '</span>' : '');
+    el.momentKaart.hidden = false;
+    el.kring.setAttribute('data-moment', 'ja');
+    for (var j = 0; j < el.momenten.children.length; j++) {
+      el.momenten.children[j].dataset.actief = (j === i ? 'ja' : 'nee');
+    }
+    if (el.kern) el.kern.setAttribute('aria-label', 'Terug naar de klok');
+  }
+
+  function sluitMoment() {
+    momentOpen = null;
+    if (el.momentKaart) el.momentKaart.hidden = true;
+    if (el.kring) el.kring.setAttribute('data-moment', 'nee');
+    if (el.momenten) {
+      for (var j = 0; j < el.momenten.children.length; j++) el.momenten.children[j].dataset.actief = 'nee';
+    }
+    kernLabel();
+  }
+  function momentStaatOpen() { return momentOpen != null; }
+
+  // tekst uit de agenda is tekst en geen opmaak: hij komt van buiten
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* ---------- Rahul kent je ritme ----------
+
+     "Normaal open je om deze tijd RTG Kantoor." Dat is een van de mooiste
+     zinnen uit het ontwerp en tegelijk de gevaarlijkste, want er zit gedrag van
+     een mens onder. Vier grenzen daarom, en ze staan hier omdat een grens die
+     alleen in een document staat over drie maanden weg is:
+
+     1. HET BLIJFT OP HET TOESTEL. De telling woont in localStorage, naast de
+        gebruiksteller die het OS al had (rtg_os_gebruik_*). Er gaat niets over
+        dit lid naar de server -- niet zijn ritme, niet zijn uren, niets. Dat is
+        dezelfde regel als de codenamen: wat je niet verstuurt, kan ook niet
+        uitlekken.
+
+     2. HET OPENT, HET STUURT NIET. Er is geen badge, geen teller, geen "je hebt
+        dit al drie dagen niet gedaan", geen streak. Het is een aanbod dat je
+        kunt negeren, en negeren kost niets. CLAUDE.md verbiedt verslavende
+        patronen, en een ritme dat je eraan HERINNERT dat je iets normaal doet,
+        is precies zo'n patroon.
+
+     3. PAS ALS HET ECHT EEN PATROON IS. Een keer om tien uur Kantoor openen is
+        geen ritme. Er moet een duidelijke koploper zijn in dit uur, en die moet
+        het vaak genoeg gedaan hebben (DREMPEL). Tot die tijd zegt hij niets --
+        liever stil dan een gok die als inzicht klinkt.
+
+     4. HIJ BELOOFT NIETS WAT HIJ NIET DOET. Het ontwerp zei "Ik heb het alvast
+        voorbereid". Dat zou hier een leugen zijn: er wordt niets voorbereid.
+        Wat hij WEL kan, doet hij ook echt -- de ring zet klaar wat je normaal
+        opent, en tikken draait je er meteen heen. */
+  var ritme = null;         // { sleutel, naam } of null
+  var ritmeWeg = false;     // vandaag weggetikt? dan zwijgt hij
+
+  function heeftRitme() { return !!ritme && !ritmeWeg; }
+
+  function zetRitme(v) {
+    ritme = (v && v.sleutel && v.naam) ? v : null;
+    toonRitme();
+  }
+
+  /* De ring van Rahul draagt hoogstens EEN ding. Wat hij zelf te melden heeft
+     gaat voor: dat is nieuws, en dit is een gewoonte. Zegt hij niets, dan mag
+     het ritme de ring hebben. */
+  function toonRitme() {
+    if (!st.aan || !el.rahul || !ritme || ritmeWeg) return;
+    /* Zijn NIEUWS gaat voor -- dat is nieuws, dit is een gewoonte. Zijn lege zin
+       komt hier nooit terecht (zie rahulZei), dus als de ring bezet is door
+       'rahul' staat er echt iets in. */
+    if (el.rahul.getAttribute('data-soort') === 'rahul' &&
+        el.rahul.getAttribute('data-toon') === 'ja') return;
+    if (draadStaatOpen()) return;
+    el.rahul.querySelector('span').textContent = 'Normaal open je nu ' + ritme.naam;
+    el.rahul.setAttribute('data-soort', 'ritme');
+    el.rahul.setAttribute('data-toon', 'ja');
+  }
+
+  /* Tikken draait de bezel naar die wereld -- en opent hem NIET. Het verschil
+     is de hele afspraak: hij zet klaar, jij besluit. Meteen openen zou van een
+     aanbod een handeling maken die je niet hebt gedaan. */
+  function ritmeVolg() {
+    if (!ritme) return;
+    var i = -1;
+    for (var j = 0; j < st.werelden.length; j++) {
+      if (st.werelden[j].sleutel === ritme.sleutel) { i = j; break; }
+    }
+    ritmeSluit();
+    if (i >= 0) { if (st.diep) zoom(false); naar(i); }
+  }
+
+  /* Weggetikt is weg, voor vandaag. Niet voor altijd -- morgen is het weer een
+     nieuwe dag en misschien klopt het dan wel. Maar hem dezelfde dag opnieuw
+     laten opkomen is zeuren, en dat is precies wat grens 2 verbiedt. */
+  function ritmeSluit() {
+    ritmeWeg = true;
+    if (el.rahul) {
+      el.rahul.setAttribute('data-toon', 'nee');
+      el.rahul.setAttribute('data-soort', 'rahul');
+    }
+  }
+
+  /* ---------- planeten, en de vlucht ernaartoe ----------
+
+     Het ontwerp vroeg om werelden als planeten die om de klok draaien, en om
+     inzoomen dat voelt als vliegen in plaats van openen. Allebei zijn ze hier
+     gebouwd, maar niet zoals ze op papier stonden -- en dat verschil is een
+     besluit dat uitleg verdient.
+
+     WAT ER NIET GEBEURT: de merken gaan niet vrij in banen om de klok draaien.
+     Een bezel leest zijn stand af aan een VAST punt (de gouden index op twaalf
+     uur); merken die elk hun eigen baan hebben, hebben geen stand meer, en dan
+     is het geen horloge maar een mobiel. Dat zou ook de meting breken die
+     bewaakt dat ze op EEN cirkel liggen -- en die meting bewaakt een echte
+     fout, geen smaak.
+
+     WAT ER WEL GEBEURT, en wat het idee eigenlijk vraagt:
+
+     1. Elke wereld krijgt zijn EIGEN LICHT. De acht merken waren acht
+        identieke grijze schijven; nu draagt elk de tint van zijn eigen wereld
+        (dezelfde tint als zijn gloed op de grond, uit MOTIEVEN). Daardoor lees
+        je de ring als een stelsel van lichamen in plaats van als een rij
+        knoppen -- en je herkent een wereld aan zijn kleur voordat je de glyf
+        leest.
+
+     2. Inzoomen is een VLUCHT. De andere werelden schieten naar buiten weg
+        alsof je er langs komt, en pas als ze weg zijn staan de onderdelen er.
+        Uitzoomen is dezelfde beweging terug. Het is een overgang en geen tweede
+        scherm: er komt geen stand bij, alleen tijd tussen twee standen.
+
+     3. Binnen een wereld krijgt de grond een HORIZON die meeschuift als je
+        draait. Dat is wat "een stad" hier kan betekenen zonder er een te
+        tekenen: je merkt dat je je ergens doorheen beweegt in plaats van door
+        een lijst te bladeren. */
+
+  // de tint van een wereld: dezelfde als zijn gloed, uit de tabel in deel 5b
+  function wereldTint(sleutel) {
+    var m = MOTIEVEN[sleutel];
+    return (m && m[0] && m[0][3]) || TINT.goud;
+  }
+
+  /* Het licht van een merk. Staat als custom property op de knop zelf, zodat
+     het blad hem kan gebruiken zonder dat hier kleuren worden geschilderd --
+     schilderen doet de CSS, hier staat alleen WELKE. */
+  function merkLicht(b, item) {
+    if (!item || !item.sleutel) return;
+    var t = wereldTint(item.sleutel);
+    if (!t) return;
+    b.style.setProperty('--planeet', t[0] + ',' + t[1] + ',' + t[2]);
+  }
+
+  /* ---------- de vlucht ----------
+     Twee stappen met een pauze ertussen: eerst wegschieten, dan pas de nieuwe
+     ring. Zonder die pauze wisselt de inhoud terwijl de oude nog in beeld is,
+     en dan is het geen vlucht maar een flikkering.
+
+     Bewegingsarm slaat de vlucht over. Wie geen beweging wil, wil hem ook hier
+     niet -- en de FUNCTIE (je staat in de wereld) is dezelfde. */
+  var VLUCHT_MS = 300;
+  var vluchtBezig = null;
+
+  function vlieg(naarBinnen, klaar) {
+    if (!el.kring) { klaar(); return; }
+    if (RUSTIG || sleepStil()) { klaar(); return; }
+    if (vluchtBezig) { w.clearTimeout(vluchtBezig); vluchtBezig = null; }
+    el.kring.setAttribute('data-vlucht', naarBinnen ? 'in' : 'uit');
+    vluchtBezig = w.setTimeout(function () {
+      vluchtBezig = null;
+      klaar();
+      /* Het attribuut moet ER NOG STAAN als de nieuwe merken worden gemaakt,
+         anders beginnen ze niet aan de rand maar staan ze er meteen. Een frame
+         later halen we hem weg; dan speelt de terugkomst. */
+      w.requestAnimationFrame(function () {
+        w.requestAnimationFrame(function () {
+          if (el.kring) el.kring.setAttribute('data-vlucht', 'nee');
+        });
+      });
+    }, VLUCHT_MS);
+  }
+
+  /* ---------- de horizon binnen een wereld ----------
+     Een band onderin die met de ring meeschuift. Hij is er alleen als je IN een
+     wereld staat: buiten kijk je naar het stelsel, binnen sta je ergens. */
+  function horizon(c, W, H, t) {
+    if (!st.diep) return;
+    var tint = wereldTint((st.werelden[st.wereldIdx] || {}).sleutel);
+    var schuif = (st.hoek / 360) * W * 0.5;
+    var basis = H * 0.78;
+    c.save();
+    c.globalCompositeOperation = 'lighter';
+    /* Drie lagen op verschillende diepte, zodat de dichtstbije het hardst
+       meeschuift. Dat is wat je van een plek verwacht als je erlangs beweegt --
+       en het is hetzelfde parallax-idee als bij de sterren, alleen dichterbij. */
+    for (var laag = 0; laag < 3; laag++) {
+      var diep = 0.35 + laag * 0.32;
+      var hoogte = H * (0.05 + laag * 0.022);
+      var a = (0.05 - laag * 0.012) * (0.6 + 0.4 * Math.sin(t * 0.4 + laag));
+      c.fillStyle = 'rgba(' + tint[0] + ',' + tint[1] + ',' + tint[2] + ',' + a.toFixed(4) + ')';
+      c.beginPath();
+      c.moveTo(0, H);
+      for (var x = 0; x <= W; x += W / 24) {
+        var u = (x + schuif * diep) / W;
+        var y = basis + laag * H * 0.03 - hoogte * (0.5 + 0.5 * Math.sin(u * 6.28 * 1.5 + laag * 2.1));
+        c.lineTo(x, y);
+      }
+      c.lineTo(W, H);
+      c.closePath();
+      c.fill();
+    }
+    c.restore();
+  }
+
   /* ---------- aanzetten, uitzetten ----------
      ER ZIJN GEEN TWEE BEGINSCHERMEN. Dat is de belangrijkste regel van dit
      blok, en de reden dat het zo weinig doet: omschakelen verplaatst de KLOK en
@@ -913,13 +1276,14 @@
          lid zelf koos (os-wall-*) het te winnen. */
       el.scherm.setAttribute('data-inlogkleur', '');
       if (w.Inlogkleur && w.Inlogkleur.verf) { try { w.Inlogkleur.verf(); } catch (e) {} }
-      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
+      bouwKring(); bouwNaam(); bouwKern(); bouwMomenten(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
       if (!gebonden) { bindSleep(); bindToetsen(); gebonden = true; }
       el.kring.hidden = false;
       el.naam.hidden = false; el.sub.hidden = false;
       if (el.grond) el.grond.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
-      vulRing(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
+      vulRing(); tekenMomenten(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
+      toonRitme();
     } else {
       wiel(false);
       grondStop();
@@ -1031,6 +1395,8 @@
       naam: (it && it.naam) || null,
       wereld: st.diep ? (st.werelden[st.wereldIdx] || {}).naam || null : (it && it.naam) || null,
       merken: st.merken.length,
+      momenten: momenten.length,
+      moment: momentStaatOpen(),
       wiel: wielOpen()
     };
   }
@@ -1044,6 +1410,8 @@
     zoom: zoom,
     wiel: wiel,
     rahulZei: rahulZei,
+    momenten: zetMomenten,
+    ritme: zetRitme,
     stand: stand
   };
 })(window);

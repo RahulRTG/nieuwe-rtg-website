@@ -133,59 +133,17 @@ module.exports = ({ db, save, codenaamVan, progressieMag, GEEN_PROGRESSIE }) => 
     return { weg, uitleg: 'Wat anderen over deze samenwerking bewaren blijft staan, op codenaam.' };
   }
 
-  /* EEN AFGELOPEN POTJE OPSCHRIJVEN. Dezelfde vorm als `noteerUitslag` in
-     ./uitslagen.js en om dezelfde reden idempotent: hij wordt aangeroepen
-     vanuit `naPotje` in ./partij.js, en een partij kan maar een keer klaar zijn.
-
-     HIJ LEEST `potje.staat.diensten`, en dat is vandaag alleen Magnaat -- het
-     enige spel waarin spelers elkaar in dienst nemen (magnaat/dienst.js). Dat
-     staat hier als VORM en niet als naam: een tweede spel met dienstverbanden
-     levert dezelfde lijst aan en hoeft niets nieuws te bouwen. Een spel dat ze
-     niet heeft, komt hier langs en er gebeurt niets.
-
-     ER KOMT GEEN BEDRAG MEE, en dat is grens 2 hierboven in werking. In
-     `diensten` staat een `loon` en een `betaaldTotaal`; die blijven waar ze
-     horen -- in het potje. */
-  function noteerLoopbaan(potje) {
-    if (!potje || potje.status !== 'klaar' || potje.loopbaanGenoteerd) return null;
-    potje.loopbaanGenoteerd = true;
-    const diensten = ((potje.staat || {}).diensten) || [];
-    if (!diensten.length) return null;
-    const uit = [];
-    for (const d of diensten) {
-      const maanden = d.maanden || 0;
-      if (maanden < 1) continue;                 // niet begonnen is niet gewerkt
-      const wn = codenaamVan(d.werknemer), wg = codenaamVan(d.werkgever);
-      /* BEIDE KANTEN, elk op zijn eigen codenaam en elk alleen als DIE persoon
-         binnen de grens valt. Een volwassene die met een tiener speelde, houdt
-         zijn eigen kant; de tiener houdt niets. Dat is de grens per PERSOON en
-         niet per potje, en het is de enige lezing die klopt. */
-      const r1 = onthoudBaan(d.werknemer, wn, { werkgever: wg, rol: d.rol,
-        rolnaam: d.rolnaam, maanden, reden: d.reden || 'partij voorbij', potje: potje.id });
-      if (r1.bewaard) {
-        onthoud(d.werknemer, wn, 'eerste_baan', { samen: wg, wat: d.rol, potje: potje.id });
-        uit.push({ wie: wn, bij: wg });
-      }
-      /* En de werkgeverskant: dat er iemand voor je werkte is ook JOUW
-         geschiedenis. Hij krijgt geen `baan` -- hij had er geen -- maar wel het
-         moment, want er was een tweede mens bij. */
-      onthoud(d.werkgever, wg, 'eerste_mens', { samen: wn, wat: d.rol, potje: potje.id });
-      /* DE LEERLING DIE ZELF BEGON (hoofdstuk 9, en de mooiste van de zes).
-         Alleen als hij bij het einde van de partij ook echt een eigen zaak
-         had -- anders is het een voornemen en geen moment. */
-      const eigen = ((potje.staat.vestigingen || {})[d.werknemer] || []).length;
-      if (eigen > 0) {
-        onthoud(d.werknemer, wn, 'eerste_zaak', { samen: wg, wat: duur(maanden), potje: potje.id });
-        onthoud(d.werkgever, wg, 'opgeleid', { samen: wn, wat: duur(maanden), potje: potje.id });
-      }
-    }
-    return uit;
-  }
+  /* WAT EEN AFGELOPEN POTJE OPLEVERT staat in ./loopbaan-noteren.js: de
+     dienstverbanden EN de overdrachten die iemand naliet. Dat is een eigen
+     onderwerp -- het groeit met elke laag die een blijvend feit produceert,
+     terwijl dit register af is zodra het klopt. */
+  const { noteerLoopbaan, noteerNalatenschap } =
+    require('./loopbaan-noteren')({ onthoud, onthoudBaan, duur, codenaamVan });
 
   const terugblik = maakTerugblik({ alle, mag, GEEN_PROGRESSIE });
 
   return { MOMENTEN, MOMENTLIJST, duur, mag, onthoudBaan, onthoud, terugblik,
-    stoptErmee, noteerLoopbaan, alle };
+    stoptErmee, noteerLoopbaan, noteerNalatenschap, alle };
 };
 module.exports.MOMENTEN = MOMENTEN;
 module.exports.duur = duur;

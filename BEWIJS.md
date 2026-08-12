@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 932 bestanden en 6219 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 932 bestanden en 6225 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 932 |
-| losse beweringen (`test(...)`) | 6219 |
+| losse beweringen (`test(...)`) | 6225 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-812 bestanden, 6004 beweringen.
+812 bestanden, 6010 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -665,7 +665,7 @@ toets omvalt.
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
 | `spellab.test.js` | 15 | -- | MAGNAAT: HET BALANSLAB -- meet het wat het zegt te meten? Een meetopstelling is zelf software, en een kapotte meter is duurder dan geen meter: hij geeft een getal en je gelooft het. |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |
-| `spelloopbaan.test.js` | 14 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
+| `spelloopbaan.test.js` | 20 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
 | `spelmaatje.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen voor een hint, een regel of een peptalk. |
 | `spelmagnaat.test.js` | 34 | genoemd | MAGNAAT: twee vormen, en de economie die er nieuw bij staat. Het bordspel is niet veranderd; wat hier onder toets staat is de ECONOMIE, en dan vooral de vier beweringen waar een economische simulatie op valt of staat. |
 | `spelnabespreking.test.js` | 8 | -- | De nabespreking: Rahul kijkt een AFGELOPEN partij terug. Er zijn twee Rahul-deuren en ze mogen elkaar niet raken. |

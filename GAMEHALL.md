@@ -1694,8 +1694,35 @@ een mens overblijft) en de **levende kaart** — `kern/spellen/stadsgeheugen.js`
 > niemand speelde. En hij valt buiten de 18+-poort om precies de reden die
 > `grens.js` bij de dagtelling al opschreef: *daar staat geen persoon in.*
 
-Nog open in fase C: vakantiemodus, overdracht, legacy, Magnaat Daily en lokale
-governance.
+Daarna kwamen de **overdracht** en de **nalatenschap** —
+`kern/spellen/magnaat/uitstap.js` en `kern/spellen/loopbaan-noteren.js`.
+
+> **Wie stopt, stopt de campagne niet.** `spelOpgeven` beëindigt het hele potje
+> zodra iemand ermee ophoudt. Voor schaken klopt dat; voor een campagne van zes
+> over zesendertig maanden zijn er dan vijf mensen hun partij kwijt omdat er een
+> wegging. Uitstappen is iets anders dan opgeven: je draagt je bedrijf over aan
+> een opvolger die de **boekwaarde** betaalt — niet een prijs die je zelf
+> verzint, want dat is de goedkoopste samenzwering in het spel — of het wordt
+> afgewikkeld zoals bij sluiten. Lopende dienstverbanden eindigen met de reden
+> *werkgever gestopt*.
+>
+> Wat ervan het potje overleeft is het **feit**, niet het geld: *jij gaf het
+> door, hij nam het over*. Twee momenten in hetzelfde register als de rest van
+> de loopbaan, en met dezelfde wet — zonder opvolger is er geen tweede mens en
+> dus geen herinnering.
+
+Twee dingen die de keuring hierbij vond, en allebei stonden ze er al langer.
+De **eindstand** filterde een vertrokken speler weg; terecht voor de ranglijst,
+fataal voor de optelsom, want dezelfde lijst is het wereldvermogen — de
+geldpompkeuring las −31,75% op een overdracht waar geen euro van eigenaar
+hoorde te veranderen. En de **beurt ging nooit door** in de economische vorm:
+de descriptor zegt dat openen, uitbreiden en sluiten grote zetten zijn die op je
+beurt horen, `partij.js` handhaaft dat, en niemand zette `potje.beurt` door. In
+een campagne kon dus alleen speler één ooit een vestiging openen. Het bleef
+staan omdat elke toets de motor rechtstreeks aanspreekt en de beurtbewaking een
+laag hoger zit.
+
+Nog open in fase C: Magnaat Daily en lokale governance.
 
 **Fase D — de rollen.** Meerdere mensen in één concern (CEO/CFO/COO), lokale
 ondernemerskringen, chat-integratie.

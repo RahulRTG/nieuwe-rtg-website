@@ -14,13 +14,25 @@
    zinnen blijven hangen. */
 'use strict';
 
-/* DE MOMENTEN DIE HET ONTHOUDEN WAARD ZIJN. Zes, en er staat met opzet geen
+/* DE MOMENTEN DIE HET ONTHOUDEN WAARD ZIJN. Acht, en er staat met opzet geen
    omzet, vermogen of aantal tussen: die staan al op de eindstand van een potje
    en horen daar. Een herinnering die een getal is, is een score met een lijstje
    eromheen.
 
    `samen` is geen veld maar de wet: elk moment hieronder noemt een TWEEDE
-   codenaam, en `onthoud` weigert er een zonder. */
+   codenaam, en `onthoud` weigert er een zonder.
+
+   DE LAATSTE TWEE ZIJN DE NALATENSCHAP (fase C, GAMEHALL.md 12.9). Ze horen
+   HIER en niet in een eigen laag, en dat is een besluit: wat iemand nalaat is
+   geen tweede soort geschiedenis maar dezelfde. Een overdracht is precies wat
+   de grondwet toelaat om een potje te overleven -- geen kas, geen zaak, geen
+   waarde, maar het FEIT dat jij jouw levenswerk aan iemand gaf en dat hij het
+   aannam (VERHAAL.md paragraaf 1: uit tijd en uit wat je deed, nooit uit geld).
+
+   En hij voldoet vanzelf aan de wet van deze laag: WIE ZONDER OPVOLGER
+   uitstapt, wikkelt af en laat niemand achter. Dan is er geen tweede mens en
+   dus geen moment -- niet omdat het verdriet minder is, maar omdat dit register
+   over samenwerking gaat en niet over een leeg pand. */
 const MOMENTEN = {
   eerste_baan: { naam: 'Je eerste baan',
     zin: (m) => 'Je begon als ' + m.wat + ' bij ' + m.samen + '.' },
@@ -33,7 +45,14 @@ const MOMENTEN = {
   opgeleid: { naam: 'Iemand die jij opleidde',
     zin: (m) => m.samen + ' begon voor zichzelf, na ' + m.wat + ' bij jou.' },
   eerste_mens: { naam: 'Je eerste medewerker',
-    zin: (m) => m.samen + ' kwam bij je werken als ' + m.wat + '.' }
+    zin: (m) => m.samen + ' kwam bij je werken als ' + m.wat + '.' },
+  /* De twee kanten van een overdracht, en ze staan er allebei omdat het voor
+     allebei een moment is -- net als eerste_baan en eerste_mens. Wie stopt
+     onthoudt aan wie hij het gaf; wie doorgaat onthoudt van wie hij het kreeg. */
+  doorgegeven: { naam: 'Je gaf het door',
+    zin: (m) => 'Je stopte na ' + m.wat + ', en ' + m.samen + ' ging verder waar jij ophield.' },
+  overgenomen: { naam: 'Je nam het over',
+    zin: (m) => 'Je nam over wat ' + m.samen + ' in ' + m.wat + ' had opgebouwd.' }
 };
 const MOMENTLIJST = Object.keys(MOMENTEN);
 

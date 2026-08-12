@@ -308,7 +308,7 @@ niet vrij.
 | 0 | **De grens als code** ✅ | 18+, codenaam, spelvak — op één plek, zoals `grens.js` dat voor progressie doet | alle vier |
 | 1 | **Loondienst binnen één potje** ✅ | je kunt bij een andere speler werken, met een rol en een salaris uit zíjn kas. Niets blijft bewaard | geen permanentie, dus nog geen 18+-vraag |
 | 2 | **Het werkverleden dat het potje overleeft** ✅ | de melding *"hij werkte 3 jaar 2 maanden voor jou"*, en de vier keuzes van hoofdstuk 3 | hier begint 18+ |
-| 3 | **Het wereldvak onder de echte schermen** | spelers gebruiken het échte personeels-, rooster- en dossierscherm op spelgegevens | grens 2, structureel |
+| 3 | **Het wereldvak onder de echte schermen** ✅ | spelers gebruiken het échte personeels-, rooster- en dossierscherm op spelgegevens | grens 2, structureel |
 | 4 | **De momenten** ✅ | wat onthouden wordt, en alleen als er een tweede persoon bij was | grens 4 |
 | 5 | **De terugblik** ✅ | hoofdstuk 13: geen cijfers, wel een geschiedenis | — |
 

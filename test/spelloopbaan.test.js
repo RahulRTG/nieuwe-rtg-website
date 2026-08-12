@@ -219,3 +219,66 @@ test('elk soort moment heeft een zin die de tweede mens noemt', () => {
     assert.ok(m.naam && m.naam.length > 3, soort + ' heeft geen naam');
   }
 });
+
+/* ================= 9. de nalatenschap ================= */
+/* Fase C, `legacy` uit GAMEHALL.md 12.9. Wat er van je overblijft bij de mensen
+   die doorgingen -- zie ../server/kern/spellen/nalatenschap.js. Vier
+   beweringen, en ze volgen alle vier uit de grondwet in VERHAAL.md paragraaf 1. */
+
+const potjeMetUitstap = (uit, extra) => ({ id: 'p2', status: 'klaar',
+  staat: Object.assign({ diensten: [], vestigingen: {}, uit }, extra) });
+
+test('wie zijn levenswerk doorgeeft, laat aan beide kanten iets achter', () => {
+  const { L } = opstelling();
+  L.noteerLoopbaan(potjeMetUitstap({ rahul: { maand: 38, naar: 'mike', overgedragen: 3, afgewikkeld: 0 } }));
+  const van = L.terugblik('rahul', 'CN-rahul').momenten.find(m => m.soort === 'doorgegeven');
+  const naar = L.terugblik('mike', 'CN-mike').momenten.find(m => m.soort === 'overgenomen');
+  assert.ok(van, 'de vertrekker onthoudt aan wie hij het gaf');
+  assert.equal(van.samen, 'CN-mike');
+  assert.match(van.zin, /3 jaar 2 maanden/, 'in mensentaal en niet in maanden: ' + van.zin);
+  assert.ok(naar, 'en de opvolger onthoudt van wie hij het kreeg');
+  assert.equal(naar.samen, 'CN-rahul');
+});
+
+test('wie zonder opvolger stopt, laat niets na -- en dat is geen gebrek', () => {
+  /* De wet van deze laag is dat een herinnering TWEE mensen raakt. Afwikkelen
+     is geen samenwerking, dus er is niets te onthouden. */
+  const { L } = opstelling();
+  L.noteerLoopbaan(potjeMetUitstap({ rahul: { maand: 20, naar: null, overgedragen: 0, afgewikkeld: 2 } }));
+  assert.deepEqual(L.terugblik('rahul', 'CN-rahul').momenten, []);
+});
+
+test('overdragen zonder dat er iets overging, is geen nalatenschap', () => {
+  const { L } = opstelling();
+  L.noteerLoopbaan(potjeMetUitstap({ rahul: { maand: 20, naar: 'mike', overgedragen: 0, afgewikkeld: 0 } }));
+  assert.deepEqual(L.terugblik('rahul', 'CN-rahul').momenten, []);
+  assert.deepEqual(L.terugblik('mike', 'CN-mike').momenten, []);
+});
+
+test('de nalatenschap valt niet weg in een partij zonder dienstverbanden', () => {
+  /* DE VALKUIL. `noteerLoopbaan` keert vroeg terug als er geen diensten zijn --
+     en dat is juist de partij waarin een overdracht het enige is wat er te
+     onthouden viel. */
+  const { L } = opstelling();
+  const p = potjeMetUitstap({ rahul: { maand: 12, naar: 'mike', overgedragen: 1, afgewikkeld: 0 } });
+  assert.equal((p.staat.diensten || []).length, 0);
+  L.noteerLoopbaan(p);
+  assert.equal(L.terugblik('mike', 'CN-mike').momenten.length, 1);
+});
+
+test('de grens geldt ook hier per persoon', () => {
+  const { L } = opstelling(['rahul']);        // alleen de vertrekker is volwassen
+  L.noteerLoopbaan(potjeMetUitstap({ rahul: { maand: 38, naar: 'mike', overgedragen: 2, afgewikkeld: 0 } }));
+  assert.equal(L.terugblik('rahul', 'CN-rahul').momenten.length, 1, 'hij houdt zijn eigen kant');
+  assert.equal(L.terugblik('mike', 'CN-mike').mag, false, 'en de tiener houdt niets');
+});
+
+test('er komt geen bedrag mee uit een overdracht', () => {
+  /* De overdracht ging over boekwaarde en die staat in het potje. Wat het
+     register overhoudt is een duur en twee codenamen, en niets anders. */
+  const { L } = opstelling();
+  L.noteerLoopbaan(potjeMetUitstap({ rahul: { maand: 38, naar: 'mike', overgedragen: 3, som: 4200000 } }));
+  const alles = JSON.stringify(L.alle());
+  assert.ok(!alles.includes('4200000'), 'de overnameprijs hoort in het potje te blijven: ' + alles);
+  assert.ok(!/\d[\d.,]*\s*(euro|EUR)/i.test(alles), alles);
+});

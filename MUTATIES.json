@@ -2708,6 +2708,10 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "persistentiestand.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "pestgrens.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -182,6 +182,16 @@ function startSqliteSync() {
 }
 
 // Laatste flush bij het afsluiten, zodat niets in de write-behind blijft hangen.
+/* De persistentiestand: een getal dat OPLOOPT zodra er werkelijk is
+   weggeschreven. Alleen de SQLite-opslag houdt zo'n teller bij; bij de andere
+   opslagsoorten geven we null terug, en dat betekent NIET VAST TE STELLEN. Een
+   aanroeper die dat als "in orde" leest, bouwt precies de valse bevestiging waar
+   deze functie tegen bestaat. */
+function persistentieStand() {
+  if (STORE !== 'sqlite') return null;
+  return sqlite.persistentieStandSqlite();
+}
+
 async function flushBijAfsluiten() {
   if (db.writable && snapshotVuil()) { try { schrijfSnapshotNu(); } catch (e) {} }
   geheugen.flushGeheugen();   // no-op buiten de geheugen-modus
@@ -206,7 +216,7 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, bijeen, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, bijeen, persistentieStand, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

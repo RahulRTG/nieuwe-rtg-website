@@ -172,3 +172,26 @@ test('de telling is uitzonderingsgestuurd: wat aandacht vraagt is apart te zien'
   assert.equal(t.wachtend, 1, 'de aanvraag wacht op de reisadviseur');
   assert.equal(t.onbekend, 0);
 });
+
+test('het uur reist mee waar het bestaat, en wordt nergens verzonnen', () => {
+  /* LAAG 3 VAN HET COMMAND CANVAS (CANVAS.md) staat of valt hierbij. Een vlucht
+     vertrekt om 17:30 en een charter om 09:05; een verblijf en een reis van het
+     reisbureau kennen alleen een dag. Zou deze laag daar een 00:00 van maken,
+     dan zet het scherm een hotelovernachting bovenaan uw dag -- en dan is de
+     tijdlijn geen tijdlijn meer maar een lijst met nepuren.
+
+     DE MUTATIE DIE DEZE TOETS HOORT TE LATEN ZAKKEN: zet in reiswereld.js
+     `tijd: o.tijd || null` op `tijd: o.tijd || '00:00'`. */
+  const w = wereldMet({
+    mijnVerblijven: () => [{ id: 'v1', roomName: 'Suite', aankomst: morgen(2), vertrek: morgen(4), status: 'bevestigd' }],
+    lucht: { mijn: () => ({
+      boekingen: [{ code: 'B1', status: 'geboekt', vlucht: { nummer: 'RT101', bestemming: 'Nice', datum: morgen(1), tijd: '17:30' } }],
+      charters: [{ code: 'C1', soort: 'jet', bestemming: 'Ibiza', datum: morgen(1), tijd: '09:05', status: 'bevestigd' }]
+    }) }
+  });
+  const r = w.komend('k');
+  const uren = Object.fromEntries(r.komend.map((x) => [x.soort, x.tijd]));
+  assert.equal(uren.vlucht, '17:30', 'een vlucht kent zijn vertrektijd en die hoort mee te komen');
+  assert.equal(uren.charter, '09:05', 'een charter ook');
+  assert.equal(uren.verblijf, null, 'een verblijf kent geen uur, en krijgt er dus geen');
+});

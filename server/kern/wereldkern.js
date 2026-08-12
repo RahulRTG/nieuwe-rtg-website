@@ -68,4 +68,74 @@ function betekenisVan(tabel) {
   return (status) => tabel[String(status || '').toLowerCase()] || {};
 }
 
-module.exports = { SIGNALEN, RANG, bron, betekenisVan };
+/* ---------------------------------------------------------------------------
+   LAAG 0 VAN HET COMMAND CANVAS: DE STAND (CANVAS.md).
+
+   Elke wereld opent met een oordeel in EEN woord. Dat woord is geen sierstrook
+   en geen samenvatting van de drukte: het is de vraag "is er iets aan de hand?"
+   beantwoord voordat iemand hoeft te lezen.
+
+   DE ENIGE REGEL DIE ERTOE DOET: DE STAND LIEGT NOOIT. Een stand die altijd
+   groen is, is versiering; erger nog is een stand die groen is terwijl er een
+   bron zweeg, want dan verkoopt hij een storing als rust. Daarom telt hier niet
+   alleen wat er MIS is maar ook wat er NIET GEMETEN is, en dat weegt zwaarder
+   dan wat er wel gemeten kon worden.
+
+   De vier niveaus, in de volgorde waarin ze elkaar overstemmen:
+
+     verstoord   er staat een incident tussen; er is iets stuk of verlopen
+     onbekend    dit beeld is niet compleet -- een bron zweeg, of een regel
+                 heeft een status die deze wereld niet kent
+     aandacht    er speelt iets vandaag
+     gezond      niets aan de hand, en dat is gemeten en niet gehoopt
+
+   Waarom 'verstoord' boven 'onbekend' staat, en niet andersom: bij een incident
+   weet je iets ERGERS dan dat je iets niet weet, en dat hoort voor te gaan. De
+   ontbrekende bron verdwijnt daarmee niet -- hij reist mee in `stil` en in
+   `reden`, zodat het scherm hem alsnog bij naam noemt.
+
+   WAT EEN WERELD ZELF BENOEMT, EN WAT NIET. De drie woorden voor verstoord,
+   aandacht en gezond komen van de wereld zelf: Kantoor is 'Operationeel' waar
+   Sociaal 'Rustig' is, en die verschillen zijn de werelden zelf (zie de kop van
+   dit bestand). Het woord voor 'onbekend' is met opzet NIET van de wereld. Wie
+   zijn eigen onwetendheid mag benoemen, noemt hem vroeg of laat 'Prima'. */
+const NIVEAUS = ['verstoord', 'onbekend', 'aandacht', 'gezond'];
+const EIGEN = ['verstoord', 'aandacht', 'gezond'];   // de drie die een wereld zelf benoemt
+const WOORD_ONBEKEND = 'Onbekend';
+
+function standVan(woorden) {
+  const w = woorden || {};
+  for (const n of EIGEN) {
+    if (typeof w[n] !== 'string' || !w[n].trim()) {
+      throw new Error('wereldkern: de stand mist het woord voor "' + n + '"; een wereld die er ' +
+        'een weglaat valt bij dat niveau stil, en een stand die zwijgt is een stand die liegt');
+    }
+  }
+  if (w.onbekend !== undefined) {
+    throw new Error('wereldkern: "onbekend" is geen woord van de wereld maar van de kern (' +
+      WOORD_ONBEKEND + '); wie zijn eigen onwetendheid mag benoemen, noemt hem vroeg of laat mooier');
+  }
+  return function stand(regels, stil) {
+    const r = regels || [], s = stil || [];
+    const incident = r.filter((x) => x.sig === 'incident').length;
+    const aandacht = r.filter((x) => x.sig === 'aandacht').length;
+    /* Een regel zonder signaal is niet 'in orde'. Hij heeft een status die deze
+       wereld niet kent, en dat is een gat in de meting -- precies het soort gat
+       dat zich als rust voordoet zolang niemand het apart telt. */
+    const ongemeten = r.filter((x) => !x.sig).length;
+    const niveau = incident ? 'verstoord'
+      : (s.length || ongemeten) ? 'onbekend'
+        : aandacht ? 'aandacht' : 'gezond';
+    return {
+      niveau,
+      woord: niveau === 'onbekend' ? WOORD_ONBEKEND : w[niveau],
+      incident, aandacht, ongemeten,
+      /* WAAROM het onbekend is, zodat het scherm de juiste zin kan zetten.
+         Niet WELKE bron zweeg: die staat al in `stil` naast deze stand, en
+         dezelfde waarheid op twee plekken loopt uiteen (LAT.md regel 4). */
+      reden: niveau !== 'onbekend' ? '' : (s.length ? 'bron' : 'status')
+    };
+  };
+}
+
+module.exports = { SIGNALEN, RANG, bron, betekenisVan, NIVEAUS, WOORD_ONBEKEND, standVan };

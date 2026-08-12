@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 918 bestanden en 5960 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 928 bestanden en 6065 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 918 |
-| losse beweringen (`test(...)`) | 5960 |
+| toetsbestanden | 928 |
+| losse beweringen (`test(...)`) | 6065 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 86 |
+| alleen in de kop *genoemd*, nog niet gemeten | 96 |
 | niets van beide | 187 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-798 bestanden, 5742 beweringen.
+806 bestanden, 5845 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -136,6 +136,7 @@ toets omvalt.
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
 | `cache.test.js` | 6 | gezakt op `===->!==` | De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting, treffer/misser-telling, en de response-cache-middleware die een publiek JSON- antwoord memoiseert (miss -> hit) en een niet-200 juist NIET... |
 | `canary.test.js` | 11 | genoemd | De canary (kern/command/canary.js) en de verdeling die erbij hoort (inCanary in server/functies/toegang.js). WAT DEZE TOETS VOORAL BEWAAKT zijn drie dingen die allemaal stil kunnen omslaan en waarvan je het pas merkt... |
+| `canvas.test.js` | 12 | genoemd | THE COMMAND CANVAS: de regels uit CANVAS.md, machinaal gehandhaafd. CANVAS.md beschrijft een opbouw, geen smaak, en precies twee regels daarvan zijn hard genoeg om te meten. |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
 | `cdt.test.js` | 8 | -- | De CDT-laag: rittenregistratie en arbeids-, rij- en rusttijden voor het Nederlandse taxivervoer. Draai los: node --experimental-sqlite --test test/cdt.test.js Wat deze toetsen bewaken: 1. |
 | `chaos.pg.test.js` | 3 | slaat zichzelf over | Chaos-/concurrency-test: meerdere gelijktijdige schrijvers naar DEZELFDE Postgres-collectie, om te bewijzen dat er onder contentie niets verloren gaat. Elke "schrijver" is een eigen pg-adapterinstance (eigen... |
@@ -343,6 +344,7 @@ toets omvalt.
 | `leren.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo), het overhoorduel via de vriendenlaag (zonder automatische vriendschap), samen-projecten met taken/notities/AI-plan, en schrijven met... |
 | `levenbandroutes.test.js` | 8 | genoemd | LEVEN.md fase 2 aan de BUITENKANT: de routes die de twee sessiewerelden aan elkaar knopen (server/routes/levenband.js). De kernregels zelf staan in test/levensband.test.js en worden hier niet overgedaan. |
 | `levensband.test.js` | 17 | genoemd | LEVEN.md fase 2: rechten per relatie. Dit bestand handhaaft de twee besluiten van 11 augustus 2026, en het is daarmee het belangrijkste toetsbestand van deze fase. |
+| `levensbeleid.test.js` | 9 | genoemd | Het levensbeleid (LEVEN.md par. 3): de tweede laag van het wereldpatroon voor RTFoundation, en de laag die er nog niet was. |
 | `levensgraafleven.test.js` | 7 | genoemd | De levenslaag van de levensgraaf: talenten, interesses en bijdrage (LEVEN.md par. 1.2), en vooral de twee dingen die daar het werk zijn. |
 | `levenslijn.test.js` | 11 | genoemd | De levenslijn (LEVEN.md par. 1.1, fase 1): EEN lijn door een leven in plaats van vijf leeftijdshokjes. |
 | `levensloop.test.js` | 1 | gezakt op `liegpoort /api/` | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
@@ -429,6 +431,8 @@ toets omvalt.
 | `noodkaart.test.js` | 7 | gezakt op `liegpoort /api/` | De noodkaart (kern/noodkaart.js): het kleinste beetje dat een vreemde over u moet weten als u het zelf niet kunt vertellen. Twee dingen worden hier vastgezet, en het zijn allebei grenzen: 1. |
 | `normprestatie.test.js` | 8 | -- | DE PRESTATIELAT (scripts/norm.js + BEPROEVING.json). De ratel bewaakte tot nu toe alleen statische meters: dekking, keuring, dependencies. |
 | `notities.test.js` | 3 | gezakt op `liegpoort /api/` | Notities & Taken: het bord, samen werken op codenaam, en de herinnering die een gekoppelde agenda-afspraak wordt (een wekkerlaag, niet drie). |
+| `objectlaag.test.js` | 24 | genoemd | De objectlaag (LIFE.md fase 2): niet apps maar objecten -- persoon, groep, event, elk met de caps die er ECHT bij horen. De vier beloften die deze toetsen bewaken: 1. |
+| `objectlaagroutes.test.js` | 11 | genoemd | De objectlaag over de echte route en de echte domeinen (LIFE.md fase 2). WAAROM DEZE TOETS NAAST test/objectlaag.test.js STAAT. |
 | `ochtend.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor het Ochtendritme (RTFoundation-gezin): een persoonlijk ochtendlijstje dat elke dag reset, de zachte weektelling bij een afgeronde ochtend (bewust geen reeks en geen record -- een ketting die je... |
 | `office-bank.test.js` | 8 | gezakt op `liegpoort /api/` | DE BANK VANUIT DE BOARDROOM -- de zwaarste knoppen die er zijn. Tien endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees. |
 | `office-blad.test.js` | 6 | gezakt op `true->false#0` | De rekenmotor van RTG Office. Deze draait in de browser, dus we laden het bestand hier los in en rekenen erop -- zonder server, zonder scherm. |
@@ -553,7 +557,7 @@ toets omvalt.
 | `reisbieb.test.js` | 6 | gezakt op `liegpoort /api/` | De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen redactie. Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. |
 | `reisbureau.test.js` | 6 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |
 | `reisplan.test.js` | 9 | -- | De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte reis waarin ze samen EEN reis zijn. Draai los: node --experimental-sqlite --test test/reisplan.test.js Wat deze toetsen bewaken: 1. |
-| `reiswereld.test.js` | 9 | genoemd | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
+| `reiswereld.test.js` | 10 | genoemd | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
 | `reiswijzer.test.js` | 7 | gezakt op `liegpoort /api/` | De Reiswijzer: van elk land van de wereld alle reisregels (visum, rijrichting, alarmnummer, water, fooi, let-op), automatisch bijgehouden door de Regelwacht en automatisch uitgereikt zodra iemand ergens naartoe gaat... |
 | `rekening.test.js` | 2 | gezakt op `liegpoort /api/` | "De rekening" (betalen na het eten): een zaak die achteraf laat betalen laat het lid tijdens het bezoek meerdere rondes bestellen; aan het eind worden alle lopende bonnen als een rekening opgeteld en in een keer... |
 | `rekenmotor.test.js` | 12 | gezakt op `true->false#0` | RTG Office: de formulemotor van het rekenblad. Dit is de test die de belofte "alle pro-functies, bij ons gewoon" hard maakt voor het rekenblad. |
@@ -647,7 +651,11 @@ toets omvalt.
 | `sloophamer.pg.test.js` | 1 | slaat zichzelf over | De "sloophamer": de chaos-intentie van een aangeleverde test, maar dan tegen de ECHTE architectuur van dit platform (twee kind-processen op een gedeelde Postgres + Redis, echte HTTP-endpoints), niet tegen een... |
 | `smtp-in.test.js` | 16 | gezakt op `liegpoort /api/` | De SMTP-ONTVANGER: post van buiten aannemen. Wat hier bewezen wordt, en waarom juist dit: geen relay een RCPT TO naar een adres dat hier geen postvak is, krijgt 550 -- en wel VOOR de inhoud. |
 | `smtp.test.js` | 7 | gezakt op `===->!==#0` | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
-| `socialewereld.test.js` | 8 | genoemd | RTG Sociaal, de samenhanglaag. Zelfde belofte als de twee andere werelden: hij bezit niets, hij verzint niets, en hij doet nooit alsof hij compleet is terwijl een bron zweeg. |
+| `socialebeleid.test.js` | 9 | genoemd | Het sociale beleid (LIFE.md par. 6): de regels van het lid over zijn eigen sociale wereld, en de tweede laag van het wereldpatroon. |
+| `socialecommand.test.js` | 10 | genoemd | Life Command (LIFE.md fase 5): de eerste laag van deze wereld die iets MAG. De vijf besluiten die deze toetsen bewaken: 1. |
+| `socialegraaf.test.js` | 11 | genoemd | De sociale graaf (LIFE.md fase 1): negen sociale domeinen plus de Control Tower, samengebracht tot een beeld van wat er tussen mensen speelt. Wat deze toetsen bewaken is niet "komen er rijen uit" -- dat is te... |
+| `socialelijn.test.js` | 10 | genoemd | De momentlijn (LIFE.md fase 4): leven in plaats van posts. Wat deze toetsen bewaken is niet dat er regels uitkomen, maar de vier besluiten waar de lijn op staat: 1. |
+| `socialewereld.test.js` | 9 | genoemd | RTG Sociaal, de samenhanglaag. Zelfde belofte als de twee andere werelden: hij bezit niets, hij verzint niets, en hij doet nooit alsof hij compleet is terwijl een bron zweeg. |
 | `societeit.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor De Societeit (18-21): het Quizduel (tien dezelfde vragen, oplossing blijft op de server tot er geantwoord is) en het Schatduel (vijf ronden, het dichtstbij pakt het punt). Jong-profielen zijn... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spelaandeel.test.js` | 13 | genoemd | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
@@ -693,7 +701,7 @@ toets omvalt.
 | `stadsweefsel.test.js` | 12 | genoemd | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staff-inzet-mob.test.js` | 6 | -- | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
-| `stijlbundel.test.js` | 9 | -- | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
+| `stijlbundel.test.js` | 10 | genoemd | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | -- | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |
 | `stillepost.test.js` | 2 | -- | Post die nergens heen kan, moet je kunnen zien. WAT ER MIS WAS. |
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |
@@ -783,7 +791,7 @@ toets omvalt.
 | `webplatform.test.js` | 28 | -- | RTG WEB PLATFORM -- de automatische bedrijfssite en de browser die bedrijven begrijpt. Het principe onder deze laag is "automatic first, customizable forever": een partner krijgt uit zijn zaakprofiel in een keer een... |
 | `webpush.test.js` | 5 | gezakt op `&&->||#0` | Test voor onze eigen web-push (server/webpush.js), die het pakket `web-push` verving. Twee harde ijkpunten: 1. |
 | `wereld.test.js` | 5 | gezakt op `liegpoort /api/` | De wereld van het kantoor: alles in het veld als bolletje (groen = oke, oranje = uit, rood = storing), met reset- en hulpknoppen die als opdracht bij de doos landen. Plus de 9+-veiligheidsronde: het auditlog (wie... |
-| `wereldkern.test.js` | 5 | -- | DE WERELDKERN: spreken de vier samenhanglagen ECHT dezelfde taal? Er bestond al een toets met die naam, in test/geldwereld.test.js -- maar die keek alleen naar geldwereld. |
+| `wereldkern.test.js` | 9 | -- | DE WERELDKERN: spreken de vier samenhanglagen ECHT dezelfde taal? Er bestond al een toets met die naam, in test/geldwereld.test.js -- maar die keek alleen naar geldwereld. |
 | `wereldlaag.test.js` | 15 | gezakt op `liegpoort /api/` | Integratietests voor RTG Wereld: de laag die van De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen één app maakt met één schakelaar. Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de... |
 | `wereldprofiel.test.js` | 6 | gezakt op `liegpoort /api/` | Het profiel met lagen, en de kern ervan: WIE WAT MAG ZIEN, per veld. Waarom de zichtbaarheden hier op DEZELFDE vier mensen naast elkaar staan: dat is de enige manier om te bewijzen dat ze echt iets verschillends doen. |
 | `wereldregels.test.js` | 4 | gezakt op `liegpoort /api/` | De wereldtabel: alle landen van de wereld in de fiscale tabel, in dezelfde structuur als de rijke kernlanden, en de Regelwacht die elk land automatisch kan bijwerken. Getest: dekking en veldkwaliteit (alles binnen de... |
@@ -838,7 +846,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-120 bestanden, 218 beweringen.
+122 bestanden, 220 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -893,6 +901,7 @@ toets omvalt.
 | `leven.e2e.js` | 1 | -- | Schermtoets voor het levens-command-center (LEVEN.md par. 1.5). |
 | `levenspas.e2e.js` | 1 | genoemd | De levenspas aan de GEZINSKANT (/apps/foundation/mijnbanden.html), in een echte browser. Twee dingen bewaakt deze toets, en ze bestaan allebei alleen op dit niveau. |
 | `life-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/life.html. De belofte van dit scherm is dat je NIET hoeft te weten welke app je moet openen: een doel dat je in Doelen zet en een afspraak die je bij de salon maakt, staan hier vanzelf. |
+| `lifecommand.e2e.js` | 1 | -- | Schermtoets voor Life Command (LIFE.md fase 5). Deze toets bewaakt de regel waar de hele fase op staat, en hij meet hem op het GERENDERDE scherm en niet op de bron: er is geen knop die iets uitvoert zonder dat de... |
 | `lifestyleschermen.e2e.js` | 2 | -- | DE TWAALF LIFESTYLE-SCHERMEN: LEGT EEN TOETS DE WEG ECHT AF? WAAROM JUIST DEZE TWAALF Bij het afsluiten van TAKEN 4.1 heb ik zelf de openstaande rest opgeschreven: "wat er nog steeds niet is: dezelfde weg door het... |
 | `livinglab.e2e.js` | 2 | -- | Scherm-test voor het RTF Living Lab: het kantoorscherm (/apps/livinglab.html) en het bewonersscherm (/apps/labpas.html). WAAROM DEZE TOETS ER IS. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |
@@ -905,6 +914,7 @@ toets omvalt.
 | `metier.e2e.js` | 1 | -- | Scherm-test voor Métier. De unit-toetsen (test/metier.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet, en vooral dat het signatuurstuk zichtbaar werkt: je kaart bewaren, de bevestigde rol met... |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
 | `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
+| `objectpaneel.e2e.js` | 1 | genoemd | Schermtoets voor het objectpaneel op RTG Sociaal (LIFE.md fase 2). Deze toets bewaakt EEN ding, en het is de reden dat de objectlaag bestaat: het scherm kent geen enkele cap bij naam. |
 | `office-blad.e2e.js` | 1 | -- | Scherm-test voor het rekenblad van RTG Office. test/rekenmotor.test.js bewijst dat de motor rekent; deze bewijst dat een mens er ook bij kan. |
 | `office-formschets.e2e.js` | 1 | -- | Scherm-test voor de twee nieuwe officesoorten: het formulier en de schets. Wat hier bewezen wordt, door de echte schermen heen: - A bouwt een formulier (open vraag + schaal) en deelt het met B als meelezer, op... |
 | `office-suite.e2e.js` | 1 | -- | Scherm-test voor de tekstverwerker en de presentatie van RTG Office. Wat hier bewezen wordt: - zoeken en vervangen raakt alleen TEKST, nooit de opmaak: na "haven" naar "kade" staat de kop er nog als kop; - de... |

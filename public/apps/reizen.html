@@ -53,16 +53,28 @@
     <h1 class="rtg-ceremonie">RTG Reizen</h1>
   </header>
 
-  <a class="balk" id="balk" href="#komend" data-rustig>
-    <span class="teken" id="balkTeken"></span>
-    <span>
-      <span class="kop" id="balkKop">Laden</span>
-      <span class="zin rtg-ceremonie" id="balkZin">&nbsp;</span>
-    </span>
-    <span class="pijl" aria-hidden="true">&rsaquo;</span>
-  </a>
+  <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
+       de rust, en pas daarna de functies. Hier stond een alarmbalk die
+       hetzelfde probeerde en het per scherm opnieuw uitvond.
 
-  <div id="stilte"></div>
+       ZE STAAN LEEG, EN DAT IS DE BELANGRIJKSTE REGEL VAN DIT BLOK. Een woord
+       dat in de HTML staat, staat er ook als er niets is opgehaald -- en dat is
+       precies de leugen die de stand niet mag vertellen. -->
+  <div id="stand"></div>
+  <div id="rust"></div>
+
+  <!-- LAAG 3: DE COMMAND TIMELINE (CANVAS.md). Wat er vandaag OP DE KLOK staat.
+       Bij Reizen is dat smal en met reden: een vlucht vertrekt om 17:30, een
+       hotelovernachting niet. Wat een uur heeft komt hier, de rest blijft in het
+       register -- een verblijf bovenaan uw dag zetten op een verzonnen 00:00 is
+       precies wat een tijdlijn kapotmaakt.
+
+       Hij verdwijnt als er niets is: een leeg kader boven een rustige dag vraagt
+       aandacht zonder iets te zeggen. -->
+  <section id="vandaagVak" hidden>
+    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
+    <div id="vandaag"></div>
+  </section>
 
   <div class="regkop">
     <h2>Wat eraan komt</h2>
@@ -74,6 +86,11 @@
   <div class="poorten" id="poorten"></div>
 </main>
 
+<!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
+     tekent de stand meteen bij het laden, en een uitgesteld blad is er dan nog
+     niet. Zie CANVAS.md; de vorm staat in shared/canvas.css. -->
+<script src="/shared/canvas.js"></script>
+<script src="/shared/canvas-taal.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -89,8 +106,6 @@
     'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
     'stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
   const ICO = {
-    bel: '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
-    vink: '<path d="M20 6 9 17l-5-5"/>',
     mens: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     pand: '<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
     bed:  '<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20"/><circle cx="7" cy="12" r="2"/>',
@@ -107,6 +122,7 @@
 
   const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
   const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  const VANDAAG = new Date().toISOString().slice(0, 10);
   function dagdeel(d) {
     const x = new Date(d + 'T00:00:00');
     if (isNaN(x)) return { wd: '', nr: d || '', mnd: '' };
@@ -114,29 +130,33 @@
     return { wd: WD[x.getDay()], nr: String(x.getDate()).padStart(2, '0'), mnd: MND[x.getMonth()] };
   }
 
-  function tekenBalk(t) {
-    /* Wachten is geen aandacht. Drie reizen die netjes bij de reisadviseur
-       liggen is de normale gang van zaken; daar een gouden alarmbalk boven
-       zetten is loos alarm, en loos alarm leert mensen de balk te negeren op de
-       dag dat hij wel klopt. */
-    const alarm = t.aandacht + t.onbekend;
-    const b = $('#balk');
-    if (alarm) {
-      b.removeAttribute('data-rustig');
-      $('#balkTeken').innerHTML = ic(ICO.bel, 22);
-      $('#balkKop').textContent = 'Er vraagt iets aandacht';
-      const s = [];
-      if (t.aandacht) s.push(t.aandacht + ' ' + (t.aandacht === 1 ? 'vraagt' : 'vragen') + ' actie');
-      if (t.onbekend) s.push(t.onbekend + ' met onbekende status');
-      $('#balkZin').textContent = s.join(', ');
-      return;
-    }
-    b.setAttribute('data-rustig', '');
-    $('#balkTeken').innerHTML = ic(ICO.vink, 22);
-    $('#balkKop').textContent = t.komend ? 'Alles loopt' : 'Niets gepland';
-    $('#balkZin').textContent = t.wachtend
-      ? t.wachtend + ' ' + (t.wachtend === 1 ? 'wacht' : 'wachten') + ' op bevestiging'
-      : (t.komend ? 'geen actie nodig' : 'nog geen reizen');
+  /* Laag 0 en 1 van het Command Canvas (CANVAS.md). Het OORDEEL komt uit de
+     wereld mee (d.stand); dit scherm kiest alleen welke drie cijfers eronder
+     passen, want dat verschilt per wereld. Bij Reizen is dat wat eraan komt,
+     niet wat er open staat.
+
+     Wachten is geen aandacht. Drie reizen die netjes bij de reisadviseur liggen
+     is de normale gang van zaken; dat als alarm tonen is loos alarm, en loos
+     alarm leert mensen de stand te negeren op de dag dat hij wel klopt. Het
+     staat er dus als cijfer, en het kleurt het woord niet. */
+  function tekenStand(d) {
+    const t = d.telling || {};
+    RTGCanvas.stand('#stand', {
+      app: 'RTG Reizen',
+      stand: d.stand,
+      cijfers: [
+        [t.komend || 0, t.komend === 1 ? 'reis gepland' : 'reizen gepland'],
+        [t.aandacht || 0, 'vraagt actie'],
+        [t.wachtend || 0, 'wacht op bevestiging']
+      ]
+    });
+    RTGCanvas.rust('#rust', {
+      kop: RTGCanvas.groet(),
+      /* Een onvolledig reisschema is geen leeg reisschema, en het verschil
+         hoort hardop gezegd te worden -- niet in een apart kadertje eronder,
+         maar in de enige zin die iemand sowieso leest. */
+      zin: RTGCanvas.zin(d.stand, { stil: d.stil })
+    });
   }
 
   function reisRegel(x) {
@@ -177,19 +197,50 @@
     '</a>';
   }
 
+  /* LAAG 3: de Command Timeline van vandaag.
+
+     WAT ER OP DE KLOK STAAT. Bij Reizen zijn dat de vluchten en de charters:
+     die kennen een vertrektijd. Een verblijf en een reis van het reisbureau
+     kennen alleen een dag -- die zouden op een verzonnen uur belanden, en dan
+     is de lijn geen lijn meer. Ze blijven in het register staan.
+
+     Op TIJD gesorteerd en niet op signaal: om tien voor elf is de vraag niet
+     wat het zwaarst weegt maar wat er zo vertrekt. */
+  function opDeKlok(x) { return x.van === VANDAAG && !!x.tijd; }
+
+  function tekenVandaag(r) {
+    const punten = r.filter(opDeKlok)
+      .sort((a, b) => String(a.tijd).localeCompare(String(b.tijd)));
+    $('#vandaagVak').hidden = !punten.length;
+    $('#telVandaag').textContent = punten.length
+      ? punten.length + (punten.length === 1 ? ' moment' : ' momenten') : '';
+    if (!punten.length) return;
+    RTGCanvas.lijn('#vandaag', punten.map(x => ({
+      uur: x.tijd,
+      titel: (x.titel || SOORT[x.soort] || 'Reis') + (x.bestemming ? ' naar ' + x.bestemming : ''),
+      sig: x.sig,
+      // alleen wat het domein WEET: waar het vandaan komt en hoe het ervoor staat
+      toe: x.status ? x.app + ' · ' + x.status : x.app,
+      href: x.link
+    })));
+  }
+
   function teken(d) {
-    $('#stilte').innerHTML = (d.stil || []).length
-      ? '<div class="stilte" role="status"><strong>Niet alles is opgehaald.</strong> ' +
-        esc((d.stil || []).join(' en ')) + ' gaf geen antwoord. Dit is een onvolledig reisschema, ' +
-        'geen leeg reisschema; kijk zo nodig in de app zelf.</div>' : '';
+    tekenStand(d);
 
-    tekenBalk(d.telling || { komend: 0, aandacht: 0, wachtend: 0, onbekend: 0 });
-
-    const r = d.komend || [];
+    const alles = d.komend || [];
+    tekenVandaag(alles);
+    // wat op de tijdlijn staat, staat niet nog eens in het register
+    const r = alles.filter(x => !opDeKlok(x));
     $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' reis' : ' reizen') : '';
     $('#komend').innerHTML = r.length ? r.map(reisRegel).join('')
-      : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
-        'verschijnt het hier vanzelf.</p>';
+      /* Twee soorten leeg, en ze betekenen niet hetzelfde: vertrekt alles wat
+         er is vandaag, dan is "er staat niets gepland" onwaar -- het staat drie
+         centimeter hoger. */
+      : (alles.length
+        ? '<p class="stil">Verder staat er niets gepland; wat er vandaag vertrekt, staat hierboven.</p>'
+        : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
+          'verschijnt het hier vanzelf.</p>');
 
     $('#komend').querySelectorAll('.rtg-ref').forEach(b => b.addEventListener('click', async (e) => {
       e.preventDefault(); e.stopPropagation();
@@ -238,6 +289,10 @@
   })();
 
   (async function laad() {
+    /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
+       onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets
+       aan de hand', en dat is de enige uitkomst die hij nooit mag suggereren. */
+    tekenStand({});
     try {
       const res = await fetch('/api/reis/wereld', {
         method: 'POST',
@@ -248,8 +303,8 @@
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
     } catch (e) {
-      $('#balkKop').textContent = 'Niet ingelogd';
-      $('#balkZin').textContent = '';
+      // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
+      RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
       $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
     }
   })();

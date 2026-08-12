@@ -55,6 +55,18 @@ test('een bijeenkomst van vandaag vraagt aandacht, een van later niet', () => {
   assert.equal(nu.teken, '!', 'kleur alleen is niet genoeg');
   assert.equal(nu.door, 'De Kring', 'de groep hoort erbij te staan');
   assert.equal(r.regels.find(x => x.kenmerk === 'b2').sig, 'actief');
+
+  /* DE NAAM, en die was er niet. Deze laag las `x.titel`, en een bijeenkomst
+     heet `wat` (kern/genootschap/bijeenkomst.js, publiek()) -- dus kwam elke
+     bijeenkomst naamloos binnen en viel het scherm terug op het woord
+     "Bijeenkomst". De toets zag het niet omdat de fixtures hier `titel` mee
+     gaven: een proefopstelling die iets anders levert dan het echte domein
+     bewijst niets (LAT.md regel 9). De fixtures zeggen nu `wat`, net als de
+     bron zelf.
+
+     DE MUTATIE: zet in socialewereld.js `titel: x.wat` terug naar `x.titel`. */
+  assert.equal(nu.titel, 'Borrel', 'een bijeenkomst hoort met haar eigen naam door te komen');
+  assert.equal(nu.tijd, '20:00', 'en met haar uur, want daarop draait laag 3 van het Canvas');
 });
 
 /* DE TOETS DIE ER NIET WAS, EN DIE EEN ECHTE FOUT AFDEKT.
@@ -144,7 +156,12 @@ test('de drie werelden spreken dezelfde taal', () => {
      producten die op elkaar lijken (LAT.md regel 4). Deze toets bewaakt dat de
      VORM gelijk blijft; de inhoud mag per genre verschillen. */
   const r = wereld().kring('k');
-  assert.deepEqual(Object.keys(r).sort(), ['bronnen', 'ok', 'regels', 'stil', 'telling']);
+  assert.deepEqual(Object.keys(r).sort(), ['bronnen', 'ok', 'regels', 'stand', 'stil', 'telling']);
   assert.deepEqual(Object.keys(r.telling).sort(),
     ['aandacht', 'onbekend', 'regels', 'vandaag', 'wachtend']);
+  /* En sinds het Command Canvas dragen ze ook alle drie een stand (CANVAS.md,
+     laag 0). Dat de WOORDEN verschillen is de bedoeling -- Sociaal is
+     'Levendig' waar Kantoor 'Druk' is; dat de vorm gelijk is, is de regel. */
+  assert.deepEqual(Object.keys(r.stand).sort(),
+    ['aandacht', 'incident', 'niveau', 'ongemeten', 'reden', 'woord']);
 });

@@ -28,7 +28,13 @@ module.exports.maakReiswereld = ({ kern }) => {
      alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
-  const { RANG, bron, betekenisVan } = require('./wereldkern');
+  const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+
+  /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
+     (CANVAS.md). Bij Reizen betekent 'aandacht' bijna altijd hetzelfde ding --
+     er vertrekt vandaag iets -- en dan is 'Op vertrek' meer waard dan 'Druk'.
+     Dat is waarom de woorden bij de wereld horen en niet bij de kern. */
+  const meetStand = standVan({ verstoord: 'Verstoord', aandacht: 'Op vertrek', gezond: 'Rustig' });
 
   const dag = (d) => String(d || '').slice(0, 10);
   const vandaag = () => new Date().toISOString().slice(0, 10);
@@ -68,6 +74,13 @@ module.exports.maakReiswereld = ({ kern }) => {
     return {
       soort, titel: o.titel || '', bestemming: o.bestemming || '',
       van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
+      /* HET UUR, en alleen waar het domein er een kent. Een vlucht vertrekt om
+         17:30 en een charter ook; een verblijf en een reis van het reisbureau
+         hebben een dag en geen tijdstip. Dat verschil is precies wat laag 3 van
+         het Command Canvas nodig heeft: op de tijdlijn hoort wat een uur heeft,
+         en de rest hoort in het register. Hier een 00:00 verzinnen zou een
+         hotelovernachting bovenaan uw dag zetten (CANVAS.md). */
+      tijd: o.tijd || null,
       sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
       /* Alleen meesturen wat het domein ECHT weet. Een verblijf kent geen
          reizigersaantal en een vlucht kent een stoel en geen gezelschap; daar
@@ -105,12 +118,13 @@ module.exports.maakReiswereld = ({ kern }) => {
       const d = kern.lucht.mijn(key) || {};
       const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
         titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
-        van: (x.vlucht || {}).datum, status: x.status, kenmerk: x.code,
+        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
+        status: x.status, kenmerk: x.code,
         app: 'Vluchten', link: '/apps/vluchten.html'
       }));
       const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
-        titel: x.soort, bestemming: x.bestemming, van: x.datum, status: x.status,
-        kenmerk: x.code, app: 'Hangar', link: '/apps/hangar.html'
+        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
+        status: x.status, kenmerk: x.code, app: 'Hangar', link: '/apps/hangar.html'
       }));
       return b.concat(c);
     }, uit, stil);
@@ -139,6 +153,11 @@ module.exports.maakReiswereld = ({ kern }) => {
     return {
       ok: true,
       komend: komendeReizen,
+      /* Laag 0: het oordeel in EEN woord, hier berekend en niet op het scherm
+         (CANVAS.md). Let op WELKE rij eronder ligt: de stand oordeelt over de
+         komende reizen, want dat is ook wat het scherm toont. Hem over `uit`
+         laten lopen zou hem laten schrikken van een reis van vorig jaar. */
+      stand: meetStand(komendeReizen, stil),
       telling,
       /* Eerlijk over wat er niet gemeten is: niet nul melden wat onbekend is.
          Het scherm zegt dit hardop, want een lege reiswereld die eigenlijk een

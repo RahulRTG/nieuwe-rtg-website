@@ -123,3 +123,65 @@ test('9. de echte app-pagina: zes bladen samen, en er raakt geen script zoek', (
   const na = (uit.match(/<link[^>]*rel="stylesheet"/g) || []).length;
   assert.ok(na < voor, 'minder blokkerende verzoeken dan eerst: ' + voor + ' -> ' + na);
 });
+
+/* ==========================================================================
+   DE ETAG. Tot hier ging deze toets over de HTML; dit gaat over wat de server
+   antwoordt als de browser vraagt "is er iets veranderd?".
+
+   WAAROM DIT ER STAAT. De ETag werd gemaakt door de STEMPEL af te kappen op 32
+   tekens -- en die stempel is "grootte.mtime" per blad, achter elkaar. Die 32
+   tekens dekten het eerste blad en een stukje van het tweede. Wijzigde je het
+   vijfde blad, dan bleef de ETag letterlijk gelijk en zei de server 304 Not
+   Modified: de browser hield zijn oude stijl, terwijl op schijf alles klopte.
+
+   Zo is hij ook gevonden: een verbouwde canvas.css (het vijfde blad van de
+   wereldschermen) kwam in de browser niet aan, drie keer achter elkaar.
+   ========================================================================== */
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { stijlbundel } = require('../server/middleware/stijlbundel');
+
+function proefBundel(bladen) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sb-'));
+  for (const [naam, inhoud] of Object.entries(bladen)) fs.writeFileSync(path.join(dir, naam), inhoud);
+  const mw = stijlbundel(dir);
+  const f = Buffer.from(Object.keys(bladen).map((n) => '/' + n).join('\n')).toString('base64url');
+  // een minimale req/res: genoeg om de kop en de status te lezen
+  const haal = (etag) => new Promise((klaar) => {
+    const koppen = {};
+    const res = {
+      statusCode: 200, setHeader: (k, v) => { koppen[k] = v; }, getHeader: (k) => koppen[k],
+      end: (body) => klaar({ status: res.statusCode, koppen, body: body ? String(body) : '' })
+    };
+    mw({ path: '/stijlbundel.css', query: { f }, headers: etag ? { 'if-none-match': etag } : {} },
+      res, () => klaar({ status: 404, koppen, body: '' }));
+  });
+  return { dir, haal, raak: (naam, inhoud) => fs.writeFileSync(path.join(dir, naam), inhoud) };
+}
+
+test('10. de ETag dekt ELK blad, ook het laatste', async () => {
+  /* DE MUTATIE DIE DEZE TOETS HOORT TE LATEN ZAKKEN: zet in stijlbundel.js de
+     hash terug naar `Buffer.from(stempel).toString('base64url').slice(0, 32)`.
+     Dan verandert de ETag hieronder niet meer en zakt deze toets -- precies de
+     fout die in productie een browser op een oude stijl laat staan. */
+  const p = proefBundel({ 'a.css': '.a{color:red}', 'b.css': '.b{color:teal}',
+    'c.css': '.c{color:gold}', 'd.css': '.d{color:navy}', 'e.css': '.e{color:olive}' });
+  const eerst = await p.haal();
+  assert.equal(eerst.status, 200);
+  assert.ok(eerst.koppen.ETag, 'een bundel hoort een ETag te dragen');
+  assert.ok(eerst.body.includes('olive'), 'het laatste blad zit er ook echt in');
+
+  // dezelfde vraag met dezelfde ETag: niets veranderd, dus 304 -- dat mag
+  assert.equal((await p.haal(eerst.koppen.ETag)).status, 304, 'onveranderd hoort 304 te geven');
+
+  // en nu verandert ALLEEN het laatste blad
+  p.raak('e.css', '.e{color:fuchsia;padding:1px}');
+  const na = await p.haal();
+  assert.notEqual(na.koppen.ETag, eerst.koppen.ETag,
+    'de ETag hoort te veranderen als het laatste blad verandert; anders blijft de browser op de oude stijl staan');
+  assert.ok(na.body.includes('fuchsia'), 'de nieuwe inhoud wordt wel degelijk geserveerd');
+  assert.equal((await p.haal(eerst.koppen.ETag)).status, 200,
+    'met de OUDE ETag hoort er 200 met nieuwe inhoud te komen, geen 304');
+  fs.rmSync(p.dir, { recursive: true, force: true });
+});

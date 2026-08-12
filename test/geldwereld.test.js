@@ -116,9 +116,16 @@ test('elke toestand die deze laag kan maken, kent hij ook', () => {
    echt meet is de vorm van geldwereld zelf, en dat is nuttig -- dus heet hij
    nu zo. De vier werelden worden vergeleken in test/wereldkern.test.js, waar
    ze alle vier geladen worden. */
-test('de vorm van deze laag: precies de vijf velden die het scherm verwacht', () => {
+test('de vorm van deze laag: precies de zes velden die het scherm verwacht', () => {
   const r = wereld().stand('k');
-  assert.deepEqual(Object.keys(r).sort(), ['bronnen', 'ok', 'regels', 'stil', 'telling']);
+  assert.deepEqual(Object.keys(r).sort(), ['bronnen', 'ok', 'regels', 'stand', 'stil', 'telling']);
   assert.deepEqual(Object.keys(r.telling).sort(),
     ['aandacht', 'onbekend', 'regels', 'vandaag', 'wachtend']);
+  /* Laag 0 van het Command Canvas reist mee (CANVAS.md). Het OORDEEL hoort bij
+     de wereld en niet bij het scherm; wat het niveau betekent staat in
+     test/wereldkern.test.js. Hier telt alleen dat het er is en een woord draagt
+     -- een stand zonder woord laat het scherm alsnog zelf verzinnen. */
+  assert.deepEqual(Object.keys(r.stand).sort(),
+    ['aandacht', 'incident', 'niveau', 'ongemeten', 'reden', 'woord']);
+  assert.ok(r.stand.woord, 'de stand hoort een woord te dragen');
 });

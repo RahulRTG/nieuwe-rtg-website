@@ -38,6 +38,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 const { herschrijfHtml, decodeer, GOED_PAD, PAD } = require('./stijlbundel-rij');
 /* De bundel zelf. Leest de bestanden, schrijft relatieve url() om naar het
@@ -130,7 +131,24 @@ function stijlbundel(publicDir) {
     const ae = String(req.headers['accept-encoding'] || '');
     const br = /\bbr\b/.test(ae), gz = !br && /\bgzip\b/.test(ae);
     const vorm = br ? 'b' : (gz ? 'g' : 'r');
-    const etag = 'W/"sb-' + Buffer.from(stempel).toString('base64url').slice(0, 32) + '-' + vorm + '"';
+    /* HASHEN EN DAN AFKAPPEN, NIET ANDERSOM. Hier stond
+       `Buffer.from(stempel).toString('base64url').slice(0, 32)`: de stempel
+       zelf, afgekapt op 32 tekens. Die 32 tekens base64 dragen 24 bytes van de
+       stempel, en de stempel is "grootte.mtime_grootte.mtime_..." per blad --
+       dus hij dekte de eerste een a twee bladen en verder niets.
+
+       Wat dat deed: wijzig je het VIJFDE blad (canvas.css), dan blijft de ETag
+       letterlijk gelijk en antwoordt de server 304 Not Modified op een bundel
+       die wel degelijk veranderd is. De browser houdt de oude stijl, en op
+       schijf klopt alles -- de onvindbaarste soort. Het is precies de fout waar
+       de opmerking twintig regels hierboven al voor waarschuwt, alleen een
+       stap later in dezelfde functie: de stempel dekte de bladen wel, en de
+       ETag gooide dat weer weg.
+
+       Bij een HASH mag afkappen wel: elke byte van de invoer raakt elke byte
+       van de uitvoer, dus 22 tekens sha1 hangen nog steeds van alle bladen af. */
+    const etag = 'W/"sb-' + crypto.createHash('sha1').update(stempel).digest('base64url').slice(0, 22) +
+      '-' + vorm + '"';
     res.setHeader('ETag', etag);
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Vary', 'Accept-Encoding');

@@ -1,7 +1,14 @@
 /* THE COMMAND CANVAS -- de gedeelde opbouw van elk RTG-scherm.
    Zie CANVAS.md voor het waarom. Dit blad draagt de VORM; de kleuren komen uit
-   rtg-uniform.css, want een tweede kleurbron is hoe een huisstijl uit elkaar
-   loopt (LAT.md regel 4).
+   de themalaag (--rtg-*), want een tweede kleurbron is hoe een huisstijl uit
+   elkaar loopt (LAT.md regel 4).
+
+   HIER STONDEN EERST DE MERKTOKENS ZELF (--white, --line, --grey). Die zijn de
+   LICHTE waarden uit CLAUDE.md, en de acht werelden staan op Onyx: een kaart
+   met `background: var(--white)` is op zo'n scherm een wit vlak. Het viel niet
+   op omdat nog niemand een kaart tekende -- de vorm van een fout die pas
+   opduikt bij de eerste die hem gebruikt. De merkwaarden staan nu als terugval
+   achter de tokens, voor een pagina die de UI-kit niet laadt.
 
    EEN BLAD EN NIET ACHT. Elke wereld die zijn eigen variant tekent, is de
    duurste manier om het geheel goedkoop te laten voelen. Komt er iets bij dat
@@ -14,18 +21,30 @@
 .cv-stand { padding: 2.5rem 1.25rem 1.75rem; }
 .cv-stand .cv-app {
   font-size: .68rem; letter-spacing: .22em; text-transform: uppercase;
-  color: var(--grey-soft, #8A8680);
+  color: var(--rtg-soft, #8A8680);
 }
 .cv-stand .cv-woord {
   font-family: 'Bodoni Moda', Georgia, serif;
   font-size: clamp(1.9rem, 6vw, 2.6rem); line-height: 1.1; margin: .35rem 0 0;
   font-weight: 400;
 }
+/* Het teken naast het woord. NOOIT op kleur alleen (ONTWERP.md par. 5): wie
+   kleur niet ziet, leest hier alsnog het verschil tussen ✓ en !. De rail links
+   van de stand draagt de kleur; dit draagt de betekenis. */
+.cv-stand .cv-teken {
+  font-family: Inter, system-ui, sans-serif; font-size: .5em;
+  margin-left: .5rem; vertical-align: .35em; opacity: .6;
+}
+/* De stand hangt aan de Signal Rail uit rtg-ontwerp.css -- geen tweede
+   uitvinding voor hetzelfde element. De padding hierboven wint van die van de
+   rail (zelfde gewicht, later blad), en dat is de bedoeling: het streepje ligt
+   op de rand van het scherm en de tekst houdt zijn lucht. */
+.cv-stand.rtg-rail::before { top: 2.5rem; bottom: 1.75rem; }
 .cv-stand .cv-cijfers {
   display: flex; flex-wrap: wrap; gap: 0 1.75rem; margin-top: 1.1rem;
-  padding-top: 1.1rem; border-top: 1px solid var(--line, #DEDBD5);
+  padding-top: 1.1rem; border-top: 1px solid var(--rtg-line, #DEDBD5);
 }
-.cv-stand .cv-cijfers > span { font-size: .82rem; color: var(--grey, #4D4A45); }
+.cv-stand .cv-cijfers > span { font-size: .82rem; color: var(--rtg-muted, #4D4A45); }
 .cv-stand .cv-cijfers b { font-variant-numeric: tabular-nums; font-weight: 500; }
 
 /* ---------- laag 1: de rust ----------
@@ -35,28 +54,29 @@
   font-family: 'Bodoni Moda', Georgia, serif; font-weight: 400;
   font-size: clamp(1.35rem, 4.5vw, 1.75rem); margin: 0 0 .4rem;
 }
-.cv-rust p { margin: 0; color: var(--grey, #4D4A45); font-size: .95rem; }
+.cv-rust p { margin: 0; color: var(--rtg-muted, #4D4A45); font-size: .95rem; }
 
 /* ---------- laag 2: drie kaarten. Altijd drie, nooit zes ----------
    De grens staat in de opmaak zelf: een vierde kaart valt op omdat het raster
    op drie staat. Dat is met opzet -- een regel die je ziet, hoef je niet te
    onthouden. */
 .cv-kaarten {
-  display: grid; gap: 1px; background: var(--line, #DEDBD5);
-  border-block: 1px solid var(--line, #DEDBD5);
+  display: grid; gap: 1px; background: var(--rtg-line, #DEDBD5);
+  border-block: 1px solid var(--rtg-line, #DEDBD5);
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 .cv-kaart {
-  background: var(--white, #fff); padding: 1.5rem 1.25rem;
+  background: var(--rtg-card, #fff); padding: 1.5rem 1.25rem;
   display: block; text-decoration: none; color: inherit;
 }
 .cv-kaart .cv-kop {
+  display: block;
   font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--grey-soft, #8A8680);
+  color: var(--rtg-soft, #8A8680);
 }
-.cv-kaart .cv-regel { margin-top: .55rem; font-size: .92rem; line-height: 1.5; }
+.cv-kaart .cv-regel { display: block; margin-top: .55rem; font-size: .92rem; line-height: 1.5; }
 .cv-kaart .cv-regel b { font-variant-numeric: tabular-nums; font-weight: 500; }
-a.cv-kaart:hover { background: #FAF9F7; }
+a.cv-kaart:hover { background: var(--rtg-card2, #FAF9F7); }
 
 /* ---------- laag 3: de tijdlijn ----------
    Geen lijst maar een lijn: het uur draagt hem, de gebeurtenis hangt eraan. */
@@ -64,17 +84,32 @@ a.cv-kaart:hover { background: #FAF9F7; }
 .cv-lijn .cv-stip { display: grid; grid-template-columns: 4.25rem 1fr; gap: 1rem; }
 .cv-lijn .cv-uur {
   font-variant-numeric: tabular-nums; font-size: .82rem;
-  color: var(--grey-soft, #8A8680); padding-top: .1rem;
+  color: var(--rtg-soft, #8A8680); padding-top: .1rem;
 }
-.cv-lijn .cv-wat { padding-bottom: 1.6rem; border-left: 1px solid var(--line, #DEDBD5);
-  padding-left: 1.1rem; margin-left: -.55rem; position: relative; }
+.cv-lijn .cv-wat { padding-bottom: 1.6rem; border-left: 1px solid var(--rtg-line, #DEDBD5);
+  padding-left: 1.1rem; margin-left: -.55rem; position: relative;
+  color: inherit; text-decoration: none; }
 .cv-lijn .cv-stip:last-child .cv-wat { border-left-color: transparent; }
+/* De stip draagt het signaal van het punt -- dezelfde vier kleuren als de
+   Signal Rail en de registerregel, want een oranje stip hoort overal hetzelfde
+   te betekenen. Zonder signaal is hij stil grijs en niet bordeaux: bordeaux is
+   het accent van het merk, geen toestand. */
 .cv-lijn .cv-wat::before {
   content: ''; position: absolute; left: -3.5px; top: .45rem;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--burgundy, #7F1634);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--rtg-sig-stil, #DEDBD5);
 }
-.cv-lijn .cv-titel { font-size: .95rem; }
-.cv-lijn .cv-toe { font-size: .85rem; color: var(--grey, #4D4A45); margin-top: .2rem; }
+.cv-lijn .cv-wat[data-sig="gezond"]::before   { background: var(--rtg-sig-gezond, #4C9A75); }
+.cv-lijn .cv-wat[data-sig="aandacht"]::before { background: var(--rtg-sig-aandacht, #C9A24B); }
+.cv-lijn .cv-wat[data-sig="incident"]::before { background: var(--rtg-sig-incident, #DE6E92); }
+.cv-lijn .cv-wat[data-sig="actief"]::before   { background: var(--rtg-sig-actief, #7E8FC4); }
+.cv-lijn .cv-titel { display: block; font-size: .95rem; }
+.cv-lijn .cv-toe { display: block; font-size: .85rem; color: var(--rtg-muted, #4D4A45); margin-top: .2rem; }
+/* Een punt dat ergens heen gaat, zegt dat pas als je het aanwijst: de lijn
+   onder de titel verschijnt, net als in de apprij. Dezelfde afspraak, en dus
+   geen tweede manier om 'hier kun je klikken' te tonen. */
+a.cv-wat .cv-titel { border-bottom: 1px solid transparent; display: inline-block; }
+a.cv-wat:hover .cv-titel { border-bottom-color: var(--rtg-goud, #857007); }
+a.cv-wat:focus-visible { outline: 1px solid var(--rtg-goud, #857007); outline-offset: 4px; }
 
 /* ---------- Focus Mode ----------
    Het verschil dat ertoe doet: wat niet belangrijk is VERVAAGT en verdwijnt
@@ -83,21 +118,60 @@ a.cv-kaart:hover { background: #FAF9F7; }
 .cv-focus .cv-vervaagt, .cv-kaart, .cv-vervaagt { transition: opacity .35s ease, filter .35s ease; }
 
 /* ---------- de rij met apps van een wereld ----------
-   Bestond al op vijf werelden in eigen exemplaren; hier op een plek gezet. */
+   Bestond al op vijf werelden in eigen exemplaren; hier op een plek gezet.
+
+   HIER STOND EEN RIJ DOOSJES, en die is weg. Elke app had een eigen randje met
+   ronde hoeken en werd bij aanwijzen bordeaux -- vijfendertig knopjes op een
+   rij, wat een werkbalk uit 2010 oplevert boven een scherm dat verder alleen
+   uit typografie en lucht bestaat. CLAUDE.md par. 3 zegt het met zoveel
+   woorden: geen ronde hoeken of gouden randjes. Deze rij overtrad zijn eigen
+   huisregel, en niets hield dat tegen (nu wel: test/canvas.test.js).
+
+   Wat het geworden is: een GEZETTE REGEL. Namen op een lijn, met de groepen als
+   ritme erin. De lijn onder een naam ligt klaar en verschijnt pas bij aanwijzen
+   -- een rand die er altijd is, is een doos; een rand die verschijnt, is een
+   antwoord. Rechts vervaagt de rij in plaats van af te kappen: dat is dezelfde
+   afspraak als Focus Mode (vervagen geeft rust, afkappen is een muur). */
 .wereldapps {
-  display: flex; gap: .5rem; overflow-x: auto; padding: .75rem 1.25rem;
-  border-bottom: 1px solid var(--line, #DEDBD5);
+  display: flex; align-items: baseline; gap: 1.3rem;
+  overflow-x: auto; padding: 1.05rem 3rem .9rem 1.25rem;
+  border-bottom: 1px solid var(--rtg-line, #DEDBD5);
+  /* de rij IS de lijn; een schuifbalk eronder maakt er weer een bak van */
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
 }
+.wereldapps::-webkit-scrollbar { display: none; }
+/* Ligt er een zwevende hamburger linksboven (shared/appmenu.js zet die klasse
+   op de body), dan begint de rij daarachter. Anders leest de eerste naam als
+   "ving Lab" -- wat er op de RTFoundation ook stond, verstopt achter een
+   knop die er pas na het laden bij komt. */
+body.amn-zwevend .wereldapps:first-of-type { padding-left: 3.6rem; }
 .wereldapps a {
-  white-space: nowrap; text-decoration: none; font-size: .82rem;
-  padding: .35rem .7rem; border: 1px solid var(--line, #DEDBD5);
-  border-radius: 2px; color: inherit;
+  white-space: nowrap; text-decoration: none; color: inherit;
+  font-size: .84rem; padding-bottom: .2rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color .18s ease, color .18s ease;
 }
-.wereldapps a:hover { border-color: var(--burgundy, #7F1634); }
+.wereldapps a:hover { border-bottom-color: var(--rtg-goud, #857007); }
+/* Zichtbaar zonder muis, en niet met dezelfde haarlijn: wie tabt moet weten
+   waar hij staat, ook op een naam die hij niet aanwijst. */
+.wereldapps a:focus-visible {
+  outline: 1px solid var(--rtg-goud, #857007); outline-offset: 5px; border-bottom-color: transparent;
+}
+/* De groepskop is geen knop maar een markering in de regel: kleiner, wijder
+   gespatieerd, en met een haarlijn ervoor die de groep begint. */
 .wereldapps b {
-  align-self: center; font-size: .68rem; letter-spacing: .12em;
-  text-transform: uppercase; opacity: .55; padding-left: .4rem;
+  font-weight: 400; font-size: .62rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--rtg-soft, #8A8680);
 }
+.wereldapps b + a { margin-left: -.45rem; }
+.wereldapps b:not(:first-child) {
+  border-left: 1px solid var(--rtg-line, #DEDBD5);
+  padding-left: 1.3rem; margin-left: -.3rem;
+}
+
+@media (prefers-reduced-motion: reduce) { .wereldapps a { transition: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   .cv-focus .cv-vervaagt, .cv-kaart, .cv-vervaagt { transition: none; }

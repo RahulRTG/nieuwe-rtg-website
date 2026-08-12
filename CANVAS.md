@@ -145,6 +145,47 @@ De andere 5 kan ik automatisch uitvoeren.        [Toon]
 
 Dat is enterprise: niet veel functies, maar **werk uit handen**.
 
+## Wat er staat, en wat het vasthoudt
+
+Dit document beschrijft een opbouw; hieronder staat welk deel ervan **bestaat**
+en wie hem handhaaft. Wat hier niet staat, is nog tekst.
+
+| laag | waar | handhaver |
+|---|---|---|
+| 0 — de stand | `server/kern/wereldkern.js` (`standVan`), per wereld drie eigen woorden | `test/wereldkern.test.js` 6–9 |
+| 0/1 op het scherm | `public/shared/canvas.js` + `canvas.css` | `test/canvas.test.js` |
+| de drie kaarten | `RTGCanvas.kaarten` — een vierde **gooit** | `test/canvas.test.js` 1 |
+| Focus Mode | `RTGCanvas.focus` + `.cv-vervaagt` | `test/canvas.test.js` 5 |
+| Kantoor, Reizen, Sociaal | dragen laag 0, 1 en 3 | `test/canvas.test.js` 8/9, `test/kantoor.e2e.js` |
+| laag 3 — de tijdlijn | `RTGCanvas.lijn`, op alle drie de werelden | `test/canvas.test.js` 5b/8, `test/kantoor.e2e.js` |
+| de apprij van een wereld | `.wereldapps` — namen op een regel, geen doosjes | `test/canvas.test.js` 5c |
+| Command Ring, COMMAND-knop | nog niet gebouwd | — |
+
+**De tijdlijn is de klok, niet de lijst.** Wat er vandaag op een tíjd staat gaat
+naar laag 3, op tijd gesorteerd; al het andere blijft in het register eronder,
+op signaal gesorteerd. Een taak die vandaag af moet heeft geen uur en hoort dus
+niet op een lijn die op tijd loopt — die zou op 09:00 of onderaan belanden, en
+allebei is verzonnen. En wat op de tijdlijn staat, staat niet óók in het
+register: hetzelfde ding twee keer is precies wat een scherm dat zijn bestaan
+aan weglaten ontleent niet kan hebben.
+
+Per wereld valt dat anders uit, en dat is de bedoeling: bij Kantoor zijn het de
+afspraken met een tijd, bij Reizen de vluchten en charters (een hotelovernachting
+heeft een dag en geen uur), bij Sociaal de bijeenkomsten. Een wereld waar niets
+een uur draagt, hoort dus géén tijdlijn te tonen — een lege lijn is een leeg
+kader dat om aandacht vraagt zonder iets te zeggen.
+
+**De stand komt uit de wereld, niet uit het scherm.** Wanneer iets
+'Operationeel' heet is één regel op één plek (`standVan`); een scherm dat dat
+zelf afleidt, maakt er acht (LAT.md regel 4). Elke wereld benoemt zijn eigen
+drie woorden — Kantoor is *Operationeel* waar Sociaal *Rustig* is — maar niet
+zijn eigen onwetendheid: **'Onbekend' is van de kern**, want wie zijn eigen
+onwetendheid mag benoemen, noemt hem vroeg of laat mooier.
+
+En de stand liegt in twee richtingen niet: geen groen woord als een bron zweeg,
+en **geen cijfers als er niets gemeten is**. Drie nullen onder een 'Onbekend'
+zijn dezelfde leugen, alleen kleiner gedrukt.
+
 ## Wat dit betekent voor wie hier bouwt
 
 - **Uniform.** Alle acht werelden dragen dezelfde opbouw. Een eigen variant
@@ -153,6 +194,12 @@ Dat is enterprise: niet veel functies, maar **werk uit handen**.
 - **De stand liegt nooit.** Kan een scherm zijn stand niet meten, dan zegt het
   dat — een verzonnen "Operationeel" is erger dan geen stand.
 - **Wie een vierde kaart toevoegt, haalt er een weg.**
+- **Geen doosjes om namen.** Navigatie is typografie: een naam op een regel, met
+  een lijn die pas bij aanwijzen verschijnt. Een rand die er altijd is, is een
+  knop; vijfendertig knoppen op een rij is een werkbalk, en een werkbalk boven
+  een scherm van lucht en Bodoni leest als software van vijftien jaar geleden.
+  Dit staat ook al in CLAUDE.md par. 3 (geen ronde hoeken of gouden randjes) —
+  het stond er alleen niet aan gehouden.
 
 ## Het gevoel dat we zoeken
 

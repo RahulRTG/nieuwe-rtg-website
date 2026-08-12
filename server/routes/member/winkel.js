@@ -27,10 +27,10 @@ app.post('/api/uitgaan/mijn', auth, (req, res) => res.json({ avonden: uitgaan.mi
 // het overzicht van de reizen
 app.post('/api/reisbureau', auth, (req, res) => res.json(reisbureau.overzicht()));
 // een lid vraagt een reis aan (aangevraagd; een reisadviseur bevestigt)
-app.post('/api/reisbureau/boek', auth, (req, res) => {
+app.post('/api/reisbureau/boek', auth, async (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   if (gegevensStop(req, res, 'reservering')) return;
-  const r = reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
+  const r = await reisbureau.boek(req.session, liveCodename(req.session), req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   // wie ergens naartoe gaat, krijgt meteen ALLE regels van dat land mee
   const wijzer = kern.reiswijzer(r.aanvraag.bestemming);
@@ -40,8 +40,8 @@ app.post('/api/reisbureau/boek', auth, (req, res) => {
 // mijn reisaanvragen
 app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
 // een eigen reisaanvraag intrekken zolang die openstaat
-app.post('/api/reisbureau/annuleer', auth, (req, res) => {
-  const r = reisbureau.annuleer(req.session.key, String(req.body.ref || ''));
+app.post('/api/reisbureau/annuleer', auth, async (req, res) => {
+  const r = await reisbureau.annuleer(req.session.key, String(req.body.ref || ''));
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });

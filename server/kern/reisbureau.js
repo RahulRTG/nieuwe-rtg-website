@@ -39,7 +39,7 @@ function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
   }
 
   // een lid vraagt een reis aan; de aanvraag komt bij het reisbureau te liggen
-  function boek(sess, codename, data) {
+  async function boek(sess, codename, data) {
     data = data || {};
     const trip = (db.data.partnerTrips || []).find(t => t.id === String(data.tripId || ''));
     if (!trip) return { status: 404, error: 'Reis niet gevonden.' };
@@ -63,7 +63,7 @@ function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
     save();
     // is de bestemming visumplichtig, dan staat de aanvraag-taak meteen klaar
     const vt = visum();
-    const taak = vt ? vt.bijBoeking(sess.key, { ref: entry.ref, bestemming: trip.dest, vertrek }).taak : null;
+    const taak = vt ? (await vt.bijBoeking(sess.key, { ref: entry.ref, bestemming: trip.dest, vertrek })).taak : null;
     return { ok: true, aanvraag: entry, visumtaak: taak };
   }
 
@@ -72,7 +72,7 @@ function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
   }
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
-  function annuleer(key, ref) {
+  async function annuleer(key, ref) {
     const a = (db.data.reisAanvragen || []).find(x => x.ref === String(ref || '') && x.customerKey === key);
     if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
@@ -81,7 +81,7 @@ function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
     // de visumtaak van deze reis gaat mee weg; een taak voor een reis die
     // niet doorgaat is ruis in de agenda
     const vt = visum();
-    if (vt) vt.bijAnnulering(key, a.ref);
+    if (vt) await vt.bijAnnulering(key, a.ref);
     return { ok: true, aanvraag: a };
   }
 

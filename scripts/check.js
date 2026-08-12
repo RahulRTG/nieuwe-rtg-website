@@ -3010,7 +3010,11 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
-    ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout']
+    ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
+    ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
+    ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
+    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

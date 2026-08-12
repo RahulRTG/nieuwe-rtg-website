@@ -131,3 +131,84 @@ test('5. de duurzame bundel is geen optie die je stil kunt weglaten', async () =
   assert.throws(() => maakVastleggen({ bijeen: async () => {}, bron: 'proef' }), /save/);
   assert.equal(typeof maakVastleggen({ bijeen: async (fn) => fn(), save() {}, bron: 'proef' }), 'function');
 });
+
+/* ---------- en dezelfde belofte voor de drie andere apps ----------
+
+   Notities was de eerste; agenda, bestanden en berichten hangen sinds
+   12 augustus aan dezelfde helper (server/lib/duurzaam.js). Een toets per app
+   en niet een lus over alle vier: als er een zakt, wil je in de naam van de
+   toets lezen WELKE app zijn werk kwijtraakt. */
+
+test('6. de agenda bevestigt niet zonder opslag, en werkt gewoon zonder verraad', async () => {
+  const tok = await lid(eerlijk.base);
+  const goed = await api(eerlijk.base, '/api/agenda/toevoegen',
+    { titel: 'Tandarts', datum: '2026-09-01', tijd: '10:00' }, tok);
+  assert.equal(goed.status, 200);
+  assert.equal(goed.body.ok, true, 'een 200 zonder ok is een niet-afgewachte belofte');
+
+  const tok2 = await lid(leugen.base);
+  const slecht = await api(leugen.base, '/api/agenda/toevoegen',
+    { titel: 'Verdwijnt', datum: '2026-09-01' }, tok2);
+  assert.ok(slecht.status >= 500, 'de agenda hoort nee te zeggen (kreeg ' + slecht.status + ')');
+});
+
+test('7. de kluis bevestigt niet zonder opslag', async () => {
+  const tok = await lid(eerlijk.base);
+  const goed = await api(eerlijk.base, '/api/bestanden/map', { naam: 'Reizen' }, tok);
+  assert.equal(goed.status, 200);
+  assert.match(String(goed.body.id || ''), /\w/, 'de route hoort het echte id terug te geven');
+
+  const tok2 = await lid(leugen.base);
+  const slecht = await api(leugen.base, '/api/bestanden/map', { naam: 'Verdwijnt' }, tok2);
+  assert.ok(slecht.status >= 500, 'de kluis hoort nee te zeggen (kreeg ' + slecht.status + ')');
+});
+
+test('8. een berichtvlag bevestigt niet zonder opslag', async () => {
+  const tok = await lid(eerlijk.base);
+  const goed = await api(eerlijk.base, '/api/member/berichten/vlag',
+    { id: 'proef-gesprek', vlag: 'vast', aan: true }, tok);
+  assert.equal(goed.status, 200);
+  assert.equal(goed.body.ok, true);
+
+  const tok2 = await lid(leugen.base);
+  const slecht = await api(leugen.base, '/api/member/berichten/vlag',
+    { id: 'proef-gesprek', vlag: 'vast', aan: true }, tok2);
+  assert.ok(slecht.status >= 500, 'een vlag hoort nee te zeggen (kreeg ' + slecht.status + ')');
+});
+
+test('9. een geneste laag doet MEE in de bundel en commit niet zelf', async () => {
+  /* Een notitie met een datum maakt een agenda-afspraak, en allebei die lagen
+     leggen duurzaam vast. Zou de binnenste zijn eigen commit doen, dan staat de
+     afspraak vast voordat de notitie dat is -- twee commits met een gat ertussen.
+     Dit is de bewering, en hij is hier met nepdelen te stellen; over HTTP is het
+     verschil tussen een en twee commits van buiten niet te zien.
+
+     WAT ER NIET WORDT BEWEERD: dat het geheugen leeg blijft na een mislukte
+     commit. Dat doet het niet, en dat is bewust dezelfde keuze als op de
+     geldketen -- de belofte gaat over wat een herstart overleeft, niet over wat
+     er tot dan toe op je scherm staat. De ketenronde meet dat deel. */
+  const maakVastleggen = require('../server/lib/duurzaam');
+  let bundels = 0, saves = 0;
+  const nep = { bijeen: async (fn) => { bundels++; return fn(); }, save: () => { saves++; } };
+
+  const buiten = maakVastleggen({ ...nep, inBundel: () => false, bron: 'proef' });
+  await buiten(() => {});
+  assert.equal(bundels, 1, 'buiten een bundel opent hij er zelf een');
+
+  const binnen = maakVastleggen({ ...nep, inBundel: () => true, bron: 'proef' });
+  await binnen(() => {});
+  assert.equal(bundels, 1, 'binnen een bundel opent hij er GEEN tweede');
+  assert.equal(saves, 2, 'maar zijn mutatie gaat wel mee de bundel in');
+});
+
+test('10. zonder verraad landt de notitie MET zijn afspraak', async () => {
+  /* De tegenproef bij 9: zou de bundel de agenda-afspraak overslaan, dan is
+     toets 9 groen om de verkeerde reden. */
+  const tok = await lid(eerlijk.base);
+  const n = await api(eerlijk.base, '/api/notities/bewaar',
+    { titel: 'Ophalen bij de stomerij', tekst: 'x', herinnerOp: '2026-09-02', herinnerTijd: '09:00' }, tok);
+  assert.equal(n.status, 200);
+  const ag = await api(eerlijk.base, '/api/agenda/mijn-lijst', {}, tok);
+  assert.match(JSON.stringify(ag.body || {}), /Ophalen bij de stomerij/,
+    'de gekoppelde afspraak hoort er te staan');
+});

@@ -114,6 +114,21 @@ const bijeenContext = new AsyncLocalStorage();
    Alleen de geldcommit zet hem aan; check.js regel 47 bewaakt dat
    saveDuurzaam() niet elders opduikt, en hier is de aanroep bewust de enige
    plek waar een aanroeper er indirect bij kan. */
+/* STAAT ER AL EEN BUNDEL OPEN IN DEZE CONTEXT?
+
+   Nodig sinds er meer dan een app duurzaam vastlegt. Een notitie met een datum
+   maakt een agenda-afspraak, en allebei die lagen willen hun werk duurzaam
+   wegzetten. Zou de binnenste dat zelf doen, dan committeert de agenda-afspraak
+   VOOR de notitie -- twee commits, en een moment waartussen de een vaststaat en
+   de ander niet. Precies de toestand waar bijeen() voor is gemaakt.
+
+   Dus vraagt de binnenste laag eerst of er al een bundel loopt; zo ja, dan doet
+   hij zijn mutatie gewoon mee in die bundel. Zie server/lib/duurzaam.js. */
+function inBundel() {
+  const doos = bijeenContext.getStore();
+  return !!(doos && doos.open);
+}
+
 async function bijeen(fn, opties) {
   const duurzaam = !!(opties && opties.duurzaam);
   const doos = { open: true, nodig: false, duurzaam };
@@ -367,7 +382,7 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

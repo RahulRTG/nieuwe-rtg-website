@@ -40,14 +40,14 @@ function maakVisumtaak({ agenda, reiswijzer }) {
      Idempotent op de bron: een tweede boeking op dezelfde ref (een herhaalde
      aanroep) zet geen tweede taak. Geeft { taak } terug zodat het antwoord
      van de boeking kan zeggen wat er is klaargezet. */
-  function bijBoeking(key, { ref, bestemming, vertrek }) {
+  async function bijBoeking(key, { ref, bestemming, vertrek }) {
     if (!key || !ref) return { taak: null };
     const w = reiswijzer(bestemming);
     if (!w || w.error || !w.visum || !VOORAF[w.visum.soort]) return { taak: null };
     const eigenaar = agendaLidSleutel(key);
     const b = bron(ref);
     if (agenda.lijst(eigenaar).some(i => i.bron === b)) return { taak: null };
-    const r = agenda.voegToe(eigenaar, {
+    const r = await agenda.voegToe(eigenaar, {
       titel: VOORAF[w.visum.soort] + ' aanvragen voor ' + w.naam,
       datum: taakDatum(vertrek),
       notitie: w.visum.tekst + (vertrek ? ' Vertrek: ' + vertrek + '.' : ' De vertrekdatum staat nog niet vast; vraag hem op tijd aan.'),
@@ -59,12 +59,12 @@ function maakVisumtaak({ agenda, reiswijzer }) {
   /* Bij een annulering: alle taken met deze bron gaan weg, ook een taak die
      al was afgevinkt (een visum voor een reis die niet doorgaat is klaar
      noch nodig). */
-  function bijAnnulering(key, ref) {
+  async function bijAnnulering(key, ref) {
     if (!key || !ref) return { weg: 0 };
     const eigenaar = agendaLidSleutel(key);
     const b = bron(ref);
     let weg = 0;
-    for (const i of agenda.lijst(eigenaar)) if (i.bron === b) { agenda.verwijder(eigenaar, i.id); weg++; }
+    for (const i of agenda.lijst(eigenaar)) if (i.bron === b) { await agenda.verwijder(eigenaar, i.id); weg++; }
     return { weg };
   }
 

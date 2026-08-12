@@ -18,7 +18,7 @@ module.exports = (kern) => {
   app.post('/api/lucht/cockpit', supplierAuth, poort, (req, res) => res.json(lucht.cockpit()));
   app.post('/api/lucht/bord', supplierAuth, poort, (req, res) => res.json(lucht.bord(req.body || {})));
   app.post('/api/lucht/vlucht/maak', supplierAuth, poort, (req, res) => stuur(res, lucht.vluchtMaak(wie(req), req.body || {})));
-  app.post('/api/lucht/vlucht/status', supplierAuth, poort, (req, res) => stuur(res, lucht.vluchtStatus(wie(req), String(req.body.id || ''), String(req.body.status || ''))));
+  app.post('/api/lucht/vlucht/status', supplierAuth, poort, async (req, res) => stuur(res, await lucht.vluchtStatus(wie(req), String(req.body.id || ''), String(req.body.status || ''))));
   app.post('/api/lucht/vlucht/vertraag', supplierAuth, poort, (req, res) => stuur(res, lucht.vluchtVertraag(wie(req), String(req.body.id || ''), req.body.minuten, req.body.reden)));
   app.post('/api/lucht/vlucht/gate', supplierAuth, poort, (req, res) => stuur(res, lucht.vluchtGate(wie(req), String(req.body.id || ''), String(req.body.gate || ''))));
   app.post('/api/lucht/draai/taak', supplierAuth, poort, (req, res) => stuur(res, lucht.draaiTaak(wie(req), String(req.body.id || ''), String(req.body.taak || ''))));
@@ -63,7 +63,7 @@ module.exports = (kern) => {
     return true;
   };
   app.post('/api/member/vluchten/bord', auth, (req, res) => res.json(lucht.bord(req.body || {})));
-  app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'vlucht')) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
+  app.post('/api/member/vluchten/boek', auth, async (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'vlucht')) return; stuur(res, await lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
   app.post('/api/member/vluchten/incheck', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.incheck(req.session, String(req.body.code || ''), req.body || {})); });
   app.post('/api/member/vluchten/mijn', auth, (req, res) => res.json(lucht.mijn(req.session.key)));
   // een charter aanvragen (privejet of helikopter); operations bevestigt of wijst af

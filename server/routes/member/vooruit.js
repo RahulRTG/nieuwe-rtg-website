@@ -72,9 +72,9 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     res.json(Object.assign({ status: 200 }, postdatum.voorstellen(adresVan(req), mijnAgenda(req))));
   });
-  app.post('/api/member/vooruit/post/neem', auth, (req, res) => {
+  app.post('/api/member/vooruit/post/neem', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const r = postdatum.neem(adresVan(req), mijnAgenda(req), req.body || {});
+    const r = await postdatum.neem(adresVan(req), mijnAgenda(req), req.body || {});
     if (r.error) return res.status(400).json(r);
     res.json(r);
   });

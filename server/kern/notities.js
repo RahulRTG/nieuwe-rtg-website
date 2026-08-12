@@ -15,7 +15,7 @@
 
 const MAX_PER_LID = 500, MAX_ITEMS = 50;
 
-function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda) {
+function maakNotities({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda) {
   /* DIT BORD LEGT DUURZAAM VAST. Werk van een lid mag niet bevestigd worden
      voordat de opslag het heeft; het waarom en de reikwijdte staan in
      server/lib/duurzaam.js en GELDLAT.md.
@@ -25,7 +25,7 @@ function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codena
      boodschap die weer aanstaat, een notitie die terugkomt nadat je hem
      weggooide. Alleen de gemeten knop repareren is het symptoom repareren
      (LAT.md, regel 1). De LEESkant schrijft niets en gaat hier niet doorheen. */
-  const vastleggen = require('../lib/duurzaam')({ bijeen, save, bron: 'notities' });
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'notities' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const store = () => { if (!db.data.notities || typeof db.data.notities !== 'object') db.data.notities = {}; return db.data.notities; };
@@ -65,15 +65,15 @@ function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codena
   }
 
   /* de gekoppelde agenda-afspraak: zetten, verzetten of opruimen */
-  function agendaBij(eigenaar, n) {
+  async function agendaBij(eigenaar, n) {
     if (!agenda) return;
     try {
       if (n.herinnerOp && n.herinnerTijd) {
-        const r = agenda.bewaarAfspraak('lid:' + eigenaar, { id: n.agendaId || undefined,
+        const r = await agenda.bewaarAfspraak('lid:' + eigenaar, { id: n.agendaId || undefined,
           titel: n.titel || 'Notitie', datum: n.herinnerOp, tijd: n.herinnerTijd,
           notitie: 'Uit Notities & Taken', herinner: 0 });
         if (r && r.id) n.agendaId = r.id;
-      } else if (n.agendaId) { agenda.verwijder('lid:' + eigenaar, n.agendaId); n.agendaId = null; }
+      } else if (n.agendaId) { await agenda.verwijder('lid:' + eigenaar, n.agendaId); n.agendaId = null; }
     } catch (e) { /* de notitie blijft gewoon bestaan */ }
   }
 
@@ -90,7 +90,7 @@ function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codena
         gedeeldMet: [], gemaakt: nu() };
       nieuw = true;
     }
-    const mis = await vastleggen(() => {
+    const mis = await vastleggen(async () => {
       if (nieuw) alleVan(key).push(n);
       if (data.titel != null) n.titel = scho(data.titel, 120);
       if (n.soort === 'notitie' && data.tekst != null) n.tekst = scho(data.tekst, 4000);
@@ -107,7 +107,7 @@ function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codena
           n.herinnerTijd = /^\d{2}:\d{2}$/.test(String(data.herinnerTijd || '')) ? data.herinnerTijd : null;
           /* De agenda-afspraak gaat MEE in dezelfde commit: anders bestaat er
              een moment waarop de notitie vaststaat en de herinnering niet. */
-          agendaBij(eigenaar, n);
+          await agendaBij(eigenaar, n);
         }
       }
       n.gewijzigd = nu();
@@ -169,9 +169,9 @@ function maakNotities({ db, save, bijeen, crypto, schoon, keyVanCodenaam, codena
     const arr = alleVan(key);
     const n = arr.find(x => x.id === id);
     if (n) {
-      const mis = await vastleggen(() => {
+      const mis = await vastleggen(async () => {
         // de gekoppelde agenda-afspraak gaat mee het archief van de tijd in
-        if (n.agendaId && agenda) { try { agenda.verwijder('lid:' + key, n.agendaId); } catch (e) {} }
+        if (n.agendaId && agenda) { try { await agenda.verwijder('lid:' + key, n.agendaId); } catch (e) {} }
         store()['lid:' + key] = arr.filter(x => x.id !== id);
       });
       if (mis) return mis;

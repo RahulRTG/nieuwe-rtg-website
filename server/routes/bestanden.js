@@ -34,17 +34,17 @@ module.exports = (kern) => {
   // een document, dit over een map met bestanden.
   require('./bestanden-pdf')(kern);
 
-  app.post('/api/bestanden/map', auth, (req, res) => {
+  app.post('/api/bestanden/map', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
-    stuur(res, b.id ? bestanden.bestandenMapWijzig(req.session.key, String(b.id), b)
-      : bestanden.bestandenMapNieuw(req.session.key, b.naam, b.ouder));
+    stuur(res, b.id ? await bestanden.bestandenMapWijzig(req.session.key, String(b.id), b)
+      : await bestanden.bestandenMapNieuw(req.session.key, b.naam, b.ouder));
   });
-  app.post('/api/bestanden/upload', auth, (req, res) => {
+  app.post('/api/bestanden/upload', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
     stuur(res, b.id ? bestanden.bestandenVersieNieuw(req.session.key, String(b.id), b.dataUrl)
-      : bestanden.bestandenUpload(req.session.key, b));
+      : await bestanden.bestandenUpload(req.session.key, b));
   });
   // grote bestanden: in stukken (de globale JSON-grens is 8 MB)
   app.post('/api/bestanden/upstart', auth, (req, res) => {
@@ -55,13 +55,13 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, bestanden.bestandenUpDeel(req.session.key, (req.body || {}).uploadId, (req.body || {}).stuk));
   });
-  app.post('/api/bestanden/upklaar', auth, (req, res) => {
+  app.post('/api/bestanden/upklaar', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenUpKlaar(req.session.key, (req.body || {}).uploadId));
+    stuur(res, await bestanden.bestandenUpKlaar(req.session.key, (req.body || {}).uploadId));
   });
-  app.post('/api/bestanden/wijzig', auth, (req, res) => {
+  app.post('/api/bestanden/wijzig', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenWijzig(req.session.key, String((req.body || {}).id || ''), req.body || {}));
+    stuur(res, await bestanden.bestandenWijzig(req.session.key, String((req.body || {}).id || ''), req.body || {}));
   });
   app.post('/api/bestanden/deel', auth, async (req, res) => {
     if (geenGast(req, res)) return;

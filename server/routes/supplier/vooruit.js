@@ -68,9 +68,9 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     res.json(Object.assign({ status: 200 }, postdatum.voorstellen(adresVan(req), zaakAgenda(req))));
   });
-  app.post('/api/supplier/vooruit/post/neem', supplierAuth, (req, res) => {
+  app.post('/api/supplier/vooruit/post/neem', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = postdatum.neem(adresVan(req), zaakAgenda(req), req.body || {});
+    const r = await postdatum.neem(adresVan(req), zaakAgenda(req), req.body || {});
     if (r.error) return res.status(400).json(r);
     res.json(r);
   });

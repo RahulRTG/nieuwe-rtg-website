@@ -29,14 +29,14 @@ module.exports = (kern) => {
     if (!buf.slice(0, 5).equals(Buffer.from('%PDF-'))) return { status: 422, error: '"' + bron.naam + '" is geen PDF.' };
     return { buf, naam: bron.naam };
   };
-  const bewaar = (req, res, naam, buf, extra) => {
-    const nieuw = bestanden.bestandenUpload(req.session.key, { naam, map: (req.body || {}).map || null,
+  const bewaar = async (req, res, naam, buf, extra) => {
+    const nieuw = await bestanden.bestandenUpload(req.session.key, { naam, map: (req.body || {}).map || null,
       dataUrl: 'data:application/pdf;base64,' + buf.toString('base64') });
     if (nieuw.error) return stuur(res, nieuw);
     res.json(Object.assign({ ok: true, bestand: nieuw, naam }, extra));
   };
 
-  app.post('/api/bestanden/pdf/samenvoegen', auth, (req, res) => {
+  app.post('/api/bestanden/pdf/samenvoegen', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const ids = (Array.isArray((req.body || {}).ids) ? req.body.ids : []).map(String).slice(0, 20);
     if (ids.length < 2) return res.status(400).json({ error: 'Kies minstens twee PDF-bestanden om samen te voegen.' });
@@ -48,11 +48,11 @@ module.exports = (kern) => {
     }
     const uit = require('../kern/pdf-bouw').voegSamen(bufs);
     if (!uit.ok) return res.status(422).json({ error: uit.waarom });
-    bewaar(req, res, 'Samengevoegd (' + uit.paginas + ' pagina\'s).pdf',
+    await bewaar(req, res, 'Samengevoegd (' + uit.paginas + ' pagina\'s).pdf',
       uit.bestand, { paginas: uit.paginas, documenten: uit.documenten, let: uit.let });
   });
 
-  app.post('/api/bestanden/pdf/splitsen', auth, (req, res) => {
+  app.post('/api/bestanden/pdf/splitsen', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
     const bron = pdfBytes(req.session.key, b.id);
@@ -61,7 +61,7 @@ module.exports = (kern) => {
     if (!uit.ok) return res.status(422).json({ error: uit.waarom });
     const naam = String(bron.naam || 'document.pdf').replace(/(\.pdf)?$/i, '') +
       ' (pagina ' + uit.van + (uit.tot > uit.van ? '-' + uit.tot : '') + ').pdf';
-    bewaar(req, res, naam, uit.bestand, { paginas: uit.paginas, van: uit.van, tot: uit.tot,
+    await bewaar(req, res, naam, uit.bestand, { paginas: uit.paginas, van: uit.van, tot: uit.tot,
       let: uit.let + ' Het bronbestand blijft staan; wie een deel van een dossier deelt, wil het geheel houden.' });
   });
 
@@ -70,7 +70,7 @@ module.exports = (kern) => {
      origineel blijft byte voor byte staan, met een tweede kruisverwijzing die
      met /Prev naar de eerste wijst. Wie iets echt weg wil hebben, gebruikt de
      redactie hieronder. */
-  app.post('/api/bestanden/pdf/notitie', auth, (req, res) => {
+  app.post('/api/bestanden/pdf/notitie', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
     const bron = pdfBytes(req.session.key, b.id);
@@ -79,7 +79,7 @@ module.exports = (kern) => {
       { pagina: b.pagina, tekst: b.tekst, wie: b.wie, rechthoek: b.rechthoek });
     if (!uit.ok) return res.status(422).json({ error: uit.waarom });
     const naam = String(bron.naam || 'document.pdf').replace(/(\.pdf)?$/i, '') + ' (met notitie).pdf';
-    bewaar(req, res, naam, uit.bestand, { pagina: uit.pagina, let: uit.let });
+    await bewaar(req, res, naam, uit.bestand, { pagina: uit.pagina, let: uit.let });
   });
 
   app.post('/api/bestanden/pdf/notities', auth, (req, res) => {
@@ -91,7 +91,7 @@ module.exports = (kern) => {
     res.json(uit);
   });
 
-  app.post('/api/bestanden/pdf/redigeer', auth, (req, res) => {
+  app.post('/api/bestanden/pdf/redigeer', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
     const woorden = (Array.isArray(b.woorden) ? b.woorden : [b.woorden])
@@ -111,7 +111,7 @@ module.exports = (kern) => {
     if (!uit.geraakt) return res.json({ ok: true, geraakt: 0, waarom: uit.waarom });
 
     const naam = String(bron.naam || 'document.pdf').replace(/(\.pdf)?$/i, '') + ' (geredigeerd).pdf';
-    const nieuw = bestanden.bestandenUpload(req.session.key, { naam, map: b.map || null,
+    const nieuw = await bestanden.bestandenUpload(req.session.key, { naam, map: b.map || null,
       dataUrl: 'data:application/pdf;base64,' + uit.bestand.toString('base64') });
     if (nieuw.error) return stuur(res, nieuw);
     res.json({ ok: true, geraakt: uit.geraakt, bestand: nieuw, naam,

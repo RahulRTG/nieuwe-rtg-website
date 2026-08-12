@@ -15,7 +15,7 @@ const MAX_VERSIES = 10;                 // per bestand; de oudste valt eraf
 const PRULLENBAK_DAGEN = 30;
 const MAX_NAAM = 120;
 
-function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir, antivirus }) {
+function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir, antivirus }) {
   const OPSLAG = path.join(dir, 'bestanden');
   const id = () => 'b' + crypto.randomBytes(6).toString('hex');
   const nu = () => new Date().toISOString();
@@ -70,8 +70,14 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   }
   const schoonNaam = n => schoon(String(n || ''), MAX_NAAM).replace(/[/\\]/g, '-').trim();
 
+  /* De kluis van een lid: bevestigd is vastgelegd. Zie server/lib/duurzaam.js.
+     De BYTES gaan al duurzaam naar schijf (schrijfBytes); wat hier duurzaam
+     wordt, is de verwijzing ernaartoe -- zonder die verwijzing is het bestand
+     er wel en bestaat het niet. */
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'bestanden' });
+
   /* ---- mappen: plat opgeslagen, genest via 'ouder' ---- */
-  function mapNieuw(key, naam, ouder) {
+  async function mapNieuw(key, naam, ouder) {
     const b = bord(key);
     if (b.mappen.length >= MAX_MAPPEN) return { status: 409, error: 'U heeft het maximum van ' + MAX_MAPPEN + ' mappen.' };
     naam = schoonNaam(naam);
@@ -79,10 +85,10 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
     ouder = String(ouder || '') || null;
     if (ouder && !b.mappen.find(m => m.id === ouder)) return { status: 404, error: 'Die bovenliggende map bestaat niet.' };
     const m = { id: id(), naam, ouder, op: nu() };
-    b.mappen.push(m); save();
-    return { id: m.id };
+    const mis = await vastleggen(() => { b.mappen.push(m); });
+    return mis || { id: m.id };
   }
-  function mapWijzig(key, mid, wat) {
+  async function mapWijzig(key, mid, wat) {
     const b = bord(key);
     const m = b.mappen.find(x => x.id === String(mid || ''));
     if (!m) return { status: 404, error: 'Die map bestaat niet.' };
@@ -93,8 +99,8 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
       for (const it of b.items) if (it.map === m.id) it.map = m.ouder;
       b.mappen = b.mappen.filter(x => x.id !== m.id);
     }
-    save();
-    return { ok: true };
+    const mis = await vastleggen();   // legt de mutaties hierboven duurzaam vast
+    return mis || { ok: true };
   }
 
   /* De Ontsmetter aan de deur van de kluis. Twee plekken maken hier van bytes
@@ -105,7 +111,7 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   const { scanOk } = require('./bestanden-poort')({ antivirus });
 
   /* ---- uploaden: een data-URL in, een verwijzing terug ---- */
-  function upload(key, { naam, map, dataUrl }) {
+  async function upload(key, { naam, map, dataUrl }) {
     const b = bord(key);
     if (b.items.length >= MAX_ITEMS) return { status: 409, error: 'U heeft het maximum van ' + MAX_ITEMS + ' bestanden; ruim eerst op.' };
     const m = /^data:([\w.+-]+\/[\w.+-]+);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
@@ -122,19 +128,20 @@ function maakBestanden({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
     if (map && !b.mappen.find(x => x.id === map)) map = null;
     const it = { id: id(), naam, map, mime: m[1], bytes: buf.length, ref: schrijfBytes(buf),
       versies: [], gedeeldMet: [], ster: false, weg: false, wegOp: null, op: nu(), gewijzigd: nu() };
-    b.items.push(it); save();
-    return { id: it.id, bytes: it.bytes };
+    const mis = await vastleggen(() => { b.items.push(it); });
+    return mis || { id: it.id, bytes: it.bytes };
   }
 
-  function wijzig(key, bid, wat) {
+  async function wijzig(key, bid, wat) {
     const b = bord(key);
     const it = b.items.find(x => x.id === String(bid || ''));
     if (!it) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
     if (wat.naam !== undefined) { const n = schoonNaam(wat.naam); if (!n) return { status: 400, error: 'Geef het bestand een naam.' }; it.naam = n; }
     if (wat.map !== undefined) { const doel = String(wat.map || '') || null; it.map = doel && b.mappen.find(x => x.id === doel) ? doel : null; }
     if (wat.ster !== undefined) it.ster = !!wat.ster;
-    it.gewijzigd = nu(); save();
-    return { ok: true };
+    it.gewijzigd = nu();
+    const mis = await vastleggen();   // legt de mutaties hierboven duurzaam vast
+    return mis || { ok: true };
   }
 
   /* ---- de lijst: het hele bord in een keer, plus de Office-spiegel ---- */

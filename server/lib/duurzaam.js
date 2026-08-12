@@ -33,7 +33,7 @@
    als het is vastgelegd, of een foutantwoord ({status, error}) als de opslag het
    niet kon bevestigen. Die vorm is met opzet: de aanroeper kan hem rechtstreeks
    teruggeven en kan hem niet per ongeluk negeren zoals een boolean. */
-module.exports = function maakVastleggen({ bijeen, save, bron }) {
+module.exports = function maakVastleggen({ bijeen, save, inBundel, bron }) {
   /* Zonder de bundel zou een app terugvallen op de gewone write-behind save() en
      weer 200 zeggen over iets wat de opslag nog niet heeft gedaan. Een
      ontbrekende afhankelijkheid hoort hier luid te zijn: dit is opstarttijd. */
@@ -41,9 +41,33 @@ module.exports = function maakVastleggen({ bijeen, save, bron }) {
     throw new Error('duurzaam vastleggen heeft db.bijeen en db.save nodig (zie GELDLAT.md).');
   }
   const naam = bron || 'app';
-  return async function vastleggen(mutatie) {
+  /* `mutatie` mag WEGGELATEN worden, en dat is geen slordigheid maar een tweede
+     vorm met een eigen betekenis: "leg vast wat er hierboven al in het geheugen
+     is veranderd". Sommige handlers muteren over tientallen regels heen, met
+     seintjes en kopieën ertussen; die in een callback persen zou de code
+     onleesbaarder maken dan de winst waard is. Het is veilig zolang er tussen de
+     mutatie en deze aanroep geen `await` staat -- dan kan geen ander verzoek de
+     halve toestand zien of wegschrijven. */
+  const niets = () => {};
+  return async function vastleggen(mutatie = niets) {
+    /* AL IN EEN BUNDEL? DAN MEEDOEN, NIET ZELF COMMITTEN.
+
+       Een notitie met een datum maakt een agenda-afspraak, en allebei die lagen
+       leggen duurzaam vast. Zou de binnenste zijn eigen commit doen, dan staat
+       de afspraak vast voordat de notitie dat is -- twee commits met een gat
+       ertussen, precies wat bijeen() moest wegnemen. De buitenste bundel neemt
+       deze mutatie mee; faalt die, dan faalt alles samen.
+
+       Een worp gaat hier BEWUST omhoog in plaats van als 503 terug: de
+       buitenste laag heeft zijn eigen antwoord al bedacht, en twee antwoorden
+       op een verzoek is er een te veel. */
+    if (typeof inBundel === 'function' && inBundel()) {
+      await mutatie();
+      save();
+      return null;
+    }
     try {
-      await bijeen(async () => { mutatie(); save(); }, { duurzaam: true });
+      await bijeen(async () => { await mutatie(); save(); }, { duurzaam: true });
     } catch (e) {
       /* Niet stil (LAT.md, regel 5): het lid krijgt een nee, en waarom de opslag
          niet bevestigde hoort in het log -- anders is een app die 503'en

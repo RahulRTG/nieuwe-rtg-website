@@ -113,7 +113,7 @@ module.exports = ({ db, save, rtmail, agenda, vandaag }) => {
      echt is voorgesteld -- anders is `bron: 'post:...'` een bewering die niet
      klopt, en dan staat er straks een afspraak in de agenda die zegt uit uw post
      te komen terwijl niemand hem daar heeft gezien. */
-  function neem(adres, eigenaar, { id, datum, titel } = {}) {
+  async function neem(adres, eigenaar, { id, datum, titel } = {}) {
     if (!adres || !eigenaar) return { error: 'Geen postvak voor deze inlog.' };
     const berichtId = String(id || '');
     if (besloten(eigenaar).has(berichtId)) return { error: 'Over dit bericht is al besloten.' };
@@ -124,7 +124,7 @@ module.exports = ({ db, save, rtmail, agenda, vandaag }) => {
     const gekozen = r.datums.find(d => d.datum === String(datum || ''));
     if (!gekozen) return { error: 'Die datum staat niet in dit bericht.' };
 
-    const r2 = agenda.voegToe(eigenaar, {
+    const r2 = await agenda.voegToe(eigenaar, {
       titel: schoon(titel, 120) || schoon(m.onderwerp, 120) || 'Uit uw post',
       datum: gekozen.datum,
       tijd: gekozen.tijd,

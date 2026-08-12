@@ -24,6 +24,47 @@ precies het soort compliance dat niets aantoont en dat na twee kwartalen
 achterloopt op de werkelijkheid. Zijn de bewijzen er eerst, dan ontstaat de
 tweede laag grotendeels vanzelf: hij mapt, hij meet niet.
 
+## De vijf niveaus van bewijs
+
+Een toets kan vijf verschillende dingen vergelijken, en ze worden makkelijk door
+elkaar gehaald omdat ze allemaal "een test" heten.
+
+| | Vergelijkt | Vraagt | RTG staat op |
+|---|---|---|---|
+| **1** unit | code ↔ verwachting | geeft functie X het juiste resultaat? | 5.736 beweringen |
+| **2** integratie | route ↔ verwachting | werkt de hele betaalroute? | 465 servertoetsen |
+| **3** sabotage | code ↔ vijandige wereld | werkt hij nog als de opslag faalt? | 3 van 8 verraden ingebouwd |
+| **4** contract | verwachting ↔ werkelijkheid | betekent 200 OK wat de gebruiker denkt? | 6 scenario's, 8 velden |
+| **5** invariant | werkelijkheid ↔ systeemwet | kan dit onder ÉÉNIGE toegestane volgorde breken? | nog niet gebouwd |
+
+De sprong van 1 naar 4 is er een van strengheid: je blijft de code toetsen, maar
+tegen een steeds hardere maatstaf. Niveau 4 was de winst van de ketenronde — de
+vaststelling dat "geslaagd" zelf te zwak gedefinieerd was.
+
+**De sprong van 4 naar 5 is van een andere soort**, en dat is de reden dat de
+invariantenmotor geen zwaardere ketenronde is. Niveau 1 tot en met 4
+kwantificeren over **invoer**: welke waarden kunnen erin. Niveau 5 kwantificeert
+over **volgordes**: welke interleavings van gebeurtenissen zijn toegestaan. Die
+zijn niet met de hand op te sommen — vandaar gegenereerde toestandsovergangen,
+en vandaar shrinking, want een wet die pas na 4,7 miljoen stappen breekt is
+alleen bruikbaar als je hem terugbrengt tot de zes stappen die hem breken.
+
+### Wanneer is iets een wet en nog geen toets
+
+Een wet moet een herschrijving overleven. Of `oplaadAfronden`, `save()`, SQLite
+of straks Postgres het werk doet, hoort niet uit te maken:
+
+> Een bevestigde financiële mutatie mag nooit stil verdwijnen.
+
+Daaruit volgt een acceptatiecriterium dat scherp genoeg is om te handhaven:
+
+**noemt een wet een implementatienaam, dan is het nog geen wet.**
+
+Geen functienaam, geen tabel, geen endpoint, geen opslagsoort. Wat overblijft is
+een uitspraak over waarneembaar gedrag — en precies daarom blijft hij staan als
+de code eronder wordt vervangen. Een wet die `pay/oplaad` noemt, is een
+integratietoets met een deftige naam.
+
 ## Laag 1 — Proof System (in aanbouw)
 
 Wat er staat: `BEWIJSMATRIX.json` (elf schakels per route), `MUTATIES.json`,

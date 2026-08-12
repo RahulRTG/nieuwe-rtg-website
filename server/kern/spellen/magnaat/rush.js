@@ -12,42 +12,31 @@
 
    DE VIJF WETTEN (VERHAAL.md par. 0f), en waar ze staan:
 
-   1. GEEN SCORE ALS DE WERKELIJKHEID HET ANTWOORD KAN ZIJN. Er staat nergens
-      een punt. Wat een dienst oplevert is DERVING IN EURO'S -- bederf, koud
-      eten, gebroken glas -- en dat is een kostenpost die al bestond
-      (./sectoren.js `derving`, ./stap.js). Ervaring is geschiedenis en geen
-      getal: wat er van een dienst overblijft is een regel met een reden
-      (./rush-maand.js), precies zoals ./beheer.js dat voor de AI-manager doet.
+   1. GEEN SCORE ALS DE WERKELIJKHEID HET ANTWOORD KAN ZIJN. Nergens een punt.
+      Wat een dienst oplevert is DERVING IN EURO'S -- een kostenpost die al
+      bestond (./sectoren.js, ./stap.js). Ervaring is geschiedenis en geen getal.
 
-   2. IEDERE ROL SPEELT ALLEEN ZIJN EIGEN VERANTWOORDELIJKHEID. Elk voorval
-      draagt een `mag`, en die wordt tegen de `mag`-lijst van de rol gelegd
-      (./dienst-rollen.js). Een hulpkracht heeft een LEGE lijst, dus hij ziet
-      alleen wat je met je handen doet. Er komt hier GEEN tweede rechtenmodel
-      bij; de grens die de rol al draagt is de grens van het spel.
+   2. IEDERE ROL SPEELT ALLEEN ZIJN EIGEN VERANTWOORDELIJKHEID. De `mag` van een
+      voorval en van elke UITWEG wordt tegen de rol gelegd (./dienst-rollen.js).
+      Geen tweede rechtenmodel: de grens die de rol al draagt is de grens.
 
-   3. IEDERE UITKOMST LOOPT DOOR DE ECHTE ECONOMIE. Deze module maakt geen geld
-      en geen valuta. Hij geeft EEN GETAL terug -- een factor op een kostenpost
-      die er al was -- en verder niets. Derving is geen nieuwe post maar een
-      NAAM voor een deel van de inkoop dat altijd al bedierf; bij factor 1
-      rekent ./stap.js tot op de cent hetzelfde als voordat deze laag bestond.
-      Dat is wat scripts/magnaat-pomp.js natelt, en die keuring is het bewijs
-      dat de dienst eerlijk is.
+   3. IEDERE UITKOMST LOOPT DOOR DE ECHTE ECONOMIE. Deze module maakt geen geld;
+      hij geeft EEN FACTOR terug op een post die er al was. Bij factor 1 rekent
+      ./stap.js tot op de cent zoals voordat deze laag bestond, en dat is wat
+      scripts/magnaat-pomp.js natelt.
 
    4. NIET SPELEN IS NEUTRAAL, en dit is de wet met de scherpste definitie.
-      "Neutraal" is hier geen gemiddelde en geen half getal maar een SIMULATIE:
-      `opVolgorde()` hieronder laat de ploeg de voorvallen op VOLGORDE VAN
-      BINNENKOMST afwerken. Dat is letterlijk wat een werkvloer zonder sturing
-      doet, en het is dezelfde regel waarmee de AI-concurrent kandidaten
-      aanneemt (VERHAAL.md par. 0d): wie op volgorde werkt, rangschikt niets.
-      Wie de dienst niet speelt krijgt die uitkomst, en dus factor 1. Geen
-      reeks, geen inhaalschuld, geen straf voor afwezigheid -- en een dienst die
-      je begint en niet afmaakt telt ook als neutraal, want anders is beginnen
-      een risico.
+      "Neutraal" is geen gemiddelde maar een SIMULATIE: `opVolgorde()` laat de
+      ploeg de voorvallen op VOLGORDE VAN BINNENKOMST afwerken -- letterlijk wat
+      een werkvloer zonder sturing doet, en dezelfde regel waarmee de
+      AI-concurrent aanneemt (par. 0d): wie op volgorde werkt, rangschikt niets.
+      Wie niet speelt krijgt die uitkomst, en dus factor 1. Geen reeks, geen
+      inhaalschuld -- en een dienst die je begint en niet afmaakt telt ook als
+      neutraal, want anders is beginnen een risico.
 
    5. BETEKENISVOLLE UITZONDERINGEN WORDEN GESCHIEDENIS. Niet elke klik. Er
-      wordt alleen een FEIT gestempeld (./rush-maand.js); of dat een moment
-      wordt beslist ../loopbaan-noteren.js achteraf. Precies de scheiding uit
-      ./dienst.js: systemen schrijven feiten, Magnaat leest geschiedenis.
+      wordt alleen een FEIT gestempeld (./rush-nalaten.js); of dat een moment
+      wordt beslist ../loopbaan-noteren.js achteraf.
 
    EEN ROL, EEN SECTOR, EEN SCHERM -- zie ./rush-voorvallen.js.
 
@@ -60,6 +49,7 @@ const { trek } = require('./risico');
 const { magRol } = require('./dienst-rollen');
 const { SECTOREN } = require('./sectoren');
 const { SOORTEN, magRush } = require('./rush-voorvallen');
+const STORING = require('./storing');
 
 const rond = (n) => Math.round(n);
 const klem = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -85,16 +75,41 @@ function tafel(st) { return (st.rush = st.rush || { diensten: {}, log: [] }); }
 /* WELKE VOORVALLEN DEZE DIENST HEEFT, en wanneer ze binnenkomen. Uit een hash
    van (partij, dienstverband, maand): dezelfde dienst geeft altijd dezelfde
    avond, hoe vaak je hem ook opent. */
-function bouw(potjeId, d, maand, rol) {
+function bouw(potjeId, d, maand, rol, v) {
   const zaad = potjeId + ':' + d.id + ':' + maand + ':';
-  return SOORTEN
-    .filter(s => !s.mag || magRol(rol, s.mag))
+  const stukNu = v ? STORING.openstaand(v).map(x => x.soort) : [];
+  const mag = SOORTEN.filter(s => (!s.mag || magRol(rol, s.mag))
+    /* EEN STORINGSVOORVAL BESTAAT ALLEEN ALS DIE STORING OPEN STAAT. Anders
+       staat er "koeling B loopt op" op een avond waarop hij het prima doet, en
+       is "repareren" een knop die niets repareert. */
+    && (!s.storing || stukNu.includes(s.storing)));
+  /* WAT ER STUK IS, KOMT ELKE DIENST TERUG. Dit is de continuiteit uit
+     VERHAAL.md par. 0f punt 2, en hij is met opzet geen aparte machinerie: een
+     voorval dat aan een OPEN storing hangt (./rush-voorvallen.js `storing`)
+     wordt niet geloot maar staat er gewoon, elke avond, tot iemand hem oplost.
+
+     De ochtendploeg begint dus niet in een schone wereld. En omdat hij ook in
+     `opVolgorde()` hieronder meetelt, verschuift de LAT mee -- wie niet speelt
+     krijgt de wereld zoals hij is en niet een schuld die hij zelf gemaakt heeft.
+     Dat is hoe punt 2 en wet 4 naast elkaar kunnen bestaan (./storing.js). */
+  const vast = mag.filter(s => s.storing);
+  return vast.concat(mag
+    .filter(s => !vast.includes(s))
     .map(s => ({ s, r: trek(zaad + 'k' + s.id) }))
     .sort((a, b) => a.r - b.r || (a.s.id < b.s.id ? -1 : 1))
+    .map(({ s }) => s))
     .slice(0, VOORVALLEN_PER_DIENST)
-    .map(({ s }) => ({
+    .map((s) => ({
       id: s.id, wat: s.wat, deed: s.deed, incident: !!s.incident,
-      kost: s.kost, groei: s.groei,
+      kost: s.kost, groei: s.groei, storing: s.storing || null,
+      /* WAT JE ERMEE KUNT, en dat hangt aan je ROL en niet aan je leeftijd of je
+         voortgang (par. 0f wet 2). Een voorval zonder opties heeft er impliciet
+         een: pak het op. Zo hoeft de tabel alleen iets te zeggen waar het echt
+         anders is -- en dat is vandaag alleen de koelstoring. */
+      /* `alleenZaak` valt hier af: dat zijn de uitwegen die geld aan het pand
+         uitgeven, en die kiest de zaak op zijn eigen scherm en niet iemand
+         midden in de drukte (./rush-voorvallen.js bij `repareren`). */
+      opties: (s.opties || []).filter(o => !o.alleenZaak && (!o.mag || magRol(rol, o.mag))),
       /* Wanneer het binnenkomt. Nooit in het laatste moment: een voorval dat
          pas op het einde verschijnt is geen keuze maar een fooi. */
       vanaf: Math.floor(trek(zaad + 't' + s.id) * (SLOTS - 1))

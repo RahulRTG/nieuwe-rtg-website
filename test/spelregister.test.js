@@ -63,7 +63,7 @@ const GOUD = {
     /* DE DIENST (VERHAAL.md par. 0f). Vrij, en scherper dan de rest: een avond
        op de werkvloer die op je beurt moet wachten is geen avond meer. Hij
        staat NIET in de volwassen laag hieronder -- dit is de bijbaan zelf. */
-    'rush', 'rush-pak',
+    'rush', 'rush-pak', 'storing-verhelpen',
     'foundation-stem', 'bestuur-zet'],
     volwassenLaag: ['open', 'uitbreiden', 'sluiten', 'uitstappen',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien', 'functie-openen',
@@ -74,7 +74,9 @@ const GOUD = {
       'polis-opzeggen', 'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
       'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
       'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid',
-      'bouw', 'verkoop'],
+      /* Beslissen wat er met een kapotte machine gebeurt is ondernemen: het kost
+         geld en het raakt de capaciteit van een zaak (magnaat/storing.js). */
+      'bouw', 'verkoop', 'storing-verhelpen'],
     vormen: ['live', 'async'],
     varianten: { vorm: ['bord', 'economie'], stad: ['IJmuiden'], duur: ['quick', 'avond', 'weekend'],
       start: ['ondernemer', 'mens'] } }],

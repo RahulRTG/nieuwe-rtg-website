@@ -51,7 +51,7 @@ function opstelling(id = 'r1', sector = 'horeca') {
     return m.eco.zet(p, 'anna', { actie: 'aannemen', id: r.id, speler: 'boris' });
   };
   const kijk = () => m.eco.zet(p, 'boris', { actie: 'rush' });
-  const pak = (wat) => m.eco.zet(p, 'boris', { actie: 'rush-pak', wat });
+  const pak = (wat, optie) => m.eco.zet(p, 'boris', { actie: 'rush-pak', wat, optie });
   return { m, p, st: p.staat, zaak, maand, inDienst, kijk, pak };
 }
 
@@ -258,24 +258,30 @@ test('twee hulpkrachten op een zaak middelen, ze tellen niet op', () => {
 
 /* ============ 4. een rol ziet alleen zijn eigen verantwoordelijkheid ==== */
 
-test('een hulpkracht ziet nooit wat hij niet mag beslissen -- wet 2', () => {
-  /* De grens die de ROL al draagt (dienst-rollen.js `mag`) is de grens van het
-     spel. Er komt geen tweede rechtenmodel bij, en dus hoort een voorval met een
-     `mag` die de rol mist er domweg niet te zijn. */
-  const beperkt = R.SOORTEN.filter(s => s.mag);
-  assert.ok(beperkt.length, 'de tabel heeft geen enkel voorval met een bevoegdheid');
-  for (let i = 0; i < 40; i++) {
-    const vv = R.bouw('rol' + i, { id: 'd1' }, i, 'hulp');
-    for (const s of beperkt)
-      assert.equal(vv.some(x => x.id === s.id), false,
-        'een hulpkracht kreeg ' + s.id + ' te zien, en die vraagt ' + s.mag);
-  }
-  /* En wie het WEL mag, kan hem tegenkomen. Zonder deze helft bewijst de eerste
-     helft alleen dat de tabel nooit gebruikt wordt. */
-  let gezien = false;
-  for (let i = 0; i < 60 && !gezien; i++)
-    gezien = R.bouw('rol' + i, { id: 'd1' }, i, 'vakkracht').some(x => x.id === 'installatie');
-  assert.ok(gezien, 'een vakkracht komt het onderhoudsvoorval nooit tegen');
+test('hetzelfde incident, minder uitwegen voor wie minder mag -- wet 2', () => {
+  /* DE GRENS DIE DE ROL AL DRAAGT is de grens van het spel; er komt geen tweede
+     rechtenmodel bij (dienst-rollen.js `mag`).
+
+     HIJ ZIT OP DE UITWEGEN EN NIET OP HET VOORVAL, en dat is wat de tweede
+     dienst vertelde. De eerste opzet zette dezelfde koeling twee keer in de
+     tabel -- een keer voor de hulpkracht, een keer voor de vakkracht -- en dat
+     las als de vijf hoogtes maar waren twee incidenten die op elkaar leken. Bij
+     een derde rol waren het er drie geweest. Het is EEN incident met opties. */
+  const stuk = { storingen: [{ soort: 'koeling', staat: 'open', sinds: 0, sindsStand: 0 }] };
+  const hulp = R.bouw('rol', { id: 'd1' }, 3, 'hulp', stuk).find(x => x.id === 'koeling');
+  const vak = R.bouw('rol', { id: 'd1' }, 3, 'vakkracht', stuk).find(x => x.id === 'koeling');
+  assert.ok(hulp && vak, 'een open storing hoort bij beide rollen op de dienst te staan');
+  assert.deepEqual(hulp.opties.map(o => o.id), ['overzetten'],
+    'een hulpkracht kan de waar redden en verder niets');
+  assert.ok(vak.opties.length > hulp.opties.length, 'een vakkracht hoort meer te kunnen');
+  for (const o of vak.opties.filter(x => x.id !== 'overzetten'))
+    assert.equal(o.mag, 'onderhoud', 'uitweg ' + o.id + ' hangt niet aan een bevoegdheid');
+  /* En de hulpkracht kan er niet omheen door een naam te raden. */
+  const o = opstelling('r-p');
+  o.inDienst('hulp');
+  o.maand(2);
+  assert.equal(o.pak('koeling', 'repareren').status, 404,
+    'een hulpkracht kan geen monteur bestellen bij een zaak zonder storing');
 });
 
 test('er is geen werkvloer voor een rol of sector die hem niet heeft', () => {
@@ -411,7 +417,10 @@ test('een dienst laat een feit achter en geen oordeel -- wet 5', () => {
   o.maand(1);
   const feit = o.st.diensten[0].diensten[0];
   assert.deepEqual(Object.keys(feit).sort(),
-    ['aangepakt', 'bleefLiggen', 'incident', 'maand', 'vestiging']);
+    ['aangepakt', 'bleefLiggen', 'incident', 'maand', 'storing', 'vestiging']);
+  /* `storing` is `null` als er niets stuk was -- geen ontbrekend veld maar een
+     leeg antwoord, zodat de lezer niet hoeft te raden of het gemeten is. */
+  assert.equal(feit.storing, null);
   assert.equal(typeof feit.incident, 'boolean');
   assert.ok(feit.aangepakt > 0);
 });
@@ -426,9 +435,8 @@ test('dezelfde maand twee keer opschrijven geeft een regel, geen twee', () => {
   o.inDienst('hulp');
   o.maand(2);
   draai(o, eerste);
-  const RUSH = require('../server/kern/spellen/magnaat/rush-maand');
-  assert.equal(RUSH.afgerond(o.p).length, 1, 'de dienst hoort nu meegeteld te worden');
-  RUSH.naMaand(o.p); RUSH.naMaand(o.p); RUSH.naMaand(o.p);
+  assert.equal(RUSHMAAND.afgerond(o.p).length, 1, 'de dienst hoort nu meegeteld te worden');
+  RUSHNA.naMaand(o.p); RUSHNA.naMaand(o.p); RUSHNA.naMaand(o.p);
   assert.equal(o.st.diensten[0].diensten.length, 1, 'de maand werd meer dan eens opgeschreven');
   assert.equal(o.st.rush.log.length, 1);
 });
@@ -459,14 +467,235 @@ test('de factor die de maand rekent is de factor die de speler zag', () => {
     'de dervingregel volgt de factor niet: ' + b.derving + ' tegen ' + a.derving + ' x ' + gezien);
 });
 
-test('een incident telt alleen als je het ook echt hebt opgevangen', () => {
-  /* Niet elke klik wordt geschiedenis. `incident` staat op de gesloten lijst in
-     rush-voorvallen.js, en hij valt alleen als het voorval is AANGEPAKT -- een
-     avond waarop de koeling openstond en je er niets aan deed, is geen avond
-     waarop je een koelstoring hebt opgevangen. */
-  const vv = R.bouw('inc', { id: 'd1' }, 3, 'hulp').filter(x => x.incident);
-  assert.ok(vv.length, 'deze avond had geen incident om op te vangen');
-  assert.ok(R.SOORTEN.filter(s => s.incident).length >= 1);
+test('een storingsvoorval bestaat alleen zolang de storing openstaat', () => {
+  /* "Koeling B loopt op" op een avond waarop hij het prima doet, is een leugen
+     op het scherm -- en dan is "repareren" een knop die niets repareert. */
+  let zonder = 0;
+  for (let i = 0; i < 25; i++)
+    if (R.bouw('geen' + i, { id: 'd1' }, i, 'vakkracht').some(x => x.id === 'koeling')) zonder++;
+  assert.equal(zonder, 0, 'de koeling verscheen bij een zaak die niets mankeert');
+  /* En zolang hij WEL openstaat, komt hij elke dienst terug -- dat is de
+     continuiteit uit par. 0f punt 2 en niet een tweede loting. */
+  const stuk = { storingen: [{ soort: 'koeling', staat: 'open', sinds: 0, sindsStand: 0 }] };
+  for (let i = 0; i < 25; i++)
+    assert.ok(R.bouw('stuk' + i, { id: 'd1' }, i, 'hulp', stuk).some(x => x.id === 'koeling'),
+      'een open storing hoort elke dienst terug te komen, ook dienst ' + i);
   assert.ok(R.SOORTEN.every(s => !s.incident || s.kost >= 0.5),
     'een incident dat weinig kost is geen incident maar een klusje');
+});
+
+/* ============ 9. de storing: toestand die blijft ============ */
+
+const STORING = require('../server/kern/spellen/magnaat/storing');
+const RUSHMAAND = require('../server/kern/spellen/magnaat/rush-maand');
+const RUSHNA = require('../server/kern/spellen/magnaat/rush-nalaten');
+
+test('een storing hoort bij de ZAAK en niet bij de speler -- zo blijft wet 4 heel', () => {
+  /* DE BOTSING DIE DEZE LAAG MOEST OPLOSSEN. Punt 2 wil dat wat je laat liggen
+     blijft bestaan; wet 4 verbiedt een inhaalschuld. Die twee kunnen alleen
+     naast elkaar bestaan als de toestand een EIGENSCHAP VAN HET BEDRIJF is:
+     wie morgen begint erft de wereld zoals hij is, met een koeling die het niet
+     doet. Dat is geen schuld maar een ochtend.
+
+     Meetbaar: een zaak met een open storing rekent hetzelfde of er nu iemand in
+     dienst is die niet speelt, of helemaal niemand. */
+  const leeg = opstelling('r-q');
+  const stil = opstelling('r-q');
+  stil.inDienst('hulp');
+  for (const o of [leeg, stil]) STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  leeg.maand(2); stil.maand(2);
+  const a = leeg.st.laatste.anna.regels.find(r => r.id === leeg.zaak.id);
+  const b = stil.st.laatste.anna.regels.find(r => r.id === stil.zaak.id);
+  for (const veld of ['derving', 'vast', 'omzet', 'kosten', 'resultaat'])
+    assert.equal(b[veld], a[veld], veld + ': een werknemer die niets doet hoort niets te veranderen');
+  assert.ok(a.derving > 0 && a.storingen && a.storingen[0].staat === 'open',
+    'en de storing staat wel degelijk op de regel');
+});
+
+test('een open storing kost echt geld, en dat loopt door bestaande posten', () => {
+  /* WET 3, en hier ging het een keer grondig mis. De storingsfactor stond eerst
+     IN `dervingBasis`, en omdat `inkoop` diezelfde basis er weer aftrekt, hief
+     een kapotte koeling zichzelf op: de derving op het scherm ging met driekwart
+     omhoog en het resultaat bewoog geen cent. Elk getal klopte op zichzelf, dus
+     geen enkele toets zag het -- scripts/magnaat-storing.js vond het. */
+  const gezond = opstelling('r-r');
+  const stuk = opstelling('r-r');
+  STORING.uitVoorval(stuk.zaak, 'machinebreuk', stuk.st.maand);
+  gezond.maand(2); stuk.maand(2);
+  const a = gezond.st.laatste.anna.regels.find(r => r.id === gezond.zaak.id);
+  const b = stuk.st.laatste.anna.regels.find(r => r.id === stuk.zaak.id);
+  assert.ok(b.derving > a.derving, 'een kapotte koeling laat meer bederven');
+  assert.ok(b.resultaat < a.resultaat,
+    'en dat hoort het RESULTAAT te raken, niet alleen de regel: ' + b.resultaat + ' tegen ' + a.resultaat);
+  assert.equal(b.resultaat - a.resultaat, -(b.derving - a.derving),
+    'het verschil in resultaat is precies het verschil in derving en niets anders');
+  /* En er komt geen regel bij: het loopt door posten die er al waren. */
+  assert.deepEqual(Object.keys(b).sort(), Object.keys(a).sort());
+});
+
+test('wat je laat liggen, ziet de volgende ploeg terug -- punt 2', () => {
+  const o = opstelling('r-s');
+  o.inDienst('vakkracht');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  o.maand(1);
+  /* De storing staat elke dienst opnieuw op de werkvloer, tot iemand hem
+     oplost. Dat is de continuiteit, en het is geen tweede loting.
+
+     GEMETEN OVER DE HELE AVOND en niet op het eerste moment. `open` toont wat er
+     NU binnen is; een voorval dat pas om half tien arriveert staat op dat moment
+     in geen van beide lijsten. Een eerdere versie van deze toets keek alleen bij
+     binnenkomst en zakte daardoor op maanden waarin de koeling later opdook --
+     terwijl de motor precies deed wat hij moest doen. */
+  for (let i = 0; i < 3; i++) {
+    const gezien = new Set();
+    let r = o.kijk();
+    for (let n = 0; n < R.SLOTS + 2 && r.dienst && !r.dienst.klaar; n++) {
+      if (!r.dienst.open.length) break;
+      r.dienst.open.forEach(x => gezien.add(x.id));
+      r = o.pak(r.dienst.open[0].id);
+    }
+    assert.ok(gezien.has('koeling'),
+      'de koelstoring hoort in maand ' + o.st.maand + ' nog ergens op de avond te staan,'
+      + ' maar er kwam alleen ' + [...gezien].join(', '));
+    o.maand(1);
+    assert.ok(STORING.vind(o.zaak, 'koeling'),
+      'en de waar overzetten lost hem niet op -- morgen ligt er weer wat in');
+  }
+});
+
+test('een noodoplossing houdt niet eeuwig, en dat zie je aankomen', () => {
+  const o = opstelling('r-t');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  STORING.zet(o.zaak, 'koeling', 'workaround', o.st.maand);
+  assert.equal(STORING.vind(o.zaak, 'koeling').staat, 'workaround');
+  o.maand(STORING.WORKAROUND_MAANDEN + 1);
+  assert.equal(STORING.vind(o.zaak, 'koeling').staat, 'open',
+    'na ' + STORING.WORKAROUND_MAANDEN + ' maanden hoort een noodkoeling het te begeven');
+});
+
+test('geen enkele uitweg maakt een storing tot een verbetering', () => {
+  /* Zou stukgaan winstgevend zijn, dan is dat waarde uit het niets in de
+     kleinste denkbare vorm -- en scripts/magnaat-pomp.js ziet hem NIET, want er
+     komt geen euro de wereld in die er niet uit ging. `uit bedrijf` stond even
+     op 0,90 derving, en toen leverde een kapotte koeling in een rustige zaak
+     geld op. */
+  for (const stand of ['open', 'workaround', 'uit']) {
+    const f = STORING.SOORTEN.koeling[stand];
+    assert.ok(f.derving >= 1, stand + ' laat MINDER bederven dan een gezonde zaak');
+    assert.ok(f.vast >= 1, stand + ' maakt het pand goedkoper');
+    assert.ok(f.capaciteit <= 1, stand + ' vergroot de capaciteit');
+  }
+});
+
+test('dezelfde maand twee keer doorrekenen kost niet twee keer spoedgeld', () => {
+  /* DE WERELD REKENT BIJ (GAMEHALL.md 12.4), dus dezelfde maand kan meer dan
+     eens langskomen -- en dan hoort een reparatie een reparatie te blijven. Zou
+     `maandInvoer` de besluiten opnieuw toepassen, dan betaalt de zaak twee keer
+     voor een monteur die een keer kwam. Dezelfde eis als bij `naMaand`, en om
+     dezelfde reden. */
+  const o = opstelling('r-w');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  o.m.eco.zet(o.p, 'anna', { actie: 'storing-verhelpen',
+    vestiging: o.zaak.id, storing: 'koeling', hoe: 'repareren' });
+  assert.ok(o.zaak.spoedOpen > 0, 'er staat een spoedbedrag klaar');
+  const een = RUSHMAAND.maandInvoer(o.p);
+  const twee = RUSHMAAND.maandInvoer(o.p);
+  assert.ok(een.spoed[o.zaak.id] > 0, 'de eerste doorrekening haalt het op');
+  assert.equal(twee.spoed[o.zaak.id], undefined,
+    'de tweede hoort niets meer te vinden, anders betaalt de zaak twee keer voor een monteur die een keer kwam');
+  assert.equal(o.zaak.spoedOpen, 0, 'en het bedrag is opgehaald, niet gekopieerd');
+});
+
+/* ============ 10. hetzelfde incident, een hoogte hoger ============ */
+
+test('de vakkracht komt de avond door, de zaak geeft geld uit', () => {
+  /* DE SCHERPSTE LES VAN DE TWEEDE DIENST, en hij kwam uit een meting. Zolang de
+     vakkracht zelf een monteur kon bestellen, was repareren overal het beste en
+     was de noodkoeling een knop die niemand ooit hoort te gebruiken. Het is ook
+     gewoon niet waar: om tien uur 's avonds bel je geen monteur.
+
+     Daarmee kreeg `escaleren` pas een reden om te bestaan -- het is de weg naar
+     de hoogte die WEL geld kan uitgeven. */
+  const stuk = { storingen: [{ soort: 'koeling', staat: 'open', sinds: 0, sindsStand: 0 }] };
+  const vloer = R.bouw('h', { id: 'd1' }, 3, 'vakkracht', stuk)
+    .find(x => x.id === 'koeling').opties.map(o => o.id);
+  assert.equal(vloer.includes('repareren'), false, 'een monteur bestel je niet vanaf de vloer');
+  assert.ok(vloer.includes('escaleren'), 'maar doorgeven kan wel');
+  const SA = require('../server/kern/spellen/magnaat/storing-acties')({ mijnVestiging: () => null });
+  const zaak = SA.UITWEGEN('koeling').map(o => o.id);
+  assert.ok(zaak.includes('repareren'), 'en de zaak kan hem wel laten komen');
+  assert.equal(zaak.includes('escaleren'), false, 'de zaak schuift niets naar zichzelf door');
+});
+
+test('de eigenaar lost dezelfde storing op via dezelfde regels', () => {
+  /* EEN VRAAG, EEN ANTWOORD: `STORING.pas()` is de enige plek waar staat wat
+     repareren doet, of het nu van de vloer of van het zaakscherm komt. Zonder
+     die ene plek kost repareren op twee schermen iets anders. */
+  const o = opstelling('r-u');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  const mis = o.m.eco.zet(o.p, 'boris', { actie: 'storing-verhelpen',
+    vestiging: o.zaak.id, storing: 'koeling', hoe: 'repareren' });
+  assert.equal(mis.status, 403, 'andermans zaak repareer je niet');
+  const r = o.m.eco.zet(o.p, 'anna', { actie: 'storing-verhelpen',
+    vestiging: o.zaak.id, storing: 'koeling', hoe: 'repareren' });
+  assert.ok(r.ok && r.spoed > 0, 'repareren kost spoedgeld: ' + JSON.stringify(r));
+  o.maand(1);
+  const regel = o.st.laatste.anna.regels.find(x => x.id === o.zaak.id);
+  assert.equal(regel.spoed, r.spoed, 'en dat bedrag staat op het maandoverzicht');
+  assert.ok(regel.onderhoud >= r.spoed,
+    'in de ONDERHOUDSPOST en niet in een eigen regel: ' + regel.onderhoud);
+  assert.equal(regel.storingen, null, 'en de storing is weg');
+});
+
+/* ============ 11. telemetrie, audit, geschiedenis ============ */
+
+test('niet elke avond wordt geschiedenis -- de drempel heeft twee helften', () => {
+  /* PUNT 3. Zonder deze grens wordt een levensloop een lijst van vierduizend
+     avonden waarin niets bijzonders gebeurde. Twee eisen samen: het incident
+     kostte de zaak merkbaar geld, EN jij bent degene die er een eind aan maakte. */
+  const zaak = { sector: 'horeca', omvang: 30, prijs: 'midden', maanden: 6,
+    omzetTotaal: 220000, resultaatTotaal: 84000,
+    storingen: [{ soort: 'koeling', staat: 'open', sinds: 0, sindsStand: 0 }] };
+  const vv = R.bouw('drempel', { id: 'd1' }, 9, 'vakkracht', zaak);
+  const koeling = vv.find(x => x.id === 'koeling');
+  const maak = (optie, raming) => RUSHNA.storingsbesluit(zaak,
+    { maand: 9, raming, gedaan: [{ id: 'koeling', slot: 0, optie }] }, vv);
+  assert.ok(koeling, 'de avond had een koelstoring');
+  /* WIE HET DOORGEEFT OF ALLEEN REDT WAT ER LIGT, maakt er geen eind aan. */
+  for (const optie of ['overzetten', 'escaleren']) {
+    const b = maak(optie, 5000);
+    assert.equal(b.beeindigd, false, optie + ' beeindigt het incident niet');
+    assert.equal(b.zwaar, false, 'en wordt dus nooit geschiedenis, hoe duur het ook was');
+  }
+  /* EN EEN KLEIN INCIDENT OOK NIET, ook al loste je het op. */
+  assert.equal(maak('workaround', 1).zwaar, false, 'een verwaarloosbare storing is geen moment');
+  const groot = maak('workaround', 5000);
+  assert.equal(groot.beeindigd, true);
+  assert.equal(groot.zwaar, true, 'een zware storing die JIJ beeindigde wel: ' + JSON.stringify(groot));
+  assert.ok(RUSHNA.BEEINDIGT.length && RUSHNA.DREMPEL > 0);
+});
+
+test('de drie bewaarlagen zijn niet inwisselbaar', () => {
+  /* telemetrie op de ZAAK (wat de maand nodig heeft), audit in het POTJE (wat er
+     besloten is, afgekapt), geschiedenis BUITEN het potje (wat later nog iets
+     over een mens zegt). Zonder die grenzen wordt de ruggengraat een vuilnisbak. */
+  const o = opstelling('r-v');
+  o.inDienst('vakkracht');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  o.maand(1);
+  draai(o, eerste);
+  o.maand(1);
+  /* telemetrie: alleen de stand van nu, geen verleden */
+  for (const s of o.zaak.storingen || [])
+    assert.deepEqual(Object.keys(s).sort(), ['sinds', 'sindsStand', 'soort', 'staat'],
+      'de vestiging hoort de stand te dragen en geen logboek');
+  /* audit: in het potje, met een reden, afgekapt */
+  assert.ok(o.st.rush.log.length > 0 && o.st.rush.log[0].waarom, 'elke dienst krijgt een reden');
+  assert.ok(RUSHNA.LOGLENGTE > 0 && RUSHNA.LOGLENGTE < 200, 'en het log is afgekapt');
+  /* geschiedenis: de momentsoort bestaat en is er een die maar EEN keer kan */
+  const M = require('../server/kern/spellen/loopbaan-momenten');
+  assert.ok(M.MOMENTEN.eerste_storing, 'de momentsoort bestaat');
+  assert.ok('eerste_storing'.startsWith('eerste_'),
+    'en hij hoort bij de familie die loopbaan.js hoogstens een keer toelaat --'
+    + ' anders staat er na tweehonderd avonden tweehonderd keer hetzelfde');
 });

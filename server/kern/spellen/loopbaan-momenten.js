@@ -49,6 +49,21 @@ const MOMENTEN = {
   /* De twee kanten van een overdracht, en ze staan er allebei omdat het voor
      allebei een moment is -- net als eerste_baan en eerste_mens. Wie stopt
      onthoudt aan wie hij het gaf; wie doorgaat onthoudt van wie hij het kreeg. */
+  /* DE STORING DIE JIJ BEEINDIGDE (VERHAAL.md par. 0f wet 5). De strengste
+     ingang van de negen, en met opzet: een werkvloer levert honderden avonden
+     op en bijna geen ervan zegt later iets over een mens. Twee eisen samen,
+     allebei gemeten in magnaat/rush-nalaten.js -- het incident kostte de zaak
+     merkbaar geld, EN jij bent degene die er een eind aan maakte. Wie de waar
+     overzette of hem doorgaf komt er niet in; dat was nuttig, en het incident
+     liep door.
+
+     HIJ HEET `eerste_` OMDAT HIJ DAT OOK IS. ../loopbaan.js laat een soort met
+     dat voorvoegsel hoogstens EEN keer toe, en dat is precies de garantie die
+     deze ingang nodig heeft -- anders staat er na tweehonderd avonden
+     tweehonderd keer hetzelfde in een levensloop. Een eigen telregel erbij
+     bouwen zou een tweede antwoord zijn op een vraag die al beantwoord is. */
+  eerste_storing: { naam: 'De eerste keer dat jij het oploste',
+    zin: (m) => 'Bij ' + m.samen + ' maakte jij een eind aan ' + m.wat + '.' },
   doorgegeven: { naam: 'Je gaf het door',
     zin: (m) => 'Je stopte na ' + m.wat + ', en ' + m.samen + ' ging verder waar jij ophield.' },
   overgenomen: { naam: 'Je nam het over',

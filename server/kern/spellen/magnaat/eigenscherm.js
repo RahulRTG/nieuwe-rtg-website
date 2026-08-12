@@ -13,6 +13,9 @@
 const { SECTOREN } = require('./sectoren');
 const { PROJECTEN } = require('./foundation');
 
+const STORING = require('./storing');
+const { UITWEGEN } = require('./storing-acties')({ mijnVestiging: () => null });
+
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capaciteit,
   personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld, vergeven, mijnContracten,
   veilingbeeld, belangbeeld, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
@@ -24,6 +27,14 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
     const eigen = (st.vestigingen[mij] || []).map(v => Object.assign({}, v, {
       kavelNaam: k.kavel.get(v.kavel).naam, zone: k.kavel.get(v.kavel).zone,
       capaciteit: capaciteit(v, foundationArbeid(st)), waarde: waarde(v), prijsPer: prijsVan(v.sector, v.prijs),
+      /* WAT ER STUK IS, met de uitwegen erbij die JIJ hier hebt (./storing.js).
+         De lijst komt van de motor en niet van het scherm: welke uitweg waar
+         hoort is een regel en geen opmaak -- een scherm dat hem zelf verzint,
+         verzint hem een keer anders. */
+      storingen: STORING.openstaand(v).map(x => ({ soort: x.soort, staat: x.staat, sinds: x.sinds,
+        naam: (STORING.SOORTEN[x.soort] || {}).naam || x.soort,
+        uitwegen: UITWEGEN(x.soort).filter(u => u.staat !== x.staat)
+          .map(u => ({ id: u.id, wat: u.wat, uitleg: u.uitleg })) })),
       /* HOEVEEL MENSEN DEZE ZAAK NODIG HEEFT om vol te draaien. Staat er sinds
          de onderzoekslaag: `automatisering` verhoogt wat een medewerker aankan,
          en bij een volle bezetting merk je daar niets van tot je iemand naar

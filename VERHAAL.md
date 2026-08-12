@@ -993,3 +993,130 @@ Pas als er een tweede is, weet je wat het raamwerk is. De open vragen:
   `loopbaan-noteren.js` doet er nog niets mee. *"Voorkwam voorraadschade tijdens
   een koelstoring"* staat wel in 0f en nog niet in `MOMENTEN` — en par. 0e laat
   zien wat er gebeurt als je het omgekeerd doet.
+
+---
+
+## 12. De tweede dienst: de vakkracht, en wat het raamwerk blijkt te zijn
+
+Paragraaf 0f zei het vooruit: *de tweede dienst vertelt je wat het raamwerk is;
+de eerste kan dat niet.* Dat klopte, en het antwoord was niet wat de eerste
+opzet suggereerde.
+
+### Het raamwerk is: één incident met opties
+
+De eerste versie zette dezelfde koeling **twee keer** in de tabel — een keer als
+*"zet de waar over"* voor de hulpkracht en een keer als *"laat onderhoud komen"*
+voor de vakkracht. Dat las als de vijf hoogtes, maar het waren twee incidenten
+die toevallig op elkaar leken. Bij een derde rol waren het er drie geweest, en
+bij de vijfde had niemand meer geweten welke bij welke hoorde.
+
+Wat het werkelijk is: **één voorval, en welke uitwegen je ziet hangt aan je
+rol.** Een voorval zonder opties heeft er impliciet één, en die heet *oppakken*
+— dus de tabel hoeft alleen iets te zeggen waar het echt anders is. Vandaag is
+dat precies één regel: de koelstoring.
+
+### Punt 2 botste met wet 4, en de uitweg was een begrip
+
+Continuïteit en *"geen inhaalschuld"* kunnen alleen naast elkaar bestaan als de
+achtergelaten toestand **niet van de speler is**. Vandaar `magnaat/storing.js`,
+en vandaar dat het bestand níét `rush-storing.js` heet:
+
+> Een storing is een feit over een bedrijf, net als achterstallig onderhoud. Hij
+> staat op de vestiging, hij werkt door via posten die er al waren, en hij blijft
+> bestaan of er nu iemand speelt of niet. Wie morgen begint erft de wereld zoals
+> hij is — met een koeling die het niet doet. **Dat is geen schuld maar een
+> ochtend.**
+
+Er kwam ook **geen nieuw toeval** bij. `machinebreuk` gaat in `risico.js` al
+deterministisch af en zit al in de balans; wat verandert is dat hij nu iets
+achterlaat in plaats van alleen een rekening te sturen. Eén gebeurtenislaag,
+geen twee.
+
+Drie standen, elk met een andere rekening — allemaal via bestaande posten
+(derving, vaste lasten, capaciteit, onderhoud). Een noodoplossing houdt vier
+maanden en valt dan terug op `open`: anders is het een gratis reparatie met een
+andere naam.
+
+### De meter die het ontwerp omgooide
+
+`scripts/magnaat-storing.js` stelt twee dingen vast die geen toets kan zien: dat
+een open storing pijn doet, en dat elke uitweg érgens de beste is. De eerste
+ronde zakte op allebei, en één van de vondsten was een echte bug:
+
+**De storingsfactor hief zichzelf op.** Hij stond in `dervingBasis`, en omdat
+`inkoop` diezelfde basis er weer aftrekt, ging de derving op het scherm met
+driekwart omhoog terwijl het resultaat geen cent bewoog. Een open koelstoring
+kostte over twaalf maanden **426 euro**. Elk getal klopte op zichzelf, dus geen
+enkele toets keek ernaar.
+
+En daarna gooide de meter het ontwerp om:
+
+> Zolang de vakkracht zélf een monteur kon bestellen, was repareren overal het
+> beste en was de noodkoeling een knop die niemand ooit hoort te gebruiken.
+
+Dat is ook gewoon niet waar. **Een vakkracht om tien uur 's avonds belt geen
+monteur.** Repareren verhuisde naar het zaakscherm (`storing-acties.js`), en
+daarmee kreeg `escaleren` pas een reden om te bestaan: het is de weg naar de
+hoogte die wél geld kan uitgeven.
+
+Zo staat het nu — de bedragen zijn wat de storing over twaalf maanden aan
+resultaat kost:
+
+| zaak | bezetting | open | noodoplossing | uit bedrijf | repareren | beste op de vloer |
+|---|---|---|---|---|---|---|
+| vol (30 stoelen) | 100% | 11.760 | 2.568 | 24.672 | **1.249** | noodoplossing |
+| ruim (60 stoelen) | 66% | 16.845 | 4.032 | **506** | 2.499 | uit bedrijf |
+| rustig (terrein) | 21% | 2.380 | 1.007 | **0** | 1.250 | uit bedrijf |
+
+**Uit bedrijf nemen is fout in een volle zaak en goed in een rustige.** Dezelfde
+knop, een ander antwoord — de situatie beslist, niet de knop. Dat is de les die
+deze laag moest dragen, en nu is hij gemeten in plaats van gehoopt.
+
+Eén ding is daarbij expliciet dichtgezet: `uit bedrijf` stond even op 0,90
+derving, en toen **leverde een kapotte koeling in een rustige zaak geld op**.
+Dat is waarde uit het niets in de kleinste denkbare vorm, en `magnaat-pomp.js`
+ziet hem níét — er komt geen euro de wereld in die er niet uit ging. Nu bewaakt
+de storingsmeter het: geen enkele uitweg mag winst opleveren.
+
+### Punt 3: de drie bewaarlagen, als regel
+
+| laag | waar | wat | levensduur |
+|---|---|---|---|
+| **telemetrie** | de vestiging (`v.storingen`, `v.onderhoud`) | alleen de stand van nu | zolang de zaak bestaat |
+| **audit** | het potje (`st.rush.log`) | elk besluit, met een reden | afgekapt op 40, weg met de partij |
+| **geschiedenis** | buiten het potje (`loopbaan.js`) | wat later nog iets over een mens zegt | voorgoed |
+
+De drempel naar die derde laag heeft **twee helften, en ze moeten allebei waar
+zijn**: het incident kostte de zaak merkbaar geld (wat een open storing per
+maand kost, maal hoe lang hij liep, tegen een vijfde van een maandresultaat),
+**én** jij bent degene die er een eind aan maakte. Wie de waar overzette heeft
+gered wat er lag; wie het meldde heeft het doorgegeven. Allebei nuttig, allebei
+geen moment — het incident liep gewoon door.
+
+En de momentsoort heet `eerste_storing`, niet `storing_gedragen`. Dat is geen
+cosmetiek: `loopbaan.js` laat een soort met dat voorvoegsel **hoogstens één keer**
+toe, en dat is precies de garantie die deze ingang nodig heeft. Een eigen
+telregel erbij bouwen zou een tweede antwoord zijn op een vraag die al beantwoord
+is.
+
+### Wat de mutatieproef nog vond
+
+Van acht mutaties zakten er zeven meteen. De overlever was leerzaam: de vlag die
+voorkwam dat besluiten twee keer geboekt werden, bewaakte **een tak die sinds de
+verhuizing van `repareren` onbereikbaar was**. Een bewaking die niet kan zakken
+is erger dan geen bewaking (`LAT.md` regel 9), dus de tak is weg in plaats van
+bewaakt — wat overblijft is idempotent omdat een stand zetten dat is.
+
+### Wat er nog niet is
+
+- **De vierde en vijfde hoogte.** De bedrijfsleider ziet vandaag hetzelfde
+  zaakscherm als de eigenaar. De vraag uit de opdracht — *"vier koelstoringen in
+  zes maanden: blijf je repareren of vervang je het systeem?"* — vraagt dat een
+  storing zijn eigen geschiedenis bijhoudt, en dat is precies wat de
+  telemetrielaag nu **niet** doet. Dat is een besluit en geen omissie: die
+  historie hoort in de auditlaag, niet op de vestiging.
+- **Rimpelen naar buiten.** Een workaround raakt vandaag je eigen maandrekening.
+  Naar de leverancier en de klant doorwerken kan pas als er een tweede sector
+  meedoet.
+- **Het echte PDA-scherm.** Onveranderd: hoofdstuk 9 staat er nog, de brug draagt
+  nog geen verkeer.

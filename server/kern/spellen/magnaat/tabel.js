@@ -62,7 +62,13 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
   const rush = require('./rush-acties')();
   Object.assign(ACTIES, rush.ACTIES);
   VRIJE_ACTIES.push(...rush.VRIJE_ACTIES);
+  /* EEN STORING VERHELPEN vanaf het zaakscherm -- dezelfde uitwegen als op de
+     werkvloer, een hoogte hoger (./storing-acties.js). Zonder hem zit een zaak
+     zonder vakkracht eeuwig aan een kapotte koeling vast. */
+  const storing = require('./storing-acties')({ mijnVestiging });
+  Object.assign(ACTIES, storing.ACTIES);
+  VRIJE_ACTIES.push(...storing.VRIJE_ACTIES);
   const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
 
-  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie, rush };
+  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie, rush, storing };
 };

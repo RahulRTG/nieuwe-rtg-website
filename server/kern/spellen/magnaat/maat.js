@@ -137,4 +137,17 @@ function kwaliteit(v, verkocht, arbeid) {
   return klem(100 * ruimte * (0.55 + (v.onderhoud / 100) * 0.45) * O.factor(v, 'kwaliteit'), 0, 100);
 }
 
-module.exports = { capaciteit, personeelNodig, rendabelVanaf, levering, kwaliteit, perMens };
+/* WAT DEZE ZAAK PER MAAND AAN ONDERHOUD NODIG HEEFT om zijn staat op peil te
+   houden. Hij stond als losse regel in ./stap.js en is hierheen gehaald toen
+   ./storing.js hem ook nodig had: spoedwerk wordt afgerekend als een veelvoud
+   van de gewone onderhoudsbeurt van DEZE zaak, want een monteur voor veertig
+   stoelen kost meer dan een voor vier.
+
+   Twee kopieen van deze som zouden uit elkaar lopen zodra iemand er een
+   aanpast, en dan kost repareren ineens iets anders dan onderhouden. Een vraag,
+   een antwoord -- dezelfde regel die `waarde` in ./stap.js draagt. */
+const onderhoudsnorm = (v) => v.omvang * SECTOREN[v.sector].vast
+  * (KOSTENSTAND[v.prijs] || 1) * 0.35;
+
+module.exports = { capaciteit, personeelNodig, rendabelVanaf, levering, kwaliteit,
+  perMens, onderhoudsnorm };

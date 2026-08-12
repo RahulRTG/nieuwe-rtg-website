@@ -86,6 +86,9 @@ module.exports = (ctx) => {
          lijst: een avond op de werkvloer die op je beurt moet wachten is geen
          avond meer. Zie ./rush-acties.js. */
       'rush', 'rush-pak',
+      /* EEN STORING VERHELPEN wacht al helemaal niet op je beurt: een koeling
+         die stuk is, is nu stuk. Zie ./storing-acties.js. */
+      'storing-verhelpen',
       /* STEMMEN over wat de Foundation bouwt (fase C, ./governance.js). Vrij,
          want een stemming met een beurt eraan vast is een deadline -- en dat is
          de kunstmatige urgentie die CLAUDE.md verbiedt. */
@@ -115,7 +118,11 @@ module.exports = (ctx) => {
       'polis-sluiten', 'polis-opzeggen',
       'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
       'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
-      'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid', 'bouw', 'verkoop'],
+      'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid', 'bouw', 'verkoop',
+      /* Beslissen wat er met een kapotte machine gebeurt is ondernemen: het kost
+         geld en het raakt de capaciteit van een zaak. Een zestienjarige met een
+         bijbaan doet dat niet -- hij meldt het, en dat kan via zijn dienst. */
+      'storing-verhelpen'],
     rolVanZet: require('./rolhaak'),
     init, zet,
     varianten: {

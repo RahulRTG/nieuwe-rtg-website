@@ -31,9 +31,13 @@ const { prijsVan, LATFACTOR, KOSTENSTAND } = require('./prijsstand');
 const { vraagVoor } = require('./vraag');
 const H = require('./handel');
 const O = require('./onderzoek');
+/* WAT ER STUK IS aan deze zaak, en wat dat met de maand doet (./storing.js). Het
+   staat hier tussen de andere eigenschappen van de vestiging omdat het er een
+   IS -- geen spellaag maar een feit over het bedrijf, zoals `v.onderhoud`. */
+const STORING = require('./storing');
 /* HOEVEEL EEN ZAAK AANKAN EN HOE GOED HET GAAT staat in ./maat.js -- waar over
    de vestiging zelf, los van de kalender. Dit bestand rekent een MAAND. */
-const { capaciteit, personeelNodig, levering, kwaliteit } = require('./maat');
+const { capaciteit, personeelNodig, levering, kwaliteit, onderhoudsnorm } = require('./maat');
 
 const rond = (n) => Math.round(n);
 const klem = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -48,7 +52,7 @@ const klem = (n, min, max) => Math.max(min, Math.min(max, n));
    contracten); `gedekt` is wat hij als afnemer geleverd KREEG, per handelssoort.
    Zonder allebei rekent deze functie precies zoals in fase A -- dat is de eis:
    een economie die anders rekent zodra er een laag bijkomt, is twee economieen. */
-function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, gedekt, dervingFactor }) {
+function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, gedekt, dervingFactor, spoed }) {
   const s = SECTOREN[v.sector];
   const vr = vraagVoor(kaart, v, { maand: m, zoneDruk, marketing: v.marketing });
   const gevraagd = vr.eenheden * (wereldFactor || 1);
@@ -57,7 +61,16 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
      vergeven voordat de eerste klant binnenkomt. Zonder die volgorde is een
      contract gratis geld en tekent iedereen alles. Zie ./handel.js. */
   const toegezegd = (contract && contract.eenheden) || 0;
-  const { cap, geleverd, deel: leverDeel } = levering(v, arbeid, toegezegd);
+  /* WAT ER STUK IS werkt op drie posten die er al waren: wat je aankan, wat er
+     bederft, en wat het pand kost. Een zaak zonder storingen krijgt overal 1 en
+     rekent dus tot op de cent zoals voordat deze laag bestond. */
+  const stuk = STORING.effect(v);
+  const { cap: capVol, geleverd, deel: leverDeel } = levering(v, arbeid, toegezegd);
+  /* CAPACITEIT UIT BEDRIJF. Hij grijpt NA `levering()` aan en niet ervoor, want
+     een contract dat je getekend hebt gaat nog steeds voor -- je hebt minder,
+     en dat merk je eerst aan je vrije verkoop. Dat is de eerlijke volgorde en
+     het is dezelfde die ./handel.js al aanhoudt. */
+  const cap = capVol * stuk.capaciteit;
   const leverOmzet = ((contract && contract.bedrag) || 0) * leverDeel;
 
   const verkocht = Math.min(gevraagd, Math.max(0, cap - geleverd));
@@ -73,34 +86,39 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
     korting += H.dekking(v, omzet, soort, ontvangen).bedrag;
   const inkoopBruto = Math.max(0, omzet * s.inkoop * O.factor(v, 'inkoop') - korting);
   /* DERVING IS GEEN NIEUWE POST MAAR EEN UITSNEDE. Een deel van wat je inkoopt
-     wordt nooit verkocht -- het bederft, het breekt, het valt af -- en dat zat
-     altijd al in `inkoop`. Hier krijgt het een naam, zodat het op het
-     maandoverzicht tussen huur en loon kan staan en een dienst er iets aan kan
-     doen (./rush.js, VERHAAL.md par. 0f wet 3).
+     wordt nooit verkocht -- bederf, breuk, uitval -- en dat zat altijd al in
+     `inkoop`. Hier krijgt het een naam, zodat het op het maandoverzicht kan
+     staan en een dienst er iets aan kan doen (./rush.js, par. 0f wet 3). Bij
+     alle factoren op 1 is `inkoop + derving` tot op de cent `inkoopBruto`: een
+     spel dat erbij komt maakt geen enkele zaak in de stad duurder.
 
-     BIJ FACTOR 1 VERANDERT ER NIETS, en dat is de eis: `inkoop + derving` is tot
-     op de cent `inkoopBruto`. Zou derving een post ERBIJ zijn, dan werd elke
-     zaak in de stad duurder omdat er een spel bijkwam -- en dan is de balans van
-     scripts/magnaat-balans.js een andere geworden zonder dat iemand daarvoor
-     koos. Een dienst maakt hier dus geen geld; hij verschuift hoeveel van een
-     bestaande kostenpost werkelijk bederft. */
+     DE BASIS IS DE UITSNEDE, DE FACTOREN BEWEGEN HET TOTAAL. Dat ging hier een
+     keer mis: de storingsfactor stond IN `dervingBasis`, en omdat `inkoop`
+     diezelfde basis er weer aftrekt, hief een kapotte koeling zichzelf op --
+     de derving ging met driekwart omhoog en het resultaat bewoog geen cent.
+     Alleen `dervingBasis` mag dus uit `inkoop`. */
   const dervingBasis = inkoopBruto * (s.derving || 0);
-  const derving = dervingBasis * (dervingFactor || 1);
+  const derving = dervingBasis * stuk.derving * (dervingFactor || 1);
   const inkoop = inkoopBruto - dervingBasis;
   const lonen = v.personeel * s.loon;
   // en een duurder pand per eenheid; hetzelfde getal, dezelfde reden
-  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v, 'vast');
+  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v, 'vast') * stuk.vast;
   const huur = v.huur;
   const marketing = v.marketing || 0;
   /* Onderhoud is een BEDRAG dat de speler kiest, geen vinkje. Wat het oplevert
      staat hieronder: het houdt de staat op peil in plaats van hem te laten
      zakken. */
-  const onderhoudKosten = v.onderhoudBudget || 0;
+  /* SPOEDWERK HOORT BIJ ONDERHOUD EN KRIJGT GEEN EIGEN REGEL. Een storing die
+     deze maand gerepareerd is, is onderhoud dat niet gepland was -- duurder,
+     maar dezelfde post. Zou er een regel bijkomen, dan had de vakkracht een
+     eigen kostenpost en dus een eigen economie (par. 0f wet 3). Hij telt
+     bovendien mee in `herstel` hieronder, want er is werkelijk iets gemaakt. */
+  const onderhoudKosten = (v.onderhoudBudget || 0) + (spoed || 0);
   const kosten = inkoop + derving + lonen + vast + huur + marketing + onderhoudKosten;
   const resultaat = omzet - kosten;
 
   // de staat van het pand: zakt vanzelf, stijgt met wat je eraan besteedt
-  const nodig = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * 0.35;
+  const nodig = onderhoudsnorm(v);
   const herstel = nodig > 0 ? klem((onderhoudKosten / nodig) * 6, 0, 12) : 0;
   v.onderhoud = klem(v.onderhoud - 4 + herstel, 0, 100);
   // wat er in de zaak omgaat, en dus wat de kwaliteit bepaalt: contract en
@@ -124,6 +142,16 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
     omzet: rond(omzet), inkoop: rond(inkoop), derving: rond(derving), lonen: rond(lonen),
     vast: rond(vast), huur: rond(huur), marketing: rond(marketing), onderhoud: rond(onderhoudKosten),
     kosten: rond(kosten), resultaat: rond(resultaat),
+    /* WAT ER STUK IS, op de regel die de speler ziet. Zonder dit staat er een
+       hogere derving zonder reden, en dan is een storing een onzichtbare straf.
+       `null` als er niets aan de hand is, zodat een gezonde zaak er niets van
+       merkt -- dezelfde vorm als `levering` hieronder. */
+    storingen: STORING.openstaand(v).length
+      ? STORING.openstaand(v).map(x => ({ soort: x.soort,
+          naam: (STORING.SOORTEN[x.soort] || {}).naam || x.soort,
+          staat: x.staat, sinds: x.sinds }))
+      : null,
+    spoed: rond(spoed || 0),
     staat: Math.round(v.onderhoud), reputatie: Math.round(v.reputatie),
     /* De kwaliteit die deze maand geleverd is, ONGEWOGEN door de prijsstand:
        een kwaliteitseis in een contract gaat over wat er geleverd wordt en niet

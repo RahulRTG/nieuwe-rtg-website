@@ -576,6 +576,9 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
          avond op de werkvloer die op je beurt moet wachten is geen avond meer. */
       'rush', 'rush-pak',
       'solliciteren',
+      /* EEN STORING VERHELPEN vanaf het zaakscherm: een koeling die stuk is
+         wacht niet tot jij aan zet bent. Zie magnaat/storing-acties.js. */
+      'storing-verhelpen',
       /* UITSTAPPEN is de enige VRIJE zet die de kaart verandert, en dat volgt
          uit de zet zelf: wie ermee ophoudt komt per definitie niet meer op zijn
          beurt terug. Zou hij moeten wachten, dan wacht de tafel op iemand die

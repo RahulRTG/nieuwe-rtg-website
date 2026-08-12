@@ -36,6 +36,7 @@ const C = require('./cyclus');
 const N = require('./nieuws');
 const DIENST = require('./dienst');
 const RUSH = require('./rush-maand');
+const RUSHNA = require('./rush-nalaten');
 const maakPerZaak = require('./maand-vestiging');
 const F = require('./foundation');
 const H = require('./handel');
@@ -79,7 +80,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        hetzelfde beeld rekenen, en een dienst die halverwege de ronde van
        betekenis verandert is een tweede volgorde-afhankelijkheid in een maand
        die er geen mag hebben (zie de determinisme-eis in ./stap.js). */
-    const dervingFactor = RUSH.factoren(potje);
+    const werkvloer = RUSH.maandInvoer(potje);
+    const dervingFactor = werkvloer.derving;
     /* WAT ER DEZE MAAND VASTLIGT AAN CONTRACTEN, voordat er ook maar iets
        gerekend is. Een levering gaat voor de vrije verkoop (./handel.js), dus
        die capaciteit moet vergeven zijn voordat de eerste klant binnenkomt --
@@ -120,7 +122,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          mee (fase B zette er de levering in, de kwaliteitsmeting en de
          verdeling onder aandeelhouders). */
       wereldOmzet += perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-        arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor });
+        arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, spoed: werkvloer.spoed });
       /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
          rood staan, de leningen, de polissen en het onderzoek. Vier posten die
          niet aan een pand hangen maar aan de speler, en die alle vier geld de
@@ -165,7 +167,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        maand gebeurd; en voor het verslag, zodat een terugblik hem al ziet. Hij
        is idempotent -- de wereld rekent bij, en een maand mag geen tweede regel
        opleveren omdat er iemand keek. */
-    RUSH.naMaand(potje);
+    RUSHNA.naMaand(potje);
     const verslag = afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
       wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
       concernlast });

@@ -1410,6 +1410,11 @@ function mgCoord(veld){
 let ecKavels = null, ecSectoren = null, ecKiesZone = null;
 // welk promotiegesprek er open staat; null = alleen de regel "X wil je spreken"
 let ecGesprek = null;
+/* Hoe een storingsstand in gewone taal heet. De motor rekent met sleutels; een
+   scherm schrijft in woorden -- hetzelfde onderscheid dat magnaat/nieuws.js al
+   maakt tussen een sectorsleutel en hoe een krant hem noemt. */
+const STORINGSTAND = { open: 'staat open', workaround: 'noodoplossing', uit: 'uit bedrijf' };
+
 const ecGeld = (n) => (n < 0 ? '-' : '') + '€' + Math.abs(Math.round(n)).toLocaleString('nl-NL');
 
 /* DE WERKVLOER (VERHAAL.md par. 0f). Wat een hulpkracht op zijn dienst ziet:
@@ -1444,8 +1449,21 @@ function tekenDienst(d, waarom){
     (d.open || []).map(o => '<div class="rij"><div class="nm">' + esc(o.wat) +
       '<small>' + (o.gelopen > 0 ? 'kostte tot nu toe ' + ecGeld(o.gelopen) + ' · ' : '') +
       ecGeld(o.perMoment) + ' per moment dat het wacht · ' +
-      ecGeld(o.blijftLiggen) + ' als het blijft liggen</small></div>' +
-      '<button type="button" class="chip" data-rush="' + esc(o.id) + '">Oppakken</button></div>').join('') +
+      ecGeld(o.blijftLiggen) + ' als het blijft liggen</small>' +
+      /* MEER DAN EEN UITWEG? Dan is dit geen taakje maar een besluit, en dan
+         hoort elke uitweg te zeggen wat hij betekent. Bij een hulpkracht staat
+         hier niets extra's: hij heeft er een, en die heet Oppakken. Dat verschil
+         op het scherm IS de promotie (VERHAAL.md par. 0f). */
+      ((o.opties || []).length > 1
+        ? '<div class="keuzerij">' + o.opties.map(x =>
+            '<button type="button" class="chip" data-rush="' + esc(o.id) + '" data-optie="' +
+            esc(x.id) + '" title="' + esc(x.uitleg || '') + '">' + esc(x.wat) + '</button>').join('') +
+          '</div>' + o.opties.map(x => '<small class="leeg">' + esc(x.wat) + ' — ' +
+            esc(x.uitleg || '') + '</small>').join('')
+        : '') + '</div>' +
+      ((o.opties || []).length > 1 ? ''
+        : '<button type="button" class="chip" data-rush="' + esc(o.id) + '">Oppakken</button>') +
+      '</div>').join('') +
     '<div class="leeg">Je kunt er per moment één doen.</div>';
 }
 
@@ -1486,7 +1504,24 @@ function tekenMagnaatEco(){
         (v.marketing ? 'marketing uit' : 'marketing aan') + '</button>' +
       '<button type="button" class="chip" data-ec="onderhoud" data-id="' + esc(v.id) + '" data-w="' + (v.onderhoudBudget ? 0 : Math.round(v.omvang*20)) + '">' +
         (v.onderhoudBudget ? 'onderhoud uit' : 'onderhoud aan') + '</button>' +
-      '</div></div>').join('');
+      '</div>' +
+      /* WAT ER STUK IS, EN WAT JE ERAAN KUNT DOEN. Dit is de derde hoogte uit
+         VERHAAL.md par. 0f: dezelfde koelstoring die een vakkracht op zijn
+         dienst tegenkomt, maar hier met het maandoverzicht ernaast in plaats van
+         midden in de drukte -- en met de uitweg die op de vloer niet bestaat.
+         Een monteur laten komen kost geld, dus dat besluit hoort hier. */
+      (v.storingen || []).map(x => '<div class="rij" style="width:100%;flex-wrap:wrap;">' +
+        '<div class="nm">' + esc(x.naam) + ' — ' + esc(STORINGSTAND[x.staat] || x.staat) +
+        '<small>sinds maand ' + x.sinds + '</small></div>' +
+        '<div class="keuzerij" style="width:100%;">' + (x.uitwegen || []).map(u =>
+          '<button type="button" class="chip" data-stor="' + esc(x.soort) + '" data-id="' +
+          esc(v.id) + '" data-hoe="' + esc(u.id) + '" title="' + esc(u.uitleg || '') + '">' +
+          esc(u.wat) + '</button>').join('') + '</div></div>').join('') +
+      '</div>').join('');
+  $('#ecMijn').querySelectorAll('[data-stor]').forEach(b => b.addEventListener('click', async () => {
+    try{ await speelZet({ actie:'storing-verhelpen', vestiging: b.dataset.id,
+      storing: b.dataset.stor, hoe: b.dataset.hoe }); }catch(e){ meld(e.message); }
+  }));
   $('#ecMijn').querySelectorAll('[data-ec]').forEach(b => b.addEventListener('click', async () => {
     const zet = { actie:'beleid', id: b.dataset.id };
     zet[b.dataset.ec] = b.dataset.ec === 'prijs' ? b.dataset.w : Number(b.dataset.w);
@@ -1603,7 +1638,9 @@ function tekenMagnaatEco(){
   }
 
   werk.querySelectorAll('[data-rush]').forEach(b => b.addEventListener('click', async () => {
-    try{ await speelZet({ actie:'rush-pak', wat: b.dataset.rush }); }catch(e){ meld(e.message); }
+    const zet = { actie:'rush-pak', wat: b.dataset.rush };
+    if (b.dataset.optie) zet.optie = b.dataset.optie;
+    try{ await speelZet(zet); }catch(e){ meld(e.message); }
   }));
 
   werk.querySelectorAll('[data-sol]').forEach(b => b.addEventListener('click', async () => {

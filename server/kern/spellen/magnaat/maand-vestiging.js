@@ -21,7 +21,7 @@ module.exports = ({ verdeel, rekenMaand, F, N }) => {
      STADSOMZET bij kwam; de regels worden op `regels` geduwd en de kas wordt
      hier gezet, want de verdeling onder aandeelhouders bepaalt wie wat krijgt. */
   return function perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor }) {
+    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, spoed }) {
     const st = potje.staat;
     let wereldOmzet = 0;
       for (const v of rij) {
@@ -50,7 +50,11 @@ module.exports = ({ verdeel, rekenMaand, F, N }) => {
              afgemaakt -- dan is hij `undefined` en rekent ./stap.js met 1: de
              maand die er zonder deze laag ook was geweest. Dat is wet 4, en het
              is de reden dat hij als FACTOR reist en niet als bedrag. */
-          dervingFactor: (dervingFactor || {})[v.id] });
+          dervingFactor: (dervingFactor || {})[v.id],
+          /* SPOEDWERK dat deze maand besloten is (./storing.js). Het landt in de
+             ONDERHOUDSPOST en krijgt geen eigen regel -- een reparatie is
+             onderhoud dat niet gepland was, geen nieuwe soort kosten. */
+          spoed: (spoed || {})[v.id] });
         const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
         regels.push(regel);
         /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).

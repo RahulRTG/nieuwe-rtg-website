@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 942 bestanden en 6382 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 942 bestanden en 6392 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 942 |
-| losse beweringen (`test(...)`) | 6382 |
+| losse beweringen (`test(...)`) | 6392 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-822 bestanden, 6167 beweringen.
+822 bestanden, 6177 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -688,7 +688,7 @@ toets omvalt.
 | `spelregels-drift.test.js` | 17 | overleefd | Driftbewaking: twee spelregels bestaan bewust in tweevoud (server keurt, client geeft directe feedback): de Woordduel-premievelden en de Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt hem... |
 | `spelregister.test.js` | 32 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |
 | `spelreplay.test.js` | 9 | gezakt op `return-weg#0` | Het verloop van een partij, voor de replay. De uitslagen zeggen WIE won; dit zegt HOE. |
-| `spelrush.test.js` | 20 | genoemd | MAGNAAT: PDA RUSH -- de dienst van een hulpkracht op de werkvloer. De werklaag uit VERHAAL.md par. |
+| `spelrush.test.js` | 30 | genoemd | MAGNAAT: PDA RUSH -- de dienst van een hulpkracht op de werkvloer. De werklaag uit VERHAAL.md par. |
 | `spelstad.test.js` | 16 | -- | DE STAD ONTHOUDT -- fase C: de Living World en de levende kaart. Uit hoofdstuk 10 en 11 van de visie: jullie bouwden een bibliotheek, de wijk werd veiliger, en "nieuwe spelers weten niet eens meer dat het ooit een... |
 | `spelstadskrant.test.js` | 13 | -- | MAGNAAT DAILY -- de stad van vandaag, en er valt niets te halen. Fase C, het laatste open stuk. |
 | `spelstart.test.js` | 14 | -- | DE ECHTE START -- je begint als mens, niet als ondernemer. VERHAAL.md par. |

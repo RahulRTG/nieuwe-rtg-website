@@ -16,6 +16,7 @@
    zich te mogen verzekeren, is een speler die schade oploopt aan de
    beurtvolgorde. */
 const R = require('./risico');
+const STORING = require('./storing');
 const P = require('./polis');
 
 const rond = (n) => Math.round(n);
@@ -119,6 +120,12 @@ module.exports = ({ mijnVestiging }) => {
            rekening, en dan werkt hij niet door in kwaliteit en reputatie -- en
            juist die doorwerking is wat een risico van een boete onderscheidt. */
         if (voorval.soort === 'pand') v.onderhoud = Math.max(0, v.onderhoud - voorval.deel * 100);
+        /* EN SOMMIGE VOORVALLEN LATEN IETS ACHTER (./storing.js). Een
+           machinebreuk in een restaurant is een koeling die het niet meer doet,
+           en die is morgen nog steeds stuk. Tot nu toe was hij een bedrag en
+           daarna niets; nu is hij een feit over de zaak, dat blijft staan of er
+           iemand speelt of niet. Zie VERHAAL.md par. 0f punt 2. */
+        STORING.uitVoorval(v, voorval.risico, st.maand);
         // 3. en wat de polis daarvan draagt
         const p = polissen.find(x => x.vestiging === v.id && x.risico === voorval.risico);
         const uit = p ? P.uitkering(p, v, kosten) : { bedrag: 0, reden: 'niet verzekerd' };

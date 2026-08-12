@@ -112,6 +112,23 @@ module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan }) => {
         onthoud(d.werknemer, wn, 'samen_door', { samen: wg, wat: zwaar.wat, potje: potje.id });
         onthoud(d.werkgever, wg, 'samen_door', { samen: wn, wat: zwaar.wat, potje: potje.id });
       }
+      /* DE STORING DIE HIJ BEEINDIGDE (par. 0f wet 5). Het FEIT staat op de
+         dienst (magnaat/rush-maand.js schreef het, met de drempel er al in);
+         hier valt alleen de vraag of het een moment werd. Dat onderscheid is
+         par. 0b: het feit blijft waar, de betekenis mag verschuiven.
+
+         ALLEEN DE EERSTE, en dat regelt de NAAM: ../loopbaan.js laat een soort
+         met het voorvoegsel `eerste_` hoogstens een keer toe. Het gaat om de dag
+         dat je voor het eerst zelf een probleem beeindigde, niet om een teller.
+
+         DE WOORDEN KOMEN UIT HET FEIT ZELF en niet uit een tabel hier. Dit
+         bestand hoort niet te weten hoe een koeling heet -- dat is een detail
+         van de magnaat-motor, en een woordenboek hier zou uit de pas gaan lopen
+         met het spel dat het beschrijft. */
+      const beeindigd = (d.diensten || []).find(x => x.storing && x.storing.zwaar);
+      if (beeindigd)
+        onthoud(d.werknemer, wn, 'eerste_storing', { samen: wg,
+          wat: beeindigd.storing.naam || 'een storing', potje: potje.id });
       /* DE LEERLING DIE ZELF BEGON (hoofdstuk 9, en de mooiste van de acht).
          Alleen als hij bij het einde van de partij ook echt een eigen zaak
          had -- anders is het een voornemen en geen moment. */

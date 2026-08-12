@@ -1,7 +1,7 @@
 /* Magnaat: DE DIENST DRAAIEN -- de staat en de twee handelingen.
 
    De wetten staan in ./rush.js, de tabel in ./rush-voorvallen.js, de maandkant
-   in ./rush-maand.js; dit bestand is de BEDIENING. Dezelfde scheiding als
+   in ./rush-maand.js en ./rush-nalaten.js; dit bestand is de BEDIENING. Dezelfde scheiding als
    ./dienst.js tegenover ./dienst-acties.js, en om dezelfde reden: de lijst
    handelingen groeit met elke rol mee en de wetten niet.
 
@@ -42,7 +42,7 @@ module.exports = () => {
 
   /* De staat van EEN dienst, in DEZE maand. Een nieuwe maand is een nieuwe
      avond: de oude staat wordt overschreven en niet bewaard, want wat er van een
-     dienst overblijft is de logregel en niet het klikpad (./rush-maand.js). */
+     dienst overblijft is de logregel en niet het klikpad (./rush-nalaten.js). */
   function staat(st, d, v) {
     const t = R.tafel(st);
     const bestaand = t.diensten[d.id];
@@ -83,7 +83,7 @@ module.exports = () => {
     const mijn = mijnDienst(st, h);
     if (mijn.error) return { status: 200, ok: true, dienst: null, waarom: mijn.error };
     const { d, v } = mijn;
-    const vv = R.bouw(potje.id, d, st.maand, d.rol);
+    const vv = R.bouw(potje.id, d, st.maand, d.rol, v);
     const s = verzet(vv, staat(st, d, v));
     const schaal = s.raming / Math.max(0.001, R.opVolgorde(vv));
     return { status: 200, ok: true, dienst: {
@@ -97,7 +97,12 @@ module.exports = () => {
            bedragen, en de speler weegt zelf. Dat is wet 1. */
         gelopen: R.rond(x.groei * Math.max(0, s.slot - x.vanaf) * schaal),
         perMoment: R.rond(x.groei * schaal),
-        blijftLiggen: R.rond(x.kost * schaal)
+        blijftLiggen: R.rond(x.kost * schaal),
+        /* WAT JE ERMEE KUNT. Meestal niets bijzonders -- dan is er een manier en
+           heet die "oppakken". Bij een storing hangt de lijst aan je rol, en dat
+           is het hele verschil tussen een hulpkracht en een vakkracht: hetzelfde
+           incident, meer te zeggen. */
+        opties: x.opties.map(o => ({ id: o.id, wat: o.wat, uitleg: o.uitleg }))
       })),
       gedaan: s.gedaan.map(g => ({ id: g.id, moment: g.slot + 1,
         deed: (vv.find(x => x.id === g.id) || {}).deed || g.id })),
@@ -116,12 +121,22 @@ module.exports = () => {
       const mijn = mijnDienst(st, h);
       if (mijn.error) return { status: 409, error: mijn.error };
       const { d, v } = mijn;
-      const vv = R.bouw(potje.id, d, st.maand, d.rol);
+      const vv = R.bouw(potje.id, d, st.maand, d.rol, v);
       const s = verzet(vv, staat(st, d, v));
       if (s.klaar) return { status: 409, error: 'Je dienst zit erop.' };
       const wat = openstaand(vv, s, s.slot).find(x => x.id === String(zet.wat || ''));
       if (!wat) return { status: 404, error: 'Daar staat nu niets voor open.' };
-      s.gedaan.push({ id: wat.id, slot: s.slot });
+      /* WELKE UITWEG. Zonder opties is er een manier en hoeft er niets gekozen
+         te worden; met opties moet het er een uit JOUW lijst zijn -- die is al
+         op je rol gefilterd, dus een hulpkracht kan hier niet per ongeluk een
+         monteur bestellen door een naam te raden. */
+      let optie = null;
+      if (wat.opties.length) {
+        optie = wat.opties.find(o => o.id === String(zet.optie || ''))
+          || (zet.optie === undefined ? wat.opties[0] : null);
+        if (!optie) return { status: 400, error: 'Dat kun jij hier niet doen.' };
+      }
+      s.gedaan.push({ id: wat.id, slot: s.slot, optie: optie ? optie.id : null });
       s.slot++;
       verzet(vv, s);
       return beeld(potje, h);

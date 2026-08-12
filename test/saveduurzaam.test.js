@@ -102,3 +102,42 @@ test('de huisregels kennen een regel die saveDuurzaam bewaakt', () => {
 
    Dit is precies het geval waarvoor TOEZICHT.md de bewijssoort apart noemt:
    `gate closure  HANDMATIG NAGETROKKEN` en niet stilzwijgend PROVEN. */
+
+/* ---------- sterf-na-commit: het gemeenste moment ----------
+
+   De schrijfactie is duurzaam en de aanroeper heeft nog niets gehoord. Dat is
+   het venster waarin de klant niet weet dat het gelukt is en het opnieuw
+   probeert -- en waar durability en idempotentie samenkomen (zie GELDLAT.md).
+
+   Deze twee toetsen bewijzen het INJECTIEPUNT, niet de geldketen. Dat de
+   herhaling daarna exact één economische mutatie oplevert, is scenario 3 en
+   staat nog open: de geldcommit hangt nog niet aan saveDuurzaam. */
+
+test('sterf-na-commit doodt het proces NA de duurzame schrijfactie', () => {
+  const map = verseMap();
+  let gestorven = false;
+  try {
+    execFileSync(process.execPath, ['--experimental-sqlite', '-e',
+      "const db=require('./server/db');(async()=>{await db.load();" +
+      "db.db.data.overleefdit={t:1};db.saveDuurzaam();" +
+      "console.log('DIT MAG NIET GEBEUREN')})()"],
+      { encoding: 'utf8', cwd: WORTEL,
+        env: { ...process.env, RTG_DATA_DIR: map, RTG_VERRAAD: 'sterf-na-commit' } });
+  } catch (e) { gestorven = true; }
+  assert.equal(gestorven, true, 'het proces hoort niet meer terug te keren uit saveDuurzaam');
+
+  /* EN DIT IS DE HELFT DIE ERTOE DOET: het proces is dood, maar de schrijfactie
+     was al duurzaam. Zou de data weg zijn, dan bootste dit verraad een crash
+     VOOR de commit na, en dan gaat scenario 3 over iets anders. */
+  const terug = inProces({ RTG_DATA_DIR: map },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "console.log(JSON.stringify(!!(db.db.data.overleefdit)))})()");
+  assert.equal(terug, 'true', 'de duurzame schrijfactie hoort de crash te overleven');
+});
+
+test('zonder dat verraad keert saveDuurzaam gewoon terug', () => {
+  const uit = inProces({ RTG_DATA_DIR: verseMap() },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "db.db.data.p={t:1};db.saveDuurzaam();console.log('teruggekeerd')})()");
+  assert.equal(uit, 'teruggekeerd');
+});

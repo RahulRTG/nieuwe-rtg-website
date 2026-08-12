@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 929 bestanden en 6131 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 929 bestanden en 6133 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 929 |
-| losse beweringen (`test(...)`) | 6131 |
+| losse beweringen (`test(...)`) | 6133 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 623 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 19 |
-| alleen in de kop *genoemd*, nog niet gemeten | 85 |
-| niets van beide | 189 |
+| alleen in de kop *genoemd*, nog niet gemeten | 86 |
+| niets van beide | 188 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-809 bestanden, 5927 beweringen.
+809 bestanden, 5929 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -621,7 +621,7 @@ toets omvalt.
 | `samendelen.test.js` | 3 | gezakt op `liegpoort /api/` | SAMEN DELEN -- vrienden worden, samen uitgeven, verrekenen, en de wekker. WAAROM DIT ER IS Wie betaalt wat (WBW) is het lijstje waar vriendschappen op stuklopen: een weekend weg, vier mensen, iedereen legt iets voor,... |
 | `samenwerking.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor de samenwerkingslaag (kern/samenwerking.js): EGn knop om als creator een leverancier voor te stellen, en een oproep waarop creators reageren en de leverancier er een kiest. We loggen als manager... |
 | `satelliet.test.js` | 4 | gezakt op `liegpoort /api/` | De satellietlaag: alles wat de app bruikbaar houdt op een trage verbinding met hoge vertraging (satelliet, buitengebied, traag mobiel). We toetsen: 1. |
-| `saveduurzaam.test.js` | 5 | -- | saveDuurzaam() -- de zware primitive, en de poort die hem schaars houdt. WAT HIER OP HET SPEL STAAT, en het is niet de techniek. |
+| `saveduurzaam.test.js` | 7 | genoemd | saveDuurzaam() -- de zware primitive, en de poort die hem schaars houdt. WAT HIER OP HET SPEL STAAT, en het is niet de techniek. |
 | `scanner.test.js` | 4 | gezakt op `>=->>#0` | RTG Scanner (public/shared/scanner.js): de camera-bediening. De camera zelf (getUserMedia, BarcodeDetector) bestaat niet in Node, dus we toetsen de pure, camera-onafhankelijke kern: de grijswaarde-omzetting die elk... |
 | `scannerpdf.test.js` | 3 | gezakt op `<=-><#0` | RTG Scanner: de eigen PDF-bouwer (public/apps/scanner/pdfje.js) is puur en draait ook in Node -- dus toetsen we hem zonder browser: een geldige PDF-structuur, een beeld per pagina, en een kloppende xref-verwijzing. |
 | `schakelkast-dekking.test.js` | 6 | gezakt op `liegpoort /api/` | STAAT ELKE FUNCTIE VAN HET PLATFORM IN DE BOARDROOM? De schakelkast is niet zo compleet als haar knoppen, maar zo compleet als haar CATALOGUS. |

@@ -244,6 +244,21 @@ function saveDuurzaam() {
   }
   const na = persistentieStand();
   const bevestigd = voor !== null && na !== null && na > voor;
+
+  /* STERF-NA-COMMIT. Het gemeenste moment dat er bestaat, en het is hier
+     eenduidig aan te wijzen: de schrijfactie is duurzaam, de aanroeper heeft
+     nog niets gehoord.
+
+     De klant weet dus niet dat zijn opdracht is gelukt en probeert het opnieuw.
+     Herkent RTG die herhaling niet, dan is lost-write opgelost en double-write
+     gebouwd -- zie GELDLAT.md. Dit verraad maakt dat scenario stelbaar; het
+     beantwoordt het niet.
+
+     SIGKILL en geen process.exit: een nette afsluiting laat afsluithaken lopen
+     en bewijst daarmee iets over een pad dat bij een echte crash niet bestaat. */
+  if (bevestigd && verraad.sla('sterf-na-commit')) {
+    try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
+  }
   return { duurzaam: bevestigd, stand: na,
     reden: bevestigd ? null
       : (voor === null || na === null ? 'deze opslag kan duurzaamheid niet bevestigen'

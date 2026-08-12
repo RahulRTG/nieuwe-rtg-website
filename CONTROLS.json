@@ -33,9 +33,9 @@
       },
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 8,
+        "beweringen": 10,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:02.702Z",
+        "at": "2026-08-12T07:19:34.151Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -63,7 +63,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:02.916Z",
+        "at": "2026-08-12T07:19:34.358Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -91,7 +91,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:03.155Z",
+        "at": "2026-08-12T07:19:34.579Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -127,7 +127,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:04.053Z",
+        "at": "2026-08-12T07:19:35.441Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -163,7 +163,7 @@
         "staat": "GROEN",
         "beweringen": 29,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:04.248Z",
+        "at": "2026-08-12T07:19:35.659Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -192,7 +192,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:06.470Z",
+        "at": "2026-08-12T07:19:37.561Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -223,7 +223,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:38.156Z",
+        "at": "2026-08-12T07:20:07.084Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -256,7 +256,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:38.383Z",
+        "at": "2026-08-12T07:20:07.288Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -286,7 +286,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:13:38.577Z",
+        "at": "2026-08-12T07:20:07.483Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

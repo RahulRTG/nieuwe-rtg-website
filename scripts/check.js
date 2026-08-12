@@ -2996,7 +2996,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
   const TOEGESTAAN = new Map([
     ['server/db/index.js', 'hier WOONT de primitive'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
-    ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt']
+    ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
+    ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep']
   ]);
   const overtreders = [];
   let gezien = 0;

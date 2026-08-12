@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 922 bestanden en 5979 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 5983 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 922 |
-| losse beweringen (`test(...)`) | 5979 |
+| toetsbestanden | 923 |
+| losse beweringen (`test(...)`) | 5983 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 618 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 619 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 86 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-802 bestanden, 5764 beweringen.
+803 bestanden, 5768 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -742,6 +742,7 @@ toets omvalt.
 | `uitgeven-inwisselen.test.js` | 5 | gezakt op `liegpoort /api/` | WAT EEN ZAAK UITGEEFT EN EEN LID INWISSELT -- 6 endpoints. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: giftcard/sell, giftcard/redeem, salon/deal, salon/deal/redeem, salon/poll en salon/stats. |
 | `uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | De documentenuitgifte (kern/uitgifte.js): met een druk op de knop de officiele documentatie naar oude apparatuur of een harde schijf, altijd achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak... |
 | `uitloggen.test.js` | 4 | gezakt op `liegpoort /api/` | UITLOGGEN MOET ECHT UITLOGGEN. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14), en het is het soort gat dat je alleen vindt door het te DOEN in plaats van te lezen: POST /api/logout -> { ok: true } POST... |
+| `uitzonderingen.test.js` | 4 | gezakt op `return-weg#0` | EEN UITZONDERING VERLOOPT, OF HET IS GEEN UITZONDERING. EXCEPTIONS.json legt vast waar dit huis bewust van zijn eigen wetten afwijkt. |
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
 | `vakken.test.js` | 4 | gezakt op `liegpoort /api/` | De vakmannen-golf: tien alledaagse vakken (autogarage, schoonmaak, hovenier, wasserij, rijschool, dierenarts, tandarts, fotograaf, verhuizer, IT-hulp) op de vakwerk-motor, elk met een demo-zaak op het Dienstenplein;... |
 | `vakpro.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro: de pro-laag van de dienstverlenende genres -- de offerte-keten (lid vraagt vrije klus, zaak biedt prijs, lid geeft akkoord en de klus staat als bevestigde boeking klaar), de digitale werkbon die met de... |

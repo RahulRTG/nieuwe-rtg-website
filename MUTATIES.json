@@ -4033,6 +4033,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "uitzonderingen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/uitzonderingen.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 3
+    },
     "upload-poort.test.js": {
       "soort": "server",
       "staat": "gezakt",

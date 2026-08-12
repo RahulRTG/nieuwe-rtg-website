@@ -1,0 +1,51 @@
+{
+  "uitleg": "Uitzonderingen op de systeemwetten: plekken waar dit huis bewust van zijn eigen regel afwijkt. Een uitzondering is GEEN todo en geen commentaarregel -- ze draagt een eigenaar, een risico, een vervaldatum en de maatregelen die de schade beperken zolang ze bestaat. `node scripts/uitzonderingen.js` keurt dit register en zakt zodra er een verlopen is: dan moet iemand hem verlengen met een reden, of het gat dichten. Zo kan schuld niet stilzwijgend eeuwig worden.\n\nWat hier NIET in hoort: werkvoorraad zonder risico, en gaten die niemand bewust heeft geaccepteerd. Die horen thuis in de wet zelf (stand OPEN) of in NORM.json. Deze lijst is voor afwijkingen die we kennen, kunnen benoemen en tijdelijk dragen.",
+  "velden": {
+    "id": "EXC-nnn, wordt nooit hergebruikt",
+    "regel": "de wet waarvan wordt afgeweken (id uit INVARIANTS.json), of een benoemde huisregel",
+    "wat": "de afwijking zelf, in een zin",
+    "waarom": "waarom dit nu niet anders kan -- geen excuus maar de werkelijke reden",
+    "risico": "wat een aanvaller hier concreet mee kan; benoem de schade, niet de kans",
+    "compenserend": "wat de schade beperkt zolang de uitzondering bestaat",
+    "eigenaar": "wie hem sluit; een rol, geen persoonsnaam (deze repo draagt geen namen)",
+    "aangemaakt": "JJJJ-MM-DD",
+    "verloopt": "JJJJ-MM-DD -- na deze datum zakt de keuring",
+    "meter": "optioneel: de NORM-meter die de omvang telt, zodat de schuld niet stil kan groeien"
+  },
+  "uitzonderingen": [
+    {
+      "id": "EXC-001",
+      "regel": "RTG-017",
+      "wat": "style-src-attr houdt 'unsafe-inline' in de Content-Security-Policy",
+      "waarom": "Er staan style=\"...\"-attributen in public/. CSP kent geen nonce voor een attribuut, dus dit is niet af te dwingen zonder ze allemaal weg te halen. De blokken (<style>) dragen wel een nonce; alleen de attributen niet.",
+      "risico": "Wie HTML weet te injecteren, kan op het element dat hij injecteert een style-attribuut meegeven en dat ene element overtekenen. Kleiner dan een vrij <style>-blok, dat de hele pagina kan hertekenen, maar niet nul.",
+      "compenserend": "img-src en connect-src staan op 'self', dus de klassieke CSS-exfiltratie (een attribuutselector die een achtergrondplaatje bij een vreemde server ophaalt en zo tekens verklikt) komt niet weg. De blokken dragen wel een nonce. En de NORM-ratel inlineStijlAttributen mag alleen omlaag, dus de schuld kan niet groeien.",
+      "eigenaar": "Platform / frontend",
+      "aangemaakt": "2026-08-12",
+      "verloopt": "2027-02-01",
+      "meter": "inlineStijlAttributen"
+    },
+    {
+      "id": "EXC-002",
+      "regel": "RTG-005",
+      "wat": "Het PIN-slot en de inlogteller leven in het geheugen, dus per instance",
+      "waarom": "Een gedeelde teller vraagt om gedeelde opslag (Redis of Postgres) op het pad van elke inlogpoging. Die stap staat gepland; tot die tijd is een slot dat een herstart niet overleeft nog altijd oneindig veel beter dan vijf tellers die elkaar niet kennen -- dat was de fout die dit slot juist kwam repareren.",
+      "risico": "Bij N instances achter een load balancer krijgt een aanvaller N keer het aantal pogingen op dezelfde pin van vier cijfers, omdat elke instance zijn eigen teller bijhoudt. Bij drie instances is dat vijftien pogingen per minuut in plaats van vijf.",
+      "compenserend": "Het schild (kern/schild.js) bant per IP over alle verzoeken heen, en beveiliging.js laat bij brute force vanaf meerdere bronnen de registratie- en onderhoudszekering springen. Die twee zitten voor de teller en zijn niet per instance te omzeilen met een enkele bron.",
+      "eigenaar": "Platform / opslag",
+      "aangemaakt": "2026-08-12",
+      "verloopt": "2026-12-01"
+    },
+    {
+      "id": "EXC-003",
+      "regel": "RTG-014",
+      "wat": "Het sessietoken reist als ?token= in de URL van de live-verbindingen (SSE)",
+      "waarom": "EventSource kan geen Authorization-header meesturen. Zonder token in de query is er geen live-verbinding, en zonder live-verbinding werkt het halve platform niet. Een kortlevend, eenmalig streamticket is de goede oplossing en bestaat nog niet.",
+      "risico": "URL's belanden standaard in de access log van elke reverse proxy en elk CDN, en in browsergeschiedenis. Een sessietoken dat daar terechtkomt is dertig dagen bruikbaar voor wie die logs kan lezen.",
+      "compenserend": "Referrer-Policy staat op strict-origin-when-cross-origin, dus een externe partij ziet hooguit onze origin en nooit de volledige URL. Onze eigen logger schrijft req.path zonder querystring, en test/loghygiene.test.js bewaakt dat -- gericht bewezen via de sabotage van RTG-014. Wat dit NIET dekt is de proxy of het CDN ervoor; die moeten apart worden ingesteld (PRODUCTION.md).",
+      "eigenaar": "Platform / auth",
+      "aangemaakt": "2026-08-12",
+      "verloopt": "2027-02-01"
+    }
+  ]
+}

@@ -36,6 +36,10 @@
     "RTG-036": {
       "stand": "BEWEZEN",
       "uitleg": "scripts/zekerheid.js: zin: niveau + ' -- NIET ABSOLUUT (' + onbekend + ' onbekend)' -> zin: niveau maakt zekerheid.test.js rood"
+    },
+    "RTG-037": {
+      "stand": "BEWEZEN",
+      "uitleg": "scripts/uitzonderingen.js:   if (dagen < 0) return { stand: 'VERLOPEN', mist: [], dagen }; ->   if (false) return { stand: 'VERLOPEN', mist: [], dagen }; maakt uitzonderingen.test.js rood"
     }
   }
 }

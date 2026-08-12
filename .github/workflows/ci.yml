@@ -60,6 +60,15 @@ jobs:
       # een finally terug; test/sabotage.test.js bewaakt precies dat herstel.
       - name: Sabotage -- gaat de handhaver uit, wie wordt er dan rood
         run: node scripts/sabotage.js
+      # DE UITZONDERINGEN. Schuld met een eigenaar en een vervaldatum. Na die
+      # datum zakt deze stap, en dan moet iemand verlengen met een reden of het
+      # gat dichten -- stilzwijgend eeuwig bestaan is de enige uitkomst die
+      # onmogelijk is. De zelftest staat ervoor, om dezelfde reden als bij de
+      # wettenmotor: een keuring die niet kan uitslaan mag geen oordeel dragen.
+      - name: De uitzonderingskeuring slaat zelf uit (LAT regel 10)
+        run: node scripts/uitzonderingen.js --zelftest
+      - name: Geen verlopen of half ingevulde uitzonderingen
+        run: node scripts/uitzonderingen.js
       # HET ZEKERHEIDSPANEEL. Dit is geen extra poort maar een AFDRUK: hij zet in
       # de log wat we weten en -- belangrijker -- wat we niet weten. Zeven regels
       # staan er op ONTBREEKT omdat ze bewijs van buiten vragen (pentest, red

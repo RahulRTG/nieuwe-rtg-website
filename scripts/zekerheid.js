@@ -91,6 +91,13 @@ function zelfmetingen() {
       (gaten ? ', ' + gaten + ' GEBROKEN gat(en)' : '');
   }, 'gericht bewijs: de handhaver ging echt uit');
 
+  rij('UITZONDERINGEN', 'EXCEPTIONS.json', () => {
+    const u = require('./uitzonderingen.js');
+    const t = u.keur(u.leesRegister()).telling;
+    return t.GELDIG + ' geldig' + (t.BINNENKORT ? ', ' + t.BINNENKORT + ' verloopt binnenkort' : '') +
+      (t.VERLOPEN || t.ONVOLLEDIG ? ', ' + (t.VERLOPEN + t.ONVOLLEDIG) + ' GEBROKEN' : '');
+  }, 'bewuste afwijkingen, met eigenaar en vervaldatum');
+
   rij('SCHERMEN BEREIKBAAR', 'BEREIK.json', () => {
     const b = lees('BEREIK.json').gemeten;
     return b.bereikbaar + '/' + b.schermen + (b.zonderRoute ? ', ' + b.zonderRoute + ' zonder klikroute' : '');

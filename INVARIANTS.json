@@ -518,6 +518,27 @@
           "zekerheid.test.js"
         ]
       }
+    },
+    {
+      "id": "RTG-037",
+      "wet": "Een uitzondering verloopt, of het is geen uitzondering",
+      "waarom": "Elk volwassen systeem wijkt ergens van zijn eigen regels af. Het verschil zit niet in het aantal afwijkingen maar in wat ermee gebeurt. De gebruikelijke vorm -- // TODO -- noemt geen risico, heeft geen eigenaar en verloopt nooit, en overleeft dus iedereen die weet waarom hij er staat. Hier draagt elke afwijking een wet, een risico, een compenserende maatregel, een eigenaar en een vervaldatum; na die datum zakt de keuring en moet er een besluit komen. Stilzwijgend eeuwig bestaan is de enige uitkomst die onmogelijk is.",
+      "handhaver": [
+        "scripts/uitzonderingen.js",
+        "EXCEPTIONS.json"
+      ],
+      "toetsen": [
+        "uitzonderingen.test.js"
+      ],
+      "sabotage": "zet BIJNA_DAGEN op 0, maak de VERPLICHT-lijst leeg, of laat een verlopen datum als GELDIG tellen",
+      "sabotageProef": {
+        "bestand": "scripts/uitzonderingen.js",
+        "van": "  if (dagen < 0) return { stand: 'VERLOPEN', mist: [], dagen };",
+        "naar": "  if (false) return { stand: 'VERLOPEN', mist: [], dagen };",
+        "toets": [
+          "uitzonderingen.test.js"
+        ]
+      }
     }
   ]
 }

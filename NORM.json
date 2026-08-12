@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs blijft 11 (37 wetten in plaats van 36)",
+      "reden": "RTG-037 erbij -- een uitzondering verloopt, of het is geen uitzondering -- en die kwam meteen BEWEZEN binnen via sabotage. Het register EXCEPTIONS.json legt de drie schulden vast die dit huis al benoemde: het unsafe-inline op style-src-attr, het PIN-slot dat per instance telt, en het sessietoken in de SSE-URL. Elk met risico, compenserende maatregel, eigenaar en vervaldatum.",
+      "eerlijkheidshalve": "De mutatieproef ving een tandeloze bewering die ik zelf schreef: de toets liep met een lus over de geimporteerde VERPLICHT-lijst, dus die lijst leegmaken -- de controle volledig uitzetten -- liet de toets GROEN, want een lus over een lege verzameling voert geen enkele assertie uit. Precies de vorm die scripts/tandeloos.js jaagt. De veldnamen staan nu hard in de toets."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "wettenZonderBewijs 12 -> 11",
       "reden": "Vijf beveiligingswetten kregen een uitvoerbare sabotage (RTG-003 tokenvorm, RTG-004 sessiegrens, RTG-009 opslagpoort, RTG-010 kluisbinding, RTG-013 inzagejournaal). Negen van de zesendertig wetten laten hun handhaver nu echt uitzetten en zien een toets rood worden.",
       "eerlijkheidshalve": "Twee van de vijf overleefden hun eerste sabotage, en de oorzaken waren verschillend. RTG-009 wees naar test/opslagpoort.test.js -- maar dat bestand gaat over de productiekeuring ('geen grootboek, geen productie'), niet over de middleware; die staat in test/middleware.test.js. Een naamsverwarring die pas opviel toen de handhaver echt uit ging. RTG-003 was erger: TOKENVORM helemaal uitzetten maakte NIETS rood. accounts.test.js probeert alleen `token+'x'` en `'onzin'`, en die vallen af op de handtekening en niet op de vorm. De bug waarvoor die controle is gebouwd -- uitloggen omzeilen met een spatie voor het token -- had geen enkele toets. test/tokenvorm.test.js voert die aanval nu wel uit."

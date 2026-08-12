@@ -13,7 +13,7 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 25 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **BEWEZEN** | 26 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
 | **ONBEPROEFD** | 7 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
@@ -444,6 +444,18 @@ Een systeem dat zijn onbekenden verbergt, liegt over precies het deel dat je moe
 *Toets:* `test/zekerheid.test.js`
 
 *Breek hem zo:* laat oordeel() alleen het niveau teruggeven, of laat een ontbrekende bron 0 melden in plaats van null
+
+### RTG-037 -- Een uitzondering verloopt, of het is geen uitzondering
+
+`BEWEZEN` · zien zakken in `sabotage` op `scripts/uitzonderingen.js`
+
+Elk volwassen systeem wijkt ergens van zijn eigen regels af. Het verschil zit niet in het aantal afwijkingen maar in wat ermee gebeurt. De gebruikelijke vorm -- // TODO -- noemt geen risico, heeft geen eigenaar en verloopt nooit, en overleeft dus iedereen die weet waarom hij er staat. Hier draagt elke afwijking een wet, een risico, een compenserende maatregel, een eigenaar en een vervaldatum; na die datum zakt de keuring en moet er een besluit komen. Stilzwijgend eeuwig bestaan is de enige uitkomst die onmogelijk is.
+
+*Handhaver:* `scripts/uitzonderingen.js`, `EXCEPTIONS.json`
+
+*Toets:* `test/uitzonderingen.test.js`
+
+*Breek hem zo:* zet BIJNA_DAGEN op 0, maak de VERPLICHT-lijst leeg, of laat een verlopen datum als GELDIG tellen
 
 ## Hoe je dit bestand bijwerkt
 

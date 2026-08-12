@@ -52,6 +52,7 @@
     "wetten": "node scripts/wetten.js",
     "zekerheid": "node scripts/zekerheid.js",
     "sabotage": "node scripts/sabotage.js",
+    "uitzonderingen": "node scripts/uitzonderingen.js",
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",

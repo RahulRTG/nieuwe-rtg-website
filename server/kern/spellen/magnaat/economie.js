@@ -19,16 +19,16 @@
    De descriptor draagt dat via `buitenBeurt`, en de motor houdt zich eraan door
    niets anders te doen dan wat de speler vraagt.
 
-   WAT ER IN DEZE FASE NOG NIET IS, en dat staat hier zodat niemand het
-   misverstaat: contracten tussen spelers, aandelen, banken, verzekeringen,
-   onderzoek, veilingen, AI-managers en de permanente wereld. Fase B en C in
-   GAMEHALL.md paragraaf 12.9. Wat er WEL is, is een economie die je kunt
-   spelen, en dat was de eis. */
+   HIER STOND WAT ER NOG NIET WAS: contracten, aandelen, banken, onderzoek,
+   veilingen, de permanente wereld. Ze zijn er allemaal (fase B en C), en een
+   lijst die niet klopt is erger dan geen lijst -- wat er is staat in
+   ./lagen.js en ./tabel.js. */
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
 const { SECTORLIJST } = require('./sectoren');
 const { waarde } = require('./stap');
 const F = require('./foundation');
 const H = require('./handel');
+const G = require('./governance');
 
 /* De speelduur in SPELMAANDEN, per variant. Een Quick is drie jaar economie in
    een klein uur: lang genoeg dat een investering zich terugbetaalt, kort genoeg
@@ -114,9 +114,12 @@ module.exports = (ctx) => {
   const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet } =
     require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L });
 
+  // wat de tafel koos voor de Foundation; "wie doet er nog mee" is een vraag
+  // over de PARTIJ, en die woont hier -- zie ./governance.js en ./verloop.js
+  const kiesProject = (p) => G.uitslag(p, L.uitstap.speeltNog);
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
     verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering,
-    rnd: L.rnd, beheer });
+    rnd: L.rnd, beheer, kiesProject });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
@@ -167,13 +170,14 @@ module.exports = (ctx) => {
      buitenaf te gebruiken -- daar is  voor, met zijn poort en zijn duwtjes. */
   const acties = () => ACTIES;
 
-  /* WAT UITSTAPPEN JE KOST, VOORDAT JE HET DOET. Een vraag en geen zet, dus
-     geen actie: hij verandert niets en mag daarom ook door iemand gesteld
-     worden die nog nadenkt. Zonder dit getal is uitstappen een sprong in het
-     duister -- je weet niet of je opvolger het kan betalen. */
+  /* TWEE VRAGEN EN GEEN ZETTEN: wat uitstappen je kost voordat je het doet, en
+     hoe de stemming ervoor staat. Ze veranderen niets en mogen daarom ook
+     gesteld worden door iemand die nog nadenkt -- zonder die getallen is
+     uitstappen een sprong in het duister en is stemmen een knop. */
   const uitstapvoorstel = (potje, h, naar) => L.uitstap.voorstel(potje.staat, h, naar || null);
+  const stembeeld = (potje, h) => G.beeld(potje, h, L.uitstap.speeltNog);
 
-  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, uitstapvoorstel,
+  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, uitstapvoorstel, stembeeld,
     DUUR, MAAND_MS, START_GELD,
     SECTORLIJST, STEDENLIJST, stadNaam, kaartVan: (s) => kaart(s) };
 };

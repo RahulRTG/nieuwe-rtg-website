@@ -22,6 +22,7 @@
    doen maar niet mag doen -- test/spelmagnaat.test.js telt ze na. */
 'use strict';
 const { kaart } = require('./kaart');
+const G = require('./governance');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
   /* WAT EEN SPELER DOET staat in ./acties.js; de lagen schuiven hun acties erbij. */
@@ -36,6 +37,12 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
   ACTIES.uitstappen = (potje, h, zet) => L.uitstap.uitstappen(potje, h,
     zet && zet.naar ? String(zet.naar) : null);
   VRIJE_ACTIES.push('uitstappen');
+  /* STEMMEN OVER WAT DE FOUNDATION BOUWT (fase C, ./governance.js). Vrij, en
+     dat volgt uit de laag zelf: een stemming met een beurt eraan vast is een
+     deadline, en dat is de kunstmatige urgentie die CLAUDE.md verbiedt. */
+  ACTIES['foundation-stem'] = (potje, h, zet) => G.stem(potje, h,
+    zet.project === undefined ? null : zet.project, zet.zone);
+  VRIJE_ACTIES.push('foundation-stem');
   /* LOONDIENST (VERHAAL.md stap 1) krijgt om dezelfde reden als de manager de
      complete tabel: een werknemer verandert niets rechtstreeks maar roept de
      gewone `beleid`-actie aan namens zijn werkgever. */

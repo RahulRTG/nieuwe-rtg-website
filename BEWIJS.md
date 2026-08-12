@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 933 bestanden en 6245 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 936 bestanden en 6287 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 933 |
-| losse beweringen (`test(...)`) | 6245 |
+| toetsbestanden | 936 |
+| losse beweringen (`test(...)`) | 6287 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 196 |
+| niets van beide | 199 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-813 bestanden, 6030 beweringen.
+816 bestanden, 6072 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -661,9 +661,11 @@ toets omvalt.
 | `spelcyclus.test.js` | 13 | genoemd | MAGNAAT: DE ECONOMISCHE CYCLUS -- de wind die over de hele stad waait. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `speldag.test.js` | 22 | -- | DE DAGOPGAVE: een opgave per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Deze toets staat op twee hoogten, en dat is met opzet: 1. |
 | `speldienst.test.js` | 16 | -- | MAGNAAT: LOONDIENST -- een speler die voor een andere speler werkt. Stap 1 uit VERHAAL.md, en met opzet zonder permanentie: alles hieronder leeft in het potje. |
+| `spelgovernance.test.js` | 15 | -- | MAGNAAT: LOKALE GOVERNANCE -- wie beslist wat de Foundation bouwt. Fase C, het laatste stuk. |
 | `spelhandel.test.js` | 28 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
 | `spelkijken.test.js` | 15 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
+| `spelkring-lokaal.test.js` | 14 | -- | DE LOKALE ONDERNEMERSKRING -- wie hier ooit een zaak had. Fase D. |
 | `spellab.test.js` | 15 | -- | MAGNAAT: HET BALANSLAB -- meet het wat het zegt te meten? Een meetopstelling is zelf software, en een kapotte meter is duurder dan geen meter: hij geeft een getal en je gelooft het. |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |
 | `spelloopbaan.test.js` | 20 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
@@ -684,6 +686,7 @@ toets omvalt.
 | `spelregister.test.js` | 32 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |
 | `spelreplay.test.js` | 9 | gezakt op `return-weg#0` | Het verloop van een partij, voor de replay. De uitslagen zeggen WIE won; dit zegt HOE. |
 | `spelstad.test.js` | 16 | -- | DE STAD ONTHOUDT -- fase C: de Living World en de levende kaart. Uit hoofdstuk 10 en 11 van de visie: jullie bouwden een bibliotheek, de wijk werd veiliger, en "nieuwe spelers weten niet eens meer dat het ooit een... |
+| `spelstadskrant.test.js` | 13 | -- | MAGNAAT DAILY -- de stad van vandaag, en er valt niets te halen. Fase C, het laatste open stuk. |
 | `spelsudoku.test.js` | 20 | gezakt op `liegpoort /api/` | Sudoku: het eerste arcadespel waarvan de score NIET uit de client komt. Bij Sneek en Tetris rekent de browser de punten uit en stuurt een getal op; de server kan daar niets van narekenen en kapt hem alleen af op de... |
 | `spelteams.test.js` | 19 | gezakt op `liegpoort /api/` | Teams: een vaste club om mee te spelen. Iedereen mag er een maken. |
 | `speltelling.test.js` | 9 | gezakt op `liegpoort /api/` | Telemetrie van de spellen: geaggregeerd, zonder personen. Deze toets bewaakt vooral wat er NIET in mag staan. |

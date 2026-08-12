@@ -566,7 +566,7 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'bestuur-zet', 'beurs-aanbieden', 'beurs-intrekken',
       'beurs-kopen', 'bouw',
       'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
-      'dienst-opzeggen', 'functie-intrekken', 'functie-openen',
+      'dienst-opzeggen', 'foundation-stem', 'functie-intrekken', 'functie-openen',
       'krediet-aflossen', 'krediet-herzien', 'krediet-opnemen',
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',
       'overname-antwoord', 'overname-bod', 'overname-intrekken',

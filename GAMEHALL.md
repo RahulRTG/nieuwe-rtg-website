@@ -1722,7 +1722,26 @@ een campagne kon dus alleen speler één ooit een vestiging openen. Het bleef
 staan omdat elke toets de motor rechtstreeks aanspreekt en de beurtbewaking een
 laag hoger zit.
 
-Nog open in fase C: Magnaat Daily en lokale governance.
+En daarmee is fase C af: **lokale governance**
+(`kern/spellen/magnaat/governance.js`) en **Magnaat Daily**
+(`kern/spellen/stadskrant.js`).
+
+> **Governance beslist wat erbij komt, nooit wat weggaat.** De volgorde van de
+> Foundation lag vast; nu stemt de tafel over wat er hierna gebouwd wordt en in
+> welke buurt. Eén speler, één stem — níét gewogen naar vermogen, want dan *is*
+> de rijkste speler het bestuur en is governance een tweede ranglijst met een
+> ander woord erop. Stemmen kost niets en niet stemmen kost niets. Er bestaat
+> geen besluit dat iemand iets afneemt: een meerderheid die een minderheid kan
+> uitkleden is een pestmechaniek. En stemt niemand, dan bouwt de Foundation de
+> vaste volgorde af — de laag is volledig weglaatbaar.
+>
+> **Magnaat Daily is een krant en geen dagopgave.** "Daily" is in deze industrie
+> de naam van precies het patroon dat `CLAUDE.md` uitsluit: een reeks, een
+> beloning voor wie komt, een verlies voor wie een dag oversloeg. Hier valt
+> niets te halen en niets te missen. Een editie wordt *gerekend* uit de stad en
+> de datum, niet opgeslagen — dus die van gisteren is morgen nog precies zo
+> terug te vragen. Er staat geen persoon in en geen bedrag, en daarom valt hij
+> buiten de 18+-poort om woordelijk dezelfde reden als het stadsgeheugen.
 
 **Fase D — de rollen.** *In aanbouw.* Het eerste stuk staat:
 `kern/spellen/magnaat/bestuur.js` — **meerdere mensen in één concern**.
@@ -1743,7 +1762,21 @@ Nog open in fase C: Magnaat Daily en lokale governance.
 > dezelfde prijs, een andere bestemming — het tarief van de AI verlaat de
 > wereld, het salaris van een mens gaat naar een speler aan tafel.
 
-Nog open in fase D: lokale ondernemerskringen en chat-integratie.
+Daarna kwam de **lokale ondernemerskring**
+(`kern/spellen/ondernemerskring.js`).
+
+> **Een naambord, geen netwerk.** Wie in een stad een zaak had, staat erop — op
+> codenaam, oudste eerst, met wat hij deed en of hij het doorgaf. Geen bedrag,
+> geen volgorde van beste naar minste. En vooral: het is **geen contactenlijst**.
+> `kring.js` zegt dat een potje geen nieuw recht geeft om iemand te bereiken —
+> de wachtrij koppelt willekeurige spelers, en de RTF-app bevat tieners die met
+> opzet onvindbaar zijn. Een ondernemerskring die je met je oud-medespelers laat
+> praten is precies die deur. Er is dus geen knop om iemand te bereiken.
+>
+> Hier staat wél een persoon in, en dat is het verschil met het stadsgeheugen:
+> de **18+-poort geldt**, per persoon. Het bord slijt op de klok van de stad.
+
+Nog open in fase D: chat-integratie.
 
 Elke fase is speelbaar zonder de volgende. Dat is de eis: een half aangezette
 economie is gevaarlijker dan een afwezige, want dan gaat iemand er echt in

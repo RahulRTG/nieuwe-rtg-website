@@ -68,7 +68,8 @@ const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', '
   /* De loopbaan (VERHAAL.md): wat er van een MENS overblijft als het potje
      voorbij is. Naast uitslagen.js en prestaties.js hierboven, en om dezelfde
      reden geen spel: hij BEWAART wat een partij oplevert. */
-  'loopbaan.js', 'loopbaan-momenten.js', 'loopbaan-noteren.js', 'bewaren.js', 'stadsgeheugen.js']);
+  'loopbaan.js', 'loopbaan-momenten.js', 'loopbaan-noteren.js', 'bewaren.js', 'stadsgeheugen.js',
+  'stadskrant.js', 'ondernemerskring.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)

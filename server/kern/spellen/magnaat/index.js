@@ -78,6 +78,10 @@ module.exports = (ctx) => {
          iemand met een rol in plaats van door de eigenaar. */
       'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
       'dienst-opzeggen', 'werk-beleid',
+      /* STEMMEN over wat de Foundation bouwt (fase C, ./governance.js). Vrij,
+         want een stemming met een beurt eraan vast is een deadline -- en dat is
+         de kunstmatige urgentie die CLAUDE.md verbiedt. */
+      'foundation-stem',
       /* BESTUUR (fase D) om dezelfde reden als `werk-beleid`: het is dezelfde
          handeling, door iemand met een rol in plaats van door de eigenaar. Wat
          hij aanroept kan wel op een beurt moeten wachten -- dat bewaakt de

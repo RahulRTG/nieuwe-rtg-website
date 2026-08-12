@@ -41,10 +41,10 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer }) => {
+module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer, kiesProject }) => {
   const perZaak = maakPerZaak({ verdeel, rekenMaand, F, N });
   const { wikkelAf } = require('./maand-contracten')({ rond });
-  const afsluiten = require('./maand-afsluiten')({ wikkelAf });
+  const afsluiten = require('./maand-afsluiten')({ wikkelAf, kiesProject });
   const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd, beheer });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);

@@ -54,7 +54,21 @@ module.exports = (ctx) => {
      en die uitzondering is dezelfde als die van de dagtelling: er staat geen
      persoon in. Zie de kop van ./stadsgeheugen.js. */
   const stadsgeheugen = require('./stadsgeheugen')({ db, save });
+  /* MAGNAAT DAILY (./stadskrant.js): de stad van vandaag in woorden. Hij hoort
+     hier omdat hij van het stadsgeheugen leeft en verder van niets -- en om
+     dezelfde reden valt hij buiten de 18+-poort: er staat geen persoon in. Hij
+     BEWAART niets: een editie wordt gerekend, niet opgeslagen. */
+  const daily = require('./stadskrant')({ stadsgeheugen });
+
+  /* DE LOKALE ONDERNEMERSKRING (fase D): wie er in een stad een zaak had. Naast
+     het stadsgeheugen, maar met een STRENGERE grens -- daar staat geen persoon
+     in en hier wel, dus geldt de 18+-poort per persoon. Zie de kop van
+     ./ondernemerskring.js, en vooral de regel dat hij GEEN contactenlijst is:
+     een potje geeft geen nieuw recht om iemand te bereiken. */
+  const ondernemerskring = require('./ondernemerskring')({
+    db, save, progressieMag, GEEN_PROGRESSIE
+  });
 
   return { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan, stadsgeheugen };
+    spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring };
 };

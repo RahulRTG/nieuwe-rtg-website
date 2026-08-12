@@ -72,23 +72,45 @@ function draagAf(f, omzet) {
 /* Is er genoeg voor het volgende project? Zo ja: voer het uit en verschuif de
    zone. De volgorde ligt vast (en niet op toeval), want een campagne moet na
    een herstart hetzelfde verlopen -- zie de kop van ./stap.js. */
-function bouw(f, kaart, perZone) {
+/* `kies` is de LOKALE GOVERNANCE (./governance.js) en met opzet optioneel: hij
+   geeft terug wat de tafel heeft gekozen, of niets. Zonder stem valt hij terug
+   op de vaste volgorde hieronder, en dan verloopt een campagne precies zoals
+   hij verliep -- deze laag is volledig weglaatbaar. Datzelfde geldt voor de
+   zone: kiest de tafel er geen, dan landt het project waar de bedrijvigheid is.
+
+   `volgend` blijft de vaste volgorde bijhouden en wordt bij een gekozen project
+   DOORGESCHOVEN over alles wat al gebouwd is. Zou hij blijven staan, dan bouwt
+   de vaste volgorde later hetzelfde project nog een keer. */
+function bouw(f, kaart, perZone, kies) {
   const klaar = [];
-  while (f.volgend < PROJECTEN.length && f.lokaal >= PROJECTEN[f.volgend].kosten) {
-    const p = PROJECTEN[f.volgend];
+  const gebouwd = (id) => f.gedaan.some(g => g.id === id);
+  const volgende = () => {
+    const gekozen = kies ? kies(f) : null;
+    if (gekozen && gekozen.project && !gebouwd(gekozen.project.id)
+      && f.lokaal >= gekozen.project.kosten) return { project: gekozen.project, zone: gekozen.zone, gekozen: true };
+    while (f.volgend < PROJECTEN.length && gebouwd(PROJECTEN[f.volgend].id)) f.volgend++;
+    if (f.volgend < PROJECTEN.length && f.lokaal >= PROJECTEN[f.volgend].kosten)
+      return { project: PROJECTEN[f.volgend], zone: null };
+    return null;
+  };
+  for (let beurt = volgende(); beurt; beurt = volgende()) {
+    const p = beurt.project;
     f.lokaal -= p.kosten;
     /* Het project landt in de zone met de MEESTE bedrijvigheid: daar komt het
        geld vandaan en daar zijn de mensen die het gebruiken. Bij gelijke stand
        wint de zone die in de stadsdata het eerst staat -- vast en niet
        willekeurig, want een campagne moet na een herstart hetzelfde verlopen. */
-    let zone = kaart.zones[0].id, meeste = -1;
-    for (const z of kaart.zones) {
-      const n = (perZone || {})[z.id] || 0;
-      if (n > meeste) { meeste = n; zone = z.id; }
+    let zone = beurt.zone || kaart.zones[0].id;
+    if (!beurt.zone) {
+      let meeste = -1;
+      for (const z of kaart.zones) {
+        const n = (perZone || {})[z.id] || 0;
+        if (n > meeste) { meeste = n; zone = z.id; }
+      }
     }
     f.gedaan.push({ id: p.id, zone });
-    f.volgend++;
-    klaar.push({ id: p.id, naam: p.naam, tekst: p.tekst, zone });
+    while (f.volgend < PROJECTEN.length && gebouwd(PROJECTEN[f.volgend].id)) f.volgend++;
+    klaar.push({ id: p.id, naam: p.naam, tekst: p.tekst, zone, gekozen: !!beurt.gekozen });
   }
   return klaar;
 }

@@ -14,7 +14,7 @@ const F = require('./foundation');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ wikkelAf }) => {
+module.exports = ({ wikkelAf, kiesProject }) => {
   return function afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
     wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
     concernlast }) {
@@ -35,7 +35,11 @@ module.exports = ({ wikkelAf }) => {
       const zone = sleutel.split(':')[0];
       perZone[zone] = (perZone[zone] || 0) + druk[sleutel];
     }
-    const projecten = F.bouw(st.foundation, k, perZone);
+    /* WAT DE TAFEL KOOS (./governance.js). Hij staat HIER en niet in
+       ./foundation.js omdat het een vraag aan de PARTIJ is (wie doet er nog
+       mee) en niet aan de Foundation. Stemde niemand, dan geeft hij null en
+       bouwt de vaste volgorde af zoals hij altijd deed. */
+    const projecten = F.bouw(st.foundation, k, perZone, kiesProject ? () => kiesProject(potje) : null);
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,

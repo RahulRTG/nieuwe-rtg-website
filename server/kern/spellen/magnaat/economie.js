@@ -111,7 +111,7 @@ module.exports = (ctx) => {
      acties van elke laag, en de twee AI's die de complete tabel nodig hebben.
      Dat is een bouwstap die met elke fase meegroeit; dit bestand gaat over de
      klok en die verandert niet meer. */
-  const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet } =
+  const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie } =
     require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L });
 
   // wat de tafel koos voor de Foundation; "wie doet er nog mee" is een vraag
@@ -126,12 +126,14 @@ module.exports = (ctx) => {
      er afgerekend) dat los staat van de klok hierboven. */
   const { zicht, zichtRuw, publiek, eindstand, tijdlijn } = require('./weergave')(Object.assign({
     K, codenaamVan, rond, bijrekenen,
-    dienstbeeld: (st, h) => dienen.beeld(st, h, codenaamVan),
+    // het promotievoorstel reist mee met het werkbeeld: geen tweede onderwerp
+    // maar hetzelfde -- wat er met je baan gebeurt. Zie ./promotie.js
+    dienstbeeld: (st, h) => Object.assign(dienen.beeld(st, h, codenaamVan),
+      { promoties: promotie.beeld(st, h, codenaamVan) }),
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
-  /* WIE ER AAN ZET IS EN WANNEER HET AF IS staat in ./verloop.js. Dat is een
-     echte naad: dit bestand gaat over de KLOK en dat is af; de beurtvolgorde
-     kreeg er in fase C een vraag bij (wat als iemand stopt) die de klok niets
-     aangaat. Lees daar ook waarom de beurt in deze vorm NOOIT doorging. */
+  /* WIE ER AAN ZET IS EN WANNEER HET AF IS staat in ./verloop.js -- een echte
+     naad: dit bestand gaat over de KLOK en die is af. Lees daar ook waarom de
+     beurt in deze vorm NOOIT doorging. */
   const V = require('./verloop')({ eindstand, speeltNog: L.uitstap.speeltNog });
   const beeindig = V.beeindig;
 
@@ -170,10 +172,8 @@ module.exports = (ctx) => {
      buitenaf te gebruiken -- daar is  voor, met zijn poort en zijn duwtjes. */
   const acties = () => ACTIES;
 
-  /* TWEE VRAGEN EN GEEN ZETTEN: wat uitstappen je kost voordat je het doet, en
-     hoe de stemming ervoor staat. Ze veranderen niets en mogen daarom ook
-     gesteld worden door iemand die nog nadenkt -- zonder die getallen is
-     uitstappen een sprong in het duister en is stemmen een knop. */
+  /* TWEE VRAGEN EN GEEN ZETTEN: wat uitstappen kost, en hoe de stemming staat.
+     Ze veranderen niets en mogen dus ook door iemand die nog nadenkt. */
   const uitstapvoorstel = (potje, h, naar) => L.uitstap.voorstel(potje.staat, h, naar || null);
   const stembeeld = (potje, h) => G.beeld(potje, h, L.uitstap.speeltNog);
 

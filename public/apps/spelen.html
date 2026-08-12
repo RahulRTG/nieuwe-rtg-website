@@ -1408,6 +1408,8 @@ function mgCoord(veld){
    van het potje (`statisch()` in de descriptor) en niet bij elke poll: het zijn
    honderden kavels die nooit veranderen. */
 let ecKavels = null, ecSectoren = null, ecKiesZone = null;
+// welk promotiegesprek er open staat; null = alleen de regel "X wil je spreken"
+let ecGesprek = null;
 const ecGeld = (n) => (n < 0 ? '-' : '') + '€' + Math.abs(Math.round(n)).toLocaleString('nl-NL');
 
 function tekenMagnaatEco(){
@@ -1460,7 +1462,49 @@ function tekenMagnaatEco(){
      rekende het al uit. */
   const werk = $('#ecWerk');
   const w = st.werk || {};
-  if (st.klaar) werk.innerHTML = '';
+  /* "SVEN WIL JE SPREKEN." Een promotievoorstel begint als EEN REGEL en niet als
+     een kaart met een grote knop. Het moment is klein en serieus: iemand vond je
+     goed genoeg, en dat verkoop je niet met confetti. Pas als je het gesprek
+     opent staat er wat hij aanbiedt en wat er verandert. */
+  const voorstellen = (w.promoties || []).filter(x => x.mijn);
+  const p0 = voorstellen[0];
+  if (!st.klaar && p0) {
+    const uit = ecGesprek === p0.id;
+    werk.innerHTML = '<div class="sec">Werk</div>' +
+      (uit ? '' : '<div class="rij"><div class="nm">' + esc(p0.van_wie) + ' wil je spreken.' +
+        '</div><button type="button" class="chip" data-gesprek="' + esc(p0.id) + '">Openen</button></div>');
+    if (uit) {
+      const beurt = p0.aanZet === p0.van_wie;
+      werk.innerHTML += '<div class="rij"><div class="nm">' + esc(p0.van_wie) +
+        '<small>' + (beurt ? 'Hij kijkt naar je tegenvoorstel.'
+          : 'Je draait dit nu al maanden zelfstandig. Ik wil dat je '
+            + esc((p0.naarNaam || p0.naar).toLowerCase()) + ' wordt.') +
+        '</small></div></div>' +
+        '<div class="leeg">' + (p0.mag.length
+          ? 'Je gaat dan over ' + p0.mag.map(esc).join(', ') + '. '
+          : 'Je krijgt geen nieuwe bevoegdheden. ') +
+        'Het loon wordt ' + ecGeld(p0.loon) + ' per maand.</div>' +
+        (beurt ? '<div class="leeg">Wacht op zijn antwoord.</div>'
+          : '<div class="keuzerij">' +
+            '<button type="button" class="chip aan" data-pr="ja" data-id="' + esc(p0.id) + '">Aannemen</button>' +
+            '<button type="button" class="chip" data-pr="tegenbod" data-id="' + esc(p0.id) + '">Ander bedrag vragen</button>' +
+            '<button type="button" class="chip" data-pr="nee" data-id="' + esc(p0.id) + '">Liever niet</button></div>');
+    }
+    werk.querySelectorAll('[data-gesprek]').forEach(b => b.addEventListener('click', () => {
+      ecGesprek = b.dataset.gesprek; tekenMagnaatEco();
+    }));
+    werk.querySelectorAll('[data-pr]').forEach(b => b.addEventListener('click', async () => {
+      const zet = { actie:'promotie-antwoord', id: b.dataset.id, antwoord: b.dataset.pr };
+      if (b.dataset.pr === 'tegenbod') {
+        const vraag = prompt('Welk bedrag per maand vraag je?', String(p0.loon));
+        if (vraag === null) return;
+        zet.loon = Number(vraag);
+      }
+      ecGesprek = null;
+      try{ await speelZet(zet); }catch(e){ meld(e.message); }
+    }));
+  }
+  else if (st.klaar) werk.innerHTML = '';
   else if (w.baan) {
     const b = w.baan;
     werk.innerHTML = '<div class="sec">Je werk</div>' +

@@ -287,3 +287,45 @@ test('DE HELE BOOG: van niemand tot iemand, in een wereld die al draaide', () =>
   /* En er staat geen enkel bedrag in wat je overhoudt. */
   assert.ok(!/\d{4,}/.test(JSON.stringify(t)), JSON.stringify(t));
 });
+
+/* ================= het moment op het scherm ================= */
+
+test('het voorstel bereikt het scherm, en het is een regel en geen kaart', () => {
+  /* Het moment hoort klein en serieus te zijn. Wat het scherm krijgt is
+     precies genoeg voor EEN regel ("X wil je spreken") en daarachter een
+     gesprek -- niet een blok met een cijfer erop. */
+  const o = opstelling();
+  o.maand(10);
+  const b = bied(o, 'vakkracht');
+  const zicht = o.m.eco.zicht(o.p, o.st, 'boris').werk;
+  const v = (zicht.promoties || [])[0];
+  assert.ok(v, 'het voorstel staat op zijn scherm');
+  assert.equal(v.van_wie, 'anna', 'en van wie het komt');
+  assert.equal(v.mijn, true, 'hij is aan zet');
+  assert.ok(v.naarNaam, 'met de rol in mensentaal: ' + v.naarNaam);
+  assert.ok(Array.isArray(v.mag), 'en wat er verandert aan bevoegdheden');
+  /* Geen score, geen niveau, geen voortgang -- er valt niets te vieren, er valt
+     iets te beslissen. */
+  for (const woord of ['xp', 'niveau', 'level', 'punten', 'voortgang', 'badge'])
+    assert.ok(!JSON.stringify(v).toLowerCase().includes(woord), 'het voorstel draagt een ' + woord);
+  /* De werkgever ziet hetzelfde voorstel, maar is niet aan zet. */
+  const bij = o.m.eco.zicht(o.p, o.st, 'anna').werk.promoties[0];
+  assert.equal(bij.mijn, false);
+  assert.equal(bij.aan, 'boris');
+});
+
+test('de terugblik houdt er een regel aan over, zonder bedrag', () => {
+  const o = opstelling();
+  o.maand(12);
+  const b = bied(o, 'bedrijfsleider');
+  o.m.eco.zet(o.p, 'boris', { actie: 'promotie-antwoord', id: b.id, antwoord: 'ja' });
+  o.maand(3);
+  o.p.status = 'klaar';
+  const L = require('../server/kern/spellen/loopbaan')({ db: { data: {} }, save() {},
+    codenaamVan: (h) => 'CN-' + h, progressieMag: () => true, GEEN_PROGRESSIE: 'x' });
+  L.noteerLoopbaan(o.p);
+  const m = L.terugblik('boris', 'CN-boris').momenten.find(x => x.soort === 'eerste_promotie');
+  assert.equal(m.naam, 'Je eerste promotie');
+  assert.match(m.zin, /^CN-anna vond je goed genoeg voor /);
+  assert.ok(!/\d/.test(m.zin), 'geen enkel cijfer in de zin: ' + m.zin);
+});

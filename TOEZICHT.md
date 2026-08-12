@@ -4,8 +4,9 @@ Dit document beschrijft **drie lagen die op elkaar staan** en de volgorde waarin
 ze gebouwd worden. Het beschrijft ook wat de onderste laag nú al moet uitzenden,
 zodat de bovenste twee later kunnen ontstaan in plaats van gebouwd te worden.
 
-`LAT.md` gaat over de code, `NORM.md` over de meters, dit document over de vraag
-die een buitenstaander stelt: *waarmee toon je aan dat het beheerst is?*
+`LAT.md` gaat over de code, `NORM.md` over de meters, `GELDLAT.md` over het
+contract van de zwaarste keten, en dit document over de vraag die een
+buitenstaander stelt: *waarmee toon je aan dat het beheerst is?*
 
 ## De drie lagen
 
@@ -67,6 +68,22 @@ wáár het getal staat.
 
 Een teller die niet in het register staat, toont `ONGEMETEN` en niet `0` — nul
 is de geruststellendste manier om "ik weet het niet" te zeggen.
+
+**En de bewijssoort hoort erbij, ook waar hij niet van toepassing is.** Niet één
+woord PROVEN, maar waar het bewijs vandaan komt:
+
+```
+GELD-DURABILITY
+  scenario test        PROVEN
+  fault injection      PROVEN
+  subprocess detector  SELF-TESTED
+  source mutation      NOT APPLICABLE
+```
+
+Die laatste regel staat er omdat een subprocestoets buiten het bereik van de
+mutatiemotor valt (`test/persistentiestand.test.js` is er zo een). Dat is geen
+vergeten toets, en het hoort niet weg te vallen in een totaal van zeshonderd
+groene: het bewijs kwam anders tot stand, en dat moet leesbaar blijven.
 
 Het veld `grens` is verplicht en niet optioneel. Een control zonder
 opgeschreven grens wordt bij het mappen naar een eis onvermijdelijk te ruim

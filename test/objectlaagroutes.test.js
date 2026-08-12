@@ -240,6 +240,39 @@ test('beleid versmalt wat er klaarstaat, en kent geen automatische stand', async
   await api('/api/sociaal/beleid/zet', { knop: 'vonk', aan: true }, lidToken);
 });
 
+/* DE GRAAF ZELF (LIFE.md, de eerste laag van het wereldpatroon). De bronnen en
+   de rangorde staan los getoetst in test/socialegraaf.test.js; wat hier bestaat
+   is de route -- en die was de enige van deze wereld die in geen enkele toets
+   voorkwam. Zonder deze toets zou hij stil kunnen breken terwijl de laag
+   eronder groen blijft.
+
+   DE MUTATIE: `if (geenGast(req, res)) return;` uit routes/sociaal.js halen bij
+   /graaf; de laatste bewering zakt dan. */
+test('de graaf komt over zijn eigen route binnen, met zijn bronnen erbij', async () => {
+  const d = await json(await api('/api/sociaal/graaf', {}, lidToken));
+  assert.equal(d.ok, true);
+  assert.ok(Array.isArray(d.momenten), 'de momenten reizen mee');
+  assert.ok(Array.isArray(d.bronnen) && d.bronnen.length >= 9,
+    'en hij zegt WELKE bronnen hij las -- een beeld met een weggevallen bron ziet er compleet uit');
+  assert.deepEqual(d.stil, [], 'geen enkele bron hoort hier stuk te gaan');
+
+  /* Een telling en geen score: getallen over dingen, nooit per persoon
+     (LIFE.md par. 4.4). */
+  assert.equal(typeof d.telling.wachtOpMij, 'number');
+  assert.equal(d.telling.momenten, d.momenten.length, 'de telling telt wat er staat');
+
+  const zonder = await api('/api/sociaal/graaf', {});
+  assert.ok(zonder.status === 401 || zonder.status === 403, 'zonder inlog geen graaf');
+
+  /* En een anonieme demo-gast evenmin, en dat is een andere deur dan de vorige:
+     hij IS ingelogd. De graaf leest de vriendenlaag, de matches en de termijnen
+     van de mensen om het lid heen -- geen beeld voor een sessie zonder pas. */
+  const gast = await json(await api('/api/login', { tier: 'guest' }));
+  assert.ok(gast.token, 'een demo-gast komt wel gewoon binnen');
+  const gastGraaf = await api('/api/sociaal/graaf', {}, gast.token);
+  assert.equal(gastGraaf.status, 403, 'maar niet op de graaf');
+});
+
 /* Een gast mag deze laag niet: hij leest de vriendenlaag, matches en groepen.
    De route weigert hem, en dat hoort een toets te bewaken en geen afspraak. */
 test('een onbekende soort en een sessie zonder pas komen er niet in', async () => {

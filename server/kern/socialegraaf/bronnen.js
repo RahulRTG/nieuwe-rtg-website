@@ -120,7 +120,13 @@ module.exports = ({ kern }) => {
      Alleen kamers waar op dit moment iemand IN zit. Een lege vergaderkamer is
      meubilair; een kamer waar drie mensen zitten te wachten is een moment. */
   function meet(key) {
-    const m = kern.meetMijn(key) || {};
+    /* kern.MEET.meetMijn en niet kern.meetMijn: Meet hangt als OBJECT aan de
+       kern (server.js `meet`), net als routes/meet.js het pakt. Met de platte
+       naam gooide deze bron elke aanroep een TypeError, viel hij in zijn eigen
+       vangnet en stond hij bij iedereen in `stil` -- een sociaal beeld zonder
+       zijn kamers, dat er compleet uitzag. Precies waar de kop hierboven voor
+       waarschuwt, alleen dan met een functienaam in plaats van een veldnaam. */
+    const m = kern.meet.meetMijn(key) || {};
     return lijst(m.kamers)
       .filter(k => lijst(k.aanwezig).length > 0)
       .slice(0, 6)

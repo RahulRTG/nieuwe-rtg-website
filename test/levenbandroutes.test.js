@@ -162,3 +162,76 @@ test('8. elke kant verbreekt, en dan is de weg terug dicht', async () => {
   const opnieuw = await huis('/api/rtf/leven/deel/zet', { bandId: band.id, stuk: 'afspraken', vervalt: dag(30) }, kindTok);
   assert.equal(opnieuw.status, 400, 'en er valt niets meer over te delen');
 });
+
+/* ---------------------------------------------------------------------------
+   HET BELEID EN WAT ER EINDIGDE, over de route.
+
+   De regels zelf staan in test/levensbeleid.test.js -- die toetst de kern
+   rechtstreeks en komt hier niet langs een deur binnen. Precies daarom stonden
+   deze zes routes in geen enkele toets: de laag was gedekt, de weg ernaartoe
+   niet. Wat hier gemeten wordt bestaat alleen op dit niveau: dat BEIDE
+   inlogwerelden hetzelfde beleid bereiken, elk met hun eigen poort.
+   --------------------------------------------------------------------------- */
+
+/* MUTATIE: in routes/levenband.js `gezinsPoort` bij de rtf-beleidsroutes
+   vervangen door niets; deze toets zakt dan op de tweede bewering. */
+test('9. beide werelden lezen hun eigen beleid, en het zegt zelf dat vooraf delen niet bestaat', async () => {
+  const lid = await post('/api/leven/beleid', {}, lidTok);
+  assert.equal(lid.status, 200, JSON.stringify(lid.body));
+  assert.equal(lid.body.vooraafDelenMogelijk, false,
+    'een FEIT en geen instelling: zonder deze zin gaat iemand die stand zoeken');
+  assert.ok(Array.isArray(lid.body.stukken) && lid.body.stukken.length, 'de stukken staan erbij');
+  assert.ok(lid.body.grens && lid.body.grens.min < lid.body.grens.max, 'en de grenzen van de termijn');
+
+  const kind = await huis('/api/rtf/leven/beleid', {}, kindTok);
+  assert.equal(kind.status, 200, JSON.stringify(kind.body));
+  assert.equal(kind.body.vooraafDelenMogelijk, false, 'ook aan de gezinskant');
+
+  const zonder = await post('/api/rtf/leven/beleid', {});
+  assert.equal(zonder.status >= 400, true, 'zonder gezinspoort komt niemand hier binnen');
+});
+
+/* MUTATIE: in kern/levensbeleid/index.js de grenscontrole op standaardTot
+   weghalen; de derde bewering zakt dan. */
+test('10. het beleid versmalt en wordt bewaard, en een termijn buiten de grens wordt geweigerd', async () => {
+  const zet = await post('/api/leven/beleid/zet', { stuk: 'gezondheid', nooit: true }, lidTok);
+  assert.equal(zet.status, 200, JSON.stringify(zet.body));
+  assert.equal(zet.body.gewijzigd, true);
+  assert.ok(zet.body.beleid.nooit.includes('gezondheid'), 'het slot zit erop');
+
+  const opnieuw = await post('/api/leven/beleid', {}, lidTok);
+  assert.ok(opnieuw.body.nooit.includes('gezondheid'), 'en hij staat er de volgende keer nog');
+
+  const teLang = await post('/api/leven/beleid/zet', { standaardTot: 100000 }, lidTok);
+  assert.equal(teLang.status, 400, 'een termijn buiten de grens is geen beleid maar een fout');
+
+  const onzin = await post('/api/leven/beleid/zet', { stuk: 'verzonnen' }, lidTok);
+  assert.equal(onzin.status, 400, 'een stuk dat niet bestaat wordt geweigerd, niet stil genegeerd');
+
+  const kind = await huis('/api/rtf/leven/beleid/zet', { stuk: 'talenten', nooit: true }, kindTok);
+  assert.equal(kind.status, 200, JSON.stringify(kind.body));
+  assert.ok(kind.body.beleid.nooit.includes('talenten'), 'de gezinskant zet zijn eigen slot');
+  assert.equal((await post('/api/leven/beleid', {}, lidTok)).body.nooit.includes('talenten'), false,
+    'en dat slot is van hem alleen -- twee mensen, twee beleiden');
+});
+
+/* MUTATIE: in kern/levensband/banden.js `beeindigd()` ook `verbrokenDoor` mee
+   laten geven; de laatste bewering zakt dan. */
+test('11. wat onlangs eindigde staat er, zonder wie het deed en zonder reden', async () => {
+  const lid = await post('/api/leven/beeindigd', {}, lidTok);
+  assert.equal(lid.status, 200, JSON.stringify(lid.body));
+  assert.equal(lid.body.banden.length, 1, 'toets 8 verbrak er een, en die staat hier binnen het venster');
+  const b = lid.body.banden[0];
+  assert.ok(b.beeindigdAt, 'met de dag erbij -- dat is wat je wil weten');
+
+  const kind = await huis('/api/rtf/leven/beeindigd', {}, kindTok);
+  assert.equal(kind.status, 200);
+  assert.equal(kind.body.banden.length, 1, 'beide kanten zien dat het voorbij is');
+
+  /* LEVEN.md par. 2.8: verbreken kan zonder uitleg. Bij een band met een kind
+     zou "wie" van een gewone handeling een verantwoording maken. */
+  const tekst = JSON.stringify(lid.body) + JSON.stringify(kind.body);
+  for (const woord of ['verbrokenDoor', 'reden', kindNaam, lidNaam]) {
+    assert.equal(tekst.includes(woord), false, woord + ' hoort hier niet in te staan');
+  }
+});

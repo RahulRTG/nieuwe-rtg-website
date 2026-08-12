@@ -21,7 +21,16 @@ const dagen = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10)
 
 /* Een lege kern in de vorm die de domeinen ECHT hebben. Elke veldnaam hier is
    uit het domeinbestand overgenomen en niet verzonnen -- dat is precies de fout
-   die kern/socialewereld.js maakte (zie test/socialewereld.test.js). */
+   die kern/socialewereld.js maakte (zie test/socialewereld.test.js).
+
+   EN DIE FOUT STOND HIER ZELF OOK IN, wat meteen laat zien waarom dit zo nauw
+   luistert: `meetMijn` stond hier plat, terwijl Meet als OBJECT aan de kern
+   hangt (kern.meet.meetMijn, zoals routes/meet.js hem pakt). De bron greep een
+   niveau te hoog, viel bij ELKE aanroep in zijn eigen vangnet, en stond bij
+   iedereen in stil[] -- en deze toets kon dat niet zien, want hij bouwde
+   dezelfde verkeerde kern na. Een stub die niet op het domein lijkt, toetst de
+   veronderstelling en niet de code. Gevonden door de routetoets, die de ECHTE
+   kern krijgt (test/objectlaagroutes.test.js). */
 function kernMet(over) {
   const k = {
     comm: { inbox: () => ({ gesprekken: [] }) },
@@ -32,7 +41,7 @@ function kernMet(over) {
     socialConnecties: () => ({ connections: [], requests: [] }),
     vonkMijn: () => ({ status: 200, matches: [] }),
     rvMatches: () => ({ status: 200, matches: [] }),
-    meetMijn: () => ({ kamers: [] }),
+    meet: { meetMijn: () => ({ kamers: [] }) },
     levensgraaf: { termijnen: () => [], graaf: () => ({ knopen: [] }) }
   };
   Object.assign(k, over || {});
@@ -61,7 +70,7 @@ test('bezit niets: er is geen enkele manier om iets te schrijven', () => {
 test('een bron die stukgaat wordt gemeld en neemt de andere niet mee', () => {
   const g = graaf({
     comm: { inbox: () => { throw new Error('comm stuk'); } },
-    meetMijn: () => { throw new Error('meet stuk'); },
+    meet: { meetMijn: () => { throw new Error('meet stuk'); } },
     genootschap: { mijn: () => ({ groepen: [], uitnodigingen: [
       { id: 'gr1', naam: 'De Kring', leden: 8 }] }) }
   });

@@ -1,6 +1,8 @@
 .claude/settings.local.json
 .DS_Store
-node_modules/
+# zonder slash: dit dekt ook een SYMLINK met die naam. Met slash deed hij dat
+# niet, en zo is er een symlink naar een lokaal pad de boom in geglipt.
+node_modules
 server/data/
 # runtime-staat + sleutels van de Rust-motor (state.json, secret.key, vault.key):
 # nooit committen -- privaat sleutelmateriaal en de hele geldstand

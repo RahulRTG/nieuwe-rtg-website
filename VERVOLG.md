@@ -31,7 +31,7 @@ TOESTAND         2.338 / 2.936 beoordeeld (80%) · 7 rollback gezakt
 KLOK             1.298 directe tijdsaanroepen · 2 modules op de klok
 ```
 
-Van 5.972 naar 13.025 bewezen cellen in één dag: stap B (de rolproef over alle
+Van 5.972 naar 15.044 bewezen cellen in één dag: stap B (de rolproef over alle
 routes, plus INVOER en IDEMPOTENCY) en stap D (de toestandsvingerafdruk, die in
 zijn eentje STATE, SIDE_EFFECT en ROLLBACK opent).
 
@@ -49,8 +49,8 @@ Alle poorten groen, werkboom schoon.
 
 1. **`saveDuurzaam()` gaat gelden voor geld én alles wat een lid zelf maakt** —
    notities, agenda, bestanden, berichten. Niet voor herbouwbare toestand. Zie
-   `GELDLAT.md`, paragraaf over de reikwijdte. **Alle vijf aangesloten**; alleen
-   `kern/bestanden-delen.js` staat nog open.
+   `GELDLAT.md`, paragraaf over de reikwijdte. **Alle vijf aangesloten, compleet** —
+   inclusief delen, versies en de prullenbak.
 2. **De invariantenmotor is de volgende laag** (niveau 5 uit `TOEZICHT.md`), met
    vijf kandidaat-wetten die daar al staan. De toestandsvingerafdruk uit stap D
    is daarvan het meetdeel; wat er nog ontbreekt zijn de WETTEN zelf.
@@ -80,9 +80,9 @@ terug (een opslagfout las dus als "u heeft iets verkeerd ingevuld"), en
 `routes/member/berichtenapp.js` zette `ok: true` hard in het antwoord met de
 uitkomst ernaast.
 
-Wat er nog open ligt: **`kern/bestanden-delen.js`** (delen, versies,
-prullenbak) schrijft nog write-behind. Dezelfde app, andere knoppen — en dat is
-precies het argument waarom notities al zijn vier knoppen kreeg.
+Sinds 12 augustus ook **`kern/bestanden-delen.js`** (delen, versies, prullenbak).
+Daarmee is de reikwijdte uit GELDLAT.md compleet: een lid ziet niet welke knop
+beschermd is, dus zijn ze het alle vier.
 
 ### ~~B. De goedkope drie matrixkolommen~~ — GEDAAN op 12 augustus
 
@@ -106,7 +106,8 @@ De rest doet zijn tweede schrijfactie stil, en van buiten is dat niet te meten.
 Dat is geen tekort van de proef maar de grens ervan, en hij zegt het per route
 met reden. Wie die 2.830 alsnog wil, heeft de per-route vingerafdruk uit D nodig.
 
-Wat er van B nog open ligt: de 94 routes die als `onbeschermd` uit de ronde komen.
+Wat er van B nog open ligt: de routes die als `onbeschermd` uit de ronde komen —
+94 op het antwoord gemeten, 100 op de toestand (stap D ziet er meer).
 Ze staan met naam in `IDEMPROEF.json`. Dat is een werklijst voor idem-sleutels,
 geen buglijst — begin bij de routes die geld of toegang raken.
 

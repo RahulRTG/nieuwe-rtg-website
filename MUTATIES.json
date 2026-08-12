@@ -1287,6 +1287,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "grootboek-idem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "groothandel.test.js": {
       "soort": "server",
       "staat": "gezakt",

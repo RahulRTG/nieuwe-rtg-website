@@ -55,6 +55,37 @@ module.exports = function lijfpoort(deps) {
     next();
   });
 
+  /* DE IDEM-SLEUTEL WORDT HIER CANONIEK, EN NERGENS ANDERS.
+
+     Wet RTG-038 op de geldketen. Vijftien routes lezen req.body.idem en bouwen
+     daar een sleutel mee ('oplaad:' + codenaam + ':' + idem). Die samengestelde
+     sleutel beslist of een verzoek een HERHALING is, en hij vergelijkt bytes.
+
+     Waarom het hier moet en niet bij de vergelijking zelf: de client-sleutel
+     staat MIDDEN in de samengestelde sleutel. Canoniseren in server/lib/idem.js
+     trimt dan de buitenkant van 'oplaad:kiek: probe-1 ' en laat de spatie
+     binnenin staan -- ik heb die reparatie gebouwd, gemeten, en zien falen. De
+     canonisatie hoort dus VOOR het samenstellen, en dan is er precies een plek:
+     hier, waar de body binnenkomt.
+
+     Wat er gebeurde zonder dit: twee keer /api/pay/oplaad met idem 'probe-1' en
+     ' probe-1 ' gaf saldo 10000 in plaats van 5000. De BETALING zag een
+     herhaling (server/sleutelvorm.js canoniseerde die sleutel al wel) en het
+     GROOTBOEK zag een nieuw verzoek. Vijftig euro werd honderd.
+
+     Dit raakt ook de Rust-motor mee: die krijgt zijn sleutel van deze kant, dus
+     beide engines zien nu dezelfde bytes zonder dat er een tweede canonisatie
+     in Rust bij hoeft. */
+  app.use((req, res, next) => {
+    const b = req.body;
+    if (b && typeof b === 'object' && b.idem !== undefined && b.idem !== null && b.idem !== '') {
+      const canon = require('../sleutelvorm').canoniekeSleutel(b.idem);
+      if (!canon) return res.status(400).json({ error: 'Ongeldige idem-sleutel (leeg, te lang of met stuurtekens).' });
+      b.idem = canon;
+    }
+    next();
+  });
+
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
      journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
      Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */

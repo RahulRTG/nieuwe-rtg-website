@@ -572,10 +572,12 @@
       "wet": "Canonisatie voegt samen wat hetzelfde betekent, en nooit wat verschillend is",
       "waarom": "De spiegelkant van RTG-038, en de duurdere van de twee. Een canonisatie die te ver gaat, stelt twee ECHT verschillende identiteiten gelijk -- en op de geldketen betekent dat een tweede, legitieme opdracht stilzwijgend als herhaling wordt gezien en dus NIET gebeurt. Case-vouwen is daar het scherpste voorbeeld: in base64 of hex zijn aB en Ab twee sleutels. Een dubbele afschrijving valt op en is terug te draaien; een betaling die stil verdwijnt niet. Daarom is dit een eigen wet en geen voetnoot bij RTG-038: 'canonisatie werkt' en 'canonisatie gaat niet te ver' zijn twee beweringen, en een toets die alleen de eerste doet, dekt de duurdere fout niet. test/retrygedrag.test.js telt daarvoor de ECHTE schrijfacties in plaats van de teruggegeven id te vergelijken -- een implementatie die netjes hetzelfde id teruggeeft en ondertussen tweemaal wegschrijft, komt anders gewoon door.",
       "handhaver": [
-        "server/sleutelvorm.js"
+        "server/sleutelvorm.js",
+        "server/opzet/lijfpoort.js"
       ],
       "toetsen": [
-        "retrygedrag.test.js"
+        "retrygedrag.test.js",
+        "grootboek-idem.test.js"
       ],
       "sabotage": "zet een toLowerCase() achter de canonisatie: twee legitieme opdrachten vallen dan samen tot een",
       "sabotageProef": {
@@ -584,6 +586,27 @@
         "naar": "  const k = String(waarde == null ? '' : waarde).normalize('NFC').trim().toLowerCase();",
         "toets": [
           "retrygedrag.test.js"
+        ]
+      }
+    },
+    {
+      "id": "RTG-040",
+      "wet": "Een retry raakt het grootboek precies een keer, niet alleen de betaallaag",
+      "waarom": "Idempotentie op de betaallaag is niet hetzelfde als idempotentie op het geld, en dat verschil was een echte bug. server/sleutelvorm.js canoniseerde de sleutel van de BETALING al, maar server/lib/idem.js -- de laag die het grootboek grendelt -- kreeg zijn sleutel rauw. Bij een retry met witruimte zag de betaling dus een herhaling en het grootboek een nieuw verzoek. Gemeten met een echte server: /api/pay/oplaad met idem 'probe-1' en daarna ' probe-1 ' gaf saldo 10000 in plaats van 5000. Vijftig euro werd honderd, en geen enkele toets op de betaallaag had dat gezien. De reparatie zit in de body-poort en niet bij de vergelijking: de client-sleutel staat MIDDEN in de samengestelde sleutel ('oplaad:' + codenaam + ':' + idem), dus canoniseren bij de vergelijking trimt de buitenkant en laat de spatie binnenin staan -- die versie is gebouwd, gemeten en zien falen. Canoniseren hoort dus voor het samenstellen, en dan is er precies een plek: waar de body binnenkomt.",
+      "handhaver": [
+        "server/opzet/lijfpoort.js",
+        "server/lib/idem.js"
+      ],
+      "toetsen": [
+        "grootboek-idem.test.js"
+      ],
+      "sabotage": "haal de idem-canonisatie uit de body-poort: een oplaad-retry met witruimte boekt dan twee keer",
+      "sabotageProef": {
+        "bestand": "server/opzet/lijfpoort.js",
+        "van": "      b.idem = canon;",
+        "naar": "      // sabotage: canonisatie uit",
+        "toets": [
+          "grootboek-idem.test.js"
         ]
       }
     }

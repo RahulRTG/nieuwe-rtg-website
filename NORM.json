@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs blijft 11 (40 wetten in plaats van 39)",
+      "reden": "RTG-040: een retry raakt het GROOTBOEK precies een keer, niet alleen de betaallaag. server/sleutelvorm.js canoniseerde de sleutel van de betaling al, maar server/lib/idem.js -- de laag die het grootboek grendelt -- kreeg zijn sleutel rauw. Gemeten met een echte server: /api/pay/oplaad met idem probe-1 en daarna spatie-probe-1-spatie gaf saldo 10000 in plaats van 5000. Vijftig euro werd honderd. De canonisatie staat nu in de body-poort, voor de vijftien routes die er een sleutel mee samenstellen.",
+      "eerlijkheidshalve": "Twee keer fout gezeten voor dit klopte. Eerst repareerde ik in server/lib/idem.js, waar de VERGELIJKING gebeurt -- dat deed niets, want de client-sleutel staat MIDDEN in de samengestelde sleutel en trimmen raakt alleen de buitenkant. Die versie is gebouwd, gemeten en zien falen. En daarna zakten drie van mijn vier nieuwe toetsen op een fout in de TOETS: /api/login met dezelfde tier geeft steeds hetzelfde demo-lid terug, dus de saldi stapelden over de gevallen heen. Nu meet de toets verschillen in plaats van absolute standen, wat ook inhoudelijk de juiste maat is."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "wettenZonderBewijs blijft 11 (39 wetten in plaats van 38)",
       "reden": "RTG-039 is de spiegelkant van RTG-038: canonisatie voegt samen wat hetzelfde betekent, en NOOIT wat verschillend is. Aparte wet en geen voetnoot, want het zijn twee beweringen -- een toets die alleen de eerste doet, dekt de duurdere fout niet.",
       "eerlijkheidshalve": "De vorige toets bewees dat twee schrijfwijzen dezelfde SLEUTEL geven en dat de tweede aanroep hetzelfde id teruggeeft. Dat is niet hetzelfde als bewijzen dat er precies EEN duurzame mutatie ontstaat: een implementatie die netjes hetzelfde id teruggeeft en ondertussen tweemaal wegschrijft komt daar gewoon doorheen. test/retrygedrag.test.js hangt daarom een telstore onder betaal.js en telt de ECHTE schrijfacties. Beide richtingen gemuteerd en zien zakken: trim eruit geeft twee entries op een retry (onder-deduplicatie), toLowerCase erbij geeft een entry op twee legitieme opdrachten (over-deduplicatie). Wat dit NIET aantoont is het grootboek als geheel -- saldi en tegenboekingen hebben hun eigen toetsen."

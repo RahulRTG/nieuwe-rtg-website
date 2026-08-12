@@ -48,6 +48,10 @@
     "RTG-039": {
       "stand": "BEWEZEN",
       "uitleg": "server/sleutelvorm.js:   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim(); ->   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim().toLowerCase(); maakt retrygedrag.test.js rood"
+    },
+    "RTG-040": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/opzet/lijfpoort.js:       b.idem = canon; ->       // sabotage: canonisatie uit maakt grootboek-idem.test.js rood"
     }
   }
 }

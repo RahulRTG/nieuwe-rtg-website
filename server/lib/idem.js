@@ -64,6 +64,27 @@ module.exports = function maakIdem({ d, save, naam, bijeen }) {
 
   return async function metIdem(sleutel, afdruk, werk) {
     if (!sleutel) return werk();
+    /* EEN TWEEDE SLOT, NIET HET EERSTE -- en dat onderscheid is de moeite waard.
+
+       Wet RTG-038. De echte reparatie staat in server/opzet/lijfpoort.js: daar
+       wordt req.body.idem canoniek gemaakt VOORDAT vijftien routes er een sleutel
+       mee samenstellen ('oplaad:' + codenaam + ':' + idem).
+
+       Waarom niet hier alleen: de client-sleutel staat MIDDEN in die samenstelling.
+       Ik heb deze regel eerst als DE reparatie gebouwd, en toen gemeten dat hij
+       niets deed -- 'oplaad:kiek: probe-1 ' trimt aan de buitenkant en houdt de
+       spatie binnenin. Het saldo bleef 10000 in plaats van 5000. Canoniseren moet
+       dus voor het samenstellen.
+
+       Waarom hij toch blijft staan: deze laag wordt ook aangeroepen met sleutels
+       die niet uit een HTTP-body komen, en een tweede slot dat niets kost is geen
+       dubbele waarheid maar diepteverdediging. Wat hij WEL alleen doet is een
+       samengestelde sleutel weigeren die stuurtekens of onzin bevat; die zou
+       anders als "geen sleutel" kunnen doorgaan en het werk ongegrendeld laten
+       draaien -- en dan is elke retry een nieuwe boeking. */
+    const canon = require('../sleutelvorm').canoniekeSleutel(sleutel);
+    if (!canon) return { status: 400, error: 'Ongeldige idem-sleutel (leeg, te lang of met stuurtekens).' };
+    sleutel = canon;
     const s = store();
     const a = afdrukStore();
     if (sleutel in s && sleutel !== '_keys') {

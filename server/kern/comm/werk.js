@@ -155,22 +155,6 @@ function maakCommWerk({ db, save, comm }) {
     return oudeVorm(m, sollicitant);
   }
 
-  /* ---------------------------------------------------- de lijsten
-
-     Zelfde valkuil als bij het gastcontact (./gast.js): een lijst die uit de
-     kern komt ziet alleen wat al verhuisd is, en de lijst is de manier om een
-     gesprek te openen. Zonder binnenhalen staat de sollicitatielijst op de dag
-     van de verhuizing leeg. Begrensd tot deze sollicitant of deze zaak, dus
-     nog steeds een verhuizing op aanraking. */
-  function haalBinnen(filter) {
-    let oud = null;
-    try { oud = db.data.applyChats || {}; } catch (e) { return; }
-    for (const [id, chat] of Object.entries(oud)) {
-      if (!chat || !filter(chat)) continue;
-      gesprek(id);
-    }
-  }
-
   function rij(chat, g) {
     const lijst = comm.berichtenVan(g.id).filter((m) => !m.weg);
     const laatste = lijst[lijst.length - 1] || null;
@@ -182,33 +166,15 @@ function maakCommWerk({ db, save, comm }) {
       at: g.laatst || chat.at || null };
   }
 
-  function voorSollicitant(sleutel) {
-    haalBinnen((c) => sollicitantVan(c) === String(sleutel));
-    const uit = [];
-    for (const g of comm.inbox(String(sleutel), {}).gesprekken) {
-      const kern = comm.gesprekVan(g.id);
-      if (!kern || !kern.meta || kern.meta.bron !== 'Werk') continue;
-      const chat = chatVan(String(kern.meta.sleutel).replace(/^werk:/, ''));
-      if (chat) uit.push(rij(chat, kern));
-    }
-    return uit.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
-  }
-
-  function voorZaak(code) {
-    const c = String(code || '').trim().toUpperCase();
-    haalBinnen((chat) => String(chat.supplierCode || '').toUpperCase() === c);
-    const uit = [];
-    for (const g of comm.inbox(wie.zaak(c), {}).gesprekken) {
-      const kern = comm.gesprekVan(g.id);
-      if (!kern || !kern.meta || kern.meta.bron !== 'Werk') continue;
-      const chat = chatVan(String(kern.meta.sleutel).replace(/^werk:/, ''));
-      if (chat) uit.push(Object.assign(rij(chat, kern), { ongelezen: g.ongelezen }));
-    }
-    return uit.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
-  }
+  /* De twee overzichten (wat ziet een sollicitant, wat ziet een zaak) staan
+     in ./werk-lijsten.js. Dit bestand gaat over EEN gesprek; een lijst is een
+     ander onderwerp, met zijn eigen valkuil (zie de kop daar). Wat hij van de
+     gesprekken moet weten krijgt hij MEE, zodat er een lezing blijft van wie
+     de sollicitant is en hoe een rij eruitziet. */
+  const lijsten = require('./werk-lijsten')({ db, comm, wie, gesprek, chatVan, rij, sollicitantVan });
 
   return { gesprek, berichten, stuur, oudeVorm, sollicitantVan, werkgeverVan,
-    voorSollicitant, voorZaak };
+    voorSollicitant: lijsten.voorSollicitant, voorZaak: lijsten.voorZaak };
 }
 
 module.exports = { maakCommWerk };

@@ -329,3 +329,76 @@ test('de terugblik houdt er een regel aan over, zonder bedrag', () => {
   assert.match(m.zin, /^CN-anna vond je goed genoeg voor /);
   assert.ok(!/\d/.test(m.zin), 'geen enkel cijfer in de zin: ' + m.zin);
 });
+
+/* ================= de werkgeverskant, en de loonstrook ================= */
+
+test('een MENS start dezelfde promotiehandeling als Sven', () => {
+  /* DE CIRKEL SLUITEN. Zolang alleen de AI promoveert, spreken de AI en de
+     speler niet dezelfde arbeidsmarkt -- en dan is "dezelfde werkwoorden" een
+     belofte die op een scherm strandt. */
+  const o = opstelling();
+  o.maand(10);
+  const mensen = o.m.eco.zicht(o.p, o.st, 'anna').werk.mijnMensen;
+  assert.equal(mensen.length, 1, 'zij ziet haar mensen');
+  const x = mensen[0];
+  assert.equal(x.wie, 'boris');
+  assert.equal(x.naar, 'vakkracht', 'en welke trede er boven hem ligt');
+  assert.equal(x.inGesprek, false);
+  /* Precies de zet die het scherm doet -- en het is dezelfde die de AI doet. */
+  const r = o.m.eco.zet(o.p, 'anna', { actie: 'promotie-aanbieden', dienst: x.id, rol: x.naar });
+  assert.ok(r.ok, JSON.stringify(r));
+  assert.equal(o.m.eco.zicht(o.p, o.st, 'anna').werk.mijnMensen[0].inGesprek, true,
+    'en daarna staat er geen tweede knop');
+});
+
+test('het scherm biedt geen trede aan die al bezet is', () => {
+  const o = opstelling();
+  o.maand(8);
+  /* Anna neemt zelf ook een vakkracht aan; dan is die trede weg voor boris. */
+  const f = o.m.eco.zet(o.p, 'anna', { actie: 'functie-openen', vestiging: o.zaak.id, rol: 'vakkracht' });
+  o.m.eco.zet(o.p, 'chris', { actie: 'solliciteren', id: f.id });
+  o.p.spelers.push('chris');
+  o.st.geld.chris = 0; o.st.vestigingen.chris = [];
+  o.m.eco.zet(o.p, 'chris', { actie: 'solliciteren', id: f.id });
+  o.m.eco.zet(o.p, 'anna', { actie: 'aannemen', id: f.id, speler: 'chris' });
+  const boris = o.m.eco.zicht(o.p, o.st, 'anna').werk.mijnMensen.find(x => x.wie === 'boris');
+  assert.equal(boris.naar, 'bedrijfsleider', 'vakkracht is bezet, dus de trede erboven');
+});
+
+test('de loonstrook is sober en wordt nergens bewaard', () => {
+  const o = opstelling();
+  o.maand(5);
+  const b = o.m.eco.zicht(o.p, o.st, 'boris').werk.baan;
+  assert.ok(b.strook, 'er is een strook zodra er gewerkt is');
+  assert.deepEqual(Object.keys(b.strook).sort(),
+    ['bedrag', 'dienstmaanden', 'functie', 'periode', 'sinds', 'werkgever', 'zaak'],
+    'periode, werkgever, functie, bedrag -- en niets meer');
+  assert.equal(b.strook.werkgever, 'anna');
+  assert.equal(b.strook.functie, 'Hulpkracht');
+  assert.equal(b.strook.bedrag, Math.round(o.dienst().loon));
+  assert.equal(b.strook.periode, o.st.maand);
+  /* AFGELEID EN NIET BEWAARD: een tweede voorraad naast een som die klopt is
+     een tweede waarheid. */
+  assert.ok(!('strook' in o.dienst()), 'hij staat niet op het dienstverband');
+  assert.ok(!JSON.stringify(o.st).includes('"strook"'), 'en nergens in de staat');
+});
+
+test('wie nog geen maand gewerkt heeft, heeft nog geen strook', () => {
+  const o = opstelling();
+  const b = o.m.eco.zicht(o.p, o.st, 'boris').werk.baan;
+  assert.equal(b.strook, null, 'aangenomen is nog niet betaald');
+});
+
+test('een bestuurder krijgt geen volgende trede aangeboden', () => {
+  /* Een bestuursrol hangt aan het CONCERN en niet aan een vestiging, dus
+     "welke trede ligt hier boven" is er geen zinnige vraag over -- die stap is
+     een ander gesprek (magnaat/bestuur.js). Zonder deze grens zou het scherm
+     een knop tonen die de motor terecht weigert. */
+  const o = opstelling();
+  o.maand(10);
+  const d = o.dienst();
+  d.rol = 'ceo';
+  d.vestiging = null;
+  const x = o.m.eco.zicht(o.p, o.st, 'anna').werk.mijnMensen.find(y => y.wie === 'boris');
+  assert.equal(x.naar, null, 'geen trede voor wie het concern bestuurt');
+});

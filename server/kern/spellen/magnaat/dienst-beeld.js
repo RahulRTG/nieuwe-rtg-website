@@ -9,6 +9,24 @@
    naad" op het moment dat het antwoord nog kort is. */
 const D = require('./dienst');
 
+const P = require('./promotie');
+
+/* DE EERSTVOLGENDE TREDE die bij deze zaak nog vrij is. Alleen zaakrollen: een
+   bestuursrol hangt aan het concern en niet aan een vestiging, en die stap is
+   een ander gesprek (../bestuur.js). */
+function volgendeRol(st, d) {
+  /* HIER STOND EEN WACHT op `d.vestiging`, voor wie het concern bestuurt. Die
+     was dood: een bestuursrol staat BOVEN aan de ladder van ../promotie.js, dus
+     de lus hieronder vindt er sowieso niets boven. Een tak die geen enkele
+     toets kan omleggen is een tak die niemand onderhoudt -- dezelfde afweging
+     als bij het kavellog. De grens zelf blijft staan, hij zit alleen in de
+     ladder en niet in een extra regel. */
+  const bezet = new Set(D.dienstenBij(st, d.vestiging).map(x => x.rol));
+  for (const rol of ['vakkracht', 'bedrijfsleider'])
+    if (P.TRAP[rol] > P.TRAP[d.rol] && !bezet.has(rol)) return rol;
+  return null;
+}
+
 module.exports = ({ vind }) => {
   /* WAT EEN SPELER ZIET. Drie dingen, en het is geen toeval dat het er drie zijn:
      wat er te krijgen is, wat je zelf hebt, en wie er voor je werkt.
@@ -38,14 +56,31 @@ module.exports = ({ vind }) => {
       baan: eigen ? { id: eigen.id, werkgever: naam(eigen.werkgever), rol: eigen.rol,
         rolnaam: (D.ROLLEN[eigen.rol] || {}).naam, mag: D.ROLLEN[eigen.rol].mag,
         loon: eigen.loon, sinds: eigen.sinds, maanden: eigen.maanden || 0,
-        verdiend: eigen.betaaldTotaal || 0, zaak: v ? v.naam : null, vestiging: eigen.vestiging } : null,
+        verdiend: eigen.betaaldTotaal || 0, zaak: v ? v.naam : null, vestiging: eigen.vestiging,
+        /* DE LOONSTROOK, en met opzet sober: periode, werkgever, functie,
+           bedrag. Hij is AFGELEID en wordt nergens bewaard -- het loon en de
+           maand staan er al, en een tweede voorraad naast een som die klopt is
+           een tweede waarheid. Waar hij voor is: salaris verandert daarmee van
+           "mijn kas ging omhoog" in "ik heb gewerkt en hiervoor ben ik betaald". */
+        strook: (eigen.maanden || 0) > 0 ? { periode: st.maand,
+          werkgever: naam(eigen.werkgever), functie: (D.ROLLEN[eigen.rol] || {}).naam || eigen.rol,
+          bedrag: Math.round(eigen.loon), zaak: v ? v.naam : null,
+          sinds: eigen.sinds, dienstmaanden: eigen.maanden || 0 } : null } : null,
       // en wat JIJ als werkgever hebt uitstaan, met de sollicitaties erbij
       mijnFuncties: D.functies(st).filter(f => f.werkgever === h && f.status === 'open').map(f => ({
         id: f.id, vestiging: f.vestiging, rol: f.rol, loon: f.loon,
         sollicitaties: f.sollicitaties.map(x => ({ speler: naam(x.speler), loon: x.loon, maand: x.maand })) })),
       mijnMensen: D.lopend(st).filter(d => d.werkgever === h).map(d => ({
         id: d.id, wie: naam(d.werknemer), rol: d.rol, rolnaam: (D.ROLLEN[d.rol] || {}).naam,
-        loon: d.loon, vestiging: d.vestiging, maanden: d.maanden || 0 }))
+        loon: d.loon, vestiging: d.vestiging, maanden: d.maanden || 0,
+        /* WELKE TREDE ER VOOR DEZE MENS BOVEN LIGT, en of hij vrij is. Zonder
+           dit getal is "promotie aanbieden" een knop die soms werkt: de motor
+           weigert een bezette rol terecht, maar een scherm hoort dat te weten
+           voordat het iets aanbiedt. Zie ../promotie.js voor de ladder. */
+        naar: volgendeRol(st, d),
+        /* En of er al een gesprek loopt -- dan hoort er geen tweede knop. */
+        inGesprek: (st.promoties || []).some(x => x.dienst === d.id
+          && (x.status === 'open' || x.status === 'tegenbod')) }))
     };
   }
 

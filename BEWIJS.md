@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 941 bestanden en 6356 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 941 bestanden en 6361 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 941 |
-| losse beweringen (`test(...)`) | 6356 |
+| losse beweringen (`test(...)`) | 6361 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-821 bestanden, 6141 beweringen.
+821 bestanden, 6146 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -683,7 +683,7 @@ toets omvalt.
 | `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |
 | `spelprestaties.test.js` | 8 | gezakt op `!==->===#0` | Prestaties, afgeleid uit de uitslagen. Drie keuzes maken dit anders dan een gewoon prestatiesysteem, en die staan hier alle drie als toets omdat ze anders stil terugdraaien: alleen wat BEHAALD is gaat terug (geen "7... |
 | `spelprojectie.test.js` | 12 | -- | De projectiekamer: een potje op een gedeeld scherm. Alles hier hangt aan één zin: EEN SCHERM IS EEN PROJECTIE EN GEEN DEELNEMER. |
-| `spelpromotie.test.js` | 15 | -- | DE PROMOTIE -- "Sven wil je spreken." VERHAAL.md hoofdstuk 2. Promoveren KON al: je zegt je baan op en solliciteert opnieuw. |
+| `spelpromotie.test.js` | 20 | -- | DE PROMOTIE -- "Sven wil je spreken." VERHAAL.md hoofdstuk 2. Promoveren KON al: je zegt je baan op en solliciteert opnieuw. |
 | `spelquiz.test.js` | 12 | -- | HET QUIZDUEL: teams, schoolvragen, en wat er NIET over de lijn gaat. Dit is het eerste spel met varianten, en dat maakt het ook het eerste spel waar "dezelfde motor, andere bron" een bewering is in plaats van een plan. |
 | `spelregels-drift.test.js` | 17 | overleefd | Driftbewaking: twee spelregels bestaan bewust in tweevoud (server keurt, client geeft directe feedback): de Woordduel-premievelden en de Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt hem... |
 | `spelregister.test.js` | 32 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |

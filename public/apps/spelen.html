@@ -1507,11 +1507,19 @@ function tekenMagnaatEco(){
   else if (st.klaar) werk.innerHTML = '';
   else if (w.baan) {
     const b = w.baan;
+    /* DE LOONSTROOK. Sober: periode, werkgever, functie, bedrag. Salaris hoort
+       niet "mijn kas ging omhoog" te zijn maar "ik heb gewerkt en hiervoor ben
+       ik betaald" -- en daar is geen dashboard voor nodig, alleen een strook. */
     werk.innerHTML = '<div class="sec">Je werk</div>' +
       '<div class="rij"><div class="nm">' + esc(b.rolnaam || b.rol) + ' bij ' + esc(b.werkgever) +
       '<small>' + esc(b.zaak || '') + ' · ' + (b.maanden || 0) + ' maanden · ' +
       'loon ' + ecGeld(b.loon) + ' per maand</small></div>' +
       '<button type="button" class="chip" data-opzeg="' + esc(b.id) + '">Opzeggen</button></div>' +
+      (b.strook ? '<div class="rij"><div class="nm">Loonstrook maand ' + b.strook.periode +
+        '<small>' + esc(b.strook.werkgever) + ' · ' + esc(b.strook.functie) +
+        (b.strook.zaak ? ' · ' + esc(b.strook.zaak) : '') +
+        ' · in dienst sinds maand ' + b.strook.sinds + '</small></div>' +
+        '<b>' + ecGeld(b.strook.bedrag) + '</b></div>' : '') +
       ((b.mag || []).length
         ? '<div class="keuzerij">' + (b.mag || []).map(veld =>
             '<button type="button" class="chip" data-wb="' + esc(veld) + '">' + esc(veld) + ' bijstellen</button>').join('') + '</div>'
@@ -1532,6 +1540,25 @@ function tekenMagnaatEco(){
       '<div class="leeg">Op dit moment staat er niets open in ' + esc(st.stad) + '. ' +
       'Bedrijven zoeken personeel zodra ze groeien.</div>';
   } else werk.innerHTML = '';
+
+  /* DE WERKGEVERSKANT. Sinds Sven het kan, hoort een mens het ook te kunnen:
+     dezelfde handeling, dezelfde ladder, dezelfde loonband. Zonder dit scherm
+     spreken de AI en de speler niet dezelfde arbeidsmarkt -- en dat is precies
+     wat ./promotie.js belooft. */
+  if (!st.klaar && (w.mijnMensen || []).length) {
+    werk.innerHTML += '<div class="sec">Jouw mensen</div>' +
+      w.mijnMensen.map(x => '<div class="rij"><div class="nm">' + esc(x.wie) +
+        '<small>' + esc(x.rolnaam || x.rol) + ' · ' + x.maanden + ' maanden · ' +
+        ecGeld(x.loon) + ' per maand</small></div>' +
+        (x.inGesprek ? '<span class="leeg">In gesprek</span>'
+          : x.naar ? '<button type="button" class="chip" data-prom="' + esc(x.id) +
+              '" data-naar="' + esc(x.naar) + '">Promotie aanbieden</button>'
+          : '') + '</div>').join('');
+    werk.querySelectorAll('[data-prom]').forEach(b => b.addEventListener('click', async () => {
+      try{ await speelZet({ actie:'promotie-aanbieden', dienst: b.dataset.prom, rol: b.dataset.naar }); }
+      catch(e){ meld(e.message); }
+    }));
+  }
 
   werk.querySelectorAll('[data-sol]').forEach(b => b.addEventListener('click', async () => {
     try{ await speelZet({ actie:'solliciteren', id: b.dataset.sol }); }catch(e){ meld(e.message); }

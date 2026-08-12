@@ -1458,7 +1458,7 @@ function tekenDienst(d, waarom){
         ? '<div class="keuzerij">' + o.opties.map(x =>
             '<button type="button" class="chip" data-rush="' + esc(o.id) + '" data-optie="' +
             esc(x.id) + '" title="' + esc(x.uitleg || '') + '">' + esc(x.wat) + '</button>').join('') +
-          '</div>' + o.opties.map(x => '<small class="leeg">' + esc(x.wat) + ' — ' +
+          '</div>' + o.opties.map(x => '<small class="leeg">' + esc(x.wat) + ' · ' +
             esc(x.uitleg || '') + '</small>').join('')
         : '') + '</div>' +
       ((o.opties || []).length > 1 ? ''
@@ -1511,7 +1511,7 @@ function tekenMagnaatEco(){
          midden in de drukte -- en met de uitweg die op de vloer niet bestaat.
          Een monteur laten komen kost geld, dus dat besluit hoort hier. */
       (v.storingen || []).map(x => '<div class="rij" style="width:100%;flex-wrap:wrap;">' +
-        '<div class="nm">' + esc(x.naam) + ' — ' + esc(STORINGSTAND[x.staat] || x.staat) +
+        '<div class="nm">' + esc(x.naam) + ' · ' + esc(STORINGSTAND[x.staat] || x.staat) +
         '<small>sinds maand ' + x.sinds + '</small></div>' +
         '<div class="keuzerij" style="width:100%;">' + (x.uitwegen || []).map(u =>
           '<button type="button" class="chip" data-stor="' + esc(x.soort) + '" data-id="' +

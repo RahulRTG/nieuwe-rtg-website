@@ -48,6 +48,15 @@ nooit een pas, en weg zijn mag niets kosten. De kern in een zin: blijvende
 waarde komt uit tijd en uit wat je deed, nooit uit geld — kas en bedrijven
 blijven in het potje, het verleden gaat mee.
 
+**`SAMENLEVING.md` is de wegenkaart van Magnaat** — veertien fasen van "iemand
+geeft jou een kans" naar een levende economische samenleving waarin jij een spoor
+achterlaat. Lees hem naast VERHAAL.md: dat beschrijft wat er gebouwd is, dit waar
+het heen gaat en vooral **wat er al ligt** (vier fasen staan grotendeels, drie in
+de steigers). De ene open vraag staat er bovenaan: een pand terugkopen dat je
+vader ooit had is bezit dat over campagnes heen reist, en `stadsgeheugen.js` zegt
+ondubbelzinnig *"wie bezit het? niemand, en dat is de hele regel"*. De stad
+onthoudt; het bezit niet.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

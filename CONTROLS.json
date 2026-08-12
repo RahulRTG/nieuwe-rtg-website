@@ -2,9 +2,9 @@
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
     "controls": 9,
-    "groen": 8,
+    "groen": 7,
     "nietInBedrijf": 1,
-    "nietGroen": 0
+    "nietGroen": 1
   },
   "controls": [
     {
@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:41.362Z",
+        "at": "2026-08-12T10:04:00.994Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -65,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:41.575Z",
+        "at": "2026-08-12T10:04:01.150Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -93,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:41.794Z",
+        "at": "2026-08-12T10:04:01.300Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:42.679Z",
+        "at": "2026-08-12T10:04:01.933Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -147,25 +147,25 @@
       "bewijsstuk": "KETENS.json -- acht velden per keten en verraad, met de zevenstappenlat",
       "grens": "drie ketens van de tientallen die er zijn, en alleen de twee verraden die op het schrijfpad zijn ingebouwd. Voor GELD geldt de strengere lat (antwoord EN persistentie EN grootboek); voor de andere ketens is er nog geen invariant om tegen af te rekenen. Een keten die achter een poort zit (KYC, een bestaande toestemming) wordt NIET beoordeeld en staat als blind met reden in het register.",
       "dekking": {
-        "beproefd": 3,
+        "beproefd": 4,
         "totaal": 9,
         "eenheid": "scenarios die de zevenstappenlat halen",
         "tellers": {
           "ketens": 3,
           "blindeKetens": 0,
-          "rollbackBewezen": 1,
+          "rollbackBewezen": 2,
           "ledgerGebroken": 0,
-          "stilVerlies": 1,
+          "stilVerlies": 0,
           "geldProven": 2,
           "geldScenarios": 3
         },
-        "pct": 33.3
+        "pct": 44.4
       },
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:42.867Z",
+        "at": "2026-08-12T10:04:02.086Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -194,7 +194,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:36:44.787Z",
+        "at": "2026-08-12T10:04:03.323Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -222,10 +222,9 @@
       },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
-        "staat": "GROEN",
-        "beweringen": 18,
-        "overgeslagen": 0,
-        "at": "2026-08-12T08:37:12.628Z",
+        "staat": "GEZAKT",
+        "gezakt": 1,
+        "at": "2026-08-12T10:04:11.288Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -258,7 +257,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:37:12.828Z",
+        "at": "2026-08-12T10:04:11.429Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -288,7 +287,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T08:37:13.013Z",
+        "at": "2026-08-12T10:04:11.563Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

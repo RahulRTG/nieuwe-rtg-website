@@ -28,7 +28,7 @@ const BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vergeten-'));
 const SERVER = path.join(__dirname, '..', 'server', 'server.js');
 
-let kind, token = null, codenaam = null, sleutel = null;
+let kind, token = null, tokenB = null, codenaam = null, sleutel = null;
 let bestandenVoor = [], bestandenVanWilma = [];
 const NAAM = 'Wilma Wegduiker';
 const MAIL = 'wilma@vergeten.test';
@@ -100,6 +100,16 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   assert.equal(reg.status, 200, 'registreren lukt');
   token = (await reg.json()).token;
 
+  /* Een TWEEDE lid, en niet als decor: zonder iemand anders is "alleen zij ziet
+     haar cadeaukaart" een bewering die niet kan zakken. Hij blijft verder overal
+     buiten -- de bezem hieronder gaat over haar. */
+  const regB = await post('/api/auth/register', {
+    name: 'Buurman Bram', email: 'bram' + Date.now() + '@x.test', phone: '0622222222',
+    password: 'geheim12345', geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg'
+  });
+  assert.equal(regB.status, 200, 'het tweede lid registreert ook');
+  tokenB = (await regB.json()).token;
+
   const antwoord = await (await post('/api/state', {}, token)).json();
   const staat = antwoord.state || antwoord;
   codenaam = staat.user && staat.user.codename;
@@ -158,6 +168,24 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      leeggelopen (een endpoint dat hernoemd wordt, valt hier op) en zou de bezem
      hieronder groen staan zonder iets te hebben geveegd. */
   assert.ok(geland.length >= 6, 'te weinig sporen geland (' + geland.length + '): ' + geland.join(', '));
+
+  /* DE CADEAUKAART IS VAN HAAR, en dat hoort ze ook te ZIEN. Dit staat hier en
+     niet in een eigen bestand omdat de kaart hierboven net gekocht is: een
+     toets die zijn eigen aanleiding maakt, meet de keten en niet de vorm.
+
+     Waarom hij ertoe doet: /api/giftcards/mine filtert op `customerKey`, en dat
+     is de enige scheiding tussen de kaarten van twee leden. Valt die filter weg,
+     dan leest iedereen de codes van andermans tegoed -- geld dus. De route stond
+     in geen enkele toets.
+
+     DE MUTATIE: haal de filter op customerKey weg in routes/member/boeken.js.
+     De tweede bewering zakt dan. */
+  const mijne = await (await post('/api/giftcards/mine', {}, token)).json();
+  assert.ok((mijne.kaarten || []).some(k => k.bedrag === 25),
+    'de zojuist gekochte kaart staat in haar eigen overzicht');
+  const vreemde = await (await post('/api/giftcards/mine', {}, tokenB)).json();
+  assert.equal((vreemde.kaarten || []).some(k => k.bedrag === 25), false,
+    'en een ander lid ziet hem niet: een cadeaukaart draagt saldo, dus dit is geld');
 
   /* EN NU DE SPOREN DIE NIET IN db.json STAAN. Drie plekken die alle drie
      alleen een verwijzing in de database achterlaten en de echte inhoud op

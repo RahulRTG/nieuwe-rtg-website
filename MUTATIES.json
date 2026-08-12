@@ -4452,6 +4452,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "wereldroutes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "wereldtaal.test.js": {
       "soort": "puur",
       "staat": "overleefd",

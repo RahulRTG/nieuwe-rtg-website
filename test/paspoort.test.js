@@ -154,3 +154,63 @@ test('9. het lid ziet zijn eigen verificatiestatus (regie bij het lid)', async (
   assert.equal(mijn.body.status.selfieAanwezig, true);
   assert.ok(mijn.body.verzoeken.length >= 1, 'de historie van verzoeken staat er');
 });
+
+/* De korte weg naar dezelfde waarheid. /api/verify/status is het antwoord waar
+   de app zijn poorten op zet (reserveren mag pas na een echte keuring), en hij
+   stond in geen enkele toets -- terwijl hij bij een fout GEEN fout geeft maar
+   gewoon iets anders zegt dan het uitgebreide antwoord hierboven. Twee bronnen
+   voor dezelfde waarheid horen niet uiteen te lopen (LAT.md regel 4).
+
+   DE MUTATIE: laat de route `req.session.account.verified` vervangen door een
+   vaste 'verified', of door `req.session.tier`. De tweede bewering zakt dan bij
+   het verse lid. */
+test('10. de korte statusroute zegt hetzelfde als het uitgebreide antwoord', async () => {
+  const kort = await api(base, '/api/verify/status', {}, lid.token);
+  assert.equal(kort.status, 200);
+  const lang = await api(base, '/api/paspoort/mijn', {}, lid.token);
+  assert.equal(kort.body.status, lang.body.status.geverifieerd,
+    'de korte en de lange weg horen dezelfde stand te melden');
+
+  /* En een vers lid is NIET geverifieerd. Zonder deze helft zou een route die
+     altijd 'verified' teruggeeft er ook doorheen komen. */
+  const u = (Date.now() + (++seq)).toString().slice(-8);
+  const vers = await api(base, '/api/auth/register', { name: 'Nog Onbekend', email: 'v' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1993-06-06', tier: 'rtg', pasApp: 'rtg' });
+  const r = await api(base, '/api/verify/status', {}, vers.body.token);
+  assert.equal(r.status, 200);
+  assert.notEqual(r.body.status, 'verified', 'wie niets heeft ingeleverd, is niet geverifieerd');
+});
+
+/* DE MELDING DIE BIJ DIE GOEDKEURING HOORT, en het afvinken ervan.
+
+   Deze toets staat hier omdat de goedkeuring hierboven de melding MAAKT
+   (routes/office/verificaties.js roept notify aan). Een losse toets zou een
+   melding moeten verzinnen, en dan meet hij de vorm in plaats van de keten.
+
+   Let op wat de melding wel en niet draagt: hij gaat naar de PAS en niet naar
+   een persoon, en er staat geen naam in -- alleen "U kunt nu in een tik boeken".
+   De mail met de echte naam gaat langs de andere weg. Dat is geen detail: de
+   codenaam-scheiding (CLAUDE.md) valt om zodra er een naam in een melding sluipt
+   die iedereen op die pas kan lezen.
+
+   DE MUTATIE: laat /api/notifications/read de `read`-vlag niet zetten (of alleen
+   op de eerste). De laatste bewering zakt dan. */
+test('11. de goedkeuring levert een melding op, en die is af te vinken', async () => {
+  const lijst = await api(base, '/api/notifications', {}, lid.token);
+  assert.equal(lijst.status, 200);
+  const melding = (lijst.body.notifications || []).find(n => n.title === 'Identiteit geverifieerd');
+  assert.ok(melding, 'de goedkeuring uit de opzet staat als melding op de pas');
+  assert.equal(melding.read, false, 'en hij staat als ongelezen klaar');
+
+  const tekst = JSON.stringify(lijst.body);
+  assert.equal(tekst.includes('Jamie'), false,
+    'een melding draagt geen echte naam: die reist per mail, niet langs de pas');
+
+  const af = await api(base, '/api/notifications/read', {}, lid.token);
+  assert.equal(af.status, 200);
+  assert.equal(af.body.ok, true);
+
+  const na = await api(base, '/api/notifications', {}, lid.token);
+  assert.equal((na.body.notifications || []).some(n => !n.read), false,
+    'na afvinken staat er niets meer ongelezen');
+});

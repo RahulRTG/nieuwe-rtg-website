@@ -47,6 +47,9 @@ const bundels = {
   'shared/glyf.js': 'shared/glyf',
   'shared/qr.js': 'shared/qr',
   'shared/klok.js': 'shared/klok',
+  // de levende wereld: de kring, het draaien, het inzoomen, het Command Wheel,
+  // de ring van Rahul en de levende grond -- zes delen in EEN IIFE
+  'shared/wereld.js': 'shared/wereld',
   'shared/metgezel.js': 'shared/metgezel',
   // het app-menu: stijl, tekens, de eigen functies van een app, de vaste
   // functies, het blad en de knop -- zes onderdelen achter elkaar in een IIFE

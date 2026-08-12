@@ -119,7 +119,16 @@
      Ook deze regel is door een merge teruggezet naar de oude vier, samen met
      de rest van het beginscherm; zie de opmerking bij .os-aibalk in
      apps/app.html. test/comm.e2e.js bewaakt hem. */
-  const FUNCTIES = ['link:berichten', 'os:snaps', 'link:camera', 'link:wallet'];
+  /* LEEG, EN DAT IS DE BEDOELING. Het beginscherm toont alleen nog de acht
+     werelden: dat is de hele afspraak van PLATFORM.md par. 0, en een rij losse
+     apps eronder is precies de uitzondering die de afspraak weer uitholt.
+
+     De vier zijn niet weg, ze staan waar ze horen: Berichten en Camera in
+     Sociaal, de Wallet IS de Geld-wereld (geld.html laadt wallet.js), en Snaps
+     zit in Berichten sinds de vier contact-apps er een werden. De lijst blijft
+     als lege lijst bestaan zodat de rij later opnieuw te vullen is zonder de
+     tekenlaag aan te raken -- en zodat hier staat waarom hij leeg is. */
+  const FUNCTIES = [];
 
   /* ---------- de mappen, boven de klok ----------
      Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets

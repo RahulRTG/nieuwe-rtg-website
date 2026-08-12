@@ -11,6 +11,7 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/canvas.css" rel="stylesheet">
 <!-- de vormtaal van een wereldscherm; dezelfde als RTG Reizen, en met opzet
      uit een gedeeld blad in plaats van overgetikt (LAT.md regel 4) -->
 <link href="/shared/rtg-wereld.css" rel="stylesheet">
@@ -40,6 +41,14 @@
      Zou dit scherm ook opslaan, dan bestaat een taak op twee plekken
      (LAT.md regel 4). -->
 
+<!-- De apps van deze wereld die nog geen enkele ingang hadden. De vier
+     specialisten hierboven (Berichten, Salon, Genootschap, Pulse) staan in het
+     scherm zelf; deze stonden nergens. -->
+<nav class="wereldapps" aria-label="Apps in deze wereld">
+  <a href="/apps/galerij.html">Galerij</a>
+  <a href="/apps/vertaler.html">Vertaler</a>
+  <a href="/apps/sportclub.html">Sportclub</a>
+</nav>
 <main id="inhoud">
   <header class="merkkop">
     <h1 class="rtg-ceremonie">RTG Sociaal</h1>
@@ -96,7 +105,13 @@
     ['Berichten', 'Alle gesprekken op een plek', '/apps/comm.html', ICO.lijst],
     ['De Salon', 'Het besloten netwerk van RTG', '/apps/salon.html', ICO.blad],
     ['Genootschap', 'Groepen en bijeenkomsten', '/apps/genootschap.html', ICO.mens],
-    ['Pulse', 'De dag in uw kring, rustig gebundeld', '/apps/pulse.html', ICO.klok]
+    ['Pulse', 'De dag in uw kring, rustig gebundeld', '/apps/pulse.html', ICO.klok],
+    /* Camera hoort hier sinds het beginscherm alleen nog de acht werelden
+       toont. Hij stond in de functierij onder de klok, en die is weg; zonder
+       deze regel was hij alleen nog via Spotlight te vinden -- een app die
+       bestaat maar nergens meer staat. Delen met iemand is sociaal, dus dit
+       is zijn wereld. */
+    ['Camera', 'Een foto maken en bewerken', '/apps/camera.html', ICO.blad]
   ];
 
   const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];

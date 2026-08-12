@@ -11,6 +11,7 @@
 <script src="/shared/schermrust.js" defer></script>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/canvas.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
@@ -104,6 +105,25 @@
 <main>
   <p class="stil" id="uitleg">De wereld laadt…</p>
   <div class="stukken" id="stukken"></div>
+
+  <!-- DE SPECIALISTEN. Muziek, Kijk en Flow zijn STANDEN van deze wereld; de
+       apps hieronder zijn dat niet -- ze hebben een eigen scherm met eigen
+       regels (een potje heeft spelers en beurten, een krant heeft een redactie).
+       Ze stonden in de map-items van het beginscherm, maar sinds de wereldtegel
+       rechtstreeks hierheen navigeert wordt die lijst nergens meer getekend.
+       Daardoor was er GEEN ENKELE weg naar Spelen: Magnaat en de rest waren
+       alleen nog te bereiken door het adres in te typen. Vandaar deze rij:
+       links naar volwaardige apps, geen vervangingen ervan. -->
+  <nav class="standen" id="specialisten" aria-label="Media-apps">
+    <a href="/apps/spelen.html">Spelen</a>
+    <a href="/apps/muziek.html">Muziek</a>
+    <a href="/apps/podium.html">Podium</a>
+    <a href="/apps/theater.html">Theater</a>
+    <a href="/apps/clips.html">Clips</a>
+    <a href="/apps/sport.html">Sport</a>
+    <a href="/apps/nieuws.html">Nieuws</a>
+    <a href="/apps/krant.html">Krant</a>
+  </nav>
 
   <div class="bodem">
     <p class="stil" id="einde"></p>

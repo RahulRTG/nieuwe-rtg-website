@@ -235,16 +235,38 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
         'de knop "nieuw gesprek" staat buiten beeld (' + maat.plusRechts + ' > ' + maat.venster + ')');
       assert.equal(maat.overloop, false, 'het scherm loopt horizontaal over');
 
-      /* En op het beginscherm staan Bellen en Videobellen niet meer als eigen
-         app: dat waren vier iconen voor een ding dat een mens als EEN ding
-         ziet. Ze zitten nu in de kop van het gesprek. */
-      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#osFuncties .os-app', { timeout: 10000 });
-      const functies = await page.evaluate(() =>
-        [...document.querySelectorAll('#osFuncties .os-app')].map((b) => b.getAttribute('aria-label')));
-      assert.ok(!functies.includes('Bellen'), 'Bellen staat nog als eigen app op het beginscherm');
-      assert.ok(!functies.includes('Videobellen'), 'Videobellen staat nog als eigen app op het beginscherm');
-      assert.ok(functies.includes('Berichten'), 'Berichten staat niet in de functierij: ' + functies.join(', '));
+      /* HET BEGINSCHERM TOONT ALLEEN NOG DE ACHT WERELDEN.
+
+         Hier stond dat Bellen en Videobellen niet meer als eigen app in de
+         functierij mochten staan, en dat Berichten er WEL in stond. Die rij
+         bestaat niet meer: het beginscherm draagt de acht werelden en verder
+         geen losse apps. De oude bewering zou nu eisen dat er een rij is.
+
+         Wat de bewering waard was, blijft: contact met iemand is EEN ding en
+         geen vier apps. Dat wordt hierboven al getoetst op het gesprek zelf.
+         Wat hier overblijft is de nieuwe afspraak -- geen losse app-tegels op
+         het beginscherm -- plus de weg naar Berichten die er moet zijn, want
+         een app zonder ingang is erger dan een app te veel. */
+      /* IN DE BRON EN NIET OP HET SCHERM, en dat is met reden. Mijn eerste
+         versie las `#osFuncties .os-app` uit de DOM. Die telde altijd nul --
+         ook toen ik er met een mutatie een tegel in terugzette. De rij wordt
+         in dit klikpad namelijk niet getekend (de bezoeker is hier geen lid
+         met een pas), dus de bewering kon niet zakken. Een toets die je niet
+         hebt zien zakken is geen toets (LAT.md regel 9).
+
+         De gebouwde bundel is wel eerlijk te lezen, en dat is precies waar de
+         afspraak staat: een lege FUNCTIES-lijst. Zet iemand er een app in
+         terug, dan zakt deze regel. */
+      const bundel = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app-main.js'), 'utf8');
+      assert.match(bundel, /const FUNCTIES = \[\s*\]/,
+        'het beginscherm draagt weer losse app-tegels naast de acht werelden');
+
+      // en Berichten is bereikbaar vanuit zijn wereld
+      await page.goto(base + '/apps/sociaal.html', { waitUntil: 'domcontentloaded' });
+      const naarComm = await page.evaluate(() =>
+        [...document.querySelectorAll('a[href],[data-href]')]
+          .some((e) => /\/apps\/comm\.html/.test(e.getAttribute('href') || e.getAttribute('data-href') || '')));
+      assert.ok(naarComm, 'vanuit RTG Sociaal is Berichten niet te bereiken');
 
       assert.deepEqual(fouten, [], 'JS-fouten: ' + fouten.join(' | '));
     } finally { await browser.close(); }

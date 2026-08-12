@@ -90,6 +90,13 @@ async function metLid(fn) {
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     await fn({ base, ctx });
@@ -243,13 +250,30 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
           .filter((b) => b.offsetParent).map((b) => b.id || b.className)
       };
     });
+    /* EEN DEUR, EN VERDER NIETS.
+
+       Hier stond `paneel === false` en `zichtbaarRechts === []`: de statusbalk
+       moest helemaal leeg zijn. Dat klopte tot de balk werd leeggemaakt --
+       scannen, Zegel, backoffice en de bel verhuisden allemaal NAAR het
+       bedieningspaneel -- en de knop van dat paneel per ongeluk meeging in de
+       opruiming. Toen was het paneel waar ze allemaal in zitten alleen nog te
+       openen via Rahuls "zoek ..."-opdracht, en dus praktisch onvindbaar.
+
+       Die knop is daarom bewust teruggezet, met de reden erbij in app.html. De
+       eis is niet veranderd -- de bovenrand is de ingang en de balk is geen
+       gereedschapskist -- maar "leeg" is nu "precies EEN deur". Deze toets
+       bewaakt dat scherper dan een lege lijst: hij noemt de enige knop die er
+       mag staan, dus zowel een knop erbij als deze deur die verdwijnt, zakt. */
     assert.equal(balk.bel, false, 'de bel staat nog in de statusbalk');
-    assert.equal(balk.paneel, false, 'het bedieningspaneel staat nog als knop in de statusbalk');
     assert.equal(balk.accu, false, 'de batterij staat nog in de statusbalk');
     assert.equal(balk.hamburger, false, 'het beginscherm hoort geen hamburger te hebben');
     assert.equal(balk.groet, false, 'de begroeting hoort van het beginscherm af te zijn');
-    assert.deepEqual(balk.zichtbaarRechts, [],
-      'er staat nog iets in de statusbalk: ' + balk.zichtbaarRechts.join(', '));
+    assert.equal(balk.paneel, true,
+      'de deur naar het bedieningspaneel is uit de statusbalk verdwenen; dan is alles wat ' +
+      'daarin verhuisd is (scannen, Zegel, backoffice, meldingen) alleen nog via Rahul te openen');
+    assert.deepEqual(balk.zichtbaarRechts, ['osCcBtn'],
+      'in de statusbalk hoort alleen de deur naar het bedieningspaneel te staan, gevonden: ' +
+      (balk.zichtbaarRechts.join(', ') || '(niets)'));
 
     /* ...EN DAN MOET DE WEG NAAR HET SYSTEEM ER WEL ZIJN. Dit is de helft die
        stil kapot kan: knoppen weghalen is zichtbaar, een ingang die niemand
@@ -408,6 +432,13 @@ test('geen enkele map loopt leeg op de instappas',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();
@@ -489,6 +520,13 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();

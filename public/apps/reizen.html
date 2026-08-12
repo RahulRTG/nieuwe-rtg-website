@@ -12,6 +12,7 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/canvas.css" rel="stylesheet">
 <!-- het ontwerpsysteem, de materialen en de vier thema's komen mee via
      shared/rtg-ui.css, dat ze insluit voor het hele platform. Hier stonden ze
      ook nog eens los; dat laadde dezelfde drie bladen twee keer. -->
@@ -31,6 +32,17 @@
      doet. Zou dit scherm ook boeken, dan ontstaat een reis op twee plekken
      (LAT.md regel 4). -->
 
+<!-- DE APPS VAN DEZE WERELD, en dat past bij wat dit scherm al is: het toont
+     wat er aankomt en verwijst voor het echte werk door naar de app die het
+     doet (zie de opmerking hierboven). Deze vier hadden alleen geen enkele
+     ingang -- niet hier, niet op het beginscherm, nergens. Ze zijn met de
+     graaf in test/bereikbaar.test.js gevonden. -->
+<nav class="wereldapps" aria-label="Apps in deze wereld">
+  <a href="/apps/boeken.html">Boeken</a>
+  <a href="/apps/luchthaven.html">Luchthaven</a>
+  <a href="/apps/uitgaan.html">Uitgaan</a>
+  <a href="/apps/zaal.html">Zaal</a>
+</nav>
 <main id="inhoud">
   <!-- EEN vaste RTG-header: hamburger, appnaam, lucht, inhoud. Verder niets.
        Hier stonden een "Home"-link, een RTG-rondje en de ondertitel "uw

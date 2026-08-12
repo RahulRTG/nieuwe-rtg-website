@@ -121,6 +121,13 @@
     // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
     vorigeAfdruk = afdruk();
     sync();
+    /* De ring van de wereldstand hangt aan DEZELFDE bouw() als de tegels. Dat is
+       geen nettigheid maar de kern van de afspraak: welke werelden je ziet en
+       welke onderdelen erin zitten hangt aan je pas en je boardroom, dus twee
+       lijsten die op verschillende momenten worden bijgewerkt lopen uit elkaar.
+       Eerder hing de ring aan het laden van de pagina, en die is een slag
+       eerder dan de boardroom-gegevens: het beginscherm was leeg. */
+    if (typeof wereldBij === 'function') wereldBij();
   }
 
   /* ---------- mappen openen ---------- */

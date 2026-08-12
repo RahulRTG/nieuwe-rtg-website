@@ -30,6 +30,23 @@ module.exports = ({ DUUR, MAAND_MS, START_GELD }) => {
       onderzoek: [], onderzoekTeller: 0, beurs: [], beursTeller: 0, overnames: [], overnameTeller: 0,
       laatste: {}, klaar: false
     };
+    /* DE STAD DIE AL WAT HEEFT MEEGEMAAKT (fase C, ../stadsgeheugen.js). Wat er
+       in eerdere campagnes in deze stad is gebouwd, staat er nog: dezelfde
+       vorm die ./foundation.js zelf gebruikt, dus de motor hoeft er niets
+       nieuws voor te kennen.
+
+       HIJ WORDT MEEGEGEVEN EN NIET OPGEHAALD, en dat is geen omweg maar de
+       enige eerlijke weg: een spelmodule krijgt bewust geen `db` (zie `spelCtx`
+       in ../../spellen.js). De wereld stempelt hem op het potje voordat de init
+       draait; staat er niets, dan begint de campagne zoals hij altijd al begon.
+
+       EN HIJ TELT NIET MEE VOOR DE VOLGENDE: `volgend` blijft op nul staan, dus
+       een geerfde stad maakt het bouwen van het EIGEN eerste project niet
+       goedkoper. Zou dat wel zo zijn, dan erft een oude stad een voorsprong, en
+       dat is precies wat een stad-van-niemand niet mag doen. */
+    const erf = (potje.stadsgeheugen || {}).gedaan || [];
+    for (const g of erf) st.foundation.gedaan.push({ id: g.id, zone: g.zone, geerfd: true });
+    st.stadsgeschiedenis = { potjes: (potje.stadsgeheugen || {}).potjes || 0, geerfd: erf.length };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
     /* AI-CONCURRENTEN. Wie er meespelen staat in de variant: de LAATSTE n
        spelers aan tafel worden door de computer gespeeld. Ze krijgen ieder een

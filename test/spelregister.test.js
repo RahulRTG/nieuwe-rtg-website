@@ -53,7 +53,7 @@ const GOUD = {
     'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
     'polis-sluiten', 'polis-opzeggen',
     'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
-    'beheer-aan', 'beheer-uit', 'beheer-regels',
+    'beheer-aan', 'beheer-uit', 'beheer-regels', 'vakantie-aan', 'vakantie-uit',
     'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
     'overname-bod', 'overname-antwoord', 'overname-intrekken',
     'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',

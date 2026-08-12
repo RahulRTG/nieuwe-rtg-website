@@ -60,6 +60,10 @@ module.exports = (ctx) => {
          daarom mag het altijd: wie halverwege een partij op vakantie gaat, moet
          dat op dat moment kunnen regelen. */
       'beheer-aan', 'beheer-uit', 'beheer-regels',
+      /* Vakantiemodus (fase C) om dezelfde reden als het beheer zelf: wie
+         halverwege een partij weg moet, hoort dat op dat moment te kunnen
+         zeggen en niet pas als hij aan de beurt is. */
+      'vakantie-aan', 'vakantie-uit',
       'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
       'overname-bod', 'overname-antwoord', 'overname-intrekken',
       /* LOONDIENST (VERHAAL.md stap 1) staat er om dezelfde reden als de

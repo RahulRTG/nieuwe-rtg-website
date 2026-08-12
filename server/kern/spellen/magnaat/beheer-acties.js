@@ -40,6 +40,41 @@ module.exports = () => {
       return { status: 200, ok: true, aan: true, kostenPerMaand: tarief(st, h),
         regels: B.regelsVan(st, h) };
     },
+    /* VAKANTIEMODUS (fase C). Hij is met opzet GEEN tweede mechaniek: hij zet
+       de manager aan en zegt het aan tafel, meer niet. Alles wat er nodig was
+       stond er al -- de manager, zijn tarief, zijn log.
+
+       WAAROM HIJ DAN BESTAAT. Omdat "ik ben weg" iets ANDERS is dan "mijn
+       manager draait". Het eerste hoort de tafel te weten: wie een contract
+       aanbiedt aan iemand die op vakantie is, weet dan dat er een regelboek
+       antwoordt en geen mens. Zonder dat verschil is de manager een verborgen
+       speler, en dat is precies wat ./beheer.js in zijn vierde wet verbiedt.
+
+       EN HIJ KOST NIETS EXTRA. Dat is de afwezigheidsgrens uit VERHAAL.md,
+       hier letterlijk: weg zijn mag niets kosten. Je betaalt het gewone
+       beheertarief omdat je een manager gebruikt -- geen vakantietoeslag, geen
+       boete, geen vervallende voortgang. */
+    'vakantie-aan'(potje, h) {
+      const st = potje.staat;
+      const b = vak(st, h);
+      b.vakantie = true;
+      b.vakantieSinds = st.maand;
+      if (!b.aan) { b.aan = true; b.sinds = st.maand; }
+      return { status: 200, ok: true, vakantie: true, aan: true,
+        kostenPerMaand: tarief(st, h),
+        uitleg: 'Je manager draait en de tafel ziet dat je weg bent. Er gaat niets verloren.' };
+    },
+    'vakantie-uit'(potje, h) {
+      const st = potje.staat;
+      const b = vak(st, h);
+      if (!b.vakantie) return { status: 409, error: 'Je stond niet op vakantie.' };
+      b.vakantie = false;
+      b.vakantieTot = st.maand;
+      /* De manager blijft draaien tot je hem zelf uitzet. Hem hier stilzetten
+         zou betekenen dat terugkomen je bedrijf plotseling onbeheerd achterlaat
+         -- en dat is een verrassing, geen dienst. */
+      return { status: 200, ok: true, vakantie: false, aan: !!b.aan };
+    },
     'beheer-uit'(potje, h) {
       const st = potje.staat;
       const b = vak(st, h);
@@ -79,6 +114,7 @@ module.exports = () => {
     const b = (st.beheer || {})[h] || {};
     return {
       aan: !!b.aan, sinds: b.sinds ?? null,
+      vakantie: !!b.vakantie, vakantieSinds: b.vakantieSinds ?? null,
       regels: B.regelsVan(st, h),
       standaard: B.STANDAARD, magLijst: B.MAGLIJST,
       kostenPerMaand: tarief(st, h),

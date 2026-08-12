@@ -568,6 +568,7 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',
       'overname-antwoord', 'overname-bod', 'overname-intrekken',
       'polis-opzeggen', 'polis-sluiten', 'solliciteren',
+      'vakantie-aan', 'vakantie-uit',
       'veiling-bod', 'veiling-intrekken', 'veiling-start', 'verkoop', 'werk-beleid']);
   for (const groot of ['open', 'uitbreiden', 'sluiten'])
     assert.equal(m.spel.buitenBeurt.includes(groot), false, groot + ' is een grote zet en hoort bij je beurt');

@@ -14,6 +14,7 @@ module.exports = (ctx) => {
   const naPotje = (p) => {
     noteerUitslag(p);
     if (ctx.noteerLoopbaan) ctx.noteerLoopbaan(p);
+    if (ctx.stadsgeheugen) ctx.stadsgeheugen.onthoud(p);
     if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p);
   };
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en

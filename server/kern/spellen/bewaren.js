@@ -48,6 +48,13 @@ module.exports = (ctx) => {
     spelStand, naamVanSpel: (soort) => ctx.SOORTEN[soort] || null
   });
 
+  /* En de STAD (fase C): wat een campagne aan de stad toevoegt blijft staan als
+     de campagne voorbij is. Hij hoort in deze rij omdat hij dezelfde vraag
+     beantwoordt -- wat blijft er staan -- maar hij staat BUITEN de 18+-poort,
+     en die uitzondering is dezelfde als die van de dagtelling: er staat geen
+     persoon in. Zie de kop van ./stadsgeheugen.js. */
+  const stadsgeheugen = require('./stadsgeheugen')({ db, save });
+
   return { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan };
+    spelPrestaties, loopbaan, stadsgeheugen };
 };

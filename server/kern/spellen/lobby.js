@@ -9,6 +9,13 @@ module.exports = (ctx) => {
   const uitnodigen = require('./uitnodigen')({ zijnVrienden, socialZoek, isGeblokkeerd, klasgenotenVan });
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
+    /* DE STAD DIE AL WAT HEEFT MEEGEMAAKT (fase C). Hij wordt op het potje
+       gestempeld VOOR de init, zodat het spel hem gewoon kan lezen -- een
+       spelmodule krijgt bewust geen `db` (zie spelCtx in ../spellen.js), dus de
+       enige eerlijke weg is dat de wereld hem meegeeft. Geen stad, geen
+       geheugen, en dan begint een campagne zoals hij altijd al begon. */
+    if (ctx.stadsgeheugen && potje.variant && potje.variant.stad)
+      potje.stadsgeheugen = ctx.stadsgeheugen.voor(potje.variant.stad);
     INITS[potje.soort](potje);
     // de eerste beurt begint nu; zonder tempo doet dit niets
     if (klok) klok.zetKlok(potje);

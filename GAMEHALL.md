@@ -1677,9 +1677,25 @@ om een afronding te verzetten. Ze blijven staan omdat ze bij een andere tabel
 wel bijten, en het staat erbij in de code — dit is een van de plekken die op
 mensen leunt.
 
-**Fase C — de permanente wereld.** Living World, vakantiemodus, overdracht,
-legacy, Magnaat Daily,
-lokale governance, de levende kaart.
+**Fase C — de permanente wereld.** *In aanbouw.* De permanente-state-grens staat
+(`VERHAAL.md`), en daarmee de eerste twee stukken: de **loopbaan** (wat er van
+een mens overblijft) en de **levende kaart** — `kern/spellen/stadsgeheugen.js`.
+
+> **De stad onthoudt, en de stad is van niemand.** Wat spelers samen aan
+> Foundation-projecten bouwden staat er de volgende campagne nog. Dat mag blijven
+> bestaan waar vermogen dat niet mag, om één reden: er zit geen persoon in.
+> Iedereen die daarna in die stad speelt begint met dezelfde kaart — de bouwer
+> net zo goed als iemand die er nooit was. Zou dat anders zijn, dan is een oude
+> speler structureel in het voordeel en is elke eerste campagne een verplichte
+> inhaalronde.
+>
+> Hij slijt op de klok van de **stad** (het aantal gespeelde campagnes) en niet
+> op de kalender, want anders verliest een stad zijn geheugen doordat er even
+> niemand speelde. En hij valt buiten de 18+-poort om precies de reden die
+> `grens.js` bij de dagtelling al opschreef: *daar staat geen persoon in.*
+
+Nog open in fase C: vakantiemodus, overdracht, legacy, Magnaat Daily en lokale
+governance.
 
 **Fase D — de rollen.** Meerdere mensen in één concern (CEO/CFO/COO), lokale
 ondernemerskringen, chat-integratie.

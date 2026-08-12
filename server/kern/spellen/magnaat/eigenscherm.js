@@ -53,6 +53,16 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       // hoeveel. Hun cash is van hen -- zie de waarschuwing in de descriptor
       anderen: potje.spelers.filter(sp => sp !== mij).map(sp => ({
         codenaam: codenaamVan(sp), vestigingen: (st.vestigingen[sp] || []).length,
+        /* OF IEMAND WEG IS, is het ENIGE dat er over een ander bijkwam -- en
+           dat is geen inbreuk op de regel hierboven maar de reden dat
+           vakantiemodus bestaat (fase C). Wie een contract aanbiedt aan iemand
+           die weg is, hoort te weten dat er een regelboek antwoordt en geen
+           mens; anders is de manager een verborgen speler.
+
+           Dat hij zijn zaken door een manager laat draaien blijft privé -- dat
+           is een keuze en geen aanwezigheid. Alleen "ik ben er even niet" is
+           publiek, en alleen omdat de speler dat zelf zegt. */
+        vakantie: !!(((st.beheer || {})[sp] || {}).vakantie),
         zaken: (st.vestigingen[sp] || []).map(v => ({
           /* WAT ER OP STRAAT STAAT, en dat is precies wat een tegenpartij nodig
              heeft om een contract voor te stellen: een naam, een sector, een

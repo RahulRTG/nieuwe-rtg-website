@@ -96,7 +96,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      bedraadt de spellenlaag en stond op de 10 kB-grens; het knelde toen de
      loopbaan erbij kwam, en dat is precies waar die grens voor is. */
   const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan } = require('./spellen/bewaren')({
+    spelPrestaties, loopbaan, stadsgeheugen } = require('./spellen/bewaren')({
     db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
     get SOORTEN() { return SOORTEN; } });
 
@@ -111,7 +111,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet,
-    noteerLoopbaan: loopbaan.noteerLoopbaan };
+    noteerLoopbaan: loopbaan.noteerLoopbaan, stadsgeheugen };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd

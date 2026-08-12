@@ -17,27 +17,27 @@
         "test/persistentiestand.test.js"
       ],
       "bewijsstuk": "db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean",
-      "grens": "de geldcommit gaat er nu doorheen en scenario 1 en 2 zijn bewezen. Scenario 3 (crash na de commit, klant retryt) staat op NIET, en de PRESTATIE is ongemeten -- stap 6 van GELDLAT.md. GELDPROVEN mag pas 3/3 heten als die twee er allebei zijn.",
+      "grens": "scenario 1, 2 en 3 zijn bewezen: de gewone weg werkt, een mislukte duurzame write geeft geen succesresponse, en een crash na de commit levert bij de retry exact een boeking. Wat ONTBREEKT is de prestatiemeting (p95/p99, event-loop, voor en na) -- stap 6 van GELDLAT.md. Een duurzaamheidsgarantie die de latentie verdubbelt is een productbeslissing.",
       "bewijssoorten": {
         "primitive": "PROVEN",
         "onder sabotage": "PROVEN",
         "poortbewijs": "HANDMATIG GEREPRODUCEERD",
         "geldcommit aangesloten": "PROVEN",
-        "scenario 3 (crash + retry)": "ONGEMETEN",
+        "scenario 3 (crash + retry)": "PROVEN",
         "prestatie p95/p99": "ONGEMETEN"
       },
       "dekking": {
-        "beproefd": 1,
+        "beproefd": 2,
         "totaal": 3,
         "eenheid": "geldscenario's met alle drie bewezen",
         "tellers": {},
-        "pct": 33.3
+        "pct": 66.7
       },
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:27.205Z",
+        "at": "2026-08-12T08:36:41.362Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -65,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:27.423Z",
+        "at": "2026-08-12T08:36:41.575Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -93,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:27.645Z",
+        "at": "2026-08-12T08:36:41.794Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:28.524Z",
+        "at": "2026-08-12T08:36:42.679Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -153,19 +153,19 @@
         "tellers": {
           "ketens": 3,
           "blindeKetens": 0,
-          "rollbackBewezen": 4,
+          "rollbackBewezen": 1,
           "ledgerGebroken": 0,
           "stilVerlies": 1,
-          "geldProven": 1,
+          "geldProven": 2,
           "geldScenarios": 3
         },
         "pct": 33.3
       },
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 29,
+        "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:28.717Z",
+        "at": "2026-08-12T08:36:42.867Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -194,7 +194,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:30.623Z",
+        "at": "2026-08-12T08:36:44.787Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -225,7 +225,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:58.634Z",
+        "at": "2026-08-12T08:37:12.628Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -258,7 +258,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:58.826Z",
+        "at": "2026-08-12T08:37:12.828Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -288,7 +288,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:50:59.009Z",
+        "at": "2026-08-12T08:37:13.013Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

@@ -315,15 +315,16 @@ const CONTROL_DUURZAAM = {
   eigenaar: 'Techniek',
   bewijs: ['test/saveduurzaam.test.js', 'test/persistentiestand.test.js'],
   bewijsstuk: 'db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean',
-  grens: 'de geldcommit gaat er nu doorheen en scenario 1 en 2 zijn bewezen. Scenario 3 ' +
-    '(crash na de commit, klant retryt) staat op NIET, en de PRESTATIE is ongemeten -- stap 6 ' +
-    'van GELDLAT.md. GELDPROVEN mag pas 3/3 heten als die twee er allebei zijn.',
+  grens: 'scenario 1, 2 en 3 zijn bewezen: de gewone weg werkt, een mislukte duurzame write ' +
+    'geeft geen succesresponse, en een crash na de commit levert bij de retry exact een boeking. ' +
+    'Wat ONTBREEKT is de prestatiemeting (p95/p99, event-loop, voor en na) -- stap 6 van ' +
+    'GELDLAT.md. Een duurzaamheidsgarantie die de latentie verdubbelt is een productbeslissing.',
   bewijssoorten: {
     primitive: 'PROVEN',
     'onder sabotage': 'PROVEN',
     poortbewijs: 'HANDMATIG GEREPRODUCEERD',
     'geldcommit aangesloten': 'PROVEN',
-    'scenario 3 (crash + retry)': 'ONGEMETEN',
+    'scenario 3 (crash + retry)': 'PROVEN',
     'prestatie p95/p99': 'ONGEMETEN'
   },
   dekking: { register: 'KETENS.json', beproefd: 'gemeten.geldProven',

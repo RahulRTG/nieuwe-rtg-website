@@ -54,7 +54,20 @@ function beoordeel({ schoon, met, verraadSloegToe, herhaalbaar }) {
   /* CLIENT-ANTWOORD. 2xx is OK, al het andere FAIL. Een verzoek dat helemaal
      niet aankwam (de server lag) telt ook als FAIL: de aanroeper kreeg geen
      bevestiging, en dat is wat er voor hem toe doet. */
-  const clientAntwoord = (m.schrijfStatus >= 200 && m.schrijfStatus < 300) ? 'OK' : 'FAIL';
+  /* DRIE STANDEN, EN DE DERDE IS ER GEKOMEN DOOR SCENARIO 3.
+
+     Eerst waren het er twee: OK of FAIL. Maar een crash vóór de response geeft
+     geen antwoord, en dat is iets anders dan een weigering. Het verschil is bij
+     geld het hele verschil: bij een WEIGERING hoort er niets te blijven staan
+     (anders is het "geweigerd en toch geboekt"), bij GEEN ANTWOORD hoort de
+     duurzame boeking juist wél te blijven staan -- de klant weet alleen niet dat
+     het gelukt is, en dáárvoor bestaat de idempotentiesleutel.
+
+     Zonder deze derde stand meldde de proef een geslaagd scenario 3 als een
+     fout, en dat is de vervelendste soort: hij zou iemand ertoe brengen correct
+     gedrag te "repareren". */
+  const clientAntwoord = (m.schrijfStatus >= 200 && m.schrijfStatus < 300) ? 'OK'
+    : (m.schrijfStatus === 0 || m.schrijfStatus == null) ? 'GEEN ANTWOORD' : 'FAIL';
 
   /* TOESTANDWIJZIGING. Drie standen, en het verschil tussen de eerste twee is
      niet cosmetisch: GEEN betekent dat er nooit iets is gebeurd, TERUGGEDRAAID
@@ -77,6 +90,9 @@ function beoordeel({ schoon, met, verraadSloegToe, herhaalbaar }) {
      PROVEN dus betekenisloos -- dan staat er NVT en niet stilzwijgend PROVEN. */
   let rollback;
   if (clientAntwoord === 'OK') rollback = 'NVT';
+  /* Bij GEEN ANTWOORD valt er niets terug te draaien: het systeem heeft niets
+     beloofd en niets geweigerd. Dan telt de retry, niet de rollback. */
+  else if (clientAntwoord === 'GEEN ANTWOORD') rollback = 'NVT';
   else if (toestandWijziging === BLIJVEND) rollback = 'NIET';
   else rollback = 'PROVEN';
 
@@ -164,6 +180,18 @@ function financieelOordeel(o) {
   }
   if (o.clientAntwoord === 'FAIL' && o.toestandWijziging === BLIJVEND) {
     return { staat: 'NIET', reden: 'geweigerd en toch blijvend geboekt' };
+  }
+  /* SCENARIO 3. Geen antwoord, duurzaam geboekt, en de herhaling boekt niet nog
+     eens -- dat is precies goed, en het is de zwaarste van de drie. */
+  if (o.clientAntwoord === 'GEEN ANTWOORD') {
+    if (o.toestandWijziging !== BLIJVEND) {
+      return { staat: 'NIET', reden: 'het proces stierf na de commit en de boeking is toch weg' };
+    }
+    if (o.retryVeilig !== JA) {
+      return { staat: 'NIET', reden: 'de klant kreeg geen antwoord en de herhaling boekt een tweede keer' };
+    }
+    return { staat: 'PROVEN',
+      reden: 'geen antwoord, duurzaam geboekt, en de herhaling boekt niet nog eens' };
   }
   if (o.retryVeilig === 'NEE') {
     return { staat: 'NIET', reden: 'een herhaling boekt een tweede keer' };

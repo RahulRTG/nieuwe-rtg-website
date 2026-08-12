@@ -99,7 +99,7 @@ const IDENTITEIT = {
 
 const KETENS = {
   async GELD(basis, tok, merk) {
-    const idem = 'ketenproef-' + merk;
+    const idem = 'ketenproef-' + merk;   // etappe 2 herhaalt met DEZELFDE sleutel
     const op = await post(basis, '/api/pay/oplaad', { centen: 1234, idem }, tok);
     const na = await post(basis, '/api/pay/overzicht', {}, tok);
     const saldoNa = na.data && na.data.saldo;
@@ -198,7 +198,23 @@ async function draai(keten, verraadAan) {
     if (tok2) {
       if (keten === 'GELD') {
         const ov = await post(twee.basis, '/api/pay/overzicht', {}, tok2);
-        w.blijftNaHerstart = typeof (ov.data && ov.data.saldo) === 'number' && ov.data.saldo >= 1234;
+        const saldoNa = (ov.data && ov.data.saldo);
+        w.blijftNaHerstart = typeof saldoNa === 'number' && saldoNa >= 1234;
+
+        /* SCENARIO 3. De klant heeft geen antwoord gekregen (het proces stierf)
+           en probeert het opnieuw -- met dezelfde idem-sleutel, want dat is wat
+           een client doet. Er hoort dan EXACT EEN economische mutatie te staan:
+           herkent RTG de herhaling niet, dan is lost-write opgelost en
+           double-write gebouwd. Zie GELDLAT.md.
+
+           Na de herstart, want alleen daar is de eerste opdracht duurzaam en de
+           in-geheugen-toestand weg -- precies de situatie van de klant. */
+        await post(twee.basis, '/api/pay/oplaad', { centen: 1234, idem: 'ketenproef-' + merk }, tok2);
+        const naRetry = await post(twee.basis, '/api/pay/overzicht', {}, tok2);
+        const saldoRetry = (naRetry.data && naRetry.data.saldo);
+        w.retryNaHerstartDubbel = typeof saldoNa === 'number' && typeof saldoRetry === 'number'
+          ? saldoRetry > saldoNa : null;
+
         const g = await haal(twee.basis, '/api/pay/gezond');
         w.ledgerKlopt = g.status === 200 && g.data.klopt === true;
       } else if (keten === 'TOESTEMMING') {

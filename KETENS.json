@@ -5,11 +5,11 @@
     "ketens": 3,
     "scenarios": 9,
     "voldoetAanLat": 3,
-    "rollbackBewezen": 4,
+    "rollbackBewezen": 1,
     "ledgerGebroken": 0,
     "stilVerlies": 1,
     "geldScenarios": 3,
-    "geldProven": 1,
+    "geldProven": 2,
     "blindeKetens": 0
   },
   "scenarios": [
@@ -27,6 +27,7 @@
       "herhaalbaar": "JA",
       "afwijkingen": [
         "blijftNaHerstart: true -> false",
+        "retryNaHerstartDubbel: false -> true",
         "schrijfStatus: 200 -> 500"
       ],
       "lat": {
@@ -46,7 +47,8 @@
         "auditSpoor": true,
         "retryGafTweedeEffect": false,
         "startteOp": true,
-        "identiteitLukte": true
+        "identiteitLukte": true,
+        "retryNaHerstartDubbel": true
       }
     },
     {
@@ -54,12 +56,12 @@
       "verraad": "schrijf-faalt",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "FAIL",
+      "clientAntwoord": "GEEN ANTWOORD",
       "toestandWijziging": "GEEN",
       "ledgerInvariant": "ONGEMETEN",
       "audit": "ONGEMETEN",
       "retryVeilig": "ONGEMETEN",
-      "rollback": "PROVEN",
+      "rollback": "NVT",
       "herhaalbaar": "JA",
       "afwijkingen": [
         "auditSpoor: true -> null",
@@ -67,6 +69,7 @@
         "identiteitLukte: true -> undefined",
         "ledgerKlopt: true -> null",
         "retryGafTweedeEffect: false -> null",
+        "retryNaHerstartDubbel: false -> undefined",
         "schrijfStatus: 200 -> null",
         "startteOp: true -> false",
         "zichtbaarVoorHerstart: true -> null"
@@ -97,12 +100,12 @@
       "verraad": "sterf-na-commit",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "FAIL",
+      "clientAntwoord": "GEEN ANTWOORD",
       "toestandWijziging": "BLIJVEND",
       "ledgerInvariant": "GELDIG",
       "audit": "AFWEZIG",
       "retryVeilig": "JA",
-      "rollback": "NIET",
+      "rollback": "NVT",
       "herhaalbaar": "JA",
       "afwijkingen": [
         "auditSpoor: true -> false",
@@ -115,8 +118,8 @@
       },
       "stilVerlies": false,
       "financieel": {
-        "staat": "NIET",
-        "reden": "geweigerd en toch blijvend geboekt"
+        "staat": "PROVEN",
+        "reden": "geen antwoord, duurzaam geboekt, en de herhaling boekt niet nog eens"
       },
       "ruw": {
         "schrijfStatus": 0,
@@ -126,7 +129,8 @@
         "auditSpoor": false,
         "retryGafTweedeEffect": false,
         "startteOp": true,
-        "identiteitLukte": true
+        "identiteitLukte": true,
+        "retryNaHerstartDubbel": false
       }
     },
     {
@@ -166,12 +170,12 @@
       "verraad": "schrijf-faalt",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "FAIL",
+      "clientAntwoord": "GEEN ANTWOORD",
       "toestandWijziging": "GEEN",
       "ledgerInvariant": "ONGEMETEN",
       "audit": "ONGEMETEN",
       "retryVeilig": "ONGEMETEN",
-      "rollback": "PROVEN",
+      "rollback": "NVT",
       "herhaalbaar": "JA",
       "afwijkingen": [
         "auditSpoor: true -> null",
@@ -269,12 +273,12 @@
       "verraad": "schrijf-faalt",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "FAIL",
+      "clientAntwoord": "GEEN ANTWOORD",
       "toestandWijziging": "GEEN",
       "ledgerInvariant": "ONGEMETEN",
       "audit": "ONGEMETEN",
       "retryVeilig": "ONGEMETEN",
-      "rollback": "PROVEN",
+      "rollback": "NVT",
       "herhaalbaar": "JA",
       "afwijkingen": [
         "auditSpoor: true -> null",

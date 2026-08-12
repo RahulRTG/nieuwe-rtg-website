@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 929 bestanden en 6137 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 929 bestanden en 6141 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 929 |
-| losse beweringen (`test(...)`) | 6137 |
+| losse beweringen (`test(...)`) | 6141 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 623 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-809 bestanden, 5933 beweringen.
+809 bestanden, 5937 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -313,7 +313,7 @@ toets omvalt.
 | `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
 | `keten.test.js` | 30 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |
 | `ketenchat.test.js` | 5 | gezakt op `liegpoort /api/` | De ketenchat en de interne noodknop: korpsen verbinden eenmalig en delen daarna EEN ketenkanaal; besloten deelgroepen zijn alleen voor de leden en de meldkamer-chefs van de betrokken korpsen kijken mee (lezen, niet... |
-| `ketenproef.test.js` | 29 | gezakt op `===->!==#0` | DE KETENPROEF (scripts/lib/ketenproef.js) -- de acht velden en de zevenstappenlat. WAAROM DIT LOS GETOETST WORDT. |
+| `ketenproef.test.js` | 33 | gezakt op `===->!==#0` | DE KETENPROEF (scripts/lib/ketenproef.js) -- de acht velden en de zevenstappenlat. WAAROM DIT LOS GETOETST WORDT. |
 | `keuken.test.js` | 17 | gezakt op `liegpoort /api/` | Het keukenbrein (toren horeca): recepten per gerecht, automatische voorraad-afboeking bij de kassabon EN de betaalde gastbestelling, telling, verspilling, levering (met nieuwe kostprijs), het inkoopadvies en de marge... |
 | `keuring.test.js` | 8 | gezakt op `===->!==#0` | De Keuring keurt het systeem; deze test keurt de Keuring. Een oordeelsscript dat vals alarm slaat wordt genegeerd, en een script dat niets meer vindt wordt overbodig. |
 | `kijken.test.js` | 2 | gezakt op `===->!==#0` | Rahul kijkt mee: een foto van iets, en hij zegt wat het is. Het gaat hier vooral om de poort ervoor. |

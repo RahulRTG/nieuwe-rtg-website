@@ -77,11 +77,38 @@ test('rollback is NVT bij een geslaagd antwoord -- daar valt niets terug te draa
 
 /* ---------- client-antwoord ---------- */
 
-test('een verzoek dat niet aankwam telt als FAIL', () => {
-  /* Status 0: de server lag. Voor de aanroeper is dat geen bevestiging, en dat
-     is wat telt. */
-  assert.equal(oordeel({ schrijfStatus: 0 }).clientAntwoord, 'FAIL');
-  assert.equal(oordeel({ schrijfStatus: null }).clientAntwoord, 'FAIL');
+test('geen antwoord is iets anders dan een weigering', () => {
+  /* Scenario 3 dwong deze derde stand af. Bij een WEIGERING hoort er niets te
+     blijven staan; bij GEEN ANTWOORD hoort de duurzame boeking juist wel te
+     blijven -- de klant weet alleen niet dat het gelukt is, en daarvoor bestaat
+     de idempotentiesleutel. Ze op een hoop gooien meldt correct gedrag als een
+     fout, en dat brengt iemand ertoe het te "repareren". */
+  assert.equal(oordeel({ schrijfStatus: 0 }).clientAntwoord, 'GEEN ANTWOORD');
+  assert.equal(oordeel({ schrijfStatus: null }).clientAntwoord, 'GEEN ANTWOORD');
+  assert.equal(oordeel({ schrijfStatus: 503 }).clientAntwoord, 'FAIL');
+});
+
+test('bij geen antwoord valt er niets terug te draaien', () => {
+  assert.equal(oordeel({ schrijfStatus: 0 }).rollback, 'NVT');
+});
+
+test('SCENARIO 3: geen antwoord, duurzaam geboekt, retry boekt niet nog eens = PROVEN', () => {
+  const uit = financieelOordeel(oordeel({ schrijfStatus: 0, retryGafTweedeEffect: false }));
+  assert.equal(uit.staat, 'PROVEN');
+  assert.match(uit.reden, /niet nog eens/);
+});
+
+test('SCENARIO 3 faalt als de herhaling wel een tweede keer boekt', () => {
+  const uit = financieelOordeel(oordeel({ schrijfStatus: 0, retryGafTweedeEffect: true }));
+  assert.equal(uit.staat, 'NIET');
+  assert.match(uit.reden, /tweede keer/);
+});
+
+test('SCENARIO 3 faalt als de boeking na de crash toch weg is', () => {
+  const uit = financieelOordeel(oordeel({ schrijfStatus: 0, blijftNaHerstart: false,
+    retryGafTweedeEffect: false }));
+  assert.equal(uit.staat, 'NIET');
+  assert.match(uit.reden, /toch weg/);
 });
 
 test('204 telt als OK', () => {

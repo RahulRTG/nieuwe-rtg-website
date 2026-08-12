@@ -663,6 +663,10 @@
       "gezakt": 1,
       "geprobeerd": 26
     },
+    "canvas.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "care.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1132,6 +1136,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "geldwereld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/geldwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "geloofbieb.test.js": {
       "soort": "server",
@@ -1723,6 +1735,21 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "levenbandroutes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "levensbeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/levensbeleid/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "levensloop.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2207,6 +2234,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "objectlaag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/objectlaag/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "objectlaagroutes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
       "scherp": "gezakt"
     },
     "ochtend.test.js": {
@@ -2943,6 +2985,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reiswereld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reiswereld.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "reiswijzer.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3509,6 +3559,46 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "socialebeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/socialebeleid/index.js",
+      "operator": "false->true#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "socialecommand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/socialecommand/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
+    "socialegraaf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/socialegraaf/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "socialelijn.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/socialegraaf/lijn.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "socialewereld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/socialewereld.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "societeit.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3522,6 +3612,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "spelbeleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 8,
+      "geprobeerd": 4
     },
     "spelkijken.test.js": {
       "soort": "puur",
@@ -3701,6 +3799,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "stijlbundel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/stijlbundel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "streng-poorten.test.js": {
       "soort": "server",
@@ -4310,6 +4416,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "wereldkern.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wereldkern.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "wereldlaag.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4474,6 +4588,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "wetten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wetboek.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "wiring-contract.test.js": {
       "soort": "puur",

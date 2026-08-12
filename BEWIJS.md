@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 936 bestanden en 6287 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 937 bestanden en 6297 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 936 |
-| losse beweringen (`test(...)`) | 6287 |
+| toetsbestanden | 937 |
+| losse beweringen (`test(...)`) | 6297 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 199 |
+| niets van beide | 200 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-816 bestanden, 6072 beweringen.
+817 bestanden, 6082 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -690,6 +690,7 @@ toets omvalt.
 | `spelsudoku.test.js` | 20 | gezakt op `liegpoort /api/` | Sudoku: het eerste arcadespel waarvan de score NIET uit de client komt. Bij Sneek en Tetris rekent de browser de punten uit en stuurt een getal op; de server kan daar niets van narekenen en kapt hem alleen af op de... |
 | `spelteams.test.js` | 19 | gezakt op `liegpoort /api/` | Teams: een vaste club om mee te spelen. Iedereen mag er een maken. |
 | `speltelling.test.js` | 9 | gezakt op `liegpoort /api/` | Telemetrie van de spellen: geaggregeerd, zonder personen. Deze toets bewaakt vooral wat er NIET in mag staan. |
+| `speltijdlijn.test.js` | 10 | -- | MAGNAAT: DE TIJDLIJN -- waar de tafel het over heeft. Fase D, `chat-integratie`. |
 | `speltoernooi.test.js` | 14 | gezakt op `return-weg#0` | Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. De keuze die het meeste uitlegt: een toernooi valt NIET onder de progressiegrens. |
 | `speluitslagen.test.js` | 25 | gezakt op `===->!==#0` | Uitslagen die een potje overleven -- de bron onder winrate, niveaus en toernooien, die er tot nu toe niet was (een klaar potje werd na 24 uur weggegooid). De regel die het meeste werk doet: de progressiegrens geldt... |
 | `speluitstap.test.js` | 21 | -- | MAGNAAT: UITSTAPPEN -- iemand stopt, en de campagne gaat door. Fase C, de overdracht. |

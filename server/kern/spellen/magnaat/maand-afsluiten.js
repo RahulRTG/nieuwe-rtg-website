@@ -39,7 +39,7 @@ module.exports = ({ wikkelAf, kiesProject }) => {
        ./foundation.js omdat het een vraag aan de PARTIJ is (wie doet er nog
        mee) en niet aan de Foundation. Stemde niemand, dan geeft hij null en
        bouwt de vaste volgorde af zoals hij altijd deed. */
-    const projecten = F.bouw(st.foundation, k, perZone, kiesProject ? () => kiesProject(potje) : null);
+    const projecten = F.bouw(st.foundation, k, perZone, kiesProject ? () => kiesProject(potje) : null, st.maand);
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,

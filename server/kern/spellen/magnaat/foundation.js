@@ -81,7 +81,7 @@ function draagAf(f, omzet) {
    `volgend` blijft de vaste volgorde bijhouden en wordt bij een gekozen project
    DOORGESCHOVEN over alles wat al gebouwd is. Zou hij blijven staan, dan bouwt
    de vaste volgorde later hetzelfde project nog een keer. */
-function bouw(f, kaart, perZone, kies) {
+function bouw(f, kaart, perZone, kies, maand) {
   const klaar = [];
   const gebouwd = (id) => f.gedaan.some(g => g.id === id);
   const volgende = () => {
@@ -108,7 +108,10 @@ function bouw(f, kaart, perZone, kies) {
         if (n > meeste) { meeste = n; zone = z.id; }
       }
     }
-    f.gedaan.push({ id: p.id, zone });
+    /* MET DE MAAND ERBIJ. Zonder datum is een project geen gebeurtenis maar een
+       feit, en dan is het niet op een tijdlijn te zetten (./tijdlijn.js). Oudere
+       partijen hebben hem niet; die regel gaat daar vooraan. */
+    f.gedaan.push(maand === undefined ? { id: p.id, zone } : { id: p.id, zone, maand });
     while (f.volgend < PROJECTEN.length && gebouwd(PROJECTEN[f.volgend].id)) f.volgend++;
     klaar.push({ id: p.id, naam: p.naam, tekst: p.tekst, zone, gekozen: !!beurt.gekozen });
   }

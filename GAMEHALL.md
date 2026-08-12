@@ -1776,7 +1776,23 @@ Daarna kwam de **lokale ondernemerskring**
 > Hier staat wél een persoon in, en dat is het verschil met het stadsgeheugen:
 > de **18+-poort geldt**, per persoon. Het bord slijt op de klok van de stad.
 
-Nog open in fase D: chat-integratie.
+En de **chat-integratie**, `kern/spellen/magnaat/tijdlijn.js` — waarmee fase D
+staat.
+
+> **Hij stuurt niets.** Een spellaag die zelf gaat sturen kan een mens buiten
+> het spel om bereiken, en dan is "mag dit bericht" op twee plekken beantwoord.
+> Deze module schrijft nergens: geen bericht, geen sein, geen duwtje, geen push.
+> Hij rekent uit wat de tafel gedeeld heeft meegemaakt — wat de Foundation
+> bouwde, wie er stopte en aan wie — en de client zet dat naast het gesprek dat
+> er al is. Praten loopt onveranderd langs `praat.js`, met de regel die
+> daarboven staat: een potje geeft geen nieuw recht om iemand te bereiken.
+>
+> Er staat alleen in wat al publiek is. Geen kas, geen omzet, geen vermogen,
+> en geen contract tussen twee anderen — dat zijn iemands boeken. En hij wordt
+> **gerekend en niet bewaard**, dus mist niemand een regel doordat hij weg was.
+> Het wereldnieuws staat er bewust níét in: `nieuws.js` rekent dat per maand uit
+> een hash op de partij-id, en een tweede voorraad naast een deterministische
+> som is een tweede waarheid.
 
 Elke fase is speelbaar zonder de volgende. Dat is de eis: een half aangezette
 economie is gevaarlijker dan een afwezige, want dan gaat iemand er echt in

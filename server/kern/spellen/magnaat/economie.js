@@ -124,7 +124,7 @@ module.exports = (ctx) => {
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
      er afgerekend) dat los staat van de klok hierboven. */
-  const { zicht, zichtRuw, publiek, eindstand } = require('./weergave')(Object.assign({
+  const { zicht, zichtRuw, publiek, eindstand, tijdlijn } = require('./weergave')(Object.assign({
     K, codenaamVan, rond, bijrekenen,
     dienstbeeld: (st, h) => dienen.beeld(st, h, codenaamVan),
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
@@ -177,7 +177,7 @@ module.exports = (ctx) => {
   const uitstapvoorstel = (potje, h, naar) => L.uitstap.voorstel(potje.staat, h, naar || null);
   const stembeeld = (potje, h) => G.beeld(potje, h, L.uitstap.speeltNog);
 
-  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, uitstapvoorstel, stembeeld,
+  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, uitstapvoorstel, stembeeld, tijdlijn,
     DUUR, MAAND_MS, START_GELD,
     SECTORLIJST, STEDENLIJST, stadNaam, kaartVan: (s) => kaart(s) };
 };

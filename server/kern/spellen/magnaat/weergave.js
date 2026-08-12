@@ -118,5 +118,11 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       foundation: st.foundation.gedaan.length };
   }
 
-  return { zicht, zichtRuw, publiek, eindstand };
+  /* DE TIJDLIJN (fase D, ./tijdlijn.js): wat de tafel gedeeld heeft meegemaakt.
+     Hij hoort HIER omdat het een weergave is en niets anders -- hij stuurt
+     niets, schrijft niets en maakt geen gesprek. Lees daar waarom dat een
+     besluit is en geen toevalligheid. */
+  const tijdlijn = require('./tijdlijn')({ codenaamVan });
+
+  return { zicht, zichtRuw, publiek, eindstand, tijdlijn };
 };

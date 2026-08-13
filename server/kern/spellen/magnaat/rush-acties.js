@@ -25,38 +25,9 @@
 
 const R = require('./rush');
 const D = require('./dienst');
-const KETEN = require('./storing-keten');
+const OVER = require('./overdracht');
+const { watIkWeet, overTeDragen } = require('./rush-weten');
 const { vind } = require('./rush-maand');
-
-/* WAT ER IS GEBEURD TERWIJL JIJ ER NIET WAS -- de overdracht.
-
-   Dit is de andere kant van punt 2 uit VERHAAL.md par. 0f. Die zei: als jij om
-   tien uur iets laat liggen, begint de ochtendploeg niet in een schone wereld.
-   Waar is dat en het werkte al -- maar het werkte STIL. Je erfde de feitelijke
-   toestand (de koeling staat nog open) zonder ooit te horen dat er iemand een
-   besluit over had genomen.
-
-   Nu wel: wat er sinds je vorige dienst bij deze zaak besloten is, en niet door
-   jou. Zo praat de organisatie via haar handelingen -- de vakkracht meldde,
-   de eigenaar liet repareren, en de volgende ploeg leest dat terug zonder dat er
-   een bericht is verstuurd.
-
-   HET IS EEN MEDEDELING EN GEEN TAAK. Er staat geen knop bij, er verandert geen
-   getal, en wie hem niet leest is niets kwijt. Zou hij een lijstje worden dat
-   je moet afvinken, dan is het geen overdracht maar werk. */
-const OVERDRACHT_MAX = 4;
-
-function overdracht(d, v, h, naam) {
-  const gehad = d.diensten || [];
-  /* SINDS JE VORIGE DIENST, en bij je eerste sinds je aantreden. Anders krijgt
-     iemand op zijn eerste avond de hele geschiedenis van de zaak te lezen als
-     nieuws, terwijl hij er toen niet was. */
-  const vorige = gehad.length ? Math.max(...gehad.map(x => x.maand)) : (d.sinds || 0);
-  return KETEN.sinds(v, vorige, h).slice(-OVERDRACHT_MAX).map(f => Object.assign(
-    { maand: f.maand, wie: naam(f.wie), rol: (D.ROLLEN[f.rol] || {}).naam || f.rol,
-      deed: f.deed },
-    f.spoed ? { spoed: f.spoed } : {}));
-}
 
 /* `codenaamVan` REIST MEE MET DE MODULE en niet alleen met het werkbeeld. De
    overdracht draagt namen van andere mensen, en de actie `rush` is net zo goed
@@ -128,9 +99,12 @@ module.exports = ({ codenaamVan } = {}) => {
       id: d.id, zaak: v.naam, rol: (D.ROLLEN[d.rol] || {}).naam,
       maand: st.maand, moment: Math.min(s.slot + 1, R.SLOTS), momenten: R.SLOTS,
       klaar: s.klaar,
-      /* WAT ER IS GEBEURD TERWIJL JIJ ER NIET WAS. Bovenaan de dienst, want het
-         is de context waarin je avond begint -- niet een voetnoot eronder. */
-      overdracht: overdracht(d, v, h, naam),
+      /* WAT JE WEET ALS JE BINNENKOMT. Bovenaan de dienst, want het is de
+         context waarin je avond begint -- niet een voetnoot eronder. */
+      weet: watIkWeet(d, v, h, naam),
+      /* EN WAT JIJ ZELF NOG DOOR TE GEVEN HEBT. Kost een moment van je dienst,
+         precies wat een voorval oppakken kost -- zie ./overdracht.js. */
+      overTeDragen: s.klaar ? [] : overTeDragen(v, s),
       open: s.klaar ? [] : openstaand(vv, s, s.slot).map(x => ({
         id: x.id, wat: x.wat,
         /* WAT HET NU AL GEKOST HEEFT en wat het per moment nog kost. Geen
@@ -178,6 +152,32 @@ module.exports = ({ codenaamVan } = {}) => {
         if (!optie) return { status: 400, error: 'Dat kun jij hier niet doen.' };
       }
       s.gedaan.push({ id: wat.id, slot: s.slot, optie: optie ? optie.id : null });
+      s.slot++;
+      verzet(vv, s);
+      return beeld(potje, h);
+    },
+
+    /* HET DOORGEVEN. Een moment, net als oppakken -- en dat is de hele
+       economie ervan: dit moment is een bestelling die blijft staan, en die
+       kost NU geld terwijl de overdracht pas volgende maand iets bespaart.
+       Precies waarom er in het echt zo slecht wordt overgedragen.
+
+       ER KOMT GEEN TEKSTVELD. Wat er wordt doorgegeven zijn feiten die de dienst
+       al kent: wat je deed en welke stand je achterlaat. De KEUZE is of je het
+       doorgeeft; de inhoud is geen schrijfwerk. Zie ./overdracht.js. */
+    'rush-overdragen'(potje, h) {
+      const st = potje.staat;
+      const mijn = mijnDienst(st, h);
+      if (mijn.error) return { status: 409, error: mijn.error };
+      const { d, v } = mijn;
+      const vv = R.bouw(potje.id, d, st.maand, d.rol, v);
+      const s = verzet(vv, staat(st, d, v));
+      if (s.klaar) return { status: 409, error: 'Je dienst zit erop.' };
+      const bij = overTeDragen(v, s);
+      if (!bij.length) return { status: 409, error: 'Er valt nu niets door te geven.' };
+      for (const x of bij)
+        OVER.noteer(v, { maand: st.maand, soort: x.soort, wie: h, rol: d.rol,
+          staat: x.staat, deed: x.deed });
       s.slot++;
       verzet(vv, s);
       return beeld(potje, h);

@@ -85,7 +85,7 @@ module.exports = (ctx) => {
       /* DE DIENST (VERHAAL.md par. 0f). Vrij, en scherper dan de rest van deze
          lijst: een avond op de werkvloer die op je beurt moet wachten is geen
          avond meer. Zie ./rush-acties.js. */
-      'rush', 'rush-pak',
+      'rush', 'rush-pak', 'rush-overdragen',
       /* EEN STORING VERHELPEN wacht al helemaal niet op je beurt: een koeling
          die stuk is, is nu stuk. Zie ./storing-acties.js. */
       'storing-verhelpen',

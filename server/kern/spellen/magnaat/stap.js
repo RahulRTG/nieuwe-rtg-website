@@ -35,6 +35,7 @@ const O = require('./onderzoek');
    staat hier tussen de andere eigenschappen van de vestiging omdat het er een
    IS -- geen spellaag maar een feit over het bedrijf, zoals `v.onderhoud`. */
 const STORING = require('./storing');
+const OVER = require('./overdracht');
 /* HOEVEEL EEN ZAAK AANKAN EN HOE GOED HET GAAT staat in ./maat.js -- waar over
    de vestiging zelf, los van de kalender. Dit bestand rekent een MAAND. */
 const { capaciteit, personeelNodig, levering, kwaliteit, onderhoudsnorm } = require('./maat');
@@ -62,9 +63,11 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
      contract gratis geld en tekent iedereen alles. Zie ./handel.js. */
   const toegezegd = (contract && contract.eenheden) || 0;
   /* WAT ER STUK IS werkt op drie posten die er al waren: wat je aankan, wat er
-     bederft, en wat het pand kost. Een zaak zonder storingen krijgt overal 1 en
-     rekent dus tot op de cent zoals voordat deze laag bestond. */
+     bederft, en wat het pand kost. Een zaak zonder storingen krijgt overal 1.
+     En wat er ZONDER UITLEG staat kost arbeidstijd op diezelfde post `vast`
+     (./overdracht.js). */
   const stuk = STORING.effect(v);
+  const onwetend = OVER.effect(v, STORING.openstaand(v));
   const { cap: capVol, geleverd, deel: leverDeel } = levering(v, arbeid, toegezegd);
   /* CAPACITEIT UIT BEDRIJF. Hij grijpt NA `levering()` aan en niet ervoor, want
      een contract dat je getekend hebt gaat nog steeds voor -- je hebt minder,
@@ -102,7 +105,7 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
   const inkoop = inkoopBruto - dervingBasis;
   const lonen = v.personeel * s.loon;
   // en een duurder pand per eenheid; hetzelfde getal, dezelfde reden
-  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v, 'vast') * stuk.vast;
+  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v, 'vast') * stuk.vast * onwetend.vast;
   const huur = v.huur;
   const marketing = v.marketing || 0;
   /* Onderhoud is een BEDRAG dat de speler kiest, geen vinkje. Wat het oplevert

@@ -31,6 +31,7 @@ const assert = require('node:assert/strict');
 
 const KETEN = require('../server/kern/spellen/magnaat/storing-keten');
 const STORING = require('../server/kern/spellen/magnaat/storing');
+const OVER = require('../server/kern/spellen/magnaat/overdracht');
 const { SOORTEN } = require('../server/kern/spellen/magnaat/rush-voorvallen');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 
@@ -71,17 +72,24 @@ function opstelling(id = 'k1', rol = 'vakkracht') {
    gespeeld (wet 4, test/spelrush.test.js), dus wordt er ook niets van geboekt.
    Wie hem hier weglaat toetst een keten die per definitie leeg blijft -- en dat
    is precies waar deze toets de eerste keer op zakte. */
-function koelstoringMet(o, hoe) {
+function koelstoringMet(o, hoe, geefDoor) {
   STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
-  let r = o.kijk(), gedaan = false;
+  let r = o.kijk(), gedaan = false, over = false;
   for (let i = 0; i < R_SLOTS + 2 && r.dienst && !r.dienst.klaar; i++) {
+    /* DOORGEVEN MOET TIJDENS DE DIENST, want daarna is er geen moment meer om
+       aan te besteden -- en dat is precies wat het kost. */
+    if (geefDoor && !over && (r.dienst.overTeDragen || []).length) {
+      over = true;
+      r = o.m.eco.zet(o.p, 'boris', { actie: 'rush-overdragen' });
+      continue;
+    }
     const open = r.dienst.open || [];
     if (!open.length) break;
     const k = open.find(x => x.id === 'koeling');
     if (k && !gedaan) { gedaan = true; r = o.pak('koeling', hoe); continue; }
     r = o.pak(open[0].id);
   }
-  return gedaan;
+  return geefDoor ? (gedaan && over) : gedaan;
 }
 const R_SLOTS = require('../server/kern/spellen/magnaat/rush').SLOTS;
 
@@ -133,27 +141,76 @@ test('op het zaakscherm staat wie de storing meldde', () => {
   assert.match(st.keten[0].deed, /gemeld/);
 });
 
-/* ============ 4. de volgende dienst leest wat er besloten is ============ */
+/* ============ 4. de vloer leest de audit NIET ============ */
 
-test('de volgende dienst leest wat de zaak besloot -- en niet zijn eigen besluit', () => {
+test('de vloer krijgt de auditlog niet te zien', () => {
+  /* DIT WAS EEN LEK, en de eerste versie van deze toets bevestigde het nog ook:
+     de strook "sinds je vorige dienst" las rechtstreeks uit ./storing-keten.js,
+     dus een vakkracht kreeg de codenaam van zijn eigenaar EN het bedrag van de
+     maandrekening te zien.
+
+     Twee dingen tegelijk fout. Een werknemer heeft niets te maken met wat zijn
+     werkgever uitgaf; en als iedereen de audit kan lezen, verdwijnt alle
+     menselijke frictie en is iedereen alwetend -- precies wat ./overdracht.js
+     uitsluit. Wat de vloer wel krijgt: wat hij ZIET, en wat aan hem is
+     OVERGEDRAGEN. */
   const o = opstelling('k-d');
   assert.ok(koelstoringMet(o, 'escaleren'));
   o.maand(1);
-  /* Anna beslist: een monteur. Dat kost geld en dat is precies waarom het
-     besluit bij haar ligt en niet op de vloer. */
   const r = o.verhelp('repareren');
   assert.equal(r.ok, true, JSON.stringify(r));
   o.maand(1);
   const d = o.kijk().dienst;
-  const namen = (d.overdracht || []).map(x => x.wie);
-  assert.ok(namen.includes('CN-anna'), 'het besluit van de eigenaar hoort in de overdracht: '
-    + JSON.stringify(d.overdracht));
-  assert.equal(namen.includes('CN-boris'), false,
-    'je eigen melding terugkrijgen is geen overdracht maar een echo');
-  const mijne = (d.overdracht || []).find(x => x.wie === 'CN-anna');
-  assert.match(mijne.deed, /gerepareerd|repareren/);
-  assert.equal(mijne.rol, 'eigenaar');
-  assert.ok(mijne.spoed > 0, 'en wat het werkelijk kostte staat erbij, achteraf');
+  const alles = JSON.stringify(d);
+  assert.equal(alles.includes('CN-anna'), false,
+    'de naam van de eigenaar hoort niet op de werkvloer te staan: ' + alles);
+  assert.equal(/1250|spoed/.test(alles), false,
+    'en het bedrag van de maandrekening al helemaal niet: ' + alles);
+  /* De eigenaar ziet hem WEL -- de audit blijft waar hij hoort. */
+  const zaken = o.zaakscherm().vestigingen[0];
+  assert.ok(JSON.stringify(zaken).includes('CN-boris') || !(zaken.storingen || []).length,
+    'op het zaakscherm blijft de keten gewoon staan');
+});
+
+test('wat de vloer wel ziet is de STAND, zonder naam en zonder bedrag', () => {
+  const o = opstelling('k-d2');
+  assert.ok(koelstoringMet(o, 'escaleren'));
+  o.maand(1);
+  /* Anna zet een noodkoeling neer op haar zaakscherm en zegt er niets bij.
+     Boris komt de maand daarna terug: de stand is anders dan hij hem achterliet,
+     en dat is wat hij met eigen ogen ziet. */
+  assert.equal(o.verhelp('workaround').ok, true);
+  o.maand(1);
+  const w = o.kijk().dienst.weet;
+  const gezien = (w.gezien || []).find(x => /Koeling/.test(x.naam));
+  assert.ok(gezien, 'de verzette stand hoort waarneembaar te zijn: ' + JSON.stringify(w));
+  assert.equal(gezien.staat, 'workaround');
+  assert.equal(gezien.uitgelegd, false, 'en niemand heeft verteld waarom');
+  assert.deepEqual(Object.keys(gezien).sort(), ['naam', 'staat', 'uitgelegd'],
+    'een waarneming draagt geen naam en geen bedrag');
+});
+
+test('je eigen ingreep en je eigen overdracht zijn geen nieuws', () => {
+  /* Wie zelf de noodkoeling neerzette hoeft de volgende avond niet te lezen dat
+     er een noodkoeling staat, en wie zelf heeft doorgegeven al helemaal niet dat
+     iemand iets heeft doorgegeven. Zonder die twee regels is de strook een echo
+     van je eigen avond.
+
+     DEZE TOETS DEED DAT EERST NIET ECHT. Hij keek naar een ploeg die niets had
+     doorgegeven, en dan is `gekregen` per definitie leeg -- een toets die niet
+     kan zakken. Nu geeft Boris werkelijk iets door, en de vraag is of hij het
+     terugkrijgt. */
+  const o = opstelling('k-d3');
+  assert.ok(koelstoringMet(o, 'workaround', true), 'de avond hoort met een overdracht af te lopen');
+  assert.equal(OVER.lijst(o.zaak).length, 1, 'er is echt iets doorgegeven');
+  o.maand(1);
+  const w = o.kijk().dienst.weet;
+  assert.deepEqual(w.gezien, [], 'je eigen stand terugkrijgen is geen waarneming');
+  assert.deepEqual(w.gekregen, [],
+    'en je eigen overdracht terugkrijgen is een echo: ' + JSON.stringify(w.gekregen));
+  /* MAAR HIJ IS ER WEL, en hij telt: de zaak betaalt geen arbeidstijd meer voor
+     een noodkoeling waarvan is doorgegeven waarom hij draait. */
+  assert.equal(OVER.onwetend(o.zaak, STORING.vind(o.zaak, 'koeling')), false);
 });
 
 /* ============ 5. het bedrag staat in de audit, nooit op de knop ============ */
@@ -230,4 +287,127 @@ test('de drie bewaarlagen schuiven niet', () => {
   const f = KETEN.lijst(o.zaak)[0];
   assert.deepEqual(Object.keys(f).sort(), ['deed', 'maand', 'optie', 'rol', 'soort', 'wie'],
     'en de audit draagt geen oordeel, geen score en geen tweede kopie van de stand');
+});
+
+/* ============ 9. de overdracht: wat je doorgeeft, en wat het kost ============ */
+
+test('doorgeven kost een moment van je dienst -- en dat is de hele economie', () => {
+  /* Geen apart budget en geen gratis knop: dat ene moment is een bestelling die
+     blijft staan, en die kost NU geld terwijl de overdracht pas volgende maand
+     iets bespaart. Precies waarom er in het echt zo slecht wordt overgedragen.
+
+     TWEE DEZELFDE AVONDEN (zelfde potje-id, dus dezelfde voorvallen op dezelfde
+     momenten), een met en een zonder overdracht. De avond met hoort duurder af
+     te lopen -- er is een moment minder gewerkt. */
+  const avond = (id, geefDoor) => {
+    const o = opstelling(id);
+    STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+    let r = o.kijk(), over = false;
+    for (let i = 0; i < R_SLOTS + 2 && r.dienst && !r.dienst.klaar; i++) {
+      if (geefDoor && !over && (r.dienst.overTeDragen || []).length) {
+        over = true;
+        r = o.m.eco.zet(o.p, 'boris', { actie: 'rush-overdragen' });
+        continue;
+      }
+      const open = r.dienst.open || [];
+      if (!open.length) break;
+      const k = open.find(x => x.id === 'koeling');
+      r = k ? o.pak('koeling', 'workaround') : o.pak(open[0].id);
+    }
+    return { o, r, over };
+  };
+  const met = avond('k-g', true), zonder = avond('k-g', false);
+  assert.equal(met.over, true, 'er hoorde iets door te geven te zijn');
+  assert.equal(zonder.over, false);
+  const a = met.r.dienst.uitkomst, b = zonder.r.dienst.uitkomst;
+  assert.ok(a && b, 'beide avonden horen af te zijn');
+  assert.ok(a.derving > b.derving,
+    'een avond waarin je een moment aan de overdracht besteedt, laat meer liggen: '
+    + a.derving + ' tegen ' + b.derving);
+  /* EN HET IS EEN MOMENT EN NIET MEER. Zonder deze grens is doorgeven een straf
+     in plaats van een keuze. */
+  assert.ok(a.bleefLiggen.length - b.bleefLiggen.length <= 1,
+    'het hoort precies een moment te kosten, niet meer');
+});
+
+test('zonder iets om door te geven staat er geen knop', () => {
+  /* Een knop die niets doet leert de speler dat knoppen niets doen. */
+  const o = opstelling('k-h');
+  const d = o.kijk().dienst;
+  assert.deepEqual(d.overTeDragen, []);
+  assert.equal(o.m.eco.zet(o.p, 'boris', { actie: 'rush-overdragen' }).status, 409);
+});
+
+test('een overdracht komt aan bij de volgende ploeg, een ontbrekende niet', () => {
+  const maak = (id, geefDoor) => {
+    const o = opstelling(id);
+    /* Anna zet de noodkoeling neer -- dan is het niet Boris z'n eigen ingreep en
+       is er dus echt iets over te dragen aan hem. */
+    STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+    o.verhelp('workaround');
+    if (geefDoor) OVER.noteer(o.zaak, { maand: o.st.maand, soort: 'koeling',
+      wie: 'anna', rol: 'eigenaar', staat: 'workaround',
+      deed: 'een noodkoeling geregeld voor koeling B' });
+    o.maand(1);
+    return o.kijk().dienst.weet;
+  };
+  const met = maak('k-i1', true), zonder = maak('k-i2', false);
+  assert.equal(met.gekregen.length, 1, 'wat is doorgegeven komt aan: ' + JSON.stringify(met));
+  assert.equal(met.gekregen[0].wie, 'CN-anna');
+  assert.deepEqual(zonder.gekregen, [], 'en wat niet is doorgegeven komt niet aan');
+  /* BEIDE PLOEGEN ZIEN WEL DE STAND. Dat is het hele punt: de wereld is voor
+     allebei gelijk, wat ze WETEN is dat niet. */
+  assert.equal(met.gezien.length, 1);
+  assert.equal(zonder.gezien.length, 1);
+  assert.equal(met.gezien[0].uitgelegd, true);
+  assert.equal(zonder.gezien[0].uitgelegd, false);
+});
+
+test('een ongedocumenteerde ingreep kost de zaak arbeidstijd, elke maand', () => {
+  /* GEEN SCORE MAAR EEN KOSTENPOST. Het loopt via `vast` -- dezelfde post die de
+     noodoplossing zelf al gebruikt ("iemand is er elke dienst mee bezig") -- dus
+     er komt geen regel bij, alleen een reden waarom hij hoger staat. */
+  const maak = (id, geefDoor) => {
+    const o = opstelling(id);
+    STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+    o.verhelp('workaround');
+    if (geefDoor) OVER.noteer(o.zaak, { maand: o.st.maand, soort: 'koeling',
+      wie: 'anna', rol: 'eigenaar', staat: 'workaround', deed: 'noodkoeling' });
+    o.maand(1);
+    return o.st.laatste.anna.regels.find(x => x.id === o.zaak.id);
+  };
+  const met = maak('k-j1', true), zonder = maak('k-j2', false);
+  assert.ok(zonder.vast > met.vast,
+    'zonder uitleg hoort de zaak meer arbeidstijd kwijt te zijn: '
+    + zonder.vast + ' tegen ' + met.vast);
+  /* EN VERDER NIETS. Geen omzet uit het niets, geen tweede post: alleen `vast`
+     beweegt, precies zoals scripts/magnaat-pomp.js het wil zien. */
+  assert.equal(zonder.omzet, met.omzet, 'omzet hoort niet te bewegen van een ontbrekende uitleg');
+  assert.equal(zonder.derving, met.derving, 'en derving ook niet');
+  assert.equal(zonder.resultaat < met.resultaat, true, 'het verschil landt in het resultaat');
+});
+
+test('een storing die gewoon open ligt vraagt geen uitleg', () => {
+  /* Open is voor iedereen zichtbaar precies wat het is: de koeling doet het
+     niet. Daar valt niets uit te leggen, en een zaak die er niets aan heeft
+     gedaan hoort geen boete te krijgen voor het niet-documenteren van niets. */
+  const o = opstelling('k-k');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  const s = STORING.vind(o.zaak, 'koeling');
+  assert.equal(OVER.onwetend(o.zaak, s), false);
+  assert.equal(OVER.effect(o.zaak, [s]).vast, 1);
+});
+
+test('een overdracht die niet meer bij de stand hoort, is ruis en verdwijnt', () => {
+  const o = opstelling('k-l');
+  STORING.uitVoorval(o.zaak, 'machinebreuk', o.st.maand);
+  o.verhelp('workaround');
+  OVER.noteer(o.zaak, { maand: o.st.maand, soort: 'koeling', wie: 'anna',
+    rol: 'eigenaar', staat: 'workaround', deed: 'noodkoeling' });
+  o.maand(1);
+  assert.equal(OVER.lijst(o.zaak).length, 1);
+  o.verhelp('repareren');
+  o.maand(2);
+  assert.deepEqual(OVER.lijst(o.zaak), [],
+    'een uitleg over een noodkoeling die gemaakt is, is geen informatie meer');
 });

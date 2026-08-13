@@ -25,6 +25,7 @@
 
 const R = require('./rush');
 const STORING = require('./storing');
+const OVER = require('./overdracht');
 const { SOORTEN } = require('./rush-voorvallen');
 const { afgerond } = require('./rush-maand');
 
@@ -135,7 +136,12 @@ function naMaand(potje) {
   /* OPGELOSTE STORINGEN OPRUIMEN, nadat de maand ze gezien heeft. Een lijst die
      alles bewaart is telemetrie noch geschiedenis, alleen een bak. */
   for (const rij of Object.values(potje.staat.vestigingen || {}))
-    for (const v of rij) STORING.ruim(v);
+    /* EN DE OVERDRACHTEN MEE. Een uitleg over een noodkoeling die inmiddels
+       gerepareerd is, is geen informatie maar ruis -- en hij hoort op dezelfde
+       plek weg te vallen als de storing zelf, anders zijn er twee momenten
+       waarop iemand het kan vergeten. Volgorde telt: eerst opruimen leest de
+       nog-openstaande lijst, daarna pas de storingen zelf. */
+    for (const v of rij) { OVER.ruim(v, STORING.openstaand(v)); STORING.ruim(v); }
 }
 
 module.exports = { naMaand, storingsbesluit, LOGLENGTE, DREMPEL, BEEINDIGT };

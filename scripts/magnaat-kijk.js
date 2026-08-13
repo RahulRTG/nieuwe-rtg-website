@@ -263,47 +263,48 @@ function terug(id, n) {
     return n;
   }
 
-  /* ---- 1. de werkvloer, met de vier uitwegen open ---- */
-  await schiet(wn, 'werkvloer', async (page) => {
-    await page.waitForSelector('#ecWerk .sec', { timeout: 20000 });
-    console.log('werkvloer in', await plakken(page, '#ecWerk', 'werknemer'), 'plakken');
-  });
-
-  /* ---- 2. DE KETEN. Nu wordt hij ook echt gespeeld, want een keten fotografeer
-       je niet uit een stand: hij ontstaat doordat mensen na elkaar iets doen.
-
-         de vakkracht meldt  ->  de eigenaar ziet WIE het meldde
-         de eigenaar beslist ->  de vakkracht leest het op zijn volgende dienst
-
-       De dienst wordt AFGEMAAKT voor de maand draait: een halve dienst telt als
-       niet gespeeld (wet 4), dus wordt er dan ook niets van geboekt. */
-  const dienstAf = async () => {
-    for (let i = 0; i < 8; i++) {
-      const d = ((await staat(wn, p2)).potje.staat.werk || {}).dienst || {};
-      if (d.klaar || !(d.open || []).length) return d;
-      const k = (d.open || []).find(o => o.id === 'koeling');
-      await zet(wn, p2, k ? { actie: 'rush-pak', wat: 'koeling', optie: 'escaleren' }
-        : { actie: 'rush-pak', wat: d.open[0].id });
+  /* ---- 2. DE OVERDRACHT. Boris zet een noodkoeling neer en GEEFT HEM DOOR --
+       dat kost hem een moment van zijn avond. Daarna kijkt Anna, en daarna komt
+       Boris terug op een dienst waarop hij ziet wat er intussen veranderd is. */
+  let over = false;
+  for (let i = 0; i < 8; i++) {
+    const d = await vloer();
+    if (d.klaar) break;
+    if (!over && (d.overTeDragen || []).length) {
+      over = true;
+      /* HIER STAAT DE KNOP, en alleen hier: er valt iets door te geven en de
+         avond is nog niet om. Vandaar dat de eerste foto op DIT moment valt en
+         niet aan het begin van de dienst. */
+      await schiet(wn, 'werkvloer', async (page) => {
+        await page.waitForSelector('#ecWerk .sec', { timeout: 20000 });
+        console.log('werkvloer in', await plakken(page, '#ecWerk', 'werknemer'), 'plakken');
+      });
+      await zet(wn, p2, { actie: 'rush-overdragen' });
+      continue;
     }
-    return null;
-  };
-  await dienstAf();
+    const k = (d.open || []).find(o => o.id === 'koeling');
+    if (k) { await zet(wn, p2, { actie: 'rush-pak', wat: 'koeling', optie: 'workaround' }); continue; }
+    if (!(d.open || []).length) break;
+    await zet(wn, p2, { actie: 'rush-pak', wat: d.open[0].id });
+  }
+  console.log('doorgegeven:', over);
   terug(p2, 1); await staat(eig, p2);
   const zaakNa = (await mijn(eig, p2)).find(v => v.id === stuk.id);
-  console.log('keten na de melding:', JSON.stringify((zaakNa.storingen || [])[0] || {}).slice(0, 260));
+  console.log('keten bij de zaak:', JSON.stringify((zaakNa.storingen || [])[0] || {}).slice(0, 240));
+  console.log('overdrachten:', JSON.stringify(zaakNa.overdrachten));
 
   await schiet(eig, 'zaakscherm', async (page) => {
     await page.waitForSelector('#ecMijn [data-stor]', { timeout: 20000 });
     console.log('zaakscherm in', await plakken(page, '#ecMijn', 'eigenaar'), 'plakken');
   });
 
-  /* ---- 3. de eigenaar beslist, en de volgende dienst leest het terug ---- */
+  /* ---- 3. de eigenaar beslist, en de volgende ploeg treft de wereld aan ---- */
   const rep = await zet(eig, p2, { actie: 'storing-verhelpen', vestiging: stuk.id,
-    storing: 'koeling', hoe: 'repareren' });
-  console.log('eigenaar laat repareren:', JSON.stringify(rep).slice(0, 140));
+    storing: 'koeling', hoe: 'uit' });
+  console.log('eigenaar neemt hem uit bedrijf:', JSON.stringify(rep).slice(0, 120));
   terug(p2, 1); await staat(eig, p2);
-  const na = ((await staat(wn, p2)).potje.staat.werk || {}).dienst || {};
-  console.log('overdracht op de volgende dienst:', JSON.stringify(na.overdracht));
+  const na = await vloer();
+  console.log('wat de volgende ploeg weet:', JSON.stringify(na.weet));
 
   await schiet(wn, 'overdracht', async (page) => {
     await page.waitForSelector('#ecWerk .sec', { timeout: 20000 });

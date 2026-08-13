@@ -70,7 +70,7 @@ const GOUD = {
     /* DE DIENST (VERHAAL.md par. 0f). Vrij, en scherper dan de rest: een avond
        op de werkvloer die op je beurt moet wachten is geen avond meer. Hij
        staat NIET in de volwassen laag hieronder -- dit is de bijbaan zelf. */
-    'rush', 'rush-pak', 'storing-verhelpen',
+    'rush', 'rush-pak', 'rush-overdragen', 'storing-verhelpen',
     'foundation-stem', 'bestuur-zet'],
     volwassenLaag: ['open', 'uitbreiden', 'sluiten', 'uitstappen',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien', 'functie-openen',

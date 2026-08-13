@@ -77,7 +77,10 @@ const JONG_MAG = [
      geen niveau -- dus de progressiegrens hierboven blijft onaangeroerd. Welke
      voorvallen hij ziet bepaalt zijn ROL en niet zijn leeftijd, precies zoals
      bij `werk-beleid`. */
-  'rush', 'rush-pak',
+  /* DOORGEVEN HOORT ERBIJ EN IS GEEN APARTE BEVOEGDHEID. Wie mag werken mag
+     vertellen wat hij gedaan heeft; een overdracht achter een leeftijd of een
+     rol zetten zou betekenen dat de jongste ploeg per definitie zwijgt. */
+  'rush', 'rush-pak', 'rush-overdragen',
   /* JA ZEGGEN TEGEN EEN PROMOTIE, of hem afhouden. Hulp naar vakkracht is
      vakinhoudelijk en precies wat een zestienjarige hoort te kunnen: je wordt
      beter in je vak. Wat er dan NIET mag is de rol zelf -- bedrijfsleider is

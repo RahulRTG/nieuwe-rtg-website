@@ -574,7 +574,9 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
       /* DE DIENST (VERHAAL.md par. 0f). Scherper dan de rest van deze lijst: een
          avond op de werkvloer die op je beurt moet wachten is geen avond meer. */
-      'rush', 'rush-pak',
+      /* EN HET DOORGEVEN. Om precies dezelfde reden: een overdracht die op je
+         beurt moet wachten komt te laat bij de ploeg die hem nodig heeft. */
+      'rush', 'rush-overdragen', 'rush-pak',
       'solliciteren',
       /* EEN STORING VERHELPEN vanaf het zaakscherm: een koeling die stuk is
          wacht niet tot jij aan zet bent. Zie magnaat/storing-acties.js. */

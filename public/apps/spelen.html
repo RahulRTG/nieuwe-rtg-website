@@ -1503,25 +1503,50 @@ function uitwegen(lijst, attrs, sleutel){
     '</div>';
 }
 
-/* WAT ER IS GEBEURD TERWIJL JIJ ER NIET WAS. Een mededeling en geen taak: er
-   staat geen knop bij en er verandert geen getal. Wie hem niet leest is niets
-   kwijt -- maar wie hem wel leest, weet dat de zaak intussen iets besloten heeft
-   (magnaat/rush-acties.js `overdracht`). */
-function overdrachtStrook(lijst){
-  if (!(lijst || []).length) return '';
-  return '<div class="sec">Sinds je vorige dienst</div>' +
-    lijst.map(f => '<div class="rij"><div class="nm">' + esc(f.wie || 'iemand') +
-      ' heeft ' + esc(f.deed) + '<small>maand ' + f.maand +
-      (f.rol ? ' · ' + esc(f.rol) : '') +
-      (f.spoed ? ' · ' + ecGeld(f.spoed) + ' op de maandrekening' : '') +
+/* WAT JE WEET ALS JE BINNENKOMT, en dat is met opzet niet alles.
+
+   De wet staat in magnaat/overdracht.js: de wereld weet wat waar is, een ploeg
+   weet alleen wat zij kan ZIEN of wat aan haar is OVERGEDRAGEN. Twee stroken,
+   en het verschil ertussen is de hele laag:
+
+     gezien     de stand van de wereld. Zonder naam en zonder bedrag -- dat is
+                precies wat je met eigen ogen ziet als je binnenkomt.
+     gekregen   wat iemand BEWUST heeft achtergelaten, met zijn naam erbij,
+                want hij koos ervoor het je te vertellen.
+
+   "Niemand heeft verteld waarom" is de belangrijkste regel op dit scherm: dat
+   is het verschil tussen een ploeg die weet wat er speelt en een die het gaat
+   uitzoeken. Er staat geen score bij en geen kleur -- alleen wat er is. */
+function weetStrook(w){
+  if (!w || (!(w.gezien || []).length && !(w.gekregen || []).length)) return '';
+  return '<div class="sec">Wat je aantreft</div>' +
+    (w.gezien || []).map(g => '<div class="rij"><div class="nm">' + esc(g.naam) +
+      ' · ' + esc(STORINGSTAND[g.staat] || g.staat) +
+      '<small>' + (g.uitgelegd ? 'er is doorgegeven waarom'
+        : 'niemand heeft doorgegeven waarom') + '</small></div></div>').join('') +
+    (w.gekregen || []).map(f => '<div class="rij"><div class="nm">' +
+      esc(f.wie || 'iemand') + ' heeft ' + esc(f.deed) +
+      '<small>maand ' + f.maand + (f.rol ? ' · ' + esc(f.rol) : '') +
       '</small></div></div>').join('');
+}
+
+/* EN WAT JIJ ZELF NOG DOOR TE GEVEN HEBT. Een moment van je dienst, precies wat
+   een voorval oppakken kost -- dus staat de prijs erbij en niet in een uitleg
+   achteraf. Is er niets door te geven, dan staat er niets: een knop die niets
+   doet leert de speler dat knoppen niets doen. */
+function doorgevenKnop(lijst){
+  if (!(lijst || []).length) return '';
+  return '<div class="rij"><div class="nm">Doorgeven aan de volgende ploeg' +
+    '<small>' + lijst.map(x => esc(x.naam)).join(', ') +
+    ' · kost een moment van je dienst</small></div>' +
+    '<button type="button" class="chip" data-overdragen="1">Doorgeven</button></div>';
 }
 
 function tekenDienst(d, waarom){
   if (!d) return waarom ? '<div class="leeg">' + esc(waarom) + '</div>' : '';
   if (d.klaar){
     const u = d.uitkomst || {};
-    return overdrachtStrook(d.overdracht) + '<div class="sec">Je dienst zit erop</div>' +
+    return weetStrook(d.weet) + '<div class="sec">Je dienst zit erop</div>' +
       '<div class="rij"><div class="nm">Derving deze dienst<small>' +
         (u.verschil > 0 ? ecGeld(u.verschil) + ' lager dan een dienst zonder sturing'
          : u.verschil < 0 ? ecGeld(-u.verschil) + ' hoger dan een dienst zonder sturing'
@@ -1533,7 +1558,7 @@ function tekenDienst(d, waarom){
         ? '<div class="leeg">Blijven liggen: ' + u.bleefLiggen.map(esc).join(' ') + '</div>'
         : '<div class="leeg">Er is niets blijven liggen.</div>');
   }
-  return overdrachtStrook(d.overdracht) +
+  return weetStrook(d.weet) +
     '<div class="sec">Je dienst · moment ' + d.moment + ' van ' + d.momenten + '</div>' +
     (d.open || []).map(o => '<div class="rij"><div class="nm">' + esc(o.wat) +
       '<small>' + (o.gelopen > 0 ? 'kostte tot nu toe ' + ecGeld(o.gelopen) + ' · ' : '') +
@@ -1549,6 +1574,7 @@ function tekenDienst(d, waarom){
       ((o.opties || []).length > 1 ? ''
         : '<button type="button" class="chip" data-rush="' + esc(o.id) + '">Oppakken</button>') +
       '</div>').join('') +
+    doorgevenKnop(d.overTeDragen) +
     '<div class="leeg">Je kunt er per moment één doen.</div>';
 }
 
@@ -1734,6 +1760,10 @@ function tekenMagnaatEco(){
       catch(e){ meld(e.message); }
     }));
   }
+
+  werk.querySelectorAll('[data-overdragen]').forEach(b => b.addEventListener('click', async () => {
+    try{ await speelZet({ actie:'rush-overdragen' }); }catch(e){ meld(e.message); }
+  }));
 
   werk.querySelectorAll('[data-rush]').forEach(b => b.addEventListener('click', async () => {
     const zet = { actie:'rush-pak', wat: b.dataset.rush };

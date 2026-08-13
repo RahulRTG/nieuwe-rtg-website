@@ -1275,3 +1275,86 @@ ruimste.
 
 **De standaardmandaten zijn daarom niet aangepast.** Eerst meten, dan bewust
 beslissen hoeveel schade slecht bestuur mag veroorzaken.
+
+## 15. De keten, en de wet eronder
+
+De koelstoring uit hoofdstuk 12 was een toestand: *koeling B staat open sinds
+maand 104*. Wie hem gevonden had, wie hem had doorgegeven en wie er geld aan
+uitgaf stond nergens. Daardoor waren de drie schermen drie losse werelden.
+
+Nu loopt hetzelfde incident door de rollen heen:
+
+> Boris constateert → Boris escaleert → Anna besluit → de monteur herstelt →
+> de maandrekening draagt de kosten
+
+Zonder chat en zonder scene. Wat de een deed staat op het scherm van de ander
+omdat het **waar** is, niet omdat er een melding is verstuurd. De organisatie
+praat via haar handelingen.
+
+De besluiten staan op de **zaak** (`magnaat/storing-keten.js`) en niet op de
+storing, want een verholpen storing wordt opgeruimd — dan zou de keten
+verdwijnen op het moment dat hij af is. Mitigeren telt niet mee: wie de waar
+overzet verandert niets aan wat de volgende erft.
+
+### En toen bleek de keten te veel te vertellen
+
+De eerste versie zette die keten ook op de werkvloer: *"Anna heeft koeling B
+laten repareren · €1.250 op de maandrekening"*. Dat leest goed en het is fout,
+op twee manieren tegelijk. Een werknemer heeft niets te maken met wat zijn
+werkgever uitgaf. En als iedereen de audit kan lezen, verdwijnt alle menselijke
+frictie en is iedereen alwetend.
+
+Daaruit volgt de wet waar de hele werklaag vanaf hier op staat:
+
+> **De wereld weet wat waar is. Een ploeg weet alleen wat zij kan ZIEN of wat
+> aan haar is OVERGEDRAGEN.**
+
+Drie informatiebronnen, en ze mogen nooit één worden:
+
+| | wat het is | waar het woont |
+|---|---|---|
+| **waarneembaar** | de stand: de noodkoeling draait, de capaciteit is lager | `storing.js`, op de vestiging |
+| **overdracht** | wat de vorige ploeg bewust achterliet | `overdracht.js`, op de vestiging |
+| **audit** | wie besloot en wat het kostte | `storing-keten.js`, voor wie de zaak bestuurt |
+
+### Wat doorgeven kost
+
+**Een moment van je dienst.** Geen apart budget en geen gratis knop: dat ene
+moment is een bestelling die blijft staan, en die kost nu geld terwijl de
+overdracht pas volgende maand iets bespaart.
+
+Er staat geen score tegenover — geen `overdrachtkwaliteit: 62%`, geen
+teamworkpunten. Wat een ontbrekende overdracht kost is **arbeidstijd**: de
+volgende ploeg moet uitzoeken wat er speelt, en dat loopt via `vast`, dezelfde
+post die de noodoplossing zelf al gebruikt. Er komt geen regel bij, alleen een
+reden waarom die post hoger staat.
+
+`scripts/magnaat-overdracht.js` meet waar het omslaat. In een volle zaak loont
+doorgeven pas vanaf een maand of drie; in een rustige zaak meteen, want daar
+kost een moment van je dienst bijna niets. De situatie beslist — precies zoals
+bij `uit bedrijf`.
+
+### En wie betaalt er eigenlijk
+
+Het scherpste komt er gratis uit: **de kosten en de baten landen op
+verschillende mensen.** Wie doorgeeft betaalt met derving op zijn eigen dienst
+— zichtbaar, vanavond, in euro's op zijn scherm. Wat het oplevert is minder
+arbeidstijd op de maandrekening van de zaak, en die regel ziet een vakkracht
+nooit.
+
+Dat is waarom er in het echt zo slecht wordt overgedragen, en er is geen enkele
+stat voor nodig. De prikkel van de mens loopt niet gelijk met het belang van
+het bedrijf. Een eigenaar die dat wil veranderen moet er iets aan **doen**.
+
+### Wat er nog niet is
+
+Drie soorten fout, dezelfde onderliggende storing:
+
+1. **Boris doet niets** → de volgende ploeg erft het probleem. *Operationeel.*
+   Dat werkte al.
+2. **Boris mitigeert maar meldt niets** → de volgende ploeg ziet dat er iets
+   veranderd is en begrijpt niet waarom. *Overdracht.* Dat staat nu.
+3. **Boris meldt iets verkeerd** → de volgende ploeg handelt op verkeerde
+   menselijke informatie. *Communicatie.* Die is er **niet**, en met opzet niet
+   half: hij vraagt dat een mens een bewering kan doen die onwaar kan zijn, en
+   dat is een laag op zichzelf.

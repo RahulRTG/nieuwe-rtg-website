@@ -109,7 +109,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          verdeling onder aandeelhouders). */
       wereldOmzet += perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
         arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor,
-        besteding: st.besteding, spoed: werkvloer.spoed });
+        besteding: st.besteding, mand: (st.huishoudens || {}).mand, spoed: werkvloer.spoed });
       /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
          rood staan, de leningen, de polissen en het onderzoek. Vier posten die
          niet aan een pand hangen maar aan de speler, en die alle vier geld de

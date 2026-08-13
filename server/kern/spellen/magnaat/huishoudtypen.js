@@ -41,6 +41,7 @@
 'use strict';
 
 const { boekje, SPAARQUOTE, VAST_DEEL } = require('./huishoudboekje');
+const MAND = require('./mand');
 
 /* DE COHORTEN. `deel` is het aandeel huishoudens, `inkomen` hun inkomen ten
    opzichte van het gemiddelde, `lasten` hoe zwaar hun vaste lasten wegen, en
@@ -66,6 +67,14 @@ const AANPASSING = 1 / 3;
 /* EN HOE SNEL VASTE LASTEN DAT DOEN: veel langzamer, want dat is wat een
    contract is. Een twaalfde per maand -- ongeveer een huurjaar. */
 const VAST_TRAAG = 1 / 12;
+
+/* HOE SNEL "NORMAAL" MEEVERSCHUIFT. Dit is het ijkpunt waartegen ./mand.js
+   afmeet of er gesneden wordt, en het beweegt met een zesendertigste per maand
+   -- jaren dus. De reden dat het uberhaupt beweegt: een huishouden dat blijvend
+   minder verdient snijdt niet eeuwig, het krijgt een NIEUW normaal. Zonder die
+   beweging zou een stad die twintig jaar geleden een fabriek verloor vandaag nog
+   steeds als "in crisis" gelezen worden. */
+const IJK_TRAAG = 1 / 36;
 
 /* HET AANDEEL VAN DE LOONSOM per cohort, genormaliseerd zodat de som exact 1 is.
    Zo wordt er geen euro loon verzonnen of kwijtgeraakt bij het verdelen. */
@@ -103,8 +112,11 @@ function maand(st, loonkosten) {
       per[t.id] = { vast: e.vast, consumptie: e.consumptie, spaargeld: e.consumptie * t.buffer, krap: false };
     }
     st.huishoudens = tel(per);
+    st.huishoudens.ijk = st.huishoudens.consumptie;
+    st.huishoudens.mand = MAND.perSector(1);
     return st.huishoudens;
   }
+  const ijk = st.huishoudens.ijk;
   const per = st.huishoudens.per;
   for (const t of TYPEN) {
     const h = per[t.id];
@@ -125,6 +137,11 @@ function maand(st, loonkosten) {
     h.spaargeld += besteedbaar - h.consumptie;
   }
   st.huishoudens = tel(per);
+  /* WAT ER NU IN DE MAND ZIT (./mand.js). `r` is de besteding ten opzichte van
+     wat voor deze huishoudens normaal is -- en pas als die onder de 1 zakt wordt
+     er gesneden, in de volgorde die de mand voorschrijft. */
+  st.huishoudens.ijk = ijk + (st.huishoudens.consumptie - ijk) * IJK_TRAAG;
+  st.huishoudens.mand = MAND.perSector(ijk > 0 ? st.huishoudens.consumptie / ijk : 1);
   return st.huishoudens;
 }
 
@@ -136,4 +153,4 @@ function tel(per) {
   return { consumptie, spaargeld, per };
 }
 
-module.exports = { TYPEN, GEWICHT, LASTEN, AANPASSING, VAST_TRAAG, evenwicht, maand };
+module.exports = { TYPEN, GEWICHT, LASTEN, AANPASSING, VAST_TRAAG, IJK_TRAAG, evenwicht, maand };

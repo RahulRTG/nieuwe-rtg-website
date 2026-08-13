@@ -111,7 +111,8 @@ Van klein naar groot, en elk onderdeel gebruikt de vorige.
 | 3 | marginale consumptie | extra inkomen gaat niet volledig de markt op | ✅ `huishoudboekje.js` |
 | 4 | huishoudtypen | zelfde salaris, andere bestedingsruimte | ✅ `huishoudtypen.js` |
 | 5 | verplichtingen als geldstroom | huur → verhuurder, energie → energiebedrijf | ✗ |
-| 6 | behoeftecategorieën | essentieel / semi-vrij / discretionair | ✗ |
+| 6 | behoeftecategorieën | essentieel / semi-vrij / discretionair | ◐ `mand.js` — klopt, maar raakt de wereld nog nauwelijks |
+| 6b | stadshuishoudens die meebewegen | zonder dit stuurt de mand alleen het randje | ✗ |
 | 7 | onzekerheid | reorganisatie verlaagt uitgaven vóór het ontslag | ✗ |
 | 8 | werkloosheid met tijd | maand 1 buffer, maand 6 grote aankopen uitgesteld | ✗ |
 | 9 | huishoudens kiezen echte bedrijven | €80 naar supermarkt A, €55 naar B | ✗ |
@@ -144,6 +145,15 @@ kringlopen in één keer — en dan pas kan een woningmarkt iets betekenen.
 inkomensverlies gaat niet alles evenredig omlaag: huur en eten worden betaald,
 het restaurant en de vakantie worden geschrapt. Zonder die volgorde raakt een
 neergang elke sector even hard, en dat is precies wat `ECONOMIE.md` verbiedt.
+
+`mand.js` staat, en klopt: elf posten in drie stijfheden, de verdeling behoudt
+het totaal exact en snijdt in de goede volgorde — bij 10% minder te besteden
+verdwijnt 33% van het uit-eten-gaan en 3,7% van de huur. **Maar op wereldniveau
+doet hij nog bijna niets**, en dat is gemeten. De vraagfactor vermenigvuldigt de
+mand met het *overschot* van de spelershuishoudens boven de stad, en juist dat
+overschot verdwijnt bij een schok. Daarom staat **6b** eronder: zolang de
+huishoudens van de stad zelf een constante zijn, stuurt de mand alleen het
+randje. Dat is de eerstvolgende stap, en hij is klein — de mand is er al.
 
 **Huishoudens kiezen echte bedrijven (9)** is wat van vraag een markt maakt. Niet
 `€200 boodschappen → retailsector`, maar €80 naar supermarkt A, €55 naar B, €25

@@ -21,7 +21,7 @@ module.exports = ({ verdeel, rekenMaand, F, N, HUIS }) => {
      STADSOMZET bij kwam; de regels worden op `regels` geduwd en de kas wordt
      hier gezet, want de verdeling onder aandeelhouders bepaalt wie wat krijgt. */
   return function perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, besteding, spoed }) {
+    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, besteding, mand, spoed }) {
     const st = potje.staat;
     let wereldOmzet = 0;
       for (const v of rij) {
@@ -51,7 +51,7 @@ module.exports = ({ verdeel, rekenMaand, F, N, HUIS }) => {
              hij het opgeschoven kavel mee en niet het kale. */
           wereldFactor: conjunctuur * N.factorVoor(potje.id, st.maand, zones,
             { zone: kavel.zone, sector: v.sector })
-            * HUIS.factorVoor(k, opgeschoven, v.sector, st.maand, besteding),
+            * HUIS.factorVoor(k, opgeschoven, v.sector, st.maand, besteding, mand),
           arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id],
           /* WAT DE DIENST VAN DEZE MAAND MET DE DERVING DEED (VERHAAL.md par.
              0f). Ontbreekt hij -- niemand in dienst, niet gespeeld, niet

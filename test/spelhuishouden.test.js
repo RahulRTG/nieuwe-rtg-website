@@ -26,6 +26,7 @@ const assert = require('node:assert/strict');
 const HUIS = require('../server/kern/spellen/magnaat/huishoudens');
 const BOEKJE = require('../server/kern/spellen/magnaat/huishoudboekje');
 const TYPEN = require('../server/kern/spellen/magnaat/huishoudtypen');
+const MANDJE = require('../server/kern/spellen/magnaat/mand');
 const V = require('../server/kern/spellen/magnaat/vraag');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 
@@ -397,3 +398,50 @@ test('de wig verandert de bestedingskracht niet -- alleen wat er te zien is', ()
   assert.ok(Math.abs(o.st.besteding - (1 + HUIS.loonsom(o.st) / HUIS.stadsLoon(K))) < 1e-9,
     'de evenwichtsstand hoort de kale loonverhouding te zijn: ' + o.st.besteding);
 });
+
+/* ============ 10. de mand: waar het geld heen gaat als er gesneden wordt ============ */
+
+test('wat er in de mand zit telt altijd precies op tot wat er te besteden is', () => {
+  /* BEHOUDSREGEL. Snijden verplaatst, het laat niets verdwijnen -- ook niet als
+     een post op nul loopt en de rest het moet overnemen. */
+  for (const r of [1, 0.95, 0.8, 0.6, 0.4, 1.15]) {
+    const som = Object.values(MANDJE.verdeel(r)).reduce((a, b) => a + b, 0);
+    assert.ok(Math.abs(som - r) < 1e-9, 'bij r=' + r + ' telt de mand op tot ' + som);
+    for (const [id, x] of Object.entries(MANDJE.verdeel(r)))
+      assert.ok(x >= -1e-12, id + ' hoort niet negatief te worden bij r=' + r);
+  }
+});
+
+test('bij minder geld gaat de vakantie eruit en het eten niet', () => {
+  /* HUISHOUDEN.md 3.6, en dit is de hele reden dat de mand bestaat. Er staat
+     geen prioriteitslijst met nummers: er staan drie soorten met een reden, en
+     de volgorde volgt uit hoe hard je iets nodig hebt. */
+  const s = MANDJE.perSector(0.9);
+  assert.ok(s.horeca < s.retail, 'uit eten gaat eerder dan boodschappen: '
+    + s.horeca.toFixed(3) + ' tegen ' + s.retail.toFixed(3));
+  assert.ok(s.retail < s.buiten, 'en boodschappen eerder dan de huur: '
+    + s.retail.toFixed(3) + ' tegen ' + s.buiten.toFixed(3));
+  /* EEN TIENDE MINDER TE BESTEDEN IS VEEL MEER DAN EEN TIENDE MINDER HORECA. */
+  assert.ok(1 - s.horeca > 0.25,
+    'tien procent minder besteding hoort de horeca veel harder te raken: ' + s.horeca.toFixed(3));
+  assert.ok(1 - s.buiten < 0.06, 'en de vaste lasten nauwelijks: ' + s.buiten.toFixed(3));
+});
+
+/* HIER STOND EEN WERELDTOETS, en hij is weggehaald omdat hij niet waar was.
+
+   Hij beweerde dat een restaurant bij een loonschok meer omzet verliest dan een
+   winkel. Een mutatie die de mand volledig uitzette liet hem gewoon slagen, en
+   toen ik het narekende bleek het OMGEKEERDE: horeca -4,0% en retail -4,9%.
+
+   DE OORZAAK ZIT IN DE BEDRADING EN NIET IN ./mand.js. De vraagfactor
+   vermenigvuldigt de mand met `(b - 1)` -- het OVERSCHOT van de spelers boven de
+   stad. Zakt de loonsom, dan verdwijnt dat overschot (1,082 -> 1,013), en dan
+   heeft de mand bijna niets meer om over te verdelen. De verhouding tussen
+   horeca en retail wordt op dat punt bepaald door de segmentsom en door
+   ./keten.js, niet door de mand.
+
+   ./mand.js zelf klopt en is getoetst -- op eenheidsniveau, waar hij wel
+   aantoonbaar doet wat hij belooft. Wat er ontbreekt is dat de huishoudens VAN
+   DE STAD ZELF nog niet bewegen: zolang die een constante zijn, kan een mand
+   alleen het randje sturen. Dat staat als open punt in HUISHOUDEN.md par. 3. */
+

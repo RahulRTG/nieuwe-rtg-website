@@ -59,9 +59,10 @@
    ================== WAT ER NOG NIET IS ==================
 
    De wig staat in ./huishoudboekje.js, de huishoudens die hem ondergaan in
-   ./huishoudtypen.js. Wat er daarna nog ontbreekt staat in HUISHOUDEN.md par. 3, en de twee die er het meest toe doen zijn VERPLICHTINGEN ALS GELDSTROOM
-   (huur hoort bij een verhuurder aan te komen) en BEHOEFTECATEGORIEEN (een
-   neergang hoort de horeca eerder te raken dan de bakker). */
+   ./huishoudtypen.js, en waar zij hun geld aan uitgeven in ./mand.js. Wat er
+   daarna nog ontbreekt staat in HUISHOUDEN.md par. 3; het grootste is dat er nog
+   geen verhuurder en geen energiebedrijf BESTAAN, dus 45% van de mand kan
+   nergens aankomen. */
 'use strict';
 
 const { SECTOREN, SECTORLIJST } = require('./sectoren');
@@ -161,10 +162,15 @@ function loongevoelig(kaart, kavel, sector, maand) {
 /* DE FACTOR VOOR EEN VESTIGING. Staat de bestedingskracht op 1, dan is hij
    overal exact 1 en verandert er niets -- ook niet met afrondingsruis, want dan
    is dit letterlijk `1 + iets * 0`. */
-function factorVoor(kaart, kavel, sector, maand, besteding) {
+function factorVoor(kaart, kavel, sector, maand, besteding, mand) {
   const b = besteding === undefined ? 1 : besteding;
   if (b === 1) return 1;
-  return Math.max(0, 1 + loongevoelig(kaart, kavel, sector, maand) * (b - 1));
+  /* EN WAT ER IN DE MAND ZIT (./mand.js). Zakt de besteding, dan zakt hij NIET
+     overal even hard: eerst gaat de vakantie eruit en pas veel later het eten.
+     Staat de mand in evenwicht, dan is deze factor overal exact 1 en rekent
+     alles zoals hiervoor. */
+  const deel = mand && mand[sector] !== undefined ? mand[sector] : 1;
+  return Math.max(0, 1 + loongevoelig(kaart, kavel, sector, maand) * (b - 1) * deel);
 }
 
 module.exports = { LOONGEVOELIG, LOONQUOTE, stadsLoon, loonsom,

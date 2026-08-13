@@ -24,7 +24,7 @@
 const { kaart } = require('./kaart');
 const G = require('./governance');
 
-module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
+module.exports = ({ K, mijnVestiging, vrijKavel, rond, L, codenaamVan }) => {
   /* WAT EEN SPELER DOET staat in ./acties.js; de lagen schuiven hun acties erbij. */
   const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
   const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
@@ -59,7 +59,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
      gemak maar de wet: een dienst die op je beurt moet wachten kan in een
      partij van zes een week duren, en dan is de avond al voorbij. Hij staat NA
      de dienstacties omdat hij een lopend dienstverband nodig heeft. */
-  const rush = require('./rush-acties')();
+  const rush = require('./rush-acties')({ codenaamVan });
   Object.assign(ACTIES, rush.ACTIES);
   VRIJE_ACTIES.push(...rush.VRIJE_ACTIES);
   /* EEN STORING VERHELPEN vanaf het zaakscherm -- dezelfde uitwegen als op de

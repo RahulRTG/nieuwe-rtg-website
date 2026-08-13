@@ -41,7 +41,25 @@
    repareert. Zie ./storing.js.
 
    `incident` MARKEERT WAT EEN AVOND BIJZONDER MAAKT. Niet elke klik wordt
-   geschiedenis (wet 5); dit is de gesloten lijst van wat dat wel kan worden. */
+   geschiedenis (wet 5); dit is de gesloten lijst van wat dat wel kan worden.
+
+   ================== `gevolg`: DE AARD, NOOIT DE OMVANG ==================
+
+   Elke uitweg draagt een regel van twee helften -- wat het je KOST en wat het
+   je OPLEVERT -- en die staat op het scherm onder de knop zelf. Hij verving een
+   losse woordenlijst onder de vier knoppen, want die dwong je twee plekken
+   tegen elkaar te leggen om te weten waar je op drukte.
+
+   ER STAAT GEEN BEDRAG IN, EN DAT IS DE REGEL. "Kost 1.184 en voorkomt 2.722"
+   maakt van bedrijfsvoering een rekensom waarin de beste knop zichzelf
+   verraadt, en dan is kiezen geen oordeel meer maar aftrekken. Wat het
+   werkelijk kost hangt aan de SITUATIE, en die staat er al: `uit bedrijf` is in
+   een volle zaak een vermogen en in een rustige zaak bijna gratis (gemeten in
+   scripts/magnaat-storing.js). Dezelfde zin kan dus altijd waar zijn zonder
+   ooit te zeggen welke keuze goed is.
+
+   De toets hierop staat in test/spelrush.test.js: geen enkel `gevolg` mag een
+   cijfer of een euroteken bevatten. */
 'use strict';
 
 const SOORTEN = [
@@ -70,7 +88,7 @@ const SOORTEN = [
       { id: 'overzetten', mag: null,
         wat: 'De waar overzetten naar de andere koeling',
         deed: 'de verse waar uit koeling B overgezet',
-        uitleg: 'Redt wat er vanavond in ligt. Morgen ligt er weer wat in.' },
+        gevolg: 'Geen directe kosten · morgen ligt er weer wat in' },
       /* REPAREREN STAAT NIET OP DE WERKVLOER, en dat is de scherpste les van de
          tweede dienst. Zolang de vakkracht zelf een monteur kon bestellen, was
          repareren altijd het beste en was de noodkoeling een knop die niemand
@@ -85,19 +103,19 @@ const SOORTEN = [
       { id: 'repareren', mag: 'onderhoud', lost: true, alleenZaak: true,
         wat: 'Monteur laten komen',
         deed: 'koeling B laten repareren',
-        uitleg: 'Kost spoedgeld op de maandrekening, en dan is het over.' },
+        gevolg: 'Onderhoudskosten · de storing is daarna over' },
       { id: 'workaround', mag: 'onderhoud', staat: 'workaround',
         wat: 'Noodkoeling regelen en doordraaien',
         deed: 'een noodkoeling geregeld voor koeling B',
-        uitleg: 'Bijna geen bederf meer, maar iemand is er elke dienst mee bezig. Houdt het een paar maanden.' },
+        gevolg: 'Tijdelijke capaciteit · extra werk, houdt een paar maanden' },
       { id: 'uit', mag: 'onderhoud', staat: 'uit',
         wat: 'Koeling B uit bedrijf nemen',
         deed: 'koeling B uit bedrijf genomen',
-        uitleg: 'Er bederft niets meer, maar je kunt minder aan.' },
+        gevolg: 'Geen bederf meer · capaciteit daalt' },
       { id: 'escaleren', mag: 'onderhoud', staat: 'open',
         wat: 'Melden en de zaak laten beslissen',
         deed: 'de koelstoring gemeld bij de zaak',
-        uitleg: 'Kost vanavond niets. De storing blijft open tot iemand anders kiest.' }
+        gevolg: 'Geen eigen uitgave · de storing blijft open' }
     ] },
   { id: 'afruimen', kost: 0.14, groei: 0.26, mag: null,
     wat: 'Tafel 12 is niet afgeruimd; er wacht een gezelschap van zes.',

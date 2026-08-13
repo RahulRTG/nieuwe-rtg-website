@@ -112,7 +112,7 @@ module.exports = (ctx) => {
      Dat is een bouwstap die met elke fase meegroeit; dit bestand gaat over de
      klok en die verandert niet meer. */
   const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie, rush } =
-    require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L });
+    require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L, codenaamVan });
 
   // wat de tafel koos voor de Foundation; "wie doet er nog mee" is een vraag
   // over de PARTIJ, en die woont hier -- zie ./governance.js en ./verloop.js

@@ -263,13 +263,51 @@ function terug(id, n) {
     return n;
   }
 
+  /* ---- 1. de werkvloer, met de vier uitwegen open ---- */
   await schiet(wn, 'werkvloer', async (page) => {
     await page.waitForSelector('#ecWerk .sec', { timeout: 20000 });
     console.log('werkvloer in', await plakken(page, '#ecWerk', 'werknemer'), 'plakken');
   });
+
+  /* ---- 2. DE KETEN. Nu wordt hij ook echt gespeeld, want een keten fotografeer
+       je niet uit een stand: hij ontstaat doordat mensen na elkaar iets doen.
+
+         de vakkracht meldt  ->  de eigenaar ziet WIE het meldde
+         de eigenaar beslist ->  de vakkracht leest het op zijn volgende dienst
+
+       De dienst wordt AFGEMAAKT voor de maand draait: een halve dienst telt als
+       niet gespeeld (wet 4), dus wordt er dan ook niets van geboekt. */
+  const dienstAf = async () => {
+    for (let i = 0; i < 8; i++) {
+      const d = ((await staat(wn, p2)).potje.staat.werk || {}).dienst || {};
+      if (d.klaar || !(d.open || []).length) return d;
+      const k = (d.open || []).find(o => o.id === 'koeling');
+      await zet(wn, p2, k ? { actie: 'rush-pak', wat: 'koeling', optie: 'escaleren' }
+        : { actie: 'rush-pak', wat: d.open[0].id });
+    }
+    return null;
+  };
+  await dienstAf();
+  terug(p2, 1); await staat(eig, p2);
+  const zaakNa = (await mijn(eig, p2)).find(v => v.id === stuk.id);
+  console.log('keten na de melding:', JSON.stringify((zaakNa.storingen || [])[0] || {}).slice(0, 260));
+
   await schiet(eig, 'zaakscherm', async (page) => {
     await page.waitForSelector('#ecMijn [data-stor]', { timeout: 20000 });
     console.log('zaakscherm in', await plakken(page, '#ecMijn', 'eigenaar'), 'plakken');
+  });
+
+  /* ---- 3. de eigenaar beslist, en de volgende dienst leest het terug ---- */
+  const rep = await zet(eig, p2, { actie: 'storing-verhelpen', vestiging: stuk.id,
+    storing: 'koeling', hoe: 'repareren' });
+  console.log('eigenaar laat repareren:', JSON.stringify(rep).slice(0, 140));
+  terug(p2, 1); await staat(eig, p2);
+  const na = ((await staat(wn, p2)).potje.staat.werk || {}).dienst || {};
+  console.log('overdracht op de volgende dienst:', JSON.stringify(na.overdracht));
+
+  await schiet(wn, 'overdracht', async (page) => {
+    await page.waitForSelector('#ecWerk .sec', { timeout: 20000 });
+    console.log('overdracht in', await plakken(page, '#ecWerk', 'overdracht'), 'plakken');
   });
   await browser.close();
   console.log('JS-fouten:', fouten.length ? fouten : 'geen');

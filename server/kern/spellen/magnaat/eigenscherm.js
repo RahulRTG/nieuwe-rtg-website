@@ -14,6 +14,7 @@ const { SECTOREN } = require('./sectoren');
 const { PROJECTEN } = require('./foundation');
 
 const STORING = require('./storing');
+const D = require('./dienst');
 const { UITWEGEN } = require('./storing-acties')({ mijnVestiging: () => null });
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capaciteit,
@@ -33,8 +34,15 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
          verzint hem een keer anders. */
       storingen: STORING.openstaand(v).map(x => ({ soort: x.soort, staat: x.staat, sinds: x.sinds,
         naam: (STORING.SOORTEN[x.soort] || {}).naam || x.soort,
+        /* WIE HIER AL AAN GEZETEN HEEFT (./storing-keten.js). Zonder deze regel
+           komt een storing op dit scherm uit de lucht vallen, terwijl er een
+           vakkracht voor stond die hem meldde -- en dan is de organisatie een
+           verzameling losse schermen in plaats van een keten. */
+        keten: STORING.KETEN.vanStoring(v, x).map(f => ({ maand: f.maand,
+          wie: codenaamVan(f.wie), rol: (D.ROLLEN[f.rol] || {}).naam || f.rol,
+          deed: f.deed, spoed: f.spoed || 0 })),
         uitwegen: UITWEGEN(x.soort).filter(u => u.staat !== x.staat)
-          .map(u => ({ id: u.id, wat: u.wat, uitleg: u.uitleg })) })),
+          .map(u => ({ id: u.id, wat: u.wat, gevolg: u.gevolg })) })),
       /* HOEVEEL MENSEN DEZE ZAAK NODIG HEEFT om vol te draaien. Staat er sinds
          de onderzoekslaag: `automatisering` verhoogt wat een medewerker aankan,
          en bij een volle bezetting merk je daar niets van tot je iemand naar

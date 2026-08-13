@@ -80,7 +80,11 @@ function maandInvoer(potje) {
     for (const g of s.gedaan) {
       const bron = SOORTEN.find(x => x.id === g.id);
       if (!bron || !bron.storing) continue;
-      STORING.pas(v, bron.storing, (bron.opties || []).find(o => o.id === g.optie), st.maand);
+      /* MET EEN NAAM ERAAN. Wie er die avond stond is bekend, en zonder dat
+         staat er op het zaakscherm een storing die uit de lucht komt vallen --
+         terwijl er iemand voor stond die hem meldde (./storing-keten.js). */
+      STORING.pas(v, bron.storing, (bron.opties || []).find(o => o.id === g.optie), st.maand,
+        { wie: d.werknemer, rol: d.rol });
     }
   }
   /* EN WAT ER BUITEN DE DIENST OM BESLOTEN IS (./storing-acties.js): de

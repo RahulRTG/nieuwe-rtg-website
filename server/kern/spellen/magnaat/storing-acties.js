@@ -49,14 +49,20 @@ module.exports = ({ mijnVestiging }) => {
         /* TWEE WEGEN EN NIET MEER: je bezit de zaak, of je hebt er een rol die
            onderhoud mag. Precies `magAan` uit ./dienst.js -- de enige plek waar
            die vraag beantwoord wordt. */
-        const v = mijnVestiging(st, h, id) || (D.magAan(st, h, id, 'onderhoud') ? vind(st, id) : null);
+        const eigen = mijnVestiging(st, h, id);
+        const v = eigen || (D.magAan(st, h, id, 'onderhoud') ? vind(st, id) : null);
         if (!v) return { status: 403, error: 'Dat is niet jouw zaak.' };
+        /* IN WELKE HOEDANIGHEID je dit doet. Dezelfde twee wegen als hierboven,
+           en het is precies wat de vloer straks te lezen krijgt: "besluit: Anna
+           (eigenaar)" leest anders dan "besluit: Sven (bedrijfsleider)". Geen
+           derde rechtenmodel -- dit is een LABEL en geen bevoegdheid. */
+        const rol = eigen ? 'eigenaar' : ((D.dienstVan(st, h) || {}).rol || null);
         const s = STORING.vind(v, String(zet.storing || ''));
         if (!s) return { status: 404, error: 'Daar is niets mis mee.' };
         const optie = UITWEGEN(s.soort).find(o => o.id === String(zet.hoe || ''));
         if (!optie) return { status: 400, error: 'Dat kun je hier niet doen.' };
         if (optie.staat === s.staat) return { status: 409, error: 'Zo staat hij al.' };
-        const uit = STORING.pas(v, s.soort, optie, st.maand);
+        const uit = STORING.pas(v, s.soort, optie, st.maand, { wie: h, rol });
         if (!uit) return { status: 409, error: 'Dat lukt niet.' };
         /* HET SPOEDBEDRAG WACHT OP DE MAAND. Hij hangt aan de VESTIGING en niet
            aan een speler, want dat is waar de rekening thuishoort -- en zo telt

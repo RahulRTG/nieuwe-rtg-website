@@ -25,9 +25,47 @@
 
 const R = require('./rush');
 const D = require('./dienst');
+const KETEN = require('./storing-keten');
 const { vind } = require('./rush-maand');
 
-module.exports = () => {
+/* WAT ER IS GEBEURD TERWIJL JIJ ER NIET WAS -- de overdracht.
+
+   Dit is de andere kant van punt 2 uit VERHAAL.md par. 0f. Die zei: als jij om
+   tien uur iets laat liggen, begint de ochtendploeg niet in een schone wereld.
+   Waar is dat en het werkte al -- maar het werkte STIL. Je erfde de feitelijke
+   toestand (de koeling staat nog open) zonder ooit te horen dat er iemand een
+   besluit over had genomen.
+
+   Nu wel: wat er sinds je vorige dienst bij deze zaak besloten is, en niet door
+   jou. Zo praat de organisatie via haar handelingen -- de vakkracht meldde,
+   de eigenaar liet repareren, en de volgende ploeg leest dat terug zonder dat er
+   een bericht is verstuurd.
+
+   HET IS EEN MEDEDELING EN GEEN TAAK. Er staat geen knop bij, er verandert geen
+   getal, en wie hem niet leest is niets kwijt. Zou hij een lijstje worden dat
+   je moet afvinken, dan is het geen overdracht maar werk. */
+const OVERDRACHT_MAX = 4;
+
+function overdracht(d, v, h, naam) {
+  const gehad = d.diensten || [];
+  /* SINDS JE VORIGE DIENST, en bij je eerste sinds je aantreden. Anders krijgt
+     iemand op zijn eerste avond de hele geschiedenis van de zaak te lezen als
+     nieuws, terwijl hij er toen niet was. */
+  const vorige = gehad.length ? Math.max(...gehad.map(x => x.maand)) : (d.sinds || 0);
+  return KETEN.sinds(v, vorige, h).slice(-OVERDRACHT_MAX).map(f => Object.assign(
+    { maand: f.maand, wie: naam(f.wie), rol: (D.ROLLEN[f.rol] || {}).naam || f.rol,
+      deed: f.deed },
+    f.spoed ? { spoed: f.spoed } : {}));
+}
+
+/* `codenaamVan` REIST MEE MET DE MODULE en niet alleen met het werkbeeld. De
+   overdracht draagt namen van andere mensen, en de actie `rush` is net zo goed
+   een ingang als het zicht -- zou hij daar de spelersleutel teruggeven, dan lekt
+   de privacylaag via de achterdeur (CLAUDE.md: klantdata draait op codenamen).
+   De terugval is de identiteit, zodat een toets die de motor los opbouwt niet
+   over een ontbrekende vertaler struikelt. */
+module.exports = ({ codenaamVan } = {}) => {
+  const naam = (x) => (codenaamVan && x ? codenaamVan(x) : x);
   /* De dienst van deze speler, met de zaak erbij -- of de reden dat er geen is.
      Een vraag, een antwoord: alles hieronder begint hier. */
   function mijnDienst(st, h) {
@@ -90,6 +128,9 @@ module.exports = () => {
       id: d.id, zaak: v.naam, rol: (D.ROLLEN[d.rol] || {}).naam,
       maand: st.maand, moment: Math.min(s.slot + 1, R.SLOTS), momenten: R.SLOTS,
       klaar: s.klaar,
+      /* WAT ER IS GEBEURD TERWIJL JIJ ER NIET WAS. Bovenaan de dienst, want het
+         is de context waarin je avond begint -- niet een voetnoot eronder. */
+      overdracht: overdracht(d, v, h, naam),
       open: s.klaar ? [] : openstaand(vv, s, s.slot).map(x => ({
         id: x.id, wat: x.wat,
         /* WAT HET NU AL GEKOST HEEFT en wat het per moment nog kost. Geen
@@ -102,7 +143,7 @@ module.exports = () => {
            heet die "oppakken". Bij een storing hangt de lijst aan je rol, en dat
            is het hele verschil tussen een hulpkracht en een vakkracht: hetzelfde
            incident, meer te zeggen. */
-        opties: x.opties.map(o => ({ id: o.id, wat: o.wat, uitleg: o.uitleg }))
+        opties: x.opties.map(o => ({ id: o.id, wat: o.wat, gevolg: o.gevolg }))
       })),
       gedaan: s.gedaan.map(g => ({ id: g.id, moment: g.slot + 1,
         deed: (vv.find(x => x.id === g.id) || {}).deed || g.id })),

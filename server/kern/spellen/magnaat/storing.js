@@ -41,6 +41,7 @@
    bij, en scripts/magnaat-pomp.js hoort er niets van te merken behalve dat er
    minder of meer geld de wereld uit gaat. */
 'use strict';
+const KETEN = require('./storing-keten');
 
 const { onderhoudsnorm } = require('./maat');
 
@@ -171,15 +172,25 @@ function ruim(v) {
    Geeft terug wat de MAAND ervan moet weten: een spoedbedrag en een
    herstelsprong. Hij zet zelf geen geld en raakt geen kas -- dat doet de maand,
    want daar horen bedragen thuis (par. 0f wet 3). */
-function pas(v, soort, optie, maand) {
+function pas(v, soort, optie, maand, door) {
   const t = SOORTEN[soort];
   const s = vind(v, soort);
   if (!t || !s || !optie) return null;
-  if (optie.lost) { zet(v, soort, 'weg', maand); return { spoed: onderhoudsnorm(v) * t.spoed, herstel: t.herstel }; }
+  /* WIE DIT BESLOOT, hier en niet bij de twee aanroepers: dit is de enige plek
+     waar een uitweg werkelijkheid wordt, dus ook de enige plek waar hij
+     opgeschreven hoort te worden. Zie ./storing-keten.js. */
+  const boek = (spoed) => KETEN.noteer(v, { maand, soort, optie: optie.id,
+    deed: optie.deed, spoed, wie: (door || {}).wie, rol: (door || {}).rol });
+  if (optie.lost) {
+    zet(v, soort, 'weg', maand);
+    const spoed = onderhoudsnorm(v) * t.spoed;
+    boek(spoed);
+    return { spoed, herstel: t.herstel };
+  }
   /* MITIGEREN IS GEEN STANDVERANDERING. Een hulpkracht die de waar overzet lost
      niets op; hij redt wat er vanavond in ligt. Morgen ligt er weer wat in, en
      het voorval komt terug. Dat verschil IS de rol. */
-  if (optie.staat) { zet(v, soort, optie.staat, maand); return { spoed: 0, herstel: 0 }; }
+  if (optie.staat) { zet(v, soort, optie.staat, maand); boek(0); return { spoed: 0, herstel: 0 }; }
   return { spoed: 0, herstel: 0 };
 }
 
@@ -194,4 +205,4 @@ function zwaarte(v, soort, dervingBasis) {
 }
 
 module.exports = { SOORTEN, UIT_RISICO, WORKAROUND_MAANDEN, lijst, heeft, vind,
-  ontstaat, uitVoorval, zet, pas, effect, verval, ruim, zwaarte, openstaand };
+  ontstaat, uitVoorval, zet, pas, effect, verval, ruim, zwaarte, openstaand, KETEN };

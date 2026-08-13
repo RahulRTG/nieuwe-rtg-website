@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 947 bestanden en 6447 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 947 bestanden en 6453 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 947 |
-| losse beweringen (`test(...)`) | 6447 |
+| losse beweringen (`test(...)`) | 6453 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-827 bestanden, 6232 beweringen.
+827 bestanden, 6238 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -652,7 +652,7 @@ toets omvalt.
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spelaandeel.test.js` | 13 | genoemd | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | genoemd | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
-| `spelbeheer.test.js` | 20 | -- | MAGNAAT: DE AI-MANAGER -- je zaken laten draaien terwijl je er niet bent. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
+| `spelbeheer.test.js` | 26 | -- | MAGNAAT: DE AI-MANAGER -- je zaken laten draaien terwijl je er niet bent. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
 | `spelbeleid.test.js` | 10 | -- | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
 | `spelbestuur.test.js` | 20 | -- | MAGNAAT: HET BESTUUR -- meerdere mensen in EEN concern. Fase D, het eerste stuk. |
 | `spelbeurs.test.js` | 15 | genoemd | MAGNAAT: DE BEURS -- belangen die openbaar te koop staan. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |

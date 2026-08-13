@@ -85,10 +85,24 @@ const VORMEN = [
    De andere helft is de realistische: iemand vertrekt met een zaak die aandacht
    nodig heeft. Daar hoort bestuur zijn geld te verdienen, en daar wordt "het
    bedrijf raakt verstopt" ook echt zichtbaar. */
+const STORING = require('../server/kern/spellen/magnaat/storing');
+
 const VERTREK = {
   verzorgd: { naam: 'verzorgd achtergelaten', doe() {} },
   verwaarloosd: { naam: 'verwaarloosd achtergelaten',
-    doe(m, p, v) { m.spel.zet(p, 'anna', { actie: 'beleid', id: v.id, onderhoud: 0, personeel: 1 }); } }
+    doe(m, p, v) { m.spel.zet(p, 'anna', { actie: 'beleid', id: v.id, onderhoud: 0, personeel: 1 }); } },
+  /* EN DE DERDE, sinds de manager storingen mag verhelpen: je gaat weg terwijl
+     de koeling het niet doet. Dit is de vertrekvorm waar een MANDAAT werkelijk
+     iets beslist -- repareren kost geld, dus "onderhoud tot X" bepaalt of je
+     terugkomt in een zaak die draait of in een die drie jaar heeft gebloed.
+
+     Hij wordt NIET geloot maar gezet, want dit is een meter en geen partij: een
+     machinebreuk valt met een paar procent per maand en dan meet je het weer. */
+  kapot: { naam: 'met een kapotte koeling achtergelaten',
+    doe(m, p, v) {
+      m.spel.zet(p, 'anna', { actie: 'beleid', id: v.id, onderhoud: 0, personeel: 1 });
+      STORING.uitVoorval(v, 'machinebreuk', p.staat.maand);
+    } }
 };
 
 /* Een zaak, een bestuursvorm, en dan drie jaar zonder eigenaar. Wat er
@@ -128,7 +142,11 @@ function proef(vorm, hoe = 'verzorgd') {
      bedrijf raakt verstopt": niet dat er iets fout ging, maar dat er iets bleef
      liggen omdat niemand erover mocht beslissen. */
   const log = ((p.staat.beheer || {}).anna || {}).log || [];
-  uit.geweigerd = log.filter(x => /niet verhoogd|niet aangenomen|niet geleend/.test(x.wat || '')).length;
+  uit.geweigerd = log.filter(x => /niet verhoogd|niet aangenomen|niet geleend|blijft stuk/.test(x.wat || '')).length;
+  /* EN OF DE KOELING HET WEER DOET. Bij de derde vertrekvorm is dit de vraag:
+     een manager die hem mag repareren komt hier op `nee` uit, een die dat niet
+     mag op `ja` -- en dan zie je in de kas wat dat drie jaar lang kost. */
+  uit.stuk = STORING.openstaand(v).length > 0;
   uit.kas = Math.round(p.staat.geld.anna);
   uit.onderhoud = Math.round(v.onderhoud);
   uit.personeel = v.personeel;
@@ -185,14 +203,17 @@ function toon(hoe, telt) {
   console.log('\nMagnaat-mandaatmeter: ' + MAANDEN + ' maanden zonder eigenaar -- '
     + VERTREK[hoe].naam + '\n');
   console.log('bestuursvorm                   |       kas | gemist | onderh | mensen |'
-    + ' rente | geweigerd');
+    + ' rente | geweigerd' + (hoe === 'kapot' ? ' | koeling' : ''));
   for (const r of rijen)
     console.log(r.vorm.naam.padEnd(30) + ' | ' + String(r.kas).padStart(9)
       + ' | ' + String(Math.round(r.gemist)).padStart(6)
       + ' | ' + String(r.onderhoud).padStart(6)
       + ' | ' + String(r.personeel).padStart(6)
       + ' | ' + String(Math.round(r.rente)).padStart(5)
-      + ' | ' + String(r.geweigerd).padStart(9));
+      + ' | ' + String(r.geweigerd).padStart(9)
+      /* EN OF DE KOELING HET WEER DOET. Alleen bij de vertrekvorm waar er een
+         stuk was, want een kolom die overal `nee` zegt is geen kolom. */
+      + (r.stuk === undefined || hoe !== 'kapot' ? '' : ' | ' + (r.stuk ? 'nog stuk' : 'gemaakt')));
   const weg = rijen.find(r => r.vorm.sleutel === 'weg');
   console.log('\nten opzichte van een bedrijf zonder enige sturing:');
   for (const r of rijen.filter(x => x.vorm.sleutel !== 'weg'))
@@ -217,6 +238,7 @@ if (require.main === module) {
      verwaarloosde telt voor de uitslag: een zaak die niets nodig heeft, meet
      geen bestuur. */
   toon('verzorgd', false);
+  toon('kapot', false);
   const klachten = toon('verwaarloosd', true);
   if (klachten.length) process.exitCode = 1;
 }

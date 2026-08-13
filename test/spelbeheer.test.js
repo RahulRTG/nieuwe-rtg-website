@@ -331,3 +331,111 @@ test('beheer instellen is een vrije actie', () => {
   for (const naam of ['beheer-aan', 'beheer-uit', 'beheer-regels'])
     assert.ok(d.buitenBeurt.includes(naam), naam + ' hoort buiten je beurt te mogen');
 });
+
+/* ================= 9. hij laat een kapotte zaak niet bloeden ================= */
+
+const STORING = require('../server/kern/spellen/magnaat/storing');
+const OVER = require('../server/kern/spellen/magnaat/overdracht');
+
+/* Een zaak met een kapotte koeling en een manager die eraan mag zitten.
+   `kasbuffer` op nul, want deze toetsen gaan over het MANDAAT en niet over de
+   vraag of er geld is. */
+function metStoring(id, mandaat) {
+  const o = opstelling(id);
+  o.m.eco.zet(o.p, 'anna', { actie: 'beheer-aan' });
+  /* HET MANDAAT WOONT ONDER `mag`, en niet in een eigen veld: `regelsVan` leest
+     dezelfde map twee keer -- als bedrag (`mandaat`) en als ja-of-nee (`mag`).
+     Deze toets ging daar de eerste keer op onderuit door een `mandaat`-sleutel
+     te sturen die nergens gelezen wordt. */
+  o.m.eco.zet(o.p, 'anna', { actie: 'beheer-regels',
+    kasbuffer: 0, ...(mandaat ? { mag: mandaat } : {}) });
+  STORING.uitVoorval(o.A, 'machinebreuk', o.st.maand);
+  return o;
+}
+const logVan = (st) => ((st.beheer || {}).anna || {}).log || [];
+
+test('een manager laat een kapotte koeling niet staan', () => {
+  /* HET GAT DAT DE OVERDRACHTSLAAG DUURDER MAAKTE. Hij kon `beleid` en
+     `krediet-opnemen` en verder niets, dus wie op vakantie ging met een kapotte
+     koeling liet een manager achter die ernaar keek terwijl de derving doorliep.
+     Dat botst met de belofte van hoofdstuk 13: weg zijn mag alleen kosten wat de
+     wereld logisch veroorzaakt. */
+  const o = metStoring('b-s1');
+  assert.ok(STORING.heeft(o.A, 'koeling'), 'de koeling is stuk');
+  maand(o.m, o.p, 1);
+  assert.equal(STORING.heeft(o.A, 'koeling'), false,
+    'een manager zonder grens hoort hem gewoon te laten repareren');
+  const regel = logVan(o.st).find(x => /repareren/.test(x.wat));
+  assert.ok(regel, 'en het hoort in zijn log te staan: ' + JSON.stringify(logVan(o.st)));
+  assert.ok(regel.bedrag > 0, 'met het bedrag erbij');
+  assert.match(regel.waarom, /stuk/);
+});
+
+test('een krap mandaat maakt er een noodoplossing van, met de reden erbij', () => {
+  /* HIER GAAT HET MANDAAT EINDELIJK ERGENS OVER. "Onderhoud tot 7.500" was een
+     plafond op een budget; nu beslist het of hij de monteur belt of de zaak op
+     een noodkoeling laat draaien tot jij terug bent. En hij laat het NIET
+     bloeden: een noodoplossing kost geen geld en stopt het bederf grotendeels. */
+  const o = metStoring('b-s2', { onderhoud: 1 });
+  maand(o.m, o.p, 1);
+  const s = STORING.vind(o.A, 'koeling');
+  assert.ok(s, 'de koeling is niet gerepareerd');
+  assert.equal(s.staat, 'workaround', 'maar hij staat wel op een noodoplossing');
+  const regel = logVan(o.st).find(x => /noodoplossing/.test(x.wat));
+  assert.ok(regel, 'en je hoort waarom: ' + JSON.stringify(logVan(o.st)));
+  assert.match(regel.waarom, /mandaat/,
+    '"hij mocht het niet" hoort met zoveel woorden in het log te staan');
+});
+
+test('een manager schrijft zijn noodoplossing op', () => {
+  /* Hij is degene die het besloot, en zijn bureau staat niet midden in de
+     drukte. Een vakkracht betaalt de overdracht met een moment van zijn dienst;
+     een manager niet -- dat is geen voorrecht maar hetzelfde verschil dat in het
+     echt bestaat. Wat hij ervoor rekent staat in zijn tarief. */
+  const o = metStoring('b-s3', { onderhoud: 1 });
+  maand(o.m, o.p, 1);
+  const s = STORING.vind(o.A, 'koeling');
+  assert.equal(OVER.onwetend(o.A, s), false,
+    'een noodkoeling van de manager hoort niet als onverklaard te blijven staan');
+  assert.equal(OVER.lijst(o.A).length, 1);
+  assert.equal(OVER.lijst(o.A)[0].rol, 'manager');
+});
+
+test('hij herhaalt zichzelf niet zolang de noodoplossing staat', () => {
+  /* Een besluit dat al genomen is nog een keer nemen is geen besluit maar een
+     herhaling, en het log is een VERANTWOORDING en geen archief -- twaalf keer
+     "ik mag hem nog steeds niet repareren" maakt hem onleesbaar.
+
+     DEZE TOETS TELDE EERST ALLEEN DE NOODOPLOSSINGSREGELS, en die kon niet
+     zakken: `storing-acties.js` weigert dezelfde stand toch al ("zo staat hij
+     al"), dus die tweede poging landde als "blijft stuk" en werd niet geteld.
+     Nu telt hij ALLES wat er over deze koeling in het log komt. */
+  const o = metStoring('b-s4', { onderhoud: 1 });
+  maand(o.m, o.p, 3);
+  const overKoeling = logVan(o.st).filter(x => /Koeling B/.test(x.wat));
+  assert.equal(overKoeling.length, 1,
+    'een regel, niet een per maand: ' + JSON.stringify(overKoeling));
+  assert.match(overKoeling[0].wat, /noodoplossing/);
+});
+
+test('maar als de noodoplossing bezwijkt, probeert hij het opnieuw', () => {
+  /* De keerzijde van de regel hierboven, en de reden dat hij op de STAND hangt
+     en niet op een vlag: een noodkoeling houdt het een paar maanden
+     (magnaat/storing.js) en valt dan terug op `open`. Dan is er weer iets te
+     beslissen, en hoort de manager niet stil te blijven omdat hij het ooit al
+     eens gemeld heeft. */
+  const o = metStoring('b-s6', { onderhoud: 1 });
+  maand(o.m, o.p, STORING.WORKAROUND_MAANDEN + 2);
+  const overKoeling = logVan(o.st).filter(x => /Koeling B/.test(x.wat));
+  assert.ok(overKoeling.length >= 2,
+    'na het bezwijken hoort hij opnieuw te handelen: ' + JSON.stringify(overKoeling));
+});
+
+test('zonder manager blijft de koeling gewoon stuk', () => {
+  /* De positieve controle. Zonder deze meting bewijst het bovenstaande alleen
+     dat storingen vanzelf verdwijnen. */
+  const o = opstelling('b-s5');
+  STORING.uitVoorval(o.A, 'machinebreuk', o.st.maand);
+  maand(o.m, o.p, 2);
+  assert.ok(STORING.heeft(o.A, 'koeling'), 'niemand die er iets aan doet, dus hij blijft stuk');
+});

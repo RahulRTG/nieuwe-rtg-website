@@ -42,7 +42,6 @@
    minder of meer geld de wereld uit gaat. */
 'use strict';
 const KETEN = require('./storing-keten');
-
 const { onderhoudsnorm } = require('./maat');
 
 /* Hoe lang een noodoplossing het houdt. Niet oneindig, want dan is een
@@ -62,15 +61,12 @@ const SOORTEN = {
        genoeg dat de SITUATIE beslist welke goed is. */
     open: { derving: 1.90, vast: 1, capaciteit: 1 },
     workaround: { derving: 1.15, vast: 1.05, capaciteit: 1 },
-    /* UIT BEDRIJF IS SITUATIONEEL, en dat is met opzet de mooiste van de vier:
-       in een zaak die tegen zijn plafond draait kost acht procent capaciteit een
-       vermogen, in een rustige zaak kost het niets. Dezelfde knop, een ander
-       antwoord -- afhankelijk van hoe vol je zit. */
-    /* UIT BEDRIJF ZAKT NOOIT ONDER DE BASIS. Hij stond even op 0,90 -- dan
-       bederft er MINDER dan in een gezonde zaak -- en in een rustige zaak leverde
-       een kapotte koeling daarmee geld op. Dat is waarde uit het niets in de
-       kleinste denkbare vorm: een storing hoort nooit een verbetering te zijn.
-       De basisderving gaat over de hele operatie en niet over dit ene apparaat. */
+    /* UIT BEDRIJF IS SITUATIONEEL, en met opzet de mooiste van de vier: in een
+       zaak die tegen zijn plafond draait kost acht procent capaciteit een
+       vermogen, in een rustige zaak kost het niets. En zijn derving zakt NOOIT
+       onder de basis -- op 0,90 bederfde er minder dan in een gezonde zaak, en
+       dan leverde een kapotte koeling geld op. Waarde uit het niets in de
+       kleinste denkbare vorm. */
     uit: { derving: 1, vast: 1, capaciteit: 0.92 },
     /* Wat repareren kost, als deel van de maandelijkse onderhoudsnorm van de
        zaak (./stap.js `nodig`). Ruim boven een gewone onderhoudsbeurt, want dit
@@ -172,6 +168,11 @@ function ruim(v) {
    Geeft terug wat de MAAND ervan moet weten: een spoedbedrag en een
    herstelsprong. Hij zet zelf geen geld en raakt geen kas -- dat doet de maand,
    want daar horen bedragen thuis (par. 0f wet 3). */
+/* WAT REPAREREN KOST. Apart, want de manager moet het VOORAF weten om zijn
+   mandaat te kunnen toetsen (./beheer-besluit.js) -- en een tweede som daar zou
+   een tweede antwoord zijn op "wat kost spoed". */
+const spoedsom = (v, soort) => onderhoudsnorm(v) * ((SOORTEN[soort] || {}).spoed || 0);
+
 function pas(v, soort, optie, maand, door) {
   const t = SOORTEN[soort];
   const s = vind(v, soort);
@@ -183,7 +184,7 @@ function pas(v, soort, optie, maand, door) {
     deed: optie.deed, spoed, wie: (door || {}).wie, rol: (door || {}).rol });
   if (optie.lost) {
     zet(v, soort, 'weg', maand);
-    const spoed = onderhoudsnorm(v) * t.spoed;
+    const spoed = spoedsom(v, soort);
     boek(spoed);
     return { spoed, herstel: t.herstel };
   }
@@ -205,4 +206,4 @@ function zwaarte(v, soort, dervingBasis) {
 }
 
 module.exports = { SOORTEN, UIT_RISICO, WORKAROUND_MAANDEN, lijst, heeft, vind,
-  ontstaat, uitVoorval, zet, pas, effect, verval, ruim, zwaarte, openstaand, KETEN };
+  ontstaat, uitVoorval, zet, pas, effect, verval, ruim, zwaarte, openstaand, spoedsom, KETEN };

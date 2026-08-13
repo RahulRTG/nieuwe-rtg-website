@@ -19,6 +19,8 @@ const rond = (n) => Math.round(n);
    1). `zet` van ../economie.js wordt met opzet NIET gebruikt: die doet save() en
    stuurt duwtjes rond, en dat hoort bij een mens die op een knop drukt. */
 const M = require('./mandaat');
+const STORING = require('./storing');
+const OVER = require('./overdracht');
 
 module.exports = ({ doe }) => {
   /* ONDERHOUD. Het budget omhoog zolang de staat onder het doel zakt, omlaag
@@ -131,5 +133,54 @@ module.exports = ({ doe }) => {
       rond(-st.geld[h] + tekort) + ' in de min en rood staan is het duurst', bedrag: tekort });
   }
 
-  return { onderhoud, bezetting, prijs, rood };
+  /* WAT ER STUK IS -- het besluit waar deze manager geen antwoord op had.
+
+     Hij kon `beleid` en `krediet-opnemen` en verder niets, dus wie op vakantie
+     ging met een kapotte koeling liet een manager achter die ernaar keek. Dat
+     botst met VERHAAL.md hoofdstuk 13: weg zijn mag alleen kosten wat de wereld
+     LOGISCH veroorzaakt, en een gat in de actietabel is geen wereld.
+
+     EN HIER GAAT HET MANDAAT EINDELIJK ERGENS OVER. "Onderhoud tot 7.500" was
+     een plafond op een budget; nu beslist het of hij de monteur belt of de zaak
+     op een noodkoeling laat draaien tot jij terug bent.
+
+     Drie uitkomsten, en alle drie staan ze in het log met een reden: repareren,
+     een noodoplossing als hij niet mag of niet kan betalen, of niets -- en dan
+     hoor je waarom. */
+  function storing(potje, h, v, r, regels, uit) {
+    const st = potje.staat;
+    for (const s of STORING.openstaand(v)) {
+      const naam = (STORING.SOORTEN[s.soort] || {}).naam || s.soort;
+      const spoed = rond(STORING.spoedsom(v, s.soort));
+      const toe = M.magVoor(regels.mandaat, 'onderhoud', spoed);
+      const betaalbaar = st.geld[h] - spoed >= regels.kasbuffer;
+      const magRepareren = betaalbaar
+        && (toe.mag || regels.mandaat.onderhoud === undefined);
+      if (magRepareren && doe(potje, h, { actie: 'storing-verhelpen',
+        vestiging: v.id, storing: s.soort, hoe: 'repareren' }).ok) {
+        uit.push({ wat: naam + ' laten repareren', bedrag: spoed, vestiging: v.id,
+          waarom: 'hij stond sinds maand ' + s.sinds + ' stuk' });
+        continue;
+      }
+      /* DE TERUGVAL, en alleen vanuit `open` -- een noodkoeling die al draait
+         nog een keer neerzetten is geen besluit maar een herhaling. */
+      if (s.staat !== 'open') continue;
+      const reden = !betaalbaar ? 'repareren kost ' + spoed + ' en dat past niet in de kasbuffer'
+        : toe.reden;
+      if (doe(potje, h, { actie: 'storing-verhelpen',
+        vestiging: v.id, storing: s.soort, hoe: 'workaround' }).ok) {
+        /* EN HIJ SCHRIJFT HET OP, want hij is degene die het besloot en zijn
+           bureau staat niet midden in de drukte. Een vakkracht betaalt de
+           overdracht met een moment van zijn dienst; een manager niet, en dat
+           is geen voorrecht maar hetzelfde verschil dat in het echt bestaat.
+           Wat hij ervoor rekent staat in ./beheer.js. */
+        OVER.noteer(v, { maand: st.maand, soort: s.soort, wie: h, rol: 'manager',
+          staat: 'workaround', deed: 'een noodkoeling geregeld voor ' + naam });
+        uit.push({ wat: naam + ' op een noodoplossing', vestiging: v.id,
+          waarom: reden });
+      } else uit.push({ wat: naam + ' blijft stuk', vestiging: v.id, waarom: reden });
+    }
+  }
+
+  return { onderhoud, bezetting, prijs, rood, storing };
 };

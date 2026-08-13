@@ -1358,3 +1358,54 @@ Drie soorten fout, dezelfde onderliggende storing:
    menselijke informatie. *Communicatie.* Die is er **niet**, en met opzet niet
    half: hij vraagt dat een mens een bewering kan doen die onwaar kan zijn, en
    dat is een laag op zichzelf.
+
+## 16. De manager mocht er niet aan zitten
+
+Twee lagen verder bleek er een gat dat er al zat en dat door hoofdstuk 15
+duurder werd: `beheer.js` gebruikte `beleid` en `krediet-opnemen` en verder
+niets. Wie op vakantie ging met een kapotte koeling liet dus een manager achter
+die ernaar keek — de derving liep door, een noodoplossing klapte na een paar
+maanden terug op `open`, en een ongedocumenteerde ingreep kostte elke maand
+arbeidstijd.
+
+Dat botst met de belofte van hoofdstuk 13: **weg zijn mag alleen kosten wat de
+wereld logisch veroorzaakt.** Een gat in de actietabel is geen wereld.
+
+### En hier gaat het mandaat eindelijk ergens over
+
+*"Onderhoud tot 7.500"* was tot nu toe een plafond op een budget. Nu beslist het
+of je manager de monteur belt of de zaak op een noodkoeling laat draaien tot je
+terug bent. Drie uitkomsten, en alle drie staan ze in zijn log met een reden:
+
+| | wanneer | wat het log zegt |
+|---|---|---|
+| **repareren** | past binnen zijn mandaat én zijn kasbuffer | *"Koeling B laten repareren · hij stond sinds maand 104 stuk"* |
+| **noodkoeling** | mag niet of kan niet betalen, maar laat het niet bloeden | *"Koeling B op een noodoplossing · boven zijn mandaat van 1"* |
+| **niets** | zelfs dat niet | en dan hoor je waarom |
+
+De manager **schrijft zijn noodoplossing op**. Hij is degene die het besloot en
+zijn bureau staat niet midden in de drukte; een vakkracht betaalt de overdracht
+met een moment van zijn dienst, een manager niet. Dat is geen voorrecht maar
+hetzelfde verschil dat in het echt bestaat — en wat hij ervoor rekent staat in
+zijn tarief.
+
+Hij herhaalt zich niet zolang de noodoplossing staat, maar probeert het
+**opnieuw zodra die bezwijkt**. Dat hangt aan de stand en niet aan een vlag: een
+manager die ooit één keer meldde en daarna zwijgt, is geen manager.
+
+### Wat de meter zegt
+
+`scripts/magnaat-mandaat.js` heeft er een derde vertrekvorm bij — *met een
+kapotte koeling achtergelaten* — en die laat het in één kolom zien:
+
+```
+bestuursvorm                   |       kas | gemist | geweigerd | koeling
+niemand (eigenaar vertrokken)  |    386729 |  26266 |         0 | nog stuk
+krap mandaat                   |    376028 |  30052 |        44 | nog stuk
+standaard (niets ingesteld)    |    659424 |  11279 |         0 | gemaakt
+ruim mandaat                   |    737640 |   3491 |         0 | gemaakt
+```
+
+Een te krap mandaat komt na drie jaar terug in een zaak waar de koeling het nog
+steeds niet doet — en dat is niet omdat er iets fout ging, maar omdat niemand
+erover mocht beslissen.

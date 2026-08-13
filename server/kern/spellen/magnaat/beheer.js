@@ -71,7 +71,7 @@ STANDAARD.mag = Object.fromEntries(MAGLIJST.map(k => [k, false]));
    bestaat doet gewoon niets. Nu telt `test/spelbeheer.test.js` na dat elke naam
    hieronder in de echte tabel van de motor zit. Wie hier een actie bij zet en
    hem niet aansluit, ziet dat meteen. */
-const GEBRUIKT = ['beleid', 'krediet-opnemen'];
+const GEBRUIKT = ['beleid', 'krediet-opnemen', 'storing-verhelpen'];
 
 /* De regels van deze speler, aangevuld met de standaard. Nooit de opgeslagen
    waarde rechtstreeks lezen: een partij die begon voordat een regel bestond
@@ -138,6 +138,7 @@ module.exports = ({ ACTIES }) => {
       besluit.onderhoud(potje, h, v, r, regels, uit);
       besluit.bezetting(potje, h, v, r, regels, uit);
       besluit.prijs(potje, h, v, r, regels, uit);
+      besluit.storing(potje, h, v, r, regels, uit);
     }
     besluit.rood(potje, h, regels, uit);
     for (const m of uit) meld(st, h, st.maand, m.wat, m.waarom, m);

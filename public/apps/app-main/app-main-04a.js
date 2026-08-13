@@ -133,16 +133,3 @@
         'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
         'font-size:1.2rem;line-height:1;opacity:1;}' +
       '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
-      /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
-         onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
-
-         Deze regel stond er als `.rtgcookie` -- een klasse die nergens
-         bestaat. Het element heet `#rtg-cookie` (shared/cookie.js) en zet zijn
-         eigen positie al: vast, onderaan, gecentreerd. Er viel dus niets te
-         verplaatsen, en het commentaar hierboven beschreef een verhuizing die
-         nooit heeft plaatsgevonden. Wat er ECHT misging is iets anders: de
-         melding ligt met z-index 9999 over het invoerveld heen, en dan is de
-         enige actie op het scherm onbereikbaar tot je hem wegklikt.
-         De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
-         langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
-      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +

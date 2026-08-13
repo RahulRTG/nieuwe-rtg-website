@@ -697,7 +697,6 @@
     try { trainData = await API.call('/supplier/training', {}); } catch(e){ trainData = null; }
     try { const hm = await API.call('/supplier/horeca/missions', {}); horecaMissies = hm.mijn || []; horecaOverdrachten = hm.overdrachten || []; } catch(e){ horecaMissies = []; horecaOverdrachten = []; }
   }
-
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
   async function restoreSession(){
     let t = null, c = null;
@@ -741,7 +740,6 @@
     (state.guestChats||[]).filter(c=>c.unread).forEach(c => t.push({ icon:'', b:c.codename+' ('+c.dept+')', s:c.last, kind:'info' }));
     return t;
   }
-
   // de voorspeller op de PDA: het team ziet de piek van morgen aankomen
   let vwPda = null, vwPdaBezig = false;
   function laadVwPda(){

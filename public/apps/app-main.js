@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5ad4bd7f';
+var RTG_BOUW = 'b95d4a3d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -680,18 +680,13 @@ var RTG_BOUW = '5ad4bd7f';
         'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
         'font-size:1.2rem;line-height:1;opacity:1;}' +
       '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
-      /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
+      /* De koekjesmelding hoort niet midden in de kennismaking. Hij zweeft
          onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
 
-         Deze regel stond er als `.rtgcookie` -- een klasse die nergens
-         bestaat. Het element heet `#rtg-cookie` (shared/cookie.js) en zet zijn
-         eigen positie al: vast, onderaan, gecentreerd. Er viel dus niets te
-         verplaatsen, en het commentaar hierboven beschreef een verhuizing die
-         nooit heeft plaatsgevonden. Wat er ECHT misging is iets anders: de
-         melding ligt met z-index 9999 over het invoerveld heen, en dan is de
-         enige actie op het scherm onbereikbaar tot je hem wegklikt.
-         De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
-         langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
+         Deze regel stond er als `.rtgcookie`, een klasse die nergens bestaat.
+         Het element heet `#rtg-cookie` en ligt anders met z-index 9999 over
+         het enige invoerveld. De kolom houdt daarom alleen ruimte vrij zolang
+         de melding er werkelijk staat. */
       'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
     /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
        insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn

@@ -8,7 +8,7 @@
     if(!naast||innerWidth<761){panes.forEach(function(p){p.el.remove()});panes=[]}
     if(panes.length>=2){panes.shift().el.remove()}
     var el=document.createElement('section');el.className='rv-pane';el.dataset.id=id;
-    if(a[1]){var f=document.createElement('iframe');f.src=a[1];f.title=a[0];el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
+    if(a[1]){var f=document.createElement('iframe');f.src=a[1];f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
     $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});kies(panes.length-1);haak(el);if(id==='overzicht')laadMomenten(el)
   }
   function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context()}

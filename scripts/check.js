@@ -1637,6 +1637,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
+  POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -1663,6 +1664,8 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        hebben een rem per ip die bij een misser oploopt. */
     ['/api/gast/tafel', 'de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)'],
     ['/api/gast/aanschuiven', 'aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)'],
+    ['/api/arrival/interpret', 'publieke wensontleding zonder opslag of uitvoering (met rem per ip)'],
+    ['/api/arrival/request', 'gast maakt zelf een aanvraag; sterke bezitssleutel, idempotentie en rem per ip'],
     ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
     ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
     ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],

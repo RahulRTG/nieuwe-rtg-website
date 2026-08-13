@@ -1,0 +1,39 @@
+/* App-gids data, deel 12: de samengestelde commandoschermen en Living OS.
+   Zie ../appgids.js voor de gedeelde uitleglaag. */
+const G = (wat, doe, tip) => ({ wat, doe, tip });
+
+module.exports = {
+  '/apps/arrival.html': G('Invisible Arrival: een tijdelijke gastpas waarmee een zaak uw komst kan voorbereiden zonder uw route of GPS te volgen.',
+    ['Vertel Rahul het moment, gezelschap en alleen de wensen die voor dit bezoek nodig zijn',
+      'Controleer het voorstel voordat u de aanvraag verstuurt',
+      'Deel vrijwillig onderweg, in de buurt of gearriveerd; stop delen wanneer u wilt'],
+    'De tijdelijke pas is het toegangsbewijs en verloopt na het bezoek. Deel hem dus niet met anderen.'),
+  '/apps/geld-command.html': G('RTG Geld Command: uw rekeningen, plannen, veiligheidsgrenzen en beslissingen in een financieel werkblad.',
+    ['Lees eerst wat vandaag echt aandacht vraagt', 'Simuleer een keuze voordat er geld beweegt',
+      'Bevestig een betaling altijd zelf bij de financiële leverancier'],
+    'Rahul mag rekenen, vergelijken en voorbereiden; geld verplaatsen blijft een persoonlijke handeling.'),
+  '/apps/instant-reality.html': G('Instant Reality: een intentie wordt direct een controleerbare wereld van voorbereiding, bewijs en uitzonderingen.',
+    ['Beschrijf het gewenste resultaat en de harde grenzen', 'Bekijk wat lokaal klaarstaat en waarop providers nog moeten antwoorden',
+      'Geef alleen de voorbereiding vrij; boeken en betalen blijven apart geblokkeerd'],
+    'Gereed betekent pas gereed als de echte provider dat heeft bevestigd; een mooie voorspelling is geen bewijs.'),
+  '/apps/living-os.html': G('Living OS: geld, tijd, energie, mensen en beleving als een samenhangende wereld vooruit bekijken.',
+    ['Vergelijk de waarschijnlijke, ideale en verstoorde wereld', 'Bekijk in de beslisgraaf wat Rahul mag voorbereiden en wat alleen u mag doen',
+      'Spoel een verandering terug om oorzaak, gevolg en herstel te begrijpen'],
+    'Een simulatie helpt kiezen maar beslist niet. Menselijk akkoord blijft zichtbaar op iedere onomkeerbare grens.'),
+  '/apps/partner-network.html': G('Symbiotic Partner Network: bedrijven werken rond één gastbelofte samen zonder hun hele dossiers te delen.',
+    ['Open het gezamenlijke servicecontract', 'Vergelijk capaciteit, kwaliteit, marge en privacy per partner',
+      'Kies een herstelroute wanneer een deelnemer de belofte niet kan dragen'],
+    'Iedere partner ontvangt alleen wat nodig is voor zijn eigen deel; de gezamenlijke uitkomst blijft controleerbaar.'),
+  '/apps/private-office.html': G('Private Office: een rustige directietafel voor zaken die echt persoonlijk oordeel of een handtekening vragen.',
+    ['Lees de korte briefing en laat stil geregelde zaken op de achtergrond', 'Roep de Council bijeen voor meerdere controleerbare perspectieven',
+      'Onderteken eerst voorbereiding en pas later de definitieve uitvoering'],
+    'Quiet Protocol verbergt geen risico: uitzonderingen en ontbrekend bewijs komen juist naar voren.'),
+  '/apps/reizen-veilig.html': G('Reizen en Veilig: plannen, vervoer, aankomst en vrijwillige veiligheidsdeling in één reiswerkruimte.',
+    ['Plan vervoer op tijd, prijs en uitstoot', 'Open uw samengestelde reizen naast de live reisdag',
+      'Kies per moment wie uw plan, voortgang of tijdelijke locatie mag zien'],
+    'Locatie delen staat standaard uit, stopt automatisch en kan ieder moment handmatig worden beëindigd.'),
+  '/apps/vandaag.html': G('Vandaag: uw korte dagbriefing en de snelste ingang naar de software die nu nodig is.',
+    ['Lees de briefing van Rahul', 'Open een voorstel of vraag in gewone taal om een andere app',
+      'Zet een tweede werkblad ernaast wanneer twee onderwerpen bij dezelfde beslissing horen'],
+    'Vandaag is een regiescherm: de bronapp blijft de plek waar gegevens worden gewijzigd of een handeling definitief wordt uitgevoerd.')
+};

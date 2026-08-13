@@ -43,5 +43,6 @@
   (function(){var uur=new Date().getHours(),g=document.getElementById('groet');g.textContent=(uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.');function ga(q){if(parent.RTGCommand&&parent.RTGCommand.bestemming){var r=parent.RTGCommand.bestemming(q);document.getElementById('brief').textContent=r||'Zeg in de hulpbalk welke software u wilt openen.'}}document.querySelectorAll('[data-vraag]').forEach(function(b){b.onclick=function(){ga(b.dataset.vraag)}});document.getElementById('praat').onclick=function(){try{parent.document.querySelector('[data-open=ai]').click()}catch(e){}}})();
 </script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

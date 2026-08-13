@@ -71,6 +71,19 @@ nulmeting in: `scripts/magnaat-oorsprong.js` zegt dat 59% van de inkoop uit de
 stad zou kúnnen komen en 0% er werkelijk doorheen loopt — de keten bestaat als
 mogelijkheid en niet als structuur.
 
+**`HUISHOUDEN.md` is de ontbrekende actor** — het huishouden. Magnaat heeft
+vooral bedrijven die aan elkaar verkopen; dit document beschrijft de cirkel die
+dat sluit: *mensen werken → verdienen → wonen → consumeren → sparen → investeren
+→ bedrijven verdienen → bedrijven betalen mensen.* Lees vóór je aan loon,
+koopkracht of consumptie werkt vooral **de grenzen**: iedere euro die een actor
+verlaat komt bij een andere actor aan of passeert expliciet de simulatiegrens
+(geen `kosten -= 500` zonder ontvanger), geen vaste percentages voor consumptie,
+geen consumentenvertrouwen-index, en een huishouden is een cohort en geen
+persoon. De kern in één zin: **een werkgever die €3.000 loonkosten betaalt levert
+geen huishouden op dat €3.000 kan uitgeven** — en dat verschil is het halve
+verhaal van elke loondiscussie. `scripts/magnaat-oorsprong.js` meet waar de
+loonmassa werkelijk heen gaat: 26 cent van elke euro komt als vraag terug.
+
 **`ORGANISATIE.md` is de natuurkunde van een organisatie** — waarom sommige
 bedrijven onder druk blijven functioneren en andere uit elkaar vallen terwijl hun
 cijfers er nog prima uitzien. De keten *waarnemen → begrijpen → bevoegd zijn →

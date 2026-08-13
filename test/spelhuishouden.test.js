@@ -4,7 +4,7 @@
    s.loon` was geld dat de wereld verliet zonder ergens aan te komen. Zolang loon
    alleen een kostenpost is, is er geen kringloop.
 
-   ZEVEN BEWERINGEN, en de derde en de vierde zijn de eigenlijke:
+   NEGEN BEWERINGEN, en de derde, de vierde en de achtste zijn de eigenlijke:
 
    1. EEN LEGE STAD REKENT ZOALS IN FASE A -- exact, niet ongeveer.
    2. LOON DAT BETAALD WORDT KOMT TERUG als bestedingskracht.
@@ -15,12 +15,16 @@
    5. ER KOMT GEEN EURO BIJ. Deze laag raakt de vraag, niet de kas.
    6. WIE IN ZIJN EENTJE DE STAD RIJK MAAKT, BETAALT DAT ZELF.
    7. EEN ZAAK DIE SLUIT NEEMT ZIJN LOONSOM MEE -- zo reist een faillissement.
+   8. SCHADE IS NIET METEEN MAXIMAAL, EN WORDT ERGER NAARMATE HIJ LANGER DUURT.
+      De buffer vangt de eerste maanden op en loopt daarna leeg.
+   9. ELKE AFTREKPOST HEEFT EEN BESTEMMING -- geen euro gaat er zomaar af.
 
    Draai los: node --experimental-sqlite --test test/spelhuishouden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const HUIS = require('../server/kern/spellen/magnaat/huishoudens');
+const BOEKJE = require('../server/kern/spellen/magnaat/huishoudboekje');
 const V = require('../server/kern/spellen/magnaat/vraag');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 
@@ -236,4 +240,102 @@ test('een zaak die sluit neemt zijn loonsom mee, en dat merkt de buurt', () => {
   const a = blijft.regel(blijft.zaken()[0]), b = sluit.regel(sluit.zaken()[0]);
   assert.ok(b.omzet < a.omzet,
     'en het restaurant verkoopt minder: ' + b.omzet + ' tegen ' + a.omzet);
+});
+
+/* ============ 8. de buffer, en dat schade tijd nodig heeft ============ */
+
+test('een klap komt niet in een keer aan, maar wordt erger naarmate hij duurt', () => {
+  /* HUISHOUDEN.md par. 6, en er staat nergens een fase, een vlag of een teller.
+     Een huishouden dat deze maand minder verdient eet deze maand nog hetzelfde;
+     pas als het spaargeld op is valt de consumptie terug op wat er binnenkomt.
+
+     TWEE WERELDEN MET DEZELFDE ZAAIING, want anders meet je het seizoen. In de
+     ene wordt de fabriek leeggehaald, in de andere niet -- en het verschil moet
+     GROEIEN over de maanden. */
+  const heel = stad('h-8', [RUIM, ['industrie', 40, 'haven']]);
+  const klap = stad('h-8', [RUIM, ['industrie', 40, 'haven']]);
+  heel.maand(3); klap.maand(3);
+  for (const v of klap.zaken()) if (v.sector === 'industrie') v.personeel = 1;
+  const gat = [];
+  for (let i = 0; i < 6; i++) {
+    heel.maand(1); klap.maand(1);
+    gat.push(heel.st.besteding - klap.st.besteding);
+  }
+  assert.ok(gat[0] > 0, 'er hoort meteen iets te gebeuren: ' + gat[0]);
+  assert.ok(gat[5] > gat[0] * 1.5,
+    'en het hoort erger te worden naarmate het duurt: ' + gat.map(x => x.toFixed(4)).join(' '));
+  /* EN HET SPAARGELD IS WAAR HET UIT BETAALD WORDT. Let op wat hier NIET staat:
+     dat de buffer opraakt. Dat doet hij niet -- zie de kop van
+     magnaat/huishoudboekje.js -- want er is nu een gemiddeld huishouden per stad
+     en een gemiddelde buffer haalt het altijd. De verergering komt hier van de
+     traagheid; de bodem van de buffer bestaat pas met huishoudtypen. */
+  assert.ok(klap.st.huishoudens.spaargeld < heel.st.huishoudens.spaargeld,
+    'het spaargeld hoort aangesproken te zijn');
+});
+
+test('en een huishouden geeft nooit geld uit dat er niet is', () => {
+  /* DE BEHOUDSREGEL UIT HUISHOUDEN.md par. 2, rechtstreeks gevoerd. Geen enkele
+     campagne komt hier vandaag: daarvoor zou een huishouden een buffer moeten
+     hebben die dunner is dan wat een stadsgemiddelde ooit oplevert. Hij staat er
+     omdat `spaargeld` anders negatief kan worden, en dan geeft een huishouden
+     geld uit dat niet bestaat. */
+  const st = { huishoudens: { consumptie: 50000, spaargeld: 100 } };
+  BOEKJE.maand(st, 5000);
+  const besteedbaar = BOEKJE.boekje(5000).stand.besteedbaar;
+  assert.ok(st.huishoudens.spaargeld >= 0, 'het spaargeld hoort nooit onder nul te komen');
+  assert.ok(st.huishoudens.consumptie <= besteedbaar + 100 + 1e-9,
+    'en er wordt nooit meer uitgegeven dan inkomen plus buffer: '
+    + Math.round(st.huishoudens.consumptie) + ' tegen ' + Math.round(besteedbaar + 100));
+});
+
+test('en als het werk terugkomt, herstelt de consumptie vanzelf', () => {
+  /* GEEN RECOVERY FLAG. Er komt weer geld binnen, dus er wordt weer meer
+     uitgegeven -- dat is het hele mechaniek. */
+  const o = stad('h-8b', [RUIM, ['industrie', 40, 'haven']]);
+  o.maand(3);
+  const vol = o.st.besteding;
+  const fabriek = o.zaken().find(v => v.sector === 'industrie');
+  const bezet = fabriek.personeel;
+  fabriek.personeel = 1;
+  o.maand(4);
+  const diep = o.st.besteding;
+  fabriek.personeel = bezet;
+  o.maand(6);
+  assert.ok(diep < vol - 0.001, 'de klap hoort te zijn aangekomen: ' + diep + ' tegen ' + vol);
+  assert.ok(o.st.besteding > diep, 'en het hoort te herstellen: ' + o.st.besteding);
+  assert.ok(Math.abs(o.st.besteding - vol) < 0.005,
+    'tot ongeveer waar het was: ' + o.st.besteding + ' tegen ' + vol);
+});
+
+/* ============ 9. elke aftrekpost heeft een bestemming ============ */
+
+test('van loonkosten naar besteedbaar gaat geen euro zomaar af', () => {
+  /* DE WET UIT HUISHOUDEN.md par. 2, op de plek waar hij voor het eerst geldt:
+     wat de wereld verlaat, verlaat hem NAAR IETS. Vandaag zijn dat allemaal
+     partijen buiten de wereld -- er is geen overheid en geen verhuurder -- en
+     juist daarom moet elke post een naam hebben. Een lek met een naam is een
+     lek dat je kunt dichten; zo zijn keten.js en deze laag allebei ontstaan. */
+  const { stand, stroom } = BOEKJE.boekje(3000);
+  assert.ok(stand.besteedbaar < stand.netto, 'vaste lasten gaan van het netto af');
+  assert.ok(stand.netto < stand.bruto, 'heffing en pensioen gaan van het bruto af');
+  assert.ok(stand.bruto < stand.loonkosten, 'premies gaan van de loonkosten af');
+  for (const x of stroom) {
+    assert.ok(x.bedrag > 0, x.post + ' hoort een bedrag te hebben');
+    assert.ok(x.naar && x.naar.length > 2, x.post + ' hoort een bestemming te hebben');
+  }
+  /* EN DE SOM KLOPT: wat eraf gaat plus wat overblijft is wat erin ging. */
+  const af = stroom.reduce((n, x) => n + x.bedrag, 0);
+  assert.ok(Math.abs((af + stand.besteedbaar) - 3000) < 1e-9,
+    'afgedragen plus besteedbaar hoort de loonkost te zijn: ' + (af + stand.besteedbaar));
+});
+
+test('de wig verandert de bestedingskracht niet -- alleen wat er te zien is', () => {
+  /* DIT IS DE EIS WAARONDER HET HUISHOUDBOEKJE MOCHT BESTAAN. De stad ondergaat
+     dezelfde wig als de spelers, dus in de evenwichtsstand valt hij tegen elkaar
+     weg. Zou dat niet zo zijn, dan was elke ijking uit fase A verschoven door een
+     laag die daar niets mee te maken heeft. */
+  const o = stad('h-9', [['horeca', 60, 'boulevard'], ['retail', 60, 'centrum']]);
+  o.maand(2);
+  assert.ok(Math.abs(o.st.besteding - (1 + HUIS.loonsom(o.st) / HUIS.stadsLoon(K))) < 1e-9,
+    'de evenwichtsstand hoort de kale loonverhouding te zijn: ' + o.st.besteding);
 });

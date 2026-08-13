@@ -58,14 +58,16 @@
 
    ================== WAT ER NOG NIET IS ==================
 
-   TRAAGHEID: een huishouden dat deze maand minder verdient, eet deze maand nog
-   hetzelfde -- er zit een spaarbuffer tussen, en die zit er hier niet.
-   WERKLOOSHEID als eigen toestand (wie ontslagen wordt verdwijnt nu gewoon uit
-   de som), SPAREN, en HUUR EN VASTE LASTEN van huishoudens. Zie ECONOMIE.md. */
+   De wig tussen loonkost en koopkracht, de buffer en de traagheid staan in
+   ./huishoudboekje.js. Wat er daarna nog ontbreekt staat in HUISHOUDEN.md par.
+   3, en de twee die er het meest toe doen zijn VERPLICHTINGEN ALS GELDSTROOM
+   (huur hoort bij een verhuurder aan te komen) en BEHOEFTECATEGORIEEN (een
+   neergang hoort de horeca eerder te raken dan de bakker). */
 'use strict';
 
 const { SECTOREN, SECTORLIJST } = require('./sectoren');
 const { segmenten } = require('./vraag');
+const BOEKJE = require('./huishoudboekje');
 
 /* WELK DEEL VAN EEN SEGMENT ZIJN GELD IN DEZE STAD VERDIENT. Geen gevoeligheid
    op een schaal van tien maar een feit over waar inkomen vandaan komt:
@@ -117,12 +119,27 @@ function loonsom(st) {
 
    Boven de 1 komt hij doordat er WERK is bijgekomen dat er niet was; eronder
    zakt hij als dat werk verdwijnt. Er is geen bovengrens en geen bodem behalve
-   nul, want allebei zouden een getal zijn dat niets betekent. */
+   nul, want allebei zouden een getal zijn dat niets betekent.
+
+   HIJ REKENT IN CONSUMPTIE EN NIET IN LOONSOM (./huishoudboekje.js). In de
+   evenwichtsstand maakt dat geen enkel verschil -- de stad ondergaat dezelfde
+   wig als de spelers, dus die valt weg -- en dat is precies de bedoeling: de
+   ijking van fase A blijft staan. Wat het WEL verandert is dat de teller een
+   BUFFER heeft. Zakt de loonsom, dan zakt de consumptie niet mee tot op de
+   bodem maar kruipt hij, en pas als het spaargeld op is komt de hele klap.
+
+   `st.huishoudens` bestaat nog niet voordat er een maand gerekend is; dan is de
+   evenwichtsstand het antwoord, en dat is dezelfde uitkomst als voorheen. */
 function bestedingskracht(st, kaart) {
-  const basis = stadsLoon(kaart);
+  const basis = BOEKJE.doelVan(stadsLoon(kaart));
   if (!(basis > 0)) return 1;
-  return (basis + loonsom(st)) / basis;
+  const eigen = st.huishoudens ? st.huishoudens.consumptie : BOEKJE.doelVan(loonsom(st));
+  return (basis + eigen) / basis;
 }
+
+/* DE MAAND VAN DE HUISHOUDENS. Staat hier en niet in ../maand.js omdat de
+   loonsom hier vandaan komt; wie hem daar zou uitrekenen, rekent hem twee keer. */
+const bijwerken = (st, kaart) => BOEKJE.maand(st, loonsom(st)) && bestedingskracht(st, kaart);
 
 /* WELK DEEL VAN DE VRAAG OP DEZE PLEK VAN LOKAAL VERDIEND GELD LEEFT. Uit de
    segmentsom die ./vraag.js toch al maakt, zodat er geen tweede telling van
@@ -147,4 +164,4 @@ function factorVoor(kaart, kavel, sector, maand, besteding) {
 }
 
 module.exports = { LOONGEVOELIG, LOONQUOTE, stadsLoon, loonsom,
-  bestedingskracht, loongevoelig, factorVoor };
+  bestedingskracht, bijwerken, loongevoelig, factorVoor };

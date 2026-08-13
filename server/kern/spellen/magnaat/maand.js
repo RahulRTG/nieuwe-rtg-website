@@ -73,7 +73,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        Om dezelfde reden hier en niet bij de vestiging: hij hoort op de
        BEGINTOESTAND gerekend te worden. Zou hij per zaak worden bijgewerkt, dan
        eet de eerste speler in het object van een andere stad dan de laatste. */
-    st.besteding = HUIS.bestedingskracht(st, k);
+    st.besteding = HUIS.bijwerken(st, k);
     // de zones van deze stad, voor het nieuws dat er op valt
     const zones = [...new Set(k.kavels.map(x => x.zone))];
     const perSpeler = {};

@@ -180,3 +180,31 @@ for (const v of s.zaken) {
 console.log('\nHet verschil tussen die percentages IS de regel "dezelfde schok raakt niet');
 console.log('iedereen gelijk". Er staat geen tabel met uitzonderingen achter: een hotel');
 console.log('leeft van toeristen die hun geld elders verdienden, een buurtwinkel niet.');
+
+/* ================== EN WAAR DE LOONMASSA HEEN GAAT ==================
+
+   HUISHOUDEN.md par. 1 en 4. Een werkgever betaalt 3.000 aan loonkosten en dat
+   is niet 3.000 aan koopkracht -- er zit een wig tussen, en elke post daarvan
+   heeft een BESTEMMING. Vandaag zijn dat allemaal partijen buiten de wereld, en
+   juist daarom hoort deze tabel er te staan: wat hier als "buiten de wereld"
+   staat is de lijst met kringlopen die nog niet bestaan. */
+const BOEKJE = require('../server/kern/spellen/magnaat/huishoudboekje');
+const loonmassa = HUIS.stadsLoon(k) + HUIS.loonsom(s.p.staat);
+const bk = BOEKJE.boekje(loonmassa);
+console.log('\n\nEn waar gaat die loonmassa heen?\n');
+console.log('loonkosten van de hele stad: ' + Math.round(loonmassa).toLocaleString('nl-NL') + ' per maand\n');
+console.log('post                | per maand   | deel | komt aan bij');
+for (const x of bk.stroom)
+  console.log(x.post.padEnd(20) + '| ' + Math.round(x.bedrag).toLocaleString('nl-NL').padStart(11)
+    + ' | ' + (Math.round(x.bedrag / loonmassa * 100) + '%').padStart(4) + ' | ' + x.naar);
+const cons = bk.stand.besteedbaar * (1 - BOEKJE.SPAARQUOTE);
+console.log('consumptie          | ' + Math.round(cons).toLocaleString('nl-NL').padStart(11)
+  + ' | ' + (Math.round(cons / loonmassa * 100) + '%').padStart(4) + ' | bedrijven in de stad');
+console.log('sparen              | ' + Math.round(bk.stand.besteedbaar - cons).toLocaleString('nl-NL').padStart(11)
+  + ' | ' + (Math.round((bk.stand.besteedbaar - cons) / loonmassa * 100) + '%').padStart(4)
+  + ' | buffer (nog geen bank)');
+console.log('\nVan elke euro loonkosten komt er dus ' + Math.round(cons / loonmassa * 100)
+  + ' cent als vraag terug in de stad.');
+console.log('De grootste stroom die de wereld verlaat zijn de VASTE LASTEN, en dat is');
+console.log('meteen de grootste kringloop die nog ontbreekt: huur hoort bij een verhuurder');
+console.log('aan te komen en energie bij een energiebedrijf (HUISHOUDEN.md 3.5).');

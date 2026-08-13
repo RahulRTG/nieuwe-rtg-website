@@ -294,7 +294,8 @@ voor huishoudens. Zolang loon alleen een kostenpost is, is er geen kringloop.
 
 Dat was de scherpste openstaande fout in laag 3, en `huishoudens.js` heft hem
 op — zie §1b. De kringloop is er nu voor **loon**; voor huur, sparen en
-uitkeringen nog niet.
+uitkeringen nog niet. Hoe de rest van laag 3 eruit hoort te zien staat in
+**`HUISHOUDEN.md`**, met het huishouden als eigen actor.
 
 **GEEN SKILL-SCORES.** Niet `chef.skill = 83` maar *negen jaar horeca, drie
 jaar leidinggegeven, 682 diensten, twee vestigingsopeningen meegemaakt*. Dat is

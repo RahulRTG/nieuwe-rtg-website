@@ -18,6 +18,8 @@ const rond = (n) => Math.round(n);
 /* `doe` is een actie namens de speler, door dezelfde tabel als het scherm (wet
    1). `zet` van ../economie.js wordt met opzet NIET gebruikt: die doet save() en
    stuurt duwtjes rond, en dat hoort bij een mens die op een knop drukt. */
+const M = require('./mandaat');
+
 module.exports = ({ doe }) => {
   /* ONDERHOUD. Het budget omhoog zolang de staat onder het doel zakt, omlaag
      zodra hij er ruim boven zit. Wie dit laat lopen bespaart nu en betaalt
@@ -37,6 +39,17 @@ module.exports = ({ doe }) => {
     if (ruimte <= 0) return;
     const nieuw = rond(Math.min(v.onderhoudBudget * 1.35 + 250, v.onderhoudBudget + ruimte));
     if (nieuw <= v.onderhoudBudget) return;
+    /* HET MANDAAT IS EEN PLAFOND (../magnaat/mandaat.js). Staat er geen grens,
+       dan is er niets veranderd -- dat is met opzet: een partij die begon
+       voordat mandaten bestonden hoort niet ineens een manager te hebben die
+       stilvalt. Wie wel een grens zet, krijgt een manager die het ZEGT als hij
+       eraan komt, en dat is precies waar delegeren over gaat. */
+    const toe = M.magVoor(regels.mandaat, 'onderhoud', nieuw);
+    if (!toe.mag && regels.mandaat.onderhoud !== undefined) {
+      uit.push({ wat: 'onderhoud niet verhoogd', waarom: toe.reden,
+        bedrag: nieuw, vestiging: v.id });
+      return;
+    }
     if (doe(potje, h, { actie: 'beleid', id: v.id, onderhoud: nieuw }).ok)
       uit.push({ wat: 'onderhoud omhoog', waarom: 'de staat zakte naar ' + Math.round(v.onderhoud) +
         ', doel is ' + doel, bedrag: nieuw, vestiging: v.id });
@@ -91,6 +104,14 @@ module.exports = ({ doe }) => {
     const st = potje.staat;
     if (!regels.mag.lenen || st.geld[h] >= 0) return;
     const tekort = rond(-st.geld[h] + regels.kasbuffer);
+    /* EN OOK HIER EEN PLAFOND. "Mag lenen" was een categorie; "mag lenen tot
+       500.000" is een bevoegdheid. Komt hij eraan, dan leent hij NIET half --
+       een halve werkkapitaallening lost het tekort niet op en kost wel rente. */
+    const toe = M.magVoor(regels.mandaat, 'lenen', tekort);
+    if (!toe.mag) {
+      uit.push({ wat: 'niet geleend', waarom: toe.reden, bedrag: tekort });
+      return;
+    }
     const r = doe(potje, h, { actie: 'krediet-opnemen', soort: 'werkkapitaal',
       bedrag: tekort, looptijd: 12 });
     if (r.ok) uit.push({ wat: 'werkkapitaal opgenomen', waarom: 'de kas stond ' +

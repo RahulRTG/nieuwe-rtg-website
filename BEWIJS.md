@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 944 bestanden en 6414 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 946 bestanden en 6426 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 944 |
-| losse beweringen (`test(...)`) | 6414 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
+| toetsbestanden | 946 |
+| losse beweringen (`test(...)`) | 6426 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 6 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 94 |
-| niets van beide | 205 |
+| niets van beide | 207 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-824 bestanden, 6199 beweringen.
+826 bestanden, 6211 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -673,6 +673,7 @@ toets omvalt.
 | `spelloopbaan.test.js` | 20 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
 | `spelmaatje.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen voor een hint, een regel of een peptalk. |
 | `spelmagnaat.test.js` | 34 | genoemd | MAGNAAT: twee vormen, en de economie die er nieuw bij staat. Het bordspel is niet veranderd; wat hier onder toets staat is de ECONOMIE, en dan vooral de vier beweringen waar een economische simulatie op valt of staat. |
+| `spelmandaat.test.js` | 11 | -- | MAGNAAT: MANDATEN -- wat iemand mag beslissen, en tot welk bedrag. De laag die van "de wereld gaat door zonder jou" een SPEL maakt in plaats van een straf (VERHAAL.md hoofdstuk 13). |
 | `spelnabespreking.test.js` | 8 | -- | De nabespreking: Rahul kijkt een AFGELOPEN partij terug. Er zijn twee Rahul-deuren en ze mogen elkaar niet raken. |
 | `spelnaspelen.test.js` | 9 | -- | Naspelen: een afgelopen partij zet voor zet herbouwen. De belofte die hier bewaakt wordt is niet "er komt een bord uit" maar "het is HETZELFDE bord". |
 | `spelnieuws.test.js` | 14 | genoemd | MAGNAAT: WERELDNIEUWS -- wat er in de stad gebeurt terwijl jij onderneemt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
@@ -861,6 +862,7 @@ toets omvalt.
 | `zorgketen.test.js` | 6 | gezakt op `liegpoort /api/` | De zorgketen (laag twee op de hulpdiensten): recepten van de spreekkamer naar de apotheek, de eerste hulp met triagekleuren, verwijzingen naar de medisch specialist en beauty medical (intake verplicht), en de agenda's. |
 | `zorgniveau.test.js` | 9 | gezakt op `liegpoort /api/` | De grens (kern/zorgniveau.js) en de dagcheck-in die erop staat (kern/gemoed.js). Wat hier bewezen wordt is bijna allemaal een NEGATIEF: dat er GEEN tip komt, GEEN geruststelling en GEEN oefening zodra de grens aanslaat. |
 | `zorgwallet.test.js` | 7 | gezakt op `liegpoort /api/` | De zorgpas en de RTG Wallet: Segur (de verzekeraar) schrijft een lid in op codenaam en de zorgpas ligt direct in de wallet van het lid; de declaratieketen (een mens beslist, afwijzen alleen met reden); de... |
+| `zz-ijk-tijdelijk.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 

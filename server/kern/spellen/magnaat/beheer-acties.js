@@ -11,6 +11,7 @@
    AANZETTEN IS EEN BESLUIT MET EEN PRIJS, en die staat in het antwoord. Er is
    geen scherm denkbaar waarop "laat het over aan de manager" gratis oogt. */
 const B = require('./beheer');
+const M = require('./mandaat');
 
 const rond = (n) => Math.round(n);
 const klem = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -100,7 +101,11 @@ module.exports = () => {
            betekenen dat een typefout een toestemming lijkt te zetten die
            nergens gelezen wordt -- en dan denkt een speler dat hij iets heeft
            aangezet wat uit staat. */
-        for (const k of B.MAGLIJST) if (z.mag[k] !== undefined) r.mag[k] = !!z.mag[k];
+        /* EN EEN BEDRAG BLIJFT EEN BEDRAG (../magnaat/mandaat.js). Hij was
+           `!!z.mag[k]`, dus "onderhoud tot 7.500" werd stil "onderhoud: ja" --
+           en dan is een mandaat weer een vinkje. */
+        for (const k of B.MAGLIJST) if (z.mag[k] !== undefined) r.mag[k] = z.mag[k];
+        r.mag = M.schoon(r.mag);
       }
       return { status: 200, ok: true, regels: B.regelsVan(st, h) };
     }

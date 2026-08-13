@@ -32,6 +32,10 @@
    HIJ IS DETERMINISTISCH, net als de rest. Hij kijkt naar de stand aan het begin
    van de maand en beslist daarop; tien maanden in een keer geeft dezelfde reeks
    besluiten als tien maanden los (GAMEHALL.md 12.4). */
+/* WAT IEMAND MAG BESLISSEN EN TOT HOEVER staat in ./mandaat.js. Dit bestand
+   gaat over WAT de manager doet; dat over hoe ver hij daarin mag gaan. */
+const M = require('./mandaat');
+
 const rond = (n) => Math.round(n);
 const klem = (n, a, b) => Math.max(a, Math.min(b, n));
 
@@ -47,10 +51,18 @@ const STANDAARD = {
   onderhoudsdoel: 70,      // hierboven houden, niet hoger poetsen dan nodig
   bezettingsdoel: 0.85,    // waarboven de kwaliteit begint te zakken (./maat.js)
   kasbuffer: 25000,        // hieronder geeft hij niets meer uit
-  mag: { prijs: false, uitbreiden: false, lenen: false, contracten: false,
-    onderzoek: false, verzekeren: false }
+  /* HET MANDAAT, standaard overal DICHT. Delegeren is een handeling en geen
+     beginwaarde, en dat staat er met opzet uitgeschreven in plaats van als leeg
+     object: een lijst waarop je ziet WAT er dicht staat, is leesbaarder dan een
+     afwezigheid waar je zelf uit moet afleiden wat er had kunnen staan.
+
+     De lijst met wat er te delegeren VALT komt uit ./mandaat.js en niet van
+     hier -- hij stond hier ooit als tweede vocabulaire, met `investeren` naast
+     `uitbreiden` als gevolg. */
+  mag: null            // hieronder ingevuld, want hij hangt aan MAGLIJST
 };
-const MAGLIJST = Object.keys(STANDAARD.mag);
+const MAGLIJST = M.SOORTLIJST.filter(k => M.SOORTEN[k].niveau !== 'persoonlijk');
+STANDAARD.mag = Object.fromEntries(MAGLIJST.map(k => [k, false]));
 
 /* WELKE ACTIES DEZE MANAGER GEBRUIKT, met naam. Deze lijst bestaat om een fout
    te vangen die hier echt is gemaakt: de manager kreeg een halve actietabel mee,
@@ -70,6 +82,16 @@ function regelsVan(st, h) {
     onderhoudsdoel: klem(Number(eigen.onderhoudsdoel ?? STANDAARD.onderhoudsdoel), 0, 100),
     bezettingsdoel: klem(Number(eigen.bezettingsdoel ?? STANDAARD.bezettingsdoel), 0.5, 1),
     kasbuffer: Math.max(0, Number(eigen.kasbuffer ?? STANDAARD.kasbuffer)),
+    /* HET MANDAAT (./mandaat.js). Hij was een map van JA of NEE en draagt nu
+       ook BEDRAGEN: "mag lenen" is een categorie, "mag lenen tot 500.000" is een
+       bevoegdheid. `true` blijft werken en betekent nog steeds "onbegrensd",
+       zodat een partij die begon voordat grenzen bestonden gewoon doorloopt.
+
+       De booleanvorm blijft ernaast staan als `mag`, want ./beheer-besluit.js
+       stelt op twee plekken een JA-of-NEE-vraag waar geen bedrag bij hoort. Een
+       tweede lezing van hetzelfde veld en niet een tweede veld: zou het mandaat
+       ergens anders wonen dan de regels, dan kun je ze uit elkaar zetten. */
+    mandaat: M.schoon(eigen.mag || {}),
     mag: Object.fromEntries(MAGLIJST.map(k => [k, !!(eigen.mag || {})[k]]))
   };
 }

@@ -38,6 +38,41 @@ De regel eronder is niet nieuw en verandert niet:
 
 ---
 
+## De regel die herzien is: de wereld wacht op niemand
+
+`VERHAAL.md` hoofdstuk 13 draagt hem voluit. In het kort, want alles hieronder
+leunt erop:
+
+> **Weg zijn mag alleen kosten wat de wereld logisch veroorzaakt.**
+
+Niet meer *"weg zijn mag niets kosten"*. Die was te grof: een wereld die
+stilstaat als jij er niet bent, is geen wereld. Wat blijft is het andere halve
+verbod — **geen kunstmatige urgentie**, geen aftellende beloning, geen reeks die
+breekt. Het onderscheid zit in de oorzaak: een deadline die bestaat om je terug
+te halen is verboden, een einddatum die uit een echt contract volgt is de
+werkelijkheid.
+
+En daarmee verandert de vraag van *"mag er iets gebeuren zonder de speler?"* in:
+
+> **Welke bevoegdheden had je gedelegeerd voordat je vertrok?**
+
+Dat maakt organisatiekwaliteit gameplay, en het levert een progressiemaat op die
+beter is dan vermogen: van *ik ben het bedrijf* naar *ik kan drie maanden
+verdwijnen en de organisatie blijft gezond.*
+
+**Gebouwd:** `magnaat/mandaat.js`. Bevoegdheid bestond al twee keer — een rol
+draagt een lijst velden die hij mag zetten, de AI-manager draagt `mag: {lenen:
+false}` — maar allebei als **ja of nee**. Wat ontbrak is de grens. *"Mag
+onderhoud goedkeuren"* is een categorie; *"mag onderhoud goedkeuren tot 7.500"*
+is een bevoegdheid, en dat verschil is het hele onderscheid tussen een vinkje en
+governance.
+
+Er kwam **geen derde rechtenmodel** bij: `magAan` in `dienst.js` blijft de enige
+plek waar *"mag deze speler aan deze zaak zitten"* wordt beantwoord; het mandaat
+beantwoordt de volgende vraag — *en tot hoe ver?*
+
+---
+
 ## De ene open vraag die alles eronder raakt
 
 In fase 12 staat één zin die met de grondwet botst:
@@ -228,23 +263,28 @@ grens.
 Vandaag neemt alleen `concurrent.js` initiatief, en die concurreert — hij wil
 niets.
 
-**De vraag die eerst beantwoord moet worden**, en het is een besluit en geen
-detail: *wiens persona mag handelen?* Als de wereld Boris laat solliciteren
-terwijl de mens achter Boris niet aan tafel zit, dan handelt er iemand namens een
-speler die er niet is. Dat botst met de hardste absentieregel die dit huis kent —
-**weg zijn mag niets kosten** — en met zijn spiegelbeeld: weg zijn mag ook niets
-opleveren, want anders is minder spelen een strategie.
+**Die vraag is beantwoord** (zie de herziene regel hierboven): de wereld gaat
+door. Wat er níét doorgaat is de **persoonlijke** laag — trouwen, van carrière
+wisselen, vrijwillig voor jezelf beginnen. Dat wordt nooit namens een mens
+gesimuleerd. Wat wél doorgaat is alles daaronder: lopende verplichtingen, wat je
+gedelegeerd hebt, en wat anderen besluiten.
 
-Drie lezingen, en ze leiden tot verschillende architecturen:
+Dus: **Boris kan zijn baan verliezen terwijl hij offline is**, als zijn werkgever
+reorganiseert. Hard, en de eerlijke kant van een wereld die doorloopt — mits het
+volgt uit iets echts en niet uit een timer die op zijn afwezigheid staat. Maar
+Boris besluit niet zelf, buiten zijn medeweten, om voor zichzelf te beginnen.
 
-1. **Alleen niet-spelers handelen.** De persoon van een mens die niet meedoet
-   wordt een wereldactor; wie wél aan tafel zit beslist altijd zelf. Kost: "dat
-   is dezelfde Boris" wordt "dat is Boris' nalatenschap".
-2. **Iedereen handelt, ook aan tafel.** Kost: je persona kan iets doen wat jij
-   niet wilde.
-3. **Alleen op uitnodiging.** Een wereldactor doet niets tenzij een levende
-   speler hem aanspreekt. Kost: de wereld neemt geen initiatief, en dat was juist
-   de belofte.
+Voor **NPC's** geldt dat onderscheid niet: Mike hoeft niet te wachten tot jij er
+bent. Als hij ontslag neemt en twaalf dagen later zijn eigen zaak opent, dan
+miste je een kans omdat de wereld niet op je wachtte — en dat maakt beslissingen
+betekenisvol.
+
+Wat er dus nog moet: **intentie** (5b) en **handelen via de bestaande werkwoorden**
+(5c). En de regel die daarbij hoort staat al vast: *geschiedenis mag de optie
+relevant maken, nooit de uitkomst bepalen.* Geen `if oud_collega: solliciteer()`
+— dan is geschiedenis alsnog een verborgen bonus. De wereld moet een reden
+hebben: hij zoekt werk, jij hebt een passende vacature, er is historische
+overlap, locatie en sector kloppen — dán mag zijn actor overwegen te reageren.
 
 **En de twee grenzen die vooraf vastliggen**, want deze fase trekt ze allebei
 aan:

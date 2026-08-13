@@ -1120,3 +1120,84 @@ bewaakt — wat overblijft is idempotent omdat een stand zetten dat is.
   meedoet.
 - **Het echte PDA-scherm.** Onveranderd: hoofdstuk 9 staat er nog, de brug draagt
   nog geen verkeer.
+
+---
+
+## 13. De afwezigheidsgrens, herzien
+
+Tot nu toe stond er één regel, en hij stond er als grens: **weg zijn mag niets
+kosten.** Die is te grof gebleken, en de reden is precies de ambitie van dit
+spel: een wereld die stilstaat als jij er niet bent, is geen wereld.
+
+De regel is daarom gesplitst in de twee dingen die eronder zaten en die niets
+met elkaar te maken hebben.
+
+### Wat blijft: geen kunstmatige urgentie
+
+Onveranderd, en zonder uitzondering. Geen aftellende beloning, geen "log voor
+20:00 in", geen reeks die breekt, geen voortgang die vervalt omdat je een week
+niet keek. Dat is het patroon dat `CLAUDE.md` uitsluit en dat `stadskrant.js`
+in zijn kop al met zoveel woorden verbiedt.
+
+### Wat verandert: de wereld wacht op niemand
+
+> **Weg zijn mag alleen kosten wat de wereld logisch veroorzaakt.**
+
+Huur loopt door. Contracten lopen af omdat contracten einddata hebben. Een
+concurrent handelt. Een leverancier gaat failliet. Een werknemer neemt ontslag.
+Een manager neemt een beslissing die jij anders had genomen. Een slecht
+ingericht bedrijf kan kapotgaan terwijl jij er niet bent — en een goed ingericht
+bedrijf kan juist floreren.
+
+**Het onderscheid zit in de oorzaak, niet in het gevolg.** Een deadline die
+bestaat om je terug te halen is verboden; een einddatum die uit een echt
+contract volgt is de werkelijkheid. Verlies omdat je niet inlogde is straf;
+verlies omdat je niemand had aangewezen die kon beslissen, is een gevolg van je
+eigen inrichting.
+
+### De vraag die daarvoor in de plaats komt
+
+Niet meer *"mag er iets gebeuren zonder de speler?"* maar:
+
+> **Welke bevoegdheden had je gedelegeerd voordat je vertrok?**
+
+Daarmee wordt organisatiekwaliteit gameplay. Een ondernemer die alles zelf
+beslist is krachtig zolang hij aanwezig is en kwetsbaar zodra hij wegvalt. Een
+ondernemer die mensen opleidt en bevoegdheden delegeert, kan weg zijn.
+
+En dat levert een progressiemaat op die beter is dan vermogen:
+
+| | |
+|---|---|
+| begin | *ik ben het bedrijf* — als ik weg ben gebeurt er weinig goeds |
+| dan | ik heb één bedrijfsleider |
+| dan | ik heb een managementteam |
+| dan | ik heb governance |
+| eind | **ik kan drie maanden verdwijnen en de organisatie blijft gezond** |
+
+### Vier niveaus van autonomie
+
+| | wat | wie handelt zonder jou |
+|---|---|---|
+| 1 | **persoonlijk** | niemand. Trouwen, van carrière wisselen, een persoonlijke investering — nooit namens een mens gesimuleerd |
+| 2 | **lopende verplichtingen** | de wereld. Huur, loon, rente, polissen, bestaande contracten, voorraad, gewone omzet |
+| 3 | **gedelegeerde beslissingen** | wie er een mandaat voor heeft. Personeel vervangen, onderhoud goedkeuren, prijzen bijstellen, incidenten oplossen |
+| 4 | **strategisch** | alleen wie het expliciet gekregen heeft. Nieuwe vestiging, grote lening, overname, uitgifte, sluiten |
+
+### Wat dat betekent voor twee bestaande regels
+
+Ze overleven allebei, en het is de moeite waard om te zeggen waarom — ze leunden
+op de oude formulering maar gaan over iets anders.
+
+- **`dienst.js` grens 3, opzeggen kan altijd zonder boete.** Blijft. Dat gaat
+  over een speler die zélf kiest, niet over afwezigheid. Een baan waar je niet
+  uit kunt is een verplichting buiten het spel, en die maken we niet.
+- **`beheer-acties.js`, vakantiemodus kost niets extra.** Blijft. Je betaalt het
+  gewone beheertarief omdat je een manager gebruikt — geen vakantietoeslag, geen
+  boete. Dat de zaak intussen geld kan verliezen doordat je manager een
+  beperkt mandaat had, is geen straf maar het gevolg van je inrichting.
+
+**Wat wél verandert:** een dienstverband is niet langer onaantastbaar zolang je
+weg bent. Een werkgever kan reorganiseren. Dat is hard, en het is de eerlijke
+kant van een wereld die doorloopt — mits het uit iets echts volgt en niet uit
+een timer die op je afwezigheid staat.

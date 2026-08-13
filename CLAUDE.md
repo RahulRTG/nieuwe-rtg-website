@@ -44,7 +44,9 @@ speelveld. Lees vóór je aan carrieres, loondienst tussen spelers of het
 minderjarigen aan zich binden bouwen we niet), een spelfeit is nooit een
 juridisch feit (eigen datavak, structureel gescheiden zoals
 `kern/command/zandbak.js`), een spelbaan is geen arbeidsovereenkomst en vraagt
-nooit een pas, en weg zijn mag niets kosten. De kern in een zin: blijvende
+nooit een pas, en weg zijn mag alleen kosten wat de wereld logisch veroorzaakt
+(hoofdstuk 13: de wereld wacht op niemand, maar kunstmatige urgentie blijft
+verboden). De kern in een zin: blijvende
 waarde komt uit tijd en uit wat je deed, nooit uit geld — kas en bedrijven
 blijven in het potje, het verleden gaat mee.
 

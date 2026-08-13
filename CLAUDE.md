@@ -59,6 +59,18 @@ vader ooit had is bezit dat over campagnes heen reist, en `stadsgeheugen.js` zeg
 ondubbelzinnig *"wie bezit het? niemand, en dat is de hele regel"*. De stad
 onthoudt; het bezit niet.
 
+**`ECONOMIE.md` is één economische natuurkunde** — de laag onder alle sectoren,
+zodat er niet over drie jaar tweehonderd economics engines staan die uit elkaar
+lopen. De eerste wet is *niets spawnt zomaar*: ieder product heeft een
+oorsprong, iedere dienst capaciteit, iedere euro een tegenpartij. Lees vóór je
+een nieuwe sector of een economisch gevolg bouwt vooral **de grenzen**: geen
+event dat een gevolg nabootst (geen `voedselinflatie +8%`, geen `housingCrash =
+true`), dezelfde schok raakt niet iedereen gelijk, en recessies en bubbels
+worden niet geschreven maar horen eruit te komen. Er staat een eerlijke
+nulmeting in: `scripts/magnaat-oorsprong.js` zegt dat 59% van de inkoop uit de
+stad zou kúnnen komen en 0% er werkelijk doorheen loopt — de keten bestaat als
+mogelijkheid en niet als structuur.
+
 **`ORGANISATIE.md` is de natuurkunde van een organisatie** — waarom sommige
 bedrijven onder druk blijven functioneren en andere uit elkaar vallen terwijl hun
 cijfers er nog prima uitzien. De keten *waarnemen → begrijpen → bevoegd zijn →

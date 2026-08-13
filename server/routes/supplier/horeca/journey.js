@@ -1,11 +1,18 @@
 /* Hospitality Journey & Course Conductor. Geen tweede orderstaat: dit is een
    realtime projectie van de bestaande rekeningen, keukenregels en verzoeken. */
 'use strict';
+
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem. Wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op een schrikkeldag, een
+   zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
+   zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
+const klok = require('../../../lib/klok');
 module.exports = (kern) => {
   const { app, supplierAuth, horeca } = kern;
   const { H } = horeca;
   const { bereidingsMinuten } = require('../../../kern/horeca/keukenlaag');
-  const minSinds = at => at ? Math.max(0, Math.round((Date.now()-Date.parse(at))/60000)) : 0;
+  const minSinds = at => at ? Math.max(0, Math.round((klok.nu()-Date.parse(at))/60000)) : 0;
   function stap(rek) {
     const regels=rek.regels||[], besteld=regels.length, uitgegeven=regels.filter(r=>r.stand==='uitgegeven').length;
     if(!besteld)return {code:'welkom',label:'Welkom & eerste aandacht',actie:'Bied water aan en begeleid de eerste keuze.',voortgang:12};

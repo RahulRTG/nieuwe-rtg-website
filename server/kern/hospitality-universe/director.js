@@ -1,5 +1,12 @@
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem. Wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op een schrikkeldag, een
+   zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
+   zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
+const klok = require('../../lib/klok');
+
 const crypto = require('crypto');
 const WM = require('./world-model');
 const rond = n => Math.round(n * 10) / 10;
@@ -54,7 +61,7 @@ function vergelijk(w, id, varianten) {
 function bewijs(w, d) {
   d = d || {};
   const basisInvarianten = ['Geen dubbele geldboeking', 'Geen automatische allergie-override', 'Geen schrijfrecht naar productie'];
-  const vast = { soort: 'Hospitality Simulation Evidence', modelVersie: w.modelVersie, wereld: w.id, seed: w.seed, rtgVersie: d.rtgVersie || 'onbekend', configuratie: d.configuratie || 'synthetisch', runs: Math.max(1, Number(d.runs) || 1), scenariofamilies: d.scenariofamilies || [], injecties: d.injecties || {}, invarianten: d.invarianten || basisInvarianten.concat((w.human && w.human.invarianten) || []), overtredingen: d.overtredingen || [], onzekerheden: w.aannames, beperkingen: w.beperkingen, gegenereerdAt: d.at || new Date().toISOString() };
+  const vast = { soort: 'Hospitality Simulation Evidence', modelVersie: w.modelVersie, wereld: w.id, seed: w.seed, rtgVersie: d.rtgVersie || 'onbekend', configuratie: d.configuratie || 'synthetisch', runs: Math.max(1, Number(d.runs) || 1), scenariofamilies: d.scenariofamilies || [], injecties: d.injecties || {}, invarianten: d.invarianten || basisInvarianten.concat((w.human && w.human.invarianten) || []), overtredingen: d.overtredingen || [], onzekerheden: w.aannames, beperkingen: w.beperkingen, gegenereerdAt: d.at || klok.datum().toISOString() };
   vast.vingerafdruk = crypto.createHash('sha256').update(JSON.stringify(vast)).digest('hex');
   return vast;
 }

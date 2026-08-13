@@ -30,6 +30,11 @@ module.exports = (kern) => {
   require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
   require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen
   require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
+  require('./horeca/journey')(ctx);     // één gastreis en gangsynchronisatie voor alle schermen
+  require('./horeca/dish-twin')(ctx);   // gerechtbrein, chefversies, stations en mise-en-place
+  require('./horeca/spatial-command')(ctx); // venue twin, veilige golven, overdracht en herstel
+  require('./horeca/invisible-arrival')(ctx); // één wens, capacity twin, promises en tijdelijke pass
+  require('./horeca/simulation-bridge')(ctx); // anonieme Magnaat-brug; alleen voorstellen terug
   require('./horeca/bezorging')(ctx);  // bezorgzones en tijdsloten
   require('./horeca/bezorgrit')(ctx);  // gecombineerde route en afleverbewijs
   require('./horeca/club')(ctx);       // polsbandtegoed en minimum spend op een VIP-tafel

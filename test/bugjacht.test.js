@@ -504,7 +504,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
   const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eig-'));
   const sleutel = (c) => c.repeat(64);
   const eigen = await startServer({ env: {
-    SMTP_URL: '', RTG_DATA_DIR: TMP2,
+    SMTP_URL: 'smtp://mail.test:2525', OPENAI_API_KEY: 'test-provider-key', RTG_DATA_DIR: TMP2,
     NODE_ENV: 'production', RTG_DEMO: '',
     // productie weigert te starten zonder deze; dat is bewust en het hoort zo
     RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
@@ -561,6 +561,18 @@ test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
 
   const met = valideer(Object.assign({}, basis, { STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }));
   assert.ok(!(met.fouten || []).some(f => /STRIPE/.test(f)), 'met sleutel en webhook-secret is er niets aan de hand');
+});
+
+test('productie zonder echte AI en mail start niet als halve demo', () => {
+  const { valideer } = require('../server/config');
+  const basis = { NODE_ENV:'production', RTG_ENC_KEY:'x'.repeat(64), RTG_VAULT_KEY:'a'.repeat(64),
+    RTG_SECRET_KEY:'b'.repeat(64), RTG_OWNER_EMAIL:'eigenaar@echt.nl', OFFICE_CODE:'ABCDEFGHIJKL',
+    STRIPE_SECRET_KEY:'sk_live_x', STRIPE_WEBHOOK_SECRET:'whsec_x' };
+  const zonder = valideer(basis);
+  assert.ok(zonder.fouten.some(f=>/AI-provider/.test(f)));
+  assert.ok(zonder.fouten.some(f=>/mailprovider/.test(f)));
+  const echt = valideer(Object.assign({},basis,{OPENAI_API_KEY:'provider-key',SMTP_URL:'smtp://mail.test:2525'}));
+  assert.ok(!echt.fouten.some(f=>/AI-provider|mailprovider/.test(f)));
 });
 
 test('een betaal-webhook voor een onbekende betaling verandert niets en valt niet om', async () => {

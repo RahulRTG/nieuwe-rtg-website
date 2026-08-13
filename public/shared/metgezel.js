@@ -29,6 +29,11 @@
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!memTok && !supTok) return;
+  if (!window.__rahulTabStandaard) {
+    var rahulTabScript = document.createElement('script');
+    rahulTabScript.src = '/shared/rahul-tab.js?v=command5'; rahulTabScript.defer = true;
+    document.head.appendChild(rahulTabScript);
+  }
 
   /* De muisvrije laag erbij (shared/handenvrij.js): de stuurbalk waar je in typt
      of tegen praat, met navigatie zonder tik. Hij hangt hier omdat de metgezel
@@ -240,10 +245,7 @@
      De rest van deze laag (het palet, de wauw-laag, de stijl hierboven) draait
      wel gewoon door: dat is de reden dat zo'n scherm de laag WEL laadt en niet
      overslaat. Alleen de balk blijft weg. */
-  var eigenRahul = !!(document.getElementById('osAiBalk') ||
-    (document.body && document.body.hasAttribute('data-ios-home')) ||
-    (document.body && document.body.hasAttribute('data-eigen-rahul')) ||
-    /\/apps\/(app|bureau|index)\.html$|^\/(apps\/)?$/.test(location.pathname));
+  var eigenRahul = true; // de gedeelde Rahul-tablaag is voortaan de enige vorm
   if (!eigenRahul) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
@@ -320,7 +322,6 @@
       blok.classList.toggle('mgz-klein-blok', klein);
       meetRuimte();
     });
-
     /* HET BLOK VAN RAHUL: het antwoord boven, de balk eronder, en de ruimte
        die de pagina ervoor vrijhoudt. Apart deel omdat metgezel-01b.js anders
        over de 10 KB-lat komt (scripts/check.js regel 13) en omdat dit een eigen

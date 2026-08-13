@@ -5,6 +5,7 @@
 const training = require('../../../training');
 module.exports = (kctx) => {
   const { accounts, anthropic, app, crypto, db, findSupplier, logActivity, loginFails, managerOnly, noteFailedTry, notifySupplier, rememberSession, save, schoon, sseToSupplier, supplierAuth, supplierState, tooManyTries, orderMetRef, ordersVanZaak } = kctx;
+  require('./vloer-missies')(kctx);
 /* ============================================================================
    Service-uitmuntendheid: de zaak ziet welke gasten aandacht vragen en welke
    tafels/bestellingen te lang stil liggen, zodat niemand ooit vergeten wordt.

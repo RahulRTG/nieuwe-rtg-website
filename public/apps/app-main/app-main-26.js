@@ -36,10 +36,13 @@
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
-      // een app opent overal hetzelfde: schermvullend. Op een breed scherm
-      // werd hier een zwevend venster geopend; die vensterlaag is weg, want
-      // een app op iOS heeft geen kader, geen titelbalk en geen dock.
-      const openen = () => { location.href = l.url; };
+      // Op telefoon blijft een app één scherm. Op een computer wordt hetzelfde
+      // scherm een blad in de Command-werktafel; zo kunnen meerdere bladen van
+      // dezelfde software naast elkaar blijven staan zonder extra knoppen.
+      const openen = () => {
+        if (window.RTGCommand && RTGCommand.actief()) RTGCommand.open(l.url, l.naam);
+        else location.href = l.url;
+      };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
       if (l.prive) return metAlgPin(openen);
       openen();
@@ -109,4 +112,3 @@
     }
     belScrim.classList.add('open');
   }
-

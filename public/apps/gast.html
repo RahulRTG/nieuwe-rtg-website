@@ -90,6 +90,12 @@
   .dnarij{padding:.6rem 0;border-bottom:1px solid var(--line);}
   .smal{width:auto;}
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  .service-kompas{margin:.8rem 0 1rem;padding:1rem;border:1px solid rgba(169,143,28,.35);border-radius:14px;background:radial-gradient(100% 120% at 100% 0,rgba(127,22,52,.16),transparent 65%),var(--card2);}
+  .service-kompas>span{font-size:.58rem;letter-spacing:.16em;color:var(--gold)}
+  .service-kompas>div{display:flex;justify-content:space-between;align-items:end;margin-top:.45rem}.service-kompas b{font-family:'Bodoni Moda',serif;font-size:1.35rem}.service-kompas strong{font-size:.7rem;color:var(--gold)}
+  .service-kompas>i{display:block;height:2px;margin-top:.65rem;background:var(--line);overflow:hidden}.service-kompas>i>u{display:block;height:100%;background:linear-gradient(90deg,var(--burgundy),var(--gold));text-decoration:none}
+  .service-kompas>p{margin:.65rem 0 0;font-size:.76rem;line-height:1.55;color:var(--muted)}
+  .menu-concierge{margin:.7rem 0 1rem;padding:.9rem;border:1px solid rgba(169,143,28,.3);border-radius:14px;background:linear-gradient(145deg,rgba(127,22,52,.12),var(--card2))}.menu-concierge>span{font-size:.58rem;letter-spacing:.15em;color:var(--gold)}.menu-concierge .rij{margin-top:.55rem}.menu-concierge input{flex:1}.menu-concierge p{font-size:.73rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}.concierge-keus{padding:.55rem 0;border-top:1px solid var(--line)}.concierge-keus b{font-size:.82rem}.concierge-keus small{display:block;color:var(--soft);margin-top:.1rem}
 </style>
 </head>
 <!-- data-ios-uit: deze pagina wil bewust GEEN OS-chroom. Ze staat wel onder
@@ -131,6 +137,7 @@
 
     <section class="kaart" data-paneel="kaart">
       <h2>De kaart</h2>
+      <div class="menu-concierge"><span>RAHUL MENU CONCIËRGE</span><div class="rij"><input id="menuVraag" maxlength="240" placeholder="Bijvoorbeeld: iets lichts, alcoholvrij en zonder noten"><button id="menuVraagGo" type="button">Ontdek</button></div><p id="menuAntwoord">Vertel wat bij uw moment past. Rahul gebruikt alleen de actuele kaart.</p><div id="menuSuggesties"></div></div>
       <label class="lbl" for="allergie">Allergie of dieet (gaat mee naar de keuken)</label>
       <input id="allergie" maxlength="120" placeholder="bijvoorbeeld: ernstige notenallergie">
       <p class="sub mt35" id="allergieLet"></p>
@@ -139,6 +146,7 @@
 
     <section class="kaart" data-paneel="rekening" hidden>
       <h2>Wat er op tafel staat</h2>
+      <div id="serviceKompas" class="service-kompas"></div>
       <div id="rekLijst"></div>
       <h2 class="mt10">Verloop</h2>
       <ul class="tl" id="tijdlijn"></ul>
@@ -360,6 +368,7 @@
         h += '<div class="item' + (m.uitverkocht ? ' uit' : '') + '">' +
           '<div><span class="nm">' + esc(m.naam) + '</span>' +
           (m.uitleg ? '<div class="ds">' + esc(m.uitleg) + '</div>' : '') +
+          (m.twin && m.twin.pairing ? '<div class="ds">Pairing: '+esc(m.twin.pairing)+'</div>' : '') +
           (m.allergenen || []).map(function (a) { return '<span class="alg">' + esc(a) + '</span>'; }).join('') +
           (m.uitverkocht ? '<div class="waarschuw">Door de keuken op uitverkocht gezet.</div>' : '') +
           (m.alcohol ? '<div class="waarschuw">Alcohol: dit neemt een medewerker op.</div>' : '') +
@@ -385,6 +394,15 @@
     if (plus) MAND[plus] = Math.min(20, (MAND[plus] || 0) + 1);
     if (min) { MAND[min] = Math.max(0, (MAND[min] || 0) - 1); if (!MAND[min]) delete MAND[min]; }
     if (plus || min) tekenKaart();
+  });
+
+  $('#menuVraagGo').addEventListener('click', function(){
+    var vraag=$('#menuVraag').value.trim(), zonder=$('#allergie').value.split(/[,;]/).map(function(x){return x.trim()}).filter(Boolean);
+    if(!vraag)return meld('Vertel Rahul waar u zin in heeft.');
+    api('concierge',{sleutel:SLEUTEL,vraag:vraag,zonder:zonder}).then(function(j){
+      if(j._fout)return meld(j._fout);$('#menuAntwoord').textContent=j.antwoord;
+      $('#menuSuggesties').innerHTML=(j.suggesties||[]).map(function(x){return '<div class="concierge-keus"><b>'+esc(x.naam)+'</b><small>'+esc(x.uitleg||x.cat)+(x.twin&&x.twin.pairing?' · '+esc(x.twin.pairing):'')+'</small></div>'}).join('');
+    });
   });
 
   function tekenMand() {
@@ -419,6 +437,9 @@
   function tekenRekening() {
     if (!REK) return;
     var h = '';
+    var sc = REK.service || { stap:'Uw bezoek', volgende:'Wij houden u hier op de hoogte.', voortgang:10 };
+    $('#serviceKompas').innerHTML = '<span>UW SERVICE COMPASS</span><div><b>'+esc(sc.stap)+'</b><strong>'+sc.voortgang+'%</strong></div><i><u></u></i><p>'+esc(sc.volgende)+'</p>';
+    $('#serviceKompas').querySelector('u').style.width = sc.voortgang+'%';
     REK.regels.forEach(function (r) {
       h += '<div class="item"><div><span class="nm">' + r.aantal + ' × ' + esc(r.naam) + '</span>' +
         '<div class="ds">' + (r.doorHandle ? esc(r.doorHandle) : 'tafel') +

@@ -20,6 +20,14 @@
 (function (root) {
   'use strict';
 
+  /* De mond ontsluit overal dezelfde Rahul-tab; de module kiest alleen een
+     bestaande werkbladstrook en maakt nooit een zwevende balk. */
+  if (typeof document !== 'undefined' && !root.__rahulTabStandaard) {
+    var rahulTab = document.createElement('script');
+    rahulTab.src = '/shared/rahul-tab.js?v=command5'; rahulTab.defer = true;
+    document.head.appendChild(rahulTab);
+  }
+
   /* ---- de pure kern: het puntenveld met diepte (ook in Node) ----
      De lipvormen als functies: de middellijn met cupidoboog, de boog van de
      bovenlip en de boog van de onderlip (mondhoeken op x=50 en x=170). Elk punt
@@ -127,4 +135,3 @@
 
   var api = { puntenVeld: puntenVeld, mondStand: mondStand };
   if (typeof module !== 'undefined' && module.exports) { module.exports = api; return; }
-

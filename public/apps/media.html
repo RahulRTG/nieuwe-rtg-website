@@ -15,6 +15,7 @@
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
+<link rel="stylesheet" href="/shared/media-command.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
     --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#4C9A75;--rood:#DE6E92;}
@@ -89,16 +90,36 @@
 </style>
 </head>
 <body>
+<aside class="media-bank" aria-label="RTG hoofdnavigatie">
+  <nav>
+    <a href="/apps/vandaag.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>
+    <a href="/apps/reisbureau.html"><span aria-hidden="true">◇</span><b>Reizen</b></a>
+    <a href="/apps/geld.html"><span aria-hidden="true">▭</span><b>Geld</b></a>
+    <a href="/apps/sociaal.html"><span aria-hidden="true">◯</span><b>Sociaal</b></a>
+    <a class="actief" href="/apps/media.html"><span aria-hidden="true">▷</span><b>Media</b></a>
+    <a href="/apps/reisboek.html"><span aria-hidden="true">♙</span><b>Gastdossier</b></a>
+  </nav>
+  <a class="media-bank-instel" href="#instellingen"><span aria-hidden="true">☷</span><b>Instellingen</b></a>
+</aside>
+<div class="media-werk">
 <header class="kop">
-  <a href="/apps/app.html" aria-label="Terug">&#8592;</a>
-  <h1>RTG Media</h1>
-  <span class="badge">één wereld</span>
+  <div class="media-titel"><span>Media · Rahul</span><h1>Uw mediawereld.</h1><p>Kijken, luisteren en produceren in één rustige ruimte.</p></div>
   <span class="rek"></span>
+  <button class="knop media-nieuw" id="nieuwKnop" type="button">Nieuwe productie</button>
   <button class="knop" id="lijstKnop" type="button">Lijsten</button>
   <button class="knop" id="samenKnop" type="button">Samen</button>
   <button class="knop" id="biebKnop" type="button">Bibliotheek</button>
   <button class="knop" id="bordKnop" type="button">Mijn bord</button>
 </header>
+
+<nav class="media-ruimtes" aria-label="Media ruimtes">
+  <button type="button" data-media-ruimte="wereld" aria-current="true"><span>Vandaag</span><small>voor u gekozen</small></button>
+  <button type="button" data-media-ruimte="ontdek"><span>Ontdekken</span><small>makers en werk</small></button>
+  <button type="button" id="ruimteBieb"><span>Bibliotheek</span><small>bewaren en verdergaan</small></button>
+  <button type="button" data-media-ruimte="studio"><span>Studio</span><small id="studioStand">nieuwe productie</small></button>
+  <button type="button" data-media-ruimte="rechten"><span>Releases</span><small id="releaseStand">geen besluit nodig</small></button>
+  <button type="button" data-media-ruimte="live"><span>Live</span><small>uitzenden en premières</small></button>
+</nav>
 
 <nav class="standen" id="standen" aria-label="Standen"></nav>
 
@@ -138,6 +159,33 @@
   </div>
 </main>
 
+<section class="media-studio" id="mediaStudio" hidden aria-labelledby="studioTitel">
+  <header class="media-studio-kop"><div><span>Studio · concept</span><h2 id="studioTitel">Nieuwe productie</h2><p id="studioMeta">Begin met één bestand. De professionele ruimte groeit vanzelf mee.</p></div><button class="knop" id="studioSluit" type="button">Sluiten</button></header>
+  <div class="media-studio-vlak" id="studioVlak">
+    <label class="media-upload" for="mediaBestand"><strong>Sleep uw productie hierheen</strong><span>Video, audio, foto’s, een script of een complete productiemap</span><input id="mediaBestand" type="file" accept="video/*,audio/*,image/*,.pdf,.txt,.doc,.docx" multiple></label>
+  </div>
+  <div class="media-productie" id="mediaProductie" hidden>
+    <div class="media-preview"><button type="button" aria-label="Voorbeeld afspelen">▷</button><span id="mediaScene">VOORBEELD · 00:00</span></div>
+    <div class="media-tijdlijn" aria-label="Productietijdlijn"><i></i><i></i><b></b></div>
+    <div class="media-controles">
+      <button type="button"><b>Rahul-controle</b><span>Technische analyse voorbereiden</span></button>
+      <button type="button"><b>Review</b><span id="mediaTypt">Niemand typt</span></button>
+      <button type="button" id="rechtenKnop"><b>Rechten</b><span>Controleer publicatiegebied</span></button>
+      <button type="button"><b>Ondertiteling</b><span>Transcript en talen</span></button>
+    </div>
+  </div>
+</section>
+
+<aside class="media-rechten" id="mediaRechten" hidden aria-labelledby="rechtenTitel">
+  <header><div><span>Rechten · publicatie</span><h2 id="rechtenTitel">Releasecontrole</h2></div><button class="knop" id="rechtenSluit" type="button">Sluiten</button></header>
+  <p class="stil">Deze tweede ruimte verschijnt alleen wanneer een productie een beslissing nodig heeft.</p>
+  <div class="media-besluit"><b>Menselijke goedkeuring vereist</b><p>Controleer makers, herkenbare personen, muziekgebruik, sponsoring en beschikbare markten vóór publicatie.</p><button class="knop vol" type="button">Controle starten</button></div>
+  <div class="media-rechten-regel"><b>Makers en medewerkers</b><span>Nog in te vullen</span></div>
+  <div class="media-rechten-regel"><b>Muziek en beeld</b><span>Nog te controleren</span></div>
+  <div class="media-rechten-regel"><b>Markten en talen</b><span>Niet gekozen</span></div>
+  <div class="media-rechten-regel"><b>Logboek en toegang</b><span>Alleen u</span></div>
+</aside>
+
 <div class="lade" id="lade" role="dialog" aria-label="Details" aria-modal="true">
   <div class="vlak" id="ladeVlak"></div>
 </div>
@@ -160,6 +208,7 @@
 </footer>
 
 <div class="melding" id="melding" role="status"></div>
+</div>
 
 <!-- De muziekmotor van het Klankwerk, ongewijzigd hergebruikt: een uitgave
      reist als getallen en klinkt op uw eigen toestel, precies zoals de maker
@@ -187,5 +236,6 @@
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/apps/media/studio.js"></script>
 </body>
 </html>

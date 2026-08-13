@@ -260,6 +260,7 @@
       <div class="pinfo" id="ecKop"></div>
       <div id="ecSinds"></div>
       <div id="ecMijn"></div>
+      <div id="ecHospitality"></div>
       <div class="sec">Een zaak openen</div>
       <div id="ecOpen"></div>
       <div id="ecFonds"></div>
@@ -1452,6 +1453,45 @@ function tekenMagnaatEco(){
     zet[b.dataset.ec] = b.dataset.ec === 'prijs' ? b.dataset.w : Number(b.dataset.w);
     try{ await speelZet(zet); }catch(e){ meld(e.message); }
   }));
+
+  /* Hospitality Universe is een speelbare proef boven dezelfde economie. De
+     client toont de wereld; alle scores, incidenten en herstelregels komen van
+     de server. */
+  const hu=st.hospitality||{}, hv=$('#ecHospitality');
+  const un=st.universe||{}, br=un.briefing, vg=un.vergelijking, ev=un.evidence;
+  const hr=un.wereld&&un.wereld.human||{situaties:[],signalen:[],groepen:[]};
+  const score=(hu.scores?Object.entries(hu.scores):[]).map(([k,v])=>'<span class="chip">'+esc(k)+' <b>'+v+'</b></span>').join('');
+  hv.innerHTML='<div class="sec">Hospitality Universe <small>live testmodus</small></div>'+
+    '<div class="pinfo"><b>'+(hu.status==='live'?'SIMULATIE LIVE':hu.status==='afgerond'?'DIENST AFGEROND':'KLAAR VOOR EEN DIENST')+'</b><br><small>'+
+    esc((hu.bron&&hu.bron.soort)||'synthetisch')+' · moment '+(hu.tick||0)+' · '+esc(hu.fase||'voorbereiding')+'</small><div class="keuzerij" style="margin-top:.7rem;">'+score+'</div></div>'+
+    (hu.status==='gereed'?'<div class="keuzerij">'+['goud','rood','zwart','platina'].map(x=>'<button class="chip" data-hstart="'+x+'">'+x+'</button>').join('')+'</div><div class="keuzerij"><input class="veld" id="huCode" maxlength="8" placeholder="Anonieme live-code"><button class="chip" data-hkoppel>Koppel tellingen</button></div>':'')+
+    (hu.status==='live'?'<div class="keuzerij"><button class="chip aan" data-hstap>Speel volgend moment</button>'+['ziek','allergie','regen','pin','koeling','dubbel','document','levering','noshow','privacy'].map(x=>'<button class="chip mini" data-hchaos="'+x+'">+'+x+'</button>').join('')+'</div>':'')+
+    (hu.incidenten||[]).filter(x=>x.status==='open').map(x=>'<div class="rij"><div class="nm">'+esc(x.titel)+'<small>'+esc(x.as)+' · menselijke keuze vereist</small></div><div class="keuzerij">'+x.keuzes.map(k=>'<button class="chip mini" data-hbesluit="'+esc(x.id)+'" data-keuze="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div></div>').join('')+
+    (hu.wereld?'<div class="sec">Levende wereld</div><div class="keuzerij"><span class="chip">'+hu.wereld.sollicitanten.length+' sollicitanten</span><span class="chip">'+hu.wereld.medewerkers.length+' medewerkers</span><span class="chip">'+hu.wereld.gasten.length+' gasten</span><span class="chip">'+hu.wereld.reserveringen.length+' reserveringen</span><span class="chip">'+hu.wereld.bestellingen.length+' orders</span><span class="chip">'+hu.wereld.betalingen.length+' betalingen</span></div>'+hu.wereld.gasten.slice(0,4).map(g=>'<div class="rij"><div class="nm">'+esc(g.id)+' · '+esc(g.reis)+'<small>'+esc(g.status)+(g.allergie?' · allergie '+esc(g.allergie):'')+(g.toestemming?' · arrival toegestaan':' · geen tracking')+'</small></div><b>'+g.tevreden+'</b></div>').join(''):'')+
+    (hu.voorstellen||[]).map(x=>'<div class="rij"><div class="nm">'+esc(x.titel)+'<small>'+esc(x.uitleg)+'</small></div></div>').join('')+
+    (hu.status==='afgerond'&&hu.brugCode?'<button class="chip aan" data-hdelen>Stuur voorstellen naar managerpoort</button>':'')+
+    ((hu.tijdlijn||[]).length?'<div class="leeg">'+hu.tijdlijn.slice(0,6).map(x=>'T'+x.tick+' · '+esc(x.tekst)).join('<br>')+'</div>':'')+
+    '<div class="sec">Enterprise War Room</div><div class="keuzerij"><button class="chip aan" data-ub>Wat kan ons pijn doen?</button><button class="chip" data-uv>Vergelijk personeelskeuze</button><button class="chip" data-ue>Maak Simulation Evidence</button></div>'+
+    (br?'<div class="pinfo"><b>'+esc(br.vraag)+'</b><br><small>'+br.antwoord.length+' materiële uitzonderingen · '+br.stil+' locaties stil</small></div>'+br.antwoord.map(x=>'<div class="rij"><div class="nm">'+esc(x.stad)+' · '+esc(x.locatie)+'<small>'+esc(x.bevinding)+'</small></div><b>'+x.prioriteit+'</b></div>').join(''):'')+
+    (vg?'<div class="sec">Counterfactual · '+esc(vg.locatie)+'</div>'+vg.runs.map(x=>'<div class="rij"><div class="nm">'+esc(x.naam)+'<small>'+x.uitkomst.wachttijdMin+' min wachten · '+x.uitkomst.herstelPct+'% herstel · bar '+esc(x.uitkomst.bar)+'</small></div><b>'+ecGeld(x.verschil.loonkosten)+'</b></div>').join(''):'')+
+    (ev?'<div class="leeg"><b>Hospitality Simulation Evidence</b><br>'+ev.runs+' runs · '+ev.invarianten.length+' invarianten · '+ev.overtredingen.length+' open overtredingen<br><small>Vingerafdruk '+esc(ev.vingerafdruk.slice(0,20))+'… · bewijst niet: '+ev.beperkingen.map(esc).join(', ')+'</small></div>':'')+
+    '<div class="sec">Human Reality</div><div class="keuzerij">'+[['klacht','Boze gast'],['publiek','Profvoetballer + groep'],['kwetsbaar','Kwetsbare bezoeker'],['beschermd','Fictief beschermd bezoek'],['kind','Vermist kind'],['medisch','Gast onwel']].map(x=>'<button class="chip mini" data-hro="'+x[0]+'">+'+x[1]+'</button>').join('')+'</div>'+
+    (hr.signalen||[]).map(x=>'<div class="rij"><div class="nm">'+esc(x.niveau.toUpperCase())+' · menselijke aandacht<small>'+esc(x.tekst)+'</small></div></div>').join('')+
+    (hr.situaties||[]).filter(x=>x.status!=='afgerond').map(x=>'<div class="rij"><div class="nm">'+esc(x.titel)+'<small>'+esc(x.zone)+' · '+esc(x.fase||'waarnemen')+' · '+x.omstanders+' omstanders · spanning '+x.spanning+'</small></div><div class="keuzerij">'+(x.status==='open'?x.besluiten.map(k=>'<button class="chip mini" data-hrb="'+esc(x.id)+'" data-hrk="'+esc(k)+'">'+esc(k)+'</button>').join(''):'<button class="chip mini" data-hrstab="'+esc(x.id)+'">Stabiliseer omgeving</button><button class="chip mini aan" data-hraf="'+esc(x.id)+'">Teken nazorg af</button>')+'</div></div>').join('')+
+    ((hr.lessen||[]).length?'<div class="leeg"><b>'+hr.lessen.length+' privacyarme lessen</b><br><small>Alleen patroon, keuze en uitkomst - geen namen of persoonlijke details.</small></div>':'');
+  hv.querySelectorAll('[data-hstart]').forEach(b=>b.onclick=()=>speelZet({actie:'hospitality-start',route:b.dataset.hstart}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hstap]').forEach(b=>b.onclick=()=>speelZet({actie:'hospitality-stap'}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hchaos]').forEach(b=>b.onclick=()=>speelZet({actie:'hospitality-chaos',incident:b.dataset.hchaos}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hbesluit]').forEach(b=>b.onclick=()=>speelZet({actie:'hospitality-besluit',incident:b.dataset.hbesluit,keuze:b.dataset.keuze}).catch(e=>meld(e.message)));
+  const hk=hv.querySelector('[data-hkoppel]');if(hk)hk.onclick=()=>speelZet({actie:'hospitality-koppel',code:$('#huCode').value}).catch(e=>meld(e.message));
+  const hd=hv.querySelector('[data-hdelen]');if(hd)hd.onclick=()=>speelZet({actie:'hospitality-delen'}).then(d=>meld(d.let)).catch(e=>meld(e.message));
+  const ub=hv.querySelector('[data-ub]');if(ub)ub.onclick=()=>speelZet({actie:'universe-briefing',vraag:'Wat kan ons dit weekend pijn doen?'}).catch(e=>meld(e.message));
+  const uv=hv.querySelector('[data-uv]');if(uv)uv.onclick=()=>speelZet({actie:'universe-vergelijk',locatieId:'LOC-01',varianten:[{naam:'Twee medewerkers minder',medewerkers:7},{naam:'Eén medewerker minder',medewerkers:8}]}).catch(e=>meld(e.message));
+  const ue=hv.querySelector('[data-ue]');if(ue)ue.onclick=()=>speelZet({actie:'universe-evidence'}).catch(e=>meld(e.message));
+  hv.querySelectorAll('[data-hro]').forEach(b=>b.onclick=()=>speelZet({actie:'human-open',type:b.dataset.hro,zone:'lobby',omstanders:b.dataset.hro==='publiek'?14:2,spanning:b.dataset.hro==='klacht'?75:45}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hrb]').forEach(b=>b.onclick=()=>speelZet({actie:'human-besluit',id:b.dataset.hrb,keuze:b.dataset.hrk}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hrstab]').forEach(b=>b.onclick=()=>speelZet({actie:'human-ontwikkel',id:b.dataset.hrstab,omstanders:-20,spanning:-40}).catch(e=>meld(e.message)));
+  hv.querySelectorAll('[data-hraf]').forEach(b=>b.onclick=()=>speelZet({actie:'human-afronden',id:b.dataset.hraf,betrokkenenGesproken:true}).catch(e=>meld(e.message)));
 
   // een zaak openen: eerst een buurt, dan een vrij kavel, dan een sector
   const open = $('#ecOpen');

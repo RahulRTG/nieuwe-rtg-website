@@ -76,6 +76,16 @@ module.exports = (kern) => {
     uit(res, kern.alarmAfsluiten(h, req.body.id, req.body.hoe));
   });
 
+  /* ---- Live Circle per reis of afspraak ---- */
+  app.post('/api/veiligheid/moment', auth, (req, res) => uit(res, kern.momentMijn(mij(req))));
+  app.post('/api/veiligheid/moment/maak', auth, (req, res) => uit(res, kern.momentMaak(mij(req), req.body || {})));
+  app.post('/api/veiligheid/moment/status', auth, (req, res) => uit(res, kern.momentStatus(mij(req), req.body.id, req.body || {})));
+  app.post('/api/veiligheid/moment/pauze', auth, (req, res) => uit(res, kern.momentPauze(mij(req), req.body.id, req.body.aan)));
+  app.post('/api/veiligheid/moment/stop', auth, (req, res) => uit(res, kern.momentStop(mij(req), req.body.id)));
+  app.post('/api/supplier/veiligheid/aankomsten', kern.supplierAuth, (req, res) => {
+    res.json({ aankomsten: kern.momentVoorBedrijf(req.supplier.code) });
+  });
+
   require('./veiligheid/wacht')(kern);
   require('./veiligheid/codewoord')(kern);
   require('./veiligheid/rust')(kern);

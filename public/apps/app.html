@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="22089fcf">
+<meta name="rtg-bouw" content="b95d4a3d">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -28,6 +28,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/seizoen-pas.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/command.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
@@ -454,11 +455,17 @@
   .view .sub{margin-top:0.4rem;font-size:0.85rem;color:var(--muted);}
 
   .card{
-    background:var(--card);
-    border:1px solid var(--line);
+    background:linear-gradient(145deg,
+      color-mix(in srgb,var(--card) 91%,white) 0%,
+      var(--card) 50%,
+      color-mix(in srgb,var(--card) 90%,black) 100%);
+    border:1px solid color-mix(in srgb,var(--line) 78%,white);
     border-radius:18px;
     padding:1.3rem 1.35rem;
     margin-top:1rem;
+    box-shadow:0 1px 0 rgba(255,255,255,.045) inset,
+      0 -1px 0 rgba(0,0,0,.28) inset,
+      0 12px 30px rgba(0,0,0,.24);
   }
   .card .label{
     font-size:0.62rem;
@@ -590,10 +597,15 @@
   /* salon */
   .post{
     margin-top:1rem;
-    background:var(--card);
-    border:1px solid var(--line);
+    background:linear-gradient(145deg,
+      color-mix(in srgb,var(--card) 91%,white),
+      var(--card) 52%,
+      color-mix(in srgb,var(--card) 90%,black));
+    border:1px solid color-mix(in srgb,var(--line) 78%,white);
     border-radius:18px;
     overflow:hidden;
+    box-shadow:0 1px 0 rgba(255,255,255,.045) inset,
+      0 14px 34px rgba(0,0,0,.25);
   }
   .post .head{
     padding:0.9rem 1.15rem;
@@ -1620,7 +1632,9 @@
      beginscherm) is weg met dat tweede scherm zelf. De kaartjes staan nu in
      de app waar ze horen; daar hoeft niets meer gekozen of gesleept. */
 </style>
-<script src="/shared/vensters.js" defer></script>
+<script src="/shared/command/catalog.js" defer></script>
+<script src="/shared/command/console.js" defer></script>
+<script src="/shared/command.js" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">

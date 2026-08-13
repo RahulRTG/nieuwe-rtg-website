@@ -52,10 +52,7 @@
      De rest van deze laag (het palet, de wauw-laag, de stijl hierboven) draait
      wel gewoon door: dat is de reden dat zo'n scherm de laag WEL laadt en niet
      overslaat. Alleen de balk blijft weg. */
-  var eigenRahul = !!(document.getElementById('osAiBalk') ||
-    (document.body && document.body.hasAttribute('data-ios-home')) ||
-    (document.body && document.body.hasAttribute('data-eigen-rahul')) ||
-    /\/apps\/(app|bureau|index)\.html$|^\/(apps\/)?$/.test(location.pathname));
+  var eigenRahul = true; // de gedeelde Rahul-tablaag is voortaan de enige vorm
   if (!eigenRahul) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
@@ -132,4 +129,3 @@
       blok.classList.toggle('mgz-klein-blok', klein);
       meetRuimte();
     });
-

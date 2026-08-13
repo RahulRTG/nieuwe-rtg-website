@@ -91,9 +91,18 @@ module.exports = ({ save, schoon, horeca, regelbouw, beleid }) => {
   function gastBeeld(rek, deelnemer) {
     const t = totaal(rek);
     const wie = (nr) => (rek.deelnemers || []).find(d => d.nr === nr);
+    const regels = rek.regels || [], n = regels.length, uit = regels.filter(r => r.stand === 'uitgegeven').length;
+    let service = { stap:'Welkom', volgende:'Bekijk rustig de kaart of vraag de bediening.', voortgang:10 };
+    if (n) service = regels.some(r => r.bevestiging === 'wacht')
+      ? { stap:'Persoonlijke controle', volgende:'Een medewerker controleert uw bestelling zorgvuldig.', voortgang:28 }
+      : uit === n ? { stap:'Genieten', volgende:'Alles is geserveerd. Vraag met één tik iets of bekijk de rekening.', voortgang:82 }
+      : regels.some(r => r.stand === 'klaar') ? { stap:'Bijna bij u', volgende:'Uw gang wordt nu compleet gemaakt voor uitserveren.', voortgang:68 }
+      : regels.some(r => r.stand === 'gestart'||r.stand === 'bereid') ? { stap:'In bereiding', volgende:'De keuken bereidt uw bestelling en stemt de gerechten op elkaar af.', voortgang:50 }
+      : { stap:'Ontvangen', volgende:'Uw bestelling staat veilig bij de zaak. De keuken start op het juiste moment.', voortgang:34 };
     return {
       rekeningId: rek.id, tafel: rek.tafel, kanaal: rek.kanaal, status: rek.status,
       reis: rek.reis || 'plaatsgenomen',
+      service,
       ik: deelnemer ? { nr: deelnemer.nr, handle: deelnemer.handle } : null,
       deelnemers: (rek.deelnemers || []).map(d => ({ nr: d.nr, handle: d.handle, lid: !!d.lid })),
       regels: (rek.regels || []).map(r => ({

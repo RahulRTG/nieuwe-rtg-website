@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3787 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3821 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3787 |
-| servermodules (`server/**/*.js`) | 2052 |
-| routebestanden (`server/routes/**`) | 424 |
-| kernmodules (`server/kern/**`) | 1269 |
-| schermen (`public/**/*.html`) | 243 |
-| gedeelde browsermodules (`public/shared/*.js`) | 207 |
-| toetsbestanden (`test/*.test.js`) | 825 |
+| API-endpoints | 3821 |
+| servermodules (`server/**/*.js`) | 2069 |
+| routebestanden (`server/routes/**`) | 432 |
+| kernmodules (`server/kern/**`) | 1278 |
+| schermen (`public/**/*.html`) | 251 |
+| gedeelde browsermodules (`public/shared/*.js`) | 215 |
+| toetsbestanden (`test/*.test.js`) | 832 |
 | schermtoetsen (`test/*.e2e.js`) | 123 |
 
 ## 2. De weg van een verzoek
@@ -102,7 +102,7 @@ zie §5 -- er zijn nog 181 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 640 | 56 | 10 | 398 |
-| `supplier` | 534 | 96 | 6 | 293 |
+| `supplier` | 560 | 102 | 10 | 293 |
 | `office` | 39 | 7 | 3 | 58 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
@@ -115,7 +115,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2112 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2120 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -123,9 +123,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1370 |
+| kern-namen die routes aanraken | 1376 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 181 |
-| daarvan door precies één domein | 1189 |
+| daarvan door precies één domein | 1195 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -137,7 +137,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(163) auth(100) supplierAuth(51) db(34) officeAuth(33) status(27) liveCodename(25)
+app(163) auth(100) supplierAuth(52) db(34) officeAuth(33) status(27) liveCodename(25)
 accounts(20) schoon(20) managerOnly(15) codenaamVan(15) save(14) rtf(13) anthropic(13)
 crypto(11) tooManyTries(10) boardroomWie(9) express(9) gegevensStop(9) payrollOS(9)
 keyVanCodenaam(9) rtmail(9) geenGast(8) findSupplier(8) noteFailedTry(7) logActivity(7)

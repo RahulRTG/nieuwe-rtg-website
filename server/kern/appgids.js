@@ -20,7 +20,7 @@ const GIDS = Object.assign({},
   require('./appgids-data/deel5'), require('./appgids-data/deel6'),
   require('./appgids-data/deel7'), require('./appgids-data/deel7b'), require('./appgids-data/deel8'),
   require('./appgids-data/deel9'), require('./appgids-data/deel10'),
-  require('./appgids-data/deel11'));
+  require('./appgids-data/deel11'), require('./appgids-data/deel12'));
 
 
 // de terugvaluitleg: ook een onbekende of nieuwe pagina krijgt nette hulp

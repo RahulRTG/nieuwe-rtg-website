@@ -20,8 +20,9 @@ module.exports = function startControle({ PRODUCTION, DEMO, accounts, eigenaar }
   if (!PRODUCTION) return;
   if (!process.env.OFFICE_CODE) console.warn('[start] LET OP: OFFICE_CODE staat op de demo-waarde. Zet een eigen code in de omgeving.');
   if (DEMO) console.warn('[start] LET OP: de demo-inlog (universeel account) is AAN in productie (RTG_DEMO=1). Zet hem uit voor een echte lancering.');
-  if (!process.env.SMTP_URL) console.warn('[start] LET OP: geen SMTP_URL; e-mail gaat naar de outbox in plaats van naar klanten.');
-  if (!process.env.ANTHROPIC_API_KEY) console.warn('[start] Info: geen ANTHROPIC_API_KEY; AI en chatvertaling draaien in demo-stand.');
+  /* SMTP en AI worden al door config/productie.js hard geblokkeerd. Hier geen
+     zachte waarschuwing meer: die suggereerde ten onrechte dat productie in
+     zo'n half aangesloten stand mocht doorlopen. */
   /* HET EIGENAARSACCOUNT: alleen zeggen als het ECHT ergens over gaat.
 
      Sinds de registratie op het eigenaarsadres een eenmalige sleutel vraagt

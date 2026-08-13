@@ -15,6 +15,7 @@
 <!-- de vormtaal van een wereldscherm; dezelfde als RTG Reizen, en met opzet
      uit een gedeeld blad in plaats van overgetikt (LAT.md regel 4) -->
 <link href="/shared/rtg-wereld.css" rel="stylesheet">
+<link href="/shared/sociaal-command.css" rel="stylesheet">
 <style>
   /* Wat alleen van DIT scherm is. De rest komt uit rtg-wereld.css; komt hier
      iets te staan dat ook voor Reizen geldt, dan hoort het daar en niet hier. */
@@ -90,6 +91,18 @@
 <body class="rtg-stijl" data-rtg-modus="pro">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
+<aside class="sociaal-bank" aria-label="RTG hoofdnavigatie">
+  <nav>
+    <a href="/apps/vandaag.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>
+    <a href="/apps/reisbureau.html"><span aria-hidden="true">◇</span><b>Reizen</b></a>
+    <a href="/apps/geld.html"><span aria-hidden="true">▭</span><b>Geld</b></a>
+    <a class="actief" href="/apps/sociaal.html"><span aria-hidden="true">◯</span><b>Sociaal</b></a>
+    <a href="/apps/media.html"><span aria-hidden="true">▷</span><b>Media</b></a>
+    <a href="/apps/reisboek.html"><span aria-hidden="true">♙</span><b>Gastdossier</b></a>
+  </nav>
+  <a class="sociaal-bank-instel" href="#instellingen"><span aria-hidden="true">☷</span><b>Instellingen</b></a>
+</aside>
+
 <!-- RTG Sociaal ORKESTREERT de kantoordomeinen en vervangt ze niet
      (PLATFORM.md). Berichten, De Salon, Genootschap, Pulse, Vonk, Meet en
      Attenties houden elk hun eigen kern, hun eigen opslag en hun eigen werkstroom. Op de toetsvraag
@@ -113,8 +126,21 @@
 </nav>
 <main id="inhoud">
   <header class="merkkop">
-    <h1 class="rtg-ceremonie">RTG Sociaal</h1>
+    <div>
+      <span class="sociaal-boven">Sociaal · Rahul</span>
+      <h1 class="rtg-ceremonie">Uw sociale wereld.</h1>
+      <p class="sociaal-inleiding">Mensen, gesprekken, momenten en professioneel werk in één rustige tijdlijn.</p>
+    </div>
+    <button class="sociaal-filter" type="button" id="sociaalFilter" aria-expanded="false">Alles <span aria-hidden="true">⌄</span></button>
   </header>
+
+  <nav class="sociaal-ruimtes" aria-label="Sociale ruimtes">
+    <a class="actief" href="#lijn">Tijdlijn <small>alles bij elkaar</small></a>
+    <a href="/apps/comm.html" data-ruimte="Berichten">Berichten <small id="sociaalBerichtStand">gesprekken en bellen</small></a>
+    <a href="/apps/salon.html" data-ruimte="De Salon">Momenten <small>foto, tekst en video</small></a>
+    <a href="/apps/genootschap.html" data-ruimte="Genootschap">Kringen <small>groepen en bijeenkomsten</small></a>
+    <a href="/apps/pulse.html" data-ruimte="Pulse">Actueel <small>kort en professioneel</small></a>
+  </nav>
 
   <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
        de rust, en pas daarna de functies. Hier stond een alarmbalk die
@@ -151,7 +177,7 @@
   <!-- DE MOMENTLIJN (LIFE.md fase 4). Geen stroom berichten maar wat er in uw
        leven aankomt, in de tijdvakken waarin een mens denkt. Lege vakken bestaan
        niet: een week zonder afspraken is geen gat om op te vullen. -->
-  <div class="regkop"><h2>Uw lijn</h2><span class="tel" id="lijntel"></span></div>
+  <div class="regkop lijnkop"><h2>Tijdlijn</h2><span class="tel" id="lijntel"></span></div>
   <div id="lijn"></div>
 
   <div class="regkop"><h2>De sociale wereld</h2></div>
@@ -179,6 +205,11 @@
 <script src="/shared/canvas-taal.js"></script>
 <script>
 (() => {
+  try {
+    if (parent !== window && parent.RTGCommand && parent.RTGCommand.actief()) {
+      document.body.classList.add('sociaal-in-werktafel');
+    }
+  } catch (e) {}
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
     c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -458,6 +489,12 @@
   // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
   // professional zoekt, dus hij staat er en is met een klik mee te nemen)
   document.addEventListener('click', (e) => {
+    const ruimte = e.target.closest('[data-ruimte]');
+    if (ruimte && parent !== window && parent.RTGCommand && parent.RTGCommand.actief()) {
+      e.preventDefault();
+      parent.RTGCommand.open(ruimte.getAttribute('href'), ruimte.dataset.ruimte);
+      return;
+    }
     const obj = e.target.closest('[data-obj]');
     if (obj) { e.preventDefault(); open(obj.dataset.obj, obj.dataset.objid); return; }
     /* OP data-ref EN NIET OP DE KLASSE. `rtg-ref` is een VORM uit het
@@ -475,6 +512,14 @@
       const oud = b.textContent; b.textContent = 'gekopieerd';
       setTimeout(() => { b.textContent = oud; }, 1200);
     } catch (err) {}
+  });
+
+  $('#sociaalFilter').addEventListener('click', (e) => {
+    const open = e.currentTarget.getAttribute('aria-expanded') === 'true';
+    e.currentTarget.setAttribute('aria-expanded', String(!open));
+    const ruimtes = document.querySelector('.sociaal-ruimtes');
+    ruimtes.classList.toggle('filter-open', !open);
+    if (!open) ruimtes.querySelector('a:not(.actief)')?.focus();
   });
 
   /* De lijn tekenen. Het scherm bepaalt GEEN vakken en verzint geen labels: het
@@ -577,6 +622,39 @@
     } catch (e) { /* de kring staat er al; een stille lijn is geen kapot scherm */ }
   }
 
+  async function laadBerichtStand() {
+    if (!token()) return;
+    try {
+      const res = await fetch('/api/comm/inbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) return;
+      const gesprekken = d.gesprekken || [];
+      const typers = gesprekken.flatMap(g => g.typt || []);
+      const stand = $('#sociaalBerichtStand');
+      if (typers.length) {
+        stand.textContent = typers.slice(0, 2).join(', ') + (typers.length > 2 ? ' en meer' : '') + ' typt…';
+        stand.closest('a').classList.add('is-levend');
+      } else if (d.ongelezen) {
+        stand.textContent = d.ongelezen + (d.ongelezen === 1 ? ' nieuw bericht' : ' nieuwe berichten');
+        stand.closest('a').classList.add('is-levend');
+      } else {
+        stand.textContent = 'gesprekken en bellen';
+        stand.closest('a').classList.remove('is-levend');
+      }
+    } catch (e) {}
+  }
+
+  if (window.EventSource && token()) {
+    try {
+      const sociaalLive = new EventSource('/api/stream?token=' + encodeURIComponent(token()));
+      sociaalLive.addEventListener('comm', laadBerichtStand);
+    } catch (e) {}
+  }
+
   (async function laad() {
     /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
        onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets
@@ -593,6 +671,7 @@
       teken(d);
       laadKlaar();
       laadLijn();
+      laadBerichtStand();
     } catch (e) {
       // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });

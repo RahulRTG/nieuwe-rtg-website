@@ -683,6 +683,8 @@
   let tipsOpen = false;     // toon de volledige tip-lijst
   let coachRef = null;      // coaching voor een concrete tafel/bestelling
   let coachRefTafel = null; // leesbare naam van die tafel
+  let horecaMissies = []; // persoonlijke chef-missies; de PDA is het verlengstuk
+  let horecaOverdrachten = []; // pas van eigenaar na akkoord van de opvolger
   let wisselOpties = []; // verbonden zaken waar dit personeelslid ook op het rooster staat
   let mijnPosities = []; // eigen werkplekken (RTG-account) om tussen te wisselen na 1x aanmelden
   async function laadZaken(){
@@ -693,8 +695,8 @@
     try { aandacht = await API.call('/supplier/aandacht', {}); } catch(e){ aandacht = null; }
     try { netwerk = (await API.call('/supplier/net/lijst', {})).verbindingen || []; } catch(e){ netwerk = []; }
     try { trainData = await API.call('/supplier/training', {}); } catch(e){ trainData = null; }
+    try { const hm = await API.call('/supplier/horeca/missions', {}); horecaMissies = hm.mijn || []; horecaOverdrachten = hm.overdrachten || []; } catch(e){ horecaMissies = []; horecaOverdrachten = []; }
   }
-
   // Blijf ingelogd: met een bewaard token direct naar Vandaag, zonder PIN.
   async function restoreSession(){
     let t = null, c = null;
@@ -725,6 +727,9 @@
   }
   function taskList(){
     const t = [];
+    horecaMissies.filter(x=>x.status!=='klaar').forEach(x => t.push({ icon:'', b:x.titel,
+      s:'Rahul · '+x.sectie+' · '+x.minuten+' min'+(x.status==='bezig'?' · bezig':'')+(x.prioriteit==='hoog'?' · PRIORITEIT':''),
+      kind:'mission', id:x.id, status:x.status, detail:x.detail }));
     (state.tickets||[]).filter(x=>x.status!=='klaar').forEach(x => t.push({ icon:'', b:x.text, s:(x.room?x.room+' · ':'')+(x.status==='bezig'?T('pd.busy','wordt opgepakt'):T('pd.open','open')), kind:'ticket', id:x.id, status:x.status }));
     (state.rooms||[]).filter(r=>r.hk&&r.hk.status==='vuil').forEach(r => t.push({ icon:'', b:r.name, s:T('pd.toclean','schoonmaken'), kind:'hk', id:r.id }));
     if (state.minibar){
@@ -735,7 +740,6 @@
     (state.guestChats||[]).filter(c=>c.unread).forEach(c => t.push({ icon:'', b:c.codename+' ('+c.dept+')', s:c.last, kind:'info' }));
     return t;
   }
-
   // de voorspeller op de PDA: het team ziet de piek van morgen aankomen
   let vwPda = null, vwPdaBezig = false;
   function laadVwPda(){
@@ -767,6 +771,23 @@
           (vwPda.morgen.drukUren.length ? ' · '+T('pd.vw.piek','piek rond')+' '+vwPda.morgen.drukUren.map(u=>u.uur+':00').join(', ') : '')+
           '<br>'+esc(vwPda.morgen.advies||'')+'</div></div>'
         : '');
+    const nuMissie = horecaMissies.filter(x=>x.status!=='klaar').sort((a,b)=>(a.prioriteit==='hoog'?-1:0)-(b.prioriteit==='hoog'?-1:0))[0];
+    if (horecaOverdrachten.length) {
+      const o=horecaOverdrachten[0];
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
+      $('#hmAccept').addEventListener('click',async()=>{try{await API.call('/supplier/horeca/handover/accept',{id:o.id});toast('Overdracht geaccepteerd.');await laadZaken();renderAll();}catch(e){toast(e.message)}});
+    }
+    if (nuMissie) {
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:rgba(169,143,28,.48);background:linear-gradient(145deg,rgba(127,22,52,.14),var(--card));">'+
+        '<div class="k" style="color:var(--gold);">RAHUL SERVICE COMPASS · NU</div><div class="shift-big" style="color:var(--txt);">'+esc(nuMissie.titel)+'</div>'+
+        '<div style="margin-top:.4rem;font-size:.76rem;line-height:1.55;color:var(--soft);">'+esc(nuMissie.sectie)+' · circa '+nuMissie.minuten+' min'+(nuMissie.detail?' · '+esc(nuMissie.detail):'')+'</div>'+
+        '<div class="row" style="margin-top:.75rem;">'+(nuMissie.status==='nieuw'?'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="bezig">Start nu</button>':'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="klaar">Gereed</button><button class="abtn ghost" data-hmnu="'+nuMissie.id+'" data-hmnst="hulp">Vraag hulp</button><button class="abtn ghost" id="hmDraag">Overdragen</button>')+'<button class="abtn ghost" id="hmAlle">Bekijk hierna</button></div></div>');
+      document.querySelectorAll('[data-hmnu]').forEach(b=>b.addEventListener('click',async()=>{
+        try{await API.call('/supplier/horeca/missions/status',{id:b.dataset.hmnu,status:b.dataset.hmnst});toast(b.dataset.hmnst==='klaar'?'Missie gereed.':b.dataset.hmnst==='hulp'?'Chef ziet uw hulpvraag.':'Missie gestart.');await laadZaken();renderAll();openTab('vandaag');}catch(e){toast(e.message);}
+      }));
+      const alle=$('#hmAlle'); if(alle) alle.addEventListener('click',()=>openTab('taken'));
+      const draag=$('#hmDraag'); if(draag) draag.addEventListener('click',async()=>{try{const d=await API.call('/supplier/horeca/handover/start',{missieId:nuMissie.id});toast('Overdracht wacht op '+d.overdracht.naarNaam+'.');}catch(e){toast(e.message)}});
+    }
     laadVwPda();
     // Service op sterrenniveau: gasten die aandacht vragen en te lang stille
     // tafels staan bovenaan, zodat niemand ooit wordt vergeten.
@@ -886,6 +907,9 @@
         ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
         : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
       if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
+      if (t.kind==='mission') act = t.status==='nieuw'
+        ? '<button class="abtn" data-hm="'+t.id+'" data-hmst="bezig">Start</button>'
+        : '<span style="display:flex;gap:.35rem;"><button class="abtn ghost" data-hm="'+t.id+'" data-hmst="hulp">Hulp</button><button class="abtn" data-hm="'+t.id+'" data-hmst="klaar">Klaar</button></span>';
       return '<div class="task"><span class="ic">'+RTGGlyf.tekst(t.icon)+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
     }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
     const tw = $('#takenWrap');
@@ -907,6 +931,13 @@
     }));
     tw.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+    tw.querySelectorAll('[data-hm]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/horeca/missions/status', { id:b.dataset.hm, status:b.dataset.hmst });
+        toast(b.dataset.hmst==='klaar'?'Missie afgerond. Goed werk.':b.dataset.hmst==='hulp'?'Hulp is aan de chef gevraagd.':'Missie gestart.');
+        await laadZaken(); renderAll(); openTab('taken');
+      } catch(e){ toast(e.message); }
     }));
     const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
       const text = $('#klusTekst').value.trim(); if (!text) return;

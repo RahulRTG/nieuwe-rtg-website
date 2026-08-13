@@ -98,6 +98,9 @@
         ? '<button class="abtn" data-tk="'+t.id+'" data-st="bezig">'+T('pd.pickup','Oppakken')+'</button>'
         : '<button class="abtn" data-tk="'+t.id+'" data-st="klaar">'+T('pd.done','Klaar')+'</button>';
       if (t.kind==='hk') act = '<button class="abtn" data-hk="'+t.id+'">'+T('pd.clean','Schoon')+'</button>';
+      if (t.kind==='mission') act = t.status==='nieuw'
+        ? '<button class="abtn" data-hm="'+t.id+'" data-hmst="bezig">Start</button>'
+        : '<span style="display:flex;gap:.35rem;"><button class="abtn ghost" data-hm="'+t.id+'" data-hmst="hulp">Hulp</button><button class="abtn" data-hm="'+t.id+'" data-hmst="klaar">Klaar</button></span>';
       return '<div class="task"><span class="ic">'+RTGGlyf.tekst(t.icon)+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
     }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
     const tw = $('#takenWrap');
@@ -119,6 +122,13 @@
     }));
     tw.querySelectorAll('[data-hk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/room/hk', { id:b.dataset.hk, status:'schoon' }); toast(T('pd.cleaned','Kamer staat op schoon.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
+    }));
+    tw.querySelectorAll('[data-hm]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/supplier/horeca/missions/status', { id:b.dataset.hm, status:b.dataset.hmst });
+        toast(b.dataset.hmst==='klaar'?'Missie afgerond. Goed werk.':b.dataset.hmst==='hulp'?'Hulp is aan de chef gevraagd.':'Missie gestart.');
+        await laadZaken(); renderAll(); openTab('taken');
+      } catch(e){ toast(e.message); }
     }));
     const km = $('#klusMeld'); if (km) km.addEventListener('click', async () => {
       const text = $('#klusTekst').value.trim(); if (!text) return;

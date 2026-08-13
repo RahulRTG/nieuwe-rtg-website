@@ -1,104 +1,11 @@
-<!doctype html>
-<html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mijn leven · RTFoundation</title>
-<meta name="theme-color" content="#0C0C0B">
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/rtg-wereld.css" rel="stylesheet">
-<!-- de levenspas onderaan dit scherm; gedeeld met /apps/foundation/mijnbanden.html -->
-<link href="/shared/levenspas.css" rel="stylesheet">
-</head>
-<body class="rtg-stijl" data-rtg-modus="world">
-<a class="skip" href="#inhoud">Naar de inhoud</a>
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>RTG Leven</title><meta name="theme-color" content="#0C0C0B"><meta name="robots" content="noindex,nofollow"><link rel="icon" href="/icon.svg"><link href="/fonts/fonts.css" rel="stylesheet"><link href="/shared/rtg-ui.css" rel="stylesheet"><link href="/shared/reizen-veilig.css" rel="stylesheet"><link href="/shared/leven.css" rel="stylesheet"><link href="/shared/media.css" rel="stylesheet"><link href="/shared/leven-contract.css" rel="stylesheet"></head>
+<body class="rtg-stijl"><style>#lvPlus{align-self:center;width:38px;height:38px;border:1px solid rgba(244,241,236,.11);border-radius:50%;background:#151312;color:#a8a29a;padding:0}</style><div class="rv-app lv-app">
+<aside class="rv-bank"><nav aria-label="RTG Leven"><button class="actief" data-open="moment"><span class="rv-icoon">⌂</span><span>Vandaag</span></button><button data-open="ontdek"><span class="rv-icoon">◇</span><span>Ontdekken</span></button><button data-open="bestellen"><span class="rv-icoon">□</span><span>Bestellen</span></button><button data-open="uitgaan"><span class="rv-icoon">◌</span><span>Uitgaan</span></button><button data-open="verblijf"><span class="rv-icoon">⌑</span><span>Verblijf</span></button><button data-open="plannen"><span class="rv-icoon">≋</span><span>Mijn plannen</span></button></nav><div class="rv-bankvoet"><button data-open="kantoor"><span class="rv-icoon">≡</span><span>Instellingen</span></button></div></aside>
+<main class="rv-werk"><header class="rv-tabs"><div id="lvTabs"></div><button id="lvPlus" aria-label="Tweede scherm openen">＋</button></header><section class="rv-panes" id="lvPanes"></section></main>
+<section class="rv-rahul" aria-label="Rahul conciërge"><button class="rv-mond" id="lvMond" aria-label="Rahul openen"><span>◌</span></button><div class="rv-vraag"><small id="lvContext">Vertel mij het gevoel; ik regel de rest.</small><input id="lvIn" placeholder="Bijv. zaterdag bijzonder eten en daarna rustig uit…" aria-label="Vraag Rahul"></div><button class="rv-stuur" id="lvStuur" aria-label="Versturen">→</button></section></div>
 
-<!-- HET LEVENS-COMMAND-CENTER (LEVEN.md par. 1.5). Drie vragen, en verder
-     rust: hoe sta ik ervoor, wat komt eraan, moet ik iets doen.
+<template id="lvOntdek"><article class="lv-ontdek"><div class="rv-ey">CURATED BY RTG</div><div class="lv-kop"><h1>Wat past bij vanavond?</h1><button data-app="avond">Laat Rahul kiezen</button></div><div class="lv-filters"><button>Nu open</button><button>Rustig</button><button>Bijzonder</button><button>Buiten</button></div><section class="lv-hero" data-app="food"><div><span>PRIVATE DINING · AMSTERDAM</span><h2>Maison Noire</h2><p>Een verborgen tafel, een persoonlijk menu en vervoer dat precies aansluit.</p><em>Beschikbaar om 19:30</em></div><b>01</b></section><div class="lv-grid"><button data-app="uitgaan"><span>NA HET DINER</span><h3>Salon Privé</h3><p>Live jazz, lage bezetting, gastenlijst beschikbaar.</p></button><button data-app="bestellen"><span>THUIS</span><h3>Chef aan huis</h3><p>Een menu dat arriveert wanneer uw gezelschap compleet is.</p></button><button data-app="verblijf"><span>OVERNACHTEN</span><h3>The Residence</h3><p>Late check-in, ontbijt en terugreis in één Moment.</p></button><button data-app="avond"><span>VERRASSING</span><h3>Rahul’s selectie</h3><p>Geef sfeer en budget; Rahul combineert de avond.</p></button></div></article></template>
 
-     WAAROM DIT SCHERM AAN DE LEDENKANT STAAT EN NIET IN /apps/foundation/.
-     Het foundation-huis draait op een gezinscode met een profieltoken; de
-     levenslijn staat op de RTG-lidsleutel, want zijn bronnen (paspoort,
-     onderwijs, werk, entourage) hangen daaraan.
+<template id="lvMoment"><article class="lv-moment"><div class="rv-ey">VANDAAG · RAHUL</div><div class="rv-rahulteken">◌</div><h1>Uw avond,<br>als één geheel.</h1><p class="rv-intro">Niet vier reserveringen, maar één levend Moment. Ik laat alles op elkaar aansluiten en vraag alleen wanneer u echt moet kiezen.</p><form class="lv-composer" data-composer><input name="sfeer" placeholder="Sfeer" value="rustig en bijzonder"><input name="datum" type="date"><input name="start" type="time" value="19:30" required><input name="thuis" type="time" value="00:30"><input name="personen" type="number" min="1" max="40" value="4" aria-label="Personen"><input name="budget" type="number" min="0" value="150" aria-label="Budget per persoon"><button>Maak Moment</button></form><p class="lv-composerfout" data-fout></p><div class="lv-opdrachten"><button data-app="food">Reserveer een tafel</button><button data-app="bestellen">Laat iets bezorgen</button><button data-app="avond">Volledige planner</button></div><section class="lv-contract" data-contract hidden></section><section class="lv-tijdlijn" data-tijdlijn><header><h2>Moment · zaterdag</h2><span>CONCEPT</span></header><div><time>19:30</time><i></i><p><b>Diner</b><small>Rahul vergelijkt echte beschikbare zaken</small></p><em>Voorstel</em></div><div><time>22:15</time><i></i><p><b>Ervaring</b><small>Gastenlijst of tweede adres</small></p><em>Voorstel</em></div><div><time>00:30</time><i></i><p><b>Veilig naar huis</b><small>Vervoer sluit aan op werkelijk vertrek</small></p><em>Automatisch</em></div></section><section class="lv-live"><i></i><div><b>Live wisselwerking</b><small>De zaak ziet alleen uw toegestane aankomsttijd. Vrienden zien de voortgang die u kiest.</small></div><button data-app="avond">Beheer</button></section></article></template>
 
-     Die twee sessiewerelden zijn in fase 2 aan elkaar geknoopt, maar alleen
-     dáár waar het over TOESTEMMING gaat: de levenspas hieronder werkt over
-     beide werelden heen (routes/levenband.js draait elke actie achter allebei
-     de deuren). Het levensbeeld zelf blijft van het lid, want zijn bronnen
-     hangen aan de lidsleutel -- en een half gekoppeld beeld tonen zou minder
-     eerlijk zijn dan het eerlijk gescheiden houden.
-
-     WAT HIER NOOIT BIJ MAG (par. 2.4 en 2.9): geen getal dat een mens met
-     een ander vergelijkt, geen voortgangsbalk over een leven, geen reeks,
-     geen dagelijks doel, geen badge, geen aansporing om terug te komen. -->
-
-<main id="inhoud">
-  <header class="merkkop">
-    <h1 class="rtg-ceremonie">Mijn leven</h1>
-  </header>
-  <p class="lv-intro">Uw levenslijn en wat er speelt, uit alle bronnen tegelijk. RTFoundation kijkt mee en opent deuren; beslissen doet u zelf.</p>
-
-  <section aria-label="Het beeld">
-    <div id="lvVak"><p class="stil">Laden...</p></div>
-  </section>
-
-  <!-- DE LEVENSPAS (LEVEN.md par. 2.8). Twee besluiten staan hier hardop op
-       het scherm omdat ze allebei anders zijn dan mensen verwachten: een band
-       ontstaat pas als de ANDER hem bevestigt, en van een minderjarige ziet
-       een ouder standaard niets. Een lege lijst zonder die uitleg leest als
-       een storing, en dan gaat iemand zoeken naar de instelling die er niet
-       is en ook niet komt. -->
-  <section aria-label="Wie mag wat zien" class="lv-mentorvak">
-    <h2>Wie mag wat zien</h2>
-    <p class="lv-intro">Een band ontstaat alleen als u allebei bevestigt, en daarna ziet niemand iets tot u het per stuk geeft. Alles is intrekbaar, altijd, zonder uitleg.</p>
-    <div id="krVak"><p class="stil">Laden...</p></div>
-    <p id="krFout" class="lp-fout" hidden role="alert"></p>
-    <form id="krVorm" class="lp-vorm">
-      <input id="krNaam" placeholder="Codenaam van de ander" aria-label="Codenaam van de ander" autocomplete="off">
-      <select id="krSoort" aria-label="Wat bent u voor elkaar"></select>
-      <!-- bij een leerkracht of een mentorschap hoort hier een datum te staan
-           (par. 2.8: toegang die vanzelf eindigt vraagt niemand om eraan te
-           denken). Afdwingen doen we niet: dat zou een oordeel zijn over
-           andermans relatie. Vandaar een voorstel in tekst en geen eis. -->
-      <label class="lp-tot" for="krTot">Loopt tot (mag leeg)</label>
-      <input id="krTot" type="date" aria-label="Band loopt tot; mag leeg blijven">
-      <button class="knop hoofd lp-mini" type="submit">Band vragen</button>
-    </form>
-  </section>
-
-  <section aria-label="Vraag de mentor" class="kaart lv-mentorvak">
-    <h2>Vraag de mentor</h2>
-    <div id="lvMentorUit" class="stil" hidden aria-live="polite"></div>
-    <form id="lvMentorForm">
-      <div class="lv-vraagrij">
-        <input id="lvMentorIn" placeholder="Hoe sta ik ervoor?" aria-label="Vraag aan de mentor" autocomplete="off">
-        <button class="knop hoofd" type="submit">Vraag</button>
-      </div>
-    </form>
-  </section>
-</main>
-
-<script src="/apps/leven/leven.js"></script>
-<!-- de levenspas is gedeeld met het foundation-huis (aan de andere kant van
-     elke band staat een gezinsprofiel dat hetzelfde hoort te zien); de schil
-     eronder leunt op de twee helpers die leven.js op window.LV zet en hoort er
-     dus NA te staan, en niet defer -->
-<script src="/shared/levenspas.js"></script>
-<script src="/apps/leven/kring.js"></script>
-<script src="/shared/seizoen.js" defer></script>
-<!-- de metgezel-laag (Rahul, wauw, palet) hoort op elke app-pagina; keuring 10 -->
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/wauw.js" defer></script>
-<script src="/shared/palet.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
-</body>
-</html>
+<script src="/shared/poortgesprek.js" defer></script><script src="/shared/media.js"></script><script src="/shared/mond.js"></script><script src="/apps/leven.js"></script><script src="/shared/basis.js" defer></script><script src="/shared/metgezel.js" defer></script></body></html>

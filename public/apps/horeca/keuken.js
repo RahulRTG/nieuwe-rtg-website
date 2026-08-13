@@ -58,6 +58,11 @@
           (t.gereed ? 'gereed' : (t.staatKoud ? t.staatKoud + ' min koud' : 'loopt')) + '</span></div>';
       }).join('') || '<p class="stil">Niets onderhanden.</p>';
     });
+    api('/autopilot', {}).then(function(r){
+      var d=r.body;if(d.error)return;$('kAutoRahul').textContent=d.rahul;
+      $('kAutoStations').innerHTML=(d.stations||[]).map(function(s){return '<div class="item"><span><b>'+esc(s.station)+'</b><span class="stil"> · '+s.nu+' nu · '+s.hierna+' hierna</span></span><button class="knop" data-autost="'+esc(s.station)+'">Open station</button></div>'}).join('')||'<p class="stil">Geen vrijgegeven werk. Gebruik dit moment voor gecontroleerde mise-en-place.</p>';
+      Array.prototype.forEach.call($('kAutoStations').querySelectorAll('[data-autost]'),function(b){b.addEventListener('click',function(){$('kStation').value=b.dataset.autost;laad()})});
+    });
   }
 
   function bind() {

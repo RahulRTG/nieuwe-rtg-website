@@ -360,3 +360,71 @@ body.rtg-stijl .skip{
   border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
   transition:top .15s;}
 body.rtg-stijl .skip:focus{top:0;}
+
+/* ====================== DIEPTE & VOLUME ==================================
+   De rustige RTG-vormtaal blijft de basis, maar grote vlakken mogen niet als
+   gekleurd karton op elkaar liggen. Eén vaste lichtbron linksboven geeft
+   kaarten, bediening en velden een voelbare voor- en achterkant. De schaduwen
+   blijven compact: volume, geen zwevende dashboard-kaarten. */
+:root{
+  --rtg-oppervlak:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-card) 91%,white) 0%,
+    var(--rtg-card) 48%,
+    color-mix(in srgb,var(--rtg-card) 90%,black) 100%);
+  --rtg-oppervlak-2:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-card2) 92%,white) 0%,
+    var(--rtg-card2) 58%,
+    color-mix(in srgb,var(--rtg-card2) 88%,black) 100%);
+  --rtg-diepte:0 1px 0 rgba(255,255,255,.045) inset,
+    0 -1px 0 rgba(0,0,0,.28) inset,
+    0 10px 28px rgba(0,0,0,.22);
+  --rtg-diepte-klein:0 1px 0 rgba(255,255,255,.055) inset,
+    0 5px 14px rgba(0,0,0,.16);
+}
+
+.rtg-groep,
+body.rtg-stijl .kaart,body.rtg-stijl .sec,body.rtg-stijl .item,
+body.rtg-stijl .paneel,body.rtg-stijl .groep,body.rtg-stijl .art,
+body.rtg-stijl .doc,body.rtg-stijl .blok,body.rtg-stijl .vak,
+body.rtg-stijl .inlog,body.rtg-stijl .login{
+  background:var(--rtg-oppervlak);
+  border-color:color-mix(in srgb,var(--rtg-line) 78%,white);
+  box-shadow:var(--rtg-diepte);
+}
+
+.rtg-knop,
+body.rtg-stijl .knop,body.rtg-stijl button:not(.rtg-sw),
+body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil{
+  box-shadow:var(--rtg-diepte-klein);
+}
+
+.rtg-knop.vol,
+body.rtg-stijl .knop.vol,body.rtg-stijl .knop.primair,
+body.rtg-stijl .tab.aan,body.rtg-stijl .tab.actief,
+body.rtg-stijl .chip.aan{
+  background:linear-gradient(155deg,
+    color-mix(in srgb,var(--rtg-goud) 78%,white),
+    var(--rtg-goud) 52%,
+    color-mix(in srgb,var(--rtg-goud) 78%,black));
+  box-shadow:0 1px 0 rgba(255,255,255,.28) inset,
+    0 -1px 0 rgba(0,0,0,.22) inset,
+    0 7px 18px color-mix(in srgb,var(--rtg-goud) 20%,transparent);
+}
+
+.rtg-veld,
+body.rtg-stijl .veld,body.rtg-stijl input:not([type=range]):not([type=checkbox]):not([type=radio]),
+body.rtg-stijl select,body.rtg-stijl textarea{
+  background:var(--rtg-oppervlak-2);
+  box-shadow:0 1px 0 rgba(255,255,255,.035),
+    0 2px 7px rgba(0,0,0,.3) inset;
+}
+
+body.rtg-stijl .kpi{
+  background:var(--rtg-oppervlak-2);
+  box-shadow:var(--rtg-diepte-klein);
+}
+
+@media (prefers-reduced-transparency:reduce){
+  .rtg-groep,body.rtg-stijl .kaart,body.rtg-stijl .sec,
+  body.rtg-stijl .paneel,body.rtg-stijl .groep{background:var(--rtg-card);}
+}

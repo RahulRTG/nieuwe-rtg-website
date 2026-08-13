@@ -70,7 +70,7 @@
        een map is voor een gebruiker een raadsel en voor test/appmenu.e2e.js een
        fout -- die toets bewaakt dat een app in precies EEN map staat en meet dat
        op het label. De bibliotheek noemt hem ook RTG Reizen. */
-    reizen:      { naam: 'RTG Reizen',    url: '/apps/reizen.html' },
+    reizen:      { naam: 'Reizen & Veilig', url: '/apps/reizen-veilig.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },

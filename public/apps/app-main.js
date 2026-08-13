@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '22089fcf';
+var RTG_BOUW = 'b95d4a3d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -609,7 +609,7 @@ var RTG_BOUW = '22089fcf';
          een kaart van 160px was. Nu die een regel van 26px is, past het wel,
          en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
          opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
-      '#gate{--klokschaal:1.2;}' +
+      '#gate{--klokschaal:1;}' +
       /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
          groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
          boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
@@ -646,18 +646,18 @@ var RTG_BOUW = '22089fcf';
          --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
          tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
          net voorbij de schaduw. De rest volgt eruit. */
-      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.62);' +
         '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
         '--doekleeg:calc(var(--doekhoog) * 0.279);' +
-        '--lipgat:calc(var(--mondbreed) * 0.126);' +
-        'width:var(--mondbreed);height:auto;' +
-        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.2rem;}' +
+        '--lipgat:calc(var(--mondbreed) * 0.25);' +
+        'width:var(--mondbreed);height:auto;opacity:0.82;' +
+        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.9rem;}' +
       // de zin is de aanspreking en geen onderschrift
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
          max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
       '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
-        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;margin-inline:auto;}' +
+        'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
       // het invoerveld is de actie: breed en royaal, geen streepje
       /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
          daar een volledige rand overheen leggen gaf een dubbele doos met een
@@ -668,23 +668,25 @@ var RTG_BOUW = '22089fcf';
          draagt nu het kader, het veld erin is kaal. De padding was ook
          asymmetrisch (0,9rem links tegen 0,5rem rechts). */
       '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
-        'box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;' +
-        'margin-inline:auto;padding:0 0.9rem;}' +
-      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px var(--burgundy);}' +
+        'background:color-mix(in srgb,var(--onyx-basis) 82%,transparent);' +
+        'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 34%,transparent),' +
+          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:14px;' +
+        'margin-inline:auto;padding:0.35rem 0.45rem 0.35rem 0.9rem;}' +
+      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 70%,transparent);}' +
       '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
       '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
-      /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
+      '#gate .ag-rij #agGo{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;' +
+        'padding:0;border:1px solid color-mix(in srgb,var(--gold-tekst) 62%,transparent);' +
+        'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
+        'font-size:1.2rem;line-height:1;opacity:1;}' +
+      '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
+      /* De koekjesmelding hoort niet midden in de kennismaking. Hij zweeft
          onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
 
-         Deze regel stond er als `.rtgcookie` -- een klasse die nergens
-         bestaat. Het element heet `#rtg-cookie` (shared/cookie.js) en zet zijn
-         eigen positie al: vast, onderaan, gecentreerd. Er viel dus niets te
-         verplaatsen, en het commentaar hierboven beschreef een verhuizing die
-         nooit heeft plaatsgevonden. Wat er ECHT misging is iets anders: de
-         melding ligt met z-index 9999 over het invoerveld heen, en dan is de
-         enige actie op het scherm onbereikbaar tot je hem wegklikt.
-         De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
-         langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
+         Deze regel stond er als `.rtgcookie`, een klasse die nergens bestaat.
+         Het element heet `#rtg-cookie` en ligt anders met z-index 9999 over
+         het enige invoerveld. De kolom houdt daarom alleen ruimte vrij zolang
+         de melding er werkelijk staat. */
       'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
     /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
        insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
@@ -695,11 +697,16 @@ var RTG_BOUW = '22089fcf';
        De brede-schermregels komen bewust NA de compositie in 04a: bij gelijke
        specificiteit wint de laatste, en op een breed scherm hoort de poort het
        hele venster te vullen in plaats van de kolompadding van 04a te houden. */
+      /* Bordeauxfluweel boven en onder, een rustig onyx midden. */
+      '#gate{background:' +
+        'radial-gradient(ellipse 115% 52% at 50% -8%,color-mix(in srgb,var(--bordeaux-basis) 44%,var(--onyx-diep)) 0%,color-mix(in srgb,var(--bordeaux-diep) 24%,var(--onyx-basis)) 44%,transparent 76%),' +
+        'radial-gradient(ellipse 120% 54% at 50% 108%,color-mix(in srgb,var(--bordeaux-basis) 46%,var(--onyx-diep)) 0%,color-mix(in srgb,var(--bordeaux-diep) 26%,var(--onyx-basis)) 45%,transparent 76%),' +
+        'linear-gradient(180deg,var(--onyx-diep),var(--onyx-basis) 31%,var(--onyx-diep) 50%,var(--onyx-basis) 69%,var(--onyx-diep));}' +
       '@media (min-width:900px){' +
         /* op #gate en niet op .os-lock: de mond meet zich aan de klok en
            moet die schaal dus ook kunnen erven. Stond hij op .os-lock, dan
            bleef de mond op een breed scherm 224 breed onder een klok van 384. */
-        '#gate{--klokschaal:1.5;}' +
+        '#gate{--klokschaal:1.08;}' +
         '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
           'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
           'justify-content:center;flex-direction:column;}' +
@@ -714,9 +721,11 @@ var RTG_BOUW = '22089fcf';
        hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
        gesloten scope, dus er verandert niets aan het gedrag. */
 
-    // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
+    // Een dicht maar fluisterzacht starlight-veld over het hele scherm. Meer
+    // lichtpunten geeft de indruk van ontelbaar veel vezels; de lagere
+    // helderheid voorkomt dat de poort glitterig of onrustig wordt.
     (function sterrenhemel(){
-      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { helderheid: 0.9 }); };
+      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { dichtheid: 1.35, helderheid: 0.72 }); };
       if (window.RTGSterren) return hang();
       var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
       s.onload = hang; document.head.appendChild(s);
@@ -3415,7 +3424,7 @@ var RTG_BOUW = '22089fcf';
        een map is voor een gebruiker een raadsel en voor test/appmenu.e2e.js een
        fout -- die toets bewaakt dat een app in precies EEN map staat en meet dat
        op het label. De bibliotheek noemt hem ook RTG Reizen. */
-    reizen:      { naam: 'RTG Reizen',    url: '/apps/reizen.html' },
+    reizen:      { naam: 'Reizen & Veilig', url: '/apps/reizen-veilig.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
@@ -3528,10 +3537,10 @@ var RTG_BOUW = '22089fcf';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'RTG Reizen', wereld: '/apps/reizen.html', glyf: 'vluchten', items: [
+    { sleutel: 'map-reizen', naam: 'Reizen & Veilig', wereld: '/apps/reizen-veilig.html', glyf: 'vluchten', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld.html', glyf: 'wallet', items: [
+    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld-command.html', glyf: 'wallet', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
@@ -3548,7 +3557,7 @@ var RTG_BOUW = '22089fcf';
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/lifestyle.html', glyf: 'wonen', items: [
+    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/leven.html', glyf: 'wonen', items: [
       'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
@@ -3598,7 +3607,6 @@ var RTG_BOUW = '22089fcf';
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
-
 
   /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon"
      erbij kwam. De snede loopt langs een echte grens: hierboven staat WAT er
@@ -3926,10 +3934,13 @@ var RTG_BOUW = '22089fcf';
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
-      // een app opent overal hetzelfde: schermvullend. Op een breed scherm
-      // werd hier een zwevend venster geopend; die vensterlaag is weg, want
-      // een app op iOS heeft geen kader, geen titelbalk en geen dock.
-      const openen = () => { location.href = l.url; };
+      // Op telefoon blijft een app één scherm. Op een computer wordt hetzelfde
+      // scherm een blad in de Command-werktafel; zo kunnen meerdere bladen van
+      // dezelfde software naast elkaar blijven staan zonder extra knoppen.
+      const openen = () => {
+        if (window.RTGCommand && RTGCommand.actief()) RTGCommand.open(l.url, l.naam);
+        else location.href = l.url;
+      };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
       if (l.prive) return metAlgPin(openen);
       openen();
@@ -3999,7 +4010,6 @@ var RTG_BOUW = '22089fcf';
     }
     belScrim.classList.add('open');
   }
-
   /* Rahuls signatuurmond in de balk onderaan het beginscherm. Eén gedeeld
      canvas (de mond-lus hervat vanzelf zodra hij weer in beeld is); de
      tekenlaag (shared/mond.js) laden we er zelf bij. */

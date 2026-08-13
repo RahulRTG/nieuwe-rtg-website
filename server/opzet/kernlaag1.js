@@ -76,6 +76,7 @@ Object.assign(kern, require('../kern/veiligheid')({
   meldAan,
   appUrl: () => process.env.APP_URL || ''
 }));
+Object.assign(kern, require('../kern/instant-reality')({ db, save, crypto, schoon }));
 kern.meldAan = meldAan;
 
 /* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.

@@ -43,10 +43,10 @@
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'RTG Reizen', wereld: '/apps/reizen.html', glyf: 'vluchten', items: [
+    { sleutel: 'map-reizen', naam: 'Reizen & Veilig', wereld: '/apps/reizen-veilig.html', glyf: 'vluchten', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld.html', glyf: 'wallet', items: [
+    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld-command.html', glyf: 'wallet', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
@@ -63,7 +63,7 @@
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/lifestyle.html', glyf: 'wonen', items: [
+    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/leven.html', glyf: 'wonen', items: [
       'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
@@ -113,4 +113,3 @@
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
-

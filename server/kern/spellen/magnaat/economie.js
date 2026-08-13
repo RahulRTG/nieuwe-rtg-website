@@ -43,7 +43,9 @@ const MAX_MAANDEN_PER_KEER = 60;   // een vangnet: een partij die maanden lag ho
 const rond = (n) => Math.round(n);
 
 module.exports = (ctx) => {
-  const { save, codenaamVan, nudge } = ctx;
+  const { db, save, codenaamVan, nudge } = ctx;
+  const hospitality = require('./hospitality');
+  const worldModel = require('../../hospitality-universe/world-model');
 
   /* ---------- opzetten ---------- */
   function init(potje) {
@@ -57,7 +59,8 @@ module.exports = (ctx) => {
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
-      laatste: {}, klaar: false
+      laatste: {}, klaar: false, hospitality: hospitality.nieuw(),
+      universe: { wereld: worldModel.maak({ id: 'MAGNAAT-'+potje.id, seed: 'magnaat-'+potje.id }), briefing: null, vergelijking: null, evidence: null }
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
     potje.staat = st;
@@ -142,8 +145,10 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
+  const SIM_ACTIES=require('./simulation-actions')({db,hospitality,
+    director:require('../../hospitality-universe/director'),human:require('../../hospitality-universe/human-reality')});
+  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES, SIM_ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES,Object.keys(SIM_ACTIES));
 
   function zet(potje, h, z) {
     const st = potje.staat;

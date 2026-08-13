@@ -161,6 +161,8 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       foundation: { lokaal: rond(st.foundation.lokaal), centraal: rond(st.foundation.centraal),
         gedaan: st.foundation.gedaan.map(g => (PROJECTEN.find(p => p.id === g.id) || {}).naam).filter(Boolean) },
       sinds: st.laatste[mij] || null,
+      hospitality: st.hospitality || null,
+      universe: st.universe || null,
       eindstand: st.klaar ? eindstand(potje) : null
     };
   }

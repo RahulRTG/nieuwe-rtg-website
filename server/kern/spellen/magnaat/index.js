@@ -54,7 +54,10 @@ module.exports = (ctx) => {
       'veiling-start', 'veiling-bod', 'veiling-intrekken',
       'belang-voorstel', 'belang-antwoord',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
-      'polis-sluiten', 'polis-opzeggen'],
+      'polis-sluiten', 'polis-opzeggen', 'hospitality-start','hospitality-stap',
+      'hospitality-chaos','hospitality-besluit','hospitality-koppel','hospitality-delen',
+      'universe-briefing','universe-vergelijk','universe-evidence',
+      'human-open','human-ontwikkel','human-besluit','human-afronden'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

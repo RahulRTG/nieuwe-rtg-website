@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vandaag · RTG</title>
+<link rel="icon" href="/icons/pas-rtg.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--line:var(--rtg-line);--goud:var(--gold-tekst,#C0A544)}
+  *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(90% 55% at 50% 105%,rgba(127,22,52,.14),transparent 64%),var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  main{width:min(840px,100%);margin:auto;padding:clamp(2rem,7vh,5.5rem) clamp(1.25rem,5vw,4rem) 7rem}
+  .ey{font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;color:var(--goud);margin-bottom:1.4rem}
+  .rahul{display:grid;grid-template-columns:72px minmax(0,1fr);gap:1.4rem;align-items:start}
+  .mond{width:72px;height:44px;background:none;border:1px solid color-mix(in srgb,var(--goud) 36%,transparent);border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--goud)}
+  .mond::after{content:'◌';font:400 1.8rem Georgia;transform:scaleX(1.55)}
+  h1{font:400 clamp(2rem,4vw,3.8rem)/1.08 'Bodoni Moda',Georgia,serif;margin:0;max-width:15ch;text-wrap:balance}
+  .brief{font:400 clamp(1.08rem,1.8vw,1.4rem)/1.65 'Bodoni Moda',Georgia,serif;color:var(--muted);max-width:43ch;margin:1.25rem 0 0}
+  .keuzes{display:flex;gap:.55rem;flex-wrap:wrap;margin:2rem 0 0 96px}.keuzes button{border:1px solid var(--line);background:rgba(5,5,5,.22);color:var(--muted);border-radius:999px;padding:.7rem 1rem;font:500 .78rem 'Inter';cursor:pointer}.keuzes button:hover{color:var(--txt);border-color:color-mix(in srgb,var(--goud) 58%,var(--line))}
+  .lijn{margin:clamp(3rem,8vh,6rem) 0 0 96px;border-top:1px solid var(--line);padding-top:1.5rem}.lijn h2{font:400 1.35rem 'Bodoni Moda',Georgia,serif;margin:0 0 1.2rem}.moment{display:grid;grid-template-columns:64px 1fr;gap:1rem;padding:.85rem 0;border-top:1px solid color-mix(in srgb,var(--line) 62%,transparent)}.tijd{color:var(--goud);font-size:.75rem;font-variant-numeric:tabular-nums}.moment b{font:500 .9rem}.moment span{display:block;color:var(--soft);font-size:.78rem;margin-top:.2rem}.moment button{justify-self:start;margin-top:.55rem;border:0;background:none;color:var(--goud);font:500 .72rem 'Inter';padding:0;cursor:pointer}
+  @media(max-width:600px){.rahul{grid-template-columns:1fr}.mond{width:58px;height:38px}.keuzes,.lijn{margin-left:0}}
+</style>
+</head>
+<body class="rtg-stijl">
+<main>
+  <div class="ey">Vandaag · Rahul</div>
+  <section class="rahul">
+    <button class="mond" id="praat" aria-label="Vraag Rahul"></button>
+    <div><h1 id="groet">Goedemorgen.</h1><p class="brief" id="brief">Uw dag staat rustig klaar. Ik kan iedere software voor u openen, combineren en precies naar het juiste onderdeel brengen.</p></div>
+  </section>
+  <div class="keuzes" aria-label="Voorstellen van Rahul">
+    <button data-vraag="Open Reizen">Bereid mijn reis voor</button>
+    <button data-vraag="Zet Geld ernaast">Wat vraagt financieel aandacht?</button>
+    <button data-vraag="Open De Salon">Open mijn berichten</button>
+  </div>
+  <section class="lijn"><h2>Uw eerstvolgende momenten</h2>
+    <article class="moment"><div class="tijd">10:30</div><div><b>Reisvoorbereiding</b><span>Planning en documenten staan klaar om te controleren.</span><button data-vraag="Open Reizen">Open Reizen →</button></div></article>
+    <article class="moment"><div class="tijd">15:00</div><div><b>Financieel moment</b><span>Bekijk alleen wat vandaag uw aandacht nodig heeft.</span><button data-vraag="Zet Geld ernaast">Open Geld ernaast →</button></div></article>
+  </section>
+</main>
+<script>
+  (function(){var uur=new Date().getHours(),g=document.getElementById('groet');g.textContent=(uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.');function ga(q){if(parent.RTGCommand&&parent.RTGCommand.bestemming){var r=parent.RTGCommand.bestemming(q);document.getElementById('brief').textContent=r||'Zeg in de hulpbalk welke software u wilt openen.'}}document.querySelectorAll('[data-vraag]').forEach(function(b){b.onclick=function(){ga(b.dataset.vraag)}});document.getElementById('praat').onclick=function(){try{parent.document.querySelector('[data-open=ai]').click()}catch(e){}}})();
+</script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

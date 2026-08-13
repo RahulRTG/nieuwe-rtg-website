@@ -13,19 +13,14 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/werk-command.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG Werk OS</span><h1>De werkplek</h1></span>
-  <span style="flex:1;"></span>
-  <button class="knop" id="ververs" type="button">Ververs</button>
-  <button class="knop" id="inlogUit" type="button">Uitloggen</button>
-</header>
-<main id="main">
+<div class="wk-shell"><aside class="wk-bank"><nav aria-label="Werk OS"><button class="actief" data-wk="start"><i>⌂</i><span>Briefing</span></button><button data-wk="projecten"><i>◇</i><span>Werk</span></button><button data-wk="klanten"><i>◎</i><span>Relaties</span></button><button data-wk="service"><i>↗</i><span>Service</span></button><button data-wk="bouw"><i>⌁</i><span>Control</span></button><button data-wk="besluit"><i>✦</i><span>Authority</span></button></nav><footer><button data-wk="people"><i>◌</i><span>Personeel</span></button><button data-wk="settings"><i>≋</i><span>Instellingen</span></button></footer></aside>
+<main class="wk-main"><header class="wk-top"><div class="wk-tabs"><button class="actief">Enterprise Briefing<small>WORKSPACE</small></button><button id="wkContextTab">Operations Universe<small>LIVE</small></button><button id="wkRahulTab" type="button">Rahul<small>AI WORKSPACE</small></button></div><section><i></i><span>Organisatie beschermd</span><button class="knop" id="ververs" type="button">Ververs</button><button class="knop" id="inlogUit" type="button">Uitloggen</button></section></header><section id="main" class="wk-stage">
   <div class="kaart" id="inlog">
-    <div class="kop">Werkruimte</div>
-    <p class="stil">Een werkruimte heeft zijn eigen sleutel: een code en uw persoonlijke lid-token. Dat is bewust iets anders dan uw RTG-pas -- een werkplek hoort ook te werken voor iemand die geen pas heeft. Wie zijn RTG-account erbij wil (agenda, postvak, kluis), koppelt dat daarna een keer.</p>
+    <div class="ey">BESLOTEN ORGANISATIEGEBIED</div><h1>Uw Work OS.</h1>
+    <p class="stil">Een eigen omgeving voor uw bedrijf en personeel. Wie al via RTG verbonden is, komt automatisch binnen; externe medewerkers gebruiken de code en hun persoonlijke werksleutel.</p>
     <div class="rij" style="margin-top:.6rem;">
       <input class="veld" id="iWerkruimte" maxlength="8" placeholder="Werkruimtecode" aria-label="Werkruimtecode" style="flex:0 1 11rem;">
       <input class="veld" id="iToken" type="password" maxlength="80" placeholder="Lid-token" aria-label="Lid-token">
@@ -34,19 +29,20 @@
   </div>
 
   <div id="inhoud" hidden>
-    <div class="tabs" role="tablist" aria-label="Weergave">
+    <div class="tabs wk-hidden-tabs" role="tablist" aria-label="Weergave">
       <button class="knop" id="tabStart" role="tab" aria-selected="true" type="button">Start</button>
       <button class="knop" id="tabModules" role="tab" aria-selected="false" type="button">Modules</button>
     </div>
 
-    <section id="vStart" aria-label="Startscherm">
-      <div class="kaart">
+    <section id="vStart" class="wk-workspace" aria-label="Startscherm"><article class="wk-view wk-briefing"><div class="wk-ey">ENTERPRISE BRIEFING · ALLEEN WAT BETEKENIS HEEFT</div><h1>Uw organisatie,<br>rustig in beeld.</h1><p class="wk-lead">Rahul bundelt werk, mensen, klanten en besluiten. Wat niet gemeten is, wordt nooit als nul voorgesteld.</p>
+      <div class="kaart wk-identity">
         <div class="kop">Wie kijkt er</div>
         <p><b id="wWie">-</b></p>
         <p class="stil" id="wRuimte"></p>
         <p class="stil" style="margin-top:.5rem;">Snelle acties: <span id="wActies"></span></p>
       </div>
       <div class="kpis" id="wBlokken"></div>
+      </article><article class="wk-view wk-attention"><div class="wk-ey">OPERATIONS UNIVERSE</div><h2>Wat vraagt aandacht?</h2>
       <div class="kaart">
         <div class="kop">Waarschuwingen</div>
         <div id="wWaarschuwingen"></div>
@@ -56,14 +52,16 @@
         <div id="wNiet"></div>
         <p class="stil" style="margin-top:.4rem;">Wat hier staat, staat er als niet gemeten en niet als nul. Een leeg vak op een dashboard leest als "rustig", en dat is precies de leugen die dit scherm niet vertelt.</p>
       </div>
+      </article><article class="wk-view wk-authority"><div class="wk-ey">AUTHORITY TABLE</div><h2>Besluiten met menselijke autoriteit.</h2>
       <div class="kaart">
         <div class="kop">Directiebeeld</div>
         <div id="wBeeld"></div>
         <p class="stil" id="wBeeldLet" style="margin-top:.4rem;"></p>
       </div>
+      <section class="wk-rule"><i></i><p><b>Enterprise boundaries actief</b><small>Rollen, werkruimtegrenzen, menselijke productie-goedkeuring en eerlijk niet-gemeten.</small></p></section></article>
     </section>
 
-    <section id="vModules" aria-label="Modules" hidden>
+    <section id="vModules" class="wk-modules" aria-label="Modules" hidden>
       <div class="kaart">
         <div class="rij">
           <select class="veld" id="mKeuze" aria-label="Welke module" style="flex:0 1 16rem;">
@@ -93,16 +91,19 @@
       </div>
       <div id="mActie"></div>
     </section>
+    <section id="vPeople" class="wk-people" aria-label="Human Enterprise" hidden><article class="wk-human"><header><span>HUMAN ENTERPRISE · EMPLOYEE UNIVERSE</span><em id="wkPeopleCount">LADEN…</em></header><div class="wk-humanhead"><div><div class="wk-humanmark">◌</div><h1>De organisatie vormt<br>zich rond de mens.</h1><p>Onboarding verbindt bedoeling, vermogen, bevoegdheid, relaties en welzijn. Gemeten werk wordt nooit handmatig afgevinkt.</p></div><div class="wk-orbit"><i>H<small>UNIVERSE</small></i><span style="--n:0">Purpose<b>92</b></span><span style="--n:1">Capability<b>74</b></span><span style="--n:2">Authority<b>61</b></span><span style="--n:3">Network<b>84</b></span><span style="--n:4">Wellbeing<b>88</b></span></div></div><nav class="wk-human-nav"><button class="actief" data-human="journey">Journey</button><button data-human="worlds">Onboarding Worlds</button><button data-human="authority">Authority</button><button data-human="growth">First 90 Days</button></nav><section data-human-panel="journey"><div class="wk-person-select"><span>ACTIEVE EMPLOYEE UNIVERSES</span><select id="wkPerson"></select></div><div id="wkOnboarding" class="wk-onboarding"></div></section><section data-human-panel="worlds" hidden><div class="wk-worldcards"><button data-onboard-world="fast"><span>FAST START</span><strong>21 dagen</strong><p>Snel zelfstandig, intensievere begeleiding en meer vroege controlemomenten.</p><small>Teamimpact hoog · autonomie vroeg</small></button><button class="actief" data-onboard-world="balanced"><span>BALANCED START</span><strong>45 dagen</strong><p>Verantwoordelijkheid groeit mee met werkelijk bewijs en persoonlijke rust.</p><small>Teamimpact gezond · aanbevolen</small></button><button data-onboard-world="deep"><span>DEEP FOUNDATION</span><strong>90 dagen</strong><p>Eerst context, relaties en oefensituaties; daarna brede zelfstandigheid.</p><small>Risico minimaal · autonomie later</small></button></div><aside class="wk-world-note"><span>RAHUL’S ADVIES</span><p id="wkWorldAdvice">Balanced Start past bij deze rol: voldoende snelheid, zonder bevoegdheden eerder te geven dan het bewijs toelaat.</p></aside></section><section data-human-panel="authority" hidden><div class="wk-permission-flow"><header><span>PERMISSION CHOREOGRAPHY</span><em>JUST IN TIME</em></header><div><i>01</i><p><b>Basisrechten</b><small>Actief vanaf eerste werkdag</small></p><em>GEMETEN</em></div><div><i>02</i><p><b>Operationele bevoegdheid</b><small>Na instructie en praktijksimulatie</small></p><em>VOORBEREID</em></div><div><i>03</i><p><b>Tijdelijk projectrecht</b><small>Alleen zolang het resultaat dit nodig heeft</small></p><em>MENS AKKOORD</em></div><div><i>04</i><p><b>Automatisch intrekken</b><small>Bij einde project, rol of dienstverband</small></p><em>BELEID</em></div></div></section><section data-human-panel="growth" hidden><div class="wk-days"><header><div><span>FIRST 90 DAYS TWIN</span><h2>Van welkom naar meesterschap.</h2></div><b>Dag 01 <small>van 90</small></b></header><div class="wk-dayline"><i style="--x:1%"></i><i style="--x:32%"></i><i style="--x:66%"></i><i style="--x:98%"></i></div><div class="wk-daystages"><span>Welkom<small>relaties & veiligheid</small></span><span>Meedoen<small>werk met begeleiding</small></span><span>Zelfstandig<small>bewijs & bevoegdheid</small></span><span>Meesterschap<small>reflectie & volgende groei</small></span></div><section><b>Knowledge Flight Simulator</b><p>Oefen een boze gast, privacyverzoek, leveranciersuitval of veiligheidsincident voordat echte bevoegdheid wordt vrijgegeven.</p><button id="wkSimulation">Start veilige simulatie →</button></section></div></section></article><article class="wk-human-side"><header><span>RELATIONSHIP ARCHITECTURE</span><em>GEEN VERGADERDRUKTE</em></header><h2>De juiste mensen,<br>op het juiste moment.</h2><div class="wk-rel"><i>M</i><p><b>Manager</b><small>verwachting en beslisruimte</small></p><em>25 min</em></div><div class="wk-rel"><i>B</i><p><b>Buddy</b><small>dagelijkse werkelijkheid</small></p><em>15 min</em></div><div class="wk-rel"><i>S</i><p><b>Safety steward</b><small>één praktijksituatie</small></p><em>20 min</em></div><section class="wk-invisible"><span>INVISIBLE ADMINISTRATION</span><p><i></i>Account en werkruimte</p><p><i></i>Apparatuur en toegang</p><p><i></i>Contract en payroll-overdracht</p><p><i></i>Kennis en eerste planning</p><small>Alleen uitzonderingen komen naar een mens.</small></section><section class="wk-ethics"><b>Human dignity boundary</b><p>Geen verborgen persoonlijkheidsranglijst, gezondheidsafleiding of automatisch personeelsbesluit.</p></section></article></section>
   </div>
-</main>
+</section><section class="wk-rahul" aria-label="Rahul AI"><header><button id="wkMouth" type="button" aria-label="Praat met Rahul">◌</button><span><b>Rahul</b><small>AI · BESCHIKBAAR</small></span><button id="wkRahulExpand" type="button" aria-label="Terug naar werkblad" aria-expanded="true">↙</button></header><div class="wk-rahul-conversation"><span>RAHUL · WORK INTELLIGENCE</span><h2>Waarmee kan ik uw organisatie helpen?</h2><small id="wkRahulContext">Ik zie wat werk blokkeert, wie bevoegd is en welke beslissing het meeste vrijgeeft.</small></div><div class="wk-rahul-compose"><input id="wkRahulInput" placeholder="Vraag Rahul…"><button id="wkRahulSend" type="button" aria-label="Verstuur naar Rahul">→</button></div></section></main></div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/apps/werk/kern.js"></script>
 <script src="/apps/werk/start.js"></script>
 <script src="/apps/werk/modules.js"></script>
 <script src="/apps/werk/acties.js"></script>
 <script src="/apps/werk/app.js"></script>
+<script src="/apps/werk/command.js"></script>
+<script src="/apps/werk/ai-toggle.js"></script>
+<script src="/apps/werk/command-entry.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>

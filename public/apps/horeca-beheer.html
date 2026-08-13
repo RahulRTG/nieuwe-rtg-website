@@ -13,6 +13,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/horeca-command.css" rel="stylesheet"><link href="/shared/horeca-enterprise-modules.css" rel="stylesheet"><script src="/shared/horeca-enterprise.js" defer></script>
 </head>
 <body class="rtg-stijl">
 <header>
@@ -28,6 +29,27 @@
     <div class="kpi"><b id="mGasten">-</b><span>gasten</span></div>
     <div class="kpi"><b id="mGemiddeld">-</b><span>per bon</span></div>
   </div>
+
+  <section class="kaart hm-control" aria-labelledby="hmTitel">
+    <div class="hm-head"><div><div class="kop" id="hmTitel">Rahul Mission Control</div><p class="stil">Uw besluit, slim verdeeld naar de PDA van uitsluitend ingeklokte medewerkers.</p></div><span class="hm-live"><i></i><b id="hmLive">0</b> live</span></div>
+    <div class="hm-grid">
+      <div class="hm-command">
+        <label for="hmVraag">Wat moet het team nu weten of doen?</label>
+        <textarea class="veld" id="hmVraag" rows="3" placeholder="Bijvoorbeeld: laat iemand van de zaal over tien minuten alle tafels persoonlijk drinken aanbieden."></textarea>
+        <button class="knop p" id="hmDenk" type="button">Laat Rahul voorbereiden</button>
+        <div id="hmVoorstel" class="hm-proposal"><p>Rahul maakt eerst een voorstel. Er gaat niets naar het team zonder uw bevestiging.</p></div>
+      </div>
+      <div><div class="hm-label">Ingeklokt en inzetbaar</div><div id="hmTeam" class="hm-team"></div></div>
+    </div>
+    <div class="hm-label hm-space">Actieve missies</div><div id="hmMissies" class="hm-missions"></div>
+  </section>
+
+  <section class="kaart" aria-labelledby="simTitel">
+    <div class="kop" id="simTitel">Magnaat · Hospitality Universe</div>
+    <p class="stil">Maak een tijdelijke anonieme testwereld van de huidige omvang. Namen, contactgegevens, gerechten en bedragen reizen niet mee.</p>
+    <div class="rij"><button class="knop p" id="simMaak" type="button">Maak veilige simulatiecode</button><input class="veld" id="simCode" maxlength="8" placeholder="Simulatiecode" aria-label="Simulatiecode"><button class="knop" id="simLees" type="button">Lees voorstellen</button></div>
+    <div id="simUit" class="z-mt60"><p class="stil">De simulatie kan uitsluitend voorstellen terugsturen. Live publiceren blijft een apart managerbesluit.</p></div>
+  </section>
 
   <div class="kaart">
     <div class="kop">De dag over alle kanalen</div>
@@ -146,6 +168,8 @@
 <script src="/apps/horeca/beheer-dag.js"></script>
 <script src="/apps/horeca/beheer-loon.js"></script>
 <script src="/apps/horeca/beheer-pols.js"></script>
+<script src="/apps/horeca/beheer-missions.js"></script>
+<script src="/apps/horeca/beheer-simulation.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

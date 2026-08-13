@@ -65,7 +65,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
-  const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
+  const spelCtx = { db, save, crypto, schud, beurtDoor, codenaamVan, nudge };
   const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, VARIANT, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });

@@ -1,0 +1,58 @@
+/* RTG Sociaal — de sociale wereld in dezelfde brede commandovorm als Vandaag.
+   De functies en serverwaarheid blijven in sociaal.html; dit blad verandert
+   alleen compositie, ritme en de manier waarop specialistische ruimtes openen. */
+body.rtg-stijl{background:
+  radial-gradient(80% 55% at 8% -12%,rgba(127,22,52,.13),transparent 58%),
+  radial-gradient(65% 45% at 100% 100%,rgba(127,22,52,.08),transparent 60%),
+  var(--onyx-glans,#0c0c0b);}
+.sociaal-bank{position:fixed;z-index:40;inset:0 auto 0 0;width:156px;display:flex;flex-direction:column;padding:2.55rem .55rem 1rem;border-right:1px solid var(--rtg-line);background:linear-gradient(180deg,#11100f,#080808 75%);}
+.sociaal-bank nav{display:flex;flex-direction:column;gap:.22rem;flex:1}.sociaal-bank a{min-height:48px;display:flex;align-items:center;gap:.7rem;padding:.55rem .72rem;border-left:2px solid transparent;border-radius:8px;color:var(--rtg-muted);text-decoration:none;font:500 .76rem/1.2 var(--rtg-interface)}.sociaal-bank a span{width:19px;text-align:center;color:inherit;font-size:1rem}.sociaal-bank a b{font-weight:500}.sociaal-bank a:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}.sociaal-bank a.actief{color:var(--rtg-txt);border-left-color:#7f1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08))}.sociaal-bank-instel{border-top:1px solid var(--rtg-line);border-radius:0!important}.sociaal-in-werktafel .sociaal-bank{display:none;}
+body.rtg-stijl main#inhoud{box-sizing:border-box;width:min(1280px,calc(100% - 156px));max-width:none;padding:0 clamp(1.25rem,4vw,4.5rem) 7rem;margin:0 auto 0 156px;}
+body.sociaal-in-werktafel main#inhoud{width:min(1280px,100%);margin-inline:auto;}
+.wereldapps{display:none;}
+.merkkop{min-height:148px;align-items:flex-end;padding:2.5rem 0 1.25rem;border-top:2px solid color-mix(in srgb,var(--gold-tekst,#c0a544) 42%,transparent);border-bottom:1px solid var(--rtg-line);}
+.merkkop h1{font-size:clamp(2rem,4vw,3.3rem);max-width:16ch;font-weight:400;}
+.sociaal-boven{display:block;margin-bottom:.75rem;color:var(--rtg-soft);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;}
+.sociaal-inleiding{max-width:56ch;margin:.8rem 0 0;color:var(--rtg-muted);font:400 clamp(.9rem,1.5vw,1.05rem)/1.65 var(--rtg-interface);}
+.sociaal-filter{margin-left:auto;margin-bottom:.35rem;border:1px solid var(--rtg-line);border-radius:999px;background:rgba(5,5,5,.36);color:var(--rtg-muted);padding:.55rem .9rem;font:500 .72rem var(--rtg-interface);cursor:pointer;}
+.sociaal-filter:hover,.sociaal-filter:focus-visible{border-color:var(--gold-rand);color:var(--rtg-txt);}
+.sociaal-ruimtes{display:flex;min-width:0;overflow-x:auto;border-bottom:1px solid var(--rtg-line);scrollbar-width:none;}
+.sociaal-ruimtes a{position:relative;flex:1 0 150px;padding:1rem .8rem;color:var(--rtg-muted);text-decoration:none;border-right:1px solid var(--rtg-line);font:500 .76rem var(--rtg-interface);}
+.sociaal-ruimtes a:first-child{padding-left:0}.sociaal-ruimtes a:last-child{border-right:0}
+.sociaal-ruimtes a small{display:block;margin-top:.3rem;color:var(--rtg-soft);font-size:.62rem;font-weight:400;white-space:nowrap;}
+.sociaal-ruimtes a.actief{color:var(--rtg-txt);}
+.sociaal-ruimtes a.is-levend small{color:var(--gold-tekst);}
+.sociaal-ruimtes a.is-levend::before{content:"";position:absolute;top:1rem;right:.8rem;width:5px;height:5px;border-radius:50%;background:var(--gold-tekst);box-shadow:0 0 10px color-mix(in srgb,var(--gold-tekst) 70%,transparent);animation:sociaalLeeft 1.8s ease-in-out infinite;}
+@keyframes sociaalLeeft{50%{opacity:.35;transform:scale(.78)}}
+.sociaal-ruimtes a.actief::after{content:"";position:absolute;left:0;right:.8rem;bottom:-1px;height:2px;background:#7f1634;box-shadow:0 0 12px rgba(127,22,52,.45);}
+.sociaal-ruimtes a:hover,.sociaal-ruimtes a:focus-visible{color:var(--gold-tekst);background:linear-gradient(180deg,rgba(127,22,52,.08),transparent);}
+#stand,#rust{margin-top:1.25rem;}
+#vandaagVak,#klaar,#kring,.lijnkop,#lijn,.regkop:has(+ #poorten),#poorten{max-width:none;}
+@media(min-width:850px){
+  body.rtg-stijl main#inhoud{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);column-gap:clamp(2rem,4vw,4.5rem);align-items:start;}
+  .merkkop,.sociaal-ruimtes{grid-column:1/-1;}
+  #stand{grid-column:1;margin-top:2rem;}
+  #rust{grid-column:2;grid-row:3;margin-top:2rem;}
+  #vandaagVak{grid-column:2;}
+  #klaar{grid-column:2;}
+  .regkop:has(+ #kring),#kring{grid-column:1;}
+  .regkop:has(+ #kring){grid-row:4}.regkop:has(+ #kring)+#kring{grid-row:5}
+  .lijnkop,#lijn{grid-column:1;}
+  .lijnkop{grid-row:6}#lijn{grid-row:7}
+  .regkop:has(+ #poorten),#poorten{grid-column:2;}
+  .regkop:has(+ #poorten){grid-row:6}#poorten{grid-row:7}
+  #vandaagVak,#klaar,.regkop:has(+ #poorten),#poorten{padding-left:clamp(1.2rem,2vw,2rem);border-left:1px solid var(--rtg-line);}
+}
+.regkop{margin-top:2rem;padding-bottom:.65rem;border-bottom:1px solid var(--rtg-line);}
+.regkop h2{color:var(--rtg-muted);}
+.reis{padding-left:1.25rem}.reis .doos{padding:1rem 0}.reis::before{background:color-mix(in srgb,var(--gold-tekst,#c0a544) 18%,var(--rtg-line));}
+.reis:hover .doos,.reis:focus-visible .doos{background:linear-gradient(90deg,rgba(127,22,52,.09),transparent);}
+.vak{margin:0}.vak>h3{margin-top:1.1rem}.vak .mom{padding:.78rem 0;}
+.vst{border:0;border-left:2px solid #7f1634;padding:.75rem 0 .75rem 1rem;}
+.vst .keuzes button{border-radius:999px;}
+.poorten{grid-template-columns:1fr;gap:0}.poort{display:grid;grid-template-columns:34px 1fr;column-gap:.75rem;text-align:left;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;padding:.85rem 0;}.poort .ic{grid-row:1/3;margin:0;color:var(--gold-tekst)}.poort b,.poort span{margin:0}.poort:hover{border-color:var(--rtg-line);background:linear-gradient(90deg,rgba(127,22,52,.09),transparent);}
+#objpaneel{background:color-mix(in srgb,var(--onyx-basis,#0c0c0b) 94%,transparent);backdrop-filter:blur(28px);border-color:var(--gold-rand);box-shadow:0 30px 90px rgba(0,0,0,.6);}
+@media(max-width:999px){.sociaal-bank{width:70px}.sociaal-bank a{justify-content:center}.sociaal-bank a b{display:none}body.rtg-stijl main#inhoud{width:calc(100% - 70px);margin-left:70px}}
+@media(max-width:849px){.merkkop{min-height:132px;padding-top:2rem}.sociaal-filter{align-self:flex-end}.sociaal-ruimtes{margin-inline:calc(var(--rtg-ruim)*-1);padding-left:var(--rtg-ruim)}body.rtg-stijl main#inhoud{padding-bottom:5rem}}
+@media(max-width:620px){.sociaal-bank{display:none}body.rtg-stijl main#inhoud{width:100%;margin-inline:0}.merkkop h1{font-size:2.3rem}}
+@media(prefers-reduced-motion:reduce){.sociaal-ruimtes a.is-levend::before{animation:none}}

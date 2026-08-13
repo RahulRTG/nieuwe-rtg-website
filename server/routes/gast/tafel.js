@@ -39,12 +39,16 @@ module.exports = (kern) => {
     const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
     const h = kern.horeca.H(zaakcode);
     const uit = (h.instel && h.instel.uitverkocht) || {};
+    const twins = h.dishTwins || {};
     return menu.map(m => ({
       id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
       centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
       station: m.station || null,
       alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),
-      uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null
+      uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
+      twin: twins[m.id] && twins[m.id].publicatie ? { versie:twins[m.id].publicatie.versie,
+        presentatie:twins[m.id].publicatie.presentatie||null, service:twins[m.id].publicatie.service||null,
+        pairing:twins[m.id].publicatie.pairing||null } : null
     }));
   }
   kern.gastKaartVanZaak = kaartVanZaak;
@@ -117,5 +121,17 @@ module.exports = (kern) => {
     res.json({ ok: true, aantal: rijen.length, categorieen: cats, kaart: rijen,
       gefilterdOp: dieet.length ? dieet : null,
       beleid: beleid.beleidVan(zaakcode) });
+  });
+
+  /* Menu Concierge: filtert alleen op gepubliceerde kaartfeiten. Bij een
+     allergeen wordt nooit "veilig" beloofd: de bestaande menselijke
+     bevestigingsgrendel blijft gelden bij bestellen. */
+  app.post('/api/gast/concierge', gastAuth, (req,res) => {
+    const { zaakcode }=req.gast, b=req.body||{}, vraag=String(schoon(b.vraag,240)||'').toLowerCase();
+    const zonder=(Array.isArray(b.zonder)?b.zonder:[]).map(x=>String(x).toLowerCase()).filter(Boolean);
+    const woorden=vraag.split(/[^a-zà-ÿ0-9]+/).filter(x=>x.length>2);
+    let kaart=kaartVanZaak(zaakcode).filter(x=>!x.uitverkocht&&!x.alcohol&&!x.allergenen.some(a=>zonder.includes(String(a).toLowerCase())));
+    kaart=kaart.map(x=>{const tekst=(x.naam+' '+(x.uitleg||'')+' '+x.cat+' '+((x.twin&&x.twin.pairing)||'')).toLowerCase();return Object.assign({},x,{score:woorden.reduce((n,w)=>n+(tekst.includes(w)?1:0),0)});}).sort((a,b)=>b.score-a.score||a.centen-b.centen).slice(0,4);
+    res.json({ok:true,suggesties:kaart,antwoord:kaart.length?'Deze combinaties passen het best bij uw vraag en zijn nu beschikbaar. Allergieën worden bij bestellen altijd nog persoonlijk gecontroleerd.':'Ik zie nu geen passende beschikbare combinatie. Vraag de bediening om een persoonlijk alternatief.',menselijkeControle:zonder.length>0});
   });
 };

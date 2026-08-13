@@ -298,10 +298,11 @@
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'gsp';
       b.setAttribute('aria-current', staat.open === g.id ? 'true' : 'false');
+      var typt = g.typt && g.typt.length ? g.typt.join(', ') + ' typt...' : '';
       b.innerHTML =
         '<span class="rond">' + esc(initialen(g.titel)) + (g.online ? '<i class="stip"></i>' : '') + '</span>' +
         '<span class="mid"><b>' + esc(g.titel) + (g.vast ? ' &#9679;' : '') + '</b>' +
-        '<span>' + (g.concept ? '<i style="color:var(--rtg-goud);">concept: </i>' + esc(g.concept)
+        '<span' + (typt ? ' class="typtregel"' : '') + '>' + (typt ? esc(typt) : g.concept ? '<i style="color:var(--rtg-goud);">concept: </i>' + esc(g.concept)
           : (g.laatsteVanMij ? 'Jij: ' : '') + esc(g.laatste || 'Nog geen bericht')) + '</span></span>' +
         '<span class="rechts"><time>' + esc(klok(g.at)) + '</time>' +
         (g.ongelezen ? '<span class="telbol">' + (g.ongelezen > 9 ? '9+' : g.ongelezen) + '</span>' : '') +

@@ -31,6 +31,7 @@ module.exports = (state) => {
   const wacht = require('./wacht')({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal });
   const codewoord = require('./codewoord')({ db, save, crypto, kluis, alarm, plek, sociaal });
   const rust = require('./rust')({ db, save, schoon });
+  const moment = require('./moment')({ db, save, crypto, schoon, sociaal, plek });
 
   /* Het volledige beeld voor een lid: wat loopt er, wie is mijn kring, hoe
      staat het codewoord, welke rust. Een aanroep, want de vier apps tonen
@@ -48,6 +49,7 @@ module.exports = (state) => {
       venster: (() => { const v = plek.vensterActief(handle); return v ? { tot: new Date(v.tot).toISOString(), reden: v.reden } : null; })(),
       alarmen: alarm.alarmenVan(handle, 10),
       voorMij: alarm.alarmenVoorMij(handle, 10),
+      liveCircle: moment.momentMijn(handle),
       // eerlijk, en op elk scherm te tonen
       grens: 'RTG is geen alarmcentrale: er wordt niemand gebeld en er kijkt geen mens mee. Bij levensgevaar belt u het alarmnummer.'
     };
@@ -85,6 +87,11 @@ module.exports = (state) => {
 
     rustStand: rust.rustStand, rustAan: rust.rustAan, rustUit: rust.rustUit,
     rustMagDoor: rust.magDoor,
+
+    momentMaak: moment.momentMaak, momentMijn: moment.momentMijn,
+    momentStatus: moment.momentStatus, momentPauze: moment.momentPauze,
+    momentStop: moment.momentStop, momentVoorContact: moment.momentVoorContact,
+    momentVoorBedrijf: moment.momentVoorBedrijf,
 
     veiligBeeld, veiligCheckin, veiligSweep: wacht.sweep
   };

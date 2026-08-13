@@ -13,21 +13,31 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/glyf.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/horeca-command.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG Horeca</span><h1>Zaal en keuken</h1></span>
-  <span style="flex:1;"></span>
-  <button class="knop" id="ververs" type="button">Ververs</button>
-</header>
-<main id="main">
+<div class="hq-shell"><aside class="hq-rail"><nav aria-label="Horeca OS"><a class="actief" href="/apps/horeca.html"><i>⌂</i><span>Command</span></a><a href="#arrival"><i>◌</i><span>Host</span></a><a href="#floor"><i>⌁</i><span>Floor</span></a><a href="#kitchen"><i>◇</i><span>Kitchen</span></a><a href="/apps/horeca-beheer.html"><i>≋</i><span>Operations</span></a></nav><footer><details><summary>Meer</summary><a href="/apps/horeca-bezorg.html">Bezorging</a><a href="/apps/horeca-hotel.html">Hotel</a><a href="/apps/horeca-events.html">Events</a><a href="/apps/horeca-club.html">Club</a><a href="/apps/horeca-haccp.html">HACCP</a></details></footer></aside>
+<main class="hq-main"><header class="hq-top"><div class="hq-tabs" data-tabs><button class="actief" type="button">Horeca Command<small>OPERATIONS</small></button><button type="button">Service Live<small>ZAAL + KEUKEN</small></button></div><section><i></i><span>Operatie beschermd</span><button class="knop" id="ververs" type="button">Ververs</button></section></header><section id="main" class="hq-stage">
+  <section class="hq-hero"><div><span class="hq-ey">HORECA COMMAND · ALLE KANALEN</span><h1>Uw operatie.<br>Als één service.</h1><p>Zaal, keuken, hotel, bezorging en events werken vanuit dezelfde gastbelofte. Rahul bundelt alleen wat aandacht of menselijk akkoord vraagt.</p></div><aside><span>LIVE OPERATIONS</span><p><i></i><b>Zaal en keuken verbonden</b><small>Werkelijke aantallen laden uit uw zaak</small></p><p><i></i><b>Menselijke betaalgrens</b><small>Geen betaling zonder bestaande controle</small></p><p><i></i><b>Niet gemeten blijft zichtbaar</b><small>Nooit als nul gepresenteerd</small></p></aside></section>
+  <section class="hj-tower" aria-labelledby="hjTitle">
+    <header><div><span>RAHUL · LIVE GASTREIS</span><h2 id="hjTitle">Eén ritme door de hele zaak.</h2><p id="hjRahul">Rahul leest de werkelijke operatie…</p></div><div class="hj-kpis"><b id="hjGasten">–<small>gasten</small></b><b id="hjTafels">–<small>reizen</small></b><b id="hjAandacht">–<small>aandacht</small></b></div></header>
+    <div id="hjReizen" class="hj-reizen"></div>
+  </section>
+  <section class="dt-command" id="kitchen" aria-labelledby="dtTitle">
+    <header><div><span>DIGITAL DISH TWIN · AUTOPILOT</span><h2 id="dtTitle">Van gerecht naar levende operatie.</h2><p id="dtRahul">Rahul verbindt kaart, receptuur, stations en voorraad…</p></div><button class="knop p" id="dtOpen" type="button">Open Dish Intelligence</button></header>
+    <div class="dt-stations" id="dtStations"></div><div class="dt-dishes" id="dtDishes" hidden></div>
+  </section>
+  <section class="sv-command" id="floor" aria-labelledby="svTitle">
+    <header><div><span>HOSPITALITY SPATIAL COMMAND</span><h2 id="svTitle">De hele zaak. Eén veilige beweging.</h2><p id="svPrivacy">Werkzones, geen exacte personeelstracking.</p></div><div><button class="knop" id="svRecovery" type="button">Guest Recovery</button><button class="knop p" id="svWave" type="button">Bouw servicegolf</button></div></header>
+    <div class="sv-layout"><div class="sv-venue" id="svVenue"><div class="sv-axis sv-a">ZAAL</div><div class="sv-axis sv-b">BAR</div><div class="sv-axis sv-c">PAS · KEUKEN</div></div><aside><div class="sv-kpis"><b id="svGasten">–<small>gasten</small></b><b id="svAandacht">–<small>aandacht</small></b></div><div class="sv-label">INGEKLOKTE ZONES</div><div id="svTeam"></div><div class="sv-label">SAFETY KERNEL</div><div id="svSafety"><p>Alle harde controles actief.</p></div><div class="sv-label">OPEN GUEST RECOVERY</div><div id="svRecoveryList"></div><div id="svProposal"></div></aside></div>
+  </section>
+  <section class="ia-host" aria-labelledby="iaTitle"><header><div><span>INVISIBLE ARRIVAL · HOST AUTOPILOT</span><h2 id="iaTitle">Verwachten voelt als verwelkomen.</h2><p>Alleen uitzonderingen vragen een besluit; bevestigen betekent persoonlijk gecontroleerd.</p></div><a class="knop" href="/apps/arrival.html">Open gastvoorbeeld</a></header><div class="ia-summary"><b id="iaComing">–<small>actieve arrivals</small></b><b id="iaPromises">–<small>open beloften</small></b><p id="iaRahul">Rahul leest de aankomststroom…</p></div><div id="iaList" class="ia-list"></div></section>
   <div class="tabs" role="tablist" aria-label="Weergave">
     <button class="knop" id="tabZaal" role="tab" aria-selected="true" type="button">Zaal</button>
     <button class="knop" id="tabKeuken" role="tab" aria-selected="false" type="button">Keuken</button>
   </div>
 
-  <nav class="rij" aria-label="De rest van het Horeca OS" style="margin-bottom:.9rem;">
+  <nav class="rij hq-legacy-nav" aria-label="De rest van het Horeca OS" style="margin-bottom:.9rem;">
     <a class="knop" href="/apps/horeca-expeditie.html">Expeditie</a>
     <a class="knop" href="/apps/horeca-bezorg.html">Bezorging</a>
     <a class="knop" href="/apps/horeca-hotel.html">Hotel</a>
@@ -88,6 +98,7 @@
   </section>
 
   <section id="vKeuken" aria-label="De keuken" hidden>
+    <div class="kaart" id="kAutoKaart"><div class="kop">Station Autopilot</div><p class="stil" id="kAutoRahul">Rahul berekent de werkvolgorde…</p><div id="kAutoStations"></div></div>
     <div class="kaart">
       <div class="kop">Stationsbord</div>
       <div class="rij">
@@ -102,7 +113,7 @@
       <div id="kRegie"></div>
     </div>
   </section>
-</main>
+</section></main></div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
@@ -110,6 +121,10 @@
 <script src="/apps/horeca/verzoeken.js"></script>
 <script src="/apps/horeca/keuken.js"></script>
 <script src="/apps/horeca/app.js"></script>
+<script src="/apps/horeca/journey.js"></script>
+<script src="/apps/horeca/dish-intelligence.js"></script>
+<script src="/apps/horeca/spatial-command.js"></script>
+<script src="/apps/horeca/invisible-arrival.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

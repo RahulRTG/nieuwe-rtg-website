@@ -79,6 +79,7 @@ function maakTonen(binnen) {
       laatsteVanMij: laatste ? laatste.van === mij : false,
       at: g.laatst, ongelezen,
       vast: !!st.vast, stil: !!st.stil, weg: !!st.weg, concept: st.concept || null,
+      typt: wieTypt(g.id, mij),
       online: anderen.length === 1 ? isAanwezig(anderen[0]) : anderen.some(isAanwezig),
       bron: (g.meta && g.meta.bron) || null, link: (g.meta && g.meta.link) || null
     };

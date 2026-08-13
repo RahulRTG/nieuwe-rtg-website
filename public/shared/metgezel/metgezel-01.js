@@ -29,6 +29,11 @@
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!memTok && !supTok) return;
+  if (!window.__rahulTabStandaard) {
+    var rahulTabScript = document.createElement('script');
+    rahulTabScript.src = '/shared/rahul-tab.js?v=command5'; rahulTabScript.defer = true;
+    document.head.appendChild(rahulTabScript);
+  }
 
   /* De muisvrije laag erbij (shared/handenvrij.js): de stuurbalk waar je in typt
      of tegen praat, met navigatie zonder tik. Hij hangt hier omdat de metgezel

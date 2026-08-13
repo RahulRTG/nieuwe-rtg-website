@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RTG Reizen & Veilig</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/reizen-veilig.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<div class="rv-app" id="rvApp">
+  <aside class="rv-bank">
+    <nav aria-label="Reizen en veiligheid">
+      <button class="actief" data-open="overzicht" aria-current="page"><span class="rv-icoon">⌂</span><span>Vandaag</span></button>
+      <button data-open="vervoer"><span class="rv-icoon">↗</span><span>Gaan</span></button>
+      <button data-open="reisblad"><span class="rv-icoon">◇</span><span>Reizen</span></button>
+      <button data-open="veilig"><span class="rv-icoon">◈</span><span>RTG Veilig</span></button>
+      <button data-open="navigatie"><span class="rv-icoon">⌖</span><span>Navigatie</span></button>
+    </nav>
+    <div class="rv-bankvoet"><button data-open="instellingen"><span class="rv-icoon">≡</span><span>Instellingen</span></button></div>
+  </aside>
+
+  <main class="rv-werk">
+    <header class="rv-tabs"><div id="rvTabs"></div><button id="rvPlus" aria-label="Tweede scherm openen">＋</button></header>
+    <section class="rv-panes" id="rvPanes"></section>
+  </main>
+
+  <section class="rv-rahul" id="rvRahul" aria-label="Rahul reisassistent">
+    <button class="rv-mond" id="rvMond" aria-label="Rahul openen"><span>◌</span></button>
+    <div class="rv-vraag"><small id="rvContext">Ik bewaak uw reis en breng u waar u moet zijn.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
+    <button class="rv-stuur" id="rvStuur" aria-label="Versturen">→</button>
+  </section>
+</div>
+
+<template id="rvOverzicht">
+  <article class="rv-overzicht">
+    <div class="rv-ey">VANDAAG · RAHUL</div>
+    <div class="rv-rahulteken">◌</div>
+    <h1>Goedemiddag.</h1>
+    <p class="rv-intro">Uw reisdag staat rustig klaar. Ik verbind vervoer, aankomst en veiligheid zonder dat u tussen losse apps hoeft te zoeken.</p>
+    <div class="rv-suggesties"><button data-action="vervoer">Bereid mijn reis voor</button><button data-circle="maak">Deel mijn aankomst</button><button data-action="veilig">Loop met mij mee</button></div>
+    <div class="rv-status"><i></i><span><b>RTG Veilig staat klaar</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
+    <section class="rv-moment">
+      <div class="rv-momentkop"><span>Uw eerstvolgende moment</span><em>LIVE</em></div>
+      <div class="rv-lijn">
+        <time>Nu</time><div><b>Vertrek plannen</b><small>Vergelijk OV, taxi en lopen op tijd, prijs en uitstoot.</small><button data-action="vervoer">Plan met Rahul →</button></div>
+      </div>
+      <div class="rv-lijn gedimd"><time>Daarna</time><div><b>Veilig aankomen</b><small>Kies pas bij het boeken wie uw voortgang of aankomst mag zien.</small></div></div>
+    </section>
+    <section class="rv-circle"><div><span class="rv-ey">LIVE CIRCLE</span><h2>Alleen delen wat nodig is</h2><p>Vrienden, partners en bedrijven krijgen per Moment precies genoeg informatie en nooit automatisch uw volledige locatie.</p><div class="rv-momenten" data-momenten></div></div><button data-circle="maak">Nieuw Moment</button></section>
+  </article>
+</template>
+
+<template id="rvReizen">
+  <article class="rv-reisblad">
+    <div class="rv-ey">SAMENGESTELDE REIZEN</div>
+    <div class="rv-reisintro"><button data-action="reizen">Meenemen</button><p>Reizen die wij voor u samenstellen, met één planning voor verblijf, vervoer en veilige aankomst.</p></div>
+    <div class="rv-reiszoek"><input placeholder="Waar hebt u zin in? Bijv. zon, strand, rust" aria-label="Reiswens"><button data-action="reizen">Adviseer</button></div>
+    <section class="rv-reiskaart"><span>IBIZA · 7 DAGEN · ZOMER 2026</span><h2>Ibiza, jetset-week</h2><p>Vanaf Schiphol naar het eiland: hotel aan zee, een villa met eigen zwembad en diners bij geselecteerde adressen.</p><em>Vanaf € 2200 per persoon</em></section>
+    <section class="rv-reiskaart"><span>GSTAAD · 4 DAGEN · DOORLOPEND</span><h2>Gstaad, alpien weekend</h2><p>Een chalet met open haard, privéritten en diners in de bergen. Uw terugreis kan door RTG Veilig worden bewaakt.</p><em>Persoonlijk samengesteld</em></section>
+    <section class="rv-reiskaart"><span>UW REIS · LIVE</span><h2>Alles in één Moment</h2><p>Open uw echte boekingen, vervoerbewijzen en veiligheidskring zonder deze werkruimte te verlaten.</p><button data-action="reizen">Open mijn reizen →</button></section>
+  </article>
+</template>
+
+<dialog class="rv-dialoog" id="rvDialoog">
+  <form method="dialog" id="rvMomentForm">
+    <div class="rv-ey">NIEUWE LIVE CIRCLE</div><h2>Wie mag uw aankomst zien?</h2>
+    <label>Moment<input name="titel" maxlength="80" placeholder="Bijv. diner bij Maison" required></label>
+    <label>Bestemming<input name="doel" maxlength="100" placeholder="Alleen de naam is voldoende"></label>
+    <div class="rv-formduo"><label>Ontvanger<select name="soort"><option value="contact">Vriend of partner</option><option value="bedrijf">Betrokken bedrijf</option></select></label><label>Codenaam of bedrijfscode<input name="ontvanger" maxlength="40" required></label></div>
+    <div class="rv-formduo"><label>Delen<select name="niveau"><option value="voortgang">Voortgang en aankomsttijd</option><option value="plan">Alleen het plan</option><option value="locatie">Tijdelijke locatie (alleen connecties)</option></select></label><label>Automatisch stoppen<select name="minuten"><option value="120">Na 2 uur</option><option value="240" selected>Na 4 uur</option><option value="720">Na 12 uur</option><option value="1440">Na 24 uur</option></select></label></div>
+    <p class="rv-fout" id="rvMomentFout"></p><div class="rv-acties"><button value="cancel">Annuleren</button><button class="hoofd" value="default" id="rvMomentBewaar">Moment starten</button></div>
+  </form>
+</dialog>
+
+<script src="/shared/mond.js"></script>
+<script src="/apps/reizen-veilig.js"></script>
+</body>
+</html>

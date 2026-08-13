@@ -5,9 +5,11 @@
        hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
        gesloten scope, dus er verandert niets aan het gedrag. */
 
-    // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
+    // Een dicht maar fluisterzacht starlight-veld over het hele scherm. Meer
+    // lichtpunten geeft de indruk van ontelbaar veel vezels; de lagere
+    // helderheid voorkomt dat de poort glitterig of onrustig wordt.
     (function sterrenhemel(){
-      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { helderheid: 0.9 }); };
+      var hang = function(){ if (window.RTGSterren) window.RTGSterren.hang(gate, { dichtheid: 1.35, helderheid: 0.72 }); };
       if (window.RTGSterren) return hang();
       var s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
       s.onload = hang; document.head.appendChild(s);

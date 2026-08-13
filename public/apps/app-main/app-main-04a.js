@@ -62,7 +62,7 @@
          een kaart van 160px was. Nu die een regel van 26px is, past het wel,
          en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
          opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
-      '#gate{--klokschaal:1.2;}' +
+      '#gate{--klokschaal:1;}' +
       /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
          groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
          boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
@@ -99,18 +99,18 @@
          --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
          tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
          net voorbij de schaduw. De rest volgt eruit. */
-      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.62);' +
         '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
         '--doekleeg:calc(var(--doekhoog) * 0.279);' +
-        '--lipgat:calc(var(--mondbreed) * 0.126);' +
-        'width:var(--mondbreed);height:auto;' +
-        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.2rem;}' +
+        '--lipgat:calc(var(--mondbreed) * 0.25);' +
+        'width:var(--mondbreed);height:auto;opacity:0.82;' +
+        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.9rem;}' +
       // de zin is de aanspreking en geen onderschrift
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
          max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
       '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
-        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;margin-inline:auto;}' +
+        'min-height:0;padding:1rem 0 1.6rem;max-width:22ch;margin-inline:auto;}' +
       // het invoerveld is de actie: breed en royaal, geen streepje
       /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
          daar een volledige rand overheen leggen gaf een dubbele doos met een
@@ -121,11 +121,18 @@
          draagt nu het kader, het veld erin is kaal. De padding was ook
          asymmetrisch (0,9rem links tegen 0,5rem rechts). */
       '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
-        'box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;' +
-        'margin-inline:auto;padding:0 0.9rem;}' +
-      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px var(--burgundy);}' +
+        'background:color-mix(in srgb,var(--onyx-basis) 82%,transparent);' +
+        'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 34%,transparent),' +
+          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:14px;' +
+        'margin-inline:auto;padding:0.35rem 0.45rem 0.35rem 0.9rem;}' +
+      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 70%,transparent);}' +
       '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
       '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
+      '#gate .ag-rij #agGo{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;' +
+        'padding:0;border:1px solid color-mix(in srgb,var(--gold-tekst) 62%,transparent);' +
+        'border-radius:50%;background:var(--gold-tekst);color:var(--onyx-diep);' +
+        'font-size:1.2rem;line-height:1;opacity:1;}' +
+      '#gate .ag-rij #agGo:hover{background:var(--gold-hoog);}' +
       /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
          onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
 

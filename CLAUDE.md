@@ -59,6 +59,18 @@ vader ooit had is bezit dat over campagnes heen reist, en `stadsgeheugen.js` zeg
 ondubbelzinnig *"wie bezit het? niemand, en dat is de hele regel"*. De stad
 onthoudt; het bezit niet.
 
+**`ORGANISATIE.md` is de natuurkunde van een organisatie** — waarom sommige
+bedrijven onder druk blijven functioneren en andere uit elkaar vallen terwijl hun
+cijfers er nog prima uitzien. De keten *waarnemen → begrijpen → bevoegd zijn →
+beslissen → uitvoeren → overdragen → leren*, en zeven verschillende manieren
+waarop dezelfde zin ontstaat: *koeling B is alweer kapot*. Lees vóór je aan
+mandaten, escalatie of dashboards werkt vooral **de grenzen**: geen enkele score
+(geen bus factor, geen kennisschuld-percentage, geen cultuurcijfer), alles is een
+LEZING van feiten die er al staan, en inzicht is nooit een mechaniek — een
+herhaling kost geen cent extra, want anders poetst een speler zijn geschiedenis
+weg in plaats van eruit te leren. De kernvraag onderaan: *is dit een bedrijf, of
+één uitzonderlijk mens met personeel eromheen?*
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

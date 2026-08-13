@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 947 bestanden en 6453 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 948 bestanden en 6465 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 947 |
-| losse beweringen (`test(...)`) | 6453 |
+| toetsbestanden | 948 |
+| losse beweringen (`test(...)`) | 6465 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 94 |
+| alleen in de kop *genoemd*, nog niet gemeten | 95 |
 | niets van beide | 208 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-827 bestanden, 6238 beweringen.
+828 bestanden, 6250 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -680,6 +680,7 @@ toets omvalt.
 | `spelnaspelen.test.js` | 9 | -- | Naspelen: een afgelopen partij zet voor zet herbouwen. De belofte die hier bewaakt wordt is niet "er komt een bord uit" maar "het is HETZELFDE bord". |
 | `spelnieuws.test.js` | 14 | genoemd | MAGNAAT: WERELDNIEUWS -- wat er in de stad gebeurt terwijl jij onderneemt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelonderzoek.test.js` | 38 | genoemd | MAGNAAT: ONDERZOEK -- bedrijven die ANDERS worden in plaats van alleen groter. NEGEN BEWERINGEN, en ze zijn alle negen stil terug te draaien: 1. |
+| `spelorganisatie.test.js` | 12 | genoemd | MAGNAAT: WAT EEN ORGANISATIE OVER ZICHZELF WEET. De eerste steen van ORGANISATIE.md, en hij bestaat uit twee LEZINGEN van het besluitenlog dat er al staat (magnaat/storing-keten.js). |
 | `spelovername.test.js` | 13 | genoemd | MAGNAAT: OVERNAMES -- een zaak rechtstreeks van een ander kopen. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelpand.test.js` | 14 | -- | HET PAND ALS PERSONAGE -- wat er op deze plek stond, over campagnes heen. De eerste wervel van de geschiedenislaag, en met opzet op het onderwerp met de minste uitzonderingen: een stuk grond. |
 | `spelpersonen.test.js` | 10 | genoemd | MENSEN BUITEN HET POTJE -- fase 5a uit SAMENLEVING.md. Tot nu toe was een mens een DEELNEMER van campagne X: hij bestond zolang het potje bestond. |

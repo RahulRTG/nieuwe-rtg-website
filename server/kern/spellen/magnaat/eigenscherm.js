@@ -15,6 +15,7 @@ const { PROJECTEN } = require('./foundation');
 
 const STORING = require('./storing');
 const D = require('./dienst');
+const ORG = require('./organisatie');
 const { UITWEGEN } = require('./storing-acties')({ mijnVestiging: () => null });
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capaciteit,
@@ -53,7 +54,12 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       eigenDeel: Math.round(eigenDeel(st, v.id) * 100),
       // wat deze zaak inkoopt en wat hij zelf kan leveren -- zonder dat is
       // onderhandelen raden over getallen die de motor gewoon kent
-      handel: inkoopbeeld(v), vergeven: vergeven(st, v)
+      handel: inkoopbeeld(v), vergeven: vergeven(st, v),
+      /* WAT DEZE ZAAK OVER ZICHZELF WEET (./organisatie.js). Twee feiten en
+         geen oordeel: wat er voor de zoveelste keer stuk is, en wie de
+         besluiten feitelijk nam. Een lezing van het besluitenlog dat er al
+         staat -- er wordt niets voor bewaard. */
+      organisatie: ORG.beeld(st, v, mij, codenaamVan)
     }));
     return {
       stad: k.naam, bron: k.bron, maand: st.maand, duur: st.duur, klaar: st.klaar,

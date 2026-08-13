@@ -300,9 +300,20 @@ function terug(id, n) {
 
   /* ---- 3. de eigenaar beslist, en de volgende ploeg treft de wereld aan ---- */
   const rep = await zet(eig, p2, { actie: 'storing-verhelpen', vestiging: stuk.id,
-    storing: 'koeling', hoe: 'uit' });
-  console.log('eigenaar neemt hem uit bedrijf:', JSON.stringify(rep).slice(0, 120));
-  terug(p2, 1); await staat(eig, p2);
+    storing: 'koeling', hoe: 'repareren' });
+  console.log('eigenaar laat repareren:', JSON.stringify(rep).slice(0, 100));
+  terug(p2, 2); await staat(eig, p2);
+  /* EN DAN GAAT HIJ WEER STUK. Niet geplaatst maar afgewacht zou hier maanden
+     kosten; de herhaling is het onderwerp van de foto, dus de tweede breuk komt
+     uit dezelfde motor maar op commando -- dit is een fotograaf en geen partij. */
+  const potje = db.data.spellen.potjes[p2];
+  const zaakObj = (potje.staat.vestigingen[H[eig]] || [])
+    .find(v => v.id === stuk.id);
+  require('../server/kern/spellen/magnaat/storing')
+    .uitVoorval(zaakObj, 'machinebreuk', potje.staat.maand);
+  await staat(eig, p2);
+  const zaakOrg = (await mijn(eig, p2)).find(v => v.id === stuk.id);
+  console.log('organisatie:', JSON.stringify(zaakOrg.organisatie));
   const na = await vloer();
   console.log('wat de volgende ploeg weet:', JSON.stringify(na.weet));
 

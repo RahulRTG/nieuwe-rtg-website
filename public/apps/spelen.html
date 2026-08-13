@@ -1578,6 +1578,36 @@ function tekenDienst(d, waarom){
     '<div class="leeg">Je kunt er per moment één doen.</div>';
 }
 
+/* WAT EEN ZAAK OVER ZICHZELF WEET. De schakel `leren` uit ORGANISATIE.md: een
+   probleem dat terugkeert omdat de organisatie er niets van heeft opgestoken.
+   En de tweede organisatie: wie mensen daadwerkelijk bellen als het misgaat,
+   naast wie er volgens het organigram over gaat.
+
+   ER STAAT GEEN SCORE. Wat een herhaling kost, kostte hij de vorige keer ook --
+   en juist dat is de les: de rekening was er altijd al, alleen niemand telde
+   hem op. Zou er een cijfer omheen staan, dan is het een balk om te
+   optimaliseren in plaats van iets om te ontdekken. */
+function organisatieStrook(o){
+  if (!o) return '';
+  const herhaald = (o.herhaald || []).map(h => '<div class="rij"><div class="nm">' +
+    esc(h.naam) + ' is de ' + h.keer + 'e keer stuk' +
+    '<small>de eerste keer in maand ' + h.sinds +
+    (h.tijdelijk ? ' · ' + h.tijdelijk + ' keer met een tijdelijke oplossing' : '') +
+    '</small></div></div>').join('');
+  /* DE FEITELIJKE HANDEN, en alleen als ze IEMAND ANDERS zijn dan de eigenaar.
+     Staat er niemand anders, dan is er geen tweede organisatie en zou de regel
+     alleen bevestigen wat het organigram al zei. */
+  const anderen = (o.handen || []).filter(x => x.wie !== o.formeel);
+  const handen = !anderen.length ? '' :
+    '<div class="rij"><div class="nm">Wie het feitelijk doet<small>' +
+    anderen.map(x => esc(x.wie) + (x.rol ? ' (' + esc(x.rol) + ')' : '') +
+      ' · ' + x.aantal + ' besluit' + (x.aantal === 1 ? '' : 'en')).join(' · ') +
+    ' · van de laatste ' + o.laatste + '</small></div></div>';
+  if (!herhaald && !handen) return '';
+  return '<div class="sec" style="width:100%;">Wat deze zaak over zichzelf weet</div>' +
+    herhaald + handen;
+}
+
 function tekenMagnaatEco(){
   const p = huidig, st = p.staat;
   if (st.kavels) ecKavels = st.kavels;
@@ -1621,6 +1651,12 @@ function tekenMagnaatEco(){
          dienst tegenkomt, maar hier met het maandoverzicht ernaast in plaats van
          midden in de drukte -- en met de uitweg die op de vloer niet bestaat.
          Een monteur laten komen kost geld, dus dat besluit hoort hier. */
+      /* WAT DEZE ZAAK OVER ZICHZELF WEET (magnaat/organisatie.js). Twee feiten
+         en geen oordeel: wat er voor de zoveelste keer stuk is, en wie de
+         besluiten feitelijk nam. Er staat met opzet GEEN cijfer omheen -- geen
+         bus factor, geen kennisschuld-percentage. Een aantal en een naam; wat
+         dat betekent bepaalt de speler. */
+      organisatieStrook(v.organisatie) +
       (v.storingen || []).map(x => '<div class="rij" style="width:100%;flex-wrap:wrap;">' +
         '<div class="nm">' + esc(x.naam) + ' · ' + esc(STORINGSTAND[x.staat] || x.staat) +
         '<small>sinds maand ' + x.sinds + '</small>' +

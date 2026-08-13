@@ -69,6 +69,19 @@ module.exports = ({ doe }) => {
     if (krap && v.personeel < nodig) {
       const kosten = (nodig - v.personeel) * 3000;
       if (st.geld[h] - kosten < regels.kasbuffer) return;
+      /* EN BINNEN ZIJN MANDAAT, in MENSEN en niet in euro's (../magnaat/mandaat.js).
+         Zonder grens gezet blijft het zoals het was; met een grens krijg je het
+         geval waar deze laag om draait -- een bedrijfsleider die ziet dat er
+         handen tekort zijn en er niet genoeg mag aannemen. Dat is geen
+         onvermogen maar een inrichtingskeuze van de eigenaar, en hij hoort hem
+         terug te zien in het log. */
+      const erbij = nodig - v.personeel;
+      const toe = M.magVoor(regels.mandaat, 'personeel', erbij);
+      if (!toe.mag && regels.mandaat.personeel !== undefined) {
+        uit.push({ wat: 'mensen niet aangenomen', waarom: toe.reden,
+          bedrag: erbij, vestiging: v.id });
+        return;
+      }
       if (doe(potje, h, { actie: 'beleid', id: v.id, personeel: nodig }).ok)
         uit.push({ wat: 'mensen erbij', waarom: (r.gemist ? 'er liep ' + rond(r.gemist) + ' vraag weg'
           : 'de bezetting stond op ' + r.bezetting + '%'), bedrag: nodig, vestiging: v.id });

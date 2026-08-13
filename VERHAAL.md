@@ -1201,3 +1201,77 @@ op de oude formulering maar gaan over iets anders.
 weg bent. Een werkgever kan reorganiseren. Dat is hard, en het is de eerlijke
 kant van een wereld die doorloopt — mits het uit iets echts volgt en niet uit
 een timer die op je afwezigheid staat.
+
+
+---
+
+## 14. Wat de mandaatmeter vond
+
+`scripts/magnaat-mandaat.js` zet identieke bedrijven onder verschillende
+bestuursvormen en laat ze zesendertig maanden draaien **zonder eigenaar**. Niet
+om te weten welke instelling het meest verdient — dat zou governance een
+schuifje met een beste stand maken — maar om de vraag te beantwoorden: vanaf welk
+punt wordt autonomie organisatorische kracht?
+
+Hij meet daarom het *waarom* en niet alleen de kas: gemiste omzet, de staat van
+het pand, het aantal mensen, rentelast, derving, en hoeveel besluiten er
+geweigerd zijn omdat niemand erover mocht beslissen.
+
+### De vertrekvorm bleek de belangrijkste as
+
+De eerste opzet liet de eigenaar vertrekken met alles keurig ingesteld. Dan valt
+er niets te besturen, en de uitkomst is ontnuchterend:
+
+> **Een manager kost dan meer dan hij oplevert.** −28.626 over drie jaar: tarief
+> zonder werk.
+
+Dat is een echte uitkomst en geen defect — maar het is de saaie helft. De
+interessante is een zaak die aandacht nodig heeft.
+
+### Verwaarloosd achtergelaten — en hier zit de les
+
+| bestuursvorm | kas | gemist | onderhoud | mensen | geweigerd | t.o.v. geen sturing |
+|---|---|---|---|---|---|---|
+| niemand | 396.783 | 26.266 | 0 | 1 | 0 | — |
+| **krap mandaat** | **383.570** | **30.052** | 74 | **1** | **44** | **−13.213** |
+| standaard | 660.788 | 11.148 | 73 | 3 | 0 | +264.005 |
+| ruim mandaat | 739.693 | 3.474 | 92 | 4 | 0 | +342.910 |
+
+**Een krap mandaat is slechter dan géén manager.** Dat is de eerste van de drie
+uitkomsten, en hij is scherper dan verwacht: je betaalt een tarief voor een
+manager die vierenveertig keer moest melden dat hij niet mocht. Het pand werd
+onderhouden (74) en de handen kwamen nooit — dus liep er méér vraag weg dan bij
+een bedrijf waar helemaal niemand op lette (30.052 tegen 26.266).
+
+Dat is precies *het bedrijf raakt verstopt*: kleine problemen wachten op de
+eigenaar, kansen worden gemist, en de schade stapelt.
+
+### De bovenkant is ongemeten, niet veilig
+
+`ruim` en `alles` geven **exact hetzelfde**. Dat komt niet doordat te veel
+mandaat ongevaarlijk is, maar doordat de AI-manager niet roekeloos *kan* zijn:
+zijn tweede wet verbiedt hem het bedrijf groter te maken, en zijn actielijst is
+`beleid` en `krediet-opnemen`. Een ruimer mandaat geeft hem meer ruimte om te
+doen wat hij toch al deed.
+
+De derde uitkomst — *te veel mandaat wordt roekeloosheid* — vraagt dus eerst een
+gemandateerde die beslissingen kan nemen waarvan de gevolgen groter zijn dan zijn
+informatie: uitbreiden, tekenen, overnemen. Zolang die er niet is meldt de meter
+de bovenkant als **ongemeten**, en niet als gehaald.
+
+### En een gat dat een besluit vraagt
+
+> Voor onderhoud en personeel betekent **geen mandaat** nog steeds
+> **onbegrensd**.
+
+Dat is de achterwaartse compatibiliteit uit hoofdstuk 13, en de prijs ervan is
+dat *"hij mag dit niet"* onuitdrukbaar is — alleen een klein ja kan. Een grens
+van nul wordt weggegooid, want nul is geen bevoegdheid.
+
+Dat omdraaien is verdedigbaar en het is precies het soort besluit dat niet als
+bijwerking hoort te gebeuren: het verandert het gedrag van elke lopende partij,
+en het maakt "niets instellen" ineens de strengste stand in plaats van de
+ruimste.
+
+**De standaardmandaten zijn daarom niet aangepast.** Eerst meten, dan bewust
+beslissen hoeveel schade slecht bestuur mag veroorzaken.

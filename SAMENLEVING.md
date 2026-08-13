@@ -60,6 +60,13 @@ Dat maakt organisatiekwaliteit gameplay, en het levert een progressiemaat op die
 beter is dan vermogen: van *ik ben het bedrijf* naar *ik kan drie maanden
 verdwijnen en de organisatie blijft gezond.*
 
+**Gemeten:** `scripts/magnaat-mandaat.js` (VERHAAL.md hoofdstuk 14). Een krap
+mandaat blijkt **slechter dan geen manager** — je betaalt tarief voor iemand die
+vierenveertig keer meldt dat hij niet mocht, terwijl er meer vraag wegloopt dan
+bij een bedrijf waar niemand op let. De bovenkant is **ongemeten**: de
+AI-manager kan niet roekeloos zijn, dus *te veel mandaat* is nog geen meetbare
+uitkomst.
+
 **Gebouwd:** `magnaat/mandaat.js`. Bevoegdheid bestond al twee keer — een rol
 draagt een lijst velden die hij mag zetten, de AI-manager draagt `mag: {lenen:
 false}` — maar allebei als **ja of nee**. Wat ontbrak is de grens. *"Mag

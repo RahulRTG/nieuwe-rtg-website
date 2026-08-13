@@ -99,16 +99,20 @@ function geleverd(zaken) {
    meter, en het verschil met `leverbaar` is de hele bevinding: capaciteit die
    bestaat is niet hetzelfde als een keten die er is.
 
-   Zonder contract is de inkoop van een zaak een PERCENTAGE VAN ZIJN EIGEN
-   OMZET (magnaat/stap.js) en gaat er geen euro naar een leverancier -- ook niet
-   als die leverancier op het kavel ernaast staat en capaciteit over heeft. De
-   goederen komen dan uit het niets, of preciezer: van buiten, zonder dat er
-   ooit iets van buiten is gekomen. `contract-voorstel` is de enige plek waar
-   die verbinding wel gelegd wordt, en die is per paar en per soort. */
+   TOEN DEZE METER WERD GEBOUWD STOND HIER 0%: zonder contract was de inkoop van
+   een zaak een percentage van zijn eigen omzet en ging er geen euro naar een
+   leverancier, ook niet als die op het kavel ernaast stond met capaciteit over.
+   magnaat/keten.js verdeelt sindsdien wat de contracten niet dekken over de
+   leveranciers die er zijn. Dit getal is dus de reden dat deze meter bestaat. */
 function verbonden(st) {
   const uit = Object.fromEntries(HG.HANDELSSOORTEN.map(x => [x, 0]));
   for (const c of (st.contracten || []))
     if (c.status === 'loopt' && uit[c.soort] !== undefined) uit[c.soort] += c.eenheden;
+  /* EN SINDS magnaat/keten.js OOK DE VRIJE MARKT. Dit is de regel waarvoor deze
+     meter is gebouwd: hij stond op nul zolang alleen contracten telden. */
+  for (const perSoort of Object.values((st.keten || {}).perAfnemer || {}))
+    for (const [soort, x] of Object.entries(perSoort))
+      if (uit[soort] !== undefined) uit[soort] += x.lokaal || 0;
   return uit;
 }
 
@@ -133,9 +137,13 @@ for (const soort of HG.HANDELSSOORTEN) {
 const kan = totKoop > 0 ? totDek / totKoop : 0;
 const doet = totKoop > 0 ? totEcht / totKoop : 0;
 console.log('\nKAN uit de stad komen : ' + Math.round(kan * 100) + '%   (er is capaciteit voor)');
-console.log('LOOPT er werkelijk door: ' + Math.round(doet * 100) + '%   (er is een contract voor)');
-console.log('\nDAT VERSCHIL IS DE BEVINDING. Zonder contract is de inkoop van een zaak een');
-console.log('percentage van zijn EIGEN omzet: er gaat geen euro naar een leverancier, ook');
-console.log('niet als die op het kavel ernaast staat met capaciteit over. De keten bestaat');
-console.log('dus wel als MOGELIJKHEID en niet als STRUCTUUR -- en zolang dat zo is, raakt');
-console.log('een leverancier die omvalt niemand. Zie ECONOMIE.md, de eerste wet.');
+console.log('LOOPT er werkelijk door: ' + Math.round(doet * 100)
+  + '%   (contract of vrije markt)');
+console.log('\nHet verschil tussen die twee is wat er niet lokaal geleverd KAN worden en');
+console.log('dus van buiten de wereld komt. Dat is een legitiem antwoord -- IJmuiden is');
+console.log('een stad en geen wereld -- zolang het maar hardop staat.');
+for (const soort of HG.HANDELSSOORTEN) {
+  const kr = (s.p.staat.keten || {}).krapte || {};
+  if (kr[soort] > 0.001) console.log('  krap: ' + soort + ' -- '
+    + Math.round(kr[soort] * 100) + '% van de vraag kan de stad niet leveren');
+}

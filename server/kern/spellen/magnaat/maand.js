@@ -14,18 +14,17 @@
    opleveren als tien maanden los.
 
      1. de concurrentiedruk per zone en sector, op de begintoestand
-     2. wat er aan contracten vastligt, VOORDAT er iets gerekend is
-     3. wat elke leverancier daarvan waarmaakt (naar rato bij een tekort)
-     4. iedere vestiging rekent zijn maand, allemaal op DEZELFDE begintoestand
-     5. rood staan kost rente
-     6. de contracten worden afgewikkeld -- na de maand, want de kwaliteitseis
+     2. de bevoorrading: contracten eerst, dan de vrije markt (./maand-bevoorrading.js)
+     3. iedere vestiging rekent zijn maand, allemaal op DEZELFDE begintoestand
+     4. rood staan kost rente
+     5. de contracten worden afgewikkeld -- na de maand, want de kwaliteitseis
         gaat over de kwaliteit die er DEZE maand geleverd is
-     7. de Foundation draagt af en bouwt
+     6. de Foundation draagt af en bouwt
 
-   Stap 1 en 4 staan met opzet uit elkaar: zou elke vestiging op de bijgewerkte
+   Stap 1 en 3 staan met opzet uit elkaar: zou elke vestiging op de bijgewerkte
    toestand rekenen, dan bepaalt de volgorde van de spelers in een object wie de
    klanten krijgt. */
-const { maand: rekenMaand, levering } = require('./stap');
+const { maand: rekenMaand } = require('./stap');
 /* DE CONJUNCTUUR. Hij komt hier binnen en nergens anders: een golf over de hele
    stad hoort op de plek waar de stad gerekend wordt. Zie ./cyclus.js -- hij
    raakt twee dingen, de vraag en de prijs van geld, en verder niets. */
@@ -39,7 +38,7 @@ const RUSH = require('./rush-maand');
 const RUSHNA = require('./rush-nalaten');
 const maakPerZaak = require('./maand-vestiging');
 const F = require('./foundation');
-const H = require('./handel');
+const BEVOORRADING = require('./maand-bevoorrading');
 
 const rond = (n) => Math.round(n);
 
@@ -82,33 +81,14 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        die er geen mag hebben (zie de determinisme-eis in ./stap.js). */
     const werkvloer = RUSH.maandInvoer(potje);
     const dervingFactor = werkvloer.derving;
-    /* WAT ER DEZE MAAND VASTLIGT AAN CONTRACTEN, voordat er ook maar iets
-       gerekend is. Een levering gaat voor de vrije verkoop (./handel.js), dus
-       die capaciteit moet vergeven zijn voordat de eerste klant binnenkomt --
-       en wat een afnemer krijgt, moet hij krijgen ongeacht in welke volgorde de
-       spelers in dit object staan. */
-    const actief = (st.contracten || []).filter(c => c.status === 'loopt'
-      && st.maand + 1 >= c.startMaand && st.maand < c.eindMaand);
-    const toezegging = {}, ontvangst = {};
-    for (const c of actief) {
-      const t = toezegging[c.leverancierId] = toezegging[c.leverancierId] || { eenheden: 0, bedrag: 0 };
-      t.eenheden += c.eenheden; t.bedrag += c.bedrag;
-    }
-    /* Wat elke leverancier ervan waarmaakt, met dezelfde functie die zijn eigen
-       maand straks gebruikt. Komt een leverancier tekort, dan delen al zijn
-       afnemers naar rato mee in dat tekort -- niet "wie het eerst getekend
-       heeft krijgt alles", want dan bepaalt de volgorde in een object wie er
-       failliet gaat. */
-    const leverDeel = {};
-    for (const [id, t] of Object.entries(toezegging)) {
-      const w = wieHeeft(st, id);
-      leverDeel[id] = w ? levering(w.v, arbeid, t.eenheden).deel : 0;
-    }
-    for (const c of actief) {
-      const geleverd = c.eenheden * (leverDeel[c.leverancierId] || 0);
-      const o = ontvangst[c.afnemerId] = ontvangst[c.afnemerId] || {};
-      o[c.soort] = (o[c.soort] || 0) + geleverd;
-    }
+    /* WAAR DE GOEDEREN VAN DEZE MAAND VANDAAN KOMEN staat in
+       ./maand-bevoorrading.js: eerst wat de contracten vastleggen, dan wat de
+       vrije markt met de rest doet. VOORDAT er ook maar iets gerekend is, want
+       een levering gaat voor de vrije verkoop (./handel.js) en die capaciteit
+       moet vergeven zijn voordat de eerste klant binnenkomt. */
+    const { actief, toezegging, ontvangst, leverDeel } =
+      BEVOORRADING.bevoorraden(st, arbeid, wieHeeft);
+
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */

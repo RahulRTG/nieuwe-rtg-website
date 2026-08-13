@@ -53,13 +53,54 @@ KAN uit de stad komen : 59%   (er is capaciteit voor)
 LOOPT er werkelijk door: 0%   (er is een contract voor)
 ```
 
-**Dat verschil is de stand van vandaag.** Zonder contract is de inkoop van een
-zaak een percentage van zijn eigen omzet (`stap.js`): er gaat geen euro naar
-een leverancier, ook niet als die op het kavel ernaast staat met capaciteit
-over. De keten bestaat als **mogelijkheid** en niet als **structuur** — en
-zolang dat zo is, raakt een leverancier die omvalt niemand.
+**Dat was de stand.** Zonder contract was de inkoop van een zaak een percentage
+van zijn eigen omzet (`stap.js`): er ging geen euro naar een leverancier, ook
+niet als die op het kavel ernaast stond met capaciteit over.
 
-Dat is niet erg als je het weet. Het is erg als je het niet weet.
+`magnaat/keten.js` — Supply Network v1 — sluit die keten. Dezelfde meting nu:
+
+```
+goederen     |         1211 |            851 |                900 | retail
+productie    |           43 |            105 |                 43 | industrie
+vervoer      |          298 |           1456 |                297 | logistiek
+diensten     |            4 |             12 |                  4 | kantoor
+
+KAN uit de stad komen : 77%
+LOOPT er werkelijk door: 80%
+  krap: goederen -- 25% van de vraag kan de stad niet leveren
+```
+
+### Hoe hij werkt
+
+**Het is geen nieuwe post maar een verplaatsing.** De inkoopsom blijft wat hij
+was; wat verandert is waar hij heen gaat. Dezelfde vorm als `derving`: een
+uitsnede, geen extra rekening. Hij loopt daarom door de machinerie die er al
+was en al getoetst is — `toezegging` en `ontvangst` uit de contractlaag. **Een
+spotlevering is een contract dat niemand hoefde te onderhandelen.**
+
+**De buitenwereld is een actor.** Wat er niet lokaal geleverd wordt komt van
+buiten, en heet dan ook zo. Dat kostte geen enkel nieuw geldmechaniek: import
+is precies wat de inkooppost altijd al *was* — geld dat de wereld verlaat
+zonder tegenpartij.
+
+**De prijs komt uit de structuur.** De wereldprijs is het plafond van de lokale
+markt: niemand betaalt lokaal meer dan invoeren kost. Bij een ruime markt geldt
+het lokale voordeel (3%, gemeten), bij volledige schaarste verdwijnt dat. Geen
+`scarcityBonus`.
+
+**Een contract is voorrang, geen korting.** Contracten leggen beslag op
+capaciteit vóór de spotverdeling. Tijdens schaarste krijg jij geleverd en je
+concurrent niet — en dát is wat een contract waard is.
+
+**Verdelen gaat pro rata.** Niet wie het eerst komt, want dan bepaalt de
+volgorde in een object wie er omvalt.
+
+### Wat er nog niet is
+
+Met zoveel woorden, want een half gebouwde laag die eruitziet als een hele is
+erger dan een ontbrekende: **levertijd** (een bestelling is er meteen),
+**voorraad** (er ligt niets ergens), **substitutie** (geen alternatief product)
+en **meerdere steden**. En het scherm: de keten is nog niet klikbaar.
 
 ---
 

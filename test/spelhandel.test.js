@@ -32,6 +32,7 @@ const H = require('../server/kern/spellen/magnaat/handel');
 const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { MARKTPRIJS } = H;
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+const KETEN = require('../server/kern/spellen/magnaat/keten');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
@@ -84,24 +85,59 @@ test('elke sector koopt precies 100% van zijn inkoop ergens, en niets valt buite
     assert.ok(H.LEVERANCIERS[soort].length > 0, 'niemand levert ' + soort);
 });
 
-test('zonder contracten rekent de economie precies zoals in fase A', () => {
+test('zonder leverancier in de stad rekent de economie precies zoals in fase A', () => {
   /* De eis achter de hele laag: een economie die anders rekent zodra er een
-     laag bijkomt, is twee economieen. Meetbaar doordat `koopt` alleen de
-     BESTAANDE inkooppost verdeelt en er niets aan toevoegt. */
+     laag bijkomt, is twee economieen.
+
+     DEZE TOETS IS AANGESCHERPT TOEN magnaat/keten.js ERBIJ KWAM, en dat is geen
+     verwatering maar het omgekeerde. Hij zei eerst "zonder CONTRACTEN" -- maar
+     sindsdien verdeelt de vrije markt ook zonder contract wat er in de stad
+     geleverd kan worden, en dan koopt een restaurant zijn vervoer bij de
+     vervoerder om de hoek. De eis die overblijft is scherper: waar GEEN
+     leverancier is, komt alles van buiten en verandert er tot op de euro niets.
+
+     Vandaar een stad met alleen een restaurant: niemand levert hier goederen of
+     vervoer, dus alles is import -- precies zoals het altijd was. */
+  const m = maakMagnaat();
+  const p = { id: 'solo', soort: 'magnaat', spelers: ['boris'], teams: [0], modus: 'vrij',
+    status: 'bezig', beurt: 0, winnaar: null, variant: ECO };
+  m.spel.init(p);
+  p.staat.geld.boris = 5000000;
+  m.eco.zet(p, 'boris', { actie: 'open', kavel: kavelIn('boulevard').id,
+    sector: 'horeca', omvang: 60, naam: 'Zeezicht' });
+  maand(m, p, 6);
+  const r = p.staat.laatste.boris.regels[0];
+  const s = SECTOREN.horeca;
+  assert.equal(r.korting, 0, 'zonder leverancier is er niets gedekt');
+  assert.ok(Math.abs((r.inkoop + r.derving) - Math.round(r.omzet * s.inkoop)) <= 1,
+    'de inkooppost is onveranderd: ' + (r.inkoop + r.derving) + ' tegen ' + Math.round(r.omzet * s.inkoop));
+  assert.equal(r.levering, null, 'en er wordt niets geleverd');
+});
+
+test('met een leverancier verschuift de post naar hem toe -- en groeit hij niet', () => {
+  /* SUPPLY NETWORK v1 (magnaat/keten.js) mag de inkooppost VERPLAATSEN en niet
+     vergroten. Wat de afnemer kwijt is, is nog steeds de oude post: alleen gaat
+     een deel ervan nu naar een echte leverancier in plaats van de wereld uit.
+
+     Het enige verschil is het LOKALE VOORDEEL -- lokaal kopen is iets goedkoper
+     dan invoeren, want er zit geen afstand tussen. Dat is een besluit en geen
+     bijwerking, dus het staat hier als een BOVENGRENS: nooit meer dan wat
+     keten.js belooft. Zou die grens er niet staan, dan kan een volgende ronde
+     hem stilletjes verdubbelen. */
   const { m, p, st, B } = opstelling();
   maand(m, p, 6);
   const r = st.laatste.boris.regels[0];
   const s = SECTOREN[B.sector];
-  assert.equal(r.korting, 0, 'zonder contract is er niets gedekt');
-  /* INKOOP EN DERVING SAMEN ZIJN DE INKOOPPOST. Sinds VERHAAL.md par. 0f staat
-     het deel dat bederft als eigen regel (magnaat/stap.js), en dat is een
-     UITSNEDE en geen post erbij -- precies dezelfde eis als hier: een economie
-     die anders rekent zodra er een laag bijkomt, is twee economieen. Alleen
-     `r.inkoop` lezen zou die eis stil laten vervallen. De euro speling is de
-     afronding van twee posten in plaats van een. */
-  assert.ok(Math.abs((r.inkoop + r.derving) - Math.round(r.omzet * s.inkoop)) <= 1,
-    'de inkooppost is onveranderd: ' + (r.inkoop + r.derving) + ' tegen ' + Math.round(r.omzet * s.inkoop));
-  assert.equal(r.levering, null, 'en er wordt niets geleverd');
+  const oudePost = r.omzet * s.inkoop;
+  const lokaal = Object.values((st.keten.perAfnemer || {})[B.id] || {})
+    .reduce((n, x) => n + (x.bedrag || 0), 0);
+  assert.ok(lokaal > 0, 'er hoort lokaal ingekocht te zijn: ' + JSON.stringify(st.keten.perAfnemer));
+  const kwijt = r.inkoop + r.derving + lokaal;
+  assert.ok(kwijt <= oudePost + 1,
+    'de post mag niet GROEIEN: ' + Math.round(kwijt) + ' tegen ' + Math.round(oudePost));
+  assert.ok(kwijt >= oudePost * (1 - KETEN.LOKAAL_VOORDEEL) - 1,
+    'en niet meer krimpen dan het lokale voordeel: ' + Math.round(kwijt)
+    + ' tegen ' + Math.round(oudePost * (1 - KETEN.LOKAAL_VOORDEEL)));
 });
 
 /* ================= 1. een contract verandert de cijfers ================= */

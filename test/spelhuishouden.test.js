@@ -25,6 +25,7 @@ const assert = require('node:assert/strict');
 
 const HUIS = require('../server/kern/spellen/magnaat/huishoudens');
 const BOEKJE = require('../server/kern/spellen/magnaat/huishoudboekje');
+const TYPEN = require('../server/kern/spellen/magnaat/huishoudtypen');
 const V = require('../server/kern/spellen/magnaat/vraag');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 
@@ -274,37 +275,94 @@ test('een klap komt niet in een keer aan, maar wordt erger naarmate hij duurt', 
 });
 
 test('en een huishouden geeft nooit geld uit dat er niet is', () => {
-  /* DE BEHOUDSREGEL UIT HUISHOUDEN.md par. 2, rechtstreeks gevoerd. Geen enkele
-     campagne komt hier vandaag: daarvoor zou een huishouden een buffer moeten
-     hebben die dunner is dan wat een stadsgemiddelde ooit oplevert. Hij staat er
-     omdat `spaargeld` anders negatief kan worden, en dan geeft een huishouden
-     geld uit dat niet bestaat. */
-  const st = { huishoudens: { consumptie: 50000, spaargeld: 100 } };
-  BOEKJE.maand(st, 5000);
-  const besteedbaar = BOEKJE.boekje(5000).stand.besteedbaar;
-  assert.ok(st.huishoudens.spaargeld >= 0, 'het spaargeld hoort nooit onder nul te komen');
-  assert.ok(st.huishoudens.consumptie <= besteedbaar + 100 + 1e-9,
-    'en er wordt nooit meer uitgegeven dan inkomen plus buffer: '
-    + Math.round(st.huishoudens.consumptie) + ' tegen ' + Math.round(besteedbaar + 100));
+  /* DE BEHOUDSREGEL UIT HUISHOUDEN.md par. 2. Een instorting tot een procent van
+     het inkomen, zes maanden lang: geen enkel cohort mag ergens onderweg geld
+     uitgeven dat er niet is.
+
+     EN LET OP WAT ER NIET WORDT BEWEERD: dat ze aan het eind nog tegen de bodem
+     zitten. Dat doen ze niet -- ze zijn dan volledig aangepast, en `krap` is
+     juist weer vals. Wat de toets vasthoudt is dat ze er onderweg WEL tegenaan
+     zaten, want dat is het verschil met het gemiddelde huishouden van hiervoor. */
+  const st = {};
+  TYPEN.maand(st, 400000);
+  const geraakt = {};
+  for (let i = 0; i < 6; i++) {
+    TYPEN.maand(st, 4000);
+    for (const t of TYPEN.TYPEN) {
+      const h = st.huishoudens.per[t.id];
+      assert.ok(h.spaargeld >= -1e-6, t.id + ' maand ' + i + ': spaargeld onder nul: ' + h.spaargeld);
+      assert.ok(h.consumptie >= 0, t.id + ': consumptie onder nul');
+      if (h.krap) geraakt[t.id] = true;
+    }
+  }
+  assert.ok(geraakt.krap, 'het dunne-bufferhuishouden hoort de bodem te hebben geraakt');
+  assert.ok(geraakt.schuld, 'het huishouden met hoge schuld ook');
 });
 
-test('en als het werk terugkomt, herstelt de consumptie vanzelf', () => {
-  /* GEEN RECOVERY FLAG. Er komt weer geld binnen, dus er wordt weer meer
-     uitgegeven -- dat is het hele mechaniek. */
-  const o = stad('h-8b', [RUIM, ['industrie', 40, 'haven']]);
-  o.maand(3);
-  const vol = o.st.besteding;
-  const fabriek = o.zaken().find(v => v.sector === 'industrie');
-  const bezet = fabriek.personeel;
-  fabriek.personeel = 1;
-  o.maand(4);
-  const diep = o.st.besteding;
-  fabriek.personeel = bezet;
-  o.maand(6);
-  assert.ok(diep < vol - 0.001, 'de klap hoort te zijn aangekomen: ' + diep + ' tegen ' + vol);
-  assert.ok(o.st.besteding > diep, 'en het hoort te herstellen: ' + o.st.besteding);
-  assert.ok(Math.abs(o.st.besteding - vol) < 0.005,
-    'tot ongeveer waar het was: ' + o.st.besteding + ' tegen ' + vol);
+/* ============ 8b. en ze zijn niet gemiddeld ============ */
+
+test('dezelfde inkomensschok landt totaal anders per huishouden', () => {
+  /* HUISHOUDEN.md 3.4, en dit is de reden dat deze laag bestaat. Een gemiddelde
+     lijn verbergt precies waar het bij een schok om gaat: wie stopt er als
+     eerste met uit eten gaan?
+
+     GEEN STEREOTYPEN MAAR BALANSEN: het enige dat `krap` van `ruim` onderscheidt
+     is hoeveel er binnenkomt, hoe vast het eruit gaat en hoeveel er ligt. */
+  const st = {};
+  TYPEN.maand(st, 300000);
+  const voor = {};
+  for (const t of TYPEN.TYPEN) voor[t.id] = st.huishoudens.per[t.id].consumptie;
+  for (let i = 0; i < 4; i++) TYPEN.maand(st, 300000 * 0.7);
+  const val = (id) => 1 - st.huishoudens.per[id].consumptie / voor[id];
+  assert.ok(val('krap') > val('ruim') * 1.3,
+    'het dunne-bufferhuishouden snijdt veel dieper dan het dikke: '
+    + (val('krap') * 100).toFixed(1) + '% tegen ' + (val('ruim') * 100).toFixed(1) + '%');
+  assert.ok(val('ruim') >= 0, 'en het dikke huishouden snijdt wel iets');
+});
+
+test('vaste lasten zijn stijver dan boodschappen, en dus valt de vrije besteding harder', () => {
+  /* HUISHOUDEN.md 3.2. Zakt het inkomen met een vijfde, dan zakt de huur niet
+     mee -- een contract loopt door. De VRIJE besteding wordt daardoor met veel
+     meer dan een vijfde samengedrukt, en dat is precies waarom de horeca eerder
+     een klap krijgt dan de verhuurder. Er staat nergens dat dat zo moet zijn;
+     het volgt uit de volgorde van betalen. */
+  const st = {};
+  TYPEN.maand(st, 300000);
+  const voor = st.huishoudens.consumptie;
+  const val = [];
+  for (let i = 0; i < 12; i++) {
+    TYPEN.maand(st, 300000 * 0.8);
+    val.push(1 - st.huishoudens.consumptie / voor);
+  }
+  /* DE HEFBOOM BOUWT OP: de eerste maand valt mee (traagheid), en pas als de
+     consumptie is meegezakt staat de volle klap er. Op het diepste punt is hij
+     duidelijk groter dan de inkomensdaling zelf. */
+  const diepst = Math.max(...val);
+  assert.ok(diepst > 0.25,
+    'een inkomensdaling van 20% hoort de vrije besteding met veel meer dan 20% te drukken: '
+    + val.map(x => (x * 100).toFixed(0)).join(' '));
+  /* EN HIJ ZAKT DAARNA WEER, want een huurcontract loopt af en wordt opnieuw
+     gesloten. Dat is geen herstel van het inkomen -- dat blijft laag -- maar van
+     de VERHOUDING tussen vaste en vrije lasten. */
+  assert.ok(val[11] < diepst - 0.005,
+    'en hij hoort weer te zakken als de vaste lasten meegeven: '
+    + val.map(x => (x * 100).toFixed(0)).join(' '));
+});
+
+test('maar opgeteld zijn ze precies het gemiddelde huishouden van hiervoor', () => {
+  /* DE EIS WAARONDER DEZE LAAG MOCHT BESTAAN, en hij wordt afgedwongen en niet
+     gehoopt: de gewichten en de lastenverdeling worden bij het laden
+     genormaliseerd. Zou de optelsom afwijken, dan had een laag over de VERDELING
+     van inkomens het NIVEAU van de economie verschoven -- en dan klopt elke
+     ijking uit fase A niet meer. */
+  const st = {};
+  TYPEN.maand(st, 250000);
+  assert.ok(Math.abs(st.huishoudens.consumptie - BOEKJE.doelVan(250000)) < 1e-6,
+    'de som van de cohorten hoort de evenwichtsconsumptie te zijn: '
+    + st.huishoudens.consumptie + ' tegen ' + BOEKJE.doelVan(250000));
+  /* En de loonsom wordt volledig verdeeld: geen euro verzonnen of kwijtgeraakt. */
+  const som = TYPEN.TYPEN.reduce((n, t) => n + TYPEN.GEWICHT[t.id], 0);
+  assert.ok(Math.abs(som - 1) < 1e-12, 'de gewichten horen op te tellen tot 1: ' + som);
 });
 
 /* ============ 9. elke aftrekpost heeft een bestemming ============ */

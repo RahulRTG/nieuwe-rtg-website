@@ -205,6 +205,34 @@ console.log('sparen              | ' + Math.round(bk.stand.besteedbaar - cons).t
   + ' | buffer (nog geen bank)');
 console.log('\nVan elke euro loonkosten komt er dus ' + Math.round(cons / loonmassa * 100)
   + ' cent als vraag terug in de stad.');
+
 console.log('De grootste stroom die de wereld verlaat zijn de VASTE LASTEN, en dat is');
 console.log('meteen de grootste kringloop die nog ontbreekt: huur hoort bij een verhuurder');
 console.log('aan te komen en energie bij een energiebedrijf (HUISHOUDEN.md 3.5).');
+
+/* ================== EN WIE DAT ZIJN ==================
+
+   HUISHOUDEN.md 3.4. Een gemiddelde lijn verbergt precies waar het bij een schok
+   om gaat, dus staat hier wat een inkomensschok van een vijfde bij elk cohort
+   doet -- vier maanden na de klap, zodat de traagheid eruit is. */
+const TY = require('../server/kern/spellen/magnaat/huishoudtypen');
+const hst = {};
+TY.maand(hst, loonmassa);
+const voorCons = Object.fromEntries(TY.TYPEN.map(t => [t.id, hst.huishoudens.per[t.id].consumptie]));
+const raakte = {};
+for (let i = 0; i < 4; i++) {
+  TY.maand(hst, loonmassa * 0.8);
+  for (const t of TY.TYPEN) if (hst.huishoudens.per[t.id].krap) raakte[t.id] = true;
+}
+console.log('\n\nEn wie er geraakt wordt als de loonsom met een vijfde zakt?\n');
+console.log('huishouden                 | deel | buffer | consumptie na 4 mnd | bodem geraakt');
+for (const t of TY.TYPEN) {
+  const val = 1 - hst.huishoudens.per[t.id].consumptie / voorCons[t.id];
+  console.log(t.naam.padEnd(27) + '| ' + (Math.round(t.deel * 100) + '%').padStart(4)
+    + ' | ' + (t.buffer + ' mnd').padStart(6)
+    + ' | ' + ('-' + (val * 100).toFixed(1) + '%').padStart(19)
+    + ' | ' + (raakte[t.id] ? 'ja' : '-'));
+}
+console.log('\nDezelfde schok, zes verschillende uitkomsten -- en er staat geen enkele');
+console.log('uitzondering in de code. Het verschil zit in drie balansfeiten: wat er');
+console.log('binnenkomt, hoe vast het eruit gaat, en hoeveel er ligt.');

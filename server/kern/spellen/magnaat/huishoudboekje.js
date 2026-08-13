@@ -27,31 +27,12 @@
    stad heen gaat, met zoveel woorden -- en dat is de opstap naar het onderdeel
    dat er het meest toe doet: huur die bij een verhuurder aankomt.
 
-   ================== WAT ER WEL BEWEEGT: DE BUFFER ==================
+   ================== WAT ER MET DIT BOEKJE GEBEURT ==================
 
-   Een huishouden dat deze maand minder verdient, eet deze maand nog hetzelfde.
-   Er zit spaargeld tussen, en dat is geen verfijning maar het verschil tussen
-   een formule en een actor. Gevolg, en het is er een die niemand heeft
-   ingetikt: **schade is niet meteen maximaal, en hij wordt erger naarmate hij
-   langer duurt.** Zo ontstaat het verloop uit HUISHOUDEN.md par. 6 vanzelf --
-   maand 1 valt mee, maand 6 niet -- zonder dat er ergens `recessie` staat. En
-   herstelt het inkomen, dan herstelt de consumptie ook weer: niet omdat er een
-   vlag omgaat, maar omdat er weer geld binnenkomt.
-
-   EN NU HET DEEL DAT EERLIJK MOET STAAN, want hier stond eerst een grotere
-   belofte dan de code waarmaakt. De buffer LOOPT LEEG maar RAAKT NIET OP: in
-   een instorting van 200.000 naar 20.000 loonsom zakt het spaargeld van 158k
-   naar 69k en stabiliseert daar. Dat komt doordat er nu EEN gemiddeld huishouden
-   per stad is, en een gemiddelde buffer haalt het altijd. In het echt is dat
-   precies andersom -- het zijn de dunne buffers die als eerste de bodem raken,
-   en dat is waar veerkrachtverschillen vandaan komen. Zolang HUISHOUDEN.md 3.4
-   (huishoudtypen) en 3.12 (vermogensverschillen) er niet zijn, IS die bodem er
-   niet en hoort niemand te denken van wel.
-
-   De begrenzing hieronder blijft dus staan als BEHOUDSREGEL en niet als
-   mechaniek: je kunt niet meer uitgeven dan er binnenkomt plus wat er ligt.
-   Zonder hem zou spaargeld negatief worden -- een huishouden dat geld uitgeeft
-   dat niet bestaat -- en dat is precies wat HUISHOUDEN.md par. 2 verbiedt.
+   Dit bestand rekent de WIG en verder niets: van loonkosten naar vrij
+   besteedbaar. Wie dat boekje voert -- en met hoeveel verschillende huishoudens
+   -- staat in ./huishoudtypen.js. Die splitsing is er omdat de wig voor iedereen
+   hetzelfde is (belasting is belasting) terwijl de balans dat juist niet is.
 
    ================== WAT ER NOG NIET IS ==================
 
@@ -70,6 +51,7 @@
    De aandelen zijn met opzet uitgedrukt op de post waar ze in het echt op
    drukken: premies op de loonkost, heffing en pensioen op het bruto, vaste
    lasten op het netto. Wie er een verstelt, verstelt precies een ding. */
+const VAST_DEEL = 0.45;
 const WIG = [
   { post: 'werkgeverspremies', deel: 0.20, van: 'loonkosten', naar: 'overheid' },
   { post: 'loonheffing', deel: 0.30, van: 'bruto', naar: 'overheid' },
@@ -79,23 +61,13 @@ const WIG = [
      bij een energiebedrijf, verdubbelt het aantal kringlopen in een keer.
      Zolang dat er niet is, is dit de grootste stroom die de wereld verlaat --
      en dan hoort hij als grootste zichtbaar te zijn, niet weggemoffeld. */
-  { post: 'vaste lasten', deel: 0.45, van: 'netto', naar: 'buiten de wereld' }
+  { post: 'vaste lasten', deel: VAST_DEEL, van: 'netto', naar: 'buiten de wereld' }
 ];
 
 /* WAT ER VAN HET VRIJ BESTEEDBARE NIET WORDT UITGEGEVEN. Niet omdat huishoudens
    zuinig zijn maar omdat er altijd iets opzij gaat; hij is hier vast en hoort
    later af te hangen van buffer, schuld en onzekerheid (HUISHOUDEN.md 3.7). */
 const SPAARQUOTE = 0.08;
-
-/* HOE SNEL CONSUMPTIE MEEBEWEEGT met wat er binnenkomt. Een derde per maand:
-   een huishouden past zijn leven aan, maar niet in een week. Dit is de traagheid
-   uit HUISHOUDEN.md 3.2, en zonder hem is een ontslag meteen maximaal. */
-const AANPASSING = 1 / 3;
-
-/* HOEVEEL MAANDEN CONSUMPTIE ER IN DE BUFFER ZIT als de wereld begint. Drie
-   maanden is de orde van grootte waarop het in het echt scheef gaat: daar
-   beginnen uitgestelde aankopen en verhuizingen. */
-const BUFFERMAANDEN = 3;
 
 /* VAN LOONKOSTEN NAAR VRIJ BESTEEDBAAR, met de posten erbij. Geeft ELKE stap
    terug en niet alleen de uitkomst, want de tussenstappen zijn precies wat een
@@ -119,42 +91,4 @@ function boekje(loonkosten) {
    evenwichtsstand: waar de consumptie naartoe kruipt als er niets verandert. */
 const doelVan = (loonkosten) => boekje(loonkosten).stand.besteedbaar * (1 - SPAARQUOTE);
 
-/* EEN MAAND VOOR DE HUISHOUDENS VAN EEN STAD. Verandert de toestand in plaats,
-   want dit is een actor met een balans en geen som -- dat is het hele verschil
-   met wat er stond.
-
-   IDEMPOTENT PER MAAND EN VERDER NIET: hij hoort exact een keer per spelmaand
-   te draaien, net als ./cyclus.js. De wereld rekent bij, dus tien maanden in een
-   keer moeten hetzelfde opleveren als tien maanden los -- daarom staat er geen
-   klok in deze functie en telt hij niets zelf. */
-function maand(st, loonkosten) {
-  const doel = doelVan(loonkosten);
-  if (!st.huishoudens) {
-    /* EEN VERSE WERELD BEGINT IN EVENWICHT. Zou hij op nul beginnen en
-       toegroeien, dan zou de eerste maand van elke campagne een neergang zijn
-       die niemand veroorzaakt heeft. */
-    st.huishoudens = { consumptie: doel, spaargeld: doel * BUFFERMAANDEN };
-    return st.huishoudens;
-  }
-  const h = st.huishoudens;
-  const besteedbaar = boekje(loonkosten).stand.besteedbaar;
-  /* WAAR DE CONSUMPTIE HEEN KRUIPT, en hoe ver hij deze maand komt. */
-  const wens = h.consumptie + (doel - h.consumptie) * AANPASSING;
-  /* MAAR JE KUNT NIET MEER UITGEVEN DAN ER BINNENKOMT PLUS WAT ER LIGT. Zie de
-     kop: dit is een BEHOUDSREGEL en geen mechaniek. Geen enkele campagne raakt
-     hem vandaag -- daarvoor zijn huishoudtypen nodig -- maar zonder hem kan
-     `spaargeld` negatief worden, en dat is een huishouden dat geld uitgeeft dat
-     niet bestaat. De toets die hem dekt voert hem daarom rechtstreeks, met een
-     buffer die te dun is om te bestaan in een echte stad. */
-  h.consumptie = Math.max(0, Math.min(wens, besteedbaar + h.spaargeld));
-  /* ZONDER `Math.max` EROMHEEN, en dat is geen slordigheid. De begrenzing
-     hierboven zegt `consumptie <= besteedbaar + spaargeld`, en daaruit volgt dat
-     dit nooit onder nul komt. Er stond een tweede wachter op dezelfde regel; een
-     mutatie liet zien dat hij onbereikbaar was, en een wachter die niet kan
-     afgaan verbergt alleen maar of de eerste nog werkt. */
-  h.spaargeld = h.spaargeld + besteedbaar - h.consumptie;
-  return h;
-}
-
-module.exports = { WIG, SPAARQUOTE, AANPASSING, BUFFERMAANDEN,
-  boekje, doelVan, maand };
+module.exports = { WIG, VAST_DEEL, SPAARQUOTE, boekje, doelVan };

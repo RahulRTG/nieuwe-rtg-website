@@ -309,6 +309,75 @@ nuttig voor de wereld.
 
 ---
 
+## 4b. De ultieme eis
+
+> **Elke macro-uitkomst moet terug te voeren zijn op microgedrag; elke
+> microhandeling moet ergens in de macrodata kunnen landen.**
+
+Deze staat boven alle andere. Stijgt de inflatie, dan moet je kunnen terugzoeken
+wélke prijzen bewogen. Stijgt de werkloosheid, wélke bedrijven mensen lieten
+gaan. Stort de consumptie in, wélke huishoudtypen begonnen te snijden. Groeit een
+stad, waar de banen, woningen en investeringen vandaan kwamen.
+
+Van één loonstrook tot het BBP van de wereld — dezelfde werkelijkheid.
+
+Daaruit volgt meteen wat er **niet** mag: een macrogetal dat rechtstreeks
+geschreven wordt. Een inflatiecijfer dat niet uit prijzen komt, een
+werkloosheidspercentage dat niet uit ontslagen komt, een groeicijfer dat niet uit
+transacties komt — dat zijn alle drie hetzelfde als `housingCrash = true`, alleen
+met een net jasje aan.
+
+En het geeft je gratis het verschil tussen drie soorten kijkers naar dezelfde
+gebeurtenis:
+
+| | ziet |
+|---|---|
+| speler | *"Waarom zit mijn terras leeg?"* |
+| ondernemer | *"Vrij besteedbaar inkomen in mijn wijk is gedaald."* |
+| econoom | *"Een arbeidsmarktschok heeft via huishoudbuffers en discretionaire consumptie de lokale diensten geraakt."* |
+
+Zelfde gebeurtenis, drie niveaus van begrip. Dat is niet drie modellen — het is
+één keten, op drie hoogtes gelezen.
+
+---
+
+## 4c. Economenmodus
+
+Wat er bovenop diezelfde motor kan staan zodra §4b klopt. Geen academisch model
+óver het spel, maar gereedschap om de motor te bestuderen die er al is.
+
+**Schoklaboratorium.** Kloon een wereld. Wereld A blijft gelijk, wereld B krijgt
+precies één exogene verandering: energie-aanvoer −20%, rente +2 procentpunt, een
+grote werkgever die sluit, een importkanaal dat wegvalt. Vergelijk daarna. Niet
+om iets over de echte wereld te beweren, maar om te zien welk mechanisme in déze
+motor het verschil maakt. Dat is dezelfde vorm als de supply-shocktoets in
+`test/spelketennetwerk.test.js` en de schoktoets in `test/spelhuishouden.test.js`,
+maar dan als gereedschap in plaats van als toets.
+
+**Reproduceerbaarheid.** Zelfde zaaiing, zelfde regels, zelfde begintoestand,
+zelfde uitkomst — tenzij mensen andere keuzes maken. Dat is er al: de wereld
+rekent bij, dus tien maanden in één keer moeten hetzelfde opleveren als tien
+maanden los, en toeval hoort in de wereld en niet in de boeken. Experimenten zijn
+daardoor letterlijk herhaalbaar.
+
+**Counterfactuals.** *"Wat als leverancier X niet was omgevallen?"* Kloon de
+wereld vlak vóór de gebeurtenis, laat hem lopen zonder die schok, vergelijk.
+
+**Causaliteitskaart.** Geen AI die uitlegt waarom, maar een graaf van echte
+stromen: *fabriek sluit → loonmassa wijk −8% → horeca-uitgaven −11% → twee
+restaurants krimpen → veertien diensten verdwijnen → loonmassa nog −1,2%.* Een
+econoom volgt daarmee de transmissieketen zelf.
+
+**En geen enkele score voor "gezonde economie".** Hoge groei kan samengaan met
+hoge schuld, woningtekort, ongelijkheid en inflatie; lage groei kan stabiel zijn.
+Er komt dus geen `Economy Health: 88`. Geef de feiten, per groep uitgesplitst —
+mediaan loon, onderste en bovenste vijfde, werkloosheid per sector, huurdruk,
+schuldquote, spaarbuffer — en laat de beoordeling aan wie kijkt. Dat is dezelfde
+regel als in `ORGANISATIE.md` (geen bus factor, geen cultuurcijfer) en om dezelfde
+reden: een balk om te optimaliseren is geen inzicht.
+
+---
+
 ## 5. Hetzelfde Wimbledon, acht schermen
 
 Een evenement is geen sport-feature maar een **tijdelijk economisch

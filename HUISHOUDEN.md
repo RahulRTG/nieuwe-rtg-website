@@ -23,10 +23,16 @@ bestedingskracht. Dat was de juiste eerste stap en het is een echte kringloop:
 minder werk in de stad is minder vraag in de winkel, en de klap verschilt per
 sector omdat de segmentsom verschilt.
 
-**Maar het is nog een formule.** Er is één getal per stad, er is geen huishouden
-dat iets ontvangt, geen huur die ergens aankomt, geen buffer die leegloopt, geen
-keuze tussen deze supermarkt en die. Dit document beschrijft wat het moet worden,
-en de volgorde waarin dat kan zonder halve lagen achter te laten.
+**Dat wás nog een formule**: één getal per stad, geen huishouden dat iets
+ontvangt, geen huur die ergens aankomt, geen buffer die leegloopt. Inmiddels
+staan de eerste vier onderdelen hieronder — er is een wig tussen loonkost en
+koopkracht, er zijn zes cohorten met een eigen balans, vaste lasten zijn stijver
+dan boodschappen, en de dunne buffers raken werkelijk de bodem.
+
+Wat er nog niet is, is even belangrijk: er komt nog steeds geen huur bij een
+verhuurder aan, consumptie is nog een bedrag in plaats van een mand, en een
+huishouden kiest nog geen winkel. Dit document beschrijft de volgorde waarin dat
+kan zonder halve lagen achter te laten.
 
 ---
 
@@ -100,9 +106,10 @@ Van klein naar groot, en elk onderdeel gebruikt de vorige.
 | # | onderdeel | wat het toevoegt | staat er |
 |---|---|---|---|
 | 1 | bruto → netto → besteedbaar | de wig tussen loonkost en koopkracht | ✅ `huishoudboekje.js` |
-| 2 | buffer en traagheid | schade is niet meteen maximaal | ✅ `huishoudboekje.js` |
+| 1b | stijve vaste lasten | de huur zakt niet mee, dus vrije besteding wel | ✅ `huishoudtypen.js` |
+| 2 | buffer en traagheid | schade is niet meteen maximaal | ✅ `huishoudtypen.js` |
 | 3 | marginale consumptie | extra inkomen gaat niet volledig de markt op | ✅ `huishoudboekje.js` |
-| 4 | huishoudtypen | zelfde salaris, andere bestedingsruimte | ✗ |
+| 4 | huishoudtypen | zelfde salaris, andere bestedingsruimte | ✅ `huishoudtypen.js` |
 | 5 | verplichtingen als geldstroom | huur → verhuurder, energie → energiebedrijf | ✗ |
 | 6 | behoeftecategorieën | essentieel / semi-vrij / discretionair | ✗ |
 | 7 | onzekerheid | reorganisatie verlaagt uitgaven vóór het ontslag | ✗ |
@@ -110,13 +117,21 @@ Van klein naar groot, en elk onderdeel gebruikt de vorige.
 | 9 | huishoudens kiezen echte bedrijven | €80 naar supermarkt A, €55 naar B | ✗ |
 | 10 | sparen wordt kapitaal | loon → sparen → bank → krediet → onderneming | ✗ |
 | 11 | schuld en aflossing | loonstijging hoeft de horeca niet te helpen | ✗ |
-| 12 | vermogensverschillen | veerkracht uit balansposities | ✗ |
+| 12 | vermogensverschillen | veerkracht uit balansposities | ◐ buffers verschillen; vastgoed en schuld niet |
 | 13 | grote aankopen | recessie raakt de auto vóór het brood | ✗ |
 | 14 | woon-werk en lekkage | wonen in Haarlem, werken in IJmuiden | ✗ |
 | 15 | boodschappenmand → inflatie | +3% loon en tóch minder koopkracht | ✗ |
 | 16 | belastingkringloop | overheid betaalt ambtenaren, die besteden weer | ✗ |
 | 17 | vangnet | automatische stabilisatoren | ✗ |
 | 18 | loononderhandeling met macrogevolgen | één loonbesluit raakt marge, markt én prijzen | ✗ |
+| 19 | liquiditeit naast winst | winstgevend en tóch de lonen niet kunnen betalen | ✗ |
+| 20 | betalingsachterstanden als keten | te laat betalen raakt de liquiditeit van een ander | ✗ |
+| 21 | leverage | zelfde omzetdaling, andere uitkomst bij andere schuld | ✗ |
+| 22 | markttoetreding en -uittreding | hoge marges trekken aanbod, maar niet meteen | ✗ |
+| 23 | investeringen kosten tijd | vraag stijgt nu, aanbod reageert over twee jaar | ✗ |
+| 24 | agglomeratie en congestie | clusters ontstaan én prijzen zichzelf weg | ✗ |
+| 25 | regionale prijsverschillen | €3.000 betekent niets zonder locatie | ✗ |
+| 26 | ervaren inflatie per huishoudtype | CPI 4% terwijl een kwetsbaar huishouden 7% voelt | ✗ |
 
 ### Wat de belangrijkste zijn, en waarom
 

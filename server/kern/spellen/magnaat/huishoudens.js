@@ -58,9 +58,8 @@
 
    ================== WAT ER NOG NIET IS ==================
 
-   De wig tussen loonkost en koopkracht, de buffer en de traagheid staan in
-   ./huishoudboekje.js. Wat er daarna nog ontbreekt staat in HUISHOUDEN.md par.
-   3, en de twee die er het meest toe doen zijn VERPLICHTINGEN ALS GELDSTROOM
+   De wig staat in ./huishoudboekje.js, de huishoudens die hem ondergaan in
+   ./huishoudtypen.js. Wat er daarna nog ontbreekt staat in HUISHOUDEN.md par. 3, en de twee die er het meest toe doen zijn VERPLICHTINGEN ALS GELDSTROOM
    (huur hoort bij een verhuurder aan te komen) en BEHOEFTECATEGORIEEN (een
    neergang hoort de horeca eerder te raken dan de bakker). */
 'use strict';
@@ -68,6 +67,7 @@
 const { SECTOREN, SECTORLIJST } = require('./sectoren');
 const { segmenten } = require('./vraag');
 const BOEKJE = require('./huishoudboekje');
+const TYPEN = require('./huishoudtypen');
 
 /* WELK DEEL VAN EEN SEGMENT ZIJN GELD IN DEZE STAD VERDIENT. Geen gevoeligheid
    op een schaal van tien maar een feit over waar inkomen vandaan komt:
@@ -121,12 +121,16 @@ function loonsom(st) {
    zakt hij als dat werk verdwijnt. Er is geen bovengrens en geen bodem behalve
    nul, want allebei zouden een getal zijn dat niets betekent.
 
-   HIJ REKENT IN CONSUMPTIE EN NIET IN LOONSOM (./huishoudboekje.js). In de
+   HIJ REKENT IN CONSUMPTIE EN NIET IN LOONSOM (./huishoudboekje.js voor de wig,
+   ./huishoudtypen.js voor de huishoudens die hem ondergaan). In de
    evenwichtsstand maakt dat geen enkel verschil -- de stad ondergaat dezelfde
-   wig als de spelers, dus die valt weg -- en dat is precies de bedoeling: de
-   ijking van fase A blijft staan. Wat het WEL verandert is dat de teller een
-   BUFFER heeft. Zakt de loonsom, dan zakt de consumptie niet mee tot op de
-   bodem maar kruipt hij, en pas als het spaargeld op is komt de hele klap.
+   wig als de spelers en de cohorten zijn erop genormaliseerd, dus alles valt
+   weg -- en dat is precies de bedoeling: de ijking van fase A blijft staan.
+
+   Wat het WEL verandert is wat er gebeurt als de wereld UIT evenwicht raakt.
+   Consumptie kruipt in plaats van te springen, vaste lasten kruipen nog veel
+   langzamer, en de huishoudens met een dunne buffer raken de bodem terwijl de
+   dikke buffers er niets van merken.
 
    `st.huishoudens` bestaat nog niet voordat er een maand gerekend is; dan is de
    evenwichtsstand het antwoord, en dat is dezelfde uitkomst als voorheen. */
@@ -139,7 +143,7 @@ function bestedingskracht(st, kaart) {
 
 /* DE MAAND VAN DE HUISHOUDENS. Staat hier en niet in ../maand.js omdat de
    loonsom hier vandaan komt; wie hem daar zou uitrekenen, rekent hem twee keer. */
-const bijwerken = (st, kaart) => BOEKJE.maand(st, loonsom(st)) && bestedingskracht(st, kaart);
+const bijwerken = (st, kaart) => TYPEN.maand(st, loonsom(st)) && bestedingskracht(st, kaart);
 
 /* WELK DEEL VAN DE VRAAG OP DEZE PLEK VAN LOKAAL VERDIEND GELD LEEFT. Uit de
    segmentsom die ./vraag.js toch al maakt, zodat er geen tweede telling van

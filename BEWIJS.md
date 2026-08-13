@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 950 bestanden en 6492 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 950 bestanden en 6494 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 950 |
-| losse beweringen (`test(...)`) | 6492 |
+| losse beweringen (`test(...)`) | 6494 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-830 bestanden, 6277 beweringen.
+830 bestanden, 6279 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -664,7 +664,7 @@ toets omvalt.
 | `spelgovernance.test.js` | 15 | -- | MAGNAAT: LOKALE GOVERNANCE -- wie beslist wat de Foundation bouwt. Fase C, het laatste stuk. |
 | `spelhandel.test.js` | 29 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
 | `spelherkomst.test.js` | 13 | -- | MAGNAAT: WAAR JE VANDAAN KOMT -- fase 3, de loopbaan die vooruit gelezen wordt. `loopbaan.js` schreef al aan het eind van een partij; niemand las het aan het begin van de volgende. |
-| `spelhuishouden.test.js` | 14 | genoemd | MAGNAAT: LAAG 3 -- loon dat terugkomt. ECONOMIE.md noemde dit *de scherpste openstaande fout*: `lonen = v.personeel * s.loon` was geld dat de wereld verliet zonder ergens aan te komen. |
+| `spelhuishouden.test.js` | 16 | genoemd | MAGNAAT: LAAG 3 -- loon dat terugkomt. ECONOMIE.md noemde dit *de scherpste openstaande fout*: `lonen = v.personeel * s.loon` was geld dat de wereld verliet zonder ergens aan te komen. |
 | `spelketen.test.js` | 17 | -- | MAGNAAT: DE KETEN -- een incident dat door de rollen heen loopt. Tot nu toe was een storing een TOESTAND, en daardoor waren de drie schermen drie losse werelden: de vakkracht meldde iets aan niemand, en de eigenaar... |
 | `spelketennetwerk.test.js` | 12 | genoemd | MAGNAAT: SUPPLY NETWORK v1 -- niets wordt verbruikt zonder bron. ECONOMIE.md, de eerste wet. |
 | `spelkijken.test.js` | 15 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |

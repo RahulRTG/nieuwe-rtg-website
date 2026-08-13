@@ -32,22 +32,36 @@ const O = require('./onderzoek');
    zakelijk volgt `zakelijk`, de rest volgt gewoon de passanten. */
 const BRON = { toeristen: 'toerisme', zakelijk: 'zakelijk' };
 
-/* De basisvraag van een kavel voor een sector, per maand, in EENHEDEN (couverts,
-   kamernachten, klanten). Nog zonder prijs, reputatie of concurrentie: dit is
-   "hoeveel mensen komen hier langs die hier iets zouden kunnen willen". */
-function basisvraag(kaart, kavel, sector, maand) {
+/* WIE ER LANGSKOMT, UITGESPLITST NAAR SEGMENT. Dit is de lus die vroeger binnen
+   `basisvraag` stond; hij is eruit gehaald omdat er een TWEEDE lezer bij kwam
+   (./huishoudens.js wil weten welk deel van deze vraag van mensen komt die hun
+   inkomen in deze stad verdienen) en een tweede optelling van dezelfde bron een
+   tweede waarheid is die kan gaan afwijken.
+
+   `basisvraag` telt hem gewoon op. De uitkomst is tot op de bit dezelfde als
+   ervoor -- dat is de eis, want alles onder deze functie is geijkt in fase A. */
+function segmenten(kaart, kavel, sector, maand) {
   const s = SECTOREN[sector];
-  const zone = kaart.zone.get(kavel.zone);
   const seizoenFactor = 1 + (kaart.seizoen[maand % 12] - 1) * s.seizoen;
-  let som = 0;
+  const uit = {};
   for (const [segment, aandeel] of Object.entries(kaart.bevolking)) {
     const gewicht = s.trekt[segment] || 0;
     if (!gewicht) continue;
     const bron = kavel.eigenschappen[BRON[segment] || 'passanten'];
     // toeristen bewegen met het seizoen, de rest veel minder
     const seizoen = segment === 'toeristen' ? seizoenFactor : 1 + (seizoenFactor - 1) * 0.25;
-    som += (aandeel / 100) * gewicht * (bron / 100) * seizoen;
+    uit[segment] = (aandeel / 100) * gewicht * (bron / 100) * seizoen;
   }
+  return uit;
+}
+
+/* De basisvraag van een kavel voor een sector, per maand, in EENHEDEN (couverts,
+   kamernachten, klanten). Nog zonder prijs, reputatie of concurrentie: dit is
+   "hoeveel mensen komen hier langs die hier iets zouden kunnen willen". */
+function basisvraag(kaart, kavel, sector, maand) {
+  const zone = kaart.zone.get(kavel.zone);
+  let som = 0;
+  for (const n of Object.values(segmenten(kaart, kavel, sector, maand))) som += n;
   // de geschiktheid van de zone voor deze sector, en de bereikbaarheid
   const bereik = 0.75 + (kavel.eigenschappen.ov + kavel.eigenschappen.parkeren) / 800;
   /* Een INDEX en geen aantal: 1.0 is een gemiddelde plek voor deze sector. Wat
@@ -91,4 +105,4 @@ function vraagVoor(kaart, vestiging, { maand, zoneDruk, marketing }) {
   };
 }
 
-module.exports = { basisvraag, vraagVoor, drukFactor, BRON };
+module.exports = { segmenten, basisvraag, vraagVoor, drukFactor, BRON };

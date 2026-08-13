@@ -39,11 +39,12 @@ const RUSHNA = require('./rush-nalaten');
 const maakPerZaak = require('./maand-vestiging');
 const F = require('./foundation');
 const BEVOORRADING = require('./maand-bevoorrading');
+const HUIS = require('./huishoudens');
 
 const rond = (n) => Math.round(n);
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer, kiesProject }) => {
-  const perZaak = maakPerZaak({ verdeel, rekenMaand, F, N });
+  const perZaak = maakPerZaak({ verdeel, rekenMaand, F, N, HUIS });
   const { wikkelAf } = require('./maand-contracten')({ rond });
   const afsluiten = require('./maand-afsluiten')({ wikkelAf, kiesProject });
   const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd, beheer });
@@ -68,6 +69,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        rekent. Een getal op de staat is een getal waar iedereen het over eens is. */
     const conjunctuur = C.vraagFactor(potje.id, st.maand);
     st.cyclus = C.geldstand(potje.id, st.maand);
+    /* DE BESTEDINGSKRACHT VAN DE STAD (./huishoudens.js, ECONOMIE.md laag 3).
+       Om dezelfde reden hier en niet bij de vestiging: hij hoort op de
+       BEGINTOESTAND gerekend te worden. Zou hij per zaak worden bijgewerkt, dan
+       eet de eerste speler in het object van een andere stad dan de laatste. */
+    st.besteding = HUIS.bestedingskracht(st, k);
     // de zones van deze stad, voor het nieuws dat er op valt
     const zones = [...new Set(k.kavels.map(x => x.zone))];
     const perSpeler = {};
@@ -102,7 +108,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          mee (fase B zette er de levering in, de kwaliteitsmeting en de
          verdeling onder aandeelhouders). */
       wereldOmzet += perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-        arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, spoed: werkvloer.spoed });
+        arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor,
+        besteding: st.besteding, spoed: werkvloer.spoed });
       /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
          rood staan, de leningen, de polissen en het onderzoek. Vier posten die
          niet aan een pand hangen maar aan de speler, en die alle vier geld de

@@ -104,6 +104,103 @@ en **meerdere steden**. En het scherm: de keten is nog niet klikbaar.
 
 ---
 
+## 1b. De tweede wet — en het geld komt terug
+
+> **Wat een bedrijf aan mensen betaalt, verdwijnt niet uit de stad.**
+
+Dezelfde wet als §1, een halve slag gedraaid. Daar ging het over goederen die
+een producent moeten hebben; hier over klanten die hun geld ergens verdiend
+moeten hebben. En het stond er net zo scheef: `stap.js` had de regel
+
+```js
+const lonen = v.personeel * s.loon;
+```
+
+Geld dat de wereld verliet zonder ooit ergens aan te komen — precies de vorm van
+de inkooppost van vóór `keten.js`. Een lek met een nette naam.
+
+### Het is een lek dat terugkeert, geen bron
+
+Dit is de ontwerpkeuze waar de rest aan hangt, en ze sluit meteen de enige echte
+uitbuiting uit. Wat terugkomt is uitsluitend het loon van het **personeel** —
+geld dat de wereld werkelijk verliet. Een dienstverband tussen twee **spelers**
+telt niet mee, hoe hoog het loon ook is: dat geld ging van de ene kas naar de
+andere en is de wereld nooit uit geweest.
+
+*Alleen wat weglekte kan terugkeren.* Zonder die regel zouden drie spelers
+elkaar in een kring in dienst kunnen nemen — netto nul tussen hen — en samen de
+vraag van de hele stad opstoken. Het scenario `loondienst` in
+`scripts/magnaat-pomp.js` staat er nog steeds op **0,00**.
+
+En er komt geen euro bij: koopkracht landt op de **vraag**, niet op een kas.
+
+### De stad is groter dan de spelers
+
+De noemer is de loonsom van de stad zélf, afgeleid uit `stadsomzet` — het getal
+waar de Foundation al uit put. IJmuiden had een economie voordat er iemand een
+restaurant opende. Twee gevolgen, allebei gewenst:
+
+- **In zijn eentje kan niemand de stad rijk maken.** Wie personeel aanneemt om
+  de vraag op te stoken betaalt honderd procent van dat loon en verschuift een
+  paar procent van een stadsloonsom die grotendeels van hem los staat — en de
+  vraag die hij koopt komt ook bij zijn concurrenten terecht.
+- **Maar samen wel.** Sluiten er zaken, dan zakt de loonsom zichtbaar, en dat
+  raakt iedereen die van lokale klanten leeft. Zo reist een faillissement
+  (laag 28) zonder dat er iets gescript is.
+
+### Dezelfde schok raakt niet iedereen gelijk
+
+Die grens volgt hier **uit de structuur** en niet uit een tabel met
+uitzonderingen. Een strandhotel leeft van toeristen die hun geld elders
+verdienden; een buurtwinkel van mensen die hier werken. Het verschil komt uit
+de segmentsom die `vraag.js` toch al maakt — gemeten in een stad met van elke
+sector één zaak:
+
+| sector | leeft van lokaal verdiend geld |
+|---|---|
+| vrije-tijd | 52% |
+| retail | 39% |
+| horeca | 36% |
+| hotel | 25% |
+| logistiek | 9% |
+| kantoor | 7% |
+| industrie | 4% |
+
+Daar hangt een eigenschap aan die niemand heeft ingetikt: **een stad met veel
+ouderen en veel toeristen staat steviger in een neergang** dan een stad die van
+haar eigen loonsom leeft. Pensioen en vakantiegeld komen niet uit de lokale
+werkgelegenheid.
+
+### Wat de nulmeting zegt
+
+`scripts/magnaat-oorsprong.js`, tweede helft:
+
+```
+loonsom van de stad zelf : 1.055.963 per maand (18% van de stadsomzet)
+loonsom van de spelers   :   254.150 per maand, van 7 zaken
+bestedingskracht         : 1.241   (1.000 = een stad zonder spelers)
+```
+
+Zeven zaken zijn dus goed voor bijna een kwart van wat er in deze stad aan loon
+omgaat. Ontslaan ze samen tachtig procent van hun mensen, dan zakt de
+bestedingskracht naar **1,05** — en dat kost een winkel in het centrum vraag
+terwijl een fabriek in de haven er nauwelijks iets van merkt.
+
+### Wat er nog niet is
+
+**Traagheid** (een huishouden dat deze maand minder verdient eet deze maand nog
+hetzelfde — er hoort een spaarbuffer tussen), **werkloosheid** als eigen
+toestand (wie ontslagen wordt verdwijnt nu gewoon uit de som), **sparen**, en
+**huur en vaste lasten** van huishoudens.
+
+En één eigenschap die geen gebrek is maar wel het vermelden waard: een zaak die
+**vol zit merkt van extra koopkracht niets**. `maat.js` begrenst de capaciteit
+op de omvang, dus extra vraag landt in `gemist` tot de eigenaar uitbreidt.
+Koopkracht die stijgt raakt eerst wie ruimte heeft; koopkracht die zakt raakt
+uiteindelijk iedereen.
+
+---
+
 ## 2. De acht vragen
 
 Elke sector krijgt dezelfde fundamentele vragen. Daarboven ontstaat alle
@@ -138,7 +235,7 @@ Van onderaf, en met opzet in deze volgorde: elke laag gebruikt de vorige.
 |---|---|---|
 | 1 | grond, natuur, grondstoffen | ◐ kavels en zones |
 | 2 | energie | ✗ |
-| 3 | mensen en huishoudens | ◐ loon wordt betaald, maar verdwijnt daarna |
+| 3 | mensen en huishoudens | ◐ `huishoudens.js` — loon komt terug als koopkracht; werkloosheid en sparen niet |
 | 4 | arbeidsmarkt | ◐ `dienst.js`, `loopbaan.js` |
 | 5 | wonen en vastgoed | ◐ kavels als bedrijfscapaciteit |
 | 6 | horeca: fastfood tot Michelin | ✅ `sectoren.js`, prijsstand |
@@ -193,8 +290,11 @@ komt, is de motor niet af — en dan is een crisis-event een pleister.
 **HET GELD KOMT TERUG.** Het salaris dat een fastfoodketen betaalt verdwijnt
 niet: het wordt huur, boodschappen, OV, een voetbalkaartje, spaargeld. Een
 loonstijging is tegelijk hogere kosten voor werkgevers **en** meer koopkracht
-voor huishoudens. Zolang loon alleen een kostenpost is, is er geen kringloop —
-en dat is de scherpste openstaande fout in laag 3.
+voor huishoudens. Zolang loon alleen een kostenpost is, is er geen kringloop.
+
+Dat was de scherpste openstaande fout in laag 3, en `huishoudens.js` heft hem
+op — zie §1b. De kringloop is er nu voor **loon**; voor huur, sparen en
+uitkeringen nog niet.
 
 **GEEN SKILL-SCORES.** Niet `chef.skill = 83` maar *negen jaar horeca, drie
 jaar leidinggegeven, 682 diensten, twee vestigingsopeningen meegemaakt*. Dat is
@@ -262,12 +362,9 @@ economie is veranderd.
 
 Niet bovenaan. De volgorde die uit de nulmeting volgt:
 
-1. **De keten sluiten voor wat er al is.** Inkoop die langs een aanwezige
-   leverancier komt, ook zonder contract — dan gaat `0%` omhoog en heeft
-   omvallen gevolgen. Dit is de kleinste stap met het grootste effect, want
-   alles hierna leunt erop.
-2. **Loon dat terugkomt** (laag 3). Zonder kringloop is er geen macro-economie,
-   alleen een optelsom van bedrijven.
+1. ~~**De keten sluiten voor wat er al is.**~~ **Staat** — `keten.js`, §1.
+   `0%` → `80%`.
+2. ~~**Loon dat terugkomt** (laag 3).~~ **Staat** — `huishoudens.js`, §1b.
 3. **Energie** (laag 2), omdat hij bijna alles raakt en dus meteen laat zien of
    "dezelfde schok raakt niet iedereen gelijk" werkelijk klopt.
 

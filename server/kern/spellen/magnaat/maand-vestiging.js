@@ -16,12 +16,12 @@
    dubbel -- en dan groeit de Foundation-pot van geld dat heen en weer schuift. */
 'use strict';
 
-module.exports = ({ verdeel, rekenMaand, F, N }) => {
+module.exports = ({ verdeel, rekenMaand, F, N, HUIS }) => {
   /* Een speler, zijn zaken, en de regels die eruit komen. Geeft terug wat er aan
      STADSOMZET bij kwam; de regels worden op `regels` geduwd en de kas wordt
      hier gezet, want de verdeling onder aandeelhouders bepaalt wie wat krijgt. */
   return function perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, spoed }) {
+    arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor, besteding, spoed }) {
     const st = potje.staat;
     let wereldOmzet = 0;
       for (const v of rij) {
@@ -42,8 +42,16 @@ module.exports = ({ verdeel, rekenMaand, F, N }) => {
              vraag; welk deel daarvan uit de conjunctuur komt en welk deel uit
              een festival om de hoek, is een vraag voor de krant en niet voor de
              boekhouding. */
+          /* EN DE BESTEDINGSKRACHT VAN DE STAD hoort in datzelfde product
+             (./huishoudens.js). Hij staat er als DERDE factor en niet als een
+             aparte ingang om precies dezelfde reden: voor een vestiging is er
+             een vraag. Wat hem anders maakt dan de golf en de bui is dat hij
+             PER PLEK verschilt -- een strandhotel leeft van geld dat elders
+             verdiend is en merkt een loonsom die zakt nauwelijks. Daarom krijgt
+             hij het opgeschoven kavel mee en niet het kale. */
           wereldFactor: conjunctuur * N.factorVoor(potje.id, st.maand, zones,
-            { zone: kavel.zone, sector: v.sector }),
+            { zone: kavel.zone, sector: v.sector })
+            * HUIS.factorVoor(k, opgeschoven, v.sector, st.maand, besteding),
           arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id],
           /* WAT DE DIENST VAN DEZE MAAND MET DE DERVING DEED (VERHAAL.md par.
              0f). Ontbreekt hij -- niemand in dienst, niet gespeeld, niet

@@ -147,3 +147,36 @@ for (const soort of HG.HANDELSSOORTEN) {
   if (kr[soort] > 0.001) console.log('  krap: ' + soort + ' -- '
     + Math.round(kr[soort] * 100) + '% van de vraag kan de stad niet leveren');
 }
+
+/* ================== EN DE ANDERE KANT: WAAR KOMT DE VRAAG VANDAAN ==================
+
+   Dezelfde wet, een halve slag gedraaid. Hierboven staat of wat een bedrijf
+   INKOOPT een producent heeft; hieronder of wat een bedrijf VERKOOPT een klant
+   heeft die zijn geld ergens verdiend heeft. Zolang loon alleen een kostenpost
+   is, is het antwoord op die tweede vraag "nee, de klanten komen uit het niets"
+   -- en dat was de scherpste openstaande fout van laag 3 (ECONOMIE.md).
+
+   Ook dit is een METER en geen keuring. Een kustplaats hoort van toeristen te
+   leven; dat is geen fout maar een eigenschap. Wat er hardop moet staan is
+   HOEVEEL van de vraag op de eigen loonsom rust, want dat is precies hoe hard
+   een stad geraakt wordt als het werk verdwijnt. */
+const HUIS = require('../server/kern/spellen/magnaat/huishoudens');
+const k = kaart('ijmuiden');
+console.log('\n\nEn de andere kant: waar komt de VRAAG vandaan?\n');
+console.log('loonsom van de stad zelf : ' + Math.round(HUIS.stadsLoon(k)).toLocaleString('nl-NL')
+  + ' per maand (' + Math.round(HUIS.LOONQUOTE * 100) + '% van de stadsomzet)');
+console.log('loonsom van de spelers   : ' + Math.round(HUIS.loonsom(s.p.staat)).toLocaleString('nl-NL')
+  + ' per maand, van ' + s.n + ' zaken');
+console.log('bestedingskracht         : ' + (s.p.staat.besteding || 1).toFixed(3)
+  + '   (1.000 = een stad zonder spelers)\n');
+console.log('sector       | leeft van lokaal verdiend geld | vraagfactor nu');
+for (const v of s.zaken) {
+  const kav = k.kavel.get(v.kavel);
+  const deel = HUIS.loongevoelig(k, kav, v.sector, s.p.staat.maand);
+  const f = HUIS.factorVoor(k, kav, v.sector, s.p.staat.maand, s.p.staat.besteding);
+  console.log(v.sector.padEnd(12) + ' | ' + (Math.round(deel * 100) + '%').padStart(30)
+    + ' | ' + f.toFixed(3).padStart(14));
+}
+console.log('\nHet verschil tussen die percentages IS de regel "dezelfde schok raakt niet');
+console.log('iedereen gelijk". Er staat geen tabel met uitzonderingen achter: een hotel');
+console.log('leeft van toeristen die hun geld elders verdienden, een buurtwinkel niet.');

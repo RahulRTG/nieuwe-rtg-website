@@ -527,8 +527,20 @@ test('een open storing kost echt geld, en dat loopt door bestaande posten', () =
   assert.ok(b.derving > a.derving, 'een kapotte koeling laat meer bederven');
   assert.ok(b.resultaat < a.resultaat,
     'en dat hoort het RESULTAAT te raken, niet alleen de regel: ' + b.resultaat + ' tegen ' + a.resultaat);
-  assert.equal(b.resultaat - a.resultaat, -(b.derving - a.derving),
-    'het verschil in resultaat is precies het verschil in derving en niets anders');
+  /* TOT OP DE AFRONDING, en die euro speling zat er altijd al in: ./stap.js
+     rondt `derving` en `resultaat` ELK AFZONDERLIJK af, dus of ze precies
+     tegen elkaar wegvallen hangt af van waar de centen toevallig vallen. Deze
+     toets stond op `equal` en hield het jaren vol; hij zakte pas toen
+     magnaat/huishoudens.js het omzetniveau een fractie verschoof -- niet omdat
+     er iets brak, maar omdat de centen anders vielen.
+
+     EN DE SPELING KAN DE FOUT NIET VERBERGEN waarvoor deze toets bestaat. Toen
+     de storingsfactor zichzelf ophief was het verschil in resultaat NUL bij een
+     derving die met driekwart omhoog ging; hier gaat het om een euro op een
+     verschil van bijna duizend. */
+  assert.ok(Math.abs((b.resultaat - a.resultaat) + (b.derving - a.derving)) <= 1,
+    'het verschil in resultaat is het verschil in derving en niets anders: '
+    + (b.resultaat - a.resultaat) + ' tegen ' + -(b.derving - a.derving));
   /* En er komt geen regel bij: het loopt door posten die er al waren. */
   assert.deepEqual(Object.keys(b).sort(), Object.keys(a).sort());
 });

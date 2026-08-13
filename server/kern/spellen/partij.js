@@ -9,22 +9,25 @@ module.exports = (ctx) => {
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
   // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
   /* En de loopbaan (VERHAAL.md): wat er van een MENS overblijft als de partij
-     voorbij is. Hij hangt aan dezelfde plek en om dezelfde reden als de uitslag
-     en het toernooi -- zo is er EEN moment waarop een afgelopen potje wordt
-     opgeschreven en geen drie kansen om er een te vergeten. Zelf idempotent,
-     net als de andere twee. */
+     voorbij is. EEN functie voor alles wat een afgelopen potje nalaat -- geen
+     drie plekken met drie kansen om er een te vergeten -- en zelf idempotent. */
   const naPotje = (p) => {
     noteerUitslag(p);
     if (ctx.noteerLoopbaan) ctx.noteerLoopbaan(p);
-    /* En DAT ze bestaan (SAMENLEVING.md fase 5a). Naast de loopbaan en om
-       dezelfde reden op deze ene plek: een afgelopen potje wordt op EEN moment
-       opgeschreven, niet op drie plekken met drie kansen om er een te vergeten. */
+    // en DAT ze bestaan (SAMENLEVING.md fase 5a), om dezelfde reden hier
     if (ctx.noteerPersonen) ctx.noteerPersonen(p);
     if (ctx.stadsgeheugen) ctx.stadsgeheugen.onthoud(p);
     if (ctx.noteerKring) ctx.noteerKring(p);
     if (ctx.noteerPand) ctx.noteerPand(p);
     if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p);
   };
+  /* HIJ HANGT AAN DE ZET EN AAN HET LEZEN, want Magnaat rekent zijn maanden bij
+     op AANRAKING: een campagne kan aflopen tijdens een `spelStaat`, en `spelZet`
+     weigert een klaar potje al bij de deur. Wie er een uitspeelde door hem te
+     VOLGEN hield dus niets over. Twee ingangen, een functie; elke stap erin is
+     flag-idempotent, dus een poll kost een booleaanse controle. Zie
+     test/spelnapotje.test.js. */
+  const alsKlaar = (p) => { if (p && p.status === 'klaar') naPotje(p); };
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
      rekken van anderen blijven verborgen) staat in het spel zelf en komt via
      het register mee in ZICHT.speler. Een spel zonder eigen weergave komt het
@@ -42,6 +45,11 @@ module.exports = (ctx) => {
       // client erom vraagt (bij het openen), niet bij elke poll van 2,5 seconde
       if (metVelden && STATISCH[p.soort]) Object.assign(uit.staat, STATISCH[p.soort](p));
     }
+    // NA de weergave, want die kan het potje net hebben afgesloten -- en dan
+    // klopt de stand die hierboven al is ingevuld niet meer
+    alsKlaar(p);
+    uit.status = p.status;
+    uit.winnaar = p.winnaar;
     return { status: 200, potje: uit };
   }
   function spelZet(mij, id, zet) {

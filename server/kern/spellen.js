@@ -61,11 +61,53 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     }
   });
 
+  /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
+     laag aan hangt, en daarom een eigen bestand met een eigen naam. */
+  // twee grenzen, een bestand: progressie blijft 18+, werk is getrapt vanaf 16
+  const grens = require('./spellen/grens')({ volwassen, leeftijd });
+  const { progressieMag, GEEN_PROGRESSIE } = grens;
+
+  /* WAT EEN POTJE OVERLEEFT staat in ./spellen/bewaren.js: uitslagen,
+     telemetrie, prestaties, loopbaan, stad, kring, panden. Een vraag -- wat
+     blijft er staan als de partij voorbij is -- en dus een naad.
+
+     HIJ STAAT BOVEN HET REGISTER, en dat is sinds fase 3 een eis en geen
+     volgorde-smaak: de loopbaan die hier uitkomt reist mee IN de spelcontext
+     hieronder, dus hij moet er zijn voordat de spelmodules gebouwd worden. Het
+     stond andersom, en toen kreeg Magnaat `herkomst: undefined` -- de
+     herkomststrook en de "je kent deze werkgever"-regels waren daarmee dood in
+     de echte server terwijl elke toets ze groen liet, want die bouwen de motor
+     zelf op en geven `herkomst` gewoon mee. `get SOORTEN()` hieronder is een
+     late binding en niet toevallig: die tabel komt pas uit het register. */
+  const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
+    spelPrestaties, loopbaan, personen, stadsgeheugen, daily, ondernemerskring, pandgeheugen } = require('./spellen/bewaren')({
+    db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
+    werkMag: grens.werkMag, GEEN_WERK: grens.GEEN_WERK,
+    get SOORTEN() { return SOORTEN; } });
+
+  /* Waar een speler vandaan komt (spellen/loopbaan-profiel.js): alleen FEITEN,
+     nooit een getal waar iets mee vermenigvuldigd wordt. Geschiedenis maakt
+     deuren zichtbaar en schenkt geen waarde -- zie de kop daar.
+
+     EEN OBJECT EN NIET TWEE. Hij gaat zowel de spelcontext in (Magnaat leest
+     hem in economie.js) als de partijcontext (`ctx` verderop); een tweede
+     letterlijk object zou betekenen dat "wat weet een speler van zijn verleden"
+     op twee plekken kan gaan afwijken. */
+  const herkomst = {
+    van: (h) => loopbaan.profiel(h, codenaamVan(h)),
+    tussen: (h, ander) => loopbaan.tussen(h, codenaamVan(h), ander),
+    ervaringIn: (h, sector) => loopbaan.ervaringIn(h, codenaamVan(h), sector),
+    /* En DAT iemand bestaat, los van of hij ooit gewerkt heeft
+       (spellen/persoon.js). Zelfde grens: feiten, geen bedragen. */
+    persoon: (h) => personen.van(codenaamVan(h)),
+    wie: (codenaam) => personen.van(codenaam)
+  };
+
   /* ---------- de spelmotoren: elk spel een eigen module ----------
      De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
-  const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
+  const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge, herkomst };
   const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, VARIANT, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
@@ -78,12 +120,6 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     lidBoardUit: lidBoardUit || (() => false)
   });
 
-  /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
-     laag aan hangt, en daarom een eigen bestand met een eigen naam. */
-  // twee grenzen, een bestand: progressie blijft 18+, werk is getrapt vanaf 16
-  const grens = require('./spellen/grens')({ volwassen, leeftijd });
-  const { progressieMag, GEEN_PROGRESSIE } = grens;
-
   /* HET BELEID (spellen/beleid.js): alle toetredingsvragen op een plek, in
      volgorde. Neemt geen regel over -- hij roept gedeeld.js, grens.js en
      zicht.js aan. Nieuwe ingangen horen hem te gebruiken. */
@@ -91,15 +127,6 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     wereldFout, leeftijdFout, ZICHT,
     get SPEL() { return SPEL; }, get VARIANT() { return VARIANT; }
   });
-
-  /* WAT EEN POTJE OVERLEEFT staat in ./spellen/bewaren.js: uitslagen,
-     telemetrie, prestaties, loopbaan, stad, kring, panden. Een vraag -- wat
-     blijft er staan als de partij voorbij is -- en dus een naad. */
-  const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan, personen, stadsgeheugen, daily, ondernemerskring, pandgeheugen } = require('./spellen/bewaren')({
-    db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
-    werkMag: grens.werkMag, GEEN_WERK: grens.GEEN_WERK,
-    get SOORTEN() { return SOORTEN; } });
 
   /* Het verloop van een partij, voor de replay. Aparte tak en aparte termijn:
      een uitslag zegt WIE won en gaat een jaar mee, een verloop zegt HOE en is
@@ -118,18 +145,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
     noteerKring: (p) => ondernemerskring.noteerKring(p, codenaamVan),
     noteerPand: pandgeheugen.onthoud,
-    /* Waar een speler vandaan komt (spellen/loopbaan-profiel.js): alleen FEITEN,
-       nooit een getal waar iets mee vermenigvuldigd wordt. Geschiedenis maakt
-       deuren zichtbaar en schenkt geen waarde -- zie de kop daar. */
-    herkomst: {
-      van: (h) => loopbaan.profiel(h, codenaamVan(h)),
-      tussen: (h, ander) => loopbaan.tussen(h, codenaamVan(h), ander),
-      ervaringIn: (h, sector) => loopbaan.ervaringIn(h, codenaamVan(h), sector),
-      /* En DAT iemand bestaat, los van of hij ooit gewerkt heeft
-         (spellen/persoon.js). Zelfde grens: feiten, geen bedragen. */
-      persoon: (h) => personen.van(codenaamVan(h)),
-      wie: (codenaam) => personen.van(codenaam)
-    } };
+    // hetzelfde object dat de spelmodules kregen; zie hierboven waarom er maar
+    // een van is
+    herkomst };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd

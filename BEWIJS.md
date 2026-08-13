@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 946 bestanden en 6426 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 946 bestanden en 6430 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,8 +13,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 946 |
-| losse beweringen (`test(...)`) | 6426 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 6 |
+| losse beweringen (`test(...)`) | 6430 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-826 bestanden, 6211 beweringen.
+826 bestanden, 6215 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -663,7 +663,7 @@ toets omvalt.
 | `speldienst.test.js` | 16 | -- | MAGNAAT: LOONDIENST -- een speler die voor een andere speler werkt. Stap 1 uit VERHAAL.md, en met opzet zonder permanentie: alles hieronder leeft in het potje. |
 | `spelgovernance.test.js` | 15 | -- | MAGNAAT: LOKALE GOVERNANCE -- wie beslist wat de Foundation bouwt. Fase C, het laatste stuk. |
 | `spelhandel.test.js` | 28 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
-| `spelherkomst.test.js` | 12 | -- | MAGNAAT: WAAR JE VANDAAN KOMT -- fase 3, de loopbaan die vooruit gelezen wordt. `loopbaan.js` schreef al aan het eind van een partij; niemand las het aan het begin van de volgende. |
+| `spelherkomst.test.js` | 13 | -- | MAGNAAT: WAAR JE VANDAAN KOMT -- fase 3, de loopbaan die vooruit gelezen wordt. `loopbaan.js` schreef al aan het eind van een partij; niemand las het aan het begin van de volgende. |
 | `spelkijken.test.js` | 15 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
 | `spelkring-lokaal.test.js` | 14 | -- | DE LOKALE ONDERNEMERSKRING -- wie hier ooit een zaak had. Fase D. |
@@ -675,6 +675,7 @@ toets omvalt.
 | `spelmagnaat.test.js` | 34 | genoemd | MAGNAAT: twee vormen, en de economie die er nieuw bij staat. Het bordspel is niet veranderd; wat hier onder toets staat is de ECONOMIE, en dan vooral de vier beweringen waar een economische simulatie op valt of staat. |
 | `spelmandaat.test.js` | 11 | -- | MAGNAAT: MANDATEN -- wat iemand mag beslissen, en tot welk bedrag. De laag die van "de wereld gaat door zonder jou" een SPEL maakt in plaats van een straf (VERHAAL.md hoofdstuk 13). |
 | `spelnabespreking.test.js` | 8 | -- | De nabespreking: Rahul kijkt een AFGELOPEN partij terug. Er zijn twee Rahul-deuren en ze mogen elkaar niet raken. |
+| `spelnapotje.test.js` | 4 | -- | WAT ER GEBEURT ALS EEN PARTIJ AFLOOPT TERWIJL NIEMAND EEN ZET DOET. Twee beweringen, en ze komen allebei uit een fout die niet door een toets maar door een SCHERMFOTO aan het licht kwam (.shot/maak.js: een echte... |
 | `spelnaspelen.test.js` | 9 | -- | Naspelen: een afgelopen partij zet voor zet herbouwen. De belofte die hier bewaakt wordt is niet "er komt een bord uit" maar "het is HETZELFDE bord". |
 | `spelnieuws.test.js` | 14 | genoemd | MAGNAAT: WERELDNIEUWS -- wat er in de stad gebeurt terwijl jij onderneemt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelonderzoek.test.js` | 38 | genoemd | MAGNAAT: ONDERZOEK -- bedrijven die ANDERS worden in plaats van alleen groter. NEGEN BEWERINGEN, en ze zijn alle negen stil terug te draaien: 1. |
@@ -862,7 +863,6 @@ toets omvalt.
 | `zorgketen.test.js` | 6 | gezakt op `liegpoort /api/` | De zorgketen (laag twee op de hulpdiensten): recepten van de spreekkamer naar de apotheek, de eerste hulp met triagekleuren, verwijzingen naar de medisch specialist en beauty medical (intake verplicht), en de agenda's. |
 | `zorgniveau.test.js` | 9 | gezakt op `liegpoort /api/` | De grens (kern/zorgniveau.js) en de dagcheck-in die erop staat (kern/gemoed.js). Wat hier bewezen wordt is bijna allemaal een NEGATIEF: dat er GEEN tip komt, GEEN geruststelling en GEEN oefening zodra de grens aanslaat. |
 | `zorgwallet.test.js` | 7 | gezakt op `liegpoort /api/` | De zorgpas en de RTG Wallet: Segur (de verzekeraar) schrijft een lid in op codenaam en de zorgpas ligt direct in de wallet van het lid; de declaratieketen (een mens beslist, afwijzen alleen met reden); de... |
-| `zz-ijk-tijdelijk.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 

@@ -57,3 +57,5 @@ server/routes/zz-ijk-tijdelijk*.js
 # is. Dat is hier gebeurd. Achterblijvers worden niet door git bewaakt maar
 # door de toets zelf ("de ijking ruimt zichzelf op").
 zz-ijk-tijdelijk*
+# de platen van scripts/magnaat-kijk.js: gereedschap, geen broncode
+.magnaat-beeld/

@@ -1557,10 +1557,19 @@ function tekenMagnaatEco(){
       (v.storingen || []).map(x => '<div class="rij" style="width:100%;flex-wrap:wrap;">' +
         '<div class="nm">' + esc(x.naam) + ' · ' + esc(STORINGSTAND[x.staat] || x.staat) +
         '<small>sinds maand ' + x.sinds + '</small></div>' +
+        /* ELKE UITWEG DRAAGT ZIJN REKENING OP HET SCHERM en niet in een `title`.
+           Die tooltip bestond alleen voor een muis, en dit is een telefoonapp:
+           wie de storing betaalt zag dus VIER KALE KNOPPEN, terwijl de vakkracht
+           op de vloer bij dezelfde koeling wel te lezen kreeg wat elke uitweg
+           betekent. De eigenaar geeft hier geld uit -- hij hoort niet minder te
+           weten dan zijn personeel. Zelfde vorm als op de werkvloer hieronder. */
         '<div class="keuzerij" style="width:100%;">' + (x.uitwegen || []).map(u =>
           '<button type="button" class="chip" data-stor="' + esc(x.soort) + '" data-id="' +
-          esc(v.id) + '" data-hoe="' + esc(u.id) + '" title="' + esc(u.uitleg || '') + '">' +
-          esc(u.wat) + '</button>').join('') + '</div></div>').join('') +
+          esc(v.id) + '" data-hoe="' + esc(u.id) + '">' +
+          esc(u.wat) + '</button>').join('') + '</div>' +
+        (x.uitwegen || []).map(u => '<small class="leeg" style="width:100%;">' +
+          esc(u.wat) + ' · ' + esc(u.uitleg || '') + '</small>').join('') +
+        '</div>').join('') +
       '</div>').join('');
   $('#ecMijn').querySelectorAll('[data-stor]').forEach(b => b.addEventListener('click', async () => {
     try{ await speelZet({ actie:'storing-verhelpen', vestiging: b.dataset.id,

@@ -27,7 +27,7 @@ module.exports = (ctx) => {
      niet aan de twee einden van een potje -- een plek, en meteen dezelfde
      idempotentie. Zie spellen/telling.js voor waarom dit NAAST de uitslagen
      staat en er niet uit wordt afgeleid. */
-  const { telPotje, spelTelemetrie } = require('./telling')({ db, save, nu, SOORTEN: ctx.SOORTEN });
+  const { telPotje, spelTelemetrie } = require('./telling')({ db, save, nu, get SOORTEN() { return ctx.SOORTEN; } });
 
   const { noteerUitslag, spelUitslagen, spelStand } = require('./uitslagen')({
     db, save, codenaamVan, nu, progressieMag, telPotje

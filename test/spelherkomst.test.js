@@ -319,3 +319,48 @@ test('de rekenlagen krijgen het verleden niet eens te zien', () => {
     assert.equal(gevonden.includes(rekenaar), false,
       rekenaar + ' rekent geld uit en hoort het verleden niet te kennen');
 });
+
+/* 10. EN HIJ KOMT ER OOK ECHT AAN. De negen beweringen hierboven bouwen de motor
+   ZELF op en geven `herkomst` netjes mee -- en precies daardoor bleven ze groen
+   terwijl de echte server hem helemaal niet doorgaf. In kern/spellen.js werd de
+   spelcontext samengesteld VOORDAT de loopbaanlaag bestond, dus Magnaat kreeg
+   `undefined`: de herkomststrook en de "je kent deze werkgever"-regels waren
+   dood in het product en levend in de toetsen.
+
+   Dat is niet met een unittest te vangen -- de fout zit in de BEDRADING en niet
+   in een module -- dus vraagt deze het aan een draaiende server. Er hoeft geen
+   loopbaan voor te bestaan: zonder verleden hoort er `{er:false}` te staan en
+   niet `null`, en dat verschil is precies het verschil tussen aangesloten en
+   niet aangesloten. */
+const { startServer, stop } = require('./helper');
+const os2 = require('node:os'), fs2 = require('node:fs'), path2 = require('node:path');
+
+test('de echte server geeft het verleden door aan de motor', async () => {
+  const TMP = fs2.mkdtempSync(path2.join(os2.tmpdir(), 'herkomst-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const post = async (pad, body, token) => {
+      const h = { 'Content-Type': 'application/json' };
+      if (token) h.Authorization = 'Bearer ' + token;
+      return (await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body) })).json();
+    };
+    const t = Date.now();
+    const reg = async (naam) => (await post('/api/auth/register', { name: naam,
+      email: naam.toLowerCase() + t + '@voorbeeld.nl', password: 'geheim123',
+      geboortedatum: '1985-03-03' })).token;
+    const een = await reg('Ada'), twee = await reg('Bram');
+    const variant = { vorm: 'economie', stad: 'IJmuiden', duur: 'quick', start: 'ondernemer' };
+    await post('/api/member/spel/random', { soort: 'magnaat', grootte: 2, variant }, een);
+    const r = await post('/api/member/spel/random', { soort: 'magnaat', grootte: 2, variant }, twee);
+    const id = r.id || (r.potje || {}).id;
+    assert.ok(id, 'er hoort een potje te starten');
+    const st = (await post('/api/member/spel/staat', { id }, een)).potje.staat;
+    assert.notEqual(st.herkomst, null,
+      'de motor kreeg het verleden niet aangereikt: de herkomststrook is dood in het product');
+    assert.equal(st.herkomst.er, false);
+    assert.match(st.herkomst.reden, /nog geen werkverleden/);
+  } finally {
+    stop(child);
+    try { fs2.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

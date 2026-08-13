@@ -28,7 +28,13 @@
    datum per rij, dus hij verloopt vanzelf. Een dagcijfer van drie jaar terug
    zegt niets meer over een spel dat sindsdien is veranderd. */
 module.exports = (ctx) => {
-  const { db, save, nu, SOORTEN } = ctx;
+  const { db, save, nu } = ctx;
+  /* `SOORTEN` WORDT PAS BIJ EEN AANROEP GELEZEN en niet hier uitgepakt: die
+     tabel komt uit spellen/register.js, en ./bewaren.js -- die deze module
+     bouwt -- staat inmiddels BOVEN dat register (zie de kop van ../spellen.js).
+     Uitpakken op deze regel zou de getter meteen aanroepen en de opstart breken.
+     Zelfde late binding als bij `SPEL` in spellen/klok.js. */
+  const soorten = () => ctx.SOORTEN;
 
   const MAX_DAGEN = 400;   // wat een vraag hoogstens terug mag kijken
 
@@ -68,7 +74,7 @@ module.exports = (ctx) => {
     const perSpel = new Map();
     const perDag = new Map();
     for (const r of rijen) {
-      const s = perSpel.get(r.spel) || { spel: r.spel, naam: (SOORTEN && SOORTEN[r.spel]) || r.spel, potjes: 0, spelers: 0 };
+      const s = perSpel.get(r.spel) || { spel: r.spel, naam: (soorten() || {})[r.spel] || r.spel, potjes: 0, spelers: 0 };
       s.potjes += r.potjes; s.spelers += r.spelers;
       perSpel.set(r.spel, s);
       const d = perDag.get(r.dag) || { dag: r.dag, potjes: 0 };

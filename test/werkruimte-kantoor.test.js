@@ -4,6 +4,7 @@ const bron=fs.readFileSync(path.join(__dirname,'../public/apps/werkruimte.html')
 const personeel=fs.readFileSync(path.join(__dirname,'../public/apps/personeel.html'),'utf8');
 const personeelJs=fs.readFileSync(path.join(__dirname,'../public/apps/personeel.js'),'utf8');
 const office=fs.readFileSync(path.join(__dirname,'../public/apps/office.html'),'utf8');
+const klok=fs.readFileSync(path.join(__dirname,'../public/shared/klok.js'),'utf8');
 
 test('RTG Work OS opent de echte kantoorsoftware als zelfstandige surfaces',()=>{
   for(const url of ['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html?kantoor=1',
@@ -25,6 +26,7 @@ test('de originele personeelsklok blijft volledig binnen een Work OS-paneel',()=
   assert.match(personeel,/data-rtg-oppervlak="1"[\s\S]*justify-content:flex-start/);
   assert.match(personeel,/data-rtg-oppervlak="1"\] #gate \.badge\{display:none;/);
   assert.doesNotMatch(personeel,/data-rtg-oppervlak="1"\][^}]*\.rr-naam/);
+  assert.match(klok,/naam\.textContent = 'RAHUL TRAVEL GROUP'/);
 });
 
 test('de kantooraccount-ingang kan niet dubbel worden toegevoegd',()=>{

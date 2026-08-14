@@ -82,6 +82,13 @@ const stand = () => {
     gateInShell: !!(S && S.contains(document.getElementById('gate'))),
     greep: !!document.querySelector('.cmd-lade'),
     klokIngang: !!document.querySelector('.cmd-klok'),
+    // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
+    tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
+    greepOpBlad: (() => {
+      const g = document.querySelector('.cmd-lade'), f = document.querySelector('.cmd-pane.actief iframe');
+      if (!g || !f) return null;
+      return g.getBoundingClientRect().top < f.getBoundingClientRect().bottom - 1;
+    })(),
     leegstaat: !!document.querySelector('.cmd-leeg'),
   };
 };
@@ -212,6 +219,15 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(smalBlad.greep, true, 'met een greep voor de lade, want de bank is hier geen vaste rail');
     assert.equal(smalBlad.lade.inBeeld, false, 'die lade ligt dicht tot je hem haalt');
 
+    /* GEEN TABSTRIP BIJ EEN BLAD. Gemeten op 390x844: acht van de twaalf
+       werelden dragen een eigen bovenbalk en vijf een eigen onderbalk; met de
+       strip erbovenop was 21% van het scherm navigatie, in drie lagen. De
+       bovenste had niets te kiezen -- er is geen tweede tabblad. En de greep
+       mag niet op het blad komen te liggen: hij hoort in de band die de schil
+       onderaan toch al vrijhoudt. */
+    assert.equal(smalBlad.tabstrip, 'none', 'met een blad valt er niets te kiezen; de strip hoort weg te zijn');
+    assert.equal(smalBlad.greepOpBlad, false, 'en de greep mag de wereld niet afdekken');
+
     // de lade halen: dezelfde twaalf werelden als in de rail op een computer
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
@@ -227,6 +243,13 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     const laDicht = await page.evaluate(stand);
     assert.equal(laDicht.lade.inBeeld, false, 'Escape hoort de lade te sluiten');
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'false', 'en de stand hoort mee te gaan');
+
+    // een TWEEDE blad geeft de strip zijn werk terug
+    await page.evaluate(() => window.RTGCommand.open('/apps/geld-command.html', 'Geld'));
+    await page.waitForTimeout(900);
+    const twee = await page.evaluate(stand);
+    assert.equal(twee.bladen, 2, 'twee bladen open');
+    assert.notEqual(twee.tabstrip, 'none', 'en dan verdient de tabstrip zijn plek weer');
 
     // en ook hier: het laatste blad dicht = de lege werktafel, niet de klok
     await page.evaluate(() => window.RTGCommand.sluitAlles());

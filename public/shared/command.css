@@ -148,6 +148,35 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-kiezer button{width:100%;border:0;border-radius:9px;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
 .cmd-kiezer button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.05)}
 
+/* ------------------------------------ een blad op een telefoon: geen tabstrip --
+   Gemeten op 390x844: acht van de twaalf werelden dragen een eigen bovenbalk
+   (51-64px) en vijf een eigen onderbalk. Met de tabstrip erbovenop kwam dat op
+   175px van de 844 -- 21% van het scherm aan navigatie, in drie lagen.
+
+   De bovenste laag had daarbij niets te kiezen: met EEN blad open is er geen
+   tweede tabblad om naar over te schakelen. Die verdwijnt hier dus, en komt
+   terug zodra er een tweede blad is -- dan verdient hij zijn plek. Wat blijft is
+   de greep van de lade, want de bank moet bereikbaar blijven; die wordt een
+   losse knop die op het blad ligt in plaats van een balk die ruimte kost.
+
+   Alleen onder 1000px: op een breed scherm kost de strip geen leesruimte en
+   toont hij bovendien welke twee bladen er naast elkaar staan. */
+@media (max-width:999px){
+  #rtgCommand[data-bladen="1"] .cmd-tabs{display:none}
+  #rtgCommand[data-bladen="1"] .cmd-werk{grid-template-rows:minmax(0,1fr)}
+  /* De greep ligt LINKSONDER en niet linksboven. Dat is gemeten, niet gekozen:
+     een zwevende knop dekt altijd iets af (de werelden zijn volschermapps), maar
+     linksboven zit bij 8 van de 12 werelden een bediening en linksonder bij 5.
+     Het is bovendien waar hij hoort: de lade komt van onderen. */
+  #rtgCommand[data-bladen="1"] .cmd-lade{
+    top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);left:10px;width:40px;height:40px;
+    border:1px solid color-mix(in srgb, var(--gold-tekst,#C0A544) 30%, var(--rtg-line));
+    background:color-mix(in srgb, var(--onyx-basis,#0C0C0B) 76%, transparent);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 6px 20px rgba(0,0,0,.45);
+  }
+}
+
 /* ------------------------------------------------- de gesloten stand (inlog) --
    Voor het inloggen IS de werktafel het inlogscherm: de bank staat er, en de
    werkvloer draagt #gate -- Rahuls inloggesprek, hierheen verplaatst door

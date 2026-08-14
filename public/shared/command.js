@@ -136,6 +136,6 @@
   w.RTGCommand={open:open,bestemming:bestemming,
     herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
     actief:mag,
-    sluitAlles:function(){if(!tafel)return;tafel.staat().panes.slice().forEach(function(){tafel.sluit(0)})}};
+    sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

@@ -16,9 +16,9 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 const { WAAROM_NULL } = require('../server/kern/mall/stand');
+const { lokaal } = require('../server/kern/tijdzone');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mallos-'));
-const VANDAAG = new Date().toISOString().slice(0, 10);
 let srv, base, lid;
 const tok = {};
 
@@ -86,6 +86,11 @@ test('3. de ondernemer blokkeert vandaag, en de Mall zegt het', async () => {
      en bewees het blokkeren daarna niets (LAT-regel 9). De oorspronkelijke
      dagen worden aan het eind teruggezet. */
   const begin = (await api('/api/supplier/vak/uren', {}, tok.SERENA)).body.uren;
+  /* "Vandaag" is de kalenderdag bij de zaak, niet de UTC-dag van de
+     testrunner. Rond middernacht kunnen die verschillen. Lees daarom dezelfde
+     zaakzone als de Mall en laat de gedeelde tijdzonehulp de datum bepalen. */
+  const spiegel = await api('/api/supplier/mall', {}, tok.SERENA);
+  const vandaag = lokaal(spiegel.body.tijdzone.zone).datum;
   const alleDagen = await api('/api/supplier/vak/uren-zet', { dagen: [true, true, true, true, true, true, true] }, tok.SERENA);
   assert.equal(alleDagen.status, 200);
 
@@ -95,9 +100,9 @@ test('3. de ondernemer blokkeert vandaag, en de Mall zegt het', async () => {
   assert.notEqual(voor.open.tekst, 'Vandaag gesloten', 'vandaag is nu een werkdag');
 
   // de ondernemer blokkeert vandaag in zijn EIGEN scherm
-  const zet = await api('/api/supplier/vak/uren-zet', { blokkeer: VANDAAG }, tok.SERENA);
+  const zet = await api('/api/supplier/vak/uren-zet', { blokkeer: vandaag }, tok.SERENA);
   assert.equal(zet.status, 200);
-  assert.ok(zet.body.uren.geblokkeerd.includes(VANDAAG), 'de blokkade staat in zijn agenda');
+  assert.ok(zet.body.uren.geblokkeerd.includes(vandaag), 'de blokkade staat in zijn agenda');
 
   // en de Mall volgt, zonder dat er iets is overgezet
   const na = (await mallVan('SERENA')).mijn[0];
@@ -108,7 +113,7 @@ test('3. de ondernemer blokkeert vandaag, en de Mall zegt het', async () => {
      dag hoort op te leveren, en die eerste versie van deze toets eiste ten
      onrechte helemaal geen beschikbaarheid meer. */
   if (na.beschikbaar) {
-    assert.notEqual(na.beschikbaar.datum, VANDAAG, 'geen tijdvak op de geblokkeerde dag');
+    assert.notEqual(na.beschikbaar.datum, vandaag, 'geen tijdvak op de geblokkeerde dag');
     assert.match(na.beschikbaar.tekst, /Eerste plek/, 'maar wel het eerstvolgende moment daarna');
   }
 
@@ -117,8 +122,8 @@ test('3. de ondernemer blokkeert vandaag, en de Mall zegt het', async () => {
   assert.equal(open.mijn.length, 0, 'een geblokkeerde dag komt niet in "Nu open"');
 
   // terugdraaien, zodat de volgende toetsen op een normale zaak kijken
-  const terug = await api('/api/supplier/vak/uren-zet', { deblokkeer: VANDAAG }, tok.SERENA);
-  assert.ok(!terug.body.uren.geblokkeerd.includes(VANDAAG), 'de blokkade is er weer af');
+  const terug = await api('/api/supplier/vak/uren-zet', { deblokkeer: vandaag }, tok.SERENA);
+  assert.ok(!terug.body.uren.geblokkeerd.includes(vandaag), 'de blokkade is er weer af');
   const herstel = (await mallVan('SERENA')).mijn[0];
   assert.notEqual(herstel.open.tekst, 'Vandaag gesloten', 'en de Mall is meteen weer bij');
 

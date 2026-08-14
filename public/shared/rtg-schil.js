@@ -37,7 +37,6 @@
     });
   };
 
-
 /* ---------------------------------------------------------- de indeling --
      De console is het ANKER en schuift naar waar hij het minst stoort
      (WERKRUIMTE.md par. 2): bij een lege ruimte staat hij midden, zodra er

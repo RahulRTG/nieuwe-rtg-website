@@ -9,7 +9,7 @@
    zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
 const klok = require('../../../lib/klok');
 
-module.exports=({db,hospitality,director,human})=>({
+module.exports=({db,hospitality,director,human,leren})=>({
   'hospitality-start':(p,h,z)=>hospitality.start(p.staat.hospitality,String(z.route||'')),
   'hospitality-stap':p=>{const r=hospitality.stap(p.staat.hospitality);if(r.afgerond&&leren)r.leren=leren.registreerHospitality({potjeId:p.id,simulatie:p.staat.hospitality});return r},
   'hospitality-chaos':(p,h,z)=>{const x=hospitality.INCIDENTEN.find(i=>i.id===String(z.incident||''));return hospitality.injecteer(p.staat.hospitality,x)},

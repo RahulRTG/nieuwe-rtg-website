@@ -19,7 +19,9 @@ function maakOffice(state) {
   return {
     ...require('./office/docs')(state, basis),
     ...require('./office/delen')(state, basis),
-    ...require('./office/formulier')(state, basis)
+    ...require('./office/formulier')(state, basis),
+    ...require('./office/workflow')(state, basis),
+    ...require('./office/samen')(state, basis)
   };
 }
 

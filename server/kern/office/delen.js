@@ -6,7 +6,7 @@
 const { MAX_VERSIES } = require('./basis');
 
 module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, basis) => {
-  const { nu, docMet, naamVan, magSchrijven, magLezen } = basis;
+  const { nu, docMet, naamVan, magSchrijven, magLezen, faseVan, schrijfAudit } = basis;
 
   /* ---- versiegeschiedenis: bekijken en terugzetten ---- */
   function versies(key, did, kring) {
@@ -24,7 +24,11 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     d.versies.unshift({ om: d.gewijzigd, door: naamVan(key), inhoud: d.inhoud });
     if (d.versies.length > MAX_VERSIES) d.versies.length = MAX_VERSIES;
     d.inhoud = JSON.parse(JSON.stringify(v.inhoud));
+    const oudeFase = faseVan(d);
+    d.fase = 'concept';
+    d.laatstDoor = naamVan(key);
     d.gewijzigd = nu();
+    schrijfAudit(d, key, 'versie-teruggezet', { van: oudeFase, naar: 'concept' });
     save();
     return { status: 200, ok: true, inhoud: d.inhoud, gewijzigd: d.gewijzigd };
   }
@@ -38,6 +42,8 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     try { const t = keyVanCodenaam ? await keyVanCodenaam(String(codenaam || '').trim()) : null; doelKey = t && t.key; } catch (e) {}
     if (!doelKey) return { status: 404, error: 'Geen lid gevonden met die codenaam.' };
     if (doelKey === key) return { status: 400, error: 'Uzelf toevoegen hoeft niet.' };
+    if (aan !== false && d.beheer && d.beheer.classificatie === 'strikt')
+      return { status: 409, error: 'Een strikt document kan niet worden gedeeld. Pas eerst de classificatie aan.' };
     d.gedeeldMet = (d.gedeeldMet || []).filter(k => k !== doelKey);
     d.bewerkers = (d.bewerkers || []).filter(k => k !== doelKey);
     if (aan !== false) {
@@ -46,8 +52,12 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
       try { sseToCustomer(doelKey, 'office', { kind: 'gedeeld', id: d.id, titel: d.titel, door: naamVan(key), rechten: rechten === 'bewerken' ? 'bewerken' : 'lezen' }); } catch (e) {}
     }
     d.gewijzigd = nu();
+    d.laatstDoor = naamVan(key);
+    schrijfAudit(d, key, aan === false ? 'deling-ingetrokken' : 'gedeeld',
+      { rechten: aan === false ? 'uit' : (rechten === 'bewerken' ? 'bewerken' : 'lezen'), met: naamVan(doelKey) });
     save();
-    return { status: 200, ok: true, gedeeldMet: d.gedeeldMet.map(naamVan), bewerkers: d.bewerkers.map(naamVan) };
+    return { status: 200, ok: true, gewijzigd: d.gewijzigd,
+      gedeeldMet: d.gedeeldMet.map(naamVan), bewerkers: d.bewerkers.map(naamVan) };
   }
 
   /* ---- delen met de eigen kring (het RTF-gezin): uit, meelezen of samen schrijven ---- */
@@ -59,8 +69,11 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     if (![null, '', 'uit', 'lezen', 'bewerken'].includes(stand)) return { status: 400, error: 'Kies uit, lezen of bewerken.' };
     d.kringDeel = (stand === 'lezen' || stand === 'bewerken') ? stand : null;
     d.gewijzigd = nu();
+    d.laatstDoor = naamVan(key);
+    schrijfAudit(d, key, d.kringDeel ? 'gedeeld' : 'deling-ingetrokken',
+      { rechten: d.kringDeel || 'uit', met: 'gezin' });
     save();
-    return { status: 200, ok: true, kringDeel: d.kringDeel };
+    return { status: 200, ok: true, kringDeel: d.kringDeel, gewijzigd: d.gewijzigd };
   }
 
   /* ---- de AI-schrijfhulp: stelt alleen voor, de mens voegt in of niet ---- */
@@ -92,19 +105,34 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
         if (tekst) return { status: 200, opdracht, voorstel: tekst.slice(0, 4000) };
       } catch (e) {}
     }
-    // demostand: een vast, bruikbaar voorstel; de mens beslist wat ermee gebeurt
-    const demo = {
-      samenvatten: 'Samenvatting (demo): dit document beschrijft de kern in enkele alinea\'s; de belangrijkste punten staan bovenaan en de afspraken onderaan.',
-      herschrijven: 'Herschreven (demo): ' + (kaal ? kaal.slice(0, 240) : 'Begin met een korte, heldere openingszin en sluit af met de afspraak.'),
-      doorschrijven: 'Vervolg (demo): In de volgende stap werken we dit punt concreet uit, met een verantwoordelijke en een datum per actie.',
-      formule: w && /som|totaal|optel/i.test(w) ? '=SOM(A1:A10)' : w && /gemiddel/i.test(w) ? '=GEM(A1:A10)'
-        : w && /afrond/i.test(w) ? '=AFRONDEN(A1;2)' : w && /als|indien|drempel/i.test(w) ? '=ALS(A1>100;"boven";"onder")' : '=SOM(A1:A5)',
-      actiepunten: 'Actiepunten (demo):\n- [wie] · [wat] · [wanneer]\n- [wie] · [wat] · [wanneer]\nZet er per punt een naam en een datum bij; zonder die twee is het geen actiepunt.',
-      inkorten: 'Ingekort (demo): ' + (kaal ? kaal.slice(0, 180) : 'Zeg hetzelfde in de helft van de woorden; schrap wat de lezer al weet.'),
-      engels: 'English (demo): this document sets out the background, the proposal and the decision requested. Set an API key for a real translation.',
-      kritisch: 'Kritisch gelezen (demo): 1) De gevraagde beslissing staat er niet expliciet in. 2) Er ontbreekt een datum bij de acties. 3) De cijfers worden genoemd maar niet onderbouwd. U beslist zelf wat u ermee doet.'
-    };
-    return { status: 200, opdracht, voorstel: demo[opdracht], demo: true };
+    /* Geen AI-provider betekent geen toneelstukje. Alleen bewerkingen die
+       lokaal en controleerbaar uit de bestaande tekst volgen blijven werken;
+       herschrijven, vertalen en doorschrijven zouden nieuwe taal verzinnen en
+       melden daarom eerlijk dat Rahul nodig is. */
+    const zinnen = kaal.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+    if (opdracht === 'formule') return { status: 200, opdracht, stand: 'lokaal', voorstel:
+      w && /som|totaal|optel/i.test(w) ? '=SOM(A1:A10)' : w && /gemiddel/i.test(w) ? '=GEM(A1:A10)'
+        : w && /afrond/i.test(w) ? '=AFRONDEN(A1;2)' : w && /als|indien|drempel/i.test(w) ? '=ALS(A1>100;"boven";"onder")' : '=SOM(A1:A5)' };
+    if (opdracht === 'samenvatten') return { status: 200, opdracht, stand: 'lokaal',
+      voorstel: zinnen.slice(0, 3).join(' ').trim() || 'Dit document bevat nog geen tekst om samen te vatten.' };
+    if (opdracht === 'inkorten') return { status: 200, opdracht, stand: 'lokaal',
+      voorstel: zinnen.slice(0, Math.max(1, Math.ceil(zinnen.length / 2))).join(' ').trim()
+        || 'Dit document bevat nog geen tekst om in te korten.' };
+    if (opdracht === 'actiepunten') {
+      const acties = zinnen.filter(x => /\b(moet|zal|gaat|levert|stuurt|plant|regelt|beslist|controleert|voor\s+\w+dag)\b/i.test(x)).slice(0, 8);
+      return { status: 200, opdracht, stand: 'lokaal', voorstel: acties.length
+        ? acties.map(x => '- ' + x.trim()).join('\n')
+        : 'Geen concrete actiepunten gevonden. Voeg per actie een verantwoordelijke, handeling en datum toe.' };
+    }
+    if (opdracht === 'kritisch') {
+      const punten = [];
+      if (!/[€%]|\b\d+[.,]?\d*\b/.test(kaal)) punten.push('Cijfers of meetbare onderbouwing ontbreken.');
+      if (!/\b(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag|vandaag|morgen|\d{1,2}[-/]\d{1,2})\b/i.test(kaal)) punten.push('Er staat geen concrete datum of termijn bij.');
+      if (!/\b(besluit|akkoord|keuze|goedkeuring)\b/i.test(kaal)) punten.push('De gevraagde beslissing staat niet expliciet in de tekst.');
+      return { status: 200, opdracht, stand: 'lokaal', voorstel: (punten.length ? punten : ['Geen vaste structurele lacunes gevonden.']).map((x, i) => (i + 1) + ') ' + x).join('\n') };
+    }
+    return { status: 503, error: 'Rahul is nu niet beschikbaar voor deze creatieve opdracht. U kunt het document zonder AI blijven bewerken.',
+      code: 'AI_NIET_BESCHIKBAAR', handmatig: true, opdracht };
   }
 
   return { officeVersies: versies, officeTerug: terug, officeDeel: deel, officeKring: kringDeel, officeAI: aiHulp };

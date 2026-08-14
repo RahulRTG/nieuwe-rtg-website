@@ -23,6 +23,8 @@ test('de originele personeelsklok blijft volledig binnen een Work OS-paneel',()=
   assert.match(personeel,/window\.self!==window\.top/);
   assert.match(personeel,/data-rtg-oppervlak="1"[\s\S]*--rtg-klok-maat:min\(11\.5rem,42vh,62vw\)/);
   assert.match(personeel,/data-rtg-oppervlak="1"[\s\S]*justify-content:flex-start/);
+  assert.match(personeel,/data-rtg-oppervlak="1"\] #gate \.badge\{display:none;/);
+  assert.doesNotMatch(personeel,/data-rtg-oppervlak="1"\][^}]*\.rr-naam/);
 });
 
 test('de kantooraccount-ingang kan niet dubbel worden toegevoegd',()=>{

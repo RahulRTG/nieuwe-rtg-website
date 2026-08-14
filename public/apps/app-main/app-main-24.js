@@ -19,6 +19,9 @@
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'Documenten',   url: '/apps/office.html' },
+    rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html' },
+    rtmail:      { naam: 'RTMail',       url: '/apps/rtmail.html' },
+    magnaat:     { naam: 'Magnaat',      url: '/apps/magnaat.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
        tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
        het ene RTG-account, de andere vroeg opnieuw om een werkruimtecode en

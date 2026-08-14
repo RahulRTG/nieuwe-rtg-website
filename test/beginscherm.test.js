@@ -1,4 +1,4 @@
-/* HET BEGINSCHERM DRAAGT DE ACHT WERELDEN EN VERDER GEEN LOSSE APPS.
+/* HET BEGINSCHERM DRAAGT DE DRIE WERELDEN EN VERDER GEEN LOSSE APPS.
 
    Dat is de afspraak van PLATFORM.md par. 0, en hij slijt precies op een
    manier: er komt "even" een app-tegel bij omdat iemand hem vaak nodig heeft,
@@ -22,17 +22,17 @@ const path = require('path');
 
 const lees = (...d) => fs.readFileSync(path.join(__dirname, '..', ...d), 'utf8');
 
-test('het beginscherm draagt geen losse app-tegels naast de acht werelden', () => {
+test('het beginscherm draagt geen losse app-tegels naast de drie werelden', () => {
   const bundel = lees('public', 'apps', 'app-main.js');
   assert.match(bundel, /const FUNCTIES = \[\s*\]/,
-    'de functierij onder de klok is weer gevuld; het beginscherm hoort alleen de acht werelden te dragen');
+    'de functierij onder de klok is weer gevuld; het beginscherm hoort alleen de drie werelden te dragen');
 });
 
-test('en het zijn er ACHT, elk met een eigen wereldpagina die bestaat', () => {
+test('en het zijn er DRIE, elk met een eigen wereldpagina die bestaat', () => {
   const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
   const werelden = [...bron.matchAll(/wereld:\s*'([^']+)'/g)].map((m) => m[1]);
-  assert.equal(werelden.length, 8,
-    'er horen acht werelden te staan, gevonden: ' + werelden.join(', '));
+  assert.equal(werelden.length, 3,
+    'er horen drie werelden te staan, gevonden: ' + werelden.join(', '));
   for (const w of werelden) {
     const p = path.join(__dirname, '..', 'public', w.replace(/^\//, ''));
     assert.ok(fs.existsSync(p), 'de wereldtegel wijst naar een pagina die niet bestaat: ' + w);
@@ -73,7 +73,7 @@ test('wat uit de functierij verdween, heeft een ingang in zijn wereld', () => {
 test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', () => {
   const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
   const mappen = [...bron.matchAll(/wereld:\s*'([^']+)'[\s\S]*?items:\s*\[([^\]]*)\]/g)];
-  assert.ok(mappen.length >= 7, 'de mappen zijn niet te lezen; dan meet deze regel niets');
+  assert.ok(mappen.length >= 3, 'de mappen zijn niet te lezen; dan meet deze regel niets');
 
   /* DE SCHULD DIE ER AL LAG, met naam en toenaam -- zelfde afspraak als de
      BEKEND-lijst in scripts/check.js regel 45: hij mag ALLEEN KRIMPEN. Deze
@@ -88,12 +88,8 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
      wereld die af is (zie de rij specialisten in apps/media.html); de rest
      hoort te volgen. */
   const SCHULD = new Set([
-    '/apps/sociaal.html mist vonk', '/apps/sociaal.html mist cercle', '/apps/sociaal.html mist entourage',
-    '/apps/sociaal.html mist rendezvous', '/apps/sociaal.html mist attenties',
     '/apps/kantoor.html mist onderneming', '/apps/kantoor.html mist loonstrook',
-    '/apps/kantoor.html mist browser', '/apps/kantoor.html mist sitemaker',
-    '/apps/veilig.html mist ik', '/apps/veilig.html mist veilig',
-    '/apps/veilig.html mist passkeys', '/apps/veilig.html mist juridisch'
+    '/apps/kantoor.html mist browser', '/apps/kantoor.html mist sitemaker'
   ]);
 
   const gemist = [], nogOpen = new Set();

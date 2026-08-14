@@ -154,7 +154,7 @@
      raster van #osMapGrid af -- niet twee rasters in elkaar.
      test/appmenu.e2e.js meet de meetkunde en zakt als dat weer gebeurt. */
   function openMap(map) {
-    /* ACHT WERELDEN (PLATFORM.md par. 0). Een wereld is een APP en geen map:
+    /* DRIE WERELDEN (PLATFORM.md par. 0). Een wereld is een APP en geen map:
        tikken opent hem, en er komt geen tussenscherm met tegels. De `items`
        blijven staan zolang de onderdelen nog eigen pagina's zijn -- Spotlight
        indexeert ze en zonder die index is er halverwege de verhuizing van

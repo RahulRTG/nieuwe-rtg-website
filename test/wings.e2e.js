@@ -109,7 +109,7 @@ async function meet(pwBrowser, base, token, breed, hoog) {
      Hier stond `waitForTimeout(2500)` met de opmerking "de widgets halen hun
      bron op". Dat is een gok: op een rustige machine te lang, onder belasting
      te kort -- en dan zakt de toets op iets dat niets met de wings te maken
-     heeft. De widgets markeren zichzelf nu met `wing-klaar` zodra hun bron
+     heeft. De widgets markeren zichzelf nu met `data-wing-bron="klaar"` zodra hun bron
      geantwoord heeft (ook als het antwoord leeg was), dus is er een echte
      toestand om op te wachten. Op smalle schermen bestaan er geen widgets; dan
      is de toestand "de flanken zijn leeg" en die is er meteen. */
@@ -118,7 +118,7 @@ async function meet(pwBrowser, base, token, breed, hoog) {
     if (!L) return false;
     const kaarten = document.querySelectorAll('.wing-widget');
     if (!kaarten.length) return getComputedStyle(L).display === 'none' || !L.children.length;
-    return [...kaarten].every(k => k.classList.contains('wing-klaar'));
+    return [...kaarten].every(k => k.dataset.wingBron === 'klaar');
   }, { timeout: 20000 });
   const uit = await page.evaluate(() => {
     const L = document.getElementById('wingL'), R = document.getElementById('wingR');
@@ -145,6 +145,14 @@ async function meet(pwBrowser, base, token, breed, hoog) {
       acties: [...document.querySelectorAll('.wing-widget')].filter(x => x.querySelector('.wing-acties'))
         .map(x => x.querySelector('.wing-naam').textContent.trim() + ': ' + [...x.querySelectorAll('.wing-actie')].map(b => b.textContent.trim()).join('/')),
       knopInKnop: !!document.querySelector('button button'),
+      /* De VORM van een afgeronde widget. Zie de bewering hieronder: dit meet
+         of de kaart zijn eigen uiterlijk houdt en niet dat van een vreemde
+         regel erft. */
+      vorm: (() => {
+        const k = document.querySelector('.wing-widget'); if (!k) return null;
+        const s = getComputedStyle(k);
+        return { radius: s.borderRadius, bg: s.backgroundColor, klaar: k.dataset.wingBron || null };
+      })(),
       shell: Math.round(document.getElementById('shell').getBoundingClientRect().width)
     };
   });
@@ -199,6 +207,21 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
          met de meegeleverde vraag opent, zonder de console te verlaten. */
       assert.ok(uit.acties.some(a => a.startsWith('Balans')), 'Balans hoort een actie in de flank te hebben, kreeg: ' + JSON.stringify(uit.acties));
       assert.equal(uit.knopInKnop, false, 'een knop in een knop is ongeldige HTML en niet te bedienen met het toetsenbord');
+      /* EEN AFGERONDE WIDGET MAG GEEN VREEMD UITERLIJK ERVEN.
+
+         De markering "mijn bron heeft geantwoord" was een KLASSE, `wing-klaar`,
+         en die naam bestond al: app.html geeft hem aan de Klaar-knop van de
+         instelkaart, een witte pil met border-radius 999px. Elke widget die
+         zijn bron had opgehaald werd daarmee overgeschilderd tot een witte pil
+         met onleesbare tekst -- en niemand zag het, want de wings stonden
+         achter body.rtg-command, dat op elke computer permanent op de body
+         hing. De markering is nu een attribuut (die kan geen opmaak erven);
+         deze twee beweringen meten de vingerafdruk van die botsing, zodat een
+         volgende naam die per ongeluk raak schiet hier zakt in plaats van in
+         de app. */
+      assert.equal(uit.vorm.klaar, 'klaar', 'een afgeronde widget hoort zich als afgerond te melden');
+      assert.notEqual(uit.vorm.radius, '999px', 'een widget is een kaart, geen pil: hij erft het uiterlijk van een knop');
+      assert.notEqual(uit.vorm.bg, 'rgb(255, 255, 255)', 'en zeker geen wit vlak op een zwarte flank');
       assert.deepEqual(uit.fouten, [], 'geen JS-fouten');
 
       // 3) aanpassen: de eerste app links uitzetten en dat moet blijven staan

@@ -3,7 +3,17 @@
 
      Waarom geen knop-in-een-knop: dat is ongeldige HTML en het maakt de
      actieknoppen onbereikbaar met het toetsenbord. De kaart is een groep, de
-     kop is de deur, de acties staan ernaast. */
+     kop is de deur, de acties staan ernaast.
+
+     "MIJN BRON HEEFT GEANTWOORD" IS EEN TOESTAND EN GEEN OPMAAK, en daarom is
+     het hier een attribuut. Het was een klasse: `wing-klaar`. Die naam bestond
+     al -- app.html regel 251 geeft hem aan de Klaar-KNOP van de instelkaart, en
+     dat is een witte pil met border-radius 999px. Elke widget die zijn bron had
+     opgehaald werd dus overgeschilderd tot een witte pil met onleesbare tekst.
+     Niemand zag het, want de wings stonden achter body.rtg-command en die
+     klasse hing op elke computer permanent op de body (shared/command.js).
+     Twee betekenissen op een naam lopen altijd uiteen; een attribuut kan niet
+     per ongeluk een uiterlijk erven. */
   function wingWidget(item) {
     const naamVan = it => it.startsWith('tab:') ? tabNaam(it.slice(4)) : ((itemDef(it) || {}).naam || it);
     const kaart = document.createElement('div');
@@ -55,10 +65,10 @@
           kaart.appendChild(rij);
         }
       }).catch(() => { /* een stukke bron laat het lijf leeg; dat is de bedoeling */ })
-        .then(() => kaart.classList.add('wing-klaar'));
+        .then(() => kaart.setAttribute('data-wing-bron', 'klaar'));
     } else {
       // geen bron om op te wachten: deze kaart is meteen af
-      kaart.classList.add('wing-klaar');
+      kaart.setAttribute('data-wing-bron', 'klaar');
     }
     return kaart;
   }

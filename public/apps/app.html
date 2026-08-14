@@ -1139,6 +1139,28 @@
      we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
      schermvullend, zodat de desktop eruitziet als de app in een tablet-kader. */
   @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;width:100vw;max-width:100vw;} }
+  /* ...EN DAT LIET DE REGEL HIERBOVEN NIET TOE.
+
+     De belofte in dat commentaar was niet waar. `width:min(430px, 100vw)` geldt
+     op elke breedte, en hij wint van de `width:auto` van het tabletkader --
+     dus stond de app op een 1440px-scherm als een telefoonstrook van 430px
+     midden op een leeg bureau. Het gemeten plafond hierboven (820px bij 520px,
+     1040px bij 1100px, uitgerekend tot op de pixel waar --e verzadigt) heeft
+     nooit iemand gezien: os-vast staat aan zodra de app zichtbaar is, en dat is
+     na het inloggen altijd.
+
+     De REDEN van die regel blijft staan en is hier overgenomen: de breedte moet
+     uit de VIEWPORT komen. Onder container-type:size klapte een breedte die van
+     de ouder kwam op iOS naar nul (zie hierboven), en `calc(100% - 3rem)` uit de
+     max-width is precies zo'n ouder-breedte. Daarom is de hele som hier
+     viewport-gebonden: de hoogte is vh, de breedte volgt uit de iPad-verhouding
+     786:1001, en de marge is 100vw. Niets erin kan dichtklappen. */
+  @media (min-width:520px){
+    body.os-vast #shell{width:min(820px, calc(min(92vh, 1040px) * 786 / 1001), calc(100vw - 3rem));}
+  }
+  @media (min-width:1100px){
+    body.os-vast #shell{width:min(1040px, calc(min(94vh, 1320px) * 786 / 1001), calc(100vw - 4rem));}
+  }
 
   /* app-modus: fullscreen met home-indicator */
   .os-pill{
@@ -1634,6 +1656,7 @@
 </style>
 <script src="/shared/command/catalog.js" defer></script>
 <script src="/shared/command/console.js" defer></script>
+<script src="/shared/command/werktafel.js" defer></script>
 <script src="/shared/command.js" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>

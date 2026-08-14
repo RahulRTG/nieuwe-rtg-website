@@ -96,9 +96,9 @@ een moment waarop de helft werkt.
 
 ### Het wereldpatroon: samenvoegen is stap een, niet de bedoeling
 
-Een wereld is pas af als hij zijn onderwerp BEGRIJPT. Acht schillen om
-tachtig pagina's is opruimen; acht werelden die elk hun domein snappen is een
-platform. RTG Geld heeft de vorm sinds 10 augustus 2026 werkend en getoetst,
+Een wereld is pas af als hij zijn onderwerp BEGRIJPT. De zes ledenwerelden zijn
+samengebracht in RTG; Kantoor en RTFoundation behouden elk hun eigen huis.
+Drie werelden die hun domeinen snappen vormen het platform. RTG Geld heeft de vorm sinds 10 augustus 2026 werkend en getoetst,
 en elke volgende wereld krijgt dezelfde vijf lagen:
 
 | Laag | Wat | De regel die hem eerlijk houdt |

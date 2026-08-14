@@ -2,208 +2,85 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG &mdash; Het Huis</title>
-<meta name="theme-color" content="#7F1634">
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/magazine.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RTG · Uw wereld</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#090908">
+<link href="../fonts/fonts.css" rel="stylesheet">
+<link href="../shared/rtg-uniform.css" rel="stylesheet">
+<link href="../shared/rtg-ui.css" rel="stylesheet">
+<style>
+:root{--goud:#c9a24b;--lijn:rgba(201,162,75,.18);--vlak:rgba(18,17,15,.68);--zacht:rgba(237,231,218,.62)}
+*{box-sizing:border-box}body{margin:0;background:#030303;color:#ede7da;font-family:Inter,system-ui,sans-serif;min-height:100vh;overflow-x:hidden}body:after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 38% 4%,rgba(127,22,52,.25),transparent 42%),linear-gradient(90deg,rgba(0,0,0,.15),rgba(0,0,0,.38));z-index:0}
+.skip{position:fixed;left:.6rem;top:-4rem;z-index:120;background:var(--goud);color:#080807;padding:.55rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.82rem;text-decoration:none;transition:top .15s}.skip:focus-visible{top:0}
+.schil{position:relative;z-index:1;display:grid;grid-template-columns:164px 1fr;grid-template-rows:52px 1fr;min-height:100vh}.bank{grid-row:1/3;position:sticky;top:0;height:100vh;padding:42px 10px 20px;border-right:1px solid rgba(255,255,255,.07);background:rgba(7,7,6,.9);backdrop-filter:blur(22px);overflow:auto}
+.merk{font-family:"Bodoni Moda",serif;font-size:1rem;color:#ded7c9;margin:0 24px 38px;letter-spacing:.16em}.merk small{display:block;font:500 .48rem Inter;letter-spacing:.28em;color:var(--zacht);margin-top:7px;white-space:nowrap}
+.bank a{display:flex;align-items:center;gap:11px;width:100%;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(237,231,218,.56);padding:14px 15px;text-decoration:none;font:500 .7rem Inter}.bank a span{width:20px;color:var(--goud);font-size:.58rem}.bank a:hover,.bank a.actief{background:linear-gradient(90deg,rgba(201,162,75,.09),transparent);color:#eee8dc}.bankvoet{margin-top:12px;border-top:1px solid var(--lijn)}
+.topbar{grid-column:2;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--lijn);background:rgba(5,5,4,.72);backdrop-filter:blur(22px);position:sticky;top:0;z-index:8}.topbar a,.topbar button{border:0;background:none;color:#e9e2d6;font:600 .72rem Inter;text-decoration:none;display:flex;align-items:center;gap:9px}.topbar .terug{color:var(--goud);font-size:1rem}.topbar .titel{letter-spacing:.15em;text-transform:uppercase;font-size:.61rem}.topbar .bediening{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--lijn);border-radius:50%;cursor:pointer}
+.werk{grid-column:2;padding:30px clamp(28px,6vw,90px) 90px;max-width:1280px;width:100%;margin-inline:auto}.kop{text-align:center;margin:0 auto 20px}.ey{font-size:.58rem;letter-spacing:.26em;color:var(--goud);text-transform:uppercase}.kop h1{font:500 clamp(1.8rem,3.8vw,3.8rem)/1 "Bodoni Moda",serif;margin:10px 0}.kop p{color:var(--zacht);max-width:620px;line-height:1.6;margin:0 auto}.status{display:inline-block;border:1px solid var(--lijn);border-radius:999px;padding:7px 12px;font-size:.58rem;margin-top:14px;letter-spacing:.12em}.status i{display:inline-block;width:6px;height:6px;background:#62bc7a;border-radius:50%;margin-right:8px}.standen{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin:0 auto 25px}.standen button{border:0;border-bottom:1px solid transparent;background:transparent;color:var(--zacht);padding:9px 12px;font:600 .65rem Inter;cursor:pointer}.standen button.actief{color:#fff;border-color:var(--goud)}
+.paneel,.paneel.actief{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:0!important}.paneel{display:none}.paneel.actief{display:block}.wereldklok,.wereldklok.rtg-ring{--rtg-klok-maat:min(310px,58vw);display:flex;width:var(--rtg-klok-maat);height:var(--rtg-klok-maat);margin:8px auto 34px}.hero{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(10,10,9,.68);backdrop-filter:blur(18px);padding:28px;margin-bottom:18px}.hero h2{font:500 1.8rem "Bodoni Moda",serif;margin:6px 0}.hero p{color:var(--zacht);max-width:700px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.kaart{display:block;min-height:160px;padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#121210;color:inherit;text-decoration:none;transition:.2s}.kaart:hover{transform:translateY(-3px);border-color:var(--goud);background:#181713}.kaart b{display:block;font:500 1.35rem "Bodoni Moda",serif;margin:12px 0 7px}.kaart p{color:var(--zacht);font-size:.78rem;line-height:1.55;margin:0}.nummer{font-size:.6rem;letter-spacing:.18em;color:var(--goud)}
+@media(max-width:850px){.schil{display:block}.bank{display:none}.topbar{display:flex;height:52px}.werk{padding:25px 18px 80px}.grid{grid-template-columns:1fr}.standen{justify-content:flex-start;overflow:auto;flex-wrap:nowrap}}
+</style>
 </head>
-<body class="rtg-stijl">
-<header class="mag-top">
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span class="merk">
-    <span class="naam">Rahul Travel Group</span>
-    <span class="tagline">Experience the elite class</span>
-  </span>
-  <span class="rek"></span>
-  <span class="uitgave">Het Huis &middot; Uitgave I</span>
-</header>
-
-<main class="mag-flip" id="flip" aria-label="Het RTG-magazine; blader zijwaarts">
-  <section class="mag-blad donker">
-    <div class="mag-binnen mag-omslag">
-      <figure class="mag-plaat">
-        <img src="/campagne/huis-omslag.jpg" width="640" height="641" alt="Rahul Travel Group &mdash; Experience the elite class: een priv&eacute;jet en een auto in zwart-wit (AI-gegenereerd campagnebeeld)">
-      </figure>
-      <p class="mag-issue">Een uitgave van het huis</p>
-      <h1 class="mag-titel">Reizen is een <em>manier van leven</em></h1>
-      <p class="mag-standfirst">Geen boekingssite maar een huis. Blader mee door de passen, de takken, De Salon en de foundation.</p>
-      <p class="mag-swipe">Swipe om te bladeren <span class="pijl">&#8594;</span></p>
-    </div>
-  </section>
-
-  <!-- Het reisdossier: het enige blad met echte gegevens erin. Het staat vooraan
-       omdat het van u is; de rest van het magazine gaat over het huis. -->
-  <section class="mag-blad">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">Uw dossier</span> De reis</p>
-      <h2 class="mag-kop">Alles bij elkaar, <em>en eerlijk</em></h2>
-      <p class="mag-deck" id="dosDeck">Uw reis, uw papieren en wat er nog moet &mdash; op &eacute;&eacute;n plek.</p>
-      <div id="dossier" aria-live="polite"><p class="mag-telling">Het dossier wordt opgehaald&hellip;</p></div>
-      <p class="paginanr">Uw dossier</p>
-    </div>
-  </section>
-
-  <section class="mag-blad">
-    <div class="mag-binnen mag-inhoud">
-      <h2>In dit nummer</h2>
-      <ul class="mag-index">
-        <li><span class="nr">01</span><span class="titel">Passen<span class="sub">Elke pas heeft een eigen stem</span></span></li>
-        <li><span class="nr">02</span><span class="titel">Reizen<span class="sub">Reizen en verblijven onder &eacute;&eacute;n dak</span></span></li>
-        <li><span class="nr">03</span><span class="titel">Care<span class="sub">Spa, wellness en kliniek in &eacute;&eacute;n tak</span></span></li>
-        <li><span class="nr">04</span><span class="titel">Leren<span class="sub">Overhoren, projecten en een eigen leerlaag</span></span></li>
-        <li><span class="nr">05</span><span class="titel">Cultuur<span class="sub">Theater, Podium en Clips</span></span></li>
-        <li><span class="nr">06</span><span class="titel">Salon<span class="sub">Een sociaal netwerk zonder publiek en zonder algoritme</span></span></li>
-        <li><span class="nr">07</span><span class="titel">Foundation<span class="sub">De sociale, non-profit kant van het huis</span></span></li>
-        <li><span class="nr">08</span><span class="titel">Partners<span class="sub">Hoe partners met het huis samenwerken, en hoe wij met je gegevens omgaan</span></span></li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="mag-blad donker">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 01</span> De toegang</p>
-      <h2 class="mag-kop">Drie passen, <em>drie toonaarden</em></h2>
-      <p class="mag-deck">Elke pas heeft een eigen stem &mdash; bewust zo. De ene fluistert, de andere schikt, de derde rekent scherp.</p>
-      <div class="mag-lood intro">
-        <p>RTG kent drie passen, en ze klinken alle drie anders. De <b>RTG Pass</b> is de instap: ingetogen, zeker, in de je/jij-vorm &mdash; old money, nooit budget. Het contact loopt volledig via de AI, die je leert kennen zonder je te haasten.</p>
-        <p>De <b>Lifestyle Pass</b> is de vertrouwde rechterhand: voorkomend, in de u-vorm. De <b>Business Pass</b> is de effici&euml;nte, strategische partner voor de ondernemer &mdash; van boekhouding tot belasting per land.</p>
-      </div>
-      <div class="mag-kader"><h3>De toegangsregels</h3><ul><li>RTG Pass: voor iedereen, na de AI-intake (de ballotage).</li><li>Lifestyle Pass: uitsluitend op uitnodiging of na goedkeuring.</li><li>Business Pass: uitsluitend op uitnodiging of na goedkeuring.</li><li>De AI belooft nooit zelf toegang.</li></ul></div>
-      <p class="paginanr">01 &middot; Passen</p>
-    </div>
-  </section>
-  <section class="mag-blad">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 02</span> De reis</p>
-      <h2 class="mag-kop">Van de dagreis tot <em>de wolken</em></h2>
-      <p class="mag-deck">Reizen en verblijven onder &eacute;&eacute;n dak &mdash; en altijd eerlijk over wat al bevestigd is en wat nog niet.</p>
-      <div class="mag-lood intro">
-        <p>Een reis begint zelden bij een vlucht. Ze begint bij een idee, een vrije middag, een groep vrienden. RTG pakt dat op waar het is: een dagje weg, een verblijf, of de private aviation van partners voor wie hoger wil.</p>
-        <p>De boekingen lopen via partners. RTG noemt nooit een hotel- of luchtvaartmerk als bevestigd zolang de partner het niet heeft bevestigd &mdash; en de app zegt dat ook met zoveel woorden.</p>
-      </div>
-      <blockquote class="mag-citaat">Een boeking is pas definitief na bevestiging &mdash; en de app zegt dat eerlijk.<span class="bron">Over reizen bij RTG</span></blockquote>
-      <p class="paginanr">02 &middot; Reizen</p>
-    </div>
-  </section>
-  <section class="mag-blad donker">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 03</span> De zorg</p>
-      <h2 class="mag-kop">Zorg, <em>zonder dat het schuurt</em></h2>
-      <p class="mag-deck">Spa, wellness en kliniek in &eacute;&eacute;n tak &mdash; met een intake die je deelt zoals jij dat wilt.</p>
-      <div class="mag-lood intro">
-        <p>RTG Care is de zorg- en welzijnstak: van een middag spa tot een behandeling in de kliniek. Wat een behandelaar moet weten, deel je vooraf &mdash; veilig, en op codenaam.</p>
-        <p>De AI kent je wensen en grenzen en regelt de afspraak, maar leest nooit meer voor dan nodig. Wat de behandelaar ziet, is precies genoeg om je goed te helpen.</p>
-      </div>
-      <blockquote class="mag-citaat">Wat de behandelaar ziet, is precies genoeg &mdash; niet meer.<span class="bron">Over RTG Care</span></blockquote>
-      <p class="paginanr">03 &middot; Care</p>
-    </div>
-  </section>
-  <section class="mag-blad">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 04</span> De geest</p>
-      <h2 class="mag-kop">Een huis dat <em>ook leert</em></h2>
-      <p class="mag-deck">Overhoren, projecten en een eigen leerlaag &mdash; voor wie onderweg blijft groeien.</p>
-      <div class="mag-lood intro">
-        <p>Reizen verruimt, en leren houdt die ruimte open. RTG heeft een eigen leerlaag: overhoren, samen aan projecten werken, schrijven en verdiepen &mdash; in je eigen tempo, zonder cijferdruk.</p>
-        <p>Het is geen schoolbank maar een gereedschapskist: je pakt eruit wat je nodig hebt, wanneer je het nodig hebt.</p>
-      </div>
-      <blockquote class="mag-citaat">Geen schoolbank, maar een gereedschapskist.<span class="bron">Over de leerlaag</span></blockquote>
-      <p class="paginanr">04 &middot; Leren</p>
-    </div>
-  </section>
-  <section class="mag-blad donker">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 05</span> Het beeld</p>
-      <h2 class="mag-kop">Cultuur op <em>bioscoopniveau</em></h2>
-      <p class="mag-deck">Theater, Podium en Clips &mdash; verhalen van het huis, met zorg getoond.</p>
-      <div class="mag-lood intro">
-        <p>Het huis heeft een eigen podium. RTG Theater toont film op bioscoopniveau; het Podium is het live-kanaal; Clips is de korte vorm. Alles blijft binnen het huis, en gevoelige content gaat pas live na goedkeuring van kantoor.</p>
-        <p>Zo blijft cultuur een uitnodiging in plaats van een schreeuw &mdash; iets om bij stil te zitten, niet iets dat aan je trekt.</p>
-      </div>
-      <blockquote class="mag-citaat">Een uitnodiging, geen schreeuw.<span class="bron">Over cultuur bij RTG</span></blockquote>
-      <p class="paginanr">05 &middot; Cultuur</p>
-    </div>
-  </section>
-  <section class="mag-blad">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 06</span> Het gezelschap</p>
-      <h2 class="mag-kop">De Salon, <em>besloten en echt</em></h2>
-      <p class="mag-deck">Een sociaal netwerk zonder publiek en zonder algoritme &mdash; en de bron van al ons beeld.</p>
-      <div class="mag-lood intro">
-        <p>De Salon is het besloten netwerk van het huis. Geen publiek, geen algoritme dat je vasthoudt: je verbindt op codenaam, deelt een reis, en belt of videobelt binnen het huis.</p>
-        <p>De Salon levert ook het gezicht van RTG. Elk campagnebeeld is een uitgelichte Salon-post, altijd met naamsvermelding &mdash; nooit stockfoto, nooit een model.</p>
-      </div>
-      <blockquote class="mag-citaat">Geen stockfoto, geen model &mdash; alleen wat leden zelf laten zien.<span class="bron">Over De Salon</span></blockquote>
-      <p class="paginanr">06 &middot; Salon</p>
-    </div>
-  </section>
-  <section class="mag-blad donker">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 07</span> Het hart</p>
-      <h2 class="mag-kop">Dertig procent, <em>terug de wereld in</em></h2>
-      <p class="mag-deck">De sociale, non-profit kant van het huis &mdash; met een eigen wereld voor elke leeftijd.</p>
-      <div class="mag-lood intro">
-        <p>Van elke bijdrage gaat dertig procent naar liefdadigheid, via de RTFoundation. Het is geen bijzaak maar het hart van het huis: de reden dat luxe hier iets teruggeeft.</p>
-        <p>De foundation heeft een eigen wereld voor elke leeftijd, van de allerkleinsten tot de ouders &mdash; leren, spelen en zorgen voor elkaar, in dezelfde rust als de rest.</p>
-      </div>
-      <blockquote class="mag-citaat">Dertig procent van elke bijdrage &mdash; naar liefdadigheid.<span class="bron">Over de RTFoundation</span></blockquote>
-      <p class="paginanr">07 &middot; Foundation</p>
-    </div>
-  </section>
-  <section class="mag-blad">
-    <div class="mag-binnen">
-      <p class="mag-nr"><span class="no">N&deg; 08</span> De afspraak</p>
-      <h2 class="mag-kop">Eerlijk, <em>tot in de codenaam</em></h2>
-      <p class="mag-deck">Hoe partners met het huis samenwerken, en hoe wij met je gegevens omgaan.</p>
-      <div class="mag-lood intro">
-        <p>Zaken en makers werken met RTG samen via een eigen partnerkanaal, met een heldere afspraak: de ledenprijsgarantie. Een partner rekent leden nooit meer dan de eigen publieke prijs.</p>
-        <p>Klantdata draait op codenamen; echte namen staan in een gescheiden kluis. En de AI belooft nooit zelf toegang tot een pas &mdash; geen loze beloftes.</p>
-      </div>
-      <blockquote class="mag-citaat">Een partner rekent leden nooit meer dan de eigen publieke prijs.<span class="bron">De ledenprijsgarantie</span></blockquote>
-      <p class="paginanr">08 &middot; Partners</p>
-    </div>
-  </section>
-
-  <section class="mag-blad donker">
-    <div class="mag-binnen mag-colofon">
-      <figure class="mag-plaat mag-plaat--klein">
-        <img src="/campagne/huis-omslag.jpg" width="640" height="641" alt="Rahul Travel Group &mdash; Experience the elite class (AI-gegenereerd campagnebeeld)" loading="lazy">
-      </figure>
-      <p class="mag-issue">Colofon</p>
-      <h2>Het Huis</h2>
-      <p>Een reishuis op lidmaatschap. Dit magazine is de website van RTG, nu als app op je bureaublad &mdash; &eacute;&eacute;n pagina, om zijwaarts doorheen te bladeren.</p>
-      <div class="acties">
-        <a class="mag-knop prim" href="/apps/uitzicht.html">Zie het uitzicht</a>
-        <a class="mag-knop sec" href="/apps/app.html">Naar het bureaublad</a>
-      </div>
-    </div>
-  </section>
-</main>
-
-<nav class="mag-pager" id="pager" aria-label="Bladeren">
-  <button type="button" id="vorige" aria-label="Vorig blad">&#8592;</button>
-  <div class="stippen" id="stippen"></div>
-  <span class="teller" id="teller">01 / 11</span>
-  <button type="button" id="volgende" aria-label="Volgend blad">&#8594;</button>
-</nav>
-
-<script src="/shared/uitvoer.js"></script>
-<script src="/apps/rtg-magazine.js"></script>
-<script src="/apps/rtg-dossier.js"></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
+<body class="rtg-stijl" data-ios-home>
+<a class="skip" href="#inhoud">Naar inhoud</a>
+<div class="schil">
+<aside class="bank"><nav aria-label="Hoofdnavigatie">
+  <div class="merk">RTG<small>ONE LIFE PLATFORM</small></div>
+  <a class="actief" href="/apps/app.html"><span>01</span>Vandaag</a>
+  <a href="/apps/instant-reality.html"><span>02</span>Instant Reality</a>
+  <a href="/apps/lifestyle.html"><span>03</span>Private Office</a>
+  <a href="/apps/living-os.html"><span>04</span>Living OS</a>
+  <a href="/apps/partner-network.html"><span>05</span>Partner Network</a>
+  <a href="/apps/reizen-veilig.html"><span>06</span>Reizen & Veilig</a>
+  <a href="/apps/leven.html"><span>07</span>Leven</a>
+  <a href="/apps/geld-command.html"><span>08</span>Geld</a>
+  <a href="/apps/sociaal.html"><span>09</span>Sociaal</a>
+  <a href="/apps/media.html"><span>10</span>Media</a>
+  <a href="/apps/horeca.html"><span>11</span>Horeca</a>
+  <a href="/apps/gastdossier.html"><span>12</span>Gastdossier</a>
+  <div class="bankvoet"><a href="/apps/instellingen.html"><span>13</span>Instellingen</a></div>
+</nav></aside>
+<header class="topbar" role="banner"><a href="/apps/app.html" aria-label="Terug naar het beginscherm"><span class="terug">‹</span><span class="titel">RTG · Uw wereld</span></a><button class="bediening" type="button" aria-label="Bedieningspaneel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="#050504"/><circle cx="15" cy="12" r="2" fill="#050504"/><circle cx="7" cy="17" r="2" fill="#050504"/></svg></button></header>
+<main class="werk" id="inhoud">
+  <header class="kop"><div><div class="ey">EEN ACCOUNT · EEN WERELD</div><h1>Alles wat u nodig hebt.</h1><p>Zes vertrouwde RTG-werelden werken voortaan als standen van één premium app. Uw rechten, gegevens en vertrouwde diensten blijven intact.</p></div><div class="status"><i></i>RTG beveiligd</div></header>
+  <nav class="standen" aria-label="Onderdelen van RTG"><button class="actief" data-paneel="vandaag">Vandaag</button><button data-paneel="reizen">Reizen</button><button data-paneel="sociaal">Sociaal</button><button data-paneel="leven">Leven</button><button data-paneel="veilig">Veilig</button><button data-paneel="geld">Geld</button><button data-paneel="media">Media</button></nav>
+  <section class="paneel actief" data-inhoud="vandaag"><div class="wereldklok os-home-klok" data-rtg-klok="ring" aria-label="RTG-horloge"></div><article class="hero"><div class="ey">UW DAG</div><h2>Goedemiddag. Alles staat rustig klaar.</h2><p>Reizen, mensen, thuis, veiligheid, geld en media komen hier samen. Alleen wat aandacht nodig heeft komt naar voren.</p></article><div class="grid">
+    <a class="kaart" href="/apps/reizen-veilig.html"><span class="nummer">01 · REIZEN</span><b>Uw volgende beweging</b><p>Planning, vervoer en veilige aankomst in één reisbeeld.</p></a>
+    <a class="kaart" href="/apps/sociaal.html"><span class="nummer">02 · SOCIAAL</span><b>Uw mensen</b><p>Gesprekken, kring en ontmoetingen zonder sociale drukte.</p></a>
+    <a class="kaart" href="/apps/leven.html"><span class="nummer">03 · LEVEN</span><b>Uw dagelijks leven</b><p>Wonen, eten, zorg en persoonlijke ondersteuning.</p></a>
+    <a class="kaart" href="/apps/veilig.html"><span class="nummer">04 · VEILIG</span><b>Uw bescherming</b><p>Identiteit, toestemming en veiligheid onder uw controle.</p></a>
+    <a class="kaart" href="/apps/geld-command.html"><span class="nummer">05 · GELD</span><b>Uw financiële rust</b><p>Betalen, vermogen en inzicht vanuit één cockpit.</p></a>
+    <a class="kaart" href="/apps/media.html"><span class="nummer">06 · MEDIA</span><b>Uw vrije tijd</b><p>Muziek, kijken, nieuws, sport en spelen.</p></a>
+  </div></section>
+  <section class="paneel" data-inhoud="reizen"><article class="hero"><div class="ey">REIZEN</div><h2>Van vertrek tot veilige aankomst.</h2><p>Open de volledige reiswerkruimte met planning, vervoer, verblijf en Live Circle.</p><a class="kaart" href="/apps/reizen-veilig.html"><b>Open Reizen</b><p>Uw complete reiswereld.</p></a></article></section>
+  <section class="paneel" data-inhoud="sociaal"><article class="hero"><div class="ey">SOCIAAL</div><h2>Uw kring, zonder ruis.</h2><p>Open gesprekken, relaties, communities en ontmoetingen.</p><a class="kaart" href="/apps/sociaal.html"><b>Open Sociaal</b><p>Alles rond uw mensen.</p></a></article></section>
+  <section class="paneel" data-inhoud="leven"><article class="hero"><div class="ey">LEVEN</div><h2>Een huis dat met u meedenkt.</h2><p>Wonen, gezondheid, gezin, tafel en persoonlijke service.</p><a class="kaart" href="/apps/leven.html"><b>Open Leven</b><p>Uw persoonlijke levensomgeving.</p></a></article></section>
+  <section class="paneel" data-inhoud="veilig"><article class="hero"><div class="ey">VEILIG</div><h2>Bescherming als stille standaard.</h2><p>Beheer identiteit, passkeys, juridische afspraken en hulp.</p><a class="kaart" href="/apps/veilig.html"><b>Open Veilig</b><p>Uw beveiligingscentrum.</p></a></article></section>
+  <section class="paneel" data-inhoud="geld"><article class="hero"><div class="ey">GELD</div><h2>Volledig inzicht, zonder onrust.</h2><p>Uw wallet, rekening, balans en vermogen in één financieel beeld.</p><a class="kaart" href="/apps/geld-command.html"><b>Open Geld</b><p>Uw financiële command center.</p></a></article></section>
+  <section class="paneel" data-inhoud="media"><article class="hero"><div class="ey">MEDIA</div><h2>Alles om te kijken, luisteren en beleven.</h2><p>Een hoogwaardige mediawereld zonder eindeloze afleiding.</p><a class="kaart" href="/apps/media.html"><b>Open Media</b><p>Uw persoonlijke podium.</p></a></article></section>
+  <section class="hero" aria-labelledby="alleDiensten"><div class="ey">ALLE DIENSTEN</div><h2 id="alleDiensten">Rechtstreeks naar wat u zoekt.</h2><div class="grid">
+    <a class="kaart" href="/apps/reizen.html"><b>Reizen</b></a><a class="kaart" href="/apps/vluchten.html"><b>Vluchten</b></a><a class="kaart" href="/apps/ov.html"><b>OV</b></a><a class="kaart" href="/apps/navigatie.html"><b>Navigatie</b></a><a class="kaart" href="/apps/flits.html"><b>Flits</b></a><a class="kaart" href="/apps/stad.html"><b>Stad</b></a><a class="kaart" href="/apps/reisboek.html"><b>Reisboek</b></a><a class="kaart" href="/apps/hangar.html"><b>Hangar</b></a><a class="kaart" href="/apps/residentie.html"><b>Residentie</b></a>
+    <a class="kaart" href="/apps/wallet.html"><b>Wallet</b></a><a class="kaart" href="/apps/bank.html"><b>Bank</b></a><a class="kaart" href="/apps/wbw.html"><b>Wie betaalt wat</b></a><a class="kaart" href="/apps/rtgcode.html"><b>Betaalcode</b></a><a class="kaart" href="/apps/balans.html"><b>Balans</b></a><a class="kaart" href="/apps/labfonds.html"><b>Fonds</b></a><a class="kaart" href="/apps/mecenaat.html"><b>Mecenaat</b></a><a class="kaart" href="/apps/nalatenschap.html"><b>Nalatenschap</b></a><a class="kaart" href="/apps/logboek.html"><b>Logboek</b></a>
+    <a class="kaart" href="/apps/pulse.html"><b>Vandaag</b></a><a class="kaart" href="/apps/camera.html"><b>Camera</b></a><a class="kaart" href="/apps/vonk.html"><b>Daten</b></a><a class="kaart" href="/apps/cercle.html"><b>Cercle</b></a><a class="kaart" href="/apps/entourage.html"><b>Entourage</b></a><a class="kaart" href="/apps/rendezvous.html"><b>Rendez-vous</b></a><a class="kaart" href="/apps/attenties.html"><b>Attenties</b></a>
+    <a class="kaart" href="/apps/maison.html"><b>Maison</b></a><a class="kaart" href="/apps/table.html"><b>Table</b></a><a class="kaart" href="/apps/cellier.html"><b>Cellier</b></a><a class="kaart" href="/apps/garderobe.html"><b>Garde-robe</b></a>
+    <a class="kaart" href="/apps/muziek.html"><b>Muziek</b></a><a class="kaart" href="/apps/podium.html"><b>Podium</b></a><a class="kaart" href="/apps/theater.html"><b>Theater</b></a><a class="kaart" href="/apps/clips.html"><b>Video</b></a><a class="kaart" href="/apps/spelen.html"><b>Spelen</b></a><a class="kaart" href="/apps/nieuws.html"><b>Nieuws</b></a><a class="kaart" href="/apps/krant.html"><b>Krant</b></a><a class="kaart" href="/apps/sport.html"><b>Sport</b></a>
+    <a class="kaart" href="/apps/ik.html"><b>Wie ben ik</b></a><a class="kaart" href="/apps/passkeys.html"><b>Passkeys</b></a><a class="kaart" href="/apps/juridisch.html"><b>Juridisch</b></a>
+  </div></section>
+</main></div>
+<script src="../shared/sterren.js"></script>
+<script src="../shared/uurwerk.js"></script>
+<script src="../shared/klok.js" defer></script>
+<script>RTGSterren.hang(document.body,{dichtheid:.9,helderheid:.75});document.querySelectorAll('[data-paneel]').forEach(function(knop){knop.addEventListener('click',function(){document.querySelectorAll('[data-paneel]').forEach(function(x){x.classList.toggle('actief',x===knop)});document.querySelectorAll('[data-inhoud]').forEach(function(x){x.classList.toggle('actief',x.dataset.inhoud===knop.dataset.paneel)});});});</script>
+<script src="../shared/schermbeeld.js" defer></script>
+<script src="../shared/metgezel.js" defer></script>
+<script src="../shared/basis.js" defer></script>
+<script src="../shared/bediening.js" defer></script>
+<script src="../shared/randen.js" defer></script>
+<script src="../shared/volscherm.js" defer></script>
+<script src="../shared/cookie.js" defer></script>
+<script src="../shared/sneltoets.js" defer></script>
+<script src="../shared/ios.js" defer></script>
 </body>
 </html>

@@ -43,18 +43,16 @@
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'Reizen & Veilig', wereld: '/apps/reizen-veilig.html', glyf: 'vluchten', items: [
+    { sleutel: 'map-rtg', naam: 'RTG', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld-command.html', glyf: 'wallet', items: [
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
-      'link:nalatenschap', 'link:logboek'] },
+      'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-    { sleutel: 'map-salon', naam: 'RTG Sociaal', wereld: '/apps/sociaal.html', glyf: 'salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
-      'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties'] },
+      'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
        gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
@@ -63,17 +61,16 @@
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/leven.html', glyf: 'wonen', items: [
       'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
-      'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
+      'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
     /* --- tweede rij, gecentreerd --- */
-    { sleutel: 'map-media', naam: 'RTG Media', wereld: '/apps/media.html', glyf: 'film', items: [
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport'] },
+      'link:nieuws', 'link:krant', 'link:sport',
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
     { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
@@ -94,8 +91,6 @@
        app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
-    { sleutel: 'map-veilig', naam: 'RTG Veilig', wereld: '/apps/veilig.html', glyf: 'schild', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
     /* De achtste wereld. De stichting stond als EEN tegel binnen Het Huis
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld

@@ -30,8 +30,8 @@ module.exports = (kern) => {
         if (tekst) return res.json({ ok: true, antwoord: tekst });
       } catch (e) { /* val terug */ }
     }
-    // demo: de eerste zinnen als eerlijke samenvatting
+    // handmatige uitwijk: de eerste zinnen als eerlijke, lokale samenvatting
     const zinnen = (a.intro + ' ' + a.tekst).split(/(?<=[.!?])\s+/).filter(Boolean).slice(0, 3).join(' ');
-    res.json({ ok: true, demo: true, antwoord: 'In het kort: ' + zinnen });
+    res.json({ ok: true, ai: false, bron: 'artikel', modus: 'handmatig', antwoord: 'In het kort: ' + zinnen });
   });
 };

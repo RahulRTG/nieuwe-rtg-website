@@ -105,12 +105,13 @@ function keur(env, fouten, waarschuwingen) {
        functie kent alleen de omgeving, niet de database. Die controle staat nu in
        server.js, na load(), waar hij het antwoord echt weet. */
     if (!env.OFFICE_TOTP_SECRET) waarschuwingen.push('OFFICE_TOTP_SECRET niet gezet: de backoffice heeft geen tweede factor (2FA). Sterk aangeraden: zet een base32-geheim en koppel een authenticator-app.');
-    /* NUL DEMO'S: Rahul en herstelmail zijn geen decoratieve onderdelen. Een
-       productieproces zonder provider mag niet een vast antwoord verzinnen of
-       een herstelbericht alleen lokaal parkeren. Liever niet starten dan aan
-       een gebruiker tonen dat iets is uitgevoerd terwijl het nergens heen is. */
+    /* AI is een versneller, geen afhankelijkheid. Zonder provider start RTG in
+       de ingebouwde werkmodus: schermen, regels, controles en handmatige routes
+       blijven beschikbaar en de UI meldt eerlijk dat vrije AI niet actief is.
+       Mail is anders: een herstelbericht lokaal parkeren terwijl de gebruiker
+       denkt dat het verzonden is, is geen werkbare uitwijk en blijft blokkeren. */
     if (!env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY && !env.GEMINI_API_KEY && !env.GOOGLE_API_KEY)
-      fouten.push('Geen echte AI-provider ingesteld: Rahul zou terugvallen op vaste demo-antwoorden. Zet minstens één van ANTHROPIC_API_KEY, OPENAI_API_KEY of GEMINI_API_KEY.');
+      waarschuwingen.push('Geen AI-provider ingesteld: RTG start volledig in handmatige werkmodus. Vrije AI-verrijking staat uit; kernprocessen, navigatie en regelgestuurde opdrachten blijven beschikbaar.');
     if (!env.SMTP_URL && !env.SMTP_HOST)
       fouten.push('Geen echte mailprovider ingesteld: herstel- en bevestigingsmail zou alleen in de lokale outbox belanden. Zet SMTP_URL of SMTP_HOST.');
     // De geldkant (Stripe, munt, RTF-afdracht) staat in ./productie-geld.js

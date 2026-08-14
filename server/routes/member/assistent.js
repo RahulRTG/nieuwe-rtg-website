@@ -1,10 +1,13 @@
 /* Member-submodule: de persoonlijke AI en Rahul/concierge-chat. De vrije
-   AI-conversatie (Claude met demo-terugval) en de doorlopende chat met het
+   AI-conversatie (model met regelgestuurde uitwijk) en de doorlopende chat met het
    eigen account (vertaald in de taal van het lid).
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, anthropic, aiSystemPrompt, cannedAnswer, trChat, convOf, talen,
     memberSays, accounts } = kern;
+  const aiStatus = () => require('../../ai').beschikbaarheid(anthropic);
+
+  app.post('/api/ai/status', auth, (req, res) => res.json(aiStatus()));
 
   app.post('/api/ai', auth, async (req, res) => {
     if (req.session.tier === 'guest') {
@@ -35,20 +38,20 @@ module.exports = (kern) => {
           .map(b => b.text)
           .join('\n')
           .trim();
-        return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'claude' });
+        return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true, modus: 'ondersteund' });
       } catch (e) {
-        console.error('Claude API-fout, val terug op demo-antwoord:', e.message);
+        console.error('AI-provider niet bereikbaar; handmatige werkmodus blijft actief:', e.message);
       }
     }
     /* De PAS gaat mee, want het register hangt eraan (AI_TONE in kern/ai.js:
        RTG tutoyeert, Lifestyle en Business spreken met u). Deze regel gaf hem
        eerst niet mee, en dit is de aanroep die zonder API-sleutel ALTIJD loopt
        -- dus in elke demo en de hele suite kreeg een RTG Pass-lid de u-vorm. */
-    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'demo' });
+    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'regels', ai: false, modus: 'handmatig' });
   });
 
   app.post('/api/chat/history', auth, (req, res) => {
-    if (!req.session.account) return res.json({ messages: [], mode: 'rahul', demo: true });
+    if (!req.session.account) return res.json({ messages: [], mode: 'rahul', leeg: true });
     // het lid leest alles (ook concierge-antwoorden) in de eigen taal
     trChat(convOf(req.session.account.id), talen.taalVan(req.body.lang)).then(messages => res.json({
       messages,

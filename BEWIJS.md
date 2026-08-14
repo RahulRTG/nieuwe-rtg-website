@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 955 bestanden en 6390 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 956 bestanden en 6393 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 955 |
-| losse beweringen (`test(...)`) | 6390 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 11 |
+| toetsbestanden | 956 |
+| losse beweringen (`test(...)`) | 6393 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 12 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 101 |
+| niets van beide | 102 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-832 bestanden, 6169 beweringen.
+833 bestanden, 6172 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -52,6 +52,7 @@ toets omvalt.
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
 | `ai-cache.test.js` | 10 | gezakt op `===->!==` | Prompt caching in de Claude-client (server/anthropic.js, verrijkMetCache). De verrijking zet cache_control-markeringen op de juiste blokken, met drempels (een cache-schrijf kost 1,25x; klein werk markeren is verlies)... |
 | `ai-oproepen.test.js` | 5 | gezakt op `return-weg` | De AI-ingang-scanner toetsen. Poort 21 in check.js leunt op scan(): die vindt elke plek die het model aanroept en zegt of de gedeelde toegangsregel eronder ligt. |
+| `ai-optioneel.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ai-regie.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-regie van de boardroom: het kantoor vult Rahuls karakter en verhaal AAN (nooit vervangen: de vaste kern staat in de code en wordt door test/rahul-eerlijk.test.js bewaakt). De aanvulling komt live mee in elke... |
 | `ai-uitwijk.test.js` | 6 | gezakt op `===->!==` | De AI-uitwijk: onze eigen dunne clients voor Claude, OpenAI en Gemini (allemaal in de Claude-vorm: messages.create in, Claude-vormig antwoord uit) plus server/ai.js die naar de volgende aanbieder overstapt als er een... |
 | `aidata.test.js` | 3 | gezakt op `liegpoort /api/` | De eigen-AI-dataset: de boardroom-knop die alle logs (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL bewaart om later een eigen model te trainen. Getest: het bord telt, de export is geldig... |

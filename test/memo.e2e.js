@@ -56,7 +56,7 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
 
     /* samenvatting: eerlijk demo-antwoord op het transcript */
     await page.evaluate(() => { document.querySelector('[data-vat]').click(); });
-    await page.waitForFunction(() => /Demo-samenvatting/.test(document.querySelector('[data-uit]').textContent), null, { timeout: 8000 });
+    await page.waitForFunction(() => /Lokale samenvatting/.test(document.querySelector('[data-uit]').textContent), null, { timeout: 8000 });
 
     /* weggooien: naar de prullenbak, de lijst wordt leeg */
     await page.evaluate(() => { document.querySelector('[data-weg]').click(); });

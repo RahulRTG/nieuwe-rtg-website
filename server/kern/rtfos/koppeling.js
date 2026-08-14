@@ -102,7 +102,7 @@ module.exports = (ctx, eigen) => {
     const k = b.koppelingen.find(x => x.id === schoon(welke, 30));
     if (!k) return { status: 404, error: 'Deze koppeling kennen we niet.' };
     if (k.werkt) return { status: 400, error: 'Deze koppeling werkt wel; gebruik zijn eigen ingang.' };
-    return { status: 503, error: k.naam + ' is niet gekoppeld. ' + k.nodig };
+    return { status: 409, error: k.naam + ' is niet gekoppeld. ' + k.nodig };
   }
 
   return { bord, naarAgenda, nietGekoppeld };

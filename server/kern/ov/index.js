@@ -114,7 +114,7 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
 
   ensureOv();
   return Object.assign({ ovPrijsVan, ovZaakVan: ovZaak, ovLijnVan: lijnVan },
-    require('./reizen')(ctx), require('./dienst')(ctx));
+    require('./reizen')(ctx), require('./dienst')(ctx), require('./regie')(ctx), require('./operatie')(ctx));
 }
 
 module.exports = { maakOv };

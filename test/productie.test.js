@@ -40,7 +40,8 @@ test('config: veilige productie is foutloos', () => {
        op ERR_WEBHOOK_URL. Een "veilige productie" die SENTRY_DSN zet en
        ERR_WEBHOOK_URL niet, heeft in werkelijkheid GEEN externe alarmering --
        en deze toets zei dat dat foutloos was. */
-    REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm', STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
+    REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm', OPENAI_API_KEY: 'test-ai-key',
+    STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });

@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, supplierAuth, managerOnly, ovKaart, ovCodeMaak, ovHierIn, ovCheckUit, ovMijn,
     ovDienst, ovPos, ovCodeIn, ovStand, ovOverzicht, ovLijnenBeheer, ovLijnZet, ovRegie, ovRegieZet,
-    ovOperatieOverzicht, ovOperatieConcept, ovOperatieBevestig, ovOperatieAnnuleer } = kern;
+    ovOperatieOverzicht, ovOperatieConcept, ovOperatieBevestig, ovOperatieAnnuleer, ovOperatieSegment } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG OV is voor leden.' }); return true; }
@@ -51,6 +51,7 @@ module.exports = (kern) => {
   app.post('/api/ov/operatie/concept', auth, (req, res) => stuur(res, ovOperatieConcept(req.session.key, req.session.tier, req.body || {})));
   app.post('/api/ov/operatie/bevestig', auth, (req, res) => stuur(res, ovOperatieBevestig(req.session.key, req.session.tier, req.body || {})));
   app.post('/api/ov/operatie/annuleer', auth, (req, res) => stuur(res, ovOperatieAnnuleer(req.session.key, req.session.tier, req.body || {})));
+  app.post('/api/ov/operatie/segment', auth, (req, res) => stuur(res, ovOperatieSegment(req.session.key, req.session.tier, req.body || {})));
 
   // de dienstkant (PDA: chauffeur, machinist, schipper)
   app.post('/api/staff/ov/dienst', supplierAuth, (req, res) => {

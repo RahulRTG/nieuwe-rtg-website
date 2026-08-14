@@ -110,6 +110,7 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));
   require('../routes/rtmail-bestuur')(grens('rtmail-bestuur'));
   require('../routes/rtmail-team')(grens('rtmail-team'));
+  require('../routes/rtgone')(grens('rtgone'));
   require('../routes/werkmail')(grens('werkmail'));
   require('../routes/mailpost')(grens('mailpost'));
   require('../routes/payroll')(grens('payroll'));
@@ -126,6 +127,7 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/markt')(grens('markt'));
   require('../routes/borden')(grens('borden'));
   require('../routes/spellen')(grens('spellen'));
+  require('../routes/magnaatwereld')(grens('magnaatwereld'));
   require('../routes/leren')(grens('leren'));
   /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/), naast de
      oude payroll-routes en met dezelfde poorten. */

@@ -17,6 +17,7 @@ const MODI = {
   bagage: { naam: 'Bagage en materiaal', icoon: '▣', groep: 'logistiek' }
 };
 const ROLLEN = ['hoofdgast', 'familie', 'assistent', 'manager', 'beveiliging', 'medisch', 'crew', 'bagage'];
+const SEGMENT_KETEN = ['voorbereid', 'aangevraagd', 'offerte', 'bevestigd', 'onderweg', 'afgerond'];
 
 module.exports = ctx => {
   const { db, save, crypto, schoon } = ctx;
@@ -26,6 +27,14 @@ module.exports = ctx => {
   const beeld = o => ({ id: o.id, naam: o.naam, status: o.status, van: o.van, naar: o.naar, vertrek: o.vertrek,
     aangemaakt: o.aangemaakt, geactiveerd: o.geactiveerd || null, personen: o.personen, rollen: o.rollen,
     segmenten: o.segmenten, privacy: o.privacy, veiligheid: o.veiligheid });
+  function herbereken(o) {
+    const actief = o.segmenten.filter(s => s.status !== 'geannuleerd');
+    if (!actief.length) o.status = 'geannuleerd';
+    else if (actief.every(s => s.status === 'afgerond')) o.status = 'afgerond';
+    else if (actief.some(s => s.status === 'onderweg')) o.status = 'onderweg';
+    else if (actief.every(s => ['bevestigd', 'afgerond'].includes(s.status))) o.status = 'gereed';
+    else if (actief.some(s => ['aangevraagd', 'offerte', 'bevestigd'].includes(s.status))) o.status = 'in-regie';
+  }
 
   function overzicht(key, tier) {
     if (tier !== 'business') return { status: 403, error: 'Private operaties horen bij Business.' };
@@ -78,5 +87,27 @@ module.exports = ctx => {
     o.status = 'geannuleerd'; o.geannuleerd = nu(); delete o.bevestigHash; delete o.codeTot; save();
     return { status: 200, ok: true, operatie: beeld(o) };
   }
-  return { ovOperatieOverzicht: overzicht, ovOperatieConcept: concept, ovOperatieBevestig: bevestig, ovOperatieAnnuleer: annuleer };
+  function segment(key, tier, data) {
+    if (tier !== 'business') return { status: 403, error: 'Private operaties horen bij Business.' };
+    const o = voor(key).find(x => x.id === String(data.id || ''));
+    if (!o) return { status: 404, error: 'Operatie niet gevonden.' };
+    if (['concept', 'geannuleerd', 'afgerond'].includes(o.status)) return { status: 409, error: 'Activeer eerst de regie of kies een actieve operatie.' };
+    const s = o.segmenten.find(x => x.id === String(data.segmentId || ''));
+    if (!s) return { status: 404, error: 'Segment niet gevonden.' };
+    const actie = String(data.actie || '');
+    if (actie === 'vraag-aan') {
+      if (s.status !== 'voorbereid') return { status: 409, error: 'Dit segment is al ' + s.status + '.' };
+      if (data.akkoord !== true) return { status: 409, error: 'Bevestig dat RTG dit segment operationeel mag aanvragen.' };
+      s.status = 'aangevraagd'; s.aangevraagd = nu(); s.ref = 'MOVE-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+      s.bevestigingNodig = false; s.betaald = false; s.prijs = null;
+    } else if (actie === 'annuleer') {
+      if (['onderweg', 'afgerond'].includes(s.status)) return { status: 409, error: 'Een lopend of afgerond segment kan niet worden geannuleerd.' };
+      s.status = 'geannuleerd'; s.geannuleerd = nu();
+    } else return { status: 400, error: 'Onbekende segmentactie.' };
+    herbereken(o); save();
+    return { status: 200, ok: true, operatie: beeld(o), segment: s,
+      melding: actie === 'vraag-aan' ? 'Operationele aanvraag verstuurd. Een offerte of betaling volgt nooit zonder nieuw akkoord.' : 'Segment geannuleerd.' };
+  }
+  return { ovOperatieOverzicht: overzicht, ovOperatieConcept: concept, ovOperatieBevestig: bevestig,
+    ovOperatieAnnuleer: annuleer, ovOperatieSegment: segment, OV_SEGMENT_KETEN: SEGMENT_KETEN };
 };

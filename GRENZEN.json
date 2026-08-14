@@ -1,6 +1,14 @@
 {
   "uitleg": "Per domein de kern-namen die het mag aanraken, BOVEN de gedeelde interface in server/opzet/domeingrens.js. Gegenereerd met npm run grenslijst en met de hand aan te vullen; die aanvullingen blijven staan.",
   "domeinen": {
+    "magnaatwereld": [
+      "boardroomAuth",
+      "magnaatWereld"
+    ],
+    "rtgone": [
+      "boardroomBaas",
+      "rtgone"
+    ],
     "aanmeldgesprek": [
       "intakeStart",
       "intakeZeg",
@@ -1283,7 +1291,9 @@
       "status"
     ],
     "rtmail": [
-      "automatisering"
+      "agenda",
+      "automatisering",
+      "leren"
     ],
     "rtmail-bestuur": [
       "rtmailBewaar",

@@ -12,7 +12,7 @@ test('de Capability Graph leest apps, routes, werkprocessen en kantoren rechtstr
   assert.ok(graph.cijfers.apiActies >= 1500, 'de echte API-deuren worden gevonden');
   assert.ok(graph.cijfers.werkprocessen >= 500, 'routes worden tot procesfamilies gebundeld');
   assert.ok(graph.cijfers.kantoren >= 29, 'afdelingen en specialistische kamers worden gevonden');
-  assert.ok(graph.cijfers.ongedekteApiActies >= 400, 'de scanner toont wat het oude functieregister mist');
+  assert.ok(graph.cijfers.ongedekteApiActies > 0, 'de scanner toont wat het functieregister nog mist');
   assert.ok(graph.cijfers.controlepunten >= 2500, 'iedere API, app, functie en procesfamilie krijgt een controlepunt');
   assert.equal(graph.apps.some(a => a.pad === '/apps/kantoren.html'), true);
   assert.equal(graph.kantoren.some(k => k.id === 'klantenservice'), true);

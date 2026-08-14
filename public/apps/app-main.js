@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '3067f1cc';
+var RTG_BOUW = '04b58960';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -160,6 +160,7 @@ var RTG_BOUW = '3067f1cc';
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  let magnaatProef = false;
   // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
   // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
   const _apiCall = API.call.bind(API);
@@ -236,6 +237,8 @@ var RTG_BOUW = '3067f1cc';
      RTG-app, met minder functies. ZONDER ?pas= bestaat er geen brede app
      meer: dan is dit alleen een keuzescherm dat naar de pas-apps verwijst. */
   const zoekParams = new URLSearchParams(location.search);
+  magnaatProef = zoekParams.get('magnaat') === '1';
+  if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
   if (vastePas === 'guest') vastePas = 'rtg'; // gratis speelt in de RTG-app
   if (!['rtg','lifestyle','business'].includes(vastePas)) vastePas = null;
@@ -8457,5 +8460,8 @@ var RTG_BOUW = '3067f1cc';
     } catch(e){ toast(e.message); }
   });
 
-  restoreSession();
+  // In Magnaat start de echte OS-schil direct op een synthetische Business
+  // persona. Normaal blijft de bestaande sessieherstelroute ongewijzigd.
+  if (magnaatProef) login(vastePas === 'lifestyle' ? 'lifestyle' : vastePas === 'rtg' ? 'rtg' : 'business');
+  else restoreSession();
 })();

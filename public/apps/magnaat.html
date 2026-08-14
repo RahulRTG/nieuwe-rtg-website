@@ -7,6 +7,7 @@
 <title>Magnaat Wereld · RTG</title>
 <link rel="icon" href="/icons/rtg.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/media.css" rel="stylesheet">
 <style>
   :root{
     --ink:#07100f;--night:#0b1715;--panel:#10211e;--panel2:#152b27;--line:rgba(220,199,145,.16);
@@ -69,6 +70,8 @@
   @media(max-width:1050px){.ecokpis{grid-template-columns:repeat(3,1fr)}.ecogrid,.ecolower{grid-template-columns:1fr}.ctltools{grid-template-columns:1fr 1fr}.ctlsummary{grid-template-columns:repeat(3,1fr)}}
   @media(max-width:700px){.dienst{margin-top:.4rem}.wereld-event,.ecohero{grid-template-columns:1fr;gap:.35rem}.office{border-left:0;border-right:0}.casefacts{grid-template-columns:repeat(2,1fr)}.nav{grid-template-columns:repeat(6,1fr)}.ecokpis{grid-template-columns:repeat(2,1fr)}.strategy{grid-template-columns:1fr}.strategy .wide{grid-column:auto}.companytable{font-size:.58rem}.companytable th:nth-child(4),.companytable td:nth-child(4){display:none}.econrules{columns:1}.ctlhead{align-items:start;flex-direction:column}.ctlgrid{grid-template-columns:1fr}.ctlpoint{border-right:0}.ctlsummary{grid-template-columns:repeat(2,1fr)}.ctltools{grid-template-columns:1fr}.taskrow{grid-template-columns:1fr}}
 </style>
+<script src="/shared/id.js"></script>
+<script src="/shared/media.js"></script>
 </head>
 <body>
 <div class="app">
@@ -363,6 +366,7 @@ async function softwareAction(sleutel,apparaat){
 }
 function bindRtgFrame(id,apparaat){
   const frame=$(id),bron='/apps/app.html?pas=business&magnaat=1';if(!frame)return;
+  RTGMedia.kader(frame);
   frame.addEventListener('load',()=>{
     let doc,loc;try{doc=frame.contentDocument;loc=frame.contentWindow.location}catch(e){return}
     if(!doc||loc.pathname!=='/apps/app.html'){frame.src=bron;toast('Deze app blijft in de afgeschermde RTG-trainingskopie.');return}
@@ -406,7 +410,7 @@ function renderEconomy(){
 }
 async function planShock(schokId){try{const d=await api('economie/schok',{schokId});DATA.economie=d;renderEconomy();toast('Stress-scenario staat klaar voor de volgende economische dag.')}catch(e){toast(e.message)}}
 $('#ecoStrategy').onsubmit=async ev=>{ev.preventDefault();const b=ev.submitter;b.disabled=true;const body={prijs:Number($('#ecoPrice').value),personeelDoel:Number($('#ecoStaff').value),loonMaand:Number($('#ecoWage').value),trainingDag:Number($('#ecoTraining').value),bestelling:Number($('#ecoOrder').value),impactPct:Number($('#ecoImpact').value)};try{const d=await api('economie/beslis',body);DATA.economie=d;renderEconomy();toast('Strategie vastgelegd. De markt rekent morgen door.')}catch(e){toast(e.message)}finally{b.disabled=false}};
-$('#nextEcoDay').onclick=async()=>{const b=$('#nextEcoDay');b.disabled=true;try{const commandoId=(globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():'eco-'+Date.now()+'-'+Math.random().toString(36).slice(2));const d=await api('economie/volgende-dag',{commandoId});DATA.economie=d;renderEconomy();toast('Speldag '+d.dag+' verwerkt: '+d.actieveSchok.naam+'.')}catch(e){toast(e.message)}finally{b.disabled=false}};
+$('#nextEcoDay').onclick=async()=>{const b=$('#nextEcoDay');b.disabled=true;try{const commandoId=RTGId('eco');const d=await api('economie/volgende-dag',{commandoId});DATA.economie=d;renderEconomy();toast('Speldag '+d.dag+' verwerkt: '+d.actieveSchok.naam+'.')}catch(e){toast(e.message)}finally{b.disabled=false}};
 function renderFuture(){const p=DATA.futureLab;$('#proposals').innerHTML=p.length?p.map(v=>'<article class="card proposal"><span class="lane">'+(v.spoor==='rtf'?'RTFoundation':'RTG product')+'</span><span class="phase">'+esc(v.status)+'</span><h3>'+esc(v.naam)+'</h3><p>'+esc(v.probleem)+'</p><dl><dt>Voor wie</dt><dd>'+esc(v.doelgroep)+'</dd><dt>Oplossing</dt><dd>'+esc(v.oplossing)+'</dd><dt>Impact</dt><dd>'+esc(v.impact)+'</dd>'+(v.bewijs?'<dt>Spelbewijs</dt><dd>'+v.bewijs.missies+' missies · '+v.bewijs.gemiddelde+'% kwaliteit</dd>':'')+'<dt>Bouwt op</dt><dd>'+v.gebruiktFuncties.map(esc).join(' · ')+'</dd></dl></article>').join(''):'<p class="muted">De scan heeft nog geen ontbrekende productkans gevonden.</p>'}
 
 async function quick(){try{toast('Matchmaking gestart…');const d=await spelApi('random',{soort:'magnaat',grootte:4});if(d.gestart)location.href='/apps/spelen.html?potje='+encodeURIComponent(d.id);else toast('Je staat in de rij: plek '+d.plek+' van '+d.nodig+'.')}catch(e){toast(e.message)}}
@@ -414,6 +418,7 @@ $('#quick').onclick=quick;document.querySelectorAll('[data-quick]').forEach(b=>b
 bindRtgFrame('#rtgComputer','computer');bindRtgFrame('#rtgPda','pda');
 load();
 </script>
+<script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>
 </html>

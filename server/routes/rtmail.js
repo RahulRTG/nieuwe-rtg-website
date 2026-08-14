@@ -6,7 +6,7 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db } = kern;
+  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren } = kern;
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
      handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
      komt nog steeds aan: het postvak hangt aan het linkerdeel. */
@@ -174,6 +174,27 @@ module.exports = (kern) => {
     const r = rtmail.lees(codenaam, String((req.body && req.body.id) || ''));
     if (r.error) return res.status(404).json({ error: r.error });
     res.json({ ok: true, bericht: r });
+  });
+
+  app.post('/api/member/rtmail/workflow', auth, async (req, res) => {
+    const b = req.body || {}, codenaam = lidCodenaam(req);
+    if (!codenaam) return res.status(404).json({ error: 'Geen RTMAIL-postvak.' });
+    const bericht = rtmail.postvak(codenaam, { limit: 200 }).find(m => m.id === String(b.id || ''));
+    if (!bericht) return res.status(404).json({ error: 'Bericht niet gevonden.' });
+    if (b.actie === 'agenda') {
+      const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? b.datum : new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      const r = await agenda.voegToe('lid:' + req.session.key, { titel: b.titel || bericht.onderwerp, datum, tijd: b.tijd, notitie: 'Vanuit RTMAIL · ' + bericht.id });
+      if (r.error) return res.status(400).json(r);
+      return res.json({ ok: true, resultaat: r.item, bericht: rtmail.workflow(codenaam, bericht.id, { soort: 'agenda', label: 'In agenda gezet', ref: r.item.id }) });
+    }
+    if (b.actie === 'project') {
+      if (!leren || req.session.tier === 'guest') return res.status(403).json({ error: 'Projecten zijn beschikbaar voor leden.' });
+      const r = leren.projectMaak(req.session.key, { titel: b.titel || bericht.onderwerp, wat: b.wat || bericht.tekst.slice(0, 300) });
+      if (r.error) return res.status(r.status || 400).json(r);
+      const project = r.project || r;
+      return res.json({ ok: true, resultaat: project, bericht: rtmail.workflow(codenaam, bericht.id, { soort: 'project', label: 'Samenwerkingsproject gestart', ref: project.id }) });
+    }
+    res.status(400).json({ error: 'Onbekende workflowactie.' });
   });
 
 };

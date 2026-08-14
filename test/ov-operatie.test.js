@@ -32,3 +32,19 @@ test('activeren vraagt de eenmalige code en boekt of betaalt nog niets', () => {
   assert.ok(goed.operatie.segmenten.every(s => s.status === 'voorbereid' && s.prijs === null && s.bevestigingNodig));
   assert.equal(db.data.rides, undefined, 'de operatie maakt niet stiekem een rit');
 });
+
+test('ieder segment vraagt apart akkoord en blijft onbetaald', () => {
+  const { api } = kern();
+  const c = api.ovOperatieConcept('k', 'business', { van: 'Villa', naar: 'Jacht', modi: ['konvooi', 'helikopter', 'jacht'] });
+  const o = api.ovOperatieBevestig('k', 'business', { id: c.operatie.id, code: c.bevestigCode }).operatie;
+  const seg = o.segmenten[0];
+  const geenAkkoord = api.ovOperatieSegment('k', 'business', { id: o.id, segmentId: seg.id, actie: 'vraag-aan' });
+  assert.equal(geenAkkoord.status, 409);
+  const aan = api.ovOperatieSegment('k', 'business', { id: o.id, segmentId: seg.id, actie: 'vraag-aan', akkoord: true });
+  assert.equal(aan.segment.status, 'aangevraagd'); assert.equal(aan.segment.betaald, false); assert.equal(aan.segment.prijs, null);
+  assert.match(aan.segment.ref, /^MOVE-[0-9A-F]{6}$/); assert.equal(aan.operatie.status, 'in-regie');
+  const dubbel = api.ovOperatieSegment('k', 'business', { id: o.id, segmentId: seg.id, actie: 'vraag-aan', akkoord: true });
+  assert.equal(dubbel.status, 409, 'dezelfde opdracht kan niet dubbel worden aangevraagd');
+  const weg = api.ovOperatieSegment('k', 'business', { id: o.id, segmentId: seg.id, actie: 'annuleer' });
+  assert.equal(weg.segment.status, 'geannuleerd');
+});

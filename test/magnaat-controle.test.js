@@ -107,7 +107,7 @@ test('filters en paginering houden duizenden knoppen beheersbaar', () => {
   const bank = controle.overzicht(boardroom, { kantoorId: 'bank', soort: 'api', zoek: 'rekening', pagina: 1, limiet: 10 });
   assert.equal(bank.punten.length <= 10, true);
   assert.ok(bank.punten.every(p => p.kantoor.id === 'bank' && p.soort === 'api'));
-  assert.ok(bank.punten.every(p => [p.naam, p.route, p.sleutel].join(' ').toLowerCase().includes('rekening')));
+  assert.ok(bank.punten.every(p => [p.naam, p.route, p.sleutel, p.bestand, p.rol].join(' ').toLowerCase().includes('rekening')));
   assert.ok(bank.paginering.totaal >= bank.punten.length);
 });
 

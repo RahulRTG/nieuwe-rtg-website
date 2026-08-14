@@ -2005,7 +2005,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
 
    Het hulpje stond er al en werd door drie van de drieenveertig bestanden
    gebruikt. De andere veertig hadden hun eigen regel, en die telde de ruis
-   gewoon mee. Dat viel pas op toen wings.e2e.js erop zakte -- in CI, niet hier,
+   gewoon mee. Dat viel pas op toen wings.e2e.js erop zakte (die toets is inmiddels weg met de wings) -- in CI, niet hier,
    want het is een race. Een hulpje dat niemand aanroept is geen reparatie.
 
    Deze regel bewaakt dus niet de smaak maar de ruis: wie zijn eigen luisteraar

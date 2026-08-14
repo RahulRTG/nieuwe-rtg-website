@@ -221,7 +221,8 @@ async function startEens(opts) {
    `stop(srv.child)` -- raakte een object zonder .kill: de TypeError verdween in
    de catch en de server bleef gewoon draaien. De testrunner wacht dan op een
    kindproces dat niemand doodt, en de toets "hangt" zonder dat er iets stuk is.
-   Dat is me met test/wings.e2e.js precies overkomen en het kostte twee runs van
+   Dat is me met test/wings.e2e.js precies overkomen (dat bestand is er niet meer,
+   de wings zijn verwijderd; de les eronder blijft) en het kostte twee runs van
    een kwartier voordat ik doorhad dat het aan de aanroep lag.
 
    Nu accepteert hij beide vormen (het kind of het hele resultaat), en een

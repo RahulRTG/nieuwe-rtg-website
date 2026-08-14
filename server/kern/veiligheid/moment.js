@@ -6,18 +6,25 @@
    Exacte locatie kan alleen naar een bestaande RTG-connectie, nooit naar een
    bedrijf. Aankomsttijd en voortgang mogen wel naar een betrokken bedrijf.
    Na de eindtijd levert de kern niets meer uit en een stop wist de laatste plek. */
+
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem. Wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op een schrikkeldag, een
+   zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
+   zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
+const klok = require('../../lib/klok');
 module.exports = ({ db, save, crypto, schoon, sociaal, plek }) => {
   const MAX_DUUR_MIN = 48 * 60;
   const STATUSSEN = new Set(['gepland', 'onderweg', 'vertraagd', 'bijna-aangekomen', 'aangekomen', 'geannuleerd']);
   const NIVEAUS = new Set(['plan', 'voortgang', 'locatie']);
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
 
   function lijst() {
     if (!db.data.veilig) db.data.veilig = {};
     if (!db.data.veilig.momenten) db.data.veilig.momenten = [];
     return db.data.veilig.momenten;
   }
-  const actief = m => m.status !== 'gestopt' && m.tot > Date.now();
+  const actief = m => m.status !== 'gestopt' && m.tot > klok.nu();
   const codenaam = h => sociaal.codenaamVan(h) || h;
   function ontvanger(r) { return { soort: r.soort, id: r.id, naam: r.naam, niveau: r.niveau }; }
   function eigenBeeld(m) {
@@ -54,7 +61,7 @@ module.exports = ({ db, save, crypto, schoon, sociaal, plek }) => {
     if (!ontvangers.length) return {status:400,error:'Kies minstens één verbonden persoon of betrokken bedrijf.'};
     const minuten=Math.max(5,Math.min(MAX_DUUR_MIN,Math.round(Number(body.minuten)||180)));
     const m={id:crypto.randomBytes(6).toString('hex'),handle,titel:schoon(body.titel,80)||'Onderweg',doel:schoon(body.doel,100)||null,
-      status:'gepland',eta:body.eta?schoon(body.eta,35):null,van:nu(),tot:Date.now()+minuten*60000,ontvangers,gepauzeerd:false,
+      status:'gepland',eta:body.eta?schoon(body.eta,35):null,van:nu(),tot:klok.nu()+minuten*60000,ontvangers,gepauzeerd:false,
       ritRef:schoon(body.ritRef,30)||null,bijgewerkt:nu(),log:[{at:nu(),soort:'gemaakt'}]};
     lijst().push(m);save();return {status:200,ok:true,moment:eigenBeeld(m)};
   }
@@ -65,11 +72,11 @@ module.exports = ({ db, save, crypto, schoon, sociaal, plek }) => {
     if(!actief(m))return {status:409,error:'Dit Moment is afgelopen.'};
     const status=String(body.status||'');if(!STATUSSEN.has(status))return {status:400,error:'Onbekende voortgang.'};
     m.status=status;if(body.eta!==undefined)m.eta=schoon(body.eta,35)||null;m.bijgewerkt=nu();m.log.push({at:m.bijgewerkt,soort:'status',status});
-    if(status==='aangekomen'||status==='geannuleerd'){m.tot=Math.min(m.tot,Date.now()+15*60000);delete m.laatstePlek}
+    if(status==='aangekomen'||status==='geannuleerd'){m.tot=Math.min(m.tot,klok.nu()+15*60000);delete m.laatstePlek}
     save();return {status:200,ok:true,moment:eigenBeeld(m)};
   }
   function pauze(handle,id,aan) { const m=vind(handle,id);if(!m)return {status:404,error:'Dit Moment bestaat niet.'};m.gepauzeerd=aan!==false;m.bijgewerkt=nu();save();return {status:200,ok:true,moment:eigenBeeld(m)}; }
-  function stop(handle,id) { const m=vind(handle,id);if(!m)return {status:404,error:'Dit Moment bestaat niet.'};m.status='gestopt';m.tot=Date.now();m.gepauzeerd=true;m.bijgewerkt=nu();delete m.laatstePlek;save();return {status:200,ok:true}; }
+  function stop(handle,id) { const m=vind(handle,id);if(!m)return {status:404,error:'Dit Moment bestaat niet.'};m.status='gestopt';m.tot=klok.nu();m.gepauzeerd=true;m.bijgewerkt=nu();delete m.laatstePlek;save();return {status:200,ok:true}; }
   function voorContact(handle) { return lijst().filter(m=>actief(m)&&!m.gepauzeerd).flatMap(m=>m.ontvangers.filter(r=>r.soort==='contact'&&r.id===handle).map(r=>gedeeldBeeld(m,r))); }
   function voorBedrijf(code) { const c=String(code||'').toUpperCase();return lijst().filter(m=>actief(m)&&!m.gepauzeerd).flatMap(m=>m.ontvangers.filter(r=>r.soort==='bedrijf'&&r.id===c).map(r=>gedeeldBeeld(m,r))); }
   return { momentMaak:maak,momentMijn:mijn,momentStatus:zetStatus,momentPauze:pauze,momentStop:stop,momentVoorContact:voorContact,momentVoorBedrijf:voorBedrijf };

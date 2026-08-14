@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 958 bestanden en 6398 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 956 bestanden en 6392 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 958 |
-| losse beweringen (`test(...)`) | 6398 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 14 |
+| toetsbestanden | 956 |
+| losse beweringen (`test(...)`) | 6392 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 11 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 104 |
+| niets van beide | 102 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -875,7 +875,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-123 bestanden, 221 beweringen.
+124 bestanden, 223 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -992,13 +992,14 @@ toets omvalt.
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `vooruitscherm.e2e.js` | 1 | -- | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
 | `wereld.e2e.js` | 14 | genoemd | DE LEVENDE WERELD: het beginscherm als kring om de klok (shared/wereld.js). WAAROM DEZE TOETS BESTAAT. |
+| `wereldbreedte.e2e.js` | 1 | -- | ELKE WERELD PAST OP EEN TELEFOON. Vier van de twaalf werelden liepen op 390px rechts buiten beeld: Partner Network 558, Private Office 557, Living OS 532, Instant Reality 459. |
 | `wereldlaag.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |
 | `werkblad.e2e.js` | 1 | -- | RTG Kantoren en de middenconsole in een echte browser. Twee dingen die alleen daar te zien zijn: 1. |
 | `werkruimte-objecten.e2e.js` | 1 | genoemd | Scherm-test voor stap 7 uit WERKRUIMTE.md: objecten slepen tussen apps. Wat hier bewezen wordt is niet dat er iets beweegt, maar de twee regels die dit een operating environment maken in plaats van een desktop met... |
 | `werkruimte.e2e.js` | 1 | -- | Scherm-test voor de RTG Werkruimte: stap 5 (werkruimtes bewaren en terughalen) en stap 6 (het commandopalet) uit WERKRUIMTE.md. Wat hier bewezen wordt is dat de kamer ECHT terugkomt -- niet dat er een knop staat. |
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |
 | `werkschermen.e2e.js` | 4 | -- | DE WERKSCHERMEN: WIE ZIT ER ACHTER, EN WAT MAG DIE ZIEN. De laatste grote groep uit TAKEN 4.9. |
-| `wings.e2e.js` | 1 | genoemd | DE WINGS van de leden-app: de werkbank naast de console. Op de computer kan de middenconsole niet groter -- dat is gemeten, niet gekozen: --e wordt begrensd door 1.48cqh omdat het beginscherm in EEN scherm past... |
+| `werktafel.e2e.js` | 2 | genoemd | DE WERKTAFEL: wanneer hij er WEL mag staan, en wanneer niet. Deze toets bestaat om twee fouten die alleen op een breed venster bestonden, en die daarom niemand zag: de app wordt op een telefoon ontwikkeld en op een... |
 | `zaakregie.e2e.js` | 2 | -- | Schermtoets voor de Regie van de zaak: hetzelfde scherm hangt in de zaak-app (leverancier.html, breed) en in de personeels-PDA (personeel.html, duimstand), en beide moeten opkomen zonder onopgevangen JS-fouten.... |
 | `zaal.e2e.js` | 1 | -- | Scherm-test voor de hele keten van deze ronde: een LIED laten neerzetten met een eigen zin erin, het samen produceren, uitgeven, en het in DE ZAAL horen. De zwaarste bewering die hier op het scherm getoetst wordt: de... |
 | `zegel-ui.e2e.js` | 1 | -- | Scherm-test: "Toon je Zegel" in de leden-app. Het lid opent de Zegel-knop, kiest een feit (18+ staat standaard aan) en toont het. |

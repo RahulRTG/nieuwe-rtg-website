@@ -84,7 +84,7 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
          af is. Dat is CORRECT gedrag: een gratis account hoort eerst vier dingen
          te geven. Wij halen hem weg omdat deze toets over de twee KAARTEN gaat;
          of de onboarding zelf klopt, staat in de aanmeldtoetsen. Zelfde aanpak
-         en zelfde voorbehoud als test/wings.e2e.js. */
+         en zelfde voorbehoud als test/werktafel.e2e.js. */
       await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
       await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.remove(); });
       /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN MENS HET DOET.

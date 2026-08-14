@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="b95d4a3d">
+<meta name="rtg-bouw" content="3067f1cc">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -162,7 +162,7 @@
      inhoud niet, en dat is precies de uitgerekte tablet die we niet willen.
 
      De verhouding blijft die van de iPad (786:1001). Wat er links en rechts
-     overblijft is voor de wings; die vullen de breedte, niet het kader. */
+     overblijft is rust: hier stonden de wings, en die zijn eruit. */
   @media (min-width:1100px){
     #shell{
       height:min(94vh, 1320px);
@@ -170,85 +170,6 @@
     }
   }
 
-  /* ---------- de wings ----------
-     Onder 1100px bestaan ze niet en vult de OS-laag ze ook niet. Ze hangen NIET
-     aan de shell maar staan ernaast in dezelfde flexrij: het kader houdt zijn
-     iPad-verhouding, de flanken nemen de breedte die het kader per definitie
-     niet kan gebruiken. */
-  .wing{display:none;}
-  @media (min-width:1100px){
-    body{flex-direction:row;gap:clamp(1rem, 2.2vw, 2.4rem);}
-    .wing{
-      display:flex;flex-direction:column;gap:calc(var(--wing-e) * 0.9);
-      flex:1 1 0;max-width:230px;min-width:0;justify-content:center;
-      /* de eigen maat van de flank: kleiner dan die van de console, want dit is
-         de tweede rang in de compositie en hoort dat ook te zijn */
-      --wing-e:clamp(10px, 1.1vw, 15px);
-      padding:1.5rem 0;max-height:94vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;
-    }
-    #wingL{align-items:flex-end;}
-    #wingR{align-items:flex-start;}
-    /* De widget: een kaart met een kop (glyf, naam, uitklappijl) en een lijf dat
-       alleen gevuld wordt als er een echte bron is. Zonder waarde blijft het
-       lijf leeg en is de kaart gewoon een nette deur -- geen lege belofte. */
-    .wing-widget{
-      display:flex;flex-direction:column;width:100%;max-width:214px;
-      background:color-mix(in srgb, var(--card) 62%, transparent);
-      border:1px solid var(--line);border-radius:16px;color:var(--txt);
-      transition:background 140ms ease, border-color 140ms ease;
-    }
-    /* de deur: kop + lijf zijn samen de knop die de app opent */
-    .wing-open{
-      display:flex;flex-direction:column;gap:calc(var(--wing-e) * 0.35);width:100%;
-      background:none;border:none;padding:calc(var(--wing-e) * 0.7) calc(var(--wing-e) * 0.8);
-      cursor:pointer;text-align:left;color:inherit;font-family:inherit;border-radius:16px;
-    }
-    /* de acties: hier doe je iets ZONDER de console te verlaten */
-    .wing-acties{
-      display:flex;flex-wrap:wrap;gap:0.3rem;
-      padding:0 calc(var(--wing-e) * 0.8) calc(var(--wing-e) * 0.7);
-    }
-    .wing-actie{
-      background:none;border:1px solid var(--line);border-radius:999px;
-      padding:0.22rem 0.6rem;font-size:calc(var(--wing-e) * 0.78);color:var(--muted);
-      font-family:inherit;cursor:pointer;transition:border-color 140ms ease, color 140ms ease;
-    }
-    .wing-actie:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));color:var(--gold);}
-    .wing-actie:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-    /* de tweede regel: een detail bij de waarde (bv. de laatste mutatie) */
-    .wing-onder{font-size:calc(var(--wing-e) * 0.8);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .wing-widget:not(.heeft-onder) .wing-onder{display:none;}
-    .wing-kop{display:flex;align-items:center;gap:0.6rem;}
-    .wing-widget .os-tegel{width:calc(var(--wing-e) * 2.2);height:calc(var(--wing-e) * 2.2);flex-shrink:0;}
-    .wing-naam{font-size:calc(var(--wing-e) * 0.9);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
-    /* de uitklappijl: full screen is de app zelf. Rustig, tot je de kaart raakt. */
-    .wing-vol{font-size:calc(var(--wing-e) * 0.85);color:var(--muted);opacity:0;transition:opacity 140ms ease;flex-shrink:0;}
-    .wing-lijf{
-      font-family:'Bodoni Moda',serif;font-size:calc(var(--wing-e) * 1.15);line-height:1.35;color:var(--txt);
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;
-    }
-    .wing-widget:not(.heeft-waarde) .wing-lijf{display:none;}
-    .wing-widget:hover{background:color-mix(in srgb, var(--card) 88%, transparent);border-color:color-mix(in srgb, var(--gold) 40%, var(--line));}
-    .wing-widget:hover .wing-naam{color:var(--txt);}
-    .wing-widget:hover .wing-vol{opacity:1;}
-    .wing-open:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-    .wing-instel{
-      align-self:center;margin-top:0.6rem;background:none;border:none;cursor:pointer;
-      color:var(--muted);font-family:inherit;font-size:calc(var(--wing-e) * 0.82);
-      letter-spacing:0.08em;padding:0.4rem 0.6rem;border-radius:999px;
-    }
-    .wing-instel:hover{color:var(--gold);}
-  }
-  @media (prefers-reduced-motion: reduce){ .wing-tegel{transition:none;} }
-  .wing-scrim{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.62);padding:1.5rem;}
-  .wing-kaart{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:1.6rem 1.5rem 1.2rem;width:min(420px, 100%);max-height:80vh;overflow:auto;}
-  .wing-kaart h2{font-family:'Bodoni Moda',serif;font-size:1.15rem;font-weight:600;margin-bottom:0.35rem;}
-  .wing-uitleg{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-bottom:1.1rem;}
-  .wing-rij{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;padding:0.45rem 0;border-top:1px solid var(--line);font-size:0.86rem;}
-  .wing-standen{display:flex;gap:0.25rem;flex-shrink:0;}
-  .wing-stand{background:none;border:1px solid var(--line);border-radius:999px;padding:0.24rem 0.62rem;font-size:0.7rem;color:var(--muted);font-family:inherit;cursor:pointer;}
-  .wing-stand.aan{border-color:var(--gold);color:var(--gold);}
-  .wing-klaar{display:block;width:100%;margin-top:1.2rem;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.85rem;font-size:0.86rem;font-weight:600;font-family:inherit;cursor:pointer;}
 
   /* ---------- login ---------- */
 
@@ -1139,6 +1060,28 @@
      we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
      schermvullend, zodat de desktop eruitziet als de app in een tablet-kader. */
   @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;width:100vw;max-width:100vw;} }
+  /* ...EN DAT LIET DE REGEL HIERBOVEN NIET TOE.
+
+     De belofte in dat commentaar was niet waar. `width:min(430px, 100vw)` geldt
+     op elke breedte, en hij wint van de `width:auto` van het tabletkader --
+     dus stond de app op een 1440px-scherm als een telefoonstrook van 430px
+     midden op een leeg bureau. Het gemeten plafond hierboven (820px bij 520px,
+     1040px bij 1100px, uitgerekend tot op de pixel waar --e verzadigt) heeft
+     nooit iemand gezien: os-vast staat aan zodra de app zichtbaar is, en dat is
+     na het inloggen altijd.
+
+     De REDEN van die regel blijft staan en is hier overgenomen: de breedte moet
+     uit de VIEWPORT komen. Onder container-type:size klapte een breedte die van
+     de ouder kwam op iOS naar nul (zie hierboven), en `calc(100% - 3rem)` uit de
+     max-width is precies zo'n ouder-breedte. Daarom is de hele som hier
+     viewport-gebonden: de hoogte is vh, de breedte volgt uit de iPad-verhouding
+     786:1001, en de marge is 100vw. Niets erin kan dichtklappen. */
+  @media (min-width:520px){
+    body.os-vast #shell{width:min(820px, calc(min(92vh, 1040px) * 786 / 1001), calc(100vw - 3rem));}
+  }
+  @media (min-width:1100px){
+    body.os-vast #shell{width:min(1040px, calc(min(94vh, 1320px) * 786 / 1001), calc(100vw - 4rem));}
+  }
 
   /* app-modus: fullscreen met home-indicator */
   .os-pill{
@@ -1634,6 +1577,10 @@
 </style>
 <script src="/shared/command/catalog.js" defer></script>
 <script src="/shared/command/console.js" defer></script>
+<script src="/shared/command/verdeler.js" defer></script>
+<script src="/shared/command/bank.js" defer></script>
+<script src="/shared/command/inlogpoort.js" defer></script>
+<script src="/shared/command/werktafel.js" defer></script>
 <script src="/shared/command.js" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -1644,10 +1591,6 @@
      (#osPill) en er is niets om vanaf hier naar "thuis" te gaan. -->
 <body class="rtg-stijl" data-ios-home>
 <a class="skip" href="#content">Naar de inhoud</a>
-<!-- De wings: gevuld door de OS-laag (app-main-31.js, einde OS-IIFE) en alleen
-     op een breed scherm. Leeg zijn ze onzichtbaar, dus telefoon en iPad merken
-     hier niets van. -->
-<aside id="wingL" class="wing" aria-label="Werkbank"></aside>
 <div id="shell" data-levendegrond>
 
   <!-- login -->
@@ -2293,7 +2236,6 @@
 <script src="/shared/spraak.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/apps/util.js"></script>
-<aside id="wingR" class="wing" aria-label="Administratie"></aside>
 <script src="/shared/appshell.js"></script>
 <script src="/shared/borden.js"></script>
 <script src="/shared/accounts-os.js"></script>

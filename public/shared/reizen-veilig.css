@@ -14,3 +14,10 @@ body.rtg-stijl main.rv-werk{width:auto;max-width:none;margin:0;padding:0}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 .rv-rahul{left:176px;transform:none;width:min(650px,calc(100vw - 210px))}
 @media(max-width:760px){.rv-rahul{left:12px;transform:none;width:calc(100vw - 24px)}}
+.rv-specialisten{margin:20px 0;border:1px solid rgba(192,165,68,.24);border-radius:13px;background:rgba(18,16,14,.88);color:var(--rv-tekst)}
+.rv-specialisten summary{padding:12px 15px;color:#d4c27a;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.rv-specialisten>div{display:flex;flex-wrap:wrap;gap:7px;padding:0 12px 12px}
+.rv-specialisten a{border:1px solid var(--rv-line);border-radius:999px;padding:7px 10px;color:var(--rv-soft);font-size:11px;text-decoration:none}
+.rv-specialisten a:hover{border-color:rgba(192,165,68,.45);color:#f4f1ec}
+.rv-specialisten-hoek{position:fixed;z-index:45;top:9px;right:58px;margin:0;max-width:min(520px,calc(100vw - 90px));box-shadow:0 18px 50px rgba(0,0,0,.4)}
+@media(max-width:760px){.rv-specialisten-hoek{top:5px;right:52px}.rv-specialisten-hoek summary{padding:9px 11px;font-size:9px}}

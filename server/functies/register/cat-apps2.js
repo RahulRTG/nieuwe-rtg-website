@@ -64,4 +64,14 @@ module.exports = [
       'Hier zit ook de Hospitality DNA: wat een zaak van je te zien krijgt, per soort en per zaak.',
     paden: ['/api/avond'] },
 
+  { id: 'arrival', categorie: 'Eigen apps', naam: 'RTG Invisible Arrival', standaard: true, doelgroepen: LEDEN_GAST,
+    uitleg: 'Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.',
+    paden: ['/api/arrival'] },
+  { id: 'instantreality', categorie: 'Eigen apps', naam: 'RTG Instant Reality', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen.',
+    paden: ['/api/instant-reality'] },
+  { id: 'rtgone', categorie: 'Eigen apps', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
+    uitleg: 'De bestuurlijke regielaag voor intenties, beloften, overdracht, goedkeuringen, projecten en herstelbare automatisering.',
+    paden: ['/api/rtgone'] },
+
 ];

@@ -52,8 +52,8 @@ module.exports = (kern) => {
   const { app, officeAuth, rtfos } = kern;
 
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-  const veilig = (res, werk) => {
-    try { stuur(res, werk()); }
+  const veilig = async (res, werk) => {
+    try { stuur(res, await werk()); }
     catch (e) { console.error('[rtfos]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   /* De handler-verpakking mag wel een hulpje zijn: die staat NA de poort en na

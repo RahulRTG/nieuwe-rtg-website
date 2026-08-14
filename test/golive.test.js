@@ -32,7 +32,8 @@ const PROD_ENV = {
      afgerekend -- terwijl de RTF-afdracht wel gewoon wordt geboekt. Deze toets
      draait de stand waarin dat bewust is: geen echte betalingen, wel eerlijk. */
   STRIPE_DEMO_BEWUST: '1',
-  SMTP_URL: '', DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
+  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
+  DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 
 /* In productie dwingt de server https af (301 voor kaal http). De testsuite

@@ -371,6 +371,10 @@
       "toegankelijkVan",
       "toegankelijkZet"
     ],
+    "instant-reality": [
+      "instantGet",
+      "instantMutate"
+    ],
     "journaal": [
       "boardroomAuth",
       "journaalBeeld",
@@ -1186,8 +1190,15 @@
       "ovLijnZet",
       "ovLijnenBeheer",
       "ovMijn",
+      "ovOperatieAnnuleer",
+      "ovOperatieBevestig",
+      "ovOperatieConcept",
+      "ovOperatieOverzicht",
+      "ovOperatieSegment",
       "ovOverzicht",
       "ovPos",
+      "ovRegie",
+      "ovRegieZet",
       "ovStand"
     ],
     "overheid": [
@@ -1919,6 +1930,12 @@
       "kringToevoegen",
       "kringToon",
       "kringVerwijderen",
+      "momentMaak",
+      "momentMijn",
+      "momentPauze",
+      "momentStatus",
+      "momentStop",
+      "momentVoorBedrijf",
       "plekMelden",
       "rustAan",
       "rustStand",

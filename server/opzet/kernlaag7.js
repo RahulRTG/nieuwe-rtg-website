@@ -168,6 +168,14 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
 
+/* RTG One en Magnaat Wereld zijn overkoepelende werkruimtes. Ze worden hier
+   opgebouwd voordat kernlaag7b de routers ophangt, zodat de domeingrens nooit
+   een half gemonteerde motor kan doorgeven. */
+Object.assign(kern, require('../kern/rtgone')({ db, save, crypto }));
+Object.assign(kern, require('../kern/magnaatwereld')({
+  db, save, crypto, functies: require('../functies')
+}));
+
 // De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
 // die moeten er dus al zijn. Uitleg: ./mediaos.js.
 require('./mediaos')(kern, hulp);

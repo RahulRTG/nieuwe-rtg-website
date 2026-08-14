@@ -423,6 +423,10 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
     'server/kern/pay/index.js',
+    /* RTMAIL bevat de bestaande mailboxroutes plus de nieuwe Smart Action Dock.
+       De workflowroutes krijgen in een volgende onderhoudssnede een eigen
+       router; tot die veilige bedrading blijft dit een zichtbare waarschuwing. */
+    'server/routes/rtmail.js',
     'server/kern/werkplaats.js',
     'server/lokaal-tls.js',
     'server/techniek.js',
@@ -483,7 +487,20 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        boekte dubbel; nu schrijft de rijstrook als EEN transactie. De snede
        bestaat (schrijfEen + de twee schrijflanen naar een eigen deel) en staat
        in TAKEN.md 4.23. */
-    'server/pg/sync.js'
+    'server/pg/sync.js',
+    // De geïmporteerde enterprise-motoren hebben benoemde sneden, maar hun
+    // opslag- en migratiebedrading wordt pas na deze release afzonderlijk
+    // geknipt met de integratietoetsen ernaast.
+    'server/kern/rtgone.js',
+    'server/kern/magnaat-capabilities.js',
+    'server/kern/magnaat-controle.js',
+    'server/kern/magnaat-economie.js',
+    'server/kern/magnaatwereld.js'
+    ,
+    // De app-gids is een declaratieve kaart. De nieuwe enterprise-ingangen
+    // brachten dit deel net over de grens; bij de volgende gidsronde verhuizen
+    // ze als één groep naar deel1b.
+    'server/kern/appgids-data/deel1.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {

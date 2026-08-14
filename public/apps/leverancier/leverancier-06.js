@@ -118,6 +118,12 @@
     renderAll();
     startStream();
     loadNotifs();
+    // RTMAIL deep-link: een Office-actie landt direct op het juiste zakelijke
+    // werkblad. Alleen bestaande tab-id's worden geaccepteerd.
+    try {
+      const rtmailTab = (new URLSearchParams(location.search).get('rtmail') || '').toLowerCase();
+      if (rtmailTab && TABDEF[rtmailTab]) setTimeout(() => openTab(rtmailTab, true), 0);
+    } catch (e) {}
     // de moedertaal van de ingelogde medewerker: het hele scherm en de
     // bonnen volgen (de keuze zelf zet hij in de personeels-app)
     if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), () => { try { renderAll(); } catch(e){} });

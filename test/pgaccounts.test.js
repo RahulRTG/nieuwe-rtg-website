@@ -76,10 +76,12 @@ if (!URL) {
 
   test('pg-accounts: staff-upsert en verwijderen van een gebruiker', async () => {
     const a = nieuw(); await leeg(a);
-    await a.upsertStaff({ id: 5000001, supplier_code: 'SAKURA', name: 'Marc', pin_hash: 'x', role: 'manager', active: 1, created_at: new Date().toISOString(), func: 'Beheer' });
+    await a.upsertStaff({ id: 5000001, supplier_code: 'SAKURA', name: 'Marc', pin_hash: 'x', role: 'manager', active: 1, created_at: new Date().toISOString(), func: 'Beheer', member_id: 1000001, member_tier: 'business' });
     let s = await a.pool.query('SELECT * FROM supplier_staff WHERE id = 5000001');
     assert.equal(s.rows.length, 1);
     assert.equal(s.rows[0].supplier_code, 'SAKURA');
+    assert.equal(Number(s.rows[0].member_id), 1000001, 'de RTG-identiteit reist mee tussen instances');
+    assert.equal(s.rows[0].member_tier, 'business');
 
     await a.upsertUser(userRow(1000002));
     await a.deleteUser(1000002);

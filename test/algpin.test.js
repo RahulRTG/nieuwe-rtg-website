@@ -33,10 +33,15 @@ test('algemene pin: instellen, bewijzen, en de werk-app-poort', async () => {
     assert.equal((await api(base, '/api/pin/check', { pin: '246810' }, lid)).status, 200);
     assert.equal((await api(base, '/api/pin/zet', { pin: '13579', oud: '246810' }, lid)).status, 200, 'met de oude pin wijzigt hij wel');
 
-    // de tanden: personeelsrol koppelen en dan een werksessie proberen
+    // de tanden: een oud, nog niet gekoppeld personeelsrecord eenmalig claimen
+    // en dan een werksessie proberen. Een bestaand (al gekoppeld) seedrecord
+    // overnemen is bewust niet meer toegestaan.
     const staf = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body.staff;
-    const wie = staf.find(x => x.role !== 'manager');
-    assert.equal((await api(base, '/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: wie.id, pin: '5678' }, lid)).status, 200);
+    const manager = staf.find(x => x.role === 'manager');
+    const managerLogin = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: manager.id, pin: '1234' });
+    const gemaakt = await api(base, '/api/supplier/staff/add', { name: 'Pin Medewerker', role: 'staff', func: 'Balie' }, managerLogin.body.token);
+    const wie = gemaakt.body.staff;
+    assert.equal((await api(base, '/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: wie.id, pin: gemaakt.body.pin }, lid)).status, 200);
     const zonder = await api(base, '/api/account/start', { rol: 'personeel', code: 'KIKUNOI', staffId: wie.id }, lid);
     assert.equal(zonder.status, 401, 'pin gezet = geen werksessie zonder pin');
     assert.equal(zonder.body.pinNodig, true, 'de app weet dat hij om de pin moet vragen');

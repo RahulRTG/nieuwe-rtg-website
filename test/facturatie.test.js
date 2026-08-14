@@ -76,3 +76,15 @@ test('5. de AI beantwoordt een vraag over de facturen', async () => {
   const r = await api(base, '/api/supplier/facturen/ai', { opdracht: 'hoeveel heb ik gefactureerd?' }, sup);
   assert.ok(/factuur|omzet|EUR/i.test(r.body.antwoord), 'geeft een zinnig antwoord met cijfers');
 });
+
+test('6. Receipt Vault bewaart en scheidt documenten in prive en zakelijk', async () => {
+  const eerst = (await api(base, '/api/facturen/mijn', {}, lid)).body.facturen[0];
+  assert.equal(eerst.classificatie, 'prive');
+  const zet = await api(base, '/api/facturen/classificeer', { id: eerst.id, classificatie: 'zakelijk' }, lid);
+  assert.equal(zet.status, 200);
+  assert.equal(zet.body.factuur.classificatie, 'zakelijk');
+  const kluis = (await api(base, '/api/member/rtmail/documenten', {}, lid)).body;
+  assert.ok(kluis.facturen.some(f => f.id === eerst.id && f.classificatie === 'zakelijk'));
+  const terug = await api(base, '/api/member/rtmail/classificeer', { id: eerst.id, classificatie: 'prive' }, lid);
+  assert.equal(terug.body.factuur.classificatie, 'prive');
+});

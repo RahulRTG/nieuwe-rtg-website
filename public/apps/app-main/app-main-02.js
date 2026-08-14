@@ -14,6 +14,7 @@
 
   // API-client uit de gedeelde app-shell (public/shared/appshell.js).
   const API = RTGApp.maakAPI({ foutTekst: 'API-fout' });
+  let magnaatProef = false;
   // Een 403 met kyc:true (bijv. een gratis lid dat RTG Pay gebruikt zonder
   // paspoort) laat Rahul meteen de paspoort-stap van de onboarding tonen.
   const _apiCall = API.call.bind(API);
@@ -90,6 +91,8 @@
      RTG-app, met minder functies. ZONDER ?pas= bestaat er geen brede app
      meer: dan is dit alleen een keuzescherm dat naar de pas-apps verwijst. */
   const zoekParams = new URLSearchParams(location.search);
+  magnaatProef = zoekParams.get('magnaat') === '1';
+  if (magnaatProef) API.enabled = false;
   let vastePas = zoekParams.get('pas');
   if (vastePas === 'guest') vastePas = 'rtg'; // gratis speelt in de RTG-app
   if (!['rtg','lifestyle','business'].includes(vastePas)) vastePas = null;

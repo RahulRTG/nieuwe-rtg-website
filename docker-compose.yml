@@ -28,17 +28,47 @@ services:
       # stond hier, maar wordt door niets gelezen (geen externe pakketten).
       ERR_WEBHOOK_URL: ${ERR_WEBHOOK_URL:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Rust draait standaard als continu gecontroleerde schaduwmotor. De Node-
+      # waarheid blijft autoritatief tot RTG_MOTOR_GELD expliciet op motor gaat.
+      RTG_MOTOR_SHADOW: http://motor:3100
+      RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
+      RTG_MOTOR_GELD_URL: http://motor:3100
+      RTG_MOTOR_TOKEN: ${RTG_MOTOR_TOKEN:?Zet RTG_MOTOR_TOKEN op minimaal 16 willekeurige tekens}
     volumes:
       - rtg-data:/app/server/data
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      motor:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 30s
       timeout: 4s
       retries: 3
       start_period: 10s
+
+  motor:
+    build: .
+    restart: unless-stopped
+    command: ["/app/rtg-motor"]
+    environment:
+      RTG_MOTOR_ADDR: 0.0.0.0:3100
+      RTG_MOTOR_DATA: /app/motor-data/state.json
+      RTG_MOTOR_GIDS: /app/motor-data/gids.bin
+      RTG_KLUIS_KEY_FILE: /app/motor-data/secret.key
+      RTG_KLUIS_DATA: /app/motor-data/kluis.json
+      RTG_MOTOR_TOKEN: ${RTG_MOTOR_TOKEN:?Zet RTG_MOTOR_TOKEN op minimaal 16 willekeurige tekens}
+    volumes:
+      - rtg-motor:/app/motor-data
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3100/api/leeft',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
   redis:
     image: redis:7-alpine
@@ -66,3 +96,4 @@ volumes:
   rtg-data:
   rtg-redis:
   rtg-pg:
+  rtg-motor:

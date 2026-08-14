@@ -69,3 +69,12 @@ test('de bestandsopslag staat in de lijst die meegaat', () => {
       'de map "' + nodig + '" hoort mee in de backup; anders verwijst een teruggezet systeem naar bestanden die er niet zijn. Nu: ' + mappen.join(', '));
   }
 });
+
+test('een dagbackup wordt pas zichtbaar na een complete marker en atomische wissel', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'opzet', 'backup.js'), 'utf8');
+  assert.match(bron, /\.complete/, 'de afgeronde dag hoort een complete-marker te dragen');
+  assert.match(bron, /vervangAtomisch\(tijdelijk, dir\)/,
+    'de tijdelijke map hoort pas na het kopiëren de zichtbare dagmap te vervangen');
+  assert.match(bron, /bronback-up heeft geen \.complete-marker/,
+    'ook de tweede-schijfkopie mag nooit een half afgemaakte dag meenemen');
+});

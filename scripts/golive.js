@@ -52,6 +52,8 @@ function leesEnvBestand(pad) {
 
   // 1. de configuratie, beoordeeld op productieniveau
   const env = { ...(bestand || {}), ...process.env, NODE_ENV: 'production' };
+  if (env.RTG_PRIVATE_BETA === '1')
+    blokkeer('RTG_PRIVATE_BETA=1 staat nog aan: deze stand is alleen voor localhost en mag nooit als publieke livegang worden goedgekeurd.');
   const r = config.valideer(env);
   for (const f of r.fouten) blokkeer(f);
   for (const w of r.waarschuwingen) waarschuw(w);

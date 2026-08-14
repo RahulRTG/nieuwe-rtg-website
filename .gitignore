@@ -20,6 +20,8 @@ motor-data/
 **/tls/ca/
 .env
 .env.*
+.rtg-secrets/
+backups/
 .vercel
 public/dist/
 

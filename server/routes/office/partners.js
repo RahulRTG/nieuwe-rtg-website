@@ -2,10 +2,11 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { accounts, app, appUrl, boardroomWie, db, ensureSupplierDefaults, mail, makeSupplierCode, officeAuth, save,
-          schoon, sseToOffice, sseToSupplier,
+  const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
+          logActivity, mail, makeSupplierCode, officeAuth, save, sessions, schoon, sseClients, sseSend,
+          sseToOffice, sseToSupplier,
           ondernemingRegie, ondernemingProvisioningZet, ondernemingBijdrageZet, rechtsvormwacht } = kern;
-app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
+app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
@@ -45,6 +46,51 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
     'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment helaas geen partnerplek aanbieden.\n\nRahul Travel Group');
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
+});
+
+/* Een partnerschap openen en sluiten is boardroomwerk: het maakt of verbreekt
+   toegang tot een volledige bedrijfswerkplek. Een schorsing trekt daarom niet
+   alleen nieuwe logins dicht, maar wist ook alle bestaande sessies en sluit
+   open SSE-verbindingen. Anders blijft een al geopend scherm na het besluit
+   gewoon doorwerken. */
+app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
+  const code = String((req.body || {}).code || '').trim().toUpperCase();
+  const status = String((req.body || {}).status || '').trim().toLowerCase();
+  const reden = schoon((req.body || {}).reden, 240);
+  const s = findSupplier(code);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  if (!['actief', 'geschorst', 'beeindigd'].includes(status))
+    return res.status(400).json({ error: 'Kies actief, geschorst of beeindigd.' });
+  if (status !== 'actief' && !reden)
+    return res.status(400).json({ error: 'Leg vast waarom deze partnerwerkplek wordt gesloten.' });
+
+  s.partnerStatus = status;
+  s.partnerStatusAt = new Date().toISOString();
+  s.partnerStatusDoor = boardroomWie(req);
+  s.partnerStatusReden = reden || null;
+
+  let ingetrokken = 0;
+  if (status !== 'actief') {
+    for (const [hash, sess] of sessions.entries()) {
+      if (sess && sess.role === 'supplier' && String(sess.code).toUpperCase() === code) {
+        sessions.delete(hash);
+        delete db.data.sessions[hash];
+        ingetrokken++;
+      }
+    }
+    for (let i = sseClients.length - 1; i >= 0; i--) {
+      const client = sseClients[i];
+      if (!client || String(client.sup || '').toUpperCase() !== code) continue;
+      try { sseSend(client.res, 'toegang-ingetrokken', { status }); } catch (e) {}
+      try { client.res.end(); } catch (e) {}
+      sseClients.splice(i, 1);
+    }
+  }
+  save();
+  logActivity(code, { name: 'Boardroom' }, status === 'actief'
+    ? 'hief de partnerschorsing op'
+    : 'zette de partnerwerkplek op ' + status + ': ' + reden);
+  res.json({ ok: true, code, status, sessiesIngetrokken: ingetrokken });
 });
 
 /* ---------- RTF School: RTG keurt schoolaanmeldingen goed ----------

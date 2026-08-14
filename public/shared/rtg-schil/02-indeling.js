@@ -12,6 +12,25 @@
   function schik() {
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
+    if (schil.tabbar) {
+      var bank = Math.max(228, Math.min(286, Math.round(m.b * .18)));
+      var tabHoog = 40;
+      zet(schil.console, 0, 0, bank, m.h);
+      zet(schil.tabbar, bank, 0, m.b - bank, tabHoog);
+      var vrijStandaard = schil.surfaces.filter(function (s) { return !s.eigen; });
+      if (!vrijStandaard.length) return;
+      var kolStandaard = vrijStandaard.length === 1 ? 1 : 2;
+      var rijStandaard = Math.ceil(vrijStandaard.length / kolStandaard);
+      var breedStandaard = Math.floor((m.b - bank) / kolStandaard);
+      var hoogStandaard = Math.floor((m.h - tabHoog) / rijStandaard);
+      vrijStandaard.forEach(function (s, i) {
+        var c = i % kolStandaard, r = Math.floor(i / kolStandaard);
+        zet(s.el, bank + c * breedStandaard, tabHoog + r * hoogStandaard,
+          c === kolStandaard - 1 ? m.b - bank - c * breedStandaard : breedStandaard,
+          r === rijStandaard - 1 ? m.h - tabHoog - r * hoogStandaard : hoogStandaard);
+      });
+      return;
+    }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
     if (!n) {
@@ -47,4 +66,3 @@
     e.style.left = x + 'px'; e.style.top = y + 'px';
     e.style.width = b + 'px'; e.style.height = h + 'px';
   }
-

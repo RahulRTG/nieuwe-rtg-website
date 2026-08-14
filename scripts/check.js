@@ -1561,6 +1561,8 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
     ['POSTGRES_DB', 'gelezen door de postgres-container zelf, niet door onze code'],
     ['POSTGRES_USER', 'idem'],
     ['POSTGRES_PASSWORD', 'idem'],
+    ['POSTGRES_PASSWORD_FILE', 'gelezen door de officiele postgres-container; het geheim blijft zo buiten docker inspect'],
+    ['PGDATA', 'gelezen door de officiele postgres-container om de datamap te kiezen'],
     ['RTG_ALLOW_PLAINTEXT', 'bevestigingsvlag VOOR de keuring: "ik weet dat er geen sleutel is, start toch"'],
     ['STRIPE_DEMO_BEWUST', 'bevestigingsvlag VOOR de keuring: "deze installatie draait bewust zonder betalingen"'],
     ['SENTRY_DSN', 'bewust genoemd om te WAARSCHUWEN dat hij niets doet; de echte alarmweg is ERR_WEBHOOK_URL']
@@ -1573,12 +1575,20 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
   try {
     const gelezen = new Set();
     for (const map of ['server', 'scripts']) {
-      loop(path.join(ROOT, map), /\.(js|mjs|cjs)$/, f => {
+      loop(path.join(ROOT, map), /\.(js|mjs|cjs|sh)$/, f => {
         const rel = path.relative(ROOT, f).replace(/\\/g, '/');
         if (rel.startsWith(KEURMAP)) return;         // de keuring is niet haar eigen bewijs
         const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
         for (const m of bron.matchAll(/process\.env\.([A-Z_][A-Z0-9_]*)/g)) gelezen.add(m[1]);
         for (const m of bron.matchAll(/\benv\.([A-Z_][A-Z0-9_]*)/g)) gelezen.add(m[1]);
+        /* Shellscripts lezen dezelfde productieomgeving, maar stonden hier
+           buiten beeld. Daardoor noemde Compose een werkende backupvariabele
+           "dood" terwijl backup.sh hem letterlijk gebruikte. Alleen $NAAM en
+           ${NAAM...}; geen losse hoofdletters uit tekst. */
+        if (rel.endsWith('.sh')) {
+          for (const m of bron.matchAll(/\$\{([A-Z_][A-Z0-9_]*)[^}]*\}/g)) gelezen.add(m[1]);
+          for (const m of bron.matchAll(/\$([A-Z_][A-Z0-9_]*)\b/g)) gelezen.add(m[1]);
+        }
       });
     }
     const genoemd = new Map();                        // naam -> waar hij beloofd wordt

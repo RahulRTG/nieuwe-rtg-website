@@ -14,6 +14,8 @@
 #   --poort=NUMMER      poort van de site (standaard 3000)
 #   --env=PAD           het geheimenbestand (standaard /usr/local/etc/rtg/rtg.env)
 #   --slaap-uit         zet de Mac op serverstand (niet slapen, terug na stroomuitval)
+#   --private-beta      start veilig zonder mail/betaalprovider, alleen op een
+#                       lokaal APP_URL; publieke livegang blijft geblokkeerd
 #   --geen-start        alles klaarzetten maar de service niet laden
 #   --toch-doorgaan     negeer de waarschuwing over Bureaublad/Documenten (zie onder)
 #
@@ -36,6 +38,7 @@ ENVBESTAND="/usr/local/etc/rtg/rtg.env"
 SLAAPUIT=0
 STARTEN=1
 TOCHDOORGAAN=0
+PRIVATEBETA=0
 
 kop() { echo; echo "== $* =="; }
 zeg() { echo "   $*"; }
@@ -49,6 +52,7 @@ for arg in "$@"; do
     --poort=*)     POORT="${arg#*=}" ;;
     --env=*)       ENVBESTAND="${arg#*=}" ;;
     --slaap-uit)   SLAAPUIT=1 ;;
+    --private-beta) PRIVATEBETA=1 ;;
     --geen-start)  STARTEN=0 ;;
     --toch-doorgaan) TOCHDOORGAAN=1 ;;
     -h|--help)     awk 'NR>1 && /^#/ { sub(/^# ?/, ""); print; next } NR>1 { exit }' "$0"; exit 0 ;;
@@ -161,6 +165,10 @@ else
     echo "# Lokale opslag op deze machine (SQLite). Zonder deze regel waarschuwt"
     echo "# de keuring dat DATABASE_URL ontbreekt."
     echo "RTG_STORE=sqlite"
+    if [ "$PRIVATEBETA" = "1" ]; then
+      echo "# Alleen lokaal bouwen; de server weigert hiermee een publiek APP_URL."
+      echo "RTG_PRIVATE_BETA=1"
+    fi
   } > "$TIJDELIJK"
   chown "$GEBRUIKER:$GROEP" "$TIJDELIJK"
   mv "$TIJDELIJK" "$ENVBESTAND"

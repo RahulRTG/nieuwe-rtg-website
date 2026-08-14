@@ -18,7 +18,7 @@
   var MARGE = 64;   // hoe dicht bij de rand voordat er gedockt wordt
 
   var schil = {
-    vak: null, console: null, dok: null,
+    vak: null, console: null, tabbar: null, dok: null,
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
@@ -37,7 +37,7 @@
     });
   };
 
-  /* ---------------------------------------------------------- de indeling --
+/* ---------------------------------------------------------- de indeling --
      De console is het ANKER en schuift naar waar hij het minst stoort
      (WERKRUIMTE.md par. 2): bij een lege ruimte staat hij midden, zodra er
      surfaces zijn gaat hij naar links en verdelen de surfaces de rest. Dit is
@@ -51,6 +51,25 @@
   function schik() {
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
+    if (schil.tabbar) {
+      var bank = Math.max(228, Math.min(286, Math.round(m.b * .18)));
+      var tabHoog = 40;
+      zet(schil.console, 0, 0, bank, m.h);
+      zet(schil.tabbar, bank, 0, m.b - bank, tabHoog);
+      var vrijStandaard = schil.surfaces.filter(function (s) { return !s.eigen; });
+      if (!vrijStandaard.length) return;
+      var kolStandaard = vrijStandaard.length === 1 ? 1 : 2;
+      var rijStandaard = Math.ceil(vrijStandaard.length / kolStandaard);
+      var breedStandaard = Math.floor((m.b - bank) / kolStandaard);
+      var hoogStandaard = Math.floor((m.h - tabHoog) / rijStandaard);
+      vrijStandaard.forEach(function (s, i) {
+        var c = i % kolStandaard, r = Math.floor(i / kolStandaard);
+        zet(s.el, bank + c * breedStandaard, tabHoog + r * hoogStandaard,
+          c === kolStandaard - 1 ? m.b - bank - c * breedStandaard : breedStandaard,
+          r === rijStandaard - 1 ? m.h - tabHoog - r * hoogStandaard : hoogStandaard);
+      });
+      return;
+    }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
     if (!n) {
@@ -86,7 +105,6 @@
     e.style.left = x + 'px'; e.style.top = y + 'px';
     e.style.width = b + 'px'; e.style.height = h + 'px';
   }
-
   /* ------------------------------------------------------------- surfaces -- */
   function open(id, opties) {
     opties = opties || {};
@@ -264,7 +282,26 @@
   function opContext(fn) { if (typeof fn === 'function') schil.luisteraars.push(fn); }
 
   /* --------------------------------------------------------- de console -- */
+  function tekenTabbar() {
+    if (!schil.tabbar) return;
+    schil.tabbar.innerHTML = schil.surfaces.map(function (s) {
+      return '<div class="rtg-tab"' + (schil.actief === s ? ' data-actief' : '') + '>' +
+        '<button type="button" class="rtg-tab-kies" data-tab-ga="' + esc(s.id) + '">' + esc(s.naam) + '</button>' +
+        '<button type="button" class="rtg-tab-sluit" data-tab-sluit="' + esc(s.id) +
+          '" aria-label="Sluit ' + esc(s.naam) + '">&times;</button></div>';
+    }).join('');
+    schil.tabbar.querySelectorAll('[data-tab-ga]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var s = vind(b.dataset.tabGa);
+        if (s) { zoom(s, 'work'); maakActief(s); }
+      });
+    });
+    schil.tabbar.querySelectorAll('[data-tab-sluit]').forEach(function (b) {
+      b.addEventListener('click', function () { sluit(b.dataset.tabSluit); });
+    });
+  }
   function tekenConsole() {
+    tekenTabbar();
     var c = schil.console.querySelector('[data-actieflijst]');
     if (c) {
       c.innerHTML = schil.surfaces.length
@@ -299,7 +336,6 @@
         : 'Geen gedeelde context. Kies iets in een app; de rest volgt.';
     }
   }
-
   /* ------------------------------------------------------- werkruimtes --
      Stap 5 uit WERKRUIMTE.md. Een gerangschikte set surfaces is opslaanbaar en
      met één klik terug te halen: "Mijn Directie", "Reisbureau",
@@ -573,6 +609,10 @@
     opties = opties || {};
     schil.vak = opties.vak || d.querySelector('.rtg-werkruimte');
     schil.console = opties.console || schil.vak.querySelector('.rtg-console');
+    if (d.body && d.body.dataset.rtgSchil === 'standaard') {
+      schil.tabbar = el('nav', 'rtg-tabbar', schil.vak);
+      schil.tabbar.setAttribute('aria-label', 'Open werkbladen');
+    }
     schil.dok = el('div', 'rtg-dok', schil.vak);
     /* De apps die dit scherm kan openen. De shell KENT ze niet uit zichzelf --
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3909 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3910 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3909 |
+| API-endpoints | 3910 |
 | servermodules (`server/**/*.js`) | 2084 |
 | routebestanden (`server/routes/**`) | 437 |
 | kernmodules (`server/kern/**`) | 1288 |
 | schermen (`public/**/*.html`) | 258 |
 | gedeelde browsermodules (`public/shared/*.js`) | 221 |
-| toetsbestanden (`test/*.test.js`) | 847 |
+| toetsbestanden (`test/*.test.js`) | 848 |
 | schermtoetsen (`test/*.e2e.js`) | 124 |
 
 ## 2. De weg van een verzoek
@@ -103,7 +103,7 @@ zie §5 -- er zijn nog 185 kern-namen die meer dan één domein aanraakt.
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 641 | 56 | 10 | 398 |
 | `supplier` | 560 | 102 | 10 | 293 |
-| `office` | 39 | 7 | 3 | 58 |
+| `office` | 40 | 7 | 5 | 63 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 45 | 12 | 1 | 50 |
@@ -139,10 +139,10 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(167) auth(102) supplierAuth(53) officeAuth(35) db(34) status(27) liveCodename(25)
 accounts(21) schoon(20) managerOnly(15) rtf(15) codenaamVan(15) save(14) anthropic(13)
-boardroomWie(11) crypto(11) tooManyTries(10) geenGast(9) express(9) gegevensStop(9)
-payrollOS(9) keyVanCodenaam(9) rtmail(9) findSupplier(8) noteFailedTry(7) logActivity(7)
-sseToOffice(7) kern(6) stuur(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
-boardroomAuth(5) overheid(5) notifySupplier(5) sseToCustomer(5)
+boardroomWie(11) crypto(11) tooManyTries(10) geenGast(9) express(9) findSupplier(9)
+gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8) noteFailedTry(7)
+sseToOffice(7) kern(6) stuur(6) boardroomAuth(6) talen(6) mail(5) loginFails(5)
+sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

@@ -1174,6 +1174,8 @@ function supplierAuth(req, res, next) {
   if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
+  if (req.supplier.partnerStatus === 'geschorst' || req.supplier.partnerStatus === 'beeindigd')
+    return res.status(401).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
   // Wie is er aan het werk (voor toeschrijving van activiteiten).
   req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
   next();

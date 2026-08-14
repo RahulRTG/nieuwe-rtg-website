@@ -22,7 +22,26 @@
   function opContext(fn) { if (typeof fn === 'function') schil.luisteraars.push(fn); }
 
   /* --------------------------------------------------------- de console -- */
+  function tekenTabbar() {
+    if (!schil.tabbar) return;
+    schil.tabbar.innerHTML = schil.surfaces.map(function (s) {
+      return '<div class="rtg-tab"' + (schil.actief === s ? ' data-actief' : '') + '>' +
+        '<button type="button" class="rtg-tab-kies" data-tab-ga="' + esc(s.id) + '">' + esc(s.naam) + '</button>' +
+        '<button type="button" class="rtg-tab-sluit" data-tab-sluit="' + esc(s.id) +
+          '" aria-label="Sluit ' + esc(s.naam) + '">&times;</button></div>';
+    }).join('');
+    schil.tabbar.querySelectorAll('[data-tab-ga]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var s = vind(b.dataset.tabGa);
+        if (s) { zoom(s, 'work'); maakActief(s); }
+      });
+    });
+    schil.tabbar.querySelectorAll('[data-tab-sluit]').forEach(function (b) {
+      b.addEventListener('click', function () { sluit(b.dataset.tabSluit); });
+    });
+  }
   function tekenConsole() {
+    tekenTabbar();
     var c = schil.console.querySelector('[data-actieflijst]');
     if (c) {
       c.innerHTML = schil.surfaces.length
@@ -57,4 +76,3 @@
         : 'Geen gedeelde context. Kies iets in een app; de rest volgt.';
     }
   }
-

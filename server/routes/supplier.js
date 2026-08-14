@@ -2,7 +2,7 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
-  const { app, db, save, scheduleFor, sessionFor, sseClients, sseSend, sseToSupplier, supplierAuth,
+  const { app, accounts, db, save, scheduleFor, sessionFor, sseClients, sseSend, sseToSupplier, supplierAuth,
           supplierState } = kern;
 
 

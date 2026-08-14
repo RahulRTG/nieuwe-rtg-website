@@ -12,15 +12,16 @@
 'use strict';
 
 function keurGeld(env, fouten, waarschuwingen) {
+    const demoBewust = env.STRIPE_DEMO_BEWUST === '1' || env.RTG_PRIVATE_BETA === '1';
     /* FOUT en geen waarschuwing: zonder sleutel draait de demo-provider, die
        ELKE betaling zelf bevestigt. Facturen gaan op 'paid' zonder afschrijving,
        terwijl de 30%-afdracht aan de RTFoundation wel gewoon wordt geboekt --
        geld eruit, niets erin. Dat is geen mededeling maar een storing. Wie
        bewust zonder betalingen draait, zegt dat met STRIPE_DEMO_BEWUST=1. */
-    if (!env.STRIPE_SECRET_KEY && env.STRIPE_DEMO_BEWUST !== '1')
+    if (!env.STRIPE_SECRET_KEY && !demoBewust)
       fouten.push('STRIPE_SECRET_KEY ontbreekt in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Facturen gaan op betaald zonder dat er is afgerekend, terwijl de RTF-afdracht wel wordt geboekt. Zet de sleutel -- of, als deze installatie bewust zonder betalingen draait, zet STRIPE_DEMO_BEWUST=1.');
-    if (!env.STRIPE_SECRET_KEY && env.STRIPE_DEMO_BEWUST === '1')
-      waarschuwingen.push('STRIPE_DEMO_BEWUST=1: de demo-betaalprovider bevestigt elke betaling zelf. Dat is hier een bewuste keuze; er gaat geen echt geld om en facturen kloppen niet.');
+    if (!env.STRIPE_SECRET_KEY && demoBewust)
+      waarschuwingen.push((env.RTG_PRIVATE_BETA === '1' ? 'RTG_PRIVATE_BETA=1' : 'STRIPE_DEMO_BEWUST=1') + ': de demo-betaalprovider bevestigt elke betaling zelf. Dat is hier een bewuste keuze; er gaat geen echt geld om en facturen kloppen niet.');
     /* Een betaalsleutel zonder webhook-secret is gevaarlijker dan geen van
        beide: er gaat echt geld om, en de webhook die vertelt of er betaald is
        zou dan onondertekend binnenkomen. Wie het adres kent roept "betaald". */

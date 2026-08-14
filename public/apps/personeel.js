@@ -552,7 +552,13 @@
         const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
         const d = await r.json().catch(() => ({}));
         if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
+        // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
+        // onderweg is. Beide controles kwamen daarna op dezelfde nieuwe kaart
+        // uit en voegden dezelfde ingang tweemaal toe. De ingang heeft daarom
+        // één vaste identiteit: ook bij twee antwoorden blijft er één knop.
+        if ($('#kaAccountVerder')) return;
         const b = document.createElement('button');
+        b.id = 'kaAccountVerder';
         b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
         b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
         b.addEventListener('click', async () => {

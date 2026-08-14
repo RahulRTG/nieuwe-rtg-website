@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
+<script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Office</title>
 <meta name="theme-color" content="#0E0E0D">
@@ -312,11 +313,18 @@
     #tekst{padding:1.6rem 1.3rem;}
   }
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+  /* Work OS levert zelf al de titel, terugweg en vensterbediening. De eigen
+     Office-kop nogmaals tonen kost hoogte en liet de drive-chip in de smalle
+     surface op een invoerveld lijken. Alleen in een ingesloten surface valt
+     die dubbele chrome weg; zelfstandig blijft RTG Office ongewijzigd. */
+  html[data-rtg-oppervlak="1"] .kop{display:none !important;}
+  html[data-rtg-oppervlak="1"] body{padding-bottom:0;}
 </style>
 <script src="/shared/glyf.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
+<script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header class="kop">
   <a href="/apps/app.html" class="terug" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>

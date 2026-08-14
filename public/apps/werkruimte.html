@@ -40,7 +40,7 @@
      hier een tweede navigator naast de console zetten, en twee navigators is er
      een te veel. De weg terug staat daarom expliciet in de console zelf; zonder
      die link zou dit attribuut een uitweg zijn in plaats van een keuze. -->
-<body class="rtg-stijl" data-rtg-modus="pro" data-ios-uit>
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-schil="standaard" data-ios-uit>
 
 <div class="smal">
   <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
@@ -53,41 +53,41 @@
        de huidige context (WERKRUIMTE.md par. 2). -->
   <aside class="rtg-console" id="console" aria-label="RTG Command">
     <div>
-      <h1>RTG Command</h1>
-      <div class="wie" id="wie">Rahul &middot; Nederland / RTG</div>
-      <a class="terugmobiel" href="/apps/app.html">&lsaquo; RTG Mobile</a>
+      <h1 id="ruimteTitel">RTG Command</h1>
+      <div class="wie" id="wie">Nederland / RTG</div>
+      <a class="terugmobiel" id="ruimteTerug" href="/apps/app.html">&lsaquo; RTG Mobile</a>
     </div>
 
-    <div class="blok">
+    <div class="blok console-zoek">
       <div class="bloknaam">Vraag of open iets</div>
       <input class="zoek" id="zoek" placeholder="&#8984;K  Reizen, Veilig, Ibiza..." aria-label="Zoeken of openen">
     </div>
 
-    <div class="blok">
-      <div class="bloknaam">Werelden</div>
+    <div class="blok console-werelden">
+      <div class="bloknaam" id="wereldLabel">Werelden</div>
       <div class="rijtje" id="werelden"></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-actief">
       <div class="bloknaam">Actief</div>
       <div class="rijtje" data-actieflijst></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-ruimtes">
       <div class="bloknaam">Werkruimtes</div>
       <div class="rijtje" data-ruimtes></div>
       <button type="button" class="bewaar" id="bewaar">Deze kamer bewaren</button>
     </div>
 
-    <div class="blok">
+    <div class="blok console-context">
       <div class="bloknaam">Gedeelde context</div>
       <div class="context" data-context></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-rahul">
       <div class="bloknaam">Rahul</div>
-      <div class="context">Schikt de ruimte als u dat vraagt. Hij verstuurt niets
-      en betaalt niets; dat blijft aan u.</div>
+      <div class="context">Optioneel. Rahul kan ordenen en voorbereiden; alle
+      schermen en handelingen blijven zonder AI volledig bruikbaar.</div>
     </div>
   </aside>
 </main>
@@ -113,7 +113,7 @@
   /* De werelden die als surface te openen zijn. Elk is een ECHTE app die zijn
      eigen pagina blijft: de schil weet alleen naam en adres, niet wat erin
      gebeurt (PLATFORM.md -- de apps houden hun diepte, de bovenlaag verbindt). */
-  const WERELDEN = [
+  const PERSOONLIJK = [
     { id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
     { id: 'veilig', naam: 'Veilig', url: '/apps/veilig.html' },
     { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
@@ -124,10 +124,36 @@
     { id: 'sociaal', naam: 'RTG Sociaal', url: '/apps/sociaal.html' }
   ];
 
+  /* Dezelfde Spatial Shell heeft een eigen bedrijfsstand. Dit is geen tweede
+     desktop en geen kopie van de kantoorfuncties: elke surface opent de echte
+     bestaande app met haar eigen rechten. De schil bewaart alleen de indeling. */
+  const KANTOOR = [
+    { id: 'vandaag', naam: 'Vandaag', url: '/apps/kantoor.html' },
+    { id: 'afdelingen', naam: 'Afdelingen', url: '/apps/kantoren.html' },
+    { id: 'personeel', naam: 'Personeel', url: '/apps/personeel.html?kantoor=1' },
+    { id: 'office', naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
+    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
+    { id: 'mail', naam: 'RTG Mail', url: '/apps/rtmail.html' },
+    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
+    { id: 'backoffice', naam: 'Backoffice', url: '/apps/backoffice.html' },
+    { id: 'command', naam: 'RTG Command', url: '/apps/command.html' }
+  ];
+  const kantoorModus = new URLSearchParams(location.search).get('gebied') === 'kantoor';
+  const WERELDEN = kantoorModus ? KANTOOR : PERSOONLIJK;
+  if (kantoorModus) {
+    document.title = 'RTG Work OS';
+    $('#ruimteTitel').textContent = 'RTG Work OS';
+    $('#wie').textContent = 'Rahul Travel Group · Kantooromgeving';
+    $('#wereldLabel').textContent = 'Werkbanken';
+    $('#ruimteTerug').href = '/apps/personeel.html?kantoor=1';
+    $('#ruimteTerug').textContent = '‹ Personeelsingang';
+    document.body.dataset.omgeving = 'kantoor';
+  }
+
   const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN });
 
   $('#werelden').innerHTML = WERELDEN.map(w =>
-    '<button type="button" data-open="' + w.id + '">' + w.naam + '</button>').join('');
+    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' + w.naam + '</button>').join('');
   $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
     const w = WERELDEN.find(x => x.id === b.dataset.open);
     if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
@@ -178,8 +204,12 @@
   });
 
   // een werkruimte begint niet leeg: twee surfaces, zodat de tafel meteen leest
-  RTGSchil.open('reizen', { naam: 'Reizen', url: '/apps/reizen.html', kort: 'Reizen' });
-  RTGSchil.open('agenda', { naam: 'Agenda', url: '/apps/agenda.html', kort: 'Agenda' });
+  const begin = kantoorModus
+    ? [{ id: 'vandaag', naam: 'Vandaag', url: '/apps/kantoor.html' },
+       { id: 'afdelingen', naam: 'Afdelingen', url: '/apps/kantoren.html' }]
+    : [{ id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
+       { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' }];
+  begin.forEach(x => RTGSchil.open(x.id, { naam: x.naam, url: x.url, kort: x.naam }));
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

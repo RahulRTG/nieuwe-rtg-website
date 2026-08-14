@@ -7,7 +7,8 @@
 
    De volgorde is Claude eerst (ons hoofdmodel), dan OpenAI, dan Gemini;
    alleen aanbieders met een sleutel doen mee. maakAI() geeft null terug als
-   er helemaal geen sleutel staat -- dan draait de demostand, net als nu. */
+   er helemaal geen sleutel staat -- dan draait RTG in de ingebouwde,
+   handmatige werkmodus. */
 'use strict';
 const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
@@ -30,7 +31,7 @@ function bouwKetting(opts) {
 
 function maakAI(opts) {
   const ketting = bouwKetting(opts);
-  if (!ketting.length) return null; // geen enkele sleutel: demostand
+  if (!ketting.length) return null; // geen sleutel: kern blijft handmatig draaien
   const log = opts && opts.log;
   const client = {
     aanbieders: ketting.map(c => c.naam),
@@ -54,6 +55,24 @@ function maakAI(opts) {
     }
   };
   return client;
+}
+
+/* Eén eerlijk contract voor schermen en routes. Beschikbaarheid zegt alleen of
+   vrije modelverrijking mogelijk is; nooit of de onderliggende app werkt. */
+function beschikbaarheid(ai) {
+  const beschikbaar = !!(ai && ai.messages && typeof ai.messages.create === 'function');
+  return {
+    beschikbaar,
+    modus: beschikbaar ? 'ondersteund' : 'handmatig',
+    aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
+    kernprocessen: 'beschikbaar',
+    uitwijk: {
+      navigatie: 'menu-en-zoeken',
+      uitvoering: 'schermen-en-workflows',
+      samenvatten: 'lokale-extractie',
+      beslissingen: 'menselijk-akkoord'
+    }
+  };
 }
 
 /* Een kort ja/nee-oordeel, via dezelfde uitwijkketen. Losse modules die maar
@@ -105,4 +124,4 @@ async function tekst(ai, system, prompt, opties) {
   } catch (e) { return null; }
 }
 
-module.exports = { maakAI, bouwKetting, jaNee, tekst, MODEL_KORT };
+module.exports = { maakAI, bouwKetting, beschikbaarheid, jaNee, tekst, MODEL_KORT };

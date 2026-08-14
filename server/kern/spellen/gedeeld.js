@@ -33,7 +33,7 @@ module.exports = (ctx) => {
 
   function wereldFout(wereld, soort) {
     const s = spel(soort);
-    if (!s || s.wereld === wereld || (wereld !== 'rtg' && wereld !== 'rtf')) return null;
+    if (!s || s.wereld === wereld || (Array.isArray(s.werelden) && s.werelden.includes(wereld)) || (wereld !== 'rtg' && wereld !== 'rtf')) return null;
     return wereld === 'rtg' ? 'Dit spel vind je in de RTFoundation-app.' : 'Dit spel vind je in de RTG-leden-app.';
   }
 

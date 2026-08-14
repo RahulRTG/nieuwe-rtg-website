@@ -56,7 +56,9 @@ test('2. de samenvatting is eerlijk zonder sleutel en de route is dicht zonder t
   const r = await api('/api/memo/samenvat', { transcript: 'morgen de aannemer bellen over de kozijnen en het schilderwerk inplannen voor september' });
   assert.equal(r.status, 200);
   assert.equal(r.body.ai, false, 'zonder sleutel zegt de app eerlijk dat het geen AI is');
-  assert.match(r.body.samenvatting, /Demo-samenvatting/, 'de demo doet zich niet voor als een echte samenvatting');
+  assert.match(r.body.samenvatting, /Lokale samenvatting/, 'zonder AI blijft een eerlijke lokale samenvatting beschikbaar');
+  assert.equal(r.body.bron, 'extractief');
+  assert.equal(r.body.modus, 'handmatig');
   assert.match(r.body.samenvatting, /13 woorden/, 'en telt de woorden echt');
   const dicht = await api('/api/memo/samenvat', { transcript: 'x' }, 'nep');
   assert.equal(dicht.status, 401);

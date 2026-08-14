@@ -43,7 +43,7 @@ const MAX_MAANDEN_PER_KEER = 60;   // een vangnet: een partij die maanden lag ho
 const rond = (n) => Math.round(n);
 
 module.exports = (ctx) => {
-  const { db, save, codenaamVan, nudge } = ctx;
+  const { db, save, codenaamVan, nudge, magnaatLeren } = ctx;
   const hospitality = require('./hospitality');
   const worldModel = require('../../hospitality-universe/world-model');
 
@@ -59,7 +59,7 @@ module.exports = (ctx) => {
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
-      laatste: {}, klaar: false, hospitality: hospitality.nieuw(),
+      laatste: {}, klaar: false, hospitality: hospitality.nieuw(), leer:{acties:{},fouten:{}},
       universe: { wereld: worldModel.maak({ id: 'MAGNAAT-'+potje.id, seed: 'magnaat-'+potje.id }), briefing: null, vergelijking: null, evidence: null }
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
@@ -132,6 +132,8 @@ module.exports = (ctx) => {
     // waarop er wordt afgerekend en waarom, staat bij de eindstand zelf (./weergave.js)
     if (stand.length > 1 && stand[0].vermogen === stand[1].vermogen) potje.gelijk = true;
     else potje.winnaar = stand[0].codenaam;
+    if(magnaatLeren)magnaatLeren.registreerCampagne({potjeId:potje.id,
+      acties:st.leer&&st.leer.acties,fouten:st.leer&&st.leer.fouten});
   }
 
   /* WAT EEN SPELER DOET staat in ./acties.js, en dat is een echte naad: dit
@@ -145,7 +147,7 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const SIM_ACTIES=require('./simulation-actions')({db,hospitality,
+  const SIM_ACTIES=require('./simulation-actions')({db,hospitality,leren:magnaatLeren,
     director:require('../../hospitality-universe/director'),human:require('../../hospitality-universe/human-reality')});
   const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES, SIM_ACTIES);
   const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES,Object.keys(SIM_ACTIES));
@@ -157,8 +159,10 @@ module.exports = (ctx) => {
     if (st.klaar) return { status: 409, error: 'Deze campagne is net afgelopen.' };
     const actie = String(z.actie || '');
     if (!ACTIES[actie]) return { status: 400, error: 'Onbekende actie.' };
+    st.leer=st.leer||{acties:{},fouten:{}};
+    st.leer.acties[actie]=(st.leer.acties[actie]||0)+1;
     const r = ACTIES[actie](potje, h, z);
-    if (r.error) return r;
+    if (r.error){st.leer.fouten[actie]=(st.leer.fouten[actie]||0)+1;save();return r}
     save();
     // een grote zet is nieuws voor de tafel; aan een prijswijziging heeft
     // niemand anders een duwtje

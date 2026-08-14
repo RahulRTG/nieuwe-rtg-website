@@ -8,11 +8,12 @@
    gewoon een regel.
 
    [id, naam, categorie, doelgroep, url, uitleg]
-   doelgroep: mini (0-5), kind (6-11), tiener (12+) of gezin (iedereen). */
+   doelgroep: mini (0-4), kind (5-11), tiener (12+) of gezin (iedereen). */
 
 const CATEGORIEEN = [
   { id: 'leren', label: 'Leren & school', icon: 'diploma' },
   { id: 'creatief', label: 'Maken & ontdekken', icon: 'ontwerp' },
+  { id: 'spelen', label: 'Spelen & ondernemen', icon: 'spel' },
   { id: 'gezin', label: 'Samen in het gezin', icon: 'maison' },
   { id: 'gevoel', label: 'Gevoelens & steun', icon: 'hart' },
   { id: 'geld', label: 'Geld & later', icon: 'rekening' },
@@ -23,6 +24,7 @@ const CATEGORIEEN = [
 const R = [
   // ---- leren & school ----
   ['leren', 'Leren', 'leren', 'kind', '/apps/foundation/leren.html', 'Oefenen en samen leren, in je eigen tempo.'],
+  ['leerpaspoort', 'Mijn leerpaspoort', 'leren', 'kind', '/apps/foundation/leerpaspoort.html', 'Je leerlijn, lessen, opgaven, behaalde doelen en bijles in één persoonlijke werkplek.'],
   ['overhoren', 'Overhoren', 'leren', 'kind', '/apps/foundation/overhoren.html', 'Woordjes en sommen overhoren; alleen of als duel met een vriend.'],
   ['school', 'School', 'leren', 'kind', '/apps/foundation/school.html', 'Klas, rooster, huiswerk en cijfers voor het hele gezin.'],
   ['schrift', 'Schrift', 'leren', 'kind', '/apps/foundation/schrift.html', 'Je eigen schrift: aantekeningen en sommen netjes bij elkaar.'],
@@ -43,6 +45,10 @@ const R = [
   ['magazine', 'Magazine', 'creatief', 'gezin', '/apps/foundation/magazine.html', 'Het RTF-magazine: verhalen, tips en werk van gezinnen zelf.'],
   ['dromen', 'Onze dromen', 'creatief', 'gezin', '/apps/foundation/dromen.html', 'Waar het gezin van droomt, bewaard en af en toe teruggelezen.'],
   ['bord', 'Bord', 'creatief', 'gezin', '/apps/foundation/bord.html', 'Een bord met kaartjes: ideeen, plannen en wat af is.'],
+
+  // ---- spelen & ondernemen ----
+  ['speelhal', 'Game Hall', 'spelen', 'kind', '/apps/foundation/speelhal.html', 'Zeven eindige spellen voor rekenen, taal, geheugen, klokkijken en logisch denken.'],
+  ['magnaat', 'Magnaat', 'spelen', 'kind', '/apps/spelen.html?pas=foundation&open=magnaat', 'Bouw samen een eerlijke onderneming en leer over handel, risico, bank, mensen en verantwoordelijkheid.'],
 
   // ---- samen in het gezin ----
   ['agenda', 'Gezinsagenda', 'gezin', 'gezin', '/apps/foundation/agenda.html', 'Alle afspraken van het gezin op een rij, voor iedereen zichtbaar.'],

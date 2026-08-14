@@ -17,12 +17,16 @@ require('./foundation/onderwijs')(ctx);
 /* De gezins-helpers (gezinnen, profielen, PIN, codenamen, sessiehulpen)
    staan als deelmodule in foundation/gezinshulp.js; hier komen ze terug in
    scope voor de wiring hieronder. */
-const { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij } = require('./foundation/gezinshulp')(ctx);
+const { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
+  magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
+  schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
+  pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij } = require('./foundation/gezinshulp')(ctx);
 
 /* De gezinsroutes (gezin maken/inloggen, profielen, berichten) draaien als
    submodule op een gedeelde context, een keer opgebouwd bij het opstarten. */
 const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan, tokenUit,
-  nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, schoonGroep, isBeschermd, isGast, KLEUREN,
+  nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
+  schoonGroep, isBeschermd, isGast, KLEUREN,
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 require('./foundation/gezin')(gctx);
@@ -104,6 +108,31 @@ function groepen() {
   return GROEPEN.map(id => ({ id, naam: GROEP_INFO[id].naam, bereik: GROEP_INFO[id].bereik }));
 }
 
+/* De drie leerlingpassen zijn afgeleide rechten, nooit vinkjes die een
+   browser zelf mag zetten. Foundation is de geldige gezinssessie, Leeftijd
+   komt uitsluitend uit de geboortedatum en School uitsluitend uit een echte
+   klasinschrijving. Daardoor opent een gekopieerde URL geen leerlingenscherm. */
+function leerlingPassen(sess) {
+  if (!sess || !sess.p || !sess.g) return null;
+  const geboorte = actualiseerGroep(sess.p);
+  const sleutel = sess.g.code + ':' + sess.p.id;
+  const f = F();
+  const klassen = Object.values(f.klassen || {}).filter(k => (k.leerlingen || []).some(l => l.sleutel === sleutel));
+  const scholen = f.scholen || {};
+  const actieveKlassen = klassen.filter(k => !k.schoolCode || !scholen[k.schoolCode] || (scholen[k.schoolCode].status || 'actief') === 'actief');
+  const leerling = sess.p.rol === 'kind' && !sess.gast;
+  const passen = ['foundation'];
+  if (geboorte) passen.push('leeftijd');
+  if (geboorte && leerling) passen.push('leerling');
+  if (geboorte && leerling && actieveKlassen.length) passen.push('school');
+  return {
+    groep: sess.p.groep || null, leeftijd: geboorte ? geboorte.leeftijd : null,
+    leeftijdBevestigd: !!geboorte, leerling, passen,
+    school: actieveKlassen.length ? { actief: true, aantalKlassen: actieveKlassen.length,
+      klassen: actieveKlassen.map(k => ({ code: k.code, naam: k.naam, school: k.school })) } : { actief: false, aantalKlassen: 0, klassen: [] }
+  };
+}
+
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };

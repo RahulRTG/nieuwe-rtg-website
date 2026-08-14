@@ -23,7 +23,7 @@
     // bellen binnen de app: de leraar zet het klas-belkanaal een keer open
     if (kc && window.SchoolBel && !belAan) {
       try {
-        var sessie = JSON.parse(localStorage.getItem('rtg_schoolpartner') || 'null');
+        var sessie = window.RTGSchoolSession ? RTGSchoolSession.lees('rtg_schoolpartner') : null;
         if (sessie && sessie.token) { belAan = true; SchoolBel.start({ klasCode: kc, leraar: { token: sessie.token } }); }
       } catch (e) {}
     }

@@ -1,10 +1,9 @@
-/* Domein "member", deelmodule persoonlijk: alles wat van het lid zelf is.
-   Het zorgprofiel en locatie-delen (kern/gastzorg.js), Rahul
-   (kern/fluister.js) en de Shared Assets (kern/assets.js). Alleen routes;
-   de logica woont in de kern-modules. */
+/* Persoonlijke ledenroutes: zorg, locatie, Rahul en Shared Assets.
+   De logica woont in de kernmodules. */
 module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus, assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap } = kern;
   const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
+  const aiStatus = () => require('../../ai').beschikbaarheid(kern.anthropic);
 
 /* ---- de zorgvolle keten (kern/gastzorg.js) ----
    Het zorgprofiel: allergenen, dieet en medische aandachtspunten. Reist
@@ -72,11 +71,12 @@ app.post('/api/fluister', auth, async (req, res) => {
     });
     if (lus && lus.tekst) {
       onthoudGesprek(req, lus.tekst);
-      return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+      return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+        aiBeschikbaar: true, modus: 'ondersteund' });
     }
   }
   onthoudGesprek(req, r && r.antwoord);
-  res.json(r);
+  res.json(Object.assign(r, { aiBeschikbaar: aiStatus().beschikbaar, modus: aiStatus().modus }));
 });
 /* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en
    de balk in het OS EEN draadje zijn en je geschiedenis niet half is. Alleen

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn leerpaspoort · RTF Campus</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-school-shell.css" rel="stylesheet">
+<style>
+  [hidden]{display:none!important}.sec,.deel{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);margin:.2rem 0}.deel{margin:1.8rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--lijn)}
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(8rem,1fr));gap:.55rem;margin-bottom:.8rem}.kpi{padding:.75rem .85rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:.85rem}.kpi b{display:block;font-family:var(--serif);font-size:1.3rem}.kpi span,.leeg{color:var(--zacht);font-size:.72rem}.kaart{padding:1rem;margin-bottom:.7rem}.rij{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center}.veld{flex:1;min-width:9rem}.knop.stil{background:transparent;color:var(--txt);border:1px solid var(--lijn)}
+  .eerlijk{border-left:2px solid var(--goud);padding-left:.65rem;color:var(--zacht);font-size:.75rem;line-height:1.55}.doel{display:flex;gap:.5rem;align-items:center;justify-content:space-between;border-bottom:1px solid var(--lijn);padding:.48rem 0;font-size:.82rem}.doel:last-child{border-bottom:0}.vakkop{color:var(--goud);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin:.8rem 0 .2rem}.pil{font-size:.58rem;border:1px solid var(--lijn);border-radius:99px;padding:.14rem .4rem;color:var(--zacht)}.pil.ok{color:#7ee0a3}.vraagblok{font-size:1rem;line-height:1.55;margin:.55rem 0}.opties,.chat{display:flex;flex-direction:column;gap:.4rem}.chat{max-height:22rem;overflow:auto}.beurt{max-width:85%;border-radius:.8rem;padding:.55rem .7rem;font-size:.83rem;line-height:1.5}.beurt.ik{align-self:flex-end;background:var(--goud);color:#17130d}.beurt.rahul{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn)}.uitslag{font-size:.8rem;line-height:1.55;margin-top:.45rem}.melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);z-index:50;background:#111;border:1px solid var(--goud);border-radius:.7rem;padding:.55rem .9rem;opacity:0}
+  @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl school-shell">
+<div class="school-kader">
+<aside class="school-zij" aria-label="RTF Campus">
+  <a class="school-merk" href="campus.html"><span class="school-merkbeeld">F</span><span><strong>RTF Campus</strong><small>jouw leeromgeving</small></span></a>
+  <div class="school-navkop">Vandaag</div>
+  <a class="school-nav" href="campus.html"><i>01</i>Campus</a><a class="school-nav" href="school.html"><i>02</i>Mijn klas</a><a class="school-nav aan" href="leerpaspoort.html" aria-current="page"><i>03</i>Leerpaspoort</a>
+  <div class="school-navkop">Maken</div>
+  <a class="school-nav" href="leren.html"><i>04</i>Live les</a><a class="school-nav" href="projecten.html"><i>05</i>Projecten</a><a class="school-nav" href="schoolbieb.html"><i>06</i>Bibliotheek</a>
+  <div class="school-veilig"><b>Persoonlijk en veilig</b>Alleen jouw doelen en oefeningen. Geen ranglijst en nooit vergelijken met klasgenoten.</div>
+</aside>
+<div class="school-werk">
+<header class="school-boven"><div class="school-boventitel"><span class="school-ey">RTFoundation</span><h1>Mijn leerpaspoort</h1></div><span class="school-bovenruimte"></span><a class="school-toplink" href="campus.html">Campus</a><div id="balk" class="school-sessiebalk"></div></header>
+<main id="main">
+  <section class="enterprise-hero"><div><span class="ey">Jouw eigen leerlijn</span><h2>Leren, oefenen en groeien in één paspoort.</h2><p>Je kiest je fase, krijgt lessen en oefent met verse opgaven. Behaalde doelen reizen met jou mee, zonder ranglijst of prestatiedruk.</p></div><div class="enterprise-belofte"><b>Jij bent geen score</b>Een fout is leermateriaal. Advies blijft advies; mensen en officiële scholen nemen echte besluiten.</div></section>
+  <div class="kpis" id="schoolKpi"></div>
+  <div class="deel">Het paspoort</div><section class="kaart"><div class="sec">Mijn leerpaspoort</div><div id="paspoort" class="leeg">Laden…</div><div class="rij" style="margin-top:.55rem"><select class="veld" id="ladderKies"></select><button class="knop" id="inschrijfKnop">Inschrijven</button><button class="knop stil" id="jaarKnop" hidden>Jaar erbij</button></div><p class="eerlijk" id="eerlijk" style="margin-top:.65rem"></p></section>
+  <div class="deel">Leren en oefenen</div><section class="kaart"><div class="sec">De leerlijn</div><select class="veld" id="leerKies"><option value="">Kies je fase…</option></select><div id="vakken" class="leeg" style="margin-top:.6rem">Kies je fase; dan verschijnt jouw leerlijn.</div></section>
+  <section class="kaart" id="lesKaart" hidden><div class="sec">De les</div><div id="lesInhoud" class="leeg"></div></section>
+  <section class="kaart" id="oefenKaart" hidden><div class="sec">Oefenen · <span id="oefenStand">1/5</span></div><div class="vraagblok" id="oefenVraag"></div><div class="opties" id="oefenOpties"></div><div class="rij"><input class="veld" id="oefenIn" placeholder="Jouw antwoord"><button class="knop" id="oefenStuur">Antwoord</button></div><div class="uitslag" id="oefenUit"></div></section>
+  <div class="deel">Toetsing en advies</div><section class="kaart"><div class="sec">Examentraining</div><p class="leeg">Tien vragen; de terugblik komt pas aan het einde. Dit is oefening, geen echt examen.</p><div class="rij"><select class="veld" id="examenKies"></select><button class="knop" id="examenStartKnop">Start training</button></div><div id="examenBlok" hidden><div class="sec" style="margin-top:.6rem">Vraag <span id="examenStand">1/10</span></div><div class="vraagblok" id="examenVraag"></div><div class="opties" id="examenOpties"></div><div class="rij"><input class="veld" id="examenIn" placeholder="Jouw antwoord"><button class="knop" id="examenStuur">Antwoord</button></div></div><div class="uitslag" id="examenUit"></div></section>
+  <section class="kaart"><div class="sec">Niveau-advies</div><button class="knop stil" id="adviesKnop">Vraag advies</button><div class="uitslag" id="adviesUit"></div></section>
+  <div class="deel">Bijles</div><section class="kaart"><div class="sec">Rahul Bijles</div><div class="chat" id="bijlesLog"><div class="leeg">Stel je vraag; Rahul legt uit op jouw tempo.</div></div><div class="rij" style="margin-top:.5rem"><input class="veld" id="bijlesIn" maxlength="600" placeholder="Waar wil je hulp bij?"><button class="knop" id="bijlesStuur">Vraag</button></div></section>
+</main></div></div>
+<div class="melding" id="melding" role="status"></div>
+<script src="sessie.js"></script><script src="/shared/uitvoer.js"></script>
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sess=Sessie.huidig(); if(!Sessie.eisProfiel()) throw new Error('geen leerlingtoegang'); Sessie.balk($('#balk'),{terug:'campus.html',terugTekst:'← Campus'});
+function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',3000)}
+const PAD={'/api/onderwijs/ladder':'/ladder','/api/onderwijs/mijn':'/paspoort','/api/onderwijs/inschrijf':'/inschrijf','/api/onderwijs/jaar-over':'/jaar-over','/api/onderwijs/advies':'/advies','/api/leerstof/vakken':'/vakken','/api/leerstof/les':'/les','/api/leerstof/oefen':'/oefen','/api/leerstof/antwoord':'/antwoord','/api/leerstof/examen':'/examen','/api/leerstof/examen-antwoord':'/examen-antwoord','/api/bijles/gesprek':'/bijles/gesprek','/api/bijles/vraag':'/bijles/vraag'};
+const api=(pad,body)=>fetch('/api/rtf/leerling'+PAD[pad],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:sess.code,token:sess.token},body||{}))}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d});
+</script>
+<script src="/apps/rtgschool/leer.js"></script><script src="/apps/rtgschool/examen.js"></script><script src="/apps/rtgschool/bijles.js"></script>
+<script>if(window.RTGSchool)RTGSchool.start();</script>
+<script src="/shared/basis.js" defer></script><script src="/shared/metgezel.js" defer></script><script src="/shared/randen.js" defer></script><script src="/shared/ios.js" defer></script>
+</body></html>

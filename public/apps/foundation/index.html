@@ -174,6 +174,13 @@
     <div id="hImpact" class="kaart" style="margin-top:.7rem;padding:.7rem .6rem;" hidden></div>
   </div>
 
+  <a class="campus-ingang kaart" href="campus.html">
+    <span class="campus-merk">RTF Campus</span>
+    <strong>School, leren en spelen in één wereld</strong>
+    <span>Ga verder met je dag, open de Game Hall of bouw je onderneming in Magnaat.</span>
+    <b>Open jouw campus →</b>
+  </a>
+
   <div class="buddy kaart" id="buddyKaart">
     <div class="buddy-t">Jouw AI-buddy<span class="buddy-nm" id="buddyNm"></span></div>
     <div class="buddy-keuze">
@@ -600,7 +607,11 @@ async function start(){
     // controleer token; toon hub
     const d = await Sessie.ophalen();
     if (d && d.profiel){
-      Sessie.balk($('#balk')); $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel); checkOnbRtf(d.profiel);
+      /* De vaste balk hoort in de pagina, maar een oude offline-schil kan nog
+         heel even een eerdere HTML-versie tonen. Laat profielkeuze dan nooit
+         eindigen in een leeg scherm; de Campus blijft gewoon bereikbaar. */
+      const balk = $('#balk'); if (balk) Sessie.balk(balk);
+      $('#hWelkom').textContent = 'Welkom, ' + d.profiel.naam; toonRol(d.profiel); checkOnbRtf(d.profiel);
       // openstaand verzoek om alles te verwijderen
       if (d.wisVerzoek){
         if (d.wisVerzoek.vanMij){

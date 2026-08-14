@@ -195,6 +195,7 @@
 </main>
 
 <script src="/shared/uitvoer.js"></script>
+<script src="sessie.js"></script>
 <script>
   document.getElementById('terug').onclick = function(){ if (history.length > 1) history.back(); else location.href = 'index.html'; };
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(function(){});

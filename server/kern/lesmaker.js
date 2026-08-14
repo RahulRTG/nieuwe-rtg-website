@@ -69,8 +69,11 @@ module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
   const alsLeraar = (c, tok) => { const les = vind(c); return les && les.leraarToken === String(tok || '') ? les : null; };
 
   function stand(les) {
+    /* De leraar ziet voortgang in alfabetische volgorde, geen podium. De score
+       is voortaan simpelweg het aantal goed beantwoorde vragen; snelheid telt
+       niet mee en leerlingen worden niet onderling gerangschikt. */
     return Object.entries(les.deelnemers).map(([naam, d]) => ({ naam, score: d.score, beantwoord: d.antwoorden.length }))
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => a.naam.localeCompare(b.naam, 'nl'));
   }
   function leraarBeeld(les) {
     return { code: les.code, titel: les.titel, uitleg: les.uitleg, onderwerp: les.onderwerp, app: les.app,
@@ -128,7 +131,7 @@ module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
       fase: les.fase, vraagIx: les.vraagIx, totaalVragen: les.vragen.length, volg: les.volg,
       vraag: vraag ? { v: vraag.v, opties: vraag.opties } : null,           // NOOIT het juiste antwoord meesturen
       beantwoord: !!eigen, goedFout: eigen ? eigen.goed : null,
-      score: d ? d.score : 0, stand: les.fase === 'klaar' ? stand(les).slice(0, 10) : undefined };
+      score: d ? d.score : 0 };
   }
   function kijk(c, naam, tok) {
     const s = alsKind(c, naam, tok);
@@ -143,9 +146,8 @@ module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
     if (d.antwoorden[les.vraagIx]) return { status: 400, error: 'Je hebt deze vraag al beantwoord.' };
     const k = Math.min(3, Math.max(0, Number(keuze) || 0));
     const goed = k === les.vragen[les.vraagIx].juist;
-    // snelheid telt een beetje mee, kennis het meest: 100 basis + max 50 tempo
-    const tempo = Math.max(0, 50 - Math.floor((nu() - les.vraagStart) / 1000));
-    const punten = goed ? 100 + tempo : 0;
+    // Geen snelheidsbonus of puntenjacht: goed is één leerstap, fout is uitleg.
+    const punten = goed ? 1 : 0;
     d.antwoorden[les.vraagIx] = { keuze: k, goed, punten };
     d.score += punten;
     les.volg += 1; save();

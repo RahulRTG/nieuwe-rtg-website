@@ -68,7 +68,7 @@ test('3. de Lesmaker: een leraar maakt een les en vindt apps uit de bibliotheken
   assert.equal((await api(base, '/api/les/leraar', { code: les.body.code, leraarToken: 'fout' })).status, 403);
 });
 
-test('4. de klas-PDA: kinderen doen mee, antwoorden en zien het podium', async () => {
+test('4. de klas-PDA: kinderen doen mee en zien alleen hun eigen leerstappen', async () => {
   const les = (await api(base, '/api/les/maak', { onderwerp: 'veilig internet', niveau: 'kind' })).body;
   const kim = (await api(base, '/api/les/mee', { code: les.code, naam: 'Kim' })).body;
   const bo = (await api(base, '/api/les/mee', { code: les.code, naam: 'Bo' })).body;
@@ -86,17 +86,18 @@ test('4. de klas-PDA: kinderen doen mee, antwoorden en zien het podium', async (
   // Kim antwoordt goed (demo-les: optie 0), Bo fout; dubbel antwoorden mag niet
   const ak = await api(base, '/api/les/antwoord', { code: les.code, naam: 'Kim', deelnemerToken: kim.deelnemerToken, keuze: 0 });
   assert.equal(ak.body.goed, true);
-  assert.ok(ak.body.score >= 100);
+  assert.equal(ak.body.score, 1, 'één goed antwoord is één leerstap, zonder snelheidsbonus');
   const ab = await api(base, '/api/les/antwoord', { code: les.code, naam: 'Bo', deelnemerToken: bo.deelnemerToken, keuze: 2 });
   assert.equal(ab.body.goed, false);
   assert.equal((await api(base, '/api/les/antwoord', { code: les.code, naam: 'Kim', deelnemerToken: kim.deelnemerToken, keuze: 1 })).status, 400);
-  // de leraar ziet de keuzes en de tussenstand; daarna sluit hij de les
+  // de leraar ziet keuzes en alfabetische voortgang; daarna sluit hij de les
   const lb = await api(base, '/api/les/leraar', { code: les.code, leraarToken: les.leraarToken });
   assert.deepEqual(lb.body.les.keuzes.reduce((a, b) => a + b, 0), 2, 'twee kinderen hebben gekozen');
-  assert.equal(lb.body.les.stand[0].naam, 'Kim');
+  assert.deepEqual(lb.body.les.stand.map(x => x.naam), ['Bo', 'Kim'], 'de leraar ziet voortgang alfabetisch, niet als ranglijst');
   const einde = await api(base, '/api/les/sluit', { code: les.code, leraarToken: les.leraarToken });
   assert.equal(einde.body.les.fase, 'klaar');
-  const podium = await api(base, '/api/les/kijk', { code: les.code, naam: 'Bo', deelnemerToken: bo.deelnemerToken });
-  assert.equal(podium.body.les.fase, 'klaar');
-  assert.equal(podium.body.les.stand[0].naam, 'Kim', 'het podium staat op de klas-PDA');
+  const terugblik = await api(base, '/api/les/kijk', { code: les.code, naam: 'Bo', deelnemerToken: bo.deelnemerToken });
+  assert.equal(terugblik.body.les.fase, 'klaar');
+  assert.equal(terugblik.body.les.score, 0, 'Bo ziet alleen zijn eigen leerstappen');
+  assert.equal(terugblik.body.les.stand, undefined, 'een leerling krijgt geen klasranglijst');
 });

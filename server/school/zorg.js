@@ -20,7 +20,7 @@
 'use strict';
 
 module.exports = (sctx, { vind, zorgVan }) => {
-  const { router, save, rid, nu, schoon, poort, log } = sctx;
+  const { router, save, rid, nu, schoon, eigenVeld, poort, log } = sctx;
 
   /* ---------- het zorgdeel bijwerken ----------
      Ondersteuningsbehoefte, plan, individuele leerdoelen en de remedial-

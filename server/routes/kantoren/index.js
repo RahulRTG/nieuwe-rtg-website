@@ -99,4 +99,5 @@ module.exports = (kern) => {
   require('./techniek')(ctx);
   require('./betaalproviders')(ctx);
   require('./zelfzorg')(ctx);
+  require('./magnaat-leren')(ctx);
 };

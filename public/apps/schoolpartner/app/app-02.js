@@ -3,13 +3,16 @@
   function leraar() {
     toon('vLeraar');
     api('/school/leraar/overzicht', { schoolCode: S.code, personeelToken: S.token }).then(function (r) {
-      if (r.body.error) return meld(r.body.error);
+      if (r.body.error) { if (r.status === 403) uitloggen('Deze schoolsessie is niet meer geldig.'); return meld(r.body.error); }
+      var schoolNaam = typeof r.body.school === 'string' ? r.body.school : (r.body.school && r.body.school.naam) || S.code;
+      context(schoolNaam, 'Leraar');
+      $('#lWelkom').textContent = 'Welkom, ' + r.body.naam + '.';
       $('#lKlassen').innerHTML = (r.body.klassen || []).map(function (k) {
         return '<div class="item"><span>' + esc(k.naam) + ' <span class="stil">· code ' + esc(k.code) + '</span></span>' +
           '<button class="knop p" data-klas="' + esc(k.code) + '">Open</button></div>';
       }).join('') || '<p class="stil">Nog geen klas. Maak er een in de school-app, of laat een collega je vast op zijn klas zetten.</p>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-klas]'), function (b) {
-        b.addEventListener('click', function () { KLAS = b.dataset.klas; $('#lWerk').hidden = false; werkbank(); });
+        b.addEventListener('click', function () { KLAS = b.dataset.klas; $('#lWerk').hidden = false; context(schoolNaam, 'Leraar · ' + b.parentNode.querySelector('span').textContent.split(' · ')[0]); werkbank(); });
       });
     });
   }

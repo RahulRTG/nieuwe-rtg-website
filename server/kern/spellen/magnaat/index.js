@@ -34,7 +34,7 @@ module.exports = (ctx) => {
   const zet = (potje, h, z) => (isEco(potje) ? eco.zet(potje, h, z) : bord.magnaatZet(potje, h, z));
 
   const spel = {
-    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', vormen: ['live', 'async'],
+    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', werelden: ['rtg', 'rtf'], vormen: ['live', 'async'],
     /* De vrije acties, en dit is de lijst waar Long Play op staat of valt (zie
        GAMEHALL.md paragraaf 12.3). Zonder deze staat een partij van zes met 24
        uur per beurt zes dagen stil tussen twee van jouw handelingen; met deze

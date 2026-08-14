@@ -84,11 +84,21 @@ const stand = () => {
     klokIngang: !!document.querySelector('.cmd-klok'),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
-    // loopt het blad door tot de onderrand? Zo niet, dan staat er weer een band
+    // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
+    // zijn -- geen gat, geen overlap
     bladTotOnder: (() => {
       const f = document.querySelector('.cmd-pane.actief iframe');
       return f ? Math.round(window.innerHeight - f.getBoundingClientRect().bottom) : null;
     })(),
+    // de schilbalk: de bank, waar je bent, en weg hier
+    balk: (() => { const b = document.querySelector('.cmd-balk');
+      return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
+    chips: [...document.querySelectorAll('.cmd-balkblad')]
+      .map(x => x.textContent + (x.classList.contains('actief') ? '*' : '')),
+    sluitknop: (() => { const k = document.querySelector('.cmd-balksluit'); return !!k && !k.hidden; })(),
+    // begint de wereld bovenaan? Zo niet, dan staat er weer schil-chroom boven
+    bladVanaf: (() => { const f = document.querySelector('.cmd-pane.actief iframe');
+      return f ? Math.round(f.getBoundingClientRect().top) : null; })(),
     leegstaat: !!document.querySelector('.cmd-leeg'),
   };
 };
@@ -230,7 +240,14 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        glasconsole, die al niet zichtbaar is -- lege ruimte in de haarlijnkleur,
        zichtbaar als een grijze balk. De greep ligt nu IN de onderbalk van de
        wereld, op dezelfde hoogte als de iconen daar. */
-    assert.equal(smalBlad.bladTotOnder, 0, 'onder het blad hoort geen band meer te staan');
+    /* De schilbalk is op een telefoon het enige wat de schil laat zien: de wereld
+       begint bovenaan, en onder het blad staat precies die balk -- geen gat, geen
+       overlap, en geen tweede navigatielaag boven de kop van de wereld zelf. */
+    assert.equal(smalBlad.bladVanaf, 0, 'de wereld hoort bovenaan te beginnen; daar hoort geen schil-chroom meer');
+    assert.equal(smalBlad.balk, 48, 'de schilbalk hoort 48px te zijn, kreeg ' + smalBlad.balk);
+    assert.equal(smalBlad.bladTotOnder, 48, 'en het blad hoort er precies op te eindigen');
+    assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
+    assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
     // de lade halen: dezelfde twaalf werelden als in de rail op een computer
     await page.click('.cmd-lade');
@@ -253,7 +270,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForTimeout(900);
     const twee = await page.evaluate(stand);
     assert.equal(twee.bladen, 2, 'twee bladen open');
-    assert.notEqual(twee.tabstrip, 'none', 'en dan verdient de tabstrip zijn plek weer');
+    assert.deepEqual(twee.chips, ['Vandaag', 'Geld*'], 'en de balk toont ze allebei, met de actieve gemarkeerd');
 
     // en ook hier: het laatste blad dicht = de lege werktafel, niet de klok
     await page.evaluate(() => window.RTGCommand.sluitAlles());

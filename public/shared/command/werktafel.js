@@ -11,7 +11,7 @@
     var root=null,panes=[],actief=-1,consoleLaag=null,APPS=o.catalog.APPS,titelVan=o.catalog.titelVan;
     var stand='open',bank=null;
     var poort=w.RTGCommandInlogpoort();
-    var ICON={terug:'<path d="M15 5l-7 7 7 7"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',verder:'<path d="M9 5l7 7-7 7"/>',instel:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',reis:'<path d="M4 19h16M6 19V8h12v11M9 8V5h6v3"/>',geld:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',salon:'<path d="M5 20v-7h14v7M7 13V8a5 5 0 0110 0v5"/>',mens:'<circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0116 0"/>',plus:'<path d="M12 5v14M5 12h14"/>',play:'<path d="M8 5l11 7-11 7z"/>',pauze:'<path d="M8 5v14M16 5v14"/>'};
+    var ICON={terug:'<path d="M15 5l-7 7 7 7"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',verder:'<path d="M9 5l7 7-7 7"/>',instel:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',reis:'<path d="M4 19h16M6 19V8h12v11M9 8V5h6v3"/>',geld:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',salon:'<path d="M5 20v-7h14v7M7 13V8a5 5 0 0110 0v5"/>',mens:'<circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0116 0"/>',plus:'<path d="M12 5v14M5 12h14"/>',kruis:'<path d="M6 6l12 12M18 6L6 18"/>',play:'<path d="M8 5l11 7-11 7z"/>',pauze:'<path d="M8 5v14M16 5v14"/>'};
     function svg(k){return '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'}
 
     /* zet() is de enige ingang voor de stand. Wisselt hij, dan wordt opnieuw
@@ -20,7 +20,7 @@
        begint bouw() LEEG -- hier stonden twee open()-aanroepen, en welke apps
        dat zouden zijn is een keuze van een mens en niet van het huis. */
     function zet(s){if(root&&stand!==s)sloop();stand=s;bouw()}
-    function bouw(){if(root||!o.magBestaan())return;root=d.createElement('div');root.id='rtgCommand';root.dataset.stand=stand;root.innerHTML='<aside class="cmd-bank"><div class="cmd-adem"></div><nav class="cmd-nav" aria-label="Hoofdnavigatie"></nav><div class="cmd-bankvoet"><button data-cmd="settings">'+svg('instel')+'<span>Instellingen</span></button></div></aside><main class="cmd-werk"><button class="cmd-lade" aria-label="Werelden" aria-expanded="false">'+svg('menu')+'</button><div class="cmd-tabs" role="tablist"></div><button class="cmd-toevoeg" aria-label="Werkblad openen">'+svg('plus')+'</button><div class="cmd-kiezer" hidden></div><div class="cmd-panes"></div></main>';d.body.appendChild(root);d.body.classList.add('rtg-command');consoleLaag=w.RTGCommandConsole({root:root,svg:svg,context:o.catalog.context,bestemming:o.bestemming,open:o.open,sluit:sluit,thuis:o.thuis,getPanes:function(){return panes},getActief:function(){return actief}});consoleLaag.bouw();bank=w.RTGCommandBank({root:root,svg:svg,apps:APPS,stand:stand,open:o.open,thuis:o.thuis,inlog:o.inlog});bank.bouw();if(stand==='gesloten')poort.naar(root.querySelector('.cmd-panes'));else leeg();
+    function bouw(){if(root||!o.magBestaan())return;root=d.createElement('div');root.id='rtgCommand';root.dataset.stand=stand;root.innerHTML='<aside class="cmd-bank"><div class="cmd-adem"></div><nav class="cmd-nav" aria-label="Hoofdnavigatie"></nav><div class="cmd-bankvoet"><button data-cmd="settings">'+svg('instel')+'<span>Instellingen</span></button></div></aside><main class="cmd-werk"><div class="cmd-tabs" role="tablist"></div><button class="cmd-toevoeg" aria-label="Werkblad openen">'+svg('plus')+'</button><div class="cmd-kiezer" hidden></div><div class="cmd-panes"></div><div class="cmd-balk"><button class="cmd-lade" aria-label="Werelden" aria-expanded="false">'+svg('menu')+'</button><div class="cmd-balkbladen" role="tablist"></div><button class="cmd-balksluit" aria-label="Sluit dit werkblad" hidden>'+svg('kruis')+'</button></div></main>';d.body.appendChild(root);d.body.classList.add('rtg-command');consoleLaag=w.RTGCommandConsole({root:root,svg:svg,context:o.catalog.context,bestemming:o.bestemming,open:o.open,sluit:sluit,thuis:o.thuis,getPanes:function(){return panes},getActief:function(){return actief}});consoleLaag.bouw();bank=w.RTGCommandBank({root:root,svg:svg,apps:APPS,stand:stand,open:o.open,thuis:o.thuis,inlog:o.inlog});bank.bouw();if(stand==='gesloten')poort.naar(root.querySelector('.cmd-panes'));else leeg();balk();
       root.querySelector('.cmd-toevoeg').onclick=function(){var k=root.querySelector('.cmd-kiezer');k.hidden=!k.hidden};
       root.querySelector('[data-cmd=settings]').onclick=function(){consoleLaag.toonBlad(3,true)};
       }
@@ -47,8 +47,32 @@
     function leeg(){var vak=root.querySelector('.cmd-panes');vak.textContent='';
       var m=d.createElement('div');m.className='cmd-leeg';
       m.innerHTML='<span>Kies een wereld om te beginnen.</span>';vak.appendChild(m)}
+    /* DE SCHILBALK: op een telefoon het enige wat de schil zelf laat zien.
+       Hij vervangt de tabstrip bovenin -- die stond boven een wereld die zijn
+       eigen kopbalk al draagt, en dat waren twee navigatielagen boven elkaar.
+       Onderaan staat hij bovendien binnen duimbereik.
+
+       Drie dingen, en niet meer: de bank, waar je bent, en weg hier. Bij nul
+       bladen blijft alleen de bank over -- een sluitknop zonder iets om te
+       sluiten is een knop die niets doet. */
+    function balk(){
+      var rij=root.querySelector('.cmd-balkbladen'),kruis=root.querySelector('.cmd-balksluit');
+      if(!rij)return;
+      rij.textContent='';
+      panes.forEach(function(p,i){
+        var b=d.createElement('button');
+        b.className='cmd-balkblad'+(i===actief?' actief':'');
+        b.setAttribute('role','tab');b.setAttribute('aria-selected',i===actief?'true':'false');
+        b.textContent=p.titel;
+        b.onclick=function(){select(i)};
+        rij.appendChild(b);
+      });
+      kruis.hidden=!panes.length;
+      kruis.onclick=function(){if(actief>=0)sluit(actief)};
+    }
     function sync(){if(!root)return;root.dataset.bladen=panes.length;var tabs=root.querySelector('.cmd-tabs');tabs.textContent='';
-      if(!panes.length){if(stand!=='gesloten')leeg();return}
+      if(!panes.length){balk();if(stand!=='gesloten')leeg();return}
+      balk();
       var oudLeeg=root.querySelector('.cmd-leeg');if(oudLeeg)oudLeeg.remove();panes.forEach(function(p,i){p.el.classList.toggle('actief',i===actief);var b=d.createElement('button');b.className='cmd-tab'+(i===actief?' actief':'');b.setAttribute('role','tab');b.innerHTML='<span>'+p.titel+'</span><i aria-label="Sluiten">×</i>';b.onclick=function(e){if(e.target.tagName==='I')sluit(i);else select(i)};tabs.appendChild(b)});verdeler();root.querySelectorAll('.cmd-nav button[data-url]').forEach(function(b){b.classList.toggle('actief',panes[actief]&&panes[actief].url===b.dataset.url)});if(consoleLaag)consoleLaag.intro()}
     /* De scheiding hoort bij TWEE bladen naast elkaar: een brede-schermvorm. Op
        een telefoon staat er een blad in beeld, dus valt er niets te verdelen.

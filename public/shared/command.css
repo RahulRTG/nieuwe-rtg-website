@@ -63,19 +63,11 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmd-tab i{margin-left:auto;color:var(--rtg-soft);font-style:normal;font-size:1rem}
 .cmd-toevoeg{position:absolute;right:.7rem;top:calc(env(safe-area-inset-top,0px) + .5rem);width:38px;height:38px;border:1px solid var(--rtg-line);border-radius:50%;background:#151312;color:var(--rtg-muted);z-index:2;cursor:pointer}
-/* De greep van de lade: links in de tabbalk, waar op een telefoon de duim zit.
-   Zelfde vorm als .cmd-toevoeg hierboven -- absoluut in de balk, met ruimte
-   ervoor in .cmd-tabs -- zodat de tabbladen ernaast schuiven in plaats van
-   eronder te verdwijnen. */
-.cmd-lade{position:absolute;left:0;top:env(safe-area-inset-top,0px);width:46px;height:56px;z-index:3;
-  border:0;border-right:1px solid var(--rtg-line);background:rgba(12,12,11,.88);color:var(--rtg-muted);
-  display:grid;place-items:center;cursor:pointer;padding:0;}
-.cmd-lade svg{width:20px;height:20px;stroke:currentColor;fill:none}
-.cmd-lade[aria-expanded="true"]{color:var(--gold-tekst,#C0A544)}
-.cmd-tabs{padding-left:46px}
-/* Op een telefoon voegt de plus niets toe: de lade toont dezelfde twaalf
-   werelden, en twee deuren naar hetzelfde is er een te veel. */
-.cmd-toevoeg{display:none}
+/* De schilbalk bestaat alleen op een telefoon; op een breed scherm doen de
+   tabstrip en de vaste rail zijn werk. Basis dus verborgen, en de mediaquery
+   hieronder zet hem aan -- niet andersom, want een balk die je moet uitzetten
+   verschijnt vroeg of laat waar hij niet hoort. */
+.cmd-balk{display:none}
 /* De grond onder de bladen is ONYX en niet de haarlijnkleur. Hier stond
    background:var(--rtg-line) -- bedoeld als 1px scheiding tussen twee bladen,
    maar samen met de padding hieronder werd 82px daarvan zichtbaar als een grijze
@@ -166,32 +158,74 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
    Alleen onder 1000px: op een breed scherm kost de strip geen leesruimte en
    toont hij bovendien welke twee bladen er naast elkaar staan. */
 @media (max-width:999px){
-  #rtgCommand[data-bladen="1"] .cmd-tabs{display:none}
-  #rtgCommand[data-bladen="1"] .cmd-werk{grid-template-rows:minmax(0,1fr)}
+  /* De tabstrip bovenin bestaat hier niet meer, in geen enkele stand: de
+     schilbalk onderaan doet zijn werk, en dan is één navigatielaag genoeg. */
+  .cmd-tabs{display:none}
+  .cmd-toevoeg{display:none}
+  /* Zelfde selectorlijst als de basisregel hierboven: die draagt
+     `body.rtg-stijl main.cmd-werk` en wint anders van een kale .cmd-werk --
+     dan kreeg .cmd-panes de 56px-rij en de balk de rest. */
+  body.rtg-stijl main.cmd-werk,.cmd-werk{grid-template-rows:minmax(0,1fr) auto}
+
+  /* ---- de schilbalk ----
+     Drie zones: de bank links, waar je bent in het midden, weg hier rechts.
+     48px, want dat is de minimale aanraakmaat plus een haarlijn -- alles
+     daarboven kost leesruimte aan een wereld die zijn eigen balk al draagt. */
+  .cmd-balk{
+    display:flex;align-items:stretch;height:calc(48px + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    border-top:1px solid var(--rtg-line);background:rgba(12,12,11,.94);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .cmd-balk .cmd-lade,.cmd-balksluit{
+    flex:0 0 auto;width:48px;border:0;background:transparent;color:var(--rtg-muted);
+    display:grid;place-items:center;cursor:pointer;padding:0;position:static;height:auto;
+    transition:color 140ms ease,background 140ms ease;
+  }
+  .cmd-balk .cmd-lade svg,.cmd-balksluit svg{width:20px;height:20px;stroke:currentColor;fill:none}
+  .cmd-balk .cmd-lade:hover,.cmd-balksluit:hover{color:var(--rtg-txt);background:rgba(255,255,255,.04)}
+  .cmd-balk .cmd-lade[aria-expanded="true"]{color:var(--gold-tekst,#C0A544);background:rgba(255,255,255,.05)}
+  .cmd-balksluit[hidden]{display:none}
+  /* De open bladen. Scrolt in zichzelf, zoals elke rij hier: twee namen passen,
+     een derde niet, en de pagina hoort daar niet breder van te worden. */
+  .cmd-balkbladen{
+    flex:1 1 auto;min-width:0;display:flex;align-items:stretch;gap:0;
+    overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+    border-left:1px solid var(--rtg-line);border-right:1px solid var(--rtg-line);
+  }
+  .cmd-balkbladen::-webkit-scrollbar{display:none}
+  .cmd-balkblad{
+    flex:0 0 auto;max-width:min(50vw,220px);border:0;border-bottom:2px solid transparent;
+    background:transparent;color:var(--rtg-muted);padding:0 1rem;cursor:pointer;
+    font:500 .78rem var(--rtg-interface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    transition:color 140ms ease,border-color 140ms ease,background 140ms ease;
+  }
+  .cmd-balkblad:hover{color:var(--rtg-txt)}
+  .cmd-balkblad.actief{color:var(--rtg-txt);border-bottom-color:#7F1634;
+    background:linear-gradient(180deg,rgba(127,22,52,.22),rgba(127,22,52,.04));}
+  /* Leeg is ook een toestand: dan draagt de balk alleen de bank, en zegt de
+     middenzone waarom er verder niets staat. */
+  /* De cookiemelding is fixed op bottom (shared/cookie.js) en lag daarmee OP de
+     balk -- niet alleen lelijk: hij ving de tikken af, dus de bank en de
+     sluitknop waren onbereikbaar zolang hij stond. Hij gaat er hier bovenuit.
+     Weghalen mag niet; dat is een melding en geen versiering. */
+  body.rtg-command #rtg-cookie{
+    bottom:calc(48px + env(safe-area-inset-bottom,0px));left:0;right:0;transform:none;
+    width:auto;max-width:none;padding:.45rem .8rem;
+    /* Een eigen grond, want zonder dat leest hij als tekst dwars door de
+       onderbalk van de wereld heen. Nu is het een strook van de schil, en de
+       wereld eronder blijft leesbaar. */
+    background:rgba(12,12,11,.94);border-top:1px solid var(--rtg-line);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .cmd-balkbladen:empty::after{
+    content:"Kies een wereld";align-self:center;padding:0 1rem;
+    color:var(--rtg-soft);font:400 .76rem var(--rtg-interface);
+  }
   /* Het blad loopt door tot de onderrand. De 82px eronder was ruimte voor de
      glasconsole, en die is al niet zichtbaar (rahul-tab/style-base.js zet hem op
      display:none) -- dus was het lege ruimte in de haarlijnkleur: de grijze balk. */
-  #rtgCommand[data-bladen="1"] .cmd-panes{padding-bottom:0}
-  /* De cookiemelding stond in die 82px en ligt nu op de onderbalk van de wereld.
-     Hij is fixed op bottom (shared/cookie.js), dus we tillen hem hier boven de
-     balk uit -- weghalen mag niet, dat is een melding en geen versiering. Zodra
-     hij is weggeklikt is er niets meer om ruimte voor te maken. */
-  body.rtg-command:has(#rtgCommand[data-bladen="1"]) #rtg-cookie{
-    bottom:calc(66px + env(safe-area-inset-bottom,0px));
-  }
-  /* De greep staat IN de onderbalk van de wereld zelf, op dezelfde hoogte als
-     de andere iconen daar, en niet als losse knop erboven. Hij komt uit de
-     lade en hoort dus onderaan; de wereld schuift er niet voor opzij, dus hij
-     legt zich over het eerste item -- dat is de prijs van een bank die overal
-     bereikbaar moet zijn. */
-  #rtgCommand[data-bladen="1"] .cmd-lade{
-    top:auto;bottom:0;left:0;width:52px;height:calc(58px + env(safe-area-inset-bottom,0px));
-    padding-bottom:env(safe-area-inset-bottom,0px);
-    border:0;border-right:1px solid var(--rtg-line);
-    background:color-mix(in srgb, var(--onyx-basis,#0C0C0B) 88%, transparent);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    color:var(--gold-tekst,#C0A544);
-  }
+  .cmd-panes{padding-bottom:0}
 }
 
 /* ------------------------------------------------- de gesloten stand (inlog) --

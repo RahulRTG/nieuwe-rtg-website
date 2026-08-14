@@ -240,14 +240,20 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
     const balk = await page.evaluate(() => {
       const zichtbaar = (id) => {
         const e = document.getElementById(id);
-        return e ? !!e.offsetParent : null;   // null = bestaat niet meer
+        if (!e) return null;                  // null = bestaat niet meer
+        const b = e.getBoundingClientRect(), s = getComputedStyle(e);
+        return !e.hidden && s.display !== 'none' && s.visibility !== 'hidden' &&
+          Number(s.opacity || 1) > 0 && b.width > 0 && b.height > 0;
       };
       return {
         bel: zichtbaar('bell'), paneel: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
         hamburger: !!document.getElementById('osMenuBtn'),
         groet: !!document.getElementById('homeGreeting'),
         zichtbaarRechts: [...document.querySelectorAll('.topbar .os-rechts button')]
-          .filter((b) => b.offsetParent).map((b) => b.id || b.className)
+          .filter((e) => { const b = e.getBoundingClientRect(), s = getComputedStyle(e);
+            return !e.hidden && s.display !== 'none' && s.visibility !== 'hidden' &&
+              Number(s.opacity || 1) > 0 && b.width > 0 && b.height > 0; })
+          .map((b) => b.id || b.className)
       };
     });
     /* EEN DEUR, EN VERDER NIETS.
@@ -310,7 +316,7 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
   });
 });
 
-test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
+test('het beginscherm draagt drie hoofdwerelden, en de klok staat erboven',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
@@ -351,15 +357,11 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
     });
-    assert.ok(r.mappen >= 7, 'er staan minder dan zeven mappen: ' + r.mappen);
-    assert.equal(r.rijen, 2, 'de mappen staan niet in twee rijen (rijen: ' + r.rijen + ')');
-    /* DE TWEEDE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. In een raster
-       van vier kolommen schuift zo'n restrij tegen de linkerkolom aan en blijft
-       er rechts een kolom leeg -- dan lees je een halfvolle rij van vier in
-       plaats van een rij van drie. Links en rechts even veel marge is dus geen
-       opmaakdetail maar het verschil tussen "een vorm" en "er ontbreekt er
-       een". En de tegels houden hun rasterbreedte: drie brede tegels zijn geen
-       tweede rij meer maar een andere maat. */
+    assert.equal(r.mappen, 3, 'er horen drie hoofdwerelden te staan: ' + r.mappen);
+    assert.equal(r.rijen, 1, 'de drie hoofdwerelden horen in een rij te staan (rijen: ' + r.rijen + ')');
+    /* DE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. Links en rechts even
+       veel marge is dus geen opmaakdetail maar het verschil tussen een bewuste
+       hoofdindeling en een rij waar ogenschijnlijk iets ontbreekt. */
     assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
       'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
       ', rechts ' + r.marge.rechts + ')');
@@ -477,7 +479,7 @@ test('geen enkele map loopt leeg op de instappas',
         monogram: !!map.querySelector('.os-monogram')
       })));
 
-    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven werelden gemeten: ' + mappen.length);
+    assert.equal(mappen.length, 3, 'er horen drie hoofdwerelden gemeten te worden: ' + mappen.length);
     const kaal = mappen.filter((m) => !m.glyf);
     assert.deepEqual(kaal.map((m) => m.naam + (m.monogram ? ' (monogram)' : ' (leeg)')), [],
       'deze wereldtegels dragen geen getekende glyf:\n' +
@@ -494,7 +496,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
      De voorganger van deze toets mat de tegels in een GEOPENDE map. Sinds het
-     beginscherm acht werelden toont (PLATFORM.md par. 0) opent een tegel de
+     beginscherm drie hoofdwerelden toont (PLATFORM.md par. 0) opent een tegel de
      app zelf en is er geen tussenscherm meer. De fout waar die toets voor
      bestond is niet verdwenen -- hij is verhuisd: tegels die over elkaar
      liggen, buiten hun vak vallen of de helft van de breedte onbenut laten,
@@ -502,7 +504,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
      en geldt nu.
 
      Wat er bij komt en er niet in kon staan: dat een wereld ook echt zijn app
-     opent. Dat is het hele punt van acht werelden; een tegel die niets doet
+     opent. Dat is het hele punt van drie hoofdwerelden; een tegel die niets doet
      zou door elke telling heen komen.
 
      De mutatie die hem hoort te laten zakken: haal `wereld` van een van de
@@ -556,7 +558,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
       };
     });
 
-    assert.ok(beeld.aantal >= 7, 'er zijn minder dan zeven werelden getekend: ' + beeld.aantal);
+    assert.equal(beeld.aantal, 3, 'er horen drie hoofdwerelden getekend te zijn: ' + beeld.aantal);
     assert.equal(beeld.overlap, 0,
       'wereldtegels liggen over elkaar heen (' + beeld.overlap + ' paren): ' + beeld.namen.join(', '));
     assert.equal(beeld.buiten, 0, 'deze wereldtegels vallen buiten hun eigen vak');

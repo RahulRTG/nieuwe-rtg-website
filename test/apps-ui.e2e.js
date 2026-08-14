@@ -119,7 +119,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
 
-      /* ACHT WERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
+      /* DRIE HOOFDWERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
 
          HIER STOND DE VORIGE AFSPRAAK, en die is een eigenaarsbesluit later
          vervangen. De eis was: vier vaste tegels onder de klok (Bellen,
@@ -135,14 +135,14 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
          geldt, en die is scherper dan "de rij is leeg": elke tegel op het
          beginscherm hoort een WERELD te zijn. Zet iemand er een losse app naast
          (precies de uitzondering die de afspraak uitholt), dan zakt hij. */
-      assert.ok(thuis.tegels.length >= 7,
-        'er horen acht werelden boven de klok te staan, geteld: ' + thuis.tegels.length);
+      assert.equal(thuis.tegels.length, 3,
+        'er horen drie hoofdwerelden boven de klok te staan, geteld: ' + thuis.tegels.length);
       const geenWereld = thuis.tegels.filter(t => !/^map-/.test(t.sleutel));
       assert.deepEqual(geenWereld, [],
         'er staat iets op het beginscherm dat geen wereld is: ' +
         geenWereld.map(t => t.naam + ' (' + t.sleutel + ')').join(', '));
       assert.deepEqual(thuis.functies, [],
-        'de functierij hoort leeg te zijn -- de acht werelden dragen alles: ' + thuis.functies.join(', '));
+        'de functierij hoort leeg te zijn -- de drie hoofdwerelden dragen alles: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
         'de volgorde is mappen, klok, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');

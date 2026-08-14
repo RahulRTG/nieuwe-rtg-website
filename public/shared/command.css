@@ -76,7 +76,11 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 /* Op een telefoon voegt de plus niets toe: de lade toont dezelfde twaalf
    werelden, en twee deuren naar hetzelfde is er een te veel. */
 .cmd-toevoeg{display:none}
-.cmd-panes{min-width:0;min-height:0;display:flex;gap:0;background:var(--rtg-line);padding-bottom:82px;position:relative;}
+/* De grond onder de bladen is ONYX en niet de haarlijnkleur. Hier stond
+   background:var(--rtg-line) -- bedoeld als 1px scheiding tussen twee bladen,
+   maar samen met de padding hieronder werd 82px daarvan zichtbaar als een grijze
+   balk onderin. De scheiding komt van .cmd-split, die heeft dit niet nodig. */
+.cmd-panes{min-width:0;min-height:0;display:flex;gap:0;background:var(--rtg-bg);padding-bottom:82px;position:relative;}
 .cmd-pane{min-width:0;min-height:0;flex:1 1 0;background:var(--rtg-bg);position:relative;overflow:hidden;
   animation:cmdBinnen 360ms var(--rtg-veer) both;transition:flex-basis 340ms var(--rtg-veer),opacity 220ms,transform 300ms var(--rtg-veer)}
 .cmd-pane.sluit{opacity:0;transform:translateX(18px);pointer-events:none}
@@ -164,16 +168,29 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 @media (max-width:999px){
   #rtgCommand[data-bladen="1"] .cmd-tabs{display:none}
   #rtgCommand[data-bladen="1"] .cmd-werk{grid-template-rows:minmax(0,1fr)}
-  /* De greep ligt LINKSONDER en niet linksboven. Dat is gemeten, niet gekozen:
-     een zwevende knop dekt altijd iets af (de werelden zijn volschermapps), maar
-     linksboven zit bij 8 van de 12 werelden een bediening en linksonder bij 5.
-     Het is bovendien waar hij hoort: de lade komt van onderen. */
+  /* Het blad loopt door tot de onderrand. De 82px eronder was ruimte voor de
+     glasconsole, en die is al niet zichtbaar (rahul-tab/style-base.js zet hem op
+     display:none) -- dus was het lege ruimte in de haarlijnkleur: de grijze balk. */
+  #rtgCommand[data-bladen="1"] .cmd-panes{padding-bottom:0}
+  /* De cookiemelding stond in die 82px en ligt nu op de onderbalk van de wereld.
+     Hij is fixed op bottom (shared/cookie.js), dus we tillen hem hier boven de
+     balk uit -- weghalen mag niet, dat is een melding en geen versiering. Zodra
+     hij is weggeklikt is er niets meer om ruimte voor te maken. */
+  body.rtg-command:has(#rtgCommand[data-bladen="1"]) #rtg-cookie{
+    bottom:calc(66px + env(safe-area-inset-bottom,0px));
+  }
+  /* De greep staat IN de onderbalk van de wereld zelf, op dezelfde hoogte als
+     de andere iconen daar, en niet als losse knop erboven. Hij komt uit de
+     lade en hoort dus onderaan; de wereld schuift er niet voor opzij, dus hij
+     legt zich over het eerste item -- dat is de prijs van een bank die overal
+     bereikbaar moet zijn. */
   #rtgCommand[data-bladen="1"] .cmd-lade{
-    top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);left:10px;width:40px;height:40px;
-    border:1px solid color-mix(in srgb, var(--gold-tekst,#C0A544) 30%, var(--rtg-line));
-    background:color-mix(in srgb, var(--onyx-basis,#0C0C0B) 76%, transparent);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    box-shadow:0 6px 20px rgba(0,0,0,.45);
+    top:auto;bottom:0;left:0;width:52px;height:calc(58px + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    border:0;border-right:1px solid var(--rtg-line);
+    background:color-mix(in srgb, var(--onyx-basis,#0C0C0B) 88%, transparent);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    color:var(--gold-tekst,#C0A544);
   }
 }
 

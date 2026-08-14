@@ -84,10 +84,10 @@ const stand = () => {
     klokIngang: !!document.querySelector('.cmd-klok'),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
-    greepOpBlad: (() => {
-      const g = document.querySelector('.cmd-lade'), f = document.querySelector('.cmd-pane.actief iframe');
-      if (!g || !f) return null;
-      return g.getBoundingClientRect().top < f.getBoundingClientRect().bottom - 1;
+    // loopt het blad door tot de onderrand? Zo niet, dan staat er weer een band
+    bladTotOnder: (() => {
+      const f = document.querySelector('.cmd-pane.actief iframe');
+      return f ? Math.round(window.innerHeight - f.getBoundingClientRect().bottom) : null;
     })(),
     leegstaat: !!document.querySelector('.cmd-leeg'),
   };
@@ -226,7 +226,11 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        mag niet op het blad komen te liggen: hij hoort in de band die de schil
        onderaan toch al vrijhoudt. */
     assert.equal(smalBlad.tabstrip, 'none', 'met een blad valt er niets te kiezen; de strip hoort weg te zijn');
-    assert.equal(smalBlad.greepOpBlad, false, 'en de greep mag de wereld niet afdekken');
+    /* En het blad loopt door tot de onderrand. Hieronder zat 82px ruimte voor de
+       glasconsole, die al niet zichtbaar is -- lege ruimte in de haarlijnkleur,
+       zichtbaar als een grijze balk. De greep ligt nu IN de onderbalk van de
+       wereld, op dezelfde hoogte als de iconen daar. */
+    assert.equal(smalBlad.bladTotOnder, 0, 'onder het blad hoort geen band meer te staan');
 
     // de lade halen: dezelfde twaalf werelden als in de rail op een computer
     await page.click('.cmd-lade');

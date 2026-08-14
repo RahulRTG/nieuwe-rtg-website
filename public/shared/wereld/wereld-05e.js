@@ -15,8 +15,8 @@
 
      WAT ER WEL GEBEURT, en wat het idee eigenlijk vraagt:
 
-     1. Elke wereld krijgt zijn EIGEN LICHT. De acht merken waren acht
-        identieke grijze schijven; nu draagt elk de tint van zijn eigen wereld
+     1. Elke wereld krijgt zijn EIGEN LICHT. De merken waren identieke grijze
+        schijven; nu draagt elk de tint van zijn eigen wereld
         (dezelfde tint als zijn gloed op de grond, uit MOTIEVEN). Daardoor lees
         je de ring als een stelsel van lichamen in plaats van als een rij
         knoppen -- en je herkent een wereld aan zijn kleur voordat je de glyf

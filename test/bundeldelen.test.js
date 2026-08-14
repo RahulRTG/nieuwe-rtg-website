@@ -8,7 +8,7 @@
    delen geschreven en is de wijziging weg. Geen fout, geen melding, gewoon een
    week werk minder.
 
-   Zo verdwenen hier het lege beginscherm, de zeven mappen, de Berichten-app en
+   Zo verdwenen hier het lege beginscherm, de hoofdwerelden, de Berichten-app en
    het app-menu: vier commits hadden alleen de bundel aangeraakt, en de vijfde
    draaide de build. De afwijking stond er al die tijd; hij is alleen nooit
    gemeten op een moment dat iemand keek.

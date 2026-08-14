@@ -24,6 +24,7 @@ const AUTOMATEN = {
   entourage: { naam: 'Gezelschap coördineren', uitleg: 'Maakt een afgeschermd conceptdraaiboek per rol.', risico: 'midden', tiers: ['business'] },
   reserveplan: { naam: 'Reserveplan gereedhouden', uitleg: 'Bereidt een alternatief voor zonder het te activeren of te betalen.', risico: 'laag', tiers: ['business'] }
 };
+const klok = require('../../lib/klok');
 
 module.exports = ctx => {
   const { db, save, schoon } = ctx;
@@ -73,7 +74,7 @@ module.exports = ctx => {
     }
     if (data.privacy) p.privacy.discreteMeldingen = tier === 'business' && data.privacy.discreteMeldingen === true;
     p.privacy.locatieNaRitWissen = true;
-    p.bijgewerkt = new Date().toISOString();
+    p.bijgewerkt = klok.datum().toISOString();
     db.data.ovRegie[key] = p; save();
     return profiel(key, tier);
   }

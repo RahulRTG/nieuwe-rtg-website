@@ -27,6 +27,7 @@ const crypto = require('crypto');
 const { standaardDefinities, GEVAARLIJKE_EXT } = require('./definities');
 const { hexNaarBytes, entropie, beginMet, magieKlopt, handtekeningScan, laagAf,
   MAX_LAAG, MAX_UITPAK, HEX } = require('./analyse');
+const uploadLimiet = require('./limiet');
 
 module.exports = (ctx) => {
   ctx = ctx || {};
@@ -146,6 +147,8 @@ module.exports = (ctx) => {
   function scanDataUrl(s, meta) {
     const m = /^data:([^;]+);base64,([A-Za-z0-9+/=]+)$/.exec(String(s || ''));
     if (!m) return { verdict: 'verdacht', redenen: ['geen geldige data-URL'], bytes: 0, sha256: '', entropie: 0 };
+    const teGroot = uploadLimiet.teGroot(m[2]);
+    if (teGroot) return teGroot;
     const buf = Buffer.from(m[2], 'base64');
     return verwerk(buf, Object.assign({ mime: m[1] }, meta || {}));
   }

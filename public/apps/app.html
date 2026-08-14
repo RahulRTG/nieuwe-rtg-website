@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="30d3376c">
+<meta name="rtg-bouw" content="5138300f">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -219,7 +219,7 @@
     /* DE ONDERGRENS IS GEEN SMAAK MAAR EEN VANGRAIL.
 
        Gemeten op een iPhone (iOS 18.7, Safari) die meldde "na inloggen zie je
-       niks meer": venster 375x669, shell 669, thuisscherm 603, acht tegels
+     niks meer": venster 375x669, shell 669, thuisscherm 603, de wereldtegels
        aanwezig -- en tegelbreedte NUL. Alles eromheen klopte; alleen de tegels
        waren onzichtbaar, want hun maat is calc(var(--e) * 3.87) en --e was daar
        nul geworden. Nul maal wat dan ook blijft nul, dus tekende de app zichzelf
@@ -1162,22 +1162,12 @@
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
-  /* 1. de mappen, bovenaan -- vier op de eerste rij, drie op de tweede.
+  /* 1. de hoofdwerelden, bovenaan -- één gecentreerde rij van drie.
 
-        DE TWEEDE RIJ STAAT GECENTREERD, en daarvoor moet dit blok uit het
-        raster stappen. Een grid van vier kolommen zet een restrij links tegen
-        de eerste kolom aan en laat rechts een kolom leeg; drie mappen lezen
-        dan als een halfvolle rij van vier -- alsof er eentje ontbreekt.
-        Hetzelfde blok als flexrij die terugvalt en zichzelf centreert, leest
-        als een vorm: vier boven, drie eronder, netjes onder het midden.
-
-        De tegels houden de breedte die ze in het raster hadden (een kwart
-        minus de tussenruimte), anders worden het er op de tweede rij drie
-        brede, en dan is het geen tweede rij meer maar een andere maat.
-
-        De rijen staan ook dichter op elkaar dan de rasterafstand van
-        .os-grid: zeven tegels in twee rijen zijn samen één blok, en met de
-        losse afstand viel dat blok in twee losse rijen uiteen. */
+        De voordeur toont RTG, RTG Kantoor en RTFoundation als één rustige
+        vorm. De tegels houden de compacte rastermaat; ze worden niet uitgerekt
+        om de beschikbare breedte te vullen, want dan verdringen ze de klok en
+        voelt drie als een leeg raster in plaats van een bewuste keuze. */
   .os-mappen{
     display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
     margin-top:calc(var(--e) * 0.9);flex-shrink:0;
@@ -1641,7 +1631,7 @@
       <!-- HIER STONDEN DRIE KNOPJES, EN NU STAAT ER GEEN.
 
            De batterij, de bel en het bedieningspaneel lagen los naast elkaar
-           boven een scherm dat verder alleen lucht, een klok en zeven mappen
+           boven een scherm dat verder alleen lucht, een klok en drie werelden
            is. Drie tekens naast elkaar is een stapeling, en de merkregel zegt:
            één signatuurelement, geen stapeling van trucjes. Ze zitten nu in
            het bedieningspaneel, dat je van de bovenrand omlaag haalt

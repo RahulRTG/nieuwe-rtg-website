@@ -16,7 +16,10 @@ module.exports = (ctx) => {
          niet getoond, en dan is een factuur niet terug te leiden naar wat hem
          veroorzaakte; bij zaak-aan-zaak is dat precies wat je moet kunnen. */
       ref: f.ref || null,
-      regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode
+      regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode,
+      // Oude facturen krijgen bij het lezen veilig de persoonlijke standaard;
+      // zo is de Receipt Vault ook na een upgrade volledig classificeerbaar.
+      classificatie: f.classificatie === 'zakelijk' ? 'zakelijk' : 'prive'
     };
   }
   function vind(id) { return store().facturen.find(f => f.id === id) || null; }
@@ -39,6 +42,15 @@ module.exports = (ctx) => {
     if (ctx.supplierCode && (f.verkoper.code === ctx.supplierCode || f.koper.supplierCode === ctx.supplierCode)) return true;
     if (ctx.key && f.koper.key === ctx.key) return true;
     return false;
+  }
+  function classificeer(id, key, waarde) {
+    const f = vind(String(id || ''));
+    if (!f || f.koper.key !== key) return { status: 404, error: 'Factuur niet gevonden.' };
+    if (!['prive', 'zakelijk'].includes(String(waarde || '')))
+      return { status: 400, error: 'Kies privé of zakelijk.' };
+    f.classificatie = String(waarde);
+    save();
+    return { status: 200, ok: true, factuur: publiek(f) };
   }
 
   // De PDF van een factuur (voor beide partijen dezelfde bon).
@@ -94,5 +106,5 @@ module.exports = (ctx) => {
     if (ctx.supplierCode) return { antwoord: 'U heeft ' + set.stats.verkocht + ' facturen verstuurd (omzet EUR ' + set.stats.omzet.toFixed(2) + ', btw EUR ' + set.stats.btwAfdracht.toFixed(2) + '). Zeg "maak een factuur voor ..." om er een te maken.' };
     return { antwoord: 'U heeft ' + set.telling + ' facturen ontvangen, samen EUR ' + set.besteed.toFixed(2) + '. Tik een factuur aan om de PDF te downloaden.' };
   }
-  return { publiek, vind, voorSupplier, voorLid, mag, pdf, bedragUit, aantalUit, codenaamUit, ai };
+  return { publiek, vind, voorSupplier, voorLid, mag, classificeer, pdf, bedragUit, aantalUit, codenaamUit, ai };
 };

@@ -6,7 +6,7 @@
      Wie de sfeer van een wereld wil bijstellen, hoeft alleen hier te zijn. */
   /* ELKE WERELD IS EEN LICHT, GEEN TEKENING.
 
-     Hier stonden acht LIJNTEKENINGEN: golfjes, een skyline van rechthoekjes,
+     Hier stonden domeinspecifieke LIJNTEKENINGEN: golfjes, een skyline van rechthoekjes,
      een raster bolletjes. Naast de inlogpoort -- een diepe sterrenhemel met een
      ademende dagkleur -- zag dat er precies uit als wat het was: draadwerk op
      een vlakke ondergrond. Een luxemerk tekent geen diagram op de achtergrond.

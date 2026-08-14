@@ -20,6 +20,8 @@
    ========================================================================== */
 'use strict';
 
+const klok = require('../lib/klok');
+
 module.exports = function maakBackup(deps) {
   const { fs, path, DATA_DIR, db, accounts, checkpointSqlite, checkpointGrootboek } = deps;
 
@@ -115,12 +117,12 @@ module.exports = function maakBackup(deps) {
     }
     for (const m of BACKUP_MAPPEN) aantal += kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
     if (!aantal) throw new Error('geen enkel databestand gevonden; lege back-up wordt geweigerd');
-    fs.writeFileSync(path.join(dir, '.complete'), JSON.stringify({ dag: day, klaar: new Date().toISOString(), bestanden: aantal }) + '\n', { mode: 0o600 });
+    fs.writeFileSync(path.join(dir, '.complete'), JSON.stringify({ dag: day, klaar: klok.datum().toISOString(), bestanden: aantal }) + '\n', { mode: 0o600 });
   }
 
   function kopieerVoltooideDag(bron, basis, day) {
     fs.mkdirSync(basis, { recursive: true, mode: 0o700 });
-    const tijdelijk = path.join(basis, '.' + day + '-' + process.pid + '-' + Date.now());
+    const tijdelijk = path.join(basis, '.' + day + '-' + process.pid + '-' + klok.nu());
     const doel = path.join(basis, day);
     fs.rmSync(tijdelijk, { recursive: true, force: true });
     try {
@@ -151,9 +153,9 @@ module.exports = function maakBackup(deps) {
       // en het transactiegrootboek, dat een EIGEN sqlite-bestand met eigen WAL is
       try { checkpointGrootboek(); } catch (e) {}
 
-      const day = new Date().toISOString().slice(0, 10);
+      const day = klok.datum().toISOString().slice(0, 10);
       fs.mkdirSync(BACKUP_DIR, { recursive: true, mode: 0o700 });
-      const tijdelijk = path.join(BACKUP_DIR, '.' + day + '-' + process.pid + '-' + Date.now());
+      const tijdelijk = path.join(BACKUP_DIR, '.' + day + '-' + process.pid + '-' + klok.nu());
       const dir = path.join(BACKUP_DIR, day);
       fs.rmSync(tijdelijk, { recursive: true, force: true });
       /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat

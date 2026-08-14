@@ -58,7 +58,7 @@ function noemt(p) {
      de graaf het beginscherm verkeerd: app.html noemt geen enkele app, want
      zijn tegels worden opgebouwd in /apps/app-main.js -- en dat bestand heet
      niet naar de pagina. De meting kwam daardoor op dertien bereikbare
-     schermen uit terwijl de acht werelden er gewoon stonden. Een graaf die de
+     schermen uit terwijl de drie hoofdwerelden er gewoon stonden. Een graaf die de
      verkeerde randen volgt, meet niets. */
   try {
     for (const m of fs.readFileSync(eigen, 'utf8').matchAll(/<script[^>]+src="(\/[^"]+\.js)"/g)) {

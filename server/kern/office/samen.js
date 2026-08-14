@@ -7,6 +7,8 @@
    personeelsvolgsysteem. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const CLASSIFICATIES = ['intern', 'vertrouwelijk', 'strikt'];
 const BEWAARTERMIJNEN = ['geen', '1jaar', '3jaar', '7jaar', 'permanent'];
 const MAX_OPMERKINGEN = 200;
@@ -43,7 +45,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
     if (!magLezen(d, key, kring)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
-    const grens = Date.now() - 45000;
+    const grens = klok.nu() - 45000;
     const hier = aanwezig.get(d.id) || new Map();
     for (const [client, p] of hier) if (p.om < grens) hier.delete(client);
     if (!hier.size) aanwezig.delete(d.id);
@@ -65,7 +67,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     const standNu = standen.includes(data && data.stand) ? data.stand : 'bekijkt';
     let hier = aanwezig.get(d.id);
     if (!hier) { hier = new Map(); aanwezig.set(d.id, hier); }
-    hier.set(client, { naam: naamVan(key), stand: standNu, om: Date.now() });
+    hier.set(client, { naam: naamVan(key), stand: standNu, om: klok.nu() });
     return stand(key, did, kring);
   }
 

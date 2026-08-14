@@ -5,6 +5,8 @@
 
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
+const klok = require('../lib/klok');
+
 module.exports = (kern) => {
   const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren } = kern;
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
@@ -182,7 +184,7 @@ module.exports = (kern) => {
     const bericht = rtmail.postvak(codenaam, { limit: 200 }).find(m => m.id === String(b.id || ''));
     if (!bericht) return res.status(404).json({ error: 'Bericht niet gevonden.' });
     if (b.actie === 'agenda') {
-      const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? b.datum : new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? b.datum : new Date(klok.nu() + 86400000).toISOString().slice(0, 10);
       const r = await agenda.voegToe('lid:' + req.session.key, { titel: b.titel || bericht.onderwerp, datum, tijd: b.tijd, notitie: 'Vanuit RTMAIL · ' + bericht.id });
       if (r.error) return res.status(400).json(r);
       return res.json({ ok: true, resultaat: r.item, bericht: rtmail.workflow(codenaam, bericht.id, { soort: 'agenda', label: 'In agenda gezet', ref: r.item.id }) });

@@ -6,8 +6,10 @@
    kan die status geven. Deze module schrijft nooit code of productiegegevens. */
 'use strict';
 
+const klok = require('../../../lib/klok');
+
 module.exports=({db,save,crypto})=>{
-  const nu=()=>new Date().toISOString();
+  const nu=()=>klok.datum().toISOString();
   const hash=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
   const rond=n=>Math.round(Number(n||0)*10)/10;
   const S=()=>db.data.magnaatLeren=db.data.magnaatLeren||{

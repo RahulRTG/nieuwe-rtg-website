@@ -16,7 +16,9 @@ const STATUSSEN = ['operationeel', 'aandacht', 'onderhoud', 'gestopt'];
 const TESTSTATUSSEN = ['niet-getest', 'bezig', 'geslaagd', 'mislukt'];
 const TAAKSTATUSSEN = ['open', 'bezig', 'geblokkeerd', 'klaar'];
 
-module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = () => Date.now() }) => {
+const klok = require('../lib/klok');
+
+module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klok.nu }) => {
   if (typeof wereldState !== 'function' || typeof getGraph !== 'function') throw new Error('Magnaat Codecontrole mist de wereld of Capability Graph.');
 
   const schoon = (v, max = 240) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);

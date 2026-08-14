@@ -1,14 +1,14 @@
 /* DE LEVENDE WERELD: het beginscherm als ruimte, niet als rooster.
 
-   Het beginscherm toonde acht tegels boven een klok. Tegels zijn duidelijk en
+   Het beginscherm toonde losse domeintegels boven een klok. Tegels zijn duidelijk en
    volstrekt inwisselbaar -- iedereen heeft ze, dus ze zeggen niets over wie dit
    huis is. Wat dit huis wel eigen is, staat er al: de klok. Die is hier geen
-   widget maar de KERN. De acht werelden hangen als merken om hem heen, je
+   widget maar de KERN. De drie hoofdwerelden hangen als merken om hem heen, je
    DRAAIT eraan om te reizen, en de klok blijft steeds dezelfde cirkel -- of je
    nu naar een wereld kijkt of erin staat.
 
    Dit blad tekent alleen. Wat er beweegt en wat er gebeurt staat in
-   shared/wereld.js; de acht werelden zelf komen uit MAPPEN (app-main-24a2.js)
+   shared/wereld.js; de drie hoofdwerelden zelf komen uit MAPPEN (app-main-24a2.js)
    en staan hier niet nog eens. Wie dit blad leest en denkt "waar staat de lijst
    werelden" -- die staat er bewust niet (LAT.md regel 4).
 
@@ -89,14 +89,14 @@
 }
 
 /* ---------- 4. de bezel ----------
-   De fijne gouden haarlijn met acht streepjes, en boven op twaalf uur het
+   De fijne gouden haarlijn met een scheiding per wereld, en boven op twaalf uur het
    vaste merkteken dat aanwijst waar je bent. Dat teken staat STIL; de ring
    draait eronderdoor. Dat is het verschil tussen een horloge en een draaitol:
    je leest de stand af aan een vast punt. */
 .os-bezel { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
 .os-bezel svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
-/* ---------- 5. de acht merken ----------
+/* ---------- 5. de drie hoofdmerken ----------
    Elk merk is een echte knop: tikken, tabben en Enter werken alle drie. Het
    staat rechtop, ook als de ring gedraaid is -- een gekantelde glyf is een
    sierletter, geen teken dat je in een oogopslag herkent. */
@@ -149,7 +149,7 @@
 .os-wm > * { position: relative; }
 .os-wm:active::before { transform: scale(0.92); }
 /* ELKE WERELD HEEFT ZIJN EIGEN LICHT.
-   De acht merken waren acht identieke grijze schijven. Nu draagt elk de tint
+   De merken waren identieke grijze schijven. Nu draagt elk de tint
    van zijn eigen wereld (--planeet, gezet door merkLicht() uit dezelfde tabel
    als zijn gloed op de grond), zodat de ring leest als een stelsel van lichamen
    in plaats van als een rij knoppen -- en je een wereld aan zijn kleur herkent

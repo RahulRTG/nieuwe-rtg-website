@@ -176,7 +176,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
     const bijKlok = await page.evaluate(stand);
     assert.equal(bijKlok.shellZichtbaar, true, 'Beginscherm hoort de klok terug te brengen');
-    assert.ok(bijKlok.klok >= 4, 'met de werelden eromheen, maar er stonden er ' + bijKlok.klok);
+    assert.equal(bijKlok.klok, 3, 'met exact de drie hoofdwerelden eromheen');
 
 
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT

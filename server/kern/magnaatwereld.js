@@ -199,8 +199,10 @@ const KANSEN = [
   }
 ];
 
+const klok = require('../lib/klok');
+
 module.exports = ({ db, save, crypto, functies }) => {
-  const nu = () => Date.now();
+  const nu = klok.nu;
   const id = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
   const tekst = (v, max = 300) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
   const alleFuncties = Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : [];

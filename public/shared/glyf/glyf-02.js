@@ -1,6 +1,10 @@
   // elk glyf op een 24x24-raster; alleen paden/vormen, de <svg>-jas komt hieronder
   var P = {
     /* --- de telefoon-basis --- */
+    /* RTG als kompas: één kern, vier richtingen en één beschermende cirkel.
+       Geen letterlogo op postzegelformaat; dit blijft ook op de wereldring
+       herkenbaar als lijntekening. */
+    rtg: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3.5v6.3M20.5 12h-6.3M12 20.5v-6.3M3.5 12h6.3"/>',
     bellen: '<path d="M7 4.2c-1 0-1.9.8-1.9 1.9 0 7.6 6.2 13.8 13.8 13.8 1.1 0 1.9-.9 1.9-1.9v-2.3c0-.9-.6-1.6-1.5-1.8l-2.2-.5c-.7-.2-1.5.1-1.9.8l-.5.9c-2.1-1-3.8-2.7-4.8-4.8l.9-.5c.7-.4 1-1.2.8-1.9l-.5-2.2C9.4 4.8 8.7 4.2 7.8 4.2z"/>',
     videobellen: '<rect x="3" y="7" width="12.5" height="10" rx="2.2"/><path d="M15.5 10.6l4.7-2.7c.4-.2.8.1.8.5v7.2c0 .4-.4.7-.8.5l-4.7-2.7"/>',
     snaps: '<rect x="3" y="7.5" width="18" height="12" rx="2.6"/><path d="M8.4 7.5l1.2-2.3h4.8l1.2 2.3"/><circle cx="12" cy="13.4" r="3.1"/>',
@@ -139,4 +143,3 @@
     'emo-bloem': '<circle cx="12" cy="11.5" r="1.9"/><circle cx="12" cy="6.6" r="2.4"/><circle cx="16.7" cy="10" r="2.4"/><circle cx="14.9" cy="15.4" r="2.4"/><circle cx="9.1" cy="15.4" r="2.4"/><circle cx="7.3" cy="10" r="2.4"/>',
     'emo-proost': '<path d="M5 4.5h4.5l-.7 5a1.5 1.5 0 0 1-3 0zM7 11v6.5M5.4 18h3.2M19 4.5h-4.5l.7 5a1.5 1.5 0 0 0 3 0zM17 11v6.5M15.4 18h3.2"/>'
   };
-

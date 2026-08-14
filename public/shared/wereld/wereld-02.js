@@ -84,7 +84,7 @@
      een streepje door een glyf lopen. Zo krijgt elke wereld bovendien een eigen
      vak op de ring, en dat is precies wat je van een bezel verwacht.
 
-     Ze worden hier GETEKEND naar het aantal standen en niet als vaste acht
+     Ze worden hier GETEKEND naar het aantal standen en niet als een vast aantal
      overgetikt: komt er ooit een negende wereld bij, dan klopt de verdeling
      vanzelf. */
   function tekenStreepjes(n) {

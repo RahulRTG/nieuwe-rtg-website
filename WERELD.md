@@ -8,7 +8,7 @@ drie er dus naast.
 
 ## De vraag
 
-Niet "hoe tonen we acht werelden?" maar:
+Niet "hoe tonen we drie hoofdwerelden?" maar:
 
 > *"Waarom voelt dit alsof ik ergens BEN, in plaats van dat ik ergens naar
 > kijk?"*
@@ -23,7 +23,7 @@ Wat wél eigen is, stond er al: **de klok.**
 
 De klok is geen widget meer. Hij is de **kern**.
 
-- De acht werelden hangen als merken op een **bezel** om hem heen.
+- De drie hoofdwerelden hangen als merken op een **bezel** om hem heen.
 - Je **draait** eraan om te reizen, zoals aan een horloge.
 - Het merkteken op twaalf uur staat **stil**; de ring draait eronderdoor. Zo
   lees je je positie af aan een vast punt.
@@ -134,7 +134,7 @@ Twee dingen die daarbij niet onderhandelbaar zijn:
 ## Elke wereld is een licht, geen tekening
 
 Hierboven op ligt een canvas met de sfeer van de wereld waar je staat. Dat waren
-eerst acht **lijntekeningen**: golfjes voor Reizen, een skyline van rechthoekjes
+eerst domeinspecifieke **lijntekeningen**: golfjes voor Reizen, een skyline van rechthoekjes
 voor Kantoor, een raster bolletjes voor Veilig. Naast een poort met een diepe
 sterrenhemel zag dat eruit als wat het was — draadwerk op een vlakke ondergrond.
 Een luxemerk tekent geen diagram op de achtergrond.

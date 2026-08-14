@@ -18,10 +18,11 @@ const MODI = {
 };
 const ROLLEN = ['hoofdgast', 'familie', 'assistent', 'manager', 'beveiliging', 'medisch', 'crew', 'bagage'];
 const SEGMENT_KETEN = ['voorbereid', 'aangevraagd', 'offerte', 'bevestigd', 'onderweg', 'afgerond'];
+const klok = require('../../lib/klok');
 
 module.exports = ctx => {
   const { db, save, crypto, schoon } = ctx;
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   function ensure() { if (!Array.isArray(db.data.ovOperaties)) db.data.ovOperaties = []; }
   const voor = key => (ensure(), db.data.ovOperaties.filter(o => o.key === key));
   const beeld = o => ({ id: o.id, naam: o.naam, status: o.status, van: o.van, naar: o.naar, vertrek: o.vertrek,
@@ -62,7 +63,7 @@ module.exports = ctx => {
       status: 'concept', van, naar, vertrek, personen, rollen, segmenten, aangemaakt: nu(),
       privacy: { codenaam: true, discreteMeldingen: true, locatieNaRitWissen: true, needToKnow: true },
       veiligheid: { menselijkeRegie: true, reserveplan: data.reserveplan !== false, betalingBevestigen: true },
-      bevestigHash: crypto.createHash('sha256').update(code).digest('hex'), codeTot: Date.now() + 10 * 60 * 1000 };
+      bevestigHash: crypto.createHash('sha256').update(code).digest('hex'), codeTot: klok.nu() + 10 * 60 * 1000 };
     db.data.ovOperaties.push(o); if (db.data.ovOperaties.length > 2000) db.data.ovOperaties = db.data.ovOperaties.slice(-2000);
     save();
     return { status: 200, ok: true, operatie: beeld(o), bevestigCode: code, geldigS: 600,
@@ -73,7 +74,7 @@ module.exports = ctx => {
     const o = voor(key).find(x => x.id === String(data.id || ''));
     if (!o) return { status: 404, error: 'Operatie niet gevonden.' };
     if (o.status !== 'concept') return { status: 409, error: 'Deze operatie is al ' + o.status + '.' };
-    if (Date.now() > o.codeTot) return { status: 410, error: 'De bevestigingscode is verlopen. Maak een nieuw concept.' };
+    if (klok.nu() > o.codeTot) return { status: 410, error: 'De bevestigingscode is verlopen. Maak een nieuw concept.' };
     const hash = crypto.createHash('sha256').update(String(data.code || '').trim().toUpperCase()).digest('hex');
     if (!crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(o.bevestigHash))) return { status: 403, error: 'De bevestigingscode klopt niet.' };
     o.status = 'gereed-voor-boeken'; o.geactiveerd = nu(); delete o.bevestigHash; delete o.codeTot; save();

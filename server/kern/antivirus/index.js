@@ -27,7 +27,6 @@ const crypto = require('crypto');
 const { standaardDefinities, GEVAARLIJKE_EXT } = require('./definities');
 const { hexNaarBytes, entropie, beginMet, magieKlopt, handtekeningScan, laagAf,
   MAX_LAAG, MAX_UITPAK, HEX } = require('./analyse');
-
 module.exports = (ctx) => {
   ctx = ctx || {};
   const db = ctx.db || { data: {} };

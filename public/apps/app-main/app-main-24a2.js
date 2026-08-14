@@ -3,46 +3,23 @@
      langs een echte grens: hierboven staat de registry van alle apps en de
      vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
      welke ervan bij welke pas horen. */
-  /* ---------- de mappen, boven de klok ----------
-     Zeven mappen, een rij van vier en een rij van drie, en daar zit alles in
-     waar je pas je recht op geeft. Niets installeren: het staat er al. Wil je
-     iets niet zien, dan zet je het uit in de Boardroom (die zet het uit, hij
-     hoeft het niet aan te zetten).
+  /* ---------- de hoofdwerelden, boven de klok ----------
+     Drie duidelijke huizen vervangen de losse domeinmappen: RTG voor het
+     persoonlijke leven en onderweg, RTG Kantoor voor werk en onderneming, en
+     RTFoundation voor de stichting en het gezin eromheen. De pas bepaalt wat
+     binnen zo'n huis beschikbaar is, nooit of de voordeur er armer uitziet.
 
-     WAAROM ZEVEN, EN NIET VIER OF ACHT.
-
-     Het waren er VIER, en dat leek rustig tot je ze opendeed: De Salon droeg
-     eenentwintig apps en Het Huis zeventien. Een map met eenentwintig tegels
-     is geen map maar een lade waar je in graait, en het verschil tussen
-     "muziek" en "een vriend appen" was er niet meer aan af te zien.
-
-     Toen werden het er ACHT, en dat was één te veel -- maar dat zag je alleen
-     als je op de goede pas keek. De tegels tellen namelijk niet voor iedereen
-     hetzelfde: veertien apps zijn Lifestyle/Business (zie PREMIUM hieronder)
-     en vallen voor een RTG-pas vanzelf weg. Het Huis had ik gevuld met Maison,
-     Table, Cellier, Garde-robe en De Rechterhand -- alle vijf premium -- dus
-     een Business-lid zag daar acht tegels en een RTG-lid drie. Dezelfde map,
-     half zo vol, precies onderaan. Dat is exact wat de merkregel verbiedt: de
-     instappas mag nooit budget aanvoelen.
-
-     Nageteld over alle 62 items is er materiaal voor ZEVEN mappen die op
-     allebei de passen gevuld staan, en niet voor acht. De zorgkant is daarom
-     terug in Het Huis -- waar zorg, gezin en rust ook horen -- en de tweede
-     rij telt drie mappen in plaats van vier. Een rij van drie is geen
-     halfvolle rij van vier: hij staat gecentreerd onder de eerste (zie
-     .os-mappen in apps/app.html), dus het leest als een vorm en niet als een
-     gat.
-
-     Tellingen per pas, gemeten en niet geschat (RTG / Business):
-     Reizen 8/10, Geld 7/10, De Salon 6/10, Het Huis 6/12,
-     Media 8/8, Werk 7/7, Veilig 4/4.
+     Daarom bewaart deze lijst alleen de drie vaste hoofdwerelden. Alle apps
+     blijven in precies één wereld ingedeeld en premiumrechten worden pas op
+     onderdeelniveau toegepast. Zo blijft RTG voor elke pas compleet ogen,
+     terwijl Lifestyle en Business aantoonbaar meer mogelijkheden ontsluiten.
 
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
      vallen er vanzelf uit (itemZichtbaar). Een app staat in precies EEN map:
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
-    /* --- eerste rij --- */
+    /* --- één gecentreerde rij --- */
     { sleutel: 'map-rtg', naam: 'RTG', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
@@ -65,7 +42,6 @@
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
-    /* --- tweede rij, gecentreerd --- */
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
       'link:nieuws', 'link:krant', 'link:sport',
       'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
@@ -91,7 +67,7 @@
        app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
-    /* De achtste wereld. De stichting stond als EEN tegel binnen Het Huis
+    /* De zelfstandige Foundation-wereld. De stichting stond als EEN tegel binnen Het Huis
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld
        hangt, is geen wereld. */

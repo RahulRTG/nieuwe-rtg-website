@@ -34,7 +34,7 @@ const JS = lees('public/shared/canvas.js');
 const TAAL = lees('public/shared/canvas-taal.js');
 const CSS = lees('public/shared/canvas.css');
 
-/* De acht werelden. Ze staan hier met NAAM en niet als een zoektocht over de
+/* De acht domeinschermen. Ze staan hier met NAAM en niet als een zoektocht over de
    map: een lijst die zichzelf opbouwt uit wat er ligt, keurt een wereld die
    iemand vergeet aan te sluiten vrolijk goed (LAT.md regel 9). */
 const WERELDEN = [
@@ -261,7 +261,7 @@ test('6. elke klasse die canvas.js tekent, bestaat in canvas.css', () => {
   }
 });
 
-test('7. de acht werelden dragen dezelfde opbouw: allemaal canvas.css', () => {
+test('7. de acht domeinschermen dragen dezelfde opbouw: allemaal canvas.css', () => {
   /* CANVAS.md: "Een eigen variant bedenken is de duurste manier om het geheel
      goedkoop te laten voelen." */
   for (const p of WERELDEN) {

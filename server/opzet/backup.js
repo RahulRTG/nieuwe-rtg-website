@@ -20,6 +20,8 @@
    ========================================================================== */
 'use strict';
 
+const klok = require('../lib/klok');
+
 module.exports = function maakBackup(deps) {
   const { fs, path, DATA_DIR, db, accounts, checkpointSqlite, checkpointGrootboek } = deps;
 
@@ -65,14 +67,72 @@ module.exports = function maakBackup(deps) {
      in plaats van er iets van te maken. */
   function kopieerMap(van, naar) {
     let namen;
-    try { namen = fs.readdirSync(van, { withFileTypes: true }); } catch (e) { return; }
-    try { fs.mkdirSync(naar, { recursive: true, mode: 0o700 }); } catch (e) {}
+    try { namen = fs.readdirSync(van, { withFileTypes: true }); }
+    catch (e) { if (e && e.code === 'ENOENT') return 0; throw e; }
+    fs.mkdirSync(naar, { recursive: true, mode: 0o700 });
+    let aantal = 0;
     for (const d of namen) {
       const bron = path.join(van, d.name), doel = path.join(naar, d.name);
-      try {
-        if (d.isDirectory()) kopieerMap(bron, doel);
-        else if (d.isFile()) { fs.copyFileSync(bron, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
-      } catch (e) { /* een enkel bestand mag de rest van de backup niet ophouden */ }
+      if (d.isDirectory()) aantal += kopieerMap(bron, doel);
+      else if (d.isFile()) {
+        fs.copyFileSync(bron, doel);
+        try { fs.chmodSync(doel, 0o600); } catch (e) {}
+        aantal++;
+      }
+    }
+    return aantal;
+  }
+
+  /* Een dagmap wordt pas zichtbaar als alles erin staat. Vroeger schreef de
+     server rechtstreeks naar backups/2026-08-14; een sidecar of beheerder kon
+     die map midden in het kopiëren pakken en hield dan een keurige maar halve
+     back-up over. De .complete-marker en de rename maken "bestaat" nu gelijk
+     aan "afgerond". */
+  function vervangAtomisch(tijdelijk, doel) {
+    const oud = doel + '.vorige';
+    // Herstel eerst een onderbroken wissel van een vorige procescrash.
+    if (!fs.existsSync(doel) && fs.existsSync(oud)) fs.renameSync(oud, doel);
+    fs.rmSync(oud, { recursive: true, force: true });
+    if (fs.existsSync(doel)) fs.renameSync(doel, oud);
+    try {
+      fs.renameSync(tijdelijk, doel);
+      fs.rmSync(oud, { recursive: true, force: true });
+    } catch (e) {
+      if (!fs.existsSync(doel) && fs.existsSync(oud)) fs.renameSync(oud, doel);
+      throw e;
+    }
+  }
+
+  function vulDagmap(dir, day) {
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    let aantal = 0;
+    for (const f of BACKUP_BESTANDEN) {
+      const from = path.join(DATA_DIR, f);
+      if (fs.existsSync(from)) {
+        const doel = path.join(dir, f);
+        fs.copyFileSync(from, doel);
+        try { fs.chmodSync(doel, 0o600); } catch (e) {}
+        aantal++;
+      }
+    }
+    for (const m of BACKUP_MAPPEN) aantal += kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
+    if (!aantal) throw new Error('geen enkel databestand gevonden; lege back-up wordt geweigerd');
+    fs.writeFileSync(path.join(dir, '.complete'), JSON.stringify({ dag: day, klaar: klok.datum().toISOString(), bestanden: aantal }) + '\n', { mode: 0o600 });
+  }
+
+  function kopieerVoltooideDag(bron, basis, day) {
+    fs.mkdirSync(basis, { recursive: true, mode: 0o700 });
+    const tijdelijk = path.join(basis, '.' + day + '-' + process.pid + '-' + klok.nu());
+    const doel = path.join(basis, day);
+    fs.rmSync(tijdelijk, { recursive: true, force: true });
+    try {
+      kopieerMap(bron, tijdelijk);
+      if (!fs.existsSync(path.join(tijdelijk, '.complete')))
+        throw new Error('bronback-up heeft geen .complete-marker');
+      vervangAtomisch(tijdelijk, doel);
+    } catch (e) {
+      fs.rmSync(tijdelijk, { recursive: true, force: true });
+      throw e;
     }
   }
 
@@ -93,18 +153,21 @@ module.exports = function maakBackup(deps) {
       // en het transactiegrootboek, dat een EIGEN sqlite-bestand met eigen WAL is
       try { checkpointGrootboek(); } catch (e) {}
 
-      const day = new Date().toISOString().slice(0, 10);
+      const day = klok.datum().toISOString().slice(0, 10);
+      fs.mkdirSync(BACKUP_DIR, { recursive: true, mode: 0o700 });
+      const tijdelijk = path.join(BACKUP_DIR, '.' + day + '-' + process.pid + '-' + klok.nu());
       const dir = path.join(BACKUP_DIR, day);
-      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-      try { fs.chmodSync(dir, 0o700); } catch (e) {}
+      fs.rmSync(tijdelijk, { recursive: true, force: true });
       /* De -wal-bestanden gaan mee als vangnet: lukt het checkpointen niet omdat
          een ander proces nog leest, dan is de kopie samen met zijn WAL alsnog
          compleet. SQLite leest een database met bijbehorende -wal gewoon uit. */
-      for (const f of BACKUP_BESTANDEN) {
-        const from = path.join(DATA_DIR, f);
-        if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
+      try {
+        vulDagmap(tijdelijk, day);
+        vervangAtomisch(tijdelijk, dir);
+      } catch (e) {
+        fs.rmSync(tijdelijk, { recursive: true, force: true });
+        throw e;
       }
-      for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
       /* Hooguit 14 dagen bewaren -- en dan ook echt alleen DAGEN.
 
          Hier stond `fs.readdirSync(BACKUP_DIR).sort()` over ALLES wat er lag.
@@ -126,13 +189,10 @@ module.exports = function maakBackup(deps) {
       // extra kopie naar een tweede schijf/mount (RTG_BACKUP_DIR), zodat een
       // backup ook een crash van de app-schijf overleeft.
       if (process.env.RTG_BACKUP_DIR) {
-        const off = path.join(process.env.RTG_BACKUP_DIR, day);
-        fs.mkdirSync(off, { recursive: true });
-        for (const f of BACKUP_BESTANDEN) {
-          const from = path.join(DATA_DIR, f);
-          if (fs.existsSync(from)) fs.copyFileSync(from, path.join(off, f));
-        }
-        for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(off, m));
+        const offBasis = path.resolve(process.env.RTG_BACKUP_DIR);
+        if (offBasis === path.resolve(BACKUP_DIR))
+          throw new Error('RTG_BACKUP_DIR wijst naar de lokale backupmap; een tweede kopie moet elders staan');
+        kopieerVoltooideDag(dir, offBasis, day);
       }
     } catch (e) { console.warn('[backup] mislukt:', e.message); }
   }

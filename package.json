@@ -10,6 +10,8 @@
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",
     "sleutels": "node scripts/sleutels.js",
+    "selfhost:init": "node scripts/sleutels.js --docker --prive-beta --schrijf",
+    "selfhost:check": "node scripts/docker/controle.js",
     "kluisbeheer": "node --experimental-sqlite scripts/kluisbeheer.js",
     "outbox": "node scripts/outbox.js",
     "eigenpost": "node scripts/eigenpost.js",

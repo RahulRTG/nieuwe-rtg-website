@@ -5,8 +5,8 @@ const { datum: klokDatum } = require('../../lib/klok');
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
-          forgetSession, mail, makeSupplierCode, officeAuth, save, sessions,
-          schoon, sseToOffice, sseToSupplier,
+          forgetSession, logActivity, mail, makeSupplierCode, officeAuth, save, sessions, schoon,
+          sseClients, sseSend, sseToOffice, sseToSupplier,
           ondernemingRegie, ondernemingProvisioningZet, ondernemingBijdrageZet, rechtsvormwacht } = kern;
 app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
@@ -50,36 +50,50 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-/* Schorsen is een boardroombesluit en geen instelling van het gedeelde
-   kantoor. Alle bestaande leverancierssessies worden meteen ingetrokken; de
-   centrale supplierAuth controleert de status bovendien bij elk verzoek, als
-   tweede slot voor processen die hun sessiegeheugen nog niet hebben ververst. */
+/* Een partnerschap openen en sluiten is boardroomwerk: het maakt of verbreekt
+   toegang tot een volledige bedrijfswerkplek. Een schorsing trekt daarom niet
+   alleen nieuwe logins dicht, maar wist ook alle bestaande sessies en sluit
+   open liveverbindingen. De centrale supplierAuth controleert de status bij
+   ieder verzoek als tweede slot voor processen met oud sessiegeheugen. */
 app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
   const code = String((req.body || {}).code || '').trim().toUpperCase();
   const status = String((req.body || {}).status || '').trim().toLowerCase();
+  const reden = schoon((req.body || {}).reden, 240);
   if (!['actief', 'geschorst', 'beeindigd'].includes(status))
     return res.status(400).json({ error: 'Kies actief, geschorst of beeindigd.' });
   const s = findSupplier(code);
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  if (status !== 'actief' && !reden)
+    return res.status(400).json({ error: 'Leg vast waarom deze partnerwerkplek wordt gesloten.' });
+
   const vorige = s.partnerStatus || 'actief';
   s.partnerStatus = status;
   s.partnerStatusAt = klokDatum().toISOString();
   s.partnerStatusDoor = boardroomWie(req);
-  s.partnerStatusReden = schoon((req.body || {}).reden, 240) || null;
+  s.partnerStatusReden = reden || null;
   if (status !== 'actief') s.online = false;
 
   let ingetrokken = 0;
   if (status !== 'actief') {
     const hashes = [];
-    for (const [hash, sessie] of sessions) {
-      if (sessie && sessie.role === 'supplier' && String(sessie.code || '').toUpperCase() === code) hashes.push(hash);
-    }
+    for (const [hash, sess] of sessions)
+      if (sess && sess.role === 'supplier' && String(sess.code || '').toUpperCase() === code) hashes.push(hash);
     for (const hash of hashes) { forgetSession(hash); ingetrokken += 1; }
+    for (let i = sseClients.length - 1; i >= 0; i--) {
+      const client = sseClients[i];
+      if (!client || String(client.sup || '').toUpperCase() !== code) continue;
+      try { sseSend(client.res, 'toegang-ingetrokken', { status }); } catch (e) {}
+      try { client.res.end(); } catch (e) {}
+      sseClients.splice(i, 1);
+    }
   }
   save();
+  logActivity(code, { name: 'Boardroom' }, status === 'actief'
+    ? 'hief de partnerschorsing op'
+    : 'zette de partnerwerkplek op ' + status + ': ' + reden);
   sseToSupplier(code, 'partner-status', { status, at: s.partnerStatusAt });
   sseToOffice('sync', { scope: 'partners', code, status });
-  res.json({ ok: true, code, vorige, status, ingetrokken });
+  res.json({ ok: true, code, vorige, status, ingetrokken, sessiesIngetrokken: ingetrokken });
 });
 
 /* ---------- RTF School: RTG keurt schoolaanmeldingen goed ----------

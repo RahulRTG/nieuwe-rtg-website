@@ -15,6 +15,7 @@ const { keurGeld } = require('./productie-geld');
 const { keurOpslag } = require('./productie-opslag');
 
 function keur(env, fouten, waarschuwingen) {
+    const priveBeta = env.RTG_PRIVATE_BETA === '1';
     // 1. Demo-modus mag nooit aan in productie: dat opent de demo-inlog en het
     //    account Rahul/Imran.
     if (env.RTG_DEMO === '1')
@@ -78,6 +79,24 @@ function keur(env, fouten, waarschuwingen) {
     // 3b. Geen grootboek, geen productie. Zie ./productie-opslag.js.
     keurOpslag(env, fouten, waarschuwingen);
 
+    /* Een private beta is een bouwstand, geen sluiproute naar internet. Mail mag
+       naar de lokale outbox en de betaalprovider mag demo zijn, maar uitsluitend
+       als APP_URL aantoonbaar lokaal is. Een publiek adres met deze vlag is een
+       harde fout: anders wordt "tijdelijk" ongemerkt productie. */
+    if (priveBeta) {
+      let lokaal = false;
+      try {
+        const host = new URL(String(env.APP_URL || '')).hostname.toLowerCase();
+        lokaal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.local') ||
+          /^10\./.test(host) || /^192\.168\./.test(host) ||
+          (() => { const m = /^172\.(\d+)\./.exec(host); return !!m && Number(m[1]) >= 16 && Number(m[1]) <= 31; })();
+      } catch (e) {}
+      if (!lokaal)
+        fouten.push('RTG_PRIVATE_BETA=1 mag alleen met een lokaal APP_URL (localhost, .local of een privaat netwerkadres). Een private beta mag nooit per ongeluk publiek staan.');
+      else
+        waarschuwingen.push('RTG_PRIVATE_BETA=1: alleen lokaal bouwen; mail blijft in de outbox en demo-betalingen zijn geen echte betalingen. Verwijder deze vlag voor publieke livegang.');
+    }
+
     // 4. Aanbevolen, maar niet blokkerend.
     if (!env.APP_URL) waarschuwingen.push('APP_URL niet gezet: links in e-mails vallen terug op de Host-header.');
     /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
@@ -112,8 +131,10 @@ function keur(env, fouten, waarschuwingen) {
        denkt dat het verzonden is, is geen werkbare uitwijk en blijft blokkeren. */
     if (!env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY && !env.GEMINI_API_KEY && !env.GOOGLE_API_KEY)
       waarschuwingen.push('Geen AI-provider ingesteld: RTG start volledig in handmatige werkmodus. Vrije AI-verrijking staat uit; kernprocessen, navigatie en regelgestuurde opdrachten blijven beschikbaar.');
-    if (!env.SMTP_URL && !env.SMTP_HOST)
-      fouten.push('Geen echte mailprovider ingesteld: herstel- en bevestigingsmail zou alleen in de lokale outbox belanden. Zet SMTP_URL of SMTP_HOST.');
+    if (!env.SMTP_URL && !env.SMTP_HOST) {
+      if (priveBeta) waarschuwingen.push('Geen mailprovider in private beta: herstel- en bevestigingsmail blijft zichtbaar in de lokale outbox.');
+      else fouten.push('Geen echte mailprovider ingesteld: herstel- en bevestigingsmail zou alleen in de lokale outbox belanden. Zet SMTP_URL of SMTP_HOST.');
+    }
     // De geldkant (Stripe, munt, RTF-afdracht) staat in ./productie-geld.js
     keurGeld(env, fouten, waarschuwingen);
 }

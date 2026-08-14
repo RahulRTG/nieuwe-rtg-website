@@ -1,96 +1,204 @@
-# Lokale/kleine productie-opstelling: de app + Redis (voor realtime over meerdere
-# instances). Zet je geheimen in een .env-bestand naast dit bestand (zie
-# .env.example); compose leest die automatisch.
-#
-# Starten:  docker compose up -d --build
-# Logs:     docker compose logs -f app
-# Stoppen:  docker compose down
+# RTG self-hosted productie. De app staat standaard ALLEEN op de loopback;
+# Cloudflare Tunnel, Caddy of een andere lokale reverse proxy is de voordeur.
+# Geheimen worden als Docker secrets gemount en staan dus niet in `docker
+# inspect`. Maak ze met:
+#   npm run selfhost:init -- --eigenaar=jij@domein.nl
+# Start daarna met:
+#   docker compose up -d --build
+name: rtg
+
+x-rtg-beveiliging: &rtg-beveiliging
+  restart: unless-stopped
+  init: true
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=128m
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "5"
+
 services:
   app:
-    build: .
-    restart: unless-stopped
+    <<: *rtg-beveiliging
+    build:
+      context: .
+    command: ["node", "scripts/docker/start.js", "app"]
+    stop_grace_period: 35s
     ports:
-      - "${PORT:-3000}:3000"
+      # Bewust niet 0.0.0.0: zonder TLS-rand hoort Node niet direct op internet.
+      - "${RTG_PUBLISH_HOST:-127.0.0.1}:${PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
+      RTG_BIND: 0.0.0.0
+      RTG_ENV_FILE: /run/secrets/rtg_env
+      RTG_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://rtg:${POSTGRES_PASSWORD:-rtg}@postgres:5432/rtg
-      # de rest komt uit .env (RTG_ENC_KEY, APP_URL, STRIPE_SECRET_KEY, ...)
-      RTG_ENC_KEY: ${RTG_ENC_KEY:-}
-      RTG_VAULT_KEY: ${RTG_VAULT_KEY:-}
-      RTG_SECRET_KEY: ${RTG_SECRET_KEY:-}
-      APP_URL: ${APP_URL:-}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
-      # Externe alarmering: een webhook-POST bij elke uitzondering. SENTRY_DSN
-      # stond hier, maar wordt door niets gelezen (geen externe pakketten).
-      ERR_WEBHOOK_URL: ${ERR_WEBHOOK_URL:-}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      # Rust draait standaard als continu gecontroleerde schaduwmotor. De Node-
-      # waarheid blijft autoritatief tot RTG_MOTOR_GELD expliciet op motor gaat.
       RTG_MOTOR_SHADOW: http://motor:3100
-      RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
       RTG_MOTOR_GELD_URL: http://motor:3100
-      RTG_MOTOR_TOKEN: ${RTG_MOTOR_TOKEN:?Zet RTG_MOTOR_TOKEN op minimaal 16 willekeurige tekens}
+      RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RTG_STOP_GRACE_MS: 30000
+    secrets:
+      - rtg_env
+      - postgres_password
     volumes:
       - rtg-data:/app/server/data
+    networks:
+      - edge
+      - data
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
       motor:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 4s
-      retries: 3
-      start_period: 10s
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
   motor:
-    build: .
-    restart: unless-stopped
-    command: ["/app/rtg-motor"]
+    <<: *rtg-beveiliging
+    build:
+      context: .
+    command: ["node", "scripts/docker/start.js", "motor"]
     environment:
+      NODE_ENV: production
+      RTG_ENV_FILE: /run/secrets/rtg_env
       RTG_MOTOR_ADDR: 0.0.0.0:3100
       RTG_MOTOR_DATA: /app/motor-data/state.json
       RTG_MOTOR_GIDS: /app/motor-data/gids.bin
       RTG_KLUIS_KEY_FILE: /app/motor-data/secret.key
       RTG_KLUIS_DATA: /app/motor-data/kluis.json
-      RTG_MOTOR_TOKEN: ${RTG_MOTOR_TOKEN:?Zet RTG_MOTOR_TOKEN op minimaal 16 willekeurige tekens}
+    secrets:
+      - rtg_env
     volumes:
       - rtg-motor:/app/motor-data
+    networks:
+      - data
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3100/api/leeft',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 10s
       timeout: 3s
       retries: 5
-      start_period: 5s
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     volumes:
       - rtg-redis:/data
+    networks:
+      - data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"
 
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       POSTGRES_USER: rtg
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rtg}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_DB: rtg
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - postgres_password
     volumes:
       - rtg-pg:/var/lib/postgresql/data
+    networks:
+      - data
+    shm_size: 256m
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rtg"]
+      test: ["CMD-SHELL", "pg_isready -U rtg -d rtg"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 8
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    entrypoint: ["/bin/sh", "/usr/local/bin/rtg-backup"]
+    environment:
+      PGHOST: postgres
+      PGUSER: rtg
+      PGDATABASE: rtg
+      PGPASSWORD_FILE: /run/secrets/postgres_password
+      RTG_BACKUP_INTERVAL: ${RTG_BACKUP_INTERVAL:-86400}
+      RTG_BACKUP_RETENTION_DAYS: ${RTG_BACKUP_RETENTION_DAYS:-30}
+    secrets:
+      - postgres_password
+    volumes:
+      - ./scripts/docker/backup.sh:/usr/local/bin/rtg-backup:ro
+      - rtg-data:/app-data:ro
+      # Zet RTG_BACKUP_HOST_DIR op een externe schijf voor bescherming tegen
+      # verlies van de Docker-schijf. ./backups is alleen de veilige standaard.
+      - ${RTG_BACKUP_HOST_DIR:-./backups}:/backups
+    networks:
+      - data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m
+    depends_on:
+      app:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"
+
+secrets:
+  rtg_env:
+    file: ${RTG_ENV_FILE:-.env.productie}
+  postgres_password:
+    file: ${RTG_POSTGRES_PASSWORD_FILE:-.rtg-secrets/postgres_password}
+
+networks:
+  edge:
+  data:
+    internal: true
 
 volumes:
   rtg-data:

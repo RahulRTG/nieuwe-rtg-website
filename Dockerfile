@@ -1,10 +1,18 @@
+# syntax=docker/dockerfile:1.7
 # Bouw de Rust-motor los van de kleine Node-runtime-image. Cargo gebruikt het
 # vastgezette Cargo.lock; de uiteindelijke container krijgt alleen de binary.
 FROM rust:1.97-slim AS motor-builder
 WORKDIR /src/motor
 COPY motor/Cargo.toml motor/Cargo.lock ./
 COPY motor/src ./src
-RUN cargo test --release --locked && cargo build --release --locked
+# De tests draaien vóór publicatie in CI en in de repositorykeuring. Een image-
+# rebuild hoeft ze niet bij iedere bronwijziging opnieuw te compileren. De twee
+# caches maken ook een koude dependencyronde herbruikbaar zonder in de runtime
+# terecht te komen.
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/src/motor/target \
+    cargo build --release --locked && \
+    cp /src/motor/target/release/rtg-motor /tmp/rtg-motor
 
 # RTG / RTFoundation productie-image.
 # Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
@@ -22,11 +30,11 @@ COPY package.json package-lock.json ./
 # Het project heeft GEEN afhankelijkheden (ook de minifier is eigen code), dus
 # dit installeert niets. We doen het toch: npm ci faalt als de lockfile en
 # package.json uit elkaar lopen, en dat is precies de bewaking die we willen.
-RUN npm ci && npm cache clean --force
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 
 # De rest van de broncode.
 COPY . .
-COPY --from=motor-builder /src/motor/target/release/rtg-motor /app/rtg-motor
+COPY --from=motor-builder /tmp/rtg-motor /app/rtg-motor
 
 # Frontend-build: minify de serveerbare JS naar public/dist/min en stempel de
 # service-worker caches. Alles met eigen scripts, dus niets om achteraf te
@@ -40,6 +48,8 @@ VOLUME ["/app/server/data"]
 
 # Nooit als root draaien.
 USER node
+
+STOPSIGNAL SIGTERM
 
 EXPOSE 3000 3100
 

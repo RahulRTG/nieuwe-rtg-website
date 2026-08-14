@@ -74,6 +74,13 @@
      iemand een console hoeft te openen. */
   function meetLeeg(reden) {
     try {
+      /* RTG Command bedekt de leden-shell bewust en verbergt #shell. De lege
+         werktafel is een geldige landing met bank en console, geen zwart
+         scherm. Zonder deze uitsluiting stuurde elke gezonde Command-sessie
+         een vals alarm met shell=0 en midden=DIV.cmd-leeg. */
+      var command = document.getElementById('rtgCommand');
+      if (command && command.getBoundingClientRect().width > 0 &&
+          command.getBoundingClientRect().height > 0) return;
       /* --e staat op #app en niet op :root; hem daar lezen gaf een lege waarde,
          en juist die rekeneenheid is wat een layoutstoring verraadt. */
       var app = document.getElementById('app');

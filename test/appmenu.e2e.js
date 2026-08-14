@@ -107,6 +107,32 @@ async function metLid(fn) {
   }
 }
 
+/* Deze toetsen meten bewust de alternatieve rasterstand. Wacht eerst tot het
+   lid en de wereldmodule volledig zijn hersteld; een DOM-tegel kan al bestaan
+   terwijl de sessie nog bezig is en de standaardring hem een tel later
+   verbergt. Daarna schakelen we via dezelfde publieke bediening als de app. */
+async function wachtRooster(page) {
+  await page.waitForFunction(() => {
+    const app = document.getElementById('app');
+    return !!(app && app.classList.contains('active') && window.RTGWereld &&
+      document.querySelector('.view[data-view="home"].active') &&
+      document.querySelectorAll('#osMappen .os-app').length === 3);
+  }, null, { timeout: 60000 });
+  /* RTG Command is na de intake de landing. Deze toetsen meten de kloklaag
+     eronder, dus volgen dezelfde knop "Beginscherm" als een lid. Rechtstreeks
+     klikken via de DOM werkt ook wanneer de mobiele bank nog dicht is. */
+  await page.evaluate(() => {
+    const k = document.querySelector('#rtgCommand .cmd-klok');
+    if (k) k.click();
+  });
+  await page.evaluate(() => RTGWereld.zet(false));
+  await page.waitForFunction(() => !RTGWereld.aan() &&
+    !!document.querySelector('.view[data-view="home"].active') &&
+    [...document.querySelectorAll('#osMappen .os-app')]
+      .every((t) => t.getBoundingClientRect().width >= 8 && t.getBoundingClientRect().height >= 8),
+  null, { timeout: 10000 });
+}
+
 test('Rahul heeft één balk, op elk pad waarop de homescreen te bereiken is',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
@@ -223,7 +249,7 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#osAiBalk', { timeout: 10000 });
     /* Een vers geregistreerd lid staat nog in de intake, en die legt een blad
        over het hele scherm. Wat we hier meten ligt eronder: de statusbalk van
@@ -316,15 +342,16 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
   });
 });
 
-test('het beginscherm draagt drie hoofdwerelden, en de klok staat erboven',
+test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klok staat erboven',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osMappen .os-app', { timeout: 10000 });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await wachtRooster(page);
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await page.waitForTimeout(400);
+    await wachtRooster(page);
 
     const r = await page.evaluate(() => {
       const vak = (s) => {
@@ -335,14 +362,15 @@ test('het beginscherm draagt drie hoofdwerelden, en de klok staat erboven',
       const navVak = nav.getBoundingClientRect();
       const tegels = [...nav.querySelectorAll('.os-app')];
       const rijen = new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
-      // de laatste rij: telt hij minder tegels, dan hoort hij gecentreerd te staan
+      // de ene rij hoort als geheel gecentreerd te staan
       const laatsteTop = Math.max(...tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
       const laatste = tegels.filter((t) => Math.round(t.getBoundingClientRect().top) === laatsteTop);
       const marge = {
         links: Math.round(laatste[0].getBoundingClientRect().left - navVak.left),
         rechts: Math.round(navVak.right - laatste[laatste.length - 1].getBoundingClientRect().right)
       };
-      const onder = document.querySelector('#osDemoWet') || document.querySelector('#osAiWet');
+      const onder = [...document.querySelectorAll('#osAiWet, #osDemoWet')]
+        .filter((e) => getComputedStyle(e).display !== 'none').at(-1);
       const klokvak = vak('.os-klokvak'), klok = vak('#homeKlok');
       const tips = document.querySelector('#osAiTips');
       const boven = tips && !tips.hidden ? vak('#osAiTips') : vak('#osAiDraad');
@@ -357,11 +385,13 @@ test('het beginscherm draagt drie hoofdwerelden, en de klok staat erboven',
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
     });
-    assert.equal(r.mappen, 3, 'er horen drie hoofdwerelden te staan: ' + r.mappen);
-    assert.equal(r.rijen, 1, 'de drie hoofdwerelden horen in een rij te staan (rijen: ' + r.rijen + ')');
+    assert.equal(r.mappen, 3, 'de voordeur hoort exact drie hoofdwerelden te dragen');
+    assert.equal(r.rijen, 1, 'de drie hoofdwerelden staan niet in één rij (rijen: ' + r.rijen + ')');
     /* DE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. Links en rechts even
-       veel marge is dus geen opmaakdetail maar het verschil tussen een bewuste
-       hoofdindeling en een rij waar ogenschijnlijk iets ontbreekt. */
+       veel marge maakt er één bewuste voordeur van, in plaats van drie tegels
+       die toevallig vanaf de linkerkant zijn neergelegd. De tegels houden
+       bovendien dezelfde compacte maat; drie uitgerekte tegels zouden de klok
+       en de rustige hiërarchie verdringen. */
     assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
       'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
       ', rechts ' + r.marge.rechts + ')');
@@ -398,30 +428,13 @@ test('het beginscherm draagt drie hoofdwerelden, en de klok staat erboven',
   });
 });
 
-test('geen enkele map loopt leeg op de instappas',
+test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
-  /* DE TEGELS TELLEN NIET VOOR IEDEREEN HETZELFDE, en dat is precies waar de
-     indeling van de mappen op stukging. Veertien apps zijn Lifestyle/Business
-     (de PREMIUM-set in app-main.js) en vallen voor een RTG-pas vanzelf weg.
-     Het Huis was gevuld met Maison, Table, Cellier, Garde-robe en De
-     Rechterhand -- alle vijf premium -- dus een Business-lid zag daar acht
-     tegels en een RTG-lid drie. Dezelfde map, half zo vol, precies op de
-     instappas. De merkregel is daar niet vaag over: RTG Pass is de instap,
-     maar mag nooit budget aanvoelen.
-
-     Zoiets zie je niet in de bron -- daar staan gewoon acht sleutels in een
-     lijst -- en ook niet op je eigen scherm, want wie dit bouwt kijkt met de
-     pas die alles ziet. Je ziet het alleen door de mappen echt open te klikken
-     mét de kleinste pas. Vandaar deze toets.
-
-     De mutatie die hem hoort te laten zakken: zet de zorg-tabbladen (tab:zorg,
-     tab:gezin) uit Het Huis terug in een eigen map.
-
-     Hier stonden ook link:vitaal en link:thuisrust bij. Die twee zijn standen
-     van RTG Veilig geworden (een app kan maar in een map staan, en die map is
-     Veilig), dus Het Huis draagt zijn ondergrens nu op de twee tabbladen plus
-     link:ontdek en os:rtf. Dat is krapper dan het was: gaat er nog iets uit
-     Het Huis weg, dan zakt deze toets -- en dat is precies de bedoeling. */
+  /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
+     Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
+     dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
+     instappas: geen hoofdwereld mag daar terugvallen op een kaal monogram of
+     verdwijnen. */
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -445,9 +458,10 @@ test('geen enkele map loopt leeg op de instappas',
     }, tok);
     const page = await ctx.newPage();
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+    await wachtRooster(page);
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await page.waitForTimeout(400);
+    await wachtRooster(page);
 
     /* DE METING IS TWEE KEER VERHUISD, en dat hoort hier te staan.
 
@@ -470,16 +484,18 @@ test('geen enkele map loopt leeg op de instappas',
        verhuisd, naar regel 44 in scripts/check.js -- die leest de bron.
 
        DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: geef een wereld in
-       app-main-24a2.js een glyf-naam die niet bestaat ('map-geld' ->
+       app-main-24a2.js een glyf-naam die niet bestaat ('map-rtg' ->
        glyf: 'bestaatniet'). De tegel valt dan terug op het monogram. */
     const mappen = await page.evaluate(() =>
       [...document.querySelectorAll('#osMappen .os-app')].map((map) => ({
+        sleutel: map.dataset.sleutel || '',
         naam: (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim(),
         glyf: !!map.querySelector('.os-tegel svg'),
         monogram: !!map.querySelector('.os-monogram')
       })));
 
-    assert.equal(mappen.length, 3, 'er horen drie hoofdwerelden gemeten te worden: ' + mappen.length);
+    assert.deepEqual(mappen.map((m) => m.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
+      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
     const kaal = mappen.filter((m) => !m.glyf);
     assert.deepEqual(kaal.map((m) => m.naam + (m.monogram ? ' (monogram)' : ' (leeg)')), [],
       'deze wereldtegels dragen geen getekende glyf:\n' +
@@ -504,7 +520,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
      en geldt nu.
 
      Wat er bij komt en er niet in kon staan: dat een wereld ook echt zijn app
-     opent. Dat is het hele punt van drie hoofdwerelden; een tegel die niets doet
+     opent. Dat is het hele punt van de drie hoofdwerelden; een tegel die niets doet
      zou door elke telling heen komen.
 
      De mutatie die hem hoort te laten zakken: haal `wereld` van een van de
@@ -532,10 +548,11 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await wachtRooster(page);
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await page.waitForTimeout(400);
+    await wachtRooster(page);
 
     const beeld = await page.evaluate(() => {
       const tegels = [...document.querySelectorAll('#osMappen .os-app')];
@@ -551,6 +568,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
       }
       return {
         aantal: tegels.length,
+        sleutels: tegels.map((t) => t.dataset.sleutel || ''),
         namen: tegels.map((t) => (t.getAttribute('aria-label') || '').replace(/^Map /, '').trim()),
         overlap: overlap.length,
         buiten: doosjes.filter((r) => r.left < vak.left - 0.5 || r.right > vak.right + 0.5).length,
@@ -558,7 +576,8 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
       };
     });
 
-    assert.equal(beeld.aantal, 3, 'er horen drie hoofdwerelden getekend te zijn: ' + beeld.aantal);
+    assert.deepEqual(beeld.sleutels, ['map-rtg', 'map-werk', 'map-rtf'],
+      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te tekenen');
     assert.equal(beeld.overlap, 0,
       'wereldtegels liggen over elkaar heen (' + beeld.overlap + ' paren): ' + beeld.namen.join(', '));
     assert.equal(beeld.buiten, 0, 'deze wereldtegels vallen buiten hun eigen vak');
@@ -566,10 +585,11 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
 
     /* EN NU OPENT HIJ OOK ECHT. Een voor een, want elke klik navigeert weg. */
     for (let i = 0; i < beeld.aantal; i++) {
-      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+      await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+      await wachtRooster(page);
       await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
       await page.waitForTimeout(250);
+      await wachtRooster(page);
       await page.evaluate((n) => document.querySelectorAll('#osMappen .os-app')[n].click(), i);
       await page.waitForTimeout(900);
       const pad = new URL(page.url()).pathname;

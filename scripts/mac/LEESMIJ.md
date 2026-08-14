@@ -12,7 +12,7 @@ mv ~/Desktop/nieuwe-rtg-website ~/rtg
 cd ~/rtg
 
 # 2. installeren
-sudo scripts/mac/installeer.sh --eigenaar=jij@voorbeeld.nl --slaap-uit
+sudo scripts/mac/installeer.sh --eigenaar=jij@voorbeeld.nl --slaap-uit --private-beta
 
 # 3. bekijken
 open http://$(hostname -s).local:3000

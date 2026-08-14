@@ -17,6 +17,8 @@ module.exports = (ctx) => {
          veroorzaakte; bij zaak-aan-zaak is dat precies wat je moet kunnen. */
       ref: f.ref || null,
       regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode,
+      // Oude facturen krijgen bij het lezen veilig de persoonlijke standaard;
+      // zo is de Receipt Vault ook na een upgrade volledig classificeerbaar.
       classificatie: f.classificatie === 'zakelijk' ? 'zakelijk' : 'prive'
     };
   }
@@ -53,6 +55,15 @@ module.exports = (ctx) => {
     if (ctx.supplierCode && (f.verkoper.code === ctx.supplierCode || f.koper.supplierCode === ctx.supplierCode)) return true;
     if (ctx.key && f.koper.key === ctx.key) return true;
     return false;
+  }
+  function classificeer(id, key, waarde) {
+    const f = vind(String(id || ''));
+    if (!f || f.koper.key !== key) return { status: 404, error: 'Factuur niet gevonden.' };
+    if (!['prive', 'zakelijk'].includes(String(waarde || '')))
+      return { status: 400, error: 'Kies privé of zakelijk.' };
+    f.classificatie = String(waarde);
+    save();
+    return { status: 200, ok: true, factuur: publiek(f) };
   }
 
   // De PDF van een factuur (voor beide partijen dezelfde bon).

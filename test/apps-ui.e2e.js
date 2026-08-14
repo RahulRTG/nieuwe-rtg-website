@@ -28,6 +28,20 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) })).json();
 }
 
+// RTG Command is de landing op elke breedte. Op een telefoon zit de bank in
+// een lade; via Beginscherm vouwt de gebruiker de werktafel op naar de klok en
+// de thuislaag. Schermtests die juist die thuislaag meten volgen dezelfde weg.
+async function naarLedenThuis(page) {
+  await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
+  const lade = page.locator('#rtgCommand .cmd-lade');
+  if (await lade.isVisible()) {
+    await lade.click();
+    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
+  }
+  await page.click('#rtgCommand .cmd-klok');
+  await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
+}
+
 // Gedeeld stramien: zet tokens/keys in localStorage, open de app, wacht tot het
 // inlogscherm weg is en de app-weergave zichtbaar is, en eis geen JS-fouten.
 async function bootTest(opts) {
@@ -135,8 +149,8 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
          geldt, en die is scherper dan "de rij is leeg": elke tegel op het
          beginscherm hoort een WERELD te zijn. Zet iemand er een losse app naast
          (precies de uitzondering die de afspraak uitholt), dan zakt hij. */
-      assert.equal(thuis.tegels.length, 3,
-        'er horen drie hoofdwerelden boven de klok te staan, geteld: ' + thuis.tegels.length);
+      assert.deepEqual(thuis.tegels.map((t) => t.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
+        'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
       const geenWereld = thuis.tegels.filter(t => !/^map-/.test(t.sleutel));
       assert.deepEqual(geenWereld, [],
         'er staat iets op het beginscherm dat geen wereld is: ' +
@@ -336,7 +350,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
     // Deze test gaat over XSS-veiligheid in het conciergegesprek, niet over
@@ -346,6 +360,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
+    await naarLedenThuis(page);
 
     /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
 
@@ -390,7 +405,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
     await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
@@ -412,6 +427,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     }, reg.token);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
+    await naarLedenThuis(page);
 
     // 1. hij begint uit zichzelf: er staat een zin van Rahul in de draad
     await page.waitForSelector('#osAiDraad .os-bel.van-rahul', { timeout: 10000 });

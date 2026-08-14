@@ -77,7 +77,8 @@ module.exports = (ctx) => {
       },
       regels: v.regels, subtotaal: v.subtotaal, btwBedrag: v.btwBedrag, totaal: v.totaal,
       methode: scho(data.methode, 20) || null, ref: scho(data.ref, 60) || null,
-      classificatie: 'prive', at: nu(), datum: nu().slice(0, 10)
+      classificatie: data.classificatie === 'zakelijk' ? 'zakelijk' : 'prive',
+      at: nu(), datum: nu().slice(0, 10)
     };
     /* DE BETAALSTATUS. Facturen droegen die niet, dus gold elke factuur
        impliciet als afgedaan en bestond er geen debiteurenlijst.

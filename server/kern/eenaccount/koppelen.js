@@ -56,19 +56,21 @@ module.exports = (kctx) => {
         logInlog('koppel', false, s.code + '#' + body.staffId, req);
         return { status: 401, error: 'Onjuiste PIN.' };
       }
-      pinSlot.goed(doel);
-      /* De PIN bewijst de personeelsplek; de ingelogde accountsleutel bepaalt
-         aan WELK mens die plek voortaan vastzit. Dit is een eenmalige,
-         atomaire claim: een tweede account kan hem ook met de juiste PIN niet
-         overnemen. */
-      const sleutel = /^user-(\d+)$/.exec(String(key || ''));
-      if (!sleutel) return { status: 403, error: 'Deze personeelsplek kan alleen aan een persoonlijk RTG-account worden gekoppeld.' };
-      const lid = Number(sleutel[1]);
-      const gekoppeld = accounts.claimStaffMember(staff.id, lid, req && req.session && req.session.tier);
-      if (!gekoppeld) {
-        return { status: 403, error: 'Deze personeelsplek is al aan een ander RTG-account gekoppeld.' };
+      const lidSleutel = /^user-(\d+)$/.exec(String(key || ''));
+      const lidId = lidSleutel ? Number(lidSleutel[1]) : null;
+      const lid = lidId != null ? accounts.getUserById(lidId) : null;
+      if (!lid) return { status: 403, error: 'Deze personeelsplek kan alleen aan een geldig RTG-account worden gekoppeld.' };
+      if (staff.member_id != null && Number(staff.member_id) !== lidId) {
+        logInlog('koppel', false, s.code + '#' + body.staffId + ' al gekoppeld', req);
+        return { status: 403, error: 'Deze personeelsplek is al veilig aan een ander RTG-account gekoppeld.' };
       }
-      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: gekoppeld.id, naam: gekoppeld.name, staffRole: gekoppeld.role, at: nu() } };
+      const geclaimd = accounts.claimStaffMember(staff.id, lidId, lid.tier);
+      if (!geclaimd) {
+        logInlog('koppel', false, s.code + '#' + body.staffId + ' gelijktijdig geclaimd', req);
+        return { status: 403, error: 'Deze personeelsplek is zojuist aan een ander RTG-account gekoppeld.' };
+      }
+      pinSlot.goed(doel);
+      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: geclaimd.id, naam: geclaimd.name, staffRole: geclaimd.role, at: nu() } };
     }
 
     if (soort === 'zaak') {

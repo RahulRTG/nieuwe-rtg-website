@@ -1,10 +1,10 @@
 /* DE LEVENDE WERELD -- het beginscherm als ruimte in plaats van een rooster.
 
-   WAAROM DIT BESTAAT. Het beginscherm toonde acht tegels boven een klok. Dat
+   WAAROM DIT BESTAAT. Het beginscherm toonde losse domeintegels boven een klok. Dat
    werkt, en het is volstrekt inwisselbaar: elk toestel ter wereld opent met een
    rooster met icoontjes, dus het rooster zegt niets over wie dit huis is. Wat
    wel eigen is, stond er al -- de klok. Die is hier geen widget meer maar de
-   KERN: de acht werelden hangen als merken op een bezel om hem heen, je DRAAIT
+   KERN: de drie hoofdwerelden hangen als merken op een bezel om hem heen, je DRAAIT
    eraan om te reizen, en je stapt een wereld binnen zonder de cirkel te
    verlaten.
 
@@ -41,10 +41,10 @@
   var RUSTIG = false;
   try { RUSTIG = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
 
-  /* De acht standen op de bezel. Ze staan hier als HOEK en niet als lijst
+  /* De standen op de bezel. Ze staan hier als HOEK en niet als lijst
      werelden: hoeveel werelden er zijn bepaalt de aanroeper, en de ring rekent
      zijn verdeling daaruit uit. Zet iemand er ooit een negende bij, dan klopt
-     de bezel vanzelf -- dat is het verschil tussen een verdeling en acht
+     de bezel vanzelf -- dat is het verschil tussen een verdeling en een vast
      overgetikte hoeken. */
   var st = {
     aan: false,          // staat de wereldstand aan?
@@ -105,7 +105,7 @@
        hoort DAARBUITEN te vallen, anders loopt er een lijn dwars door een glyf.
 
        Dat ging hier eerst mis, en het was op een stilstaand scherm nauwelijks te
-       zien: de haarlijn stond op precies 41 (dus midden door alle acht de
+       zien: de haarlijn stond op precies 41 (dus midden door alle
        glyfschijven) en het merkteken op twaalf uur liep van 40,6 tot 45,4 --
        precies over het merk dat er net onder was komen te staan. Je zag geen
        aanwijzer boven een wereld maar een streepje IN een wereld.
@@ -236,7 +236,7 @@
      een streepje door een glyf lopen. Zo krijgt elke wereld bovendien een eigen
      vak op de ring, en dat is precies wat je van een bezel verwacht.
 
-     Ze worden hier GETEKEND naar het aantal standen en niet als vaste acht
+     Ze worden hier GETEKEND naar het aantal standen en niet als een vast aantal
      overgetikt: komt er ooit een negende wereld bij, dan klopt de verdeling
      vanzelf. */
   function tekenStreepjes(n) {
@@ -820,7 +820,7 @@
      Wie de sfeer van een wereld wil bijstellen, hoeft alleen hier te zijn. */
   /* ELKE WERELD IS EEN LICHT, GEEN TEKENING.
 
-     Hier stonden acht LIJNTEKENINGEN: golfjes, een skyline van rechthoekjes,
+     Hier stonden domeinspecifieke LIJNTEKENINGEN: golfjes, een skyline van rechthoekjes,
      een raster bolletjes. Naast de inlogpoort -- een diepe sterrenhemel met een
      ademende dagkleur -- zag dat er precies uit als wat het was: draadwerk op
      een vlakke ondergrond. Een luxemerk tekent geen diagram op de achtergrond.
@@ -1145,8 +1145,8 @@
 
      WAT ER WEL GEBEURT, en wat het idee eigenlijk vraagt:
 
-     1. Elke wereld krijgt zijn EIGEN LICHT. De acht merken waren acht
-        identieke grijze schijven; nu draagt elk de tint van zijn eigen wereld
+     1. Elke wereld krijgt zijn EIGEN LICHT. De merken waren identieke grijze
+        schijven; nu draagt elk de tint van zijn eigen wereld
         (dezelfde tint als zijn gloed op de grond, uit MOTIEVEN). Daardoor lees
         je de ring als een stelsel van lichamen in plaats van als een rij
         knoppen -- en je herkent een wereld aan zijn kleur voordat je de glyf

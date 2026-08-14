@@ -2,7 +2,7 @@
 
    WAAROM DEZE TOETS BESTAAT. De wereldstand is de STANDAARD van het
    beginscherm -- het eerste wat een lid ziet. Alles eraan kan stil kapot: een
-   ring die zijn merken op een hoop legt is nog steeds een ring met acht
+   ring die zijn merken op een hoop legt is nog steeds een ring met drie
    knoppen, een achtergrond die nul pixels tekent is nog steeds een canvas, en
    een gouden ring van Rahul naast een open gesprek is nog steeds een gouden
    ring. Geen van die drie geeft een foutmelding. Ze zijn hier alle drie een
@@ -82,7 +82,11 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
       } catch (e) {}
     }, [reg.token, stand, ritmeOpzet]);
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    /* De pas staat expliciet in het adres. Zonder deze query begint de ene
+       poort correct met een doorverwijzing naar de pas van het lid; een toets
+       die precies tijdens die navigatie meet, meet timing in plaats van de
+       wereldring. */
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.RTGWereld && RTGWereld.stand().merken > 0, null, { timeout: 20000 });
     /* DE INTAKEPOORT GAAT WEG, EN NIET ALLEEN OP HIDDEN.
 
@@ -131,7 +135,7 @@ test('zonder voorkeur opent het beginscherm in de wereldstand, met de tegels weg
     assert.equal(r.stand.aan, true, 'de wereldstand hoort de standaard te zijn');
     assert.equal(r.attr, 'aan', 'het beginscherm draagt data-os-wereld="aan"');
     assert.equal(r.mappenZichtbaar, false, 'in de wereldstand horen de maprijen weg te zijn');
-    assert.equal(r.tegelsInDom, 3, 'de drie hoofdwerelden horen in de DOM te blijven, er staan er ' + r.tegelsInDom);
+    assert.equal(r.tegelsInDom, 3, 'de drie wereldtegels horen in de DOM te BLIJVEN bestaan');
     /* EEN KLOK. Twee klokken zou betekenen dat de wereldstand er zelf een is
        gaan tekenen, en dan lopen ze op een dag uit elkaar. */
     assert.equal(r.klokken, 1, 'er hoort precies EEN klok te zijn, geen tweede voor de wereldstand');
@@ -142,7 +146,7 @@ test('zonder voorkeur opent het beginscherm in de wereldstand, met de tegels weg
 test('de merken liggen op een cirkel, en niet op een hoop',
   { skip: overslaan }, async () => {
   /* DE MUTATIE: haal in wereld-02.js de regel weg die m.style.left/top zet
-     (of laat plaats() nooit aanroepen). De acht knoppen bestaan dan nog steeds,
+     (of laat plaats() nooit aanroepen). De drie knoppen bestaan dan nog steeds,
      hebben nog steeds hun aria-label en zijn nog steeds aanklikbaar -- ze
      liggen alleen allemaal linksboven op elkaar. Niets in de console zegt er
      iets over; dit is precies het soort stille breuk waar een e2e-toets voor
@@ -158,7 +162,7 @@ test('de merken liggen op een cirkel, en niet op een hoop',
       });
       return { merken, kring: Math.round(kring.width), knoppen: document.querySelectorAll('.os-wm').length };
     });
-    assert.equal(r.merken.length, 3, 'er horen drie hoofdwereldmerken te staan, er zijn er ' + r.merken.length);
+    assert.equal(r.merken.length, 3, 'er horen exact drie hoofdwereldmerken te staan');
     const stralen = r.merken.map((m) => m.straal);
     const min = Math.min(...stralen), max = Math.max(...stralen);
     assert.ok(min > r.kring * 0.25,

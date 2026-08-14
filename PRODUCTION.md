@@ -10,11 +10,27 @@ minderjarige) gebruikers" vraagt meer dan code alleen.
 
 ## 1. Snel starten (Docker)
 
+Eerst veilig lokaal bouwen, zonder te doen alsof mail of betalingen al echt
+zijn:
+
 ```bash
-cp .env.example .env            # vul de geheimen in
+npm run selfhost:init -- --eigenaar=jij@domein.nl
+npm run selfhost:check
 docker compose up -d --build
-docker compose logs -f app
+docker compose ps
 ```
+
+Open `http://127.0.0.1:3000`. Docker publiceert de app bewust alleen op de
+loopback; PostgreSQL, Redis en de Rust-motor hebben helemaal geen hostpoort.
+De containers draaien met een read-only root, zonder extra Linux-capabilities
+en met begrensde, roterende logs. Geheimen komen uit `.env.productie` en
+`.rtg-secrets/postgres_password` als Docker secrets en staan niet als losse
+waarden in `docker inspect`.
+
+`selfhost:init` overschrijft bestaande sleutels nooit. Voor publieke livegang:
+verwijder `RTG_PRIVATE_BETA=1`, zet een HTTPS-`APP_URL`, SMTP en een echte
+betaalprovider, draai `npm run golive`, en zet pas daarna een TLS-tunnel of
+reverse proxy voor de loopbackpoort.
 
 - Liveness: `GET /api/health` (proces leeft)
 - Readiness: `GET /api/ready` (mag verkeer krijgen; 503 als de datalaag nog niet klaar is)
@@ -54,6 +70,10 @@ mv ~/Desktop/nieuwe-rtg-website ~/rtg        # niet in een map die macOS afscher
 cd ~/rtg
 sudo scripts/mac/installeer.sh --eigenaar=jij@voorbeeld.nl --slaap-uit
 ```
+
+Zolang mail en betalingen nog niet aangesloten zijn, voeg je bewust
+`--private-beta` toe. Die stand werkt alleen met localhost, `.local` of een
+privaat LAN-adres en wordt door `npm run golive` altijd afgekeurd.
 
 Dit zet RTG als **launchd-daemon** neer: hij start bij het aanzetten van de
 machine (zonder dat er iemand inlogt), komt terug na een crash en na een
@@ -113,6 +133,19 @@ eentje waardeloos is. Bewaar `RTG_VAULT_KEY` en `RTG_SECRET_KEY` in een
 secrets manager, met een tweede kopie ergens waar je erbij kunt als die
 secrets manager onbereikbaar is. Zonder die sleutels krijg je na een herstel
 wel alle accounts terug, maar geen enkele naam: die blijven versleuteld.
+
+In Docker draait daarnaast een onafhankelijke `backup`-container. Die maakt:
+
+- een PostgreSQL-dump in custom format en laat `pg_restore --list` hem direct
+  valideren;
+- een archief van de laatst atomisch afgeronde app-/mediaback-up;
+- SHA-256-controlesommen over beide artefacten;
+- retentie van standaard 30 dagen.
+
+De hostbestanden staan standaard in `./backups`. Zet
+`RTG_BACKUP_HOST_DIR=/Volumes/RTG-Backup` (of een andere afzonderlijke schijf)
+voordat je Compose start; een back-up op dezelfde fysieke schijf beschermt
+niet tegen schijfverlies.
 
 Herstellen:
 

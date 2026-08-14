@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3822 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3824 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3822 |
-| servermodules (`server/**/*.js`) | 2069 |
-| routebestanden (`server/routes/**`) | 432 |
-| kernmodules (`server/kern/**`) | 1278 |
+| API-endpoints | 3824 |
+| servermodules (`server/**/*.js`) | 2071 |
+| routebestanden (`server/routes/**`) | 433 |
+| kernmodules (`server/kern/**`) | 1279 |
 | schermen (`public/**/*.html`) | 251 |
 | gedeelde browsermodules (`public/shared/*.js`) | 215 |
-| toetsbestanden (`test/*.test.js`) | 833 |
+| toetsbestanden (`test/*.test.js`) | 834 |
 | schermtoetsen (`test/*.e2e.js`) | 123 |
 
 ## 2. De weg van een verzoek
@@ -115,7 +115,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2120 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2122 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -123,9 +123,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1376 |
+| kern-namen die routes aanraken | 1377 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 181 |
-| daarvan door precies één domein | 1195 |
+| daarvan door precies één domein | 1196 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

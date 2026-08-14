@@ -2,9 +2,9 @@
    het echte Horeca OS gebruiken. Alleen voorstellen mogen terug naar live. */
 'use strict';
 
-module.exports=({db,hospitality,director,human})=>({
+module.exports=({db,hospitality,director,human,leren})=>({
   'hospitality-start':(p,h,z)=>hospitality.start(p.staat.hospitality,String(z.route||'')),
-  'hospitality-stap':p=>hospitality.stap(p.staat.hospitality),
+  'hospitality-stap':p=>{const r=hospitality.stap(p.staat.hospitality);if(r.afgerond&&leren)r.leren=leren.registreerHospitality({potjeId:p.id,simulatie:p.staat.hospitality});return r},
   'hospitality-chaos':(p,h,z)=>{const x=hospitality.INCIDENTEN.find(i=>i.id===String(z.incident||''));return hospitality.injecteer(p.staat.hospitality,x)},
   'hospitality-besluit':(p,h,z)=>hospitality.besluit(p.staat.hospitality,String(z.incident||''),String(z.keuze||'')),
   'hospitality-koppel':(p,h,z)=>{const code=String(z.code||'').toUpperCase(),brug=db&&db.data&&db.data.magnaatBrug&&db.data.magnaatBrug[code];if(!brug||brug.vervaltAt<Date.now())return{status:404,error:'Deze simulatiecode bestaat niet of is verlopen.'};if(brug.gebruikt)return{status:409,error:'Deze simulatiecode is al gebruikt.'};brug.gebruikt=true;brug.potjeId=p.id;p.staat.hospitality=hospitality.nieuw(brug.bron);p.staat.hospitality.brugCode=code;return{status:200,ok:true}},

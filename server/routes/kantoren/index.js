@@ -98,4 +98,5 @@ module.exports = (kern) => {
   require('./weefsel3')(ctx);
   require('./techniek')(ctx);
   require('./zelfzorg')(ctx);
+  require('./magnaat-leren')(ctx);
 };

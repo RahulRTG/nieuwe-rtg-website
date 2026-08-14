@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 956 bestanden en 6393 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 957 bestanden en 6396 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 956 |
-| losse beweringen (`test(...)`) | 6393 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 12 |
+| toetsbestanden | 957 |
+| losse beweringen (`test(...)`) | 6396 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 13 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 102 |
+| niets van beide | 103 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-833 bestanden, 6172 beweringen.
+834 bestanden, 6175 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -380,6 +380,7 @@ toets omvalt.
 | `luchthaven.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie. Getest: de passagiersketen (boeken -> inchecken -> boarding pass + koffertags), de operationele grendels (een kist boardt pas als de draai rond is;... |
 | `luchtzijde-taal.test.js` | 5 | gezakt op `liegpoort /api/` | De luchtzijde-stand voor partners (boarding pass aan de deur, dubbele prijzen op de kassa, de vertaalknop) + de moedertaal van het account (iedereen praat de eigen taal, de ander leest de zijne in de vriendenchat). |
 | `magnaat-hospitality.test.js` | 10 | -- | Magnaat Hospitality Universe: speelbaarheid, foutpaden, replay en de harde grens tussen simulatieresultaat en een levende onderneming. |
+| `magnaat-leerkring.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |
 | `mailauth.test.js` | 14 | gezakt op `===->!==#0` | SPF en DMARC: de twee controles die RTG Mail tot vandaag als "niet gecontroleerd" meldde. ALLES HIER DRAAIT ZONDER NETWERK. |
 | `mailbijlage.test.js` | 7 | gezakt op `liegpoort /api/` | Bijlagen van buiten: door de scanner, en pas dan te openen. Vier beweringen, en de eerste is de enige die er echt toe doet: 1. |

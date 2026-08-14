@@ -19,6 +19,12 @@ De productiegrens is hard: Universe en Magnaat krijgen geen schrijfrecht naar
 een live zaak. Een simulatiebrug stuurt uitsluitend voorstellen terug. Een
 manager beslist apart of een voorstel ooit productie wordt.
 
+Magnaat heeft daarnaast een productleerkring. Die bewaart uitsluitend
+geaggregeerde actie-, fout-, scenario- en uitkomsttellingen. Herhaalde patronen
+worden een verbeterhypothese met een herhaalbare testopdracht. Alleen de
+boardroom kan die naar `test-klaar` zetten; de leerkring schrijft nooit code,
+wijzigt nooit productie en verwerkt geen namen, vrije tekst of bedrijfsdata.
+
 ## Menselijke beslissingen
 
 Rahul mag zoeken, ordenen, vergelijken, simuleren en een route voorbereiden.
@@ -29,7 +35,8 @@ route en de uitkomst; geen namen of herkenbare persoonlijke details.
 
 ## Productie zonder demo
 
-Een productiestart faalt wanneer echte AI of mail ontbreekt. Betalingen vereisen
+AI is een optionele assistentielaag: zonder AI blijven de gewone schermen,
+zoekroutes en menselijke beslissingen volledig bruikbaar. Mail en betalingen vereisen
 een echte provider en ondertekende webhook. Ontbrekende koppelingen worden als
 ontbrekend getoond en niet met voorbeelddata gevuld. De go-livekeuring blijft de
 laatste poort voor uitrol.

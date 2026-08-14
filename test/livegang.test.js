@@ -34,7 +34,8 @@ test.before(async () => {
        Het gevolg was dat alle drie de toetsen omvielen met "server stopte
        tijdens opstarten (exit 1)" -- de grendel werkte, en de toets die hem
        bewijst kwam er niet meer doorheen. */
-    NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP, SMTP_URL: '',
+    NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP,
+    SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     OFFICE_CODE: 'GEHEIME-CODE-123',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de

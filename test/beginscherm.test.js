@@ -88,16 +88,8 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
      wereld die af is (zie de rij specialisten in apps/media.html); de rest
      hoort te volgen. */
   const SCHULD = new Set([
-    '/apps/reizen.html mist reizen', '/apps/reizen.html mist ov', '/apps/reizen.html mist navigatie',
-    '/apps/reizen.html mist flits', '/apps/reizen.html mist stad', '/apps/reizen.html mist reisboek',
-    '/apps/reizen.html mist hangar', '/apps/reizen.html mist residentie',
-    '/apps/geld.html mist wallet', '/apps/geld.html mist bank', '/apps/geld.html mist wbw',
-    '/apps/geld.html mist rtgcode', '/apps/geld.html mist balans', '/apps/geld.html mist labfonds',
-    '/apps/geld.html mist mecenaat', '/apps/geld.html mist nalatenschap', '/apps/geld.html mist logboek',
     '/apps/sociaal.html mist vonk', '/apps/sociaal.html mist cercle', '/apps/sociaal.html mist entourage',
     '/apps/sociaal.html mist rendezvous', '/apps/sociaal.html mist attenties',
-    '/apps/lifestyle.html mist maison', '/apps/lifestyle.html mist table',
-    '/apps/lifestyle.html mist cellier', '/apps/lifestyle.html mist garderobe',
     '/apps/kantoor.html mist onderneming', '/apps/kantoor.html mist loonstrook',
     '/apps/kantoor.html mist browser', '/apps/kantoor.html mist sitemaker',
     '/apps/veilig.html mist ik', '/apps/veilig.html mist veilig',

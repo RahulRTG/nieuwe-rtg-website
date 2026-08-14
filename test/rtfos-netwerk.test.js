@@ -354,7 +354,7 @@ test('het koppelbord is eerlijk over wat er niet gekoppeld is', async () => {
   }
 
   const stil = await os_('koppel/nog-niet', { welke: 'vervoer' });
-  assert.equal(stil.status, 503, 'een niet-bestaande koppeling deed alsof er iets gebeurde');
+  assert.equal(stil.status, 409, 'een niet-bestaande koppeling deed alsof er iets gebeurde');
   assert.match(stil.body.error, /niet gekoppeld/);
 
   /* En de agenda doet wel echt iets: de activiteit komt in de EIGEN RTG-agenda

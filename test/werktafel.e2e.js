@@ -76,6 +76,10 @@ const stand = () => {
       const r = bank.getBoundingClientRect();
       return { inBeeld: r.top < window.innerHeight - 40, werelden: document.querySelectorAll('.cmd-nav button[data-url]').length };
     })(),
+    // #gate is de INLOG. Wordt hij bij het opruimen niet teruggezet, dan gaat
+    // hij met de werktafel mee en kan er niemand meer naar binnen.
+    gateBestaat: !!document.getElementById('gate'),
+    gateInShell: !!(S && S.contains(document.getElementById('gate'))),
     greep: !!document.querySelector('.cmd-lade'),
     klokIngang: !!document.querySelector('.cmd-klok'),
     leegstaat: !!document.querySelector('.cmd-leeg'),
@@ -117,6 +121,11 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(dicht.werktafel, false, 'de werktafel mag niet bestaan zolang er niet getekend is');
     assert.equal(dicht.poortBovenop, true, 'de overeenkomst hoort aanklikbaar te zijn en niet overdekt');
     assert.equal(dicht.commandActief, false, 'en een app hoort hier niet als blad te openen');
+    /* De werktafel stond hier even in de gesloten stand (het token wordt pas na
+       het laden hersteld) en is daarna opgeruimd voor de ondertekening. Het
+       inloggesprek hoort die opruiming te hebben overleefd. */
+    assert.equal(dicht.gateBestaat, true, 'het inloggesprek mag niet met de werktafel zijn meegenomen');
+    assert.equal(dicht.gateInShell, true, 'en hoort terug te staan waar hij vandaan kwam');
 
     /* 2) getekend: dan is de WERKTAFEL het beginscherm, en hij staat leeg.
        Leeg is hier de bedoeling: welke apps er opengaan is een keuze van een
@@ -231,6 +240,72 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await ctx.close();
     await browser.close();
     await stop(srv.child);   // stop() wil het KINDPROCES; srv meegeven doet stil niets
+    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* HET INLOGSCHERM IS DEZELFDE WERKTAFEL.
+
+   Voor het inloggen staat de bank er al, en de werkvloer draagt Rahuls
+   inloggesprek (#gate, hierheen VERPLAATST door shared/command/werktafel.js --
+   niet nagebouwd, want twee inlogschermen is er een te veel).
+
+   De reden dat dit een eigen toets heeft: deze verplaatsing zit op de kritieke
+   weg. Gaat #gate mee als de werktafel wordt opgeruimd, dan kan er niemand meer
+   naar binnen, en dat is geen fout die je pas in productie wilt zien. */
+test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  const { srv, dataDir } = await opzet();
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  const fouten = [];
+  letOpFouten(page, fouten);
+  try {
+    // géén token: dit is een bezoeker die nog niets is
+    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#agIn', { timeout: 20000 });
+
+    const uit = await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
+      const tabs = document.querySelector('.cmd-tabs');
+      return {
+        stand: r && r.dataset.stand,
+        gateInWerkvloer: !!(r && r.querySelector('#gate')),
+        gateZichtbaar: !!(g && g.getBoundingClientRect().width > 0),
+        veld: !!document.getElementById('agIn'),
+        werelden: document.querySelectorAll('.cmd-nav button').length,
+        klokIngang: !!document.querySelector('.cmd-klok'),
+        tabs: tabs ? getComputedStyle(tabs).display : null,
+      };
+    });
+    assert.equal(uit.stand, 'gesloten', 'voor het inloggen hoort de werktafel in de gesloten stand te staan');
+    assert.equal(uit.gateInWerkvloer, true, 'met het inloggesprek IN de werkvloer');
+    assert.equal(uit.gateZichtbaar, true, 'en zichtbaar -- verplaatsen mag hem niet verstoppen');
+    assert.equal(uit.veld, true, 'het antwoordveld van Rahul hoort er te zijn');
+    assert.equal(uit.werelden, 12, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    assert.equal(uit.klokIngang, false, 'maar geen Beginscherm-knop: die vouwt de werktafel op en laat je zonder gesprek achter');
+    assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
+
+    /* EEN WERELD AANRAKEN OPENT GEEN DEUR. Dit is de kern van de keuze: de bank
+       is voor het inloggen een uitnodiging, geen menu. Zonder deze stap zou een
+       gesloten werktafel met werkende knoppen erdoorheen glippen. */
+    await page.click('.cmd-nav button');
+    await page.waitForTimeout(600);
+    const na = await page.evaluate(() => ({
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      pad: location.pathname,
+      cursorInGesprek: document.activeElement && document.activeElement.id === 'agIn',
+    }));
+    assert.equal(na.bladen, 0, 'een wereld aanraken mag voor het inloggen geen blad openen');
+    assert.equal(na.pad, '/apps/app.html', 'en geen paginasprong worden');
+    assert.equal(na.cursorInGesprek, true, 'hij hoort de cursor in het inloggesprek te zetten');
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten');
+  } finally {
+    await ctx.close();
+    await browser.close();
+    await stop(srv.child);
     try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
   }
 });

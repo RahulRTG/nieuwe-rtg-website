@@ -41,9 +41,30 @@
      hierboven. */
   function breed(){return mq.matches}
   function mag(){return aangemeld()&&poortDicht()}
+  /* DRIE STANDEN, EN MAAR EEN DAARVAN IS "WEG".
+
+     weg       de ondertekening ligt bovenop; hier mag niets overheen (zie
+               poortDicht hierboven -- dat is de grendel, niet een vorm)
+     gesloten  nog geen sessie: de bank staat er wel, maar de werkvloer draagt
+               het inloggesprek van Rahul en een wereld aanraken start dat
+               gesprek in plaats van een dode deur te openen
+     open      sessie en getekend: de gewone werktafel
+
+     `gesloten` bestaat omdat het inlogscherm dezelfde werktafel hoort te zijn:
+     wat je na het inloggen krijgt staat er dan al, alleen nog gesloten. Wat het
+     NIET mag worden is een rij deuren die niets doen -- vandaar dat de bank in
+     deze stand naar het gesprek wijst. */
+  function stand(){return !poortDicht()?'weg':(aangemeld()?'open':'gesloten')}
+  function magBestaan(){return poortDicht()}
+  /* Het inloggesprek staat in #gate en wordt door app-main gebouwd; wij
+     verplaatsen dat blok alleen naar de werkvloer. Een wereld aanraken zet de
+     cursor in datzelfde gesprek -- meer belooft deze laag niet, want inloggen
+     is niet van haar. */
+  function inlog(){var i=d.getElementById('agIn');if(i)i.focus()}
 
   function bouwTafel(){
-    if(!tafel)tafel=w.RTGCommandWerktafel({mag:mag,breed:breed,catalog:catalog,open:open,bestemming:bestemming,thuis:thuis});
+    if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
+      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog});
     return tafel;
   }
   /* THUIS IS DE KLOK, MAAR NIET MEER DE LANDING.
@@ -93,8 +114,9 @@
      beginscherm en bouwt hij zich hier op, tenzij een mens hem heeft
      opgevouwen om de klok te zien. */
   function probeer(){
-    if(!mag()){if(tafel)tafel.sloop();return}
-    if(!opgevouwen)bouwTafel().toon();
+    var s=stand();
+    if(s==='weg'){if(tafel)tafel.sloop();return}
+    if(!opgevouwen)bouwTafel().zet(s);
   }
   function init(){
     probeer();

@@ -148,6 +148,28 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-kiezer button{width:100%;border:0;border-radius:9px;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
 .cmd-kiezer button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.05)}
 
+/* ------------------------------------------------- de gesloten stand (inlog) --
+   Voor het inloggen IS de werktafel het inlogscherm: de bank staat er, en de
+   werkvloer draagt #gate -- Rahuls inloggesprek, hierheen verplaatst door
+   shared/command/werktafel.js. Wat je na het inloggen krijgt staat er dus al,
+   alleen nog gesloten.
+
+   Wat er dan NIET hoort te staan: een tabbalk zonder tabbladen en een plus die
+   niets kan openen. Twee bedieningen die niets doen lezen als kapot, niet als
+   gesloten. De greep van de lade blijft wel, want de bank is op een telefoon
+   anders onvindbaar. */
+#rtgCommand[data-stand="gesloten"] .cmd-tabs{display:none}
+#rtgCommand[data-stand="gesloten"] .cmd-toevoeg{display:none}
+#rtgCommand[data-stand="gesloten"] .cmd-werk{grid-template-rows:minmax(0,1fr)}
+#rtgCommand[data-stand="gesloten"] .cmd-lade{top:calc(env(safe-area-inset-top,0px) + .5rem);height:44px;border-right:0;background:transparent}
+/* #gate draagt zijn eigen achtergrond en centreert zichzelf al (app.html); hij
+   hoeft hier alleen de vrije ruimte te krijgen. */
+#rtgCommand[data-stand="gesloten"] #gate{flex:1 1 auto;min-width:0}
+/* de bank is voor het inloggen een uitnodiging en geen menu: dezelfde namen,
+   maar zonder de indruk dat er iets openstaat */
+#rtgCommand[data-stand="gesloten"] .cmd-nav button{opacity:.72}
+#rtgCommand[data-stand="gesloten"] .cmd-nav button:hover{opacity:1}
+
 /* ------------------------------------------------------- vanaf 1000px breed --
    Hier wordt de lade weer een rail en mogen er twee bladen naast elkaar. Alles
    in dit blok is opmaak: haal je het weg, dan werkt de werktafel nog steeds,

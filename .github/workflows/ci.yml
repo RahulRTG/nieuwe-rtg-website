@@ -5,10 +5,18 @@ on:
     branches: [ main, master, 'claude/**' ]
   pull_request:
 
+# Een nieuwe push vervangt de vorige run van dezelfde PR of hoofdlijn. Zonder
+# deze grens bleven oude revisies urenlang drie runners bezetten, terwijl hun
+# uitslag door de nieuwere commit al niet meer merge-bepalend kon zijn.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Tests, checks en build
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     services:
       postgres:
         image: postgres:16-alpine
@@ -118,6 +126,7 @@ jobs:
   security:
     name: Kwetsbare dependencies (npm audit)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -136,6 +145,7 @@ jobs:
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

@@ -11,10 +11,12 @@
       op z-index 210 overheen (#onbGate zit op 130). Zelfde account, zelfde
       token: bij 999px stond je voor de overeenkomst, bij 1001px erachter.
 
-   2) HET BEGINSCHERM BESTOND HIER NIET. bouw() opende zichzelf twee vaste apps
-      (Reizen & Veilig en Geld), dus wie op een computer inlogde heeft de klok
-      met de werelden eromheen nooit gezien. WERELD.md par. 3: er zijn geen twee
-      beginschermen -- op een computer waren het er nul.
+   2) HET BEGINSCHERM KOOS VOOR JE. bouw() opende zichzelf twee vaste apps
+      (Reizen & Veilig en Geld). De werktafel IS inmiddels het beginscherm -- op
+      elke breedte -- maar hij begint leeg: welke apps er opengaan is een keuze
+      van een mens. De klok blijft bestaan als ingang bovenaan de bank, want
+      daar hangen de werelden op hun bezel (WERELD.md); hem kiezen vouwt de
+      werktafel op.
 
    Wat deze toets NIET doet, is meten of de onboarding zelf klopt (daar zijn de
    aanmeldtoetsen voor). Hij meet alleen wie er bovenop mag liggen.
@@ -75,10 +77,12 @@ const stand = () => {
       return { inBeeld: r.top < window.innerHeight - 40, werelden: document.querySelectorAll('.cmd-nav button[data-url]').length };
     })(),
     greep: !!document.querySelector('.cmd-lade'),
+    klokIngang: !!document.querySelector('.cmd-klok'),
+    leegstaat: !!document.querySelector('.cmd-leeg'),
   };
 };
 
-test('werktafel: niet over de ondertekening heen, en het beginscherm blijft het beginscherm',
+test('werktafel: niet over de ondertekening heen, en hij begint leeg',
   { skip: pw ? false : 'geen Playwright' }, async () => {
   const { srv, token, dataDir } = await opzet();
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -114,28 +118,40 @@ test('werktafel: niet over de ondertekening heen, en het beginscherm blijft het 
     assert.equal(dicht.poortBovenop, true, 'de overeenkomst hoort aanklikbaar te zijn en niet overdekt');
     assert.equal(dicht.commandActief, false, 'en een app hoort hier niet als blad te openen');
 
-    // 2) getekend: dan is er een BEGINSCHERM, en nog steeds geen werktafel
+    /* 2) getekend: dan is de WERKTAFEL het beginscherm, en hij staat leeg.
+       Leeg is hier de bedoeling: welke apps er opengaan is een keuze van een
+       mens. Eerder stonden Reizen & Veilig en Geld hier vanzelf open. */
     await page.evaluate(() => { document.getElementById('onbGate').hidden = true; });
-    await page.waitForTimeout(300);
+    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const thuis = await page.evaluate(stand);
-    assert.equal(thuis.werktafel, false, 'na het tekenen hoort de klok te volgen, niet meteen een werktafel');
-    assert.equal(thuis.shellZichtbaar, true, 'het beginscherm hoort op een computer gewoon te staan');
-    assert.ok(thuis.klok >= 4, 'met de werelden eromheen, maar er stonden er ' + thuis.klok);
-    assert.equal(thuis.commandActief, true, 'en NU opent een app wel als blad');
+    assert.equal(thuis.bladen, 0, 'de werktafel hoort leeg te beginnen, niet met apps die het huis koos');
+    assert.equal(thuis.shellZichtbaar, false, 'en hij is het beginscherm, dus de klok ligt eronder');
+    assert.equal(thuis.klokIngang, true, 'de klok hoort wel bovenaan de bank te staan als ingang');
+    assert.equal(thuis.commandActief, true, 'en een app opent hier als blad');
 
-    // 3) een app openen maakt de werktafel; die neemt het scherm over
+    // 3) een app openen vult de werkvloer; de lege staat maakt plaats
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
     const werk = await page.evaluate(stand);
     assert.equal(werk.bladen, 1, 'een geopende app is een blad, en alleen die ene');
-    assert.equal(werk.shellZichtbaar, false, 'een werktafel is volledig scherm; de home gaat eronder weg');
+    assert.equal(werk.leegstaat, false, 'en de uitnodiging hoort dan weg te zijn');
 
-    // 4) het laatste blad sluiten brengt je terug thuis, niet in een leeg vlak
+    // 4) het laatste blad sluiten laat de werktafel LEEG staan, en breekt hem niet af
     await page.evaluate(() => window.RTGCommand.sluitAlles());
-    await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
+    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const terug = await page.evaluate(stand);
-    assert.equal(terug.shellZichtbaar, true, 'na het sluiten van het laatste blad hoort het beginscherm terug te zijn');
-    assert.ok(terug.klok >= 4, 'met de werelden er weer omheen, maar er stonden er ' + terug.klok);
+    assert.equal(terug.werktafel, true, 'het laatste blad sluiten hoort niet de hele werktafel op te ruimen');
+    assert.equal(terug.bladen, 0, 'maar hem leeg achter te laten');
+
+    /* 4b) de klok is bereikbaar gebleven: hem kiezen vouwt de werktafel op. Dat
+       is de enige weg terug naar de wereldring, dus als deze knop niets doet is
+       de klok onbereikbaar geworden -- precies wat we niet wilden. */
+    await page.click('.cmd-klok');
+    await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
+    const bijKlok = await page.evaluate(stand);
+    assert.equal(bijKlok.shellZichtbaar, true, 'Beginscherm hoort de klok terug te brengen');
+    assert.ok(bijKlok.klok >= 4, 'met de werelden eromheen, maar er stonden er ' + bijKlok.klok);
+
 
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT
        de werktafel er al staat. Dan is wegnemen de enige juiste uitkomst -- een
@@ -173,10 +189,10 @@ test('werktafel: niet over de ondertekening heen, en het beginscherm blijft het 
        een blad in plaats van een paginasprong, en het laatste blad sluiten
        brengt je thuis. */
     await page.evaluate(() => { document.getElementById('onbGate').hidden = true; });
-    await page.waitForTimeout(300);
+    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalThuis = await page.evaluate(stand);
-    assert.equal(smalThuis.werktafel, false, 'ook op een telefoon is de klok het beginscherm, niet de werktafel');
-    assert.equal(smalThuis.shellZichtbaar, true, 'en die staat er gewoon');
+    assert.equal(smalThuis.bladen, 0, 'ook op een telefoon begint de werktafel leeg');
+    assert.equal(smalThuis.shellZichtbaar, false, 'en is hij het beginscherm');
 
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
@@ -203,11 +219,12 @@ test('werktafel: niet over de ondertekening heen, en het beginscherm blijft het 
     assert.equal(laDicht.lade.inBeeld, false, 'Escape hoort de lade te sluiten');
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'false', 'en de stand hoort mee te gaan');
 
-    // en ook hier: het laatste blad dicht = thuis
+    // en ook hier: het laatste blad dicht = de lege werktafel, niet de klok
     await page.evaluate(() => window.RTGCommand.sluitAlles());
-    await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
+    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalTerug = await page.evaluate(stand);
-    assert.equal(smalTerug.shellZichtbaar, true, 'het laatste blad sluiten hoort ook op een telefoon thuis te brengen');
+    assert.equal(smalTerug.bladen, 0, 'het laatste blad sluiten laat de werktafel ook hier leeg staan');
+    assert.equal(smalTerug.klokIngang, true, 'met de klok als ingang in de lade');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

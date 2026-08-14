@@ -92,7 +92,11 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-split::after{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--gold-tekst,#C0A544) 28%,var(--rtg-line));transition:background 160ms}
 .cmd-split:hover::after,.cmd-split.sleept::after{background:var(--gold-tekst,#C0A544)}
 .cmd-split i{position:absolute;left:50%;top:50%;width:5px;height:32px;transform:translate(-50%,-50%);border-radius:5px;background:var(--gold-tekst,#C0A544);opacity:.35}
-.cmd-leeg{height:100%;display:grid;place-items:center;color:var(--rtg-soft);font-size:.85rem}
+/* De lege werkvloer. `flex:1` staat er omdat .cmd-panes een flexrij is: zonder
+   dat neemt dit vak alleen de breedte van zijn tekst en staat de uitnodiging
+   tegen de linkerrand in plaats van in het midden van de ruimte. */
+.cmd-leeg{flex:1 1 auto;min-width:0;background:var(--rtg-bg);display:grid;place-items:center;
+  color:var(--rtg-soft);font-size:.85rem;padding:2rem}
 .cmd-leeg span{max-width:34ch;text-align:center;line-height:1.6}
 
 /* --------------------------------------------------------------- de console --

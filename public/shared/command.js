@@ -43,10 +43,22 @@
   function mag(){return aangemeld()&&poortDicht()}
 
   function bouwTafel(){
-    if(tafel)return tafel;
-    tafel=w.RTGCommandWerktafel({mag:mag,breed:breed,catalog:catalog,open:open,bestemming:bestemming});
+    if(!tafel)tafel=w.RTGCommandWerktafel({mag:mag,breed:breed,catalog:catalog,open:open,bestemming:bestemming,thuis:thuis});
     return tafel;
   }
+  /* THUIS IS DE KLOK, MAAR NIET MEER DE LANDING.
+
+     De werktafel is het beginscherm geworden: inloggen brengt je daar, en het
+     laatste blad sluiten laat hem leeg staan in plaats van hem af te breken.
+     De klok blijft bestaan -- daar hangen de werelden op hun bezel (WERELD.md)
+     -- en staat bovenaan de bank. Hem kiezen vouwt de werktafel op.
+
+     `opgevouwen` bestaat omdat probeer() anders zijn werk terugdraait: die
+     bouwt zodra het mag, en zou de klok bij de eerstvolgende hertekening (een
+     resize, een klasse die verspringt) weer overdekken. Een keuze van een mens
+     hoort niet door een waarnemer te worden overstemd. */
+  var opgevouwen=false;
+  function thuis(){opgevouwen=true;if(tafel)tafel.sloop()}
 
   /* TWEE REDENEN OM NIET TE OPENEN, MET TWEE VERSCHILLENDE UITKOMSTEN.
 
@@ -61,6 +73,7 @@
   function open(url,titel){
     if(!poortDicht())return null;
     if(!aangemeld()){location.href=url;return null}
+    opgevouwen=false;                         // iets openen is terugkomen
     return bouwTafel().toon(url,titel);
   }
 
@@ -74,11 +87,15 @@
     if(/open|breng|ga naar|toon|laat zien|terug naar/.test(laag)){open(a[1],a[0]);return 'Natuurlijk. Ik breng u naar '+a[0]+'.'}
     return null}
 
-  /* Alleen nog een WACHTER. Hij bouwde hier zelf de werktafel op zodra het
-     venster breed genoeg was -- dat is nu aan open(), zodat het beginscherm
-     blijft staan tot je er iets opent. Wat overblijft is de andere kant: mag de
-     werktafel er niet meer staan, dan gaat hij weg. */
-  function probeer(){if(!mag()&&tafel)tafel.sloop()}
+  /* De wachter, en tegelijk de landing. Mag de werktafel er niet staan (geen
+     sessie, of de overeenkomst is nog niet getekend), dan gaat hij weg -- dat
+     is de grendel uit de vorige ronde. Mag hij er wel staan, dan is hij het
+     beginscherm en bouwt hij zich hier op, tenzij een mens hem heeft
+     opgevouwen om de klok te zien. */
+  function probeer(){
+    if(!mag()){if(tafel)tafel.sloop();return}
+    if(!opgevouwen)bouwTafel().toon();
+  }
   function init(){
     probeer();
     var app=d.getElementById('app'),poort=d.getElementById('onbGate');

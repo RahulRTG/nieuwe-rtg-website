@@ -20,7 +20,7 @@ module.exports = (kern) => {
   app.post('/api/facturen/classificeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const r = facturatie.classificeer(String(req.body.id || ''), req.session.key, req.body.classificatie);
-    if (r.error) return res.status(404).json(r);
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
   app.post('/api/facturen/ai', auth, async (req, res) => {

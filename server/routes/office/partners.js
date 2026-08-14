@@ -2,10 +2,11 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { accounts, app, appUrl, boardroomWie, db, ensureSupplierDefaults, mail, makeSupplierCode, officeAuth, save,
+  const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
+          forgetSession, mail, makeSupplierCode, officeAuth, save, sessions,
           schoon, sseToOffice, sseToSupplier,
           ondernemingRegie, ondernemingProvisioningZet, ondernemingBijdrageZet, rechtsvormwacht } = kern;
-app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
+app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
@@ -45,6 +46,38 @@ app.post('/api/office/partner/decide', officeAuth, async (req, res) => {
     'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment helaas geen partnerplek aanbieden.\n\nRahul Travel Group');
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
+});
+
+/* Schorsen is een boardroombesluit en geen instelling van het gedeelde
+   kantoor. Alle bestaande leverancierssessies worden meteen ingetrokken; de
+   centrale supplierAuth controleert de status bovendien bij elk verzoek, als
+   tweede slot voor processen die hun sessiegeheugen nog niet hebben ververst. */
+app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
+  const code = String((req.body || {}).code || '').trim().toUpperCase();
+  const status = String((req.body || {}).status || '').trim().toLowerCase();
+  if (!['actief', 'geschorst', 'beeindigd'].includes(status))
+    return res.status(400).json({ error: 'Kies actief, geschorst of beeindigd.' });
+  const s = findSupplier(code);
+  if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
+  const vorige = s.partnerStatus || 'actief';
+  s.partnerStatus = status;
+  s.partnerStatusAt = new Date().toISOString();
+  s.partnerStatusDoor = boardroomWie(req);
+  s.partnerStatusReden = schoon((req.body || {}).reden, 240) || null;
+  if (status !== 'actief') s.online = false;
+
+  let ingetrokken = 0;
+  if (status !== 'actief') {
+    const hashes = [];
+    for (const [hash, sessie] of sessions) {
+      if (sessie && sessie.role === 'supplier' && String(sessie.code || '').toUpperCase() === code) hashes.push(hash);
+    }
+    for (const hash of hashes) { forgetSession(hash); ingetrokken += 1; }
+  }
+  save();
+  sseToSupplier(code, 'partner-status', { status, at: s.partnerStatusAt });
+  sseToOffice('sync', { scope: 'partners', code, status });
+  res.json({ ok: true, code, vorige, status, ingetrokken });
 });
 
 /* ---------- RTF School: RTG keurt schoolaanmeldingen goed ----------

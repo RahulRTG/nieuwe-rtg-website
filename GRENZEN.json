@@ -1128,6 +1128,7 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
       "conciergeDesk",
@@ -1135,6 +1136,8 @@
       "conciergeVoortgang",
       "eigenaar",
       "ensureSupplierDefaults",
+      "findSupplier",
+      "forgetSession",
       "logInlog",
       "loginFails",
       "mail",
@@ -1159,6 +1162,7 @@
       "salonItemsVan",
       "salonProfielCompleet",
       "sessionFor",
+      "sessions",
       "totpOk",
       "trChat",
       "veiligGelijk",
@@ -1305,6 +1309,7 @@
     "rtmail": [
       "agenda",
       "automatisering",
+      "facturatie",
       "leren"
     ],
     "rtmail-bestuur": [

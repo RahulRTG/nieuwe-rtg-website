@@ -6,7 +6,7 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren } = kern;
+  const { app, supplierAuth, auth, geenGast, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren, facturatie } = kern;
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
      handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
      komt nog steeds aan: het postvak hangt aan het linkerdeel. */
@@ -167,6 +167,19 @@ module.exports = (kern) => {
     if (!codenaam) return res.json({ adres: null, ongelezen: 0, berichten: [] });
     res.json({ adres: lidAdres(req), soort: lidSoort(req),
       ongelezen: rtmail.ongelezen(codenaam), berichten: rtmail.postvak(codenaam) });
+  });
+  /* Receipt Vault: RTMAIL is de documenteninbox, maar de factuurmotor blijft
+     de enige waarheid. Er wordt hier dus niets gekopieerd; beide schermen lezen
+     en classificeren exact hetzelfde document achter dezelfde ledenpoort. */
+  app.post('/api/member/rtmail/documenten', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(facturatie.voorLid(req.session.key));
+  });
+  app.post('/api/member/rtmail/classificeer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = facturatie.classificeer(String((req.body || {}).id || ''), req.session.key,
+      (req.body || {}).classificatie);
+    res.status(r.status || 200).json(r);
   });
   app.post('/api/member/rtmail/lees', auth, (req, res) => {
     const codenaam = lidCodenaam(req);

@@ -2,7 +2,7 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 const { eigenVeld } = require('../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 module.exports = (kern) => {
-  const { app, db, save, scheduleFor, sessionFor, sseClients, sseSend, sseToSupplier, supplierAuth,
+  const { accounts, app, db, findSupplier, save, scheduleFor, sessionFor, sseClients, sseSend, sseToSupplier, supplierAuth,
           supplierState } = kern;
 
 
@@ -39,6 +39,9 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
 app.get('/api/supplier/stream', (req, res) => {
   const sess = sessionFor(req.query.token);
   if (!sess || sess.role !== 'supplier') return res.status(401).end();
+  const supplier = findSupplier(sess.code);
+  if (!supplier || supplier.partnerStatus === 'geschorst' || supplier.partnerStatus === 'beeindigd')
+    return res.status(401).end();
   if (sess.staffId != null) {
     const staff = accounts.getStaffById(Number(sess.staffId));
     if (!staff || String(staff.supplier_code).toUpperCase() !== String(sess.code).toUpperCase()) return res.status(401).end();

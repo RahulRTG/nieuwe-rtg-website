@@ -18,13 +18,14 @@
 
    Krijgt van ./apipoort.js wat hij nodig heeft; hij kiest niets zelf. */
 'use strict';
+const { nu: klokNu } = require('../../lib/klok');
 
 module.exports = ({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR }) => {
 
   /* ---------- de controle, voor de middleware ---------- */
 
   function apiSleutelOk(aangeboden, pad, methode, tijd) {
-    const t = typeof tijd === 'number' ? tijd : Date.now();
+    const t = typeof tijd === 'number' ? tijd : klokNu();
     const m = /^RTG-([a-z0-9-]{4,12})\.(.+)$/i.exec(String(aangeboden || ''));
     if (!m) return { ok: false, status: 401, reden: 'geen geldige sleutel meegegeven' };
     const s = vak().sleutels[m[1]];

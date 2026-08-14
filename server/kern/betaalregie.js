@@ -2,6 +2,7 @@
    Boardroom en IT sturen het proces, geheimen blijven op de server en
    Financien leest alleen de provider-onafhankelijke waarheid. */
 'use strict';
+const { datum: klokDatum } = require('../lib/klok');
 
 const PROVIDERS = Object.freeze({
   stripe: {
@@ -48,7 +49,7 @@ const IT_FASES = new Set(['aanvraag', 'controle', 'goedgekeurd', 'techniek', 'pr
 
 module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
   const omgeving = env || process.env;
-  const nuIso = nu || (() => new Date().toISOString());
+  const nuIso = nu || (() => klokDatum().toISOString());
 
   function staat() {
     const data = d();

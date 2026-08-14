@@ -1,6 +1,8 @@
 /* RTG One: het gezamenlijke werkgeheugen voor RTG en RTF. De module bewaart
    niet alleen WAT er gebeurt, maar ook waarom, wie iets beloofde, waar werk
    schuurt en hoe een automatisering veilig kan worden teruggedraaid. */
+const { nu: klokNu, datum: klokDatum } = require('../lib/klok');
+
 module.exports = ({ db, save, crypto }) => {
   const ROLLEN = {
     executive: { naam: 'Executive', rechten: ['besluit:*', 'rollen:beheer', 'audit:lees'] },
@@ -11,7 +13,7 @@ module.exports = ({ db, save, crypto }) => {
     auditor: { naam: 'Auditor', rechten: ['audit:lees'] }
   };
   const BESLUITTYPEN = ['finance', 'legal', 'privacy', 'security', 'safeguarding', 'operations', 'people', 'ai'];
-  const nu = () => Date.now();
+  const nu = klokNu;
   const geldigHuis = h => ['rtg', 'rtf', 'gedeeld'].includes(h) ? h : 'rtg';
   const tekst = (v, n = 240) => String(v || '').replace(/[<>]/g, '').trim().slice(0, n);
   const id = p => p + crypto.randomBytes(5).toString('hex');
@@ -87,7 +89,7 @@ module.exports = ({ db, save, crypto }) => {
       if (g.goedkeuring) { project.goedkeuringId = g.goedkeuring.id; project.route.push(body.goedkeuringType); project.tijdlijn.push({ at: nu(), soort: 'besluit', tekst: 'Goedkeuringsroute ' + body.goedkeuringType + ' gestart.' }); }
     }
     mail.gelezen = true; mail.vastgezet = true; if (!Array.isArray(mail.workflow)) mail.workflow = [];
-    mail.workflow.push({ id: id('wf-'), soort: 'project', label: 'RTG One-project gestart', ref: project.id, at: new Date().toISOString() });
+    mail.workflow.push({ id: id('wf-'), soort: 'project', label: 'RTG One-project gestart', ref: project.id, at: klokDatum().toISOString() });
     s.projecten.unshift(project); log(context.label, 'project-uit-rtmail', project.id, huis); save(); return { ok: true, project, intentie };
   }
   function projectTaakZet(projectId, taakId, af, context) {

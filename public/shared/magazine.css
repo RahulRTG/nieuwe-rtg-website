@@ -7,7 +7,8 @@
    geheel (het logo-vlak). Alles in de RTG-huiskleuren: bordeaux, goud, zwart,
    crème; Bodoni voor de display, Inter voor de lopende tekst.
 
-   Alleen huisstijl en lay-out; het bladeren zit in apps/rtg-magazine.js. */
+   Alleen huisstijl en lay-out; het bladeren wordt door de betreffende app zelf
+   opgebouwd. */
 
 :root{
   --mag-paper:#F4F0E6;         /* cremepapier: de hoofdgrond */

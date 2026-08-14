@@ -23,6 +23,10 @@
 
   /* --------------------------------------------------------- de console -- */
   function tekenConsole() {
+    schil.console.querySelectorAll('[data-open]').forEach(function (b) {
+      var geopend = vind(b.dataset.open);
+      b.toggleAttribute('data-huidig', !!(geopend && schil.actief === geopend));
+    });
     var c = schil.console.querySelector('[data-actieflijst]');
     if (c) {
       c.innerHTML = schil.surfaces.length
@@ -58,3 +62,24 @@
     }
   }
 
+  /* Een tab is één echt open oppervlak: kiezen activeert het scherm en het
+     kruis sluit precies dat scherm. */
+  function tekenTabs() {
+    if (!schil.tabs) return;
+    schil.tabs.innerHTML = schil.surfaces.map(function (s) {
+      return '<div class="rtg-tab" data-id="' + esc(s.id) + '"' +
+        (schil.actief === s ? ' data-actief' : '') + '>' +
+        '<button type="button" class="rtg-tab-kies">' + esc(s.naam) + '</button>' +
+        '<button type="button" class="rtg-tab-sluit" aria-label="Sluit ' + esc(s.naam) + '">&times;</button>' +
+        '</div>';
+    }).join('');
+    schil.tabs.querySelectorAll('.rtg-tab').forEach(function (tab) {
+      tab.querySelector('.rtg-tab-kies').addEventListener('click', function () {
+        var s = vind(tab.dataset.id); if (s) maakActief(s);
+      });
+      tab.querySelector('.rtg-tab-kies').addEventListener('dblclick', function () {
+        var s = vind(tab.dataset.id); if (s) zoom(s, 'deep');
+      });
+      tab.querySelector('.rtg-tab-sluit').addEventListener('click', function () { sluit(tab.dataset.id); });
+    });
+  }

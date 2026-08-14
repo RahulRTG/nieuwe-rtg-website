@@ -50,8 +50,14 @@ test.before(async () => {
   base = srv.base;
   const roster = await api('/api/supplier/roster', { code: 'KIKUNOI' });
   const man = roster.body.staff.find(x => x.role === 'manager');
-  const st = roster.body.staff.find(x => x.role === 'staff');
   baas = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' })).body.token;
+  // Een seedmedewerker kan al aan een demo-identiteit hangen en mag dan niet
+  // door een tweede account worden overgenomen. Maak daarom bewust een verse,
+  // nog ongekoppelde werkplek voor deze eenmalige migratieproef.
+  const nieuw = await api('/api/supplier/staff/add', { name: 'Nora Werkplek', role: 'staff', func: 'Balie' }, baas);
+  assert.equal(nieuw.status, 200, 'de manager maakt een vrije werkplek');
+  const st = nieuw.body.staff;
+  const staffPin = nieuw.body.pin;
 
   /* Een lid dat OOK medewerker is: het ene RTG-account met een werkrol. Zo
      ontstaat de koppeling die het werkbeleid volgt (kern/eenaccount). */
@@ -60,9 +66,9 @@ test.before(async () => {
     password: 'werkgeheim123', geboortedatum: '1993-03-03', tier: 'rtg', pasApp: 'rtg' });
   lidToken = reg.body.token;
   lidKey = (await api('/api/state', {}, lidToken)).body.state.user.codename;
-  const koppel = await api('/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: st.id, pin: '5678' }, lidToken);
+  const koppel = await api('/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: st.id, pin: staffPin }, lidToken);
   assert.equal(koppel.status, 200, 'het lid is als medewerker gekoppeld aan de zaak');
-  werker = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: st.id, pin: '5678' })).body.token;
+  werker = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: st.id, pin: staffPin })).body.token;
   assert.ok(baas && werker && lidToken, 'baas, werker en lid staan klaar');
   void koppel;
 });

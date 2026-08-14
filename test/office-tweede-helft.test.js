@@ -43,6 +43,7 @@ function haal(pad) { return fetch(base + pad).then(async r => ({ status: r.statu
 
 let kantoor, lid, lidId, eigenaar;
 const ko = (pad, body) => post('/api/office/' + pad, body, kantoor);
+const br = (pad, body) => post('/api/office/' + pad, body, eigenaar);
 
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-off2-'));
@@ -328,7 +329,7 @@ test('9. de boardroom deelt zijn eigen sleutels uit', async () => {
     'een lid komt niet eens door de kantoordeur');
 });
 
-test('10. een partneraanvraag beslissen: het kantoor beslist, de Business Pass is de voorwaarde', async () => {
+test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass is de voorwaarde', async () => {
   // de uitgiftelijst van het kantoor (contracten) hoort er gewoon te staan
   const uit = await ko('uitgifte', {});
   assert.equal(uit.status, 200);
@@ -372,14 +373,15 @@ test('10. een partneraanvraag beslissen: het kantoor beslist, de Business Pass i
   assert.ok(mijn, 'de aanvraag staat in de backoffice');
   assert.equal(mijn.status, 'nieuw');
 
-  // een onbekende aanvraag bestaat niet, ook niet voor het kantoor
-  assert.equal((await ko('partner/decide', { id: 'bestaatniet', action: 'goedkeuren' })).status, 404);
+  // Financiën en kantoor mogen de status zien, maar de Boardroom neemt het besluit.
+  assert.equal((await ko('partner/decide', { id: mijn.id, action: 'goedkeuren' })).status, 403);
+  assert.equal((await br('partner/decide', { id: 'bestaatniet', action: 'goedkeuren' })).status, 404);
 
-  const goed = await ko('partner/decide', { id: mijn.id, action: 'goedkeuren' });
+  const goed = await br('partner/decide', { id: mijn.id, action: 'goedkeuren' });
   assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
 
   // twee keer beslissen kan niet: een behandelde aanvraag is klaar
-  const nogmaals = await ko('partner/decide', { id: mijn.id, action: 'afwijzen' });
+  const nogmaals = await br('partner/decide', { id: mijn.id, action: 'afwijzen' });
   assert.equal(nogmaals.status, 409);
   assert.match(nogmaals.body.error, /al behandeld/i);
 

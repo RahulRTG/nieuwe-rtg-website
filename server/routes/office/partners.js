@@ -1,5 +1,7 @@
 /* Backoffice (deelmodule): partner- en schoolbesluiten en het vertrouwenskanaal met het personeel.
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
+const { datum: klokDatum } = require('../../lib/klok');
+
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
@@ -61,7 +63,7 @@ app.post('/api/office/partner/status', boardroomAuth, (req, res) => {
   if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
   const vorige = s.partnerStatus || 'actief';
   s.partnerStatus = status;
-  s.partnerStatusAt = new Date().toISOString();
+  s.partnerStatusAt = klokDatum().toISOString();
   s.partnerStatusDoor = boardroomWie(req);
   s.partnerStatusReden = schoon((req.body || {}).reden, 240) || null;
   if (status !== 'actief') s.online = false;
@@ -101,9 +103,9 @@ app.post('/api/office/school/decide', officeAuth, (req, res) => {
   if (!s) return res.status(404).json({ error: 'School niet gevonden.' });
   if ((s.status || 'actief') !== 'wacht') return res.status(409).json({ error: 'Deze school is al beoordeeld.' });
   if (req.body.action === 'goedkeuren') {
-    s.status = 'actief'; s.goedgekeurdAt = new Date().toISOString();
+    s.status = 'actief'; s.goedgekeurdAt = klokDatum().toISOString();
   } else {
-    s.status = 'afgewezen'; s.afgewezenAt = new Date().toISOString();
+    s.status = 'afgewezen'; s.afgewezenAt = klokDatum().toISOString();
   }
   save();
   sseToOffice('sync', { scope: 'schools' });
@@ -124,10 +126,10 @@ app.post('/api/office/trust/reply', officeAuth, (req, res) => {
   if (!t) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
   const text = schoon(req.body.text, 800);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  t.messages.push({ from: 'rtg', text, at: new Date().toISOString() });
+  t.messages.push({ from: 'rtg', text, at: klokDatum().toISOString() });
   t.messages = t.messages.slice(-60);
   t.open = false;
-  t.lastAt = new Date().toISOString();
+  t.lastAt = klokDatum().toISOString();
   save();
   // alleen een seintje om te verversen; de inhoud gaat uitsluitend via de persoonlijke login
   sseToSupplier(t.code, 'sync', { scope: 'trust' });

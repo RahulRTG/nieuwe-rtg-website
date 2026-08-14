@@ -24,6 +24,7 @@
    en raakt geen geld -- een geld- of toegangs-actie loopt altijd langs de
    bestaande poorten waar een mens beslist. */
 const adresLaag = require('./rtmail-adres');
+const { datum: klokDatum } = require('../lib/klok');
 
 module.exports = ({ db, save, crypto }) => {
   const SYSTEEM = 'rtg@rtmail';
@@ -96,7 +97,7 @@ module.exports = ({ db, save, crypto }) => {
       vertrouwd: VERTROUWDE_BRONNEN.includes(b),
       links, // { externeLinks:[], aantal, gevaarlijk }
       bijlagen: [], // RTMAIL draagt nooit een te openen bijlage -- bewust altijd leeg
-      at: new Date().toISOString(),
+      at: klokDatum().toISOString(),
       gelezen: false
     };
     const s = store();
@@ -181,7 +182,7 @@ module.exports = ({ db, save, crypto }) => {
     if (!Array.isArray(m.workflow)) m.workflow = [];
     m.workflow.push({ id: crypto.randomBytes(4).toString('hex'),
       soort: kap(s.soort, 24) || 'actie', label: kap(s.label, 120) || 'Actie uitgevoerd',
-      ref: kap(s.ref, 100) || null, at: new Date().toISOString() });
+      ref: kap(s.ref, 100) || null, at: klokDatum().toISOString() });
     if (m.workflow.length > 50) m.workflow = m.workflow.slice(-50);
     m.gelezen = true;
     save();

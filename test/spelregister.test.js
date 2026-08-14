@@ -46,7 +46,7 @@ const GOUD = {
   pesten:   ['Pesten', 4, 'rtf', { vormen: ['live'] }],
   dam:      ['Dammen', 2, 'rtf', { vormen: ['live', 'async'], naspeelbaar: true }],
   rummi:    ['Rummi', 4, 'rtf', { vormen: ['live', 'async'] }],
-  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop', 'beleid',
+  magnaat:  ['Magnaat', 6, 'rtg', { werelden: ['rtg', 'rtf'], buitenBeurt: ['bouw', 'verkoop', 'beleid',
     'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
     'veiling-start', 'veiling-bod', 'veiling-intrekken',
     'belang-voorstel', 'belang-antwoord',

@@ -341,9 +341,11 @@ function ongebruikt() {
      worden. Vijftien valse meldingen is niet "een beetje ruis": het is de
      reden dat niemand de zestiende nog gelooft.
 
-     Het signaal is de COMBINATIE: wie een map uitleest en uit een samengesteld
-     pad requiret, laadt die map in zijn geheel. Dat is precies de vorm van een
-     register.
+     Het signaal is de COMBINATIE OP DEZELFDE PADVARIABELE: wie `map` uitleest
+     en daarna `path.join(map, naam)` requiret, laadt die map in zijn geheel.
+     Alleen ergens een map lezen en ergens anders een samengesteld pad laden is
+     niet genoeg; magnaat-capabilities doet beide met verschillende variabelen
+     en mag daardoor niet heel server/kern onzichtbaar maken.
 
      WAT DEZE REGEL NIET MEER ZIET, en dat hoort erbij: een bestand IN zo'n map
      dat echt dood is. De keuring kan aan de buitenkant niet zien welke
@@ -353,7 +355,14 @@ function ongebruikt() {
      van dat register en niet van deze keuring. */
   for (const p of bronBestanden) {
     const t = lees(p);
-    if (/\breaddirSync\s*\(/.test(t) && /require\(\s*path\.join\(/.test(t)) dynamisch.add(path.dirname(p));
+    const gelezen = new Set();
+    const rg = /\breaddirSync\s*\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g;
+    let g;
+    while ((g = rg.exec(t))) gelezen.add(g[1]);
+    const rq = /require\(\s*path\.join\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g;
+    while ((g = rq.exec(t))) {
+      if (gelezen.has(g[1])) { dynamisch.add(path.dirname(p)); break; }
+    }
   }
 
   /* DE STARTPUNTEN. Een bestand dat je met `node ...` aanroept wordt per

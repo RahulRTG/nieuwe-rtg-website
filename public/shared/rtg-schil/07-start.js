@@ -9,6 +9,8 @@
     opties = opties || {};
     schil.vak = opties.vak || d.querySelector('.rtg-werkruimte');
     schil.console = opties.console || schil.vak.querySelector('.rtg-console');
+    schil.tabs = el('nav', 'rtg-tabbar', schil.vak);
+    schil.tabs.setAttribute('aria-label', 'Open software');
     schil.dok = el('div', 'rtg-dok', schil.vak);
     /* De apps die dit scherm kan openen. De shell KENT ze niet uit zichzelf --
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen
@@ -29,7 +31,7 @@
         sleepKanJa(s, e.data.wat);
       }
     });
-    schik(); tekenConsole();
+    schik(); tekenConsole(); tekenTabs();
     return w.RTGSchil;
   }
 

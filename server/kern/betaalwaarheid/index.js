@@ -6,9 +6,10 @@
 
 const { STATUS, providerStatus, mag, definitiefBetaald } = require('./staten');
 const beeld = require('./beeld');
+const { datum: klokDatum } = require('../../lib/klok');
 
 module.exports = function maakBetaalWaarheid({ d, save, crypto, betaal, nu, log }) {
-  const nuIso = nu || (() => new Date().toISOString());
+  const nuIso = nu || (() => klokDatum().toISOString());
   const afhandelaars = new Map();
   const startend = new Map();
   const afhandelend = new Map();

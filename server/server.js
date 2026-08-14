@@ -46,6 +46,7 @@ const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
 const betaal = require('./betaal');
+const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
 const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
@@ -176,10 +177,10 @@ load();
    gebeurtenissen aan. Daardoor kan een zaak van rail wisselen zonder dat de
    betekenis van "betaald" mee verhuist. */
 const betaalWaarheid = require('./kern/betaalwaarheid')({
-  d: () => db.data, save, crypto, betaal, nu: () => new Date().toISOString(), log
+  d: () => db.data, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log
 });
 const betaalRegie = require('./kern/betaalregie')({
-  d: () => db.data, save, betaal, env: process.env, nu: () => new Date().toISOString()
+  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString()
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde

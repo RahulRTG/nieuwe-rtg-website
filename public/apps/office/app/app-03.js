@@ -1,3 +1,4 @@
+
   /* ---------- Rahul leest mee ---------- */
   $('#aiBtn').addEventListener('click', function () {
     if (!open) return;
@@ -8,17 +9,19 @@
   });
   $('#aiDicht').addEventListener('click', function () { $('#aiScrim').classList.remove('open'); });
   $('#aiVraagBtn').addEventListener('click', function () {
-    Promise.resolve(vuil ? bewaarNu() : null).then(function () {
+    Promise.resolve(vuil ? bewaarNu() : true).then(function (veilig) {
+      if (veilig === false) return null;
       $('#aiUit').value = 'Rahul leest…';
       return api('ai', { id: open.id, opdracht: $('#aiOpdracht').value, vraag: $('#aiVraag').value });
     }).then(function (r) {
+      if (!r) return;
       if (r.body.error) { $('#aiUit').value = ''; return zeg(r.body.error); }
-      $('#aiUit').value = r.body.voorstel + (r.body.demo ? '\n\n(demostand: zet een AI-sleutel voor echte voorstellen)' : '');
+      $('#aiUit').value = r.body.voorstel;
       $('#aiToepas').style.display = '';
     });
   });
   $('#aiToepas').addEventListener('click', function () {
-    var stuk = $('#aiUit').value.split('\n\n(demostand')[0];
+    var stuk = $('#aiUit').value;
     if (open.soort === 'presentatie') pres.erbij({ indeling: 'punten', titel: 'Voorstel van Rahul', tekst: stuk });
     else if (open.soort === 'blad') blad.zetFormule(stuk.trim().split('\n')[0]);
     else $('#tekst').innerHTML += '<p>' + esc(stuk).replace(/\n/g, '<br>') + '</p>';

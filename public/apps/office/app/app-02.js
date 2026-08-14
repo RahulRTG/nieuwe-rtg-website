@@ -1,8 +1,68 @@
+
   /* ---------- openen ---------- */
-  function openen(id) {
-    api('open', { id: id }).then(function (r) {
+  function zetTab(doc) {
+    var tab = tabs.find(function (t) { return t.id === doc.id; });
+    if (!tab) {
+      if (tabs.length >= 6) {
+        var weg = tabs.findIndex(function (t) { return !open || t.id !== open.id; });
+        tabs.splice(weg < 0 ? 0 : weg, 1);
+      }
+      tab = { id: doc.id }; tabs.push(tab);
+    }
+    tab.titel = doc.titel; tab.soort = doc.soort;
+    tab.fase = (doc.werkstroom && doc.werkstroom.fase) || tab.fase || 'concept';
+    tekenTabs();
+  }
+  function tekenTabs() {
+    // Rahul gebruikt dezelfde tabstrip. Bewaar zijn levende knop (met eigen
+    // click-handler) wanneer Office de documenttabs opnieuw tekent.
+    var rahulTab = $('#docTabs').querySelector('.rtg-rahul-tab');
+    if (rahulTab) rahulTab.remove();
+    $('#docTabs').innerHTML = tabs.map(function (t) {
+      var actief = open && open.id === t.id;
+      return '<button class="office-tab" type="button" role="tab" aria-selected="' + (actief ? 'true' : 'false') +
+        '" data-tab="' + esc(t.id) + '" data-actief="' + (actief ? '1' : '0') + '">' +
+        '<i>' + glyf(GLYF_SOORT[t.soort] || 'logboek') + '</i><span>' + esc(t.titel || 'Document') +
+        '</span><b data-tab-dicht="' + esc(t.id) + '" aria-label="Sluit tab">×</b></button>';
+    }).join('');
+    if (rahulTab) $('#docTabs').appendChild(rahulTab);
+    Array.prototype.forEach.call($('#docTabs').querySelectorAll('[data-tab]'), function (b) {
+      b.addEventListener('click', function (e) {
+        if (e.target && e.target.closest('[data-tab-dicht]')) return;
+        openen(b.dataset.tab);
+      });
+    });
+    Array.prototype.forEach.call($('#docTabs').querySelectorAll('[data-tab-dicht]'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); sluitTab(b.dataset.tabDicht); });
+    });
+  }
+  function sluitTab(id) {
+    var wasActief = open && open.id === id;
+    Promise.resolve(wasActief && vuil ? bewaarNu() : true).then(function (veilig) {
+      if (veilig === false) return;
+      var plek = tabs.findIndex(function (t) { return t.id === id; });
+      if (plek >= 0) tabs.splice(plek, 1);
+      if (!wasActief) return tekenTabs();
+      clearInterval(leesT); open = null; vuil = false;
+      var volgende = tabs[Math.min(plek, tabs.length - 1)];
+      if (volgende) openLaden(volgende.id); else sluitEditor();
+    });
+  }
+  function openen(id, geforceerd) {
+    if (!id) return Promise.resolve(false);
+    if (!geforceerd && open && open.id === id) return Promise.resolve(true);
+    return Promise.resolve(open && vuil ? bewaarNu() : true).then(function (veilig) {
+      if (veilig === false) return false;
+      return openLaden(id);
+    });
+  }
+  function openLaden(id) {
+    var volgorde = ++openVolgorde;
+    return api('open', { id: id }).then(function (r) {
+      if (volgorde !== openVolgorde) return false;
       if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
       open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
+      zetTab(open);
       $('#titel').value = r.body.titel; $('#titel').disabled = !r.body.eigenaar;
       $('#staat').textContent = magBewerken ? (r.body.eigenaar ? '' : 'meeschrijven · van ' + r.body.door)
         : 'alleen lezen · van ' + r.body.door;
@@ -22,7 +82,10 @@
       else if (r.body.soort === 'bord') toonBord(r.body.inhoud);
       else toonTekst(r.body.inhoud);
       $('#lijst').style.display = 'none'; $('#editor').classList.add('aan');
+      tekenFase();
+      startSamen();
       volgMee();
+      return true;
     });
   }
   function volgMee() {
@@ -35,128 +98,26 @@
         // antwoorden niet kwijt aan een verversing; nieuwe vragen komen
         // vanzelf bij de volgende keer openen
         if (open.soort === 'formulier' && !magBewerken) return;
-        open.gewijzigd = v.body.gewijzigd; open.inhoud = v.body.inhoud;
+        // Houd bij actieve tekstinvoer ook de oude versiecode vast. Als de
+        // gebruiker daarna schrijft, ziet bewaren het conflict; de nieuwere
+        // serverstand wordt nooit stil door de zichtbare oude tekst vervangen.
         if (document.activeElement && document.activeElement.id === 'tekst') return;
+        open.gewijzigd = v.body.gewijzigd; open.inhoud = v.body.inhoud; open.werkstroom = v.body.werkstroom;
         if (open.soort === 'blad') blad.laad(v.body.inhoud, magBewerken);
         else if (open.soort === 'presentatie') pres.laad(v.body.inhoud, magBewerken);
         else if (open.soort === 'formulier') formulier.laad(v.body.inhoud, magBewerken, open.id);
         else if (open.soort === 'schets') schets.laad(v.body.inhoud, magBewerken);
         else if (open.soort === 'bord') bord.laad(v.body.inhoud, magBewerken);
         else $('#tekst').innerHTML = (v.body.inhoud && v.body.inhoud.tekst) || '';
+        zetTab(open); tekenFase();
         zeg('Bijgewerkt door ' + (v.body.door || 'een ander'));
       });
     }, 5000);
   }
   function sluitEditor() {
-    clearInterval(leesT); $('#editor').classList.remove('aan'); $('#lijst').style.display = '';
-    open = null; $('#voetbalk').textContent = ''; laadLijst();
+    clearInterval(leesT); stopSamen(); $('#editor').classList.remove('aan'); $('#lijst').style.display = '';
+    open = null; vuil = false; $('#voetbalk').textContent = ''; tekenTabs(); laadLijst();
   }
-  $('#editTerug').addEventListener('click', function () { if (vuil) bewaarNu(); sluitEditor(); });
-
-  /* ---------- tekstdocument ---------- */
-  function toonTekst(inhoud) {
-    $('#tekst').style.display = '';
-    $('#tekst').innerHTML = (inhoud && inhoud.tekst) || '';
-    $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
-    if (magBewerken) {
-      $('#tekstTools').style.display = 'flex';
-      RTGOfficeTekst.bouwBalk($('#tekstTools'), $('#tekst'), markeer);
-    }
-    telBij();
-  }
-  $('#tekst').addEventListener('input', function () { markeer(); telBij(); });
-  function telBij() {
-    if (!open || open.soort !== 'tekst') return;
-    $('#voetbalk').textContent = RTGOfficeTekst.tel($('#tekst')).regel;
-  }
-
-  /* ---------- rekenblad ---------- */
-  function toonBlad(inhoud) {
-    $('#bladWrap').style.display = '';
-    if (!blad) blad = RTGOfficeBlad.maak({ tabel: $('#blad'), refVak: $('#celRef'), invoer: $('#celInvoer'),
-      voet: $('#voetbalk'), onWijzig: markeer });
-    blad.laad(inhoud, magBewerken);
-    if (magBewerken) { $('#bladTools').style.display = 'flex'; blad.bouwBalk($('#bladTools')); }
-  }
-
-  /* ---------- formulier en schets ---------- */
-  function toonFormulier(inhoud) {
-    $('#formWrap').style.display = '';
-    if (!formulier) formulier = RTGOfficeFormulier.maak({ wrap: $('#formWrap'), api: api, onWijzig: markeer, meld: zeg });
-    formulier.laad(inhoud, magBewerken, open.id);
-    var n = ((inhoud && inhoud.vragen) || []).length;
-    $('#voetbalk').textContent = n + (n === 1 ? ' vraag' : ' vragen');
-  }
-  function toonSchets(inhoud) {
-    $('#schetsWrap').style.display = '';
-    if (!schets) schets = RTGOfficeSchets.maak({ wrap: $('#schetsWrap'), onWijzig: markeer, meld: zeg, voet: $('#voetbalk') });
-    schets.laad(inhoud, magBewerken);
-  }
-  function toonBord(inhoud) {
-    $('#bordWrap').style.display = '';
-    if (!bord) bord = RTGOfficeBord.maak({ wortel: $('#bordWrap'), onWijzig: markeer, meld: zeg });
-    bord.laad(inhoud, magBewerken);
-    var n = ((inhoud && inhoud.lijsten) || []).reduce(function (a, l) { return a + ((l.kaarten || []).length); }, 0);
-    $('#voetbalk').textContent = n + (n === 1 ? ' kaart' : ' kaarten');
-  }
-
-  /* ---------- presentatie ---------- */
-  function toonPres(inhoud) {
-    $('#presWrap').style.display = 'grid';
-    if (!pres) pres = RTGOfficePres.maak({ rail: $('#diaRail'), vlak: $('#diaVlak'), onWijzig: markeer, meld: zeg });
-    pres.laad(inhoud, magBewerken);
-    $('#voetbalk').textContent = pres.dias().length + ' dia\'s';
-  }
-  $('#presBtn').addEventListener('click', function () {
-    if (!pres) return;
-    presLoop = RTGOfficePres.presenteer({ doos: $('#toonDia'), titel: $('#tdTitel'), tekst: $('#tdTekst'),
-      notitie: $('#tdNotitie'), teller: $('#tdTeller'), dias: pres.dias() });
-    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+  $('#editTerug').addEventListener('click', function () {
+    Promise.resolve(vuil ? bewaarNu() : true).then(function (veilig) { if (veilig !== false) sluitEditor(); });
   });
-  $('#tdVorige').addEventListener('click', function () { presLoop && presLoop.stap(-1); });
-  $('#tdVolgende').addEventListener('click', function () { presLoop && presLoop.stap(1); });
-  $('#tdNotitieBtn').addEventListener('click', function () { presLoop && presLoop.notitie(); });
-  $('#tdDicht').addEventListener('click', function () {
-    $('#toonDia').className = ''; presLoop = null;
-    if (document.exitFullscreen) document.exitFullscreen().catch(function () {});
-  });
-  document.addEventListener('keydown', function (e) {
-    if (!$('#toonDia').classList.contains('aan') || !presLoop) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') presLoop.stap(1);
-    else if (e.key === 'ArrowLeft') presLoop.stap(-1);
-    else if (e.key === 'n' || e.key === 'N') presLoop.notitie();
-    else if (e.key === 'Escape') $('#tdDicht').click();
-  });
-
-  /* ---------- autosave ---------- */
-  function markeer() {
-    vuil = true; $('#staat').textContent = 'Opslaan…';
-    clearTimeout(bewaarT); bewaarT = setTimeout(bewaarNu, 900);
-  }
-  function inhoudNu() {
-    return open.soort === 'blad' ? blad.inhoud()
-      : open.soort === 'presentatie' ? pres.inhoud()
-      : open.soort === 'formulier' ? formulier.inhoud()
-      : open.soort === 'schets' ? schets.inhoud()
-      : open.soort === 'bord' ? bord.inhoud()
-      : { tekst: $('#tekst').innerHTML.slice(0, 500000) };
-  }
-  function bewaarNu() {
-    if (!open || !magBewerken || !vuil) return Promise.resolve();
-    // Het document vastpakken vóór de rondreis: wie tijdens het bewaren
-    // teruggaat naar de lijst (open wordt dan null) of een ander document
-    // opent, mag niet door het late antwoord worden ingehaald.
-    var doc = open, inhoud = inhoudNu();
-    return api('bewaar', { id: doc.id, titel: $('#titel').value, inhoud: inhoud }).then(function (r) {
-      if (r.body.error) { $('#staat').textContent = ''; return zeg(r.body.error); }
-      doc.gewijzigd = r.body.gewijzigd; doc.inhoud = inhoud;
-      if (open === doc) {
-        vuil = false;
-        $('#staat').textContent = 'Bewaard ' + new Date().toLocaleTimeString('nl-NL').slice(0, 5);
-      }
-    });
-  }
-  $('#titel').addEventListener('input', markeer);
-  setInterval(function () { if (vuil) bewaarNu(); }, 8000);
-  window.addEventListener('beforeunload', function () { if (vuil) bewaarNu(); });
-

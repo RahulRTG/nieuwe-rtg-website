@@ -11,7 +11,8 @@ const { startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pp-'));
-let child, businessToken, rtgToken, officeToken;
+let child, businessToken, rtgToken, officeToken, eigenaarToken;
+let partnerCode, partnerPin;
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -29,6 +30,7 @@ test.before(async () => {
   businessToken = (await json(await api('/api/login', { username: 'Rahul', password: 'Imran' }))).token;
   rtgToken = (await json(await api('/api/login', { tier: 'rtg' }))).token;
   officeToken = (await json(await api('/api/office/login', { code: 'RTG-OFFICE' }))).token;
+  eigenaarToken = (await json(await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran' }))).token;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -51,6 +53,21 @@ test('met Business Pass: aanvraag met pass-bewijs, en het kantoor geeft de code 
   const st = await json(await api('/api/office/state', {}, officeToken));
   const a = (st.state.partnerApplications || []).find(x => x.company === 'Bodega Norte');
   assert.ok(a && a.businessPass && a.businessPass.key === 'business', 'het pass-bewijs zit op de aanvraag');
-  const besluit = await json(await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, officeToken));
+  assert.equal((await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, officeToken)).status, 403,
+    'de gedeelde kantoordeur mag geen partners toelaten');
+  const besluit = await json(await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, eigenaarToken));
   assert.ok(besluit.code || besluit.ok, 'goedkeuren levert een bedrijfscode op');
+  partnerCode = besluit.code; partnerPin = besluit.pin;
+});
+
+test('partner schorsen trekt bestaande toegang onmiddellijk in', async () => {
+  const roster = await json(await api('/api/supplier/roster', { code: partnerCode }));
+  const manager = roster.staff.find(x => x.role === 'manager');
+  const login = await json(await api('/api/supplier/login', { code: partnerCode, staffId: manager.id, pin: partnerPin }));
+  assert.ok(login.token, 'de nieuwe manager kan voor schorsing naar binnen');
+  const stop = await api('/api/office/partner/status', { code: partnerCode, status: 'geschorst', reden: 'Geautomatiseerde toegangstest' }, eigenaarToken);
+  assert.equal(stop.status, 200);
+  assert.equal((await api('/api/supplier/state', {}, login.token)).status, 401, 'bestaande sessie is ingetrokken');
+  assert.equal((await api('/api/supplier/login', { code: partnerCode, staffId: manager.id, pin: partnerPin })).status, 403, 'nieuwe toegang blijft dicht');
+  assert.equal((await api('/api/office/partner/status', { code: partnerCode, status: 'actief' }, eigenaarToken)).status, 200, 'boardroom kan een schorsing gecontroleerd opheffen');
 });

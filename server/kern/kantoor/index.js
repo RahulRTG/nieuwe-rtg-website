@@ -99,7 +99,9 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       applications: applications.slice(0, 40),
       // de zaken-lijst is begrensd (het echte aantal staat in totals.partners);
       // een rauwe dump van miljoenen zaken zou het antwoord onbruikbaar maken
-      suppliers: db.data.suppliers.slice(0, 1000).map(publicSupplier),
+      suppliers: db.data.suppliers.slice(0, 1000).map(s => ({ ...publicSupplier(s),
+        partnerStatus: s.partnerStatus || 'actief', online: s.online !== false,
+        partnerStatusAt: s.partnerStatusAt || null })),
       partnerApplications: (db.data.partnerApplications || []).slice(0, 40),
       pendingSchools: wachtScholen.map(s => ({ code: s.code, naam: s.naam, plaats: s.plaats, at: s.at,
         personeel: Object.keys(s.personeel || {}).length })).slice(0, 40),

@@ -4,6 +4,9 @@
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
+  const ordersVoor = typeof ctx.ordersVanZaak === 'function'
+    ? ctx.ordersVanZaak
+    : code => (db.data.orders || []).filter(o => o.supplierCode === code);
   function dagrapport(s, datum) {
     const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
@@ -11,7 +14,8 @@ module.exports = (ctx) => {
     const L = LANDEN[landCode];
     const caps = db.capsVan(s);
     const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
-    const catVan = naam => { const m = (s.menu || []).find(x => x.name === naam); return m && m.station === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat; };
+    const menuStations = new Map((s.menu || []).map(m => [m.name, m.station]));
+    const catVan = naam => menuStations.get(naam) === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat;
     const potten = {};
     const betaalwijzen = {};
     let bonnen = 0, fooien = 0, omzet = 0;
@@ -51,17 +55,20 @@ module.exports = (ctx) => {
     // toppers: de meest verkochte items over kassa en app samen
     const per = {};
     const telItems = items => { for (const it of items || []) per[it.name] = (per[it.name] || 0) + (it.qty || 1); };
-    for (const o of require('../../db').ordersVanZaak(s.code)) if (o.paid && opDag(o.paidAt || o.at)) telItems(o.items);
+    for (const o of ordersVoor(s.code)) if (o.paid && opDag(o.paidAt || o.at)) telItems(o.items);
     for (const v of db.data.posSales[s.code] || []) if (opDag(v.at)) telItems(v.items);
     const toppers = Object.entries(per).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([naam, aantal]) => ({ naam, aantal }));
     // de gasten van vandaag
-    const res = (db.data.reserveringen || []).filter(r => r.supplierCode === s.code && r.datum === z.datum);
-    const gasten = {
-      reserveringen: res.filter(r => !r.walkIn && !['geannuleerd', 'geweigerd'].includes(r.status)).length,
-      walkIns: res.filter(r => r.walkIn).length,
-      noShows: res.filter(r => r.status === 'no-show').length,
-      personen: res.filter(r => ['aangekomen', 'afgerond'].includes(r.status)).reduce((n, r) => n + (r.personen || 0), 0)
-    };
+    // Eén pass, zonder vier tijdelijke arrays. Op grote reserveringsbestanden
+    // scheelt dit zowel CPU als kortlevende heapobjecten/GC-pauzes.
+    const gasten = { reserveringen: 0, walkIns: 0, noShows: 0, personen: 0 };
+    for (const r of db.data.reserveringen || []) {
+      if (r.supplierCode !== s.code || r.datum !== z.datum) continue;
+      if (r.walkIn) gasten.walkIns++;
+      else if (r.status !== 'geannuleerd' && r.status !== 'geweigerd') gasten.reserveringen++;
+      if (r.status === 'no-show') gasten.noShows++;
+      if (r.status === 'aangekomen' || r.status === 'afgerond') gasten.personen += r.personen || 0;
+    }
     // de derving van vandaag, tegen kostprijs
     let derving = 0;
     for (const l of s.voorraadLog || []) {
@@ -76,15 +83,19 @@ module.exports = (ctx) => {
     // gemiddelde kamerprijs van wie er nu slaapt (ADR)
     let verblijf = null;
     if (Array.isArray(s.rooms) && s.rooms.length) {
-      const van = (db.data.verblijven || []).filter(v => v.supplierCode === s.code);
-      const inHuis = van.filter(v => v.status === 'ingecheckt');
+      let aankomsten = 0, vertrekken = 0, noShows = 0, inHuis = 0, kamerOmzet = 0;
+      for (const v of db.data.verblijven || []) {
+        if (v.supplierCode !== s.code) continue;
+        if (opDag(v.ingechecktAt)) aankomsten++;
+        if (opDag(v.uitgechecktAt)) vertrekken++;
+        if (v.status === 'no-show' && v.aankomst === z.datum) noShows++;
+        if (v.status === 'ingecheckt') { inHuis++; kamerOmzet += v.prijsPerNacht || 0; }
+      }
       verblijf = {
         bezet: s.rooms.filter(r => r.hk && r.hk.status === 'bezet').length,
         totaal: s.rooms.length,
-        aankomsten: van.filter(v => opDag(v.ingechecktAt)).length,
-        vertrekken: van.filter(v => opDag(v.uitgechecktAt)).length,
-        noShows: van.filter(v => v.status === 'no-show' && v.aankomst === z.datum).length,
-        adr: inHuis.length ? centen(inHuis.reduce((n, v) => n + (v.prijsPerNacht || 0), 0) / inHuis.length) : 0
+        aankomsten, vertrekken, noShows,
+        adr: inHuis ? centen(kamerOmzet / inHuis) : 0
       };
     }
     return {

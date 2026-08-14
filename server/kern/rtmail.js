@@ -143,6 +143,7 @@ module.exports = ({ db, save, crypto }) => {
     links: m.links || scanLinks(m.tekst),
     bijlagen: [],
     draad: m.draad || m.id, antwoordOp: m.antwoordOp || null,
+    workflow: Array.isArray(m.workflow) ? m.workflow.slice(-20) : [],
     at: m.at, gelezen: !!m.gelezen
   });
 
@@ -169,7 +170,25 @@ module.exports = ({ db, save, crypto }) => {
     return pub(m);
   }
 
-  return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees,
+  /* Een actie uit RTMAIL blijft aan het bronbericht vastzitten. Zo kan de
+     werkstroom later aantonen waar een agenda-item of project vandaan kwam,
+     zonder dat RTMAIL zelf geld of toegang aanraakt. */
+  function workflow(adres, id, stap) {
+    const a = normAdres(adres);
+    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a));
+    if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
+    const s = stap || {};
+    if (!Array.isArray(m.workflow)) m.workflow = [];
+    m.workflow.push({ id: crypto.randomBytes(4).toString('hex'),
+      soort: kap(s.soort, 24) || 'actie', label: kap(s.label, 120) || 'Actie uitgevoerd',
+      ref: kap(s.ref, 100) || null, at: new Date().toISOString() });
+    if (m.workflow.length > 50) m.workflow = m.workflow.slice(-50);
+    m.gelezen = true;
+    save();
+    return Object.assign(pub(m), { workflow: m.workflow.slice(-20) });
+  }
+
+  return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees, workflow,
     zetNaBezorging,
     // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
     DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,

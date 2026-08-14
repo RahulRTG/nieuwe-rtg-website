@@ -73,7 +73,11 @@
     "kosten": "node --experimental-sqlite scripts/duurzaamheidskosten.js",
     "verraadcatalogus": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\"",
     "verraad": "node --experimental-sqlite scripts/verraadronde.js",
-    "ketenronde": "node --experimental-sqlite scripts/ketenronde.js"
+    "ketenronde": "node --experimental-sqlite scripts/ketenronde.js",
+    "motor:build": "cargo build --release --manifest-path motor/Cargo.toml --locked",
+    "motor:test": "cargo test --release --manifest-path motor/Cargo.toml --locked",
+    "motor:start": "motor/target/release/rtg-motor",
+    "start:rust": "node scripts/start-met-motor.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

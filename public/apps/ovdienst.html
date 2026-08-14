@@ -45,6 +45,9 @@
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
+  .opdracht{background:linear-gradient(145deg,rgba(201,162,75,.16),var(--card));border-color:rgba(201,162,75,.38);}
+  .veilig{display:flex;gap:.5rem;align-items:flex-start;margin:.5rem 0;color:var(--soft);font-size:.72rem;line-height:1.4}.veilig:before{content:'\2713';color:var(--groen)}
+  .nuHero{background:linear-gradient(145deg,rgba(105,184,145,.18),var(--card));border-color:rgba(105,184,145,.42);padding:1.2rem}.nuLabel{font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;color:var(--groen)}.nuHero h3{font:500 1.8rem 'Bodoni Moda',serif;margin:.4rem 0}.actieNodig{border-left:3px solid var(--gold)}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -77,22 +80,20 @@
       <div class="kaart">
         <p class="stil">Beheert u de zaak? In de routetekenaar zet u met een paar tikken uw lijnen en haltes
           op de kaart; leden zien ze meteen.</p>
-        <div class="rij"><a class="knop" href="/apps/ovroutes.html" style="text-decoration:none;display:inline-block;">Routes tekenen</a></div>
+        <div class="rij"><a class="knop" href="/apps/ovroutes.html" style="text-decoration:none;display:inline-block;">Routes tekenen</a><a class="knop" href="/apps/ovcontrol.html" style="text-decoration:none;display:inline-block;">Control Tower</a></div>
       </div>
     </div>
 
     <!-- de lopende dienst -->
     <div id="loopt" class="weg">
-      <div class="kaart">
-        <div class="tellers">
-          <span><b id="tAanBoord">0</b><span>aan boord</span></span>
-          <span><b id="tVandaag">0</b><span>vandaag</span></span>
-        </div>
-        <p class="stil" id="gpsStatus" style="margin-top:0.6rem;">GPS delen…</p>
-        <div class="rij"><button class="knop rood" id="dStop" type="button">Stop de dienst</button></div>
-      </div>
-      <h2>Check-in met code</h2>
-      <div class="kaart codeIn">
+      <div class="kaart nuHero"><div class="nuLabel">Nu</div><h3 id="nuTitel">Rijd uw lijn</h3><p class="stil">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p><div class="tellers" style="margin-top:.8rem;"><span><b id="tAanBoord">0</b><span>aan boord</span></span><span><b id="tVandaag">0</b><span>vandaag</span></span></div><p class="stil" id="gpsStatus" style="margin-top:.6rem;">GPS delen…</p></div>
+      <h2>Hierna</h2>
+      <div class="kaart opdracht"><h2 style="margin:0 0 .5rem;">Veilige automatische dienst</h2>
+        <div class="veilig">GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</div>
+        <div class="veilig">Geld, identiteit en uitzonderingen worden nooit automatisch beslist.</div>
+        <div class="veilig">Stoppen blijft altijd direct beschikbaar.</div></div>
+      <h2>Actie nodig</h2>
+      <div class="kaart codeIn actieNodig">
         <p class="stil">Het lid toont een oplichtende code; tik hem in en de reiziger is binnen.</p>
         <form class="rij" id="codeForm">
           <label for="codeVeld" style="position:absolute;left:-999px;">Incheckcode</label>
@@ -101,6 +102,7 @@
         </form>
         <p class="stil" style="margin-top:0.5rem;">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
           de teller verschijnen.</p>
+        <div class="rij"><button class="knop rood" id="dStop" type="button">Stop de dienst</button></div>
       </div>
 
       <h2>Vervoerbewijs controleren</h2>
@@ -183,6 +185,7 @@
   function dienstLoopt(lijnNaam) {
     $('#kies').classList.add('weg'); $('#loopt').classList.remove('weg');
     $('#dienstBadge').textContent = lijnNaam + ' · live';
+    $('#nuTitel').textContent = lijnNaam + ' is live';
     clearInterval(posTimer); clearInterval(standTimer);
     const deel = async () => {
       const p = await api('pos', hier);

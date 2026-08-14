@@ -39,6 +39,10 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
 app.get('/api/supplier/stream', (req, res) => {
   const sess = sessionFor(req.query.token);
   if (!sess || sess.role !== 'supplier') return res.status(401).end();
+  if (sess.staffId != null) {
+    const staff = accounts.getStaffById(Number(sess.staffId));
+    if (!staff || String(staff.supplier_code).toUpperCase() !== String(sess.code).toUpperCase()) return res.status(401).end();
+  }
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
   const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res };

@@ -20,7 +20,7 @@ app.post('/api/supplier/zaak/functie', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/login', async (req, res) => {
-  let s, actor;
+  let s, actor, staff = null;
   if (req.body.staffId != null) {
     // Persoonlijke personeelslogin met PIN, binnen het bedrijfsaccount.
     s = findSupplier(req.body.code);
@@ -31,7 +31,7 @@ app.post('/api/supplier/login', async (req, res) => {
     const fk = pinSlot.personeel(s.code, req.body.staffId);
     if (pinSlot.dicht(fk))
       return res.status(429).json({ error: 'Te veel foute pogingen. Wacht een minuut en probeer het opnieuw.' });
-    const staff = await accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
+    staff = await accounts.verifyStaffPin(Number(req.body.staffId), req.body.pin);
     if (!staff || String(staff.supplier_code).toUpperCase() !== s.code) {
       pinSlot.fout(fk, 'de personeelspin van ' + s.code + '#' + Number(req.body.staffId));
       logInlog('zaak', false, s.code + '#' + req.body.staffId, req);
@@ -65,8 +65,12 @@ app.post('/api/supplier/login', async (req, res) => {
     return res.status(401).json({ error: 'Kies wie u bent en voer uw persoonlijke pincode in.' });
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
+  if (s.partnerStatus === 'geschorst' || s.partnerStatus === 'beeindigd')
+    return res.status(403).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
   const token = crypto.randomBytes(24).toString('hex');
-  rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager });
+    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
+      staffRole: actor.role, manager: actor.manager,
+      ...(staff && staff.member_id != null ? { lid: Number(staff.member_id), lidKey: 'user-' + staff.member_id } : {}) });
   logActivity(s.code, actor, actor.name + ' logde in');
   res.json({ token, state: supplierState(s, actor) });
 });

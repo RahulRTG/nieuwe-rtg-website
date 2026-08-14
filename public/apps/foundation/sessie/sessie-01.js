@@ -1,23 +1,3 @@
-/* Sessie: het gezin-account en het gekozen profiel, net als bij een
-   streamingdienst. Eenmaal ingelogd blijft het hele gezin ingelogd op dit
-   toestel; elk profiel weet wie hij is. Bewaard in localStorage, zodat de
-   tools (leren, cv) je naam al kennen en de balk bovenin laat zien wie je bent. */
-(function (w) {
-  var KEY = 'rtf_sessie';
-  // de gedeelde verbindingslaag (offline-banner + satellietmodus) laadt op
-  // elke RTF-pagina mee; sessie.js zit overal, dus dit is de ene plek
-  try {
-    if (!document.querySelector('script[src="/shared/verbinding.js"]')) {
-      var vscript = document.createElement('script');
-      vscript.src = '/shared/verbinding.js';
-      (document.head || document.documentElement).appendChild(vscript);
-    }
-  } catch (e) {}
-  function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
-  function api(p, b) {
-    return fetch('/api/foundation' + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b || {}) })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) { var e = new Error(d.error || 'Er ging iets mis.'); e.data = d; e.needCv = !!d.needCv; e.status = r.status; throw e; } return d; }); });
-  }
   var Sessie = {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
@@ -52,7 +32,14 @@
       document.head.appendChild(s);
     },
     // gebruik boven aan een tool-pagina: geen sessie -> de deur, met de weg erin
-    eisProfiel: function () { if (!Sessie.actief()) { Sessie.deur('gezin'); return false; } return true; },
+    eisProfiel: function () {
+      if (!Sessie.actief()) { Sessie.deur('gezin'); return false; }
+      var s = lees();
+      if (s && s.profiel && s.profiel.rol === 'kind' && s.profiel.leeftijdBevestigd === false) {
+        toegangSlot('Een beheerder vult eerst je geboortedatum in. Daarna krijg je automatisch de juiste leeftijdspas.', false); return false;
+      }
+      return true;
+    },
     // privezaken van het gezin: gasten (oppas/opa/oma/familie) zien de deur
     isGast: function () { var s = lees(); return !!(s && s.profiel && s.profiel.gast); },
     eisFamilie: function () { if (!Sessie.actief() || Sessie.isGast()) { Sessie.deur('gezin'); return false; } return true; },
@@ -66,6 +53,7 @@
         .catch(function () { return null; });
     },
     api: api,
+    toegang: controleerToegang,
     // herbruikbare AI-coach-chat. opts: { kind, chat, input, knop, wacht }
     coach: function (opts) {
       var s = lees(); if (!s) return;
@@ -100,7 +88,7 @@
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
         '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + (p.avatar || 'emo-blij') + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +

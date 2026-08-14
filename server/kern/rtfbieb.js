@@ -85,7 +85,7 @@ function maakRtfBieb({ db, save }) {
 
   const mijnApps = (handle) => rij(handle).map(appVan).filter(Boolean);
 
-  return { rtfbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, magZien, TOTAAL } };
+  return { rtfbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, magZien, zichtbaar, TOTAAL } };
 }
 
 module.exports = { maakRtfBieb, CATEGORIEEN, APPS, TOTAAL };

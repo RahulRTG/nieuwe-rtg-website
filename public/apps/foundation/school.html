@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="stijl.css">
 <script src="palet.js"></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-school-shell.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
@@ -59,17 +60,46 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl school-shell">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
-<header id="balk"></header>
+<div class="school-kader">
+<aside class="school-zij" aria-label="RTF Campus">
+  <a class="school-merk" href="campus.html"><span class="school-merkbeeld">F</span><span><strong>RTF Campus</strong><small>school &amp; ontwikkeling</small></span></a>
+  <div class="school-navkop">Leren</div>
+  <a class="school-nav" href="campus.html"><i>01</i>Vandaag</a>
+  <a class="school-nav aan" href="school.html" aria-current="page"><i>02</i>School</a>
+  <a class="school-nav" href="leerpaspoort.html"><i>03</i>Leerpaspoort</a>
+  <a class="school-nav" href="leren.html"><i>04</i>Live les</a>
+  <a class="school-nav" href="schoolbieb.html"><i>05</i>Bibliotheek</a>
+  <div class="school-navkop">Ontdekken</div>
+  <a class="school-nav" href="speelhal.html"><i>06</i>Game Hall</a>
+  <a class="school-nav" href="/apps/spelen.html?pas=foundation&amp;open=magnaat"><i>M</i>Magnaat</a>
+  <a class="school-nav" href="projecten.html"><i>07</i>Projectstudio</a>
+  <div class="school-navkop">Professioneel</div>
+  <a class="school-nav" href="/apps/schoolpartner.html"><i>08</i>School Partner</a>
+  <a class="school-nav" href="/apps/lesmaker.html"><i>09</i>Lesmaker</a>
+  <div class="school-veilig"><b>Veilige schoolomgeving</b>Rechten komen van de server. Kinderen zien alleen hun eigen klas, werk en berichten.</div>
+</aside>
+<div class="school-werk">
+<header class="school-boven">
+  <div class="school-boventitel"><span class="school-ey">RTFoundation</span><h1>School</h1></div>
+  <span class="school-bovenruimte"></span>
+  <a class="school-toplink verberg-smal" href="campus.html">Campus</a>
+  <div id="balk" class="school-sessiebalk"></div>
+</header>
 <main class="wrap" id="hoofd" tabindex="-1">
-  <h1>School</h1>
-
   <!-- gezinsweergave -->
   <section id="vGezin" hidden>
+    <section class="enterprise-hero">
+      <div><span class="ey">Gezin &amp; leerling</span><h2 id="schoolWelkom">Jouw schooldag in één rustig beeld.</h2><p>Rooster, huiswerk, toetsen, cijfers en contact horen bij elkaar. Je ziet alleen jouw eigen klas en gezin.</p>
+        <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Vandaag</span><span class="enterprise-chip"><i></i>Mijn werk</span><span class="enterprise-chip"><i></i>Berichten</span></div>
+      </div>
+      <div class="enterprise-belofte"><b>Jij houdt de regie</b>Een kind accepteert zelf een klasuitnodiging. Schoolberichten lopen via het gezin en gevoelige gegevens blijven afgeschermd.</div>
+    </section>
+    <div class="kpis" id="schoolKerncijfers" hidden aria-live="polite"></div>
     <div id="uitnodigingen"></div>
     <div id="vandaagLeren"></div>
-    <div id="schoolLijst"></div>
+    <div id="schoolLijst" class="school-dashboard-grid"></div>
     <div id="koppelBlok" hidden>
       <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
       <div class="kaart blok">
@@ -85,7 +115,13 @@
 
   <!-- leraarweergave -->
   <section id="vLeraar" hidden>
-    <div class="sec">Leraaromgeving</div>
+    <section class="enterprise-hero">
+      <div><span class="ey">Professionele toegang</span><h2>Van aanmelden naar een echte werkruimte.</h2><p>De school wordt gecontroleerd, de directie laat collega’s toe en iedere rol krijgt alleen de eigen bevoegdheden.</p>
+        <div class="enterprise-acties"><a class="knop" href="/apps/schoolpartner.html" style="text-decoration:none;">Open School Partner →</a></div>
+      </div>
+      <div class="enterprise-belofte"><b>Geen permanente sleutel</b>Professionele toegang blijft voortaan alleen in de huidige tabsessie en verloopt na inactiviteit.</div>
+    </section>
+    <div class="sec">Aanmelden en toegang</div>
     <div class="kaart blok" id="lrInlog">
       <b>1. School aanmelden</b>
       <div class="mini" style="margin:.3rem 0 .6rem;">De school gaat voorop: de directie meldt de school aan en krijgt de schoolcode (voor het personeel) en het beheer-token.</div>
@@ -105,9 +141,9 @@
       <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
       <b>Inloggen</b>
       <div class="mini" style="margin:.3rem 0 .6rem;">Met je schoolcode en je token (beheer of personeel).</div>
-      <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters">
-      <input class="veld" id="inToken" placeholder="Beheer- of personeel-token">
-      <button class="knop grijs" id="inDoe">Inloggen</button>
+      <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters" autocomplete="organization" spellcheck="false">
+      <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false">
+      <button class="knop grijs" id="inDoe">Veilig inloggen</button>
       <div class="mini" id="lrFout" style="color:var(--rood);min-height:1rem;"></div>
     </div>
     <div id="lrOverzicht" hidden></div>
@@ -115,6 +151,8 @@
     <div class="mini" style="margin-top:1rem;"><a id="terugGezin">← Terug naar de gezinsweergave</a></div>
   </section>
 </main>
+</div>
+</div>
 
 <!-- berichten-overlay (leraar <-> gezin) -->
 <div class="ov" id="chatOv" aria-label="Schoolberichten">
@@ -131,7 +169,9 @@
 <script src="/apps/util.js"></script>
 <script src="sessie.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/rtg-school-session.js"></script>
 <script>
+try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}
 const $ = s => document.querySelector(s);
 const E = Util.el, vervang = Util.vervang, esc = Util.escapeHTML;
 const s = window.Sessie ? Sessie.huidig() : null;
@@ -193,6 +233,15 @@ async function laadGezin(){
   laadPlanner();
   const lijst = d.school || [];
   gezinStand = lijst;
+  const openWerk = lijst.reduce((n, x) => n + (x.huiswerk || []).filter(h => !h.af).length, 0);
+  const lessenVandaag = lijst.reduce((n, x) => n + (x.vandaag || []).length, 0);
+  const cijfers = lijst.reduce((n, x) => n + (x.cijfers || []).length, 0);
+  const naam = s && s.profiel && s.profiel.naam;
+  if (naam) $('#schoolWelkom').textContent = 'Goed dat je er bent, ' + naam + '.';
+  $('#schoolKerncijfers').hidden = false;
+  $('#schoolKerncijfers').innerHTML = [
+    ['Klassen', lijst.length], ['Lessen vandaag', lessenVandaag], ['Open werk', openWerk], ['Cijfers', cijfers]
+  ].map(x => '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>').join('');
   if (!lijst.length){
     vervang($('#schoolLijst'), E('div',{class:'kaart blok'},
       E('b', null, 'Nog geen klas gekoppeld'),
@@ -392,7 +441,14 @@ $('#chatIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('#chatS
 /* ---------- leraaromgeving ---------- */
 const LS_DIR = 'rtfSchoolDirectie';   // { code, token } van de directie
 const LS_PERS = 'rtfSchoolPersoneel'; // { code, token } van een personeelslid
-const lees = k => { try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } };
+const schoolStore = window.RTGSchoolSession;
+const lees = k => schoolStore ? schoolStore.lees(k) : null;
+const bewaarSchool = (k, v) => { if (schoolStore) schoolStore.zet(k, v); };
+const vergeetSchool = k => { if (schoolStore) schoolStore.weg(k); };
+if (schoolStore) schoolStore.bewaak([LS_DIR, LS_PERS], ()=>{
+  $('#lrOverzicht').hidden = true; $('#lrDash').hidden = true; $('#lrInlog').hidden = false;
+  $('#lrFout').textContent = 'Je veilige schoolsessie is verlopen. Log opnieuw in.';
+});
 for (const id of ['psCode', 'inCode']) $('#'+id).addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
 
 // stap 1: de school meldt zich aan (directie)
@@ -400,7 +456,7 @@ $('#scMaak').addEventListener('click', async ()=>{
   $('#lrFout').textContent = '';
   try{
     const d = await api('/school/school/maak', { naam: $('#scNaam').value, plaats: $('#scPlaats').value });
-    localStorage.setItem(LS_DIR, JSON.stringify({ code: d.schoolCode, token: d.beheerToken }));
+    bewaarSchool(LS_DIR, { code: d.schoolCode, token: d.beheerToken });
     alert('School aangemeld.\n\nSchoolcode voor je personeel: ' + d.schoolCode + '\nBeheer-token (bewaar goed): ' + d.beheerToken +
       '\n\nRTG controleert je aanmelding. Zodra de school is goedgekeurd, kun je personeel toelaten en klassen aanmaken.');
     laadDirectie(d.schoolCode, d.beheerToken);
@@ -411,7 +467,7 @@ $('#psMeld').addEventListener('click', async ()=>{
   $('#lrFout').textContent = '';
   try{
     const d = await api('/school/personeel/aanmeld', { schoolCode: $('#psCode').value.trim(), naam: $('#psNaam').value, rol: $('#psRol').value });
-    localStorage.setItem(LS_PERS, JSON.stringify({ code: $('#psCode').value.trim(), token: d.personeelToken }));
+    bewaarSchool(LS_PERS, { code: $('#psCode').value.trim(), token: d.personeelToken });
     alert('Aangemeld bij ' + d.school.naam + '.\n\nJouw personeel-token (bewaar goed): ' + d.personeelToken + '\n\nDe directie moet je aanmelding nog goedkeuren.');
     laadPersoneel($('#psCode').value.trim(), d.personeelToken);
   }catch(e){ $('#lrFout').textContent = e.message; }
@@ -421,9 +477,9 @@ $('#inDoe').addEventListener('click', async ()=>{
   $('#lrFout').textContent = '';
   const code = $('#inCode').value.trim(), token = $('#inToken').value.trim();
   try{ await api('/school/school/overzicht', { schoolCode: code, beheerToken: token });
-    localStorage.setItem(LS_DIR, JSON.stringify({ code, token })); return laadDirectie(code, token); }catch(e){}
+    bewaarSchool(LS_DIR, { code, token }); $('#inToken').value = ''; return laadDirectie(code, token); }catch(e){}
   try{ await api('/school/personeel/status', { schoolCode: code, personeelToken: token });
-    localStorage.setItem(LS_PERS, JSON.stringify({ code, token })); return laadPersoneel(code, token); }catch(e){}
+    bewaarSchool(LS_PERS, { code, token }); $('#inToken').value = ''; return laadPersoneel(code, token); }catch(e){}
   $('#lrFout').textContent = 'Onbekende schoolcode of token.';
 });
 
@@ -446,7 +502,7 @@ async function laadDirectie(code, token){
           ? 'RTG heeft deze schoolaanmelding afgewezen. Neem contact op met RTG als je denkt dat dit niet klopt.'
           : 'Deze school wacht op goedkeuring door RTG. Je kunt alvast aanmeldingen ontvangen, maar personeel toelaten en klassen maken kan pas na goedkeuring.') : null,
       E('div',{class:'knoprij'},
-        E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_DIR); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen'))),
+        E('button',{class:'knop grijs klein', onclick:()=>{ vergeetSchool(LS_DIR); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen'))),
     wachtend.length ? [E('div',{class:'sec'}, 'Aanmeldingen (wachten op jou)'),
       E('div',{class:'kaart blok'}, wachtend.map(p => E('div',{class:'rij'},
         E('div',{class:'mid'}, p.naam, E('small', null, p.rol)),
@@ -467,10 +523,10 @@ async function laadDirectie(code, token){
 async function laadPersoneel(code, token){
   let d;
   try{ d = await api('/school/personeel/status', { schoolCode: code, personeelToken: token }); }
-  catch(e){ $('#lrFout').textContent = e.message; localStorage.removeItem(LS_PERS); return; }
+  catch(e){ $('#lrFout').textContent = e.message; vergeetSchool(LS_PERS); return; }
   $('#lrInlog').hidden = true; $('#lrDash').hidden = true;
   const ov = $('#lrOverzicht'); ov.hidden = false;
-  const uitlog = E('button',{class:'knop grijs klein', onclick:()=>{ localStorage.removeItem(LS_PERS); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen');
+  const uitlog = E('button',{class:'knop grijs klein', onclick:()=>{ vergeetSchool(LS_PERS); ov.hidden = true; $('#lrInlog').hidden = false; }}, 'Uitloggen');
   if (d.status !== 'actief'){
     vervang(ov, E('div',{class:'kaart blok'},
       E('b', null, 'Wachten op goedkeuring'),

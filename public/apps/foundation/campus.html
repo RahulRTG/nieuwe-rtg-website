@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTF Campus · leren, maken en spelen</title>
+<meta name="theme-color" content="#0c0c0b">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/media.js"></script>
+<style>
+  :root{--campus-blauw:#6aa6c9;--campus-groen:#5fa56a;--campus-paars:#9a7ac0}
+  *{box-sizing:border-box}
+  body{min-height:100%;overflow-x:hidden}
+  button,a{font:inherit}
+  .app{min-height:100vh;display:grid;grid-template-columns:15.5rem minmax(0,1fr)}
+  .zij{position:sticky;top:0;height:100vh;padding:1.1rem .8rem;border-right:1px solid var(--lijn);background:color-mix(in oklab,var(--paneel) 92%,transparent);display:flex;flex-direction:column;z-index:4}
+  .merk{display:flex;align-items:center;gap:.75rem;padding:.4rem .55rem 1.2rem;text-decoration:none;color:var(--txt)}
+  .merkbeeld{width:2.5rem;height:2.5rem;border-radius:.85rem;background:linear-gradient(145deg,var(--goud),var(--campus-groen));display:grid;place-items:center;color:#10100e;font-family:var(--serif);font-size:1.25rem;font-weight:800}
+  .merk strong{display:block;font-family:var(--serif);font-size:1.08rem}.merk small{color:var(--zacht);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase}
+  .navgroep{margin:.8rem 0}.navkop{padding:0 .7rem .35rem;color:var(--zacht);font-size:.61rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .navknop{width:100%;display:flex;align-items:center;gap:.65rem;padding:.66rem .7rem;margin:.12rem 0;border:0;border-radius:.75rem;background:transparent;color:var(--zacht);text-align:left;cursor:pointer}
+  .navknop:hover,.navknop.aan{background:var(--paneel2);color:var(--txt)}.navknop.aan{box-shadow:inset 3px 0 var(--goud)}
+  .navico{width:1.65rem;height:1.65rem;border:1px solid var(--lijn);border-radius:.55rem;display:grid;place-items:center;font-size:.7rem;font-weight:900;color:var(--goud)}
+  .veilig{margin-top:auto;padding:.75rem;border:1px solid color-mix(in oklab,var(--campus-groen) 50%,var(--lijn));border-radius:.8rem;color:var(--zacht);font-size:.7rem;line-height:1.45}.veilig b{display:block;color:#91d39a;margin-bottom:.2rem}
+  .werk{min-width:0;min-height:100vh}.top{height:4.4rem;padding:.8rem 1.25rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--lijn);position:sticky;top:0;background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(14px);z-index:3}
+  .toptekst{min-width:0}.toptekst small{display:block;color:var(--goud);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase}.toptekst strong{font-family:var(--serif);font-size:1.1rem;font-weight:600}
+  .topacties{margin-left:auto;display:flex;gap:.45rem}.topknop{border:1px solid var(--lijn);background:var(--paneel);color:var(--txt);padding:.52rem .72rem;border-radius:.7rem;text-decoration:none;cursor:pointer;font-size:.78rem}
+  .inhoud{padding:1.25rem;max-width:92rem;margin:auto}.welkom{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(16rem,.7fr);gap:1rem;margin-bottom:1rem}
+  .hero{padding:1.5rem;background:radial-gradient(circle at 85% 10%,color-mix(in oklab,var(--campus-blauw) 30%,transparent),transparent 42%),var(--paneel);border:1px solid var(--lijn);border-radius:1.2rem}.hero .kick{margin-bottom:.45rem}.hero h1{font-family:var(--serif);font-size:clamp(1.7rem,4vw,3rem);font-weight:500;line-height:1.08;max-width:16ch}.hero p{color:var(--zacht);line-height:1.55;max-width:58ch;margin:.7rem 0 1rem}
+  .doorgaan{display:inline-flex;align-items:center;gap:.5rem;background:var(--goud);color:#17130d;text-decoration:none;border:0;border-radius:.75rem;padding:.7rem 1rem;font-weight:800;cursor:pointer}
+  .dag{padding:1.1rem}.dag h2,.sectie h2{font-family:var(--serif);font-size:1.15rem;font-weight:600}.daglijn{height:.42rem;background:var(--paneel2);border-radius:99px;margin:.9rem 0;overflow:hidden}.daglijn i{display:block;width:36%;height:100%;background:linear-gradient(90deg,var(--campus-groen),var(--goud));border-radius:inherit}.dag p{font-size:.78rem;color:var(--zacht);line-height:1.5}
+  .passen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:.8rem 0 1rem}.passtatus{display:flex;align-items:center;gap:.65rem;padding:.72rem .8rem;border:1px solid var(--lijn);border-radius:.85rem;background:var(--paneel)}.passtatus i{width:.65rem;height:.65rem;border-radius:50%;background:var(--campus-groen);box-shadow:0 0 0 4px color-mix(in oklab,var(--campus-groen) 15%,transparent)}.passtatus.wacht i{background:var(--goud)}.passtatus b{display:block;font-size:.75rem}.passtatus span{display:block;color:var(--zacht);font-size:.64rem;margin-top:.08rem}
+  .werkplekgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.6rem}.werktool{min-height:7.5rem;padding:.8rem;border:1px solid var(--lijn);border-radius:.9rem;background:var(--paneel);color:var(--txt);text-align:left;cursor:pointer}.werktool:hover{border-color:var(--campus-blauw)}.werktool small{color:var(--campus-blauw);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase}.werktool strong{display:block;font-family:var(--serif);font-size:.95rem;margin:.45rem 0 .25rem}.werktool span{color:var(--zacht);font-size:.65rem;line-height:1.4}
+  .sectie{margin-top:1.2rem}.sectiekop{display:flex;align-items:end;justify-content:space-between;margin-bottom:.65rem}.sectiekop p{font-size:.75rem;color:var(--zacht)}
+  .werelden{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}.wereld{min-height:10.5rem;padding:1rem;border:1px solid var(--lijn);border-radius:1rem;background:var(--paneel);color:var(--txt);text-align:left;cursor:pointer;position:relative;overflow:hidden}.wereld:after{content:"";position:absolute;width:7rem;height:7rem;border-radius:50%;right:-2.5rem;bottom:-3rem;background:var(--kleur);opacity:.18}.wereld:hover{border-color:color-mix(in oklab,var(--kleur) 70%,var(--lijn));transform:translateY(-2px)}.wereld small{color:var(--kleur);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.58rem}.wereld h3{font-family:var(--serif);font-size:1.2rem;margin:.55rem 0 .35rem}.wereld p{font-size:.72rem;color:var(--zacht);line-height:1.45}.wereld b{display:block;margin-top:.8rem;font-size:.72rem}
+  .routes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}.route{padding:1rem}.routetop{display:flex;justify-content:space-between;gap:.5rem}.route h3{font-size:.9rem}.route span{font-size:.65rem;color:var(--zacht)}.route p{font-size:.72rem;color:var(--zacht);line-height:1.5;margin:.5rem 0}.route button{border:0;background:transparent;color:var(--goud);font-weight:800;padding:0;cursor:pointer;font-size:.72rem}
+  .ecosysteem{margin-top:1.35rem;padding-top:1.15rem;border-top:1px solid var(--lijn)}.eco-kop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:.8rem}.eco-kop h2{font-family:var(--serif);font-size:1.35rem;font-weight:600}.eco-kop p{color:var(--zacht);font-size:.74rem;line-height:1.45;margin-top:.18rem}.eco-zoek{width:min(19rem,100%);border:1px solid var(--lijn);background:var(--paneel);color:var(--txt);border-radius:.7rem;padding:.62rem .75rem;outline:none}.eco-zoek:focus{border-color:var(--goud)}
+  .eco-tabs{display:flex;gap:.35rem;overflow:auto;padding:.1rem 0 .65rem;scrollbar-width:thin}.eco-tab{border:1px solid var(--lijn);background:transparent;color:var(--zacht);border-radius:999px;padding:.42rem .72rem;white-space:nowrap;cursor:pointer;font-size:.7rem}.eco-tab.aan{background:var(--goud);border-color:var(--goud);color:#fff}.eco-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem}.eco-app{display:flex;flex-direction:column;min-height:9rem;padding:.85rem;border:1px solid var(--lijn);background:var(--paneel);color:var(--txt);border-radius:.9rem;text-align:left;cursor:pointer}.eco-app:hover{border-color:var(--goud)}.eco-app small{color:var(--goud);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase}.eco-app strong{font-family:var(--serif);font-size:1rem;margin:.42rem 0 .28rem}.eco-app span{color:var(--zacht);font-size:.68rem;line-height:1.42}.eco-app b{margin-top:auto;padding-top:.55rem;font-size:.66rem}.eco-leeg{grid-column:1/-1;padding:1rem;border:1px solid var(--lijn);border-radius:.9rem;color:var(--zacht);font-size:.8rem}.eco-status{color:var(--zacht);font-size:.72rem;margin:.35rem 0 .65rem}
+  .ruimte{position:fixed;inset:0;background:var(--bg);z-index:20;display:grid;grid-template-rows:4.2rem minmax(0,1fr)}.ruimte[hidden]{display:none}.ruimtekop{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);background:var(--paneel)}.ruimtekop button{border:1px solid var(--lijn);background:var(--paneel2);color:var(--txt);border-radius:.65rem;padding:.55rem .8rem;cursor:pointer}.ruimtekop div{min-width:0}.ruimtekop strong{display:block;font-family:var(--serif)}.ruimtekop small{color:var(--zacht)}.ruimtekop .sluit{margin-left:auto}.ruimte iframe{width:100%;height:100%;border:0;background:var(--bg)}
+  .mobiel{display:none}
+  @media(max-width:1100px){.eco-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.werkplekgrid{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:900px){.app{display:block}.zij{display:none}.top{height:4rem;padding:.65rem .8rem}.mobiel{display:inline-flex}.inhoud{padding:.8rem}.welkom{grid-template-columns:1fr}.werelden{grid-template-columns:repeat(2,1fr)}.routes{grid-template-columns:1fr}.eco-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.passen{grid-template-columns:1fr}.topacties .verberg-mobiel{display:none}}
+  @media(max-width:520px){.werelden,.eco-grid,.werkplekgrid{grid-template-columns:1fr}.wereld{min-height:8rem}.hero{padding:1.1rem}.hero h1{font-size:1.8rem}.eco-kop{align-items:stretch;flex-direction:column}.eco-zoek{width:100%}}
+  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="zij" aria-label="Campusnavigatie">
+    <a class="merk" href="index.html"><span class="merkbeeld">F</span><span><strong>RTF Campus</strong><small>één veilige leerwereld</small></span></a>
+    <nav>
+      <div class="navgroep"><div class="navkop">Jouw dag</div>
+        <button class="navknop aan" data-open="dashboard"><span class="navico">01</span>Vandaag</button>
+        <button class="navknop" data-url="school.html" data-titel="Mijn school" data-app="rtf-school"><span class="navico">02</span>School</button>
+        <button class="navknop" data-url="leerpaspoort.html" data-titel="Mijn leerpaspoort" data-app="rtf-leerpaspoort"><span class="navico">03</span>Leerpaspoort</button>
+        <button class="navknop" data-url="leren.html" data-titel="Live les" data-app="rtf-leren"><span class="navico">04</span>Live les</button>
+      </div>
+      <div class="navgroep"><div class="navkop">Ontdekken</div>
+        <button class="navknop" data-url="speelhal.html" data-titel="Game Hall" data-app="rtf-speelhal"><span class="navico">05</span>Game Hall</button>
+        <button class="navknop" data-url="/apps/spelen.html?pas=foundation&open=magnaat" data-titel="Magnaat" data-app="rtf-magnaat"><span class="navico">M</span>Magnaat</button>
+        <button class="navknop" data-url="projecten.html" data-titel="Projectstudio" data-app="rtf-projecten"><span class="navico">06</span>Projectstudio</button>
+      </div>
+      <div class="navgroep"><div class="navkop">Voor jou</div>
+        <button class="navknop" data-url="gevoel.html" data-titel="Welzijn" data-app="rtf-gevoel"><span class="navico">07</span>Welzijn</button>
+        <button class="navknop" data-url="schoolbieb.html" data-titel="School-Bibliotheek" data-app="rtf-schoolbieb"><span class="navico">08</span>Bibliotheek</button>
+        <button class="navknop" data-scroll="ecosysteem"><span class="navico">A</span>Alles</button>
+      </div>
+    </nav>
+    <div class="veilig"><b>Veilige campus</b>Geen reclame, geen aankopen en geen oneindige stroom. Je leeftijd en rechten reizen veilig met je profiel mee.</div>
+  </aside>
+  <main class="werk" id="dashboard">
+    <header class="top">
+      <a class="topknop mobiel" href="index.html" aria-label="Terug naar Foundation">←</a>
+      <div class="toptekst"><small>Jouw campus</small><strong id="groet">Goed dat je er bent</strong></div>
+      <div class="topacties"><button class="topknop verberg-mobiel" data-url="rust.html" data-titel="Even rust">Even rust</button><a class="topknop" href="index.html">Profiel</a></div>
+    </header>
+    <div class="inhoud">
+      <section class="welkom">
+        <div class="hero"><div class="kick">Vandaag op de campus</div><h1>Leren door te maken, kiezen en spelen.</h1><p>Je schoolwerk, projecten en spellen horen bij dezelfde ontwikkeling. Wat je in de les ontdekt, kun je hier veilig oefenen in de praktijk.</p><button class="doorgaan" data-url="school.html" data-titel="Mijn school" data-app="rtf-school">Ga verder met vandaag →</button></div>
+        <div class="kaart dag"><h2>Jouw daglijn</h2><div class="daglijn"><i></i></div><p><b>1 van 3 stappen verkend.</b><br>De campus beloont aandacht en groei, nooit gedachteloos blijven klikken.</p></div>
+      </section>
+      <section class="passen" id="passen" aria-label="Jouw toegangspassen"><div class="passtatus"><i></i><div><b>Foundation-pas</b><span>controle wordt geladen</span></div></div></section>
+      <section class="sectie"><div class="sectiekop"><div><h2>Jouw leerlingwerkplek</h2><p>De losse schooltools werken hier als één geheel.</p></div></div>
+        <div class="werkplekgrid">
+          <button class="werktool" data-url="school.html" data-titel="Mijn klas" data-app="rtf-school"><small>Vandaag</small><strong>Mijn klas</strong><span>Rooster, huiswerk, toetsen, cijfers en berichten.</span></button>
+          <button class="werktool" data-url="leren.html" data-titel="Live les" data-app="rtf-leren"><small>Live</small><strong>Les &amp; schoolbord</strong><span>Doe mee met een lescode en volg het bord live.</span></button>
+          <button class="werktool" data-url="leren.html" data-titel="Mijn schrift" data-app="rtf-schrift"><small>Maken</small><strong>Mijn schrift</strong><span>Typen, tekenen, bordfoto's, opgaven en agenda.</span></button>
+          <button class="werktool" data-url="leerpaspoort.html" data-titel="Mijn leerpaspoort" data-app="rtf-leerpaspoort"><small>Groeien</small><strong>Leerpaspoort</strong><span>Leerlijn, lessen, oefenen, doelen en Rahul Bijles.</span></button>
+          <button class="werktool" data-url="projecten.html" data-titel="Projectstudio" data-app="rtf-projecten"><small>Samen</small><strong>Projectstudio</strong><span>Plan, verdeel taken, onderzoek, schrijf en presenteer.</span></button>
+          <button class="werktool" data-url="schoolbieb.html" data-titel="School-Bibliotheek" data-app="rtf-schoolbieb"><small>Bronnen</small><strong>Bibliotheken</strong><span>Vind passende leerstof zonder boven je leeftijd te zoeken.</span></button>
+          <button class="werktool" data-url="speelhal.html" data-titel="Game Hall" data-app="rtf-speelhal"><small>Toepassen</small><strong>Game Hall</strong><span>Eindige spellen voor taal, rekenen, logica en geheugen.</span></button>
+          <button class="werktool" data-url="/apps/spelen.html?pas=foundation&open=magnaat" data-titel="Magnaat" data-app="rtf-magnaat"><small>Ondernemen</small><strong>Magnaat</strong><span>Handel eerlijk en leer over risico, bank en mensen.</span></button>
+          <button class="werktool" data-url="schrijven.html" data-titel="Schrijven" data-app="rtf-schrijven"><small>Gereedschap</small><strong>Maken &amp; schrijven</strong><span>Verhalen, presentaties en creatieve opdrachten.</span></button>
+          <button class="werktool" data-url="rust.html" data-titel="Welzijn" data-app="rtf-rust"><small>Veilig</small><strong>Welzijn</strong><span>Rust, steun, pesten en veilig online op jouw niveau.</span></button>
+        </div>
+      </section>
+      <section class="sectie"><div class="sectiekop"><div><h2>Vier verbonden werelden</h2><p>Één profiel, één voortgang en één veilige omgeving.</p></div></div>
+        <div class="werelden">
+          <button class="wereld" style="--kleur:var(--campus-blauw)" data-url="school.html" data-titel="Mijn school" data-app="rtf-school"><small>Leren</small><h3>School</h3><p>Rooster, huiswerk, lessen, cijfers en contact met de klas.</p><b>Open school →</b></button>
+          <button class="wereld" style="--kleur:var(--campus-groen)" data-url="leerpaspoort.html" data-titel="Leerpaspoort" data-app="rtf-leerpaspoort"><small>Oefenen</small><h3>Leerpaspoort</h3><p>Oefen in je eigen tempo en krijg uitleg zonder prestatiedruk.</p><b>Start een leerroute →</b></button>
+          <button class="wereld" style="--kleur:var(--goud)" data-url="speelhal.html" data-titel="Game Hall" data-app="rtf-speelhal"><small>Toepassen</small><h3>Game Hall</h3><p>Speel korte, eindige spellen die denken, rekenen en samenwerken trainen.</p><b>Ga naar de hal →</b></button>
+          <button class="wereld" style="--kleur:var(--campus-paars)" data-url="/apps/spelen.html?pas=foundation&open=magnaat" data-titel="Magnaat" data-app="rtf-magnaat"><small>Ondernemen</small><h3>Magnaat</h3><p>Bouw een eerlijke onderneming en leer over risico, bank, handel en mensen.</p><b>Bouw je bedrijf →</b></button>
+        </div>
+      </section>
+      <section class="sectie"><div class="sectiekop"><div><h2>Leerreizen</h2><p>Geen losse apps, maar routes met een duidelijk doel.</p></div></div>
+        <div class="routes">
+          <article class="kaart route" data-app="rtf-geld"><div class="routetop"><h3>Van rekenen naar ondernemen</h3><span>4 stappen</span></div><p>Oefen procenten, maak een begroting en pas ze daarna toe in Magnaat.</p><button data-url="geld.html" data-titel="Geldmaatje">Begin de route →</button></article>
+          <article class="kaart route" data-app="rtf-projecten"><div class="routetop"><h3>Van idee naar presentatie</h3><span>5 stappen</span></div><p>Onderzoek, schrijf, werk samen en presenteer een eigen project.</p><button data-url="projecten.html" data-titel="Projectstudio">Open je project →</button></article>
+          <article class="kaart route" data-app="rtf-mediawijs"><div class="routetop"><h3>Sterk en veilig online</h3><span>3 stappen</span></div><p>Herken groepsdruk, bescherm je gegevens en bespreek lastige situaties.</p><button data-url="mediawijs.html" data-titel="Online wijs">Ontdek de route →</button></article>
+        </div>
+      </section>
+      <section class="ecosysteem" id="ecosysteem">
+        <div class="eco-kop"><div><h2>De hele Foundation</h2><p>Alle mogelijkheden, automatisch passend bij je leeftijd en binnen dezelfde Campus.</p></div><input class="eco-zoek" id="ecoZoek" type="search" placeholder="Zoek iets om te leren of te doen" aria-label="Zoek in alle Foundation-mogelijkheden"></div>
+        <div class="eco-tabs" id="ecoTabs" role="tablist" aria-label="Foundation-werelden"></div>
+        <div class="eco-status" id="ecoStatus">Je persoonlijke Campus wordt geladen…</div>
+        <div class="eco-grid" id="ecoGrid"><div class="eco-leeg">De mogelijkheden worden geladen.</div></div>
+      </section>
+    </div>
+  </main>
+</div>
+<section class="ruimte" id="ruimte" hidden aria-label="Campusruimte">
+  <header class="ruimtekop"><button id="terug" type="button">← Campus</button><div><strong id="ruimteTitel">Ruimte</strong><small>Je blijft binnen de veilige RTF Campus</small></div><button class="sluit" id="nieuwVenster" type="button">Open groot</button></header>
+  <iframe id="frame" title="Campusruimte" referrerpolicy="same-origin" allow="microphone; camera; geolocation; fullscreen"></iframe>
+</section>
+<script src="sessie.js"></script>
+<script>
+(function(){
+  const ruimte=document.getElementById('ruimte'), frame=document.getElementById('frame'), titel=document.getElementById('ruimteTitel');
+  RTGMedia.kader(frame);
+  let huidig='';
+  function open(url, naam){
+    if(!url)return;
+    huidig=new URL(url,location.href).href;
+    titel.textContent=naam||'Campusruimte';
+    frame.src=huidig;
+    ruimte.hidden=false;
+    document.body.style.overflow='hidden';
+    history.pushState({campus:true},'', '#ruimte');
+  }
+  function sluit(terug){
+    ruimte.hidden=true;frame.src='about:blank';huidig='';document.body.style.overflow='';
+    if(!terug&&location.hash==='#ruimte')history.back();
+  }
+  function bindOpen(root){(root||document).querySelectorAll('[data-url]').forEach(el=>{if(el.dataset.openGebonden)return;el.dataset.openGebonden='1';el.addEventListener('click',()=>open(el.dataset.url,el.dataset.titel||el.textContent.trim()));});}
+  bindOpen(document);
+  document.querySelectorAll('[data-scroll]').forEach(el=>el.addEventListener('click',()=>document.getElementById(el.dataset.scroll)?.scrollIntoView({behavior:'smooth'})));
+  document.getElementById('terug').addEventListener('click',()=>sluit(false));
+  document.getElementById('nieuwVenster').addEventListener('click',()=>{if(huidig)window.open(huidig,'_blank','noopener');});
+  addEventListener('popstate',()=>{if(!location.hash)sluit(true);});
+  try{
+    const s=window.Sessie&&Sessie.huidig&&Sessie.huidig();
+    const naam=s&&((s.profiel&&s.profiel.naam)||s.profielNaam||s.naam);
+    if(naam)document.getElementById('groet').textContent='Welkom, '+naam;
+  }catch(e){}
+
+  /* De catalogus blijft van de server. Daardoor komen nieuwe RTF-apps vanzelf
+     in de Campus en blijft de leeftijdspoort dezelfde als in de App-Bibliotheek. */
+  const WERELD={leren:{naam:'Leren',cats:['leren','bieb']},maken:{naam:'Maken',cats:['creatief']},spelen:{naam:'Spelen & ondernemen',cats:['spelen']},leven:{naam:'Leven & gezin',cats:['gezin']},veilig:{naam:'Veilig & sterk',cats:['gevoel','veilig']},toekomst:{naam:'Geld & toekomst',cats:['geld']}};
+  let ecoApps=[],ecoWereld='alles',toegang=null;
+  const ecoEsc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const wereldVan=a=>Object.keys(WERELD).find(k=>WERELD[k].cats.includes(a.categorie))||'leren';
+  async function biebPagina(s,pagina){const r=await fetch('/api/rtf/bieb/catalogus',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:s.code,token:s.token,pagina,per:48})});if(!r.ok)throw new Error('Log in om jouw veilige Campus te laden.');return r.json();}
+  function tekenEco(){
+    const q=document.getElementById('ecoZoek').value.toLowerCase().trim();
+    const lijst=ecoApps.filter(a=>(ecoWereld==='alles'||wereldVan(a)===ecoWereld)&&(!q||(a.naam+' '+a.uitleg+' '+a.categorieLabel).toLowerCase().includes(q)));
+    document.getElementById('ecoTabs').innerHTML=['alles',...Object.keys(WERELD)].map(k=>'<button class="eco-tab '+(ecoWereld===k?'aan':'')+'" role="tab" aria-selected="'+(ecoWereld===k)+'" data-wereld="'+k+'">'+(k==='alles'?'Alles':WERELD[k].naam)+' <span>'+ecoApps.filter(a=>k==='alles'||wereldVan(a)===k).length+'</span></button>').join('');
+    document.querySelectorAll('[data-wereld]').forEach(b=>b.addEventListener('click',()=>{ecoWereld=b.dataset.wereld;tekenEco();}));
+    document.getElementById('ecoStatus').textContent=lijst.length+' van '+ecoApps.length+' mogelijkheden zichtbaar · gratis · zonder reclame';
+    document.getElementById('ecoGrid').innerHTML=lijst.length?lijst.map(a=>'<button class="eco-app" data-url="'+ecoEsc(a.url)+'" data-titel="'+ecoEsc(a.naam)+'"><small>'+ecoEsc(WERELD[wereldVan(a)].naam)+'</small><strong>'+ecoEsc(a.naam)+'</strong><span>'+ecoEsc(a.uitleg)+'</span><b>Open in Campus →</b></button>').join(''):'<div class="eco-leeg">Niets gevonden. Probeer een ander woord of een andere wereld.</div>';
+    bindOpen(document.getElementById('ecoGrid'));
+  }
+  async function laadEco(){
+    const s=window.Sessie&&Sessie.huidig&&Sessie.huidig();
+    if(!s||!s.code||!s.token){document.getElementById('ecoStatus').textContent='Kies eerst je gezinsprofiel; daarna toont de Campus automatisch alles wat bij jouw leeftijd past.';document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg"><a href="index.html" style="color:var(--goud)">Kies een profiel om de hele Foundation te openen →</a></div>';return;}
+    try{
+      toegang=await Sessie.toegang('campus'); if(!toegang||!toegang.toegestaan)return;
+      const mag=new Set(toegang.apps||[]);
+      document.querySelectorAll('[data-app]').forEach(el=>{if(!mag.has(el.dataset.app))el.hidden=true;});
+      const groepsnaam={mini:'Mini-pas · 0-4',kind:'Kind-pas · 5-11',tiener:'Tiener-pas · 12-15',jong:'Young-pas · 16-21',volw:'Volwassen-pas · 22+'}[toegang.groep]||toegang.groep;
+      document.getElementById('passen').innerHTML='<div class="passtatus"><i></i><div><b>Foundation-pas actief</b><span>geldig eigen gezinsprofiel</span></div></div><div class="passtatus"><i></i><div><b>'+ecoEsc(groepsnaam)+'</b><span>automatisch uit geboortedatum</span></div></div><div class="passtatus '+(toegang.school&&toegang.school.actief?'':'wacht')+'"><i></i><div><b>Schoolpas '+(toegang.school&&toegang.school.actief?'actief':'nog niet gekoppeld')+'</b><span>'+(toegang.school&&toegang.school.actief?toegang.school.aantalKlassen+' gekoppelde klas(sen)':'koppel met de klascode bij Mijn klas')+'</span></div></div>';
+      let p=1,d;do{d=await biebPagina(s,p++);ecoApps.push(...(d.items||[]));}while(p<=d.paginas);ecoApps=ecoApps.filter(a=>mag.has(a.id));tekenEco();
+    }catch(e){document.getElementById('ecoStatus').textContent=e.message;document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg">'+ecoEsc(e.message)+'</div>';}
+  }
+  document.getElementById('ecoZoek').addEventListener('input',tekenEco);
+  laadEco();
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

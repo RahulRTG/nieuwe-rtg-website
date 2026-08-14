@@ -1,14 +1,6 @@
 {
   "uitleg": "Per domein de kern-namen die het mag aanraken, BOVEN de gedeelde interface in server/opzet/domeingrens.js. Gegenereerd met npm run grenslijst en met de hand aan te vullen; die aanvullingen blijven staan.",
   "domeinen": {
-    "magnaatwereld": [
-      "boardroomAuth",
-      "magnaatWereld"
-    ],
-    "rtgone": [
-      "boardroomBaas",
-      "rtgone"
-    ],
     "aanmeldgesprek": [
       "intakeStart",
       "intakeZeg",
@@ -280,7 +272,10 @@
     "gast": [
       "H",
       "afrekenlaag",
+      "appUrl",
       "beleid",
+      "betaal",
+      "betaalWaarheid",
       "bezorglaag",
       "buitenshuis",
       "centen",
@@ -290,6 +285,8 @@
       "foodcourtlaag",
       "gastAuth",
       "gastKaartVanZaak",
+      "geldgraaf",
+      "handleVan",
       "haversine",
       "horeca",
       "horecaFolioBoek",
@@ -303,7 +300,8 @@
       "sseToSupplier",
       "stuur",
       "tooManyTries",
-      "verzoeklaag"
+      "verzoeklaag",
+      "zaakVan"
     ],
     "gebouw": [
       "gebouw",
@@ -388,6 +386,7 @@
     ],
     "kantoorpakket": [
       "boardroomBaas",
+      "boardroomWie",
       "officeAI",
       "officeAanwezig",
       "officeBeheer",
@@ -406,12 +405,14 @@
       "officeVersies",
       "officeVul",
       "officeWeg",
+      "rtf",
       "werkplek"
     ],
     "kantoorpakket-huis": [
       "boardroomBaas",
       "officeAI",
       "officeBewaar",
+      "officeFase",
       "officeKring",
       "officeMaak",
       "officeMijn",
@@ -424,6 +425,14 @@
       "officeWeg",
       "ruim",
       "stuur",
+      "werkplek"
+    ],
+    "kantoorpakket-samen": [
+      "boardroomBaas",
+      "officeAanwezig",
+      "officeBeheer",
+      "officeOpmerking",
+      "officeSamen",
       "werkplek"
     ],
     "kantoren": [
@@ -447,6 +456,7 @@
       "bankPartnerRailZet",
       "bankSalarisRekeningen",
       "bankVergunningZet",
+      "betaalRegie",
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
@@ -459,6 +469,7 @@
       "geldPasprijzen",
       "hardware",
       "ideeen",
+      "magnaatLeren",
       "mall",
       "naam",
       "pay",
@@ -539,6 +550,10 @@
     ],
     "luchthaven": [
       "lucht"
+    ],
+    "magnaatwereld": [
+      "boardroomAuth",
+      "magnaatWereld"
     ],
     "mailpost": [
       "mailAanname",
@@ -1125,15 +1140,16 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
-      "boardroomAuth",
       "conciergeDesk",
       "conciergeInbox",
       "conciergeVoortgang",
       "eigenaar",
       "ensureSupplierDefaults",
       "findSupplier",
+      "forgetSession",
       "logInlog",
       "loginFails",
       "mail",
@@ -1157,8 +1173,8 @@
       "rememberSession",
       "salonItemsVan",
       "salonProfielCompleet",
-      "sessions",
       "sessionFor",
+      "sessions",
       "totpOk",
       "trChat",
       "veiligGelijk",
@@ -1227,6 +1243,10 @@
     "payroll-os-register": [
       "payrollOS"
     ],
+    "payroll-os-run": [
+      "findSupplier",
+      "payrollOS"
+    ],
     "payroll-os-uitgang": [
       "payrollOS"
     ],
@@ -1278,12 +1298,6 @@
       "rtfbieb",
       "status"
     ],
-    "rtfleerling": [
-      "bijles",
-      "leerstof",
-      "onderwijs",
-      "vervolg"
-    ],
     "rtfkantoor": [
       "lab",
       "magBoardroom",
@@ -1291,6 +1305,12 @@
       "rtfkantoor",
       "stadsraad",
       "veilig"
+    ],
+    "rtfleerling": [
+      "bijles",
+      "leerstof",
+      "onderwijs",
+      "vervolg"
     ],
     "rtfos": [
       "rtfos"
@@ -1309,9 +1329,14 @@
       "rtgai",
       "status"
     ],
+    "rtgone": [
+      "boardroomBaas",
+      "rtgone"
+    ],
     "rtmail": [
       "agenda",
       "automatisering",
+      "facturatie",
       "leren"
     ],
     "rtmail-bestuur": [
@@ -1343,11 +1368,11 @@
       "swZet"
     ],
     "sociaal": [
-      "socialewereld",
-      "socialegraaf",
       "objectlaag",
+      "socialebeleid",
       "socialecommand",
-      "socialebeleid"
+      "socialegraaf",
+      "socialewereld"
     ],
     "social": [
       "blokkeer",
@@ -1395,6 +1420,10 @@
       "verhaalPlaatsen",
       "verhalenVoor",
       "webpush"
+    ],
+    "socialerahul": [
+      "socialecommand",
+      "socialegraaf"
     ],
     "spellen": [
       "arcadeBord",
@@ -1821,6 +1850,7 @@
       "bank",
       "bankregieOverzicht",
       "betaal",
+      "betaalRegie",
       "beveilig",
       "bewaren",
       "boardroomTelling",

@@ -23,19 +23,6 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
-  /* Receipt Vault is ook vanuit RTMAIL bereikbaar. Beide deuren gebruiken
-     dezelfde facturatiemotor en leiden de eigenaar uitsluitend uit de sessie;
-     een id in de body kan dus nooit andermans document openen of wijzigen. */
-  app.post('/api/member/rtmail/documenten', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    const overzicht = facturatie.voorLid(req.session.key);
-    res.json({ ok: true, facturen: overzicht.facturen, telling: overzicht.telling });
-  });
-  app.post('/api/member/rtmail/classificeer', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    const r = facturatie.classificeer(String(req.body.id || ''), req.session.key, req.body.classificatie);
-    res.status(r.status || 200).json(r);
-  });
   app.post('/api/facturen/ai', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const r = await facturatie.ai({ key: req.session.key }, String(req.body.opdracht || ''), true);

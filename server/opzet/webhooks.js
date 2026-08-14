@@ -15,7 +15,7 @@
 'use strict';
 
 module.exports = function hangWebhooksOp(deps) {
-  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar, opdrachtenVan } = deps;
+  const { app, express, db, save, log, betaal, betaalWaarheid, muntbetaal, opslagKlaar, opdrachtenVan } = deps;
   /* munten en settleFactuur bestaan in server.js PAS verderop, terwijl deze twee
      routes hierboven al gemount moeten zijn (voor express.json). Dat werkte daar
      omdat de handlers de bindingen pas bij een verzoek lezen. Diezelfde afspraak
@@ -58,78 +58,8 @@ module.exports = function hangWebhooksOp(deps) {
      nodig. Hij komt uit dezelfde module, dus er is maar een gedrag. */
   const webhookPoort = require('../middleware/remmen').opslagPoort(() => opslagKlaar());
 
-  /* Betaal-webhook: de provider (Stripe) bevestigt hier een betaling. Een
-     ongeldige handtekening -> 400. */
-  app.post('/api/betaal/webhook', webhookRem, webhookPoort, express.raw({ type: '*/*', limit: '1mb' }), (req, res) => {
-    let evt;
-    try {
-      evt = betaal.verifieerWebhook(req.body, req.get('stripe-signature') || req.get('x-rtg-signature'));
-    } catch (e) {
-      log.warn('betaal-webhook geweigerd', { fout: e.message, id: req.id });
-      return res.status(400).json({ error: 'Ongeldige handtekening.' });
-    }
-    /* De betaalstatus komt hier binnen als geverifieerde waarheid -- en werd
-       vervolgens alleen GELOGD. "Het routeren van evt.type naar de juiste factuur
-       is domeinlogica die de member-routes oppakken", stond erbij; die routes doen
-       dat niet en kunnen dat ook niet, want zij zijn allang klaar als deze
-       bevestiging binnenkomt. In demostand viel het niet op omdat de demo-provider
-       meteen 'betaald' antwoordt, maar routes/member/betalen.js zegt letterlijk:
-       "met een echte Stripe-sleutel komt de definitieve bevestiging via de
-       webhook, en markeren we hier nog niets als betaald." In productie werd dus
-       geen enkele factuur ooit betaald. */
-    (async () => {
-      try {
-        const soort = evt && evt.type;
-        const pi = evt && evt.data && evt.data.object;
-        if (soort === 'payment_intent.succeeded' && pi && pi.id) {
-          const wacht = db.data.kaartWachtend && db.data.kaartWachtend[pi.id];
-          if (wacht) {
-            delete db.data.kaartWachtend[pi.id];   // eenmalig: een herhaalde webhook doet niets
-            await settleFactuur(wacht, {
-              id: pi.id,
-              centen: Math.round(Number(pi.amount_received != null ? pi.amount_received : pi.amount) || 0),
-              hoe: 'Betaald per kaart'
-            });
-            save();
-          } else {
-            // geen wachtende context: of al afgewikkeld, of een betaling die niet
-            // van ons komt. Allebei geen fout, maar het hoort wel op te vallen.
-            log.info('betaal-webhook zonder wachtende betaling', { id: pi.id });
-          }
-        }
-        /* DE ANDERE KANT OP: een UITBETALING die het huis heeft verlaten. Tot nu
-           toe kende deze webhook alleen inkomend geld, en daardoor bleef een
-           uitgaande SEPA voor altijd op INGEDIEND staan -- aangenomen door de
-           rail, nooit bevestigd. Nu sluit de provider hem hier af.
-
-           Een MISLUKTE payout is hier het belangrijke geval en niet het
-           uitzonderlijke: het geld staat dan van de klant af en komt nergens
-           aan. bevestig() draait daarom bij een mislukking dezelfde
-           terugboeking als bij opgeven; hier hoeven we alleen te melden WAT de
-           rail zei. Een herhaalde levering (providers herhalen) verandert niets
-           meer, want een afgeronde opdracht neemt geen nieuwe status aan. */
-        if (soort === 'payout.paid' || soort === 'payout.failed' || soort === 'payout.canceled') {
-          const po = pi;
-          const rij = opdrachtenVan && opdrachtenVan();
-          if (rij && po && po.id) {
-            const r = await rij.bevestig({
-              settlementRef: po.id,
-              gelukt: soort === 'payout.paid',
-              reden: po.failure_message || po.failure_code || soort
-            });
-            /* Een payout die wij niet kennen is geen fout (hij kan van een ander
-               deel van het huis komen), maar hij mag niet in de stilte vallen --
-               anders is "de webhook doet niets" niet te onderscheiden van "de
-               webhook komt niet aan". */
-            if (r && r.error) log.info('payout-webhook zonder bijbehorende betaalopdracht', { id: po.id, type: soort });
-            else log.info('payout-webhook verwerkt', { id: po.id, type: soort, opdracht: r && r.id, status: r && r.status });
-          }
-        }
-        log.info('betaal-webhook', { type: soort || 'onbekend', id: evt && evt.id });
-      } catch (e) { log.uitzondering(e, { bron: 'betaal-webhook' }); }
-    })();
-    res.json({ ok: true });
-  });
+  require('./kaartwebhooks')({ app, express, db, save, log, betaal, betaalWaarheid,
+    webhookRem, webhookPoort, settleFactuur, opdrachtenVan });
 
   /* Munt-webhook: de munt-aanbieder bevestigt hier dat de munten binnen zijn en
      omgezet naar euro. Net als de betaal-webhook: ruwe body, handtekening over de

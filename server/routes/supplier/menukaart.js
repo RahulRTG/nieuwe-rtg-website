@@ -3,8 +3,8 @@
    Verbatim afgesplitst uit routes/supplier.js; alleen de routes, de helpers
    komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { alcoholGrensVan, app, auth, isFavoriet, crypto, db, findSupplier, geborenVan, i18n, ledenPrijs,
-          leeftijdVan, logActivity, managerOnly, publicSupplier, save, schoon, sseToOffice, supplierAuth } = kern;
+  const { alcoholGrensVan, app, auth, isFavoriet, crypto, db, express, findSupplier, geborenVan, i18n, ledenPrijs,
+          leeftijdVan, logActivity, managerOnly, media, publicSupplier, save, schoon, sseToOffice, supplierAuth } = kern;
 
 
 
@@ -40,6 +40,9 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     cat: schoon(m.cat || 'Overig', 40),
     name: schoon(m.name, 80),
     desc: schoon(m.desc, 200),
+    // Alleen een verwijzing uit onze eigen mediastore overleeft een
+    // menuwijziging. Zo kan een gerecht nooit een externe volgpixel laden.
+    foto: typeof m.foto === 'string' && /^\/media\/[a-zA-Z0-9._-]+$/.test(m.foto) ? m.foto : undefined,
     publiekePrijs: publiek,
     price: ledenPrijs(publiek, m.price),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
@@ -58,6 +61,24 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
   save();
   logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });
+});
+
+app.post('/api/supplier/menu/foto', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const item = (req.supplier.menu || []).find(m => String(m.id) === String(req.body.id || ''));
+  if (!item) return res.status(404).json({ error: 'Dit gerecht staat niet op de kaart.' });
+  if (req.body.verwijder === true) {
+    delete item.foto; save();
+    return res.json({ ok: true, id: item.id, foto: null });
+  }
+  const img = String(req.body.foto || '');
+  if (!/^data:image\/(jpeg|png|webp);base64,/.test(img)) return res.status(400).json({ error: 'Alleen JPG, PNG of WebP.' });
+  if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (maximaal ongeveer 1 MB).' });
+  const ref = await media.bewaarPubliek(img, 1.5 * 1024 * 1024);
+  if (!ref) return res.status(400).json({ error: 'Foto kon niet veilig worden opgeslagen.' });
+  item.foto = ref; save();
+  logActivity(req.supplier.code, req.actor, 'plaatste een foto bij gerecht "' + item.name + '"');
+  res.json({ ok: true, id: item.id, foto: ref });
 });
 
 

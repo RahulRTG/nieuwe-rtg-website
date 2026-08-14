@@ -18,7 +18,7 @@
   var MARGE = 64;   // hoe dicht bij de rand voordat er gedockt wordt
 
   var schil = {
-    vak: null, console: null, tabbar: null, dok: null,
+    vak: null, console: null, tabs: null, dok: null,
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
@@ -36,4 +36,3 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   };
-

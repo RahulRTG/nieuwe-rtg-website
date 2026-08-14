@@ -341,11 +341,11 @@ function ongebruikt() {
      worden. Vijftien valse meldingen is niet "een beetje ruis": het is de
      reden dat niemand de zestiende nog gelooft.
 
-     Het signaal is niet alleen de combinatie, maar ook HETZELFDE MAPARGUMENT:
-     wie `readdirSync(map)` gebruikt en daarna `require(path.join(map, naam))`
-     doet, laadt die map in zijn geheel. Zonder die koppeling zou een bestand
-     dat toevallig ergens scant en elders iets requiret zijn volledige eigen
-     map aan de keuring onttrekken. Dat is geen register maar een blinddoek.
+     Het signaal is de COMBINATIE OP DEZELFDE PADVARIABELE: wie `map` uitleest
+     en daarna `path.join(map, naam)` requiret, laadt die map in zijn geheel.
+     Alleen ergens een map lezen en ergens anders een samengesteld pad laden is
+     niet genoeg; magnaat-capabilities doet beide met verschillende variabelen
+     en mag daardoor niet heel server/kern onzichtbaar maken.
 
      WAT DEZE REGEL NIET MEER ZIET, en dat hoort erbij: een bestand IN zo'n map
      dat echt dood is. De keuring kan aan de buitenkant niet zien welke
@@ -355,13 +355,14 @@ function ongebruikt() {
      van dat register en niet van deze keuring. */
   for (const p of bronBestanden) {
     const t = lees(p);
-    const gelezen = new Set(Array.from(t.matchAll(
-      /\breaddirSync\s*\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g
-    ), m => m[1]));
-    const geladen = new Set(Array.from(t.matchAll(
-      /require\(\s*path\.join\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g
-    ), m => m[1]));
-    if (Array.from(gelezen).some(map => geladen.has(map))) dynamisch.add(path.dirname(p));
+    const gelezen = new Set();
+    const rg = /\breaddirSync\s*\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g;
+    let g;
+    while ((g = rg.exec(t))) gelezen.add(g[1]);
+    const rq = /require\(\s*path\.join\(\s*([A-Za-z_$][\w$]*|__dirname)\b/g;
+    while ((g = rq.exec(t))) {
+      if (gelezen.has(g[1])) { dynamisch.add(path.dirname(p)); break; }
+    }
   }
 
   /* DE STARTPUNTEN. Een bestand dat je met `node ...` aanroept wordt per

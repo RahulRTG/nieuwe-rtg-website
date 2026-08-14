@@ -196,7 +196,7 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
           if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
         }
       };
-      RTGWereld.naar(3);
+      RTGWereld.naar(2);
       await stil();
       const wm = [...document.querySelectorAll('.os-wm')].find((m) => m.dataset.actief === 'ja');
       return {
@@ -211,7 +211,7 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
         })()
       };
     });
-    assert.equal(viaMuis.stand.actief, 3, 'na naar(3) hoort stand drie actief te zijn');
+    assert.equal(viaMuis.stand.actief, 2, 'na naar(2) hoort de derde hoofdwereld actief te zijn');
     assert.notEqual(viaMuis.stand.naam, eerste, 'er hoort een ANDERE wereld actief te zijn geworden');
     assert.equal(viaMuis.naamOpScherm, viaMuis.stand.naam, 'de naam onder de klok hoort de actieve wereld te zijn');
     assert.equal(viaMuis.actiefLabel, viaMuis.stand.naam, 'het gemarkeerde merk hoort dezelfde wereld te zijn');
@@ -230,7 +230,7 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
       }
       return RTGWereld.stand().actief;
     });
-    assert.equal(naPijl, 4, 'pijl-rechts hoort een wereld verder te reizen (kreeg stand ' + naPijl + ')');
+    assert.equal(naPijl, 0, 'pijl-rechts hoort na de derde wereld door te reizen naar de eerste (kreeg stand ' + naPijl + ')');
   });
 });
 
@@ -263,7 +263,7 @@ test('inzoomen toont de onderdelen van DIE wereld, en uitzoomen komt er weer uit
       return { voor, binnen, labels, belofte, diepAttr, terug: RTGWereld.stand() };
     }, i);
 
-    const a = await bezoek(2);
+    const a = await bezoek(1);
     assert.equal(a.binnen.diep, true, 'na inzoomen hoor je binnen te staan');
     assert.equal(a.diepAttr, 'ja', 'de kring hoort te tonen dat je een niveau dieper staat');
     assert.equal(a.binnen.wereld, a.voor.naam, 'je hoort in de wereld te staan die op twaalf uur stond');
@@ -279,7 +279,7 @@ test('inzoomen toont de onderdelen van DIE wereld, en uitzoomen komt er weer uit
     assert.equal(a.terug.naam, a.voor.naam,
       'uitzoomen hoort terug te komen op DEZELFDE wereld (was ' + a.voor.naam + ', werd ' + a.terug.naam + ')');
 
-    const b = await bezoek(5);
+    const b = await bezoek(2);
     assert.notEqual(b.voor.naam, a.voor.naam, 'de tweede reis hoort naar een andere wereld te gaan');
     assert.equal(b.labels.length, b.belofte,
       'ook hier hoort de ring te tonen wat de wereld beloofde (' + b.belofte + '), kreeg er ' + b.labels.length);
@@ -427,7 +427,7 @@ test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat mome
         return h;
       };
       const voor = hoek();
-      RTGWereld.naar(3);
+      RTGWereld.naar(2);
       let vorige = null, zelfde = 0;
       for (let i = 0; i < 150 && zelfde < 4; i++) {
         await new Promise((k) => setTimeout(k, 60));
@@ -436,7 +436,7 @@ test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat mome
       }
       return { voor, na: hoek(), wereld: RTGWereld.stand().actief };
     });
-    assert.equal(naDraai.wereld, 3, 'de ring hoort wel gedraaid te zijn');
+    assert.equal(naDraai.wereld, 2, 'de ring hoort wel naar de derde hoofdwereld gedraaid te zijn');
     assert.ok(Math.abs(naDraai.na - naDraai.voor) < 1,
       'de momenten draaiden mee met de bezel (van ' + Math.round(naDraai.voor) + ' naar ' +
       Math.round(naDraai.na) + ' graden); een tijdstip hoort stil te staan');

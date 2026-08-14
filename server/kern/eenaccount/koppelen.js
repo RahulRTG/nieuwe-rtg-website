@@ -70,7 +70,7 @@ module.exports = (kctx) => {
         return { status: 403, error: 'Deze personeelsplek is zojuist aan een ander RTG-account gekoppeld.' };
       }
       pinSlot.goed(doel);
-      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: staff.id, naam: staff.name, staffRole: staff.role, at: nu() } };
+      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: geclaimd.id, naam: geclaimd.name, staffRole: geclaimd.role, at: nu() } };
     }
 
     if (soort === 'zaak') {

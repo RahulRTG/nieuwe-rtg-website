@@ -2,6 +2,8 @@
    rollen en leeftijdsgroepen, PIN-hash, codenamen, de publieke vormen en de
    sessiehulpen voor gezin/beheerder. Krijgt de gedeelde context een keer
    bij het opstarten vanuit foundation.js. */
+const { datum: klokDatum } = require('../lib/klok');
+
 module.exports = (ctx) => {
   const { db, save, eigenVeld, crypto,
     encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic,
@@ -32,10 +34,7 @@ const GROEP_INFO = {
    groep mag niet jarenlang blijven hangen: op een verjaardag rekent iedere
    sessie de groep opnieuw uit. Voor oude profielen zonder geboortedatum blijft
    p.groep bestaan, maar zo'n profiel krijgt geen bevestigde leeftijdspas. */
-function geboorteInfo(v, vandaag) {
-  // De gezinscontext gebruikt de centrale, verzetbare klok. Zo zijn een
-  // verjaardag en de overgang naar een andere leeftijdspas echt te beproeven.
-  vandaag = vandaag || new Date(nu());
+function geboorteInfo(v, vandaag = klokDatum()) {
   const tekst = String(v || '').slice(0, 10);
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(tekst);
   if (!m) return null;

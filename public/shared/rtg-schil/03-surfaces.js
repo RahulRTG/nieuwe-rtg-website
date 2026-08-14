@@ -67,7 +67,7 @@
     schil.surfaces = schil.surfaces.filter(function (x) { return x !== s; });
     if (schil.actief === s) schil.actief = schil.surfaces[schil.surfaces.length - 1] || null;
     if (schil.actief) maakActief(schil.actief);
-    schik(); tekenConsole();
+    schik(); tekenConsole(); tekenTabs();
   }
 
   function maakActief(s) {
@@ -77,7 +77,7 @@
     // de actieve surface bovenop, zodat zweven ook echt zweeft
     schil.surfaces.forEach(function (x, i) { x.el.style.zIndex = String(10 + i); });
     s.el.style.zIndex = '40';
-    tekenConsole();
+    tekenConsole(); tekenTabs();
   }
 
   /* Deep maakt er een dominante van en zet de rest op Glance: zo blijft de
@@ -93,4 +93,3 @@
     }
     schik();
   }
-

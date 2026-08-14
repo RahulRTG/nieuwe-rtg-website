@@ -26,7 +26,7 @@
 const { lokaalAdres } = require('../lib/lokaaladres');
 
 module.exports = function verzoekketen(deps) {
-  const { app, express, log, logboek, db, save, betaal, muntbetaal, opslagKlaar,
+  const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
     zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
 
   /* ---------- foutisolatie per verzoek ----------
@@ -154,7 +154,7 @@ module.exports = function verzoekketen(deps) {
      achter een dichte deur zegt niets) en voor de routes. */
   const lieg = require('./liegpoort')({ app, log });
 
-  require('./lijfpoort')({ app, express, db, save, log, betaal, muntbetaal,
+  require('./lijfpoort')({ app, express, db, save, log, betaal, betaalWaarheid, muntbetaal,
     opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan });
 
   return {

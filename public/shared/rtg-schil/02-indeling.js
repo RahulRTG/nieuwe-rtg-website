@@ -9,25 +9,30 @@
     return { b: r.width, h: r.height, g: parseInt(getComputedStyle(schil.vak).getPropertyValue('--gutter'), 10) || 14 };
   }
 
+  function standaard() {
+    return d.body && d.body.getAttribute('data-rtg-schil') === 'standaard';
+  }
+
   function schik() {
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
-    if (schil.tabbar) {
-      var bank = Math.max(228, Math.min(286, Math.round(m.b * .18)));
-      var tabHoog = 40;
+    if (standaard()) {
+      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
+      var tabhoog = 49;
       zet(schil.console, 0, 0, bank, m.h);
-      zet(schil.tabbar, bank, 0, m.b - bank, tabHoog);
-      var vrijStandaard = schil.surfaces.filter(function (s) { return !s.eigen; });
-      if (!vrijStandaard.length) return;
-      var kolStandaard = vrijStandaard.length === 1 ? 1 : 2;
-      var rijStandaard = Math.ceil(vrijStandaard.length / kolStandaard);
-      var breedStandaard = Math.floor((m.b - bank) / kolStandaard);
-      var hoogStandaard = Math.floor((m.h - tabHoog) / rijStandaard);
-      vrijStandaard.forEach(function (s, i) {
-        var c = i % kolStandaard, r = Math.floor(i / kolStandaard);
-        zet(s.el, bank + c * breedStandaard, tabHoog + r * hoogStandaard,
-          c === kolStandaard - 1 ? m.b - bank - c * breedStandaard : breedStandaard,
-          r === rijStandaard - 1 ? m.h - tabHoog - r * hoogStandaard : hoogStandaard);
+      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      if (!n) return;
+      var werkbreed = m.b - bank;
+      var werkhoog = m.h - tabhoog;
+      var sk = n <= 3 ? n : 2;
+      var sr = Math.ceil(n / sk);
+      var sw = Math.floor(werkbreed / sk);
+      var sh = Math.floor(werkhoog / sr);
+      schil.surfaces.forEach(function (s, i) {
+        var c = i % sk, r = Math.floor(i / sk);
+        zet(s.el, bank + c * sw, tabhoog + r * sh,
+          c === sk - 1 ? werkbreed - c * sw : sw,
+          r === sr - 1 ? werkhoog - r * sh : sh);
       });
       return;
     }

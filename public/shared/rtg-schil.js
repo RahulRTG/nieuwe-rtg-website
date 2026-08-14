@@ -18,7 +18,7 @@
   var MARGE = 64;   // hoe dicht bij de rand voordat er gedockt wordt
 
   var schil = {
-    vak: null, console: null, tabbar: null, dok: null,
+    vak: null, console: null, tabs: null, dok: null,
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
@@ -36,7 +36,6 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   };
-
 /* ---------------------------------------------------------- de indeling --
      De console is het ANKER en schuift naar waar hij het minst stoort
      (WERKRUIMTE.md par. 2): bij een lege ruimte staat hij midden, zodra er
@@ -48,25 +47,30 @@
     return { b: r.width, h: r.height, g: parseInt(getComputedStyle(schil.vak).getPropertyValue('--gutter'), 10) || 14 };
   }
 
+  function standaard() {
+    return d.body && d.body.getAttribute('data-rtg-schil') === 'standaard';
+  }
+
   function schik() {
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
-    if (schil.tabbar) {
-      var bank = Math.max(228, Math.min(286, Math.round(m.b * .18)));
-      var tabHoog = 40;
+    if (standaard()) {
+      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
+      var tabhoog = 49;
       zet(schil.console, 0, 0, bank, m.h);
-      zet(schil.tabbar, bank, 0, m.b - bank, tabHoog);
-      var vrijStandaard = schil.surfaces.filter(function (s) { return !s.eigen; });
-      if (!vrijStandaard.length) return;
-      var kolStandaard = vrijStandaard.length === 1 ? 1 : 2;
-      var rijStandaard = Math.ceil(vrijStandaard.length / kolStandaard);
-      var breedStandaard = Math.floor((m.b - bank) / kolStandaard);
-      var hoogStandaard = Math.floor((m.h - tabHoog) / rijStandaard);
-      vrijStandaard.forEach(function (s, i) {
-        var c = i % kolStandaard, r = Math.floor(i / kolStandaard);
-        zet(s.el, bank + c * breedStandaard, tabHoog + r * hoogStandaard,
-          c === kolStandaard - 1 ? m.b - bank - c * breedStandaard : breedStandaard,
-          r === rijStandaard - 1 ? m.h - tabHoog - r * hoogStandaard : hoogStandaard);
+      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      if (!n) return;
+      var werkbreed = m.b - bank;
+      var werkhoog = m.h - tabhoog;
+      var sk = n <= 3 ? n : 2;
+      var sr = Math.ceil(n / sk);
+      var sw = Math.floor(werkbreed / sk);
+      var sh = Math.floor(werkhoog / sr);
+      schil.surfaces.forEach(function (s, i) {
+        var c = i % sk, r = Math.floor(i / sk);
+        zet(s.el, bank + c * sw, tabhoog + r * sh,
+          c === sk - 1 ? werkbreed - c * sw : sw,
+          r === sr - 1 ? werkhoog - r * sh : sh);
       });
       return;
     }
@@ -174,7 +178,7 @@
     schil.surfaces = schil.surfaces.filter(function (x) { return x !== s; });
     if (schil.actief === s) schil.actief = schil.surfaces[schil.surfaces.length - 1] || null;
     if (schil.actief) maakActief(schil.actief);
-    schik(); tekenConsole();
+    schik(); tekenConsole(); tekenTabs();
   }
 
   function maakActief(s) {
@@ -184,7 +188,7 @@
     // de actieve surface bovenop, zodat zweven ook echt zweeft
     schil.surfaces.forEach(function (x, i) { x.el.style.zIndex = String(10 + i); });
     s.el.style.zIndex = '40';
-    tekenConsole();
+    tekenConsole(); tekenTabs();
   }
 
   /* Deep maakt er een dominante van en zet de rest op Glance: zo blijft de
@@ -200,7 +204,6 @@
     }
     schik();
   }
-
   /* --------------------------------------------------------- verplaatsen -- */
   function sleep(s, ev) {
     var m = meet();
@@ -282,26 +285,11 @@
   function opContext(fn) { if (typeof fn === 'function') schil.luisteraars.push(fn); }
 
   /* --------------------------------------------------------- de console -- */
-  function tekenTabbar() {
-    if (!schil.tabbar) return;
-    schil.tabbar.innerHTML = schil.surfaces.map(function (s) {
-      return '<div class="rtg-tab"' + (schil.actief === s ? ' data-actief' : '') + '>' +
-        '<button type="button" class="rtg-tab-kies" data-tab-ga="' + esc(s.id) + '">' + esc(s.naam) + '</button>' +
-        '<button type="button" class="rtg-tab-sluit" data-tab-sluit="' + esc(s.id) +
-          '" aria-label="Sluit ' + esc(s.naam) + '">&times;</button></div>';
-    }).join('');
-    schil.tabbar.querySelectorAll('[data-tab-ga]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var s = vind(b.dataset.tabGa);
-        if (s) { zoom(s, 'work'); maakActief(s); }
-      });
-    });
-    schil.tabbar.querySelectorAll('[data-tab-sluit]').forEach(function (b) {
-      b.addEventListener('click', function () { sluit(b.dataset.tabSluit); });
-    });
-  }
   function tekenConsole() {
-    tekenTabbar();
+    schil.console.querySelectorAll('[data-open]').forEach(function (b) {
+      var geopend = vind(b.dataset.open);
+      b.toggleAttribute('data-huidig', !!(geopend && schil.actief === geopend));
+    });
     var c = schil.console.querySelector('[data-actieflijst]');
     if (c) {
       c.innerHTML = schil.surfaces.length
@@ -335,6 +323,28 @@
         ? 'Alles op <b>' + esc(schil.huidigeContext.id) + '</b><br>' + esc(schil.huidigeContext.label)
         : 'Geen gedeelde context. Kies iets in een app; de rest volgt.';
     }
+  }
+
+  /* Een tab is één echt open oppervlak: kiezen activeert het scherm en het
+     kruis sluit precies dat scherm. */
+  function tekenTabs() {
+    if (!schil.tabs) return;
+    schil.tabs.innerHTML = schil.surfaces.map(function (s) {
+      return '<div class="rtg-tab" data-id="' + esc(s.id) + '"' +
+        (schil.actief === s ? ' data-actief' : '') + '>' +
+        '<button type="button" class="rtg-tab-kies">' + esc(s.naam) + '</button>' +
+        '<button type="button" class="rtg-tab-sluit" aria-label="Sluit ' + esc(s.naam) + '">&times;</button>' +
+        '</div>';
+    }).join('');
+    schil.tabs.querySelectorAll('.rtg-tab').forEach(function (tab) {
+      tab.querySelector('.rtg-tab-kies').addEventListener('click', function () {
+        var s = vind(tab.dataset.id); if (s) maakActief(s);
+      });
+      tab.querySelector('.rtg-tab-kies').addEventListener('dblclick', function () {
+        var s = vind(tab.dataset.id); if (s) zoom(s, 'deep');
+      });
+      tab.querySelector('.rtg-tab-sluit').addEventListener('click', function () { sluit(tab.dataset.id); });
+    });
   }
   /* ------------------------------------------------------- werkruimtes --
      Stap 5 uit WERKRUIMTE.md. Een gerangschikte set surfaces is opslaanbaar en
@@ -609,10 +619,8 @@
     opties = opties || {};
     schil.vak = opties.vak || d.querySelector('.rtg-werkruimte');
     schil.console = opties.console || schil.vak.querySelector('.rtg-console');
-    if (d.body && d.body.dataset.rtgSchil === 'standaard') {
-      schil.tabbar = el('nav', 'rtg-tabbar', schil.vak);
-      schil.tabbar.setAttribute('aria-label', 'Open werkbladen');
-    }
+    schil.tabs = el('nav', 'rtg-tabbar', schil.vak);
+    schil.tabs.setAttribute('aria-label', 'Open software');
     schil.dok = el('div', 'rtg-dok', schil.vak);
     /* De apps die dit scherm kan openen. De shell KENT ze niet uit zichzelf --
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen
@@ -633,7 +641,7 @@
         sleepKanJa(s, e.data.wat);
       }
     });
-    schik(); tekenConsole();
+    schik(); tekenConsole(); tekenTabs();
     return w.RTGSchil;
   }
 

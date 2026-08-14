@@ -81,18 +81,19 @@ function setStaffMember(id, memberId, memberTier) {
   mirror.markStaff(id);
   return getStaffById(id);
 }
-/* Claim een bestaande personeelsplek atomisch. Een juiste PIN bewijst dat
-   iemand de plek kent, maar mag nooit de reeds gekoppelde RTG-identiteit
-   overschrijven. De WHERE-clausule maakt controle + mutatie één SQLite-stap,
-   zodat twee gelijktijdige verzoeken niet allebei "vrij" kunnen zien. */
+/* Een nog ongekoppelde personeelsplek eenmalig claimen. De voorwaarde staat in
+   DE UPDATE en niet alleen in JavaScript: twee gelijktijdige juiste PIN-pogingen
+   kunnen daardoor nooit allebei de laatste schrijver worden. Dezelfde eigenaar
+   mag de handeling veilig herhalen. */
 function claimStaffMember(id, memberId, memberTier) {
-  if (memberId == null) return null;
-  const mid = Number(memberId);
-  const info = S.zin('UPDATE supplier_staff SET member_id = ?, member_tier = ? WHERE id = ? AND active = 1 AND (member_id IS NULL OR member_id = ?)')
-    .run(mid, memberTier ? String(memberTier).slice(0, 20) : null, id, mid);
-  if (!info.changes) return null;
-  mirror.markStaff(id);
-  return getStaffById(id);
+  const lid = Number(memberId);
+  if (!Number.isInteger(lid) || lid <= 0) return null;
+  const info = S.zin(`UPDATE supplier_staff SET member_id = ?, member_tier = ?
+    WHERE id = ? AND active = 1 AND (member_id IS NULL OR member_id = ?)`)
+    .run(lid, memberTier ? String(memberTier).slice(0, 20) : null, id, lid);
+  if (info.changes) mirror.markStaff(id);
+  const staff = getStaffById(id);
+  return staff && Number(staff.member_id) === lid ? staff : null;
 }
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null, lid: s.member_id != null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }

@@ -1,4 +1,4 @@
-/* De productie-keuring, deel GELD: Stripe, de munt-acceptatie en de
+/* De productie-keuring, deel GELD: Stripe, Mollie, Adyen, munt-acceptatie en de
    RTF-afdracht.
 
    Afgesplitst uit ./productie.js omdat dat bestand over de 10 kB-grens liep en
@@ -18,15 +18,30 @@ function keurGeld(env, fouten, waarschuwingen) {
        terwijl de 30%-afdracht aan de RTFoundation wel gewoon wordt geboekt --
        geld eruit, niets erin. Dat is geen mededeling maar een storing. Wie
        bewust zonder betalingen draait, zegt dat met STRIPE_DEMO_BEWUST=1. */
-    if (!env.STRIPE_SECRET_KEY && !demoBewust)
-      fouten.push('STRIPE_SECRET_KEY ontbreekt in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Facturen gaan op betaald zonder dat er is afgerekend, terwijl de RTF-afdracht wel wordt geboekt. Zet de sleutel -- of, als deze installatie bewust zonder betalingen draait, zet STRIPE_DEMO_BEWUST=1.');
-    if (!env.STRIPE_SECRET_KEY && demoBewust)
+    const echteProvider = !!(env.STRIPE_SECRET_KEY || env.MOLLIE_API_KEY || env.ADYEN_API_KEY);
+    if (!echteProvider && !demoBewust)
+      fouten.push('STRIPE_SECRET_KEY, MOLLIE_API_KEY en ADYEN_API_KEY ontbreken in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Zet minstens één echte provider -- of, als deze installatie bewust zonder betalingen draait, zet STRIPE_DEMO_BEWUST=1.');
+    if (!echteProvider && demoBewust)
       waarschuwingen.push((env.RTG_PRIVATE_BETA === '1' ? 'RTG_PRIVATE_BETA=1' : 'STRIPE_DEMO_BEWUST=1') + ': de demo-betaalprovider bevestigt elke betaling zelf. Dat is hier een bewuste keuze; er gaat geen echt geld om en facturen kloppen niet.');
     /* Een betaalsleutel zonder webhook-secret is gevaarlijker dan geen van
        beide: er gaat echt geld om, en de webhook die vertelt of er betaald is
        zou dan onondertekend binnenkomen. Wie het adres kent roept "betaald". */
     if (env.STRIPE_SECRET_KEY && !env.STRIPE_WEBHOOK_SECRET)
       fouten.push('STRIPE_SECRET_KEY gezet zonder STRIPE_WEBHOOK_SECRET: de betaal-webhook zou onondertekende berichten als waarheid aannemen. Zet het webhook-secret uit het Stripe-dashboard.');
+    /* De klassieke Mollie-terugmelding draagt alleen een payment-id. Die wordt
+       nooit zelf geloofd: RTG haalt de stand op met MOLLIE_API_KEY. Daarom is
+       hier geen fictief webhook-secret verplicht. Een vast APP_URL wel, want
+       terugkeer- en webhook-URL mogen niet uit een aanvragerkop komen. */
+    if (env.MOLLIE_API_KEY && !env.APP_URL)
+      fouten.push('MOLLIE_API_KEY gezet zonder APP_URL: Mollie heeft vaste terugkeer- en webhook-URL\'s nodig. Zet APP_URL op het publieke RTG-adres.');
+    if (env.ADYEN_API_KEY && !env.ADYEN_MERCHANT_ACCOUNT)
+      fouten.push('ADYEN_API_KEY gezet zonder ADYEN_MERCHANT_ACCOUNT: RTG kan de betaalpagina en webhook dan niet aan één zakelijke rekening binden.');
+    if (env.ADYEN_API_KEY && !/^[A-Fa-f0-9]{64}$/.test(String(env.ADYEN_HMAC_KEY || '')))
+      fouten.push('ADYEN_API_KEY gezet zonder geldige ADYEN_HMAC_KEY van 64 hex-tekens: AUTHORISATION- en REFUND-webhooks zijn dan niet te vertrouwen.');
+    if (env.ADYEN_API_KEY && !env.APP_URL)
+      fouten.push('ADYEN_API_KEY gezet zonder APP_URL: Adyen heeft een vaste terugkeer-URL nodig. Zet APP_URL op het publieke RTG-adres.');
+    if (env.ADYEN_API_KEY && !/^https:\/\/[^/]+-checkout-live\.adyenpayments\.com\/checkout\/v\d+\/?$/.test(String(env.ADYEN_CHECKOUT_BASE_URL || '')))
+      fouten.push('ADYEN_API_KEY gezet zonder geldige live ADYEN_CHECKOUT_BASE_URL. Gebruik exact de merchant-specifieke Checkout-URL uit Adyen Customer Area, inclusief /checkout/v72.');
     if (!env.RTF_IBAN) waarschuwingen.push('RTF_IBAN niet gezet: de 30%-afdracht aan de RTFoundation wordt wel per betaling geboekt en gereserveerd (status "te_storten"), maar nog niet uitbetaald. Vul het foundation-IBAN zodra het bekend is.');
     if (env.MUNT_AAN === '1' && !env.MUNT_PROVIDER_KEY)
       fouten.push('MUNT_AAN=1 zonder MUNT_PROVIDER_KEY: crypto-acceptatie zou aanstaan zonder vergunninghoudende aanbieder om te ontvangen en om te zetten. Zet de provider, of laat MUNT_AAN uit.');

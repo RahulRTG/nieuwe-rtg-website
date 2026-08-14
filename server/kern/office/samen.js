@@ -7,12 +7,11 @@
    personeelsvolgsysteem. */
 'use strict';
 
-const klok = require('../../lib/klok');
-
 const CLASSIFICATIES = ['intern', 'vertrouwelijk', 'strikt'];
 const BEWAARTERMIJNEN = ['geen', '1jaar', '3jaar', '7jaar', 'permanent'];
 const MAX_OPMERKINGEN = 200;
 const MAX_TAGS = 8;
+const { nu: klokNu } = require('../../lib/klok');
 
 module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   const { id, nu, docMet, naamVan, magSchrijven, magLezen, schrijfAudit } = basis;
@@ -45,7 +44,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
     if (!magLezen(d, key, kring)) return { status: 403, error: 'Dit document is niet met u gedeeld.' };
-    const grens = klok.nu() - 45000;
+    const grens = klokNu() - 45000;
     const hier = aanwezig.get(d.id) || new Map();
     for (const [client, p] of hier) if (p.om < grens) hier.delete(client);
     if (!hier.size) aanwezig.delete(d.id);
@@ -67,7 +66,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
     const standNu = standen.includes(data && data.stand) ? data.stand : 'bekijkt';
     let hier = aanwezig.get(d.id);
     if (!hier) { hier = new Map(); aanwezig.set(d.id, hier); }
-    hier.set(client, { naam: naamVan(key), stand: standNu, om: klok.nu() });
+    hier.set(client, { naam: naamVan(key), stand: standNu, om: klokNu() });
     return stand(key, did, kring);
   }
 

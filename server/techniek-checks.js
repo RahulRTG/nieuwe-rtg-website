@@ -13,9 +13,13 @@ const CHECKS_INTEGRATIES = [
   },
   {
     id: 'betalingen', naam: 'Betalingen', code: 'PAY-01', categorie: 'Integraties',
-    run: (c) => (c.betaal && c.betaal.AANBIEDER === 'stripe')
-      ? { status: 'ok', detail: 'Stripe actief (echte betalingen).' }
-      : { status: 'waarschuwing', detail: 'Demo-betalingen: geen STRIPE_SECRET_KEY (geen echt geld).' }
+    run: (c) => {
+      const m = c.betaal && c.betaal.mogelijkheden ? c.betaal.mogelijkheden() : null;
+      const echt = m && m.rails.filter(x => x.echt).map(x => x.id);
+      return echt && echt.length
+        ? { status: 'ok', detail: echt.map(x => x === 'mollie' ? 'Mollie' : x === 'adyen' ? 'Adyen' : 'Stripe').join(' + ') + ' actief; betaalwaarheid provider-onafhankelijk.' }
+        : { status: 'waarschuwing', detail: 'Demo-betalingen: geen echte betaalprovider ingesteld (geen echt geld).' };
+    }
   },
   {
     id: 'wallet', naam: 'RTG Pay (wallet)', code: 'PAY-02', categorie: 'Integraties',

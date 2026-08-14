@@ -5,10 +5,10 @@
 
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
-const klok = require('../lib/klok');
+const { nu: klokNu } = require('../lib/klok');
 
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren } = kern;
+  const { app, supplierAuth, auth, geenGast, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren, facturatie } = kern;
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
      handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
      komt nog steeds aan: het postvak hangt aan het linkerdeel. */
@@ -170,6 +170,19 @@ module.exports = (kern) => {
     res.json({ adres: lidAdres(req), soort: lidSoort(req),
       ongelezen: rtmail.ongelezen(codenaam), berichten: rtmail.postvak(codenaam) });
   });
+  /* Receipt Vault: RTMAIL is de documenteninbox, maar de factuurmotor blijft
+     de enige waarheid. Er wordt hier dus niets gekopieerd; beide schermen lezen
+     en classificeren exact hetzelfde document achter dezelfde ledenpoort. */
+  app.post('/api/member/rtmail/documenten', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(facturatie.voorLid(req.session.key));
+  });
+  app.post('/api/member/rtmail/classificeer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = facturatie.classificeer(String((req.body || {}).id || ''), req.session.key,
+      (req.body || {}).classificatie);
+    res.status(r.status || 200).json(r);
+  });
   app.post('/api/member/rtmail/lees', auth, (req, res) => {
     const codenaam = lidCodenaam(req);
     if (!codenaam) return res.status(404).json({ error: 'Geen postvak voor dit account.' });
@@ -184,7 +197,7 @@ module.exports = (kern) => {
     const bericht = rtmail.postvak(codenaam, { limit: 200 }).find(m => m.id === String(b.id || ''));
     if (!bericht) return res.status(404).json({ error: 'Bericht niet gevonden.' });
     if (b.actie === 'agenda') {
-      const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? b.datum : new Date(klok.nu() + 86400000).toISOString().slice(0, 10);
+      const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? b.datum : new Date(klokNu() + 86400000).toISOString().slice(0, 10);
       const r = await agenda.voegToe('lid:' + req.session.key, { titel: b.titel || bericht.onderwerp, datum, tijd: b.tijd, notitie: 'Vanuit RTMAIL · ' + bericht.id });
       if (r.error) return res.status(400).json(r);
       return res.json({ ok: true, resultaat: r.item, bericht: rtmail.workflow(codenaam, bericht.id, { soort: 'agenda', label: 'In agenda gezet', ref: r.item.id }) });

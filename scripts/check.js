@@ -1851,6 +1851,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
 
     // ---- machine naar machine, met een eigen bewijs in het verzoek ----
     ['/api/betaal/webhook', 'ondertekend door de betaalprovider; een sessie bestaat hier niet'],
+    ['/api/betaal/webhook/mollie', 'Mollie heeft geen RTG-sessie; RTG vertrouwt het id niet en haalt de betaling met de eigen geheime sleutel bij Mollie op'],
     ['/api/munt/webhook', 'idem, met een eigen webhook-secret'],
     ['/api/cluster/:actie', 'de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet'],
     ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],

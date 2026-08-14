@@ -6,6 +6,8 @@
 
    Afgesplitst uit index.js toen die de 10 KB passeerde: die is de orkestrator,
    dit is de handeling. */
+const betaalstaten = require('../betaalwaarheid/staten');
+
 module.exports = (ctx) => {
   const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notifySupplier, logActivity,
@@ -62,8 +64,11 @@ module.exports = (ctx) => {
         bestemming: s.stripeAccount || undefined
       });
     } catch (e) { return { status: 502, error: 'Betaling kon niet gestart worden: ' + e.message }; }
-    if (prov.status && !['betaald', 'succeeded', 'processing', 'requires_capture'].includes(prov.status))
-      return { status: 402, error: 'De betaling is niet bevestigd.' };
+    /* processing en requires_capture zijn nog geen ontvangen geld. Hier stond
+       dat allebei gelijk aan succeeded, waardoor de ontvangstenteller van de
+       ondernemer al opliep terwijl de kaart later nog kon mislukken. */
+    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start')))
+      return { status: 402, error: 'De betaling wacht nog op definitieve bevestiging. Betaal niet opnieuw.' };
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',

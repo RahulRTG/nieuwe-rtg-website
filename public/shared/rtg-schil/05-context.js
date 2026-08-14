@@ -22,26 +22,11 @@
   function opContext(fn) { if (typeof fn === 'function') schil.luisteraars.push(fn); }
 
   /* --------------------------------------------------------- de console -- */
-  function tekenTabbar() {
-    if (!schil.tabbar) return;
-    schil.tabbar.innerHTML = schil.surfaces.map(function (s) {
-      return '<div class="rtg-tab"' + (schil.actief === s ? ' data-actief' : '') + '>' +
-        '<button type="button" class="rtg-tab-kies" data-tab-ga="' + esc(s.id) + '">' + esc(s.naam) + '</button>' +
-        '<button type="button" class="rtg-tab-sluit" data-tab-sluit="' + esc(s.id) +
-          '" aria-label="Sluit ' + esc(s.naam) + '">&times;</button></div>';
-    }).join('');
-    schil.tabbar.querySelectorAll('[data-tab-ga]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var s = vind(b.dataset.tabGa);
-        if (s) { zoom(s, 'work'); maakActief(s); }
-      });
-    });
-    schil.tabbar.querySelectorAll('[data-tab-sluit]').forEach(function (b) {
-      b.addEventListener('click', function () { sluit(b.dataset.tabSluit); });
-    });
-  }
   function tekenConsole() {
-    tekenTabbar();
+    schil.console.querySelectorAll('[data-open]').forEach(function (b) {
+      var geopend = vind(b.dataset.open);
+      b.toggleAttribute('data-huidig', !!(geopend && schil.actief === geopend));
+    });
     var c = schil.console.querySelector('[data-actieflijst]');
     if (c) {
       c.innerHTML = schil.surfaces.length
@@ -75,4 +60,26 @@
         ? 'Alles op <b>' + esc(schil.huidigeContext.id) + '</b><br>' + esc(schil.huidigeContext.label)
         : 'Geen gedeelde context. Kies iets in een app; de rest volgt.';
     }
+  }
+
+  /* Een tab is één echt open oppervlak: kiezen activeert het scherm en het
+     kruis sluit precies dat scherm. */
+  function tekenTabs() {
+    if (!schil.tabs) return;
+    schil.tabs.innerHTML = schil.surfaces.map(function (s) {
+      return '<div class="rtg-tab" data-id="' + esc(s.id) + '"' +
+        (schil.actief === s ? ' data-actief' : '') + '>' +
+        '<button type="button" class="rtg-tab-kies">' + esc(s.naam) + '</button>' +
+        '<button type="button" class="rtg-tab-sluit" aria-label="Sluit ' + esc(s.naam) + '">&times;</button>' +
+        '</div>';
+    }).join('');
+    schil.tabs.querySelectorAll('.rtg-tab').forEach(function (tab) {
+      tab.querySelector('.rtg-tab-kies').addEventListener('click', function () {
+        var s = vind(tab.dataset.id); if (s) maakActief(s);
+      });
+      tab.querySelector('.rtg-tab-kies').addEventListener('dblclick', function () {
+        var s = vind(tab.dataset.id); if (s) zoom(s, 'deep');
+      });
+      tab.querySelector('.rtg-tab-sluit').addEventListener('click', function () { sluit(tab.dataset.id); });
+    });
   }

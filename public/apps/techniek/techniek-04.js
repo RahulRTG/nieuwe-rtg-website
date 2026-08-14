@@ -76,6 +76,7 @@
       // De Wacht-tab: zichtbaar voor iedereen met toegang (lezen); de acties
       // (afsnijden, beslissen, opruimen) zijn in de UI en op de server owner-only.
       $('#tabBtnWacht').hidden = false;
+      $('#tabBtnBetalen').hidden = false;
       // functies-tab: iedereen met toegang kan aanvragen; alleen de eigenaar besluit
       $('#tabBtnFuncties').hidden = false;
       var verzoeken = d.verzoeken || [];

@@ -101,6 +101,13 @@ module.exports = (kern) => {
       regel.bevestiging = 'akkoord';
       regel.bevestigdDoor = req.actor.name;
       regel.bevestigdAt = nu();
+      /* Op locatie is menselijke goedkeuring de laatste grendel. Bij online
+         betalen blijft daarnaast de betaalgrendel gelden: alleen een reeds
+         bevestigde rekening mag hier naar de keuken worden vrijgegeven. */
+      if (r.betaalVoorkeur !== 'online' || r.status === 'betaald') {
+        regel.vrijAt = regel.vrijAt || nu();
+        regel.serveerOm = regel.serveerOm || (r.bezorg && r.bezorg.tijd) || (r.afhaal && r.afhaal.tijd) || null;
+      }
     }
     save();
     logActivity(req.supplier.code, req.actor, (akkoord ? 'bevestigde' : 'wees af') + ': ' + regel.naam + ' op ' + (r.tafel || r.id));

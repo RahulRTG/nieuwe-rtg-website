@@ -26,6 +26,8 @@
         const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
         const d = await r.json().catch(() => ({}));
         if (!r.ok || !(d.rollen || []).some(x => x.rol === 'kantoor')) return;
+        // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
+        // onderweg is. Beide antwoorden mogen samen maar één ingang maken.
         if ($('#kaAccountVerder')) return;
         const b = document.createElement('button');
         b.id = 'kaAccountVerder';

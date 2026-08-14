@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const klok = require('../lib/klok');
+const { nu: klokNu } = require('../lib/klok');
 
 const API_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*(['"`])([^'"`]+)\2/g;
 
@@ -269,7 +269,7 @@ module.exports = ({ root = path.resolve(__dirname, '../..'), functies }) => {
     })).digest('hex');
 
     return {
-      versie: 2, gescand: klok.nu(), vingerafdruk,
+      versie: 2, gescand: klokNu(), vingerafdruk,
       cijfers: {
         functieFlags: flags.length, functiePrefixen: prefixen.length,
         apps: apps.length, apiActies: endpoints.length, kantoren: kantoren.length,

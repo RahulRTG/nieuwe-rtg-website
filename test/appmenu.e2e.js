@@ -266,14 +266,20 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
     const balk = await page.evaluate(() => {
       const zichtbaar = (id) => {
         const e = document.getElementById(id);
-        return e ? !!e.offsetParent : null;   // null = bestaat niet meer
+        if (!e) return null;                  // null = bestaat niet meer
+        const b = e.getBoundingClientRect(), s = getComputedStyle(e);
+        return !e.hidden && s.display !== 'none' && s.visibility !== 'hidden' &&
+          Number(s.opacity || 1) > 0 && b.width > 0 && b.height > 0;
       };
       return {
         bel: zichtbaar('bell'), paneel: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
         hamburger: !!document.getElementById('osMenuBtn'),
         groet: !!document.getElementById('homeGreeting'),
         zichtbaarRechts: [...document.querySelectorAll('.topbar .os-rechts button')]
-          .filter((b) => b.offsetParent).map((b) => b.id || b.className)
+          .filter((e) => { const b = e.getBoundingClientRect(), s = getComputedStyle(e);
+            return !e.hidden && s.display !== 'none' && s.visibility !== 'hidden' &&
+              Number(s.opacity || 1) > 0 && b.width > 0 && b.height > 0; })
+          .map((b) => b.id || b.className)
       };
     });
     /* EEN DEUR, EN VERDER NIETS.

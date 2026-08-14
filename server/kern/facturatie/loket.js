@@ -37,6 +37,19 @@ module.exports = (ctx) => {
     const mijn = store().facturen.filter(f => f.koper.key === key).slice(0, limit || 500).map(publiek);
     return { facturen: mijn, telling: store().facturen.filter(f => f.koper.key === key).length, besteed: rond(mijn.reduce((n, f) => n + f.totaal, 0)) };
   }
+  function classificeer(id, key, classificatie) {
+    const f = vind(String(id || ''));
+    if (!f) return { status: 404, error: 'Factuur niet gevonden.' };
+    if (!key || f.koper.key !== key) return { status: 403, error: 'Deze factuur hoort niet bij dit account.' };
+    const keuze = String(classificatie || '').toLowerCase();
+    if (keuze !== 'prive' && keuze !== 'zakelijk') {
+      return { status: 400, error: 'Kies prive of zakelijk.' };
+    }
+    f.classificatie = keuze;
+    save();
+    if (sseToCustomer) sseToCustomer(key, 'sync', { scope: 'facturen' });
+    return { status: 200, ok: true, factuur: publiek(f) };
+  }
   function mag(f, ctx) {
     if (!f) return false;
     if (ctx.supplierCode && (f.verkoper.code === ctx.supplierCode || f.koper.supplierCode === ctx.supplierCode)) return true;
@@ -106,5 +119,5 @@ module.exports = (ctx) => {
     if (ctx.supplierCode) return { antwoord: 'U heeft ' + set.stats.verkocht + ' facturen verstuurd (omzet EUR ' + set.stats.omzet.toFixed(2) + ', btw EUR ' + set.stats.btwAfdracht.toFixed(2) + '). Zeg "maak een factuur voor ..." om er een te maken.' };
     return { antwoord: 'U heeft ' + set.telling + ' facturen ontvangen, samen EUR ' + set.besteed.toFixed(2) + '. Tik een factuur aan om de PDF te downloaden.' };
   }
-  return { publiek, vind, voorSupplier, voorLid, mag, classificeer, pdf, bedragUit, aantalUit, codenaamUit, ai };
+  return { publiek, vind, voorSupplier, voorLid, classificeer, mag, pdf, bedragUit, aantalUit, codenaamUit, ai };
 };

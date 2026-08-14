@@ -125,6 +125,8 @@
 <script src="realtime.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="sessie.js"></script>
+<script src="/shared/rtg-school-session.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -132,8 +134,10 @@ const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':
 document.querySelectorAll('[data-sluit]').forEach(b => b.addEventListener('click', () => { const d = document.getElementById(b.dataset.sluit); if (d && d.close) d.close(); }));
 const q = new URLSearchParams(location.search);
 let CODE = (q.get('code')||'').toUpperCase(), TOKEN = q.get('t')||'';
-if(!CODE || !TOKEN){ try{ const d=JSON.parse(localStorage.getItem('rtf_docent')||'null'); if(d){CODE=d.code;TOKEN=d.token;} }catch(e){} }
+if(TOKEN && window.RTGSchoolSession){ RTGSchoolSession.zet('rtf_docent',{code:CODE,token:TOKEN}); history.replaceState(null,'','bord.html?code='+encodeURIComponent(CODE)); }
+if(!CODE || !TOKEN){ try{ const d=RTGSchoolSession.lees('rtf_docent'); if(d){CODE=d.code;TOKEN=d.token;} }catch(e){} }
 if(!CODE || !TOKEN){ location.href='leren.html'; }
+RTGSchoolSession.bewaak(['rtf_docent'],()=>location.href='leren.html');
 
 async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
 async function get(p){ const r=await fetch('/api/foundation'+p); return r.json(); }

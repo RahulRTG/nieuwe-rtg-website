@@ -182,10 +182,10 @@ test('de spellen van de lobby staan in de app die ze mag starten', () => {
 
   for (const sleutel of Object.keys(namen)) {
     const inRtg = rtg.includes(sleutel), inRtf = rtf.includes(sleutel);
-    assert.ok(inRtg !== inRtf, 'spel "' + sleutel + '" hoort in precies EEN van beide apps te staan, niet in ' +
-      (inRtg ? 'allebei' : 'geen van beide'));
-    assert.equal(inRtg ? 'rtg' : 'rtf', SPEL[sleutel].wereld,
-      'de lobby zet "' + sleutel + '" in de andere app dan de server toestaat');
+    assert.ok(inRtg || inRtf, 'spel "' + sleutel + '" hoort in minstens een app te staan');
+    const toegestaan = SPEL[sleutel].werelden || [SPEL[sleutel].wereld];
+    if (inRtg) assert.ok(toegestaan.includes('rtg'), 'de lobby zet "' + sleutel + '" in RTG terwijl de server dat niet toestaat');
+    if (inRtf) assert.ok(toegestaan.includes('rtf'), 'de lobby zet "' + sleutel + '" in RTF terwijl de server dat niet toestaat');
   }
 });
 

@@ -54,4 +54,7 @@
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   }
   w.Sessie = Sessie;
+  /* Draait meteen wanneer sessie.js wordt gelezen, dus nog voordat de pagina
+     bruikbaar wordt. De server beslist; bij storing blijft de deur dicht. */
+  controleerToegang();
 })(window);

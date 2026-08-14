@@ -25,9 +25,39 @@ const GROEP_INFO = {
   mini:   { naam: 'Allerkleinsten', bereik: '0 t/m 4 jaar',   emoji: 'rtf-kind', vanaf: 0 },
   kind:   { naam: 'Kind',           bereik: '5 t/m 11 jaar',  emoji: 'diploma', vanaf: 5 },
   tiener: { naam: 'Tiener',         bereik: '12 t/m 15 jaar', emoji: 'sport', vanaf: 12 },
-  jong:   { naam: 'Jongvolwassen',  bereik: '16 t/m 21+ jaar', emoji: 'vluchten', vanaf: 16 },
+  jong:   { naam: 'Jongvolwassen',  bereik: '16 t/m 21 jaar',  emoji: 'vluchten', vanaf: 16 },
   volw:   { naam: 'Volwassen',      bereik: 'volwassen',      emoji: 'entourage', vanaf: 22 }
 };
+/* De geboortedatum is de bron van de leeftijdspas. Een eenmaal gekozen
+   groep mag niet jarenlang blijven hangen: op een verjaardag rekent iedere
+   sessie de groep opnieuw uit. Voor oude profielen zonder geboortedatum blijft
+   p.groep bestaan, maar zo'n profiel krijgt geen bevestigde leeftijdspas. */
+function geboorteInfo(v, vandaag = new Date()) {
+  const tekst = String(v || '').slice(0, 10);
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(tekst);
+  if (!m) return null;
+  const jaar = Number(m[1]), maand = Number(m[2]), dag = Number(m[3]);
+  const datum = new Date(Date.UTC(jaar, maand - 1, dag));
+  if (datum.getUTCFullYear() !== jaar || datum.getUTCMonth() !== maand - 1 || datum.getUTCDate() !== dag) return null;
+  const nuJaar = vandaag.getFullYear(), nuMaand = vandaag.getMonth() + 1, nuDag = vandaag.getDate();
+  let leeftijd = nuJaar - jaar;
+  if (nuMaand < maand || (nuMaand === maand && nuDag < dag)) leeftijd -= 1;
+  if (leeftijd < 0 || leeftijd > 120) return null;
+  return { datum: tekst, leeftijd };
+}
+function groepVanLeeftijd(leeftijd) {
+  if (leeftijd < 5) return 'mini';
+  if (leeftijd < 12) return 'kind';
+  if (leeftijd < 16) return 'tiener';
+  if (leeftijd < 22) return 'jong';
+  return 'volw';
+}
+function actualiseerGroep(p) {
+  if (!p) return null;
+  const info = geboorteInfo(p.geboren);
+  if (info) p.groep = groepVanLeeftijd(info.leeftijd);
+  return info;
+}
 const magSolliciteren = groep => groep === 'jong' || groep === 'volw';
 const groepLeeftijd = groep => (GROEP_INFO[groep] || {}).vanaf; // ondergrens voor de vacature-filter
 /* Beschermd profiel (15 jaar of jonger, of rol kind): de open vriendenlaag is
@@ -36,7 +66,7 @@ const groepLeeftijd = groep => (GROEP_INFO[groep] || {}).vanaf; // ondergrens vo
    blijft altijd werken (dat is de aparte gezinslaag). We kennen alleen de
    leeftijdsgroep, niet de exacte leeftijd, dus de hele tienergroep (12 t/m 15)
    valt eronder: liever een 15-jarige te streng dan een 12-jarige te los. */
-const isBeschermd = p => !!p && (p.rol === 'kind' || ['mini', 'kind', 'tiener'].includes(p.groep));
+const isBeschermd = p => { if (!p) return false; actualiseerGroep(p); return p.rol === 'kind' || ['mini', 'kind', 'tiener'].includes(p.groep); };
 function schoonGroep(v) { return GROEPEN.includes(v) ? v : null; }
 // een gast (oppas, opa/oma of familielid) helpt mee, maar mag niet bij de
 // privezaken van het gezin (geld, mentale steun, dromen, cv, reisaanvraag).
@@ -91,7 +121,8 @@ function profielInfoVanHandle(handle) {
   const p = eigenVeld(g.profielen, m[2]); if (!p || isGast(p)) return null;
   return { handle, codenaam: ensureCodenaam(p), naam: p.naam, avatar: p.avatar, kleur: p.kleur, rol: p.rol, kind: p.rol === 'kind', beschermd: isBeschermd(p), gezinCode: g.code };
 }
-function pubProfiel(p) {
+function pubProfiel(p, metGeboortedatum) {
+  const geboorte = actualiseerGroep(p);
   const groep = p.groep && GROEP_INFO[p.groep] ? p.groep : null;
   if (!isGast(p)) ensureCodenaam(p);
   return {
@@ -99,6 +130,7 @@ function pubProfiel(p) {
     heeftPin: !!(p.pin && p.pin.hash), beheerder: p.rol === 'beheerder',
     gast: p.rol === 'gast', gekoppeld: !!p.koppel, codenaam: p.codenaam || null,
     groep, groepNaam: groep ? GROEP_INFO[groep].naam : null, groepBereik: groep ? GROEP_INFO[groep].bereik : null,
+    geboortedatum: metGeboortedatum && geboorte ? geboorte.datum : null, leeftijdBevestigd: !!geboorte,
     magSolliciteren: magSolliciteren(groep)
   };
 }
@@ -109,7 +141,11 @@ function gezinVan(req, res) {
   if (!g) { res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' }); return null; }
   return g;
 }
-function profielVan(g, token) { return Object.values(g.profielen || {}).find(p => p.token === token); }
+function profielVan(g, token) {
+  const p = Object.values(g.profielen || {}).find(x => x.token === token);
+  if (p) actualiseerGroep(p);
+  return p;
+}
 function beheerderVan(g, req, res) {
   const t = ctx.tokenUit(req);
   const p = profielVan(g, t);
@@ -118,5 +154,8 @@ function beheerderVan(g, req, res) {
 }
 function berichtVoorMij(b, pid) { return b.naar === 'allen' || b.naar === pid || b.van === pid; }
 
-  return { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
+  return { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
+    magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
+    schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
+    pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 };

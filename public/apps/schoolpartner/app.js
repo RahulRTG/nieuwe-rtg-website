@@ -2,7 +2,8 @@
    op de bestaande school-API's. Directie ziet personeel en klassen; een
    leraar draait zijn klas: online les, team en overname, toetsen uit de
    leerlijn (verse opgaven per leerling, cijfervoorstel blijft advies),
-   oefen-huiswerk en het cijferboek. Sessie lokaal, tokens nooit in de URL. */
+   oefen-huiswerk en het cijferboek. De tijdelijke tabsessie verloopt na
+   inactiviteit; tokens staan nooit in de URL of permanente browseropslag. */
 (function () {
   'use strict';
   var $ = function (s) { return document.querySelector(s); };
@@ -17,34 +18,51 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; }); });
   }
 
-  var S = null;
-  try { S = JSON.parse(localStorage.getItem('rtg_schoolpartner') || 'null'); } catch (e) {}
-  function bewaar() { try { localStorage.setItem('rtg_schoolpartner', JSON.stringify(S)); } catch (e) {} }
+  var SLOT = 'rtg_schoolpartner';
+  var Store = window.RTGSchoolSession;
+  var S = Store ? Store.lees(SLOT) : null;
+  function bewaar() { if (Store) Store.zet(SLOT, S); }
+  function context(naam, rol) {
+    var c = $('#schoolContext');
+    c.hidden = !naam;
+    if (naam) { $('#schoolContextNaam').textContent = naam; $('#schoolContextRol').textContent = rol || ''; }
+  }
   function toon(v) {
     ['vPoort', 'vDirectie', 'vLeraar'].forEach(function (id) { $('#' + id).hidden = id !== v; });
     $('#uitlog').hidden = v === 'vPoort';
+    document.body.dataset.schoolRol = v === 'vDirectie' ? 'directie' : v === 'vLeraar' ? 'leraar' : 'poort';
+    if (v === 'vPoort') context('', '');
   }
-  $('#uitlog').addEventListener('click', function () { S = null; try { localStorage.removeItem('rtg_schoolpartner'); } catch (e) {} toon('vPoort'); });
+  function uitloggen(bericht) {
+    S = null; if (Store) Store.weg(SLOT);
+    $('#inToken').value = ''; toon('vPoort');
+    if (bericht) meld(bericht);
+  }
+  $('#uitlog').addEventListener('click', function () { uitloggen(); });
+  if (Store) Store.bewaak([SLOT], function () { uitloggen('Je veilige schoolsessie is verlopen. Log opnieuw in.'); });
 
   /* ---- de poort: het token vertelt zelf of je directie of leraar bent ---- */
   $('#inGa').addEventListener('click', function () {
     var code = $('#inCode').value.trim().toUpperCase(), token = $('#inToken').value.trim();
     if (!code || !token) return meld('Vul de schoolcode en je token in.');
     api('/school/school/overzicht', { schoolCode: code, beheerToken: token }).then(function (r) {
-      if (r.status === 200) { S = { code: code, token: token, rol: 'directie' }; bewaar(); return directie(); }
+      if (r.status === 200) { S = { code: code, token: token, rol: 'directie' }; bewaar(); $('#inToken').value = ''; return directie(); }
       return api('/school/leraar/overzicht', { schoolCode: code, personeelToken: token }).then(function (r2) {
-        if (r2.status === 200) { S = { code: code, token: token, rol: 'leraar' }; bewaar(); return leraar(); }
+        if (r2.status === 200) { S = { code: code, token: token, rol: 'leraar' }; bewaar(); $('#inToken').value = ''; return leraar(); }
         meld(r2.body.error || 'Onbekende school of verkeerd token.');
       });
     });
   });
+  ['inCode', 'inToken'].forEach(function (id) { $('#' + id).addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#inGa').click(); }); });
 
   /* ---------- directie ---------- */
   function directie() {
     toon('vDirectie');
     api('/school/school/overzicht', { schoolCode: S.code, beheerToken: S.token }).then(function (r) {
-      if (r.body.error) return meld(r.body.error);
+      if (r.body.error) { if (r.status === 403) uitloggen('Deze schoolsessie is niet meer geldig.'); return meld(r.body.error); }
       var d = r.body, wacht = d.personeel.filter(function (p) { return p.status === 'wacht'; });
+      context(d.naam, 'Directie');
+      $('#dWelkom').textContent = d.naam + ' in één bestuurlijk beeld.';
       /* Meenemen (shared/uitvoer.js): voor de directie is het personeelsregister
          de lijst die deze werkbank echt bezit -- naam, rol, id en status los,
          in plaats van de regel "Naam · leraar · id 3" die op het scherm staat. */
@@ -78,19 +96,21 @@
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
     });
   }
-
   /* ---------- leraar ---------- */
   var KLAS = null, BIEB = null;
   function leraar() {
     toon('vLeraar');
     api('/school/leraar/overzicht', { schoolCode: S.code, personeelToken: S.token }).then(function (r) {
-      if (r.body.error) return meld(r.body.error);
+      if (r.body.error) { if (r.status === 403) uitloggen('Deze schoolsessie is niet meer geldig.'); return meld(r.body.error); }
+      var schoolNaam = typeof r.body.school === 'string' ? r.body.school : (r.body.school && r.body.school.naam) || S.code;
+      context(schoolNaam, 'Leraar');
+      $('#lWelkom').textContent = 'Welkom, ' + r.body.naam + '.';
       $('#lKlassen').innerHTML = (r.body.klassen || []).map(function (k) {
         return '<div class="item"><span>' + esc(k.naam) + ' <span class="stil">· code ' + esc(k.code) + '</span></span>' +
           '<button class="knop p" data-klas="' + esc(k.code) + '">Open</button></div>';
       }).join('') || '<p class="stil">Nog geen klas. Maak er een in de school-app, of laat een collega je vast op zijn klas zetten.</p>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-klas]'), function (b) {
-        b.addEventListener('click', function () { KLAS = b.dataset.klas; $('#lWerk').hidden = false; werkbank(); });
+        b.addEventListener('click', function () { KLAS = b.dataset.klas; $('#lWerk').hidden = false; context(schoolNaam, 'Leraar · ' + b.parentNode.querySelector('span').textContent.split(' · ')[0]); werkbank(); });
       });
     });
   }

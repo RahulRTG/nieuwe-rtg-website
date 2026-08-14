@@ -3,6 +3,12 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/foundation/campus.html': G('RTF Campus: jouw school, leerpaspoort, Game Hall, Magnaat en Foundation-gereedschap in één veilige werkplek.',
+    ['Bekijk bovenaan welke passen actief zijn', 'Open je klas, leerroute of project vanuit dezelfde Campus', 'Gebruik Alles om alleen functies te zien die bij jouw leeftijd passen'],
+    'Je geboortedatum bepaalt automatisch je leeftijdspas; zonder geldige pas blijft de Campus gesloten.'),
+  '/apps/foundation/leerpaspoort.html': G('Mijn leerpaspoort: een persoonlijke leerlijn met lessen, oefeningen, examentraining, doelen en Rahul Bijles.',
+    ['Kies een fase die je leeftijdspas toestaat', 'Volg een les en oefen vijf vragen in je eigen tempo', 'Vraag uitleg of niveau-advies en bespreek echte keuzes met school en thuis'],
+    'Dit paspoort helpt je groeien maar geeft geen officieel diploma of bindend schooladvies.'),
   '/apps/foundation/rust.html': G('Even rust: ademhalen en tot rust komen als het te veel wordt.',
     ['Adem mee met de cirkel', 'Kies een rustmoment dat bij je past', 'Kom terug wanneer je wilt'],
     'Drie keer diep ademen werkt echt; je lijf kalmeert je hoofd.'),
@@ -37,8 +43,8 @@ module.exports = {
     ['Bekijk vacatures voor jouw leeftijd', 'Solliciteer met je cv uit de CV-maker', 'Volg je sollicitaties live'],
     'Een korte, eerlijke sollicitatie verslaat een lange opgepompte; wees gewoon jezelf.'),
   '/apps/foundation/klas.html': G('De klas-PDA: doe live mee met de les van je juf of meester, op je eigen scherm of de iPad.',
-    ['Typ de klascode van het bord en je voornaam', 'Lees de uitleg en beantwoord de vragen zodra ze starten', 'Zie je score en aan het einde het podium'],
-    'Snel antwoorden geeft een klein beetje extra punten, maar goed nadenken levert het meest op.'),
+    ['Typ de klascode van het bord en je voornaam', 'Lees de uitleg en beantwoord de vragen zodra ze starten', 'Bekijk alleen hoeveel vragen jij goed hebt beantwoord'],
+    'Er is geen snelheidsbonus en geen podium; leren is geen wedstrijd.'),
   '/apps/foundation/zakgeld.html': G('Zakgeld: jouw eigen potje, sparen en uitgeven leren.',
     ['Houd bij wat erin komt en eruit gaat', 'Zet een spaardoel', 'Kijk hoe ver je bent'],
     'Verdeel je zakgeld in potjes (sparen, uitgeven, geven); dan is kiezen ineens makkelijk.'),

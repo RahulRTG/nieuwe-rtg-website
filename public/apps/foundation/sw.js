@@ -2,10 +2,10 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-5031d05a';
+const CACHE = 'rtf-hulp-leerpas-f3d8b1db';
 const SHELL = [
-  '/apps/foundation/', '/apps/foundation/index.html',
-  '/apps/foundation/leren.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
+  '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
+  '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
   '/apps/foundation/cv.html', '/apps/foundation/rust.html', '/apps/foundation/reis.html',
   '/apps/foundation/geld.html', '/apps/foundation/hulpwijzer.html', '/apps/foundation/dromen.html',
   '/apps/foundation/opvoeden.html', '/apps/foundation/steun.html', '/apps/foundation/studie.html',
@@ -48,7 +48,9 @@ const SHELL = [
   '/apps/foundation/os-vrijwilliger.html', '/apps/foundation/os-deelnemer.html', '/apps/foundation/os-publiek.html',
   '/apps/foundation/os-bestuur.html',
   '/apps/foundation/os-veld.html', '/apps/foundation/os-donateur.html',
-  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/palet.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
+  '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/palet.js',
+  '/apps/rtgschool/leer.js', '/apps/rtgschool/examen.js', '/apps/rtgschool/bijles.js',
+  '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];
 

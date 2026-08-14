@@ -58,7 +58,8 @@ test('2. elke app opent een pagina die echt bestaat', () => {
   const root = path.join(__dirname, '..', 'public');
   for (const a of APPS) {
     assert.ok(a.url && a.url.startsWith('/apps/'), a.naam + ' heeft een adres');
-    assert.ok(fs.existsSync(path.join(root, a.url.replace(/^\//, ''))), a.naam + ' wijst naar een bestaand bestand (' + a.url + ')');
+    const schermpad = new URL(a.url, 'https://rtg.local').pathname;
+    assert.ok(fs.existsSync(path.join(root, schermpad.replace(/^\//, ''))), a.naam + ' wijst naar een bestaand bestand (' + a.url + ')');
     assert.ok(CATEGORIEEN.some(c => c.id === a.categorie), a.naam + ' hoort bij een bestaande categorie');
   }
 });

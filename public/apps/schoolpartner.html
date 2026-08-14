@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-school-shell.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
@@ -66,41 +67,74 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
-<header>
-  <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG Partner</span><h1>School Partner</h1></span>
-  <span style="flex:1;"></span>
+<body class="rtg-stijl school-shell">
+<div class="school-kader">
+<aside class="school-zij" aria-label="Schoolnavigatie">
+  <a class="school-merk" href="/apps/foundation/campus.html"><span class="school-merkbeeld">F</span><span><strong>RTF School</strong><small>enterprise werkruimte</small></span></a>
+  <div class="school-navkop">Werkruimte</div>
+  <a class="school-nav" href="/apps/foundation/campus.html"><i>01</i>Campus</a>
+  <a class="school-nav" href="/apps/foundation/school.html"><i>02</i>Gezin &amp; leerling</a>
+  <a class="school-nav aan" href="/apps/schoolpartner.html" aria-current="page"><i>03</i>School Partner</a>
+  <div class="school-navkop">Onderwijs</div>
+  <a class="school-nav" href="/apps/lesmaker.html"><i>04</i>Lesmaker</a>
+  <a class="school-nav" href="/apps/foundation/schoolbieb.html"><i>05</i>Schoolbibliotheek</a>
+  <div class="school-veilig"><b>Enterprise beveiligd</b>Directie, leraar en ondersteuning krijgen ieder alleen hun eigen werk en bevoegdheden.</div>
+</aside>
+<div class="school-werk">
+<header class="school-boven">
+  <div class="school-boventitel"><span class="school-ey">RTG Partner</span><h1>School Partner</h1></div>
+  <span class="school-bovenruimte"></span>
+  <div class="school-context" id="schoolContext" hidden><i class="school-context-dot"></i><span id="schoolContextNaam">School</span><b id="schoolContextRol">Rol</b></div>
+  <a class="school-toplink verberg-smal" href="/apps/foundation/campus.html">Campus</a>
   <button class="knop" id="uitlog" type="button" hidden>Uitloggen</button>
 </header>
 <main>
   <!-- de poort -->
   <div id="vPoort">
-    <div class="kaart">
-      <div class="kop">Inloggen</div>
-      <p class="stil" style="margin-bottom:.6rem;">Voor directie (beheer-token) en leraren (personeel-token).</p>
-      <div class="rij">
-        <input class="veld" id="inCode" placeholder="Schoolcode" autocapitalize="characters" aria-label="Schoolcode">
-        <input class="veld" id="inToken" placeholder="Token" type="password" aria-label="Token">
-        <button class="knop p" id="inGa" type="button">Open de werkbank</button>
+    <section class="enterprise-hero">
+      <div><span class="ey">Eén veilige schoolorganisatie</span><h2>Alles wat een schooldag nodig heeft.</h2><p>Van klas en toets tot zorg, directie, veiligheid en gezin: verbonden in één rustige werkruimte met rechten per rol.</p>
+        <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Directie</span><span class="enterprise-chip"><i></i>Leraar</span><span class="enterprise-chip"><i></i>Ondersteuning</span></div>
       </div>
-    </div>
-    <div class="kaart">
-      <div class="kop">Nieuw hier?</div>
-      <p class="stil">Een school meldt zich eerst aan (RTG keurt goed), daarna meldt het personeel zich met de schoolcode, en de directie laat ze toe. Dat regel je in de school-app: <a href="/apps/foundation/school.html" style="color:var(--burgundy);">open de aanmeldstroom</a>.</p>
+      <div class="enterprise-belofte"><b>Veilig per rol</b>Je sessie is tijdelijk. Rechten worden bij ieder verzoek opnieuw door de server gecontroleerd en gevoelige inzage komt in het journaal.</div>
+    </section>
+    <div class="poort-grid">
+      <div class="kaart">
+        <div class="kop">Open jouw werkruimte</div>
+        <div class="school-rolkop"><span class="school-avatar">S</span><div><strong>Beveiligde schooltoegang</strong><span>De sleutel blijft alleen in deze tabsessie</span></div></div>
+        <div class="rij">
+          <input class="veld" id="inCode" placeholder="Schoolcode" autocapitalize="characters" autocomplete="organization" spellcheck="false" aria-label="Schoolcode">
+          <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false" aria-label="Persoonlijke toegangssleutel">
+          <button class="knop p" id="inGa" type="button">Veilig openen</button>
+        </div>
+        <div class="school-veiligheidsrij"><span><b>Tijdelijk</b>Sluit de tab en de sleutel verdwijnt.</span><span><b>Rolgestuurd</b>Alleen jouw bevoegdheden worden geladen.</span><span><b>Controleerbaar</b>Gevoelige inzage wordt gelogd.</span></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Nieuwe school of collega?</div>
+        <p class="stil">Een school wordt eerst door RTG gecontroleerd. Daarna laat de directie iedere collega persoonlijk toe.</p>
+        <div class="poort-stappen"><div class="poort-stap"><b><i>01</i>Aanmelden</b>De school vraagt toegang aan.</div><div class="poort-stap"><b><i>02</i>Controleren</b>RTG controleert de organisatie.</div><div class="poort-stap"><b><i>03</i>Toelaten</b>Directie geeft rollen aan medewerkers.</div></div>
+        <p class="stil" style="margin-top:.8rem;"><a href="/apps/foundation/school.html" style="color:var(--burgundy);">Start de gecontroleerde aanmeldstroom →</a></p>
+      </div>
     </div>
   </div>
 
   <!-- directie -->
   <div id="vDirectie" hidden>
+    <section class="enterprise-hero">
+      <div><span class="ey">Directiecentrum</span><h2 id="dWelkom">Goed bestuur begint met overzicht.</h2><p>Vandaag zie je alleen wat om een menselijk besluit vraagt. Geen leerlingranglijsten en geen verborgen algoritmische beslissingen.</p>
+        <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Organisatie</span><span class="enterprise-chip"><i></i>Veiligheid</span><span class="enterprise-chip"><i></i>Audit</span></div>
+      </div>
+      <div class="enterprise-belofte"><b>Beslissen met grenzen</b>Cijfervoorstellen blijven advies. Zorginzage vraagt een reden. De systeembeheerder komt niet in leerlingdossiers.</div>
+    </section>
     <div class="kpis" id="dKpis" aria-live="polite"></div>
-    <div class="kaart">
-      <div class="kop">Personeel</div>
-      <div id="dPersoneel"></div>
-    </div>
-    <div class="kaart">
-      <div class="kop">Klassen</div>
-      <div id="dKlassen"></div>
+    <div class="enterprise-start">
+      <div class="kaart">
+        <div class="kop">Personeel en toelating</div>
+        <div id="dPersoneel"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Klassen en capaciteit</div>
+        <div id="dKlassen"></div>
+      </div>
     </div>
     <div id="dPlus"></div>
     <div id="dEnterprise"></div>
@@ -109,6 +143,12 @@
 
   <!-- leraar-werkbank -->
   <div id="vLeraar" hidden>
+    <section class="enterprise-hero">
+      <div><span class="ey">Leraarwerkruimte</span><h2 id="lWelkom">Rust voor de klas. Overzicht voor jou.</h2><p>Je les, leerlingen, toetsen, hulplijn en excursies bij elkaar, met de klas als vaste context.</p>
+        <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Vandaag</span><span class="enterprise-chip"><i></i>Leerdoelen</span><span class="enterprise-chip"><i></i>Mentorzorg</span></div>
+      </div>
+      <div class="enterprise-belofte"><b>Kindveilig ontworpen</b>Geen privékanaal tussen leraar en kind. Ouders lezen standaard mee; vertrouwelijke hulp volgt een aparte bevoegdheid.</div>
+    </section>
     <!-- rtgdeel-vast: de klassenkiezer blijft in elk deel van het menu staan;
          zonder klas heeft de werkbank eronder geen betekenis -->
     <div class="kaart rtgdeel-vast" id="lKlassenKaart">
@@ -204,9 +244,12 @@
     </div>
   </div>
 </main>
+</div>
+</div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/schoolbel.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/rtg-school-session.js"></script>
 <script src="/apps/schoolpartner/toetsen.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
@@ -214,6 +257,7 @@
 <script src="/apps/schoolpartner/enterprise.js"></script>
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
+<script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

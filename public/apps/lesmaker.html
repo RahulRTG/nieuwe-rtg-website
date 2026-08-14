@@ -103,12 +103,11 @@ const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'
   .then(async r => { const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; });
 
 let CODE = null, TOKEN = null, LES = null, gekozenApp = '';
-/* Meenemen: de stand van de klas zoals de les hem bijhoudt -- de leraar
-   houdt zijn eigen uitslag, niet alleen een scherm dat straks weg is. */
+/* Meenemen: voortgang per leerling, alfabetisch en zonder rangorde. */
 if (window.RTGUitvoer) RTGUitvoer.bron(function () {
   if (!LES || !(LES.stand || []).length) return null;
-  return { naam: 'klasstand', kolommen: ['plaats', 'naam', 'punten'],
-    rijen: LES.stand.map(function (x, i) { return [i + 1, x.naam, x.score]; }) };
+  return { naam: 'klasvoortgang', kolommen: ['naam', 'goed', 'beantwoord'],
+    rijen: LES.stand.map(function (x) { return [x.naam, x.score, x.beantwoord]; }) };
 });
 
 /* app-zoeker over de bibliotheken */
@@ -150,7 +149,7 @@ function teken(){
   $('#lAantal').textContent = LES.aantal;
   const klaar = LES.fase === 'klaar';
   const volgendeIx = LES.vraagIx + 1;
-  $('#lVolgende').textContent = klaar ? 'De les is klaar' : (LES.fase === 'lobby' ? 'Start vraag 1 →' : (volgendeIx >= LES.vragen.length ? 'Afronden en podium →' : 'Volgende vraag ('+(volgendeIx+1)+'/'+LES.vragen.length+') →'));
+  $('#lVolgende').textContent = klaar ? 'De les is klaar' : (LES.fase === 'lobby' ? 'Start vraag 1 →' : (volgendeIx >= LES.vragen.length ? 'Afronden en terugblikken →' : 'Volgende vraag ('+(volgendeIx+1)+'/'+LES.vragen.length+') →'));
   $('#lVolgende').disabled = klaar;
   if (LES.fase === 'vraag' && LES.vraagIx >= 0){
     const v = LES.vragen[LES.vraagIx];
@@ -162,8 +161,8 @@ function teken(){
   } else { $('#lVraag').hidden = true; $('#lBalken').hidden = true; }
   const s = LES.stand || [];
   $('#lStand').innerHTML = s.length
-    ? (klaar ? '<h3 style="margin:.4rem 0;">Het podium</h3>' : '<div class="lbl">Tussenstand</div>')+
-      s.slice(0,10).map((x,i) => (i+1)+'. '+esc(x.naam)+' · <span>'+x.score+'</span> punten').join('<br>')
+    ? '<div class="lbl">Voortgang van de klas · alfabetisch</div>'+
+      s.slice(0,10).map(x => esc(x.naam)+' · <span>'+x.score+'</span> goed · '+x.beantwoord+' beantwoord').join('<br>')
     : '<p class="leeg">Nog geen kinderen; deel de klascode.</p>';
 }
 $('#lVolgende').addEventListener('click', async () => {

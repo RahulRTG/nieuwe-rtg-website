@@ -4,7 +4,8 @@
    het opstarten vanuit foundation.js. */
 module.exports = (gctx) => {
   const { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan,
-    nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, schoonGroep, isBeschermd, isGast, KLEUREN,
+    nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
+    schoonGroep, isBeschermd, isGast, KLEUREN,
     hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
     socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit } = gctx;
   const bezorgAanGasten = (g, b) => gctx.bezorgAanGasten(g, b);
@@ -21,11 +22,16 @@ router.post('/gezin/maak', async (req, res) => {
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || 'pas',
     kleur: schoonKleur(req.body.kleur), pin: await hashPin(req.body.pin), groep: schoonGroep(req.body.groep) || 'volw', token: rid(24), at: nu() };
+  if (req.body.geboortedatum) {
+    const geboorte = geboorteInfo(req.body.geboortedatum);
+    if (!geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
+    profiel.geboren = geboorte.datum; profiel.groep = groepVanLeeftijd(geboorte.leeftijd);
+  }
   ensureCodenaam(profiel); // de beheerder krijgt meteen een codenaam (o.a. voor RTMAIL)
   const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
   G()[code] = g; save();
   try { gctx.welkomRtf(profiel.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
-  res.json({ code, token: profiel.token, profiel: pubProfiel(profiel), gezin: pubGezin(g) });
+  res.json({ code, token: profiel.token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
 });
 
 router.post('/gezin/inloggen', (req, res) => {
@@ -33,7 +39,7 @@ router.post('/gezin/inloggen', (req, res) => {
   if (teVaak(res, bucket)) return;
   const g = gezinVan(req, res); if (!g) { misluktePoging(bucket, 12, 5); return; } // raden van gezinscodes afremmen
   goedePoging(bucket);
-  res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(pubProfiel) });
+  res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(p => pubProfiel(p)) });
 });
 
 router.post('/gezin/profiel/kies', async (req, res) => {
@@ -55,8 +61,10 @@ router.get('/gezin/:code/mij', (req, res) => {
   if (!p) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
   const ongelezen = (g.berichten || []).filter(b => berichtVoorMij(b, p.id) && b.van !== p.id && !(b.gelezenDoor || []).includes(p.id)).length;
   const adult = ['beheerder', 'ouder'].includes(p.rol);
+  const magGeboortedataBeheren = p.rol === 'beheerder';
   const wisVerzoek = (g.wisVerzoek && adult) ? { doorNaam: g.wisVerzoek.doorNaam, vanMij: g.wisVerzoek.door === p.id, at: g.wisVerzoek.at } : null;
-  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p), profielen: Object.values(g.profielen).map(pubProfiel), ongelezen, wisVerzoek });
+  res.json({ gezin: pubGezin(g), profiel: pubProfiel(p, magGeboortedataBeheren),
+    profielen: Object.values(g.profielen).map(x => pubProfiel(x, magGeboortedataBeheren)), ongelezen, wisVerzoek });
 });
 
 router.post('/gezin/profiel/maak', async (req, res) => {
@@ -67,12 +75,15 @@ router.post('/gezin/profiel/maak', async (req, res) => {
   if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
   const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
-  const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0;
+  const geboorte = req.body.geboortedatum ? geboorteInfo(req.body.geboortedatum) : null;
+  if (req.body.geboortedatum && !geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
+  if (geboorte) { p.geboren = geboorte.datum; p.groep = groepVanLeeftijd(geboorte.leeftijd); }
+  else { const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0; }
   if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = await hashPin(req.body.pin); }
   ensureCodenaam(p); // codenaam voor het nieuwe profiel (o.a. voor RTMAIL)
   g.profielen[p.id] = p; save();
   try { gctx.welkomRtf(p.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
-  res.json({ profiel: pubProfiel(p) });
+  res.json({ profiel: pubProfiel(p, true) });
 });
 
 router.post('/gezin/profiel/wijzig', async (req, res) => {
@@ -83,7 +94,16 @@ router.post('/gezin/profiel/wijzig', async (req, res) => {
   if (typeof req.body.naam === 'string' && schoon(req.body.naam, 40)) p.naam = schoon(req.body.naam, 40);
   if (req.body.avatar != null) p.avatar = schoonAvatar(req.body.avatar);
   if (req.body.kleur != null) p.kleur = schoonKleur(req.body.kleur);
-  if (req.body.groep != null) { const gg = schoonGroep(req.body.groep); if (gg) p.groep = gg; else delete p.groep; }
+  if (req.body.geboortedatum != null) {
+    if (req.body.geboortedatum === '') { delete p.geboren; }
+    else {
+      const geboorte = geboorteInfo(req.body.geboortedatum);
+      if (!geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
+      p.geboren = geboorte.datum; p.groep = groepVanLeeftijd(geboorte.leeftijd);
+    }
+  }
+  if (req.body.groep != null && !p.geboren) { const gg = schoonGroep(req.body.groep); if (gg) p.groep = gg; else delete p.groep; }
+  actualiseerGroep(p);
   if (ROLLEN.includes(req.body.rol)) {
     if (p.rol === 'beheerder' && req.body.rol !== 'beheerder' && Object.values(g.profielen).filter(x => x.rol === 'beheerder').length <= 1)
       return res.status(400).json({ error: 'Er moet altijd minstens een beheerder blijven.' });
@@ -92,7 +112,7 @@ router.post('/gezin/profiel/wijzig', async (req, res) => {
   if (req.body.pin === '') { delete p.pin; }
   else if (req.body.pin != null) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' }); p.pin = await hashPin(req.body.pin); }
   save();
-  res.json({ profiel: pubProfiel(p) });
+  res.json({ profiel: pubProfiel(p, true) });
 });
 
 router.post('/gezin/profiel/verwijder', (req, res) => {

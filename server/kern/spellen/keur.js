@@ -112,6 +112,12 @@ function keurArcade(naam, s) {
 function keurPotje(naam, s) {
   if (s.wereld !== 'rtg' && s.wereld !== 'rtf') fout(naam, `heeft wereld '${s.wereld}'; alleen 'rtg' of 'rtf'.`);
   const uit = { naam: s.naam, max: s.max, wereld: s.wereld };
+  if (s.werelden !== undefined) {
+    if (!Array.isArray(s.werelden) || !s.werelden.length || s.werelden.some(w => w !== 'rtg' && w !== 'rtf'))
+      fout(naam, `heeft werelden ${JSON.stringify(s.werelden)}; een niet-lege lijst met alleen 'rtg' en/of 'rtf'.`);
+    if (!s.werelden.includes(s.wereld)) fout(naam, '`wereld` moet ook in `werelden` staan.');
+    uit.werelden = [...new Set(s.werelden)];
+  }
   if (s.min) uit.min = s.min;
   if (s.volwassen) uit.volwassen = true;
   if (s.buitenBeurt) uit.buitenBeurt = s.buitenBeurt;

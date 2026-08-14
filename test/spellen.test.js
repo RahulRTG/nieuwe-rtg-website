@@ -635,7 +635,18 @@ test('elke app zijn eigen spelgroep: RTG start geen dammen, RTF start geen schak
   assert.ok(/RTG/.test((await json(r2)).error));
   // ook de random wachtrij volgt de eigen spelgroep
   assert.equal((await raw('/member/spel/random', { soort: 'rummi' }, a.tok)).status, 400);
-  assert.equal((await rtfSpel('random', { soort: 'magnaat' }, A)).status, 400);
+  assert.equal((await rtfSpel('random', { soort: 'schaak' }, A)).status, 400);
+});
+
+test('Magnaat is een gedeelde educatieve simulatie: ook RTF mag een potje starten', async () => {
+  const { A, B, bCn } = await gezinSpelers();
+  const nieuw = await rtfSpel('nieuw', { soort: 'magnaat', grootte: 2, codenamen: [bCn] }, A);
+  assert.equal(nieuw.status, 200);
+  const potje = await json(nieuw);
+  assert.equal((await rtfSpel('antwoord', { id: potje.id, akkoord: true }, B)).status, 200);
+  const stand = await json(await rtfSpel('staat', { id: potje.id }, A));
+  assert.equal(stand.potje.soort, 'magnaat');
+  assert.equal(stand.potje.staat.geld[0], 1500, 'de simulatie gebruikt alleen spelgeld');
 });
 
 /* DE PROGRESSIEGRENS. Alles wat een prestatie buiten het potje bewaart bestaat

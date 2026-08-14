@@ -88,7 +88,8 @@
        De inline `flex` van het slepen gaat hier ook weg, anders draagt een blad
        zijn desktopbreedte mee naar een smal venster. */
     function verdeler(){w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,o.breed())}
-    function haakScroll(p){try{var doc=p.frame.contentDocument,st=doc.createElement('style');st.textContent='#rahulFab,.rahulfab,.rahulsheet,.mgz-blok,.mgz-ruimte,.amn-knop,[aria-label="Cookiemelding"]{display:none!important}body{padding-bottom:0!important}';doc.head.appendChild(st);p.frame.contentWindow.addEventListener('scroll',klein,{passive:true});var sc=doc.querySelectorAll('[class*=content],main');for(var i=0;i<sc.length;i++)sc[i].addEventListener('scroll',klein,{passive:true})}catch(e){}}
+    // #rtg-cookie op ID: het aria-label is vertaald, en stond in het Engels dubbel
+    function haakScroll(p){try{var doc=p.frame.contentDocument,st=doc.createElement('style');st.textContent='#rahulFab,.rahulfab,.rahulsheet,.mgz-blok,.mgz-ruimte,.amn-knop,#rtg-cookie{display:none!important}body{padding-bottom:0!important}';doc.head.appendChild(st);p.frame.contentWindow.addEventListener('scroll',klein,{passive:true});var sc=doc.querySelectorAll('[class*=content],main');for(var i=0;i<sc.length;i++)sc[i].addEventListener('scroll',klein,{passive:true})}catch(e){}}
     function klein(){if(consoleLaag)consoleLaag.klein()}
 
     return{zet:zet,toon:toon,openNaast:openNaast,sluit:sluit,select:select,sync:sync,sloop:sloop,wis:wis,stand:function(){return stand},

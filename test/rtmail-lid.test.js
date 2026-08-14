@@ -60,6 +60,20 @@ test('een bericht lezen zet de teller op nul', async () => {
   assert.equal(na.berichten[0].gelezen, true);
 });
 
+test('Smart Action Dock maakt vanuit een bericht een agenda-item en project', async () => {
+  const inbox = await json(await api('/api/member/rtmail/inbox', {}, token));
+  const id = inbox.berichten[0].id;
+  const ag = await api('/api/member/rtmail/workflow', { id, actie: 'agenda', datum: '2027-01-15' }, token);
+  assert.equal(ag.status, 200);
+  const agenda = await json(await api('/api/agenda/mijn-lijst', {}, token));
+  assert.ok(agenda.items.some(x => x.datum === '2027-01-15'));
+  const pr = await api('/api/member/rtmail/workflow', { id, actie: 'project' }, token);
+  assert.equal(pr.status, 200);
+  const na = await json(await api('/api/member/rtmail/inbox', {}, token));
+  assert.ok(na.berichten[0].workflow.some(x => x.soort === 'agenda'));
+  assert.ok(na.berichten[0].workflow.some(x => x.soort === 'project'));
+});
+
 test('zonder inlog blijft het postvak dicht', async () => {
   const r = await fetch(BASE + '/api/member/rtmail/inbox', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(r.status, 401);

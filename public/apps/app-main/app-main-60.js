@@ -41,5 +41,8 @@
     } catch(e){ toast(e.message); }
   });
 
-  restoreSession();
+  // In Magnaat start de echte OS-schil direct op een synthetische Business
+  // persona. Normaal blijft de bestaande sessieherstelroute ongewijzigd.
+  if (magnaatProef) login(vastePas === 'lifestyle' ? 'lifestyle' : vastePas === 'rtg' ? 'rtg' : 'business');
+  else restoreSession();
 })();

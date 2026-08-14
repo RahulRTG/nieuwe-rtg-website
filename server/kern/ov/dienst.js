@@ -110,13 +110,22 @@ module.exports = (ctx) => {
     ensureOv();
     const vandaag = nu().slice(0, 10);
     const ritten = db.data.ovRitten.filter(r => r.code === s.code && String(r.in.at).slice(0, 10) === vandaag);
+    const operaties = (db.data.ovOperaties || []).filter(o => o.status === 'gereed-voor-boeken');
+    const operatieBeeld = {
+      actief: operaties.length,
+      segmenten: operaties.reduce((n, o) => n + (o.segmenten || []).length, 0),
+      personen: operaties.reduce((n, o) => n + (o.personen || 0), 0),
+      // bewust alleen operationele totalen: geen naam, route, rollen of hoofdgast
+      modi: Object.entries(operaties.flatMap(o => o.segmenten || []).reduce((a, x) => { a[x.modus] = (a[x.modus] || 0) + 1; return a; }, {}))
+        .map(([modus, aantal]) => ({ modus, aantal }))
+    };
     return { status: 200,
       voertuigen: db.data.ovVoertuigen.filter(v => v.code === s.code && versVoertuig(v))
         .map(v => ({ id: v.id, naam: v.naam, lijnId: v.lijnId, soort: v.soort, lat: v.lat, lng: v.lng, door: v.door })),
       reizigersVandaag: ritten.length, aanBoord: ritten.filter(r => r.status === 'in').length,
       omzetVandaag: ritten.reduce((n, r) => n + (r.prijs || 0), 0),
       lijnen: (s.lijnen || []).map(l => ({ id: l.id, naam: l.naam, soort: l.soort, icoon: SOORTEN[l.soort],
-        reizigers: ritten.filter(r => r.lijnId === l.id).length })) };
+        reizigers: ritten.filter(r => r.lijnId === l.id).length })), operaties: operatieBeeld };
   }
 
   return { ovDienst: dienst, ovPos: pos, ovCodeIn: codeIn, ovStand: stand,

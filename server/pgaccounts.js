@@ -24,7 +24,11 @@ const BLOK_START = 1000000; // reeks begint hoog, zodat losse seed-id's (1,2,3) 
 const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'codename',
   'enc_name', 'enc_email', 'enc_phone', 'phone_hash', 'created_at', 'verified', 'id_doc',
   'member_state', 'email_verified', 'reset_hash', 'reset_expires'];
-const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func'];
+// Houd de personeelsidentiteit ook in de gedeelde waarheid. Zonder member_id
+// werkte "een account voor alles" alleen op de lokale SQLite-cache en raakte de
+// koppeling kwijt zodra een volgende app-instance het verzoek afhandelde.
+const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func',
+  'member_id', 'member_tier'];
 
 function maakPgAccounts({ url, log }) {
   const { Pool } = require('./pgwire');
@@ -44,9 +48,15 @@ function maakPgAccounts({ url, log }) {
     await pool.query(`CREATE TABLE IF NOT EXISTS supplier_staff (
       id BIGINT PRIMARY KEY, supplier_code TEXT NOT NULL, name TEXT NOT NULL,
       pin_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'staff',
-      active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, func TEXT
+      active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, func TEXT,
+      member_id BIGINT, member_tier TEXT
     )`);
+    // Bestaande installaties veilig vooruit migreren; IF NOT EXISTS maakt dit
+    // herhaalbaar bij iedere start en vraagt geen migratiepakket.
+    await pool.query('ALTER TABLE supplier_staff ADD COLUMN IF NOT EXISTS member_id BIGINT');
+    await pool.query('ALTER TABLE supplier_staff ADD COLUMN IF NOT EXISTS member_tier TEXT');
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_code ON supplier_staff(supplier_code)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_member ON supplier_staff(member_id)`);
     await pool.query(`CREATE SEQUENCE IF NOT EXISTS rtg_id_seq INCREMENT BY ${BLOK} START ${BLOK_START} MINVALUE ${BLOK_START}`);
   }
 

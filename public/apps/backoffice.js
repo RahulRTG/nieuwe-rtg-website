@@ -441,6 +441,37 @@
       try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
     }));
 
+    // Partner-lifecycle: de boardroom kan toegang stoppen zonder de contract-,
+    // betaal- en auditgeschiedenis van het bedrijf te verwijderen.
+    const partners = (state.suppliers || []).filter(x => past(x.name, x.code, x.type, x.city, x.partnerStatus));
+    const partnerEl = $('#partnerList');
+    partnerEl.innerHTML = partners.length ? partners.map((x, i) => {
+      const status = x.partnerStatus || 'actief';
+      const kleur = status === 'actief' ? 'klaar' : status === 'geschorst' ? 'bereiding' : 'nieuw';
+      let knoppen = '';
+      if (status === 'actief') knoppen = '<button class="vbtn" data-pstatus="geschorst" data-pidx="'+i+'">Schors</button>'+
+        '<button class="vbtn no" data-pstatus="beeindigd" data-pidx="'+i+'">Beëindig</button>';
+      else if (status === 'geschorst') knoppen = '<button class="vbtn ok" data-pstatus="actief" data-pidx="'+i+'">Heractiveer</button>'+
+        '<button class="vbtn no" data-pstatus="beeindigd" data-pidx="'+i+'">Beëindig</button>';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.code)+'</span></div>'+
+        '<div class="sub">'+escHtml(x.type||'')+(x.city?' · '+escHtml(x.city):'')+' · '+(x.online?'online':'offline')+(x.partnerStatusAt?' · '+timeAgo(x.partnerStatusAt):'')+'</div></div>'+
+        '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;"><span class="pill '+kleur+'">'+escHtml(status)+'</span>'+knoppen+'</div></div></div>';
+    }).join('') : '<div class="empty">Geen partners gevonden.</div>';
+    partnerEl.querySelectorAll('[data-pstatus]').forEach(b => b.addEventListener('click', async () => {
+      const partner = partners[Number(b.dataset.pidx)];
+      if (!partner) return;
+      const status = b.dataset.pstatus;
+      if (status === 'beeindigd' && !confirm('Partnerschap met '+partner.name+' definitief beëindigen? De historie blijft bewaard, maar toegang kan niet stil worden heropend.')) return;
+      let reden = '';
+      if (status !== 'actief') {
+        reden = prompt(status === 'geschorst' ? 'Reden voor schorsing:' : 'Reden voor beëindiging:') || '';
+        if (!reden.trim()) return;
+      }
+      b.disabled = true;
+      try { await call('/office/partner/status', { code: partner.code, status, reden }); await refresh(); }
+      catch(e){ alert(e.message); b.disabled = false; }
+    }));
+
     // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
     // nadat RTG hem hier goedkeurt
     const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));

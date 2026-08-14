@@ -45,6 +45,8 @@
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
+  .opdracht{background:linear-gradient(145deg,rgba(201,162,75,.16),var(--card));border-color:rgba(201,162,75,.38);}
+  .veilig{display:flex;gap:.5rem;align-items:flex-start;margin:.5rem 0;color:var(--soft);font-size:.72rem;line-height:1.4}.veilig:before{content:'\2713';color:var(--groen)}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -77,12 +79,16 @@
       <div class="kaart">
         <p class="stil">Beheert u de zaak? In de routetekenaar zet u met een paar tikken uw lijnen en haltes
           op de kaart; leden zien ze meteen.</p>
-        <div class="rij"><a class="knop" href="/apps/ovroutes.html" style="text-decoration:none;display:inline-block;">Routes tekenen</a></div>
+        <div class="rij"><a class="knop" href="/apps/ovroutes.html" style="text-decoration:none;display:inline-block;">Routes tekenen</a><a class="knop" href="/apps/ovcontrol.html" style="text-decoration:none;display:inline-block;">Control Tower</a></div>
       </div>
     </div>
 
     <!-- de lopende dienst -->
     <div id="loopt" class="weg">
+      <div class="kaart opdracht"><h2 style="margin:0 0 .5rem;">Veilige automatische dienst</h2>
+        <div class="veilig">GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</div>
+        <div class="veilig">Geld, identiteit en uitzonderingen worden nooit automatisch beslist.</div>
+        <div class="veilig">Stoppen blijft altijd direct beschikbaar.</div></div>
       <div class="kaart">
         <div class="tellers">
           <span><b id="tAanBoord">0</b><span>aan boord</span></span>

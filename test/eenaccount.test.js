@@ -26,9 +26,12 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Sleutellid', email: 'sl' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
   const roster = await api('/api/supplier/roster', { code: 'KIKUNOI' });
-  const staff = (roster.body.staff || []).find(s => s.role !== 'manager') || roster.body.staff[0];
-  staffId = staff.id; staffNaam = staff.name;
-  staffPin = staff.role === 'manager' ? '1234' : '5678';
+  const manager = (roster.body.staff || []).find(s => s.role === 'manager');
+  const managerLogin = await api('/api/supplier/login', { code: 'KIKUNOI', staffId: manager.id, pin: '1234' });
+  // Een oud, nog niet aan een RTG-account gekoppeld record: precies de veilige
+  // eenmalige migratie waarvoor /account/koppel blijft bestaan.
+  const legacy = await api('/api/supplier/staff/add', { name: 'Legacy Medewerker', role: 'staff', func: 'Balie' }, managerLogin.body.token);
+  staffId = legacy.body.staff.id; staffNaam = legacy.body.staff.name; staffPin = legacy.body.pin;
   assert.ok(lid && staffId, 'lid geregistreerd en een personeelslid gevonden');
 });
 test.after(() => {
@@ -50,6 +53,14 @@ test('2. personeel koppelen bewijst eerst de eigen PIN; daarna staat de rol op d
   const goed = await api('/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId, pin: staffPin }, lid);
   assert.equal(goed.status, 200, 'met de juiste PIN wel: ' + JSON.stringify(goed.body).slice(0, 120));
   assert.ok(goed.body.rollen.some(r => r.rol === 'personeel' && r.code === 'KIKUNOI' && r.naam === staffNaam));
+});
+
+test('2b. dezelfde personeelsplek kan niet door een tweede RTG-account worden overgenomen', async () => {
+  const u = Date.now().toString().slice(-8);
+  const ander = (await api('/api/auth/register', { name: 'Andere Persoon', email: 'ander' + u + '@x.nl', phone: '07' + u,
+    password: 'geheim123', geboortedatum: '1991-05-05', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const claim = await api('/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId, pin: staffPin }, ander);
+  assert.equal(claim.status, 403, 'een juiste PIN overschrijft de bestaande RTG-identiteit niet');
 });
 
 test('3. met het ene account de PDA in: dezelfde sessie als de losse personeelslogin', async () => {

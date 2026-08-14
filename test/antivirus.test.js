@@ -132,6 +132,14 @@ test('een nieuwe handtekening toevoegen werkt (updatebare definities)', () => {
   assert.equal(r.verdict, 'besmet');
 });
 
+test('te grote data-URL wordt vóór base64-decodering hard geweigerd', () => {
+  const a = av();
+  const teGroot = 'data:image/png;base64,' + 'A'.repeat(Math.ceil(16 * 1024 * 1024 * 4 / 3) + 300);
+  const r = a.scanDataUrl(teGroot, { naam: 'reus.png' });
+  assert.equal(r.verdict, 'besmet');
+  assert.ok(r.redenen.some(x => /16 MB/.test(x)));
+});
+
 // --- Multi-laag / obfuscatie: gzip, deflate en geneste base64 afpellen ---
 
 const zlib = require('zlib');

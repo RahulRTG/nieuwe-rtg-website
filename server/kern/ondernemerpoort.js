@@ -60,7 +60,10 @@ module.exports = ({ salonProfielCompleet }) => {
 
   // Online-staat: undefined = aan (bestaande zaken), false = nog dicht. Een zaak
   // is pas echt online als ook de Salon-pagina compleet is (anders geen etalage).
-  function zaakOnline(s) { return s.online !== false && salonProfielCompleet(s); }
+  function zaakOnline(s) {
+    return s.partnerStatus !== 'geschorst' && s.partnerStatus !== 'beeindigd' &&
+      s.online !== false && salonProfielCompleet(s);
+  }
 
   // Volledig beeld voor de app: de stappen, de rondleidingen en de online-staat.
   function poortBeeld(s) {

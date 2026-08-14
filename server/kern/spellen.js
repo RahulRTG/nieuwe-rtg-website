@@ -1,4 +1,4 @@
-/* Kern-module "spellen": DE BEDRADING van het spelplatform.
+/* Kern "spellen": DE BEDRADING van het spelplatform.
 
    Dit bestand hangt de deellagen aan elkaar en bevat verder niets: elk spel
    beschrijft zichzelf in ./spellen/ en het register bouwt daar de tabellen uit;
@@ -14,7 +14,7 @@
    (maakt geen vriendschap), via het door de server bevestigde klasgenoten-pad,
    of via de random wachtrij per spel en groepsgrootte. Beurten gaan via polling
    plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit, comm }) => {
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, magnaatLeren, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -65,7 +65,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
-  const spelCtx = { db, save, crypto, schud, beurtDoor, codenaamVan, nudge };
+  const spelCtx = { db, save, crypto, schud, beurtDoor, codenaamVan, nudge, magnaatLeren };
   const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, VARIANT, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });

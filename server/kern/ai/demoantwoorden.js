@@ -9,14 +9,14 @@
    regel 13), wat de natuurlijke naad alleen maar bevestigde. */
 'use strict';
 
-/* Demo-antwoorden wanneer er geen Claude API-key is.
+/* Regelgestuurde werkantwoorden wanneer er geen AI-provider is.
 
    HET REGISTER HOORT BIJ DE PAS, OOK HIER.
 
    AI_TONE in kern/ai.js is er stellig over: de RTG Pass tutoyeert (je/jij),
    Lifestyle en Business spreken met u. Die regel zat alleen in de SYSTEM
    PROMPT, en die geldt uitsluitend als er een API-sleutel is. Zonder sleutel
-   -- elke demo, en de hele toetssuite -- kwamen deze vaste antwoorden eruit,
+   -- de handmatige stand en de hele toetssuite -- kwamen deze vaste antwoorden eruit,
    en die stonden allemaal in de u-vorm. Een lid met een RTG Pass werd dus
    vousvoyeerd door de app die hem juist zou tutoyeren.
 
@@ -35,7 +35,7 @@ function cannedAnswer(q, tier) {
      maar", "regel het") en het beweerde dat de paklijst klaarstond en het
      dagplan was INGEPLAND, tot en met een boot van 10:00 en een tafel om
      21:00. Er wordt hier niets geboekt: dit is het vaste antwoord voor een
-     installatie zonder API-sleutel, en dat is elke demo en de hele suite.
+     installatie zonder API-sleutel, en dat is de handmatige stand en de suite.
 
      De merkregel is dat de AI nooit bevestigt dat iets geregeld is. De prompt
      draagt die regel sinds de vorige ronde, en juist dit antwoord ontsnapte:
@@ -61,8 +61,8 @@ function cannedAnswer(q, tier) {
   if (l.includes('restaurant') || l.includes('eten') || l.includes('diner'))
     return kies('Uw tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal of een adres in Marina Botafoch, beide via ons netwerk tegen normale prijs.',
       'Je tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wil je een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal of een adres in Marina Botafoch, beide via ons netwerk tegen normale prijs.');
-  return kies('Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor uw reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.',
-      'Daar zoek ik het fijne van uit en ik kom er vandaag nog op terug. Voor je reis naar Ibiza kan ik alvast helpen met de paklijst, documenten, het weer of een dagplanning, zeg het maar.');
+  return kies('De vrije AI-verrijking is nu niet actief. Alle onderdelen blijven beschikbaar via de schermen en vaste opdrachten. Ik kan u hier direct helpen met paklijsten, documenten, planning en aanvragen; voor een andere vraag kiest u het betreffende onderdeel in het menu.',
+      'De vrije AI-verrijking is nu niet actief. Alle onderdelen blijven beschikbaar via de schermen en vaste opdrachten. Ik kan je hier direct helpen met paklijsten, documenten, planning en aanvragen; voor een andere vraag kies je het betreffende onderdeel in het menu.');
 }
 
 module.exports = { cannedAnswer };

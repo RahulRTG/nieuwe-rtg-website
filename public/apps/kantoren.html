@@ -200,7 +200,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
-  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/command.html" style="font-size:.8rem;color:var(--gold);">RTG Command</a><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
+  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/werkruimte.html?gebied=kantoor" style="font-size:.8rem;color:var(--gold);">RTG Work OS</a><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
 </div></header>
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
@@ -409,6 +409,12 @@
 
     <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
+
+    <h3 class="sec">Magnaat Product Lab</h3>
+    <div class="kaart lijst">
+      <p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;margin:0 0 .7rem;">Magnaat herkent uitsluitend anonieme patronen in spelkeuzes en maakt daar controleerbare verbeterproeven van. Het spel wijzigt nooit zelf code, rechten, prijzen of productie. De boardroom beslist wat naar een test mag.</p>
+      <div id="bMagnaatLeren"><div class="leeg">Verbeterpatronen laden…</div></div>
+    </div>
 
     <div class="kaart" id="bRahulHuis" style="margin-top:.8rem;">
       <h4 style="margin:0 0 .4rem;">Rahul kijkt over het huis</h4>
@@ -3224,6 +3230,7 @@ async function openBoard(){
     '<span style="color:var(--soft);font-size:.72rem;">'+new Date(a.at).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span></div>').join('')
     : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
+  laadMagnaatLeren();
   laadAidata();
   laadSalonBelang();
   laadZelfzorg($('#bZelfzorg'));
@@ -3330,6 +3337,33 @@ async function openBoard(){
     try { const r = await api('boardroom/schakel', { functie: c.dataset.fx, doelgroep: c.dataset.dg, aan: naarAan }); c.dataset.aan = String(naarAan); c.classList.toggle('uit', !naarAan); meldMetKoppels(r, 'Voor deze doelgroep ' + (naarAan ? 'aan' : 'uit') + ' gezet.'); }
     catch (e) { meld(e.message); }
   }));
+}
+async function laadMagnaatLeren(){
+  const doos=$('#bMagnaatLeren');
+  try{
+    const d=await api('boardroom/magnaat/leren'),ks=d.kandidaten||[];
+    const kop='<div class="stil" style="font-size:.76rem;color:var(--soft);margin-bottom:.65rem;">'+
+      esc(String(d.runs||0))+' afgeronde runs · '+esc(String(d.patronen||0))+' patronen · menselijk akkoord verplicht</div>';
+    if(!ks.length){doos.innerHTML=kop+'<div class="leeg">Nog geen sterk genoeg patroon. Magnaat blijft veilig leren tijdens afgeronde runs.</div>';return;}
+    doos.innerHTML=kop+ks.map(k=>{
+      const b=k.bewijs||{},t=k.test||{},routes=Object.entries(b.routes||{}).map(([naam,aantal])=>naam+' '+aantal+'×').join(' · ');
+      const bewijs=[b.waarnemingen!=null?b.waarnemingen+' waarneming(en)':'',b.pogingen!=null?b.pogingen+' pogingen':'',b.foutpercentage!=null?b.foutpercentage+'% frictie':'',routes].filter(Boolean).join(' · ');
+      const knoppen=k.status==='afgewezen'?'' : '<div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.65rem;">'+
+        '<button class="knop" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="naar-test">Naar veilige test</button>'+
+        '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="terug-naar-ontwerp">Terug naar ontwerp</button>'+
+        '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="afwijzen">Afwijzen</button></div>';
+      return '<div class="voorstel" style="display:block;margin-bottom:.65rem;">'+
+        '<div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;"><span class="kamerlabel">'+esc(k.soort||'patroon')+'</span><span class="stil" style="font-size:.7rem;color:var(--gold);">'+esc(k.status||'kandidaat')+'</span></div>'+
+        '<b style="display:block;margin:.45rem 0 .25rem;">'+esc(k.titel||k.id)+'</b>'+
+        (bewijs?'<div class="stil" style="font-size:.76rem;color:var(--soft);">Bewijs: '+esc(bewijs)+'</div>':'')+
+        (t.gegeven?'<div style="font-size:.8rem;line-height:1.55;margin-top:.45rem;"><b>Proef:</b> '+esc(t.gegeven)+' → '+esc(t.dan||'controleer de uitkomst')+'</div>':'')+
+        '<div class="stil" style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">Nooit productie-write · geen persoonsgegevens · mens beslist</div>'+knoppen+'</div>';
+    }).join('');
+    doos.querySelectorAll('[data-ml-id]').forEach(b=>b.addEventListener('click',async()=>{
+      try{const r=await api('boardroom/magnaat/besluit',{id:b.dataset.mlId,keuze:b.dataset.mlKeuze});meld(r.let||'Boardroombesluit bewaard.');laadMagnaatLeren();}
+      catch(e){meld(e.message)}
+    }));
+  }catch(e){doos.innerHTML='<div class="leeg">'+esc(e.message)+'</div>'}
 }
 function tekenVoorstellen(v){
   $('#bVoorstellen').innerHTML = (v.voorstellen || []).map(p =>

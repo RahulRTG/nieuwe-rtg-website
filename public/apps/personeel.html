@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
+<script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
 <title>RTG Personeel, uw dienst en taken</title>
@@ -50,6 +51,19 @@
   #gate .badge{align-self:center;background:#7F1634;border:1px solid #7F1634;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
   .gate-klok{margin-top:1.1rem;font-size:3.9rem;font-weight:200;line-height:1;letter-spacing:0.01em;font-variant-numeric:tabular-nums;color:var(--txt);}
   .gate-datum{font-size:0.82rem;color:var(--soft);text-transform:capitalize;}
+  /* In een Work OS-surface is de hoogte kleiner dan op een losse pagina. Het
+     verticaal centreren van de volledige poort duwde daardoor de bovenkant van
+     de klok buiten beeld. De originele ring blijft gelijk; alleen haar maat en
+     gereserveerde ruimte volgen hier het paneel. */
+  html[data-rtg-oppervlak="1"] #shell{height:100dvh;min-height:0;}
+  html[data-rtg-oppervlak="1"] #gate{justify-content:flex-start;overflow-y:auto;padding:1.35rem 1.75rem 2rem;}
+  html[data-rtg-oppervlak="1"] #gate .gate-top{flex:none;}
+  /* De Work OS-tab noemt het onderdeel al. De losse badge valt daarom weg;
+     de signatuur ín de originele klok blijft de enige merkplek. */
+  html[data-rtg-oppervlak="1"] #gate .badge{display:none;}
+  html[data-rtg-oppervlak="1"] #gate .gate-klok{--rtg-klok-maat:min(12.75rem,45vh,66vw);margin-top:.2rem;}
+  html[data-rtg-oppervlak="1"] #gateStep{margin-top:.65rem;}
+  html[data-rtg-oppervlak="1"] #gate .lform{margin-top:1.3rem;}
   .lform{margin-top:1.9rem;display:flex;flex-direction:column;gap:0.7rem;}
   .lform input{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.9rem 1rem;color:var(--txt);font-size:0.95rem;outline:none;color-scheme:dark;}
   .lform input:focus{border-color:var(--burgundy);}

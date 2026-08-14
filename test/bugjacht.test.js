@@ -563,16 +563,18 @@ test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
   assert.ok(!(met.fouten || []).some(f => /STRIPE/.test(f)), 'met sleutel en webhook-secret is er niets aan de hand');
 });
 
-test('productie zonder echte AI en mail start niet als halve demo', () => {
+test('productie draait zonder AI volledig handmatig, maar niet zonder echte mail', () => {
   const { valideer } = require('../server/config');
   const basis = { NODE_ENV:'production', RTG_ENC_KEY:'x'.repeat(64), RTG_VAULT_KEY:'a'.repeat(64),
     RTG_SECRET_KEY:'b'.repeat(64), RTG_OWNER_EMAIL:'eigenaar@echt.nl', OFFICE_CODE:'ABCDEFGHIJKL',
     STRIPE_SECRET_KEY:'sk_live_x', STRIPE_WEBHOOK_SECRET:'whsec_x' };
   const zonder = valideer(basis);
-  assert.ok(zonder.fouten.some(f=>/AI-provider/.test(f)));
+  assert.ok(!zonder.fouten.some(f=>/AI-provider/.test(f)), 'AI is geen productiestart-afhankelijkheid');
+  assert.ok(zonder.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)), 'de handmatige stand is zichtbaar');
   assert.ok(zonder.fouten.some(f=>/mailprovider/.test(f)));
   const echt = valideer(Object.assign({},basis,{OPENAI_API_KEY:'provider-key',SMTP_URL:'smtp://mail.test:2525'}));
   assert.ok(!echt.fouten.some(f=>/AI-provider|mailprovider/.test(f)));
+  assert.ok(!echt.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)));
 });
 
 test('een betaal-webhook voor een onbekende betaling verandert niets en valt niet om', async () => {

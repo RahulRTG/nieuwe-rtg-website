@@ -108,7 +108,10 @@ Zet een Anthropic API-key in de omgeving en de persoonlijke AI draait op Claude:
 ANTHROPIC_API_KEY=sk-ant-... npm start
 ```
 
-Zonder key geeft de AI vaste demo-antwoorden.
+Zonder key start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
+controles en regelgestuurde opdrachten blijven werken; alleen vrije
+modelverrijking valt weg. Reacties melden dit eerlijk en doen nooit alsof AI
+of een externe uitvoerder iets heeft gedaan.
 
 Met key krijgt Rahul bovendien **het AI-stuur** (`server/kern/stuur.js`): in de
 drie assistenten (leden-app, partner-app, personeels-PDA) voert hij vrije
@@ -4050,7 +4053,7 @@ Vijf lagen die samen bepalen hoe Rahul klinkt.
 
 **Geen AI-taal** (`server/kern/rahul/taal.js`). Regels in de prompt, PLUS een
 schrobber over elk antwoord dat de deur uitgaat, inclusief de vaste
-demo-antwoorden zonder API-sleutel (die komen niet langs een model, dus een
+regelantwoorden zonder API-sleutel (die komen niet langs een model, dus een
 prompt helpt daar niet). Weg: "Natuurlijk!", "Als AI-assistent kan ik...",
 "Ik hoop dat dit helpt", "Laat het me weten als je nog vragen hebt". De
 schrobber is bewust voorzichtig: liever een cliche gemist dan een zin

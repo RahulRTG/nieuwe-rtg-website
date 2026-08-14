@@ -36,13 +36,16 @@ Object.assign(kern, { tafelticket: require('../kern/tafelticket')({ crypto, data
 // De dynamische, gesloten RTG-code: HMAC-ondertekende, kort houdbare tokens die
 // alleen ons systeem maakt en verifieert (dyncode.key, 0600, in .gitignore).
 Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DATA_DIR }) });
+/* Magnaat leert alleen van anonieme tellingen. De gedeelde leerkring staat
+   naast het spelplatform zodat ook de boardroom exact dezelfde kandidaten ziet. */
+kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, crypto });
 /* Spellen (kern/spellen.js): het spelplatform op de vriendenlaag; RTF- en
    RTG-leden spelen tegen elkaar. */
 Object.assign(kern, require('../kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
   // Rahul als spelmaatje: praat met een echte sleutel, valt anders terug op vaste tips
-  anthropic,
+  anthropic, magnaatLeren: kern.magnaatLeren,
   // wie er NU is: de levende lijst van open live-verbindingen uit beide apps,
   // plus de poort "spelen uitgezet" (zie kern/spellen/presence.js)
   sseClients, lidBoardUit,

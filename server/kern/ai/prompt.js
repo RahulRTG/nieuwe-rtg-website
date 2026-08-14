@@ -1,5 +1,5 @@
 /* AI (deelmodule): de promptlaag: de system prompt per pas (toon,
-   toegangs- en AI-regels, dagcontext) en de vaste demo-antwoorden zonder
+   toegangs- en AI-regels, dagcontext) en de vaste regelantwoorden zonder
    API-key. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/ai.js. Het vaste karakterportret van Rahul (statische tekst) woont in
    ./karakter; hier wordt het aangevuld met het register en de dagcontext. */

@@ -1,5 +1,5 @@
 /* De persoonlijke AI-laag: de systeemprompt per pas (de AI heet Rahul, de enige
-   AI-hulp in het hele systeem), demo-antwoorden zonder API-sleutel, het echte
+   AI-hulp in het hele systeem), regelantwoorden zonder API-sleutel, het echte
    Claude-antwoord, en de doorlopende conversatie in de app. RTG wordt door de AI
    beantwoord; Lifestyle en Business gaan naar de menselijke concierge.
 
@@ -18,18 +18,18 @@ const AI_TONE = {
 const { naamEn } = require('../talen');
 const { dagContext } = require('./context');
 // Geen AI-taal: de schrobber gaat over alles wat Rahul zegt, ook over de vaste
-// demo-antwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
+// regelantwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
 const { schrob } = require('./rahul/taal');
 
 function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, stemmingVoor, geloofRegel }) {
-  /* De promptlaag (system prompt + demo-antwoorden) draait als submodule
+  /* De promptlaag (system prompt + regelantwoorden) draait als submodule
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
     AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel };
   const { aiSystemPrompt, cannedAnswer } = require('./ai/prompt')(ctx);
 
   /* Geeft { text, lang }: met AI antwoordt Rahul direct in de taal van het
-     lid; zonder AI proberen we het demo-antwoord te vertalen en anders blijft
+     lid; zonder AI proberen we het regelantwoord te vertalen en anders blijft
      het Nederlands, eerlijk gelabeld met de echte taal van de tekst. */
   async function generateAiReply(tier, convo, lang, key) {
     lang = lang || 'nl';

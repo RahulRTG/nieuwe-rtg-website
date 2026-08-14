@@ -16,7 +16,9 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const q = String(req.body.q || '').trim().slice(0, 300);
   if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
   const ql = q.toLowerCase();
-  const A = (reply, did) => res.json({ reply, did: !!did });
+  const A = (reply, did) => res.json({ reply, did: !!did,
+    aiBeschikbaar: !!(kern.anthropic && kern.anthropic.messages),
+    modus: 'workflow' });
 
   // het persoonlijke geheugen (dezelfde motor als Rahul van de leden):
   // onthouden, opvragen en wissen, per persoon binnen deze zaak

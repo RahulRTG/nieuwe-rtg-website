@@ -77,7 +77,7 @@ centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 - `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
 - Starten: `npm start` (gebruikt `--experimental-sqlite`, vereist Node 22+) → http://localhost:3000
-- Echte AI: `ANTHROPIC_API_KEY` als environment variable; zonder key vaste demo-antwoorden. De key nooit in de repo of client-side JS zetten.
+- AI is optioneel: met een provider-key komt vrije verrijking erbij; zonder key blijven alle kernprocessen in handmatige werkmodus beschikbaar. De key nooit in de repo of client-side JS zetten.
 - `server/data/db.json` verwijderen = terug naar de seed-data. Sleutels (`secret.key`, `vault.key`) worden automatisch aangemaakt.
 
 ## Geschiedenis

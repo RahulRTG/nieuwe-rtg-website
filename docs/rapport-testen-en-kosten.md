@@ -190,8 +190,9 @@ app-nodes al een heel groot dagverkeer; de database wordt de echte kostenpost.
 
 ### De AI-kosten (de echte variabele)
 
-Zonder `ANTHROPIC_API_KEY` draait alles op vaste demo-antwoorden en kost de
-AI niets. Met echte AI betaal je per gebruik, niet per maand. Rekenvoorbeeld
+Zonder AI-provider draait RTG in handmatige werkmodus: kernprocessen en lokale,
+regelgestuurde hulp blijven beschikbaar en externe AI kost niets. Met echte AI
+betaal je per gebruik, niet per maand. Rekenvoorbeeld
 met deze aannames: een gemiddeld gesprek van ~8 beurten, per beurt ~2.500
 tokens in (systeem-prompt plus context) en ~300 tokens uit.
 

@@ -57,7 +57,18 @@ module.exports = (kctx) => {
         return { status: 401, error: 'Onjuiste PIN.' };
       }
       pinSlot.goed(doel);
-      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: staff.id, naam: staff.name, staffRole: staff.role, at: nu() } };
+      /* De PIN bewijst de personeelsplek; de ingelogde accountsleutel bepaalt
+         aan WELK mens die plek voortaan vastzit. Dit is een eenmalige,
+         atomaire claim: een tweede account kan hem ook met de juiste PIN niet
+         overnemen. */
+      const sleutel = /^user-(\d+)$/.exec(String(key || ''));
+      if (!sleutel) return { status: 403, error: 'Deze personeelsplek kan alleen aan een persoonlijk RTG-account worden gekoppeld.' };
+      const lid = Number(sleutel[1]);
+      const gekoppeld = accounts.claimStaffMember(staff.id, lid, req && req.session && req.session.tier);
+      if (!gekoppeld) {
+        return { status: 403, error: 'Deze personeelsplek is al aan een ander RTG-account gekoppeld.' };
+      }
+      return { rol: { rol: 'personeel', code: s.code, zaakNaam: s.name, staffId: gekoppeld.id, naam: gekoppeld.name, staffRole: gekoppeld.role, at: nu() } };
     }
 
     if (soort === 'zaak') {

@@ -33,7 +33,9 @@ function formBody(obj, voorvoegsel) {
     const w = obj[sleutel];
     if (w == null) continue;
     if (typeof w === 'object' && !Array.isArray(w)) delen.push(formBody(w, naam));
-    else if (Array.isArray(w)) w.forEach((el, i) => delen.push(encodeURIComponent(naam + '[' + i + ']') + '=' + encodeURIComponent(String(el))));
+    else if (Array.isArray(w)) w.forEach((el, i) => delen.push(el && typeof el === 'object'
+      ? formBody(el, naam + '[' + i + ']')
+      : encodeURIComponent(naam + '[' + i + ']') + '=' + encodeURIComponent(String(el))));
     else delen.push(encodeURIComponent(naam) + '=' + encodeURIComponent(String(w)));
   }
   return delen.filter(Boolean).join('&');

@@ -165,11 +165,12 @@ module.exports = (kern) => {
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
   const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
-    geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails };
+    betaalRegie: kern.betaalRegie, geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails };
   require('./techniek/inlog')(tctx);   // de inlog op deze pagina, met rem en gelijk antwoord
   const bewaarDeel = require('./techniek/bewaren')(tctx);
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
+  require('./techniek/betalingen')(tctx);
   require('./techniek/beheer')(tctx);
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);

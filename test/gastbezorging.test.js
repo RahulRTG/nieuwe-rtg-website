@@ -78,6 +78,17 @@ async function maakLid(naam, metAdres) {
 
 const kaartVan = async () => (await post('/api/gast/bezorg/kaart', { zaak: 'KIKUNOI' }, LID)).body.kaart;
 
+test('de klant krijgt in een veilige, begrensde respons kaart en zaakprofiel tegelijk', async () => {
+  const uit = await post('/api/gast/bezorg/kaart', { zaak: 'KIKUNOI' }, LID);
+  assert.equal(uit.status, 200);
+  assert.ok(Array.isArray(uit.body.kaart) && uit.body.kaart.length, 'de kaart zit in dezelfde respons');
+  assert.ok(uit.body.zaak && Array.isArray(uit.body.zaak.categorieen), 'het klantprofiel bevat menucategorieen');
+  assert.equal(uit.body.zaak.bezorging.minutenVanaf, 30);
+  assert.equal(uit.body.zaak.bezorging.kostenVanafCenten, 350);
+  assert.ok(uit.body.zaak.reviews.length <= 5, 'reviews blijven begrensd');
+  assert.equal(uit.body.zaak.staff, undefined, 'interne zaakgegevens lekken niet naar de klant');
+});
+
 test('de zone antwoordt met een reden, en de zaak en de gast rekenen hetzelfde', async () => {
   const binnen = await post('/api/gast/bezorg/check', { zaak: 'KIKUNOI', postcode: '1011AB', bedragCenten: 2000 }, LID);
   assert.equal(binnen.status, 200);
@@ -96,17 +107,55 @@ test('de zone antwoordt met een reden, en de zaak en de gast rekenen hetzelfde',
   assert.equal(zaakKant.body.minimumCenten, binnen.body.minimumCenten);
 });
 
+test('de checkout rekent opnieuw op de server en laat geen lege rekening achter', async () => {
+  const lid = await maakLid('Controle', true);
+  const kaart = await kaartVan();
+  const item = kaart.filter(k => !k.alcohol && !k.uitverkocht).sort((a, b) => b.centen - a.centen)[0];
+  const voor = await post('/api/gast/bezorg/mijn', {}, lid);
+  assert.equal(voor.body.bestellingen.length, 0);
+
+  const uit = await post('/api/gast/bezorg/checkout', { zaak: 'KIKUNOI', kanaal: 'bezorging',
+    postcode: '1011AB', adres: 'Damstraat 8', tijd: '18:00',
+    items: [{ itemId: item.id, aantal: 2, centen: 1 }] }, lid);
+  assert.equal(uit.status, 200, JSON.stringify(uit.body).slice(0, 240));
+  assert.equal(uit.body.regels[0].centen, item.centen,
+    'een meegestuurde nepprijs wordt genegeerd; de kaart van de zaak is leidend');
+  assert.equal(uit.body.subtotaalCenten, item.centen * 2);
+  assert.equal(uit.body.totaalCenten, uit.body.subtotaalCenten + uit.body.bezorgkostenCenten);
+  assert.equal(uit.body.betaling.onlineAfschrijving, false,
+    'de checkout mag niet doen alsof er al online is betaald');
+  assert.ok(uit.body.betaling.keuzes.some(x => x.id === 'ontvangst'),
+    'betalen bij ontvangst blijft een expliciete keuze');
+  assert.ok(uit.body.betaling.keuzes.some(x => x.provider === 'demo'),
+    'lokaal is de veilige providernaad zichtbaar als demo en nooit als echt geld');
+  assert.ok(uit.body.geldschild && uit.body.geldschild.titel,
+    'de klant krijgt een eigen Geldschild-oordeel, zonder dat het de keuze overneemt');
+
+  const goedkoop = kaart.filter(k => !k.alcohol && !k.uitverkocht).sort((a, b) => a.centen - b.centen)[0];
+  const onderMinimum = await post('/api/gast/bezorg/checkout', { zaak: 'KIKUNOI', kanaal: 'bezorging',
+    postcode: '1011AB', adres: 'Damstraat 8', items: [{ itemId: goedkoop.id, aantal: 1 }] }, lid);
+  assert.equal(onderMinimum.body.bevestigbaar, false);
+  assert.equal(onderMinimum.body.blokkadeCode, 'minimum');
+
+  const na = await post('/api/gast/bezorg/mijn', {}, lid);
+  assert.equal(na.body.bestellingen.length, 0,
+    'controleren opent geen rekening en reserveert niets');
+});
+
 test('bezorgkosten staan als regel op de rekening en verdwijnen boven gratis-vanaf', async () => {
   const kaart = await kaartVan();
   const goedkoop = kaart.filter(k => !k.alcohol).sort((a, b) => a.centen - b.centen)[0];
 
+  /* Twee stuks halen ook bij de goedkoopste kaartregel het ingestelde minimum.
+     De server hoort een bestelling onder dat minimum nu vóór elke mutatie te
+     stoppen; vroeger bleef hij staan met alleen een waarschuwing. */
   const b1 = await post('/api/gast/bezorg/bestel', { zaak: 'KIKUNOI', postcode: '1011AB',
-    adres: 'Damstraat 1', items: [{ itemId: goedkoop.id, aantal: 1 }] }, LID);
+    adres: 'Damstraat 1', items: [{ itemId: goedkoop.id, aantal: 2 }] }, LID);
   assert.equal(b1.status, 200, JSON.stringify(b1.body).slice(0, 200));
   const kostenregel = b1.body.rekening.regels.find(r => /Bezorging/.test(r.naam));
   assert.ok(kostenregel, 'de bezorgkosten horen als regel op de rekening te staan');
   assert.equal(kostenregel.centen, 350);
-  assert.equal(b1.body.rekening.totalen.teBetalen, goedkoop.centen + 350);
+  assert.equal(b1.body.rekening.totalen.teBetalen, goedkoop.centen * 2 + 350);
 
   // erbij bestellen tot boven de gratis-vanaf: de kostenregel hoort te verdwijnen
   const duur = kaart.filter(k => !k.alcohol).sort((a, b) => b.centen - a.centen)[0];
@@ -221,4 +270,33 @@ test('bezorgen zonder adres wordt geweigerd, met wat er ontbreekt erbij', async 
     items: [{ itemId: item.id, aantal: 1 }] }, kaal);
   assert.equal(afhaal.status, 200,
     'afhalen vraagt geen adres; de tas ligt klaar op een code');
+});
+
+test('online bestellen blijft uit de keuken tot de betaalwaarheid definitief is', async () => {
+  const lid = await maakLid('Online betaler', true);
+  const kaart = await kaartVan();
+  const item = kaart.filter(k => !k.alcohol && !k.uitverkocht).sort((a, b) => b.centen - a.centen)[0];
+  const bestel = await post('/api/gast/bezorg/bestel', { zaak: 'KIKUNOI', postcode: '1011AB',
+    adres: 'Damstraat 12', idem: 'online-order-1', betalingWijze: 'online',
+    items: [{ itemId: item.id, aantal: 2 }] }, lid);
+  assert.equal(bestel.status, 200, JSON.stringify(bestel.body).slice(0, 200));
+  const rekeningId = bestel.body.rekening.rekeningId;
+  const voor = await post('/api/supplier/horeca/keuken/bord', {}, ZAAK);
+  assert.ok(!voor.body.bonnen.some(x => x.rekeningId === rekeningId),
+    'zonder providerbevestiging mag geen bon in de keuken staan');
+
+  const betaal = await post('/api/gast/bezorg/betaling/start', { zaak: 'KIKUNOI',
+    rekeningId, idem: 'online-betaling-1', aanbieder: 'demo' }, lid);
+  assert.equal(betaal.status, 200, JSON.stringify(betaal.body).slice(0, 220));
+  assert.equal(betaal.body.betaling.status, 'BEVESTIGD');
+  assert.equal(betaal.body.betaling.afgehandeld, true);
+  assert.match(betaal.body.betaling.bewijs, /^[A-F0-9]{16}$/);
+
+  const na = await post('/api/supplier/horeca/keuken/bord', {}, ZAAK);
+  assert.ok(na.body.bonnen.some(x => x.rekeningId === rekeningId),
+    'na de definitieve terugmelding wordt exact dezelfde rekening vrijgegeven');
+  const mijn = await post('/api/gast/bezorg/mijn', {}, lid);
+  const b = mijn.body.bestellingen.find(x => x.rekeningId === rekeningId);
+  assert.equal(b.status, 'betaald');
+  assert.equal(b.openstaand, 0);
 });

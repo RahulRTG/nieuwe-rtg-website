@@ -5,9 +5,10 @@
    een hypothese en daarna hooguit een testopdracht; uitsluitend de boardroom
    kan die status geven. Deze module schrijft nooit code of productiegegevens. */
 'use strict';
+const { datum: klokDatum } = require('../../../lib/klok');
 
 module.exports=({db,save,crypto})=>{
-  const nu=()=>new Date().toISOString();
+  const nu=()=>klokDatum().toISOString();
   const hash=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
   const rond=n=>Math.round(Number(n||0)*10)/10;
   const S=()=>db.data.magnaatLeren=db.data.magnaatLeren||{

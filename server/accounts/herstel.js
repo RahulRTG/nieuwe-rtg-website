@@ -25,6 +25,7 @@ const crypto = require('crypto');
 const S = require('./state');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
+const { nu: klokNu } = require('../lib/klok');
 
 function maakHerstel(getUserById) {
 
@@ -37,7 +38,7 @@ function maakHerstel(getUserById) {
   function createReset(userId, ttlMs = 3600000) {
     const token = crypto.randomBytes(24).toString('hex');
     const hash = crypto.createHash('sha256').update(token).digest('hex');
-    S.zin('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
+    S.zin('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, klokNu() + ttlMs, userId);
     mirror.markUser(userId);
     return token;
   }
@@ -45,7 +46,7 @@ function maakHerstel(getUserById) {
   function findByReset(token) {
     const hash = crypto.createHash('sha256').update(String(token || '')).digest('hex');
     const u = S.zin('SELECT * FROM users WHERE reset_hash = ?').get(hash);
-    if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
+    if (!u || !u.reset_expires || u.reset_expires < klokNu()) return null;
     return u;
   }
 
@@ -55,7 +56,7 @@ function maakHerstel(getUserById) {
      zie de kop hierboven. */
   async function setPassword(userId, password) {
     S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ? WHERE id = ?')
-      .run(await kluis.hashPassword(password), Date.now(), userId);
+      .run(await kluis.hashPassword(password), klokNu(), userId);
     mirror.markUser(userId);
     return getUserById(userId);
   }

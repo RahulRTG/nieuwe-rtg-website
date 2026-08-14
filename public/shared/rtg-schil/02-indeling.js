@@ -9,9 +9,33 @@
     return { b: r.width, h: r.height, g: parseInt(getComputedStyle(schil.vak).getPropertyValue('--gutter'), 10) || 14 };
   }
 
+  function standaard() {
+    return d.body && d.body.getAttribute('data-rtg-schil') === 'standaard';
+  }
+
   function schik() {
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
+    if (standaard()) {
+      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
+      var tabhoog = 49;
+      zet(schil.console, 0, 0, bank, m.h);
+      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      if (!n) return;
+      var werkbreed = m.b - bank;
+      var werkhoog = m.h - tabhoog;
+      var sk = n <= 3 ? n : 2;
+      var sr = Math.ceil(n / sk);
+      var sw = Math.floor(werkbreed / sk);
+      var sh = Math.floor(werkhoog / sr);
+      schil.surfaces.forEach(function (s, i) {
+        var c = i % sk, r = Math.floor(i / sk);
+        zet(s.el, bank + c * sw, tabhoog + r * sh,
+          c === sk - 1 ? werkbreed - c * sw : sw,
+          r === sr - 1 ? werkhoog - r * sh : sh);
+      });
+      return;
+    }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
     if (!n) {
@@ -47,4 +71,3 @@
     e.style.left = x + 'px'; e.style.top = y + 'px';
     e.style.width = b + 'px'; e.style.height = h + 'px';
   }
-

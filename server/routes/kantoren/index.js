@@ -97,6 +97,7 @@ module.exports = (kern) => {
   require('./weefsel2')(ctx);
   require('./weefsel3')(ctx);
   require('./techniek')(ctx);
+  require('./betaalproviders')(ctx);
   require('./zelfzorg')(ctx);
   require('./magnaat-leren')(ctx);
 };

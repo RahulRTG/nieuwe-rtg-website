@@ -108,6 +108,15 @@
   #vKamer:has(#tabChat:not([hidden])) [data-tab="chat"],
   #vKamer:has(#tabOnboarding:not([hidden])) [data-tab="onboarding"],
   #vKamer:has(#tabWereld:not([hidden])) [data-tab="wereld"]{color:var(--txt);border-bottom-color:var(--gold);}
+  .betaal-kop{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .betaal-providers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:.8rem;}
+  .betaal-provider{border:1px solid var(--line);border-radius:12px;padding:.8rem;background:rgba(255,255,255,.025);}
+  .betaal-provider h5{margin:0 0 .25rem;font-size:.94rem;display:flex;justify-content:space-between;gap:.5rem;}
+  .betaal-stip{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#B0483B;margin-right:.35rem;}
+  .betaal-stip.ok{background:#4C7A4C;}.betaal-stip.wacht{background:#C9A24B;}
+  .betaal-check{font-size:.72rem;color:var(--soft);padding:.15rem 0;}
+  .betaal-waarschuwing{border-left:3px solid var(--gold);padding:.45rem .65rem;margin:.35rem 0;font-size:.78rem;background:rgba(255,255,255,.025);}
+  @media(max-width:760px){.betaal-providers{grid-template-columns:1fr;}}
   .lijst{padding:1rem 1.2rem;margin-bottom:.8rem;}
   .lijst h4{font-size:.9rem;margin-bottom:.4rem;}
   .lijst ul{list-style:none;}
@@ -233,6 +242,16 @@
     <div id="tabOverzicht">
     <div class="kpis" id="kKpis"></div>
     <div id="kLijsten"></div>
+    <div class="kaart" id="kBetaal" hidden>
+      <div class="betaal-kop">
+        <div><h4 style="margin:0 0 .25rem;">Betaalproviders · één controlecentrum</h4>
+          <div class="stil" id="kBetaalSub" style="font-size:.78rem;color:var(--soft);">Stripe, Mollie en Adyen met één financiële waarheid.</div></div>
+        <a class="knop stil" id="kBetaalIt" href="/apps/techniek.html" style="text-decoration:none;">Naar IT-controle →</a>
+      </div>
+      <div class="kpis" id="kBetaalKpis" style="margin-top:.8rem;"></div>
+      <div class="betaal-providers" id="kBetaalProviders"></div>
+      <div id="kBetaalProblemen" style="margin-top:.75rem;"></div>
+    </div>
     <h3 class="sec">De werklijst van deze kamer</h3>
     <div class="kaart lijst">
       <div id="kTaken"><div class="leeg">Nog geen taken.</div></div>
@@ -1094,6 +1113,8 @@ async function openKamer(id){
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="kaart kpi-tegel"><b>'+esc(String(k.waarde))+'</b><span>'+esc(k.label)+'</span></div>').join('');
   $('#kLijsten').innerHTML = d.lijsten.map(l =>
     '<div class="kaart lijst"><h4>'+esc(l.titel)+'</h4>'+(l.items.length ? '<ul>'+l.items.map(i => '<li>'+esc(i)+'</li>').join('')+'</ul>' : '<div class="leeg">Niets openstaand.</div>')+'</div>').join('');
+  $('#kBetaal').hidden = (id !== 'financien' && id !== 'intern');
+  if (id === 'financien' || id === 'intern') laadBetaalKamer(id);
   tekenTaken(d.taken);
   // Rahul denkt mee in deze kamer -- schoon starten bij elke kamer
   $('#kRahulUit').textContent = '';
@@ -1117,6 +1138,32 @@ async function openKamer(id){
   // en elke afdeling heeft haar eigen huis
   $('#kHotel').hidden = false;
   laadAfdHotel(id, d.naam);
+}
+
+function geld(centen){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format((Number(centen)||0)/100); }
+async function laadBetaalKamer(kamer){
+  try {
+    const d = await api('betalingen/status');
+    const c = d.cijfers || {};
+    $('#kBetaalSub').textContent = kamer === 'financien'
+      ? 'Financiën ziet omzet, terugbetalingen, open controles en de status van elke koppeling.'
+      : 'IT koppelt en beproeft via de beveiligde Techniekdeur; geheime sleutels verschijnen hier nooit.';
+    $('#kBetaalIt').hidden = (kamer === 'financien');
+    $('#kBetaalKpis').innerHTML = [
+      [geld(c.bevestigdCenten),'bevestigd'], [geld(c.terugbetaaldCenten),'terugbetaald'],
+      [c.onderweg||0,'onderweg'], [c.controleNodig||0,'controle nodig']
+    ].map(x => '<div class="kaart kpi-tegel"><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div>').join('');
+    $('#kBetaalProviders').innerHTML = (d.providers||[]).map(p => {
+      const klas = p.werkt === 'bewezen-met-betaling' ? 'ok' : (p.gereed ? 'wacht' : '');
+      const stand = p.werkt === 'bewezen-met-betaling' ? 'Bewezen werkend' : p.werkt === 'klaar-voor-proef' ? 'Klaar voor proef' : p.faseLabel;
+      return '<div class="betaal-provider"><h5><span>'+esc(p.naam)+'</span><span style="font-size:.68rem;color:var(--soft);">'+esc(stand)+'</span></h5>'+
+        '<div style="font-size:.76rem;"><span class="betaal-stip '+klas+'"></span>'+esc(p.faseLabel)+(d.voorkeur===p.id?' · voorkeur':'')+'</div>'+
+        p.checklist.map(x => '<div class="betaal-check">'+(x.ingesteld?'✓':'○')+' '+esc(x.label)+'</div>').join('')+'</div>';
+    }).join('');
+    $('#kBetaalProblemen').innerHTML = (d.problemen||[]).length
+      ? d.problemen.map(p => '<div class="betaal-waarschuwing"><strong>'+esc(p.code)+'</strong> · '+esc(p.tekst)+'</div>').join('')
+      : '<div class="leeg">Alle betaalcontroles zijn groen.</div>';
+  } catch (e) { $('#kBetaalProviders').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
 /* ---------- het Regeringskantoor: briefing en kabinetsbesluiten ---------- */

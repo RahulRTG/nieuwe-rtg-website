@@ -19,6 +19,7 @@
 
    Krijgt dezelfde ctx als ./proxy.js. */
 'use strict';
+const { nu: klokNu } = require('../../lib/klok');
 
 module.exports = (ctx) => {
   const { db, save, st, journaal, teller, journaalGeldig,
@@ -38,7 +39,7 @@ module.exports = (ctx) => {
       for (const k of Object.keys(db.data)) { if (k !== 'doosJournaal' && k !== 'doosRefKaart') delete db.data[k]; }
       Object.assign(db.data, d.data);
       save();
-      st.laatsteKloon = Date.now();
+      st.laatsteKloon = klokNu();
     } catch (e) { /* geen lijn: de pinger regelt de modus */ }
   }
 

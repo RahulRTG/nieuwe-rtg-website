@@ -14,6 +14,7 @@
 const VERSIE = 5;
 const DAG = 24 * 60 * 60 * 1000;
 const DIENST_BONUS = { xp: 300, virtueelBudget: 25000, reputatie: 3 };
+const { nu: klokNu } = require('../lib/klok');
 
 /* De eerste volledige verticale werkroute. Dit is bewust geen quiz: de speler
    opent drie bestaande RTG-schermen en legt tussendoor de intake, overdracht en
@@ -200,7 +201,7 @@ const KANSEN = [
 ];
 
 module.exports = ({ db, save, crypto, functies }) => {
-  const nu = () => Date.now();
+  const nu = klokNu;
   const id = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
   const tekst = (v, max = 300) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
   const alleFuncties = Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : [];

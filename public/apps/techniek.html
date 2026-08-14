@@ -111,6 +111,11 @@
   .voorstelrij{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.82rem;}
   .voorstelrij:first-child{border-top:none;}
   .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
+  .bp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;}
+  .bp-kaart{border:1px solid var(--line);border-radius:14px;padding:.9rem;background:var(--card);}
+  .bp-kaart h3{margin:0 0 .25rem;font-size:1rem;}.bp-regel{font-size:.75rem;color:var(--muted);padding:.14rem 0;}
+  .bp-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}.bp-fout{border-left:3px solid #C9A24B;padding:.45rem .65rem;margin:.4rem 0;font-size:.78rem;background:var(--card);}
+  @media(max-width:760px){.bp-grid{grid-template-columns:1fr;}}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -141,6 +146,7 @@
     </header>
     <div class="tabs" role="tablist" id="tabbar">
       <button class="tab" role="tab" id="tabBtnStatus" aria-selected="true" aria-controls="tabStatus">Statusbord</button>
+      <button class="tab" role="tab" id="tabBtnBetalen" aria-selected="false" aria-controls="tabBetalen" hidden>Betaalproviders</button>
       <button class="tab" role="tab" id="tabBtnWacht" aria-selected="false" aria-controls="tabWacht" hidden>De Wacht</button>
       <button class="tab" role="tab" id="tabBtnFuncties" aria-selected="false" aria-controls="tabFuncties" hidden>Controlekamer</button>
     </div>
@@ -256,6 +262,19 @@
           <div class="fout" id="grantFout"></div>
         </div>
       </div>
+    </div>
+
+    <div id="tabBetalen" role="tabpanel" aria-labelledby="tabBtnBetalen" hidden>
+      <div class="kaart" style="margin-bottom:.8rem;">
+        <div class="naam">Stripe, Mollie en Adyen · één veilige regie</div>
+        <div class="muted" style="font-size:.8rem;margin-top:.25rem;">Open de aanvraag bij de provider, volg de controle, stel de geheime waarden uitsluitend in de beveiligde serveromgeving in en voer daarna een proefbetaling én terugbetaling uit. Geen enkele API-sleutel wordt in dit scherm opgeslagen.</div>
+      </div>
+      <div class="telrij" id="bpTellers"></div>
+      <div class="bp-grid" id="bpProviders"></div>
+      <div class="sec">Problemen en aandacht</div>
+      <div id="bpProblemen"></div>
+      <div class="sec">Controlejournaal</div>
+      <div class="kaart" id="bpAudit"></div>
     </div>
 
     <div id="tabFuncties" role="tabpanel" aria-labelledby="tabBtnFuncties" hidden>

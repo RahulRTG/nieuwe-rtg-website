@@ -113,13 +113,18 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
   try {
     const staf = await rooster(base, 'KIKUNOI');
     const mgr = staf.find(x => x.role === 'manager');
-    const lidStaf = staf.find(x => x.role !== 'manager');
     const mtok = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
+    // De gedeelde seedplek is al gekoppeld en is juist niet overneembaar. Voor
+    // deze proef maakt de manager een verse, ongekoppelde personeelsplek.
+    const nieuw = await api(base, '/api/supplier/staff/add', { name: 'Venster Medewerker', role: 'staff', func: 'Balie' }, mtok);
+    assert.equal(nieuw.status, 200, 'de manager maakt een vrije werkplek');
+    const lidStaf = nieuw.body.staff;
+    const staffPin = nieuw.body.pin;
 
     // het ene RTG-account: eerst koppelen (bewijs met de eigen PIN), voor straks
     const u = Date.now().toString(36);
     const lid = (await api(base, '/api/auth/register', { name: 'Venster Lid', email: u + '@x.nl', phone: '0611111111', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
-    const kop = await api(base, '/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' }, lid);
+    const kop = await api(base, '/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin }, lid);
     assert.equal(kop.status, 200, 'de personeelsrol hangt aan het ene account');
 
     // de werkgever sluit vandaag de werkomgeving
@@ -129,7 +134,7 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     assert.equal(zet.body.werkvenster.aan, true);
 
     // personeelslogin met PIN: dicht
-    const dicht = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    const dicht = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin });
     assert.equal(dicht.status, 403, 'buiten het venster geen sessie');
     assert.match(dicht.body.error, /gesloten/, 'de weigering legt het uit');
     // en het ene account is geen achterdeur: zelfde regel, zelfde weigering
@@ -143,7 +148,7 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     const w = await api(base, '/api/supplier/werkvenster', { aan: false }, mtok);
     assert.equal(w.status, 200);
     // venster weer open: personeel kan er weer in, en Rahuls advies-endpoint praat mee
-    const open = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    const open = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin });
     assert.equal(open.status, 200, 'venster uit = personeel weer welkom');
     const adv = await api(base, '/api/supplier/werkadvies', {}, open.body.token);
     assert.equal(adv.status, 200);
@@ -157,24 +162,24 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
       { aan: true, dagen: { [vandaag]: { dicht: false } }, plek: { lat: 52.0, lng: 4.0, radiusM: 200 } }, mtok);
     assert.equal(zone.status, 200);
     assert.equal(zone.body.werkvenster.plek.radiusM, 200, 'de zone staat in de instellingen');
-    const geenPos = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    const geenPos = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin });
     assert.equal(geenPos.status, 403, 'zone aan + geen positie = geen sessie');
     assert.equal(geenPos.body.locatieNodig, true, 'de app hoort dat een positie nodig is');
     const accPos = await api(base, '/api/account/start', { rol: 'personeel', code: 'KIKUNOI', staffId: lidStaf.id }, lid);
     assert.equal(accPos.status, 403, 'het ene account volgt dezelfde zone-regel');
     assert.equal(accPos.body.locatieNodig, true, 'ook daar reist locatieNodig mee');
-    const opPlek = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.0005, lng: 4.0 } });
+    const opPlek = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin, positie: { lat: 52.0005, lng: 4.0 } });
     assert.equal(opPlek.status, 200, 'binnen de zone gewoon aan het werk');
-    const teVer = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.1, lng: 4.0 } });
+    const teVer = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin, positie: { lat: 52.1, lng: 4.0 } });
     assert.equal(teVer.status, 403, 'ver buiten de zone niet');
     // thuiswerk-toestemming: dan werkt het ook zonder positie, net als de desktop
     const thuis = await api(base, '/api/supplier/werkvenster', { perStaff: { [lidStaf.id]: { stand: 'zaak', thuiswerk: true } } }, mtok);
     assert.equal(thuis.status, 200);
-    const vanThuis = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678' });
+    const vanThuis = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin });
     assert.equal(vanThuis.status, 200, 'thuiswerk aan = inloggen van huis mag');
     // en "nooit" sluit de PDA voor deze ene persoon, waar die ook is
     await api(base, '/api/supplier/werkvenster', { perStaff: { [lidStaf.id]: { stand: 'nooit', thuiswerk: false } } }, mtok);
-    const dichtVoorMij = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: '5678', positie: { lat: 52.0, lng: 4.0 } });
+    const dichtVoorMij = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: lidStaf.id, pin: staffPin, positie: { lat: 52.0, lng: 4.0 } });
     assert.equal(dichtVoorMij.status, 403, '"nooit" wint van alles behalve de manager');
   } finally {
     await stop(child);

@@ -42,6 +42,7 @@ module.exports = (kern) => {
     const twins = h.dishTwins || {};
     return menu.map(m => ({
       id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
+      foto: m.foto || m.photo || m.image || null,
       centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
       station: m.station || null,
       alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),

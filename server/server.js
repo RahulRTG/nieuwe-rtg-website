@@ -46,6 +46,7 @@ const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
 const betaal = require('./betaal');
+const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
 const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
@@ -170,6 +171,17 @@ function appUrl(req) {
 require('./config').pasToe(process.env, log);
 
 load();
+
+/* Eén blijvende waarheid voor inkomende betalingen, vóór routes en webhooks
+   worden bedraad. Ze hangt niet aan Stripe of Mollie: providers leveren alleen
+   gebeurtenissen aan. Daardoor kan een zaak van rail wisselen zonder dat de
+   betekenis van "betaald" mee verhuist. */
+const betaalWaarheid = require('./kern/betaalwaarheid')({
+  d: () => db.data, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log
+});
+const betaalRegie = require('./kern/betaalregie')({
+  d: () => db.data, save, betaal, env: process.env, nu: () => systeemKlok.datum().toISOString()
+});
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
    duurzame opslag als de rest; hier krijgt het de database en save() aangereikt.
@@ -381,7 +393,7 @@ if (zaakdoos.actief) {
    database), dus ze worden laat gebonden via zetWacht/zetRtgai. */
 const PRODUCTION = process.env.NODE_ENV === 'production';
 const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
-  app, express, log, logboek, db, save, betaal, muntbetaal, zaakdoos, PRODUCTION,
+  app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, zaakdoos, PRODUCTION,
   opslagKlaar: () => opslagKlaar(),
   // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
   beveiligVan: () => beveilig,
@@ -1174,6 +1186,8 @@ function supplierAuth(req, res, next) {
   if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
   req.supplier = findSupplier(sess.code);
   if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
+  if (req.supplier.partnerStatus === 'geschorst' || req.supplier.partnerStatus === 'beeindigd')
+    return res.status(401).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
   // Wie is er aan het werk (voor toeschrijving van activiteiten).
   req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
   next();
@@ -1868,7 +1882,7 @@ const kern = {
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
   ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
-  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
+  aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,

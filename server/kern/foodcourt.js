@@ -63,14 +63,43 @@ function maakFoodcourt({ db, save, crypto }) {
 
   function kaart(s) {
     const fc = s.foodcourt || {};
+    const menu = Array.isArray(s.menu) ? s.menu : [];
+    const rs = (db.data.reviewStats || {})[s.code];
+    const bezorg = db.data.horeca && db.data.horeca[s.code] && db.data.horeca[s.code].bezorg;
+    const zones = bezorg && Array.isArray(bezorg.zones) ? bezorg.zones : [];
+    const minimum = (veld) => {
+      const waarden = zones.map(z => Number(z && z[veld])).filter(n => Number.isFinite(n) && n > 0);
+      return waarden.length ? Math.min(...waarden) : null;
+    };
+    const fotos = (Array.isArray(s.photos) ? s.photos : []).slice(0, 6);
+    if (s.salon && s.salon.foto && !fotos.includes(s.salon.foto) && fotos.length < 6) fotos.push(s.salon.foto);
     return {
       code: s.code, naam: s.name, stad: s.city || null,
       keuken: fc.keuken || 'Restaurant', prijs: fc.prijs || PRIJZEN[0],
       tagline: fc.tagline || 'Reserveer je tafel in een tik.',
       deal: fc.deal || null,
-      open: !(s.settings && s.settings.reservationsOpen === false),
-      capaciteit: capaciteit(s)
+      bio: s.salon && s.salon.bio ? String(s.salon.bio).slice(0, 200) : null,
+      fotos,
+      open: !(s.settings && s.settings.ordersOpen === false),
+      reserverenOpen: !(s.settings && s.settings.reservationsOpen === false),
+      capaciteit: capaciteit(s),
+      rating: rs && rs.aantal ? { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal } : null,
+      menuAantal: menu.length,
+      categorieen: [...new Set(menu.map(m => m && m.cat).filter(Boolean))].slice(0, 12),
+      vanafCenten: minimumMenuPrijs(menu),
+      bezorgen: zones.length > 0,
+      bezorgOpen: zones.length > 0 && bezorg.open !== false,
+      bezorgMinuten: minimum('minuten'),
+      bezorgkostenVanaf: minimum('kostenCenten') || (zones.some(z => Number(z && z.kostenCenten) === 0) ? 0 : null),
+      minimumVanaf: minimum('minimumCenten'),
+      gratisVanaf: minimum('gratisVanafCenten')
     };
+  }
+
+  function minimumMenuPrijs(menu) {
+    const prijzen = menu.map(m => Number(m && (m.centen != null ? m.centen : Number(m.price) * 100)))
+      .filter(n => Number.isFinite(n) && n >= 0);
+    return prijzen.length ? Math.round(Math.min(...prijzen)) : null;
   }
 
   function overzicht() {

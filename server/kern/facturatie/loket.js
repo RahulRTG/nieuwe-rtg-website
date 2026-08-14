@@ -16,7 +16,8 @@ module.exports = (ctx) => {
          niet getoond, en dan is een factuur niet terug te leiden naar wat hem
          veroorzaakte; bij zaak-aan-zaak is dat precies wat je moet kunnen. */
       ref: f.ref || null,
-      regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode
+      regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode,
+      classificatie: f.classificatie === 'zakelijk' ? 'zakelijk' : 'prive'
     };
   }
   function vind(id) { return store().facturen.find(f => f.id === id) || null; }
@@ -33,6 +34,19 @@ module.exports = (ctx) => {
   function voorLid(key, limit) {
     const mijn = store().facturen.filter(f => f.koper.key === key).slice(0, limit || 500).map(publiek);
     return { facturen: mijn, telling: store().facturen.filter(f => f.koper.key === key).length, besteed: rond(mijn.reduce((n, f) => n + f.totaal, 0)) };
+  }
+  function classificeer(id, key, classificatie) {
+    const f = vind(String(id || ''));
+    if (!f) return { status: 404, error: 'Factuur niet gevonden.' };
+    if (!key || f.koper.key !== key) return { status: 403, error: 'Deze factuur hoort niet bij dit account.' };
+    const keuze = String(classificatie || '').toLowerCase();
+    if (keuze !== 'prive' && keuze !== 'zakelijk') {
+      return { status: 400, error: 'Kies prive of zakelijk.' };
+    }
+    f.classificatie = keuze;
+    save();
+    if (sseToCustomer) sseToCustomer(key, 'sync', { scope: 'facturen' });
+    return { status: 200, ok: true, factuur: publiek(f) };
   }
   function mag(f, ctx) {
     if (!f) return false;
@@ -94,5 +108,5 @@ module.exports = (ctx) => {
     if (ctx.supplierCode) return { antwoord: 'U heeft ' + set.stats.verkocht + ' facturen verstuurd (omzet EUR ' + set.stats.omzet.toFixed(2) + ', btw EUR ' + set.stats.btwAfdracht.toFixed(2) + '). Zeg "maak een factuur voor ..." om er een te maken.' };
     return { antwoord: 'U heeft ' + set.telling + ' facturen ontvangen, samen EUR ' + set.besteed.toFixed(2) + '. Tik een factuur aan om de PDF te downloaden.' };
   }
-  return { publiek, vind, voorSupplier, voorLid, mag, pdf, bedragUit, aantalUit, codenaamUit, ai };
+  return { publiek, vind, voorSupplier, voorLid, classificeer, mag, pdf, bedragUit, aantalUit, codenaamUit, ai };
 };

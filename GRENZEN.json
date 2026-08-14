@@ -280,7 +280,10 @@
     "gast": [
       "H",
       "afrekenlaag",
+      "appUrl",
       "beleid",
+      "betaal",
+      "betaalWaarheid",
       "bezorglaag",
       "buitenshuis",
       "centen",
@@ -290,6 +293,7 @@
       "foodcourtlaag",
       "gastAuth",
       "gastKaartVanZaak",
+      "geldgraaf",
       "haversine",
       "horeca",
       "horecaFolioBoek",
@@ -388,6 +392,7 @@
     ],
     "kantoorpakket": [
       "boardroomBaas",
+      "boardroomWie",
       "officeAI",
       "officeAanwezig",
       "officeBeheer",
@@ -406,6 +411,7 @@
       "officeVersies",
       "officeVul",
       "officeWeg",
+      "rtf",
       "werkplek"
     ],
     "kantoorpakket-huis": [
@@ -447,6 +453,7 @@
       "bankPartnerRailZet",
       "bankSalarisRekeningen",
       "bankVergunningZet",
+      "betaalRegie",
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
@@ -1125,6 +1132,7 @@
       "assetHertaxeer",
       "assetKantoor",
       "assetTerugkoopUit",
+      "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
       "conciergeDesk",
@@ -1132,6 +1140,8 @@
       "conciergeVoortgang",
       "eigenaar",
       "ensureSupplierDefaults",
+      "findSupplier",
+      "forgetSession",
       "logInlog",
       "loginFails",
       "mail",
@@ -1156,6 +1166,7 @@
       "salonItemsVan",
       "salonProfielCompleet",
       "sessionFor",
+      "sessions",
       "totpOk",
       "trChat",
       "veiligGelijk",
@@ -1309,6 +1320,7 @@
     "rtmail": [
       "agenda",
       "automatisering",
+      "facturatie",
       "leren"
     ],
     "rtmail-bestuur": [
@@ -1818,6 +1830,7 @@
       "bank",
       "bankregieOverzicht",
       "betaal",
+      "betaalRegie",
       "beveilig",
       "bewaren",
       "boardroomTelling",

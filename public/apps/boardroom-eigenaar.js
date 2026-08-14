@@ -54,6 +54,9 @@
       'color:inherit;font:inherit;font-size:.86rem;padding:.6rem;min-height:3.2rem;resize:vertical;}' +
     '.ez-ai .ez-antwoord{margin:.7rem 0;font-size:.84rem;line-height:1.55;color:var(--muted,#8A8680);white-space:pre-wrap;}' +
     '.ez-log{font-size:.76rem;color:var(--muted,#8A8680);line-height:1.6;}' +
+    '.ez-betaal{border-top:1px solid color-mix(in srgb,var(--line,#DEDBD5) 45%,transparent);padding:.65rem 0;}' +
+    '.ez-betaal:first-child{border-top:none;}.ez-betaal-kop{display:flex;align-items:center;justify-content:space-between;gap:.5rem;}' +
+    '.ez-betaal-acties{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}.ez-betaal select{background:none;color:inherit;border:1px solid var(--line,#DEDBD5);border-radius:999px;padding:.28rem .55rem;font-size:.72rem;}' +
     '.ez-melding{margin:.5rem 0;font-size:.8rem;color:var(--gold,#857007);min-height:1.1rem;}';
   document.head.appendChild(stijl);
 
@@ -155,6 +158,45 @@
     return body;
   }
 
+  function bouwBetalingen() {
+    var body = el('div', { 'class': 'ez-body' });
+    body.appendChild(el('div', { 'class': 'ez-log', text: 'Laden…' }));
+    function laadBetalen() {
+      api('/api/boardroom/betalingen/status').then(function (d) {
+        body.textContent = '';
+        if ((d.problemen || []).length) body.appendChild(el('div', { 'class': 'ez-melding',
+          text: d.problemen.length + ' aandachtspunt(en) · ' + d.problemen[0].tekst }));
+        (d.providers || []).forEach(function (p) {
+          var select = el('select');
+          ['aanvraag','controle','goedgekeurd','techniek','proef','gepauzeerd','probleem','live'].forEach(function (f) {
+            var o = el('option', { value: f, text: f }); if (p.fase === f) o.selected = true; select.appendChild(o);
+          });
+          var open = el('a', { 'class': 'ez-knop', href: p.aanmeldUrl, target: '_blank', rel: 'noopener noreferrer',
+            text: p.fase === 'niet-gestart' ? 'Open aanvraag' : 'Open provider' });
+          open.addEventListener('click', function () {
+            if (p.fase === 'niet-gestart') api('/api/boardroom/betalingen/stap', { provider: p.id, fase: 'aanvraag' }).then(laadBetalen);
+          });
+          var bewaar = el('button', { 'class': 'ez-knop', type: 'button', text: 'Sla stap op' });
+          bewaar.addEventListener('click', function () { api('/api/boardroom/betalingen/stap', { provider:p.id, fase:select.value })
+            .then(function(){ meld('Stap opgeslagen.'); laadBetalen(); }).catch(function(e){ meld(e.message); }); });
+          var proef = el('button', { 'class': 'ez-knop aan', type: 'button', text: 'Controleer' });
+          proef.addEventListener('click', function () { api('/api/boardroom/betalingen/proef', { provider:p.id })
+            .then(function(r){ meld(r.uitleg); laadBetalen(); }).catch(function(e){ meld(e.message); }); });
+          var voorkeur = el('button', { 'class': 'ez-knop', type: 'button', text: d.voorkeur === p.id ? 'Voorkeur' : 'Maak voorkeur' });
+          voorkeur.disabled = d.voorkeur === p.id;
+          voorkeur.addEventListener('click', function () { api('/api/boardroom/betalingen/keuze', { provider:p.id }).then(laadBetalen).catch(function(e){ meld(e.message); }); });
+          var gereed = (p.checklist || []).filter(function(x){return x.ingesteld;}).length + '/' + (p.checklist || []).length + ' veilig ingesteld';
+          body.appendChild(el('div', { 'class':'ez-betaal' },
+            el('div', { 'class':'ez-betaal-kop' }, el('strong', { text:p.naam }), el('span', { 'class':'ez-log', text:p.faseLabel })),
+            el('div', { 'class':'ez-log', text:gereed + ' · ' + (p.werkt === 'bewezen-met-betaling' ? 'bewezen werkend' : p.werkt.replaceAll('-', ' ')) }),
+            el('div', { 'class':'ez-betaal-acties' }, open, select, bewaar, proef, voorkeur)));
+        });
+      }).catch(function (e) { body.textContent = e.message; });
+    }
+    laadBetalen();
+    return body;
+  }
+
   function paneel(titel, inhoud, open) {
     var det = el('details', open ? { open: '' } : {});
     det.appendChild(el('summary', { text: titel }));
@@ -175,6 +217,7 @@
     meldEl = el('div', { 'class': 'ez-melding', role: 'status', 'aria-live': 'polite' });
     wrap.appendChild(meldEl);
     var s = d.samenvatting;
+    wrap.appendChild(paneel('Betaalproviders · Stripe, Mollie & Adyen', bouwBetalingen(), true));
     wrap.appendChild(paneel(T('ez.kast', 'De schakelkast') + (s && s.uit ? ' · ' + s.uit + ' ' + T('ez.dicht', 'dicht') : ''), bouwFuncties(d)));
     wrap.appendChild(paneel(T('ez.talen', 'Wereldtalen'), bouwTalen()));
     wrap.appendChild(paneel(T('ez.regie', 'AI-regie'), bouwAi(d)));

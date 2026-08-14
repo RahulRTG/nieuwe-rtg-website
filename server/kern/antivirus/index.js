@@ -113,9 +113,8 @@ module.exports = (ctx) => {
   /* Scan + verwerk: telt mee, meldt op het bord bij verdacht/besmet, en stelt
      (als De Wacht meedraait) voor om de bron af te snijden bij een echte
      besmetting. Geeft het verdict terug zodat de route kan weigeren. */
-  function verwerk(buf, meta) {
+  function legVast(r, meta) {
     meta = meta || {};
-    const r = scan(buf, meta);
     const s = S();
     s.totaal += 1;
     s[r.verdict] = (s[r.verdict] || 0) + 1;
@@ -142,13 +141,13 @@ module.exports = (ctx) => {
     return r;
   }
 
-  // Scan een data-URL (base64 image), zoals de uploads binnenkomen.
-  function scanDataUrl(s, meta) {
-    const m = /^data:([^;]+);base64,([A-Za-z0-9+/=]+)$/.exec(String(s || ''));
-    if (!m) return { verdict: 'verdacht', redenen: ['geen geldige data-URL'], bytes: 0, sha256: '', entropie: 0 };
-    const buf = Buffer.from(m[2], 'base64');
-    return verwerk(buf, Object.assign({ mime: m[1] }, meta || {}));
+  function verwerk(buf, meta) {
+    meta = meta || {};
+    return legVast(scan(buf, meta), meta);
   }
+
+  // De decodeer- en groottepoort staat apart om deze scanner klein te houden.
+  const scanDataUrl = require('./data-url')({ legVast, verwerk });
 
   // Praktische poort voor de intake-plekken: geef {ok:false, error} terug bij een
   // BESMET bestand (verdacht mag door, maar staat wel op het bord).

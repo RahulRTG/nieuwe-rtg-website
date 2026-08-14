@@ -153,13 +153,15 @@
 
   /* ---------- tabbladen ---------- */
   function toonTab(naam){
-    var panelen = { status:'#tabStatus', wacht:'#tabWacht', functies:'#tabFuncties' };
-    var knoppen = { status:'#tabBtnStatus', wacht:'#tabBtnWacht', functies:'#tabBtnFuncties' };
+    var panelen = { status:'#tabStatus', betalen:'#tabBetalen', wacht:'#tabWacht', functies:'#tabFuncties' };
+    var knoppen = { status:'#tabBtnStatus', betalen:'#tabBtnBetalen', wacht:'#tabBtnWacht', functies:'#tabBtnFuncties' };
     if (!panelen[naam]) naam = 'status';
     for (var k in panelen){ $(panelen[k]).hidden = (k !== naam); $(knoppen[k]).setAttribute('aria-selected', k===naam?'true':'false'); }
     if (naam === 'wacht') laadWacht();
+    if (naam === 'betalen') laadBetalingen();
   }
   $('#tabBtnStatus').addEventListener('click', function(){ toonTab('status'); });
+  $('#tabBtnBetalen').addEventListener('click', function(){ toonTab('betalen'); });
   $('#tabBtnWacht').addEventListener('click', function(){ toonTab('wacht'); });
   $('#tabBtnFuncties').addEventListener('click', function(){ toonTab('functies'); });
 

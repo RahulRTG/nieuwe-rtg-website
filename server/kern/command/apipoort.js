@@ -30,6 +30,7 @@
 'use strict';
 
 const { veiligGelijk } = require('../util');
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const UUR = 3600000;
 const MAX_SLEUTELS = 50;
@@ -42,7 +43,7 @@ function maakApiPoort({ db, save, crypto, journaal }) {
     if (!Array.isArray(v.toelating)) v.toelating = [];
     return v;
   }
-  const nu = () => new Date().toISOString();
+  const nu = () => klokDatum().toISOString();
   const hash = (geheim, zout) => crypto.createHash('sha256').update(zout + ':' + geheim).digest('hex');
 
   /* ---------- de toelating: wat mag hier ooit achter ---------- */
@@ -79,7 +80,7 @@ function maakApiPoort({ db, save, crypto, journaal }) {
   const kort = (s) => ({ id: s.id, naam: s.naam, eigenaar: s.eigenaar || null, scopes: s.scopes,
     quotaPerUur: s.quotaPerUur, gemaakt: s.gemaakt, door: s.door, vervalt: s.vervalt,
     ingetrokken: s.ingetrokken, laatst: s.laatst, geweigerd: s.geweigerd,
-    gebruiktDitUur: s.teller && s.teller.uur === Math.floor(Date.now() / UUR) ? s.teller.n : 0 });
+    gebruiktDitUur: s.teller && s.teller.uur === Math.floor(klokNu() / UUR) ? s.teller.n : 0 });
 
   function maak(naam, scopes, opties) {
     const v = vak();
@@ -108,7 +109,7 @@ function maakApiPoort({ db, save, crypto, journaal }) {
           ? sc.methoden.map(m => String(m).toUpperCase()) : ['GET', 'POST'] })),
       quotaPerUur: Math.max(1, Math.min(Number(o.quotaPerUur || 1000), 1000000)),
       gemaakt: nu(), door: String(o.door || ''),
-      vervalt: o.dagen ? new Date(Date.now() + Number(o.dagen) * 86400000).toISOString() : null,
+      vervalt: o.dagen ? new Date(klokNu() + Number(o.dagen) * 86400000).toISOString() : null,
       ingetrokken: null, teller: { uur: 0, n: 0 }, laatst: null, geweigerd: 0
     };
     save();

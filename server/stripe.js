@@ -1,7 +1,7 @@
 /* Eigen, dunne client voor de Stripe-API, i.p.v. het pakket 'stripe'. Dekt
-   precies wat de betaal-naad (server/betaal.js) gebruikt: een PaymentIntent
-   en een Payout aanmaken (met idempotentiesleutel), en de handtekening van
-   een inkomende webhook verifieren. Draait op onze eigen HTTP-client, form-
+   precies wat de betaal-naad (server/betaal.js) gebruikt: een PaymentIntent,
+   gehoste Checkout Session en Payout aanmaken (met idempotentiesleutel), en
+   de handtekening van een inkomende webhook verifieren. Draait op onze HTTP-client, form-
    urlencoded zoals de Stripe-API verwacht. Geen dependency.
 
    const Stripe = require('./stripe'); const stripe = Stripe(SECRET_KEY);
@@ -29,8 +29,28 @@ function Stripe(apiKey, opts) {
     throw fout;
   }
 
+  async function get(pad) {
+    const headers = { authorization: 'Bearer ' + apiKey, 'user-agent': 'rtg-stripe/1', 'stripe-version': '2024-06-20' };
+    const r = await http.vraag({ url: BASIS + pad, method: 'GET', headers, timeout, maxRetries: 1 });
+    let data = {}; try { data = r.json(); } catch (e) {}
+    if (r.status >= 200 && r.status < 300) return data;
+    const bericht = (data && data.error && data.error.message) || ('Stripe-API-fout ' + r.status);
+    const fout = new Error(bericht); fout.status = r.status; fout.raw = data; throw fout;
+  }
+
   return {
-    paymentIntents: { create(params, extra) { return post('/v1/payment_intents', params, extra); } },
+    paymentIntents: {
+      create(params, extra) { return post('/v1/payment_intents', params, extra); },
+      retrieve(id) { return get('/v1/payment_intents/' + encodeURIComponent(String(id))); }
+    },
+    checkout: { sessions: {
+      create(params, extra) { return post('/v1/checkout/sessions', params, extra); },
+      retrieve(id) { return get('/v1/checkout/sessions/' + encodeURIComponent(String(id))); }
+    } },
+    refunds: {
+      create(params, extra) { return post('/v1/refunds', params, extra); },
+      retrieve(id) { return get('/v1/refunds/' + encodeURIComponent(String(id))); }
+    },
     payouts: { create(params, extra) { return post('/v1/payouts', params, extra); } },
     webhooks: {
       /* Stripe-handtekening: de header is "t=<tijd>,v1=<hmac>,...". De getekende

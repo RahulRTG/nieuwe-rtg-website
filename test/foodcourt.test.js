@@ -36,6 +36,9 @@ test('1. de food court toont restaurants met keuken en prijs; alleen na inlog', 
   assert.ok(r.body.restaurants.length >= 1, 'er staat minstens een restaurant');
   const eersteMet = r.body.restaurants[0];
   assert.ok(eersteMet.code && eersteMet.naam && eersteMet.keuken && eersteMet.prijs, 'elk restaurant heeft keuken en prijs');
+  assert.equal(typeof eersteMet.menuAantal, 'number', 'de klantkaart kent de omvang van het menu');
+  assert.ok(Array.isArray(eersteMet.categorieen), 'categorieen zijn direct beschikbaar voor snel filteren');
+  assert.equal(typeof eersteMet.bezorgen, 'boolean', 'bezorgbeschikbaarheid is expliciet');
   assert.ok(Array.isArray(r.body.keukens) && r.body.keukens.length, 'er zijn keukens om op te filteren');
 });
 

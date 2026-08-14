@@ -80,6 +80,29 @@ test('2. een API-fout wordt een nette Error met status en bericht', async () => 
   }
 });
 
+test('2b. gehoste Checkout gebruikt dezelfde idempotentie en geneste ordervelden', async () => {
+  const server = await nepStripe(() => ({ json: { id: 'cs_1', status: 'open', payment_status: 'unpaid',
+    url: 'https://checkout.stripe.com/c/pay/cs_1' } }));
+  const oud = process.env.STRIPE_BASE_URL; process.env.STRIPE_BASE_URL = server.base;
+  try {
+    delete require.cache[require.resolve('../server/stripe')];
+    const stripe = require('../server/stripe')('sk_test_123');
+    const s = await stripe.checkout.sessions.create({ mode: 'payment', client_reference_id: 'BW-1',
+      line_items: [{ quantity: 1, price_data: { currency: 'eur', unit_amount: 1250,
+        product_data: { name: 'Bestelling' } } }] }, { idempotencyKey: 'checkout-1' });
+    assert.equal(s.id, 'cs_1');
+    const v = server.laatste.verzoeken[0];
+    assert.equal(v.pad, '/v1/checkout/sessions');
+    assert.equal(v.headers['idempotency-key'], 'checkout-1');
+    assert.equal(v.form['line_items[0][price_data][unit_amount]'], '1250');
+    assert.equal(v.form['line_items[0][price_data][product_data][name]'], 'Bestelling');
+  } finally {
+    server.srv.close();
+    if (oud == null) delete process.env.STRIPE_BASE_URL; else process.env.STRIPE_BASE_URL = oud;
+    delete require.cache[require.resolve('../server/stripe')];
+  }
+});
+
 test('3. webhook: een echte Stripe-handtekening wordt aanvaard, geknoei en ouderdom niet', () => {
   const Stripe = require('../server/stripe');
   const stripe = Stripe('sk_test_123');

@@ -13,7 +13,7 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, schoon, findSupplier, orderlaag, buitenshuis, bezorglaag, beleid, stuur, naad } = kern;
+  const { app, auth, schoon, findSupplier, horeca, orderlaag, buitenshuis, bezorglaag, beleid, stuur, naad } = kern;
 
   /* De codenaam van het lid. Nooit de echte naam en nooit de sleutel: de
      identiteitskluis blijft gescheiden, ook als de bezorger voor de deur staat
@@ -28,6 +28,17 @@ module.exports = (kern) => {
     const s = findSupplier(schoon((req.body || {}).zaak, 30));
     if (!s) { res.status(404).json({ error: 'Deze zaak kennen we niet.', code: 'zaak-onbekend' }); return null; }
     return s;
+  };
+
+  const betaalBuiten = require('./betalen-buiten')({ kern, zaakVan, handleVan,
+    horeca, orderlaag, naad });
+
+  const checkoutVan = require('./checkout-buiten')({ kern, horeca, bezorglaag, beleid, schoon });
+
+  const publiekCheckout = (uit) => {
+    const schoonUit = Object.assign({}, uit);
+    delete schoonUit._check;
+    return schoonUit;
   };
 
   /* ---------- kan het hier bezorgd worden ----------
@@ -45,12 +56,20 @@ module.exports = (kern) => {
       datum: sloten.datum, sloten: sloten.sloten.filter(x => !x.vol) }));
   });
 
-  /* ---------- de kaart van een zaak, buiten de deur ---------- */
-  app.post('/api/gast/bezorg/kaart', auth, (req, res) => {
+  /* Eén controlepoort voor bezorgen én afhalen. De naam blijft onder bezorg
+     omdat dit scherm en deze ledensessie daar al hun API-ruimte hebben; het
+     veld `kanaal` maakt het antwoord ondubbelzinnig. */
+  app.post('/api/gast/bezorg/checkout', auth, (req, res) => {
+    if (kern.gegevensStop(req, res, 'bestelling')) return;
     const s = zaakVan(req, res); if (!s) return;
-    res.json({ ok: true, zaak: { code: s.code, naam: s.name },
-      kaart: kern.gastKaartVanZaak(s.code), beleid: beleid.beleidVan(s.code) });
+    const b = req.body || {};
+    const kanaal = b.kanaal === 'afhaal' ? 'afhaal' : 'bezorging';
+    const uit = checkoutVan(s, b, kanaal);
+    if (uit.error) return stuur(res, uit);
+    res.json(betaalBuiten.verrijkCheckout(req, publiekCheckout(uit)));
   });
+
+  require('./profiel-buiten')({ kern, zaakVan, horeca, bezorglaag, beleid, schoon });
 
   /* ---------- bestellen ---------- */
   function bestelBuiten(req, res, kanaal) {
@@ -58,20 +77,25 @@ module.exports = (kern) => {
     const b = req.body || {};
     const handle = handleVan(req);
 
-    /* Eerst de zone, dan pas een rekening openen. Een half opgebouwde
-       bestelling bij een zaak die niet bij je bezorgt, is rommel die blijft
-       staan en die de zaak op zijn scherm ziet. */
-    let check = null;
-    if (kanaal === 'bezorging') {
-      check = bezorglaag.bezorgCheck(s.code, s, { postcode: b.postcode, lat: b.lat, lng: b.lng, bedragCenten: 0 });
-      if (check.error) return stuur(res, check);
-      if (!check.bezorgbaar) return res.status(409).json({ error: check.reden || check.redenDicht,
-        code: check.code || 'bezorging-dicht', km: check.km || null });
-    }
+    /* Eerst het HELE mandje en de zone, dan pas een rekening openen. Dezelfde
+       functie voedt de controlesheet in de app, maar de server voert hem hier
+       opnieuw uit: een oude of aangepaste browser kan de grens niet omzeilen. */
+    const voorbeeld = checkoutVan(s, b, kanaal);
+    if (voorbeeld.error) return stuur(res, voorbeeld);
+    /* Een vol slot houdt de oude, herstelbare API-belofte: de regels worden
+       aangenomen en het antwoord noemt een alternatief. De nieuwe checkout
+       voorkomt dat normale schermgebruikers zover komen, maar een oudere app
+       verliest zijn bestelling niet. Andere blokkades openen niets. */
+    if (!voorbeeld.bevestigbaar && voorbeeld.blokkadeCode !== 'slot-vol')
+      return res.status(409).json({ error: voorbeeld.blokkade,
+        code: voorbeeld.blokkadeCode, checkout: publiekCheckout(voorbeeld) });
+    const check = voorbeeld._check;
 
     const lop = buitenshuis.lopende(s.code, kanaal, handle);
     if (lop.error) return stuur(res, lop);
     const rek = lop.rekening;
+    const betalingLoopt = betaalBuiten.bewaakRekening(rek);
+    if (betalingLoopt) return res.status(betalingLoopt.status).json(betalingLoopt);
 
     const kaart = kern.gastKaartVanZaak(s.code);
     const uit = orderlaag.bestel(s.code, rek, lop.deelnemer, {
@@ -112,6 +136,11 @@ module.exports = (kern) => {
     } else {
       buitenshuis.zetAfhaal(rek, { datum: b.datum, tijd: b.tijd, opmerking: b.opmerking });
     }
+    /* Bij betaling op locatie mag de keuken meteen aan de slag. Bij online
+       betalen blijft de bon achter de harde grendel tot de provider definitief
+       heeft bevestigd -- processing of authorized is nadrukkelijk niet genoeg. */
+    rek.betaalVoorkeur = b.betalingWijze === 'online' ? 'online' : 'ontvangst';
+    if (rek.betaalVoorkeur !== 'online') betaalBuiten.maakVrij(rek);
     orderlaag.audit(rek, { actor: handle, bron: 'gast', apparaat: schoon(b.apparaat, 40) || null,
       wat: kanaal, naar: (b.tijd || 'zonder tijd') });
     kern.save();
@@ -139,18 +168,6 @@ module.exports = (kern) => {
     bestelBuiten(req, res, 'afhaal');
   });
 
-  /* ---------- mijn bestellingen ---------- */
-  app.post('/api/gast/bezorg/mijn', auth, (req, res) => {
-    res.json({ ok: true, bestellingen: buitenshuis.mijne(kern.db, handleVan(req)) });
-  });
-
-  app.post('/api/gast/bezorg/rekening', auth, (req, res) => {
-    const s = zaakVan(req, res); if (!s) return;
-    const kanaal = String((req.body || {}).kanaal || 'bezorging');
-    const lop = buitenshuis.lopende(s.code, kanaal, handleVan(req), { open: false });
-    if (lop.error) return stuur(res, lop);
-    if (!lop.rekening) return res.status(404).json({ error: 'Je hebt hier geen lopende bestelling.', code: 'niets-open' });
-    res.json({ ok: true, rekening: orderlaag.gastBeeld(lop.rekening, lop.deelnemer),
-      bezorg: lop.rekening.bezorg || null, afhaal: lop.rekening.afhaal || null });
-  });
+  require('./mijn-buiten')({ kern, zaakVan, handleVan, horeca, orderlaag,
+    buitenshuis, findSupplier, stuur });
 };

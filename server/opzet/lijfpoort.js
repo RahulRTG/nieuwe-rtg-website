@@ -33,7 +33,7 @@ function teDiep(wortel) {
 }
 
 module.exports = function lijfpoort(deps) {
-  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar,
+  const { app, express, db, save, log, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
     zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
 
   /* De twee betaal-webhooks staan in ./webhooks.js. Ze horen HIER en niet in de
@@ -42,7 +42,7 @@ module.exports = function lijfpoort(deps) {
      en niet krijgen -- en waarom de hoofdzekering er bewust niet bij zit --
      staat in de kop van dat bestand. */
   require('./webhooks')({
-    app, express, db, save, log, betaal, muntbetaal,
+    app, express, db, save, log, betaal, betaalWaarheid, muntbetaal,
     opslagKlaar: () => opslagKlaar(),
     // pas verderop in server.js gebouwd; zie de uitleg in webhooks.js
     muntenVan, settleFactuurVan, opdrachtenVan

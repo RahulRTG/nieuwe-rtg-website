@@ -1,9 +1,9 @@
 /* Betaal-abstractie: één naad waarachter de echte provider zit.
 
-   - Staat STRIPE_SECRET_KEY klaar, dan draaien betalingen echt via Stripe: een
-     PaymentIntent met idempotentiesleutel, en webhooks die met de
-     Stripe-handtekening worden geverifieerd. Dat loopt over onze EIGEN dunne
-     client (./stripe), niet over het npm-pakket: geen dependency.
+   - Stripe, Mollie en Adyen zijn verwisselbare rails. Stripe en Adyen gebruiken
+     ondertekende gebeurtenissen; bij de klassieke Mollie-webhook halen we de
+     betaling met onze eigen API-sleutel terug. Altijd is de provider -- nooit
+     de browser -- de bron voor "betaald".
    - Anders draait de demo-provider: dezelfde interface, maar hij "bevestigt"
      direct zonder echt geld. Zo werkt lokaal en in demo alles zonder keys.
 
@@ -19,13 +19,29 @@ const crypto = require('crypto');
 
 const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || '';
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+const MOLLIE_KEY = process.env.MOLLIE_API_KEY || '';
+const ADYEN_KEY = process.env.ADYEN_API_KEY || '';
 
 let stripe = null;
 if (STRIPE_KEY) {
   try { stripe = require('./stripe')(STRIPE_KEY); } // eigen dunne client (geen dependency)
   catch (e) { /* kan niet starten: val terug op demo */ }
 }
-const AANBIEDER = stripe ? 'stripe' : 'demo';
+let mollie = null;
+if (MOLLIE_KEY) {
+  try { mollie = require('./mollie')(MOLLIE_KEY); }
+  catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
+}
+let adyen = null;
+if (ADYEN_KEY) {
+  try { adyen = require('./adyen')(ADYEN_KEY); }
+  catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
+}
+const voorkeur = String(process.env.PAYMENT_PROVIDER || '').toLowerCase();
+const AANBIEDER = voorkeur === 'mollie' && mollie ? 'mollie'
+  : voorkeur === 'adyen' && adyen ? 'adyen'
+  : voorkeur === 'stripe' && stripe ? 'stripe'
+  : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen' : 'demo';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
    persistente store injecteren (bijv. gespiegeld in de database), zodat de
@@ -38,31 +54,9 @@ function koppelStore(store) {
   if (store && typeof store.set === 'function') bewaar = store.set;
 }
 
-/* Start (of hervind) een betaling. Geeft { id, status, aanbieder, ... } terug.
-   Bij Stripe is status doorgaans 'requires_...' tot de webhook 'succeeded' meldt;
-   bij de demo is hij meteen 'betaald'. Herhaalde aanroepen met dezelfde
-   idempotentieSleutel geven exact hetzelfde resultaat terug (met herhaald:true). */
-async function maakBetaling(opdracht) {
-  const { bedrag, valuta = 'eur', referentie, idempotentieSleutel, omschrijving } = opdracht || {};
-  if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
-  const sleutel = idempotentieSleutel || (referentie ? 'ref:' + referentie : crypto.randomUUID());
-
-  const bestaand = haalOp(sleutel);
-  if (bestaand) return Object.assign({}, bestaand, { herhaald: true });
-
-  let res;
-  if (stripe) {
-    const pi = await stripe.paymentIntents.create(
-      { amount: Math.round(bedrag), currency: valuta, description: omschrijving, metadata: { referentie: referentie || '' } },
-      { idempotencyKey: sleutel }
-    );
-    res = { id: pi.id, status: pi.status, clientSecret: pi.client_secret, aanbieder: 'stripe', bedrag: Math.round(bedrag), valuta, referentie };
-  } else {
-    res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald', aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };
-  }
-  bewaar(sleutel, res);
-  return res;
-}
+const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
+  standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v), env: process.env });
+const { maakBetaling, haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder } = ontvangst;
 
 /* Start (of hervind) een uitbetaling naar een externe bankrekening (SEPA).
    Gebruikt voor de vaste 30%-afdracht aan de RTFoundation: RTG ontvangt de
@@ -140,4 +134,9 @@ function tekenDemo(ruweBody) {
   return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
 }
 
-module.exports = { AANBIEDER, maakBetaling, maakUitbetaling, verifieerWebhook, koppelStore, tekenDemo, WEBHOOK_SECRET };
+module.exports = { AANBIEDER, maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
+  verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
+  WEBHOOK_SECRET, MOLLIE_AAN: !!mollie, ADYEN_AAN: !!adyen,
+  adyenMerchantAccount: adyen && adyen.merchantAccount,
+  adyenHandmatigeCapture: !!(adyen && adyen.handmatigeCapture),
+  verifieerAdyenMelding: (item) => !!(adyen && adyen.verifieerMelding(item)) };

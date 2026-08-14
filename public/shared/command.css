@@ -11,8 +11,8 @@
    Let op de volgorde: het beginscherm blijft ook hier het beginscherm. De
    klasse rtg-command hangt er pas op zodra er echt een blad openstaat
    (shared/command.js, bouw/sloop), en dan mag hij de home eronder wegnemen --
-   een werktafel is volledig scherm. Zolang hij er niet staat, staan #shell en
-   de wings er gewoon; dat is geen uitzondering maar de reden dat ze bestaan.
+   een werktafel is volledig scherm. Zolang hij er niet staat, staat #shell er
+   gewoon.
 
    Dit blad stond eerst volledig in @media (min-width:1000px), met daaronder
    `@media (max-width:999px){#rtgCommand{display:none!important}}`. Die twee
@@ -21,7 +21,7 @@
    overal. */
 
 body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
-body.rtg-command > #shell,body.rtg-command > .wing{display:none!important;}
+body.rtg-command > #shell{display:none!important;}
 #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}

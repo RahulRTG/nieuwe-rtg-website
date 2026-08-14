@@ -172,10 +172,17 @@ test('8. Rahul leest mee met meer dan drie opdrachten, en weigert wat hij niet k
   const t = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Notitie' }, lidA);
   await api('/api/kantoorpakket/bewaar', { id: t.body.id,
     inhoud: { tekst: '<p>Jan levert het rapport voor vrijdag. De cijfers moeten nog onderbouwd.</p>' } }, lidA);
-  for (const opdracht of ['samenvatten', 'herschrijven', 'inkorten', 'actiepunten', 'kritisch', 'engels']) {
+  for (const opdracht of ['samenvatten', 'inkorten', 'actiepunten', 'kritisch']) {
     const r = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht }, lidA);
-    assert.equal(r.status, 200, opdracht + ' bestaat');
+    assert.equal(r.status, 200, opdracht + ' werkt ook zonder AI-provider');
+    assert.equal(r.body.stand, 'lokaal', opdracht + ' is een controleerbare lokale bewerking');
     assert.ok(r.body.voorstel && r.body.voorstel.length > 10, opdracht + ' levert een leesbaar voorstel');
+  }
+  for (const opdracht of ['herschrijven', 'engels', 'doorschrijven']) {
+    const r = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht }, lidA);
+    assert.equal(r.status, 503, opdracht + ' doet zonder provider niet alsof');
+    assert.equal(r.body.code, 'AI_NIET_BESCHIKBAAR');
+    assert.equal(r.body.handmatig, true, 'het document blijft handmatig bruikbaar');
   }
   const raar = await api('/api/kantoorpakket/ai', { id: t.body.id, opdracht: 'verzin-maar-wat' }, lidA);
   assert.equal(raar.status, 400, 'een onbekende opdracht wordt geweigerd');

@@ -25,6 +25,11 @@ const MAX_INZENDINGEN = 500;     // per formulier; een enquete, geen volkstellin
 const VORMEN = ['kader', 'ovaal', 'ruit', 'pijl', 'tekst'];
 const MAX_VORMEN = 300;
 const VLAK_B = 1200, VLAK_H = 800; // het tekenvlak van een schets (viewBox)
+/* Een documentstatus is geen decoratie. Concept, beoordeling, goedgekeurd en
+   archief zijn de vier menselijke standen van hetzelfde stuk. Rahul mag een
+   voorstel doen, maar zet nooit zelf een document op goedgekeurd. */
+const FASES = ['concept', 'beoordeling', 'goedgekeurd', 'archief'];
+const MAX_AUDIT = 60;
 
 const { SJABLONEN } = require('./sjablonen');
 
@@ -53,6 +58,12 @@ function maakBasis({ db, crypto, codenaamVan }) {
     || (inKring(d, kring) && d.kringDeel === 'bewerken');
   const magLezen = (d, key, kring) => magSchrijven(d, key, kring) || (d.gedeeldMet || []).includes(key)
     || inKring(d, kring);
+  const faseVan = d => FASES.includes(d && d.fase) ? d.fase : 'concept';
+  const schrijfAudit = (d, door, actie, extra) => {
+    if (!d.audit) d.audit = [];
+    d.audit.unshift(Object.assign({ om: nu(), door: naamVan(door), actie: String(actie || '').slice(0, 40) }, extra || {}));
+    if (d.audit.length > MAX_AUDIT) d.audit.length = MAX_AUDIT;
+  };
 
   // de inhoud netjes begrenzen per soort (geen vreemde velden, geen enorme cellen)
   function schoonInhoud(soort, inhoud) {
@@ -149,9 +160,10 @@ function maakBasis({ db, crypto, codenaamVan }) {
     return { tekst: String(inhoud.tekst || '').slice(0, MAX_BYTES) };
   }
 
-  return { id, nu, lijsten, docMet, grootteVan, naamVan, inKring, magSchrijven, magLezen, schoonInhoud };
+  return { id, nu, lijsten, docMet, grootteVan, naamVan, inKring, magSchrijven, magLezen,
+    faseVan, schrijfAudit, schoonInhoud };
 }
 
 module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS,
   OPMAAK, INDELINGEN, THEMAS, VRAAGSOORTEN, MAX_VRAGEN, MAX_INZENDINGEN,
-  VORMEN, MAX_VORMEN, VLAK_B, VLAK_H, SJABLONEN, maakBasis };
+  VORMEN, MAX_VORMEN, VLAK_B, VLAK_H, FASES, MAX_AUDIT, SJABLONEN, maakBasis };

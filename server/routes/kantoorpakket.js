@@ -11,8 +11,8 @@
 module.exports = (kern) => {
   const { app, auth, supplierAuth, officeAuth, express, officeMijn, officeMaak, officeOpen,
     officeBewaar, officeDeel, officeWeg, officeSter, officeVersies, officeTerug, officeAI,
-    officeVul, officeUitslag } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+    officeVul, officeUitslag, officeFase } = kern;
+  const stuur = (res, r) => r.error ? res.status(r.status || 400).json(r) : res.json(r);
   const ruim = express.json({ limit: '600kb' });
 
   /* Dezelfde acties voor elke ingang; alleen de sleutel verschilt. */
@@ -37,6 +37,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/kantoorpakket/versies', supplierAuth, supDoe((key, b) => officeVersies(key, b.id)));
   app.post('/api/supplier/kantoorpakket/terug', supplierAuth, supDoe((key, b) => officeTerug(key, b.id, b.nr)));
   app.post('/api/supplier/kantoorpakket/ai', supplierAuth, supDoe((key, b) => officeAI(key, b.id, b.opdracht, b.vraag)));
+  app.post('/api/supplier/kantoorpakket/fase', supplierAuth, supDoe((key, b) => officeFase(key, b.id, b)));
   app.post('/api/supplier/kantoorpakket/vul', supplierAuth, supDoe((key, b) => officeVul(key, b.id, b)));
   app.post('/api/supplier/kantoorpakket/uitslag', supplierAuth, supDoe((key, b) => officeUitslag(key, b.id)));
 
@@ -61,6 +62,7 @@ module.exports = (kern) => {
   app.post('/api/office/kantoorpakket/versies', officeAuth, kantoorDoe((key, b) => officeVersies(key, b.id)));
   app.post('/api/office/kantoorpakket/terug', officeAuth, kantoorDoe((key, b) => officeTerug(key, b.id, b.nr)));
   app.post('/api/office/kantoorpakket/ai', officeAuth, kantoorDoe((key, b) => officeAI(key, b.id, b.opdracht, b.vraag)));
+  app.post('/api/office/kantoorpakket/fase', officeAuth, kantoorDoe((key, b) => officeFase(key, b.id, b)));
   app.post('/api/office/kantoorpakket/vul', officeAuth, kantoorDoe((key, b) => officeVul(key, b.id, b)));
   app.post('/api/office/kantoorpakket/uitslag', officeAuth, kantoorDoe((key, b) => officeUitslag(key, b.id)));
 
@@ -86,6 +88,7 @@ module.exports = (kern) => {
     app.post('/api/kantoorpakket/versies', ...ledenAuth, doe((key, b) => officeVersies(key, b.id)));
     app.post('/api/kantoorpakket/terug', ...ledenAuth, doe((key, b) => officeTerug(key, b.id, b.nr)));
     app.post('/api/kantoorpakket/ai', ...ledenAuth, doe((key, b) => officeAI(key, b.id, b.opdracht, b.vraag)));
+    app.post('/api/kantoorpakket/fase', ...ledenAuth, doe((key, b) => officeFase(key, b.id, b)));
     app.post('/api/kantoorpakket/vul', ...ledenAuth, doe((key, b) => officeVul(key, b.id, b)));
     app.post('/api/kantoorpakket/uitslag', ...ledenAuth, doe((key, b) => officeUitslag(key, b.id)));
   }
@@ -98,4 +101,5 @@ module.exports = (kern) => {
      voluit kwamen. stuur en ruim reizen mee -- die horen bij het pakket, niet
      bij een ingang. */
   require('./kantoorpakket-huis')(kern, { stuur, ruim });
+  require('./kantoorpakket-samen')(kern);
 };

@@ -1,0 +1,46 @@
+/* RTG Office: de gedeelde enterprise-laag rond ieder product. */
+.office-signalen{grid-template-columns:repeat(4,minmax(5.5rem,1fr));}
+.office-presence{display:flex;align-items:center;gap:.42rem;min-width:6.4rem;background:transparent;border:1px solid var(--line);
+  color:var(--soft);border-radius:999px;padding:.38rem .62rem;font-size:.68rem;white-space:nowrap;}
+.office-presence:hover{border-color:rgba(201,162,75,.38);color:var(--txt);}
+.office-presence>span:first-child{width:.43rem;height:.43rem;border-radius:50%;background:var(--groen);
+  box-shadow:0 0 9px rgba(105,184,145,.45);flex:none;}
+.office-presence[data-typt="1"]>span:first-child{background:var(--gold);box-shadow:0 0 10px rgba(201,162,75,.55);}
+.office-docmeta{display:inline-flex;gap:.3rem;margin-left:.4rem;vertical-align:middle;}
+.office-docmeta i{font-style:normal;border:1px solid var(--line);border-radius:999px;padding:.08rem .34rem;
+  font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--zacht);}
+.office-docmeta i[data-klasse="vertrouwelijk"]{border-color:rgba(201,162,75,.28);color:#D8BF80;}
+.office-docmeta i[data-klasse="strikt"]{border-color:rgba(222,110,146,.35);color:#E8A1B7;}
+.office-docmeta i[data-actie-open]{color:var(--txt);border-color:rgba(194,58,94,.42);}
+
+.office-samen{width:min(68rem,calc(100vw - 2rem));max-height:min(88dvh,56rem);padding:0;overflow:auto;
+  background:radial-gradient(circle at 88% 4%,rgba(127,22,52,.18),transparent 26rem),#121110;}
+.office-samenkop{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;
+  padding:1.3rem 1.4rem .95rem;background:rgba(18,17,16,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(18px);}
+.office-samenkop h3{font-family:'Bodoni Moda',serif;font-size:2rem;font-weight:500;line-height:1;}
+.office-samenstand{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);}
+.office-samenstand>div{padding:1rem 1.4rem;min-height:4.6rem;}.office-samenstand>div+div{border-left:1px solid var(--line);}
+.office-lab{display:block;color:var(--zacht);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem;}
+#samenAanwezig,#samenBeleid{display:flex;flex-wrap:wrap;gap:.35rem;color:var(--soft);font-size:.75rem;}
+.office-persoon,.office-policychip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--line);padding:.28rem .5rem;border-radius:999px;}
+.office-persoon:before{content:"";width:.36rem;height:.36rem;border-radius:50%;background:var(--groen);}
+.office-persoon[data-stand="typt"]:before{background:var(--gold);box-shadow:0 0 7px rgba(201,162,75,.45);}
+.office-opmerkingen,.office-beheer{padding:1.15rem 1.4rem 1.35rem;}.office-beheer{border-top:1px solid var(--line);}
+.office-sectiekop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:.75rem;}
+.office-sectiekop h4{font-family:'Bodoni Moda',serif;font-size:1.35rem;font-weight:500;}.office-sectiekop>span{color:var(--zacht);font-size:.7rem;}
+#opmerkingForm{display:grid;gap:.5rem;padding:.8rem;border:1px solid var(--line);background:rgba(255,255,255,.015);}
+.office-anker{width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid var(--acc);
+  color:var(--soft);padding-left:.5rem;font-size:.7rem;}
+#opmerkingForm textarea,#opmerkingForm input,.office-beheervelden input,.office-beheervelden select{width:100%;background:var(--veld);
+  border:1px solid var(--line);border-radius:3px;color:var(--txt);font:inherit;font-size:.78rem;padding:.52rem .6rem;}
+.office-opmerkingmeta{display:grid;grid-template-columns:1fr 12rem auto;gap:.5rem;align-items:end;}
+.office-opmerkingmeta label,.office-beheervelden label{display:grid;gap:.3rem;color:var(--zacht);font-size:.64rem;}
+.office-opmerkinglijst{display:grid;margin-top:.65rem;}.office-opmerking{display:grid;grid-template-columns:1fr auto;gap:.7rem;padding:.8rem 0;border-bottom:1px solid var(--line);}
+.office-opmerking[data-opgelost="1"]{opacity:.52;}.office-opmerkingkop{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.35rem;font-size:.68rem;color:var(--zacht);}
+.office-opmerkingkop b{font-size:.75rem;color:var(--txt);font-weight:500;}.office-opmerking p{color:var(--soft);font-size:.8rem;line-height:1.5;white-space:pre-wrap;}
+.office-opmerkinganker{color:#D8BF80!important;font-size:.67rem!important;margin-top:.3rem;}.office-opmerkingactie{display:flex;gap:.3rem;align-items:start;}
+.office-beheervelden{display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr;gap:.55rem;}.office-beheervoet{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:.75rem;}
+.office-beheervoet p{color:var(--zacht);font-size:.68rem;max-width:38rem;line-height:1.45;}
+@media(max-width:820px){.office-signalen{grid-template-columns:repeat(2,1fr);}.office-presence{order:2;}.office-samenstand{grid-template-columns:1fr;}
+  .office-samenstand>div+div{border-left:0;border-top:1px solid var(--line);}.office-opmerkingmeta,.office-beheervelden{grid-template-columns:1fr;}
+  .office-beheervoet{align-items:stretch;flex-direction:column;}.office-samen{width:calc(100vw - 1rem);}}

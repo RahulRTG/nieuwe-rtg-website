@@ -6,13 +6,13 @@
    (scripts/check.js regel 13) toen de paden voluit kwamen te staan -- en
    voluit moeten ze, anders ziet de schakelkast ze niet (regel 45). De naad
    ligt op de INGANG en niet middenin de acties: alle vier de ingangen doen
-   dezelfde twaalf dingen, alleen de sleutel en de kring verschillen.
+   dezelfde dertien dingen, alleen de sleutel en de kring verschillen.
 
    Gemount vanuit routes/kantoorpakket.js. */
 module.exports = (kern, gedeeld) => {
   const { app, rtf, werkplek, boardroomWie, boardroomBaas, officeMijn, officeMaak, officeOpen,
     officeBewaar, officeWeg, officeSter, officeVersies, officeTerug, officeAI, officeKring,
-    officeVul, officeUitslag } = kern;
+    officeVul, officeUitslag, officeFase } = kern;
   const { stuur, ruim } = gedeeld;
 
   /* RTF-leden: elk gezinsprofiel een eigen map (gezinscode + profieltoken in
@@ -46,6 +46,7 @@ module.exports = (kern, gedeeld) => {
   app.post('/api/rtf/kantoorpakket/versies', rtfPoort, rtfDoe((s, b) => officeVersies(s.key, b.id, s.kring)));
   app.post('/api/rtf/kantoorpakket/terug', rtfPoort, rtfDoe((s, b) => officeTerug(s.key, b.id, b.nr), { schrijf: true }));
   app.post('/api/rtf/kantoorpakket/ai', rtfPoort, rtfDoe((s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring), { schrijf: true }));
+  app.post('/api/rtf/kantoorpakket/fase', rtfPoort, rtfDoe((s, b) => officeFase(s.key, b.id, b, s.kring), { schrijf: true }));
   app.post('/api/rtf/kantoorpakket/gezin', rtfPoort, rtfDoe((s, b) => officeKring(s.key, b.id, b.rechten), { schrijf: true }));
   // invullen mag ook een oppas of familielid (gast): antwoorden is geen bewerken
   app.post('/api/rtf/kantoorpakket/vul', rtfPoort, rtfDoe((s, b) => officeVul(s.key, b.id, b, s.kring)));
@@ -88,6 +89,7 @@ module.exports = (kern, gedeeld) => {
   app.post('/api/werkplek/kantoorpakket/versies', huisPoort, huisDoe((s, b) => officeVersies(s.key, b.id, s.kring)));
   app.post('/api/werkplek/kantoorpakket/terug', huisPoort, huisDoe((s, b) => officeTerug(s.key, b.id, b.nr)));
   app.post('/api/werkplek/kantoorpakket/ai', huisPoort, huisDoe((s, b) => officeAI(s.key, b.id, b.opdracht, b.vraag, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/fase', huisPoort, huisDoe((s, b) => officeFase(s.key, b.id, b, s.kring)));
   app.post('/api/werkplek/kantoorpakket/vul', huisPoort, huisDoe((s, b) => officeVul(s.key, b.id, b, s.kring)));
   app.post('/api/werkplek/kantoorpakket/uitslag', huisPoort, huisDoe((s, b) => officeUitslag(s.key, b.id, s.kring)));
 };

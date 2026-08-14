@@ -22,6 +22,14 @@
   };
   var GLYF_SOORT = { tekst: 'logboek', blad: 'grafiek', presentatie: 'podium', formulier: 'opties', schets: 'ontwerp', bord: 'agenda' };
   var NAAM_SOORT = { tekst: 'Document', blad: 'Rekenblad', presentatie: 'Presentatie', formulier: 'Formulier', schets: 'Schets', bord: 'Bord' };
+  var FASE_NAAM = { concept: 'Concept', beoordeling: 'Ter beoordeling', goedgekeurd: 'Goedgekeurd', archief: 'Archief' };
+  var AUDIT_NAAM = { aangemaakt: 'Aangemaakt', bewerkt: 'Bewerkt', 'beoordeling-gevraagd': 'Beoordeling gevraagd',
+    goedgekeurd: 'Goedgekeurd', gearchiveerd: 'Gearchiveerd', 'concept-heropend': 'Heropend als concept',
+    'status-teruggezet': 'Terug naar concept na wijziging', 'versie-teruggezet': 'Eerdere versie teruggezet',
+    gedeeld: 'Gedeeld', 'deling-ingetrokken': 'Deling ingetrokken',
+    'opmerking-toegevoegd': 'Opmerking toegevoegd', 'opmerking-opgelost': 'Actie opgelost',
+    'opmerking-heropend': 'Actie heropend', 'opmerking-verwijderd': 'Opmerking verwijderd',
+    'documentbeheer-gewijzigd': 'Documentbeleid gewijzigd' };
 
   var PAR = new URLSearchParams(location.search);
   var WERK = PAR.get('werk') || '';
@@ -84,5 +92,5 @@
   };
 
   var open = null, magBewerken = false, bewaarT = null, vuil = false, leesT = null, stand = null;
+  var tabs = [], conflict = null, openVolgorde = 0;
   var blad = null, pres = null, presLoop = null, formulier = null, schets = null, bord = null;
-

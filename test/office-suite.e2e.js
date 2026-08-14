@@ -25,6 +25,16 @@ function laadBrowser() {
   return null;
 }
 const pw = laadBrowser();
+function browserOpties() {
+  const opties = { args: ['--no-sandbox'] };
+  const kandidaten = [process.env.RTG_BROWSER_PATH,
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+    '/usr/bin/google-chrome', '/usr/bin/chromium'].filter(Boolean);
+  const gevonden = kandidaten.find(p => fs.existsSync(p));
+  if (gevonden) opties.executablePath = gevonden;
+  return opties;
+}
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
@@ -40,7 +50,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     const reg = await api(base, '/api/auth/register', { name: 'Suite E2E', email: 'os' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1987-05-05', tier: 'rtg' });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties());
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -59,6 +69,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
         '<h1>De haven</h1><p>De haven ligt stil.</p><h2>Aankomst</h2><p>Wie de haven kent, vaart hier binnen.</p>';
       document.querySelector('#tekst').dispatchEvent(new Event('input', { bubbles: true }));
     });
+    await page.fill('#titel', 'Havenmemo');
 
     // zoeken en vervangen: alleen de tekst, nooit de opmaak
     await page.evaluate(() => {
@@ -99,11 +110,43 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     // de afdrukknop staat er (het afdrukken zelf is de dialoog van de browser)
     assert.ok(await page.evaluate(() => !!document.getElementById('printBtn')));
 
+    /* De formele werkstroom is menselijk: eerst ter beoordeling, daarna een
+       expliciete bevestiging van de eigenaar. */
+    await page.click('#faseHoofd');
+    await page.waitForFunction(() => document.querySelector('#faseBadge').dataset.fase === 'beoordeling',
+      null, { timeout: 8000 });
+    page.once('dialog', d => d.accept());
+    await page.click('#faseHoofd');
+    await page.waitForFunction(() => document.querySelector('#faseBadge').dataset.fase === 'goedgekeurd',
+      null, { timeout: 8000 });
+
+    /* Een tweede venster mag de zichtbare oude stand nooit stil overschrijven.
+       De lokale wijziging blijft staan tot de gebruiker kiest. */
+    const tekstId = await page.getAttribute('#docTabs .office-tab[data-actief="1"]', 'data-tab');
+    const actueel = await api(base, '/api/kantoorpakket/open', { id: tekstId }, reg.token);
+    await api(base, '/api/kantoorpakket/bewaar', { id: tekstId, verwachtGewijzigd: actueel.gewijzigd,
+      titel: 'Havenmemo', inhoud: { tekst: '<h1>Nieuwste serverversie</h1><p>Extern gecontroleerd.</p>' } }, reg.token);
+    await page.evaluate(() => {
+      document.querySelector('#tekst').innerHTML += '<p>Lokale, nog niet bewaarde regel.</p>';
+      document.querySelector('#tekst').dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await page.waitForSelector('#conflictScrim.open', { timeout: 8000 });
+    assert.match(await page.textContent('#conflictUitleg'), /niet overschreven/i);
+    await page.click('#conflictNieuwste');
+    await page.waitForFunction(() => /Extern gecontroleerd/.test(document.querySelector('#tekst').textContent),
+      null, { timeout: 8000 });
+
     /* ---- de presentatie ---- */
     await page.click('#editTerug');
     await page.waitForSelector('#nieuwPres', { timeout: 10000 });
     await page.click('#nieuwPres');
     await page.waitForSelector('#diaTitel', { timeout: 10000 });
+    assert.equal(await page.locator('#docTabs .office-tab').count(), 2,
+      'document en presentatie blijven als twee werkbare Office-tabs open');
+    await page.locator('#docTabs .office-tab').first().click();
+    await page.waitForFunction(() => document.querySelector('#titel').value === 'Havenmemo', null, { timeout: 8000 });
+    await page.locator('#docTabs .office-tab').last().click();
+    await page.waitForFunction(() => document.querySelector('#titel').value === 'Nieuwe presentatie', null, { timeout: 8000 });
     await page.fill('#diaTitel', 'Welkom aan boord');
     await page.fill('#diaNotitie', 'GEHEIM: alleen voor de spreker');
     await page.evaluate(() => { document.querySelector('#diaDup').click(); });

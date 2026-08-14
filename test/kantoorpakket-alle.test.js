@@ -3,7 +3,7 @@
    (kantoor-drive) en RTF-leden (per gezinsprofiel, met delen binnen het
    gezin). Bewaakt de vier ingangen, de scheiding tussen drives,
    presentaties, meeschrijf-rechten bij delen, de versiegeschiedenis met
-   terugzetten, sjablonen en de AI-schrijfhulp (demostand).
+   terugzetten, sjablonen en de AI-schrijfhulp met eerlijke lokale uitwijk.
    Draai los: node --experimental-sqlite --test test/kantoorpakket-alle.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -142,12 +142,13 @@ test('6. sjablonen: een vliegende start met een factuurblad en een pitch', async
     'elke dia heeft een titel en een indeling');
 });
 
-test('7. de AI-schrijfhulp: stelt voor (demostand), en alleen voor wie mag schrijven', async () => {
+test('7. de AI-schrijfhulp: lokale hulp blijft werken, en alleen voor wie mag schrijven', async () => {
   const m = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'AI-stuk' }, lidA);
   const id = m.body.id;
   await api('/api/kantoorpakket/bewaar', { id, inhoud: { tekst: 'Wij plannen de zomercampagne.' } }, lidA);
   const s = await api('/api/kantoorpakket/ai', { id, opdracht: 'samenvatten' }, lidA);
   assert.equal(s.status, 200);
+  assert.equal(s.body.stand, 'lokaal');
   assert.ok(s.body.voorstel && s.body.voorstel.length > 10, 'er komt een voorstel');
   const fm = await api('/api/kantoorpakket/ai', { id, opdracht: 'formule', vraag: 'tel kolom A op' }, lidA);
   assert.match(fm.body.voorstel, /^=SOM\(/, 'een formule-voorstel voor het rekenblad');
@@ -183,7 +184,7 @@ test('9. RTF: elk gezinsprofiel een eigen map, delen binnen het gezin, gast lees
   assert.equal((await rtf('/bewaar', { id, inhoud: { tekst: 'Naar Ibiza. Noor wil snorkelen.' } }, kindTok)).status, 200, 'samen schrijven kan');
   assert.equal((await rtf('/gezin', { id, rechten: 'bewerken' }, kindTok)).status, 403, 'alleen de maker deelt');
   assert.equal((await rtf('/weg', { id }, kindTok)).status, 403, 'alleen de maker verwijdert');
-  // de AI-schrijfhulp werkt ook hier (demostand)
+  // een controleerbare lokale bewerking werkt ook hier zonder AI-provider
   const ai = await rtf('/ai', { id, opdracht: 'samenvatten' }, mamaTok);
   assert.equal(ai.status, 200);
   assert.ok(ai.body.voorstel && ai.body.voorstel.length > 10);

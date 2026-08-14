@@ -5,7 +5,8 @@
 const { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, SJABLONEN } = require('./basis');
 
 module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
-  const { id, nu, lijsten, docMet, grootteVan, naamVan, magSchrijven, magLezen, schoonInhoud } = basis;
+  const { id, nu, lijsten, docMet, grootteVan, naamVan, magSchrijven, magLezen,
+    faseVan, schrijfAudit, schoonInhoud } = basis;
 
   /* ---- de mappenlijst: eigen documenten + wat met mij is gedeeld ---- */
   function mijn(key, kring) {
@@ -19,8 +20,11 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
     const kop = (d, vanMij) => ({ id: d.id, soort: d.soort, titel: d.titel, gewijzigd: d.gewijzigd,
       gemaakt: d.gemaakt || d.gewijzigd, door: naamVan(d.key), vanMij: !!vanMij,
       ster: !!d.ster, grootte: grootteVan(d.inhoud), versies: (d.versies || []).length,
-      gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length,
-      omvang: omvangVan(d) });
+      gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length, fase: faseVan(d),
+      laatstDoor: d.laatstDoor || naamVan(d.key),
+      omvang: omvangVan(d), openActies: (d.opmerkingen || []).filter(o => !o.opgelost).length,
+      classificatie: (d.beheer && d.beheer.classificatie) || 'intern',
+      herzienOp: (d.beheer && d.beheer.herzienOp) || '', tags: (d.beheer && d.beheer.tags) || [] });
     return { status: 200, docs: eigen.map(d => kop(d, true)), gedeeld: gedeeld.map(d => kop(d, false)),
       max: MAX_DOCS,
       sjablonen: Object.entries(SJABLONEN).map(([k, s]) => ({ id: k, soort: s.soort, titel: s.titel, groep: s.groep || 'Algemeen' })) };
@@ -81,8 +85,12 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       : soort === 'bord' ? { lijsten: [] }
       : { tekst: '' };
     const inhoud = sjab ? schoonInhoud(soort, JSON.parse(JSON.stringify(sjab.inhoud))) : leeg;
-    const d = { id: id(), key, soort, titel, inhoud, gedeeldMet: [], bewerkers: [], versies: [], gemaakt: nu(), gewijzigd: nu() };
+    const d = { id: id(), key, soort, titel, inhoud, gedeeldMet: [], bewerkers: [], versies: [],
+      fase: 'concept', audit: [], opmerkingen: [],
+      beheer: { classificatie: 'intern', bewaartermijn: '7jaar', herzienOp: '', tags: [] },
+      gemaakt: nu(), gewijzigd: nu(), laatstDoor: naamVan(key) };
     if (kring) { d.kring = kring; d.kringDeel = null; }
+    schrijfAudit(d, key, 'aangemaakt', { naar: 'concept' });
     alle[d.id] = d;
     save();
     return { status: 200, ok: true, id: d.id, soort, titel };
@@ -98,7 +106,14 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       magBewerken: magSchrijven(d, key, kring), eigenaar: ikEigenaar, door: naamVan(d.key), gewijzigd: d.gewijzigd,
       versies: (d.versies || []).length, kringDeel: d.kring ? (d.kringDeel || null) : undefined,
       gedeeldMet: ikEigenaar ? (d.gedeeldMet || []).map(naamVan) : undefined,
-      bewerkers: ikEigenaar ? (d.bewerkers || []).map(naamVan) : undefined };
+      bewerkers: ikEigenaar ? (d.bewerkers || []).map(naamVan) : undefined,
+      delingen: ikEigenaar ? (d.bewerkers || []).map(k => ({ codenaam: naamVan(k), naam: naamVan(k), rechten: 'bewerken' }))
+        .concat((d.gedeeldMet || []).map(k => ({ codenaam: naamVan(k), naam: naamVan(k), rechten: 'lezen' }))) : undefined,
+      samenwerken: { openActies: (d.opmerkingen || []).filter(o => !o.opgelost).length,
+        classificatie: (d.beheer && d.beheer.classificatie) || 'intern',
+        herzienOp: (d.beheer && d.beheer.herzienOp) || '' },
+      werkstroom: { fase: faseVan(d), laatstDoor: d.laatstDoor || naamVan(d.key),
+        audit: ikEigenaar ? (d.audit || []).slice(0, 20) : undefined } };
   }
 
   /* ---- bewaren (autosave): eigenaar of meeschrijver; met versiegeschiedenis ---- */
@@ -106,7 +121,18 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
     const d = docMet(did);
     if (!d) return { status: 404, error: 'Document niet gevonden.' };
     if (!magSchrijven(d, key, kring)) return { status: 403, error: 'U heeft geen schrijfrechten op dit document.' };
-    if (typeof data.titel === 'string' && d.key === key) d.titel = schoon(data.titel, MAX_TITEL) || d.titel;
+    /* Optimistische vergrendeling: een tweede venster mag nooit stil over een
+       nieuwere versie heen schrijven. Oude clients zonder dit veld blijven
+       werken; de nieuwe Office-client stuurt de laatst geopende tijd mee. */
+    if (data.verwachtGewijzigd && String(data.verwachtGewijzigd) !== String(d.gewijzigd)) {
+      return { status: 409, error: 'Dit document is intussen door iemand anders gewijzigd.',
+        code: 'VERSIECONFLICT', huidig: d.gewijzigd, laatstDoor: d.laatstDoor || naamVan(d.key) };
+    }
+    let veranderd = false;
+    if (typeof data.titel === 'string' && d.key === key) {
+      const titel = schoon(data.titel, MAX_TITEL) || d.titel;
+      if (titel !== d.titel) { d.titel = titel; veranderd = true; }
+    }
     if (data.inhoud && typeof data.inhoud === 'object') {
       const schoon2 = schoonInhoud(d.soort, data.inhoud);
       if (grootteVan(schoon2) > MAX_BYTES) return { status: 413, error: 'Dit document is te groot; kort het in.' };
@@ -115,17 +141,26 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       if (JSON.stringify(schoon2) !== JSON.stringify(d.inhoud)) {
         d.versies.unshift({ om: d.gewijzigd, door: naamVan(key), inhoud: d.inhoud });
         if (d.versies.length > MAX_VERSIES) d.versies.length = MAX_VERSIES;
+        veranderd = true;
       }
       d.inhoud = schoon2;
     }
+    if (!veranderd) return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d) };
+    const oudeFase = faseVan(d);
+    if (oudeFase !== 'concept') {
+      d.fase = 'concept';
+      schrijfAudit(d, key, 'status-teruggezet', { van: oudeFase, naar: 'concept', reden: 'inhoud gewijzigd' });
+    }
+    d.laatstDoor = naamVan(key);
     d.gewijzigd = nu();
+    schrijfAudit(d, key, 'bewerkt', { naar: faseVan(d) });
     save();
     // wie meeleest of meeschrijft krijgt een seintje dat er iets veranderd is
     for (const mk of [...(d.gedeeldMet || []), ...(d.bewerkers || []), d.key]) {
       if (mk === key) continue;
       try { sseToCustomer(mk, 'office', { kind: 'gewijzigd', id: d.id }); } catch (e) {}
     }
-    return { status: 200, ok: true, gewijzigd: d.gewijzigd };
+    return { status: 200, ok: true, gewijzigd: d.gewijzigd, fase: faseVan(d) };
   }
 
   /* ---- verwijderen (alleen de eigenaar) ---- */

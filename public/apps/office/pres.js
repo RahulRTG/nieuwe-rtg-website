@@ -132,6 +132,7 @@
       },
       inhoud: function () { return { dias: dias, thema: thema }; },
       dias: function () { return dias; },
+      actief: function () { return huidig; },
       thema: function () { return thema; },
       erbij: function (d) { dias.push(schoon(d)); huidig = dias.length - 1; tekenRail(); tekenVlak(); },
       naarTekst: function () {

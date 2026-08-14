@@ -40,7 +40,7 @@
      hier een tweede navigator naast de console zetten, en twee navigators is er
      een te veel. De weg terug staat daarom expliciet in de console zelf; zonder
      die link zou dit attribuut een uitweg zijn in plaats van een keuze. -->
-<body class="rtg-stijl" data-rtg-modus="pro" data-ios-uit>
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-schil="standaard" data-ios-uit>
 
 <div class="smal">
   <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
@@ -58,33 +58,33 @@
       <a class="terugmobiel" id="ruimteTerug" href="/apps/app.html">&lsaquo; RTG Mobile</a>
     </div>
 
-    <div class="blok">
+    <div class="blok console-zoek">
       <div class="bloknaam">Vraag of open iets</div>
       <input class="zoek" id="zoek" placeholder="&#8984;K  Reizen, Veilig, Ibiza..." aria-label="Zoeken of openen">
     </div>
 
-    <div class="blok">
+    <div class="blok console-werelden">
       <div class="bloknaam" id="wereldLabel">Werelden</div>
       <div class="rijtje" id="werelden"></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-actief">
       <div class="bloknaam">Actief</div>
       <div class="rijtje" data-actieflijst></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-ruimtes">
       <div class="bloknaam">Werkruimtes</div>
       <div class="rijtje" data-ruimtes></div>
       <button type="button" class="bewaar" id="bewaar">Deze kamer bewaren</button>
     </div>
 
-    <div class="blok">
+    <div class="blok console-context">
       <div class="bloknaam">Gedeelde context</div>
       <div class="context" data-context></div>
     </div>
 
-    <div class="blok">
+    <div class="blok console-rahul">
       <div class="bloknaam">Rahul</div>
       <div class="context">Optioneel. Rahul kan ordenen en voorbereiden; alle
       schermen en handelingen blijven zonder AI volledig bruikbaar.</div>
@@ -153,7 +153,7 @@
   const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN });
 
   $('#werelden').innerHTML = WERELDEN.map(w =>
-    '<button type="button" data-open="' + w.id + '">' + w.naam + '</button>').join('');
+    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' + w.naam + '</button>').join('');
   $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
     const w = WERELDEN.find(x => x.id === b.dataset.open);
     if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });

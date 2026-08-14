@@ -12,6 +12,7 @@ test('RTG Work OS opent de echte kantoorsoftware als zelfstandige surfaces',()=>
     '/apps/bestanden.html','/apps/backoffice.html','/apps/command.html'])assert.ok(bron.includes(url),url);
   assert.match(bron,/gebied.*kantoor/);
   assert.match(bron,/id: 'vandaag'[\s\S]*id: 'afdelingen'/);
+  assert.match(bron,/data-rtg-schil="standaard"/);
 });
 
 test('de kantoorstand blijft een meubelplan en maakt AI niet verplicht',()=>{
@@ -39,4 +40,13 @@ test('RTG Office gebruikt in Work OS geen dubbele of uitgerekte bovenbalk',()=>{
   assert.match(office,/window\.self!==window\.top/);
   assert.match(office,/data-rtg-oppervlak="1"\] \.kop\{display:none !important;/);
   assert.match(office,/body\.setAttribute\('data-ios-uit',''\)/);
+});
+
+test('de standaard schil heeft een linkerbank en een echte tabbalk',()=>{
+  const schilJs=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.js'),'utf8');
+  const schilCss=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.css'),'utf8');
+  assert.match(schilJs,/el\('nav', 'rtg-tabbar'/);
+  assert.match(schilJs,/Sluit ' \+ esc\(s\.naam\)/);
+  assert.match(schilCss,/data-rtg-schil="standaard"[\s\S]*\.rtg-console/);
+  assert.match(schilCss,/data-rtg-schil="standaard"[\s\S]*\.rtg-tab\[data-actief\]/);
 });

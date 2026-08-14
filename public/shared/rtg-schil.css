@@ -183,6 +183,76 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 .rtg-console .bewaar:hover,.rtg-console .bewaar:focus-visible{
   color:var(--gold-tekst,#C0A544);border-bottom-color:var(--gold-tekst,#C0A544);}
 
+/* ------------------------------------------------ de vaste RTG-schil --
+   De bank en tabbalk uit 1-Foto-1 zijn de standaard chrome. De software zelf
+   blijft in surfaces draaien; alleen de omlijsting wordt smaller en overal
+   gelijk. */
+body[data-rtg-schil="standaard"] .rtg-werkruimte{--gutter:0;background:#080807;}
+body[data-rtg-schil="standaard"] .rtg-console{
+  gap:0;padding:0;border:0;border-right:1px solid var(--rtg-line);border-radius:0;
+  background:linear-gradient(180deg,#0c0c0b,#090908);overflow:hidden;box-shadow:none;
+}
+body[data-rtg-schil="standaard"] .rtg-console>div:first-child,
+body[data-rtg-schil="standaard"] .console-zoek,
+body[data-rtg-schil="standaard"] .console-actief,
+body[data-rtg-schil="standaard"] .console-ruimtes,
+body[data-rtg-schil="standaard"] .console-context,
+body[data-rtg-schil="standaard"] .console-rahul{display:none;}
+body[data-rtg-schil="standaard"] .console-werelden{
+  display:block;flex:1;min-height:0;overflow-y:auto;border:0;padding:40px 8px 12px;
+}
+body[data-rtg-schil="standaard"] .console-werelden .bloknaam{display:none;}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje{display:flex;flex-direction:column;gap:3px;}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button{
+  position:relative;width:100%;min-height:48px;display:flex;align-items:center;text-align:left;
+  border:1px solid transparent;border-bottom-color:rgba(255,255,255,.045);border-radius:7px;
+  padding:.6rem .7rem .6rem 2.45rem;color:var(--rtg-muted);font-size:.78rem;white-space:nowrap;
+}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button::before{
+  content:'◇';position:absolute;left:.8rem;width:1rem;text-align:center;color:var(--rtg-soft);font-size:.92rem;
+}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:first-child::before{content:'⌂';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(2)::before{content:'▣';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(3)::before{content:'○';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(4)::before{content:'□';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(5)::before{content:'◫';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(6)::before{content:'◇';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(7)::before{content:'▤';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(8)::before{content:'◈';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(9)::before{content:'✦';}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:hover,
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button:focus-visible{
+  border-color:rgba(127,22,52,.45);background:rgba(127,22,52,.12);color:var(--rtg-txt);
+}
+body[data-rtg-schil="standaard"] .console-werelden .rijtje button[data-huidig]{
+  border-color:rgba(127,22,52,.58);background:linear-gradient(90deg,rgba(127,22,52,.34),rgba(127,22,52,.10));
+  color:var(--rtg-txt);box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+body[data-rtg-schil="standaard"] .rtg-tabbar{
+  position:absolute;box-sizing:border-box;display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;
+  background:#090908;border-bottom:1px solid var(--rtg-line);z-index:55;
+}
+body[data-rtg-schil="standaard"] .rtg-tab{
+  min-width:170px;max-width:220px;display:grid;grid-template-columns:minmax(0,1fr) 32px;
+  border-right:1px solid var(--rtg-line);position:relative;background:#0d0d0c;
+}
+body[data-rtg-schil="standaard"] .rtg-tab::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:transparent;
+}
+body[data-rtg-schil="standaard"] .rtg-tab[data-actief]{background:linear-gradient(180deg,rgba(127,22,52,.25),rgba(127,22,52,.10));}
+body[data-rtg-schil="standaard"] .rtg-tab[data-actief]::after{background:#7F1634;}
+body[data-rtg-schil="standaard"] .rtg-tab button{
+  border:0;background:none;color:var(--rtg-muted);font:400 .78rem/1 var(--rtg-interface,Inter,sans-serif);cursor:pointer;
+}
+body[data-rtg-schil="standaard"] .rtg-tab-kies{text-align:left;padding:0 0 0 1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+body[data-rtg-schil="standaard"] .rtg-tab-sluit{font-size:.95rem!important;color:var(--rtg-soft)!important;}
+body[data-rtg-schil="standaard"] .rtg-tab[data-actief] button{color:var(--rtg-txt);}
+body[data-rtg-schil="standaard"] .rtg-surface{
+  border:0;border-right:1px solid var(--rtg-line);border-radius:0;box-shadow:none;background:var(--rtg-bg);
+}
+body[data-rtg-schil="standaard"] .rtg-surface[data-actief]{border-color:var(--rtg-line);}
+body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{display:none;}
+
 /* ------------------------------------------- objecten tussen apps (stap 7) --
    Tijdens het slepen lichten de surfaces op die er IETS mee kunnen -- en alleen
    die. Zo weet je waar je heen kunt voordat je loslaat, in plaats van dat je

@@ -320,6 +320,8 @@
   html[data-rtg-oppervlak="1"] .kop{display:none !important;}
   html[data-rtg-oppervlak="1"] body{padding-bottom:0;}
 </style>
+<link href="/apps/office/enterprise.css?v=enterprise3" rel="stylesheet">
+<link href="/apps/office/collab.css?v=enterprise3" rel="stylesheet">
 <script src="/shared/glyf.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -347,12 +349,30 @@
       <div id="sjablonen"></div>
     </aside>
     <div id="vak">
+      <section class="office-overzicht" aria-label="Office-overzicht">
+        <div class="office-overzicht-kop">
+          <span>OFFICE COMMAND WORKSPACE</span>
+          <h1>Werk dat door kan.</h1>
+          <p id="officeSamenvatting">Documenten, besluiten en samenwerking in één rustige werkruimte.</p>
+        </div>
+        <div class="office-signalen" aria-label="Werkstatus">
+          <article><b id="officeActief">0</b><span>actief</span></article>
+          <article><b id="officeBeoordeling">0</b><span>ter beoordeling</span></article>
+          <article><b id="officeGedeeld">0</b><span>gedeeld</span></article>
+          <article><b id="officeActies">0</b><span>open acties</span></article>
+        </div>
+      </section>
       <div class="zoekrij">
         <input id="zoek" type="search" placeholder="Zoek op titel" aria-label="Zoek in documenten">
         <select id="filterSoort" aria-label="Filter op soort">
           <option value="">Alle soorten</option><option value="tekst">Documenten</option>
           <option value="blad">Rekenbladen</option><option value="presentatie">Presentaties</option>
-          <option value="formulier">Formulieren</option><option value="schets">Schetsen</option>
+          <option value="formulier">Formulieren</option><option value="schets">Schetsen</option><option value="bord">Borden</option>
+        </select>
+        <select id="filterFase" aria-label="Filter op werkstatus">
+          <option value="">Alle werkstatussen</option><option value="concept">Concept</option>
+          <option value="beoordeling">Ter beoordeling</option><option value="goedgekeurd">Goedgekeurd</option>
+          <option value="archief">Archief</option>
         </select>
         <select id="sorteer" aria-label="Sorteren">
           <option value="gewijzigd">Laatst gewijzigd</option><option value="titel">Titel</option>
@@ -360,28 +380,44 @@
         </select>
       </div>
       <h2 id="kopMijn">Mijn documenten</h2>
-      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Gewijzigd</span><span></span></div>
+      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Status</span><span>Gewijzigd</span><span></span></div>
       <div id="mijnDocs"></div>
       <h2>Met mij gedeeld</h2>
-      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Van</span><span></span></div>
+      <div class="tabelkop"><span></span><span>Naam</span><span>Inhoud</span><span>Status</span><span>Van</span><span></span></div>
       <div id="gedeeldDocs"></div>
     </div>
   </section>
 
   <!-- de editor -->
   <section id="editor">
+    <div class="office-tabs" id="docTabs" role="tablist" aria-label="Open Office-documenten"></div>
     <div class="balk">
       <button class="knop" id="editTerug" type="button">← Documenten</button>
       <input class="titel" id="titel" maxlength="120" aria-label="Titel van het document">
-      <span id="tekstTools" style="display:none;"></span>
-      <span id="bladTools" style="display:none;"></span>
       <span class="rek"></span>
+      <button class="office-fase" id="faseBadge" type="button">Concept</button>
+      <button class="knop vol office-hoofdactie" id="faseHoofd" type="button">Ter beoordeling</button>
       <button class="knop" id="presBtn" type="button" style="display:none;">Presenteer</button>
-      <button class="knop" id="aiBtn" type="button">Rahul</button>
-      <button class="knop" id="versiesBtn" type="button">Versies</button>
-      <button class="knop" id="deelBtn" type="button">Delen</button>
-      <button class="knop" id="printBtn" type="button" title="Afdrukken of opslaan als PDF">Afdruk</button>
-      <button class="knop" id="exportBtn" type="button">Export</button>
+      <button class="office-presence" id="samenBtn" type="button" aria-label="Samenwerking openen">
+        <span id="samenBol"></span><span id="samenLabel">Alleen u</span>
+      </button>
+      <details class="office-opmaak" id="officeOpmaak">
+        <summary class="knop">Opmaak</summary>
+        <div class="office-opmaakmenu">
+          <span id="tekstTools" style="display:none;"></span>
+          <span id="bladTools" style="display:none;"></span>
+        </div>
+      </details>
+      <details class="office-meer" id="officeMeer">
+        <summary class="knop">Meer</summary>
+        <div class="office-meermenu">
+          <button class="knop" id="aiBtn" type="button">Rahul</button>
+          <button class="knop" id="versiesBtn" type="button">Versies</button>
+          <button class="knop" id="deelBtn" type="button">Delen</button>
+          <button class="knop" id="printBtn" type="button" title="Afdrukken of opslaan als PDF">Afdruk</button>
+          <button class="knop" id="exportBtn" type="button">Export</button>
+        </div>
+      </details>
     </div>
     <div class="formbalk" id="formBalk" style="display:none;">
       <span class="ref" id="celRef">A1</span>
@@ -433,6 +469,44 @@
   </div>
 </div>
 
+<!-- Eén rustige enterprise-laag voor alle Office-producten. Opmerkingen
+     krijgen automatisch een tekstselectie, cel of dia als anker. -->
+<div class="scrim" id="samenScrim" role="dialog" aria-label="Samenwerken en documentbeheer">
+  <div class="paneel office-samen">
+    <div class="office-samenkop">
+      <div><span class="office-ey">LIVE DOCUMENT ROOM</span><h3>Samenwerken</h3></div>
+      <button class="knop" id="samenDicht" type="button">Sluit</button>
+    </div>
+    <div class="office-samenstand">
+      <div><span class="office-lab">Nu aanwezig</span><div id="samenAanwezig"></div></div>
+      <div><span class="office-lab">Documentbeleid</span><div id="samenBeleid"></div></div>
+    </div>
+    <section class="office-opmerkingen">
+      <div class="office-sectiekop"><div><span class="office-lab">Bespreken en opvolgen</span><h4>Opmerkingen & acties</h4></div><span id="samenAantal">0 open</span></div>
+      <form id="opmerkingForm">
+        <div class="office-anker" id="samenAnker">Geheel document</div>
+        <textarea id="opmerkingTekst" maxlength="1000" rows="3" placeholder="Schrijf een opmerking, vraag of actie…" aria-label="Nieuwe opmerking"></textarea>
+        <div class="office-opmerkingmeta">
+          <input id="opmerkingWie" maxlength="60" placeholder="Actiehouder (optioneel)" aria-label="Actiehouder">
+          <label><span>Voor</span><input id="opmerkingVoor" type="date" aria-label="Deadline"></label>
+          <button class="knop vol" type="submit">Plaats</button>
+        </div>
+      </form>
+      <div id="opmerkingLijst" class="office-opmerkinglijst"></div>
+    </section>
+    <section class="office-beheer" id="beheerBlok">
+      <div class="office-sectiekop"><div><span class="office-lab">Governance</span><h4>Classificatie & bewaring</h4></div></div>
+      <div class="office-beheervelden">
+        <label><span>Classificatie</span><select id="beheerClassificatie"><option value="intern">Intern</option><option value="vertrouwelijk">Vertrouwelijk</option><option value="strikt">Strikt · niet delen</option></select></label>
+        <label><span>Bewaartermijn</span><select id="beheerTermijn"><option value="geen">Geen vaste termijn</option><option value="1jaar">1 jaar</option><option value="3jaar">3 jaar</option><option value="7jaar">7 jaar</option><option value="permanent">Permanent</option></select></label>
+        <label><span>Herzien op</span><input id="beheerHerzien" type="date"></label>
+        <label class="office-tags"><span>Tags</span><input id="beheerTags" maxlength="230" placeholder="bijvoorbeeld bestuur, Q3, hotelgroep"></label>
+      </div>
+      <div class="office-beheervoet"><p>Rahul kan helpen, maar classificatie, toegang en goedkeuring blijven menselijke beslissingen.</p><button class="knop vol" id="beheerBewaar" type="button">Bewaar beleid</button></div>
+    </section>
+  </div>
+</div>
+
 <!-- versiegeschiedenis -->
 <div class="scrim" id="versieScrim" role="dialog" aria-label="Versiegeschiedenis">
   <div class="paneel">
@@ -467,6 +541,31 @@
     </div>
   </div>
 </div>
+<!-- documentwerkstroom: status, menselijke bevoegdheid en compact auditspoor -->
+<div class="scrim" id="faseScrim" role="dialog" aria-label="Documentwerkstroom">
+  <div class="paneel office-werkstroom">
+    <span class="office-ey">DOCUMENT AUTHORITY</span>
+    <h3 id="faseKop">Concept</h3>
+    <p class="stil" id="faseUitleg"></p>
+    <div class="office-faseacties" id="faseActies"></div>
+    <h4>Recente beslissingen</h4>
+    <div class="office-audit" id="faseAudit"></div>
+    <button class="knop" id="faseDicht" type="button">Sluit</button>
+  </div>
+</div>
+<!-- Gelijktijdig werk wordt nooit stil overschreven. De gebruiker bewaart
+     zijn lokale stand als kopie of opent bewust de nieuwste versie. -->
+<div class="scrim" id="conflictScrim" role="dialog" aria-label="Nieuwere documentversie gevonden">
+  <div class="paneel office-conflict">
+    <span class="office-ey">VEILIGE SAMENWERKING</span>
+    <h3>Er is intussen een nieuwere versie.</h3>
+    <p class="stil" id="conflictUitleg">Uw wijzigingen zijn niet overschreven en staan nog in dit venster.</p>
+    <div class="office-conflictacties">
+      <button class="knop vol" id="conflictKopie" type="button">Bewaar mijn werk als kopie</button>
+      <button class="knop" id="conflictNieuwste" type="button">Open nieuwste versie</button>
+    </div>
+  </div>
+</div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/rekenlezer.js" defer></script>
 <script src="/shared/rekenfuncties.js" defer></script>
@@ -484,7 +583,7 @@
 <script src="/apps/office/teksttabel.js" defer></script>
 <script src="/apps/office/tekst.js" defer></script>
 <script src="/apps/office/blad.js" defer></script>
-<script src="/apps/office/pres.js" defer></script>
+<script src="/apps/office/pres.js?v=enterprise3" defer></script>
 <script src="/apps/office/presenteren.js" defer></script>
 <script src="/apps/office/formulieruitslag.js" defer></script>
 <script src="/apps/office/formulier.js" defer></script>
@@ -494,7 +593,7 @@
 <script src="/apps/office/afdruk.js" defer></script>
 <script src="/apps/office/bordpaneel.js" defer></script>
 <script src="/apps/office/bord.js" defer></script>
-<script src="/apps/office/app.js" defer></script>
+<script src="/apps/office/app.js?v=enterprise3" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

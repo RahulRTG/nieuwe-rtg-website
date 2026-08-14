@@ -3,16 +3,41 @@
 > **RTG Desktop is not a collection of pages. It is a movable operational space.**
 
 `ONTWERP.md` legt de vormtaal vast, `PLATFORM.md` hoe apps zich tot elkaar
-verhouden. Dit bestand legt vast hoe RTG zich op een groot scherm gedraagt — en
-dat is fundamenteel iets anders dan de mobiele app, niet een uitvergroting
-ervan.
+verhouden. Dit bestand legt vast hoe RTG zich op een groot scherm gedraagt.
 
 Wat het **niet** wordt:
 
-- geen grotere mobiele app;
 - geen klassieke Windows-desktop met titelbalken en drie knopjes;
 - geen SaaS-sidebar links met één pagina rechts;
 - geen `max-width: 1200px` op een 32-inch scherm.
+
+## Wat hier is herzien, en waarom het hier staat
+
+Hier stond dat de desktop "fundamenteel iets anders is dan de mobiele app, niet
+een uitvergroting ervan", en in de lijst hierboven stond "geen grotere mobiele
+app". Dat is een besluit dat is teruggedraaid, dus het hoort hier niet meer te
+staan alsof het nog geldt.
+
+De werktafel draait sinds deze ronde **op elke breedte**. Wat met de breedte
+verandert is de vorm en niet wat er is:
+
+| | telefoon | vanaf 1000px |
+|---|---|---|
+| de bank met de werelden | een lade van onderen, met een greep in de tabbalk | een vaste rail links |
+| bladen | één in beeld, de rest staat in de tabbalk | tot twee naast elkaar, met een sleepbare scheiding |
+| het beginscherm | de klok met de werelden | dezelfde klok, in het tabletkader met de wings ernaast |
+
+Twee dingen zijn dus GELIJK op beide, en dat is de kern: het beginscherm, en
+wat er gebeurt als je een app opent. De werktafel is geen laag die over de home
+valt — hij ontstaat als je iets opent en verdwijnt met het laatste blad.
+
+Wat daarmee vervalt is de derde regel uit paragraaf 1 hieronder ("telefoon, het
+bestaande OS"): RTG Mobile is niet langer een eigen omgeving naast de shell,
+maar dezelfde shell in zijn smalle vorm.
+
+Wat NIET vervalt: de wél gebouwde stukken van paragraaf 11 (werkruimtes, ⌘K,
+slepen) zijn met de muis en het toetsenbord ontworpen en hebben op een telefoon
+nog geen vorm. Ze staan er, ze doen daar alleen niets.
 
 ---
 
@@ -20,7 +45,7 @@ Wat het **niet** wordt:
 
 | Naam | Voor | Waar |
 |---|---|---|
-| **RTG Mobile** | de persoonlijke wereld | telefoon, het bestaande OS |
+| **RTG Mobile** | de persoonlijke wereld | telefoon — dezelfde shell, smalle vorm |
 | **RTG Workspace** | waar iemand werkt | laptop en groter |
 | **RTG Command** | besturing en toezicht | operations, directie, security |
 

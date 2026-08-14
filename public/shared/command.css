@@ -1,73 +1,278 @@
-/* RTG Command Workspace - de brede werkvorm van het leden-OS.
-   Telefoon blijft één scherm; vanaf 1000px wordt dezelfde software een rustige
-   werktafel met een vaste bank links en gekoppelde bladen in het midden. */
+/* RTG Command Workspace - de werkvorm van het leden-OS, op elke breedte.
+
+   Een GEOPENDE app is een blad in een rustige werktafel: dezelfde bank met de
+   werelden, dezelfde tabbladen, dezelfde console. Wat met de breedte verandert
+   is de VORM en niet wat er is:
+
+     telefoon   de bank is een lade die van onderen opkomt, een blad in beeld
+     >=1000px   de bank is een vaste rail links, tot twee bladen naast elkaar
+                met een sleepbare scheiding ertussen
+
+   Let op de volgorde: het beginscherm blijft ook hier het beginscherm. De
+   klasse rtg-command hangt er pas op zodra er echt een blad openstaat
+   (shared/command.js, bouw/sloop), en dan mag hij de home eronder wegnemen --
+   een werktafel is volledig scherm. Zolang hij er niet staat, staat #shell er
+   gewoon.
+
+   Dit blad stond eerst volledig in @media (min-width:1000px), met daaronder
+   `@media (max-width:999px){#rtgCommand{display:none!important}}`. Die twee
+   regels waren samen de uitspraak "op een telefoon bestaat dit niet". Die
+   uitspraak is ingetrokken; wat hier nu buiten een mediaquery staat, geldt
+   overal. */
+
+body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
+body.rtg-command > #shell{display:none!important;}
+#rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
+  color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
+  background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}
+
+/* ---------------------------------------------------------------- de bank --
+   Op een telefoon een lade: hij ligt onder de rand tot je hem haalt. Hij dekt
+   het blad niet af maar schuift ervoor, en gaat weer dicht zodra je kiest
+   (shared/command.js, bouwNav) -- anders staat het ding dat je net wegklikte
+   nog steeds voor je neus. */
+.cmd-bank{min-width:0;background:linear-gradient(180deg,#11100f,#080808 75%);
+  display:flex;flex-direction:column;padding:1.35rem .55rem 1rem;
+  position:fixed;left:0;right:0;bottom:0;z-index:24;max-height:min(68vh,520px);overflow-y:auto;
+  border-top:1px solid var(--rtg-line);border-top-left-radius:20px;border-top-right-radius:20px;
+  box-shadow:0 -22px 60px rgba(0,0,0,.6);
+  transform:translateY(101%);transition:transform 280ms var(--rtg-veer);
+  padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px));}
+#rtgCommand.bank-open .cmd-bank{transform:none}
+/* de greep: een lade hoort te laten zien dat hij een lade is */
+.cmd-bank::before{content:"";position:sticky;top:0;align-self:center;width:38px;height:4px;flex:none;
+  margin:-0.55rem 0 .7rem;border-radius:4px;background:var(--rtg-line);}
+.cmd-adem{height:1.2rem;flex:none;display:none}
+.cmd-nav{display:flex;flex-direction:column;gap:.22rem;flex:1}
+.cmd-nav button,.cmd-bankvoet button{width:100%;min-height:48px;border:0;border-left:2px solid transparent;border-radius:8px;
+  color:var(--rtg-muted);background:transparent;text-align:left;padding:.55rem .72rem;font:500 .76rem/1.2 var(--rtg-interface);cursor:pointer;
+  display:flex;align-items:center;gap:.7rem;transition:background 140ms,color 140ms,border-color 140ms;}
+.cmd-nav button:hover,.cmd-bankvoet button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}
+.cmd-nav button.actief{color:var(--rtg-txt);border-left-color:#7F1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08));}
+.cmd-nav svg,.cmd-bankvoet svg{width:19px;height:19px;flex:none;stroke:currentColor}
+.cmd-bankvoet{border-top:1px solid var(--rtg-line);padding-top:.55rem}
+.cmd-bank span{white-space:nowrap;overflow:hidden;opacity:1;transition:opacity 180ms var(--rtg-veer)}
+
+/* ---------------------------------------------------------------- het werk -- */
+body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-width:none;margin:0;padding:0;display:grid;grid-template-rows:56px minmax(0,1fr);position:relative;}
+.cmd-tabs{display:flex;align-items:stretch;overflow-x:auto;border-bottom:1px solid var(--rtg-line);background:rgba(12,12,11,.88);scrollbar-width:none;padding-right:3rem;
+  padding-top:env(safe-area-inset-top,0px);}
+.cmd-tab{flex:0 0 auto;min-width:130px;max-width:260px;border:0;border-right:1px solid var(--rtg-line);border-bottom:2px solid transparent;
+  background:transparent;color:var(--rtg-muted);padding:.7rem 1rem;display:flex;align-items:center;gap:.65rem;font:500 .78rem var(--rtg-interface);cursor:pointer;}
+.cmd-tab.actief{color:var(--rtg-txt);border-bottom-color:#7F1634;background:linear-gradient(180deg,rgba(127,22,52,.2),rgba(127,22,52,.05));}
+.cmd-tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmd-tab i{margin-left:auto;color:var(--rtg-soft);font-style:normal;font-size:1rem}
+.cmd-toevoeg{position:absolute;right:.7rem;top:calc(env(safe-area-inset-top,0px) + .5rem);width:38px;height:38px;border:1px solid var(--rtg-line);border-radius:50%;background:#151312;color:var(--rtg-muted);z-index:2;cursor:pointer}
+/* De schilbalk bestaat alleen op een telefoon; op een breed scherm doen de
+   tabstrip en de vaste rail zijn werk. Basis dus verborgen, en de mediaquery
+   hieronder zet hem aan -- niet andersom, want een balk die je moet uitzetten
+   verschijnt vroeg of laat waar hij niet hoort. */
+.cmd-balk{display:none}
+/* De grond onder de bladen is ONYX en niet de haarlijnkleur. Hier stond
+   background:var(--rtg-line) -- bedoeld als 1px scheiding tussen twee bladen,
+   maar samen met de padding hieronder werd 82px daarvan zichtbaar als een grijze
+   balk onderin. De scheiding komt van .cmd-split, die heeft dit niet nodig. */
+.cmd-panes{min-width:0;min-height:0;display:flex;gap:0;background:var(--rtg-bg);padding-bottom:82px;position:relative;}
+.cmd-pane{min-width:0;min-height:0;flex:1 1 0;background:var(--rtg-bg);position:relative;overflow:hidden;
+  animation:cmdBinnen 360ms var(--rtg-veer) both;transition:flex-basis 340ms var(--rtg-veer),opacity 220ms,transform 300ms var(--rtg-veer)}
+.cmd-pane.sluit{opacity:0;transform:translateX(18px);pointer-events:none}
+@keyframes cmdBinnen{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+.cmd-pane iframe{width:100%;height:100%;border:0;background:var(--rtg-bg);display:block}
+.cmd-pane.actief{box-shadow:0 0 0 1px rgba(127,22,52,.45) inset}
+/* EEN BLAD IN BEELD op een telefoon. De andere bladen blijven bestaan -- ze
+   staan in de tabbar en houden hun iframe, dus hun toestand en scrollpositie
+   -- maar ze delen het scherm niet. Naast elkaar zetten op 390px levert twee
+   stroken van 190px op, en dat is geen van beide een app. */
+.cmd-pane:not(.actief){display:none}
+.cmd-split{flex:0 0 9px;cursor:col-resize;position:relative;background:var(--onyx-diep,#050505);touch-action:none;z-index:4}
+.cmd-split::after{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--gold-tekst,#C0A544) 28%,var(--rtg-line));transition:background 160ms}
+.cmd-split:hover::after,.cmd-split.sleept::after{background:var(--gold-tekst,#C0A544)}
+.cmd-split i{position:absolute;left:50%;top:50%;width:5px;height:32px;transform:translate(-50%,-50%);border-radius:5px;background:var(--gold-tekst,#C0A544);opacity:.35}
+/* De lege werkvloer. `flex:1` staat er omdat .cmd-panes een flexrij is: zonder
+   dat neemt dit vak alleen de breedte van zijn tekst en staat de uitnodiging
+   tegen de linkerrand in plaats van in het midden van de ruimte. */
+.cmd-leeg{flex:1 1 auto;min-width:0;background:var(--rtg-bg);display:grid;place-items:center;
+  color:var(--rtg-soft);font-size:.85rem;padding:2rem}
+.cmd-leeg span{max-width:34ch;text-align:center;line-height:1.6}
+
+/* --------------------------------------------------------------- de console --
+   Op een telefoon spant hij de volle breedte en houdt hij afstand tot de
+   thuisindicator; op een breed scherm ligt hij als een los paneel linksonder. */
+.cmd-console{position:absolute;z-index:20;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:none;
+  width:calc(100% - 24px);height:58px;
+  border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));border-radius:22px;
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018));
+  backdrop-filter:blur(30px) saturate(1.08);-webkit-backdrop-filter:blur(30px) saturate(1.08);
+  box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 -1px 0 rgba(192,165,68,.09) inset,0 14px 38px rgba(0,0,0,.24);
+  transition:width 240ms var(--rtg-veer),height 240ms var(--rtg-veer),opacity 180ms,background 180ms,border-color 180ms;overflow:hidden;}
+.cmd-console.scroll{width:72px;height:36px;opacity:.38;pointer-events:none;border-color:rgba(192,165,68,.12);background:rgba(255,255,255,.025);box-shadow:none}
+.cmd-console.open{height:min(350px,44vh);width:calc(100% - 24px);opacity:1;background:linear-gradient(145deg,rgba(28,25,24,.84),rgba(5,5,5,.78))}
+.cmd-console-bladen{height:58px;display:flex;width:400%;transition:transform 190ms var(--rtg-veer)}
+.cmd-console.scroll .cmd-console-bladen{height:36px}
+.cmd-console.open .cmd-console-bladen{position:absolute;left:0;right:0;bottom:0;height:62px}
+.cmd-console[data-blad="0"] .cmd-console-bladen{transform:translateX(0)}
+.cmd-console[data-blad="1"] .cmd-console-bladen{transform:translateX(-25%)}
+.cmd-console[data-blad="2"] .cmd-console-bladen{transform:translateX(-50%)}
+.cmd-console[data-blad="3"] .cmd-console-bladen{transform:translateX(-75%)}
+.cmd-blad{width:25%;flex:none;display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.4rem .65rem}
+.cmd-blad button{height:42px;min-width:44px;border:0;border-radius:14px;background:transparent;color:var(--rtg-muted);cursor:pointer;font:500 .76rem var(--rtg-interface)}
+.cmd-blad button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.045)}
+.cmd-blad svg{width:20px;height:20px;stroke:currentColor;fill:none}
+.cmd-mond{width:56px!important}.cmd-mond canvas{display:block!important;width:45px!important;height:auto!important;margin:auto;pointer-events:none}
+.cmd-console.scroll .cmd-blad:first-child>button:not(.cmd-mond),.cmd-console.scroll .cmd-verberg-scroll{display:none}
+.cmd-console.scroll .cmd-blad{padding:0;gap:0}
+.cmd-console.scroll .cmd-mond{height:36px!important;width:72px!important}
+.cmd-console.scroll .cmd-mond canvas{width:34px!important}
+.cmd-ai-in{flex:1;min-width:0;height:42px!important;border:1px solid var(--rtg-line)!important;background:rgba(5,5,5,.42)!important;color:var(--rtg-txt)!important;border-radius:13px!important;padding:0 .9rem!important;font:400 .84rem var(--rtg-interface)!important;box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important}
+.cmd-media-tekst{flex:1;min-width:0;text-align:center}
+.cmd-media-tekst b,.cmd-media-tekst small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmd-media-tekst b{font:400 1rem var(--rtg-display)}.cmd-media-tekst small{color:var(--rtg-soft);font-size:.65rem}
+.cmd-punten{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.cmd-punten i{width:4px;height:4px;border-radius:50%;background:var(--rtg-line)}.cmd-punten i.aan{background:var(--gold-tekst,#C0A544)}
+.cmd-uitklap{position:absolute;inset:0 0 62px;padding:1.25rem 1.35rem 1rem;display:none;overflow:auto}
+.cmd-console.open .cmd-uitklap{display:block}
+.cmd-uitklap h2{font:500 1.15rem var(--rtg-display);margin:0 0 .3rem}
+.cmd-contextzin{color:var(--rtg-muted);font-size:.82rem;margin:0 0 1rem}
+.cmd-chatlog{display:flex;flex-direction:column;gap:.7rem}
+.cmd-chatregel{font-size:.82rem;line-height:1.5;padding:.65rem .8rem;border-left:2px solid var(--rtg-line)}
+.cmd-chatregel.mij{border-left-color:#7F1634;color:var(--rtg-txt)}
+.cmd-instellingen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.cmd-instellingen button{border:1px solid var(--rtg-line);background:var(--rtg-card);color:var(--rtg-muted);border-radius:10px;padding:.75rem;text-align:left;cursor:pointer}
+.cmd-kiezer{position:absolute;z-index:30;right:.75rem;top:58px;width:230px;padding:.55rem;border:1px solid var(--rtg-line);border-radius:14px;
+  background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 92%,transparent);backdrop-filter:blur(22px);box-shadow:0 20px 55px rgba(0,0,0,.5)}
+.cmd-kiezer[hidden]{display:none}
+.cmd-kiezer button{width:100%;border:0;border-radius:9px;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
+.cmd-kiezer button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.05)}
+
+/* ------------------------------------ een blad op een telefoon: geen tabstrip --
+   Gemeten op 390x844: acht van de twaalf werelden dragen een eigen bovenbalk
+   (51-64px) en vijf een eigen onderbalk. Met de tabstrip erbovenop kwam dat op
+   175px van de 844 -- 21% van het scherm aan navigatie, in drie lagen.
+
+   De bovenste laag had daarbij niets te kiezen: met EEN blad open is er geen
+   tweede tabblad om naar over te schakelen. Die verdwijnt hier dus, en komt
+   terug zodra er een tweede blad is -- dan verdient hij zijn plek. Wat blijft is
+   de greep van de lade, want de bank moet bereikbaar blijven; die wordt een
+   losse knop die op het blad ligt in plaats van een balk die ruimte kost.
+
+   Alleen onder 1000px: op een breed scherm kost de strip geen leesruimte en
+   toont hij bovendien welke twee bladen er naast elkaar staan. */
+@media (max-width:999px){
+  /* De tabstrip bovenin bestaat hier niet meer, in geen enkele stand: de
+     schilbalk onderaan doet zijn werk, en dan is één navigatielaag genoeg. */
+  .cmd-tabs{display:none}
+  .cmd-toevoeg{display:none}
+  /* Zelfde selectorlijst als de basisregel hierboven: die draagt
+     `body.rtg-stijl main.cmd-werk` en wint anders van een kale .cmd-werk --
+     dan kreeg .cmd-panes de 56px-rij en de balk de rest. */
+  body.rtg-stijl main.cmd-werk,.cmd-werk{grid-template-rows:minmax(0,1fr) auto}
+
+  /* ---- de schilbalk ----
+     Drie zones: de bank links, waar je bent in het midden, weg hier rechts.
+     48px, want dat is de minimale aanraakmaat plus een haarlijn -- alles
+     daarboven kost leesruimte aan een wereld die zijn eigen balk al draagt. */
+  .cmd-balk{
+    display:flex;align-items:stretch;height:calc(48px + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    border-top:1px solid var(--rtg-line);background:rgba(12,12,11,.94);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .cmd-balk .cmd-lade,.cmd-balksluit{
+    flex:0 0 auto;width:48px;border:0;background:transparent;color:var(--rtg-muted);
+    display:grid;place-items:center;cursor:pointer;padding:0;position:static;height:auto;
+    transition:color 140ms ease,background 140ms ease;
+  }
+  .cmd-balk .cmd-lade svg,.cmd-balksluit svg{width:20px;height:20px;stroke:currentColor;fill:none}
+  .cmd-balk .cmd-lade:hover,.cmd-balksluit:hover{color:var(--rtg-txt);background:rgba(255,255,255,.04)}
+  .cmd-balk .cmd-lade[aria-expanded="true"]{color:var(--gold-tekst,#C0A544);background:rgba(255,255,255,.05)}
+  .cmd-balksluit[hidden]{display:none}
+  /* De open bladen. Scrolt in zichzelf, zoals elke rij hier: twee namen passen,
+     een derde niet, en de pagina hoort daar niet breder van te worden. */
+  .cmd-balkbladen{
+    flex:1 1 auto;min-width:0;display:flex;align-items:stretch;gap:0;
+    overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+    border-left:1px solid var(--rtg-line);border-right:1px solid var(--rtg-line);
+  }
+  .cmd-balkbladen::-webkit-scrollbar{display:none}
+  .cmd-balkblad{
+    flex:0 0 auto;max-width:min(50vw,220px);border:0;border-bottom:2px solid transparent;
+    background:transparent;color:var(--rtg-muted);padding:0 1rem;cursor:pointer;
+    font:500 .78rem var(--rtg-interface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    transition:color 140ms ease,border-color 140ms ease,background 140ms ease;
+  }
+  .cmd-balkblad:hover{color:var(--rtg-txt)}
+  .cmd-balkblad.actief{color:var(--rtg-txt);border-bottom-color:#7F1634;
+    background:linear-gradient(180deg,rgba(127,22,52,.22),rgba(127,22,52,.04));}
+  /* Leeg is ook een toestand: dan draagt de balk alleen de bank, en zegt de
+     middenzone waarom er verder niets staat. */
+  /* De cookiemelding is fixed op bottom (shared/cookie.js) en lag daarmee OP de
+     balk -- niet alleen lelijk: hij ving de tikken af, dus de bank en de
+     sluitknop waren onbereikbaar zolang hij stond. Hij gaat er hier bovenuit.
+     Weghalen mag niet; dat is een melding en geen versiering. */
+  body.rtg-command #rtg-cookie{
+    bottom:calc(48px + env(safe-area-inset-bottom,0px));left:0;right:0;transform:none;
+    width:auto;max-width:none;padding:.45rem .8rem;
+    /* Een eigen grond, want zonder dat leest hij als tekst dwars door de
+       onderbalk van de wereld heen. Nu is het een strook van de schil, en de
+       wereld eronder blijft leesbaar. */
+    background:rgba(12,12,11,.94);border-top:1px solid var(--rtg-line);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .cmd-balkbladen:empty::after{
+    content:"Kies een wereld";align-self:center;padding:0 1rem;
+    color:var(--rtg-soft);font:400 .76rem var(--rtg-interface);
+  }
+  /* Het blad loopt door tot de onderrand. De 82px eronder was ruimte voor de
+     glasconsole, en die is al niet zichtbaar (rahul-tab/style-base.js zet hem op
+     display:none) -- dus was het lege ruimte in de haarlijnkleur: de grijze balk. */
+  .cmd-panes{padding-bottom:0}
+}
+
+/* ------------------------------------------------- de gesloten stand (inlog) --
+   Voor het inloggen IS de werktafel het inlogscherm: de bank staat er, en de
+   werkvloer draagt #gate -- Rahuls inloggesprek, hierheen verplaatst door
+   shared/command/werktafel.js. Wat je na het inloggen krijgt staat er dus al,
+   alleen nog gesloten.
+
+   Wat er dan NIET hoort te staan: een tabbalk zonder tabbladen en een plus die
+   niets kan openen. Twee bedieningen die niets doen lezen als kapot, niet als
+   gesloten. De greep van de lade blijft wel, want de bank is op een telefoon
+   anders onvindbaar. */
+#rtgCommand[data-stand="gesloten"] .cmd-tabs{display:none}
+#rtgCommand[data-stand="gesloten"] .cmd-toevoeg{display:none}
+#rtgCommand[data-stand="gesloten"] .cmd-werk{grid-template-rows:minmax(0,1fr)}
+#rtgCommand[data-stand="gesloten"] .cmd-lade{top:calc(env(safe-area-inset-top,0px) + .5rem);height:44px;border-right:0;background:transparent}
+/* #gate draagt zijn eigen achtergrond en centreert zichzelf al (app.html); hij
+   hoeft hier alleen de vrije ruimte te krijgen. */
+#rtgCommand[data-stand="gesloten"] #gate{flex:1 1 auto;min-width:0}
+/* de bank is voor het inloggen een uitnodiging en geen menu: dezelfde namen,
+   maar zonder de indruk dat er iets openstaat */
+#rtgCommand[data-stand="gesloten"] .cmd-nav button{opacity:.72}
+#rtgCommand[data-stand="gesloten"] .cmd-nav button:hover{opacity:1}
+
+/* ------------------------------------------------------- vanaf 1000px breed --
+   Hier wordt de lade weer een rail en mogen er twee bladen naast elkaar. Alles
+   in dit blok is opmaak: haal je het weg, dan werkt de werktafel nog steeds,
+   hij ziet er alleen uit als de telefoonvorm op een groot scherm. */
 @media (min-width:1000px){
-  body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
-  body.rtg-command > #shell,body.rtg-command > .wing{display:none!important;}
-  #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:156px minmax(0,1fr);
-    color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
-    background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}
-  #rtgCommand{transition:grid-template-columns 340ms var(--rtg-veer)}
+  #rtgCommand{grid-template-columns:156px minmax(0,1fr);transition:grid-template-columns 340ms var(--rtg-veer)}
   #rtgCommand.bank-klein{grid-template-columns:70px minmax(0,1fr)}
   #rtgCommand.bank-klein:has(.cmd-bank:hover),#rtgCommand.bank-klein:has(.cmd-bank:focus-within){grid-template-columns:156px minmax(0,1fr)}
-  .cmd-bank{min-width:0;border-right:1px solid var(--rtg-line);background:linear-gradient(180deg,#11100f,#080808 75%);
-    display:flex;flex-direction:column;padding:1.35rem .55rem 1rem;box-shadow:1px 0 rgba(255,255,255,.025) inset;}
-  .cmd-adem{height:1.2rem;flex:none}.cmd-nav{display:flex;flex-direction:column;gap:.22rem;flex:1}
-  .cmd-nav button,.cmd-bankvoet button{width:100%;min-height:48px;border:0;border-left:2px solid transparent;border-radius:8px;
-    color:var(--rtg-muted);background:transparent;text-align:left;padding:.55rem .72rem;font:500 .76rem/1.2 var(--rtg-interface);cursor:pointer;
-    display:flex;align-items:center;gap:.7rem;transition:background 140ms,color 140ms,border-color 140ms;}
-  .cmd-nav button:hover,.cmd-bankvoet button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}
-  .cmd-nav button.actief{color:var(--rtg-txt);border-left-color:#7F1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08));}
-  .cmd-nav svg,.cmd-bankvoet svg{width:19px;height:19px;flex:none;stroke:currentColor}.cmd-bankvoet{border-top:1px solid var(--rtg-line);padding-top:.55rem}
-  .cmd-bank span{white-space:nowrap;overflow:hidden;opacity:1;transition:opacity 180ms var(--rtg-veer)}
+  .cmd-bank{position:static;max-height:none;overflow:visible;transform:none;border-top:0;border-radius:0;box-shadow:1px 0 rgba(255,255,255,.025) inset;
+    border-right:1px solid var(--rtg-line);padding-bottom:1rem;}
+  .cmd-bank::before{display:none}
+  .cmd-adem{display:block}
   #rtgCommand.bank-klein:not(:has(.cmd-bank:hover)):not(:has(.cmd-bank:focus-within)) .cmd-bank span{opacity:0;width:0}
-  body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-width:none;margin:0;padding:0;display:grid;grid-template-rows:64px minmax(0,1fr);position:relative;}
-  .cmd-tabs{display:flex;align-items:stretch;overflow-x:auto;border-bottom:1px solid var(--rtg-line);background:rgba(12,12,11,.88);scrollbar-width:none;padding-right:3rem;}
-  .cmd-tab{flex:0 0 auto;min-width:170px;max-width:260px;border:0;border-right:1px solid var(--rtg-line);border-bottom:2px solid transparent;
-    background:transparent;color:var(--rtg-muted);padding:.7rem 1rem;display:flex;align-items:center;gap:.65rem;font:500 .78rem var(--rtg-interface);cursor:pointer;}
-  .cmd-tab.actief{color:var(--rtg-txt);border-bottom-color:#7F1634;background:linear-gradient(180deg,rgba(127,22,52,.2),rgba(127,22,52,.05));}
-  .cmd-tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cmd-tab i{margin-left:auto;color:var(--rtg-soft);font-style:normal;font-size:1rem}
-  .cmd-toevoeg{position:absolute;right:.7rem;top:.75rem;width:38px;height:38px;border:1px solid var(--rtg-line);border-radius:50%;background:#151312;color:var(--rtg-muted);z-index:2;cursor:pointer}
-  .cmd-panes{min-width:0;min-height:0;display:flex;gap:0;background:var(--rtg-line);padding-bottom:82px;position:relative;}
-  .cmd-pane{min-width:280px;min-height:0;flex:1 1 0;background:var(--rtg-bg);position:relative;overflow:hidden;
-    animation:cmdBinnen 360ms var(--rtg-veer) both;transition:flex-basis 340ms var(--rtg-veer),opacity 220ms,transform 300ms var(--rtg-veer)}
-  .cmd-pane.sluit{opacity:0;transform:translateX(18px);pointer-events:none}
-  @keyframes cmdBinnen{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
-  .cmd-pane iframe{width:100%;height:100%;border:0;background:var(--rtg-bg);display:block}.cmd-pane.actief{box-shadow:0 0 0 1px rgba(127,22,52,.45) inset}
-  .cmd-split{flex:0 0 9px;cursor:col-resize;position:relative;background:var(--onyx-diep,#050505);touch-action:none;z-index:4}
-  .cmd-split::after{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--gold-tekst,#C0A544) 28%,var(--rtg-line));transition:background 160ms}
-  .cmd-split:hover::after,.cmd-split.sleept::after{background:var(--gold-tekst,#C0A544)}
-  .cmd-split i{position:absolute;left:50%;top:50%;width:5px;height:32px;transform:translate(-50%,-50%);border-radius:5px;background:var(--gold-tekst,#C0A544);opacity:.35}
-  .cmd-leeg{height:100%;display:grid;place-items:center;color:var(--rtg-soft);font-size:.85rem}.cmd-leeg span{max-width:34ch;text-align:center;line-height:1.6}
-  .cmd-console{position:absolute;z-index:20;left:22px;bottom:18px;transform:none;width:min(650px,calc(100% - 44px));height:58px;
-    border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));border-radius:22px;
-    background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018));
-    backdrop-filter:blur(30px) saturate(1.08);-webkit-backdrop-filter:blur(30px) saturate(1.08);
-    box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 -1px 0 rgba(192,165,68,.09) inset,0 14px 38px rgba(0,0,0,.24);
-    transition:width 240ms var(--rtg-veer),height 240ms var(--rtg-veer),opacity 180ms,background 180ms,border-color 180ms;overflow:hidden;}
-  .cmd-console.scroll{width:72px;height:36px;opacity:.38;pointer-events:none;border-color:rgba(192,165,68,.12);background:rgba(255,255,255,.025);box-shadow:none}
-  .cmd-console.open{height:min(350px,44vh);width:min(780px,calc(100% - 4rem));opacity:1;background:linear-gradient(145deg,rgba(28,25,24,.84),rgba(5,5,5,.78))}
-  .cmd-console-bladen{height:58px;display:flex;width:400%;transition:transform 190ms var(--rtg-veer)}
-  .cmd-console.scroll .cmd-console-bladen{height:36px}.cmd-console.open .cmd-console-bladen{position:absolute;left:0;right:0;bottom:0;height:62px}
-  .cmd-console[data-blad="0"] .cmd-console-bladen{transform:translateX(0)}.cmd-console[data-blad="1"] .cmd-console-bladen{transform:translateX(-25%)}
-  .cmd-console[data-blad="2"] .cmd-console-bladen{transform:translateX(-50%)}.cmd-console[data-blad="3"] .cmd-console-bladen{transform:translateX(-75%)}
-  .cmd-blad{width:25%;flex:none;display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.4rem .65rem}
-  .cmd-blad button{height:42px;min-width:44px;border:0;border-radius:14px;background:transparent;color:var(--rtg-muted);cursor:pointer;font:500 .76rem var(--rtg-interface)}
-  .cmd-blad button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.045)}.cmd-blad svg{width:20px;height:20px;stroke:currentColor;fill:none}
-  .cmd-mond{width:56px!important}.cmd-mond canvas{display:block!important;width:45px!important;height:auto!important;margin:auto;pointer-events:none}
-  .cmd-console.scroll .cmd-blad:first-child>button:not(.cmd-mond),.cmd-console.scroll .cmd-verberg-scroll{display:none}
-  .cmd-console.scroll .cmd-blad{padding:0;gap:0}.cmd-console.scroll .cmd-mond{height:36px!important;width:72px!important}.cmd-console.scroll .cmd-mond canvas{width:34px!important}
-  .cmd-ai-in{flex:1;height:42px!important;border:1px solid var(--rtg-line)!important;background:rgba(5,5,5,.42)!important;color:var(--rtg-txt)!important;border-radius:13px!important;padding:0 .9rem!important;font:400 .84rem var(--rtg-interface)!important;box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important}
-  .cmd-media-tekst{flex:1;min-width:0;text-align:center}.cmd-media-tekst b,.cmd-media-tekst small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cmd-media-tekst b{font:400 1rem var(--rtg-display)}.cmd-media-tekst small{color:var(--rtg-soft);font-size:.65rem}
-  .cmd-punten{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);display:flex;gap:5px}.cmd-punten i{width:4px;height:4px;border-radius:50%;background:var(--rtg-line)}.cmd-punten i.aan{background:var(--gold-tekst,#C0A544)}
-  .cmd-uitklap{position:absolute;inset:0 0 62px;padding:1.25rem 1.35rem 1rem;display:none;overflow:auto}.cmd-console.open .cmd-uitklap{display:block}
-  .cmd-uitklap h2{font:500 1.15rem var(--rtg-display);margin:0 0 .3rem}.cmd-contextzin{color:var(--rtg-muted);font-size:.82rem;margin:0 0 1rem}
-  .cmd-chatlog{display:flex;flex-direction:column;gap:.7rem}.cmd-chatregel{font-size:.82rem;line-height:1.5;padding:.65rem .8rem;border-left:2px solid var(--rtg-line)}.cmd-chatregel.mij{border-left-color:#7F1634;color:var(--rtg-txt)}
-  .cmd-instellingen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}.cmd-instellingen button{border:1px solid var(--rtg-line);background:var(--rtg-card);color:var(--rtg-muted);border-radius:10px;padding:.75rem;text-align:left;cursor:pointer}
-  .cmd-kiezer{position:absolute;z-index:30;right:.75rem;top:58px;width:230px;padding:.55rem;border:1px solid var(--rtg-line);border-radius:14px;
-    background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 92%,transparent);backdrop-filter:blur(22px);box-shadow:0 20px 55px rgba(0,0,0,.5)}
-  .cmd-kiezer[hidden]{display:none}.cmd-kiezer button{width:100%;border:0;border-radius:9px;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
-  .cmd-kiezer button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.05)}
+  .cmd-werk{grid-template-rows:64px minmax(0,1fr)}
+  .cmd-tab{min-width:170px}
+  .cmd-toevoeg{top:.75rem}
+  .cmd-pane{min-width:280px}
+  .cmd-pane:not(.actief){display:block}
+  .cmd-console{left:22px;bottom:18px;width:min(650px,calc(100% - 44px))}
+  .cmd-console.open{width:min(780px,calc(100% - 4rem))}
+  /* de greep heeft hier geen werk: de bank staat er als vaste rail altijd */
+  .cmd-lade{display:none}
+  .cmd-tabs{padding-left:0}
+  .cmd-toevoeg{display:block}
 }
-@media (max-width:999px){#rtgCommand{display:none!important}}
-@media (prefers-reduced-motion:reduce){#rtgCommand,.cmd-bank span,.cmd-pane,.cmd-console,.cmd-console-bladen{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){#rtgCommand,.cmd-bank,.cmd-bank span,.cmd-pane,.cmd-console,.cmd-console-bladen{animation:none!important;transition:none!important}}

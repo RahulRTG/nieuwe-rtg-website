@@ -1,34 +1,141 @@
-/* RTG Command Workspace - desktopwerktafel en adaptieve glasconsole. */
+/* RTG Command: WIE ER NAAR BINNEN MAG, en waar Rahuls opdrachten heen gaan.
+
+   Het meubel zelf (bank, tabbladen, bladen, scheiding, lade) staat in
+   shared/command/werktafel.js. Dit bestand droeg allebei en groeide daarmee
+   over de 10 KB uit regel 13 van scripts/check.js -- die grens is een dakpan,
+   en erboven zat hier inderdaad een tweede onderwerp.
+
+   Wat hier staat is de grendel, en die staat maar op EEN plek. */
 (function (w,d) {
   'use strict';
   if (w.RTGCommand) return;
-  var mq=w.matchMedia('(min-width:1000px)'),root=null,panes=[],actief=-1,geschiedenis=[],hist=-1,consoleLaag=null,catalog=w.RTGCommandCatalog,APPS=catalog.APPS,titelVan=catalog.titelVan,context=catalog.context,appUit=catalog.appUit;
-  var ICON={terug:'<path d="M15 5l-7 7 7 7"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',verder:'<path d="M9 5l7 7-7 7"/>',instel:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',reis:'<path d="M4 19h16M6 19V8h12v11M9 8V5h6v3"/>',geld:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',salon:'<path d="M5 20v-7h14v7M7 13V8a5 5 0 0110 0v5"/>',mens:'<circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0116 0"/>',plus:'<path d="M12 5v14M5 12h14"/>',play:'<path d="M8 5l11 7-11 7z"/>',pauze:'<path d="M8 5v14M16 5v14"/>'};
-  function svg(k){return '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'}
-  function bouw(){if(root||!mq.matches)return;root=d.createElement('div');root.id='rtgCommand';root.innerHTML='<aside class="cmd-bank"><div class="cmd-adem"></div><nav class="cmd-nav" aria-label="Hoofdnavigatie"></nav><div class="cmd-bankvoet"><button data-cmd="settings">'+svg('instel')+'<span>Instellingen</span></button></div></aside><main class="cmd-werk"><div class="cmd-tabs" role="tablist"></div><button class="cmd-toevoeg" aria-label="Werkblad openen">'+svg('plus')+'</button><div class="cmd-kiezer" hidden></div><div class="cmd-panes"></div></main>';d.body.appendChild(root);d.body.classList.add('rtg-command');bouwNav();bouwKiezer();consoleLaag=w.RTGCommandConsole({root:root,svg:svg,context:context,bestemming:bestemming,open:open,sluit:sluit,getPanes:function(){return panes},getActief:function(){return actief}});consoleLaag.bouw();open('/apps/reizen-veilig.html','Reizen & Veilig');open('/apps/geld-command.html','Geld');
-    root.querySelector('.cmd-toevoeg').onclick=function(){var k=root.querySelector('.cmd-kiezer');k.hidden=!k.hidden};root.querySelector('[data-cmd=settings]').onclick=function(){consoleLaag.toonBlad(3,true)};}
-  function bouwNav(){var nav=root.querySelector('.cmd-nav');APPS.forEach(function(a){var b=d.createElement('button');b.innerHTML=svg(a[2])+'<span>'+a[0]+'</span>';b.dataset.url=a[1];b.onclick=function(){open(a[1],a[0]);};nav.appendChild(b)})}
-  function bouwKiezer(){var k=root.querySelector('.cmd-kiezer');APPS.forEach(function(a){var b=d.createElement('button');b.textContent=a[0];b.onclick=function(){k.hidden=true;open(a[1],a[0])};k.appendChild(b)})}
-  function openNaast(a,kant){if(!a)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===a[1]){select(i);return panes[i]}if(panes.length>=2){var weg=actief===0?1:0;verwijder(weg)}var p=open(a[1],a[0]);if(p&&kant==='links'&&panes.length===2){panes.splice(panes.indexOf(p),1);panes.unshift(p);root.querySelector('.cmd-panes').insertBefore(p.el,root.querySelector('.cmd-panes').firstChild);actief=0;sync()}return p}
-  function bestemming(tekst){var q=String(tekst||'').trim(),laag=q.toLowerCase(),links=null,rechts=null,m;if((m=laag.match(/(.+?)\s+links(?:\s+en|,)?\s+(.+?)\s+rechts/))){links=appUit(m[1]);rechts=appUit(m[2]);if(links&&rechts){panes.slice().forEach(function(p){p.el.remove()});panes=[];actief=-1;open(links[1],links[0]);openNaast(rechts,'rechts');select(1);return 'Ik heb '+links[0]+' links en '+rechts[0]+' rechts voor u geopend.'}}
-    var a=appUit(laag);if(!a)return null;if(/ernaast|naast elkaar|rechts/.test(laag)){openNaast(a,'rechts');return 'Natuurlijk. '+a[0]+' staat ernaast.'}if(/links/.test(laag)){openNaast(a,'links');return a[0]+' staat links voor u klaar.'}if(/open|breng|ga naar|toon|laat zien|terug naar/.test(laag)){open(a[1],a[0]);return 'Natuurlijk. Ik breng u naar '+a[0]+'.'}return null}
-  function open(url,titel){if(!mq.matches){location.href=url;return null}bouw();for(var i=0;i<panes.length;i++)if(panes[i].url===url){select(i);return panes[i]}
-    if(panes.length>=2)verwijder(actief>=0?actief:0);var p={url:url,titel:titelVan(url,titel)},el=d.createElement('section');el.className='cmd-pane';var f=d.createElement('iframe');f.title=p.titel;f.src=url;if(w.RTGMedia)w.RTGMedia.kader(f);el.appendChild(f);root.querySelector('.cmd-panes').appendChild(el);p.el=el;p.frame=f;panes.push(p);f.addEventListener('load',function(){haakScroll(p);});select(panes.length-1);geschiedenis=geschiedenis.slice(0,hist+1);geschiedenis.push(url);hist=geschiedenis.length-1;sync();return p}
-  function verwijder(i){var p=panes[i];if(!p)return;p.el.remove();panes.splice(i,1);actief=Math.min(panes.length-1,Math.max(0,i-1))}
-  function sluit(i){var p=panes[i];if(!p)return;p.el.classList.add('sluit');setTimeout(function(){var nu=panes.indexOf(p);if(nu<0)return;verwijder(nu);sync()},220)}
-  function select(i){actief=i;sync();if(consoleLaag)consoleLaag.intro()}
-  function sync(){if(!root)return;var tabs=root.querySelector('.cmd-tabs');tabs.textContent='';panes.forEach(function(p,i){p.el.classList.toggle('actief',i===actief);var b=d.createElement('button');b.className='cmd-tab'+(i===actief?' actief':'');b.setAttribute('role','tab');b.innerHTML='<span>'+p.titel+'</span><i aria-label="Sluiten">×</i>';b.onclick=function(e){if(e.target.tagName==='I')sluit(i);else select(i)};tabs.appendChild(b)});verdeler();root.querySelectorAll('.cmd-nav button[data-url]').forEach(function(b){b.classList.toggle('actief',panes[actief]&&panes[actief].url===b.dataset.url)});if(consoleLaag)consoleLaag.intro()}
-  function verdeler(){var vak=root.querySelector('.cmd-panes'),oud=vak.querySelector('.cmd-split');if(oud)oud.remove();panes.forEach(function(p){p.el.style.flexBasis=''});if(panes.length!==2)return;var s=d.createElement('div');s.className='cmd-split';s.setAttribute('role','separator');s.setAttribute('aria-orientation','vertical');s.tabIndex=0;s.innerHTML='<i></i>';vak.insertBefore(s,panes[1].el);function zet(x){var r=vak.getBoundingClientRect(),pct=Math.max(30,Math.min(70,(x-r.left)/r.width*100));panes[0].el.style.flex='0 0 '+pct+'%';panes[1].el.style.flex='1 1 0'}function klaar(e){s.classList.remove('sleept');var r=vak.getBoundingClientRect(),p=(e.clientX-r.left)/r.width*100,n=p<42?35:p>58?65:50;panes[0].el.style.flex='0 0 '+n+'%';d.removeEventListener('pointermove',beweeg);d.removeEventListener('pointerup',klaar)}function beweeg(e){zet(e.clientX)}s.onpointerdown=function(e){e.preventDefault();s.classList.add('sleept');d.addEventListener('pointermove',beweeg);d.addEventListener('pointerup',klaar)};s.onkeydown=function(e){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){var n=e.key==='ArrowLeft'?35:65;panes[0].el.style.flex='0 0 '+n+'%'}}}
-  function haakScroll(p){try{var doc=p.frame.contentDocument,st=doc.createElement('style');st.textContent='#rahulFab,.rahulfab,.rahulsheet,.mgz-blok,.mgz-ruimte,.amn-knop,[aria-label="Cookiemelding"]{display:none!important}body{padding-bottom:0!important}';doc.head.appendChild(st);p.frame.contentWindow.addEventListener('scroll',klein,{passive:true});var sc=doc.querySelectorAll('[class*=content],main');for(var i=0;i<sc.length;i++)sc[i].addEventListener('scroll',klein,{passive:true})}catch(e){}}
-  function klein(){if(consoleLaag)consoleLaag.klein()}
+  var mq=w.matchMedia('(min-width:1000px)'),tafel=null,
+      catalog=w.RTGCommandCatalog,appUit=catalog.appUit;
+
   function aangemeld(){var app=d.getElementById('app');return !!(app&&app.classList.contains('active'))}
-  function probeer(){if(mq.matches&&aangemeld())bouw()}
+  /* DE ONDERTEKENING WERD OP EEN BREED SCHERM OVERGESLAGEN.
+
+     #app krijgt `active` zodra er een sessie is, maar de intake is dan nog niet
+     af: de lidmaatschaps- en reisovereenkomst wordt getekend in #onbGate, modaal
+     over de app (app-main.js, checkOnboarding). aangemeld() keek alleen naar die
+     klasse, en de werktafel bouwde zich eroverheen -- #rtgCommand op z-index 210,
+     #onbGate op 130. Zelfde account, zelfde token: bij 999px stond je voor de
+     overeenkomst, bij 1001px erachter. Getekend was er niets.
+
+     Onder 1000px viel het niet op omdat de werktafel daar toen niet bestond. Dat
+     toevallige vangnet is weg: deze voorwaarde is nu op ELKE breedte het enige
+     wat de deur dichthoudt. Een bron van waarheid -- dezelfde `hidden` die de
+     onboarding zelf zet. Gaat de deur alsnog open (checkOnboarding is
+     asynchroon), dan wijkt een werktafel die er al stond; zie init(). */
+  function poortDicht(){var g=d.getElementById('onbGate');return !g||g.hidden}
+  /* DE WERKTAFEL DRAAIT OVERAL; `mq` ZEGT ALLEEN NOG HOE HIJ ERUITZIET.
+
+     Hier stond `mq.matches` in de voorwaarde, en dat maakte de breedte tot een
+     vraag over het BESTAAN van de werktafel. Het is nu een vraag over zijn VORM:
+     op een telefoon dezelfde bank en dezelfde tabbladen, alleen komt de bank van
+     onderen als lade en staat er een blad tegelijk in beeld (command.css). Wat
+     niet verandert is het beginscherm -- dat blijft op beide de klok.
+
+     breed() is daarmee een opmaakvraag en geen grendel. Wie hem als grendel
+     gebruikt zet de breedte terug in de toegangsregel, en dat was de fout
+     hierboven. */
+  function breed(){return mq.matches}
+  function mag(){return aangemeld()&&poortDicht()}
+  /* DRIE STANDEN, EN MAAR EEN DAARVAN IS "WEG".
+
+     weg       de ondertekening ligt bovenop; hier mag niets overheen (zie
+               poortDicht hierboven -- dat is de grendel, niet een vorm)
+     gesloten  nog geen sessie: de bank staat er wel, maar de werkvloer draagt
+               het inloggesprek van Rahul en een wereld aanraken start dat
+               gesprek in plaats van een dode deur te openen
+     open      sessie en getekend: de gewone werktafel
+
+     `gesloten` bestaat omdat het inlogscherm dezelfde werktafel hoort te zijn:
+     wat je na het inloggen krijgt staat er dan al, alleen nog gesloten. Wat het
+     NIET mag worden is een rij deuren die niets doen -- vandaar dat de bank in
+     deze stand naar het gesprek wijst. */
+  function stand(){return !poortDicht()?'weg':(aangemeld()?'open':'gesloten')}
+  function magBestaan(){return poortDicht()}
+  /* Het inloggesprek staat in #gate en wordt door app-main gebouwd; wij
+     verplaatsen dat blok alleen naar de werkvloer. Een wereld aanraken zet de
+     cursor in datzelfde gesprek -- meer belooft deze laag niet, want inloggen
+     is niet van haar. */
+  function inlog(){var i=d.getElementById('agIn');if(i)i.focus()}
+
+  function bouwTafel(){
+    if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
+      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog});
+    return tafel;
+  }
+  /* THUIS IS DE KLOK, MAAR NIET MEER DE LANDING.
+
+     De werktafel is het beginscherm geworden: inloggen brengt je daar, en het
+     laatste blad sluiten laat hem leeg staan in plaats van hem af te breken.
+     De klok blijft bestaan -- daar hangen de werelden op hun bezel (WERELD.md)
+     -- en staat bovenaan de bank. Hem kiezen vouwt de werktafel op.
+
+     `opgevouwen` bestaat omdat probeer() anders zijn werk terugdraait: die
+     bouwt zodra het mag, en zou de klok bij de eerstvolgende hertekening (een
+     resize, een klasse die verspringt) weer overdekken. Een keuze van een mens
+     hoort niet door een waarnemer te worden overstemd. */
+  var opgevouwen=false;
+  function thuis(){opgevouwen=true;if(tafel)tafel.sloop()}
+
+  /* TWEE REDENEN OM NIET TE OPENEN, MET TWEE VERSCHILLENDE UITKOMSTEN.
+
+     Geen sessie is geen weigering maar een andere vorm: naar de pagina toe, die
+     draagt zijn eigen poort. (Hier stond ook `!mq.matches`; dat klopte zolang de
+     werktafel alleen breed bestond.)
+
+     De poort is wel een weigering. Toen die voorwaarde met mag() gedeeld werd,
+     viel open() met een openstaande intake terug op location.href -- precies de
+     omweg die de deur moest tegenhouden, want /apps/vandaag.html draagt #onbGate
+     niet. Zolang er niet getekend is, gebeurt hier dus niets. */
+  function open(url,titel){
+    if(!poortDicht())return null;
+    if(!aangemeld()){location.href=url;return null}
+    opgevouwen=false;                         // iets openen is terugkomen
+    return bouwTafel().toon(url,titel);
+  }
+
+  function bestemming(tekst){var q=String(tekst||'').trim(),laag=q.toLowerCase(),links=null,rechts=null,m,t;
+    if((m=laag.match(/(.+?)\s+links(?:\s+en|,)?\s+(.+?)\s+rechts/))){links=appUit(m[1]);rechts=appUit(m[2]);
+      if(links&&rechts){if(!mag())return null;t=bouwTafel();t.wis();open(links[1],links[0]);t.openNaast(rechts,'rechts');t.select(1);
+        return 'Ik heb '+links[0]+' links en '+rechts[0]+' rechts voor u geopend.'}}
+    var a=appUit(laag);if(!a)return null;
+    if(/ernaast|naast elkaar|rechts/.test(laag)){if(!mag())return null;bouwTafel().openNaast(a,'rechts');return 'Natuurlijk. '+a[0]+' staat ernaast.'}
+    if(/links/.test(laag)){if(!mag())return null;bouwTafel().openNaast(a,'links');return a[0]+' staat links voor u klaar.'}
+    if(/open|breng|ga naar|toon|laat zien|terug naar/.test(laag)){open(a[1],a[0]);return 'Natuurlijk. Ik breng u naar '+a[0]+'.'}
+    return null}
+
+  /* De wachter, en tegelijk de landing. Mag de werktafel er niet staan (geen
+     sessie, of de overeenkomst is nog niet getekend), dan gaat hij weg -- dat
+     is de grendel uit de vorige ronde. Mag hij er wel staan, dan is hij het
+     beginscherm en bouwt hij zich hier op, tenzij een mens hem heeft
+     opgevouwen om de klok te zien. */
+  function probeer(){
+    var s=stand();
+    if(s==='weg'){if(tafel)tafel.sloop();return}
+    if(!opgevouwen)bouwTafel().zet(s);
+  }
   function init(){
     probeer();
-    var app=d.getElementById('app');
+    var app=d.getElementById('app'),poort=d.getElementById('onbGate');
     if(app&&w.MutationObserver)new MutationObserver(probeer).observe(app,{attributes:true,attributeFilter:['class']});
+    if(poort&&w.MutationObserver)new MutationObserver(probeer).observe(poort,{attributes:true,attributeFilter:['hidden']});
   }
-  mq.addEventListener&&mq.addEventListener('change',function(){if(mq.matches)probeer();else{d.body.classList.remove('rtg-command');if(root){root.remove();root=null;panes=[]}}});
-  w.RTGCommand={open:open,bestemming:bestemming,herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},actief:function(){return mq.matches},sluitAlles:function(){panes.slice().forEach(function(){sluit(0)})}};
+  /* Breedte verandert de VORM en niet meer het bestaan, dus is dit geen
+     afbreekmoment meer maar een hertekening: de scheiding verschijnt of
+     verdwijnt. probeer() blijft eerst, want sessie en poort kunnen intussen ook
+     zijn veranderd. */
+  mq.addEventListener&&mq.addEventListener('change',function(){probeer();if(tafel)tafel.sync()});
+  /* actief() is de vraag "opent een app hier als BLAD of als pagina?", en het
+     antwoord is precies mag(). Hij keek alleen naar de breedte: een tweede,
+     mildere waarheid naast de grendel, waardoor de app-laag naar open() stuurde
+     terwijl die zelf alsnog naar location.href terugviel. */
+  w.RTGCommand={open:open,bestemming:bestemming,
+    herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
+    actief:mag,
+    sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

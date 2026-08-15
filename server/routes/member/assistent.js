@@ -38,7 +38,8 @@ module.exports = (kern) => {
           .map(b => b.text)
           .join('\n')
           .trim();
-        return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true, modus: 'ondersteund' });
+        return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true,
+          modus: aiStatus().modus, verwerking: aiStatus().verwerking });
       } catch (e) {
         console.error('AI-provider niet bereikbaar; handmatige werkmodus blijft actief:', e.message);
       }

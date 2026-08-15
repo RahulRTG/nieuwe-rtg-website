@@ -8,11 +8,12 @@
      npm run selfhost:init -- --eigenaar=jij@domein.nl
 
    Publiek, bewust zonder externe AI en zonder enige betaalrail:
-     npm run sleutels -- --docker --schrijf --zonder-ai --zonder-betalen \
-       --eigenaar=jij@domein.nl --url=https://jouw-domein.nl
+     npm run live:init -- --eigenaar=jij@domein.nl \
+       --url=https://jouw-domein.nl --smtp-url=smtps://...
 
    --docker maakt ook een apart PostgreSQL-wachtwoordbestand. Bestaande
-   geheimen worden nooit stil overschreven; --force is bewust en expliciet. */
+   geheimen worden nooit stil overschreven; --force is bewust en expliciet.
+   --stil drukt gegenereerde geheimen niet naar terminal/loggeschiedenis. */
 'use strict';
 
 const crypto = require('crypto');
@@ -45,12 +46,17 @@ const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
 const zonderAi = heeft('--zonder-ai');
 const zonderBetalen = heeft('--zonder-betalen');
+const nativeTls = heeft('--native-tls');
+const stil = heeft('--stil');
 const schrijven = heeft('--schrijf');
 const forceren = heeft('--force');
 const eigenaar = optie('--eigenaar') || 'VUL-IN@JOUW-DOMEIN.NL';
 const poort = optie('--poort') || '3000';
 const appUrl = optie('--url') || (priveBeta ? 'http://127.0.0.1:' + poort : 'https://VUL-IN.NL');
+const smtpUrl = optie('--smtp-url') || 'smtps://VUL-IN';
 const totp = base32(crypto.randomBytes(20));
+let tlsDomein = 'VUL-IN.NL';
+try { tlsDomein = new URL(appUrl).hostname || tlsDomein; } catch (e) {}
 
 const regels = [
   ['NODE_ENV', 'production'],
@@ -73,11 +79,18 @@ if (priveBeta) {
   regels.push(
     ['DATABASE_URL', docker ? '' : 'postgresql://VUL-IN', docker ? 'Docker bouwt deze veilig uit het aparte PostgreSQL-geheim' : 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],
     ['REDIS_URL', docker ? 'redis://redis:6379' : 'redis://VUL-IN', 'HANDMATIG: realtime over meerdere instances'],
-    ['SMTP_URL', 'smtps://VUL-IN', 'HANDMATIG: anders worden e-mails niet echt verstuurd']
+    ['SMTP_URL', smtpUrl, 'HANDMATIG: anders worden e-mails niet echt verstuurd']
   );
 }
 if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
 if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
+if (nativeTls) regels.push(
+  ['RTG_TLS', '1', 'native TLS/HTTP2 in RTG zelf'],
+  ['RTG_ACME', '1', 'automatisch publiek certificaat via Let\'s Encrypt'],
+  ['RTG_TLS_DOMAIN', tlsDomein, 'domein voor het publieke certificaat'],
+  ['RTG_TLS_EMAIL', optie('--tls-email') || eigenaar, 'contactadres voor certificaatmeldingen'],
+  ['RTG_PROXY_HOPS', '0', 'geen proxy vóór native TLS; negeer aangeleverde proxykoppen']
+);
 
 const blok = [];
 blok.push('# RTG-productiegeheimen, gegenereerd op ' + new Date().toISOString());
@@ -88,9 +101,11 @@ for (const [naam, waarde, uitleg] of regels) {
   else blok.push(naam + '=' + waarde);
 }
 
-console.log(blok.join('\n'));
-console.log('\n# 2FA koppelen: voer dit adres (of het secret hierboven) in je authenticator-app in:');
-console.log('# otpauth://totp/RTG%20Backoffice?secret=' + totp + '&issuer=RTG');
+if (!stil) {
+  console.log(blok.join('\n'));
+  console.log('\n# 2FA koppelen: voer dit adres (of het secret hierboven) in je authenticator-app in:');
+  console.log('# otpauth://totp/RTG%20Backoffice?secret=' + totp + '&issuer=RTG');
+}
 
 function schrijfNieuw(doel, inhoud) {
   fs.mkdirSync(path.dirname(doel), { recursive: true, mode: 0o700 });
@@ -134,6 +149,6 @@ if (schrijven) {
     process.exitCode = 1;
   }
 } else {
-  console.log('\n# Tip: npm run sleutels -- --schrijf zet dit blok veilig in .env.productie');
+  if (!stil) console.log('\n# Tip: npm run sleutels -- --schrijf zet dit blok veilig in .env.productie');
 }
 console.log('\n# Publieke livegang controleer je met: npm run golive');

@@ -57,7 +57,7 @@ module.exports = function veiligAdres({ PORT, HOST, env, netten, log }) {
   ] : [
     'LET OP: deze server praat http en staat op het netwerk (' + waar + ').',
     'Op een telefoon werken camera, microfoon en locatie daar NIET: buiten https geeft de browser ' +
-    'ze niet vrij. Start met RTG_TLS=1 voor https (een self-signed cert is genoeg om het te proberen), ' +
+    'ze niet vrij. Start eenvoudig met npm run telefoon voor lokale https (of RTG_TLS=1 voor één server), ' +
     'of zet er een doorgeefluik met TLS voor. De apps zeggen zelf ook waarom het niet gaat.'
   ];
   const zeg = veilig

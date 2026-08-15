@@ -51,6 +51,8 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const teBreed = [];
+  const navigatieBuiten = [];
+  let instantReality = null;
   try {
     for (const url of WERELDEN) {
       await page.goto(srv.base + url, { waitUntil: 'load', timeout: 45000 });
@@ -77,8 +79,77 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
       }));
       assert.equal(m.venster, 390, 'voorwaarde: het venster is echt 390 breed, anders meet dit niets');
       if (m.inhoud > m.venster + 2) teBreed.push(url + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
+
+      /* Deze vier vlaggenschepen gebruiken dezelfde mobiele compositie:
+         hoofdwerkvlak boven, vaste wereldnavigatie onder. Hun inhoud kan
+         hoger zijn dan het werkvlak, maar hoort BINNEN het artikel te
+         scrollen. Zonder min-height:0 op het main-griditem duwt de inhoud de
+         navigatie onder een body die zelf niet scrolt -- hij bestaat dan, maar
+         een gebruiker kan hem nooit bereiken. */
+      const navSelector = {
+        '/apps/instant-reality.html': '.ir-shell>aside',
+        '/apps/private-office.html': '.po-rail',
+        '/apps/living-os.html': '.lo-rail',
+        '/apps/partner-network.html': '.pn-rail'
+      }[url];
+      if (navSelector) {
+        const nr = await page.evaluate((sel) => {
+          const e = document.querySelector(sel);
+          const r = e && e.getBoundingClientRect();
+          return r ? { boven: Math.round(r.top), onder: Math.round(r.bottom), venster: innerHeight } : null;
+        }, navSelector);
+        if (!nr || nr.boven < 0 || nr.onder > nr.venster) {
+          navigatieBuiten.push(url + ': ' + (nr ? nr.boven + '..' + nr.onder + ' bij ' + nr.venster + 'px' : 'ontbreekt'));
+        }
+      }
+
+      /* EEN PAGINA DIE PAST KAN NOG STEEDS LEEG ZIJN.
+
+         Instant Reality verborg op telefoonmaat alle drie zijn artikelen met
+         `.ir-grid>article{display:none}`. De regel erna probeerde .ir-world
+         terug te tonen, maar verloor op CSS-specificiteit: de breedtescan was
+         groen terwijl een mens een volledig zwart werkvlak zag.
+
+         De mutatie voor deze bewering is precies de oude selector terugzetten:
+         `.ir-grid>.ir-world` -> `.ir-world`. Dan worden titel, kaart en knop
+         allemaal nul hoog en zakt deze toets. De knopmaat bewaakt tegelijk dat
+         de ene beslissende actie op een telefoon ook echt met een duim te
+         bedienen is. */
+      if (url === '/apps/instant-reality.html') {
+        instantReality = await page.evaluate(() => {
+          const wereld = document.querySelector('.ir-world');
+          const titel = wereld && wereld.querySelector('h2');
+          const actie = document.getElementById('irApprove');
+          const navigatie = document.querySelector('.ir-shell>aside');
+          const wr = wereld && wereld.getBoundingClientRect();
+          const ar = actie && actie.getBoundingClientRect();
+          const nr = navigatie && navigatie.getBoundingClientRect();
+          return {
+            wereldHoog: wr ? Math.round(wr.height) : 0,
+            titel: titel ? titel.textContent.trim() : '',
+            actieHoog: ar ? Math.round(ar.height) : 0,
+            actieZichtbaar: !!(actie && getComputedStyle(actie).display !== 'none' && ar && ar.width > 0),
+            navigatieBoven: nr ? Math.round(nr.top) : 0,
+            navigatieOnder: nr ? Math.round(nr.bottom) : 0,
+            vensterHoog: innerHeight
+          };
+        });
+      }
     }
     assert.deepEqual(teBreed, [], 'deze werelden lopen op een telefoon buiten beeld, en er is niet naartoe te scrollen');
+    assert.deepEqual(navigatieBuiten, [],
+      'de mobiele navigatie van deze werelden valt buiten het niet-scrollende venster:\n  ' + navigatieBuiten.join('\n  '));
+    assert.ok(instantReality, 'Instant Reality is werkelijk in de schermronde gemeten');
+    assert.ok(instantReality.wereldHoog > 300,
+      'Instant Reality toont op telefoonmaat zijn hoofdwereld, kreeg ' + instantReality.wereldHoog + 'px');
+    assert.match(instantReality.titel, /Alles ligt al klaar/i,
+      'de zichtbare hoofdkaart draagt zijn eigen kernboodschap');
+    assert.equal(instantReality.actieZichtbaar, true, 'de hoofdactie is zichtbaar');
+    assert.ok(instantReality.actieHoog >= 44,
+      'de hoofdactie heeft duimmaat (minimaal 44px), kreeg ' + instantReality.actieHoog + 'px');
+    assert.ok(instantReality.navigatieBoven >= 0 && instantReality.navigatieOnder <= instantReality.vensterHoog,
+      'de mobiele wereldnavigatie blijft volledig in beeld, kreeg y ' +
+      instantReality.navigatieBoven + '..' + instantReality.navigatieOnder + ' bij ' + instantReality.vensterHoog + 'px');
   } finally {
     await ctx.close();
     await browser.close();

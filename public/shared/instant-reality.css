@@ -13,9 +13,20 @@
    (shared/command.css). Zo blijven de labels leesbaar in plaats van afgekapt, en
    houdt de pagina zijn eigen breedte. */
 @media(max-width:760px){
+  /* De algemene regel `.ir-grid>article` is specifieker dan `.ir-world`.
+     Zonder deze even specifieke tegenregel verdwijnt op telefoonmaat niet
+     alleen een paneel, maar de volledige hoofdwereld: een leeg zwart scherm. */
+  .ir-grid>.ir-world{display:block}
+  /* De ene beslissende actie is geen tekstlink. Op een telefoon krijgt hij
+     daarom de volledige duimmaat die de rest van het OS ook bewaakt. */
+  .ir-world>button{min-height:44px;padding:11px 16px;font-size:10px}
   .ir-shell>main>header{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
   .ir-shell>main>header::-webkit-scrollbar{display:none}
   .ir-shell>main>header>*{flex:0 0 auto}
   .ir-shell>main>header button{min-width:144px}
-  .ir-shell>main{min-width:0}
+  /* Een grid-item heeft standaard min-height:auto. Zodra de hoofdwereld weer
+     inhoud droeg, duwde die minimumhoogte de 64px-navigatie onder het venster
+     terwijl body bewust niet scrolt. Laat het werkvlak daarom binnen de
+     beschikbare rij krimpen; het artikel zelf handelt zijn scroll af. */
+  .ir-shell>main{min-width:0;min-height:0}
 }

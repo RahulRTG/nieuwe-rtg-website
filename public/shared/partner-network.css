@@ -17,5 +17,5 @@
   .pn-top::-webkit-scrollbar{display:none}
   .pn-top>*{flex:0 0 auto}
   .pn-top button{min-width:148px}
-  .pn-shell>main{min-width:0}
+  .pn-shell>main{min-width:0;min-height:0}
 }

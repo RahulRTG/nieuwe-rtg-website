@@ -123,24 +123,29 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
   async function aiVoegToe(ownerKey, opdracht, aiAan) {
     opdracht = scho(opdracht, 300);
     if (!opdracht) return { antwoord: 'Vertel welke afspraak ik moet inplannen.' };
-    let titel = null, datum = null, tijd = null;
-    if (aiAan && anthropic) {
+    const q = opdracht.toLowerCase();
+    // Eerst de controleerbare parser. Een herkenbare afspraak hoeft het apparaat
+    // niet te verlaten, ook niet wanneer er toevallig een model beschikbaar is.
+    let titel = titelUit(opdracht), datum = datumUit(q), tijd = tijdUit(q);
+    if (!datum && aiAan && anthropic) {
       try {
         const sys = 'Je zet een afspraak om in JSON. Antwoord ALLEEN met een JSON-object {"titel":"...","datum":"YYYY-MM-DD","tijd":"HH:MM of null"}. Vandaag is ' + vandaagStr() + '. Reken relatieve dagen (morgen, volgende week) uit naar een datum.';
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 200, system: sys, messages: [{ role: 'user', content: opdracht }] });
         const tekst = (r && r.content && r.content[0] && r.content[0].text || '');
         const jm = tekst.match(/\{[\s\S]*\}/);
-        if (jm) { const o = JSON.parse(jm[0]); titel = scho(o.titel, 120); if (geldigeDatum(o.datum)) datum = o.datum; if (geldigeTijd(o.tijd)) tijd = o.tijd; }
+        if (jm) {
+          const o = JSON.parse(jm[0]);
+          if (scho(o.titel, 120)) titel = scho(o.titel, 120);
+          if (geldigeDatum(o.datum)) datum = o.datum;
+          if (!tijd && geldigeTijd(o.tijd)) tijd = o.tijd;
+        }
       } catch (e) { /* val terug op de parser */ }
     }
-    const q = opdracht.toLowerCase();
-    if (!datum) datum = datumUit(q);
-    if (!tijd) tijd = tijdUit(q);
-    if (!titel) titel = titelUit(opdracht);
     if (!datum) return { antwoord: 'Ik kon geen datum vinden. Probeer bijv. "vergadering morgen om 15u" of "levering 20-08".' };
-    const r = voegToe(ownerKey, { titel, datum, tijd });
+    const r = await voegToe(ownerKey, { titel, datum, tijd });
     if (r.error) return { antwoord: r.error };
-    return { antwoord: 'Ingepland: ' + titel + ' op ' + datum + (tijd ? ' om ' + tijd : '') + '.', gedaan: true, item: r.item };
+    return { antwoord: 'Ingepland: ' + titel + ' op ' + datum + (tijd ? ' om ' + tijd : '') + '.',
+      gedaan: true, item: r.item, bron: datumUit(q) ? 'lokale-parser' : 'model' };
   }
 
   return { lijst, telling, voegToe, wijzig, verwijder, aiVoegToe };

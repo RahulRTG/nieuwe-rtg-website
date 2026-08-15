@@ -1,31 +1,38 @@
 /* De AI-uitwijk: één messages.create die achter de schermen meerdere
-   aanbieders kent (Claude, OpenAI, Gemini) en automatisch naar de volgende
+   aanbieders kent (lokaal, Claude, OpenAI, Gemini) en automatisch naar de volgende
    overstapt als er een uitvalt. Zo blijft de persoonlijke AI overeind als
    een aanbieder een storing of een 429/5xx heeft -- de rest van de code
    (kern/stuur.js, translate.js, alle helpers) roept gewoon
    anthropic.messages.create(...) aan en merkt van de uitwijk niets.
 
-   De volgorde is Claude eerst (ons hoofdmodel), dan OpenAI, dan Gemini;
-   alleen aanbieders met een sleutel doen mee. maakAI() geeft null terug als
-   er helemaal geen sleutel staat -- dan draait RTG in de ingebouwde,
-   handmatige werkmodus. */
+   De volgorde is LOCAL FIRST: een eigen modelserver, dan pas de expliciet
+   ingestelde externe aanbieders. RTG_EXTERNE_AI_UIT=1 houdt de lokale laag
+   actief en sluit de rest hard. Zonder model draait RTG in de ingebouwde,
+   regelgestuurde werkmodus. */
 'use strict';
 const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
 const Gemini = require('./gemini');
+const LocalAI = require('./local-ai');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
   opts = opts || {};
+  if (opts.uit === true || process.env.RTG_AI_UIT === '1') return [];
+  const externUit = opts.externUit === true || process.env.RTG_EXTERNE_AI_UIT === '1';
+  const localUrl = opts.localUrl || (opts.local && opts.local.baseURL) || process.env.LOCAL_AI_URL || process.env.LOCAL_AI_BASE_URL;
   const beschikbaar = {
-    claude: () => (opts.anthropicKey || process.env.ANTHROPIC_API_KEY) ? new Anthropic(opts.anthropic) : null,
-    openai: () => (opts.openaiKey || process.env.OPENAI_API_KEY) ? new OpenAI(opts.openai) : null,
-    gemini: () => (opts.geminiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) ? new Gemini(opts.gemini) : null
+    local: () => localUrl ? new LocalAI(Object.assign({}, opts.local, { baseURL: localUrl })) : null,
+    claude: () => !externUit && (opts.anthropicKey || process.env.ANTHROPIC_API_KEY) ? new Anthropic(opts.anthropic) : null,
+    openai: () => !externUit && (opts.openaiKey || process.env.OPENAI_API_KEY) ? new OpenAI(opts.openai) : null,
+    gemini: () => !externUit && (opts.geminiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) ? new Gemini(opts.gemini) : null
   };
-  const volgorde = (opts.volgorde || (process.env.AI_VOLGORDE || 'claude,openai,gemini').split(','))
-    .map(s => s.trim().toLowerCase()).filter(n => beschikbaar[n]);
+  beschikbaar.lokaal = beschikbaar.local;
+  const gekozen = opts.volgorde || process.env.AI_VOLGORDE || 'local,claude,openai,gemini';
+  const volgorde = (Array.isArray(gekozen) ? gekozen : String(gekozen).split(','))
+    .map(s => s.trim().toLowerCase()).map(n => n === 'lokaal' ? 'local' : n).filter(n => beschikbaar[n]);
   const ketting = [];
-  for (const naam of volgorde) { const c = beschikbaar[naam](); if (c) ketting.push(c); }
+  for (const naam of [...new Set(volgorde)]) { const c = beschikbaar[naam](); if (c) ketting.push(c); }
   return ketting;
 }
 
@@ -35,14 +42,21 @@ function maakAI(opts) {
   const log = opts && opts.log;
   const client = {
     aanbieders: ketting.map(c => c.naam),
+    providerInfo: ketting.map(c => ({ naam: c.naam, lokaal: !!c.lokaal,
+      verwerking: c.lokaal ? (c.verwerking || 'op-dit-apparaat') : 'externe-provider' })),
     actief: ketting[0].naam,
+    bron: ketting[0].lokaal ? 'lokaal' : 'extern',
+    kan(params) { return ketting.some(a => typeof a.kan !== 'function' || a.kan(params)); },
+    routes(params) { return ketting.filter(a => typeof a.kan !== 'function' || a.kan(params)).map(a => a.naam); },
     messages: {
       async create(params) {
         let laatste = null;
         for (const aanbieder of ketting) {
+          if (typeof aanbieder.kan === 'function' && !aanbieder.kan(params)) continue;
           try {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
+            client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
             return uit;
           } catch (e) {
             laatste = e;
@@ -50,7 +64,10 @@ function maakAI(opts) {
             // door naar de volgende aanbieder
           }
         }
-        throw laatste || new Error('Geen enkele AI-aanbieder beschikbaar.');
+        if (laatste) throw laatste;
+        const fout = new Error('Geen ingestelde modelprovider ondersteunt deze capability.');
+        fout.code = 'AI_CAPABILITY_NIET_BESCHIKBAAR';
+        throw fout;
       }
     }
   };
@@ -61,10 +78,31 @@ function maakAI(opts) {
    vrije modelverrijking mogelijk is; nooit of de onderliggende app werkt. */
 function beschikbaarheid(ai) {
   const beschikbaar = !!(ai && ai.messages && typeof ai.messages.create === 'function');
+  const kan = (params) => beschikbaar && (typeof ai.kan !== 'function' || ai.kan(params));
+  const infos = beschikbaar && Array.isArray(ai.providerInfo) ? ai.providerInfo : [];
+  const heeftLokaal = infos.some(x => x.lokaal) || (beschikbaar && ai.bron === 'lokaal');
+  const heeftExtern = infos.some(x => !x.lokaal) || (beschikbaar && !infos.length && ai.bron !== 'lokaal');
+  const lokaalViaNetwerk = infos.some(x => x.lokaal && x.verwerking === 'eigen-netwerk');
+  const route = params => beschikbaar
+    ? (typeof ai.routes === 'function' ? ai.routes(params) : (kan(params) ? (ai.aanbieders || []) : []))
+    : [];
+  const pTekst = { messages: [{ role: 'user', content: 'x' }] };
+  const pTools = { tools: [{ name: 'doe' }], messages: [{ role: 'user', content: 'x' }] };
+  const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
+  const hybride = heeftLokaal && heeftExtern;
+  const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
   return {
     beschikbaar,
-    modus: beschikbaar ? 'ondersteund' : 'handmatig',
+    modus: hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig',
+    verwerking: hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
+    privacy: hybride ? 'kan-extern-verwerken' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
     aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
+    mogelijkheden: {
+      tekst: kan(pTekst),
+      hulpmiddelen: kan(pTools),
+      beeld: kan(pBeeld)
+    },
+    routes: { tekst: route(pTekst), hulpmiddelen: route(pTools), beeld: route(pBeeld) },
     kernprocessen: 'beschikbaar',
     uitwijk: {
       navigatie: 'menu-en-zoeken',

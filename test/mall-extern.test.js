@@ -385,29 +385,41 @@ test('13. de datumgrens van het boekscherm ligt bij de zaak, niet bij de server'
      zaak die voorloopt is haar eigen gisteren nog toekomst.
 
      Welke van de twee we kunnen meten hangt af van het uur waarop deze toets
-     draait, dus de zone EN de bewering worden daarop gekozen. Zo bijt hij
-     altijd, in plaats van zichzelf in de helft van de gevallen over te slaan. */
-  const utcUur = new Date().getUTCHours();
-  const achter = utcUur < 11;
-  const zone = achter ? 'Pacific/Midway' : 'Pacific/Kiritimati';
+     draait, dus de zone EN de bewering worden op EEN vastgelegd moment
+     gekozen. De achterlopende zone telt alleen mee als er daarna nog ruim tijd
+     is voor de korte controledienst. Zo meet een lege lijst echt de
+     datumgrens, en niet toevallig een behandeling die niet meer voor
+     middernacht past. */
+  const moment = new Date();
+  const utcDatum = moment.toISOString().slice(0, 10);
+  const zones = ['Etc/GMT+12', 'Pacific/Kiritimati']
+    .map(zone => ({ zone, lokaal: tz.lokaal(zone, moment) }));
+  const keuze = zones.find(x => x.lokaal.datum < utcDatum && x.lokaal.minuten < 22 * 60) ||
+    zones.find(x => x.lokaal.datum > utcDatum);
+  assert.ok(keuze, 'er is altijd een zone aan de andere kant van de UTC-datumgrens');
+  const { zone, lokaal: daar } = keuze;
+  const achter = daar.datum < utcDatum;
   await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
   }, tok.SERENA);
 
-  const daar = tz.lokaal(zone);
-  const utcDatum = new Date().toISOString().slice(0, 10);
   assert.notEqual(daar.datum, utcDatum, 'de zone is zo gekozen dat de dag echt verschilt');
 
-  const mijn = await mallVan('SERENA');
-  const dienstId = (mijn.find(a => a.type === 'dienst' || a.type === 'offerte') || {}).id;
-  assert.ok(dienstId, 'er is een dienst om over te oordelen');
-  const dienst = dienstId.split(':')[2];
+  /* Een vaste korte dienst houdt deze toets onafhankelijk van het toevallig
+     eerste Mall-aanbod. Dat was een massage van 60 minuten; om 22:53 lokaal
+     was de eigen datum geldig maar paste de massage terecht niet meer. */
+  const toegevoegd = await api('/api/supplier/service', {
+    action: 'add', name: 'Datumgrenscontrole', price: 1, duurMin: 30
+  }, tok.SERENA);
+  assert.equal(toegevoegd.status, 200);
+  const dienst = (toegevoegd.body.services || []).find(x => x.name === 'Datumgrenscontrole');
+  assert.ok(dienst && dienst.id, 'de korte controledienst is aangemaakt');
 
   if (achter) {
     // de zaak loopt achter: haar eigen vandaag is de dag VOOR die van de server
     assert.ok(daar.datum < utcDatum);
-    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst, date: daar.datum }, lid);
+    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst.id, date: daar.datum }, lid);
     assert.equal(r.status, 200);
     assert.ok(r.body.tijden.length >= 1,
       'de eigen dag van de zaak wordt aangenomen, ook al is hij op de server al voorbij');
@@ -415,11 +427,12 @@ test('13. de datumgrens van het boekscherm ligt bij de zaak, niet bij de server'
     // de zaak loopt voor: haar eigen gisteren is de dag van de server
     const gisteren = new Date(new Date(daar.datum + 'T12:00:00Z').getTime() - 86400000).toISOString().slice(0, 10);
     assert.equal(gisteren, utcDatum, 'haar gisteren is de dag van de server');
-    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst, date: gisteren }, lid);
+    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst.id, date: gisteren }, lid);
     assert.equal(r.status, 200);
     assert.equal(r.body.tijden.length, 0,
       'een dag die bij de zaak al voorbij is levert niets op, ook al is hij op de server vandaag');
   }
 
+  await api('/api/supplier/service', { action: 'remove', id: dienst.id }, tok.SERENA);
   await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, tok.SERENA);
 });

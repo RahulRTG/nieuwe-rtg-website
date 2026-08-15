@@ -411,16 +411,30 @@ test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
       document.querySelector('#beleidSpiegel').textContent), null, { timeout: 20000 });
     const spiegel = await page.textContent('#beleidSpiegel');
     assert.match(spiegel, /wordt niet geweigerd/, 'de spiegel zegt dat een drempel geen verbod is, kreeg: ' + spiegel.slice(0, 140));
+    await page.waitForFunction(() => /Laatst gewijzigd/.test(document.querySelector('#bStand').textContent),
+      null, { timeout: 20000 });
 
     /* Een gekozen dag moet je ZIEN, en dat is niet hetzelfde als een class die
        er staat: de huisregel `.aan` hangt aan `.tabs > button` en deed buiten
        die rij niets. Er stonden zeven identieke pillen boven een beleid dat op
        werkdagen stond. Deze toets rekent daarom af op de KLEUR. */
-    await page.evaluate(() => { [...document.querySelectorAll('#bDagen button')][2].click(); });
+    /* Niet aannemen welke dagen het geladen beleid al aan heeft staan. Zet via
+       de echte knoppen zondag bewust aan en zaterdag bewust uit. */
+    await page.evaluate(() => {
+      let knoppen = [...document.querySelectorAll('#bDagen button')];
+      if (knoppen[0].getAttribute('aria-pressed') !== 'true') knoppen[0].click();
+      knoppen = [...document.querySelectorAll('#bDagen button')];
+      if (knoppen[6].getAttribute('aria-pressed') !== 'false') knoppen[6].click();
+    });
+    await page.waitForFunction(() => {
+      const knoppen = [...document.querySelectorAll('#bDagen button')];
+      return knoppen.length === 7 && knoppen[0].getAttribute('aria-pressed') === 'true' &&
+        knoppen[6].getAttribute('aria-pressed') === 'false';
+    }, null, { timeout: 20000 });
     const dagKleur = await page.evaluate(() => {
       const knoppen = [...document.querySelectorAll('#bDagen button')];
       const kleur = b => getComputedStyle(b).backgroundColor;
-      return { aan: kleur(knoppen[2]), uit: kleur(knoppen[0]) };
+      return { aan: kleur(knoppen[0]), uit: kleur(knoppen[6]) };
     });
     assert.notEqual(dagKleur.aan, dagKleur.uit,
       'de gekozen dag ziet er anders uit dan een niet-gekozen dag, kreeg: ' + JSON.stringify(dagKleur));

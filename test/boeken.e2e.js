@@ -30,10 +30,11 @@ test('Boeken: de plank groeit met je kluis en de leesplek reist mee',
         password: 'geheim123', geboortedatum: '1986-06-06', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
     // een eigen tekstboek in de kluis
     const tekst = Array(200).fill('Dit is een eigen boek uit de kluis, regel voor regel.').join('\n');
-    await fetch(base + '/api/bestanden/upload', { method: 'POST',
+    const upload = await fetch(base + '/api/bestanden/upload', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify({ naam: 'mijn-verhaal.txt',
-        dataUrl: 'data:text/plain;base64,' + Buffer.from(tekst).toString('base64') }) });
+        dataUrl: 'data:text/plain;base64,' + Buffer.from(tekst).toString('base64') }) }).then(r => r.json());
+    assert.ok(upload.id, 'het kluisboek is opgeslagen');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
@@ -54,15 +55,27 @@ test('Boeken: de plank groeit met je kluis en de leesplek reist mee',
     await page.evaluate(() => { document.querySelector('#eigen .boek').click(); });
     await page.waitForFunction(() => !document.querySelector('#leesBlok').hidden &&
       /eigen boek uit de kluis/.test(document.querySelector('#tekst').textContent), null, { timeout: 8000 });
+    /* Wacht op de echte opslagbevestiging. De vaste 900 ms die hier stond kon
+       onder CI-belasting al voorbij zijn terwijl de aanvraag nog liep. */
     await page.evaluate(() => {
       const el = document.querySelector('#tekst');
       el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
       el.dispatchEvent(new Event('scroll'));
     });
-    await page.waitForFunction(() => new Promise(res => setTimeout(() => res(true), 900)), null, { timeout: 5000 });
-
-    /* terug naar de plank: de voortgang staat erbij, en heropenen springt terug */
+    /* Meteen terug: dit bewijst dat de lezer de debounce veilig doorspoelt en
+       niet verwacht dat een gebruiker na het scrollen 600 ms blijft wachten. */
     await page.evaluate(() => { document.querySelector('#terug').click(); });
+    let plek = 0;
+    for (let poging = 0; poging < 120 && plek <= 0.4; poging++) {
+      await new Promise(res => setTimeout(res, 100));
+      const opgeslagen = await fetch(base + '/api/boeken/voortgang', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+        body: '{}' }).then(r => r.json());
+      plek = (((opgeslagen.voortgang || {})['kluis:' + upload.id]) || {}).plek || 0;
+    }
+    assert.ok(plek > 0.4, 'de server heeft de leesplek bevestigd');
+
+    /* op de plank staat de voortgang erbij, en heropenen springt terug */
     await page.waitForFunction(() => /% gelezen/.test(document.querySelector('#eigen').textContent), null, { timeout: 8000 });
     await page.evaluate(() => { document.querySelector('#eigen .boek').click(); });
     await page.waitForFunction(() => !document.querySelector('#leesBlok').hidden &&

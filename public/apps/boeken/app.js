@@ -48,7 +48,39 @@
   }
 
   /* ---- de lezer ---- */
-  var huidig = null, bewaarT = null;
+  var huidig = null, bewaarT = null, wachtendeBewaring = null;
+  var bewaarBezig = Promise.resolve(true);
+  function melding(tekst) {
+    $('#melding').textContent = tekst;
+    $('#melding').classList.add('zie');
+  }
+  function plekVan(el) {
+    var ruimte = Math.max(1, el.scrollHeight - el.clientHeight);
+    return Math.min(1, Math.max(0, el.scrollTop / ruimte));
+  }
+  /* Leg boek + plek vast op het SCROLLMOMENT. De oude timer keek pas 600 ms
+     later naar `huidig`; na een snelle tik op Terug was dat inmiddels null en
+     werd de echte leesplek dus niet opgeslagen. Bewaringen lopen bovendien
+     achter elkaar, zodat een trage eerdere aanvraag nooit een nieuwere plek
+     kan overschrijven. */
+  function bewaarNu() {
+    clearTimeout(bewaarT);
+    bewaarT = null;
+    var taak = wachtendeBewaring;
+    wachtendeBewaring = null;
+    if (!taak) return bewaarBezig;
+    bewaarBezig = bewaarBezig.catch(function () { return false; }).then(function () {
+      return api('/api/boeken/lees', taak).then(function (r) {
+        if (r.body.error) throw new Error(r.body.error);
+        voortgang[taak.boek] = { plek: r.body.plek };
+        return true;
+      });
+    }).catch(function () {
+      melding('Je leesplek kon nog niet veilig worden bewaard. Probeer het straks opnieuw.');
+      return false;
+    });
+    return bewaarBezig;
+  }
   function open(boek) {
     var laadTekst = boek.indexOf('kluis:') === 0
       ? api('/api/bestanden/haal', { id: boek.slice(6) }).then(function (r) {
@@ -79,21 +111,23 @@
   }
   $('#tekst').addEventListener('scroll', function () {
     if (!huidig) return;
+    var taak = { boek: huidig, plek: plekVan($('#tekst')) };
+    /* De plank reageert direct; de serverbevestiging volgt stil op de
+       achtergrond. Zo hoeft iemand nooit op een aparte knop te drukken. */
+    voortgang[taak.boek] = { plek: taak.plek };
+    wachtendeBewaring = taak;
     clearTimeout(bewaarT);
-    bewaarT = setTimeout(function () {
-      var el = $('#tekst');
-      var ruimte = Math.max(1, el.scrollHeight - el.clientHeight);
-      var plek = Math.min(1, Math.max(0, el.scrollTop / ruimte));
-      api('/api/boeken/lees', { boek: huidig, plek: plek }).then(function (r) {
-        if (!r.body.error) voortgang[huidig] = { plek: r.body.plek };
-      });
-    }, 600);
+    bewaarT = setTimeout(bewaarNu, 600);
   });
   $('#terug').addEventListener('click', function () {
+    var klaar = bewaarNu();
     huidig = null;
     $('#leesBlok').hidden = true;
     $('#plankBlok').hidden = false;
-    start();
+    tekenPlank(bieb, eigen);
+    /* Lees pas opnieuw van de server nadat de laatste plek bevestigd is. Een
+       trage GET kan de zojuist opgeslagen plek daardoor niet meer inhalen. */
+    klaar.then(function (bewaard) { if (bewaard) start(); });
   });
   var MATEN = [1, 1.15, 1.32];
   var maat = 1;

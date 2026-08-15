@@ -662,17 +662,26 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
      een scherm waar je een minuut naar kijkt leest het als behang met een paar
      bewegende stipjes erover.
 
-     Deze meting kijkt daarom naar de hemel op TWEE momenten en telt hoeveel
-     opgelichte pixels er op precies dezelfde plek nog steeds oplichten. Staat
-     het veld stil, dan is dat bijna alles; beweegt het echt, dan blijft er
-     alleen toevallige overlap over (gemeten: 9,5%, zowel na zes als na twintig
-     seconden -- het veld is dan volledig gedecorreleerd).
+     Deze meting kijkt daarom naar de hemel op TWEE momenten en berekent de
+     ruimtelijke correlatie van alle zichtbare pixels. Alleen aan/uit telt:
+     ademen in helderheid is geen verplaatsing. Staat het veld stil, dan blijft
+     de correlatie hoog; verschuift het echt, dan daalt zij richting nul. De
+     normalisatie haalt toevallige overlap door een dicht scherm uit de score.
 
      DE MUTATIE: laat verfStof() met een vaste tijd tekenen (verfStof(0) in
      plaats van verfStof(t)) in sterren-03.js. Het stof staat dan weer stil, de
      heldere sterren draaien nog gewoon door, en het scherm ziet er op een
      afdruk identiek uit. Deze toets zakt dan meteen. */
   await metLid('aan', async ({ page }) => {
+    /* Deze proef meet BEWEGING. De proef erboven bewaakt al afzonderlijk dat
+       de hemel vanzelf wordt opgehangen en de juiste maat krijgt. Activeer
+       hier via de publieke schakelaar expliciet de te meten wereld en wacht op
+       haar echte doek, zodat een trage tweede browsersessie de bewegingsproef
+       niet in een opstartproef verandert. */
+    await page.evaluate(() => RTGWereld.zet(true));
+    await page.waitForFunction(
+      () => !!document.querySelector('.os-thuisscherm > canvas.rtg-sterren'),
+      null, { timeout: 30000 });
     const r = await page.evaluate(async () => {
       /* HET DOEK ELKE KEER OPNIEUW OPZOEKEN, en niet een verwijzing vasthouden.
          De hemel wordt opnieuw opgehangen als het scherm van maat verandert

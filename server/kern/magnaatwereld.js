@@ -341,6 +341,7 @@ module.exports = ({
       versie: capabilityGraph.versie,
       gescand: capabilityGraph.gescand,
       vingerafdruk: capabilityGraph.vingerafdruk.slice(0, 12),
+      motor: Object.assign({}, capabilityGraph.motor),
       cijfers: Object.assign({}, capabilityGraph.cijfers),
       dekkingsmatrix: {
         percentage: capabilityGraph.dekkingsmatrix.percentage,

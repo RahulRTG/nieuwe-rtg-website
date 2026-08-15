@@ -35,9 +35,6 @@ services:
       context: .
     command: ["node", "scripts/docker/start.js", "app"]
     stop_grace_period: 35s
-    ports:
-      # Bewust niet 0.0.0.0: zonder TLS-rand hoort Node niet direct op internet.
-      - "${RTG_PUBLISH_HOST:-127.0.0.1}:${PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -48,6 +45,14 @@ services:
       RTG_MOTOR_SHADOW: http://motor:3100
       RTG_MOTOR_GELD_URL: http://motor:3100
       RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
+      # De binary zit in hetzelfde onveranderlijke image. De modus en centrale
+      # noodstop blijven via .env.productie direct bedienbaar. Standaard blijft
+      # deze migratie uit; een canary is altijd een bewuste productie-instelling.
+      RTG_CAPABILITY_RUST_BIN: /app/rtg-motor
+      RTG_CAPABILITY_RUST_MODE: ${RTG_CAPABILITY_RUST_MODE:-uit}
+      RTG_CAPABILITY_RUST_CANARY_PCT: ${RTG_CAPABILITY_RUST_CANARY_PCT:-10}
+      RTG_CAPABILITY_RUST_CANARY_KEY: ${RTG_CAPABILITY_RUST_CANARY_KEY:-rtg-compose-app-1}
+      RTG_RUST_ALLES_UIT: ${RTG_RUST_ALLES_UIT:-0}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RTG_STOP_GRACE_MS: 30000
     secrets:
@@ -246,6 +251,8 @@ secrets:
     file: ${RTG_ENV_FILE:-.env.productie}
   postgres_password:
     file: ${RTG_POSTGRES_PASSWORD_FILE:-.rtg-secrets/postgres_password}
+  sentinel_token:
+    file: ${RTG_SENTINEL_TOKEN_FILE:-.sentinel-token}
 
 networks:
   edge:
@@ -258,7 +265,3 @@ volumes:
   rtg-pg:
   rtg-motor:
   rtg-sentinel:
-
-secrets:
-  sentinel_token:
-    file: ${RTG_SENTINEL_TOKEN_FILE:-.sentinel-token}

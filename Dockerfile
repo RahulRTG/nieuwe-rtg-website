@@ -12,7 +12,8 @@ COPY motor/src ./src
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/src/motor/target \
     cargo build --release --locked && \
-    cp /src/motor/target/release/rtg-motor /tmp/rtg-motor
+    cp /src/motor/target/release/rtg-motor /tmp/rtg-motor && \
+    cp /src/motor/target/release/rtg-sentinel /tmp/rtg-sentinel
 
 # RTG / RTFoundation productie-image.
 # Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
@@ -35,6 +36,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 # De rest van de broncode.
 COPY . .
 COPY --from=motor-builder /tmp/rtg-motor /app/rtg-motor
+COPY --from=motor-builder /tmp/rtg-sentinel /app/rtg-sentinel
 
 # Frontend-build: minify de serveerbare JS naar public/dist/min en stempel de
 # service-worker caches. Alles met eigen scripts, dus niets om achteraf te

@@ -82,6 +82,14 @@ Status, gerichte blokkade, volledige isolatie en auditbediening staan in
 `docs/sentinel.md`. De losse `.sentinel-token` wordt alleen in Sentinel gemount;
 de app krijgt hem nooit.
 
+Voor de eerste capability-canary zet je in `.env.productie`
+`RTG_CAPABILITY_RUST_MODE=canary`, een percentage en een stabiele, niet-geheime
+instance-sleutel. Het percentage selecteert instances deterministisch; op een
+enkele Compose-instance is die instance dus geheel wel of niet geselecteerd.
+De actuele bron, pariteit, terugvalreden en centrale noodstop zijn zichtbaar in
+Magnaat Boardroom bij `capabilityGraph.motor`. Zet bij twijfel direct
+`RTG_RUST_ALLES_UIT=1` en herstart alleen `app`; Sentinel blijft dan actief.
+
 ## 2. Zonder Docker
 
 ```bash

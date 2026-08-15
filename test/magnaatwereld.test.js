@@ -200,6 +200,10 @@ test('de wereld toont de automatische Capability Graph naast de bestaande functi
   const { w } = wereld();
   const d = w.overzicht('user-graph');
   assert.equal(d.capabilityGraph.cijfers.functieFlags, functies.FUNCTIES.length);
+  assert.equal(d.capabilityGraph.motor.bron, 'javascript');
+  assert.equal(d.capabilityGraph.motor.reden, 'uitgeschakeld');
+  assert.equal(Object.hasOwn(d.capabilityGraph.motor, 'canarySleutel'), false,
+    'de bestuurlijke status toont de motorstand maar nooit de instance-sleutel');
   assert.ok(d.capabilityGraph.cijfers.apps >= 150);
   assert.ok(d.capabilityGraph.cijfers.apiActies >= 1500);
   assert.ok(d.capabilityGraph.cijfers.werkprocessen >= 500);

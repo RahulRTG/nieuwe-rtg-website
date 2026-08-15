@@ -22,6 +22,14 @@ test('de drie eigen containers hebben een onveranderlijke root en geen Linux-cap
   }
 });
 
+test('het productie-image draagt zowel de Rust-motor als de onafhankelijke Sentinel', () => {
+  const dockerfile = fs.readFileSync(path.join(__dirname, '..', 'Dockerfile'), 'utf8');
+  assert.match(dockerfile, /cp \/src\/motor\/target\/release\/rtg-motor \/tmp\/rtg-motor/);
+  assert.match(dockerfile, /cp \/src\/motor\/target\/release\/rtg-sentinel \/tmp\/rtg-sentinel/);
+  assert.match(dockerfile, /COPY --from=motor-builder \/tmp\/rtg-motor \/app\/rtg-motor/);
+  assert.match(dockerfile, /COPY --from=motor-builder \/tmp\/rtg-sentinel \/app\/rtg-sentinel/);
+});
+
 test('rollback accepteert alleen exacte Docker-image-id’s en veilige tags', () => {
   const id = 'sha256:' + 'a'.repeat(64);
   assert.equal(geldigeImageId(id), true);

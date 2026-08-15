@@ -69,11 +69,33 @@ module.exports = (ctx) => {
         bestemming: s.stripeAccount || undefined
       });
     } catch (e) { return { status: 502, error: 'Betaling kon niet gestart worden: ' + e.message }; }
-    /* processing en requires_capture zijn nog geen ontvangen geld. Hier stond
-       dat allebei gelijk aan succeeded, waardoor de ontvangstenteller van de
-       ondernemer al opliep terwijl de kaart later nog kon mislukken. */
-    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start')))
-      return { status: 402, error: 'De betaling wacht nog op definitieve bevestiging. Betaal niet opnieuw.' };
+    /* Processing en requires_capture zijn nog geen ontvangen geld. Bewaar wel
+       de strikt begrensde settlementcontext, zodat uitsluitend een later
+       geverifieerd providerbericht de echte boeking kan afronden. */
+    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start'))) {
+      if (prov.id) {
+        db.data.kaartWachtend = db.data.kaartWachtend && typeof db.data.kaartWachtend === 'object'
+          ? db.data.kaartWachtend : {};
+        db.data.kaartWachtend[prov.id] = {
+          soort: 'direct', betaalwijze: 'kaart', key, codename,
+          supplierCode: s.code, centen: cent,
+          omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
+          bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
+          idem: idemSleutel || ('provider:' + prov.id), at: nuMs()
+        };
+        const sleutels = Object.keys(db.data.kaartWachtend);
+        if (sleutels.length > 20000)
+          for (const k of sleutels.slice(0, sleutels.length - 20000)) delete db.data.kaartWachtend[k];
+        save();
+      }
+      return {
+        status: 402,
+        error: 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.',
+        pending: true,
+        providerId: prov.id || null,
+        clientSecret: prov.clientSecret || null
+      };
+    }
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',

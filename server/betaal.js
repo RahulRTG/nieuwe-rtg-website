@@ -23,6 +23,12 @@ const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const MOLLIE_KEY = process.env.MOLLIE_API_KEY || '';
 const ADYEN_KEY = process.env.ADYEN_API_KEY || '';
 const BETALEN_UIT = process.env.RTG_BETALEN_UIT === '1';
+// Bewuste fail-closed bevestiging; dit opent geen uitgaande bankrail.
+const UITGAAND_BEWUST_DICHT = process.env.STRIPE_UITGAAND_UIT_BEWUST === '1';
+const regie = require('./betaal-regie')({
+  connectGeconfigureerd: sandbox.CONNECT,
+  sepaGeconfigureerd: sandbox.SEPA
+});
 
 let stripe = null;
 if (STRIPE_KEY && !BETALEN_UIT) {
@@ -60,7 +66,8 @@ const AANBIEDER = BETALEN_UIT ? 'uit'
   : voorkeur === 'mollie' && mollie ? 'mollie'
   : voorkeur === 'adyen' && adyen ? 'adyen'
   : voorkeur === 'stripe' && stripe ? 'stripe'
-  : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen' : 'demo';
+  : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen'
+  : DEMO_BETALEN ? 'demo' : 'uit';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
    persistente store injecteren (bijv. gespiegeld in de database), zodat de
@@ -76,7 +83,16 @@ function koppelStore(store) {
 const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v),
   env: process.env, uit: BETALEN_UIT });
-const { maakBetaling, haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder } = ontvangst;
+const {
+  maakBetaling: maakProviderBetaling,
+  haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
+} = ontvangst;
+
+const maakBetaling = require('./betaal-connect')({
+  crypto, sandbox, regie,
+  haalOp: (k) => haalOp(k), bewaar: (k, v) => bewaar(k, v),
+  maakProviderBetaling
+});
 
 /* Start (of hervind) een uitbetaling naar een externe bankrekening (SEPA).
    Gebruikt voor de vaste 30%-afdracht aan de RTFoundation: RTG ontvangt de
@@ -165,9 +181,11 @@ function tekenDemo(ruweBody) {
   return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
 }
 
-module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT,
+module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
   verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
+  CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
+  zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,
   WEBHOOK_SECRET, MOLLIE_AAN: !!mollie, ADYEN_AAN: !!adyen,
   adyenMerchantAccount: adyen && adyen.merchantAccount,
   adyenHandmatigeCapture: !!(adyen && adyen.handmatigeCapture),

@@ -26,6 +26,11 @@ x-rtg-beveiliging: &rtg-beveiliging
 services:
   app:
     <<: *rtg-beveiliging
+    # Ook letterlijk per eigen service: controles en operators hoeven YAML-
+    # anchors niet te evalueren om de beveiligingsgrens te kunnen bewijzen.
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
     build:
       context: .
     command: ["node", "scripts/docker/start.js", "app"]
@@ -116,6 +121,9 @@ services:
 
   motor:
     <<: *rtg-beveiliging
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
     build:
       context: .
     command: ["node", "scripts/docker/start.js", "motor"]

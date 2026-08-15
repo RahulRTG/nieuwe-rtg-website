@@ -8,7 +8,9 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { spawnSync } = require('child_process');
 const { nu: klokNu } = require('../lib/klok');
+const kantoorVan = require('./magnaat-kantoorregels');
 
 const API_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*(['"`])([^'"`]+)\2/g;
 

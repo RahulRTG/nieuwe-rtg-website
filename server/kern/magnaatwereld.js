@@ -201,7 +201,10 @@ const KANSEN = [
   }
 ];
 
-module.exports = ({ db, save, crypto, functies }) => {
+module.exports = ({
+  db, save, bewerkCollectie = null, crypto, functies,
+  partnerstudio = null, codenaamVan = null, sseToCustomer = null
+}) => {
   const nu = klokNu;
   const id = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
   const tekst = (v, max = 300) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);

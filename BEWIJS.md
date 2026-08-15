@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 979 bestanden en 6520 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 998 bestanden en 6610 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 979 |
-| losse beweringen (`test(...)`) | 6520 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 27 |
+| toetsbestanden | 998 |
+| losse beweringen (`test(...)`) | 6610 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 40 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
-| alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 125 |
+| alleen in de kop *genoemd*, nog niet gemeten | 26 |
+| niets van beide | 142 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-855 bestanden, 6296 beweringen.
+874 bestanden, 6386 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -696,6 +696,7 @@ toets omvalt.
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scriptbundel.test.js` | 5 | overleefd | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `selfhost.test.js` | 5 | -- | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
+| `sentinel.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
 | `sessie-herstart.test.js` | 1 | gezakt op `liegpoort /api/` | Sessie-duurzaamheid: een ingelogd lid blijft na een serverherstart ingelogd, omdat de sessie (alleen de token-hash) in db.data.sessions staat en bij het opstarten terug in de Map wordt geladen. Dit dekt het... |
 | `sessiegrens.test.js` | 2 | gezakt op `liegpoort /api/` | EEN NIEUW WACHTWOORD HOORT ELKE LOPENDE SESSIE TE BEEINDIGEN. WAT ER MISGING. |

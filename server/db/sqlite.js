@@ -31,9 +31,12 @@ function sqliteInit() {
   kvdb = new DatabaseSync(bestand);
   stmt = null; // verse verbinding: de voorbereide statements horen bij de oude
   besloten(bestand);
+  /* Twee verse processen kunnen tegelijk de WAL-modus willen activeren. De
+     wachttijd moet daarom VOOR die eerste lockende PRAGMA gelden; erna was te
+     laat en maakte parallelle opstart incidenteel rood met "database is locked". */
+  kvdb.exec('PRAGMA busy_timeout=5000');
   kvdb.exec('PRAGMA journal_mode=WAL');
   kvdb.exec('PRAGMA synchronous=NORMAL');
-  kvdb.exec('PRAGMA busy_timeout=5000'); // wacht kort als een ander proces net schrijft
   // Houd het WAL-bestand begrensd: na een checkpoint wordt het teruggezet naar
   // deze grens in plaats van op zijn hoogste stand te blijven staan. Zonder dit
   // groeide store.db-wal tot een paar MB en werd elke start onnodig traag.

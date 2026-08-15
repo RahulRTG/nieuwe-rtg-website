@@ -12,6 +12,7 @@
 'use strict';
 
 const { keurGeld } = require('./productie-geld');
+const { keurAi } = require('./productie-ai');
 const { keurOpslag } = require('./productie-opslag');
 
 function keur(env, fouten, waarschuwingen) {
@@ -129,8 +130,7 @@ function keur(env, fouten, waarschuwingen) {
        blijven beschikbaar en de UI meldt eerlijk dat vrije AI niet actief is.
        Mail is anders: een herstelbericht lokaal parkeren terwijl de gebruiker
        denkt dat het verzonden is, is geen werkbare uitwijk en blijft blokkeren. */
-    if (!env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY && !env.GEMINI_API_KEY && !env.GOOGLE_API_KEY)
-      waarschuwingen.push('Geen AI-provider ingesteld: RTG start volledig in handmatige werkmodus. Vrije AI-verrijking staat uit; kernprocessen, navigatie en regelgestuurde opdrachten blijven beschikbaar.');
+    keurAi(env, fouten, waarschuwingen);
     if (!env.SMTP_URL && !env.SMTP_HOST) {
       if (priveBeta) waarschuwingen.push('Geen mailprovider in private beta: herstel- en bevestigingsmail blijft zichtbaar in de lokale outbox.');
       else fouten.push('Geen echte mailprovider ingesteld: herstel- en bevestigingsmail zou alleen in de lokale outbox belanden. Zet SMTP_URL of SMTP_HOST.');

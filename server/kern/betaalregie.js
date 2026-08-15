@@ -1,6 +1,4 @@
-/* Centrale regie voor de drie providers. Dit is bewust geen sleutelkluis:
-   Boardroom en IT sturen het proces, geheimen blijven op de server en
-   Financien leest alleen de provider-onafhankelijke waarheid. */
+/* Centrale providerregie; geheimen blijven op de server. */
 'use strict';
 const { datum: klokDatum } = require('../lib/klok');
 
@@ -124,10 +122,11 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
   function overzicht() {
     const r = staat();
     const cijfers = betalingCijfers();
+    const uit = betaal.BETALEN_AAN === false;
     const actieveRails = new Set(rails().filter(x => x.echt).map(x => x.id));
     const providers = Object.keys(PROVIDERS).map(id => providerBeeld(id, r.providers[id], actieveRails, cijfers));
     const problemen = [];
-    if (!providers.some(p => p.actief)) problemen.push({ ernst: 'kritiek', code: 'GEEN-ECHTE-PROVIDER',
+    if (!uit && !providers.some(p => p.actief)) problemen.push({ ernst: 'kritiek', code: 'GEEN-ECHTE-PROVIDER',
       tekst: 'Er is nog geen echte betaalprovider gekoppeld. De demobetaling mag niet live worden gebruikt.' });
     for (const p of providers) {
       if (p.fase === 'live' && !p.gereed) problemen.push({ ernst: 'kritiek', code: p.id.toUpperCase() + '-ONVOLLEDIG',
@@ -142,7 +141,7 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
     const onverwerkt = inbox.filter(x => !x.verwerktAt).length;
     if (onverwerkt) problemen.push({ ernst: 'waarschuwing', code: 'WEBHOOK-WACHT',
       tekst: onverwerkt + ' terugmelding(en) wachten nog op verwerking.' });
-    return { eigenaarEmail: require('../eigenaar').eigenaarEmail(), voorkeur: r.voorkeur || null,
+    return { eigenaarEmail: require('../eigenaar').eigenaarEmail(), voorkeur: r.voorkeur || null, betalingenUit: uit,
       providers, cijfers, problemen, gezond: !problemen.some(p => p.ernst === 'kritiek'),
       audit: r.audit.slice(-30).reverse(), bijgewerktAt: nuIso() };
   }

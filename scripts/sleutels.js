@@ -7,6 +7,10 @@
    Veilige self-hosted private beta (alleen localhost):
      npm run selfhost:init -- --eigenaar=jij@domein.nl
 
+   Publiek, bewust zonder externe AI en zonder enige betaalrail:
+     npm run sleutels -- --docker --schrijf --zonder-ai --zonder-betalen \
+       --eigenaar=jij@domein.nl --url=https://jouw-domein.nl
+
    --docker maakt ook een apart PostgreSQL-wachtwoordbestand. Bestaande
    geheimen worden nooit stil overschreven; --force is bewust en expliciet. */
 'use strict';
@@ -39,6 +43,8 @@ function base32(buf) {
 
 const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
+const zonderAi = heeft('--zonder-ai');
+const zonderBetalen = heeft('--zonder-betalen');
 const schrijven = heeft('--schrijf');
 const forceren = heeft('--force');
 const eigenaar = optie('--eigenaar') || 'VUL-IN@JOUW-DOMEIN.NL';
@@ -70,6 +76,8 @@ if (priveBeta) {
     ['SMTP_URL', 'smtps://VUL-IN', 'HANDMATIG: anders worden e-mails niet echt verstuurd']
   );
 }
+if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
+if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
 
 const blok = [];
 blok.push('# RTG-productiegeheimen, gegenereerd op ' + new Date().toISOString());

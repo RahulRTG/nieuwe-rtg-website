@@ -12,15 +12,28 @@
 'use strict';
 
 function keurGeld(env, fouten, waarschuwingen) {
+    const betalingenUit = env.RTG_BETALEN_UIT === '1';
     const demoBewust = env.STRIPE_DEMO_BEWUST === '1' || env.RTG_PRIVATE_BETA === '1';
     /* FOUT en geen waarschuwing: zonder sleutel draait de demo-provider, die
        ELKE betaling zelf bevestigt. Facturen gaan op 'paid' zonder afschrijving,
        terwijl de 30%-afdracht aan de RTFoundation wel gewoon wordt geboekt --
        geld eruit, niets erin. Dat is geen mededeling maar een storing. Wie
-       bewust zonder betalingen draait, zegt dat met STRIPE_DEMO_BEWUST=1. */
+       bewust zonder betalingen draait, zegt dat met RTG_BETALEN_UIT=1. Alleen
+       een afgeschermde lokale beta mag de demo-provider nog bewust gebruiken. */
     const echteProvider = !!(env.STRIPE_SECRET_KEY || env.MOLLIE_API_KEY || env.ADYEN_API_KEY);
+    if (betalingenUit) {
+      if (echteProvider || env.STRIPE_WEBHOOK_SECRET || env.ADYEN_HMAC_KEY ||
+          env.MUNT_PROVIDER_KEY || env.MUNT_WEBHOOK_SECRET)
+        fouten.push('RTG_BETALEN_UIT=1 botst met ingestelde betaalgeheimen. Verwijder de provider- en webhook-sleutels: een uitgeschakelde betaalrail hoort niets te kunnen bereiken.');
+      if (demoBewust)
+        fouten.push('RTG_BETALEN_UIT=1 botst met STRIPE_DEMO_BEWUST of RTG_PRIVATE_BETA. Kies precies één stand: echt fail-closed uit, of de lokale demo.');
+      if (env.MUNT_AAN === '1')
+        fouten.push('RTG_BETALEN_UIT=1 botst met MUNT_AAN=1. Ook muntbetalingen moeten uit blijven.');
+      waarschuwingen.push('RTG_BETALEN_UIT=1: alle betaalrails, webhooks, terugbetalingen en uitbetalingen weigeren fail-closed. Er draait ook geen demo-provider.');
+      return;
+    }
     if (!echteProvider && !demoBewust)
-      fouten.push('STRIPE_SECRET_KEY, MOLLIE_API_KEY en ADYEN_API_KEY ontbreken in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Zet minstens één echte provider -- of, als deze installatie bewust zonder betalingen draait, zet STRIPE_DEMO_BEWUST=1.');
+      fouten.push('STRIPE_SECRET_KEY, MOLLIE_API_KEY en ADYEN_API_KEY ontbreken in productie: dan draait de demo-provider, die ELKE betaling zelf bevestigt. Zet minstens één echte provider -- of zet RTG_BETALEN_UIT=1 om alle betaalfuncties bewust fail-closed uit te schakelen.');
     if (!echteProvider && demoBewust)
       waarschuwingen.push((env.RTG_PRIVATE_BETA === '1' ? 'RTG_PRIVATE_BETA=1' : 'STRIPE_DEMO_BEWUST=1') + ': de demo-betaalprovider bevestigt elke betaling zelf. Dat is hier een bewuste keuze; er gaat geen echt geld om en facturen kloppen niet.');
     /* Een betaalsleutel zonder webhook-secret is gevaarlijker dan geen van

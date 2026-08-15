@@ -7,14 +7,17 @@
 const CHECKS_INTEGRATIES = [
   {
     id: 'ai', naam: 'Persoonlijke AI (Claude)', code: 'AI-01', categorie: 'Integraties',
-    run: (c) => c.anthropic
+    run: (c) => process.env.RTG_AI_UIT === '1'
+      ? { status: 'ok', detail: 'Bewust uit: handmatige werkmodus actief; geen gegevens gaan naar een AI-provider.' }
+      : c.anthropic
       ? { status: 'ok', detail: 'Claude API actief.' }
-      : { status: 'waarschuwing', detail: 'Demo-antwoorden: geen ANTHROPIC_API_KEY.' }
+      : { status: 'waarschuwing', detail: 'Handmatige werkmodus: geen AI-provider ingesteld.' }
   },
   {
     id: 'betalingen', naam: 'Betalingen', code: 'PAY-01', categorie: 'Integraties',
     run: (c) => {
       const m = c.betaal && c.betaal.mogelijkheden ? c.betaal.mogelijkheden() : null;
+      if (m && m.uit) return { status: 'ok', detail: 'Bewust uit: alle betaalrails en webhooks weigeren fail-closed; ook de demo-provider staat uit.' };
       const echt = m && m.rails.filter(x => x.echt).map(x => x.id);
       return echt && echt.length
         ? { status: 'ok', detail: echt.map(x => x === 'mollie' ? 'Mollie' : x === 'adyen' ? 'Adyen' : 'Stripe').join(' + ') + ' actief; betaalwaarheid provider-onafhankelijk.' }

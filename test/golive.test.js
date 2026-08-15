@@ -27,12 +27,11 @@ const PROD_ENV = {
      is niet geheim. De beheerder zet hem bij de eerste start en haalt hem daarna
      weg. Zie server/routes/auth/account.js. */
   RTG_OWNER_BOOTSTRAP: 'proef-eenmalige-eigenaarssleutel',
-  /* Zonder betaalsleutel weigert productie te starten: de demo-provider bevestigt
-     anders ELKE betaling zelf, dus facturen gaan op betaald zonder dat er is
-     afgerekend -- terwijl de RTF-afdracht wel gewoon wordt geboekt. Deze toets
-     draait de stand waarin dat bewust is: geen echte betalingen, wel eerlijk. */
-  STRIPE_DEMO_BEWUST: '1',
-  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
+  /* De eerste publieke stand kan bewust zonder AI en zonder betalen draaien.
+     Anders dan STRIPE_DEMO_BEWUST is dit echt fail-closed: geen enkele demo- of
+     echte rail mag een betaling bevestigen. */
+  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1',
+  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 
@@ -102,6 +101,16 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.ok(regData.token);
   assert.ok(!regData.devVerifyUrl, 'productie lekt geen bevestigingslink in het antwoord');
   assert.equal((await post('/api/auth/login', { login: 'lid@echtdomein.nl', password: 'geheim123', pasApp: 'rtg' })).status, 200);
+  const pay = await fetch(BASE + '/api/pay', { method: 'POST', headers: {
+    'Content-Type': 'application/json', Authorization: 'Bearer ' + regData.token, ...PROXY
+  }, body: '{}' });
+  assert.equal(pay.status, 503, 'betalen blijft in deze publieke stand hard uit');
+  assert.equal((await pay.json()).code, 'betalingen-uit');
+  const direct = await fetch(BASE + '/api/betaal/direct', { method: 'POST', headers: {
+    'Content-Type': 'application/json', Authorization: 'Bearer ' + regData.token, ...PROXY
+  }, body: JSON.stringify({ supplierCode: 'geen', bedrag: 10 }) });
+  assert.equal(direct.status, 503, 'ook een tweede betaalroute is centraal dicht');
+  assert.equal((await direct.json()).code, 'betalingen-uit');
 
   // wachtwoord vergeten: de tweestapsflow draait, maar link en code blijven
   // in productie UIT het antwoord (die gaan per e-mail en telefoon)

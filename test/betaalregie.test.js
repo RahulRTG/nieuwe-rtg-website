@@ -3,10 +3,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const maak = require('../server/kern/betaalregie');
 
-function regie(env, actief) {
+function regie(env, actief, uit) {
   const data = {};
   let saves = 0;
-  const betaal = { mogelijkheden: () => ({ rails: actief ? [{ id: actief, echt: true }] : [{ id: 'demo', echt: false }] }) };
+  const betaal = { BETALEN_AAN: !uit, mogelijkheden: () => uit
+    ? { standaard: 'uit', rails: [], uit: true }
+    : { rails: actief ? [{ id: actief, echt: true }] : [{ id: 'demo', echt: false }] } };
   const r = maak({ d: () => data, save: () => { saves++; }, betaal, env: env || {}, nu: () => '2026-08-14T10:00:00.000Z' });
   return { r, data, saves: () => saves };
 }
@@ -19,6 +21,14 @@ test('toont drie providers, maar nooit de geheime waarden', () => {
   assert.equal(beeld.providers[0].werkt, 'onvolledig');
   assert.equal(JSON.stringify(beeld).includes(sleutel), false);
   assert.equal(beeld.problemen.some(x => x.code === 'GEEN-ECHTE-PROVIDER'), true);
+});
+
+test('bewust uit is een gezonde toestand en vraagt niet om een provider', () => {
+  const { r } = regie({ RTG_BETALEN_UIT: '1' }, null, true);
+  const beeld = r.overzicht();
+  assert.equal(beeld.betalingenUit, true);
+  assert.equal(beeld.gezond, true);
+  assert.equal(beeld.problemen.some(x => x.code === 'GEEN-ECHTE-PROVIDER'), false);
 });
 
 test('IT kan koppelen en beproeven, maar niet zelf live zetten', () => {

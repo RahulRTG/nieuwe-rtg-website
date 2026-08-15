@@ -147,6 +147,13 @@ module.exports = function verzoekketen(deps) {
     next();
   });
 
+  /* Een installatie die bewust zonder betalen publiceert, mag nergens een
+     betaling simuleren of alleen administratief als voldaan markeren. Deze
+     routepoort staat voor de body-parser en dus ook voor alle webhooks. De
+     grootboeken hebben verderop nog een tweede, interne stop voor taken die
+     niet via HTTP lopen. */
+  require('./betaalstop')({ app });
+
   /* De liegpoort (./liegpoort.js) doet niets zonder RTG_LIEG. Staat die wel,
      dan laat hij de gekozen endpoints een geldig maar LEEG antwoord geven --
      zodat scripts/leugendetector.js kan meten welke endpoints kunnen liegen

@@ -69,7 +69,7 @@ er hier iets openstaat geeft die keuring exitcode 1.
 | 1.2 | `RTG_VAULT_KEY` uit een secrets manager | Anders ligt de sleutel van de identiteitskluis (namen, e-mail, telefoon) naast de database: wie de datamap steelt heeft ook de sleutel | idem |
 | 1.3 | `RTG_SECRET_KEY` uit een secrets manager | Zelfde probleem voor de ondertekening van sessietokens | idem |
 | 1.4 | `RTG_OWNER_EMAIL` zetten | In productie geldt de ingebouwde standaard niet | idem |
-| 1.5 | `STRIPE_SECRET_KEY` zetten | **De gevaarlijkste.** Zonder sleutel draait de demo-provider die ELKE betaling zelf bevestigt: facturen gaan op "betaald" zonder afrekening, terwijl de RTF-afdracht wel wordt geboekt. Bewust zonder betalingen draaien kan met `STRIPE_DEMO_BEWUST=1` | idem |
+| 1.5 | Echte betaalprovider óf `RTG_BETALEN_UIT=1` | **De gevaarlijkste.** Zonder beide draait de demo-provider die ELKE betaling zelf bevestigt: facturen gaan op "betaald" zonder afrekening, terwijl de RTF-afdracht wel wordt geboekt. De uit-stand weigert providers, webhooks, wallets en geldbewegingen fail-closed | idem |
 | 1.6 | Verwerkingsregister afmaken (AVG art. 30) | 15 open plekken in `VERWERKINGSREGISTER.md` | `npm run golive` telt 0 open plekken |
 | 1.7 | Datalek-draaiboek afmaken (art. 33, 72-uursklok) | 4 open plekken in `DATALEK.md` | idem |
 | 1.8 | De 18 juridische vragen beantwoorden | Begint bij "onder welke juridische naam draait RTG, en wat is het KvK-nummer?". Rahul kan ze uitvragen op de technische pagina; met de hand typen hoeft niet | `npm run papierwerk` meldt 0 open |

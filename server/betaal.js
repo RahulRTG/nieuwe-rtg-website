@@ -21,24 +21,26 @@ const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || '';
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const MOLLIE_KEY = process.env.MOLLIE_API_KEY || '';
 const ADYEN_KEY = process.env.ADYEN_API_KEY || '';
+const BETALEN_UIT = process.env.RTG_BETALEN_UIT === '1';
 
 let stripe = null;
-if (STRIPE_KEY) {
+if (STRIPE_KEY && !BETALEN_UIT) {
   try { stripe = require('./stripe')(STRIPE_KEY); } // eigen dunne client (geen dependency)
   catch (e) { /* kan niet starten: val terug op demo */ }
 }
 let mollie = null;
-if (MOLLIE_KEY) {
+if (MOLLIE_KEY && !BETALEN_UIT) {
   try { mollie = require('./mollie')(MOLLIE_KEY); }
   catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
 }
 let adyen = null;
-if (ADYEN_KEY) {
+if (ADYEN_KEY && !BETALEN_UIT) {
   try { adyen = require('./adyen')(ADYEN_KEY); }
   catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
 }
 const voorkeur = String(process.env.PAYMENT_PROVIDER || '').toLowerCase();
-const AANBIEDER = voorkeur === 'mollie' && mollie ? 'mollie'
+const AANBIEDER = BETALEN_UIT ? 'uit'
+  : voorkeur === 'mollie' && mollie ? 'mollie'
   : voorkeur === 'adyen' && adyen ? 'adyen'
   : voorkeur === 'stripe' && stripe ? 'stripe'
   : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen' : 'demo';
@@ -55,7 +57,8 @@ function koppelStore(store) {
 }
 
 const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
-  standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v), env: process.env });
+  standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v),
+  env: process.env, uit: BETALEN_UIT });
 const { maakBetaling, haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder } = ontvangst;
 
 /* Start (of hervind) een uitbetaling naar een externe bankrekening (SEPA).
@@ -68,6 +71,8 @@ const { maakBetaling, haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbie
      dezelfde naad zodat de rest van de code niet verandert als het live gaat.
    - Idempotent op sleutel: dezelfde afdracht wordt nooit twee keer weggezet. */
 async function maakUitbetaling(opdracht) {
+  if (BETALEN_UIT)
+    throw new Error('Betalen staat bewust uitgeschakeld. Er is niets uitbetaald.');
   const { bedrag, valuta = 'eur', iban, begunstigde, referentie, idempotentieSleutel, omschrijving } = opdracht || {};
   if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
   const sleutel = 'uit:' + (idempotentieSleutel || referentie || crypto.randomUUID());
@@ -100,6 +105,8 @@ async function maakUitbetaling(opdracht) {
    - Zonder secret (lokaal): body wordt alleen geparsed; NB: zet in productie
      altijd een secret, anders is de webhook niet te vertrouwen. */
 function verifieerWebhook(ruweBody, handtekening) {
+  if (BETALEN_UIT)
+    throw new Error('Betaalwebhook geweigerd: betalen staat bewust uitgeschakeld.');
   const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
   if (stripe && WEBHOOK_SECRET) {
     return stripe.webhooks.constructEvent(buf, handtekening, WEBHOOK_SECRET);
@@ -134,7 +141,8 @@ function tekenDemo(ruweBody) {
   return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
 }
 
-module.exports = { AANBIEDER, maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
+module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT,
+  maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
   verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
   WEBHOOK_SECRET, MOLLIE_AAN: !!mollie, ADYEN_AAN: !!adyen,
   adyenMerchantAccount: adyen && adyen.merchantAccount,

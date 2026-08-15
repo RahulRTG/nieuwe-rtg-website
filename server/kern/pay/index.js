@@ -29,6 +29,9 @@
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
+  const betalingenUit = process.env.RTG_BETALEN_UIT === '1';
+  const uitFout = () => ({ status: 503,
+    error: 'Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.', code: 'betalingen-uit' });
 
   // Schaduw-modus: spiegelt elke boeking naar de Rust-motor (RTG_MOTOR_SHADOW).
   // Uit = een no-op; JS blijft altijd de baas.
@@ -87,6 +90,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
   function boek({ van, naar, centen, soort, oms, ref }) {
+    if (betalingenUit) return uitFout();
     if (geldModus === 'motor') {
       const bron = (new Error().stack || '').split('\n')[2] || '';
       throw new Error('pay.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.' + bron);
@@ -107,6 +111,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
      JS-saldi -- de fout gaat netjes terug naar de caller. */
   async function boekAsync({ van, naar, centen, soort, oms, ref }) {
+    if (betalingenUit) return uitFout();
     if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
     const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };

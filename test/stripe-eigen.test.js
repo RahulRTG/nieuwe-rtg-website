@@ -89,7 +89,10 @@ test('2. een API-fout wordt een nette Error met status en bericht', async () => 
 test('2b. gehoste Checkout gebruikt dezelfde idempotentie en geneste ordervelden', async () => {
   const server = await nepStripe(() => ({ json: { id: 'cs_1', status: 'open', payment_status: 'unpaid',
     url: 'https://checkout.stripe.com/c/pay/cs_1' } }));
-  const oud = process.env.STRIPE_BASE_URL; process.env.STRIPE_BASE_URL = server.base;
+  const oud = process.env.STRIPE_BASE_URL;
+  const oudNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'test';
+  process.env.STRIPE_BASE_URL = server.base;
   try {
     delete require.cache[require.resolve('../server/stripe')];
     const stripe = require('../server/stripe')('sk_test_123');
@@ -105,6 +108,7 @@ test('2b. gehoste Checkout gebruikt dezelfde idempotentie en geneste ordervelden
   } finally {
     server.srv.close();
     if (oud == null) delete process.env.STRIPE_BASE_URL; else process.env.STRIPE_BASE_URL = oud;
+    if (oudNodeEnv == null) delete process.env.NODE_ENV; else process.env.NODE_ENV = oudNodeEnv;
     delete require.cache[require.resolve('../server/stripe')];
   }
 });

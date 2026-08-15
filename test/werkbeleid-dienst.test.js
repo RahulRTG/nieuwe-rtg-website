@@ -59,15 +59,6 @@ test.before(async () => {
   const st = nieuw.body.staff;
   const staffPin = nieuw.body.pin;
 
-  /* De vaste demo-medewerkers kunnen al aan een echt demo-account gekoppeld
-     zijn. Zo'n plek met alleen de bekende demo-PIN overnemen hoort de veilige
-     koppelroute te weigeren. Maak voor deze proef daarom een lege plek. */
-  const nieuw = await api('/api/supplier/staff/add',
-    { name: 'Werkbeleid Medewerker', role: 'staff', func: 'Bediening' }, baas);
-  assert.equal(nieuw.status, 200, 'de manager maakt een losse personeelsplek');
-  const st = nieuw.body.staff;
-  const pin = nieuw.body.pin;
-
   /* Een lid dat OOK medewerker is: het ene RTG-account met een werkrol. Zo
      ontstaat de koppeling die het werkbeleid volgt (kern/eenaccount). */
   const u = String(Date.now()).slice(-8);

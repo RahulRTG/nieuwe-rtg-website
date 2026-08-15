@@ -121,16 +121,6 @@ test('3. ingangen: buiten het venster geen personeelssessie; de manager en het e
     const lidStaf = nieuw.body.staff;
     const staffPin = nieuw.body.pin;
 
-    /* Nora uit de demo is al bewust aan haar eigen RTG-account gekoppeld.
-       Haar plek met alleen de bekende demo-PIN overnemen zou precies de
-       identiteitskaping zijn die de koppelroute nu blokkeert. Maak voor deze
-       proef daarom een eigen, nog lege personeelsplek. */
-    const nieuw = await api(base, '/api/supplier/staff/add',
-      { name: 'Venster Medewerker', role: 'staff', func: 'Balie' }, mtok);
-    assert.equal(nieuw.status, 200, 'de manager maakt een losse personeelsplek');
-    const lidStaf = nieuw.body.staff;
-    const lidPin = nieuw.body.pin;
-
     // het ene RTG-account: eerst koppelen (bewijs met de eigen PIN), voor straks
     const u = Date.now().toString(36);
     const lid = (await api(base, '/api/auth/register', { name: 'Venster Lid', email: u + '@x.nl', phone: '0611111111', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;

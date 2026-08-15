@@ -60,7 +60,7 @@ function loop(dir, filter, fn) {
    uitgeserveerd wordt. De losse delen NIET -- die zijn per stuk geen geldig
    programma (deel 2 begint midden in een functie), en dat is precies de opzet.
    public/dist is bouwuitvoer. */
-console.log('1) server- en browserbestanden compileren');
+console.log('1) server-, browser- en testbestanden compileren');
 const { bundels: BUNDELLIJST } = require('./bundel');
 const DEELMAPPEN = new Set(Object.values(BUNDELLIJST).map((d) => 'public/' + d + '/'));
 function compileerbaar(rel) {
@@ -68,7 +68,7 @@ function compileerbaar(rel) {
   for (const map of DEELMAPPEN) if (rel.startsWith(map)) return false;
   return true;
 }
-for (const map of ['server', 'public']) {
+for (const map of ['server', 'public', 'test']) {
   loop(path.join(ROOT, map), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
     if (!compileerbaar(rel)) return;
@@ -76,7 +76,7 @@ for (const map of ['server', 'public']) {
     if (r.status !== 0) fout('syntaxfout in ' + rel + '\n' + r.stderr);
   });
 }
-if (!fouten) ok('alle server- en browserbestanden compileren');
+if (!fouten) ok('alle server-, browser- en testbestanden compileren');
 
 /* Deze regel kijkt alleen in de .html-bestanden, want dat is de snelle
    keuring. De volledige variant staat in test/blindevlek.test.js (toets 6): die

@@ -36,6 +36,19 @@ test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
     })).json();
     assert.ok(reg.token, 'registreren hoort een token te geven');
 
+    /* De nieuwe Moment-interface vervangt de oude levenslijn op het scherm,
+       maar bestaande leden en koppelingen mogen het onderliggende contract
+       blijven gebruiken. Bewaak daarom ook het echte endpoint en niet alleen
+       de nieuwe compositie-interface. */
+    const lijnReactie = await fetch(base + '/api/leven/lijn', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+      body: '{}'
+    });
+    const lijn = await lijnReactie.json();
+    assert.equal(lijnReactie.ok, true, 'de bestaande levenslijn blijft bereikbaar voor gekoppelde clients');
+    assert.ok(Array.isArray(lijn.fasen) && lijn.fasen.length > 0,
+      'de levenslijn blijft een controleerbare fasenlijst leveren');
+
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });
     await ctx.addInitScript((tok) => {

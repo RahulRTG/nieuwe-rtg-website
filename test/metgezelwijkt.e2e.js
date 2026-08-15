@@ -1,4 +1,4 @@
-/* RAHUL WIJKT VOOR EEN GEOPEND VENSTER -- EN KOMT TERUG.
+/* RAHUL BLIJFT BEREIKBAAR, MAAR LIGT NOOIT BOVEN EEN GEOPEND VENSTER.
 
    Het blok van de metgezel staat op z-index 9980 en zweeft daarmee boven
    vrijwel elk venster in dit huis (de bladen van Clips staan op 10, de
@@ -8,12 +8,10 @@
    raken, en in test/clips-studio.e2e.js dertig seconden lang "intercepts
    pointer events".
 
-   De reparatie zit in de metgezel zelf (shared/metgezel/metgezel-01c.js): hij
-   gaat opzij zolang er een venster openstaat. Dat is een gedragsregel over
-   ALLE schermen, dus hij hoort een eigen toets te hebben -- en die toets moet
-   BEIDE kanten opnemen. Alleen "hij wijkt" toetsen zou een metgezel goedkeuren
-   die na het sluiten nooit meer terugkomt, en dat is een app die stilletjes
-   zijn assistent kwijtraakt.
+   Rahul is inmiddels de centrale Command-tab in de kop. De oude zwevende
+   metgezel bestaat bewust niet meer. Deze toets bewaakt dezelfde belofte in
+   de nieuwe architectuur: de tab is er, een dialoog ligt erboven en vangt de
+   tik, en na sluiten is Rahul direct weer bereikbaar.
 
    Draai: npm run e2e (of los: node --experimental-sqlite --test test/metgezelwijkt.e2e.js) */
 const test = require('node:test');
@@ -32,11 +30,10 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
-const zichtbaarheid = () => {
-  const blok = document.querySelector('.mgz-blok');
-  if (!blok) return 'geen blok';
-  const r = blok.getBoundingClientRect();
-  return getComputedStyle(blok).display !== 'none' && r.height > 0 ? 'zichtbaar' : 'weg';
+const rahulStaat = () => {
+  const tab = document.querySelector('.rtg-rahul-tab');
+  if (!tab) return 'geen tab';
+  return tab.hidden || !tab.getClientRects().length ? 'weg' : 'zichtbaar';
 };
 
 test('de metgezel wijkt voor een venster en komt daarna terug',
@@ -69,42 +66,46 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     /* Clips, want daar kwam de melding vandaan: een blad dat onderaan opent,
        met zijn sluitknop precies op de plek van de balk. */
     await page.goto(base + '/apps/clips.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !!document.querySelector('.mgz-blok'), null, { timeout: 20000 });
-    assert.equal(await page.evaluate(zichtbaarheid), 'zichtbaar', 'in rust staat Rahul er gewoon');
+    await page.waitForFunction(() => !!document.querySelector('.rtg-rahul-tab'), null, { timeout: 20000 });
+    assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
+
+    /* De enterprise-workspace wordt bewust als kleine vervolgmodule geladen.
+       Bewaak dat die opsplitsing niet alleen compileert, maar ook echt landt
+       en beide veilige voorbereidingsknoppen blijft bedienen. */
+    await page.waitForSelector('.rtg-one [data-one-decision]', { state: 'attached', timeout: 10000 });
+    await page.click('.rtg-rahul-tab');
+    await page.click('[data-build-plan]');
+    assert.equal(await page.textContent('[data-twin-state]'), '5 DOMEINEN GESIMULEERD');
+    await page.click('[data-one-decision]');
+    assert.equal(await page.textContent('[data-decision-state]'), 'CONTROLE GEOPEND');
+    await page.click('.rtg-command-close');
+    assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'na de workspace blijft de tab bereikbaar');
 
     // het blad openen zoals een lid dat doet
     await page.click('#studioOpen');
-    await page.waitForFunction(() => {
-      const b = document.querySelector('.mgz-blok');
-      return b && getComputedStyle(b).display === 'none';
-    }, null, { timeout: 5000 }).catch(() => {});
-    assert.equal(await page.evaluate(zichtbaarheid), 'weg', 'zolang het venster openstaat, gaat Rahul opzij');
+    await page.waitForSelector('#studio.open', { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    assert.equal(await page.evaluate(rahulStaat), 'weg', 'het geopende venster krijgt voorrang op Rahul');
 
     /* En de knop die hier het hele geval aanwees: zonder de reparatie zit hij
        onder de balk en meldt Playwright "intercepts pointer events". */
     await page.click('#studioDicht', { timeout: 10000 });
-    await page.waitForFunction(() => {
-      const b = document.querySelector('.mgz-blok');
-      return b && getComputedStyle(b).display !== 'none';
-    }, null, { timeout: 5000 });
-    assert.equal(await page.evaluate(zichtbaarheid), 'zichtbaar', 'en daarna komt hij terug');
+    await page.waitForFunction(() => !document.querySelector('#studio').classList.contains('open'), null, { timeout: 5000 });
+    await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en daarna is Rahul direct weer bereikbaar');
 
     /* Twee keer achter elkaar, want een wijk-regel die maar een keer werkt is
        net zo goed stuk -- en dan via een ANDER blad, zodat het niet aan dat
        ene blad ligt. De knop staat op de kaart van de eigen clip. */
     await page.waitForSelector('.clip .laag .knop', { timeout: 20000 });
     await page.locator('.clip .laag .knop', { hasText: 'Bewerken' }).first().click();
-    await page.waitForFunction(() => {
-      const b = document.querySelector('.mgz-blok');
-      return b && getComputedStyle(b).display === 'none';
-    }, null, { timeout: 5000 }).catch(() => {});
-    assert.equal(await page.evaluate(zichtbaarheid), 'weg', 'ook voor het tweede blad');
+    await page.waitForSelector('#knipSheet.open', { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    assert.equal(await page.evaluate(rahulStaat), 'weg', 'ook het tweede venster krijgt voorrang');
     await page.click('#knipDicht');
-    await page.waitForFunction(() => {
-      const b = document.querySelector('.mgz-blok');
-      return b && getComputedStyle(b).display !== 'none';
-    }, null, { timeout: 5000 });
-    assert.equal(await page.evaluate(zichtbaarheid), 'zichtbaar', 'en hij blijft terugkomen');
+    await page.waitForFunction(() => !document.querySelector('#knipSheet').classList.contains('open'), null, { timeout: 5000 });
+    await page.waitForFunction(() => !document.querySelector('.rtg-rahul-tab').hidden, null, { timeout: 5000 });
+    assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'en hij blijft terugkomen');
 
     assert.deepEqual(fouten, [], 'geen fout op de pagina');
   } finally {

@@ -19,7 +19,13 @@
   }
   function renderVooruit(){
     const el = document.getElementById('boVooruitCard'); if (!el) return;
-    if (!vooruitData){ el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>'; laadVooruit().then(renderVooruit); return; }
+    if (!vooruitData){
+      el.setAttribute('aria-busy', 'true');
+      el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>';
+      laadVooruit().then(renderVooruit);
+      return;
+    }
+    el.removeAttribute('aria-busy');
     const d = vooruitData;
     if (d.fout){ el.innerHTML = ''; return; }
     const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };

@@ -18,14 +18,10 @@
 (function () {
   'use strict';
   if (window.RTGUitvoer) return;
-  /* NIET op de inlogpoort. "Meenemen" hoort er alleen te staan als er iets te
-     halen valt, en aan de poort is er nog geen sessie en dus niets van u --
-     hij stond daar als losse knop boven de klok, op een scherm dat verder
-     alleen een sterrenhemel en een vraag toont. Het beginscherm zet #gate
-     zolang er niemand is ingelogd; is die er, dan doet deze laag niets en
-     meldt hij zich later gewoon aan zodra de poort weg is. */
+  /* De API bestaat ook aan de inlogpoort, zodat een later opgebouwd scherm
+     zijn bron alvast kan aanmelden. Alleen de KNOP blijft weg zolang de poort
+     werkelijk zichtbaar is; herzie() zet hem na het inloggen vanzelf neer. */
   var poort = document.getElementById('gate');
-  if (poort && !poort.hidden) return;
 
   var eigenBron = null;
 
@@ -110,4 +106,3 @@
     }
     return { ok: true, aantal: d.rijen.length };
   }
-

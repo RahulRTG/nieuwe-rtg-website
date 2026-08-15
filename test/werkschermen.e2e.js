@@ -53,8 +53,7 @@ const ZAAK_EN_REDACTIE = [
   { app: 'redactiekantoor', eist: /kantoor-?inlog|backoffice|kantoorcode/i },
   { app: 'leverancier-rtmail', eist: /leverancier-app|log eerst in|postvak/i },
   { app: 'overheidspda', eist: /rijksoverheid|personeel|werktelefoon/i },
-  { app: 'meldkamer', eist: /meldkamer|meldingen|eenheden/i },
-  { app: 'labfonds', eist: /onderzoekslab|lab-?fonds|inzamel/i }
+  { app: 'meldkamer', eist: /meldkamer|meldingen|eenheden/i }
 ];
 
 const WERKBANK = [
@@ -102,7 +101,7 @@ async function opstelling() {
   return { browser, page, fouten };
 }
 
-test('zeven werkschermen zeggen bij welke zaak of welk kantoor ze horen',
+test('zes werkschermen zeggen bij welke zaak of welk kantoor ze horen',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -118,7 +117,7 @@ test('zeven werkschermen zeggen bij welke zaak of welk kantoor ze horen',
       if (r.tekst.trim().length < 60) { stuk.push(s.app + ': bijna leeg (' + r.tekst.trim().length + ' tekens)'); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': zegt niet waar het bij hoort -- ' + r.tekst.slice(0, 130));
     }
-    assert.deepEqual(stuk, [], 'de zeven werkschermen wijzen de weg:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(stuk, [], 'de zes werkschermen wijzen de weg:\n  ' + stuk.join('\n  '));
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

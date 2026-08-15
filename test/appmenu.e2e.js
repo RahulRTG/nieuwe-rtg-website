@@ -133,8 +133,8 @@ async function wachtRooster(page) {
   null, { timeout: 10000 });
 }
 
-test('Rahul heeft één balk, op elk pad waarop de homescreen te bereiken is',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async (t) => {
   await metLid(async ({ base, ctx }) => {
     /* Alle vier de ingangen van de homescreen (zie voordeur.js) plus een paar
        gewone app-pagina's, want daar hoort de balk van metgezel.js juist WEL te
@@ -146,7 +146,7 @@ test('Rahul heeft één balk, op elk pad waarop de homescreen te bereiken is',
     for (const pad of thuisPaden.concat(appPagina)) {
       const page = await ctx.newPage();
       try {
-        await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
         await page.waitForTimeout(1200);
         const r = await page.evaluate(() => ({
           eigen: document.querySelectorAll('.os-aibalk').length,
@@ -163,46 +163,49 @@ test('Rahul heeft één balk, op elk pad waarop de homescreen te bereiken is',
       } finally { await page.close(); }
     }
     assert.deepEqual(fouten, [], 'dubbele balk van Rahul:\n' + fouten.join('\n'));
-  });
-});
 
-test('elke app-pagina draagt de hamburger van het app-menu',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
-  await metLid(async ({ base, ctx }) => {
-    const fouten = [];
-    let gemeten = 0;
-
-    for (const pad of appPaden()) {
-      const page = await ctx.newPage();
-      try {
-        await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        /* Wegnavigeerd (een inlogdeur) of bewust zonder OS-chrome? Niet meten.
-           De uitleesactie zelf moet ook een navigatie overleven: een pagina die
-           tijdens het lezen naar het inlogscherm springt breekt de context af,
-           en dat is geen meetresultaat maar een pagina die er niet meer is. */
-        await page.waitForTimeout(200);
-        let meedoen;
+    /* De census stond eerst in een tweede top-level test. Op GitHub sloot de
+       eerste Chromium netjes na 25 seconden, maar de volgende chromium.launch
+       kwam 89 minuten lang niet terug. Hergebruik daarom deze al bewezen
+       browser en context. De bewering blijft hetzelfde: ieder app-scherm wordt
+       echt geopend en draagt een menu of, bij de modale Foundation-poort, een
+       veilige uitweg. Eén pagina tegelijk houdt samen met de tweede fileworker
+       de totale browserparalleliteit op twee. */
+    await t.test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
+      { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+      const menuFouten = [];
+      let gemeten = 0;
+      for (const pad of appPaden()) {
+        const page = await ctx.newPage();
         try {
-          /* data-ios-uit: de pagina zegt zelf dat ze de OS-chrome niet wil.
-             data-ios-home: het beginscherm, en dat krijgt met opzet geen
-             hamburger -- daar is de bovenrand de ingang naar het systeem (zie
-             de kop van shared/appmenu.js). */
-          meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
-            !document.body.hasAttribute('data-ios-home'));
-        } catch (e) { continue; }
-        if (!meedoen) continue;
-        if (new URL(page.url()).pathname !== pad) continue;
-        try {
-          await page.waitForSelector('#osMenuBtn', { timeout: 8000 });
-          gemeten++;
-        } catch (e) {
-          if (new URL(page.url()).pathname === pad) fouten.push(pad);
+          await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+          await page.waitForTimeout(200);
+          let meedoen;
+          try {
+            meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
+              !document.body.hasAttribute('data-ios-home'));
+          } catch (e) { continue; }
+          if (!meedoen || new URL(page.url()).pathname !== pad) continue;
+          try {
+            await page.waitForSelector('#osMenuBtn, #rtf-toegang-slot [data-rtf-uitweg]',
+              { timeout: 8000 });
+            gemeten++;
+          } catch (e) {
+            if (new URL(page.url()).pathname === pad) menuFouten.push(pad);
+          }
+        } finally {
+          /* Een defecte renderer mag ook het opruimen niet onbeperkt vasthouden;
+             de context wordt aan het eind sowieso door browser.close gesloten. */
+          await Promise.race([
+            page.close().catch(() => {}),
+            new Promise((resolve) => setTimeout(resolve, 5000))
+          ]);
         }
-      } finally { await page.close(); }
-    }
-
-    assert.ok(gemeten > 100, 'te weinig pagina\'s gemeten (' + gemeten + '): dan bewijst een groene uitslag niets');
-    assert.deepEqual(fouten, [], 'deze app-pagina\'s hebben geen app-menu:\n' + fouten.join('\n'));
+      }
+      assert.ok(gemeten > 100, 'te weinig pagina\'s gemeten (' + gemeten + '): dan bewijst groen niets');
+      assert.deepEqual(menuFouten, [],
+        'deze app-pagina\'s hebben geen app-menu of veilige uitweg:\n' + menuFouten.join('\n'));
+      });
   });
 });
 
@@ -255,7 +258,25 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
        over het hele scherm. Wat we hier meten ligt eronder: de statusbalk van
        het beginscherm. Het blad gaat dus opzij -- de intake heeft een eigen
        toets en hoort niet in deze. */
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.evaluate(() => {
+      const g = document.getElementById('onbGate');
+      /* hidden is het signaal waarop Command wacht; verwijderen vóór die
+         MutationObserver heeft gelopen laat de werktafel in de toestand
+         "ondertekening open" staan. */
+      if (g) g.hidden = true;
+    });
+    /* RTG Command is de nieuwe landing. Deze toets meet bewust de stille
+       statusbalk van het beginscherm eronder, dus volgt dezelfde zichtbare
+       ingang als een lid. */
+    await page.waitForFunction(() => {
+      const g = document.getElementById('onbGate');
+      if (g) g.hidden = true;
+      const k = document.querySelector('#rtgCommand .cmd-klok');
+      if (!k) return false;
+      k.click();
+      if (g) g.remove();
+      return true;
+    }, null, { timeout: 10000 });
     await page.waitForTimeout(400);
 
     /* HET BEGINSCHERM IS DE RUSTPLEK. Geen batterij, geen bel, geen paneelknop

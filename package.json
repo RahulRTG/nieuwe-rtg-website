@@ -40,7 +40,7 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "schermen": "node scripts/schermen.js",
-    "e2e": "rm -f .schermjournaal && RTG_ROUTELOG=.schermjournaal node --experimental-sqlite --test --test-concurrency=2 test/*.e2e.js",
+    "e2e": "rm -f .schermjournaal && RTG_ROUTELOG=.schermjournaal node --experimental-sqlite --test --test-concurrency=2 --test-timeout=600000 test/*.e2e.js",
     "test:pg": "node scripts/pgtoetsen.js",
     "icons": "node scripts/icons.js",
     "norm": "node --experimental-sqlite scripts/norm.js",

@@ -1,15 +1,8 @@
-/* Schermtoets voor het levens-command-center (LEVEN.md par. 1.5).
-
-   Deze toets bewaakt EEN ding, en dat is de zwaarste regel van dit scherm:
-   fasen zonder aanwijzing komen NIET in beeld, ook niet grijs. Wie geen
-   studie, geen kinderen of geen pensioen heeft, mist niets (par. 1.1); een
-   grijze fase leest als een gemiste stap en maakt van de levenslijn stilletjes
-   een voortgangsbalk over iemands leven.
-
-   Daarnaast: geen enkel patroon dat om terugkomen vraagt (par. 2.9), en geen
-   getal dat mensen vergelijkt (par. 2.4). Die zijn hier op de GERENDERDE
-   tekst gemeten en niet op de bron, want een verbod dat je op de broncode
-   toetst overleeft geen herschrijving.
+/* Schermtoets voor het samengevoegde RTG Leven: één controleerbaar Moment in
+   plaats van losse reserveringen. Hij bewaakt dat de gebruiker de opdracht
+   zelf geeft, dat het resultaat concreet en controleerbaar is, en dat partners
+   uitsluitend hun eigen onderdeel ontvangen. Daarnaast blijven scores,
+   voortgangsbalken en terugkom-lokkertjes verboden.
 
    Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -28,7 +21,7 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
-test('het levens-command-center: geen lege fasen, geen balk, geen aansporing',
+test('RTG Leven maakt één controleerbaar Moment zonder score of aansporing',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-leven-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -42,6 +35,19 @@ test('het levens-command-center: geen lege fasen, geen balk, geen aansporing',
         geboortedatum: '1994-05-05', tier: 'rtg' })
     })).json();
     assert.ok(reg.token, 'registreren hoort een token te geven');
+
+    /* De nieuwe Moment-interface vervangt de oude levenslijn op het scherm,
+       maar bestaande leden en koppelingen mogen het onderliggende contract
+       blijven gebruiken. Bewaak daarom ook het echte endpoint en niet alleen
+       de nieuwe compositie-interface. */
+    const lijnReactie = await fetch(base + '/api/leven/lijn', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+      body: '{}'
+    });
+    const lijn = await lijnReactie.json();
+    assert.equal(lijnReactie.ok, true, 'de bestaande levenslijn blijft bereikbaar voor gekoppelde clients');
+    assert.ok(Array.isArray(lijn.fasen) && lijn.fasen.length > 0,
+      'de levenslijn blijft een controleerbare fasenlijst leveren');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });
@@ -57,29 +63,15 @@ test('het levens-command-center: geen lege fasen, geen balk, geen aansporing',
     letOpFouten(page, fouten);
 
     await page.goto(base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.lv-staat', { timeout: 15000 });
+    await page.waitForSelector('.lv-moment[data-app], .lv-moment', { timeout: 15000 });
 
     const beeld = await page.evaluate(() => ({
-      staat: (document.querySelector('.lv-staat') || {}).textContent || '',
-      getekend: [...document.querySelectorAll('.lv-fase')].map((x) => x.dataset.staat),
       balk: !!document.querySelector('progress, [role="progressbar"]'),
-      tekst: (document.getElementById('inhoud').innerText || '').toLowerCase()
+      tekst: (document.querySelector('.lv-app').innerText || '').toLowerCase(),
+      composer: !!document.querySelector('[data-composer]')
     }));
 
-    /* De server kent tien fasen; een vers lid heeft er hooguit een paar met
-       een aanwijzing. Wat hier telt is dat er GEEN nvt op het scherm staat. */
-    const lijn = await (await fetch(base + '/api/leven/lijn', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
-      body: '{}'
-    })).json();
-    const nvt = (lijn.fasen || []).filter((f) => f.staat === 'nvt').length;
-    assert.ok(nvt > 0, 'een vers lid hoort fasen zonder aanwijzing te hebben, anders meet deze toets niets');
-    assert.equal(beeld.getekend.filter((s) => s === 'nvt').length, 0,
-      'een fase zonder aanwijzing hoort NIET op het scherm te staan (LEVEN.md par. 1.1)');
-    assert.equal(beeld.getekend.length, (lijn.fasen || []).length - nvt,
-      'precies de fasen met een aanwijzing, niet meer en niet minder');
-
-    assert.ok(beeld.staat.length > 0, 'het scherm zegt in een regel hoe het ervoor staat');
+    assert.ok(beeld.composer, 'de gebruiker kan zelf sfeer, tijd, gezelschap en budget bepalen');
     assert.equal(beeld.balk, false, 'geen voortgangsbalk over een leven');
 
     /* par. 2.9 en 2.4, op de getoonde tekst. "van de 10" vangt de teller die
@@ -90,22 +82,25 @@ test('het levens-command-center: geen lege fasen, geen balk, geen aansporing',
         'het scherm hoort geen "' + woord + '" te tonen (LEVEN.md par. 2.4 en 2.9)');
     }
 
-    /* De mentor antwoordt met zijn verantwoording eronder (par. 2.10). */
-    await page.fill('#lvMentorIn', 'Hoe sta ik ervoor?');
-    await page.click('#lvMentorForm button[type="submit"]');
-    await page.waitForFunction(() => {
-      const el = document.getElementById('lvMentorUit');
-      return el && !el.hidden && !/ogenblik/i.test(el.textContent);
-    }, { timeout: 15000 });
-    const mentor = await page.evaluate(() => ({
-      tekst: document.getElementById('lvMentorUit').innerText,
-      gegevens: [...document.querySelectorAll('#lvMentorUit .lv-geg li')].length
+    await page.fill('[data-composer] input[name="sfeer"]', 'rustig diner en veilig naar huis');
+    await page.fill('[data-composer] input[name="personen"]', '3');
+    await page.fill('[data-composer] input[name="budget"]', '175');
+    await page.click('[data-composer] button');
+    await page.waitForSelector('[data-contract]:not([hidden])', { timeout: 15000 });
+    const contract = await page.evaluate(() => ({
+      tekst: document.querySelector('[data-contract]').innerText,
+      tijdlijn: document.querySelector('[data-tijdlijn]').innerText,
+      aanvragen: !!document.querySelector('[data-contract] [data-aanvraag]')
     }));
-    assert.ok(mentor.gegevens > 0, 'een antwoord komt met de gebruikte gegevens erbij');
-    for (const zin of ['niets voor jou', 'niet geschikt', 'kans is klein', 'haalbaar']) {
-      assert.equal(mentor.tekst.toLowerCase().includes(zin), false,
-        'de mentor opent en raadt nooit af (LEVEN.md par. 2.2): "' + zin + '"');
-    }
+    assert.match(contract.tekst, /MOMENT CONTRACT/i, 'het voorstel wordt een herkenbaar contract');
+    assert.match(contract.tekst, /3\s*gasten/i, 'het contract draagt het gekozen gezelschap');
+    const raming = /€\s*(\d+)/.exec(contract.tekst);
+    assert.ok(raming && Number(raming[1]) > 0 && Number(raming[1]) <= 175,
+      'de raming blijft concreet en onder het gekozen plafond van € 175: ' + contract.tekst);
+    assert.match(contract.tekst, /uitsluitend zijn eigen onderdeel/i,
+      'partners ontvangen niet het hele privéplan');
+    assert.ok(contract.aanvragen, 'de gebruiker houdt het expliciete akkoord op aanvragen');
+    assert.match(contract.tijdlijn, /Live regietafel/i, 'de samenhang blijft na het voorstel zichtbaar');
 
     const echteFouten = fouten.filter((f) => !/favicon/i.test(f));
     assert.deepEqual(echteFouten, [], 'het scherm hoort zonder consolefouten te draaien');

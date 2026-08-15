@@ -37,6 +37,42 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
+/* Vierentwintig zelfstandige RTG- en kantoorruimtes werden alleen door de
+   algemene paginascan aangeraakt. Dit is hun eigen zichtbare contract zonder
+   sessie: het adres blijft staan, de kamer noemt zichzelf, en er is een echte
+   bediening of veilige deur. Daardoor kan een lege premiumtegel niet groen
+   blijven omdat een generieke scan alleen HTTP 200 zag. */
+const PREMIUM_ZELFSTANDIG = [
+  ['arrival', /RTG Invisible Arrival/i, /Vertel het één keer|arrival/i],
+  ['leverancier-aanvragen', /Aanvragen uit de Mall/i, /Aanvragen/i],
+  ['loonstrook', /Mijn loon/i, /Mijn loon|Loonstroken/i],
+  ['merken', /Merken.*vestigingen/i, /Merken|vestigingen/i],
+  ['mijnmall', /Mijn Mall/i, /Mijn Mall|toegang|pas/i],
+  ['ovcontrol', /Mobility Control Tower/i, /Mobility Control Tower|operatie/i],
+  ['partner-worden', /Partner worden/i, /Partneraanvraag|Partner worden/i],
+  ['rit', /RTG Rit/i, /Geen rit gekozen|Rit/i],
+  ['voertuig', /RTG Voertuig/i, /Geen voertuig gekozen|Voertuig/i],
+  ['zaakweb', /Mijn RTG-website/i, /Mijn RTG-website|Nog geen website/i]
+];
+const PREMIUM_ALIASSEN = [
+  ['bank', '/apps/geld.html', '#bank'],
+  ['codewoord', '/apps/veilig.html', '#codewoord'],
+  ['labfonds', '/apps/geld.html', '#labfonds'],
+  ['mecenaat', '/apps/geld.html', '#mecenaat'],
+  ['metier', '/apps/geld.html', '#metier'],
+  ['nalatenschap', '/apps/geld.html', '#nalatenschap'],
+  ['rtgcode', '/apps/geld.html', '#rtgcode'],
+  ['thuisrust', '/apps/veilig.html', '#rust'],
+  ['thuiswacht', '/apps/veilig.html', '#wacht'],
+  ['vitaal', '/apps/veilig.html', '#vitaal'],
+  ['wbw', '/apps/geld.html', '#wbw']
+];
+const PREMIUM_TOEGANG = [
+  ['magnaat-kantoor', '/apps/personeel.html'],
+  ['magnaat', '/apps/app.html'],
+  ['rtgone', '/apps/rtgkantoor.html']
+];
+
 async function lidMetNotities(base) {
   const u = Date.now().toString().slice(-8);
   const reg = await fetch(base + '/api/auth/register', { method: 'POST',
@@ -183,14 +219,17 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
   try {
     const token = await lidMetNotities(base);
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    await context.addInitScript((t) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, token);
+    const page = await context.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/home.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
-    // balans is een deelmenu-pagina EN meldt een eigen bron aan: beide lagen
+    // Home Kit heeft drie echte delen EN meldt zijn apparatenregister aan
     await page.waitForFunction(() => !!document.querySelector('.rtgdeel-balk') &&
       !!document.querySelector('.rtguitvoer-knop'), null, { timeout: 15000 });
 
@@ -263,9 +302,12 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
   try {
     const token = await lidMetNotities(base);
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
+    const context = await browser.newContext();
+    await context.addInitScript((t) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, token);
+    const page = await context.newPage();
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
@@ -318,6 +360,79 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
       if (r.links < 0 || r.rechts > r.breed) buiten.push(pad + ' op x ' + r.links + '..' + r.rechts + ' bij ' + r.breed + ' breed');
     }
     assert.deepEqual(buiten, [], 'deze pagina\'s zetten de meeneemknop buiten beeld:\n  ' + buiten.join('\n  '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige bediening',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const context = await browser.newContext({ serviceWorkers: 'block' });
+    await context.addInitScript(() => {
+      try {
+        localStorage.clear();
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+      } catch (e) {}
+    });
+    const page = await context.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    const stuk = [];
+
+    for (const [naam, titel, doel] of PREMIUM_ZELFSTANDIG) {
+      const pad = '/apps/' + naam + '.html';
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForTimeout(350);
+      const r = await page.evaluate(() => ({
+        pad: location.pathname,
+        titel: document.title,
+        tekst: document.body.innerText.replace(/\s+/g, ' ').trim(),
+        bediening: document.querySelectorAll('a[href], button, input, textarea, select').length
+      }));
+      if (r.pad !== pad) { stuk.push(naam + ': stuurde weg naar ' + r.pad); continue; }
+      if (!titel.test(r.titel)) stuk.push(naam + ': verkeerde titel "' + r.titel + '"');
+      if (!doel.test(r.tekst)) stuk.push(naam + ': het eigen doel of de eigen deur staat niet in beeld');
+      if (!r.bediening) stuk.push(naam + ': geen enkele bediening of veilige uitweg');
+    }
+
+    /* Elf oude bladwijzerpaden zijn bewust standen van de twee brede apps.
+       Hun contract is dus geen eigen kamer, maar een exacte, verliesloze
+       omleiding naar de juiste stand. */
+    for (const [naam, doelpad, hash] of PREMIUM_ALIASSEN) {
+      await page.goto(base + '/apps/' + naam + '.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForTimeout(250);
+      const r = await page.evaluate(() => ({ pad: location.pathname, hash: location.hash }));
+      if (r.pad !== doelpad || r.hash !== hash) {
+        stuk.push(naam + ': alias kwam uit op ' + r.pad + r.hash + ' in plaats van ' + doelpad + hash);
+      }
+    }
+
+    /* Drie echte werkruimtes zijn zonder account wél dicht. Ze moeten naar
+       hun juiste inlogdeur gaan, nooit leeg blijven of een generieke fout
+       tonen. De kantooralias bewaart bovendien de veilige terugweg. */
+    for (const [naam, doelpad] of PREMIUM_TOEGANG) {
+      const bron = '/apps/' + naam + '.html';
+      await page.goto(base + bron, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForTimeout(450);
+      const r = await page.evaluate(() => ({
+        pad: location.pathname,
+        kantoor: new URLSearchParams(location.search).get('kantoor'),
+        terug: new URLSearchParams(location.search).get('terug')
+      }));
+      if (r.pad !== doelpad) stuk.push(naam + ': toegang kwam uit op ' + r.pad + ' in plaats van ' + doelpad);
+      if (naam === 'magnaat-kantoor' && (r.kantoor !== '1' || r.terug !== bron)) {
+        stuk.push(naam + ': personeelsdeur verloor de kantoorstand of veilige terugweg');
+      }
+    }
+
+    assert.deepEqual(stuk, [], 'zelfstandige premiumruimtes:\n  ' + stuk.join('\n  '));
+    const echt = fouten.filter(f => !/^geen sessie$/.test(String(f).trim()));
+    assert.deepEqual(echt, [], 'paginafouten (anders dan de bedoelde sessiestop): ' + echt.join(' | '));
   } finally {
     if (browser) await browser.close();
     child.kill();

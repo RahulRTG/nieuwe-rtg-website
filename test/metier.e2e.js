@@ -45,80 +45,81 @@ test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
-    await page.goto(base + '/apps/metier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/geld.html#metier', { waitUntil: 'load' });
 
     // 1. de app opent op je eigen profiel, en toont je codenaam -- niet je naam
-    await page.waitForSelector('#fkop', { timeout: 15000 });
-    const eerste = await page.evaluate(() => document.querySelector('#main').textContent);
+    await page.waitForSelector('#mtFkop', { timeout: 15000 });
+    const eerste = await page.evaluate(() => document.querySelector('#paneel').textContent);
     assert.equal(/Cornelis|Bakhuis/.test(eerste), false, 'je echte naam staat niet op je eigen profielscherm');
 
     // 2. je kaart bewaren, en de app laat het zien
     await page.evaluate(() => {
-      document.querySelector('#fkop').value = 'Maitre d\'hotel, vijftien jaar';
-      document.querySelector('#fover').value = 'De vloer, de gasten en de rust erin houden.';
-      document.querySelector('#fplaats').value = 'Ibiza';
+      document.querySelector('#mtFkop').value = 'Maitre d\'hotel, vijftien jaar';
+      document.querySelector('#mtFover').value = 'De vloer, de gasten en de rust erin houden.';
+      document.querySelector('#mtFplaats').value = 'Ibiza';
     });
-    await page.click('#bkaart');
+    await page.click('#mtBkaart');
     /* Wachten op de MELDING, niet op de waarde in het veld: die waarde stond er al
        omdat ik hem zelf had getypt, dus die voorwaarde was meteen waar en het
        herladen wiste daarna de velden die ik hieronder invul. */
-    await page.waitForFunction(() => /bewaard/.test((document.querySelector('#aiuit') || {}).textContent || ''), null, { timeout: 10000 });
-    await page.waitForSelector('#rwat', { timeout: 10000 });
+    await page.waitForFunction(() => /bewaard/i.test((document.querySelector('#geldMelding') || {}).textContent || ''), null, { timeout: 10000 });
+    await page.waitForSelector('#mtRwat', { timeout: 10000 });
 
     // 3. een zelf opgegeven rol krijgt zichtbaar het label "Zelf opgegeven"
     await page.evaluate(() => {
-      document.querySelector('#rwat').value = 'Chef de rang';
-      document.querySelector('#rwaar').value = 'Een zaak buiten RTG';
+      document.querySelector('#mtRwat').value = 'Chef de rang';
+      document.querySelector('#mtRwaar').value = 'Een zaak buiten RTG';
     });
-    await page.click('#brol');
-    await page.waitForFunction(() => /Zelf opgegeven/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('#mtBrol');
+    await page.waitForFunction(() => /Zelf opgegeven/.test(document.querySelector('#paneel').textContent), null, { timeout: 10000 });
 
     // 4. het beroepsregister vindt je op je vak
-    await page.click('[data-t="register"]');
-    await page.waitForSelector('#zveld', { timeout: 10000 });
-    await page.evaluate(() => { document.querySelector('#zveld').value = 'maitre'; });
-    await page.click('#bzoek');
-    await page.waitForFunction(() => /Gevonden/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
-    const reg2 = await page.evaluate(() => document.querySelector('#main').textContent);
+    await page.click('[data-mtt="register"]');
+    await page.waitForSelector('#mtZveld', { timeout: 10000 });
+    await page.evaluate(() => { document.querySelector('#mtZveld').value = 'maitre'; });
+    await page.click('#mtBzoek');
+    await page.waitForFunction(() => /Gevonden/.test(document.querySelector('#paneel').textContent), null, { timeout: 10000 });
+    const reg2 = await page.evaluate(() => document.querySelector('#paneel').textContent);
     assert.ok(/Gevonden: 1 van 1/.test(reg2), 'je staat in het register op je eigen vak: ' + reg2.slice(0, 120));
 
     // 5. HET SIGNATUURSTUK: de naam vrijgeven aan een zaak
-    await page.click('[data-t="naam"]');
-    await page.waitForSelector('#nzaak', { timeout: 10000 });
-    const leeg = await page.evaluate(() => document.querySelector('#main').textContent);
+    await page.click('[data-mtt="naam"]');
+    await page.waitForSelector('#mtNzaak', { timeout: 10000 });
+    const leeg = await page.evaluate(() => document.querySelector('#paneel').textContent);
     assert.ok(/Je hebt je naam aan niemand gegeven/.test(leeg), 'begint met niemand');
     await page.evaluate((code) => {
-      document.querySelector('#nzaak').value = code;
-      document.querySelector('#nwaarvoor').value = 'Sollicitatie maitre';
+      document.querySelector('#mtNzaak').value = code;
+      document.querySelector('#mtNwaarvoor').value = 'Sollicitatie maitre';
     }, zaakCode);
-    await page.click('#bvrij');
-    await page.waitForFunction(() => /Actief/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('#mtBvrij');
+    await page.waitForFunction(() => /Actief/.test(document.querySelector('#paneel').textContent), null, { timeout: 10000 });
 
     // 6. de werkgever leest de naam; daarna staat dat in het log van het lid
     const gezien = await api(base, '/api/supplier/metier/naam', { codenaam: (await api(base, '/api/metier/ik', {}, token)).profiel.codenaam }, zaak.token);
     assert.equal(gezien.naam, 'Cornelis Bakhuis', 'de werkgever ziet de naam nu wel');
-    await page.click('[data-t="ik"]');
-    await page.click('[data-t="naam"]');
-    await page.waitForFunction(() => /Naam gezien/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('[data-mtt="ik"]');
+    await page.click('[data-mtt="naam"]');
+    await page.waitForFunction(() => /Naam gezien/.test(document.querySelector('#paneel').textContent), null, { timeout: 10000 });
 
     // 7. intrekken, en het scherm zegt het eerlijk
-    await page.click('[data-intrek]');
-    await page.waitForFunction(() => /Ingetrokken/.test(document.querySelector('#main').textContent), null, { timeout: 10000 });
+    await page.click('[data-mtintrek]');
+    await page.waitForFunction(() => /Ingetrokken/.test(document.querySelector('#paneel').textContent), null, { timeout: 10000 });
 
     // 8. de loonspiegel: een te laag bod wordt naast de wet gelegd
-    await page.click('[data-t="loon"]');
-    await page.waitForSelector('#tuur', { timeout: 10000 });
-    await page.evaluate(() => { document.querySelector('#tuur').value = '9'; });
-    await page.click('#btoets');
-    await page.waitForFunction(() => /minimum/i.test(document.querySelector('#utoets').textContent), null, { timeout: 10000 });
-    const oordeel = await page.evaluate(() => document.querySelector('#utoets').textContent);
+    await page.click('[data-mtt="loon"]');
+    await page.waitForSelector('#mtTuur', { timeout: 10000 });
+    await page.evaluate(() => { document.querySelector('#mtTuur').value = '9'; });
+    await page.click('#mtBtoets');
+    await page.waitForFunction(() => /minimum/i.test(document.querySelector('#mtUtoets').textContent), null, { timeout: 10000 });
+    const oordeel = await page.evaluate(() => document.querySelector('#mtUtoets').textContent);
     assert.ok(/onder het wettelijk minimum/i.test(oordeel), 'het scherm zegt dat dit bod niet mag: ' + oordeel);
 
     // 9. de AI-balk staat er
-    const balk = await page.evaluate(() => !!document.querySelector('#aiform') && !!document.querySelector('#aiin'));
+    const balk = await page.evaluate(() => !!document.querySelector('#mtAiForm') && !!document.querySelector('#mtAiIn'));
     assert.equal(balk, true, 'de AI-balk staat op de app');
     const pad = await page.evaluate(() => location.pathname);
-    assert.equal(pad, '/apps/metier.html', 'we zijn nergens heen genavigeerd');
+    assert.equal(pad, '/apps/geld.html', 'we blijven in de samengevoegde Geld-app');
+    assert.equal(await page.evaluate(() => location.hash), '#metier', 'Métier blijft de actieve stand');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {

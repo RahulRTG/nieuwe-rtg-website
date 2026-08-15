@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 979 bestanden en 6513 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 979 bestanden en 6516 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 979 |
-| losse beweringen (`test(...)`) | 6513 |
+| losse beweringen (`test(...)`) | 6516 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 27 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-855 bestanden, 6290 beweringen.
+855 bestanden, 6292 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -167,7 +167,7 @@ toets omvalt.
 | `command-routes-bestuur.test.js` | 10 | gezakt op `liegpoort /api/` | DE BESTUURSROUTES VAN RTG COMMAND -- beleid, simulatie, journaal, toezicht. WAAROM DIT BESTAND ER IS. |
 | `command-routes-herstel.test.js` | 7 | gezakt op `liegpoort /api/` | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
-| `commandlagen.test.js` | 8 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
+| `commandlagen.test.js` | 10 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
 | `concern.test.js` | 14 | overleefd | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
 | `consent-dekking.test.js` | 3 | overleefd | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
@@ -895,12 +895,12 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-124 bestanden, 223 beweringen.
+124 bestanden, 224 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
-| `appmenu.e2e.js` | 7 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
+| `appmenu.e2e.js` | 6 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
@@ -947,7 +947,7 @@ toets omvalt.
 | `kwijtschelding-scherm.e2e.js` | 1 | -- | Schermtoets: de kwijtschelding in het Belastingkantoor gaat door TWEE inspecteurs, en dat moet je op het scherm ook ZIEN. De regel zelf staat vast in test/belastingkantoor.test.js (de server weigert dezelfde ogen). |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | -- | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
-| `leven.e2e.js` | 1 | -- | Schermtoets voor het levens-command-center (LEVEN.md par. 1.5). |
+| `leven.e2e.js` | 1 | -- | Schermtoets voor het samengevoegde RTG Leven: één controleerbaar Moment in plaats van losse reserveringen. Hij bewaakt dat de gebruiker de opdracht zelf geeft, dat het resultaat concreet en controleerbaar is, en dat... |
 | `levenspas.e2e.js` | 1 | genoemd | De levenspas aan de GEZINSKANT (/apps/foundation/mijnbanden.html), in een echte browser. Twee dingen bewaakt deze toets, en ze bestaan allebei alleen op dit niveau. |
 | `liegend-scherm.e2e.js` | 1 | genoemd | DE SCHERMEN TERWIJL DE BACKEND LIEGT. WAAROM DIT BESTAND ER IS, en het is een gat dat te meten viel. |
 | `life-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/life.html. De belofte van dit scherm is dat je NIET hoeft te weten welke app je moet openen: een doel dat je in Doelen zet en een afspraak die je bij de salon maakt, staan hier vanzelf. |
@@ -960,7 +960,7 @@ toets omvalt.
 | `medicijnen-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/medicijnen.html. De belofte van dit scherm is een NEGATIEVE: RTG bepaalt niets. |
 | `meet.e2e.js` | 1 | -- | Scherm-test voor RTG Meet: A maakt een kamer, B komt binnen op de code, de WebRTC-mesh verbindt echt (nepcamera's van Chromium) en de hand opsteken komt bij de ander aan. Twee aparte browser-contexten, zodat beide... |
 | `memo.e2e.js` | 1 | -- | Scherm-test voor RTG Memo: de lijst leest de kluis, de samenvatting is eerlijk (met en zonder transcript op het toestel) en weggooien gaat naar de prullenbak. Opnemen zelf (microfoon) valt buiten headless bereik; de... |
-| `metgezelwijkt.e2e.js` | 1 | -- | RAHUL WIJKT VOOR EEN GEOPEND VENSTER -- EN KOMT TERUG. Het blok van de metgezel staat op z-index 9980 en zweeft daarmee boven vrijwel elk venster in dit huis (de bladen van Clips staan op 10, de onboarding-poort op 130). |
+| `metgezelwijkt.e2e.js` | 1 | -- | RAHUL BLIJFT BEREIKBAAR, MAAR LIGT NOOIT BOVEN EEN GEOPEND VENSTER. Het blok van de metgezel staat op z-index 9980 en zweeft daarmee boven vrijwel elk venster in dit huis (de bladen van Clips staan op 10, de... |
 | `metier.e2e.js` | 1 | -- | Scherm-test voor Métier. De unit-toetsen (test/metier.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet, en vooral dat het signatuurstuk zichtbaar werkt: je kaart bewaren, de bevestigde rol met... |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
 | `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
@@ -975,7 +975,7 @@ toets omvalt.
 | `pda-ui.e2e.js` | 3 | -- | Scherm-test: de PDA draait in een echte browser (Playwright). Zo valt de frontend-logica ook onder de suite, en is een refactor van een scherm net zo veilig als de backend. |
 | `pinherstel.e2e.js` | 2 | -- | DE PIN-HERSTELSTROOM, IN EEN ECHTE BROWSER, VAN LINK TOT NIEUWE PIN. WAAROM DEZE TOETS BESTAAT. |
 | `poortgesprek.e2e.js` | 1 | -- | Scherm-test voor het gegevensgesprek: de client-kant van de gegevenspoort. De server houdt een handeling met een derde partij tegen met 428 en zegt wat er mist. |
-| `premium.e2e.js` | 5 | -- | Scherm-test voor de premium-laag: meenemen (shared/uitvoer.js) en sneltoetsen (shared/sneltoets.js). Waarom deze twee. |
+| `premium.e2e.js` | 6 | -- | Scherm-test voor de premium-laag: meenemen (shared/uitvoer.js) en sneltoetsen (shared/sneltoets.js). Waarom deze twee. |
 | `rahulscherm.e2e.js` | 1 | -- | Het scherm van Rahul in een echte browser. De standen, de beweging en de uitwegen zijn alleen in een browser te zien: een toets op een functie zegt niets over of het paneel ook echt omhoog komt en of de pagina... |
 | `reisschermen.e2e.js` | 3 | genoemd | REIZEN, UITGAAN EN DE DIENST: ZESTIEN SCHERMEN, VIER SOORTEN. Allemaal uit de lijst van TAKEN 4.9. |
 | `rtfagenda.e2e.js` | 1 | -- | Scherm-test voor de RTF-gezinsagenda op RTG-niveau: het maandraster met kleur per gezinslid, een punt zetten via het paneel, bewerken, en de verjaardag-snelknop die er een jaarpunt van maakt. |
@@ -983,7 +983,7 @@ toets omvalt.
 | `rtfcurve.e2e.js` | 1 | -- | Scherm-test voor de eerlijke vergeetcurve op overhoren.html: het blok "Vandaag herhalen" met de dagstapel, goed = later terug, fout = vandaag nog een keer, en de eerlijke lege stand als alles gehad is. |
 | `rtfgeld.e2e.js` | 1 | -- | Scherm-test voor de geldschool: de ouder zet op klusjes.html weekgeld en verzilvert sterren; het kind ziet alles eerlijk terug in zakgeld.html. |
 | `rtfhulpwijzer.e2e.js` | 1 | -- | Scherm-test voor de consistentieronde van golf 6 (deel 3): de hulpwijzer draait op de gedeelde coach-laag (soort 'hulp', wachttekst van Meike), de privacyregel staat onder elke chat, en veilig.html wijst warm door... |
-| `rtfkinderschermen.e2e.js` | 4 | -- | DE RTF-KINDERSCHERMEN: WAT ZIET EEN KIND ALS HET NOG NERGENS BIJ HOORT? Acht schermen van de RTFoundation-kant, alle acht uit de lijst van TAKEN 4.9. |
+| `rtfkinderschermen.e2e.js` | 5 | -- | DE RTF-KINDERSCHERMEN: WAT ZIET EEN KIND ALS HET NOG NERGENS BIJ HOORT? Acht schermen van de RTFoundation-kant, alle acht uit de lijst van TAKEN 4.9. |
 | `rtfosafmaak.e2e.js` | 2 | -- | DE TWEE LAATSTE SCHERMEN De grenzen staan in test/rtfos-afmaak.test.js. Dit gaat over wat er op het scherm verschijnt, en bij deze twee is dat elk een ander soort fout. |
 | `rtfosdoelgroepen.e2e.js` | 4 | -- | DE DRIE SCHERMEN VAN DE DOELGROEPEN De API-grenzen staan in test/rtfos-doelgroepen.test.js. Dit gaat over wat er op het SCHERM verschijnt -- en juist bij deze drie is dat een ander soort fout dan een kapotte knop. |
 | `rtfosgovernance.e2e.js` | 1 | -- | HET GOVERNANCE-SCHERM De grendels zelf staan in test/rtfos-governance.test.js. Dit gaat over de vraag of het scherm ze TOONT -- en dat is bij deze laag een ander soort fout dan een kapotte knop. |

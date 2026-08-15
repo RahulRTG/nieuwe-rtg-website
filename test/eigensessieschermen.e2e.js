@@ -57,16 +57,16 @@ const EIGEN_SLEUTEL = [
   { app: 'doos', eist: /doosmodus|zaakdoos/i },
   { app: 'werkplek', eist: /log eerst in|welk huis|waar werk je/i },
   { app: 'defensie', eist: /defensie/i },
-  { app: 'foundation/club', eist: /clubcode/i },
+  { app: 'foundation/club', eist: /foundation-?pas|eigen profiel|clubcode/i },
   { app: 'foundation/partner', eist: /raadcode|stadspartner/i },
-  { app: 'foundation/beroepen', eist: /beroepen-?bibliotheek/i },
-  { app: 'foundation/magazine', eist: /rtfoundation|magazine|30%/i },
+  { app: 'foundation/beroepen', eist: /foundation-?pas|eigen profiel|beroepen-?bibliotheek/i },
+  { app: 'foundation/magazine', eist: /foundation-?pas|eigen profiel|rtfoundation|magazine|30%/i },
   /* werk.html erbij op 6 augustus. scripts/schermen.js noemde hem als een van de
      vier schermen waar geen enkele toets de weg van aflegt, en hij hoort in deze
      lijst en niet in een eigen bestand: het RTG Werk OS draait op een
      WERKRUIMTECODE plus een lid-token, dus precies de vorm waar deze toets voor
      bestaat -- niet "gaat hij open" maar "zegt hij welke sleutel hij mist". */
-  { app: 'werk', eist: /werkruimte|lid-token/i },
+  { app: 'werk', eist: /werkruimte|werksleutel|lid-token/i },
   /* oog en scherm erbij op 6 augustus, om dezelfde reden als werk: scripts/
      schermen.js noemde alle drie in "geen enkele toets legt dit scherm af", en
      alle drie draaien op een andere sleutel dan de ledenpas. RTG Eye wil de

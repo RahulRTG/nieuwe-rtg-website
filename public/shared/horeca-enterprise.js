@@ -1,6 +1,12 @@
 (function(){'use strict';
   if(document.querySelector('.hq-shell'))return;
-  var body=document.body,oudKop=body.querySelector(':scope>header'),inhoud=document.getElementById('main');
+  var body=document.body;
+  /* Deze shell heeft zelf een responsieve rail, scrollvloer en veilige
+     ondernavigatie. De algemene iOS-laag zou daar nog een tweede homepil en
+     kopverbouwing overheen leggen; onderaan ving die zelfs operationele
+     knoppen af. Zet hem uit voordat het uitgestelde ios.js wordt uitgevoerd. */
+  body.setAttribute('data-ios-uit','');
+  var oudKop=body.querySelector(':scope>header'),inhoud=document.getElementById('main');
   if(!oudKop||!inhoud)return;
   var titel=(oudKop.querySelector('h1')||{}).textContent||'Horeca Operations';
   var p=location.pathname,items=[['/apps/horeca.html','⌂','Command'],['/apps/horeca.html#arrival','◌','Host'],['/apps/horeca.html#floor','⌁','Floor'],['/apps/horeca-expeditie.html','◇','Kitchen'],['/apps/horeca-beheer.html','≋','Operations']];

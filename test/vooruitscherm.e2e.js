@@ -112,7 +112,8 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
          wordt door de stap die hij aan het afwachten is. */
       await page.waitForFunction(() => {
         const el = document.querySelector('#boVooruitCard');
-        return el && el.textContent.trim().length > 0;
+        return el && !el.hasAttribute('aria-busy') &&
+          (/nog niets met een datum/i.test(el.textContent) || /Automatisch verzameld uit/i.test(el.textContent));
       }, { timeout: 20000 });
     };
 

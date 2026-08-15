@@ -127,8 +127,17 @@ const q = new URLSearchParams(location.search);
 let CODE=(q.get('code')||'').toUpperCase(), TOKEN=q.get('t')||'', NAAM='';
 if(TOKEN && window.RTGSchoolSession){ RTGSchoolSession.zet('rtf_leerling',{code:CODE,token:TOKEN,naam:NAAM}); history.replaceState(null,'','schrift.html?code='+encodeURIComponent(CODE)); }
 if(!CODE||!TOKEN){ try{ const d=RTGSchoolSession.lees('rtf_leerling'); if(d){CODE=d.code;TOKEN=d.token;NAAM=d.naam;} }catch(e){} }
-if(!CODE||!TOKEN){ location.href='leren.html'; }
-RTGSchoolSession.bewaak(['rtf_leerling'],()=>location.href='leren.html');
+if(!CODE||!TOKEN){
+  /* Eerst de Foundation-pas, daarna pas de tijdelijke klassleutel. Zo blijft
+     bij ontbrekende of geweigerde gezinstoegang precies één duidelijke,
+     fail-closed deur zichtbaar. */
+  if(Sessie && Sessie.actief()){
+    if(document.documentElement.classList.contains('rtf-toegang-dicht')) addEventListener('rtf-toegang',()=>RTGSchoolSession.deur({rol:'leerling'}),{once:true});
+    else RTGSchoolSession.deur({rol:'leerling'});
+  }
+  throw new Error(Sessie && Sessie.actief() ? 'geen schoolsessie' : 'geen sessie');
+}
+RTGSchoolSession.bewaak(['rtf_leerling'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'leerling'}); });
 
 async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
 async function get(p){ const r=await fetch('/api/foundation'+p+(p.includes('?')?'&':'?')+'token='+encodeURIComponent(TOKEN)); return r.json(); }

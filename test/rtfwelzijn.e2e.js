@@ -28,7 +28,7 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
   try {
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Zon', naam: 'Mam', pin: '1234' });
     const k = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
-      naam: 'Juno', rol: 'kind', groep: 'kind' });
+      naam: 'Juno', rol: 'kind', groep: 'kind', geboortedatum: '2015-02-18' });
     const kindToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id })).token;
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -39,7 +39,7 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
     await page.evaluate((sessie) => {
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-    }, { code: g.code, token: kindToken, profiel: { naam: 'Juno', groep: 'kind' } });
+    }, { code: g.code, token: kindToken, profiel: { naam: 'Juno', groep: 'kind', geboortedatum: '2015-02-18' } });
     /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
        zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
        begint bij het ingelogde bezoek hieronder. */

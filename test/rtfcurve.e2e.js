@@ -28,7 +28,7 @@ test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk le
   try {
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Herhaal', naam: 'Mam', pin: '1234' });
     const k = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
-      naam: 'Isa', rol: 'kind', groep: 'tiener' });
+      naam: 'Isa', rol: 'kind', groep: 'tiener', geboortedatum: '2011-05-14' });
     const kindToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id })).token;
     await post('/api/rtf/leren/lijst-maak', { code: g.code, token: kindToken, naam: 'Frans H3',
       paren: [{ v: 'de hond', a: 'le chien' }, { v: 'de kat', a: 'le chat' }] });
@@ -42,7 +42,7 @@ test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk le
     await page.evaluate((sessie) => {
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-    }, { code: g.code, token: kindToken, profiel: { naam: 'Isa', groep: 'tiener' } });
+    }, { code: g.code, token: kindToken, profiel: { naam: 'Isa', groep: 'tiener', geboortedatum: '2011-05-14' } });
     /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen
        zetten -- en de pagina stopt daar bewust met 'geen sessie'. De meting
        begint bij het ingelogde bezoek hieronder. */

@@ -342,9 +342,18 @@ async function laadBtw(){
    er nog niets te zijn ingediend. */
 const AANSL_LABEL = { sluit_aan: ['ok','sluit aan'], wijkt_af: ['open','wijkt af'],
   niet_aangegeven: ['open','niet aangegeven'], alleen_concept: ['goud','alleen concept'] };
+let aansluitingRonde = 0;
 async function laadAansluiting(){
+  const ronde = ++aansluitingRonde;
+  const lijst = $('#aanslLijst');
+  lijst.setAttribute('aria-busy', 'true');
+  lijst.innerHTML = '<div class="leeg">Periode laden...</div>';
   try {
     const r = await api('/api/overheid/bd/btw/aansluiting', { periode: $('#aanslPer').value.trim() });
+    /* Een eerder verzoek mag een net gekozen periode nooit terugdraaien.
+       Dit gebeurt makkelijk op een trage verbinding: het standaardkwartaal
+       is nog onderweg terwijl de inspecteur al een ander kwartaal kiest. */
+    if (ronde !== aansluitingRonde) return;
     AANSL = r;
     $('#aanslPer').value = r.periode;
     const kop = '<div class="item"><h4>Aansluiting ' + esc(r.periode) + '</h4><div class="meta">' +
@@ -353,7 +362,7 @@ async function laadAansluiting(){
       (r.zonderAangifte ? ' · <b class="let">' + r.zonderAangifte + ' zonder aangifte</b>' : '') +
       '</div>' + (r.periodeLoopt ? '<div class="meta">Deze periode loopt nog: er hoort nog niets te zijn ingediend, ' +
         'dus "niet aangegeven" is hier geen bevinding.</div>' : '') + '</div>';
-    $('#aanslLijst').innerHTML = kop + (r.zaken.length ? r.zaken.map(z => {
+    lijst.innerHTML = kop + (r.zaken.length ? r.zaken.map(z => {
       const st = AANSL_LABEL[z.stand] || ['','?'];
       return '<div class="item' + (z.stand === 'sluit_aan' ? '' : ' sig') + '"><h4>' + esc(z.naam) +
         ' <small class="code">' + esc(z.code) + '</small> ' +
@@ -376,12 +385,13 @@ async function laadAansluiting(){
     }).join('') : '<div class="leeg">Geen facturen en geen aangiftes in deze periode.</div>');
     /* De knop VULT het formulier en dient niets in: een naheffing die met een
        tik ontstaat is een besluit zonder dat iemand naar de boete heeft gekeken. */
-    $('#aanslLijst').querySelectorAll('[data-nhvoor]').forEach(b => b.addEventListener('click', () => {
+    lijst.querySelectorAll('[data-nhvoor]').forEach(b => b.addEventListener('click', () => {
       $('#nhPer').value = r.periode; $('#nhCode').value = b.dataset.nhvoor;
       toon('nh');
       $('#nhPct').focus();
     }));
-  } catch(e){ meld(e.message); }
+  } catch(e){ if (ronde === aansluitingRonde) meld(e.message); }
+  finally { if (ronde === aansluitingRonde) lijst.removeAttribute('aria-busy'); }
 }
 /* De naheffingen. Alle knoppen hier zijn een VOORSTEL aan de server: die
    bewaakt de vier ogen, want een scherm dat zelf bepaalt wie mag tekenen is een

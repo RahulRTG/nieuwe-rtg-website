@@ -31,7 +31,7 @@
 
   /* Rol-focus verandert alleen de werkruimte, nooit de bevoegdheden. De server
      blijft ieder managerbesluit zelf controleren. */
-  window.RTGHoreca.api('/supplier/state', {}).then(function (r) {
+  window.RTGHoreca.apiVol('/api/supplier/state', {}).then(function (r) {
     var actor = r.body && r.body.actor || {};
     var func = String(actor.func || actor.role || 'service').toLowerCase();
     var target = func.match(/chef|keuken|kok|pas/) ? 'kitchen' : func.match(/host|recept|ontvang/) ? 'arrival' : func.match(/bedien|bar|zaal|service/) ? 'floor' : 'main';

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5138300f';
+var RTG_BOUW = '36b7467e';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4316,6 +4316,8 @@ var RTG_BOUW = '5138300f';
   if (ccTaal) ccTaal.addEventListener('click', () => { sluitScrims(); if (window.RTGi18n) RTGi18n.openModal(); });
   const ccPush = $('#osCcPush');
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
+  const ccPin = $('#osCcPin');
+  if (ccPin) ccPin.addEventListener('click', () => { sluitScrims(); metAlgPin(() => {}); });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
   /* Scannen, je Zegel, je backoffice en de bel zaten als losse knopjes in de
@@ -7609,7 +7611,13 @@ var RTG_BOUW = '5138300f';
   }
   function renderVooruit(){
     const el = document.getElementById('boVooruitCard'); if (!el) return;
-    if (!vooruitData){ el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>'; laadVooruit().then(renderVooruit); return; }
+    if (!vooruitData){
+      el.setAttribute('aria-busy', 'true');
+      el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>';
+      laadVooruit().then(renderVooruit);
+      return;
+    }
+    el.removeAttribute('aria-busy');
     const d = vooruitData;
     if (d.fout){ el.innerHTML = ''; return; }
     const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };

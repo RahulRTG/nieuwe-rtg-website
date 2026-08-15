@@ -75,6 +75,21 @@
        niet in main zelf maar in een scherm daarbinnen (main > wrap > vPay).
        Op alleen childList van main werd deze wacht daar nooit wakker. */
     obs.observe(main, { childList: true, subtree: true });
+
+    /* "Een ding tegelijk" verlaagt de drempel van drie naar twee delen. De
+       snelle toegankelijkheidslaag kan die klasse NA onze eerste scan zetten:
+       defer-scripts draaien wel in volgorde, maar readyState is dan al
+       interactive. Een inhoudsobserver ziet een class op <html> niet. Volg
+       daarom precies deze ene betekenisvolle omslag en deel opnieuw in; ook
+       terug naar normaal ruimt zo een tweedelig menu meteen op. */
+    var eenDing = document.documentElement.classList.contains('rtg-eending');
+    var profiel = new MutationObserver(function () {
+      var nu = document.documentElement.classList.contains('rtg-eending');
+      if (nu === eenDing) return;
+      eenDing = nu;
+      herscan();
+    });
+    profiel.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     if (!window.RTGDeel) deelUit(geenMenu);
   }
 

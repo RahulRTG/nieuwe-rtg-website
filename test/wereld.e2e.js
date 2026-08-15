@@ -102,8 +102,35 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
        aangeraakt. Het element eruit halen is wel definitief: onbStartGesprek()
        vindt hem niet meer en keert meteen terug. De intake zelf wordt elders
        getoetst; deze toets gaat over de ring. */
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.remove(); });
-    await page.waitForTimeout(500);
+    await page.evaluate(() => {
+      const g = document.getElementById('onbGate');
+      /* hidden is het signaal waarop Command wacht. Eerst die toestand laten
+         waarnemen; pas na het opvouwen mag de testpoort definitief weg. */
+      if (g) g.hidden = true;
+    });
+    /* RTG Command is na de intake de landing. De wereldtoetsen meten de ring
+       en kloklaag eronder; open die via dezelfde knop als een lid, zodat de
+       meting niet tegen een volledig correcte deklaag botst. */
+    /* Wachten en klikken zijn bewust één browserstap. checkOnboarding kan de
+       poort tussendoor opnieuw openen; een losse wait + click zag dan een knop
+       die op de volgende event-lus alweer was afgebroken. */
+    await page.waitForFunction(() => {
+      /* checkOnboarding mag de testpoort intussen terugzetten. Herhaal het
+         test-signaal in dezelfde poll waarmee we op Command wachten; zo kan
+         zijn observer de toestand niet missen, ook niet onder CI-belasting. */
+      const g = document.getElementById('onbGate');
+      if (g) g.hidden = true;
+      const k = document.querySelector('#rtgCommand .cmd-klok');
+      if (!k) return false;
+      k.click();
+      if (g) g.remove();
+      return true;
+    }, null, { timeout: 30000 });
+    await page.waitForFunction(() => {
+      const s = document.querySelector('.os-thuisscherm');
+      return !!(s && s.getBoundingClientRect().width > 100 && s.getBoundingClientRect().height > 100);
+    }, null, { timeout: 10000 });
+    await page.waitForTimeout(300);
     await fn({ base, page });
   } finally {
     if (browser) await browser.close();

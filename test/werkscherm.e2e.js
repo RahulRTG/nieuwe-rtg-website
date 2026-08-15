@@ -72,8 +72,8 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     assert.equal(uit.pad, '/apps/werk.html', 'de pagina stuurt niemand weg');
     assert.equal(uit.kaart, true, 'de inlogkaart staat open');
     assert.equal(uit.inhoud, false, 'en de inhoud is dicht');
-    assert.match(uit.tekst, /eigen sleutel|lid-token/i, 'de kaart legt uit wat er nodig is');
-    assert.match(uit.tekst, /geen pas heeft/i, 'en dat een werkruimte iets anders is dan een RTG-pas');
+    assert.match(uit.tekst, /persoonlijke werksleutel|lid-token/i, 'de kaart legt uit wat er nodig is');
+    assert.match(uit.tekst, /eigen omgeving|via RTG verbonden/i, 'en hoe RTG-leden en externe medewerkers binnenkomen');
 
     /* ---- een verkeerde sleutel opent niets ---- */
     await page.fill('#iWerkruimte', w.werkruimte);
@@ -105,7 +105,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     assert.ok(!/Verlof beoordelen/.test(acties), 'en tonen niets waar hij geen recht op heeft');
 
     /* ---- de weigering van de server komt op het scherm ---- */
-    await page.click('#tabModules');
+    await page.click('[data-wk="projecten"]');
     await page.waitForTimeout(800);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Vergunning aanvragen/, 'de taken staan in de modulelijst');
@@ -303,7 +303,7 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     }, inlog.token);
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1400);
-    await page.click('#tabModules');
+    await page.click('[data-wk="projecten"]');
     await page.waitForTimeout(800);
 
     /* ---- een project maken vanaf het scherm ---- */

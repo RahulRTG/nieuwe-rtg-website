@@ -369,7 +369,46 @@ async function binnenEenDag(werk) {
   return werk();   // de dag sloeg om tijdens de eerste poging: een keer overdoen
 }
 
+/* Chromium levert met deze schakelaars een echt MediaStream-videotrack zonder
+   camera of toestemmingsvenster. Recente macOS-versies proberen voor AUDIO
+   soms alsnog de systeemingang te openen; dat vangen we hieronder af. */
+function nepMediaArgs() {
+  return ['--no-sandbox', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
+}
+
+/* Installeer vóór de eerste pagina een browser-eigen testmicrofoon. Dit is geen
+   kaal testobject: Web Audio maakt een echte live MediaStreamTrack die ook door
+   RTCPeerConnection kan. Alleen de audiohardware wordt vervangen; videovragen
+   blijven door Chromiums echte getUserMedia-implementatie lopen. Op een
+   onveilige http-origin bestaat mediaDevices niet en blijft de productdiagnose
+   daardoor ongewijzigd meetbaar. */
+async function installeerNepMicrofoon(context) {
+  await context.addInitScript(() => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    const echt = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async function (wensen) {
+      wensen = wensen || {};
+      if (!wensen.audio) return echt(wensen);
+      const sporen = [];
+      if (wensen.video) {
+        const beeld = await echt({ video: wensen.video, audio: false });
+        sporen.push(...beeld.getVideoTracks());
+      }
+      const AudioMotor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioMotor) throw new DOMException('Web Audio ontbreekt', 'NotSupportedError');
+      const motor = new AudioMotor();
+      const bron = motor.createOscillator();
+      const uitgang = motor.createMediaStreamDestination();
+      bron.frequency.value = 440;
+      bron.connect(uitgang);
+      bron.start();
+      sporen.push(...uitgang.stream.getAudioTracks());
+      return new MediaStream(sporen);
+    };
+  });
+}
+
 module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
-  binnenEenDag,
+  binnenEenDag, nepMediaArgs, installeerNepMicrofoon,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

@@ -196,3 +196,104 @@ test('het alarm meldt de stille sonde en is stil te zetten', async () => {
   assert.ok(Date.parse(stil.body.tot) > Date.now());
   assert.equal((await api('command/alarm/stil', { id: 'bestaatniet' })).status, 404);
 });
+
+/* De waargenomen routeproef vond deze ingangen als de laatste blinde rand:
+   hun kernen werden elders getest, maar geen verzoek liep ooit door de echte
+   router en dus was ook hun poort niet bewezen. Dit is bewust GEEN veegproef
+   over alle routes. De lijst is eindig en benoemd; iedere regel moet anoniem
+   fail-closed antwoorden. Open webhook-/arrival-ingangen staan eronder met
+   hun eigen malformed-inputcontract. */
+test('de resterende enterprise-ingangen zijn anoniem fail-closed', async () => {
+  const beschermd = [
+    '/api/aanmelding/bewijs/stand', '/api/aanmelding/bewijs/teken',
+    '/api/arrival/pass', '/api/arrival/pulse',
+    '/api/bedrijf/besluiten/zonder-koppeling', '/api/bedrijf/project/wijzig',
+    '/api/bedrijf/regel/weg', '/api/bedrijf/toen/object', '/api/bedrijf/verloop',
+    '/api/boardroom/betalingen/keuze', '/api/boardroom/betalingen/proef',
+    '/api/boardroom/betalingen/stap', '/api/boardroom/betalingen/status',
+    '/api/gast/club/tafel', '/api/gast/concierge', '/api/gast/kaart',
+    '/api/office/betalingen/status', '/api/office/boardroom/magnaat/besluit',
+    '/api/office/boardroom/magnaat/leren', '/api/office/kantoorpakket/aanwezig',
+    '/api/office/kantoorpakket/beheer', '/api/office/kantoorpakket/fase',
+    '/api/office/kantoorpakket/opmerking', '/api/office/kantoorpakket/samen',
+    '/api/office/magnaat/beslis', '/api/office/magnaat/controle/overzicht',
+    '/api/office/magnaat/controle/taak/maak', '/api/office/magnaat/controle/taak/zet',
+    '/api/office/magnaat/controle/zelftest', '/api/office/magnaat/controle/zet',
+    '/api/office/magnaat/scan', '/api/office/magnaat/status',
+    '/api/office/merk/haal', '/api/office/merk/lijst',
+    '/api/rtf/kantoorpakket/aanwezig', '/api/rtf/kantoorpakket/beheer',
+    '/api/rtf/kantoorpakket/fase', '/api/rtf/kantoorpakket/opmerking',
+    '/api/rtf/kantoorpakket/samen', '/api/rtf/leven/band/vraag',
+    '/api/rtgone/goedkeuring', '/api/rtgone/goedkeuring/beslis',
+    '/api/rtgone/project/taak', '/api/rtgone/project/van-mail',
+    '/api/rtgone/rol/geef', '/api/rtgone/rol/trek',
+    '/api/supplier/facturen/betaald', '/api/supplier/horeca/arrival/promise',
+    '/api/supplier/horeca/arrivals', '/api/supplier/horeca/autopilot',
+    '/api/supplier/horeca/dish-twin/concept', '/api/supplier/horeca/dish-twin/publiceer',
+    '/api/supplier/horeca/dish-twins', '/api/supplier/horeca/gast/beleid',
+    '/api/supplier/horeca/handover/accept', '/api/supplier/horeca/handover/start',
+    '/api/supplier/horeca/journey', '/api/supplier/horeca/missions',
+    '/api/supplier/horeca/missions/activeer', '/api/supplier/horeca/missions/status',
+    '/api/supplier/horeca/missions/voorstel', '/api/supplier/horeca/recovery/beslis',
+    '/api/supplier/horeca/recovery/open', '/api/supplier/horeca/simulatie/maak',
+    '/api/supplier/horeca/simulatie/voorstellen', '/api/supplier/horeca/spatial',
+    '/api/supplier/horeca/venue/concept', '/api/supplier/horeca/venue/publiceer',
+    '/api/supplier/horeca/wave/activeer', '/api/supplier/horeca/wave/voorstel',
+    '/api/supplier/kantoorpakket/aanwezig', '/api/supplier/kantoorpakket/beheer',
+    '/api/supplier/kantoorpakket/fase', '/api/supplier/kantoorpakket/opmerking',
+    '/api/supplier/kantoorpakket/samen', '/api/supplier/menu/foto',
+    '/api/supplier/veiligheid/aankomsten',
+    '/api/techniek/betalingen/keuze', '/api/techniek/betalingen/proef',
+    '/api/techniek/betalingen/stap',
+    '/api/techniek/vingerafdruk', '/api/techniek/vingerafdruk/verschil'
+  ];
+  for (const pad of beschermd) {
+    const r = await fetch(base + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    assert.ok(r.status === 401 || r.status === 403,
+      pad + ' moet zonder passende sessie 401/403 geven, niet ' + r.status);
+  }
+  const techniekStatus = await fetch(base + '/api/techniek/betalingen/status');
+  assert.equal(techniekStatus.status, 401,
+    '/api/techniek/betalingen/status is een GET-ingang en blijft zonder technieksessie dicht');
+
+  /* De werkplekdeur onthult vóór authenticatie niet eens of een bedrijf
+     bestaat. Met een lege tenant hoort dat daarom bewust 404 in plaats van
+     401 te zijn. */
+  for (const pad of [
+    '/api/werkplek/kantoorpakket/aanwezig', '/api/werkplek/kantoorpakket/beheer',
+    '/api/werkplek/kantoorpakket/fase', '/api/werkplek/kantoorpakket/opmerking',
+    '/api/werkplek/kantoorpakket/samen'
+  ]) {
+    const r = await fetch(base + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    assert.equal(r.status, 404, pad + ' mag het bestaan van een onbekende werkplek niet onthullen');
+  }
+});
+
+test('open bewijs-, arrival-, webhook- en projectie-ingangen weigeren onbetrouwbare invoer veilig', async () => {
+  const bewijs = await fetch(base + '/api/aanmelding/bewijs', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.ok([400, 404].includes(bewijs.status), 'een bewijs zonder aanvraag-id wordt geweigerd');
+
+  const interpret = await fetch(base + '/api/arrival/interpret', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const plan = await interpret.json();
+  assert.equal(interpret.status, 200);
+  assert.match(plan.let || '', /nog niets aangevraagd/i,
+    'taal interpreteren voert zonder menselijke controle nog niets uit');
+
+  const aanvraag = await fetch(base + '/api/arrival/request', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(aanvraag.status, 400, 'een arrival-aanvraag zonder tijdelijke request-token blijft dicht');
+
+  for (const pad of ['/api/betaal/webhook/adyen', '/api/betaal/webhook/mollie']) {
+    const r = await fetch(base + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    assert.ok(r.status >= 400 && r.status < 500,
+      pad + ' mag ongetekende invoer niet accepteren of als serverfout behandelen: ' + r.status);
+  }
+
+  const projectie = await fetch(base + '/api/projectie/NIET-BESTAAND');
+  assert.equal(projectie.status, 404, 'een onbekende korte projectiecode lekt geen spelstand');
+});

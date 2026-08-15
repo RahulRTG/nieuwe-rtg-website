@@ -37,7 +37,10 @@
        app aanspreekt. Dat is behang -- weg ermee, de titel komt groot boven
        de inhoud, zoals iOS een scherm zonder navigatie opent. */
     if (!acties.length && !oudeTerug) {
-      var houdt = false;
+      /* Ook de kop ZELF kan de drager zijn. Foundation bouwt twee lege
+         <header id="balk">-elementen later pas op vanuit de sessie. Die kop
+         verwijderen maakt de daaropvolgende initialisatie stilletjes dood. */
+      var houdt = draagtId(kop);
       for (var q = 0; q < kop.children.length; q++) {
         if (titel && kop.children[q] === titel.element) continue;
         if (draagtId(kop.children[q])) { houdt = true; break; }
@@ -126,4 +129,3 @@
     svg.appendChild(p);
     return svg;
   }
-

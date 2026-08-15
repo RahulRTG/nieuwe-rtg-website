@@ -18,14 +18,10 @@
 (function () {
   'use strict';
   if (window.RTGUitvoer) return;
-  /* NIET op de inlogpoort. "Meenemen" hoort er alleen te staan als er iets te
-     halen valt, en aan de poort is er nog geen sessie en dus niets van u --
-     hij stond daar als losse knop boven de klok, op een scherm dat verder
-     alleen een sterrenhemel en een vraag toont. Het beginscherm zet #gate
-     zolang er niemand is ingelogd; is die er, dan doet deze laag niets en
-     meldt hij zich later gewoon aan zodra de poort weg is. */
+  /* De API bestaat ook aan de inlogpoort, zodat een later opgebouwd scherm
+     zijn bron alvast kan aanmelden. Alleen de KNOP blijft weg zolang de poort
+     werkelijk zichtbaar is; herzie() zet hem na het inloggen vanzelf neer. */
   var poort = document.getElementById('gate');
-  if (poort && !poort.hidden) return;
 
   var eigenBron = null;
 
@@ -110,7 +106,6 @@
     }
     return { ok: true, aantal: d.rijen.length };
   }
-
   /* De bediening. Die was er niet: neemMee() had als enige aanroeper de
      letter "e" uit sneltoets.js, en een telefoon heeft geen toetsenbord.
      Vandaar een knop in duimmaat en een venster met een eigen sluitknop,
@@ -232,6 +227,13 @@
      verhuizing te betalen (LAT regel 5: dan is het stil, maar niet druk). */
   function herzie() {
     if (!document.body) return;
+    /* hidden alleen is niet genoeg: sommige gastschermen laten #gate bestaan
+       maar nemen hem via de indeling uit beeld. Alleen een werkelijk zichtbare
+       poort onderdrukt de uitvoerknop. */
+    if (poort && !poort.hidden && poort.getClientRects().length) {
+      if (knop) { knop.remove(); knop = null; }
+      return;
+    }
     if (!verzamel()) { if (knop) { knop.remove(); knop = null; } return; }   // niets te halen, geen knop
     if (knop && knop.isConnected && (knop.offsetParent !== null || ++pogingen > 5)) return;
     if (!knop) {
@@ -250,8 +252,10 @@
     document.head.appendChild(st);
     herzie();
     if (!window.MutationObserver) return;
-    new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); })
-      .observe(wortel(), { childList: true, subtree: true });
+    var kijker = new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); });
+    kijker.observe(wortel(), { childList: true, subtree: true });
+    if (poort) kijker.observe(poort, { attributes: true,
+      attributeFilter: ['hidden', 'class', 'style'] });
   }
 
   window.RTGUitvoer = {

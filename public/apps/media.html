@@ -61,7 +61,9 @@
   .bodem{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:0.9rem;}
 
   /* de blad-lade: hub, maker en bord komen hier binnen */
-  .lade{position:fixed;inset:0;background:rgba(12,12,11,0.86);display:none;z-index:20;overflow-y:auto;}
+  /* Een geopend blad hoort boven de vaste Media-bank te liggen. De bank staat
+     op 40; met 20 onderschepte hij de sluitknop van het blad. */
+  .lade{position:fixed;inset:0;background:rgba(12,12,11,0.86);display:none;z-index:60;overflow-y:auto;}
   .lade.open{display:block;}
   .lade .vlak{max-width:52rem;margin:2.5rem auto;background:var(--bg);border:1px solid var(--line);
     border-radius:16px;padding:1.1rem 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.4rem);}

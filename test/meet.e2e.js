@@ -4,7 +4,7 @@
    beide leden hun eigen inlog hebben. Draait alleen met een browser. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, nepMediaArgs, installeerNepMicrofoon } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -35,11 +35,11 @@ test('Meet: kamer maken, binnenkomen op code, echt verbinden en de hand opsteken
     const stB = await api(base, '/api/state', {}, regB.token);
     const codeB = stB.state.user.codename;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox',
-      '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
+    browser = await pw.chromium.launch({ args: nepMediaArgs() });
     const fouten = [];
     const open = async (token) => {
       const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });
+      await installeerNepMicrofoon(ctx);
       const page = await ctx.newPage();
       letOpFouten(page, fouten);
       await page.goto(base + '/apps/meet.html', { waitUntil: 'domcontentloaded' });

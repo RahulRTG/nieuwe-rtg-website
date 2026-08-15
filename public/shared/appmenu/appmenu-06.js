@@ -60,7 +60,11 @@
          verborgen balk.
      Een aanwezige knop die je niet ziet is erger dan geen knop: de toets die
      alleen op bestaan kijkt, kleurt groen. */
-  function zichtbaar(e) { return !!(e && (e.offsetParent || e.getClientRects().length)); }
+  function zichtbaar(e) {
+    if (!e || !(e.offsetParent || e.getClientRects().length)) return false;
+    var s = w.getComputedStyle ? w.getComputedStyle(e) : null;
+    return !s || (s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity || 1) > 0);
+  }
 
   function hangOp() {
     knop.classList.remove('amn-zweef');

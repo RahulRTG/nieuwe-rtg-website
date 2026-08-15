@@ -183,14 +183,17 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
   try {
     const token = await lidMetNotities(base);
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    await context.addInitScript((t) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, token);
+    const page = await context.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/home.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
-    // balans is een deelmenu-pagina EN meldt een eigen bron aan: beide lagen
+    // Home Kit heeft drie echte delen EN meldt zijn apparatenregister aan
     await page.waitForFunction(() => !!document.querySelector('.rtgdeel-balk') &&
       !!document.querySelector('.rtguitvoer-knop'), null, { timeout: 15000 });
 
@@ -263,9 +266,12 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
   try {
     const token = await lidMetNotities(base);
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
+    const context = await browser.newContext();
+    await context.addInitScript((t) => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, token);
+    const page = await context.newPage();
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });

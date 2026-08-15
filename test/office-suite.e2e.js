@@ -63,6 +63,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     /* ---- de tekstverwerker ---- */
     await page.waitForSelector('#nieuwTekst', { timeout: 15000 });
     await page.click('#nieuwTekst');
+    await page.click('#officeOpmaak > summary');
     await page.waitForSelector('#tekstTools .tb', { timeout: 10000 });
     await page.evaluate(() => {
       document.querySelector('#tekst').innerHTML =
@@ -108,6 +109,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     assert.equal(aantalToc, 1, 'verversen vervangt de oude inhoudsopgave; er komt er geen tweede bij');
 
     // de afdrukknop staat er (het afdrukken zelf is de dialoog van de browser)
+    await page.click('#officeMeer > summary');
     assert.ok(await page.evaluate(() => !!document.getElementById('printBtn')));
 
     /* De formele werkstroom is menselijk: eerst ter beoordeling, daarna een

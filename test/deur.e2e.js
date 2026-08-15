@@ -103,21 +103,22 @@ test('deur: een RTF-app zonder gezinssessie gooit je niet weg maar legt het uit'
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.goto(base + '/apps/foundation/klusjes.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.rtgdeur', { timeout: 10000 });
-    await page.waitForFunction(() => document.querySelectorAll('.rtgdeur li').length >= 2, null, { timeout: 10000 });
+    await page.waitForSelector('#rtf-toegang-slot', { timeout: 10000 });
 
     const p = await page.evaluate(() => {
-      const el = document.querySelector('.rtgdeur');
+      const el = document.getElementById('rtf-toegang-slot');
       return { pad: location.pathname, tekst: el.innerText,
         links: [...el.querySelectorAll('a')].map(a => a.getAttribute('href')) };
     });
 
     // 1. je blijft op de app die je koos -- dit is de kern van de reparatie
     assert.match(p.pad, /klusjes\.html$/, 'je blijft op de app staan, kreeg: ' + p.pad);
-    // 2. met de inhoud van DEZE app uit zijn eigen gids
-    assert.ok(/klusje|sterren/i.test(p.tekst), 'de deur vertelt over deze app: ' + p.tekst.slice(0, 120));
+    // 2. met de centrale, fail-closed profieldeur: geen appdata voordat de
+    // server een geldige Foundation-pas en leeftijd heeft gecontroleerd.
+    assert.ok(/eigen profiel|Foundation-pas/i.test(p.tekst),
+      'de deur noemt de veilige toegang: ' + p.tekst.slice(0, 160));
     // 3. en een weg naar binnen die bestaat
-    assert.ok(p.links.some(h => /foundation\/index\.html/.test(h)),
+    assert.ok(p.links.some(h => /(?:foundation\/)?index\.html/.test(h)),
       'met een weg naar het gezin, kreeg: ' + p.links.join(', '));
     const r = await fetch(base + '/apps/foundation/index.html');
     assert.equal(r.status, 200, 'en die pagina bestaat');

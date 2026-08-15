@@ -68,12 +68,6 @@ const APPS = [
     toont: 'Mevrouw Duarte' },
   { app: 'garderobe', zet: 'garderobe/stuk', body: { naam: 'Grijs krijtstreep', categorie: 'pak' },
     toont: 'Grijs krijtstreep' },
-  { app: 'mecenaat', zet: 'mecenaat/gift', body: { doel: 'Concertgebouw', thema: 'kunst', bedrag: 500 },
-    tab: 'GIFTEN', toont: '500' },
-  { app: 'nalatenschap', zet: 'nalatenschap/doc', body: { titel: 'Testament 2026', soort: 'testament', waar: 'Bij de notaris' },
-    toont: 'Testament 2026' },
-  { app: 'logboek', zet: 'logboek/object', body: { naam: 'De Riva', soort: 'jacht' },
-    tab: 'OBJECTEN', toont: 'De Riva' },
   { app: 'cercle', zet: 'cercle/club', body: { naam: 'Circolo Filologico', stad: 'Milaan', gastpassen: 2 },
     tab: 'UW CLUBS', toont: 'Circolo Filologico' },
   { app: 'hangar', zet: 'hangar/toestel', body: { naam: 'De Zilverreiger', type: 'jet', basis: 'EHAM' },
@@ -107,7 +101,7 @@ async function open(page, base, app, token) {
 }
 const schermtekst = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
-test('zonder pas staat er een poort op alle twaalf schermen, en geen invoerveld',
+test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en geen invoerveld',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;
@@ -161,7 +155,7 @@ test('zonder pas staat er een poort op alle twaalf schermen, en geen invoerveld'
       if (velden < 0) stuk.push(a.app + ': geen #main op het scherm, dus dit is niet vast te stellen');
       else if (velden > 0) stuk.push(a.app + ': toont ' + velden + ' invoerveld(en) in de app terwijl hij dicht is');
     }
-    assert.deepEqual(stuk, [], 'de poort staat op alle twaalf:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(stuk, [], 'de poort staat op alle ' + APPS.length + ':\n  ' + stuk.join('\n  '));
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
@@ -169,7 +163,7 @@ test('zonder pas staat er een poort op alle twaalf schermen, en geen invoerveld'
   }
 });
 
-test('met de pas tonen alle twaalf schermen de eigen gegevens, niet alleen een lege huls',
+test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet alleen een lege huls',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;

@@ -39,7 +39,7 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     const kl = await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Klas 3A' });
     const g = await api('/gezin/maak', { gezinsnaam: 'Fam Scherm', naam: 'Pap', pin: '1234' });
     const kind = await api('/gezin/profiel/maak', { code: g.code, token: g.token,
-      naam: 'Roos', rol: 'kind', groep: 'tiener', kleur: '#3A7BD5' });
+      naam: 'Roos', rol: 'kind', groep: 'tiener', kleur: '#3A7BD5', geboortedatum: '2011-08-20' });
     const kindToken = (await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id })).token;
     await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id });
     await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: kl.code, akkoord: true });
@@ -56,7 +56,7 @@ test('Vandaag leren op school.html en de schoolpunten alleen-lezen op de gezinsa
     await page.evaluate((sessie) => {
       localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-    }, { code: g.code, token: kindToken, profiel: { naam: 'Roos', beheerder: false } });
+    }, { code: g.code, token: kindToken, profiel: { naam: 'Roos', beheerder: false, geboortedatum: '2011-08-20' } });
 
     /* ---- school.html: het Vandaag leren-blok, met direct afvinken ---- */
     /* Het bezoek hierboven was uitgelogd -- alleen om localStorage te kunnen

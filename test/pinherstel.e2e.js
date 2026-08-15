@@ -142,14 +142,17 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
     const token = await lidMetPin(base, '246810');
     const { page, fouten } = await ingelogd(browser, base, token, '/apps/app.html');
 
-    // een prive-app aantikken; welke maakt niet uit, als hij maar prive is
-    const tegel = await page.evaluate(() => {
-      const prive = ['berichten', 'vonk', 'rendezvous', 'wbw', 'loonstrook'].map(n => 'link:' + n);
-      const el = [...document.querySelectorAll('.os-app')].find(x => prive.includes(x.dataset.sleutel));
-      if (el) el.click();
-      return el ? el.dataset.sleutel : null;
-    });
-    assert.ok(tegel, 'er staat een prive-app op het beginscherm om op te tikken');
+    // De drie hoofdwerelden hebben losse apptegels vervangen. Pinbeheer blijft
+    // daarom als vaste, zichtbare ingang in het bedieningspaneel bereikbaar.
+    await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
+      null, { timeout: 60000 });
+    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 10000 });
+    await page.click('#rtgCommand .cmd-klok');
+    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
+    await page.click('#osCcBtn');
+    await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
+    await page.click('#osCcPin');
 
     await page.waitForSelector('#osBelScrim.open', { timeout: 10000 });
     await page.waitForFunction(

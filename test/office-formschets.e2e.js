@@ -82,12 +82,13 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
       null, { timeout: 10000 });
 
     // delen met B, als meelezer -- invullen hoort bij lezen
+    await page.click('#officeMeer > summary');
     await page.click('#deelBtn');
     await page.waitForSelector('#deelScrim.open', { timeout: 5000 });
     await page.fill('#deelCode', codeB);
     await page.selectOption('#deelRechten', 'lezen');
     await page.evaluate(() => { document.querySelector('#deelForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); });
-    await page.waitForFunction(() => /Meelezers/.test(document.querySelector('#deelLijst').textContent),
+    await page.waitForFunction(() => /Alleen lezen/.test(document.querySelector('#deelLijst').textContent),
       null, { timeout: 8000 });
 
     /* ---- B vult in ---- */

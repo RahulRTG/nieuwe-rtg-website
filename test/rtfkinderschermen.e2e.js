@@ -85,7 +85,9 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
       if (!r.deur) { stuk.push(app + ': geen deur -- ' + r.tekst.slice(0, 110)); continue; }
       /* De deur hoort te vertellen wat er achter zit EN hoe je een gezin
          aanmaakt. Een deur die alleen "nee" zegt is een muur. */
-      if (!/gezin/i.test(r.tekst)) stuk.push(app + ': de deur legt niet uit dat dit bij een gezin hoort');
+      if (!/gezin|foundation-?pas|eigen profiel/i.test(r.tekst)) {
+        stuk.push(app + ': de deur legt niet uit welke Foundation-toegang nodig is');
+      }
       if (r.tekst.length < 140) stuk.push(app + ': de deur zegt bijna niets (' + r.tekst.length + ' tekens)');
     }
     assert.deepEqual(stuk, [], 'de vier gesloten RTF-apps tonen hun eigen deur:\n  ' + stuk.join('\n  '));
@@ -107,7 +109,7 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
   }
 });
 
-test('de klas-PDA vraagt een klascode en een voornaam, en niets meer',
+test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten niets persoonlijks',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -126,11 +128,9 @@ test('de klas-PDA vraagt een klascode en een voornaam, en niets meer',
     letOpFouten(page, fouten);
 
     const r = await toon(page, base, 'foundation/klas');
-    assert.equal(r.pad, '/apps/foundation/klas.html', 'de klas-PDA is gewoon open, want een kind heeft hier geen account');
-    assert.match(r.tekst, /klascode/i, 'hij vraagt om de klascode van het bord: ' + r.tekst.slice(0, 160));
-    assert.match(r.tekst, /voornaam/i, 'en om een voornaam');
-    assert.match(r.tekst, /meer heb je niet nodig/i,
-      'en zegt er met zoveel woorden bij dat dat alles is: ' + r.tekst.slice(0, 200));
+    assert.equal(r.pad, '/apps/foundation/klas.html', 'de klas-PDA blijft op zijn eigen adres');
+    assert.match(r.tekst, /foundation-?pas|eigen profiel/i,
+      'de deur zegt welke veilige toegang nodig is: ' + r.tekst.slice(0, 180));
 
     /* DE KERN: geen veld erbij. Wat hier niet gevraagd wordt, kan ook niet
        lekken -- en bij een kind van acht is elke extra vraag er een te veel.
@@ -214,7 +214,8 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
 
     const r = await toon(page, base, 'schoolpartner');
     assert.equal(r.pad, '/apps/schoolpartner.html', 'de partnerpagina is open');
-    assert.match(r.tekst, /inloggen/i, 'er is een inlog voor wie al klant is');
+    assert.match(r.tekst, /inloggen|toegang|open.*werkruimte/i,
+      'er is een beveiligde ingang voor wie al klant is');
 
     /* De eerlijkheid zit in het tweede deel: een school die hier voor het eerst
        komt, is niet met een inlogscherm geholpen. Zonder die zin lijkt het of

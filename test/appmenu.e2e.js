@@ -166,13 +166,13 @@ test('Rahul heeft één balk, op elk pad waarop de homescreen te bereiken is',
   });
 });
 
-test('elke app-pagina draagt de hamburger van het app-menu',
+test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const fouten = [];
     let gemeten = 0;
 
-    for (const pad of appPaden()) {
+    async function meet(pad) {
       const page = await ctx.newPage();
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
@@ -189,11 +189,16 @@ test('elke app-pagina draagt de hamburger van het app-menu',
              de kop van shared/appmenu.js). */
           meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
             !document.body.hasAttribute('data-ios-home'));
-        } catch (e) { continue; }
-        if (!meedoen) continue;
-        if (new URL(page.url()).pathname !== pad) continue;
+        } catch (e) { return; }
+        if (!meedoen) return;
+        if (new URL(page.url()).pathname !== pad) return;
         try {
-          await page.waitForSelector('#osMenuBtn', { timeout: 8000 });
+          /* Een beveiligd Foundation-kindscherm staat in een modale leeftijds-
+             en profielpoort. Die top-layer hoort de achterliggende app-chrome
+             te bedekken; in plaats van een onklikbare hamburger moet de poort
+             zelf daarom een expliciete veilige uitgang naar RTG OS dragen. */
+          await page.waitForSelector('#osMenuBtn, #rtf-toegang-slot [data-rtf-uitweg]',
+            { timeout: 8000 });
           gemeten++;
         } catch (e) {
           if (new URL(page.url()).pathname === pad) fouten.push(pad);
@@ -201,8 +206,16 @@ test('elke app-pagina draagt de hamburger van het app-menu',
       } finally { await page.close(); }
     }
 
+    /* Honderden schermen één voor één meten maakte deze ene waarborg langer
+       dan de volledige CI-grens. Vier tegelijk blijft licht voor Chromium en
+       maakt de duur evenredig aan echte fouten, niet aan het aantal apps. */
+    const paden = appPaden();
+    for (let i = 0; i < paden.length; i += 4) {
+      await Promise.all(paden.slice(i, i + 4).map(meet));
+    }
+
     assert.ok(gemeten > 100, 'te weinig pagina\'s gemeten (' + gemeten + '): dan bewijst een groene uitslag niets');
-    assert.deepEqual(fouten, [], 'deze app-pagina\'s hebben geen app-menu:\n' + fouten.join('\n'));
+    assert.deepEqual(fouten, [], 'deze app-pagina\'s hebben geen app-menu of veilige uitweg:\n' + fouten.join('\n'));
   });
 });
 
@@ -255,7 +268,25 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
        over het hele scherm. Wat we hier meten ligt eronder: de statusbalk van
        het beginscherm. Het blad gaat dus opzij -- de intake heeft een eigen
        toets en hoort niet in deze. */
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.evaluate(() => {
+      const g = document.getElementById('onbGate');
+      /* hidden is het signaal waarop Command wacht; verwijderen vóór die
+         MutationObserver heeft gelopen laat de werktafel in de toestand
+         "ondertekening open" staan. */
+      if (g) g.hidden = true;
+    });
+    /* RTG Command is de nieuwe landing. Deze toets meet bewust de stille
+       statusbalk van het beginscherm eronder, dus volgt dezelfde zichtbare
+       ingang als een lid. */
+    await page.waitForFunction(() => {
+      const g = document.getElementById('onbGate');
+      if (g) g.hidden = true;
+      const k = document.querySelector('#rtgCommand .cmd-klok');
+      if (!k) return false;
+      k.click();
+      if (g) g.remove();
+      return true;
+    }, null, { timeout: 10000 });
     await page.waitForTimeout(400);
 
     /* HET BEGINSCHERM IS DE RUSTPLEK. Geen batterij, geen bel, geen paneelknop

@@ -46,6 +46,7 @@
       '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
       (laden ? '<div style="height:3px;border-radius:9px;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
         '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:10px;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
+        '<a data-rtf-uitweg href="/apps/app.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none">Naar RTG OS</a>' +
         (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
     if (wissel) wissel.onclick = function () {

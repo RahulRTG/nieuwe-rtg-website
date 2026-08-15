@@ -73,8 +73,9 @@ test('Belastingkantoor: de aansluiting toont hetzelfde getal als de zaak zelf zi
     // nu het lopende kwartaal, waar de factuur van zojuist in zit
     await page.fill('#aanslPer', periode);
     await page.click('#aanslGa');
-    await page.waitForFunction(p => /Aansluiting/.test(document.querySelector('#aanslLijst').textContent) &&
-      document.querySelector('#aanslPer').value === p, periode, { timeout: 15000 });
+    await page.waitForFunction(p => document.querySelector('#aanslLijst').textContent.includes('Aansluiting ' + p) &&
+      document.querySelector('#aanslPer').value === p &&
+      !document.querySelector('#aanslLijst').hasAttribute('aria-busy'), periode, { timeout: 15000 });
     const tekst = (await page.$eval('#aanslLijst', e => e.textContent)).replace(/\s+/g, ' ');
 
     /* DE BEWERING WAAR HET OM DRAAIT. Het bedrag op het inspecteursscherm is het
@@ -96,7 +97,8 @@ test('Belastingkantoor: de aansluiting toont hetzelfde getal als de zaak zelf zi
        Het opleggen zelf staat in test/btw-naheffing.test.js: dat vraagt een
        AFGESLOTEN tijdvak, en dat is via deze weg niet te maken. */
     await page.click('.tab[data-t="nh"]');
-    await page.waitForSelector('#nhMaak', { timeout: 15000 });
+    await page.waitForFunction(() => /Geen naheffingen/.test(document.querySelector('#nhLijst').textContent),
+      null, { timeout: 15000 });
     assert.match(await page.$eval('#nhLijst', e => e.textContent), /Geen naheffingen/);
 
     await page.fill('#nhPer', periode);

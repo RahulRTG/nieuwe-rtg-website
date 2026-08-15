@@ -1,5 +1,5 @@
 /* De gedeelde basis-laag: het vangnet dat elke app-pagina op 9+-niveau houdt.
-   Eén klein script, vier stille taken (RTGId woont in shared/id.js):
+   Eén klein script, gedeelde stille taken (RTGId woont in shared/id.js):
    1. offline: registreert de juiste service worker (leden-OS of RTFoundation),
       zodat elke pagina ook zonder bereik opent, en meldt rustig als de
       verbinding wegvalt of terugkomt
@@ -17,6 +17,8 @@
    7. (vervallen) de OS-klok is nu zelf een rustige analoge wijzerplaat in
       shared/klok.js; het uitbundige 3D-skelet (klok3d.js) wordt niet meer
       standaard over elke ring gelegd, maar leeft als concept op /apps/horloge.html
+   8. navigatie: verzekert de centrale iOS-laag en het appmenu op iedere app
+      die de basis laadt, tenzij het scherm zichzelf expliciet uitsluit
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -31,6 +33,22 @@
      houdt zijn eigen kop. */
   if (window.self !== window.top) {
     try { document.documentElement.classList.add('rtg-in-frame'); } catch (e) {}
+  }
+
+  /* ---- 8. centrale navigatie, ook voor iedere NIEUWE app -----------------
+     Een app hoeft de veilige weg naar huis niet te onthouden. Vrijwel ieder
+     scherm laadt basis.js al; daarom vult deze laag ios.js aan wanneer de
+     pagina hem niet zelf heeft opgenomen. Bestaande pagina's houden hun
+     expliciete volgorde, maatwerkschermen houden hun eigen uiterlijk en krijgen
+     alleen de zwevende menuknop/home-veeg. data-ios-uit blijft de bewuste
+     ontsnappingsroute voor een scherm dat echt alle OS-chrome zelf verzorgt. */
+  if (document.body && !document.body.hasAttribute('data-ios-uit') &&
+      !document.body.hasAttribute('data-ios-home') && !window.RTGiOS &&
+      !document.querySelector('script[src^="/shared/ios.js"]')) {
+    var ios = document.createElement('script');
+    ios.src = '/shared/ios.js';
+    ios.async = false;
+    (document.head || document.documentElement).appendChild(ios);
   }
 
   /* ---- 0. toegankelijkheid: de instelling van het lid, voor alles ----
@@ -79,7 +97,6 @@
     th.src = '/shared/rtg-themas.js';
     (document.head || document.documentElement).appendChild(th);
   }
-
 /* Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van
    de consolidatieronde; de bundelvolgorde is alfabetisch, dus 01, 01b, 02).
    Sectie 1 en verder: offline, verbinding, en de rest. */

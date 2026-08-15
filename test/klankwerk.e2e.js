@@ -25,6 +25,13 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
+async function openDeel(page, id) {
+  await page.waitForFunction((deel) => {
+    if (!window.RTGDeel || !RTGDeel.delen || !RTGDeel.delen().includes(deel)) return false;
+    return RTGDeel.open(deel) === deel;
+  }, id, { timeout: 20000 });
+}
+
 test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-klank-e2e-'));
@@ -62,7 +69,7 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
 
     /* Het werkvlak is een deelmenu: EEN deel tegelijk. Dus eerst navigeren
        zoals een gebruiker dat doet, en daarna pas klikken. */
-    await page.evaluate(() => window.RTGDeel.open('de-notenrol'));
+    await openDeel(page, 'de-notenrol');
 
     // de notenrol hoort bij een melodisch kanaal en draagt echte nootnamen
     await page.waitForSelector('#rol .rrij', { timeout: 8000 });
@@ -103,7 +110,7 @@ test('Klankwerk: raster, notenrol, Rahul, en er komt echt geluid uit',
     assert.ok(meting.piek > 3000, 'er zit hoorbaar signaal in (piek ' + meting.piek + ' van 32767)');
 
     // Rahul zet iets neer, en het landt pas als je het plaatst
-    await page.evaluate(() => window.RTGDeel.open('rahul-zet-iets-neer'));
+    await openDeel(page, 'rahul-zet-iets-neer');
     await page.fill('#rVraag', 'een rustige lounge rond 90 bpm');
     await page.click('#rVraagKnop');
     await page.waitForSelector('#rZet', { timeout: 15000 });

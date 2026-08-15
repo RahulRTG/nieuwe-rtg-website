@@ -53,7 +53,7 @@ test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met
     .then((r) => r.json().catch(() => ({})));
   try {
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Huis', naam: 'Ouder', pin: '1234' });
-    const kind = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sem', rol: 'kind', groep: 'po' });
+    const kind = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sem', rol: 'kind', groep: 'po', geboortedatum: '2016-04-12' });
     const kies = await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id });
     assert.ok(kies.token, 'het kind kan inloggen op zijn profiel');
 
@@ -65,7 +65,7 @@ test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met
     /* En een tweede band die het KIND zelf vraagt, zodat dit scherm allebei de
        kanten van besluit 1 tegelijk laat zien. Zonder deze band meet de toets
        hieronder alleen de helft die een knop hoort te hebben. */
-    const zus = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind', groep: 'po' });
+    const zus = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind', groep: 'po', geboortedatum: '2017-06-18' });
     const eigen = await post('/api/rtf/leven/band/vraag', { code: g.code, token: kies.token, codenaam: zus.profiel.codenaam, soort: 'familie' });
     assert.equal(eigen.ok, true, 'het kind mag zelf ook vragen: ' + JSON.stringify(eigen));
 

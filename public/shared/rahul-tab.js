@@ -1,32 +1,28 @@
 (function(){
   'use strict';
-  if (window.__rahulTabStandaard) return;
-  window.__rahulTabStandaard = true;
+  if(window.__rahulTabStandaard)return;
+  window.__rahulTabStandaard=true;
 
-  function laadStijl(src){
-    var script = document.createElement('script');
-    script.src = src;
-    script.defer = true;
-    document.head.appendChild(script);
-  }
+  function laadStijl(src){var script=document.createElement('script');script.src=src;script.defer=true;document.head.appendChild(script)}
   laadStijl('/shared/rahul-tab/style-base.js');
   laadStijl('/shared/rahul-tab/style-twin.js');
   laadStijl('/shared/rahul-tab/helpers.js');
 
-  var selectors=['.wk-tabs','.rv-tabs>div','.lo-tabs','.pn-tabs','.pn-top>div','.po-tabs','.ir-tabs','.ir-shell>main>header>div','.cmd-tabs','[data-tabs]','[role="tablist"]','main>header>div','.topbar','.appbar'];
-  var host = null;
-  for (var i=0;i<selectors.length&&!host;i++) host=document.querySelector(selectors[i]);
-  if (!host || document.getElementById('wkRahulTab') || host.querySelector('.rtg-rahul-tab')) return;
+  /* De fallback is een echte app-bovenbalk, nooit een generieke `.kop`.
+     `.kop` is in veel werkapps een inhoudskop (bij Klankwerk zelfs een
+     expliciete deelmarkering); daar een globale tab in plakken vervormt zowel
+     de inhoud als de navigatie. */
+  var selectors='.wk-tabs,.rv-tabs>div,.lo-tabs,.pn-tabs,.pn-top>div,.po-tabs,.ir-tabs,.ir-shell>main>header>div,.cmd-tabs,[data-tabs],[role="tablist"],main>header>div,.topbar,.appbar,body>header'.split(','),host=null;
+  for(var i=0;i<selectors.length&&!host;i++)host=document.querySelector(selectors[i]);
+  if(!host||document.getElementById('wkRahulTab')||host.querySelector('.rtg-rahul-tab'))return;
 
-  var tab=document.createElement('button'); tab.type='button'; tab.className='rtg-rahul-tab'; tab.innerHTML='Rahul<small>COMMAND</small>'; host.appendChild(tab);
-  var page=document.createElement('section'); page.className='rtg-rahul-page'; page.hidden=true; page.setAttribute('aria-label','Rahul Command Workspace');
+  var tab=document.createElement('button');tab.type='button';tab.className='rtg-rahul-tab';tab.innerHTML='Rahul<small>COMMAND</small>';host.appendChild(tab);
+  var page=document.createElement('section');page.className='rtg-rahul-page';page.hidden=true;page.setAttribute('aria-label','Rahul Command Workspace');
   page.innerHTML='<header class="rtg-command-head"><button class="rtg-mouth" type="button" aria-label="Praat met Rahul">◡</button><span><b>Rahul</b><small>ENTERPRISE COMMAND</small></span><span class="rtg-command-state" data-ai-state><i></i>Werkmodus actief · AI optioneel</span><button class="rtg-command-close" type="button" aria-label="Terug naar werkblad">↙</button></header><main class="rtg-command-grid"><section class="rtg-command-context"><span class="rtg-command-ey">LIVE CONTEXT</span><h2 data-greeting>Uw werkruimte is begrepen.</h2><p class="rtg-command-lead" data-context></p><div class="rtg-command-fact"><span>ACTIEVE OMGEVING</span><b data-app></b><small data-selection>Geen selectie gemeten</small></div><div class="rtg-command-rule"><i></i><span>Rahul bereidt voor. Geld, publicatie, toegang en definitieve toezegging vragen menselijk akkoord.</span></div></section><section class="rtg-command-chat"><span class="rtg-command-ey">COMMAND CONVERSATION</span><h1>Van bedoeling<br>naar resultaat.</h1><div class="rtg-command-suggest"></div><div class="rtg-command-log" role="log" aria-live="polite"></div><form class="rtg-command-form"><input aria-label="Vraag Rahul" placeholder="Beschrijf het resultaat dat u wilt…" maxlength="500"><button type="submit" aria-label="Verstuur naar Rahul">→</button></form></section><section class="rtg-command-decisions"><span class="rtg-command-ey">DECISION INBOX</span><h2>Alleen wat u nodig heeft.</h2><div class="rtg-decision"><i>✓</i><p><b>Automatisch uitgevoerd</b><small data-done>Geen uitvoering in deze sessie</small></p><em>LOGBOEK</em></div><div class="rtg-decision"><i>→</i><p><b>Ter controle</b><small>Context en voorstel worden eerst zichtbaar</small></p><em>VEILIG</em></div><div class="rtg-decision"><i>!</i><p><b>Uw beslissing</b><small>Niet gemeten totdat een workflow dit vraagt</small></p><em>MENS</em></div><div class="rtg-automation"><header><span>AUTONOMOUS OPERATIONS</span><em>VOORBEREIDEN</em></header><p>Rahul mag binnen uw rol zoeken, vergelijken en voorbereiden. Onomkeerbare stappen blijven geblokkeerd.</p><button type="button" data-policy>Bekijk grenzen</button></div></section></main>';
   document.body.appendChild(page);
+  window.__rahulTabDialoog={tab:tab,page:page};
+  laadStijl('/shared/rahul-tab/dialog.js');
 
-
-  page.querySelector('.rtg-command-context').insertAdjacentHTML('beforeend','<section class="rtg-intent"><header><span>INTENT CANVAS</span><em>LIVE</em></header><div class="rtg-intent-grid"><div><small>BEDOELING</small><b data-intent-goal>Sneller resultaat</b></div><div><small>GRENS</small><b>Menselijk akkoord</b></div><div><small>TIJD</small><b>Nu voorbereiden</b></div><div><small>SUCCES</small><b>Minimale overdracht</b></div></div><button type="button" data-build-plan>Ontwerp route →</button></section>');
-  page.querySelector('.rtg-command-chat h1').insertAdjacentHTML('afterend','<section class="rtg-twin"><header><span>ENTERPRISE TWIN · PRE-FLIGHT</span><em data-twin-state>GEREED VOOR SIMULATIE</em></header><div class="rtg-twin-flow"><div><i></i><b>Intent</b><small>begrepen</small></div><div><i></i><b>People</b><small>grens actief</small></div><div><i></i><b>Finance</b><small>niet gemeten</small></div><div><i></i><b>Partners</b><small>voorbereiden</small></div><div><i></i><b>Proof</b><small>mens akkoord</small></div></div><div class="rtg-twin-foot"><span>Veilige stappen parallel voorbereid</span><b data-twin-saving>0 uitvoeringen</b></div></section>');
-  page.querySelector('.rtg-automation').insertAdjacentHTML('beforebegin','<section class="rtg-one"><header><span>ONE DECISION</span><em data-decision-state>VOORBEREID</em></header><h3>Eén akkoord.<br>Een volledige route.</h3><p>Rahul bundelt de onderlinge gevolgen. Alleen deze onomkeerbare grens blijft voor u over.</p><dl><div><dt>Uitvoering</dt><dd>nog geblokkeerd</dd></div><div><dt>Terugdraaibaar</dt><dd>waar mogelijk</dd></div><div><dt>Bewijs</dt><dd>volledig logboek</dd></div></dl><button type="button" data-one-decision>Controleer gebundeld akkoord →</button></section>');
 
   var input=page.querySelector('input'),log=page.querySelector('.rtg-command-log'),suggest=page.querySelector('.rtg-command-suggest');
   var vorige=null, bezig=false, historie=[];
@@ -38,8 +34,8 @@
   function voeg(rol,waarde){historie.push({rol:rol,tekst:waarde});historie=historie.slice(-12);render()}
   function open(ja){page.hidden=!ja;tab.classList.toggle('actief',ja);if(ja){page.scrollTop=0;vorige=document.querySelector('.rtg-rahul-tab~.actief,.wk-tabs>.actief,.lo-tabs>.actief,.po-tabs>.actief')||vorige;var c=context();page.querySelector('[data-app]').textContent=c.app;page.querySelector('[data-selection]').textContent=c.selectie||c.deel||'Geen selectie gemeten';page.querySelector('[data-context]').textContent='Ik zie '+c.deel+' in '+c.app+'. Ik combineer alleen gegevens waarvoor uw huidige rol toegang heeft.';page.querySelector('[data-greeting]').textContent=c.deel+' staat klaar.';voorstellen(c);if(!historie.length)voeg('rahul','Vertel het gewenste resultaat; ik toon de stappen, uitzonderingen en beslissingen.');setTimeout(function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}page.scrollTop=0},120)}else if(vorige)vorige.classList.add('actief')}
   async function vraag(){var q=input.value.trim();if(!q||bezig)return;input.value='';voeg('user',q);bezig=true;voeg('rahul','Context en grenzen controleren…');var token='',supplier='';try{token=localStorage.getItem('rtg_member_token')||'';supplier=localStorage.getItem('rtg_sup_token')||''}catch(e){}var pad=token?'/api/fluister':'/api/supplier/ai',auth=token||supplier;try{if(!auth)throw new Error('geen sessie');var c=context();var r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth},body:JSON.stringify({q:q+'\n\nActieve context: '+c.app+' · '+c.deel+(c.selectie?' · '+c.selectie:'')})});var d=await r.json();historie.pop();var st=page.querySelector('[data-ai-state]');if(st&&d&&d.aiBeschikbaar===false)st.innerHTML='<i></i>Handmatige werkmodus · alles blijft bruikbaar';else if(st&&d&&d.aiBeschikbaar===true)st.innerHTML='<i></i>AI ondersteund · menselijke autoriteit';voeg('rahul',(d&&(d.antwoord||d.reply||d.error))||'Ik kon dit nog niet afronden.');if(d&&d.gedaan)page.querySelector('[data-done]').textContent='Laatste opdracht uitgevoerd en vastgelegd'}catch(e){historie.pop();voeg('rahul','Vrije hulp is nu niet bereikbaar. Uw werkblad, navigatie en alle handmatige functies blijven gewoon beschikbaar.')}finally{bezig=false}}
-  page.querySelector('[data-build-plan]').onclick=function(){var c=context();page.querySelector('[data-intent-goal]').textContent=c.deel+' optimaliseren';page.querySelector('[data-twin-state]').textContent='5 DOMEINEN GESIMULEERD';page.querySelector('[data-twin-saving]').textContent='4 voorbereid · 0 uitgevoerd';voeg('rahul','De uitvoeringsroute is ontworpen. Vier omkeerbare voorbereidingen kunnen parallel; één gebundeld menselijk akkoord blijft geblokkeerd.')};
-  page.querySelector('[data-one-decision]').onclick=function(){var box=page.querySelector('.rtg-one');box.classList.toggle('approved');var aan=box.classList.contains('approved');page.querySelector('[data-decision-state]').textContent=aan?'CONTROLE GEOPEND':'VOORBEREID';this.textContent=aan?'Sluit akkoordcontrole':'Controleer gebundeld akkoord →';voeg('rahul',aan?'Akkoordcontrole geopend. Ik toon eerst gevolgen, bronnen en terugdraaimogelijkheden; er is nog niets uitgevoerd.':'Akkoordcontrole gesloten. De voorbereide route blijft veilig bewaard.')};
   tab.onclick=function(){if(window.RTGRahulTabHelpers)open(true)};page.querySelector('.rtg-command-close').onclick=function(){open(false)};page.querySelector('.rtg-mouth').onclick=function(){try{input.focus({preventScroll:true})}catch(e){input.focus()}};page.querySelector('form').onsubmit=function(e){e.preventDefault();vraag()};page.querySelector('[data-policy]').onclick=function(){voeg('rahul','Actieve grens: ik mag binnen uw rol lezen, vergelijken en voorbereiden. Betalen, publiceren, toegang wijzigen en definitief toezeggen vereisen afzonderlijk menselijk akkoord.')};
   window.RTGMetgezel=window.RTGMetgezel||{};window.RTGMetgezel.rahul=function(q){if(!window.RTGRahulTabHelpers)return;open(true);if(q){input.value=q;vraag()}};
+  window.__rahulTabCommand={page:page,context:context,voeg:voeg};
+  laadStijl('/shared/rahul-tab/workspace.js');
 })();

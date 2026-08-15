@@ -150,6 +150,11 @@
     $('#lobby').style.display = 'none';
     $('#kamer').style.display = 'flex';
     $('#tegels').innerHTML = '';
+    /* Een trage toestemmingsvraag mag de kamer niet op een leeg scherm laten
+       wachten. Code, deelnemers en de eigen tegel zijn direct bruikbaar; beeld
+       en geluid sluiten aan zodra de browser klaar is. */
+    var eigen = tegel(ik);
+    lijst();
     return haalIce().then(function () {
       /* shared/media.js zegt WAAROM het niet gaat. Zonder die reden bleef hier
          een stille null over en zag de gebruiker alleen een lege tegel -- de
@@ -160,7 +165,6 @@
     }).then(function (uit) {
       stream = uit.stroom;
       var r = uit.waarom && uit.waarom.rtg;
-      var eigen = tegel(ik);
       if (stream) eigen.srcObject = stream;
       else meld((r ? r.kort : 'Geen camera of microfoon') +
         '; u kijkt en luistert niet mee, de kamer ziet u wel.' + (r ? ' ' + r.uitleg : ''));

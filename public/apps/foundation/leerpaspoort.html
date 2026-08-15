@@ -45,7 +45,7 @@
 <script src="sessie.js"></script><script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const sess=Sessie.huidig(); if(!Sessie.eisProfiel()) throw new Error('geen leerlingtoegang'); Sessie.balk($('#balk'),{terug:'campus.html',terugTekst:'← Campus'});
+const sess=Sessie.huidig(); if(!Sessie.eisProfiel()) throw new Error('geen sessie'); Sessie.balk($('#balk'),{terug:'campus.html',terugTekst:'← Campus'});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',3000)}
 const PAD={'/api/onderwijs/ladder':'/ladder','/api/onderwijs/mijn':'/paspoort','/api/onderwijs/inschrijf':'/inschrijf','/api/onderwijs/jaar-over':'/jaar-over','/api/onderwijs/advies':'/advies','/api/leerstof/vakken':'/vakken','/api/leerstof/les':'/les','/api/leerstof/oefen':'/oefen','/api/leerstof/antwoord':'/antwoord','/api/leerstof/examen':'/examen','/api/leerstof/examen-antwoord':'/examen-antwoord','/api/bijles/gesprek':'/bijles/gesprek','/api/bijles/vraag':'/bijles/vraag'};
 const api=(pad,body)=>fetch('/api/rtf/leerling'+PAD[pad],{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:sess.code,token:sess.token},body||{}))}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d});

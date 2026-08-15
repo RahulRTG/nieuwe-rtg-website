@@ -45,7 +45,7 @@
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, nepMediaArgs, installeerNepMicrofoon } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -58,8 +58,6 @@ function laadPlaywright() {
   return null;
 }
 const pw = laadPlaywright();
-
-const NEP = ['--no-sandbox', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
 
 /* Een adres dat GEEN localhost is. Zonder zo'n adres is (a) niet te meten: op
    loopback vindt de browser http nog beveiligd, en dan blijft juist de fout die
@@ -93,8 +91,9 @@ test('camera en microfoon: op een LAN-adres zegt de app WAAROM het niet gaat, en
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_BIND: '0.0.0.0' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: NEP });
+    browser = await pw.chromium.launch({ args: nepMediaArgs() });
     const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });
+    await installeerNepMicrofoon(ctx);
 
     /* ---- (a) DE KLACHT ZELF: een http-adres dat geen localhost is ---- */
     if (!lan) {

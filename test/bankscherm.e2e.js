@@ -74,12 +74,18 @@ async function bankZet(base, aan) {
 
 async function opScherm(base, token) {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const ctx = await browser.newContext();
+  await ctx.addInitScript(t => {
+    localStorage.setItem('rtg_member_token', t);
+    localStorage.setItem('rtg_cookieinfo_v1', '1');
+  }, token);
+  const page = await ctx.newPage();
   const fouten = [];
   letOpFouten(page, fouten);
-  await page.goto(base + '/apps/bank.html', { waitUntil: 'domcontentloaded' });
-  await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
-  await page.goto(base + '/apps/bank.html', { waitUntil: 'domcontentloaded' });
+  // Bank is nu een stand van RTG Geld; open meteen de echte schil. Zo toetst
+  // deze suite de huidige gebruikersroute en niet de compatibiliteitsomleiding.
+  await page.goto(base + '/apps/geld.html#bank', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#bkApp', { timeout: 15000 });
   return { browser, page, fouten };
 }
 
@@ -100,15 +106,15 @@ test('bank, schakelaar UIT: het scherm zegt eerlijk dat er nog geen rekening is'
     browser = s.browser;
     const page = s.page;
     await page.waitForFunction(() => {
-      const el = document.querySelector('#app');
+      const el = document.querySelector('#bkApp');
       return el && !el.textContent.includes('Laden');
     }, null, { timeout: 20000 });
 
-    const tekst = await page.textContent('#app');
+    const tekst = await page.textContent('#bkApp');
 
     /* De kern: geen valse rekening. Geen IBAN, geen saldo, geen akkoordknop
        die iets opent wat er niet is. Zou de app die toch tonen, dan zakt dit. */
-    assert.equal(await page.$('#akk'), null, 'er staat GEEN akkoordknop terwijl de bank dicht is');
+    assert.equal(await page.$('#bkAkk'), null, 'er staat GEEN akkoordknop terwijl de bank dicht is');
     assert.ok(!/NL\d{2}[A-Z]{4}/.test(tekst), 'er staat geen IBAN op het scherm, kreeg: ' + tekst.slice(0, 200));
 
     // en het zegt wel iets: een dicht scherm mag niet leeg zijn (dood is stiller dan stuk)
@@ -140,19 +146,19 @@ test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bed
     const page = s.page;
 
     // 1. eerst de voorwaarden, en nog geen IBAN
-    await page.waitForSelector('#akk', { timeout: 20000 });
-    const voor = await page.textContent('#app');
+    await page.waitForSelector('#bkAkk', { timeout: 20000 });
+    const voor = await page.textContent('#bkApp');
     assert.ok(!/NL\d{2}[A-Z]{4}/.test(voor), 'voor akkoord staat er nog geen IBAN op het scherm');
 
-    await page.click('#akk');
-    await page.waitForSelector('#reks', { timeout: 20000 });
+    await page.click('#bkAkk');
+    await page.waitForSelector('.bk-rek', { timeout: 20000 });
 
     /* 2. Het IBAN halen we bij de SERVER en eisen we op het scherm -- niet
        andersom, want dan zou het scherm zijn eigen bewijs zijn. */
     const ov = await fetch(base + '/api/bank/overzicht', { method: 'POST', headers: H }).then(r => r.json());
     const rek = (ov.rekeningen || [])[0];
     assert.ok(rek && rek.iban, 'de server heeft na akkoord een rekening: ' + JSON.stringify(ov).slice(0, 200));
-    assert.ok((await page.textContent('#reks')).includes(rek.iban),
+    assert.ok((await page.textContent('#bkApp')).includes(rek.iban),
       'het IBAN van de server staat op het scherm (' + rek.iban + ')');
 
     /* 3. Storten, en de enige vraag die er bij een bank toe doet: staat het
@@ -164,7 +170,7 @@ test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bed
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
-      const el = document.querySelector('#reks');
+      const el = document.querySelector('#bkApp');
       return el && /12[,.]50/.test(el.textContent);
     }, null, { timeout: 20000 });
 
@@ -196,7 +202,7 @@ test('bank, schakelaar AAN: het hart toont de boeking, en meenemen geeft er echt
     const page = s.page;
 
     await page.waitForFunction(() => {
-      const el = document.querySelector('#hart');
+      const el = document.querySelector('#bkHart');
       return el && el.textContent.includes('Hartproef');
     }, null, { timeout: 25000 });
 

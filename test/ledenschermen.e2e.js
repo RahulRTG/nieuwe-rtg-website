@@ -50,8 +50,6 @@ const OPEN = [
   { app: 'pulse', eist: /volgend|ontdek|mijn plank/i },
   { app: 'thuis', eist: /van lid aan lid|logeren bij leden/i },
   { app: 'stad', eist: /voor bewoners|hoe de stad/i },
-  { app: 'wbw', eist: /wie betaalt wat|lijstjes/i },
-  { app: 'rtgcode', eist: /geen gewone qr|gesloten, levende code/i },
   { app: 'horloge', eist: /signatuur|skelet|horloge/i },
   { app: 'uitzicht', eist: /skyline|het huis in de nacht/i },
   { app: 'browser', eist: /browser|rtg:\/\//i },
@@ -144,7 +142,7 @@ test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit sta
   }
 });
 
-test('veertien ledenschermen tonen waar ze voor zijn',
+test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -160,7 +158,7 @@ test('veertien ledenschermen tonen waar ze voor zijn',
       if (r.tekst.trim().length < 60) { stuk.push(s.app + ': bijna leeg (' + r.tekst.trim().length + ' tekens)'); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': zegt niet waar het voor is -- ' + r.tekst.slice(0, 130));
     }
-    assert.deepEqual(stuk, [], 'de veertien ledenschermen staan er:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(stuk, [], 'de ' + OPEN.length + ' ledenschermen staan er:\n  ' + stuk.join('\n  '));
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

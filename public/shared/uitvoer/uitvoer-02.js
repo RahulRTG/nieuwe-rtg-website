@@ -119,6 +119,13 @@
      verhuizing te betalen (LAT regel 5: dan is het stil, maar niet druk). */
   function herzie() {
     if (!document.body) return;
+    /* hidden alleen is niet genoeg: sommige gastschermen laten #gate bestaan
+       maar nemen hem via de indeling uit beeld. Alleen een werkelijk zichtbare
+       poort onderdrukt de uitvoerknop. */
+    if (poort && !poort.hidden && poort.getClientRects().length) {
+      if (knop) { knop.remove(); knop = null; }
+      return;
+    }
     if (!verzamel()) { if (knop) { knop.remove(); knop = null; } return; }   // niets te halen, geen knop
     if (knop && knop.isConnected && (knop.offsetParent !== null || ++pogingen > 5)) return;
     if (!knop) {
@@ -137,8 +144,10 @@
     document.head.appendChild(st);
     herzie();
     if (!window.MutationObserver) return;
-    new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); })
-      .observe(wortel(), { childList: true, subtree: true });
+    var kijker = new MutationObserver(function () { clearTimeout(tik); tik = setTimeout(herzie, 300); });
+    kijker.observe(wortel(), { childList: true, subtree: true });
+    if (poort) kijker.observe(poort, { attributes: true,
+      attributeFilter: ['hidden', 'class', 'style'] });
   }
 
   window.RTGUitvoer = {

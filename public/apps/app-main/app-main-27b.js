@@ -22,6 +22,8 @@
   if (ccTaal) ccTaal.addEventListener('click', () => { sluitScrims(); if (window.RTGi18n) RTGi18n.openModal(); });
   const ccPush = $('#osCcPush');
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
+  const ccPin = $('#osCcPin');
+  if (ccPin) ccPin.addEventListener('click', () => { sluitScrims(); metAlgPin(() => {}); });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
   /* Scannen, je Zegel, je backoffice en de bel zaten als losse knopjes in de

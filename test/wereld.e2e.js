@@ -712,7 +712,7 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
          daardoor onder runnerbelasting twintig seconden lang zijn teller
          resetten zonder ooit de hemel te meten. Hier vernieuwt een wissel de
          nulmeting en loopt dezelfde begrensde inhoudsmeting gewoon door. */
-      let a = null, r = null, stabiel = 0, wissels = 0, zonderDoek = 0;
+      let a = null, r = null, beste = null, stabiel = 0, wissels = 0, zonderDoek = 0;
       for (let n = 0; n < 80; n++) {
         if (!a) {
           a = lees();
@@ -720,14 +720,19 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
         }
         await new Promise((k) => setTimeout(k, 750));
         const b = lees();
-        if (!b) { zonderDoek++; a = null; stabiel = 0; continue; }
-        if (a.cv !== b.cv) { wissels++; a = b; stabiel = 0; continue; }
+        if (!b) { zonderDoek++; a = null; beste = null; stabiel = 0; continue; }
+        if (a.cv !== b.cv) { wissels++; a = b; beste = null; stabiel = 0; continue; }
         r = meet(a, b);
         stabiel++;
-        if (r.aanA && r.gelijk / r.aanA < 0.2) break;   // ruim onder de eis: klaar
+        /* Een ademend veld kan later toevallig weer meer pixels van de
+           nulmeting raken. Dat maakt de eerdere, daadwerkelijk waargenomen
+           beweging niet onwaar. Bewaar daarom de sterkste geldige meting van
+           het HUIDIGE doek; een doekwissel wist hem hierboven terecht uit. */
+        if (r.aanA && (!beste || r.gelijk / r.aanA < beste.gelijk / beste.aanA)) beste = r;
+        if (beste && beste.gelijk / beste.aanA < 0.2) break; // ruim onder de eis: klaar
         if (stabiel >= 40) break;                        // dezelfde bovengrens als voorheen
       }
-      return r ? { ...r, wissels, zonderDoek } : {
+      return (beste || r) ? { ...(beste || r), wissels, zonderDoek } : {
         fout: 'geen stabiel sterrendoek binnen de meetgrens (' + wissels +
           ' wissels, ' + zonderDoek + ' keer afwezig)'
       };

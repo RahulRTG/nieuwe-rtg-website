@@ -15,11 +15,11 @@ module.exports = (kern) => {
     const t = String((req.body || {}).transcript || '').slice(0, MAX_TRANSCRIPT).trim();
     if (!t) return res.status(400).json({ error: 'Er is geen transcript; zet bij het opnemen het meeluisteren aan.' });
     const woorden = t.split(/\s+/).length;
-    const kern = samenvat(t, { maxZinnen: 3, maxTekens: 700 }) || t.slice(0, 700);
+    const samenvatting = samenvat(t, { maxZinnen: 3, maxTekens: 700 }) || t.slice(0, 700);
     const acties = actiepunten(t, { max: 3 });
-    const extra = acties.filter(a => !kern.toLowerCase().includes(a.wat.toLowerCase()))
+    const extra = acties.filter(a => !samenvatting.toLowerCase().includes(a.wat.toLowerCase()))
       .map(a => '- ' + a.wat);
-    const uit = kern + (extra.length ? '\n\nActies:\n' + extra.join('\n') : '');
+    const uit = samenvatting + (extra.length ? '\n\nActies:\n' + extra.join('\n') : '');
     res.json({ ok: true, samenvatting: uit, ai: false, bron: 'lokale-taal', modus: 'handmatig', woorden });
   });
 };

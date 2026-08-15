@@ -3,9 +3,14 @@
    kern/betaalwaarheid. */
 'use strict';
 
-module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env }) {
+module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env, uit }) {
   const stripeGehost = stripe && require('./stripe-gehost')(stripe);
+  const weigerUit = () => {
+    if (uit) throw new Error('Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.');
+  };
   function mogelijkheden() {
+    if (uit) return { standaard: 'uit', rails: [], uit: true,
+      uitleg: 'Betalen staat bewust uitgeschakeld; er is geen demo- of echte betaalrail actief.' };
     const rails = [];
     if (stripe) rails.push({ id: 'stripe', label: 'Stripe · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
     if (mollie) rails.push({ id: 'mollie', label: 'Mollie · iDEAL of bankbetaling', soort: 'doorsturen', echt: true });
@@ -15,6 +20,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   }
 
   function kiesAanbieder(opdracht) {
+    weigerUit();
     const gevraagd = String(opdracht && opdracht.aanbieder || '').toLowerCase();
     if (gevraagd) {
       if (gevraagd === 'stripe' && stripe) return 'stripe';
@@ -31,6 +37,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     value: (Math.round(centen) / 100).toFixed(2) });
 
   async function maakBetaling(opdracht) {
+    weigerUit();
     const { bedrag, valuta = 'eur', referentie, idempotentieSleutel, omschrijving,
       returnUrl, webhookUrl, methode, bestemming } = opdracht || {};
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
@@ -87,6 +94,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   }
 
   async function haalBetaling(aanbieder, id) {
+    weigerUit();
     if (aanbieder === 'mollie' && mollie) {
       const p = await mollie.payments.retrieve(id);
       return { id: p.id, status: p.status, aanbieder: 'mollie',
@@ -115,6 +123,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   }
 
   async function maakTerugbetaling(opdracht) {
+    weigerUit();
     const { aanbieder, providerId, bedrag, valuta = 'eur', idempotentieSleutel } = opdracht || {};
     if (!providerId) throw new Error('Een terugbetaling heeft een providerbetaling nodig.');
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Terugbetaalbedrag moet positief zijn.');

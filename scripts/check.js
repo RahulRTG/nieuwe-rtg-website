@@ -1564,7 +1564,7 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
     ['POSTGRES_PASSWORD_FILE', 'gelezen door de officiele postgres-container; het geheim blijft zo buiten docker inspect'],
     ['PGDATA', 'gelezen door de officiele postgres-container om de datamap te kiezen'],
     ['RTG_ALLOW_PLAINTEXT', 'bevestigingsvlag VOOR de keuring: "ik weet dat er geen sleutel is, start toch"'],
-    ['STRIPE_DEMO_BEWUST', 'bevestigingsvlag VOOR de keuring: "deze installatie draait bewust zonder betalingen"'],
+    ['STRIPE_DEMO_BEWUST', 'bevestigingsvlag VOOR de keuring: "deze afgeschermde testinstallatie gebruikt bewust de demo-provider"'],
     ['SENTRY_DSN', 'bewust genoemd om te WAARSCHUWEN dat hij niets doet; de echte alarmweg is ERR_WEBHOOK_URL']
   ]);
   // De hele keuringsmap telt als belofte-bron EN wordt uitgesloten van "leest

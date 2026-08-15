@@ -19,6 +19,9 @@ const { vingerafdruk } = require('../pay/vingerafdruk');
 module.exports = (g) => {
   const { MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern,
     bodem, id, schoon, nu, save, d, geldModus, motorklant, bordSeintje } = g;
+  const betalingenUit = process.env.RTG_BETALEN_UIT === '1';
+  const uitFout = () => ({ status: 503,
+    error: 'Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.', code: 'betalingen-uit' });
 
   /* De grootboek-guard: de VOLLEDIGE regelcontrole (bedrag, bestaan, bevroren,
      bodem/rood-staan). Retourneert een fout-object of null (mag door). Dit is de
@@ -49,6 +52,7 @@ module.exports = (g) => {
      grootboek en moet alles via boekAsync (fail-closed, luid -- nooit stil een
      tweede grootboek naast de motor). */
   function boek({ van, naar, centen, soort, oms, ref }) {
+    if (betalingenUit) return uitFout();
     if (geldModus === 'motor') {
       throw new Error('bank.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.');
     }
@@ -79,6 +83,7 @@ module.exports = (g) => {
      regel; weigert of hapert de motor, dan verandert er NIETS aan de spiegel. Alle
      motor-schrijfacties lopen door het slot (geen TOCTOU op de bodem). */
   async function boekAsync(args) {
+    if (betalingenUit) return uitFout();
     if (geldModus !== 'motor') return boek(args);
     return metSlot(() => boekMotor(args));
   }

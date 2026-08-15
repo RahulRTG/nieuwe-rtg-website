@@ -28,9 +28,25 @@ en met begrensde, roterende logs. Geheimen komen uit `.env.productie` en
 waarden in `docker inspect`.
 
 `selfhost:init` overschrijft bestaande sleutels nooit. Voor publieke livegang:
-verwijder `RTG_PRIVATE_BETA=1`, zet een HTTPS-`APP_URL`, SMTP en een echte
-betaalprovider, draai `npm run golive`, en zet pas daarna een TLS-tunnel of
-reverse proxy voor de loopbackpoort.
+verwijder `RTG_PRIVATE_BETA=1`, zet een HTTPS-`APP_URL` en SMTP. Koppel daarna
+een echte betaalprovider, of kies expliciet `RTG_BETALEN_UIT=1`; laat externe
+AI bewust uit met `RTG_AI_UIT=1`. Draai `npm run golive`, en zet pas daarna een
+TLS-tunnel of reverse proxy voor de loopbackpoort.
+
+Publiek zonder AI en zonder betalen, zoals voor een eerste veilige release:
+
+```bash
+npm run sleutels -- --docker --schrijf --zonder-ai --zonder-betalen \
+  --eigenaar=jij@domein.nl --url=https://jouw-domein.nl
+npm run selfhost:check
+docker compose up -d --build
+npm run golive
+```
+
+In deze stand is “zonder betalen” geen demo: starten, bevestigen, terugbetalen,
+uitbetalen en betaalwebhooks weigeren allemaal fail-closed. Zonder AI draait de
+app in handmatige werkmodus; navigatie, regels en overige kernprocessen blijven
+beschikbaar.
 
 - Liveness: `GET /api/health` (proces leeft)
 - Readiness: `GET /api/ready` (mag verkeer krijgen; 503 als de datalaag nog niet klaar is)
@@ -103,8 +119,10 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | `RTG_TLS=1` | De app termineert **zelf** TLS/HTTPS op Node's tls-stack (HTTP/2 + HTTP/1.1-terugval via ALPN, TLS 1.2 als vloer, harde ciphers) — een aparte reverse proxy voor TLS is dan niet meer nodig. Zonder cert maakt ze een self-signed voor local |
 | `RTG_ACME=1` + `RTG_TLS_DOMAIN` + `RTG_TLS_EMAIL` | Met `RTG_TLS=1`: de app haalt en vernieuwt **zelf** een echt Let's Encrypt-certificaat (eigen ACME-client, HTTP-01 op poort 80, live cert-herlaad zonder herstart). `RTG_ACME_STAGING=1` om eerst tegen de staging-CA te oefenen |
 
-Aanbevolen: `ERR_WEBHOOK_URL` (externe alarmering), SMTP (`SMTP_URL`), `STRIPE_SECRET_KEY`
-+ `STRIPE_WEBHOOK_SECRET` (echte betalingen), `ANTHROPIC_API_KEY` (AI).
+Aanbevolen: `ERR_WEBHOOK_URL` (externe alarmering) en SMTP (`SMTP_URL`). Voor
+echte betalingen: `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` of een andere
+provider; anders `RTG_BETALEN_UIT=1`. Voor AI: `ANTHROPIC_API_KEY` of een andere
+provider; anders `RTG_AI_UIT=1`.
 
 Volledige lijst met uitleg: `.env.example`.
 

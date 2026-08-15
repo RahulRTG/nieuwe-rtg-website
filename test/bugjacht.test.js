@@ -556,8 +556,20 @@ test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
   assert.ok((zonder.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'zonder sleutel: fout, geen waarschuwing');
 
   const bewust = valideer(Object.assign({}, basis, { STRIPE_DEMO_BEWUST: '1' }));
-  assert.ok(!(bewust.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'bewust zonder betalingen mag');
+  assert.ok(!(bewust.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'een bewust gekozen demo-provider mag nog voor afgeschermd testen');
   assert.ok((bewust.waarschuwingen || []).some(f => /STRIPE_DEMO_BEWUST/.test(f)), 'maar het blijft zichtbaar');
+
+  const echtUit = valideer(Object.assign({}, basis, { RTG_BETALEN_UIT: '1' }));
+  assert.ok(!(echtUit.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'fail-closed uit heeft geen provider nodig');
+  assert.ok((echtUit.waarschuwingen || []).some(f => /alle betaalrails.*fail-closed/i.test(f)), 'de uit-stand blijft zichtbaar');
+  const tegenstrijdig = valideer(Object.assign({}, basis,
+    { RTG_BETALEN_UIT: '1', STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }));
+  assert.ok((tegenstrijdig.fouten || []).some(f => /botst met ingestelde betaalgeheimen/i.test(f)),
+    'uit plus een echt betaalgeheim weigert in plaats van stil een provider te laden');
+  const muntTegenstrijdig = valideer(Object.assign({}, basis,
+    { RTG_BETALEN_UIT: '1', MUNT_PROVIDER_KEY: 'munt_live_x', MUNT_WEBHOOK_SECRET: 'munt_wh_x' }));
+  assert.ok((muntTegenstrijdig.fouten || []).some(f => /botst met ingestelde betaalgeheimen/i.test(f)),
+    'ook achtergebleven muntgeheimen botsen met de volledige uit-stand');
 
   const met = valideer(Object.assign({}, basis, { STRIPE_SECRET_KEY: 'sk_live_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }));
   assert.ok(!(met.fouten || []).some(f => /STRIPE/.test(f)), 'met sleutel en webhook-secret is er niets aan de hand');
@@ -572,6 +584,12 @@ test('productie draait zonder AI volledig handmatig, maar niet zonder echte mail
   assert.ok(!zonder.fouten.some(f=>/AI-provider/.test(f)), 'AI is geen productiestart-afhankelijkheid');
   assert.ok(zonder.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)), 'de handmatige stand is zichtbaar');
   assert.ok(zonder.fouten.some(f=>/mailprovider/.test(f)));
+  const bewustUit = valideer(Object.assign({}, basis, { RTG_AI_UIT:'1', SMTP_URL:'smtp://mail.test:2525' }));
+  assert.ok(!bewustUit.fouten.some(f=>/AI/.test(f)), 'AI mag bewust volledig uit');
+  assert.ok(bewustUit.waarschuwingen.some(f=>/bewust uit.*handmatige werkmodus/i.test(f)));
+  const conflict = valideer(Object.assign({}, basis,
+    { RTG_AI_UIT:'1', OPENAI_API_KEY:'provider-key', SMTP_URL:'smtp://mail.test:2525' }));
+  assert.ok(conflict.fouten.some(f=>/RTG_AI_UIT=1 botst/i.test(f)), 'uit plus een AI-sleutel weigert hard');
   const echt = valideer(Object.assign({},basis,{OPENAI_API_KEY:'provider-key',SMTP_URL:'smtp://mail.test:2525'}));
   assert.ok(!echt.fouten.some(f=>/AI-provider|mailprovider/.test(f)));
   assert.ok(!echt.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)));

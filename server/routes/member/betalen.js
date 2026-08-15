@@ -21,6 +21,8 @@ module.exports = (kern) => {
 
   app.post('/api/pay', auth, async (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (!betaal.BETALEN_AAN) return res.status(503).json({
+      error: 'Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.', code: 'betalingen-uit' });
     const zPay = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.betalingen;
     if (zPay && zPay.aan === false) return res.status(503).json({ error: 'Betalen is tijdelijk uitgeschakeld.' });
     // Echte accounts betalen hun eigen facturen; demo-sessies de gedeelde demo.

@@ -13,7 +13,8 @@
 module.exports = (ctx) => {
   const { d, boekAsync, rekeningen, rekMeta, saldoVan, betaal } = ctx;
 
-  const PROVIDERS = { stripe: 'Stripe', adyen: 'Adyen', mollie: 'Mollie', demo: 'Kaartnaad (demo)' };
+  const PROVIDERS = { stripe: 'Stripe', adyen: 'Adyen', mollie: 'Mollie',
+    demo: 'Kaartnaad (demo)', uit: 'Geen externe betaalrail' };
   const providerLabel = () => PROVIDERS[(betaal && betaal.AANBIEDER) || 'demo'] || 'Kaartprovider';
   const mijnIbans = c => Object.values(rekeningen()).filter(m => m.codenaam === c).map(m => m.iban);
 

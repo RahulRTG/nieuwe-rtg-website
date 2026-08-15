@@ -698,13 +698,28 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
          wachttijd meet je dan de drukte in plaats van de hemel. De uitkomst is
          dezelfde meting, hij krijgt alleen de tijd die hij nodig heeft. */
       const meet = (a, b) => {
-        let aanA = 0, gelijk = 0;
+        let aanA = 0, aanB = 0, gelijk = 0;
         for (let i = 3; i < a.data.length; i += 4) {
-          const x = a.data[i] > 8, y = b.data[i] > 8;
+          /* Ook het zwakste stof telt. Een helderheidsademhaling verandert de
+             alpha, maar niet of het stofpunt er staat; alpha > 0 meet dus de
+             vorm van het veld en niet zijn tijdelijke lichtsterkte. */
+          const x = a.data[i] > 0, y = b.data[i] > 0;
           if (x) aanA++;
+          if (y) aanB++;
           if (x && y) gelijk++;
         }
-        return { aanA, gelijk };
+        const totaal = a.data.length / 4;
+        const gemA = totaal ? aanA / totaal : 0;
+        const gemB = totaal ? aanB / totaal : 0;
+        /* Pearson-correlatie meet het RUIMTELIJKE beeld en niet alleen hoeveel
+           pixels toevallig oplichten. Een globale helderheidsademhaling mag
+           daardoor veranderen zonder als beweging te tellen; een vast
+           stofpatroon blijft sterk gecorreleerd, een verschoven veld niet. */
+        const spreiding = Math.sqrt(gemA * (1 - gemA) * gemB * (1 - gemB));
+        const samenhang = spreiding
+          ? Math.max(-1, Math.min(1, (gelijk / totaal - gemA * gemB) / spreiding)) : 1;
+        const rauw = aanA ? gelijk / aanA : 1;
+        return { aanA, aanB, gelijk, totaal, rauw, samenhang };
       };
       /* De nulmeting hoort bij het HUIDIGE doek. Tijdens de opbouw kan
          hangHemel() dat doek legitiem vervangen zodra de definitieve maat
@@ -728,8 +743,8 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
            nulmeting raken. Dat maakt de eerdere, daadwerkelijk waargenomen
            beweging niet onwaar. Bewaar daarom de sterkste geldige meting van
            het HUIDIGE doek; een doekwissel wist hem hierboven terecht uit. */
-        if (r.aanA && (!beste || r.gelijk / r.aanA < beste.gelijk / beste.aanA)) beste = r;
-        if (beste && beste.gelijk / beste.aanA < 0.2) break; // ruim onder de eis: klaar
+        if (r.aanA && (!beste || r.samenhang < beste.samenhang)) beste = r;
+        if (beste && beste.samenhang < 0.2) break; // ruim onder de eis: klaar
         if (stabiel >= 40) break;                        // dezelfde bovengrens als voorheen
       }
       return (beste || r) ? { ...(beste || r), wissels, zonderDoek } : {
@@ -741,11 +756,11 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
 
     assert.ok(r.aanA > 400,
       'er hoort een hemel te staan om te meten (opgelichte punten: ' + r.aanA + ')');
-    const bleef = r.gelijk / r.aanA;
-    assert.ok(bleef < 0.35,
-      'de hemel staat grotendeels stil: na zes seconden licht ' + Math.round(bleef * 100) +
-      '% van de punten nog op precies dezelfde plek op. Het stofveld hoort mee te bewegen, ' +
-      'niet als gebakken plaatje onder de draaiende sterren te liggen.');
+    assert.ok(r.samenhang < 0.35,
+      'de hemel staat grotendeels stil: de ruimtelijke beeldcorrelatie is ' +
+      Math.round(r.samenhang * 100) + '% (ruwe overlap ' + Math.round(r.rauw * 100) +
+      '%). Het stofveld hoort mee te bewegen, niet als gebakken plaatje onder de ' +
+      'draaiende sterren te liggen.');
   }, null, false);
 });
 

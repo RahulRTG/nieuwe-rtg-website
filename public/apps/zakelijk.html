@@ -228,7 +228,9 @@
     DAGNAMEN.forEach((naam, i) => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'knop';
       b.textContent = naam;
-      b.classList.toggle('aan', dagen.includes(i));
+      const aan = dagen.includes(i);
+      b.classList.toggle('aan', aan);
+      b.setAttribute('aria-pressed', String(aan));
       b.addEventListener('click', () => {
         dagen = dagen.includes(i) ? dagen.filter(d => d !== i) : dagen.concat([i]).sort();
         tekenDagen();
@@ -269,8 +271,14 @@
     for (const z of zinnen) p(waar, z, 'uitleg');
   }
 
+  /* Alleen de nieuwste leesaanvraag mag het formulier tekenen. Bij een trage
+     verbinding konden de opstartaanvraag en de tab-aanvraag NA een zojuist
+     opgeslagen beleid binnenkomen en de zichtbare keuze terugzetten. */
+  let beleidVraag = 0;
   async function haalBeleid() {
+    const vraag = ++beleidVraag;
     const r = await api('beleid', {});
+    if (vraag !== beleidVraag) return;
     if (r.status !== 200) { $('#bStand').textContent = r.body.error || 'Geen toegang.'; return; }
     vulBeleid(r.body.beleid);
     $('#bStand').textContent = r.body.beleid && r.body.beleid.gewijzigd
@@ -279,6 +287,8 @@
   }
   $('#bBewaar').addEventListener('click', async () => {
     const lijst = s => s.split(',').map(x => x.trim()).filter(Boolean);
+    /* Maak alle oudere GETs ongeldig voordat de mutatie onderweg gaat. */
+    beleidVraag++;
     const r = await api('beleid', { zet: true,
       maxPrijs: centen($('#bMax')), goedkeuringVanaf: centen($('#bDrempel')),
       budgetPerMaand: centen($('#bBudget')),

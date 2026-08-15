@@ -167,6 +167,10 @@ jobs:
       # ontbreekt, en meldt de stap "0 fail" -- groen zonder iets gezien te
       # hebben. De stap hierboven installeert de browser; deze vlag controleert
       # dat dat ook echt gelukt is.
+      # Serieel is hier bewust: elk bestand start een echte server en vaak een
+      # Chromium. Met concurrency 2 wisselde onder runnerbelasting alleen WELK
+      # goed scherm zijn lokale 8/20s-grens miste (Boeken, daarna Mobiliteit).
+      # Een volledige seriele ronde blijft ruim binnen deze jobs 90 minuten.
       - name: Scherm-tests (PDA in de browser)
         run: npm run e2e
         env:

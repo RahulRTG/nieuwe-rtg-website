@@ -86,19 +86,20 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     }, morgen);
 
     await pak();
-    // de agenda hoort te antwoorden dat hij er iets mee kan
-    await page.waitForSelector('.rtg-surface[data-id="agenda"][data-kan-vangen]', { timeout: 8000 });
+    // de agenda hoort te antwoorden en haar zichtbare tab wordt het sleepdoel
+    await page.waitForSelector('.rtg-tab[data-id="agenda"][data-kan-vangen]', { timeout: 8000 });
     const kanVangen = await page.evaluate(() =>
-      [...document.querySelectorAll('.rtg-surface[data-kan-vangen]')].map(e => e.dataset.id));
+      [...document.querySelectorAll('.rtg-tab[data-kan-vangen]')].map(e => e.dataset.id));
     assert.deepEqual(kanVangen, ['agenda'],
       'alleen de agenda kent de soort "reis"; de rest hoort te zwijgen, en zwijgen is nee');
 
-    // loslaten boven de agenda -> een voorstel, en nog GEEN afspraak
+    // loslaten op de zichtbare Agenda-tab -> een voorstel, en nog GEEN afspraak
     const doos = await page.evaluate(() => {
-      const r = document.querySelector('.rtg-surface[data-id="agenda"]').getBoundingClientRect();
+      const r = document.querySelector('.rtg-tab[data-id="agenda"]').getBoundingClientRect();
       return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
     });
     await page.mouse.move(doos.x, doos.y);
+    await page.waitForSelector('.rtg-tab[data-id="agenda"][data-vangt]', { timeout: 3000 });
     await page.mouse.up();
     await page.waitForSelector('.rtg-voorstel[data-aan]', { timeout: 8000 });
     const tekst = await page.textContent('.rtg-voorstel .wat');
@@ -116,7 +117,7 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
 
     // en nu wel bevestigen
     await pak();
-    await page.waitForSelector('.rtg-surface[data-id="agenda"][data-kan-vangen]', { timeout: 8000 });
+    await page.waitForSelector('.rtg-tab[data-id="agenda"][data-kan-vangen]', { timeout: 8000 });
     await page.mouse.move(doos.x, doos.y);
     await page.mouse.up();
     await page.waitForSelector('.rtg-voorstel[data-aan]', { timeout: 8000 });

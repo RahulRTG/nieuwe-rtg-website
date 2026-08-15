@@ -565,10 +565,33 @@
     if (!sleepObject || !wat) return;
     sleepAanbod[s.id] = String(wat).slice(0, 120);
     s.el.setAttribute('data-kan-vangen', '');
+    var tab = tabVanSurface(s);
+    if (tab) tab.setAttribute('data-kan-vangen', '');
+  }
+
+  function tabVanSurface(s) {
+    if (!schil.tabs) return null;
+    var tabs = schil.tabs.querySelectorAll('.rtg-tab[data-id]');
+    for (var i = 0; i < tabs.length; i++) if (tabs[i].dataset.id === s.id) return tabs[i];
+    return null;
   }
 
   function surfaceOp(x, y) {
+    /* In de standaard Werk OS-weergave staat maar een appvlak tegelijk open.
+       De overige apps zijn bereikbaar via hun zichtbare tab. Een tab die door
+       de ontvangende app als doel is aanvaard, is daarom een volwaardig
+       sleepdoel: zo hoeft de gebruiker een app niet eerst te openen en het
+       object daarna opnieuw op te pakken. */
+    if (schil.tabs) {
+      var tabs = schil.tabs.querySelectorAll('.rtg-tab[data-id][data-kan-vangen]');
+      for (var t = tabs.length - 1; t >= 0; t--) {
+        var tr = tabs[t].getBoundingClientRect();
+        if (x >= tr.left && x <= tr.right && y >= tr.top && y <= tr.bottom) return vind(tabs[t].dataset.id);
+      }
+    }
     for (var i = schil.surfaces.length - 1; i >= 0; i--) {
+      var stijl = w.getComputedStyle(schil.surfaces[i].el);
+      if (stijl.visibility === 'hidden' || stijl.display === 'none' || stijl.pointerEvents === 'none') continue;
       var r = schil.surfaces[i].el.getBoundingClientRect();
       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return schil.surfaces[i];
     }
@@ -579,9 +602,17 @@
     var s = surfaceOp(e.clientX, e.clientY);
     var nieuw = (s && sleepAanbod[s.id]) ? s : null;
     if (nieuw === sleepDoel) return;
-    if (sleepDoel) sleepDoel.el.removeAttribute('data-vangt');
+    if (sleepDoel) {
+      sleepDoel.el.removeAttribute('data-vangt');
+      var oudTab = tabVanSurface(sleepDoel);
+      if (oudTab) oudTab.removeAttribute('data-vangt');
+    }
     sleepDoel = nieuw;
-    if (sleepDoel) sleepDoel.el.setAttribute('data-vangt', '');
+    if (sleepDoel) {
+      sleepDoel.el.setAttribute('data-vangt', '');
+      var nieuwTab = tabVanSurface(sleepDoel);
+      if (nieuwTab) nieuwTab.setAttribute('data-vangt', '');
+    }
   }
 
   function sleepLos() {
@@ -591,6 +622,9 @@
     vangvlak(false);
     schil.surfaces.forEach(function (s) {
       s.el.removeAttribute('data-kan-vangen'); s.el.removeAttribute('data-vangt');
+    });
+    if (schil.tabs) schil.tabs.querySelectorAll('[data-kan-vangen],[data-vangt]').forEach(function (tab) {
+      tab.removeAttribute('data-kan-vangen'); tab.removeAttribute('data-vangt');
     });
     var doel = sleepDoel, object = sleepObject;
     sleepDoel = null;

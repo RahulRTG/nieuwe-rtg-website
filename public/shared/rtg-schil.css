@@ -277,6 +277,15 @@ body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{display:none;}
 .rtg-werkruimte[data-sleept-object] .rtg-surface:not([data-kan-vangen]){opacity:.45;}
 .rtg-surface[data-kan-vangen]{outline:1px solid var(--gold-rand,rgba(192,165,68,.52));outline-offset:-1px;}
 .rtg-surface[data-vangt]{outline:2px solid var(--gold-tekst,#C0A544);outline-offset:-2px;}
+body[data-rtg-schil="standaard"] .rtg-tab[data-kan-vangen]::after{
+  background:var(--gold-rand,rgba(192,165,68,.72));box-shadow:0 -3px 12px rgba(192,165,68,.18);
+}
+body[data-rtg-schil="standaard"] .rtg-tab[data-vangt]{
+  background:linear-gradient(180deg,rgba(192,165,68,.22),rgba(127,22,52,.12));
+}
+body[data-rtg-schil="standaard"] .rtg-tab[data-vangt]::after{
+  height:3px;background:var(--gold-tekst,#C0A544);box-shadow:0 -4px 16px rgba(192,165,68,.36);
+}
 
 /* Het vangvlak tijdens een objectsleep. Doorzichtig, maar het vangt de
    pointer-events die anders in een surface-iframe verdwijnen. Alleen aanwezig

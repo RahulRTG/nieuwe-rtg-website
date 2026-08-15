@@ -125,6 +125,13 @@ test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte tra
   assert.match(csp, /form-action 'none'/);
   assert.doesNotMatch(CSP('abc123'), /connect-src 'none'/, 'de gewone RTG-app behoudt zijn verbindingen');
   assert.equal(magnaatHtml('<head></head>', false), '<head></head>');
+
+  const tag = '<script src="/apps/magnaat-sandbox.js"></script>';
+  const genest = magnaatHtml('<html><head></head><body><scr' + tag + 'ipt>alert(1)</script></body></html>', true);
+  assert.equal((genest.match(/src="\/apps\/magnaat-sandbox\.js"/g) || []).length, 1,
+    'alleen de nieuwe, vroege sandbox-tag blijft staan');
+  assert.doesNotMatch(genest, /<script>alert\(1\)<\/script>/i,
+    'het verplaatsen voegt geen twee losse taghelften samen tot uitvoerbare HTML');
 });
 
 test('5. de compressielaag laat kleine antwoorden met rust', async () => {

@@ -5,40 +5,11 @@
    worden samengebracht tot speelbare werkproces-families. Een codescan kan zo
    nieuwe mogelijkheden signaleren zonder productie te wijzigen. */
 
-const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { spawnSync } = require('child_process');
 const { nu: klokNu } = require('../lib/klok');
 const kantoorVan = require('./magnaat-kantoorregels');
-
-const API_RE = /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*(['"`])([^'"`]+)\2/g;
-
-function bestanden(map, extensie, uit = []) {
-  let items = [];
-  try { items = fs.readdirSync(map, { withFileTypes: true }); } catch (e) { return uit; }
-  for (const item of items) {
-    const bestand = path.join(map, item.name);
-    if (item.isDirectory()) bestanden(bestand, extensie, uit);
-    else if (!extensie || bestand.endsWith(extensie)) uit.push(bestand);
-  }
-  return uit;
-}
-
-function lees(bestand) {
-  try { return fs.readFileSync(bestand, 'utf8'); } catch (e) { return ''; }
-}
-
-function tekst(s) {
-  return String(s || '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&')
-    .replace(/\s+/g, ' ').trim();
-}
-
-function titelVanBestand(bestand) {
-  const html = lees(bestand);
-  const titel = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  return tekst(titel ? titel[1].split(/[·|]/)[0] : path.basename(bestand, '.html'));
-}
+const bronnen = require('./magnaat-capabilities-bronnen');
 
 function menselijk(s) {
   return String(s || '').replace(/^\/+|\/+$/g, '').replace(/[-_]+/g, ' ')
@@ -49,16 +20,6 @@ function risicoVan(route) {
   if (/bank|pay|betaal|krediet|rekening|paspoort|rtgid|auth|webauthn|verify|kluis|boardroom|techniek/i.test(route)) return 'rood';
   if (/member|staff|office|bericht|dm|chat|care|zorg|sollicit|personeel/i.test(route)) return 'geel';
   return 'groen';
-}
-
-function toegangVan(bron, einde) {
-  const kop = bron.slice(einde, einde + 240).split(/=>|\{/)[0];
-  if (/boardroomAuth/.test(kop)) return 'boardroom';
-  if (/officeAuth/.test(kop)) return 'office';
-  if (/staffAuth/.test(kop)) return 'staff';
-  if (/supplierAuth/.test(kop)) return 'supplier';
-  if (/auth/.test(kop)) return 'member';
-  return 'publiek';
 }
 
 function rolVan(bron, methode, kantoor, risico) {
@@ -77,99 +38,6 @@ function workflowFamilie(route) {
   return '/' + delen.slice(0, Math.min(3, delen.length)).join('/');
 }
 
-function leesKantoren(root, functies) {
-  const leeg = {};
-  const ctx = {
-    d: () => leeg, lijst: () => [], tel: () => 0, recent: () => 0,
-    ledenGeteld: () => 0, functies: functies || { catalogus: () => [] },
-    accounts: { listByVerification: () => [] }
-  };
-  let kamers = {};
-  try {
-    kamers = Object.assign(
-      require(path.join(root, 'server/kern/afdelingen/register'))(ctx),
-      require(path.join(root, 'server/kern/afdelingen/register2'))(ctx)
-    );
-  } catch (e) { kamers = {}; }
-  const gewoon = Object.entries(kamers).map(([id, kamer]) => ({
-    id, naam: kamer.naam, missie: kamer.missie, soort: 'afdeling', eigenApp: !!kamer.eigenApp
-  }));
-  const html = lees(path.join(root, 'public/apps/kantoren.html'));
-  const bijzonder = [];
-  const gezien = new Set(gewoon.map(k => k.id));
-  const re = /data-kamer="([^"]+)"[\s\S]{0,220}?<h2>([\s\S]*?)<\/h2>/g;
-  let m;
-  while ((m = re.exec(html))) {
-    const naam = tekst(m[2]);
-    if (gezien.has(m[1]) || m[1].includes('"') || /[+'$]/.test(naam)) continue;
-    gezien.add(m[1]);
-    bijzonder.push({ id: m[1], naam, missie: 'Specialistische RTG-werkruimte', soort: 'controlekamer', eigenApp: true });
-  }
-  if (!gezien.has('ideeen') && /De Ideeënkamer/.test(html)) bijzonder.push({
-    id: 'ideeen', naam: 'De Ideeënkamer', missie: 'Gedeelde werkbank voor nieuwe RTG-concepten.', soort: 'werkruimte', eigenApp: true
-  });
-  return gewoon.concat(bijzonder);
-}
-
-function scanApps(root) {
-  return bestanden(path.join(root, 'public/apps'), '.html').map(bestand => ({
-    pad: '/' + path.relative(path.join(root, 'public'), bestand).split(path.sep).join('/'),
-    naam: titelVanBestand(bestand),
-    bestand: path.relative(root, bestand).split(path.sep).join('/')
-  })).sort((a, b) => a.pad.localeCompare(b.pad));
-}
-
-function scanEndpoints(root) {
-  const uniek = new Map();
-  for (const bestand of bestanden(path.join(root, 'server'), '.js')) {
-    const bron = lees(bestand);
-    API_RE.lastIndex = 0;
-    let m;
-    while ((m = API_RE.exec(bron))) {
-      if (!m[3].startsWith('/api/')) continue;
-      const sleutel = m[1].toUpperCase() + ' ' + m[3];
-      uniek.set(sleutel, {
-        sleutel, methode: m[1].toUpperCase(), route: m[3],
-        bestand: path.relative(root, bestand).split(path.sep).join('/'),
-        toegang: toegangVan(bron, API_RE.lastIndex)
-      });
-    }
-  }
-  return [...uniek.values()].sort((a, b) => a.sleutel.localeCompare(b.sleutel));
-}
-
-let nativeWaarschuwingGegeven = false;
-function scanNative(root) {
-  const bin = process.env.RTG_CAPABILITY_RUST_BIN;
-  if (!bin) return null;
-  const r = spawnSync(bin, ['capability-scan', root], {
-    cwd: root, encoding: 'utf8', timeout: 15000, maxBuffer: 32 * 1024 * 1024,
-    windowsHide: true
-  });
-  try {
-    if (r.error) throw r.error;
-    if (r.status !== 0) throw new Error(String(r.stderr || 'native scanner stopte met status ' + r.status).trim());
-    const uit = JSON.parse(r.stdout);
-    if (!uit || uit.ok !== true || !Array.isArray(uit.apps) || !Array.isArray(uit.endpoints)) {
-      throw new Error('native scanner gaf geen geldig inventarisantwoord');
-    }
-    // Houd exact dezelfde locale-volgorde als de JS-scanner. PathBuf/BTreeMap
-    // sorteren bytegewijs en zetten bijvoorbeeld een map soms vóór naam.html.
-    uit.apps.sort((a, b) => String(a.pad).localeCompare(String(b.pad)));
-    uit.endpoints.sort((a, b) => String(a.sleutel).localeCompare(String(b.sleutel)));
-    return uit;
-  } catch (fout) {
-    /* Een codescan mag de app nooit onbeschikbaar maken. De bewezen JS-scanner
-       blijft de exacte terugval; eenmaal waarschuwen voorkomt een logstorm als
-       de binary tijdens ontwikkeling tijdelijk ontbreekt. */
-    if (!nativeWaarschuwingGegeven) {
-      nativeWaarschuwingGegeven = true;
-      console.error('[capability-rust] veilige terugval naar JS:', fout && fout.message);
-    }
-    return null;
-  }
-}
-
 function besteApp(familie, apps) {
   const woorden = familie.split('/').filter(x => x && x !== 'api' && !['member', 'office', 'supplier', 'staff'].includes(x));
   let beste = null, score = 0;
@@ -186,10 +54,10 @@ module.exports = ({
   volledigeWerkprocessen = [], werkrouteFabriek = null
 }) => {
   function scan() {
-    const native = scanNative(root);
-    const apps = native ? native.apps : scanApps(root);
-    const endpoints = native ? native.endpoints : scanEndpoints(root);
-    const kantoren = leesKantoren(root, functies);
+    const bron = bronnen.scan(root);
+    const apps = bron.apps;
+    const endpoints = bron.endpoints;
+    const kantoren = bronnen.leesKantoren(root, functies);
     const flags = Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : [];
     const prefixen = flags.flatMap(f => (f.paden || []).map(p => ({ id: f.id, pad: p })));
     const groepen = new Map();
@@ -319,6 +187,7 @@ module.exports = ({
         controlepunten: controlepunten.length, volledigGekoppeld: dekkingsmatrix.volledig,
         dekkingsgaten: dekkingsmatrix.metGaten, dekkingspercentage: dekkingsmatrix.percentage
       },
+      motor: bron.motor,
       apps, endpoints, kantoren, workflows, automatischeWerkprocessen,
       controlepunten, dekkingsmatrix,
       domeinen: Object.entries(domeinen).map(([id, aantal]) => ({ id, aantal })).sort((a, b) => b.aantal - a.aantal),

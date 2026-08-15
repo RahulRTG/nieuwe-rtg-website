@@ -498,7 +498,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // opslag- en migratiebedrading wordt pas na deze release afzonderlijk
     // geknipt met de integratietoetsen ernaast.
     'server/kern/rtgone.js',
-    'server/kern/magnaat-capabilities.js',
     'server/kern/magnaat-controle.js',
     'server/kern/magnaat-economie.js',
     'server/kern/magnaatwereld.js'

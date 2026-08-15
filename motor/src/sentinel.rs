@@ -12,8 +12,9 @@ const MAX_BESTAND: u64 = 128 * 1024 * 1024;
 const MAX_BESTANDEN: usize = 20_000;
 const MAX_VERSCHILLEN: usize = 200;
 const MAPPEN: [&str; 4] = ["server", "public", "scripts", "motor/src"];
-const LOS: [&str; 8] = ["package.json", "package-lock.json", "motor/Cargo.toml",
-    "motor/Cargo.lock", "Dockerfile", "docker-compose.yml", ".env.example", "SLO.json"];
+const LOS: [&str; 9] = ["package.json", "package-lock.json", "motor/Cargo.toml",
+    "motor/Cargo.lock", "Dockerfile", "docker-compose.yml", ".env.example", "SLO.json",
+    "RUST-MIGRATIES.json"];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mode { Normaal, Waakzaam, Beperkt, Isolatie }

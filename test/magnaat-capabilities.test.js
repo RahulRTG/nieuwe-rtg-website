@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const functies = require('../server/functies');
 const maakScanner = require('../server/kern/magnaat-capabilities');
+const bronnen = require('../server/kern/magnaat-capabilities-bronnen');
 
 const root = path.join(__dirname, '..');
 
@@ -75,18 +76,66 @@ test('dezelfde code levert een stabiele vingerafdruk en geen dynamische nepkamer
 });
 
 const nativeBin = process.env.RTG_CAPABILITY_RUST_BIN || path.join(root, 'motor/target/release/rtg-motor');
-test('de native broncodescan is byte-voor-byte gelijk aan de JS-inventaris', { skip: !fs.existsSync(nativeBin) }, () => {
-  const oud = process.env.RTG_CAPABILITY_RUST_BIN;
-  try {
-    delete process.env.RTG_CAPABILITY_RUST_BIN;
-    const javascript = maakScanner({ root, functies }).scan();
-    process.env.RTG_CAPABILITY_RUST_BIN = nativeBin;
-    const rust = maakScanner({ root, functies }).scan();
-    assert.deepEqual(rust.apps, javascript.apps);
-    assert.deepEqual(rust.endpoints, javascript.endpoints);
-    assert.equal(rust.vingerafdruk, javascript.vingerafdruk);
-  } finally {
-    if (oud === undefined) delete process.env.RTG_CAPABILITY_RUST_BIN;
-    else process.env.RTG_CAPABILITY_RUST_BIN = oud;
+function metEnv(waarden, werk) {
+  const oud = {};
+  for (const [naam, waarde] of Object.entries(waarden)) {
+    oud[naam] = process.env[naam];
+    if (waarde === undefined) delete process.env[naam];
+    else process.env[naam] = String(waarde);
   }
+  try {
+    return werk();
+  } finally {
+    for (const [naam, waarde] of Object.entries(oud)) {
+      if (waarde === undefined) delete process.env[naam];
+      else process.env[naam] = waarde;
+    }
+  }
+}
+
+test('de native broncodescan is byte-voor-byte gelijk en doorloopt schaduw en canary veilig', { skip: !fs.existsSync(nativeBin) }, () => {
+  const javascript = bronnen.scan(root, {
+    RTG_CAPABILITY_RUST_MODE: 'uit', RTG_CAPABILITY_RUST_BIN: nativeBin
+  });
+  const schaduw = bronnen.scan(root, {
+    RTG_CAPABILITY_RUST_MODE: 'schaduw', RTG_CAPABILITY_RUST_BIN: nativeBin
+  });
+  const canary = bronnen.scan(root, {
+    RTG_CAPABILITY_RUST_MODE: 'canary', RTG_CAPABILITY_RUST_BIN: nativeBin,
+    RTG_CAPABILITY_RUST_CANARY_PCT: '100', RTG_CAPABILITY_RUST_CANARY_KEY: 'toets'
+  });
+  assert.deepEqual(schaduw.apps, javascript.apps);
+  assert.deepEqual(schaduw.endpoints, javascript.endpoints);
+  assert.equal(schaduw.motor.bron, 'javascript');
+  assert.equal(schaduw.motor.pariteit, true);
+  assert.equal(canary.motor.bron, 'rust');
+  assert.equal(canary.motor.pariteit, true);
+  assert.equal(canary.motor.canaryGekozen, true);
+});
+
+test('capability-noodstop en een kapotte binary vallen aantoonbaar terug naar JavaScript', () => {
+  const nood = bronnen.scan(root, {
+    RTG_RUST_ALLES_UIT: '1', RTG_CAPABILITY_RUST_MODE: 'motor',
+    RTG_CAPABILITY_RUST_BIN: '/bestaat/bewust/niet'
+  });
+  const kapot = bronnen.scan(root, {
+    RTG_CAPABILITY_RUST_MODE: 'motor', RTG_CAPABILITY_RUST_BIN: '/bestaat/bewust/niet'
+  });
+  assert.equal(nood.motor.globaleNoodstop, true);
+  assert.equal(nood.motor.reden, 'globale-noodstop');
+  assert.equal(nood.motor.bron, 'javascript');
+  assert.equal(kapot.motor.terugval, true);
+  assert.equal(kapot.motor.reden, 'native-fout');
+});
+
+test('de Capability Graph maakt de gekozen motorstand zichtbaar', { skip: !fs.existsSync(nativeBin) }, () => {
+  metEnv({
+    RTG_RUST_ALLES_UIT: undefined, RTG_CAPABILITY_RUST_MODE: 'canary',
+    RTG_CAPABILITY_RUST_BIN: nativeBin, RTG_CAPABILITY_RUST_CANARY_PCT: '100',
+    RTG_CAPABILITY_RUST_CANARY_KEY: 'graph-toets'
+  }, () => {
+    const graph = maakScanner({ root, functies }).scan();
+    assert.equal(graph.motor.bron, 'rust');
+    assert.equal(graph.motor.pariteit, true);
+  });
 });

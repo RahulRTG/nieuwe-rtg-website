@@ -16,7 +16,8 @@ function motorFout(code, boodschap, oorzaak) {
 
 module.exports = function maakMagnaatMotorklant(opties = {}) {
   const URL = (process.env.RTG_MOTOR_REKEN_URL || process.env.RTG_MOTOR_GELD_URL || process.env.RTG_MOTOR_SHADOW || '').replace(/\/$/, '');
-  const modus = String(process.env.RTG_MAGNAAT_RUST || (URL ? 'motor' : 'uit')).toLowerCase();
+  const globaleNoodstop = process.env.RTG_RUST_ALLES_UIT === '1';
+  const modus = globaleNoodstop ? 'uit' : String(process.env.RTG_MAGNAAT_RUST || (URL ? 'motor' : 'uit')).toLowerCase();
   const aan = modus === 'motor';
   const timeout = begrensGetal(process.env.RTG_MOTOR_REKEN_TIMEOUT, 5000, 250, 30000);
   const foutGrens = begrensGetal(process.env.RTG_MOTOR_REKEN_FOUTGRENS, 3, 1, 20);
@@ -91,6 +92,7 @@ module.exports = function maakMagnaatMotorklant(opties = {}) {
   }
 
   async function markt(invoer) {
+    if (!aan) throw motorFout('MOTOR_UIT', 'Rust-motor staat uit; gebruik de JavaScript-rekenlaag.');
     const halfOpen = beginPoging();
     const af = new AbortController();
     const timer = setTimeout(() => af.abort(), timeout);
@@ -119,11 +121,11 @@ module.exports = function maakMagnaatMotorklant(opties = {}) {
 
   function status() {
     return {
-      aan, modus, actief, maxTegelijk, fouten,
+      aan, modus, globaleNoodstop, actief, maxTegelijk, fouten,
       circuit: openTot > klok() ? 'open' : openTot ? 'half-open' : 'gesloten',
       herstelNaMs: Math.max(0, openTot - klok())
     };
   }
 
-  return { aan, modus, url: URL, markt, status };
+  return { aan, modus, globaleNoodstop, url: URL, markt, status };
 };

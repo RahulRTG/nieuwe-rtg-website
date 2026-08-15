@@ -16,7 +16,7 @@ const MAX_BESTANDEN = 20_000;
 const MAX_BESTAND = 128 * 1024 * 1024;
 const MAPPEN = ['server', 'public', 'scripts', 'motor/src'];
 const LOS = ['package.json', 'package-lock.json', 'motor/Cargo.toml', 'motor/Cargo.lock',
-  'Dockerfile', 'docker-compose.yml', '.env.example', 'SLO.json'];
+  'Dockerfile', 'docker-compose.yml', '.env.example', 'SLO.json', 'RUST-MIGRATIES.json'];
 
 function uitgesloten(rel) {
   return rel === 'server/data' || rel.startsWith('server/data/') ||

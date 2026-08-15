@@ -91,7 +91,9 @@ const appEnv = Object.assign(zonderSentinelGeheim(process.env), {
   RTG_MOTOR_GELD_URL: process.env.RTG_MOTOR_GELD_URL || 'http://' + adres,
   RTG_MOTOR_REKEN_URL: process.env.RTG_MOTOR_REKEN_URL || 'http://' + adres,
   RTG_MAGNAAT_RUST: process.env.RTG_MAGNAAT_RUST || 'motor',
-  RTG_CAPABILITY_RUST_BIN: process.env.RTG_CAPABILITY_RUST_BIN || BIN
+  RTG_CAPABILITY_RUST_BIN: process.env.RTG_CAPABILITY_RUST_BIN || BIN,
+  RTG_CAPABILITY_RUST_MODE: process.env.RTG_CAPABILITY_RUST_MODE || 'canary',
+  RTG_CAPABILITY_RUST_CANARY_PCT: process.env.RTG_CAPABILITY_RUST_CANARY_PCT || '10'
 });
 const app = spawn(process.execPath, [path.join(ROOT, 'server', 'trio.js')], { cwd: ROOT, env: appEnv, stdio: 'inherit' });
 const sentinelEnv = Object.assign(sentinelBasisEnv(), {

@@ -1,0 +1,127 @@
+{
+  "versie": 1,
+  "beleid": {
+    "fasen": ["geregistreerd", "rust-bouw", "pariteit", "schaduw", "canary", "rust"],
+    "globaleNoodstop": "RTG_RUST_ALLES_UIT=1",
+    "regel": "Nooit een fase overslaan; per module eerst bewijs, daarna maximaal één actieve schaduw/canary."
+  },
+  "modules": [
+    {
+      "volgorde": 1,
+      "pad": "server/kern/magnaat-capabilities.js",
+      "doel": "Read-only inventarisatie van apps en API-deuren",
+      "rust": "motor/src/capabilities.rs",
+      "fase": "canary",
+      "noodstop": "RTG_CAPABILITY_RUST_MODE=uit",
+      "bewijs": ["cargo test --release --manifest-path motor/Cargo.toml --locked capabilities", "node --experimental-sqlite --test test/magnaat-capabilities.test.js"]
+    },
+    {
+      "volgorde": 2,
+      "pad": "server/kern/magnaat-economie.js",
+      "doel": "Deterministische markt- en macroberekeningen",
+      "rust": "motor/src/magnaat.rs",
+      "fase": "pariteit",
+      "noodstop": "RTG_MAGNAAT_RUST=uit",
+      "bewijs": ["node scripts/motor-cutover.js", "node --experimental-sqlite --test test/magnaat-rust-integratie.test.js"]
+    },
+    {
+      "volgorde": 3,
+      "pad": "server/kern/pay/index.js",
+      "doel": "Autoritatief dubbel boekhouden voor pay",
+      "rust": "motor/src/grootboek.rs",
+      "fase": "pariteit",
+      "noodstop": "RTG_MOTOR_GELD=schaduw",
+      "bewijs": ["node scripts/motor-cutover.js", "node --experimental-sqlite --test test/pay.test.js test/motor-vingerafdruk.test.js"]
+    },
+    {
+      "volgorde": 4,
+      "pad": "server/db/ledengids.js",
+      "doel": "Begrensde ledengidsindex en opzoeking",
+      "rust": "motor/src/ledengids.rs",
+      "fase": "rust-bouw",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["cargo test --release --manifest-path motor/Cargo.toml --locked ledengids"]
+    },
+    {
+      "volgorde": 5,
+      "pad": "server/db/index.js",
+      "doel": "Transactie-, herstel- en duurzaamheidskern",
+      "rust": "motor/src/db.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/herstelproef.test.js"]
+    },
+    {
+      "volgorde": 6,
+      "pad": "server/pg/sync.js",
+      "doel": "Synchronisatieplanning en toestandsovergangen",
+      "rust": "motor/src/pg_sync.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node scripts/pgtoetsen.js"]
+    },
+    {
+      "volgorde": 7,
+      "pad": "server/kern/magnaat-controle.js",
+      "doel": "Beleids- en controleregelevaluatie",
+      "rust": "motor/src/magnaat_controle.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/magnaat-controle.test.js"]
+    },
+    {
+      "volgorde": 8,
+      "pad": "server/kern/magnaatwereld.js",
+      "doel": "Deterministische wereldtoestand en acties",
+      "rust": "motor/src/magnaatwereld.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/magnaatwereld.test.js"]
+    },
+    {
+      "volgorde": 9,
+      "pad": "server/kern/rtgone.js",
+      "doel": "Orchestratieplanner zonder netwerk-I/O",
+      "rust": "motor/src/rtgone.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/rtgone.test.js"]
+    },
+    {
+      "volgorde": 10,
+      "pad": "server/mail.js",
+      "doel": "MIME-opbouw, envelopvalidatie en wachtrijformaat",
+      "rust": "motor/src/mail.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/mail-eigen.test.js test/mailauth.test.js test/mailbijlage.test.js"]
+    },
+    {
+      "volgorde": 11,
+      "pad": "server/routes/rtmail.js",
+      "doel": "Zuivere opdrachtvalidatie; HTTP en autorisatie blijven aan de rand",
+      "rust": "motor/src/rtmail.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --experimental-sqlite --test test/rtmail.test.js"]
+    },
+    {
+      "volgorde": 12,
+      "pad": "public/shared/media.js",
+      "doel": "Zuivere mediaparsing; browserrechten en DOM blijven JavaScript",
+      "rust": "motor/src/media.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node --test test/media.test.js"]
+    },
+    {
+      "volgorde": 13,
+      "pad": "server/kern/appgids-data/deel1.js",
+      "doel": "Build-time validatie en compilatie van declaratieve appdata",
+      "rust": "motor/src/appgids.rs",
+      "fase": "geregistreerd",
+      "noodstop": "RTG_RUST_ALLES_UIT=1",
+      "bewijs": ["node scripts/check.js"]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ const stappen = [
   ['Rust toetsen', 'cargo', ['test', '--release', '--manifest-path', 'motor/Cargo.toml', '--locked']],
   ['Rust bouwen', 'cargo', ['build', '--release', '--manifest-path', 'motor/Cargo.toml', '--locked']],
   ['Sentinel-procesgrens', process.execPath, ['--test', 'test/sentinel.test.js']],
+  ['Rust-migratieregister', process.execPath, ['scripts/rust-migraties.js', '--controle']],
   ['Bron- en securityregels', process.execPath, ['scripts/check.js']],
   ['Dependency-audit', 'npm', ['audit', '--audit-level=high']],
   ['Backup en herstel', process.execPath, ['--experimental-sqlite', '--test', 'test/herstelproef.test.js', 'test/backupvolledig.test.js']],

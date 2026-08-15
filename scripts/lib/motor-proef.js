@@ -27,6 +27,8 @@ function motorUrl(env) {
 }
 
 async function motorProef(env, haal = globalThis.fetch) {
+  if (String(env.RTG_RUST_ALLES_UIT || '0') === '1')
+    return { ok: true, overgeslagen: true, noodstop: true, ms: 0, native: [] };
   const url = motorUrl(env);
   if (!url) return { overgeslagen: true };
   const begin = Date.now();

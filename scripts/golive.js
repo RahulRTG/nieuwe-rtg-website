@@ -95,9 +95,10 @@ function leesEnvBestand(pad) {
   if (env.RTG_MOTOR_REKEN_URL || env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW) {
     const motor = await require('./lib/motor-proef').motorProef(env);
     if (!motor.ok) blokkeer('Rust-motor is geconfigureerd maar niet inzetbaar: ' + motor.fout);
+    else if (motor.noodstop) waarschuw('Rust-appmotoren zijn door RTG_RUST_ALLES_UIT=1 bewust overgeslagen; Sentinel blijft actief.');
     else goed('Rust-motor bereikbaar (' + motor.ms + ' ms; native: ' + motor.native.join(', ') + ').');
   }
-  if (env.RTG_CAPABILITY_RUST_BIN) {
+  if (env.RTG_CAPABILITY_RUST_BIN && env.RTG_RUST_ALLES_UIT !== '1') {
     try {
       const cp = require('child_process');
       const proef = cp.spawnSync(env.RTG_CAPABILITY_RUST_BIN, ['capability-scan', path.join(__dirname, '..')], {
@@ -109,7 +110,7 @@ function leesEnvBestand(pad) {
       if (!body.ok || !Array.isArray(body.apps) || !Array.isArray(body.endpoints)) throw new Error('ongeldig scanantwoord');
       goed('Native Magnaat-capabilityscan werkt (' + body.apps.length + ' apps, ' + body.endpoints.length + ' API-deuren).');
     } catch (e) { blokkeer('RTG_CAPABILITY_RUST_BIN werkt niet: ' + e.message); }
-  }
+  } else if (env.RTG_CAPABILITY_RUST_BIN) waarschuw('Native capabilityscan is door de centrale Rust-noodstop bewust niet uitgevoerd.');
 
   // 3. de sleutels die instances MOETEN delen
   if (env.DATABASE_URL && env.RTG_VAULT_KEY && env.RTG_SECRET_KEY)

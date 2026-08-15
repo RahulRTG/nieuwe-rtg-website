@@ -89,6 +89,8 @@
     "ketenronde": "node --experimental-sqlite scripts/ketenronde.js",
     "motor:build": "cargo build --release --manifest-path motor/Cargo.toml --locked",
     "motor:test": "cargo test --release --manifest-path motor/Cargo.toml --locked",
+    "motor:migraties": "node scripts/rust-migraties.js",
+    "motor:migraties:controle": "node scripts/rust-migraties.js --controle",
     "motor:start": "motor/target/release/rtg-motor",
     "motor:cutover": "node scripts/motor-cutover.js",
     "magnaat:productieproef": "node --experimental-sqlite --test test/magnaat-trainingslobby.test.js test/magnaat-teamkamer-productie.test.js test/collectie-transactie-sqlite.test.js test/magnaat-rust-integratie.test.js test/productie-motor.test.js",

@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = function maakSchaduw() {
-  const URL = process.env.RTG_MOTOR_SHADOW;
+  const URL = process.env.RTG_RUST_ALLES_UIT === '1' ? null : process.env.RTG_MOTOR_SHADOW;
   if (!URL) return { aan: false, spiegel() {}, async stand() { return null; } };
 
   /* token van de motor-poortwacht; meesturen als hij daar gezet is */

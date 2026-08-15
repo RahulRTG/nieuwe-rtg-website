@@ -33,7 +33,7 @@ const PROD_ENV = {
   /* De eerste publieke stand kan bewust zonder AI en zonder betalen draaien.
      Anders dan STRIPE_DEMO_BEWUST is dit echt fail-closed: geen enkele demo- of
      echte rail mag een betaling bevestigen. */
-  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1',
+  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };

@@ -50,7 +50,7 @@ test.before(async () => {
        maar dan zou de test de demo-provider meenemen in "productie start
        schoon" en dat is precies niet wat hij wil aantonen. */
     STRIPE_SECRET_KEY: 'sk_test_livegang', STRIPE_WEBHOOK_SECRET: 'whsec_livegang',
-    STRIPE_UITGAAND_UIT_BEWUST: '1'
+    STRIPE_UITGAAND_UIT_BEWUST: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1'
   } }));
 });
 test.after(() => {

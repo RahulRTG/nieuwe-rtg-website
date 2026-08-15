@@ -58,6 +58,37 @@ npm start
 
 Open daarna **http://localhost:3000** — dat toont direct de homescreen van het RTG OS; aanmelden gaat via de welkomstkaart (Rahul).
 
+### Starten met de Rust-motor en onafhankelijke Sentinel
+
+De native motor gebruikt alleen Rust `std` (geen Cargo-crates) en bedient de
+zware/security-kritische paden: Pay, Bank, ledengids, uploadscan, identiteitskluis
+met de eigen XChaCha20-Poly1305, en de markt- en macroberekening van Magnaat.
+
+```bash
+npm run motor:test
+npm run start:rust
+```
+
+`start:rust` bouwt beide release-binaries zo nodig, maakt een gepind
+codebewijs en zet de onafhankelijke Rust Sentinel vóór de Node-poort. De app is
+daardoor niet rechtstreeks publiek bereikbaar en kan ook bij een defect of
+mogelijke besmetting buiten Node om worden geïsoleerd. Bedieningscommando's en
+het incidentdraaiboek staan in `docs/sentinel.md`.
+
+De start zet ook Magnaat op Rust. Browserweergave en DOM-interactie blijven JavaScript; de
+zware serverberekeningen lopen native. Pay en Bank blijven standaard als
+gecontroleerde Rust-schaduw draaien. Na een groene geïsoleerde
+`node scripts/motor-cutover.js` kan `RTG_MOTOR_GELD=motor` de Rust-motor voor
+beide grootboeken autoritatief maken. Bij een onbereikbare Magnaat-rekenmotor
+wordt de gehele halve dag teruggedraaid en rekent de bewezen JS-motor hem alsnog.
+Na drie opeenvolgende motorfouten opent bovendien een stroomonderbreker: nieuwe
+dagen vallen dan meteen terug in plaats van telkens op een time-out te wachten.
+Na de afkoelperiode mag precies één herstelproef door. Gelijktijdigheid en de
+antwoordgrootte zijn eveneens hard begrensd; alle grenzen staan in `.env.example`.
+Dezelfde binary inventariseert bij `start:rust` ook de duizenden statische
+API-routes en app-titels voor de Capability Graph. Die CLI voert geen projectcode
+uit, schrijft niets en valt bij iedere fout automatisch terug op de JS-scanner.
+
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
 - data wordt bewaard in `server/data/db.json` (verwijder dat bestand om terug te gaan naar de startdata);

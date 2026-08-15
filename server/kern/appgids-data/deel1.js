@@ -85,7 +85,7 @@ module.exports = Object.assign({
   '/apps/magnaat.html': G('Magnaat Wereld: oefen met echte RTG-werkprocessen in een volledig synthetische ondernemerswereld.',
     ['Kies een functie of servicedossier', 'Werk via de afgeschermde computer en PDA', 'Reken gevolgen veilig door in de economische cockpit'],
     'Geen spelhandeling raakt productiegegevens, echte betalingen of klantcommunicatie.'),
-  '/apps/magnaat-kantoor.html': G('De controlekamer van Magnaat Wereld: functies, veilige zelftests en menselijke fasebesluiten.',
+  '/apps/magnaat-kantoor.html': G('Het RTG Controleregister: functies, dekkingsgaten, veilige zelftests, automatische kantoortaken en menselijke fasebesluiten.',
     ['Bekijk de Capability Graph', 'Onderzoek open controlepunten', 'Laat alleen bevoegde mensen een voorstel naar test of pilot zetten'],
     'De Future Engine adviseert; mensen beslissen en iedere pilot blijft een sandbox.'),
   '/apps/ovcontrol.html': G('De OV Control Tower: live zicht op voertuigen, lijnen en geaggregeerde private operaties.',

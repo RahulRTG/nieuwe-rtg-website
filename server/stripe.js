@@ -11,7 +11,11 @@
 const crypto = require('crypto');
 const http = require('./lib/http');
 
-const BASIS = (process.env.STRIPE_BASE_URL || 'https://api.stripe.com').replace(/\/+$/, '');
+/* Een alternatief adres is uitsluitend voor lokale protocoltests. Anders zou
+   een verkeerd gezette STRIPE_BASE_URL de geheime sleutel naar een willekeurig
+   adres kunnen sturen. */
+const BASIS = (process.env.NODE_ENV === 'test' && process.env.STRIPE_BASE_URL
+  ? process.env.STRIPE_BASE_URL : 'https://api.stripe.com').replace(/\/+$/, '');
 
 function Stripe(apiKey, opts) {
   opts = opts || {};

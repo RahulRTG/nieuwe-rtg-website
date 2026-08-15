@@ -29,7 +29,7 @@
      door de werkgever is uitgenodigd en zich heeft aangemeld (dan sta je in het
      team), met de eigen pincode. */
   function pdaBedrijf(){
-    try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
+    try { const c = String(localStorage.getItem('rtg_pda_bedrijf') || '').toUpperCase(); return geldigeBedrijfscode(c) ? c : null; } catch(e){ return null; }
   }
   function stepStart(){
     // 1x aanmelden is de gewone ingang: log één keer in met uw eigen RTG-account
@@ -38,7 +38,7 @@
     const qs = new URLSearchParams(location.search);
     if (qs.get('kantoor') != null){ stepKantoor(); return; }
     const qb = String(qs.get('bedrijf') || '').toUpperCase();
-    if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
+    if (geldigeBedrijfscode(qb)){ stepWie(null, qb); return; }
     const vast = pdaBedrijf();
     if (vast) stepWie(null, vast);
     else stepLogin();

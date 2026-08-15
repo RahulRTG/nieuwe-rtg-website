@@ -8,6 +8,7 @@
    in server.js er ongewijzigd op blijft werken; het gedrag is identiek aan de
    oude inline-versie. */
 const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const klok = require('../lib/klok');
 // Hoeveel gelijktijdige sessies we bewaren. Vroeger stond dit hard op 400, wat
 // bij een echte lancering de 401e ingelogde gebruiker de oudste eruit liet
 // gooien (stille uitlog). Nu een productie-ruime, instelbare bovengrens die
@@ -16,39 +17,67 @@ const MAX_SESSIONS = Math.max(400, Number(process.env.RTG_MAX_SESSIONS) || 50000
 
 function maakSessies({ db, save, crypto }) {
   const sessions = new Map(); // hash -> { tier, key, at, ... }
+  const bron = crypto.randomBytes(12).toString('hex');
+  const KANAAL = 'rtg:sessies:v1';
+  let bus = null;
+  let gekoppeld = false;
 
   function tokenHash(token) { return crypto.createHash('sha256').update(String(token)).digest('hex'); }
 
+  function geldigeHash(h) { return /^[a-f0-9]{64}$/.test(String(h || '')); }
+  function geldigeSessie(sess) {
+    if (!sess || typeof sess !== 'object' || Array.isArray(sess)) return false;
+    if (!Number.isFinite(new Date(sess.at || 0).getTime())) return false;
+    try { return Buffer.byteLength(JSON.stringify(sess)) <= 16 * 1024; }
+    catch (e) { return false; }
+  }
+
+  function sessieBak() {
+    if (!db.data.sessions || typeof db.data.sessions !== 'object' || Array.isArray(db.data.sessions)) db.data.sessions = {};
+    return db.data.sessions;
+  }
+
+  function zend(actie, hash, sess) {
+    if (!bus) return;
+    bus.publish(KANAAL, Object.assign({ versie: 1, bron, actie, hash }, sess ? { sess } : {}));
+  }
+
   // Verwijder een hash uit beide opslagplaatsen (Map + snapshot).
-  function verwijder(h) { sessions.delete(h); delete db.data.sessions[h]; }
+  function verwijder(h, delen = false) {
+    sessions.delete(h);
+    delete sessieBak()[h];
+    if (delen) zend('weg', h);
+  }
 
   function rememberSession(token, sess) {
-    sess.at = new Date().toISOString();
+    sess.at = klok.datum().toISOString();
     const h = tokenHash(token);
     sessions.set(h, sess);
-    db.data.sessions[h] = sess;
-    let toks = Object.keys(db.data.sessions);
+    sessieBak()[h] = sess;
+    let toks = Object.keys(sessieBak());
     if (toks.length > MAX_SESSIONS) {
       // 1) verlopen sessies weg (die horen er toch niet meer te zijn)
-      const nu = Date.now();
+      const nu = klok.nu();
       for (const t of toks) {
         if (t === h) continue; // de zojuist gezette sessie nooit
-        if (nu - new Date(db.data.sessions[t].at || 0).getTime() > TOKEN_TTL_MS) verwijder(t);
+        if (nu - new Date(sessieBak()[t].at || 0).getTime() > TOKEN_TTL_MS) verwijder(t, true);
       }
       // 2) nog te veel? Dan als vangnet de oudste eruit (mag zelden gebeuren).
-      toks = Object.keys(db.data.sessions);
+      toks = Object.keys(sessieBak());
       if (toks.length > MAX_SESSIONS) {
-        toks.sort((a, b) => new Date(db.data.sessions[a].at || 0) - new Date(db.data.sessions[b].at || 0));
-        for (const t of toks.slice(0, toks.length - MAX_SESSIONS)) verwijder(t);
+        toks.sort((a, b) => new Date(sessieBak()[a].at || 0) - new Date(sessieBak()[b].at || 0));
+        for (const t of toks.slice(0, toks.length - MAX_SESSIONS)) verwijder(t, true);
       }
     }
     save();
+    zend('zet', h, sess);
   }
 
   // hash is de map-sleutel (zie rememberSession); aanroepers geven de hash door
   function forgetSession(hash) {
-    sessions.delete(hash);
-    if (db.data.sessions) { delete db.data.sessions[hash]; save(); }
+    if (!geldigeHash(hash)) return;
+    verwijder(hash, true);
+    save();
   }
 
   // Centrale sessie-opzoeking: hasht het token, controleert het verloop en
@@ -58,13 +87,52 @@ function maakSessies({ db, save, crypto }) {
     const h = tokenHash(token);
     const sess = sessions.get(h);
     if (!sess) return null;
-    const age = Date.now() - new Date(sess.at || 0).getTime();
+    const age = klok.nu() - new Date(sess.at || 0).getTime();
     if (age > TOKEN_TTL_MS) { forgetSession(h); return null; }
-    if (age > 60 * 60 * 1000) { sess.at = new Date().toISOString(); save(); }
+    if (age > 60 * 60 * 1000) {
+      sess.at = klok.datum().toISOString();
+      sessieBak()[h] = sess;
+      save();
+      zend('zet', h, sess);
+    }
     return sess;
   }
 
-  return { sessions, tokenHash, rememberSession, forgetSession, sessionFor, TOKEN_TTL_MS };
+  /* Redis is de snelle invalidatielaag, niet de autoriteit. Elk proces past
+     een geldige mutatie meteen op zijn lokale index en databasespiegel toe;
+     save() wordt hier bewust niet aangeroepen, anders zou ieder ontvangen
+     bericht opnieuw een volledige gedeelde snapshot schrijven. */
+  function koppelBus(nieuweBus) {
+    if (gekoppeld || !nieuweBus || typeof nieuweBus.subscribe !== 'function' || typeof nieuweBus.publish !== 'function') return false;
+    bus = nieuweBus;
+    gekoppeld = true;
+    bus.subscribe(KANAAL, bericht => {
+      if (!bericht || bericht.versie !== 1 || bericht.bron === bron || !geldigeHash(bericht.hash)) return;
+      if (bericht.actie === 'weg') {
+        verwijder(bericht.hash, false);
+      } else if (bericht.actie === 'zet' && geldigeSessie(bericht.sess)) {
+        const sess = Object.assign({}, bericht.sess);
+        sessions.set(bericht.hash, sess);
+        sessieBak()[bericht.hash] = sess;
+      }
+    });
+    return true;
+  }
+
+  /* Een Postgres/Redis-snapshot kan ook verwijderingen bevatten. Alleen
+     ontbrekende entries toevoegen liet ingetrokken tokens in de Map leven;
+     volledig herbouwen maakt de lokale index exact gelijk aan de bron. */
+  function herbouwSessions() {
+    const bronSessies = sessieBak();
+    sessions.clear();
+    for (const [h, sess] of Object.entries(bronSessies)) {
+      if (geldigeHash(h) && geldigeSessie(sess)) sessions.set(h, sess);
+    }
+    return sessions.size;
+  }
+
+  return { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
+    koppelBus, herbouwSessions, TOKEN_TTL_MS };
 }
 
 module.exports = { maakSessies, TOKEN_TTL_MS };

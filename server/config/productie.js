@@ -14,6 +14,7 @@
 const { keurGeld } = require('./productie-geld');
 const { keurAi } = require('./productie-ai');
 const { keurOpslag } = require('./productie-opslag');
+const { keurMotor } = require('./productie-motor');
 
 function keur(env, fouten, waarschuwingen) {
     const priveBeta = env.RTG_PRIVATE_BETA === '1';
@@ -79,6 +80,7 @@ function keur(env, fouten, waarschuwingen) {
 
     // 3b. Geen grootboek, geen productie. Zie ./productie-opslag.js.
     keurOpslag(env, fouten, waarschuwingen);
+    keurMotor(env, fouten, waarschuwingen);
 
     /* Een private beta is een bouwstand, geen sluiproute naar internet. Mail mag
        naar de lokale outbox en de betaalprovider mag demo zijn, maar uitsluitend

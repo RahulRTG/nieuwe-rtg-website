@@ -48,7 +48,8 @@ module.exports = (mctx) => {
       const verzoek = await munten.maakVerzoek({
         euroCenten, munt: req.body.munt, referentie: 'DP-' + s.code,
         idempotentieSleutel: key + ':muntdirect:' + s.code + ':' + euroCenten + ':' + String(req.body.munt || '').toLowerCase() + ':' + Date.now(),
-        context: { soort: 'direct', key, codename, supplierCode: s.code, omschrijving: String(req.body.omschrijving || '').slice(0, 120) }
+        context: { soort: 'direct', betaalwijze: 'munt', key, codename, supplierCode: s.code,
+          centen: euroCenten, omschrijving: String(req.body.omschrijving || '').slice(0, 120) }
       });
       res.json({ ok: true, verzoek, supplier: { code: s.code, name: s.name } });
     } catch (e) { res.status(400).json({ error: veiligeFout(e, 'Kon geen munt-adres maken.') }); }

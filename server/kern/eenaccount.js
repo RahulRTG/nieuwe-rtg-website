@@ -68,6 +68,19 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     const uitslag = await koppelen.bewijs(key, body, req);
     if (uitslag.error) return uitslag;
     const rol = uitslag.rol;
+    if (uitslag.personeelKoppeling) {
+      // Oude installaties kunnen al een sleutelbosregel hebben van vóórdat de
+      // personeelsdatabase de koppeling zelf vastlegde. Ook die identiteit mag
+      // niet door een tweede account worden geclaimd.
+      const alVanAnder = Object.entries(db.data.accountRollen || {}).some(([ander, rollen]) =>
+        ander !== key && Array.isArray(rollen) && rollen.some(r =>
+          r.rol === 'personeel' && Number(r.staffId) === Number(rol.staffId)));
+      if (alVanAnder) return { status: 403, error: 'Deze personeelsplek is al aan een ander RTG-account gekoppeld.' };
+      const p = uitslag.personeelKoppeling;
+      if (!accounts.claimStaffMember(p.staffId, p.memberId, p.memberTier)) {
+        return { status: 403, error: 'Deze personeelsplek is al aan een ander RTG-account gekoppeld.' };
+      }
+    }
     const rij = lijst(key).filter(r => !zelfde(r, rol));
     rij.push(rol);
     db.data.accountRollen[key] = rij.slice(-10);
@@ -77,10 +90,17 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
   }
 
   function accOntkoppel(key, body) {
-    const voor = lijst(key).length;
-    db.data.accountRollen[key] = lijst(key).filter(r => !(r.rol === String(body.rol || '')
+    const bestaand = lijst(key);
+    const voor = bestaand.length;
+    const weg = r => r.rol === String(body.rol || '')
       && (body.code ? r.code === String(body.code).toUpperCase() : true)
-      && (body.staffId != null ? r.staffId === Number(body.staffId) : true)));
+      && (body.staffId != null ? r.staffId === Number(body.staffId) : true);
+    const verwijderd = bestaand.filter(weg);
+    db.data.accountRollen[key] = bestaand.filter(r => !weg(r));
+    const sleutel = /^user-(\d+)$/.exec(String(key));
+    if (sleutel) for (const r of verwijderd) {
+      if (r.rol === 'personeel' && r.staffId != null) accounts.releaseStaffMember(r.staffId, Number(sleutel[1]));
+    }
     save();
     return { status: 200, ok: true, verwijderd: voor - lijst(key).length };
   }

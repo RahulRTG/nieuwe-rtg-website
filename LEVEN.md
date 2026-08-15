@@ -286,14 +286,17 @@ scherm maakt er vanzelf een score van.
 Elke fase levert werkende, getoetste software op, en geen fase begint voor de
 vorige zijn toetsen heeft (LAT.md).
 
-**Waar fase 1 en 2 staan.** De levenslijn in `server/kern/levenslijn/` met het
-command center op `/apps/leven.html`; de rechten per relatie in
-`server/kern/levensband/` met de levenspas eronder op hetzelfde scherm
-(`public/apps/leven/kring.js`). De routes staan in `server/routes/leven.js`
+**Waar fase 1 en 2 staan.** De levenslijn staat in
+`server/kern/levenslijn/`, met het command center op `/apps/leven.html`. De
+rechten per relatie staan in `server/kern/levensband/`; de actieve levenspas
+aan de gezinskant staat op `/apps/foundation/mijnbanden.html` en gebruikt
+`public/shared/levenspas.js`. De routes staan in `server/routes/leven.js`
 (alleen lezen) en `server/routes/levenband.js` (de enige schrijvende laag van
 deze wereld -- wat hij schrijft is geen leven maar toestemming), elke actie
 twee keer: een keer achter de ledendeur en een keer achter de gezinsdeur, want
-fase 2 knoopt precies die twee sessiewerelden aan elkaar.
+fase 2 knoopt precies die twee sessiewerelden aan elkaar. De oude, niet door
+een pagina geladen ledenadapter is verwijderd; het routecontract aan de
+ledenkant blijft door de integratietoets bewezen.
 
 Getoetst in `test/levensband.test.js` (de twee besluiten in de kern, met een
 injecteerbare klok voor de vervaldatums) en `test/levenbandroutes.test.js` (de

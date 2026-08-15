@@ -8,7 +8,6 @@
 const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
-const dbmod = require('../db');
 const inzagelog = require('../inzagelog');
 const { log } = require('../log');
 
@@ -77,21 +76,12 @@ module.exports = (kern) => {
     next();
   }
 
-  function ctx() {
-    return {
-      db, accounts, anthropic, betaal, sessions, DATA_DIR, fs, path,
-      STORE: dbmod.STORE, pgPing: dbmod.pgPing,
-      mailGeconfigureerd: !!(process.env.SMTP_URL || process.env.SMTP_HOST),
-      zekeringen: staat().zekeringen,
-      // de geldlagen in de bewaking: beide grootboeken (wallet + bank) horen
-      // met hun sluitcontrole op het bord, net als de nood-stand van de knop
-      pay: kern.pay, bank: kern.bank, bankRegie: kern.bankregieOverzicht,
-      // de stad in de bewaking: de Stadsdoos-vloot hoort erbij
-      stad: kern.stad,
-      // onze eigen fout-aggregatie (i.p.v. een externe tracker als Sentry)
-      fouten: () => log.foutenSamenvatting()
-    };
-  }
+  const ctx = require('./techniek/context')({
+    kern, db, accounts, anthropic, betaal, sessions, DATA_DIR, fs, path, mail,
+    zekeringen: () => staat().zekeringen
+  });
+  const controle = require('./techniek/controle')({ app, db, save, beveilig,
+    av: kern.antivirus, techAuth, eigenaarAlleen });
 
   /* Het statusbord staat in ./techniek/bord.js: het is een groot antwoord dat
      uit tien bronnen wordt samengesteld, en dat leest beter als een geheel dan
@@ -99,6 +89,7 @@ module.exports = (kern) => {
   require('./techniek/bord')({ techniek, functies, eigenaar, inzagelog, log,
     accounts, archief, beveilig, db, app, ctx, staat, isEigenaar, techAuth,
     bewaren: () => bewaarDeel, foutmelder: kern.foutmelder,
+    controle,
     // de spelcijfers zijn een BORD-lezing en horen dus daar; zie ./techniek/bord.js
     spelTelemetrie: kern.spelTelemetrie });
 

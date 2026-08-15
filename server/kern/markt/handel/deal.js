@@ -92,13 +92,13 @@ module.exports = (ctx) => {
     // De betaling loopt via de betaal-naad (met Apple Pay als methode). In demo
     // rondt die direct af; met een echte aanbieder bevestigt de app de Apple Pay
     // betaling met de clientSecret.
-    let res = { status: 'betaald' };
-    if (betaal && betaal.maakBetaling) {
-      try {
-        res = await betaal.maakBetaling({ bedrag: Math.round(chat.deal.bedrag * 100), valuta: 'eur',
-          referentie: chat.deal.factuur.nummer, omschrijving: 'De Salon: ' + (chat.adTitel || 'aankoop') });
-      } catch (e) { return { error: 'De betaling kon niet worden gestart. Probeer het opnieuw.', status: 502 }; }
-    }
+    if (!betaal || typeof betaal.maakBetaling !== 'function')
+      return { error: 'De betaalrail is niet beschikbaar. Er is niets afgeschreven.', status: 503 };
+    let res;
+    try {
+      res = await betaal.maakBetaling({ bedrag: Math.round(chat.deal.bedrag * 100), valuta: 'eur',
+        referentie: chat.deal.factuur.nummer, omschrijving: 'De Salon: ' + (chat.adTitel || 'aankoop') });
+    } catch (e) { return { error: 'De betaling kon niet worden gestart. Er is niets afgeschreven.', status: 502 }; }
     if (res.status !== 'betaald' && res.clientSecret) {
       chat.deal.methode = m; chat.deal.clientSecret = res.clientSecret; chat.deal.status = 'in-behandeling';
       save();

@@ -9,7 +9,7 @@
 const betaalstaten = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
-  const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
+  const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingenVoegToe } = ctx;
@@ -32,6 +32,11 @@ module.exports = (ctx) => {
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
+    // Een gewone platformbetaling mag nooit doorgaan voor iets dat "rechtstreeks" heet.
+    if (betaal.AANBIEDER === 'stripe' && !betaal.CONNECT_SANDBOX)
+      return { status: 503, error: 'Rechtstreeks betalen staat veilig uit totdat Stripe Connect met gecontroleerde partneraccounts is geactiveerd.' };
+    if (betaal.CONNECT_SANDBOX && !s.stripeAccount)
+      return { status: 409, error: 'Deze partner heeft nog geen Connected Account in de lokale sandbox.' };
     // idempotentie tegen dubbeltik: zelfde lid + zelfde idem = zelfde betaling
     const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
@@ -84,7 +89,7 @@ module.exports = (ctx) => {
   /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al
      binnen en door de munt-aanbieder omgezet naar euro; hier alleen registreren
      en de leverancier crediteren, zonder kaartafschrijving. */
-  function registreerMuntBetaling({ key, codename, supplierCode, bedragCenten, omschrijving }) {
+  function registreerBevestigdeBetaling({ key, codename, supplierCode, bedragCenten, omschrijving, bron, providerId, aanbieder, betaalwijze, idem }) {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
@@ -103,14 +108,27 @@ module.exports = (ctx) => {
        elkaar met verschillende grenzen leest als opzet zolang niemand ze naast
        elkaar legt. */
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
+    const idemSleutel = idem || (providerId ? String(aanbieder || 'provider') + ':' + providerId : null);
+    if (idemSleutel) {
+      const al = idemZoek(idemSleutel);
+      if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+    }
+    const isMunt = betaalwijze === 'munt';
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling (munten)',
-      bron: 'app', providerId: null, aanbieder: 'munt', betaalwijze: 'munt', idem: null, at: nu()
+      bedrag: cent, omschrijving: schoon(omschrijving, 120) || (isMunt ? 'Directe betaling (munten)' : 'Directe betaling'),
+      bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app', providerId: providerId || null,
+      aanbieder: aanbieder || (isMunt ? 'munt' : 'stripe'), betaalwijze: isMunt ? 'munt' : 'kaart', idem: idemSleutel, at: nu()
     };
-    vastleggen(b, cent, key, 'Rechtstreeks betaald (munten)', 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + ' met munten');
+    vastleggen(b, cent, key, isMunt ? 'Rechtstreeks betaald (munten)' : 'Rechtstreeks betaald',
+      'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + (isMunt ? ' met munten' : ''));
+    idemBewaar(b);
     save();
     return { status: 200, ok: true, betaling: publiek(b) };
+  }
+
+  function registreerMuntBetaling(a) {
+    return registreerBevestigdeBetaling(Object.assign({}, a, { aanbieder: 'munt', betaalwijze: 'munt' }));
   }
 
   /* De betaling in de boeken en iedereen die het aangaat een seintje. Beide
@@ -130,5 +148,5 @@ module.exports = (ctx) => {
     try { sseToOffice('sync', { scope: 'ontvangsten' }); } catch (e) {}
   }
 
-  return { betaalDirect, registreerMuntBetaling };
+  return { betaalDirect, registreerMuntBetaling, registreerBevestigdeBetaling };
 };

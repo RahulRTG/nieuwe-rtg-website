@@ -49,44 +49,6 @@ function risicoVan(route) {
   return 'groen';
 }
 
-/* De volgorde is belangrijk: specialistische RTG-kamers gaan voor de brede
-   afdelingen. Zo komt /api/office/hardware niet op de generieke IT-stapel en
-   /api/office/redactie niet bij alle creatieve werkzaamheden terecht. */
-function kantoorVan(route) {
-  route = String(route || '').toLowerCase();
-  const regels = [
-    [/office\/boardroom|\/boardroom/, ['boardroom', 'De Boardroom']],
-    [/member\/magnaat|office\/magnaat/, ['magnaat', 'Magnaat Controlekamer']],
-    [/office\/(?:paniek|rampbeeld)|paniekkamer/, ['paniekkamer', 'De Paniekkamer']],
-    [/office\/bank/, ['bank', 'RTG Bank']],
-    [/office\/redactie|\/redactie|\/krant/, ['redactie', 'RTG Redactie']],
-    [/office\/atelier(?:web)?|\/atelier/, ['atelier', 'RTG Atelier']],
-    [/office\/studio|\/studio/, ['studio', 'RTG Ontwerpstudio']],
-    [/office\/hardware|\/hardware|\/doos/, ['hardware', 'RTG Hardwarelab']],
-    [/office\/architect|\/architect/, ['architect', 'RTG Architectenbureau']],
-    [/office\/werkplaats|\/werkplaats/, ['werkplaats', 'RTG Werkplaats']],
-    [/office\/ideeen|\/ideeen/, ['ideeen', 'De Ideeënkamer']],
-    [/office\/stad|\/gemeente|\/overheid/, ['stad', 'RTG Stad']],
-    [/\/techniek|\/wacht/, ['techniek', 'Techniek & De Wacht']],
-    [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw/, ['financien', 'Financiën']],
-    [/marketing|campagne|analytics/, ['marketing', 'Marketing']],
-    [/\/pr\/|communicatie|persbericht/, ['pr', 'PR & communicatie']],
-    [/\/sales|acquisitie|lead/, ['sales', 'Sales']],
-    [/staff|personeel|vacature|sollicit/, ['hr', 'HR']],
-    [/contract|juridisch|paspoort|machtig|privacy|avg/, ['juridisch', 'Juridisch']],
-    [/supplier\/(?:inkoop|groothandel|keten|vracht)|\/inkoop/, ['inkoop', 'Inkoop']],
-    [/supplier\/(?:verkoop|retail|order|menu|reserver)|\/verkoop/, ['verkoop', 'Verkoop']],
-    [/ingenieur|engineering/, ['ingenieurs', 'Ingenieurs']],
-    [/asset|site|auth|webauthn|rtgid|verify|sleutel/, ['intern', 'Intern & IT']],
-    [/foundation|rtf|labfonds|les|school/, ['onderzoek', 'Onderzoek & data']],
-    [/podium|theater|clips|flits|creatief/, ['creatief', 'Creatief']],
-    [/salon|member|bericht|dm|ontmoet|vonk|care|zorg|reis|ticket|lucht|hotel|ov|rit|charter/, ['klantenservice', 'Klantenservice']],
-    [/supplier|partner/, ['support', 'Support team']]
-  ];
-  const regel = regels.find(r => r[0].test(route));
-  return regel ? { id: regel[1][0], naam: regel[1][1] } : { id: 'onderzoek', naam: 'Onderzoek & data' };
-}
-
 function toegangVan(bron, einde) {
   const kop = bron.slice(einde, einde + 240).split(/=>|\{/)[0];
   if (/boardroomAuth/.test(kop)) return 'boardroom';
@@ -174,6 +136,38 @@ function scanEndpoints(root) {
   return [...uniek.values()].sort((a, b) => a.sleutel.localeCompare(b.sleutel));
 }
 
+let nativeWaarschuwingGegeven = false;
+function scanNative(root) {
+  const bin = process.env.RTG_CAPABILITY_RUST_BIN;
+  if (!bin) return null;
+  const r = spawnSync(bin, ['capability-scan', root], {
+    cwd: root, encoding: 'utf8', timeout: 15000, maxBuffer: 32 * 1024 * 1024,
+    windowsHide: true
+  });
+  try {
+    if (r.error) throw r.error;
+    if (r.status !== 0) throw new Error(String(r.stderr || 'native scanner stopte met status ' + r.status).trim());
+    const uit = JSON.parse(r.stdout);
+    if (!uit || uit.ok !== true || !Array.isArray(uit.apps) || !Array.isArray(uit.endpoints)) {
+      throw new Error('native scanner gaf geen geldig inventarisantwoord');
+    }
+    // Houd exact dezelfde locale-volgorde als de JS-scanner. PathBuf/BTreeMap
+    // sorteren bytegewijs en zetten bijvoorbeeld een map soms vóór naam.html.
+    uit.apps.sort((a, b) => String(a.pad).localeCompare(String(b.pad)));
+    uit.endpoints.sort((a, b) => String(a.sleutel).localeCompare(String(b.sleutel)));
+    return uit;
+  } catch (fout) {
+    /* Een codescan mag de app nooit onbeschikbaar maken. De bewezen JS-scanner
+       blijft de exacte terugval; eenmaal waarschuwen voorkomt een logstorm als
+       de binary tijdens ontwikkeling tijdelijk ontbreekt. */
+    if (!nativeWaarschuwingGegeven) {
+      nativeWaarschuwingGegeven = true;
+      console.error('[capability-rust] veilige terugval naar JS:', fout && fout.message);
+    }
+    return null;
+  }
+}
+
 function besteApp(familie, apps) {
   const woorden = familie.split('/').filter(x => x && x !== 'api' && !['member', 'office', 'supplier', 'staff'].includes(x));
   let beste = null, score = 0;
@@ -185,10 +179,14 @@ function besteApp(familie, apps) {
   return score ? { pad: beste.pad, naam: beste.naam } : { pad: '/apps/app.html', naam: 'RTG OS' };
 }
 
-module.exports = ({ root = path.resolve(__dirname, '../..'), functies }) => {
+module.exports = ({
+  root = path.resolve(__dirname, '../..'), functies,
+  volledigeWerkprocessen = [], werkrouteFabriek = null
+}) => {
   function scan() {
-    const apps = scanApps(root);
-    const endpoints = scanEndpoints(root);
+    const native = scanNative(root);
+    const apps = native ? native.apps : scanApps(root);
+    const endpoints = native ? native.endpoints : scanEndpoints(root);
     const kantoren = leesKantoren(root, functies);
     const flags = Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : [];
     const prefixen = flags.flatMap(f => (f.paden || []).map(p => ({ id: f.id, pad: p })));
@@ -200,21 +198,46 @@ module.exports = ({ root = path.resolve(__dirname, '../..'), functies }) => {
       groepen.get(familie).push(endpoint);
     }
 
-    const workflows = [...groepen.entries()].map(([familie, acties]) => {
+    /* Bouw eerst de feitelijke procesbronnen. De optionele fabriek krijgt exact
+       die ontdekte bronnen en mag daar volledige synthetische werkdossiers van
+       maken. Alleen structureel valide routes tellen daarna als matrixbewijs. */
+    const workflowBronnen = [...groepen.entries()].map(([familie, acties]) => {
       const gekoppeld = flags.filter(f => (f.paden || []).some(p => acties.some(a => a.route.startsWith(p))));
       const kantoor = kantoorVan(familie);
       const risico = risicoVan(familie);
+      const rol = rolVan(familie, acties.some(a => a.methode !== 'GET') ? 'POST' : 'GET', kantoor, risico);
       return {
         id: 'code:' + familie.replace(/^\/api\//, '').replace(/\//g, ':'),
         naam: menselijk(familie.replace(/^\/api\//, '')),
-        familie, domein: familie.split('/')[2] || 'platform',
-        kantoor, rol: rolVan(familie, acties.some(a => a.methode !== 'GET') ? 'POST' : 'GET', kantoor, risico),
+        familie, domein: familie.split('/')[2] || 'platform', kantoor, rol,
         risico, geregistreerd: gekoppeld.length > 0,
         functieIds: gekoppeld.map(f => f.id), app: besteApp(familie, apps),
         acties: acties.map(a => ({ methode: a.methode, route: a.route })),
         actieAantal: acties.length,
         spelstappen: ['Dossier aannemen', 'Brongegevens controleren', 'Actie in trainingskopie uitvoeren', 'Resultaat dubbel controleren', 'Overdracht en afsluiting vastleggen']
       };
+    });
+    const automatischeWerkprocessen = typeof werkrouteFabriek === 'function'
+      ? werkrouteFabriek(workflowBronnen).filter(w => w && typeof w.id === 'string' &&
+        Array.isArray(w.codeFamilies) && w.codeFamilies.length > 0 &&
+        Array.isArray(w.stappen) && w.stappen.length >= 5 &&
+        w.stappen[0] && w.stappen[0].soort === 'software' &&
+        /^\/apps\/[^?#]+\.html$/.test(w.stappen[0].schermPad || ''))
+      : [];
+    const matrix = require('./magnaat-dekkingsmatrix')({
+      root, flags, volledigeWerkprocessen: volledigeWerkprocessen.concat(automatischeWerkprocessen)
+    });
+    const workflows = workflowBronnen.map(w => {
+      const koppeling = matrix.werkproces(
+        { familie: w.familie },
+        w.acties.map(a => Object.assign({ familie: w.familie }, a)),
+        w.kantoor, w.rol, w.geregistreerd
+      );
+      return Object.assign({}, w, {
+        bronstand: koppeling.bronstand,
+        signalen: koppeling.signalen,
+        dekking: koppeling.dekking
+      });
     }).sort((a, b) => b.actieAantal - a.actieAantal || a.naam.localeCompare(b.naam));
 
     const domeinen = {};
@@ -226,43 +249,59 @@ module.exports = ({ root = path.resolve(__dirname, '../..'), functies }) => {
     const apiPunten = endpoints.map(e => {
       const kantoor = kantoorVan(e.route);
       const risico = risicoVan(e.route);
+      const rol = rolVan(e.route, e.methode, kantoor, risico);
+      const familie = workflowFamilie(e.route);
+      const koppeling = matrix.api(Object.assign({ familie }, e), kantoor, rol);
       return {
         id: controleId('api', e.sleutel), soort: 'api', sleutel: e.sleutel,
         naam: e.methode + ' · ' + menselijk(e.route.replace(/^\/api\//, '')),
         route: e.route, methode: e.methode, bestand: e.bestand, toegang: e.toegang,
-        familie: workflowFamilie(e.route), kantoor,
-        rol: rolVan(e.route, e.methode, kantoor, risico), risico
+        familie, kantoor, rol, risico, bronstand: koppeling.bronstand,
+        signalen: koppeling.signalen,
+        functieIds: koppeling.functieIds, dekking: koppeling.dekking
       };
     });
     const schermPunten = apps.map(a => {
       const kantoor = kantoorVan(a.pad);
       const risico = risicoVan(a.pad);
+      const rol = rolVan(a.pad, 'GET', kantoor, risico);
+      const koppeling = matrix.scherm({ route: a.pad, sleutel: a.pad, bestand: a.bestand }, kantoor, rol);
       return {
         id: controleId('scherm', a.pad), soort: 'scherm', sleutel: a.pad,
         naam: a.naam, route: a.pad, methode: null, bestand: a.bestand,
         toegang: /kantoor|office|boardroom|techniek|personeel/i.test(a.pad) ? 'office' : 'member',
-        familie: a.pad, kantoor, rol: rolVan(a.pad, 'GET', kantoor, risico), risico
+        familie: a.pad, kantoor, rol, risico, bronstand: koppeling.bronstand,
+        signalen: koppeling.signalen,
+        functieIds: koppeling.functieIds, dekking: koppeling.dekking
       };
     });
     const functiePunten = flags.map(f => {
       const bron = [f.id, f.naam, f.categorie, ...(f.paden || [])].join(' ');
       const kantoor = kantoorVan(bron);
       const risico = risicoVan(bron);
+      const rol = rolVan(bron, 'POST', kantoor, risico);
+      const basis = { sleutel: f.id, route: (f.paden || [])[0] || null, bestand: 'server/functies.js' };
+      const koppeling = matrix.functie(basis, kantoor, rol);
       return {
         id: controleId('functie', f.id), soort: 'functie', sleutel: f.id,
         naam: f.naam, route: (f.paden || [])[0] || null, methode: null,
         bestand: 'server/functies.js', toegang: 'member', familie: f.categorie,
-        kantoor, rol: rolVan(bron, 'POST', kantoor, risico), risico
+        kantoor, rol, risico, bronstand: koppeling.bronstand,
+        signalen: koppeling.signalen,
+        functieIds: koppeling.functieIds, dekking: koppeling.dekking
       };
     });
     const workflowPunten = workflows.map(w => ({
       id: controleId('werkproces', w.id), soort: 'werkproces', sleutel: w.id,
       naam: w.naam, route: w.familie, methode: null, bestand: null,
       toegang: w.acties.some(a => /office/.test(a.route)) ? 'office' : 'member',
-      familie: w.familie, kantoor: Object.assign({}, w.kantoor), rol: w.rol, risico: w.risico
+      familie: w.familie, kantoor: Object.assign({}, w.kantoor), rol: w.rol, risico: w.risico,
+      bronstand: w.bronstand, signalen: Object.assign({}, w.signalen),
+      functieIds: w.functieIds.slice(), dekking: w.dekking
     }));
     const controlepunten = apiPunten.concat(schermPunten, functiePunten, workflowPunten)
       .sort((a, b) => a.kantoor.naam.localeCompare(b.kantoor.naam) || a.naam.localeCompare(b.naam));
+    const dekkingsmatrix = matrix.samenvat(controlepunten);
     const vingerafdruk = crypto.createHash('sha256').update(JSON.stringify({
       apps: apps.map(a => a.pad), endpoints: endpoints.map(e => e.sleutel),
       kantoren: kantoren.map(k => k.id), flags: flags.map(f => f.id)
@@ -273,10 +312,13 @@ module.exports = ({ root = path.resolve(__dirname, '../..'), functies }) => {
       cijfers: {
         functieFlags: flags.length, functiePrefixen: prefixen.length,
         apps: apps.length, apiActies: endpoints.length, kantoren: kantoren.length,
-        werkprocessen: workflows.length, ongedekteApiActies: ongedekt.length,
-        controlepunten: controlepunten.length
+        werkprocessen: workflows.length, automatischeWerkprocessen: automatischeWerkprocessen.length,
+        ongedekteApiActies: ongedekt.length,
+        controlepunten: controlepunten.length, volledigGekoppeld: dekkingsmatrix.volledig,
+        dekkingsgaten: dekkingsmatrix.metGaten, dekkingspercentage: dekkingsmatrix.percentage
       },
-      apps, endpoints, kantoren, workflows, controlepunten,
+      apps, endpoints, kantoren, workflows, automatischeWerkprocessen,
+      controlepunten, dekkingsmatrix,
       domeinen: Object.entries(domeinen).map(([id, aantal]) => ({ id, aantal })).sort((a, b) => b.aantal - a.aantal),
       ongedekt: ongedekt.map(e => e.sleutel)
     };

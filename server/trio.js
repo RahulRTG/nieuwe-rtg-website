@@ -23,6 +23,7 @@ const { maakWacht } = require('./trio-wacht');
 const LOKAAL_TLS = process.env.RTG_LOKAAL_TLS === '1';
 
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.RTG_BIND || undefined;
 const AANTAL = 3;
 const BASISPOORT = Number(process.env.RTG_TRIO_BASIS || PORT + 1); // 3001, 3002, 3003
 const SLEUTEL = crypto.randomBytes(24).toString('hex'); // deelt het trio onderling
@@ -115,8 +116,12 @@ poort.on('error', e => {
 /* ---------- netjes starten en stoppen ---------- */
 
 (async () => {
-  poort.listen(PORT, () => log('luistert op ' + (LOKAAL_TLS ? 'https' : 'http') + '://localhost:' + PORT));
-  if (caLoket) caLoket.listen(PORT + 10, () => log('CA-loket op http://localhost:' + (PORT + 10) + '/rtg-ca.crt'));
+  const poortGestart = () => log('luistert op ' + (LOKAAL_TLS ? 'https' : 'http') + '://' + (HOST || 'localhost') + ':' + PORT);
+  if (HOST) poort.listen(PORT, HOST, poortGestart); else poort.listen(PORT, poortGestart);
+  if (caLoket) {
+    const loketGestart = () => log('CA-loket op http://' + (HOST || 'localhost') + ':' + (PORT + 10) + '/rtg-ca.crt');
+    if (HOST) caLoket.listen(PORT + 10, HOST, loketGestart); else caLoket.listen(PORT + 10, loketGestart);
+  }
   // Server 1 eerst, zodat een verse database maar door een server wordt
   // aangemaakt; daarna de twee standby-servers.
   wacht.startServer(0);

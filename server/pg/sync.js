@@ -141,7 +141,12 @@ module.exports = (ctx) => {
     async function schrijfEen(client, k, jOns) {
       await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
       const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
-      let j = jOns;
+      /* De lijst `gewijzigd` is vóór het wachten op het slot gemaakt. Een
+         directe collectietransactie in DIT proces kan intussen al gecommit en
+         de lokale werkkopie vervangen hebben. Schrijf dan de verse werkkopie,
+         nooit de oude JSON die vóór het slot werd berekend. */
+      const liveJson = JSON.stringify(dataNu[k]);
+      let j = liveJson === jOns ? jOns : liveJson;
       if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
         const samen = merge3(base, dataNu[k], JSON.parse(uitStore(huidig.rows[0].val)));

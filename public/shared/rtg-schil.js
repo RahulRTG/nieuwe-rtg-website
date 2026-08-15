@@ -76,6 +76,21 @@
     }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
+    /* De standaard Work OS-schil is een vaste linkerbank met een tabbalk.
+       Alle surfaces delen daar hetzelfde werkvlak; de actieve tab bepaalt
+       welke zichtbaar en bedienbaar is. De vrije Spatial Shell hieronder
+       behoudt zijn raster, docken en eigen meubelplan. */
+    if (schil.standaard) {
+      var bankBreed = Math.max(164, Math.min(210, Math.round(m.b * 0.12)));
+      var tabHoog = 48;
+      zet(schil.console, 0, 0, bankBreed, m.h);
+      if (schil.tabbar) zet(schil.tabbar, bankBreed, 0, m.b - bankBreed, tabHoog);
+      schil.surfaces.forEach(function (s) {
+        zet(s.el, bankBreed, tabHoog, m.b - bankBreed, m.h - tabHoog);
+      });
+      return;
+    }
+
     if (!n) {
       // niets open: de console staat midden, als commandotafel zonder werk
       zet(schil.console, Math.round((m.b - consoleBreed) / 2), g, consoleBreed, m.h - g * 2);
@@ -170,6 +185,23 @@
   function vind(id) {
     for (var i = 0; i < schil.surfaces.length; i++) if (schil.surfaces[i].id === id) return schil.surfaces[i];
     return null;
+  }
+
+  function tekenTabbar() {
+    if (!schil.tabbar) return;
+    schil.tabbar.innerHTML = '';
+    schil.surfaces.forEach(function (s) {
+      var tab = el('div', 'rtg-tab', schil.tabbar);
+      if (schil.actief === s) tab.setAttribute('data-actief', '');
+      var kies = el('button', 'rtg-tab-kies', tab);
+      kies.type = 'button'; kies.textContent = s.naam;
+      kies.setAttribute('aria-label', 'Open ' + s.naam);
+      kies.addEventListener('click', function () { maakActief(s); });
+      var dicht = el('button', 'rtg-tab-sluit', tab);
+      dicht.type = 'button'; dicht.innerHTML = '&times;';
+      dicht.setAttribute('aria-label', 'Sluit ' + esc(s.naam));
+      dicht.addEventListener('click', function () { sluit(s.id); });
+    });
   }
 
   function sluit(id) {

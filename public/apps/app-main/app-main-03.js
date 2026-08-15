@@ -80,19 +80,25 @@
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
+        if (!explicieteDemo){
+          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
         }
         tier = 'business'; user = {...PERSONAS[tier]};
       }
     } else {
-      user = {...PERSONAS[tier]};
       if (API.enabled){
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
           API.token = data.token;
           applyState(data.state);
-        } catch (e) { API.enabled = false; }
+        } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
+      } else if (explicieteDemo) {
+        user = {...PERSONAS[tier]};
+      } else {
+        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;

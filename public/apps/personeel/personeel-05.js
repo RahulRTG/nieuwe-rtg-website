@@ -17,8 +17,7 @@
     $('#kaGo').addEventListener('click', go);
     $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
     $('#kaCode').focus();
-    // is de kantoor-rol al aan het RTG-account op dit toestel gekoppeld,
-    // dan is een tik genoeg (het ene account start dezelfde kantoor-sessie)
+    // Een gekoppelde kantoorrol start met een tik via hetzelfde RTG-account.
     (async () => {
       let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
       if (!lt) return;
@@ -66,6 +65,12 @@
         '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.4rem;"></div>'+
         '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
+      '<div class="card"><div class="k">Integratiekamer</div>'+
+        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">SMTP, SMS, Stripe Connect en SEPA lokaal testen, gecontroleerd schakelen en samen als keten beproeven. Bediening vraagt boardroomtoegang.</div>'+
+        '<a class="abtn" href="/apps/kantoren.html?kamer=integraties" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open het beveiligde schakelbord</a></div>'+
+      '<div class="card"><div class="k">RTG Controleregister</div>'+
+        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
+        '<a class="abtn" href="/apps/magnaat-kantoor.html" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open de dekkingsmatrix</a></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
     const toonDienst = () => {

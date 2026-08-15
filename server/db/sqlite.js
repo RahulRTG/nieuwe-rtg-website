@@ -187,5 +187,10 @@ function persistentieStandSqlite() {
   catch (e) { return null; }
 }
 
-module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+const bewerkCollectieSqlite = require('./collectie-sqlite')({
+  db, verbinding: () => { sqliteInit(); return kvdb; }, statements, uitStore, naarStore,
+  laatsteJson, toegepast, voorcheck
+});
+
+module.exports = { loadSqlite, saveSqlite, bewerkCollectieSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
   persistentieStandSqlite };

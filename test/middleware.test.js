@@ -16,7 +16,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 
-const { herschrijf, cspNonce, bureaublad, CSP } = require('../server/middleware/voordeur');
+const { herschrijf, cspNonce, bureaublad, CSP, magnaatHtml } = require('../server/middleware/voordeur');
 const { jsonGzip, statischGzip, wilGzip, wilBrotli } = require('../server/middleware/compressie');
 const { opslagPoort, hoofdzekering } = require('../server/middleware/remmen');
 const { natieNaarLand, ZIN } = require('../server/middleware/functieschakelaars');
@@ -109,6 +109,22 @@ test('4. de nonce-laag geeft kop en pagina dezelfde verse nonce', async () => {
   assert.equal((await draai(laag, nepReq('/shared/qr.js'), nepRes())).door, true);
   // en met de schakelaar uit doet hij helemaal niets
   assert.equal((await draai(cspNonce(PUBLIC, false), nepReq('/apps/app.html'), nepRes())).door, true);
+});
+
+test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte trainingslaag', async () => {
+  const req = nepReq('/apps/medicijnen.html?magnaat=1');
+  req.query = { magnaat: '1' };
+  const uit = await draai(cspNonce(PUBLIC, true), req, nepRes());
+  const html = String(uit.res.body);
+  const csp = uit.res.kop['content-security-policy'] || '';
+  assert.equal((html.match(/src="\/apps\/magnaat-sandbox\.js"/g) || []).length, 1);
+  const externeScripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(externeScripts[0], '/apps/magnaat-sandbox.js',
+    'de blokkade draait vóór het eerste externe paginascript');
+  assert.match(csp, /connect-src 'none'/);
+  assert.match(csp, /form-action 'none'/);
+  assert.doesNotMatch(CSP('abc123'), /connect-src 'none'/, 'de gewone RTG-app behoudt zijn verbindingen');
+  assert.equal(magnaatHtml('<head></head>', false), '<head></head>');
 });
 
 test('5. de compressielaag laat kleine antwoorden met rust', async () => {

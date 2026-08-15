@@ -154,6 +154,29 @@
     <div id="tabStatus" role="tabpanel" aria-labelledby="tabBtnStatus">
       <div id="motorkapBand" hidden></div>
       <div class="telrij" id="tellers"></div>
+      <div id="controleBlok" hidden>
+        <div class="sec">Permanente controle &amp; incidentbediening</div>
+        <div class="kaart">
+          <div id="controleStand"></div>
+          <label class="muted" for="incidentReden" style="display:block;margin-top:.8rem;">Reden voor een noodhandeling</label>
+          <input class="veld" id="incidentReden" maxlength="240" placeholder="Bijv. onverwachte wijziging in de betaalroute">
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+            <button class="knop grijs klein" id="bWaakzaam">Extra bewaken</button>
+            <select class="veld" id="incidentFunctie" aria-label="Functie om direct te beperken" style="width:auto;max-width:18rem;margin:0;"></select>
+            <button class="knop rood klein" id="bBeperk">Functie direct dicht</button>
+            <button class="knop rood klein" id="bIsoleer">Hele app isoleren</button>
+            <button class="knop klein" id="bHerstel">Bewaarde standen herstellen</button>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;align-items:center;">
+            <button class="knop grijs klein" id="bIntegriteit">Controleer alle code nu</button>
+            <button class="knop grijs klein" id="bBestanden">Bestandsregister</button>
+            <button class="knop grijs klein" id="bRoutes">Routeregister</button>
+            <input class="veld" id="controleZoek" maxlength="120" placeholder="Zoek pad, functie of hash" aria-label="Zoek in het controleregister" style="flex:1;min-width:12rem;margin:0;">
+          </div>
+          <div id="controleResultaat" class="advies" hidden style="max-height:24rem;overflow:auto;"></div>
+          <div id="controleAudit" style="margin-top:.8rem;"></div>
+        </div>
+      </div>
       <div id="beveiligBlok" hidden>
         <div class="sec" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
           <span>Beveiliging &amp; inbraakdetectie</span>

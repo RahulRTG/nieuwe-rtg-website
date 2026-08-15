@@ -26,8 +26,8 @@ module.exports = ({ db, save, crypto, anthropic, ledenAantal, accounts, keyVanCo
   const d = () => db.data;
 
   /* ---- het afdelingsregister woont in afdelingen/register.js (de eerste
-     twaalf kamers) en register2.js (Support team, Ingenieurs, Consumenten-
-     en Partner-abonnementen, Kantine) ---- */
+     twaalf kamers) en register2.js (de jongere specialistische kamers,
+     waaronder Integratiekamer en RTG Controleregister) ---- */
   const regCtx = { d, lijst, tel, recent, ledenGeteld, functies, accounts };
   const AFDELINGEN = Object.assign(require('./afdelingen/register')(regCtx), require('./afdelingen/register2')(regCtx));
   const KAMER_IDS = Object.keys(AFDELINGEN);

@@ -33,39 +33,13 @@
 const fs = require('fs');
 const path = require('path');
 const functies = require('../server/functies');
+const { BUITEN, redenVoor } = require('../server/kern/bestuursroutes');
 
 const WORTEL = path.join(__dirname, '..');
 
 /* De bestuurslaag: routes die met REDEN niet schakelbaar zijn. Elke regel is
    een keuze, geen omissie -- dezelfde afspraak als de publieke-routelijst in
    scripts/check.js. */
-const BUITEN = new Map([
-  ['/api/techniek', 'het techniekbord zelf: de knoppen mogen niet achter een knop'],
-  ['/api/boardroom', 'de schakelkast zelf: anders sluit de eigenaar zichzelf buiten'],
-  ['/api/health', 'de gezondheidscheck moet altijd antwoorden, anders leest een monitor gezond als dood'],
-  ['/api/ready', 'idem: de startsignalering van de load balancer'],
-  /* DE AVG-RECHTEN ZIJN GEEN FUNCTIE. Inzage, export en verwijdering zijn
-     wettelijke rechten van de betrokkene; een knop waarmee RTG die kan
-     uitzetten hoort niet te bestaan, ook niet met de beste bedoelingen. Dit is
-     de enige regel in deze lijst die er staat omdat schakelbaarheid ZELF
-     verkeerd zou zijn, en niet omdat de deur technisch open moet blijven. */
-  ['/api/privacy', 'inzage, export en verwijdering zijn AVG-rechten; die mag niemand kunnen uitzetten'],
-  /* Om precies dezelfde reden als hierboven: het Consent Center is het scherm
-     waar een lid toestemmingen INTREKT. Een schakelaar waarmee dat scherm dicht
-     kan, is een schakelaar waarmee je iemand zijn intrekknop afneemt terwijl de
-     toestemmingen doorlopen. Dat hoort niet te bestaan. */
-  ['/api/toestemming', 'intrekken van toestemming is een recht; een knop die dat scherm uitzet hoort niet te bestaan'],
-  /* De toesteldeur draagt geen ledensessie (hij komt binnen op een eigen smalle
-     sleutel), dus de boardroom-controle in de auth-laag raakt hem sowieso niet.
-     Hem toch onder een schakelaar zetten zou schakelbaarheid BEWEREN die er niet
-     is. Het lid schakelt hem wel degelijk: door de sleutel in te trekken. */
-  ['/api/toestel/meting', 'komt binnen op een toestelsleutel en niet op een ledensessie; het lid schakelt hem door die sleutel in te trekken'],
-  ['/api/metrics', 'de meetlijn voor monitoring: dicht betekent blind, en blind lijkt van buiten op gezond'],
-  ['/api/cluster', 'de clusterlaag stuurt de instances aan; die hoort niet aan een schakelaar van een instance'],
-  ['/api/sat', 'de satellietping waarmee een zaakdoos de wolk zoekt; zonder antwoord denkt de doos dat hij offline is'],
-  ['/api/test', 'de opzettelijke bug- en crashhaak: bestaat alleen in demostand en is geen dienst om te schakelen']
-]);
-
 const zonderCommentaar = (b) => String(b)
   .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
   .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
@@ -86,7 +60,7 @@ function alleRoutes() {
   return [...uit].sort();
 }
 
-const buitenOm = (pad) => [...BUITEN.keys()].some(p => pad === p || pad.startsWith(p + '/'));
+const buitenOm = (pad) => !!redenVoor(pad);
 
 function meet() {
   const routes = alleRoutes();

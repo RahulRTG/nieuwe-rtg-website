@@ -264,6 +264,7 @@ body[data-rtg-schil="standaard"] .rtg-tab[data-actief] button{color:var(--rtg-tx
 body[data-rtg-schil="standaard"] .rtg-surface{
   border:0;border-right:1px solid var(--rtg-line);border-radius:0;box-shadow:none;background:var(--rtg-bg);
 }
+body[data-rtg-schil="standaard"] .rtg-surface:not([data-actief]){visibility:hidden;pointer-events:none;}
 body[data-rtg-schil="standaard"] .rtg-surface[data-actief]{border-color:var(--rtg-line);}
 body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{display:none;}
 

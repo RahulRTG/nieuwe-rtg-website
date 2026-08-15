@@ -22,7 +22,13 @@ const { zonderCommentaar } = require('./lib/bron');
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
-    const st = fs.statSync(vol);
+    /* De meterijk-toets maakt expres kortlevende bronbestanden. Als de volle
+       suite tegelijk met deze keuring draait, kan zo'n bestand tussen readdir
+       en stat verdwijnen. Dat is geen syntaxfout; sla uitsluitend ENOENT over
+       en laat elke echte lees-/rechtenfout nog steeds hard vallen. */
+    let st;
+    try { st = fs.statSync(vol); }
+    catch (e) { if (e && e.code === 'ENOENT') continue; throw e; }
     /* De overslaglijst matcht op de HELE mapnaam en niet op een deelstring.
        Stond hier `/data/`, en daardoor sloeg elke regel in dit bestand stilletjes
        server/kern/appgids-data, server/kern/initdata, server/kern/leerstof-data
@@ -1548,7 +1554,8 @@ console.log('\n26) bedradings-contract: elke naam die je uit een module haalt, b
    DE TRUC IN DEZE REGEL. De productie-keuring zelf telt NIET mee als "leest
    hem". Anders is elke waarschuwing zijn eigen bewijs: `if (!env.SENTRY_DSN)
    waarschuw(...)` is een leesactie, en dan blijft precies deze fout onzichtbaar.
-   Wat telt is of er ergens ANDERS in server/ of scripts/ iets mee gebeurt.
+   Wat telt is of er ergens ANDERS in server/, scripts/ of de Rust-motor iets
+   mee gebeurt.
 
    Er is een categorie die dan onterecht opvalt: vlaggen die BIJ de keuring
    horen ("ik weet het, start toch"). Die staan hieronder met een reden. Dat is
@@ -1591,6 +1598,16 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
         }
       });
     }
+    // De native motor is evenzeer runtimecode. Hij leest variabelen via de
+    // kleine `env("NAAM", standaard)`-helper (en getypeerde varianten zoals
+    // env_bool) of rechtstreeks via std::env::var.
+    // Alleen Node scannen zou iedere Docker-vlag voor Rust ten onrechte dood
+    // noemen en toekomstige echte configuratiefouten in ruis laten verdwijnen.
+    loop(path.join(ROOT, 'motor', 'src'), /\.rs$/, f => {
+      const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+      for (const m of bron.matchAll(/\benv(?:_[a-z]+)*\(\s*"([A-Z_][A-Z0-9_]*)"/g)) gelezen.add(m[1]);
+      for (const m of bron.matchAll(/std::env::var\(\s*"([A-Z_][A-Z0-9_]*)"/g)) gelezen.add(m[1]);
+    });
     const genoemd = new Map();                        // naam -> waar hij beloofd wordt
     for (const n of fs.readdirSync(path.join(ROOT, KEURMAP)).filter(x => x.endsWith('.js'))) {
       const rel = KEURMAP + n;
@@ -1605,7 +1622,7 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
     for (const [naam, waar] of genoemd) {
       if (gelezen.has(naam) || MAG_DOOD.has(naam)) continue;
       dood++;
-      fout(waar + ' belooft ' + naam + ', maar niets in server/ of scripts/ leest die variabele' +
+      fout(waar + ' belooft ' + naam + ', maar niets in server/, scripts/ of motor/ leest die variabele' +
         ' -- zet hem aan het werk, haal hem weg, of zet hem met een reden in MAG_DOOD');
     }
     if (!dood) ok(genoemd.size + ' beloofde omgevingsvariabelen doen ook echt iets (' +

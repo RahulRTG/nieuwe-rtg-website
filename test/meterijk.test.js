@@ -27,7 +27,12 @@ const os = require('os');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
+// Los gestart pakt deze bronmuterende ijking zelf het afbouwslot. Via de
+// testrunner bezit de ouder dat slot al en geeft hij dit expliciet door.
+if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot').pak('meterijking');
 const norm = require('../scripts/norm.js');
+const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
+const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
 
 /* Een proef doet drie dingen: iets kapots neerzetten, meten, opruimen. Het
    opruimen staat in een finally, want een ijking die rommel achterlaat is
@@ -742,7 +747,9 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
   for (const sleutel of geijkt) {
+    meld('start ' + sleutel);
     const verschil = IJKINGEN[sleutel].proef(voor);
+    meld('klaar ' + sleutel + ': verschil ' + verschil);
     assert.ok(verschil > 0,
       'meter "' + sleutel + '" zag de bekend-foute invoer NIET (verschil ' + verschil + '). ' +
       'Een meter die niet uitslaat op iets wat fout is, meet niets.');

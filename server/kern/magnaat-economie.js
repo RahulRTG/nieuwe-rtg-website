@@ -10,6 +10,8 @@
    exports dezelfde controleerbare bron gebruiken. */
 
 const VERSIE = 1;
+const rtgKlok = require('../lib/klok');
+const economenlab = require('./magnaat-economenlab');
 const STARTDATUM = '2027-01-01';
 const MAX_HISTORIE = 180;
 const MAX_JOURNAAL = 2500;
@@ -63,12 +65,29 @@ function kopieBedrijf(id, bron) {
   }, bron);
 }
 
-module.exports = ({ wereldState, save = () => {} }) => {
+module.exports = ({ wereldState, save = () => {}, motorklant = null }) => {
   if (typeof wereldState !== 'function') throw new Error('Magnaat Economie vereist wereldState().');
+  const motor = motorklant || require('./magnaat-motorklant')();
+  let laatsteRustFoutlog = 0;
+  let rustFoutlogsOnderdrukt = 0;
+
+  function meldRustFout(reden) {
+    const nu = rtgKlok.nu();
+    if (nu - laatsteRustFoutlog < 15000) {
+      rustFoutlogsOnderdrukt += 1;
+      return;
+    }
+    const onderdrukt = rustFoutlogsOnderdrukt
+      ? ` (${rustFoutlogsOnderdrukt} gelijke meldingen onderdrukt)`
+      : '';
+    console.error('[magnaat-rust] veilige terugval naar JS:', reden, onderdrukt);
+    laatsteRustFoutlog = nu;
+    rustFoutlogsOnderdrukt = 0;
+  }
 
   function nieuweState() {
     return {
-      versie: VERSIE, startdatum: STARTDATUM, dag: 0, boekVolgorde: 0,
+      versie: VERSIE, mutatieVersie: 0, startdatum: STARTDATUM, dag: 0, boekVolgorde: 0,
       rekeningen: {}, journaal: [], verwerkteBoekingen: {}, commandos: {},
       bedrijven: {
         rtg: kopieBedrijf('rtg', BEDRIJF_START.rtg),
@@ -94,8 +113,20 @@ module.exports = ({ wereldState, save = () => {} }) => {
     const wereld = wereldState();
     if (!wereld.economie || wereld.economie.versie !== VERSIE) wereld.economie = nieuweState();
     const e = wereld.economie;
+    if (!Number.isSafeInteger(e.mutatieVersie) || e.mutatieVersie < 0) e.mutatieVersie = 0;
+    for (const b of Object.values(e.bedrijven || {})) {
+      if (!b.kostenUitsplitsing || typeof b.kostenUitsplitsing !== 'object') {
+        b.kostenUitsplitsing = { kostprijs: 0, loon: 0, training: 0, impact: 0, rente: 0, belasting: 0 };
+      }
+    }
+    economenlab._zorgStaat(e);
     if (!e.geinitialiseerd) initialiseer(e);
+    zorgVoorraadBoekwaarde(e);
     return e;
+  }
+
+  function markeerMutatie(e) {
+    e.mutatieVersie = (Number.isSafeInteger(e.mutatieVersie) ? e.mutatieVersie : 0) + 1;
   }
 
   function rekening(e, code, actor, naam, soort, normaal) {
@@ -154,6 +185,13 @@ module.exports = ({ wereldState, save = () => {} }) => {
   function initialiseer(e) {
     openingspost(e, 'rtg', 'RTG', e.bedrijven.rtg.cash);
     openingspost(e, 'praktijk', 'Praktijkbedrijf', e.bedrijven.praktijk.cash);
+    for (const b of Object.values(e.bedrijven)) {
+      const waarde = rond(b.voorraad * e.instellingen.inkoopPerEenheid);
+      boek(e, 'opening:voorraad:' + b.id, 'Openingsvoorraad ' + b.naam, [
+        regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', waarde),
+        regel(b.id + '.eigen-vermogen', b.id, 'Openingsvermogen', 'eigen-vermogen', 'credit', waarde)
+      ], ['opening', 'voorraad']);
+    }
     for (const [actor, bedrag] of Object.entries(OPENINGSKAS)) openingspost(e, actor, actor, bedrag);
     e.geinitialiseerd = true;
     e.verklaringen.unshift({
@@ -161,6 +199,21 @@ module.exports = ({ wereldState, save = () => {} }) => {
       uitleg: 'Alle beginsaldi zijn dubbel geboekt. Vanaf nu ontstaat iedere euro uit een gebalanceerde transactie.'
     });
     neemMoment(e);
+  }
+
+  /* Bestaande trainingswerelden van vóór het Economenlab hadden wel fysieke
+     voorraadeenheden maar nog geen voorraadrekening. Migreer ze één keer met
+     een gebalanceerde openingspost; nooit stil resetten of de kas veranderen. */
+  function zorgVoorraadBoekwaarde(e) {
+    for (const b of Object.values(e.bedrijven || {})) {
+      if (e.rekeningen[b.id + '.voorraad']) continue;
+      const waarde = rond(b.voorraad * e.instellingen.inkoopPerEenheid);
+      if (!waarde) continue;
+      boek(e, 'migratie:voorraad:' + b.id, 'Migratie openingsvoorraad ' + b.naam, [
+        regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', waarde),
+        regel(b.id + '.eigen-vermogen', b.id, 'Openingsvermogen', 'eigen-vermogen', 'credit', waarde)
+      ], ['migratie', 'voorraad']);
+    }
   }
 
   function saldo(e, code) {
@@ -214,6 +267,30 @@ module.exports = ({ wereldState, save = () => {} }) => {
     ], labels);
   }
 
+  /* Voorraad is geen kostenpost op het moment van inkopen. De onderneming
+     ruilt kas voor een actief; pas wanneer een eenheid wordt verkocht valt de
+     kostprijs in de resultatenrekening. Dit onderscheid is essentieel voor
+     voorraadsturing, liquiditeit en een balans die economen kan trainen. */
+  function koopVoorraad(e, sleutel, b, levering) {
+    const bedrag = Math.max(0, rond(levering * e.instellingen.inkoopPerEenheid));
+    if (!bedrag) return null;
+    return boek(e, sleutel, 'Inkoop voorraad ' + b.naam, [
+      regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'debet', bedrag),
+      regel(b.id + '.kas', b.id, 'Bank en kas', 'actief', 'credit', bedrag),
+      regel('leverancier.kas', 'leverancier', 'Bank en kas', 'actief', 'debet', bedrag),
+      regel('leverancier.omzet', 'leverancier', 'Omzet leveringen', 'opbrengsten', 'credit', bedrag)
+    ], ['aanbod', 'keten', 'voorraad']);
+  }
+
+  function boekKostprijs(e, sleutel, b, verkoop) {
+    const bedrag = Math.max(0, rond(verkoop * e.instellingen.inkoopPerEenheid));
+    if (!bedrag) return null;
+    return boek(e, sleutel, 'Kostprijs verkochte diensten ' + b.naam, [
+      regel(b.id + '.kostprijs', b.id, 'Kostprijs omzet', 'kosten', 'debet', bedrag),
+      regel(b.id + '.voorraad', b.id, 'Voorraad', 'actief', 'credit', bedrag)
+    ], ['kostprijs', 'voorraad']);
+  }
+
   function zorgLiquiditeit(e, bedrijf, nodig) {
     const beschikbaar = kas(e, bedrijf);
     if (beschikbaar >= nodig) return 0;
@@ -228,13 +305,18 @@ module.exports = ({ wereldState, save = () => {} }) => {
   }
 
   function schokVoorDag(e) {
+    const gekozen = schokZonderMutatie(e, e.dag);
     if (e.geforceerdeSchok) {
-      const gekozen = SCHOKKEN.find(s => s.id === e.geforceerdeSchok) || SCHOKKEN[0];
       e.geforceerdeSchok = null;
       return gekozen;
     }
+    return gekozen;
+  }
+
+  function schokZonderMutatie(e, dag) {
+    if (e.geforceerdeSchok) return SCHOKKEN.find(s => s.id === e.geforceerdeSchok) || SCHOKKEN[0];
     const patroon = { 3: 'vraagpiek', 6: 'leveranciersuitval', 9: 'arbeidstekort' };
-    const cyclus = e.dag % 12;
+    const cyclus = dag % 12;
     return SCHOKKEN.find(s => s.id === patroon[cyclus]) || SCHOKKEN[0];
   }
 
@@ -265,21 +347,23 @@ module.exports = ({ wereldState, save = () => {} }) => {
   function boekBedrijfsdag(e, b, verkoop, levering) {
     const dag = e.dag;
     const omzet = verkoop * b.prijs;
-    const inkoop = levering * e.instellingen.inkoopPerEenheid;
+    const inkoopKas = levering * e.instellingen.inkoopPerEenheid;
+    const kostprijs = verkoop * e.instellingen.inkoopPerEenheid;
     const loon = rond((b.loonMaand * b.personeel * (e.actieveSchok.id === 'arbeidstekort' ? 1.035 : 1)) / 30);
     const training = Math.min(b.trainingDag, kas(e, b.id));
     const impact = rond(omzet * b.impactBp / 10000);
     const rente = rond(creditWaarde(e, b.id + '.schuld') * e.macro.rente / 100 / 365);
-    zorgLiquiditeit(e, b.id, inkoop + loon + training + impact + rente);
+    zorgLiquiditeit(e, b.id, inkoopKas + loon + training + impact + rente);
 
     betaalStroom(e, 'dag:' + dag + ':omzet:' + b.id, 'Verkoop diensten ' + b.naam, 'huishoudens', b.id, omzet, 'consumptie', 'omzet', ['vraag', 'omzet']);
-    betaalStroom(e, 'dag:' + dag + ':inkoop:' + b.id, 'Inkoop capaciteit ' + b.naam, b.id, 'leverancier', Math.min(inkoop, kas(e, b.id)), 'inkoop', 'omzet', ['aanbod', 'keten']);
+    koopVoorraad(e, 'dag:' + dag + ':inkoop:' + b.id, b, Math.min(levering, Math.floor(kas(e, b.id) / e.instellingen.inkoopPerEenheid)));
+    boekKostprijs(e, 'dag:' + dag + ':kostprijs:' + b.id, b, verkoop);
     betaalStroom(e, 'dag:' + dag + ':loon:' + b.id, 'Lonen ' + b.naam, b.id, 'huishoudens', Math.min(loon, kas(e, b.id)), 'loonkosten', 'looninkomen', ['arbeid']);
     betaalStroom(e, 'dag:' + dag + ':training:' + b.id, 'Opleiding en ontwikkeling ' + b.naam, b.id, 'rtf', Math.min(training, kas(e, b.id)), 'opleidingskosten', 'opleidingsopbrengsten', ['menselijk-kapitaal', 'rtf']);
     betaalStroom(e, 'dag:' + dag + ':impact:' + b.id, 'Maatschappelijke bijdrage ' + b.naam, b.id, 'rtf', Math.min(impact, kas(e, b.id)), 'impactkosten', 'bijdragen', ['impact', 'rtf']);
     betaalStroom(e, 'dag:' + dag + ':rente:' + b.id, 'Rente ' + b.naam, b.id, 'bank', Math.min(rente, kas(e, b.id)), 'rentekosten', 'renteopbrengsten', ['krediet']);
 
-    const kostenVoorBelasting = inkoop + loon + training + impact + rente;
+    const kostenVoorBelasting = kostprijs + loon + training + impact + rente;
     const winstVoorBelasting = omzet - kostenVoorBelasting;
     const belasting = winstVoorBelasting > 0 ? rond(winstVoorBelasting * e.instellingen.vennootschapsbelastingBp / 10000) : 0;
     betaalStroom(e, 'dag:' + dag + ':belasting:' + b.id, 'Vennootschapsbelasting ' + b.naam, b.id, 'overheid', Math.min(belasting, kas(e, b.id)), 'belastingkosten', 'belastingopbrengsten', ['overheid', 'belasting']);
@@ -287,6 +371,7 @@ module.exports = ({ wereldState, save = () => {} }) => {
     b.omzetVandaag = omzet;
     b.kostenVandaag = kostenVoorBelasting + belasting;
     b.winstVandaag = omzet - b.kostenVandaag;
+    b.kostenUitsplitsing = { kostprijs, loon, training, impact, rente, belasting };
     b.verkopenVandaag = verkoop;
     b.schuld = creditWaarde(e, b.id + '.schuld');
   }
@@ -347,9 +432,107 @@ module.exports = ({ wereldState, save = () => {} }) => {
     e.macro.consumentenvertrouwen = Number(begrens(e.macro.consumentenvertrouwen + (schok.id === 'geen' ? .3 : -.7), 70, 115).toFixed(1));
     verwerkOverheid(e);
 
+    verklaarMarkt(e, totaleVraag, werkBonus);
+  }
+
+  function verklaarMarkt(e, totaleVraag, werkBonus) {
+    const schok = e.actieveSchok;
+    const werk = e.werk;
     legUit(e, 'markt', 'Vraag en marktaandeel verdeeld', 'Prijs, kwaliteit en reputatie bepalen samen de aantrekkelijkheid. Capaciteit en voorraad begrenzen de uiteindelijke verkoop.', totaleVraag + ' gevraagde diensten', 'vraagcurve + prijselasticiteit + capaciteitsgrens');
     if (schok.id !== 'geen') legUit(e, 'schok', schok.naam, schok.uitleg, 'Vraag ' + rond(schok.vraag * 100) + ' · aanbod ' + rond(schok.aanbod * 100) + ' · arbeid ' + rond(schok.arbeid * 100), 'deterministisch scenarioschema');
     if (werk.aantal) legUit(e, 'werkvloer', 'RTG-werk veranderde de uitvoering', werk.aantal + ' voltooide dossier(s) verbeteren productiviteit, service, controle of innovatie in de volgende economische dag.', '+' + rond(werkBonus * 100) + '% productiviteitspotentieel', 'Magnaat-kantoorprocessen');
+  }
+
+  function motorInvoer(e, bedrijven) {
+    return {
+      werk: {
+        aantal: e.werk.aantal, productiviteit: e.werk.productiviteit,
+        service: e.werk.service, controle: e.werk.controle, innovatie: e.werk.innovatie
+      },
+      schok: { id: e.actieveSchok.id, vraag: e.actieveSchok.vraag, aanbod: e.actieveSchok.aanbod },
+      macro: {
+        consumentenvertrouwen: e.macro.consumentenvertrouwen,
+        beroepsbevolking: e.macro.beroepsbevolking,
+        leverancierPersoneel: e.macro.leverancierPersoneel,
+        prijsindex: e.macro.prijsindex
+      },
+      instellingen: { basisVraag: e.instellingen.basisVraag, prijsElasticiteit: e.instellingen.prijsElasticiteit },
+      bedrijven: bedrijven.map(b => ({
+        id: b.id, personeel: b.personeel, basisProductiviteit: b.basisProductiviteit,
+        trainingDag: b.trainingDag, prijs: b.prijs, kwaliteit: b.kwaliteit,
+        reputatie: b.reputatie, vasteCapaciteit: b.vasteCapaciteit,
+        bestelling: b.bestelling, voorraad: b.voorraad
+      }))
+    };
+  }
+
+  const RUST_BEDRIJF_GETALLEN = [
+    'productiviteit', 'capaciteitVandaag', 'vraagVandaag', 'levering', 'voorraad',
+    'levergraad', 'verkoop', 'benutting', 'kwaliteit', 'reputatie'
+  ];
+  const RUST_MACRO_GETALLEN = [
+    'werkloosheid', 'inflatie', 'rente', 'prijsindex', 'bbpVandaag',
+    'vraagIndex', 'aanbodIndex', 'consumentenvertrouwen'
+  ];
+
+  /* Bereid alleen het kleine rekenmodel voor. De vorige versie maakte vóór
+     iedere HTTP-call een structuredClone van het volledige grootboek,
+     journaal en de historie. Dat was veilig maar werd per dag duurder. Deze
+     kopie bevat uitsluitend de velden die Rust leest; de levende staat wordt
+     pas na een geldig antwoord en een mutatieversie-check synchroon gewijzigd. */
+  function rustInvoerVoor(e, schok) {
+    const reken = {
+      dag: e.dag + 1,
+      actieveSchok: schok,
+      werk: Object.assign({}, e.werk),
+      macro: Object.assign({}, e.macro),
+      instellingen: Object.assign({}, e.instellingen),
+      bedrijven: Object.fromEntries(Object.entries(e.bedrijven).map(([id, b]) => [id, Object.assign({}, b)])),
+      verklaringen: []
+    };
+    const bedrijven = Object.values(reken.bedrijven);
+    bedrijven.forEach(b => pasArbeidsmarktToe(reken, b, schok));
+    return motorInvoer(reken, bedrijven);
+  }
+
+  function valideerRustAntwoord(antwoord, bedrijven) {
+    if (!Array.isArray(antwoord.bedrijven) || antwoord.bedrijven.length !== bedrijven.length) {
+      throw new Error('Rust-motor gaf niet alle bedrijven terug.');
+    }
+    const perId = new Map(antwoord.bedrijven.map(b => [b && b.id, b]));
+    for (const b of bedrijven) {
+      const r = perId.get(b.id);
+      if (!r || RUST_BEDRIJF_GETALLEN.some(k => !Number.isFinite(r[k]))) {
+        throw new Error('Rust-motor gaf een ongeldige uitkomst voor ' + b.id + '.');
+      }
+    }
+    if (!antwoord.macro || RUST_MACRO_GETALLEN.some(k => !Number.isFinite(antwoord.macro[k]))) {
+      throw new Error('Rust-motor gaf ongeldige macro-indices terug.');
+    }
+    if (!Number.isFinite(antwoord.totaleVraag) || !Number.isFinite(antwoord.werkBonus)) {
+      throw new Error('Rust-motor gaf ongeldige markttotalen terug.');
+    }
+  }
+
+  function pasRustAntwoordToe(e, antwoord) {
+    const bedrijven = Object.values(e.bedrijven);
+    bedrijven.forEach(b => pasArbeidsmarktToe(e, b, e.actieveSchok));
+    const perId = new Map(antwoord.bedrijven.map(b => [b && b.id, b]));
+    for (const b of bedrijven) {
+      const r = perId.get(b.id);
+      b.productiviteit = r.productiviteit;
+      b.capaciteitVandaag = r.capaciteitVandaag;
+      b.vraagVandaag = r.vraagVandaag;
+      b.voorraad = r.voorraad;
+      b.levergraad = r.levergraad;
+      b.benutting = r.benutting;
+      b.kwaliteit = r.kwaliteit;
+      b.reputatie = r.reputatie;
+      boekBedrijfsdag(e, b, r.verkoop, r.levering);
+    }
+    for (const k of RUST_MACRO_GETALLEN) e.macro[k] = antwoord.macro[k];
+    verwerkOverheid(e);
+    verklaarMarkt(e, antwoord.totaleVraag, antwoord.werkBonus);
   }
 
   function neemMoment(e) {
@@ -359,7 +542,8 @@ module.exports = ({ wereldState, save = () => {} }) => {
       bedrijven: Object.fromEntries(Object.values(e.bedrijven).map(b => [b.id, {
         omzet: b.omzetVandaag, winst: b.winstVandaag, kas: kas(e, b.id), schuld: creditWaarde(e, b.id + '.schuld'),
         personeel: b.personeel, prijs: b.prijs, kwaliteit: b.kwaliteit, reputatie: b.reputatie,
-        vraag: b.vraagVandaag, verkoop: b.verkopenVandaag, capaciteit: b.capaciteitVandaag, voorraad: b.voorraad
+        vraag: b.vraagVandaag, verkoop: b.verkopenVandaag, capaciteit: b.capaciteitVandaag, voorraad: b.voorraad,
+        kosten: Object.assign({}, b.kostenUitsplitsing || {})
       }]))
     };
     e.historie.push(moment);
@@ -375,18 +559,67 @@ module.exports = ({ wereldState, save = () => {} }) => {
     const e = state();
     commandoId = String(commandoId || '').replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 120);
     if (!commandoId) return { status: 400, error: 'Een unieke commandosleutel is nodig om dubbel verwerken te voorkomen.' };
-    if (e.commandos[commandoId]) return Object.assign({ ok: true, herhaald: true }, overzicht(), { verwerktCommando: commandoId });
+    if (e.commandos[commandoId]) return Object.assign({ ok: true, herhaald: true }, overzicht(actor), { verwerktCommando: commandoId });
     e.dag += 1;
     e.actieveSchok = schokVoorDag(e);
     berekenMarkt(e);
     neemMoment(e);
+    economenlab.verwerkDag(e);
     wisWerk(e);
     e.commandos[commandoId] = e.dag;
     const sleutels = Object.keys(e.commandos);
     if (sleutels.length > 500) for (const k of sleutels.slice(0, sleutels.length - 500)) delete e.commandos[k];
     audit(e, actor, 'volgende-dag', 'Economische dag ' + e.dag + ' verwerkt');
+    markeerMutatie(e);
     save();
-    return Object.assign({ ok: true, herhaald: false, verwerktCommando: commandoId }, overzicht());
+    return Object.assign({ ok: true, herhaald: false, verwerktCommando: commandoId }, overzicht(actor));
+  }
+
+  async function volgendeDagViaMotor(actor, commandoId) {
+    commandoId = String(commandoId || '').replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 120);
+    if (!commandoId) return { status: 400, error: 'Een unieke commandosleutel is nodig om dubbel verwerken te voorkomen.' };
+    for (let poging = 0; poging < 3; poging++) {
+      const live = state();
+      if (live.commandos[commandoId]) return Object.assign({ ok: true, herhaald: true }, overzicht(actor), { verwerktCommando: commandoId });
+      const basisVersie = live.mutatieVersie;
+      const schok = schokZonderMutatie(live, live.dag + 1);
+      let antwoord;
+      try {
+        antwoord = await motor.markt(rustInvoerVoor(live, schok));
+        valideerRustAntwoord(antwoord, Object.values(live.bedrijven));
+      } catch (fout) {
+        /* Rust werkt uitsluitend op het kleine rekenmodel. De live staat is heel en
+           kan zonder herstel of verloren gelijktijdige mutatie door JS verder. */
+        meldRustFout(fout && fout.message);
+        return volgendeDag(actor, commandoId);
+      }
+      const nogLive = state();
+      if (nogLive === live && nogLive.mutatieVersie === basisVersie) {
+        /* Vanaf hier zit geen await: de commit is één synchrone kritieke sectie.
+           schokVoorDag wist een eventuele geforceerde schok pas nu. */
+        live.dag += 1;
+        live.actieveSchok = schokVoorDag(live);
+        pasRustAntwoordToe(live, antwoord);
+        neemMoment(live);
+        economenlab.verwerkDag(live);
+        wisWerk(live);
+        live.commandos[commandoId] = live.dag;
+        const sleutels = Object.keys(live.commandos);
+        if (sleutels.length > 500) for (const k of sleutels.slice(0, sleutels.length - 500)) delete live.commandos[k];
+        audit(live, actor, 'volgende-dag', 'Economische dag ' + live.dag + ' verwerkt door Rust');
+        markeerMutatie(live);
+        save();
+        return Object.assign({ ok: true, herhaald: false, verwerktCommando: commandoId, rekenmotor: 'rust' }, overzicht(actor));
+      }
+      // Een missie of strategie kwam binnen tijdens de await. Reken opnieuw op
+      // die nieuwste waarheid; overschrijf haar nooit met de oudere kopie.
+    }
+    meldRustFout('economie bleef veranderen');
+    return volgendeDag(actor, commandoId);
+  }
+
+  function volgendeDagAsync(actor, commandoId) {
+    return motor.aan ? volgendeDagViaMotor(actor, commandoId) : volgendeDag(actor, commandoId);
   }
 
   function getal(v, veld) {
@@ -396,7 +629,7 @@ module.exports = ({ wereldState, save = () => {} }) => {
   }
 
   function beslis(actor, invoer) {
-    const e = state();
+    const e = structuredClone(state());
     const b = e.bedrijven.praktijk;
     invoer = invoer && typeof invoer === 'object' ? invoer : {};
     const velden = [
@@ -426,8 +659,10 @@ module.exports = ({ wereldState, save = () => {} }) => {
     if (!gewijzigd) return { status: 400, error: 'Geef ten minste één bedrijfsbesluit door.' };
     audit(e, actor, 'strategie', 'Praktijkbedrijf: ' + gewijzigd + ' instelling(en) gewijzigd');
     legUit(e, 'besluit', 'Nieuwe bedrijfsstrategie vastgelegd', 'De keuze verandert niet direct de score. De volgende dagcyclus rekent eerst alle markt-, arbeids- en kasgevolgen door.', gewijzigd + ' instelling(en)', 'spelersbesluit');
+    markeerMutatie(e);
+    wereldState().economie = e;
     save();
-    return Object.assign({ ok: true }, overzicht());
+    return Object.assign({ ok: true }, overzicht(actor));
   }
 
   function kiesSchok(actor, schokId) {
@@ -436,8 +671,20 @@ module.exports = ({ wereldState, save = () => {} }) => {
     if (!schok || schok.id === 'geen') return { status: 400, error: 'Kies een bestaand economisch scenario.' };
     e.geforceerdeSchok = schok.id;
     audit(e, actor, 'scenario', schok.naam + ' staat klaar voor de volgende dag');
+    markeerMutatie(e);
     save();
-    return Object.assign({ ok: true, gepland: schok }, overzicht());
+    return Object.assign({ ok: true, gepland: schok }, overzicht(actor));
+  }
+
+  function analyse(actor, invoer) {
+    const e = structuredClone(state());
+    const uitkomst = economenlab.dienAnalyse(e, actor, invoer);
+    if (uitkomst && uitkomst.error) return uitkomst;
+    audit(e, actor, 'economenanalyse', uitkomst.analyse.id + ' · voorspelling voor dag ' + uitkomst.analyse.doelDag);
+    markeerMutatie(e);
+    wereldState().economie = e;
+    save();
+    return Object.assign({ ok: true, ingediend: uitkomst.analyse }, overzicht(actor));
   }
 
   function registreerWerk(actor, taak) {
@@ -461,6 +708,7 @@ module.exports = ({ wereldState, save = () => {} }) => {
     e.werk.bronnen.unshift({ taakId: taak.id, functieId: taak.functieId, kwaliteit: waarde, soort });
     if (e.werk.bronnen.length > 30) e.werk.bronnen.length = 30;
     audit(e, actor, 'werkresultaat', taak.functieId + ' · ' + waarde + '% proceskwaliteit');
+    markeerMutatie(e);
     return { soort: koppeling[0], kwaliteit: waarde, uitleg: koppeling[1] + ' Het effect wordt bij de volgende economische dag doorgerekend.' };
   }
 
@@ -484,12 +732,21 @@ module.exports = ({ wereldState, save = () => {} }) => {
     return { debet, credit, verschil: debet - credit, inBalans: debet === credit };
   }
 
-  function overzicht() {
+  function overzicht(actor) {
     const e = state();
+    const motorStatus = typeof motor.status === 'function' ? motor.status() : {
+      aan: !!motor.aan, modus: motor.aan ? 'motor' : 'uit', circuit: motor.aan ? 'onbekend' : 'niet-van-toepassing'
+    };
     return {
       versie: VERSIE, naam: 'Magnaat Economische Motor', dag: e.dag,
       datum: datumOpDag(e.dag), omgeving: 'synthetische trainingswereld',
       serverAuthoritatief: true, deterministisch: true,
+      rekenlaag: {
+        actief: motorStatus.aan ? 'rust-native' : 'javascript-lokaal',
+        circuit: motorStatus.circuit, gelijktijdig: motorStatus.actief || 0,
+        grens: motorStatus.maxTegelijk || null,
+        terugval: 'atomair naar dezelfde deterministische JavaScript-regels'
+      },
       actieveSchok: Object.assign({}, e.actieveSchok),
       geplandeSchok: e.geforceerdeSchok || null,
       schokken: SCHOKKEN.filter(s => s.id !== 'geen').map(s => Object.assign({}, s)),
@@ -506,6 +763,7 @@ module.exports = ({ wereldState, save = () => {} }) => {
       },
       verklaringen: e.verklaringen.slice(0, 12),
       historie: e.historie.slice(-40),
+      economenlab: economenlab.rapport(e, actor),
       regels: [
         'Vraag reageert op prijs, kwaliteit, reputatie en consumentenvertrouwen.',
         'Verkoop kan nooit hoger zijn dan vraag, capaciteit of voorraad.',
@@ -517,5 +775,5 @@ module.exports = ({ wereldState, save = () => {} }) => {
     };
   }
 
-  return { overzicht, beslis, volgendeDag, kiesSchok, registreerWerk, _state: state, _boek: boek };
+  return { overzicht, beslis, analyse, volgendeDag, volgendeDagAsync, kiesSchok, registreerWerk, _state: state, _boek: boek };
 };

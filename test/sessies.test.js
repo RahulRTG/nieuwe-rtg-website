@@ -12,6 +12,19 @@ function nieuweStore() {
   return maakSessies({ db, save, crypto });
 }
 
+function gedeeldeBus() {
+  const abonnees = new Map();
+  return {
+    publish(kanaal, bericht) {
+      for (const fn of abonnees.get(kanaal) || []) fn(JSON.parse(JSON.stringify(bericht)));
+    },
+    subscribe(kanaal, fn) {
+      if (!abonnees.has(kanaal)) abonnees.set(kanaal, []);
+      abonnees.get(kanaal).push(fn);
+    }
+  };
+}
+
 test('meer dan 400 actieve sessies blijven allemaal bestaan', () => {
   const s = nieuweStore();
   const tokens = [];
@@ -50,4 +63,32 @@ test('verlopen sessies worden opgeruimd bij een nieuwe login boven de grens', ()
 
   delete process.env.RTG_MAX_SESSIONS;
   delete require.cache[require.resolve('../server/kern/sessies')];
+});
+
+test('login en intrekking zijn direct zichtbaar op een andere instance', () => {
+  const bus = gedeeldeBus();
+  const dbA = { data: { sessions: {} }, writable: true };
+  const dbB = { data: { sessions: {} }, writable: true };
+  const a = maakSessies({ db: dbA, save: () => {}, crypto });
+  const b = maakSessies({ db: dbB, save: () => {}, crypto });
+  a.koppelBus(bus); b.koppelBus(bus);
+
+  a.rememberSession('gedeeld-token', { tier: 'rtg', key: 'lid-42' });
+  assert.equal(b.sessionFor('gedeeld-token').key, 'lid-42', 'instance B kent een login meteen');
+  const hash = a.tokenHash('gedeeld-token');
+  b.forgetSession(hash);
+  assert.equal(a.sessionFor('gedeeld-token'), null, 'instance A weigert een elders ingetrokken token meteen');
+  assert.equal(dbA.data.sessions[hash], undefined);
+  assert.equal(dbB.data.sessions[hash], undefined);
+});
+
+test('snapshot-reconciliatie verwijdert lokaal achtergebleven sessies', () => {
+  const db = { data: { sessions: {} }, writable: true };
+  const s = maakSessies({ db, save: () => {}, crypto });
+  s.rememberSession('oud-token', { tier: 'rtg', key: 'oud' });
+  const hash = s.tokenHash('oud-token');
+  delete db.data.sessions[hash];
+  assert.equal(s.sessions.has(hash), true, 'fixture heeft eerst bewust een stale lokale index');
+  assert.equal(s.herbouwSessions(), 0);
+  assert.equal(s.sessionFor('oud-token'), null);
 });

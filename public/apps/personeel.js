@@ -60,7 +60,6 @@
     PORTELL:{ name:'Marina Portell', icon:'' },
     SEGUR:{ name:'Segur Advies', icon:'' }
   };
-
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
   // zodat alle apps zich identiek gedragen.
   const API = RTGApp.maakAPI();
@@ -242,7 +241,7 @@
      door de werkgever is uitgenodigd en zich heeft aangemeld (dan sta je in het
      team), met de eigen pincode. */
   function pdaBedrijf(){
-    try { const c = localStorage.getItem('rtg_pda_bedrijf'); return (c && BEDRIJVEN[c]) ? c : null; } catch(e){ return null; }
+    try { const c = String(localStorage.getItem('rtg_pda_bedrijf') || '').toUpperCase(); return geldigeBedrijfscode(c) ? c : null; } catch(e){ return null; }
   }
   function stepStart(){
     // 1x aanmelden is de gewone ingang: log één keer in met uw eigen RTG-account
@@ -251,7 +250,7 @@
     const qs = new URLSearchParams(location.search);
     if (qs.get('kantoor') != null){ stepKantoor(); return; }
     const qb = String(qs.get('bedrijf') || '').toUpperCase();
-    if (qb && BEDRIJVEN[qb]){ stepWie(null, qb); return; }
+    if (geldigeBedrijfscode(qb)){ stepWie(null, qb); return; }
     const vast = pdaBedrijf();
     if (vast) stepWie(null, vast);
     else stepLogin();
@@ -358,6 +357,31 @@
 
    Gevonden door regel 42 van scripts/check.js, die op dezelfde fout in de
    Vooruit-kaart is gebouwd. */
+  /* De vaste-PDA-ingang kent niet alleen de geseede demonstratiezaken. Nieuwe
+     partners worden na de eerste geldige roster-opvraag aan de lokale
+     schermcatalogus toegevoegd; de server blijft de enige bron van waarheid. */
+  const DEMO_BEDRIJVEN = new Set(Object.keys(BEDRIJVEN));
+  let demoOmgeving = location.protocol === 'file:';
+  const geldigeBedrijfscode = c => /^[A-Z0-9_-]{2,32}$/.test(String(c || '').toUpperCase());
+
+  async function laadOmgeving() {
+    if (!(location.protocol === 'http:' || location.protocol === 'https:')) return;
+    try {
+      const r = await fetch('/api/health');
+      const h = r.ok ? await r.json() : null;
+      demoOmgeving = !!(h && h.demo);
+    } catch (e) { demoOmgeving = false; }
+  }
+
+  function onthoudBedrijf(s) {
+    if (!s || !geldigeBedrijfscode(s.code)) return null;
+    const c = String(s.code).toUpperCase();
+    BEDRIJVEN[c] = Object.assign({}, BEDRIJVEN[c] || {}, {
+      name: String(s.name || s.naam || c),
+      icon: (BEDRIJVEN[c] && BEDRIJVEN[c].icon) || '', type: s.type || ''
+    });
+    return c;
+  }
 /* Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet.
    De gewone ingang is het gesprek met Rahul (deel 3). Dit blok staat er
    voor het geval shared/rahulpoort.js niet geladen is; zonder inlogscherm
@@ -391,6 +415,7 @@
   }
   // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
   async function landMijn(d){
+    onthoudBedrijf(d.supplier);
     API.token = d.token; state = d.state; code = d.supplier.code;
     me = { name: d.actor.name, role: d.actor.role, staffId: d.actor.staffId };
     mijnPosities = d.posities || [];
@@ -418,11 +443,21 @@
 
   function stepSector(){
     kantoorStop();
-    $('#gateStep').innerHTML = '<div class="glist">' + SECTORS.map(s =>
+    const direct = '<form class="lform" id="vastBedrijf" autocomplete="off">' +
+      '<input id="vastCode" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="'+T('pd.code','Bedrijfscode')+'" aria-label="'+T('pd.code','Bedrijfscode')+'">' +
+      '<button class="prim" type="submit">'+T('pd.openbedrijf','Open bedrijf')+'</button></form>' +
+      '<div class="lhint">'+T('pd.codehint','Gebruik de code van uw werkgever. Nieuwe RTG-partners werken hier direct, zonder dat deze app hoeft te worden aangepast.')+'</div>';
+    const voorbeelden = demoOmgeving ? '<div class="glist" style="margin-top:0.8rem;">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(s.icon):'')+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
     ).join('') +
-      '<button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button>'
-    + '</div>';
+      '</div>' : '';
+    $('#gateStep').innerHTML = direct + voorbeelden +
+      '<div class="glist" style="margin-top:0.8rem;"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
+    $('#vastBedrijf').addEventListener('submit', e => {
+      e.preventDefault(); const c = String($('#vastCode').value || '').trim().toUpperCase();
+      if (!geldigeBedrijfscode(c)) { toast(T('pd.badcode','Controleer de bedrijfscode.')); return; }
+      stepWie(null, c);
+    });
     document.querySelectorAll('[data-sec]').forEach(b => b.addEventListener('click', () => stepBedrijf(b.dataset.sec)));
     $('#gKantoor').addEventListener('click', stepKantoor);
   }
@@ -438,6 +473,7 @@
     let roster = { staff: [] };
     try { roster = await API.call('/supplier/roster', { code: c }); }
     catch(e){ toast(T('pd.needserver','Start de server om in te loggen.')); return; }
+    onthoudBedrijf(roster.supplier || { code: c, name: c });
     // dit apparaat staat nu vast op dit bedrijf
     try { localStorage.setItem('rtg_pda_bedrijf', c); } catch(e){}
     $('#gateStep').innerHTML =
@@ -458,7 +494,7 @@
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
-      '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>';
+      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
     // opnieuw proberen; de server vergelijkt en bewaart er niets van
@@ -543,8 +579,7 @@
     $('#kaGo').addEventListener('click', go);
     $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
     $('#kaCode').focus();
-    // is de kantoor-rol al aan het RTG-account op dit toestel gekoppeld,
-    // dan is een tik genoeg (het ene account start dezelfde kantoor-sessie)
+    // Een gekoppelde kantoorrol start met een tik via hetzelfde RTG-account.
     (async () => {
       let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
       if (!lt) return;
@@ -592,6 +627,12 @@
         '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.4rem;"></div>'+
         '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
+      '<div class="card"><div class="k">Integratiekamer</div>'+
+        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">SMTP, SMS, Stripe Connect en SEPA lokaal testen, gecontroleerd schakelen en samen als keten beproeven. Bediening vraagt boardroomtoegang.</div>'+
+        '<a class="abtn" href="/apps/kantoren.html?kamer=integraties" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open het beveiligde schakelbord</a></div>'+
+      '<div class="card"><div class="k">RTG Controleregister</div>'+
+        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
+        '<a class="abtn" href="/apps/magnaat-kantoor.html" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open de dekkingsmatrix</a></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
     const toonDienst = () => {
@@ -705,7 +746,7 @@
   async function restoreSession(){
     let t = null, c = null;
     try { t = localStorage.getItem('rtg_pda_token'); c = localStorage.getItem('rtg_pda_code'); } catch(e){}
-    if (!t || !c || !BEDRIJVEN[c]) return;
+    if (!t || !geldigeBedrijfscode(c)) return;
     // de PDA staat vast op een bedrijf: een sessie van een ander bedrijf herstellen we niet
     const vast = pdaBedrijf();
     if (vast && vast !== c){ try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e){} return; }
@@ -713,6 +754,7 @@
     try {
       const st = (await API.call('/supplier/state')).state;
       if (!st.actor || !st.actor.staffId){ API.token = null; return; } // alleen persoonlijke logins herstellen
+      onthoudBedrijf(st.supplier || { code: c, name: c });
       state = st; code = c;
       me = { name: st.actor.name, role: st.actor.role, staffId: st.actor.staffId };
       week = await API.call('/supplier/schedule', {}).catch(()=>null);
@@ -2942,7 +2984,11 @@
   window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); gateTik(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   gateTik(); setInterval(gateTik, 15000);
-  stepStart();
+  async function startPersoneel(){
+    await laadOmgeving();
+    stepStart();
+    await restoreSession();
+  }
   // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon.
   // RTG Eye (de camerabril: voertuigschouw + werkvloerregister) staat als
   // eigen app op het springboard; de knop leeft in een onzichtbare houder.
@@ -2977,5 +3023,5 @@
   document.body.appendChild(extraHouder);
   if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'],
     extra: { houder: '#pdaExtra', knop: '.pda-app' } });
-  restoreSession();
+  startPersoneel();
 })();

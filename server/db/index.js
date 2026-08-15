@@ -203,6 +203,31 @@ function save() {
     planSnapshot();
   }
 }
+
+/* Eén collectie lezen, valideren en schrijven als ondeelbare handeling. In
+   productie delegeren PostgreSQL en SQLite dit aan hun eigen database-slot.
+   De overige (één-proces) opslagvormen werken op een kopie en zetten die pas
+   terug nadat save() de mutatie heeft aangenomen, zodat een gooiende save geen
+   half gewijzigde RAM-staat achterlaat. */
+function bewerkCollectie(sleutel, werk) {
+  sleutel = String(sleutel || '').trim();
+  if (!sleutel || sleutel.length > 120 || typeof werk !== 'function')
+    throw new Error('Collectietransactie vereist een geldige sleutel en bewerker.');
+  if (STORE === 'postgres') return postgres.bewerkCollectiePostgres(sleutel, werk);
+  if (STORE === 'sqlite') return sqlite.bewerkCollectieSqlite(sleutel, werk);
+  if (!db.writable) throw new Error('De opslag is niet schrijfbaar.');
+  const oud = db.data[sleutel];
+  const waarde = JSON.parse(JSON.stringify(oud == null ? {} : oud));
+  const voor = JSON.stringify(waarde);
+  const resultaat = werk(waarde);
+  if (resultaat && typeof resultaat.then === 'function')
+    throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
+  if (JSON.stringify(waarde) === voor) return resultaat;
+  db.data[sleutel] = waarde;
+  try { save(); }
+  catch (e) { db.data[sleutel] = oud; throw e; }
+  return resultaat;
+}
 // De tx-veegronde vraagt na een venster-verhuis een snapshot: injecteer save().
 tx.wire(save);
 
@@ -382,7 +407,7 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

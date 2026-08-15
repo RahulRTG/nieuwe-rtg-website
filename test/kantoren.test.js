@@ -1,4 +1,4 @@
-/* De RTG-kantoren en de boardroom: drieentwintig afdelingskamers met echte cijfers,
+/* De RTG-kantoren en de boardroom: vijfentwintig afdelingskamers met echte cijfers,
    taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan
    schakelen (globaal en per doelgroep, en het werkt echt: het pad gaat dicht)
    en een verbeterkamer bijhoudt. Draai los:
@@ -19,7 +19,11 @@ const api = (pad, body) => fetch(base + '/api/office/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-KEURING-1' } });
+  srv = await startServer({ env: {
+    SMTP_URL: 'smtp://127.0.0.1:2525', SMTP_SANDBOX: '1', SMS_SANDBOX: '1',
+    STRIPE_CONNECT_SANDBOX: '1', SEPA_SANDBOX: '1', STRIPE_WEBHOOK_SECRET: 'integratiekamer-test-secret',
+    RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-KEURING-1'
+  } });
   base = srv.base;
   // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
   const login = await fetch(base + '/api/auth/login', {
@@ -33,19 +37,78 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('drieentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
+test('vijfentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
   const dicht = await fetch(base + '/api/office/kamers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
   const d = await api('kamers');
   assert.equal(d.status, 200);
-  assert.equal(d.body.kamers.length, 23, 'drieentwintig afdelingen');
-  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang']) {
+  assert.equal(d.body.kamers.length, 25, 'vijfentwintig afdelingen');
+  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang', 'integraties', 'controleregister']) {
     assert.ok(d.body.kamers.some(k => k.id === id), id + ' heeft een kamer');
   }
   const hr = await api('kamer', { id: 'hr' });
   assert.equal(hr.status, 200);
   assert.ok(hr.body.kpis.length >= 3, 'de kamer toont cijfers');
   assert.equal((await api('kamer', { id: 'kelder' })).status, 404);
+});
+
+test('Integratiekamer: lokale ketenproef, eigenaarsbesluit en noodstop werken echt', async () => {
+  const begin = await api('techniek/integraties');
+  assert.equal(begin.status, 200);
+  assert.equal(begin.body.liveActivering, 'geblokkeerd', 'live heeft bewust geen schakelroute');
+  assert.equal(begin.body.tegels.length, 4);
+  assert.deepEqual(begin.body.tegels.map(x => x.id), ['smtp', 'sms', 'connect', 'sepa']);
+  assert.ok(begin.body.tegels.every(x => x.geconfigureerd && x.aan && !x.live), 'alleen lokale sandboxes staan aan');
+
+  const keten = await api('techniek/integraties/test', { id: 'keten' });
+  assert.equal(keten.status, 200);
+  assert.equal(keten.body.proef.stappen.length, 4);
+  assert.ok(keten.body.proef.stappen.every(x => x.ok));
+  assert.match(keten.body.proef.stappen.find(x => x.id === 'connect').detail, /niets als omzet geboekt/i);
+
+  const eigen = await api('techniek/integraties/verantwoordelijke', { id: 'sms', naam: 'Noor · Techniek' });
+  assert.equal(eigen.body.tegels.find(x => x.id === 'sms').verantwoordelijke, 'Noor · Techniek');
+
+  const verzoek = await api('techniek/integraties/schakel', { id: 'sms', aan: false });
+  assert.equal(verzoek.status, 200);
+  assert.equal(verzoek.body.tegels.find(x => x.id === 'sms').aan, true, 'verzoek schakelt nog niets');
+  const verzoekId = verzoek.body.verzoek.id;
+
+  const gedeeldLogin = await fetch(base + '/api/office/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: 'KANTOOR-KEURING-1' })
+  });
+  const gedeeld = (await gedeeldLogin.json()).token;
+  const geenBaas = await fetch(base + '/api/office/techniek/integraties/besluit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + gedeeld },
+    body: JSON.stringify({ verzoekId, akkoord: true })
+  });
+  assert.equal(geenBaas.status, 403, 'gedeelde kantoorcode mag geen besluit nemen');
+
+  const besluit = await api('techniek/integraties/besluit', { verzoekId, akkoord: true });
+  assert.equal(besluit.status, 200);
+  assert.equal(besluit.body.tegels.find(x => x.id === 'sms').aan, false, 'runtime-zekering staat echt uit');
+
+  const nood = await api('techniek/integraties/noodstop', { reden: 'contracttest' });
+  assert.ok(nood.body.noodstop);
+  assert.ok(nood.body.tegels.every(x => !x.aan), 'alle lokale rails zijn direct veilig uit');
+  assert.ok(nood.body.log.some(x => x.soort === 'noodstop'), 'noodstop staat in het auditlog');
+});
+
+test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
+  const matrix = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
+  assert.equal(matrix.status, 200);
+  assert.equal(matrix.body.dekking.percentage, 100);
+  assert.equal(matrix.body.dekking.metGaten, 0);
+  assert.equal(matrix.body.dekking.dimensies.length, 11);
+  assert.equal(matrix.body.punten.length, 0);
+  const plan = await api('magnaat/controle/gaten/plan', { limiet: 5 });
+  assert.equal(plan.status, 200);
+  assert.equal(plan.body.aangemaakt, 0);
+  assert.equal(plan.body.bekeken, 0);
+  assert.deepEqual(plan.body.taken, []);
+  const terug = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 12 });
+  assert.equal(terug.body.taken.filter(t => t.autoDekking).length, 0);
+  assert.match(plan.body.waarschuwing, /trainingsomgeving/i);
 });
 
 test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
@@ -63,7 +126,7 @@ test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
 test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan', async () => {
   const b = await api('boardroom');
   assert.equal(b.status, 200);
-  assert.equal(b.body.kamers.length, 23, 'alle kamers in beeld');
+  assert.equal(b.body.kamers.length, 25, 'alle kamers in beeld');
   assert.ok(b.body.functies.length >= 5, 'het volledige schakelbord staat erop');
   assert.ok(b.body.verbeterkamer.voorstellen.length >= 1, 'de verbeterkamer heeft een dagronde');
   // pak een echte functie van het bord en zet hem uit

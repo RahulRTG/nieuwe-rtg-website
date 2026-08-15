@@ -2,6 +2,7 @@
    e-mail plus code per telefoon), het resetten en het wijzigen met het
    huidige wachtwoord als bevestiging. Krijgt de gedeelde context een keer
    bij het opstarten vanuit routes/auth.js. */
+const rtgKlok = require('../../lib/klok');
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN , kern} = actx;
@@ -30,6 +31,10 @@ const codeHash = (c) => crypto.createHash('sha256').update(String(c)).digest('he
    ruis middelt weg als je vaak genoeg meet. Een aanvaller ziet nu een vlakke
    lijn; een gewone gebruiker merkt een kwart seconde niet. */
 const MIN_MS = 250;
+/* Deze vlag is geen bypass maar een extra grendel: als hij staat, blijft
+   telefoonherstel ook dicht wanneer later per ongeluk een half geconfigureerde
+   SMS-module wordt toegevoegd. Activeren vraagt dan twee bewuste wijzigingen. */
+const HERSTEL_SMS_BEWUST_UIT = process.env.RTG_HERSTEL_SMS_UIT_BEWUST === '1';
 
 /* HET HERSTEL IN GANG ZETTEN -- als eigen functie, niet alleen als route.
 
@@ -43,12 +48,19 @@ const MIN_MS = 250;
    verandert, verandert ze voor allebei. */
 function herstelStart(u, req) {
   if (!u) return { ok: true, tweestaps: false };   // bestaan lekken we nooit
-  const tok = accounts.createReset(u.id);
-  const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
+  const tel = accounts.phoneOf(u);
+  /* PRODUCTIE ZONDER ECHT TWEEDE KANAAL: GEEN TOKEN UITGEVEN.
+
+     De outbox is een storingsvangnet voor medewerkers, geen telefoon. Een
+     herstel-link mailen en tegelijk een code eisen die de gebruiker nooit kan
+     ontvangen maakt het account onherstelbaar; link-only doorgaan zou de
+     beveiliging juist verlagen. We falen daarom gesloten en houden het
+     publieke antwoord generiek. Lokaal blijft de outbox-proef beschikbaar. */
+  if (tel && PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured)) {
+    console.error('[auth] herstel veilig geblokkeerd: account heeft telefoon maar er is geen echte SMS-provider.');
+    return { ok: true, tweestaps: true, geblokkeerd: true, url: null, code: null };
+  }
   const code = String(crypto.randomInt(100000, 1000000));
-  mail.send(accounts.emailOf(u) || '', 'Wachtwoord herstellen bij Rahul Travel Group',
-    'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
-    '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
   /* GEEN TELEFOON, GEEN TWEEDE STAP -- en dat moet je dan ook zeggen.
      Hier stond `accounts.phoneOf(u) || 'onbekend'`, en de code ging als
      'sms:onbekend' de deur uit: naar niemand. /api/auth/reset EIST die code,
@@ -56,13 +68,22 @@ function herstelStart(u, req) {
      registratie vraagt met opzet GEEN telefoonnummer, dus dat was niet de
      uitzondering maar de regel. Een `|| 'onbekend'` is een fallback die iets
      VERZINT in plaats van te weigeren. */
-  const tel = accounts.phoneOf(u);
   if (tel) {
-    herstel2fa()[u.id] = { hash: codeHash(code), tot: Date.now() + 3600000, pogingen: 0 };
-    mail.send('sms:' + tel, 'Uw RTG-herstelcode',
+    /* Eerst het tweede kanaal laten accepteren, pas daarna een herstel-link
+       uitgeven. Een gesimuleerde providerstoring laat zo geen half geldige
+       herstelpoging achter. */
+    mail.sendSms(tel, 'Uw RTG-herstelcode',
       'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
+  }
+  const tok = accounts.createReset(u.id);
+  const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
+  mail.send(accounts.emailOf(u) || '', 'Wachtwoord herstellen bij Rahul Travel Group',
+    'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
+    (tel ? '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.' : ''));
+  if (tel) {
+    herstel2fa()[u.id] = { hash: codeHash(code), tot: rtgKlok.nu() + 3600000, pogingen: 0 };
   } else {
-    herstel2fa()[u.id] = { zonderCode: true, tot: Date.now() + 3600000, pogingen: 0 };
+    herstel2fa()[u.id] = { zonderCode: true, tot: rtgKlok.nu() + 3600000, pogingen: 0 };
   }
   save();
   return { ok: true, tweestaps: !!tel, url, code: tel ? code : null };
@@ -71,20 +92,33 @@ function herstelStart(u, req) {
    belt. Hij krijgt de LINK en de CODE bewust NIET terug -- alleen dat het is
    verstuurd. Een medewerker die de link ziet, kan het account overnemen. */
 kern.herstelStart = (u, req) => {
-  const r = herstelStart(u, req);
+  let r;
+  try { r = herstelStart(u, req); }
+  catch (e) {
+    console.error('[auth] herstel niet gestart:', e && e.message);
+    r = { ok: true, tweestaps: !!(u && accounts.phoneOf(u)), url: null, code: null };
+  }
   return { ok: r.ok, verstuurd: !!u, tweestaps: r.tweestaps };
 };
 
 app.post('/api/auth/forgot', (req, res) => {
-  const begon = Date.now();
+  const begon = rtgKlok.nu();
   const antwoord = (lijf) => {
-    const over = MIN_MS - (Date.now() - begon);
+    const over = MIN_MS - (rtgKlok.nu() - begon);
     if (over > 0) setTimeout(() => res.json(lijf), over);
     else res.json(lijf);
   };
   const email = String(req.body.email || '').trim();
   const u = email ? accounts.findByLogin(email) : null;
-  const r = herstelStart(u, req);
+  let r;
+  try { r = herstelStart(u, req); }
+  catch (e) {
+    /* Een providerstoring mag niet verraden of dit account bestaat en mag ook
+       geen half geldige herstelpoging opleveren. herstelStart maakt het token
+       pas NA SMS-acceptatie; hier houden we het publieke antwoord generiek. */
+    console.error('[auth] herstel niet gestart:', e && e.message);
+    r = { ok: true, tweestaps: !!(u && accounts.phoneOf(u)), url: null, code: null };
+  }
   const dev = DEV_VELDEN(req) && u ? { devResetUrl: r.url, devCode: r.code } : {};
   // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
   antwoord({ ok: true, tweestaps: r.tweestaps, ...dev });
@@ -94,7 +128,7 @@ app.post('/api/auth/reset', async (req, res) => {
   if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });
   // tweede stap: de code van de telefoon moet kloppen
   const entry = herstel2fa()[u.id];
-  if (!entry || entry.tot < Date.now())
+  if (!entry || entry.tot < rtgKlok.nu())
     return res.status(400).json({ error: 'De code is verlopen. Vraag een nieuwe herstel-link aan.' });
   /* Was er geen tweede kanaal, dan is de link het bewijs. De vlag komt uit
      dezelfde aanvraag die de link maakte, dus een aanvaller kan hem niet zelf

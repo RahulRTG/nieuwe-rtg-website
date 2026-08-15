@@ -8,7 +8,7 @@
    en de reeks eindigt in een rapport met bevindingen en advies. Bewust hard
    in de code: de Onderzoeker LEEST alleen en ADVISEERT alleen; hij verandert
    nooit iets in het systeem en de mens beslist wat er met een rapport
-   gebeurt. Met ANTHROPIC_API_KEY schrijft Claude de analyse; zonder sleutel
+   gebeurt. Met een lokale of externe modelprovider ontstaat vrije analyse; zonder model
    een nette demo-analyse op dezelfde echte cijfers. */
 
 const BOUWPLAN = [

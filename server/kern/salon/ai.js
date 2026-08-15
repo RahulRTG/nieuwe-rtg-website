@@ -12,6 +12,7 @@
    Wat hier bewust NIET zit: een motor die de feed rangschikt op wat jou
    vasthoudt. Dat is precies het patroon dat de huisregels verbieden. */
 const { tekst } = require('../../ai');
+const { reactiesSamenvatting } = require('../../lib/lokale-taal');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +
   'zeker en zonder opsmuk. Nooit uitroeptekens, geen overdrijving, geen verkooppraat. ' +
@@ -40,11 +41,8 @@ module.exports = ({ anthropic, salon }) => {
     if (!p) return { ok: false, reden: 'Deze post bestaat niet.' };
     if (p.authorKey !== sess.key) return { ok: false, status: 403, reden: 'Dit kan alleen op je eigen post.' };
     const regels = (p.comments || []).slice(-120).map(c => c.who + ': ' + String(c.text || ''));
-    if (!regels.length) return { ok: true, samenvatting: 'Er zijn nog geen reacties.' };
-    const t = await tekst(anthropic, TOON + ' Vat de reacties samen in maximaal vijf korte zinnen: ' +
-      'welke toon overheerst, welke vragen worden gesteld, en of er iets is waar de maker op ' +
-      'zou moeten antwoorden.', regels.join('\n'), { max: 350 });
-    return t ? { ok: true, aantal: regels.length, samenvatting: t } : geenAI;
+    return { ok: true, aantal: regels.length, samenvatting: reactiesSamenvatting(regels),
+      bron: 'lokale-taal', ai: false };
   }
 
   /* Waar gaat De Salon vandaag over? De tellingen komen uit de eigen module
@@ -52,12 +50,14 @@ module.exports = ({ anthropic, salon }) => {
      blijft het cijfer waar en de tekst prettig. */
   async function waarOverGaatHet() {
     const lijst = salon.onderwerpen(12);
-    if (!lijst.length) return { ok: true, onderwerpen: [], tekst: 'Er is vandaag nog weinig gedeeld.' };
-    const t = await tekst(anthropic, TOON + ' Vat in twee zinnen samen waar het vandaag over gaat. ' +
-      'Noem hooguit drie onderwerpen. Niet opsommen, gewoon een zin.',
-    lijst.map(o => o.naam + ' (' + o.aantal + ')').join(', '), { max: 150 });
-    // zonder AI nog steeds bruikbaar: de onderwerpen zelf zijn het antwoord
-    return { ok: true, onderwerpen: lijst, tekst: t || null };
+    if (!lijst.length) return { ok: true, onderwerpen: [], tekst: 'Er is vandaag nog weinig gedeeld.',
+      bron: 'lokale-regels', ai: false };
+    const top = lijst.slice(0, 3);
+    const namen = top.map(o => o.naam);
+    const opsomming = namen.length === 1 ? namen[0] : namen.slice(0, -1).join(', ') + ' en ' + namen[namen.length - 1];
+    const tekstVandaag = 'Vandaag gaat het in De Salon vooral over ' + opsomming + '. ' +
+      'Daarover zijn samen ' + top.reduce((n, o) => n + o.aantal, 0) + ' bijdragen gedeeld.';
+    return { ok: true, onderwerpen: lijst, tekst: tekstVandaag, bron: 'lokale-regels', ai: false };
   }
 
   return { bijschrift, reactiesSamen, waarOverGaatHet };

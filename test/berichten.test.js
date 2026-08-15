@@ -133,19 +133,31 @@ test('het gesprek zegt zelf welke bel van mij is (de client kent geen sessiesleu
   assert.equal(m.mij, true, 'mijn eigen bericht staat als van mij gemarkeerd');
 });
 
-test('zonder AI-sleutel: een eerlijke melding, geen verzonnen samenvatting', async () => {
+test('zonder model: lokale samenvatting en afspraken, alleen creatief schrijven blijft dicht', async () => {
   // de testserver draait zonder AI-sleutels, dus de uitwijkketen is leeg
   const { a, keyB, gelukt } = await tweeMetGesprek('zullen we morgen om drie uur?');
   assert.ok(gelukt);
-  for (const taak of ['samenvatting', 'concept', 'afspraken']) {
-    const r = await raw('/member/berichten/' + taak, { id: 'dm:' + keyB }, a);
-    const b = await json(r);
-    assert.equal(r.status, 503, taak + ': eerlijk melden dat de AI er niet is');
-    assert.equal(b.ok, false);
-    assert.ok(/niet bereikbaar/i.test(b.reden), taak + ': met een leesbare reden');
-    assert.equal(b.samenvatting, undefined, taak + ': en zonder verzonnen inhoud');
-    assert.equal(b.concept, undefined);
-  }
+  const samen = await raw('/member/berichten/samenvatting', { id: 'dm:' + keyB }, a);
+  const sb = await json(samen);
+  assert.equal(samen.status, 200);
+  assert.equal(sb.ok, true);
+  assert.equal(sb.bron, 'lokale-taal');
+  assert.match(sb.samenvatting, /morgen om drie uur/i);
+
+  const afspraken = await raw('/member/berichten/afspraken', { id: 'dm:' + keyB }, a);
+  const ab = await json(afspraken);
+  assert.equal(afspraken.status, 200);
+  assert.equal(ab.ok, true);
+  assert.equal(ab.bron, 'lokale-taal');
+  assert.ok(ab.afspraken.length >= 1);
+  assert.equal(ab.afspraken[0].tijd, '', '"om drie" zonder dagdeel wordt niet stil als 03:00 of 15:00 gegokt');
+
+  const concept = await raw('/member/berichten/concept', { id: 'dm:' + keyB }, a);
+  const cb = await json(concept);
+  assert.equal(concept.status, 503, 'nieuwe tekst verzinnen vraagt nog wel een model');
+  assert.equal(cb.ok, false);
+  assert.ok(/niet bereikbaar/i.test(cb.reden));
+  assert.equal(cb.concept, undefined);
 });
 
 test('de AI stelt op maar verstuurt nooit', async () => {

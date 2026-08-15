@@ -1,10 +1,10 @@
 /* Overheid-domein "belasting": de Belastingdienst (aangifte inkomstenbelasting,
    demo met twee schijven en een heffingskorting) en de Dienst Toeslagen. Inclusief
-   de rekenhulp, het betalen van een aanslag (via de geld-drempel van de AI, want
-   het pad bevat "betaal") en de AI-invulhulp voor de aangifte. Krijgt de gedeelde
+   de rekenhulp, het betalen van een aanslag (via de geld-drempel van Rahul, want
+   het pad bevat "betaal") en lokale invulhulp voor de aangifte. Krijgt de gedeelde
    ctx van kern/overheid/index.js. */
 module.exports = (ctx) => {
-  const { db, save, anthropic, nu, jaar, id, ref, schoon, eur, seed, bericht, IB, TOESLAGEN } = ctx;
+  const { db, save, nu, jaar, id, ref, schoon, eur, seed, bericht, IB, TOESLAGEN } = ctx;
 
   function berekenIB(inkomen, aftrek, ingehouden) {
     const belastbaar = Math.max(0, eur(inkomen) - Math.max(0, eur(aftrek)));
@@ -103,34 +103,24 @@ module.exports = (ctx) => {
     return { ok: true, toeslag: publiekeToeslag(t) };
   }
 
-  /* AI-hulp bij de aangifte: leest een vrije omschrijving en stelt inkomen/aftrek
-     voor (Claude, met een deterministische regel-fallback zodat het altijd werkt).
-     Doet niets automatisch · het lid vult de aangifte zelf en dient hem in. */
+  /* Invulhulp bij de aangifte: leest alleen expliciet genoemde bedragen. Dat is
+     lokale extractie, geen reden om financiële tekst naar een model te sturen.
+     Doet niets automatisch · het lid controleert en dient zelf in. */
   function regelAangifte(tekst) {
     const t = String(tekst || '');
     const num = re => { const m = t.match(re); return m ? eur(m[1].replace(/[.\s]/g, '')) : 0; };
     const alle = (t.match(/\d[\d.\s]{2,}/g) || []).map(x => eur(x.replace(/[.\s]/g, '')));
     let inkomen = num(/(?:verdien|inkomen|salaris|bruto)[^\d]{0,12}(\d[\d.\s]{2,})/i);
     // aftrek staat vaak vóór of ná het trefwoord ("3200 aftrek" of "aftrek 3200")
-    let aftrek = num(/(\d[\d.\s]{2,})[^\d]{0,14}(?:aftrek|hypotheek|zorgkost|gift)/i)
-      || num(/(?:aftrek|hypotheek|zorgkosten|gift)[^\d]{0,14}(\d[\d.\s]{2,})/i);
+    let aftrek = num(/(?:aftrek|hypotheek|zorgkosten|gift)[^\d]{0,14}(\d[\d.\s]{2,})/i)
+      || num(/(\d[\d.\s]{2,})[^\d]{0,10}(?:aftrek|hypotheek|zorgkost|gift)/i);
     if (!inkomen && alle.length) inkomen = Math.max.apply(null, alle);
     if (!aftrek && alle.length > 1) aftrek = [...alle].sort((a, b) => b - a)[1];
     return { inkomen, aftrek };
   }
   async function aangifteAdvies(tekst) {
     const val = regelAangifte(tekst);
-    if (!anthropic) return { ok: true, ...val, bron: 'regel' };
-    try {
-      const resp = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 120,
-        system: 'Je helpt iemand met een eenvoudige aangifte inkomstenbelasting. Haal uit de tekst het bruto jaarinkomen en de totale aftrekposten in hele euro\'s. Antwoord uitsluitend als JSON: {"inkomen":<getal>,"aftrek":<getal>}.',
-        messages: [{ role: 'user', content: String(tekst || '').slice(0, 400) }]
-      });
-      const m = ((resp.content.find(c => c.type === 'text') || {}).text || '').match(/\{[\s\S]*\}/);
-      const j = m ? JSON.parse(m[0]) : {};
-      return { ok: true, inkomen: eur(j.inkomen) || val.inkomen, aftrek: eur(j.aftrek) || val.aftrek, bron: 'ai' };
-    } catch (e) { return { ok: true, ...val, bron: 'regel' }; }
+    return { ok: true, ...val, bron: 'regel', ai: false };
   }
 
   return { berekenIB, aangifteDoe, mijnAanslagen, aanslagBetaal, toeslagAanvraag, mijnToeslagen, toeslagenLijst, toeslagBeslis, regelAangifte, aangifteAdvies };

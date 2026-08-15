@@ -6,11 +6,9 @@
    2. geen druk: geen scores, geen ranglijsten, nooit vergelijken met anderen;
       inzet telt en fouten zijn leermateriaal;
    3. eerlijk: Rahul is geen school of examenbureau en zegt dat ook.
-   Zonder ANTHROPIC_API_KEY een vast, net zo geduldig demo-antwoord. */
-let anthropic = null;
-if (process.env.ANTHROPIC_API_KEY) {
-  try { anthropic = new (require('../anthropic'))(); } catch (e) {}
-}
+   Zonder geschikte modelprovider een vast, net zo geduldig regelantwoord. De
+   provider komt uit de centrale local-first keten; deze module kent geen merk,
+   sleutel of netwerkadres. */
 
 const MAX_BEURTEN = 40;
 
@@ -37,7 +35,7 @@ function demoAntwoord(niveau, taal) {
 
 /* winkel() geeft de opslagmap (per wereld een eigen: leden of gezinnen);
    de motor bewaart daarin per sleutel een gesprek van hooguit MAX_BEURTEN. */
-function maakBijles({ winkel, save, schoon }) {
+function maakBijles({ winkel, save, schoon, anthropic }) {
   function gesprekVan(sleutel) {
     const w = winkel();
     if (!w[sleutel]) w[sleutel] = { beurten: [], at: null };

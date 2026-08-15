@@ -27,7 +27,7 @@ app.post('/api/supplier/menu/recipe', supplierAuth, async (req, res) => {
       ((m.allergens || []).length ? '4. LET OP allergenen: ' + m.allergens.join(', ') + '. Bij een allergie-bon strikt gescheiden werken.\n' : '') +
       '5. Afwerking en garnituur; bord vegen.\n' +
       '6. Doorgeven aan de pas; chef proeft steekproefsgewijs.\n' +
-      '(Laat de manager dit recept aanscherpen in het Kantoor, of zet een ANTHROPIC_API_KEY voor een uitgewerkt recept.)';
+      '(Laat de manager dit recept aanscherpen in het Kantoor, of configureer een modelprovider voor een uitgewerkt recept.)';
   }
   m.recept = recept;
   save();

@@ -1,8 +1,8 @@
 /* Gemeente-domein "meldingen": pijler 1, meldingen openbare ruimte. Een inwoner
    meldt iets kapots of vies (met optionele GPS), de melding gaat naar de juiste
    ploeg en de melder volgt de status. De gemeente-medewerker ziet de behandelijst
-   en werkt de status bij. Plus de AI-triage die categorie en ploeg voorstelt
-   (Claude met een deterministische regel-fallback). Krijgt de gedeelde ctx van
+   en werkt de status bij. Plus uitlegbare lokale triage die alleen bij een
+   onbekende categorie optioneel een model voor een tweede lezing gebruikt. Krijgt de gedeelde ctx van
    kern/gemeente/index.js. */
 const { coord } = require('../util');
 module.exports = (ctx) => {
@@ -91,8 +91,9 @@ module.exports = (ctx) => {
     return { ok: true, melding: publiekeMelding(m) };
   }
 
-  /* AI-triage voor een melding: stelt categorie en ploeg voor (Claude, met een
-     deterministische regel-fallback zodat het altijd werkt). Mens beslist. */
+  /* Triage stelt categorie en ploeg voor. Een trefwoordmatch blijft lokaal;
+     alleen de restcategorie kan optioneel een tweede modellezing krijgen.
+     De mens beslist. */
   function regelTriage(tekst) {
     const t = String(tekst || '').toLowerCase();
     const kies = (re, cat) => re.test(t) ? cat : null;
@@ -107,7 +108,9 @@ module.exports = (ctx) => {
   }
   async function triage(tekst) {
     const val = regelTriage(tekst);
-    if (!anthropic) return { ok: true, ...val, bron: 'regel' };
+    // Een eenduidige trefwoordmatch is al uitlegbaar en betrouwbaar. Alleen de
+    // restcategorie mag, als dat kan, naar een model voor een tweede lezing.
+    if (val.categorie !== 'overig' || !anthropic) return { ok: true, ...val, bron: 'regel', ai: false };
     try {
       const resp = await anthropic.messages.create({
         model: 'claude-sonnet-5', max_tokens: 120,

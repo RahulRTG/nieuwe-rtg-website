@@ -33,7 +33,7 @@ test('scan vindt aanroepplekken en laat de transportlaag weg', () => {
   const sites = scan(ROOT);
   assert.ok(sites.length > 40, 'verwacht tientallen AI-ingangen, kreeg ' + sites.length);
   const namen = sites.map(s => s.bestand);
-  for (const transport of ['ai.js', 'anthropic.js', 'openai.js', 'gemini.js']) {
+  for (const transport of ['ai.js', 'anthropic.js', 'openai.js', 'gemini.js', 'local-ai.js']) {
     assert.ok(!namen.includes(transport), transport + ' is transport en hoort niet in de lijst');
   }
 });

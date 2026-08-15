@@ -252,6 +252,10 @@ test('Rahul schrijft en telt, maar plaatst niets', async () => {
   const na = await json(await raw('/genootschap/prikbord', { groep: g.groep.id }, a.token));
   assert.equal(na.totaal, voor.totaal, 'een aankondiging vragen zet niets op het prikbord');
 
+  const lokaal = await json(await raw('/genootschap/ai/prikbord', { groep: g.groep.id }, a.token));
+  assert.equal(lokaal.ok, true, 'bestaande prikbordtekst kan zonder model worden samengevat');
+  assert.equal(lokaal.bron, 'lokale-taal');
+
   // en een vreemde krijgt niets, ook niet van de AI
   const vreemd = await lid();
   const weg = await json(await raw('/genootschap/ai/prikbord', { groep: g.groep.id }, vreemd.token));

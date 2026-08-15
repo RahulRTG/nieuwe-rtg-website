@@ -11,6 +11,8 @@ const config = require('../../server/config');
 const ROOT = path.join(__dirname, '..', '..');
 const envPad = path.resolve(process.env.RTG_ENV_FILE || path.join(ROOT, '.env.productie'));
 const pgPad = path.resolve(process.env.RTG_POSTGRES_PASSWORD_FILE || path.join(ROOT, '.rtg-secrets', 'postgres_password'));
+const publiek = process.argv.includes('--publiek');
+const livePad = path.resolve(process.env.RTG_LIVE_ENV_FILE || path.join(ROOT, 'deploy', 'live.env'));
 const fouten = [], waarschuwingen = [];
 
 function rechten(pad, geheim) {
@@ -39,7 +41,54 @@ const uitslag = config.valideer(env);
 fouten.push(...uitslag.fouten);
 waarschuwingen.push(...uitslag.waarschuwingen);
 
-console.log('\n=== RTG self-host-keuring ===\n');
+if (publiek) {
+  let live = {};
+  try { live = { ...leesEnv(fs.readFileSync(livePad, 'utf8')), ...process.env }; }
+  catch (e) { fouten.push(livePad + ' ontbreekt of is onleesbaar.'); }
+
+  let appUrl = null;
+  try { appUrl = new URL(String(env.APP_URL || '')); }
+  catch (e) { fouten.push('APP_URL is geen geldige publieke URL.'); }
+  if (appUrl) {
+    if (appUrl.protocol !== 'https:') fouten.push('APP_URL moet voor livegang https gebruiken.');
+    if (appUrl.pathname !== '/' || appUrl.search || appUrl.hash)
+      fouten.push('APP_URL moet de domeinroot zijn, zonder subpad, query of fragment.');
+    if (env.RTG_TLS_DOMAIN !== appUrl.hostname)
+      fouten.push('RTG_TLS_DOMAIN moet exact gelijk zijn aan de host uit APP_URL (' + appUrl.hostname + ').');
+  }
+  if (env.RTG_TLS !== '1' || env.RTG_ACME !== '1')
+    fouten.push('Native live-HTTPS vereist RTG_TLS=1 en RTG_ACME=1.');
+  if (!env.RTG_TLS_EMAIL || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(env.RTG_TLS_EMAIL))
+    fouten.push('RTG_TLS_EMAIL ontbreekt of is ongeldig; certificaatmeldingen kunnen dan niet aankomen.');
+  if (env.RTG_PROXY_HOPS !== '0')
+    fouten.push('Native TLS staat rechtstreeks aan internet; zet RTG_PROXY_HOPS=0 zodat bezoekers geen proxykoppen kunnen laten geloven.');
+  if (env.RTG_BETALEN_UIT !== '1')
+    fouten.push('Deze eerste livegang is zonder betalingen afgesproken; RTG_BETALEN_UIT=1 moet fail-closed aan staan.');
+  if (env.RTG_AI_UIT !== '1' && env.RTG_EXTERNE_AI_UIT !== '1')
+    fouten.push('De lokale-eerst livegang vereist RTG_AI_UIT=1 of RTG_EXTERNE_AI_UIT=1.');
+  if (!env.OFFICE_TOTP_SECRET)
+    fouten.push('OFFICE_TOTP_SECRET ontbreekt; publieke enterprise-livegang vereist 2FA op de backoffice.');
+
+  if (live.RTG_PUBLISH_HOST !== '0.0.0.0' && live.RTG_PUBLISH_HOST !== '::')
+    fouten.push('RTG_PUBLISH_HOST moet publiek binden (0.0.0.0 of ::); nu: ' + (live.RTG_PUBLISH_HOST || 'leeg') + '.');
+  if (String(live.RTG_PUBLISH_PORT || '') !== '443' || String(live.RTG_CONTAINER_PORT || '') !== '443')
+    fouten.push('De live-poorten moeten RTG_PUBLISH_PORT=443 en RTG_CONTAINER_PORT=443 zijn.');
+  const backupDir = String(live.RTG_BACKUP_HOST_DIR || '');
+  if (!path.isAbsolute(backupDir)) fouten.push('RTG_BACKUP_HOST_DIR moet een absolute map op een afzonderlijke schijf/mount zijn.');
+  else {
+    try {
+      const st = fs.statSync(backupDir);
+      if (!st.isDirectory()) fouten.push(backupDir + ' is geen map.');
+      else fs.accessSync(backupDir, fs.constants.R_OK | fs.constants.W_OK);
+    } catch (e) { fouten.push('Externe back-upmap is niet bestaand en lees/schrijfbaar: ' + backupDir + '.'); }
+  }
+  if (!env.ERR_WEBHOOK_URL)
+    waarschuwingen.push('Geen ERR_WEBHOOK_URL: de externe GitHub-sonde merkt totale uitval, maar interne fouten melden dan alleen op het techniekbord.');
+  if (!env.TURN_URL || !env.TURN_SECRET)
+    waarschuwingen.push('TURN_URL/TURN_SECRET ontbreken: videobellen werkt via eigen STUN, maar niet gegarandeerd door strenge 4G/bedrijfsfirewalls.');
+}
+
+console.log('\n=== RTG ' + (publiek ? 'publieke live-keuring' : 'self-host-keuring') + ' ===\n');
 for (const f of fouten) console.log(' ✗ ' + f);
 for (const w of waarschuwingen) console.log(' ⚠ ' + w);
 if (fouten.length) {
@@ -47,4 +96,5 @@ if (fouten.length) {
   process.exit(1);
 }
 console.log('\n✓ Geheimen en productieconfiguratie zijn startklaar.' +
-  (env.RTG_PRIVATE_BETA === '1' ? ' De app blijft een private, lokale beta.' : ' Draai voor publieke livegang ook npm run golive.'));
+  (publiek ? ' Native HTTPS, betalingen-uit en externe back-up zijn afgedwongen.' :
+    (env.RTG_PRIVATE_BETA === '1' ? ' De app blijft een private, lokale beta.' : ' Draai voor publieke livegang ook npm run golive.')));

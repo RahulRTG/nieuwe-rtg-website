@@ -2194,9 +2194,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['kern/markt/toezicht.js', 'begrensd: advertentietekst schrijven'],
     ['kern/office/delen.js', 'RTG Office werk-tool met vaste opdrachtenlijst, geen pasgesprek'],
     ['kern/onboarding/beheer.js', 'JSON-config voor een beheerder (intakevelden/contract), geen lid-gesprek'],
-    ['kern/overheid/belasting.js', 'JSON-uitvoer: belastingberekening, geen vrije tekst naar een lid'],
     ['kern/pakketten.js', 'begrensd: advies op basis van uitsluitend het meegegeven pakket'],
-    ['kern/reisbureau.js', 'JSON-uitvoer + eigen boekingsregel (nooit "al geboekt")'],
     ['kern/rtgonderzoeker.js', 'begrensd: analyse van aangeleverde bevindingen, "de mens beslist"'],
     ['kern/werkplaats-ai.js', 'JSON-uitvoer, geen vrije tekst naar een lid'],
     ['routes/muziek.js', 'JSON-uitvoer: muzikaal patroon, geen vrije tekst naar een lid'],
@@ -2207,7 +2205,6 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['routes/supplier/events/planning.js', 'JSON-uitvoer, leverancier-gereedschap'],
     ['routes/supplier/tools.js', 'begrensd: reactie namens een leverancier'],
     ['routes/techniek/beheer.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
-    ['routes/techniek/diagnose.js', 'techniek/eigenaar-gereedschap (diagnose/herstel), geen lid-gesprek'],
     ['routes/techniek/functie.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
     ['translate.js', 'vertaalmachine, geen gesprek'],
   ]);

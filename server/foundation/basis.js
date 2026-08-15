@@ -79,11 +79,12 @@ module.exports = function maakBasis() {
      wint zodra iemand hem gebruikt. */
   const ipVan = req => String(req.ip || (req.socket && req.socket.remoteAddress) || 'onbekend');
 
+  /* Foundation wordt vóór de hoofdkern gemount en kan diens client daarom niet
+     lenen. Wel gebruikt hij exact dezelfde fabriek: lokaal eerst, dezelfde
+     capabilitygrenzen en dezelfde externe-uit-stand. Geen eigen Anthropic-pad. */
   let anthropic = null;
-  if (process.env.ANTHROPIC_API_KEY) {
-    try { anthropic = new (require('../anthropic'))({ apiKey: process.env.ANTHROPIC_API_KEY }); }
-    catch (e) { /* zonder SDK: demo-antwoorden */ }
-  }
+  try { anthropic = require('../ai').maakAI(); }
+  catch (e) { /* regelantwoorden blijven volledig bruikbaar */ }
 
   const router = express.Router();
   /* Zelfde foutisolatie als in server.js: de app-omhulling dekt alleen app.get/post,

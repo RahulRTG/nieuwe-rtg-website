@@ -127,6 +127,7 @@ app.post('/api/auth/register', async (req, res) => {
       : null;
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+    if (email === eigenaar.eigenaarEmail()) delete process.env.RTG_OWNER_BOOTSTRAP;
     res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
       ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });
   } catch (e) {

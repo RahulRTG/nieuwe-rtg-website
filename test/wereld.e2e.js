@@ -673,17 +673,6 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
      heldere sterren draaien nog gewoon door, en het scherm ziet er op een
      afdruk identiek uit. Deze toets zakt dan meteen. */
   await metLid('aan', async ({ page }) => {
-    /* Eerst wachten tot de hemel STIL HANGT: bij het opbouwen kan hij nog een
-       keer opnieuw worden opgehangen (het scherm krijgt zijn maat, de intake
-       gaat eraf). Meten terwijl dat nog kan, meet de opbouw en niet de hemel. */
-    await page.waitForFunction(() => {
-      const cv = document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
-      if (!cv) return false;
-      if (window.__hemelVorig === cv) return (window.__hemelZelfde = (window.__hemelZelfde || 0) + 1) > 6;
-      window.__hemelVorig = cv; window.__hemelZelfde = 0;
-      return false;
-    }, null, { timeout: 20000, polling: 250 });
-
     const r = await page.evaluate(async () => {
       /* HET DOEK ELKE KEER OPNIEUW OPZOEKEN, en niet een verwijzing vasthouden.
          De hemel wordt opnieuw opgehangen als het scherm van maat verandert
@@ -708,12 +697,7 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
          tekent minder beelden per seconde en heeft langer nodig. Met een vaste
          wachttijd meet je dan de drukte in plaats van de hemel. De uitkomst is
          dezelfde meting, hij krijgt alleen de tijd die hij nodig heeft. */
-      const a = lees();
-      if (!a) return { fout: 'geen sterrendoek' };
-      const meet = () => {
-        const b = lees();
-        if (!b) return null;
-        if (a.cv !== b.cv) return { fout: 'de hemel is tussentijds opnieuw opgehangen' };
+      const meet = (a, b) => {
         let aanA = 0, gelijk = 0;
         for (let i = 3; i < a.data.length; i += 4) {
           const x = a.data[i] > 8, y = b.data[i] > 8;
@@ -722,14 +706,31 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
         }
         return { aanA, gelijk };
       };
-      let r = null;
-      for (let n = 0; n < 40; n++) {
+      /* De nulmeting hoort bij het HUIDIGE doek. Tijdens de opbouw kan
+         hangHemel() dat doek legitiem vervangen zodra de definitieve maat
+         bekend is. Een losse voorwacht op zeven gelijke DOM-verwijzingen kon
+         daardoor onder runnerbelasting twintig seconden lang zijn teller
+         resetten zonder ooit de hemel te meten. Hier vernieuwt een wissel de
+         nulmeting en loopt dezelfde begrensde inhoudsmeting gewoon door. */
+      let a = null, r = null, stabiel = 0, wissels = 0, zonderDoek = 0;
+      for (let n = 0; n < 80; n++) {
+        if (!a) {
+          a = lees();
+          if (!a) { zonderDoek++; await new Promise((k) => setTimeout(k, 750)); continue; }
+        }
         await new Promise((k) => setTimeout(k, 750));
-        r = meet();
-        if (!r || r.fout) return r || { fout: 'geen sterrendoek' };
+        const b = lees();
+        if (!b) { zonderDoek++; a = null; stabiel = 0; continue; }
+        if (a.cv !== b.cv) { wissels++; a = b; stabiel = 0; continue; }
+        r = meet(a, b);
+        stabiel++;
         if (r.aanA && r.gelijk / r.aanA < 0.2) break;   // ruim onder de eis: klaar
+        if (stabiel >= 40) break;                        // dezelfde bovengrens als voorheen
       }
-      return r;
+      return r ? { ...r, wissels, zonderDoek } : {
+        fout: 'geen stabiel sterrendoek binnen de meetgrens (' + wissels +
+          ' wissels, ' + zonderDoek + ' keer afwezig)'
+      };
     });
     assert.ok(!r.fout, 'de meting kon niet worden gedaan: ' + r.fout);
 

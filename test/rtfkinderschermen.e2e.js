@@ -45,6 +45,32 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfkind-'));
 
 const GESLOTEN = ['foundation/arena', 'foundation/bieb', 'foundation/geloofbieb', 'foundation/schoolbieb'];
 
+/* Deze dertig Foundation-schermen waren door de algemene paginascan en
+   appmenu-census wel aangeraakt, maar nergens op hun EIGEN veiligheidscontract
+   beproefd. Houd de verwachting per scherm naast het pad: zo kan een gekopieerde
+   titel, een lege deur of een per ongeluk openbaar geworden kinderkamer niet
+   verdwijnen in een algemene "pagina leeft"-controle. */
+const FOUNDATION_DEUREN = [
+  ['bord', /Bord/i], ['budget', /Maandbegroting/i], ['cv', /CV-maker/i],
+  ['dromen', /Onze dromen/i], ['geld', /Geldmaatje/i], ['gezondheid', /Gezondheidsmaatje/i],
+  ['keuken', /Gezinskeuken/i], ['kompas', /Kompas/i], ['leren', /Leren/i],
+  ['liedjes', /Liedjes en versjes/i], ['markt', /Koopje/i], ['mediawijs', /Online wijs/i],
+  ['ochtend', /Ochtendritme/i], ['opvoeden', /Opvoedhulp/i], ['pesten', /Sterker dan pesten/i],
+  ['presenteren', /Spreekbeurt en presentatie/i],
+  ['projecten', /Samen aan een project/i], ['rechten', /Wat mag ik op welke leeftijd/i],
+  ['reis', /Op reis/i], ['schrift', /Schrift/i], ['schrijven', /Schrijven/i],
+  ['steun', /Steun voor jou/i], ['studie', /Verder leren/i], ['toetsen', /Toetsplanner/i],
+  ['verjaardagen', /Verjaardagen/i], ['werk', /Werk en vacatures/i]
+];
+const FOUNDATION_OPEN = [
+  ['beheer', /Gezin beheren|gezinscode/i],
+  ['contact', /Contact/i],
+  ['oppasinfo', /Belangrijke info|Noodnummers/i],
+  /* privacy-uitleg en noodnummers blijven met opzet openbaar: toestemming
+     vragen om te lezen hoe gegevens worden beschermd zou averechts zijn. */
+  ['privacy', /Privacy en veiligheid|Wat we beschermen/i]
+];
+
 async function toon(page, base, app) {
   const pad = '/apps/' + app + '.html';
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
@@ -225,6 +251,107 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
       'en het zegt wat een nieuwe school moet doen: ' + r.tekst.slice(0, 220));
 
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar doel',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const gRes = await fetch(base + '/api/foundation/gezin/maak', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gezinsnaam: 'Deurproef', naam: 'Beheerder', pin: '4321' }) });
+    const gezin = await gRes.json();
+    assert.equal(gRes.status, 200, 'voor de tweestapsdeur kan een geldig proefgezin worden gemaakt');
+    const toegangRes = await fetch(base + '/api/rtf/toegang', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: gezin.code, token: gezin.token, scherm: 'app', appId: 'rtf-bord' }) });
+    const toegang = await toegangRes.json();
+    assert.equal(toegangRes.status, 200,
+      'de Foundation-server laat het beheerprofiel bij het begeleidersbord: ' + (toegang.reden || toegang.error || 'onbekend'));
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    await ctx.addInitScript(() => {
+      try {
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+        localStorage.removeItem('rtf_sessie');
+        localStorage.removeItem('rtg_member_token');
+      } catch (e) {}
+    });
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    const stuk = [];
+
+    for (const [naam, titel] of FOUNDATION_DEUREN) {
+      const pad = '/apps/foundation/' + naam + '.html';
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForTimeout(350);
+      const r = await page.evaluate(() => ({
+        pad: location.pathname,
+        titel: document.title,
+        tekst: document.body.innerText.replace(/\s+/g, ' ').trim(),
+        deur: !!document.querySelector('.rtgdeur, #rtf-toegang-slot, #rtf-school-slot'),
+        uitweg: !!document.querySelector('.rtgdeur a[href], #rtf-toegang-slot [data-rtf-uitweg], #rtf-school-slot [data-school-uitweg]')
+      }));
+      if (r.pad !== pad) stuk.push(naam + ': stuurde weg naar ' + r.pad);
+      if (!titel.test(r.titel)) stuk.push(naam + ': verkeerde titel "' + r.titel + '"');
+      if (!r.deur) stuk.push(naam + ': de beschermde kamer heeft geen zichtbare deur');
+      if (!r.uitweg) stuk.push(naam + ': de deur heeft geen veilige uitweg');
+      if (!/foundation|gezin|profiel|pas|toegang/i.test(r.tekst)) {
+        stuk.push(naam + ': de deur legt de vereiste Foundation-toegang niet uit');
+      }
+    }
+
+    for (const [naam, doel] of FOUNDATION_OPEN) {
+      const pad = '/apps/foundation/' + naam + '.html';
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForTimeout(250);
+      const r = await page.evaluate(() => ({
+        pad: location.pathname,
+        tekst: document.body.innerText.replace(/\s+/g, ' ').trim(),
+        bediening: document.querySelectorAll('a[href], button, input, textarea, select').length
+      }));
+      if (r.pad !== pad) stuk.push(naam + ': stuurde weg naar ' + r.pad);
+      if (!doel.test(r.tekst)) stuk.push(naam + ': het openbare doel staat niet in beeld');
+      if (!r.bediening) stuk.push(naam + ': geen enkele bruikbare bediening of uitweg');
+    }
+
+    /* Een geldig gezin is nog geen klassleutel. Na de eerste servercontrole
+       verschijnt daarom op hetzelfde bord een tweede, tijdelijke Schoolpasdeur
+       en blijft alle klasbediening erachter onzichtbaar. */
+    const schoolCtx = await browser.newContext({ serviceWorkers: 'block' });
+    await schoolCtx.addInitScript((sessie) => {
+      localStorage.setItem('rtf_sessie', JSON.stringify(sessie));
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, { code: gezin.code, token: gezin.token, profiel: { naam: 'Beheerder', beheerder: true } });
+    const schoolPage = await schoolCtx.newPage();
+    letOpFouten(schoolPage, fouten);
+    await schoolPage.goto(base + '/apps/foundation/bord.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await schoolPage.waitForSelector('#rtf-school-slot', { state: 'visible', timeout: 15000 });
+    const schooldeur = await schoolPage.evaluate(() => ({
+      pad: location.pathname,
+      tekst: document.querySelector('#rtf-school-slot').innerText.replace(/\s+/g, ' ').trim(),
+      leren: document.querySelector('#rtf-school-slot [data-school-open]')?.getAttribute('href'),
+      uitweg: document.querySelector('#rtf-school-slot [data-school-uitweg]')?.getAttribute('href'),
+      afgeschermd: [...document.body.children]
+        .filter(el => el.id !== 'rtf-school-slot')
+        .every(el => getComputedStyle(el).visibility === 'hidden')
+    }));
+    if (schooldeur.pad !== '/apps/foundation/bord.html') stuk.push('bord: de Schoolpasdeur verloor het gevraagde adres');
+    if (!/tijdelijke Schoolpas|docentenruimte|dertig minuten/i.test(schooldeur.tekst)) stuk.push('bord: de Schoolpasdeur legt doel en verloop niet uit');
+    if (schooldeur.leren !== '/apps/foundation/leren.html' || schooldeur.uitweg !== '/apps/app.html') stuk.push('bord: de Schoolpasdeur mist een veilige vervolg- of uitweg');
+    if (!schooldeur.afgeschermd) stuk.push('bord: klasbediening bleef zichtbaar achter de Schoolpasdeur');
+
+    assert.deepEqual(stuk, [], 'Foundation-deuren en openbare doelen:\n  ' + stuk.join('\n  '));
+    const echt = fouten.filter(f => !/^(geen sessie|geen schoolsessie)$/.test(String(f).trim()));
+    assert.deepEqual(echt, [], 'paginafouten (anders dan een bedoelde toegangstop): ' + echt.join(' | '));
   } finally {
     if (browser) await browser.close();
     child.kill();

@@ -1,8 +1,8 @@
 {
   "vastgelegd": "2026-08-15",
   "meters": {
-    "endpointsZonderTest": 1284,
-    "dekkingPct": 69,
+    "endpointsZonderTest": 1194,
+    "dekkingPct": 71,
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
@@ -12,7 +12,7 @@
     "e2eBestanden": 124,
     "keuringOmvang": 157,
     "keuringDubbeling": 115,
-    "keuringDekkingAdvies": 60,
+    "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
@@ -20,7 +20,7 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5878,
-    "browserpoortToetsen": 198,
+    "browserpoortToetsen": 200,
     "kernBreedte": 1394,
     "kernGedeeld": 187,
     "kernBreedsteBestand": 71,
@@ -31,6 +31,11 @@
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-15",
+      "meter": "schermenZonderToets 54 -> 0; browserpoortToetsen 198 -> 200; endpointsZonderTest 1284 -> 1194; dekkingPct 69 -> 71; keuringDekkingAdvies 60 -> 56",
+      "reden": "De volledige browserronde op 257 schermen liet zien dat 54 later toegevoegde routes alleen door twee algemene veegtoetsen werden geopend. Ze hebben nu een eigen gedragscontract in de bestaande premium- en Foundation-suites: zelfstandige ruimtes bewijzen identiteit en bediening, oude bladwijzerpaden bewijzen hun exacte alias, beschermde werkruimtes bewijzen hun inlogdeur en Foundation-schermen bewijzen hun deur of bewust openbare doel. De klasborden sturen bij ontbrekende toegang niet meer stil weg: eerst beslist de Foundation-pas, daarna verschijnt zo nodig een tijdelijke Schoolpasdeur die fail-closed blijft en de sleutel alleen in de tab bewaart. De tweestapsproef controleert ook het echte serverbesluit op /api/rtf/toegang. De twee nieuwe browsertoetsen verklaren de stijging naar 200; CI draait met RTG_E2E_STRICT=1, dus ontbreken van Chromium kan deze winst daar niet stil overslaan. Daarnaast hebben de 94 resterende enterprise-ingangen nu een expliciet perimetercontract: beschermde routes weigeren anonieme toegang, verborgen werkplektenant-routes geven niets prijs, webhooks weigeren onbetrouwbare payloads en openbare bewijs-, arrival- en projectieroutes falen veilig. De volledige regressierun raakte daarna alle 4131 geregistreerde routes. Door de volledige paden in de gedragstoetsen vast te leggen daalt de tekstmeter naar 1194, stijgt de statische dekking naar 71 procent en daalt het aantal ongedekte keuringsadviezen naar 56."
+    },
     {
       "datum": "2026-08-15",
       "meter": "de actuele main-stand opnieuw vastgezet; twee PR-afwijkingen eerst teruggebracht tot main",

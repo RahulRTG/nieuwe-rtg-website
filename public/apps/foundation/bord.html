@@ -136,8 +136,17 @@ const q = new URLSearchParams(location.search);
 let CODE = (q.get('code')||'').toUpperCase(), TOKEN = q.get('t')||'';
 if(TOKEN && window.RTGSchoolSession){ RTGSchoolSession.zet('rtf_docent',{code:CODE,token:TOKEN}); history.replaceState(null,'','bord.html?code='+encodeURIComponent(CODE)); }
 if(!CODE || !TOKEN){ try{ const d=RTGSchoolSession.lees('rtf_docent'); if(d){CODE=d.code;TOKEN=d.token;} }catch(e){} }
-if(!CODE || !TOKEN){ location.href='leren.html'; }
-RTGSchoolSession.bewaak(['rtf_docent'],()=>location.href='leren.html');
+if(!CODE || !TOKEN){
+  /* De gezinspoort beslist eerst. Alleen na een geldige Foundation-pas mag
+     daarbovenop de tijdelijke docentenpas worden gevraagd; anders zouden twee
+     modale deuren elkaar onzichtbaar maken. */
+  if(Sessie && Sessie.actief()){
+    if(document.documentElement.classList.contains('rtf-toegang-dicht')) addEventListener('rtf-toegang',()=>RTGSchoolSession.deur({rol:'docent'}),{once:true});
+    else RTGSchoolSession.deur({rol:'docent'});
+  }
+  throw new Error(Sessie && Sessie.actief() ? 'geen schoolsessie' : 'geen sessie');
+}
+RTGSchoolSession.bewaak(['rtf_docent'],()=>{ CODE=''; TOKEN=''; RTGSchoolSession.deur({rol:'docent'}); });
 
 async function api(p,b){ const r=await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE,token:TOKEN},b||{}))}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Fout'); return d; }
 async function get(p){ const r=await fetch('/api/foundation'+p); return r.json(); }

@@ -40,6 +40,9 @@ test('live-, herstel- en backupscript zijn geldige shell en herstel is dubbel be
   const golive = lees('scripts/golive.js');
   assert.match(golive, /process\.env\.RTG_ENV_FILE/);
   assert.match(golive, /RTG_POSTGRES_PASSWORD_FILE/);
+  const eigenaarClaim = lees('scripts/eigenaar-claim.js');
+  assert.match(eigenaarClaim, /servername: domein/);
+  assert.doesNotMatch(eigenaarClaim, /rejectUnauthorized\s*:\s*false/);
 });
 
 test('eigenaarsclaim verwijdert de eenmalige deur zonder overige geheimen te wijzigen', () => {

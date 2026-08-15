@@ -63,7 +63,9 @@ function plaatselijkeRegistratie({ poort, domein, body }) {
   return new Promise((resolve, reject) => {
     const req = https.request({
       hostname: '127.0.0.1', port: poort, path: '/api/auth/register', method: 'POST',
-      servername: domein, rejectUnauthorized: false,
+      // Verbind lokaal, maar valideer het certificaat tegen de echte domeinnaam.
+      // De claim mag pas na een geslaagde ACME-uitgifte worden uitgevoerd.
+      servername: domein,
       headers: {
         Host: domein,
         'Content-Type': 'application/json',

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1000 bestanden en 6618 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1001 bestanden en 6619 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1000 |
-| losse beweringen (`test(...)`) | 6618 |
+| toetsbestanden | 1001 |
+| losse beweringen (`test(...)`) | 6619 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 42 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 779 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
-| niets van beide | 144 |
+| niets van beide | 145 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -916,7 +916,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-124 bestanden, 224 beweringen.
+125 bestanden, 225 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -975,6 +975,7 @@ toets omvalt.
 | `lifecommand.e2e.js` | 1 | -- | Schermtoets voor Life Command (LIFE.md fase 5). Deze toets bewaakt de regel waar de hele fase op staat, en hij meet hem op het GERENDERDE scherm en niet op de bron: er is geen knop die iets uitvoert zonder dat de... |
 | `lifestyleschermen.e2e.js` | 2 | -- | DE TWAALF LIFESTYLE-SCHERMEN: LEGT EEN TOETS DE WEG ECHT AF? WAAROM JUIST DEZE TWAALF Bij het afsluiten van TAKEN 4.1 heb ik zelf de openstaande rest opgeschreven: "wat er nog steeds niet is: dezelfde weg door het... |
 | `livinglab.e2e.js` | 2 | -- | Scherm-test voor het RTF Living Lab: het kantoorscherm (/apps/livinglab.html) en het bewonersscherm (/apps/labpas.html). WAAROM DEZE TOETS ER IS. |
+| `magnaat-partnerstudio.e2e.js` | 1 | -- | De Magnaat Partnerstudio in een echte browser. De kernproeven bewijzen de publicatie- en vier-ogenregels. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |
 | `medialijst.e2e.js` | 1 | -- | DE LIJST OP HET SCHERM -- want een knop die niemand heeft zien werken, is geen knop (LAT.md regel 10). De server-kant van de afspeellijsten staat in test/medialijsten.test.js. |
 | `mediazaak.e2e.js` | 1 | -- | DE INTERNE BIBLIOTHEEK OP HET SCHERM -- want een knop die niemand heeft zien werken, is geen knop (LAT.md regel 10). De server-kant staat in test/mediazaak.test.js. |

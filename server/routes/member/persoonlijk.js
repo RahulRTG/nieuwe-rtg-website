@@ -44,7 +44,7 @@ app.post('/api/fluister', auth, async (req, res) => {
   if (kern.codewoordCheck) { try { kern.codewoordCheck(req.session.key, req.body.q, 'rahul'); } catch (e) {} }
   const grens = pestgrens.poort(req.session.key, req.body.q);
   if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
-  // de sessie reist mee zodat Fluister ook kan doen (reserveren, 24 uur plannen)
+  // sessie mee voor doen (reserveren, 24 uur plannen)
   const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session);
   if (r.error) return res.status(r.status).json({ error: r.error });
   /* Rahul aan het stuur: pakten de eigen regels het gesprek NIET op
@@ -69,14 +69,17 @@ app.post('/api/fluister', auth, async (req, res) => {
     });
     if (lus && lus.tekst) {
       onthoudGesprek(req, lus.tekst);
+      const stand = aiStatus();
       return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
         goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
         goedkeuringWereld: 'member',
-        aiBeschikbaar: true, modus: aiStatus().modus, verwerking: aiStatus().verwerking });
+        aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas });
     }
   }
   onthoudGesprek(req, r && r.antwoord);
-  res.json(Object.assign(r, { aiBeschikbaar: aiStatus().beschikbaar, modus: aiStatus().modus }));
+  const stand = aiStatus();
+  res.json(Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
+    verwerking: stand.verwerking, kompas: stand.kompas }));
 });
 /* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en
    de balk in het OS EEN draadje zijn en je geschiedenis niet half is. Alleen

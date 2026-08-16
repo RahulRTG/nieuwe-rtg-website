@@ -22,6 +22,15 @@ test('AI-beschikbaarheid onderscheidt verrijking van de werkende kern', () => {
       uitvoering: 'schermen-en-workflows',
       samenvatten: 'lokale-extractie',
       beslissingen: 'menselijk-akkoord'
+    },
+    kompas: {
+      naam: 'RTG Kompas',
+      route: 'regels',
+      privacy: 'Geen inhoud naar een model',
+      ritme: ['nu', 'straks', 'let-op'],
+      uitleg: 'bron-en-grens-zichtbaar',
+      autoriteit: 'mens',
+      menselijkAkkoord: ['geld', 'publicatie', 'toegang', 'definitieve-toezegging']
     }
   });
 });
@@ -37,6 +46,9 @@ test('lokale AI wordt als prive lokale verwerking getoond', () => {
   assert.equal(s.mogelijkheden.tekst, true);
   assert.equal(s.mogelijkheden.hulpmiddelen, true);
   assert.equal(s.mogelijkheden.beeld, false);
+  assert.equal(s.kompas.route, 'op-dit-apparaat');
+  assert.equal(s.kompas.privacy, 'Inhoud blijft op deze Mac');
+  assert.equal(s.kompas.autoriteit, 'mens');
 });
 
 test('een modelserver op het eigen netwerk wordt niet als verwerking op dit apparaat gelabeld', () => {
@@ -72,11 +84,15 @@ test('productiegrens laat lokaal draaien terwijl externe AI bewust uit staat', (
 test('de centrale bedieningslaag houdt een handmatige route zichtbaar', () => {
   const lees = p => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
   const tab = lees('public/shared/rahul-tab.js');
+  const kompas = lees('public/shared/rahul-tab/kompas.js');
   const consoleLaag = lees('public/shared/command/console.js');
   assert.match(tab, /Handmatige werkmodus · alles blijft bruikbaar/);
-  assert.match(tab, /Lokale intelligentie · privé op dit apparaat/);
-  assert.match(tab, /Lokale intelligentie · eigen omgeving/);
-  assert.match(tab, /Lokaal eerst · externe uitwijk zichtbaar/);
+  assert.match(tab, /RTG Kompas · privé op deze Mac/);
+  assert.match(tab, /RTG Kompas · lokaal in eigen omgeving/);
+  assert.match(tab, /RTG Kompas · externe uitwijk zichtbaar/);
+  assert.match(tab, /RTG KOMPAS · LOCAL-FIRST/);
+  assert.match(kompas, /MENS BESLIST/);
+  assert.match(kompas, /RTGKompas/);
   assert.match(tab, /werkblad, navigatie en alle handmatige functies blijven gewoon beschikbaar/i);
   assert.match(consoleLaag, /Navigatie, instellingen en alle werkbladen blijven werken/);
 });

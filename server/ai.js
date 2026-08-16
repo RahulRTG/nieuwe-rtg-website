@@ -91,10 +91,21 @@ function beschikbaarheid(ai) {
   const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
   const hybride = heeftLokaal && heeftExtern;
   const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
+  const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
+  const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
+  /* RTG Kompas is de zichtbare vertrouwenslaag, niet een tweede model. De
+     applicatie bepaalt deze velden zelf, zodat een model nooit kan veinzen
+     dat iets lokaal bleef of dat een menselijke goedkeuring al is gegeven. */
+  const kompasRoute = hybride ? 'hybride' : heeftLokaal ? lokaleGrens : beschikbaar ? 'extern' : 'regels';
+  const kompasPrivacy = hybride ? 'Lokale start; externe uitwijk kan inhoud verwerken'
+    : heeftLokaal && lokaleGrens === 'op-dit-apparaat' ? 'Inhoud blijft op deze Mac'
+    : heeftLokaal ? 'Inhoud blijft binnen de eigen omgeving'
+    : beschikbaar ? 'Inhoud wordt door een externe modelprovider verwerkt'
+    : 'Geen inhoud naar een model';
   return {
     beschikbaar,
-    modus: hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig',
-    verwerking: hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
+    modus,
+    verwerking,
     privacy: hybride ? 'kan-extern-verwerken' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
     aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
     mogelijkheden: {
@@ -109,6 +120,15 @@ function beschikbaarheid(ai) {
       uitvoering: 'schermen-en-workflows',
       samenvatten: 'lokale-extractie',
       beslissingen: 'menselijk-akkoord'
+    },
+    kompas: {
+      naam: 'RTG Kompas',
+      route: kompasRoute,
+      privacy: kompasPrivacy,
+      ritme: ['nu', 'straks', 'let-op'],
+      uitleg: 'bron-en-grens-zichtbaar',
+      autoriteit: 'mens',
+      menselijkAkkoord: ['geld', 'publicatie', 'toegang', 'definitieve-toezegging']
     }
   };
 }

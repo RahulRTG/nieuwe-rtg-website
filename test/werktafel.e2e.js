@@ -53,6 +53,16 @@ async function opzet() {
   return { srv, token: d.token, dataDir };
 }
 
+async function tekenOnboarding(base, token) {
+  const r = await fetch(base + '/api/onboarding/teken', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true })
+  });
+  const d = await r.json().catch(() => ({}));
+  assert.equal(r.status, 200, 'onboarding tekenen: ' + JSON.stringify(d).slice(0, 200));
+  assert.equal(d.klaar, true, 'de proefgebruiker hoort na tekenen binnen te mogen');
+}
+
 /* De stand van het scherm in EEN oogopslag. `bovenop` is de kern van geval 1:
    niet "staat de deur in de DOM" maar "wie raakt de muis in het midden van de
    deur" -- want de bug was juist dat de deur er wel stond en onbereikbaar was. */
@@ -306,9 +316,19 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
   const fouten = [];
   letOpFouten(page, fouten);
   try {
+    // Een voorspelbare virtuele voordeur: de passkeyvraag blijft open totdat
+    // "Andere manier" hem afbreekt. Zo toetst dit schermgedrag, niet het
+    // passkeymagazijn van de machine waarop de toets toevallig draait.
+    await page.addInitScript(() => {
+      try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+      Object.defineProperty(window, 'PublicKeyCredential', { configurable: true, value: class {} });
+      Object.defineProperty(navigator, 'credentials', { configurable: true, value: { get: ({ signal }) => new Promise((resolve, reject) => {
+        if (signal) signal.addEventListener('abort', () => reject(new DOMException('afgebroken', 'AbortError')), { once: true });
+      }) } });
+    });
     // géén token: dit is een bezoeker die nog niets is
     await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
-    await page.waitForSelector('#agIn', { timeout: 20000 });
+    await page.waitForSelector('#agPasskey', { timeout: 20000 });
 
     const uit = await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
@@ -317,7 +337,10 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         stand: r && r.dataset.stand,
         gateInWerkvloer: !!(r && r.querySelector('#gate')),
         gateZichtbaar: !!(g && g.getBoundingClientRect().width > 0),
-        veld: !!document.getElementById('agIn'),
+        veldBestaat: !!document.getElementById('agIn'),
+        veldZichtbaar: !!document.getElementById('agIn')?.getBoundingClientRect().width,
+        passkeyZichtbaar: !!document.getElementById('agPasskey')?.getBoundingClientRect().width,
+        andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
         klokIngang: !!document.querySelector('.cmd-klok'),
         tabs: tabs ? getComputedStyle(tabs).display : null,
@@ -326,7 +349,10 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     assert.equal(uit.stand, 'gesloten', 'voor het inloggen hoort de werktafel in de gesloten stand te staan');
     assert.equal(uit.gateInWerkvloer, true, 'met het inloggesprek IN de werkvloer');
     assert.equal(uit.gateZichtbaar, true, 'en zichtbaar -- verplaatsen mag hem niet verstoppen');
-    assert.equal(uit.veld, true, 'het antwoordveld van Rahul hoort er te zijn');
+    assert.equal(uit.veldBestaat, true, 'het terugvalveld van Rahul hoort klaar te staan');
+    assert.equal(uit.veldZichtbaar, false, 'maar vraagt niet eerst om informatie van de bezoeker');
+    assert.equal(uit.passkeyZichtbaar, true, 'de passkey hoort de zichtbare eerste deur te zijn');
+    assert.equal(uit.andereManier, true, 'met een veilige terugval voor bestaande accounts');
     assert.equal(uit.werelden, 12, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
     assert.equal(uit.klokIngang, false, 'maar geen Beginscherm-knop: die vouwt de werktafel op en laat je zonder gesprek achter');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
@@ -339,12 +365,137 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     const na = await page.evaluate(() => ({
       bladen: document.querySelectorAll('.cmd-pane').length,
       pad: location.pathname,
-      cursorInGesprek: document.activeElement && document.activeElement.id === 'agIn',
+      cursorOpDeur: document.activeElement && document.activeElement.id === 'agPasskey',
     }));
     assert.equal(na.bladen, 0, 'een wereld aanraken mag voor het inloggen geen blad openen');
     assert.equal(na.pad, '/apps/app.html', 'en geen paginasprong worden');
-    assert.equal(na.cursorInGesprek, true, 'hij hoort de cursor in het inloggesprek te zetten');
+    assert.equal(na.cursorOpDeur, true, 'hij hoort de cursor op de passkeydeur te zetten');
 
+    // De terugval verschijnt pas na de uitdrukkelijke keuze van de bezoeker.
+    await page.click('#agAnders');
+    await page.waitForSelector('#agIn', { state: 'visible', timeout: 10000 });
+    const anders = await page.evaluate(() => ({
+      veldZichtbaar: !!document.getElementById('agIn').getBoundingClientRect().width,
+      veldActief: document.activeElement && document.activeElement.id === 'agIn',
+      passkeyZichtbaar: !!document.getElementById('agPasskey').getBoundingClientRect().width,
+      andereZichtbaar: !!document.getElementById('agAnders').getBoundingClientRect().width,
+    }));
+    assert.equal(anders.veldZichtbaar, true, 'Andere manier opent het bestaande aanmeld- en herstelgesprek');
+    assert.equal(anders.veldActief, true, 'met de cursor meteen waar iemand zelf informatie kan geven');
+    assert.equal(anders.passkeyZichtbaar, false, 'de eerste deur wijkt dan voor de gekozen terugval');
+    assert.equal(anders.andereZichtbaar, false, 'de keuze staat niet dubbel op het scherm');
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten');
+  } finally {
+    await ctx.close();
+    await browser.close();
+    await stop(srv.child);
+    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* DE SNELLE DEUR VRAAGT GEEN IDENTITEIT VOORAF.
+
+   De cryptografische ceremonie zelf wordt met een echte P-256-sleutel getoetst
+   in webauthn-ceremonie.test.js. Hier gaat het om de browserbedrading: opties
+   zonder login ophalen, de eenmalige ceremonie terugsturen en daarna precies
+   op de lege wereldkiezer landen. */
+test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  const { srv, token, dataDir } = await opzet();
+  await tekenOnboarding(srv.base, token);
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  const fouten = [];
+  let optiesBody = null, loginBody = null;
+  letOpFouten(page, fouten);
+  try {
+    await page.addInitScript(() => {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      Object.defineProperty(window, 'PublicKeyCredential', { configurable: true, value: class {} });
+      const bytes = () => new Uint8Array([1, 2, 3]).buffer;
+      Object.defineProperty(navigator, 'credentials', { configurable: true, value: { get: async () => ({
+        id: 'sleutel-uit-toestel', rawId: bytes(), type: 'public-key', getClientExtensionResults: () => ({}),
+        response: { authenticatorData: bytes(), clientDataJSON: bytes(), signature: bytes(), userHandle: null }
+      }) } });
+    });
+    await page.route('**/api/webauthn/opties', async route => {
+      optiesBody = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        ceremonie: '12345678901234567890123456789012',
+        opties: { challenge: 'AQID', rpId: '127.0.0.1', userVerification: 'required', allowCredentials: [] }
+      }) });
+    });
+    await page.route('**/api/webauthn/login', async route => {
+      loginBody = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
+    });
+
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+
+    assert.deepEqual(optiesBody, {}, 'de eerste optiesvraag bevat geen e-mailadres of gebruikersnaam');
+    assert.equal(loginBody.login, undefined, 'ook na lokale verificatie wordt geen ingevulde login verzonnen');
+    assert.equal(loginBody.ceremonie, '12345678901234567890123456789012', 'de eenmalige serverceremonie gaat ongewijzigd terug');
+    assert.equal(loginBody.antwoord.id, 'sleutel-uit-toestel', 'het toestel wijst de passkey aan');
+    assert.equal(loginBody.pasApp, 'rtg', 'de pasgrens blijft ook op de snelle deur staan');
+    const geland = await page.evaluate(() => ({
+      tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      poortVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+    }));
+    assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
+    assert.equal(geland.bladen, 0, 'de snelle deur opent geen demo-activiteit');
+    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    assert.deepEqual(fouten, [], 'geen JS-fouten');
+  } finally {
+    await ctx.close();
+    await browser.close();
+    await stop(srv.child);
+    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* DE INLOGROUTE ZELF MOET LANDEN.
+
+   De algemene MutationObserver is hieronder expres inert. Zonder die ingreep
+   zou een indirecte class-mutatie dezelfde uitkomst tekenen en kon deze toets
+   groen blijven terwijl de inlogroute zelf niets deed. Dit is dus het scherm
+   uit de productbeslissing: een terugkerend lid, op telefoonformaat, nul
+   geopende bladen en alleen de uitnodiging om zelf een wereld te kiezen. */
+test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  const { srv, token, dataDir } = await opzet();
+  await tekenOnboarding(srv.base, token);
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  const fouten = [];
+  letOpFouten(page, fouten);
+  try {
+    await page.addInitScript(t => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
+    }, token);
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+
+    const geland = await page.evaluate(() => ({
+      tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      gateVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+      appActief: document.getElementById('app').classList.contains('active'),
+      balk: Math.round(document.querySelector('.cmd-balk').getBoundingClientRect().height),
+      uitnodiging: getComputedStyle(document.querySelector('.cmd-balkbladen'), '::after').content,
+    }));
+    assert.equal(geland.appActief, true, 'voorwaarde: de sessie is werkelijk hersteld');
+    assert.equal(geland.gateVerborgen, true, 'de inlogpoort hoort na de sessie weg te zijn');
+    assert.equal(geland.bladen, 0, 'de inlog mag geen wereld of activiteit vooraf openen');
+    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    assert.equal(geland.balk, 48, 'onderaan hoort alleen de wereldbalk te staan');
+    assert.match(geland.uitnodiging, /Kies een wereld/);
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();

@@ -13,6 +13,7 @@
 
 const { generateRegistrationOptions, verifyRegistrationResponse,
   generateAuthenticationOptions, verifyAuthenticationResponse } = require('../webauthn');
+const crypto = require('crypto');
 
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
 const SLEUTELS_MAX = 8;                 // passkeys per account
@@ -20,6 +21,7 @@ const RP_NAAM = 'Rahul Travel Group';
 
 function maakWebauthn({ db, save, accounts, schoon }) {
   const challenges = new Map();         // sleutel -> { challenge, tot }
+  let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
 
@@ -28,13 +30,20 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return db.data.webauthn;
   }
   const credsVan = userId => lijsten()[userId] || [];
-  function zetChallenge(sleutel, challenge) {
-    challenges.set(sleutel, { challenge, tot: Date.now() + CHALLENGE_TTL_MS });
+  function index() {
+    if (credentialIndex) return credentialIndex;
+    credentialIndex = new Map();
+    for (const [userId, rij] of Object.entries(lijsten()))
+      for (const cred of (rij || [])) if (cred && cred.id) credentialIndex.set(cred.id, userId);
+    return credentialIndex;
+  }
+  function zetChallenge(sleutel, challenge, extra) {
+    challenges.set(sleutel, { challenge, tot: Date.now() + CHALLENGE_TTL_MS, ...(extra || {}) });
     if (challenges.size > 5000) for (const [k, v] of challenges) if (v.tot < Date.now()) challenges.delete(k);
   }
   function pakChallenge(sleutel) {
     const c = challenges.get(sleutel); challenges.delete(sleutel);
-    return c && c.tot > Date.now() ? c.challenge : null;
+    return c && c.tot > Date.now() ? c : null;
   }
 
   /* ---- registreren: een nieuwe passkey aan het eigen account hangen ---- */
@@ -45,13 +54,17 @@ function maakWebauthn({ db, save, accounts, schoon }) {
       userName: user.codename || ('lid-' + user.id),       // nooit de echte naam in de authenticator
       attestationType: 'none',
       excludeCredentials: credsVan(user.id).map(c => ({ id: c.id, transports: c.transports })),
-      authenticatorSelection: { residentKey: 'preferred', userVerification: 'preferred' }
+      // `required` maakt dit een vindbare passkey. Daardoor kan het toestel
+      // het account aanwijzen en hoeft RTG niet eerst om een e-mailadres te
+      // vragen. Biometrie blijft volledig op het toestel.
+      authenticatorSelection: { residentKey: 'required', userVerification: 'required' }
     });
     zetChallenge('reg:' + user.id, opties.challenge);
     return { status: 200, opties };
   }
   async function regMaak(user, antwoord, naam, origin, hostnaam) {
-    const challenge = pakChallenge('reg:' + user.id);
+    const aanvraag = pakChallenge('reg:' + user.id);
+    const challenge = aanvraag && aanvraag.challenge;
     if (!challenge) return { status: 400, error: 'De aanvraag is verlopen; probeer het opnieuw.' };
     if (credsVan(user.id).length >= SLEUTELS_MAX) return { status: 409, error: 'Tot ' + SLEUTELS_MAX + ' passkeys per account.' };
     let uit;
@@ -62,31 +75,55 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     if (!uit.verified) return { status: 400, error: 'De passkey kon niet worden geverifieerd.' };
     const c = uit.registrationInfo.credential;
     const rij = lijsten()[user.id] = lijsten()[user.id] || [];
-    if (rij.some(x => x.id === c.id)) return { status: 409, error: 'Deze passkey staat er al.' };
+    if (index().has(c.id)) return { status: 409, error: 'Deze passkey staat er al.' };
     rij.push({ id: c.id, publicKey: b64(c.publicKey), counter: c.counter || 0,
       transports: c.transports || [], apparaat: uit.registrationInfo.credentialDeviceType,
       naam: schoon(naam, 40) || 'Passkey', at: new Date().toISOString() });
+    index().set(c.id, String(user.id));
     save();
     return { status: 200, ok: true, sleutels: publiekeLijst(user) };
   }
 
   /* ---- inloggen met een passkey ---- */
-  async function loginOpties(login, hostnaam) {
-    const user = accounts.findByLogin(String(login || ''));
-    const creds = user ? credsVan(user.id) : [];
-    // anti-enumeratie: onbekende logins krijgen hetzelfde soort antwoord
-    const opties = await generateAuthenticationOptions({
-      rpID: hostnaam, userVerification: 'preferred',
-      allowCredentials: creds.map(c => ({ id: c.id, transports: c.transports }))
-    });
-    zetChallenge('login:' + String(login || '').toLowerCase(), opties.challenge);
-    return { status: 200, opties };
+  const loginNaam = login => String(login || '').trim().toLowerCase();
+  function vindCredential(id) {
+    const userId = index().get(id);
+    const cred = userId == null ? null : credsVan(userId).find(c => c.id === id);
+    if (cred) return { user: accounts.getUserById(userId), cred };
+    return { user: null, cred: null };
   }
-  async function loginMaak(login, antwoord, origin, hostnaam) {
-    const challenge = pakChallenge('login:' + String(login || '').toLowerCase());
-    if (!challenge) return { status: 400, error: 'De aanvraag is verlopen; probeer het opnieuw.' };
-    const user = accounts.findByLogin(String(login || ''));
-    const cred = user ? credsVan(user.id).find(c => c.id === (antwoord && antwoord.id)) : null;
+  async function loginOpties(login, hostnaam) {
+    const naam = loginNaam(login);
+    const user = naam ? accounts.findByLogin(naam) : null;
+    const creds = user ? credsVan(user.id) : [];
+    // Zonder login blijft allowCredentials leeg: de authenticator kiest dan
+    // zelf een vindbare sleutel voor dit domein. Met een login blijft de oude
+    // gerichte route beschikbaar voor bestaande, niet-vindbare passkeys.
+    let toegestaan = creds.map(c => ({ id: c.id }));
+    // De oude, gerichte route geeft altijd exact acht ids terug. Zo verraadt
+    // een antwoord niet of het genoemde account bestaat of hoeveel sleutels
+    // eraan hangen; alleen de authenticator weet welke id echt van hem is.
+    if (naam) while (toegestaan.length < SLEUTELS_MAX)
+      toegestaan.push({ id: crypto.randomBytes(32).toString('base64url') });
+    const opties = await generateAuthenticationOptions({
+      rpID: hostnaam, userVerification: 'required',
+      allowCredentials: toegestaan
+    });
+    const ceremonie = crypto.randomBytes(24).toString('base64url');
+    zetChallenge('login:' + ceremonie, opties.challenge, { login: naam });
+    return { status: 200, opties, ceremonie };
+  }
+  async function loginMaak(login, ceremonie, antwoord, origin, hostnaam) {
+    const id = String(ceremonie || '');
+    const aanvraag = /^[A-Za-z0-9_-]{32}$/.test(id) ? pakChallenge('login:' + id) : null;
+    const naam = loginNaam(login);
+    if (!aanvraag || aanvraag.login !== naam) return { status: 400, error: 'De aanvraag is verlopen; probeer het opnieuw.' };
+    const challenge = aanvraag.challenge;
+    const gevonden = naam
+      ? { user: accounts.findByLogin(naam), cred: null }
+      : vindCredential(antwoord && antwoord.id);
+    const user = gevonden.user;
+    const cred = naam ? (user ? credsVan(user.id).find(c => c.id === (antwoord && antwoord.id)) : null) : gevonden.cred;
     if (!cred) return { status: 401, error: 'Onbekende passkey voor dit account.' };
     let uit;
     try {
@@ -110,6 +147,7 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     const rij = credsVan(user.id);
     if (!rij.some(c => c.id === id)) return { status: 404, error: 'Passkey niet gevonden.' };
     lijsten()[user.id] = rij.filter(c => c.id !== id);
+    index().delete(id);
     save();
     return { status: 200, ok: true, sleutels: publiekeLijst(user) };
   }

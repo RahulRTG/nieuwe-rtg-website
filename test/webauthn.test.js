@@ -66,14 +66,25 @@ test('3. login-opties verraden nooit of een account bestaat (anti-enumeratie)', 
   const echt = await api('/api/webauthn/opties', { login: 'pk-onbekend@x.nl' });
   assert.equal(echt.status, 200, 'onbekende logins krijgen hetzelfde soort antwoord');
   assert.ok(echt.body.opties.challenge, 'met een echte challenge');
-  assert.deepEqual(echt.body.opties.allowCredentials || [], [], 'en zonder sleutel-hints');
+  assert.match(echt.body.ceremonie, /^[A-Za-z0-9_-]{32}$/, 'met een onvoorspelbare, eenmalige ceremoniecode');
+  assert.equal((echt.body.opties.allowCredentials || []).length, 8,
+    'de gerichte terugval heeft ook voor een onbekend account exact dezelfde vaste vorm');
+
+  const naamloos = await api('/api/webauthn/opties', {});
+  assert.equal(naamloos.status, 200, 'de nieuwe deur heeft geen loginnaam nodig');
+  assert.deepEqual(naamloos.body.opties.allowCredentials || [], [], 'en laat het toestel de sleutel kiezen');
+  assert.equal(naamloos.body.opties.userVerification, 'required', 'lokale gebruikerscontrole is verplicht');
 });
 
 test('4. inloggen met een valse passkey faalt en de rem op de deur telt mee', async () => {
-  await api('/api/webauthn/opties', { login: 'pk-nep@x.nl' });
-  const r = await api('/api/webauthn/login', { login: 'pk-nep@x.nl', antwoord: { id: 'nep' } });
+  const opties = await api('/api/webauthn/opties', { login: 'pk-nep@x.nl' });
+  const r = await api('/api/webauthn/login', { login: 'pk-nep@x.nl', ceremonie: opties.body.ceremonie,
+    antwoord: { id: 'nep' } });
   assert.ok(r.status === 401 || r.status === 400, 'geen sessie zonder geldige handtekening');
   assert.ok(!r.body.token, 'en zeker geen token');
+
+  const zonder = await api('/api/webauthn/login', { antwoord: { id: 'nep' } });
+  assert.equal(zonder.status, 400, 'zonder de uitgegeven ceremonie bestaat er geen inlogpoging');
 });
 
 test('5. beheer: de lijst is leeg tot de ceremonie er een toevoegt; weghalen bestaat', async () => {

@@ -4,7 +4,7 @@
    dezelfde pas-app-controle. Krijgt de gedeelde context een keer bij het
    opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
-  const { app, auth, accounts, stateFor, pasAppOk, PAS_FOUT, tooManyTries, noteFailedTry, loginFails,
+  const { app, auth, accounts, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
     webauthnRegOpties, webauthnRegMaak, webauthnLoginOpties, webauthnLoginMaak, webauthnLijst, webauthnWeg } = actx;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const eisAccount = (req, res) => {
@@ -39,13 +39,17 @@ module.exports = (actx) => {
   });
   app.post('/api/webauthn/login', async (req, res) => {
     const login = String(req.body.login || '');
-    const bucket = 'webauthn:' + req.ip + ':' + login.toLowerCase().slice(0, 60);
+    // De rem hoort bij het doel dat aangevallen wordt. Bij de naamloze deur is
+    // dat de credential-id; bij de terugvalroute blijft dat de accountnaam.
+    const credential = String(req.body.antwoord && req.body.antwoord.id || 'onbekend');
+    const bucket = 'webauthn:' + (login ? 'account:' + login.toLowerCase().slice(0, 60) : 'sleutel:' + credential.slice(0, 80));
     if (tooManyTries(res, bucket)) return;
-    const r = await webauthnLoginMaak(login, req.body.antwoord, oorsprong(req), gastheer(req));
+    const r = await webauthnLoginMaak(login, req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
     if (r.error) { noteFailedTry(bucket); return stuur(res, r); }
     loginFails.delete(bucket);
     const user = r.user;
-    if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
+    if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
+    if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     res.json({ token, state: stateFor(sess, req.body.lang) });

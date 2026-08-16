@@ -64,6 +64,10 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
 
   const opties = await api('/api/webauthn/registreer/opties', {}, lid);
   assert.equal(opties.status, 200);
+  assert.equal(opties.body.opties.authenticatorSelection.residentKey, 'required',
+    'nieuwe passkeys zijn vindbaar, zodat de deur geen e-mailadres vooraf nodig heeft');
+  assert.equal(opties.body.opties.authenticatorSelection.userVerification, 'required',
+    'de authenticator moet de mens op het toestel controleren');
   const challenge = opties.body.opties.challenge;
   assert.ok(challenge, 'er is een verse challenge om te ondertekenen');
 
@@ -75,16 +79,52 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   assert.equal(lijst.body.sleutels.length, 1, 'en staat daarna in het beheer');
   assert.equal(lijst.body.sleutels[0].naam, 'Telefoon van het lid', 'met de naam die het lid hem gaf');
 
-  /* INLOGGEN MET DIE PASSKEY, ZONDER WACHTWOORD. Nu verraden de login-opties wel
-     degelijk een hint -- maar alleen aan wie het juiste account noemt, en dat is
-     het verschil met de anti-enumeratie-toets in webauthn.test.js. */
+  // Een credential-id hoort wereldwijd bij één account. Ook iemand die op een
+  // tweede, geldig ingelogd account dezelfde sleutel probeert te registreren,
+  // mag de naamloze accountzoeker niet dubbelzinnig kunnen maken.
+  const tweede = await api('/api/auth/register', { name: 'Lid Twee', email: 'tweede-' + Date.now() + '@x.nl',
+    password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
+  const optiesTweede = await api('/api/webauthn/registreer/opties', {}, tweede.body.token);
+  const dubbel = await api('/api/webauthn/registreer',
+    { antwoord: auth.registratieAntwoord(optiesTweede.body.opties.challenge, origin), naam: 'Dezelfde sleutel' }, tweede.body.token);
+  assert.equal(dubbel.status, 409, 'dezelfde credential-id kan niet aan twee accounts hangen');
+
+  /* DE NIEUWE DEUR: geen e-mailadres vooraf. Twee tegelijk geopende ceremonies
+     krijgen elk hun eigen eenmalige sleutel; de tweede mag de eerste dus niet
+     overschrijven. De authenticator geeft na lokale verificatie de credential-
+     id terug en pas DAN zoekt RTG het account erbij. */
+  const deurA = await api('/api/webauthn/opties', {});
+  const deurB = await api('/api/webauthn/opties', {});
+  assert.equal(deurA.status, 200);
+  assert.equal(deurB.status, 200);
+  assert.deepEqual(deurA.body.opties.allowCredentials || [], [], 'RTG stuurt vooraf geen account-hints');
+  assert.notEqual(deurA.body.ceremonie, deurB.body.ceremonie, 'elke poging heeft een eigen ceremonie');
+
+  const directA = await api('/api/webauthn/login', { ceremonie: deurA.body.ceremonie,
+    antwoord: auth.loginAntwoord(deurA.body.opties.challenge, origin, 1), pasApp: 'rtg' });
+  assert.equal(directA.status, 200, 'de naamloze deur aanvaardt de passkey: ' + JSON.stringify(directA.body).slice(0, 200));
+  assert.ok(directA.body.token, 'de eerste ceremonie levert een echte sessie');
+
+  const directB = await api('/api/webauthn/login', { ceremonie: deurB.body.ceremonie,
+    antwoord: auth.loginAntwoord(deurB.body.opties.challenge, origin, 2), pasApp: 'rtg' });
+  assert.equal(directB.status, 200, 'ook de gelijktijdig geopende tweede ceremonie blijft geldig');
+
+  const herhaal = await api('/api/webauthn/login', { ceremonie: deurA.body.ceremonie,
+    antwoord: auth.loginAntwoord(deurA.body.opties.challenge, origin, 3), pasApp: 'rtg' });
+  assert.equal(herhaal.status, 400, 'een gebruikte ceremonie is niet opnieuw af te spelen');
+
+  /* De gerichte route blijft bestaan voor oude, niet-vindbare passkeys: pas na
+     "Andere manier" noemt iemand zijn account. */
   const lOpties = await api('/api/webauthn/opties', { login: lidEmail });
   assert.equal(lOpties.status, 200);
-  assert.equal((lOpties.body.opties.allowCredentials || []).length, 1,
-    'voor een account MET passkey komt er nu wel een sleutel-hint');
+  assert.equal((lOpties.body.opties.allowCredentials || []).length, 8,
+    'de gerichte terugval heeft een vaste vorm en verraadt het sleutelaantal niet');
+  assert.ok(lOpties.body.opties.allowCredentials.some(c => c.id === lijst.body.sleutels[0].id),
+    'de echte sleutel zit wel tussen de afgeschermde hints');
 
   const sessie = await api('/api/webauthn/login',
-    { login: lidEmail, antwoord: auth.loginAntwoord(lOpties.body.opties.challenge, origin), pasApp: 'rtg' });
+    { login: lidEmail, ceremonie: lOpties.body.ceremonie,
+      antwoord: auth.loginAntwoord(lOpties.body.opties.challenge, origin, 3), pasApp: 'rtg' });
   assert.equal(sessie.status, 200, 'de handtekening wordt aanvaard: ' + JSON.stringify(sessie.body).slice(0, 200));
   assert.ok(sessie.body.token, 'en er komt een echte sessie uit, net als bij een wachtwoord');
   assert.equal(sessie.body.state.user.tier, 'rtg', 'op de pas van het lid zelf');
@@ -103,7 +143,7 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   const vreemde = maakAuthenticator(rpID);
   const lOpties2 = await api('/api/webauthn/opties', { login: lidEmail });
   const nep = await api('/api/webauthn/login',
-    { login: lidEmail, pasApp: 'rtg',
+    { login: lidEmail, ceremonie: lOpties2.body.ceremonie, pasApp: 'rtg',
       antwoord: { ...vreemde.loginAntwoord(lOpties2.body.opties.challenge, origin, 99), id: lijst.body.sleutels[0].id } });
   assert.notEqual(nep.status, 200, 'een handtekening van een andere sleutel wordt geweigerd');
   assert.ok(!nep.body.token, 'en levert geen sessie op');

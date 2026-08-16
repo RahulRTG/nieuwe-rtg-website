@@ -68,8 +68,8 @@
     // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
-    if (herstel) setTimeout(resetStart, 400);
-    else if (!onthouden) setTimeout(start, 400);
+    if (herstel){ andereManier(true); setTimeout(resetStart, 400); }
+    else if (!onthouden) setTimeout(() => passkeyInlog(true), 400);
     inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();
   /* ================= SALON-CONNECTIES =================

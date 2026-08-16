@@ -1,7 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
-const fs = require('fs');
 const functies = require('../server/functies');
 const maakScanner = require('../server/kern/magnaat-capabilities');
 const bronnen = require('../server/kern/magnaat-capabilities-bronnen');
@@ -93,7 +92,7 @@ function metEnv(waarden, werk) {
   }
 }
 
-test('de native broncodescan is byte-voor-byte gelijk en doorloopt schaduw en canary veilig', { skip: !fs.existsSync(nativeBin) }, () => {
+test('de native broncodescan is byte-voor-byte gelijk en doorloopt schaduw en canary veilig', () => {
   const javascript = bronnen.scan(root, {
     RTG_CAPABILITY_RUST_MODE: 'uit', RTG_CAPABILITY_RUST_BIN: nativeBin
   });
@@ -128,7 +127,7 @@ test('capability-noodstop en een kapotte binary vallen aantoonbaar terug naar Ja
   assert.equal(kapot.motor.reden, 'native-fout');
 });
 
-test('de Capability Graph maakt de gekozen motorstand zichtbaar', { skip: !fs.existsSync(nativeBin) }, () => {
+test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
   metEnv({
     RTG_RUST_ALLES_UIT: undefined, RTG_CAPABILITY_RUST_MODE: 'canary',
     RTG_CAPABILITY_RUST_BIN: nativeBin, RTG_CAPABILITY_RUST_CANARY_PCT: '100',

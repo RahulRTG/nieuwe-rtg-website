@@ -12,7 +12,7 @@ module.exports = ({ basis: B }) => {
       return fout('Alleen een actieve, officieel goedgekeurde RTG-partner krijgt een Partnerstudio.', 403);
     return Object.assign({ ok: true }, B.eigenBeeld(B.tweeling(supplier)));
   }
-  function profielZet(supplier, actor, invoer = {}) {
+  function partnerProfielZet(supplier, actor, invoer = {}) {
     const t = B.tweeling(supplier), geblokkeerd = check(t, invoer);
     if (geblokkeerd) return geblokkeerd;
     const omschrijving = B.tekst(invoer.omschrijving, 800), trainingsdoel = B.tekst(invoer.trainingsdoel, 500);
@@ -100,5 +100,5 @@ module.exports = ({ basis: B }) => {
     return Object.assign({ ok: true, overgenomen: { locaties, aanbod } }, B.eigenBeeld(t));
   }
 
-  return { overzicht, profielZet, bouwsteenZet, bouwsteenWeg, importeer };
+  return { overzicht, profielZet: partnerProfielZet, bouwsteenZet, bouwsteenWeg, importeer };
 };

@@ -22,7 +22,7 @@ function risicoVan(route) {
   return 'groen';
 }
 
-function rolVan(bron, methode, kantoor, risico) {
+function capabilityRolVan(bron, methode, kantoor, risico) {
   const zwaar = methode !== 'GET' || /maak|zet|wijzig|verwijder|beslis|bevestig|annuleer|nood|herstel|modus|instelling|publiceer|blokkeer|bevries|autoriseer/i.test(bron);
   if (kantoor.id === 'boardroom') return 'Boardroom-regisseur';
   if (risico === 'rood' || zwaar) return kantoor.naam + '-coördinator';
@@ -75,7 +75,7 @@ module.exports = ({
       const gekoppeld = flags.filter(f => (f.paden || []).some(p => acties.some(a => a.route.startsWith(p))));
       const kantoor = kantoorVan(familie);
       const risico = risicoVan(familie);
-      const rol = rolVan(familie, acties.some(a => a.methode !== 'GET') ? 'POST' : 'GET', kantoor, risico);
+      const rol = capabilityRolVan(familie, acties.some(a => a.methode !== 'GET') ? 'POST' : 'GET', kantoor, risico);
       return {
         id: 'code:' + familie.replace(/^\/api\//, '').replace(/\//g, ':'),
         naam: menselijk(familie.replace(/^\/api\//, '')),
@@ -119,7 +119,7 @@ module.exports = ({
     const apiPunten = endpoints.map(e => {
       const kantoor = kantoorVan(e.route);
       const risico = risicoVan(e.route);
-      const rol = rolVan(e.route, e.methode, kantoor, risico);
+      const rol = capabilityRolVan(e.route, e.methode, kantoor, risico);
       const familie = workflowFamilie(e.route);
       const koppeling = matrix.api(Object.assign({ familie }, e), kantoor, rol);
       return {
@@ -134,7 +134,7 @@ module.exports = ({
     const schermPunten = apps.map(a => {
       const kantoor = kantoorVan(a.pad);
       const risico = risicoVan(a.pad);
-      const rol = rolVan(a.pad, 'GET', kantoor, risico);
+      const rol = capabilityRolVan(a.pad, 'GET', kantoor, risico);
       const koppeling = matrix.scherm({ route: a.pad, sleutel: a.pad, bestand: a.bestand }, kantoor, rol);
       return {
         id: controleId('scherm', a.pad), soort: 'scherm', sleutel: a.pad,
@@ -149,7 +149,7 @@ module.exports = ({
       const bron = [f.id, f.naam, f.categorie, ...(f.paden || [])].join(' ');
       const kantoor = kantoorVan(bron);
       const risico = risicoVan(bron);
-      const rol = rolVan(bron, 'POST', kantoor, risico);
+      const rol = capabilityRolVan(bron, 'POST', kantoor, risico);
       const basis = { sleutel: f.id, route: (f.paden || [])[0] || null, bestand: 'server/functies.js' };
       const koppeling = matrix.functie(basis, kantoor, rol);
       return {

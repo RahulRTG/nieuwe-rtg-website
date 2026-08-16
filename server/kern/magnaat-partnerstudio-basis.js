@@ -78,7 +78,7 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
       return { status: 409, error: 'Iemand anders heeft deze tweeling intussen bijgewerkt. Ververs de Partnerstudio.' };
     return null;
   }
-  function wijzig(t, actor, actie, detail) {
+  function noteerPartnerWijziging(t, actor, actie, detail) {
     t.versie += 1;
     if (t.fase === 'goedgekeurd' || t.fase === 'aanpassen' || t.fase === 'ingetrokken') t.fase = 'concept';
     t.bijgewerktAt = nu();
@@ -126,5 +126,5 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
   }
 
   return { VERSIE, SOORTEN, staat, leverancier, tweeling, tekst, regels, id, kopie, nu,
-    actorNaam, magWijzigen, wijzig, gereedheid, momentopname, relatiesVoor, eigenBeeld, save };
+    actorNaam, magWijzigen, wijzig: noteerPartnerWijziging, gereedheid, momentopname, relatiesVoor, eigenBeeld, save };
 };

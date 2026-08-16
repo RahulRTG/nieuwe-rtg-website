@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { blokkeertHtmlParser } = require('../scripts/bundel');
 
 const root = path.join(__dirname, '..', 'public', 'apps');
 
@@ -17,6 +18,8 @@ test('de twee grootste browserbundels blokkeren de HTML-parser niet', () => {
   const zaak = scriptTag('leverancier.html', '/apps/leverancier.js');
   assert.match(lid, /\bdefer\b/i, 'app-main.js hoort parallel met de HTML te laden');
   assert.match(zaak, /\bdefer\b/i, 'leverancier.js hoort parallel met de HTML te laden');
+  assert.equal(blokkeertHtmlParser(lid), false);
+  assert.equal(blokkeertHtmlParser(zaak), false);
 });
 
 test('de zware bundels blijven na hun synchrone voorvereisten staan', () => {

@@ -32,12 +32,12 @@
       '<input id="vastCode" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="'+T('pd.code','Bedrijfscode')+'" aria-label="'+T('pd.code','Bedrijfscode')+'">' +
       '<button class="prim" type="submit">'+T('pd.openbedrijf','Open bedrijf')+'</button></form>' +
       '<div class="lhint">'+T('pd.codehint','Gebruik de code van uw werkgever. Nieuwe RTG-partners werken hier direct, zonder dat deze app hoeft te worden aangepast.')+'</div>';
-    const voorbeelden = demoOmgeving ? '<div class="glist" style="margin-top:0.8rem;">' + SECTORS.map(s =>
+    const voorbeelden = demoOmgeving ? '<div class="glist compact">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(s.icon):'')+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
     ).join('') +
       '</div>' : '';
     $('#gateStep').innerHTML = direct + voorbeelden +
-      '<div class="glist" style="margin-top:0.8rem;"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
+      '<div class="glist compact"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
     $('#vastBedrijf').addEventListener('submit', e => {
       e.preventDefault(); const c = String($('#vastCode').value || '').trim().toUpperCase();
       if (!geldigeBedrijfscode(c)) { toast(T('pd.badcode','Controleer de bedrijfscode.')); return; }
@@ -79,7 +79,7 @@
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
-      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
+      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
     // opnieuw proberen; de server vergelijkt en bewaart er niets van

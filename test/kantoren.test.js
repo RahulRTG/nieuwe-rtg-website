@@ -13,7 +13,7 @@ const { startServer, stop } = require('./helper');
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoren-'));
 
-const api = (pad, body) => fetch(base + '/api/office/' + pad, {
+const api = (pad, body) => fetch(base + (pad.startsWith('/api/') ? pad : '/api/office/' + pad), {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -101,7 +101,7 @@ test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
   assert.equal(matrix.body.dekking.metGaten, 0);
   assert.equal(matrix.body.dekking.dimensies.length, 11);
   assert.equal(matrix.body.punten.length, 0);
-  const plan = await api('magnaat/controle/gaten/plan', { limiet: 5 });
+  const plan = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 5 });
   assert.equal(plan.status, 200);
   assert.equal(plan.body.aangemaakt, 0);
   assert.equal(plan.body.bekeken, 0);

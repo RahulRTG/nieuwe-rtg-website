@@ -23,16 +23,16 @@ module.exports = function maakIntegriteitswacht(opties) {
     .trim().toLowerCase();
   let laatst = null;
 
-  function kandidaten() {
+  function integriteitsKandidaten() {
     const eigen = opties.bewijsPad || process.env.RTG_RELEASE_BEWIJS;
     const lijst = eigen ? [eigen] : ['release-bewijs.json', '.release/release-bewijs.json'];
     return lijst.map(p => path.isAbsolute(p) ? p : path.resolve(root, p));
   }
 
   function lees() {
-    const bewijsPad = kandidaten().find(p => fs.existsSync(p));
+    const bewijsPad = integriteitsKandidaten().find(p => fs.existsSync(p));
     if (!bewijsPad) return { beschikbaar: false, fout: 'Geen releasebewijs gevonden.',
-      gezocht: kandidaten().map(p => path.relative(root, p) || path.basename(p)) };
+      gezocht: integriteitsKandidaten().map(p => path.relative(root, p) || path.basename(p)) };
     try {
       const stat = fs.lstatSync(bewijsPad);
       if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('Het releasebewijs is geen gewoon bestand.');

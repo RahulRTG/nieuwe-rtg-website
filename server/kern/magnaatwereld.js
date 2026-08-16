@@ -987,6 +987,7 @@ module.exports = ({
   scan('Future Engine', !state().laatsteScan);
 
   return { magnaatWereld: {
+    partnerstudio,
     overzicht, taakStart, taakAntwoord, taakHandeling, taakActie,
     werkprocesStart, kiesKantoor, scan, beslis, kantoorStatus, wereld, catalogus,
     partnerTrainingStart, partnerTrainingAntwoord,

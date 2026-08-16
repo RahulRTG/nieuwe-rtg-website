@@ -9,7 +9,7 @@
         const d = await kaApi('dienst');
         $('#kaWie').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
           '<div class="task"><span class="ic">'+(x.waar==='thuis'?'':'')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
-          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
+          : '<div class="pd-empty">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
       } catch(e){}
     };
     const laadChat = async () => {
@@ -18,8 +18,8 @@
         if (!kamer) return;
         const d = await kaApi('kachat', { kamer });
         $('#kaChat').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
-          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
-          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
+          '<div class="pd-chatrij"><b class="pd-chatnaam">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
+          : '<div class="pd-empty">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
         $('#kaChat').scrollTop = $('#kaChat').scrollHeight;
       } catch(e){}
     };

@@ -1,10 +1,5 @@
-/* Eerlijke dekkingsmatrix voor het RTG Controleregister.
-
-   "Gevonden in de code" is maar een van de controles. Deze module legt per
-   API, scherm, functievlag en werkproces apart vast of er ook een eigenaar,
-   rol, stand, schakelaar, proef, auditspoor, gameplay, economisch gevolg en
-   volledige werkroute bestaat. Een onbekend of niet aantoonbaar veld blijft
-   rood; de scanner verzint geen bewijs. */
+/* Bewijsmatrix voor het RTG Controleregister. Ieder onbekend veld blijft rood;
+   gevonden code wordt nooit vanzelf bewijs voor eigenaarschap of werking. */
 'use strict';
 
 const fs = require('node:fs');
@@ -71,9 +66,7 @@ module.exports = ({ root, flags = [], volledigeWerkprocessen = [] }) => {
   const analyseCache = new Map();
   const flagVoor = route => flags.filter(f => (f.paden || []).some(p => String(route || '').startsWith(p)));
   const economisch = punt => {
-    /* Bestuurs- en herstelroutes bedienen het platform, niet de speleconomie.
-       De gedeelde allowlist voorkomt ook toevallige woorddelen: "integriteit"
-       bevat bijvoorbeeld "rit", maar is uiteraard geen vervoersactie. */
+    /* Bestuur en herstel bedienen het platform, niet de speleconomie. */
     if (bestuursredenVoor(String(punt.route || punt.familie || ''))) return false;
     return /pay|betaal|bank|finance|factuur|order|bestel|reserver|boek|ticket|reis|rit|hotel|verhuur|huur|loon|personeel|staff|werk|contract|kassa|retail|mall|geld|munt|wallet|prijs|belasting|btw|groothandel|inkoop|verkoop|voorraad|vracht|abonnement|krediet|rente|begroting|uitkering|salaris|settlement|omzet/i
       .test([punt.route, punt.sleutel, punt.familie].join(' '));
@@ -96,7 +89,7 @@ module.exports = ({ root, flags = [], volledigeWerkprocessen = [] }) => {
     return 'codepad-aanwezig';
   }
   const audit = punt => /\baudit\b|journaal|logboek|inzagelog|\blog\s*\(|\bmeld\s*\(/i.test(fragment(punt));
-  function analyse(punt) {
+  function analyseerDekkingspunt(punt) {
     const sleutel = [punt.bestand, punt.route, punt.sleutel].join('|');
     if (!analyseCache.has(sleutel)) analyseCache.set(sleutel, {
       bronstand: bronstand(punt), proef: genoemd(punt.route || punt.sleutel), audit: audit(punt)
@@ -106,7 +99,7 @@ module.exports = ({ root, flags = [], volledigeWerkprocessen = [] }) => {
   const explicieteFamilies = new Set(volledigeWerkprocessen.flatMap(w => w.codeFamilies || []));
 
   function api(punt, kantoor, rol) {
-    const gekoppeld = flagVoor(punt.route), spel = gekoppeld.length > 0, a = analyse(punt);
+    const gekoppeld = flagVoor(punt.route), spel = gekoppeld.length > 0, a = analyseerDekkingspunt(punt);
     const economieVanToepassing = economisch(punt);
     return { bronstand: a.bronstand, functieIds: gekoppeld.map(f => f.id),
       signalen: { bronproef: a.proef, controleproef: true, bronaudit: a.audit,
@@ -144,7 +137,7 @@ module.exports = ({ root, flags = [], volledigeWerkprocessen = [] }) => {
   }
 
   function werkproces(punt, acties, kantoor, rol, geregistreerd) {
-    const analyses = acties.map(analyse);
+    const analyses = acties.map(analyseerDekkingspunt);
     const heeftProef = analyses.some(a => a.proef);
     const heeftAudit = analyses.some(a => a.audit);
     const volledig = explicieteFamilies.has(punt.familie);

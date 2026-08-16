@@ -17,17 +17,18 @@ async function vergelijk(voorbereiden, commando) {
   voorbereiden(rust);
   const verwacht = javascript.volgendeDag('pariteit', commando);
   const werkelijk = await rust.volgendeDagAsync('pariteit', commando);
-  assert.equal(werkelijk.rekenmotor, 'rust', 'de test mag niet ongemerkt op JS terugvallen');
+  if (motorUrl) assert.equal(werkelijk.rekenmotor, 'rust', 'met motor-URL mag de test niet ongemerkt op JS terugvallen');
+  else assert.notEqual(werkelijk.rekenmotor, 'rust', 'zonder motor-URL bewijst deze test de veilige lokale terugval');
   assert.deepEqual(werkelijk.macro, verwacht.macro);
   assert.deepEqual(werkelijk.bedrijven, verwacht.bedrijven);
   assert.deepEqual(werkelijk.grootboek, verwacht.grootboek);
 }
 
-test('Rust rekent een normale Magnaat-dag exact gelijk aan JavaScript', { skip: !motorUrl }, async () => {
+test('Rust of de veilige lokale terugval rekent een normale Magnaat-dag exact gelijk aan JavaScript', async () => {
   await vergelijk(() => {}, 'rust-pariteit-normaal');
 });
 
-test('Rust blijft gelijk bij besluiten, schok en uitgevoerd werk', { skip: !motorUrl }, async () => {
+test('Rust of de veilige lokale terugval blijft gelijk bij besluiten, schok en uitgevoerd werk', async () => {
   await vergelijk(e => {
     e.beslis('directie', { prijs: 117, personeelDoel: 30, loonMaand: 3650, trainingDag: 1800, bestelling: 340, impactPct: 1.4 });
     e.kiesSchok('scenarioleider', 'arbeidstekort');

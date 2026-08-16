@@ -1,11 +1,5 @@
-/* Directpay, deelbestand "betalen": het rechtstreeks afrekenen zelf. De kant
-   met de kaart (betaalDirect, via de betaal-naad) en de kant met munten
-   (registreerMuntBetaling, waar het geld al binnen is). De idempotentie, de
-   tempolimiet, het grootboek en de publieke vorm komen via de ctx uit
-   ./index.js; dit bestand kent alleen de volgorde van de stappen.
-
-   Afgesplitst uit index.js toen die de 10 KB passeerde: die is de orkestrator,
-   dit is de handeling. */
+/* Directpay-handeling voor kaart- en reeds bevestigde muntbetalingen.
+   De gedeelde grenzen, idempotentie en boekhouding komen via index.js. */
 const betaalstaten = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
@@ -14,13 +8,8 @@ module.exports = (ctx) => {
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingenVoegToe } = ctx;
 
-  /* De betalingen die op DIT moment bij de provider liggen. De idempotentie-
-     controle hieronder en het vastleggen in voerUit staan aan weerszijden van
-     `await betaal.maakBetaling`. Twee gelijktijdige verzoeken zagen allebei
-     niets en legden allebei een betaling vast: het lid werd terecht maar EEN
-     keer afgeschreven (allebei sturen dezelfde idempotencyKey naar de provider)
-     en juist daardoor viel het niet op dat de ontvangstenteller van de
-     leverancier dubbel telde. Een tweede verzoek wacht nu op het eerste. */
+  /* Verzoeken met dezelfde sleutel delen ook rond de provider-await één
+     belofte, zodat de leverancier nooit dubbel wordt gecrediteerd. */
   const inVlucht = new Map();
 
   /* Het lid betaalt een leverancier rechtstreeks. `idem` is een client-token dat
@@ -117,18 +106,8 @@ module.exports = (ctx) => {
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Bedrag te laag.' };
-    /* DEZELFDE BOVENGRENS ALS betaalDirect, en die stond hier niet.
-
-       betaalDirect weigert boven MAX_CENTEN; deze tweeling controleerde alleen de
-       ondergrens. Het bedrag komt hier uit de munt-webhook, dus de aanbieder --
-       of wie zijn bericht kan zetten -- bepaalde zelf hoeveel er bij de
-       ontvangstenteller van de leverancier bij kwam. De doorlichting zag
-       EUR 10.000.000 bijgeschreven op een verzoek van EUR 0,50.
-
-       Pijnlijk detail: deze functie is vanmiddag door mij uit index.js gehaald.
-       De asymmetrie is meeverhuisd zonder dat ik hem zag -- twee functies naast
-       elkaar met verschillende grenzen leest als opzet zolang niemand ze naast
-       elkaar legt. */
+    /* Dezelfde harde bovengrens als betaalDirect. Ook een provider-ingang mag
+       nooit een door de afzender gekozen onbeperkte bijschrijving toelaten. */
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
     const idemSleutel = idem || (providerId ? String(aanbieder || 'provider') + ':' + providerId : null);
     if (idemSleutel) {

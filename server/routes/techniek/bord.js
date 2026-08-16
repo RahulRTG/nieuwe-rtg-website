@@ -14,7 +14,7 @@
    nog niet klaar. Een getter haalt hem op het moment dat hij nodig is. */
 module.exports = (bctx) => {
   const { techniek, functies, eigenaar, inzagelog, log, accounts, archief, beveilig,
-    db, app, ctx, staat, isEigenaar, techAuth, bewaren, foutmelder, spelTelemetrie, controle } = bctx;
+    db, app, ctx, staat, isEigenaar, techAuth, bewaren, foutmelder, spelTelemetrie } = bctx;
 
   // Het statusbord: alle checks + zekeringen. Eigenaar ziet ook de toegangslijst.
   app.get('/api/techniek/status', techAuth, async (req, res) => {
@@ -75,7 +75,7 @@ module.exports = (bctx) => {
       uit.bewaren = bw ? bw.statusDeel() : null;  // zie ./bewaren.js
       // Eén centrale incident- en integriteitsstand; alleen de eigenaar ziet
       // codepaden, hashes en de noodbediening.
-      uit.controle = controle ? controle.status() : null;
+      uit.controle = bctx.controle ? bctx.controle.status() : null;
     }
     res.json(uit);
   });

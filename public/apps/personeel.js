@@ -447,12 +447,12 @@
       '<input id="vastCode" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="'+T('pd.code','Bedrijfscode')+'" aria-label="'+T('pd.code','Bedrijfscode')+'">' +
       '<button class="prim" type="submit">'+T('pd.openbedrijf','Open bedrijf')+'</button></form>' +
       '<div class="lhint">'+T('pd.codehint','Gebruik de code van uw werkgever. Nieuwe RTG-partners werken hier direct, zonder dat deze app hoeft te worden aangepast.')+'</div>';
-    const voorbeelden = demoOmgeving ? '<div class="glist" style="margin-top:0.8rem;">' + SECTORS.map(s =>
+    const voorbeelden = demoOmgeving ? '<div class="glist compact">' + SECTORS.map(s =>
       '<button class="gbtn" data-sec="'+s.id+'"><span class="ic">'+(window.RTGGlyf?RTGGlyf.svgHTML(s.icon):'')+'</span><span><b>'+(lang()==='en'?s.en:s.nl)+'</b><span>'+s.sub+'</span></span></button>'
     ).join('') +
       '</div>' : '';
     $('#gateStep').innerHTML = direct + voorbeelden +
-      '<div class="glist" style="margin-top:0.8rem;"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
+      '<div class="glist compact"><button class="gbtn" id="gKantoor"><span class="ic"></span><span><b>'+T('pd.kantoor','RTG Kantoor')+'</b><span>'+T('pd.kantoor.sub','Aanmelden en meewerken, ook vanuit huis')+'</span></span></button></div>';
     $('#vastBedrijf').addEventListener('submit', e => {
       e.preventDefault(); const c = String($('#vastCode').value || '').trim().toUpperCase();
       if (!geldigeBedrijfscode(c)) { toast(T('pd.badcode','Controleer de bedrijfscode.')); return; }
@@ -494,7 +494,7 @@
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
-      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
+      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
     // opnieuw proberen; de server vergelijkt en bewaart er niets van
@@ -628,11 +628,11 @@
         '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
         '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
       '<div class="card"><div class="k">Integratiekamer</div>'+
-        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">SMTP, SMS, Stripe Connect en SEPA lokaal testen, gecontroleerd schakelen en samen als keten beproeven. Bediening vraagt boardroomtoegang.</div>'+
-        '<a class="abtn" href="/apps/kantoren.html?kamer=integraties" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open het beveiligde schakelbord</a></div>'+
+        '<div class="pd-card-copy">SMTP, SMS, Stripe Connect en SEPA lokaal testen, gecontroleerd schakelen en samen als keten beproeven. Bediening vraagt boardroomtoegang.</div>'+
+        '<a class="abtn pd-block" href="/apps/kantoren.html?kamer=integraties">Open het beveiligde schakelbord</a></div>'+
       '<div class="card"><div class="k">RTG Controleregister</div>'+
-        '<div style="font-size:0.8rem;line-height:1.5;margin-top:0.35rem;color:var(--soft);">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
-        '<a class="abtn" href="/apps/magnaat-kantoor.html" style="display:block;text-align:center;margin-top:0.65rem;text-decoration:none;">Open de dekkingsmatrix</a></div>'+
+        '<div class="pd-card-copy">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
+        '<a class="abtn pd-block" href="/apps/magnaat-kantoor.html">Open de dekkingsmatrix</a></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
     $('#kaTerug').addEventListener('click', stepSector);
     const toonDienst = () => {
@@ -645,7 +645,7 @@
         const d = await kaApi('dienst');
         $('#kaWie').innerHTML = d.aangemeld.length ? d.aangemeld.map(x =>
           '<div class="task"><span class="ic">'+(x.waar==='thuis'?'':'')+'</span><div class="t"><b>'+esc(x.naam)+'</b><span>'+esc(x.kamer)+'</span></div></div>').join('')
-          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
+          : '<div class="pd-empty">'+T('pd.ka.niemand','Nog niemand aangemeld.')+'</div>';
       } catch(e){}
     };
     const laadChat = async () => {
@@ -654,8 +654,8 @@
         if (!kamer) return;
         const d = await kaApi('kachat', { kamer });
         $('#kaChat').innerHTML = d.berichten.length ? d.berichten.slice(-25).map(m =>
-          '<div style="padding:0.25rem 0;border-bottom:1px solid var(--line);"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
-          : '<div style="color:var(--soft);font-size:0.8rem;">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
+          '<div class="pd-chatrij"><b class="pd-chatnaam">'+esc(m.naam)+'</b> '+esc(m.tekst||'')+(m.foto?' ':'')+'</div>').join('')
+          : '<div class="pd-empty">'+T('pd.ka.stil','Nog stil hier.')+'</div>';
         $('#kaChat').scrollTop = $('#kaChat').scrollHeight;
       } catch(e){}
     };

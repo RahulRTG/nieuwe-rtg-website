@@ -676,7 +676,7 @@ module.exports = ({ wereldState, save = () => {}, motorklant = null }) => {
     return Object.assign({ ok: true, gepland: schok }, overzicht(actor));
   }
 
-  function analyse(actor, invoer) {
+  function analyseerEconomie(actor, invoer) {
     const e = structuredClone(state());
     const uitkomst = economenlab.dienAnalyse(e, actor, invoer);
     if (uitkomst && uitkomst.error) return uitkomst;
@@ -775,5 +775,5 @@ module.exports = ({ wereldState, save = () => {}, motorklant = null }) => {
     };
   }
 
-  return { overzicht, beslis, analyse, volgendeDag, volgendeDagAsync, kiesSchok, registreerWerk, _state: state, _boek: boek };
+  return { overzicht, beslis, analyse: analyseerEconomie, volgendeDag, volgendeDagAsync, kiesSchok, registreerWerk, _state: state, _boek: boek };
 };

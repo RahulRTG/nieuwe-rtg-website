@@ -356,6 +356,7 @@ test('medewerker en boardroom hebben beide een volledige codecontrole-interface'
   const member = fs.readFileSync(path.join(basis, 'public/apps/magnaat.html'), 'utf8');
   const boardroom = fs.readFileSync(path.join(basis, 'public/apps/magnaat-kantoor.html'), 'utf8');
   const routes = fs.readFileSync(path.join(basis, 'server/routes/magnaatwereld.js'), 'utf8');
+  const routebronnen = routes + fs.readFileSync(path.join(basis, 'server/routes/kantoren/integraties.js'), 'utf8');
   for (const html of [member, boardroom]) {
     assert.match(html, /id="controlPoints"/);
     assert.match(html, /id="controlTasks"/);
@@ -374,4 +375,35 @@ test('medewerker en boardroom hebben beide een volledige codecontrole-interface'
   assert.match(routes, /\/api\/member\/magnaat\/controle\/zelftest/);
   assert.match(routes, /\/api\/office\/magnaat\/controle\/zelftest/);
   assert.match(routes, /\/api\/office\/magnaat\/controle\/gaten\/plan/);
+  const nieuweBedrijfsroutes = [
+    '/api/member/magnaat/economie/analyse',
+    '/api/member/magnaat/partner/stap',
+    '/api/member/magnaat/partner/start',
+    '/api/member/magnaat/teamkamer/actie',
+    '/api/member/magnaat/teamkamer/bedien',
+    '/api/member/magnaat/teamkamer/deelnemen',
+    '/api/member/magnaat/teamkamer/maak',
+    '/api/member/magnaat/teamkamer/mijn',
+    '/api/member/magnaat/teamkamer/rol',
+    '/api/member/magnaat/teamkamer/start',
+    '/api/office/magnaat/controle/gaten/plan',
+    '/api/office/magnaat/partner/beslis',
+    '/api/office/magnaat/partners',
+    '/api/office/techniek/integraties/noodstop',
+    '/api/office/techniek/integraties/schakel',
+    '/api/office/techniek/integraties/test',
+    '/api/office/techniek/integraties/verantwoordelijke',
+    '/api/supplier/magnaat/studio/bouwsteen',
+    '/api/supplier/magnaat/studio/bouwsteen/weg',
+    '/api/supplier/magnaat/studio/indienen',
+    '/api/supplier/magnaat/studio/indienen/intrekken',
+    '/api/supplier/magnaat/studio/proef/stap',
+    '/api/supplier/magnaat/studio/proef/start',
+    '/api/supplier/magnaat/studio/profiel',
+    '/api/supplier/magnaat/studio/relatie',
+    '/api/supplier/magnaat/studio/relatie/beslis'
+  ];
+  for (const pad of nieuweBedrijfsroutes) {
+    assert.ok(routebronnen.includes("'" + pad + "'"), pad + ' is daadwerkelijk op een gekoppelde RTG-router geregistreerd');
+  }
 });

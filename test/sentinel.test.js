@@ -53,7 +53,7 @@ async function wachtOpBeheer(poort, token) {
 }
 
 test('Sentinel bewaakt de echte procesgrens, standen en forwardingheaders',
-  { skip: !fs.existsSync(BIN), timeout: 30000 }, async () => {
+  { timeout: 30000 }, async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sentinel-e2e-'));
     const bewijs = path.join(tmp, 'release.json'); const data = path.join(tmp, 'data');
     const tekst = JSON.stringify(maakManifest(ROOT)); fs.writeFileSync(bewijs, tekst);

@@ -393,6 +393,18 @@ const EIGEN_MODULE = new Map([
   /* Het grootboek op sqlite. De toets draait een rit-bestand als kindproces,
      en dat requiret server/db -- vandaar dat de scanner niets zag. */
   ['txledger-sqlite.test.js', ['server/db/tx/index.js', 'server/db/index.js']],
+  /* Deze toets start twee kindprocessen en raakt daardoor geen module via een
+     gewone require. De atomaire revisie en rollback zitten in dit SQLite-slot. */
+  ['collectie-transactie-sqlite.test.js', ['server/db/collectie-sqlite.js']],
+  /* De facade componeert de Partnerstudio; het gedrag zit bewust in deze
+     deelmodules. Muteren van alleen de dunne facade meet dus niet de workflow. */
+  ['magnaat-partnerstudio.test.js', [
+    'server/kern/magnaat-partnerstudio-basis.js',
+    'server/kern/magnaat-partnerstudio-bedrijf.js',
+    'server/kern/magnaat-partnerstudio-training.js',
+    'server/kern/magnaat-partnerstudio-publicatie.js',
+    'server/kern/magnaat-partnerstudio-relaties.js'
+  ]],
   /* De rekenmotor van RTG Office draait in de BROWSER; de toets laadt de
      bestanden los in met een uitgerekend pad, dus zonder require-regel. */
   ['office-blad.test.js', ['public/shared/rekenmotor.js', 'public/shared/rekenfuncties.js']],

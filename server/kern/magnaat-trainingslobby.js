@@ -67,7 +67,7 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     kamer.log.unshift({ id: id('event'), at: nu(), door: d ? d.naam : 'systeem', actie, detail: tekst(detail, 400) });
     kamer.log = kamer.log.slice(0, MAX_LOG);
   }
-  function rolVan(kamer, d) { return kamer.rollen.find(r => r.id === d.rolId) || null; }
+  function teamkamerRolVan(kamer, d) { return kamer.rollen.find(r => r.id === d.rolId) || null; }
   function taakPubliek(kamer) {
     const taak = kamer.taken[kamer.taakIndex];
     if (!taak) return null;
@@ -156,7 +156,7 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
   }
 
   const acties = maakActies({ tekst, fout, vind, revisie, commando, legCommandoVast,
-    muteer, publiek, rolVan, nu, id });
+    muteer, publiek, rolVan: teamkamerRolVan, nu, id });
 
   return Object.assign(maakRegie({ sseToCustomer, staat, tekst, publiek, metActueleStaat,
     maakBinnen, deelnemenBinnen, mijnBinnen, acties }), { _staat: staat });

@@ -159,6 +159,11 @@
   .witem .wdt{flex:1;color:var(--muted);font-size:.8rem;min-width:9rem;}
   .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
+.kantoor-nav{display:flex;align-items:center;gap:.9rem;}.kantoor-nav a{font-size:.8rem;color:var(--muted);}.kantoor-nav a.eerst{color:var(--gold);}
+.ik-kop{margin-top:1rem;}.ik-overzicht{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;}.ik-groei{flex:1;min-width:15rem;}.ik-inline{display:inline;}.ik-noodstop{border-color:var(--burgundy);}.ik-proefuit{margin-top:.55rem;}
+.ik-tegel{padding:1rem;}.ik-tegel.aan{border-color:#1e7d4f;}.ik-tegelkop{display:flex;gap:.5rem;justify-content:space-between;align-items:center;}.ik-tegelkop h3{margin:0;}.ik-status.aan{color:#1e7d4f;}.ik-status.uit{color:var(--gold);}.ik-status.niet-ingericht{color:var(--burgundy);}
+.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
+.ik-invoer{display:flex;gap:.35rem;}.ik-invoer input{flex:1;min-width:7rem;}.ik-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.65rem;}.ik-ketenlijst{display:grid;gap:.5rem;}.ik-rij{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--line);}.ik-rijtekst{flex:1;}.ik-besluitrij{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line);}.ik-logrij{padding:.45rem 0;border-bottom:1px solid var(--line);}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
   /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
      Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
@@ -209,7 +214,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
-  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/werkruimte.html?gebied=kantoor" style="font-size:.8rem;color:var(--gold);">RTG Work OS</a><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/partner-worden.html" style="font-size:.8rem;color:var(--muted);">Partner worden</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
+  <nav class="kantoor-nav" aria-label="Kantoor"><a class="eerst" href="/apps/werkruimte.html?gebied=kantoor">RTG Work OS</a><a href="/apps/office.html?werk=kantoor">RTG Office</a><a href="/apps/foundation/kantoor.html">RTF-kantoor</a><a href="/apps/lab.html">Onderzoekslab</a><a href="/apps/partner-worden.html">Partner worden</a><a href="/apps/backoffice.html">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
 </div></header>
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
@@ -900,7 +905,7 @@
     </div>
     <p class="deck">Hier werken SMTP, SMS, Stripe Connect en SEPA als één gecontroleerde bedrijfsketen. De knoppen bedienen uitsluitend lokale contract-sandboxes. Live providers hebben bewust geen aan-knop: daarvoor blijven contract, privacycontrole, geheimen, vergunning en een aparte livegang nodig.</p>
 
-    <div class="kaart" id="ikKop" style="margin-top:1rem;"><div class="leeg">Laden…</div></div>
+    <div class="kaart ik-kop" id="ikKop"><div class="leeg">Laden…</div></div>
 
     <h3 class="sec">De vier rails</h3>
     <div class="grid" id="ikTegels"></div>
@@ -2813,15 +2818,14 @@ async function ikVervers(){
     $('#ikTegels').innerHTML = '<div class="kaart"><b>De bedieningskast is gesloten.</b><p class="leeg">Vraag de eigenaar om boardroom-toegang. De gewone kamerkaart blijft voor het team beschikbaar.</p></div>';
   }
 }
-function ikKleur(t){ return t.status === 'aan' ? '#1e7d4f' : t.status === 'uit' ? 'var(--gold)' : 'var(--burgundy-on-dark)'; }
 function ikTeken(){
   const d = IK, aan = d.tegels.filter(t => t.aan).length, groen = d.tegels.filter(t => t.laatsteTest && t.laatsteTest.ok).length;
   $('#ikKop').innerHTML =
-    '<div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;">'+
-      '<div style="flex:1;min-width:15rem;"><b>Lokale bedrijfsketen</b><br><span class="leeg" style="display:inline;">'+aan+' van 4 rails aan · '+groen+' van 4 contractproeven groen · live activering '+esc(d.liveActivering)+'</span></div>'+
+    '<div class="ik-overzicht">'+
+      '<div class="ik-groei"><b>Lokale bedrijfsketen</b><br><span class="leeg ik-inline">'+aan+' van 4 rails aan · '+groen+' van 4 contractproeven groen · live activering '+esc(d.liveActivering)+'</span></div>'+
       '<button class="knop" id="ikKetenProef" type="button">Ketenproef uitvoeren</button>'+
-      '<button class="knop stil" id="ikNoodstop" type="button" style="border-color:var(--burgundy);">Alles veilig UIT</button>'+
-    '</div><div id="ikProefUit" class="leeg" style="margin-top:.55rem;"></div>';
+      '<button class="knop stil ik-noodstop" id="ikNoodstop" type="button">Alles veilig UIT</button>'+
+    '</div><div id="ikProefUit" class="leeg ik-proefuit"></div>';
   $('#ikKetenProef').addEventListener('click', () => ikTest('keten'));
   $('#ikNoodstop').addEventListener('click', async () => {
     if (!confirm('Alle vier lokale rails onmiddellijk veilig uitzetten? Er wordt niets live geactiveerd.')) return;
@@ -2834,15 +2838,16 @@ function ikTeken(){
     const magAan = t.geconfigureerd || t.aan;
     const test = t.laatsteTest ? (t.laatsteTest.ok ? 'Groen' : 'Mislukt')+' · '+ikTijd(t.laatsteTest.at)+' · '+esc(t.laatsteTest.detail||'') : 'Nog niet getest';
     const live = t.live ? 'Live kanaal geconfigureerd, alleen-lezen' : 'Live geblokkeerd; geen activeringsknop';
-    return '<div class="kaart" style="padding:1rem;border-color:'+(t.aan?'#1e7d4f':'var(--line)')+';">'+
-      '<div style="display:flex;gap:.5rem;justify-content:space-between;align-items:center;"><h3 style="margin:0;">'+esc(t.naam)+'</h3><span class="kpi" style="color:'+ikKleur(t)+';">'+esc(t.status.toUpperCase())+'</span></div>'+
-      '<p style="min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;">'+esc(t.doel)+'</p>'+
-      '<div style="font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;">SANDBOX · '+(t.geconfigureerd?'ingericht':'ontbreekt: '+esc(t.config))+'<br>LIVE · '+esc(live)+'</div>'+
-      '<div style="margin-top:.55rem;font-size:.74rem;"><b>Laatste proef</b><br><span class="leeg" style="display:inline;">'+test+'</span></div>'+
-      (t.laatsteStoring?'<div style="margin-top:.45rem;color:var(--burgundy-on-dark);font-size:.74rem;">Storing: '+esc(t.laatsteStoring.tekst)+'</div>':'')+
-      '<label style="display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);">Verantwoordelijke medewerker</label>'+
-      '<div style="display:flex;gap:.35rem;"><input data-iknaam="'+t.id+'" value="'+esc(t.verantwoordelijke)+'" placeholder="nog niet toegewezen" style="flex:1;min-width:7rem;"'+(d.baas?'':' disabled')+'><button class="knop stil" data-ikbewaar="'+t.id+'" type="button"'+(d.baas?'':' disabled')+'>Bewaar</button></div>'+
-      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.65rem;"><button class="knop stil" data-iktest="'+t.id+'" type="button">Test</button>'+
+    const statusClass = t.status === 'aan' ? 'aan' : t.status === 'uit' ? 'uit' : 'niet-ingericht';
+    return '<div class="kaart ik-tegel '+(t.aan?'aan':'')+'">'+
+      '<div class="ik-tegelkop"><h3>'+esc(t.naam)+'</h3><span class="kpi ik-status '+statusClass+'">'+esc(t.status.toUpperCase())+'</span></div>'+
+      '<p class="ik-doel">'+esc(t.doel)+'</p>'+
+      '<div class="ik-omgeving">SANDBOX · '+(t.geconfigureerd?'ingericht':'ontbreekt: '+esc(t.config))+'<br>LIVE · '+esc(live)+'</div>'+
+      '<div class="ik-laatste"><b>Laatste proef</b><br><span class="leeg ik-inline">'+test+'</span></div>'+
+      (t.laatsteStoring?'<div class="ik-storing">Storing: '+esc(t.laatsteStoring.tekst)+'</div>':'')+
+      '<label class="ik-label">Verantwoordelijke medewerker</label>'+
+      '<div class="ik-invoer"><input data-iknaam="'+t.id+'" value="'+esc(t.verantwoordelijke)+'" placeholder="nog niet toegewezen"'+(d.baas?'':' disabled')+'><button class="knop stil" data-ikbewaar="'+t.id+'" type="button"'+(d.baas?'':' disabled')+'>Bewaar</button></div>'+
+      '<div class="ik-acties"><button class="knop stil" data-iktest="'+t.id+'" type="button">Test</button>'+
       '<button class="knop" data-ikschakel="'+t.id+'" data-aan="'+(t.aan?'0':'1')+'" type="button"'+((!magAan||wacht)?' disabled':'')+'>'+(wacht?'Besluit wacht':(t.aan?'Vraag UIT aan':'Vraag AAN aan'))+'</button></div>'+
     '</div>';
   }).join('');
@@ -2857,11 +2862,11 @@ function ikTeken(){
     catch (e) { meld(e.message); }
   }));
 
-  $('#ikKetens').innerHTML = '<div style="display:grid;gap:.5rem;">'+d.ketens.map(k =>
-    '<div style="display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--line);"><span class="gb-stip '+(k.gereed?'groen':'oranje')+'"></span><span style="flex:1;"><b>'+esc(k.naam)+'</b><br><span class="leeg" style="display:inline;">'+k.stappen.map(x => esc(x.toUpperCase())).join(' → ')+'</span></span><span class="kpi">'+(k.gereed?'SAMEN GEREED':'NOG NIET SAMEN')+'</span></div>').join('')+'</div>';
+  $('#ikKetens').innerHTML = '<div class="ik-ketenlijst">'+d.ketens.map(k =>
+    '<div class="ik-rij"><span class="gb-stip '+(k.gereed?'groen':'oranje')+'"></span><span class="ik-rijtekst"><b>'+esc(k.naam)+'</b><br><span class="leeg ik-inline">'+k.stappen.map(x => esc(x.toUpperCase())).join(' → ')+'</span></span><span class="kpi">'+(k.gereed?'SAMEN GEREED':'NOG NIET SAMEN')+'</span></div>').join('')+'</div>';
 
   $('#ikBesluiten').innerHTML = d.verzoeken.length ? d.verzoeken.map(v =>
-    '<div style="display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="flex:1;"><b>'+esc(v.kanaal.toUpperCase())+' '+(v.aan?'AAN':'UIT')+'</b><br><span class="leeg" style="display:inline;">Aangevraagd '+ikTijd(v.at)+'</span></span>'+
+    '<div class="ik-besluitrij"><span class="ik-rijtekst"><b>'+esc(v.kanaal.toUpperCase())+' '+(v.aan?'AAN':'UIT')+'</b><br><span class="leeg ik-inline">Aangevraagd '+ikTijd(v.at)+'</span></span>'+
       (d.baas?'<button class="knop" data-ikbesluit="'+v.id+'" data-akkoord="1">Akkoord</button><button class="knop stil" data-ikbesluit="'+v.id+'" data-akkoord="0">Weiger</button>':'<span class="kpi">EIGENAAR NODIG</span>')+'</div>').join('') : '<div class="leeg">Geen besluiten open.</div>';
   $('#ikBesluiten').querySelectorAll('[data-ikbesluit]').forEach(b => b.addEventListener('click', async () => {
     try { IK = await api('techniek/integraties/besluit', { verzoekId:b.dataset.ikbesluit, akkoord:b.dataset.akkoord==='1' }); meld('Besluit verwerkt.'); ikTeken(); }
@@ -2869,7 +2874,7 @@ function ikTeken(){
   }));
   $('#ikTaken').innerHTML = d.taken.length ? '<ul>'+d.taken.map(t => '<li><b>'+esc(String(t.kanaal).toUpperCase())+'</b> · '+esc(t.tekst)+'</li>').join('')+'</ul>' : '<div class="leeg">Geen open integratietaken.</div>';
   $('#ikLog').innerHTML = d.log.length ? d.log.slice(0, 12).map(x =>
-    '<div style="padding:.45rem 0;border-bottom:1px solid var(--line);"><b>'+esc(x.soort)+'</b> · '+esc(x.door)+'<br><span class="leeg" style="display:inline;">'+ikTijd(x.at)+(x.kanaal?' · '+esc(String(x.kanaal).toUpperCase()):'')+'</span></div>').join('') : '<div class="leeg">Nog geen bedieningshandelingen vastgelegd.</div>';
+    '<div class="ik-logrij"><b>'+esc(x.soort)+'</b> · '+esc(x.door)+'<br><span class="leeg ik-inline">'+ikTijd(x.at)+(x.kanaal?' · '+esc(String(x.kanaal).toUpperCase()):'')+'</span></div>').join('') : '<div class="leeg">Nog geen bedieningshandelingen vastgelegd.</div>';
   $('#ikWaarborgen').innerHTML = '<ul>'+d.waarborgen.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>';
 }
 async function ikTest(id){

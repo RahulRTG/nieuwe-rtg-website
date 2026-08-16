@@ -117,6 +117,7 @@
   .bp-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}.bp-fout{border-left:3px solid #C9A24B;padding:.45rem .65rem;margin:.4rem 0;font-size:.78rem;background:var(--card);}
   @media(max-width:760px){.bp-grid{grid-template-columns:1fr;}}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  .incident-label{display:block;margin-top:.8rem;}.tech-inline-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}.tech-inline-row.spaced{margin-top:.9rem;}.incident-functie{width:auto;max-width:18rem;margin:0;}.controle-zoek{flex:1;min-width:12rem;margin:0;}.controle-resultaat{max-height:24rem;overflow:auto;}.controle-audit{margin-top:.8rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -158,23 +159,23 @@
         <div class="sec">Permanente controle &amp; incidentbediening</div>
         <div class="kaart">
           <div id="controleStand"></div>
-          <label class="muted" for="incidentReden" style="display:block;margin-top:.8rem;">Reden voor een noodhandeling</label>
+          <label class="muted incident-label" for="incidentReden">Reden voor een noodhandeling</label>
           <input class="veld" id="incidentReden" maxlength="240" placeholder="Bijv. onverwachte wijziging in de betaalroute">
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+          <div class="tech-inline-row">
             <button class="knop grijs klein" id="bWaakzaam">Extra bewaken</button>
-            <select class="veld" id="incidentFunctie" aria-label="Functie om direct te beperken" style="width:auto;max-width:18rem;margin:0;"></select>
+            <select class="veld incident-functie" id="incidentFunctie" aria-label="Functie om direct te beperken"></select>
             <button class="knop rood klein" id="bBeperk">Functie direct dicht</button>
             <button class="knop rood klein" id="bIsoleer">Hele app isoleren</button>
             <button class="knop klein" id="bHerstel">Bewaarde standen herstellen</button>
           </div>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;align-items:center;">
+          <div class="tech-inline-row spaced">
             <button class="knop grijs klein" id="bIntegriteit">Controleer alle code nu</button>
             <button class="knop grijs klein" id="bBestanden">Bestandsregister</button>
             <button class="knop grijs klein" id="bRoutes">Routeregister</button>
-            <input class="veld" id="controleZoek" maxlength="120" placeholder="Zoek pad, functie of hash" aria-label="Zoek in het controleregister" style="flex:1;min-width:12rem;margin:0;">
+            <input class="veld controle-zoek" id="controleZoek" maxlength="120" placeholder="Zoek pad, functie of hash" aria-label="Zoek in het controleregister">
           </div>
-          <div id="controleResultaat" class="advies" hidden style="max-height:24rem;overflow:auto;"></div>
-          <div id="controleAudit" style="margin-top:.8rem;"></div>
+          <div id="controleResultaat" class="advies controle-resultaat" hidden></div>
+          <div id="controleAudit" class="controle-audit"></div>
         </div>
       </div>
       <div id="beveiligBlok" hidden>

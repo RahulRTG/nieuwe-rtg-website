@@ -1,7 +1,8 @@
 /* Magnaat Wereld heeft twee deuren: spelers komen binnen met hun ledenpas;
    de Future Engine en testfases zitten achter de menselijke boardroom-poort. */
 module.exports = (kern) => {
-  const { app, auth, geenGast, boardroomAuth, supplierAuth, managerOnly, magnaatWereld, magnaatPartnerstudio } = kern;
+  const { app, auth, geenGast, boardroomAuth, supplierAuth, managerOnly, magnaatWereld } = kern;
+  const magnaatPartnerstudio = magnaatWereld.partnerstudio;
   const stuur = (res, r) => r && r.error
     ? res.status(r.status || 400).json({ error: r.error, taak: r.taak })
     : res.json(r);

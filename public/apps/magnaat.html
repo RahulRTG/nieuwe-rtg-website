@@ -256,6 +256,7 @@ async function spelApi(path, body){
 }
 function geld(n){return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format((Number(n)||0)/100)}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2800)}
+function zetVoortgang(wortel){(wortel||document).querySelectorAll('[data-progress]').forEach(e=>{e.style.width=Math.max(0,Math.min(100,Number(e.dataset.progress)||0))+'%'})}
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('aan',s.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('aan',b.dataset.screen===id));const b=document.querySelector('[data-screen="'+id+'"]');$('#crumb').textContent=b?b.textContent.trim():id;scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>go(b.dataset.screen));
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
@@ -442,7 +443,8 @@ function bindRtgFrame(id,apparaat){
 function renderWorld(){
   const w=DATA.wereld,g=w.gebeurtenis||{};
   $('#worldEventLabel').textContent=(g.label||'Vandaag')+' · '+(g.stad||'wereld');$('#worldEventTitle').textContent=g.titel||'Wereldsignaal';$('#worldEventText').textContent=g.beschrijving||'';$('#worldEventEffect').textContent=g.effect||'';
-  $('#cities').innerHTML=w.steden.map(s=>'<article class="card worldcard '+(s.actief?'actief':'')+'"><span class="country">'+esc(s.land)+' · '+(s.trend>=0?'+':'')+s.trend+'</span><h3>'+esc(s.naam)+'</h3><div class="meters">'+[['Vraag',s.vraag],['Kosten',s.kosten],['Impact',s.impact]].map(m=>'<div class="meter"><span>'+m[0]+'</span><span class="bar"><i style="width:'+m[1]+'%"></i></span><b>'+m[1]+'</b></div>').join('')+'</div></article>').join('');
+  $('#cities').innerHTML=w.steden.map(s=>'<article class="card worldcard '+(s.actief?'actief':'')+'"><span class="country">'+esc(s.land)+' · '+(s.trend>=0?'+':'')+s.trend+'</span><h3>'+esc(s.naam)+'</h3><div class="meters">'+[['Vraag',s.vraag],['Kosten',s.kosten],['Impact',s.impact]].map(m=>'<div class="meter"><span>'+m[0]+'</span><span class="bar"><i data-progress="'+m[1]+'"></i></span><b>'+m[1]+'</b></div>').join('')+'</div></article>').join('');
+  zetVoortgang($('#cities'));
   renderPartnerWorld()
 }
 function renderPartnerWorld(){
@@ -457,7 +459,8 @@ function renderPartnerWorld(){
 }
 function renderTeamRooms(){
   const kamers=DATA&&DATA.teamkamers||[];
-  $('#teamRooms').innerHTML=kamers.length?kamers.map(k=>{const p=k.voortgang||{klaar:0,totaal:0},pct=p.totaal?Math.round(p.klaar/p.totaal*100):0;return '<article class="card teamroom" data-team-open="'+esc(k.id)+'"><div class="roomstatus"><span>'+esc(k.status)+'</span><span>'+k.deelnemers+' deelnemers</span></div><h3>'+esc(k.bedrijf.naam)+'</h3><p>'+esc(k.bedrijf.stad||'Wereld')+' · release '+esc(k.bedrijf.releaseHash||'RTG')+'</p><div class="teamprogress"><i style="width:'+pct+'%"></i></div><p>'+p.klaar+' van '+p.totaal+' procestaken aantoonbaar klaar</p></article>'}).join(''):'<div class="partnerempty"><b>Nog geen teamkamer.</b><br>Kies bij een gepubliceerd partnerbedrijf “Maak teamkamer” of neem met een toegangscode deel.</div>';
+  $('#teamRooms').innerHTML=kamers.length?kamers.map(k=>{const p=k.voortgang||{klaar:0,totaal:0},pct=p.totaal?Math.round(p.klaar/p.totaal*100):0;return '<article class="card teamroom" data-team-open="'+esc(k.id)+'"><div class="roomstatus"><span>'+esc(k.status)+'</span><span>'+k.deelnemers+' deelnemers</span></div><h3>'+esc(k.bedrijf.naam)+'</h3><p>'+esc(k.bedrijf.stad||'Wereld')+' · release '+esc(k.bedrijf.releaseHash||'RTG')+'</p><div class="teamprogress"><i data-progress="'+pct+'"></i></div><p>'+p.klaar+' van '+p.totaal+' procestaken aantoonbaar klaar</p></article>'}).join(''):'<div class="partnerempty"><b>Nog geen teamkamer.</b><br>Kies bij een gepubliceerd partnerbedrijf “Maak teamkamer” of neem met een toegangscode deel.</div>';
+  zetVoortgang($('#teamRooms'));
   document.querySelectorAll('[data-team-open]').forEach(b=>b.onclick=()=>openTeamRoom(b.dataset.teamOpen))
 }
 function updateTeamSummary(k){

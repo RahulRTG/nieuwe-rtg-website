@@ -73,7 +73,7 @@ function publiekAnalyse(a) {
     indicatoren: a.indicatoren, richtingen: a.richtingen, voorspelling: a.voorspelling, uitkomst: a.uitkomst || null,
     dimensies: Object.assign({}, a.dimensies), scoreVoorlopig: a.scoreVoorlopig, score: a.score, maximum: a.maximum, feedback: a.feedback.slice() };
 }
-function rapport(e, actor) {
+function bouwEconomenrapport(e, actor) {
   const b = e.bedrijven.praktijk, sleutel = tekst(actor, 180) || 'anonieme-econoom';
   const analyses = (zorgStaat(e).analyses[sleutel] || []).slice(-8).reverse().map(publiekAnalyse);
   return { methode: 'hypothese → indicatoren → besluit → voorspelling → realisatie → forecastfout', opdracht: opdracht(e),
@@ -82,4 +82,4 @@ function rapport(e, actor) {
     rubric: [['diagnose', 'Bindende beperking', 20], ['bewijs', 'Gemeten bewijs', 15], ['causaliteit', 'Causale keten', 15], ['besluit', 'Besluitlogica', 10], ['alternatief', 'Alternatief', 5], ['opportunityCost', 'Opportunity cost', 5], ['onzekerheid', 'Onzekerheid', 5], ['voorspelling', 'Forecast en kalibratie', 25]].map(x => ({ id: x[0], naam: x[1], punten: x[2] })),
     grenzen: ['Geen beleidskeuze is zonder context universeel juist.', 'Een voorspelling is een toetsbare verwachting, geen belofte.', 'Niet gemeten posten worden niet alsnog geraamd.'] };
 }
-module.exports = { rapport, resultatenrekening, balans, kasstroom, kengetallen, diagnose, opdracht, publiekAnalyse };
+module.exports = { rapport: bouwEconomenrapport, resultatenrekening, balans, kasstroom, kengetallen, diagnose, opdracht, publiekAnalyse };

@@ -23,6 +23,7 @@ module.exports = function hangWebhooksOp(deps) {
      handler uitgelezen. Zo kan de volgorde niet stilzwijgend omvallen. */
   const munten = { bevestig: (a) => deps.muntenVan().bevestig(a) };
   const settleFactuur = (...a) => deps.settleFactuurVan()(...a);
+  const verwerkPayout = require('./webhook-payout');
   /* DE TWEE WEBHOOKS STAAN HIER, EN NIET ACHTER DE POORTWACHTERS.
 
      Ze MOETEN vóór de JSON-parser komen: de handtekening wordt over de ONBEWERKTE
@@ -75,13 +76,25 @@ module.exports = function hangWebhooksOp(deps) {
     try {
       if (evt && (evt.status === 'ontvangen' || evt.type === 'ontvangst.voltooid') && evt.id) {
         const entry = munten.bevestig({ id: evt.id, euroCenten: evt.euroCenten });
-        if (entry && !entry.herhaald) await settleFactuur(entry.context, {
-          id: entry.id, centen: entry.settledEuroCenten || entry.euroCenten,
-          hoe: 'Betaald met ' + String(entry.munt || '').toUpperCase()
-        });
+        /* Ook een providerretry opnieuw langs settlement. munten.bevestig is
+           idempotent en factuur/direct/opladen zijn dat eveneens. Voorheen
+           sloeg `herhaald` deze stap over: na één mislukte boeking antwoordde
+           elke retry 200 zonder het geld ooit nog te verwerken. */
+        if (entry) {
+          const uit = await settleFactuur(entry.context, {
+            id: entry.id, centen: entry.settledEuroCenten || entry.euroCenten,
+            hoe: 'Betaald met ' + String(entry.munt || '').toUpperCase()
+          });
+          if (!uit || !uit.ok) {
+            const fout = new Error((uit && uit.error) || 'munt-settlement mislukt'); fout.code = 'SETTLEMENT_MISLUKT'; throw fout;
+          }
+        }
       }
       log.info('munt-webhook', { id: evt && evt.id, status: evt && evt.status });
-    } catch (e) { log.uitzondering(e, { bron: 'munt-webhook' }); }
+    } catch (e) {
+      log.uitzondering(e, { bron: 'munt-webhook' });
+      return res.status(500).json({ error: 'De ontvangst is nog niet verwerkt; probeer de webhook opnieuw.' });
+    }
     res.json({ ok: true });
   });
 };

@@ -12,6 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+process.env.RTG_DEMO = '1';
 const betaal = require('../server/betaal');
 const { maakFonds, aandeelCenten } = require('../server/kern/fonds');
 const { startServer, stop } = require('./helper');

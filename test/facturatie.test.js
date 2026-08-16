@@ -83,6 +83,12 @@ test('6. Receipt Vault bewaart en scheidt documenten in prive en zakelijk', asyn
   const zet = await api(base, '/api/facturen/classificeer', { id: eerst.id, classificatie: 'zakelijk' }, lid);
   assert.equal(zet.status, 200);
   assert.equal(zet.body.factuur.classificatie, 'zakelijk');
+  const u = Date.now().toString().slice(-8);
+  const ander = await api(base, '/api/auth/register', { name: 'Andere Koper', email: 'a' + u + '@x.nl', phone: '07' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const vreemd = await api(base, '/api/member/rtmail/classificeer', { id: eerst.id, classificatie: 'prive' }, ander.body.token);
+  assert.equal(vreemd.status, 404, 'een ander lid kan de kluisindeling niet wijzigen');
+  const onzin = await api(base, '/api/facturen/classificeer', { id: eerst.id, classificatie: 'geheim' }, lid);
+  assert.equal(onzin.status, 400, 'de classificatie is een gesloten lijst');
   const kluis = (await api(base, '/api/member/rtmail/documenten', {}, lid)).body;
   assert.ok(kluis.facturen.some(f => f.id === eerst.id && f.classificatie === 'zakelijk'));
   const terug = await api(base, '/api/member/rtmail/classificeer', { id: eerst.id, classificatie: 'prive' }, lid);

@@ -21,6 +21,13 @@ const ADDR = '127.0.0.1:4820';
 const URL = 'http://' + ADDR;
 
 function wacht(ms) { return new Promise(r => setTimeout(r, ms)); }
+function maakOpdrachten(db) {
+  return require('../server/kern/betaalopdracht')({
+    d: () => db.data, save() {}, crypto, nu: () => Date.now(),
+    async railInzenden() { return { status: 'afgewikkeld' }; },
+    log: { warn() {} }
+  });
+}
 async function motorStatus() {
   const r = await fetch(URL + '/api/motor/status', { method: 'POST', headers: { 'content-type': 'application/json', ...(process.env.RTG_MOTOR_TOKEN ? { 'x-rtg-motor-token': process.env.RTG_MOTOR_TOKEN } : {}) }, body: '{}' });
   return r.json();
@@ -44,6 +51,7 @@ async function motorStatus() {
   };
   const { pay } = require('../server/kern/pay')({
     db, save() {}, crypto, betaal: demoBetaal,
+    betaalOpdrachten: maakOpdrachten(db),
     keyVanCodenaam: () => null, sseToCustomer() {},
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 120),
     betaaldienstKosten: () => 0,
@@ -101,6 +109,7 @@ async function motorStatus() {
   const db2 = { data: {} };
   const { pay: pay2 } = require('../server/kern/pay')({
     db: db2, save() {}, crypto, betaal: demoBetaal,
+    betaalOpdrachten: maakOpdrachten(db2),
     keyVanCodenaam: () => null, sseToCustomer() {},
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 120),
     betaaldienstKosten: () => 0,
@@ -142,6 +151,7 @@ async function motorStatus() {
   };
   const { bank } = require('../server/kern/bank')({
     db: dbB, save() {}, crypto, betaal: demoBetaal, pay, bankregie: bankregieStub,
+    betaalOpdrachten: maakOpdrachten(dbB),
     keyVanCodenaam: () => null, accounts: null, sseToCustomer() {}, sseToOffice() {}, anthropic: null,
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 140),
   });
@@ -208,6 +218,7 @@ async function motorStatus() {
   const dbB2 = { data: {} };
   const { bank: bank2 } = require('../server/kern/bank')({
     db: dbB2, save() {}, crypto, betaal: demoBetaal, pay, bankregie: bankregieStub,
+    betaalOpdrachten: maakOpdrachten(dbB2),
     keyVanCodenaam: () => null, accounts: null, sseToCustomer() {}, sseToOffice() {}, anthropic: null,
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 140),
   });
@@ -219,9 +230,40 @@ async function motorStatus() {
   else console.log('[cutover] OK  bank herstart-reconcile: verse spiegel == motor (' + jbank2 + ', ' + brec.rekeningen + ' rekeningen)');
   if (bankAfdruk() === LEEG) { fouten++; console.error('[cutover] FOUT: bank-grootboek leeg -- de bankproef zegt niets.'); }
 
-  motor.kill();
+  // 9. MAGNAAT-ECONOMIE: dezelfde echte sidecar moet de zware marktdag exact
+  //    gelijk aan de deterministische JS-ijklijn rekenen. Daarna stoppen we de
+  //    sidecar hard en eisen we dat een volgende synthetische dag heel blijft
+  //    via de gecontroleerde lokale terugval (nooit een half toegepaste dag).
+  process.env.RTG_MAGNAAT_RUST = 'motor';
+  process.env.RTG_MOTOR_REKEN_URL = URL;
+  const maakEconomie = require('../server/kern/magnaat-economie');
+  const jsWereld = {}, rustWereld = {};
+  const jsEconomie = maakEconomie({ wereldState: () => jsWereld, save() {}, motorklant: { aan: false } });
+  const rustEconomie = maakEconomie({ wereldState: () => rustWereld, save() {} });
+  const bereid = economie => {
+    economie.beslis('econoom', { prijs: 117, personeelDoel: 30, loonMaand: 3650,
+      trainingDag: 1800, bestelling: 340, impactPct: 1.4 });
+    economie.kiesSchok('econoom', 'arbeidstekort');
+    economie.registreerWerk('team', { id: 'cutover-werk', spelvorm: 'operatie', punten: 375,
+      stappen: [{ soort: 'software' }, { soort: 'keuze' }, { soort: 'keuze' }] });
+  };
+  bereid(jsEconomie); bereid(rustEconomie);
+  const verwacht = jsEconomie.volgendeDag('cutover', 'magnaat-pariteit');
+  const werkelijk = await rustEconomie.volgendeDagAsync('cutover', 'magnaat-pariteit');
+  const afdrukMagnaat = uit => JSON.stringify({ macro: uit.macro, bedrijven: uit.bedrijven, grootboek: uit.grootboek });
+  if (werkelijk.rekenmotor !== 'rust' || afdrukMagnaat(werkelijk) !== afdrukMagnaat(verwacht)) {
+    fouten++; console.error('[cutover] FOUT: Magnaat Rust-marktdag wijkt af van de JS-ijklijn.');
+  } else console.log('[cutover] OK  Magnaat-marktdag: Rust == JS, inclusief grootboek');
+
+  motor.kill('SIGTERM');
+  await Promise.race([new Promise(resolve => motor.once('exit', resolve)), wacht(1500)]);
+  const terugval = await rustEconomie.volgendeDagAsync('cutover', 'magnaat-sidecar-uit');
+  if (!terugval.ok || terugval.rekenmotor === 'rust' || terugval.dag !== werkelijk.dag + 1) {
+    fouten++; console.error('[cutover] FOUT: Magnaat bleef niet heel na sidecar-uitval.');
+  } else console.log('[cutover] OK  Magnaat-sidecar-uitval: volledige dag via veilige JS-terugval');
+
   try { require('fs').rmSync(datadir, { recursive: true, force: true }); } catch (e) {}
   if (fouten) { console.error('\n[cutover] ' + fouten + ' fout(en) -- de cutover is NIET bewezen.'); process.exit(1); }
-  console.log('\n[cutover] BEWEZEN: de motor is het enige grootboek, de JS-spiegel volgt byte-voor-byte, som blijft 0, en de guard leeft in de motor.');
+  console.log('\n[cutover] BEWEZEN: geld en bank leven in Rust, Magnaat rekent native gelijk en sidecar-uitval laat de spelstaat heel.');
   process.exit(0);
 })().catch(e => { console.error('[cutover] uitzondering:', e); process.exit(1); });

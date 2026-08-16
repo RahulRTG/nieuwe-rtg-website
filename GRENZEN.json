@@ -458,6 +458,7 @@
       "bankVergunningZet",
       "betaalRegie",
       "bevoegd",
+      "betaal",
       "boardroomAuth",
       "boardroomLijst",
       "geldBetaaldienst",
@@ -471,6 +472,7 @@
       "ideeen",
       "magnaatLeren",
       "mall",
+      "mail",
       "naam",
       "pay",
       "payrollOS",
@@ -553,6 +555,7 @@
     ],
     "magnaatwereld": [
       "boardroomAuth",
+      "magnaatPartnerstudio",
       "magnaatWereld"
     ],
     "mailpost": [

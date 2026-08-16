@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="36b7467e">
+<meta name="rtg-bouw" content="0a6efb06">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1759,7 +1759,7 @@
                pagina is weg, maar de mededeling niet: een lid moet kunnen zien
                dat er niet echt wordt afgerekend of besteld. Ze staat daarom
                hier, op de homescreen, naast de AI-regel. -->
-          <p class="os-aiwet" id="osDemoWet" data-i18n="os.demo">Demo · alles werkt, alleen echt betalen, echte bestellingen en de Boardroom staan uit</p>
+          <p class="os-aiwet" id="osDemoWet" data-i18n="os.demo" hidden>Demo · alles werkt, alleen echt betalen, echte bestellingen en de Boardroom staan uit</p>
         </div>
       </div>
 
@@ -1964,6 +1964,7 @@
             <button type="button" data-wall="bordeaux">Bordeaux</button>
             <button type="button" data-wall="beeld" data-i18n="os.cc.wall.beeld">Beeld</button>
           </div>
+          <small class="os-aiwet">De achtergrond ‘Beeld’ is een AI-gegenereerd campagnebeeld zonder echte personen.</small>
         </div>
         <!-- Het beginscherm: de levende wereld (de kring om de klok) of het
              vertrouwde rooster met tegels. Dit is EEN schakelaar en geen tweede
@@ -2244,10 +2245,12 @@
 <script src="/shared/uitvoer.js"></script>
 <!-- De levende wereld: het beginscherm als kring om de klok. Moet VOOR
      app-main.js staan en zonder defer, want app-main reikt hem de werelden aan
-     (app-main-26c.js) op het moment dat het zelf draait. -->
+     (app-main-26c.js) op het moment dat het zelf draait. De zware hoofdbundel
+     zelf mag wel uitgesteld: dan downloadt hij naast het HTML-parsen en draait
+     hij vóór DOMContentLoaded, nadat de volledige shell bestaat. -->
 <script src="/shared/wereld.js"></script>
 <script src="/apps/magnaat-sandbox.js"></script>
-<script src="/apps/app-main.js"></script>
+<script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {
   'ride.sub':'Fixed net price, paid and confirmed instantly', 'ride.datum':'Date',

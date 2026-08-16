@@ -8,6 +8,30 @@ minderjarige) gebruikers" vraagt meer dan code alleen.
 
 ---
 
+## 0. Alles automatisch afbouwen en bewijzen
+
+```bash
+npm run afbouw:snel       # releasepoort + volledige geïsoleerde stagingrepetitie
+npm run afbouw:software   # alle Node-tests + releasepoort + stagingrepetitie
+npm run afbouw:alles      # hetzelfde, daarna ook alle echte livevoorwaarden controleren
+```
+
+`afbouw:alles` is de centrale nul-dependency afbouwknop. Hij stopt bij de
+eerste echte fout en geeft pas groen nadat gameplay, economie, drie afzonderlijke
+spelers, 300-verzoekenbelasting, procesfailover, Sentinel-isolatie, audit,
+backup/herstel, Rust en alle Node-tests zijn geslaagd. De repetitie bindt alleen
+aan loopback, gebruikt uitsluitend synthetische speldata en verwijdert de hele
+tijdelijke omgeving na afloop. Het machineleesbare bewijs staat in
+`.release/staging-bewijs.json`; het laatste proceslog in
+`.release/staging-laatste.log`. Gelijktijdige bronmuterende tests en releases
+worden met één exclusief afbouwslot geweigerd, zodat Sentinel nooit een tijdelijk
+ijkbestand als productiewijziging hoeft te beoordelen.
+
+De knop voert bewust geen echte uitrol uit. Wanneer `afbouw:alles` groen is,
+blijft `npm run deploy:productie` de afzonderlijke, menselijke publicatieactie.
+Een domein, mailroute, betaalkeuze, juridische antwoorden of persoonsgegevens
+worden nooit door software verzonnen.
+
 ## 1. Snel starten (Docker)
 
 Eerst veilig lokaal bouwen, zonder te doen alsof mail of betalingen al echt
@@ -50,6 +74,21 @@ beschikbaar.
 
 - Liveness: `GET /api/health` (proces leeft)
 - Readiness: `GET /api/ready` (mag verkeer krijgen; 503 als de datalaag nog niet klaar is)
+- Sentinel: `GET /__sentinel/live` en `GET /__sentinel/ready`
+
+De app heeft in Compose bewust geen hostpoort. Alleen Sentinel publiceert de
+voordeur, standaard op host-loopback zodat een TLS-proxy/tunnel ervoor moet.
+Status, gerichte blokkade, volledige isolatie en auditbediening staan in
+`docs/sentinel.md`. De losse `.sentinel-token` wordt alleen in Sentinel gemount;
+de app krijgt hem nooit.
+
+Voor de eerste capability-canary zet je in `.env.productie`
+`RTG_CAPABILITY_RUST_MODE=canary`, een percentage en een stabiele, niet-geheime
+instance-sleutel. Het percentage selecteert instances deterministisch; op een
+enkele Compose-instance is die instance dus geheel wel of niet geselecteerd.
+De actuele bron, pariteit, terugvalreden en centrale noodstop zijn zichtbaar in
+Magnaat Boardroom bij `capabilityGraph.motor`. Zet bij twijfel direct
+`RTG_RUST_ALLES_UIT=1` en herstart alleen `app`; Sentinel blijft dan actief.
 
 ## 2. Zonder Docker
 
@@ -123,6 +162,28 @@ Aanbevolen: `ERR_WEBHOOK_URL` (externe alarmering) en SMTP (`SMTP_URL`). Voor
 echte betalingen: `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` of een andere
 provider; anders `RTG_BETALEN_UIT=1`. Voor AI: `ANTHROPIC_API_KEY` of een andere
 provider; anders `RTG_AI_UIT=1`.
+
+Veilige tussenstand: er is nog geen externe herstel-SMS en geen geactiveerde
+uitgaande Stripe-rail. Productie start daarom alleen wanneer
+`RTG_HERSTEL_SMS_UIT_BEWUST=1` expliciet bevestigt dat herstel voor accounts met
+telefoon fail-closed geblokkeerd blijft. Met `STRIPE_UITGAAND_UIT_BEWUST=1`
+bevestigt de beheerder dat partner- en RTFoundation-uitbetalingen gereserveerd
+blijven en niet via de onjuiste Payout-met-IBAN-route worden verstuurd.
+
+Voor lokale integratieproeven bestaan vier afgeschermde providerstanden. Met
+`SMS_SANDBOX=1` wordt het E.164-nummer gevalideerd en komt de herstelcode alleen
+in de beveiligde outbox. Met `STRIPE_CONNECT_SANDBOX=1` en `SEPA_SANDBOX=1`
+worden providerachtige opdrachten met status `processing` gemaakt; ze doen geen
+netwerkverkeer en verplaatsen geen geld. `SMS_SANDBOX_RESULT=failed` simuleert
+een geweigerde SMS. Een lokale SMTP-catcher kan met `SMTP_SANDBOX=1` worden
+gebruikt; de host in `SMTP_URL` moet dan localhost/loopback zijn. De
+productiekeuring weigert al deze sandboxvlaggen expliciet.
+
+De vier runtime-zekeringen staan in het RTG-kantoor onder **Integratiekamer**
+(`/apps/kantoren.html?kamer=integraties`). Boardroomleden mogen een lokale
+contractproef uitvoeren en een schakelverzoek indienen; alleen de eigenaar kan
+dat verzoek goedkeuren. De noodstop zet alle lokale rails direct uit en iedere
+handeling komt in het auditlog. Dit scherm kan geen live provider activeren.
 
 Volledige lijst met uitleg: `.env.example`.
 
@@ -388,12 +449,13 @@ achter de poortwachter, met Postgres en Redis overal aan.**
 De eerste twee stappen zijn geautomatiseerd:
 
 ```bash
-npm run sleutels   # maakt alle geheimen in een keer (.env-blok)
+npm run sleutels:bestand # schrijft .env.productie met rechten 600, zonder secrets in logs
 npm run golive     # keurt de omgeving: exitcode 0 = klaar om live te gaan
 ```
 
 De keuring beoordeelt de configuratie op productieniveau, probeert PostgreSQL
-echt te bereiken en somt blokkerende punten op. De testsuite bevat bovendien
+echt te bereiken, prikt een geconfigureerde Rust-sidecar aan en voert de native
+Magnaat-capabilityscan uit. De testsuite bevat bovendien
 een generale repetitie (`test/golive.test.js`) die de server echt in
 productiestand start en bewijst: onveilige start geweigerd, demo dicht, geen
 dev-lekken, registratie/eigenaar/backoffice werken.
@@ -432,6 +494,9 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Betalingen: voor de eerste livegang staat `RTG_BETALEN_UIT=1` en weigert elke rail fail-closed. Alleen bij een latere betaalrelease vervangen door echte providerkeys + een geteste, ondertekende webhook
 - [ ] Back-up-volume gemount; herstel-uit-back-up één keer geoefend
 - [ ] `npm run check` en `npm test` groen in CI; image bouwt
+- [ ] `npm run release:gate:productie` is groen en `.release/release-bewijs.json` verifieert met `npm run release:controle`
+- [ ] Op het techniekbord is **Controleer alle code nu** groen en staat het releasebewijs als **extern verankerd**. `npm run deploy:productie` leest de bewijs-SHA uit het gebouwde image, geeft hem als runtime-pin terug en bewaart hem in de uitrolbon. Zie `docs/incidentcontrole.md`
+- [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
 - [ ] GitHub repository variable `RTG_LIVE_URL` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen
 - [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; de keuring waarschuwt zolang hij ontbreekt)

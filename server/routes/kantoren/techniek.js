@@ -52,4 +52,6 @@ module.exports = (ctx) => {
     const r = wacht.zetLastafworp(req.body && req.body.aan === true);
     return { status: 200, ok: true, uitleg: r && r.uitleg };
   }));
+
+  require('./integraties')(ctx);
 };

@@ -52,8 +52,6 @@ const duur = ms => (ms < 1000 ? ms + ' ms' : ms < 60000 ? (ms / 1000).toFixed(1)
 
 /* ---------- de lagen ---------- */
 const NODE = process.execPath;
-const testBestanden = () => fs.readdirSync(path.join(WORTEL, 'test'))
-  .filter(n => n.endsWith('.test.js')).sort().map(n => path.join('test', n));
 const LAGEN = [
   { id: 'bouw', naam: 'DE BOUW', hard: true, bouw: true },
   { id: 'poorten', naam: 'DE POORTEN', hard: true, stappen: [
@@ -68,9 +66,10 @@ const LAGEN = [
     ['samenhang', [NODE, ['--experimental-sqlite', 'scripts/samenhang.js']]]
   ] },
   { id: 'tests', naam: 'DE TESTSUITE', hard: true, stappen: [
-    // de bestanden zelf opsommen: node --test wil paden naar bestanden, en
-    // spawn kent geen shell die een * voor ons uitvouwt
-    ['test/*.test.js', [NODE, ['--experimental-sqlite', '--test', '--test-reporter=dot'].concat(testBestanden())]]
+    /* De gedeelde runner begrenst serverconcurrentie en draait de twee
+       bronmuterende ijkingen apart. Anders kan de Slotsuite precies door haar
+       eigen meetproeven nondeterministisch rood worden. */
+    ['test/*.test.js', [NODE, ['scripts/test-runner.js', '--reporter=dot']]]
   ] },
   /* A11Y_STRICT=1, en dat is hier geen detail. scripts/a11y.js slaat zichzelf
      over met exitcode 0 als er geen browser staat -- terecht, want op een kale

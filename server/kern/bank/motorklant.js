@@ -12,7 +12,8 @@
 'use strict';
 
 module.exports = function maakBankMotorklant() {
-  const modus = String(process.env.RTG_MOTOR_GELD || 'schaduw').toLowerCase();
+  const globaleNoodstop = process.env.RTG_RUST_ALLES_UIT === '1';
+  const modus = globaleNoodstop ? 'uit' : String(process.env.RTG_MOTOR_GELD || 'schaduw').toLowerCase();
   const aan = modus === 'motor';
   const URL = (process.env.RTG_MOTOR_GELD_URL || process.env.RTG_MOTOR_SHADOW || '').replace(/\/$/, '');
   const TIMEOUT_MS = Number(process.env.RTG_MOTOR_GELD_TIMEOUT || 5000);
@@ -44,7 +45,7 @@ module.exports = function maakBankMotorklant() {
   }
 
   return {
-    aan, modus, url: URL,
+    aan, modus, globaleNoodstop, url: URL,
 
     // Rauw boeken op de motor (autoriteit). De JS-guard is AL gepasseerd voordat
     // dit wordt aangeroepen; de motor past de al-genomen beslissing enkel toe.
@@ -52,6 +53,7 @@ module.exports = function maakBankMotorklant() {
     // weigert of onbereikbaar is. NOOIT throwen op het geld-pad: de caller
     // vertaalt dit naar een nette fout en past NIETS toe op de spiegel bij een fout.
     async bankBoek({ van, naar, centen, soort, oms, ref }) {
+      if (!aan) return { error: 'Rust-motor staat uit; JavaScript blijft autoritatief.', status: 503 };
       try {
         const { http, body } = await post('/api/bank/boek', { van, naar, centen: Math.round(Number(centen)), soort, oms, ref });
         if (http >= 300 || !body || body.ok !== true || !body.boeking) {
@@ -67,6 +69,7 @@ module.exports = function maakBankMotorklant() {
     // reconcile van de JS-spiegel. Vereist RTG_MOTOR_SALDI=1 (of _DEBUG=1) op de
     // motor. Retourneert { ok, saldi } of { error }.
     async bankSaldiSnapshot() {
+      if (!aan) return { error: 'Rust-motor staat uit; geen native banksaldi opgevraagd.', status: 503 };
       const af = new AbortController();
       const t = setTimeout(() => af.abort(), TIMEOUT_MS);
       try {

@@ -60,7 +60,6 @@
     PORTELL:{ name:'Marina Portell', icon:'' },
     SEGUR:{ name:'Segur Advies', icon:'' }
   };
-
   // De API-client komt uit de gedeelde app-shell (public/shared/appshell.js),
   // zodat alle apps zich identiek gedragen.
   const API = RTGApp.maakAPI();

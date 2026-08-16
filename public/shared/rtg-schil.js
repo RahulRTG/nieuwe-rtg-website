@@ -76,6 +76,21 @@
     }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
+    /* De standaard Work OS-schil is een vaste linkerbank met een tabbalk.
+       Alle surfaces delen daar hetzelfde werkvlak; de actieve tab bepaalt
+       welke zichtbaar en bedienbaar is. De vrije Spatial Shell hieronder
+       behoudt zijn raster, docken en eigen meubelplan. */
+    if (schil.standaard) {
+      var bankBreed = Math.max(164, Math.min(210, Math.round(m.b * 0.12)));
+      var tabHoog = 48;
+      zet(schil.console, 0, 0, bankBreed, m.h);
+      if (schil.tabbar) zet(schil.tabbar, bankBreed, 0, m.b - bankBreed, tabHoog);
+      schil.surfaces.forEach(function (s) {
+        zet(s.el, bankBreed, tabHoog, m.b - bankBreed, m.h - tabHoog);
+      });
+      return;
+    }
+
     if (!n) {
       // niets open: de console staat midden, als commandotafel zonder werk
       zet(schil.console, Math.round((m.b - consoleBreed) / 2), g, consoleBreed, m.h - g * 2);
@@ -170,6 +185,23 @@
   function vind(id) {
     for (var i = 0; i < schil.surfaces.length; i++) if (schil.surfaces[i].id === id) return schil.surfaces[i];
     return null;
+  }
+
+  function tekenTabbar() {
+    if (!schil.tabbar) return;
+    schil.tabbar.innerHTML = '';
+    schil.surfaces.forEach(function (s) {
+      var tab = el('div', 'rtg-tab', schil.tabbar);
+      if (schil.actief === s) tab.setAttribute('data-actief', '');
+      var kies = el('button', 'rtg-tab-kies', tab);
+      kies.type = 'button'; kies.textContent = s.naam;
+      kies.setAttribute('aria-label', 'Open ' + s.naam);
+      kies.addEventListener('click', function () { maakActief(s); });
+      var dicht = el('button', 'rtg-tab-sluit', tab);
+      dicht.type = 'button'; dicht.innerHTML = '&times;';
+      dicht.setAttribute('aria-label', 'Sluit ' + esc(s.naam));
+      dicht.addEventListener('click', function () { sluit(s.id); });
+    });
   }
 
   function sluit(id) {
@@ -533,10 +565,33 @@
     if (!sleepObject || !wat) return;
     sleepAanbod[s.id] = String(wat).slice(0, 120);
     s.el.setAttribute('data-kan-vangen', '');
+    var tab = tabVanSurface(s);
+    if (tab) tab.setAttribute('data-kan-vangen', '');
+  }
+
+  function tabVanSurface(s) {
+    if (!schil.tabs) return null;
+    var tabs = schil.tabs.querySelectorAll('.rtg-tab[data-id]');
+    for (var i = 0; i < tabs.length; i++) if (tabs[i].dataset.id === s.id) return tabs[i];
+    return null;
   }
 
   function surfaceOp(x, y) {
+    /* In de standaard Werk OS-weergave staat maar een appvlak tegelijk open.
+       De overige apps zijn bereikbaar via hun zichtbare tab. Een tab die door
+       de ontvangende app als doel is aanvaard, is daarom een volwaardig
+       sleepdoel: zo hoeft de gebruiker een app niet eerst te openen en het
+       object daarna opnieuw op te pakken. */
+    if (schil.tabs) {
+      var tabs = schil.tabs.querySelectorAll('.rtg-tab[data-id][data-kan-vangen]');
+      for (var t = tabs.length - 1; t >= 0; t--) {
+        var tr = tabs[t].getBoundingClientRect();
+        if (x >= tr.left && x <= tr.right && y >= tr.top && y <= tr.bottom) return vind(tabs[t].dataset.id);
+      }
+    }
     for (var i = schil.surfaces.length - 1; i >= 0; i--) {
+      var stijl = w.getComputedStyle(schil.surfaces[i].el);
+      if (stijl.visibility === 'hidden' || stijl.display === 'none' || stijl.pointerEvents === 'none') continue;
       var r = schil.surfaces[i].el.getBoundingClientRect();
       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return schil.surfaces[i];
     }
@@ -547,9 +602,17 @@
     var s = surfaceOp(e.clientX, e.clientY);
     var nieuw = (s && sleepAanbod[s.id]) ? s : null;
     if (nieuw === sleepDoel) return;
-    if (sleepDoel) sleepDoel.el.removeAttribute('data-vangt');
+    if (sleepDoel) {
+      sleepDoel.el.removeAttribute('data-vangt');
+      var oudTab = tabVanSurface(sleepDoel);
+      if (oudTab) oudTab.removeAttribute('data-vangt');
+    }
     sleepDoel = nieuw;
-    if (sleepDoel) sleepDoel.el.setAttribute('data-vangt', '');
+    if (sleepDoel) {
+      sleepDoel.el.setAttribute('data-vangt', '');
+      var nieuwTab = tabVanSurface(sleepDoel);
+      if (nieuwTab) nieuwTab.setAttribute('data-vangt', '');
+    }
   }
 
   function sleepLos() {
@@ -559,6 +622,9 @@
     vangvlak(false);
     schil.surfaces.forEach(function (s) {
       s.el.removeAttribute('data-kan-vangen'); s.el.removeAttribute('data-vangt');
+    });
+    if (schil.tabs) schil.tabs.querySelectorAll('[data-kan-vangen],[data-vangt]').forEach(function (tab) {
+      tab.removeAttribute('data-kan-vangen'); tab.removeAttribute('data-vangt');
     });
     var doel = sleepDoel, object = sleepObject;
     sleepDoel = null;

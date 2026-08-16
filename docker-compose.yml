@@ -26,16 +26,16 @@ x-rtg-beveiliging: &rtg-beveiliging
 services:
   app:
     <<: *rtg-beveiliging
+    # Ook letterlijk per eigen service: controles en operators hoeven YAML-
+    # anchors niet te evalueren om de beveiligingsgrens te kunnen bewijzen.
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
     image: ${RTG_IMAGE:-rtg-app:local}
     build:
       context: .
     command: ["node", "scripts/docker/start.js", "app"]
     stop_grace_period: 35s
-    ports:
-      # Bewust niet 0.0.0.0: zonder TLS-rand hoort Node niet direct op internet.
-      # De drie waarden zijn los instelbaar omdat de live-overlay native TLS op
-      # containerpoort 443 draait, terwijl de gewone self-host op 3000 blijft.
-      - "${RTG_PUBLISH_HOST:-127.0.0.1}:${RTG_PUBLISH_PORT:-3000}:${RTG_CONTAINER_PORT:-3000}"
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -50,6 +50,14 @@ services:
       RTG_CLAMD_HOST: clamav
       RTG_CLAMD_PORT: 3310
       RTG_CLAMD_TIMEOUT_MS: ${RTG_CLAMD_TIMEOUT_MS:-15000}
+      # De binary zit in hetzelfde onveranderlijke image. De modus en centrale
+      # noodstop blijven via .env.productie direct bedienbaar. Standaard blijft
+      # deze migratie uit; een canary is altijd een bewuste productie-instelling.
+      RTG_CAPABILITY_RUST_BIN: /app/rtg-motor
+      RTG_CAPABILITY_RUST_MODE: ${RTG_CAPABILITY_RUST_MODE:-uit}
+      RTG_CAPABILITY_RUST_CANARY_PCT: ${RTG_CAPABILITY_RUST_CANARY_PCT:-10}
+      RTG_CAPABILITY_RUST_CANARY_KEY: ${RTG_CAPABILITY_RUST_CANARY_KEY:-rtg-compose-app-1}
+      RTG_RUST_ALLES_UIT: ${RTG_RUST_ALLES_UIT:-0}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       RTG_STOP_GRACE_MS: 30000
     secrets:
@@ -80,8 +88,54 @@ services:
         soft: 65536
         hard: 65536
 
+  sentinel:
+    image: ${RTG_APP_IMAGE:-rtg-app:local}
+    restart: unless-stopped
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    pids_limit: 256
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid
+    command: ["/app/rtg-sentinel", "serve"]
+    ports:
+      # Alleen de lokale TLS-proxy mag standaard bij Sentinel. Openlijk binden
+      # vraagt een bewuste RTG_SENTINEL_BIND=0.0.0.0 én een TLS-rand ervoor.
+      - "${RTG_SENTINEL_BIND:-127.0.0.1}:${PORT:-3000}:3080"
+    environment:
+      RTG_SENTINEL_ADDR: 0.0.0.0:3080
+      RTG_SENTINEL_CONTROL_ADDR: 127.0.0.1:3091
+      RTG_SENTINEL_UPSTREAM: app:3000
+      RTG_SENTINEL_FORWARDED_PROTO: ${RTG_SENTINEL_FORWARDED_PROTO:-https}
+      RTG_SENTINEL_ROOT: /app
+      RTG_SENTINEL_BEWIJS: /app/release-bewijs.json
+      RTG_SENTINEL_DATA: /app/sentinel-data
+      RTG_SENTINEL_TOKEN_FILE: /run/secrets/sentinel_token
+      RTG_RELEASE_BEWIJS_SHA256: ${RTG_RELEASE_BEWIJS_SHA256:-}
+      RTG_SENTINEL_FAIL_CLOSED: "1"
+      RTG_SENTINEL_SCAN_SEC: ${RTG_SENTINEL_SCAN_SEC:-300}
+      # Standaard niet automatisch isoleren bij alleen een healthfout: een
+      # aanvaller mag via een tijdelijke storing geen blijvende DoS veroorzaken.
+      RTG_SENTINEL_AUTO_ISOLATE_AFTER: ${RTG_SENTINEL_AUTO_ISOLATE_AFTER:-0}
+    secrets:
+      - sentinel_token
+    volumes:
+      - rtg-sentinel:/app/sentinel-data
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/rtg-sentinel", "ctl", "status"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   motor:
     <<: *rtg-beveiliging
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
     image: ${RTG_IMAGE:-rtg-app:local}
     build:
       context: .
@@ -90,6 +144,7 @@ services:
       NODE_ENV: production
       RTG_ENV_FILE: /run/secrets/rtg_env
       RTG_MOTOR_ADDR: 0.0.0.0:3100
+      RTG_MOTOR_SALDI: "1"
       RTG_MOTOR_DATA: /app/motor-data/state.json
       RTG_MOTOR_GIDS: /app/motor-data/gids.bin
       RTG_KLUIS_KEY_FILE: /app/motor-data/secret.key
@@ -232,6 +287,8 @@ secrets:
     file: ${RTG_ENV_FILE:-.env.productie}
   postgres_password:
     file: ${RTG_POSTGRES_PASSWORD_FILE:-.rtg-secrets/postgres_password}
+  sentinel_token:
+    file: ${RTG_SENTINEL_TOKEN_FILE:-.sentinel-token}
 
 networks:
   edge:
@@ -247,3 +304,4 @@ volumes:
   rtg-pg:
   rtg-motor:
   rtg-clamav:
+  rtg-sentinel:

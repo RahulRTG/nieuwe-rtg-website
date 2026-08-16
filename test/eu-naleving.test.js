@@ -49,7 +49,12 @@ test('AI-verordening art. 50: de vaste AI-melding staat in de leden-app, niet al
 });
 
 test('AI-verordening art. 50 lid 2: campagnebeeld is als AI-gegenereerd benoemd', () => {
-  assert.match(lees('public/apps/rtg.html'), /AI-gegenereerd campagnebeeld/, 'de alt-teksten zeggen het');
+  /* Het campagnebeeld is nu een kiesbare achtergrond in de leden-app en geen
+     img in het oude magazine. Juist bij die knop moet de melding staan: daar
+     ziet en kiest de gebruiker het beeld. */
+  const app = lees('public/apps/app.html');
+  assert.match(app, /os-wall-beeld[\s\S]*AI-gegenereerd campagnebeeld/,
+    'de app benoemt het beeld bij de achtergrondkeuze');
   assert.match(lees('public/apps/juridisch/privacy.html'), /met AI gemaakt/, 'het privacybeleid zegt het');
 });
 

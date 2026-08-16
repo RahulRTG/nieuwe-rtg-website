@@ -1,9 +1,3 @@
-    if (noodremAan && !confirm('De automatische noodrem uitzetten? Bij een brute-force-aanval springen de zekeringen dan NIET meer vanzelf.')) return;
-    api('/api/techniek/beveiliging/auto', { method:'POST', body:{ aan: !noodremAan } })
-      .then(function(d){ toast(d.autoReactie ? 'Noodrem aan: zekeringen springen vanzelf bij een aanval.' : 'Noodrem uit.'); laad(); })
-      .catch(function(e){ toast(e.message); });
-  });
-
   /* De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model
      leest en niet uit de kaartjes op het scherm. */
   var STAND = null;
@@ -12,6 +6,7 @@
     return api('/api/techniek/status').then(function(d){
       STAND = d;
       eigenaar = d.eigenaar;
+      tekenControle(d.controle, d.functies);
       $('#wieSub').textContent = (d.naam||'') + (d.eigenaar?' · eigenaar':' · toegelaten');
       var bev = d.beveiliging || { open:0, kritiek:0, recent:[] };
       var tellers = [

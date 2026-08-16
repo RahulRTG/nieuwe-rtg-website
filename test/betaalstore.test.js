@@ -5,6 +5,7 @@
    Zuiver, zonder server. Draai: node --test test/betaalstore.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+process.env.RTG_DEMO = '1';
 const betaal = require('../server/betaal');
 
 test('betaalstore: injectie wordt gebruikt en dezelfde sleutel schrijft nooit dubbel', async () => {

@@ -72,9 +72,19 @@ const CHECKS_INTEGRATIES = [
   },
   {
     id: 'email', naam: 'E-mail (SMTP)', code: 'MAIL-01', categorie: 'Integraties',
-    run: (c) => c.mailGeconfigureerd
+    run: (c) => c.mailLiveGeconfigureerd
       ? { status: 'ok', detail: 'SMTP ingesteld; e-mail wordt echt verstuurd.' }
-      : { status: 'waarschuwing', detail: 'Geen SMTP: e-mail gaat naar de outbox in plaats van naar klanten.' }
+      : c.mailSandboxGeconfigureerd
+        ? { status: 'waarschuwing', detail: 'Lokale SMTP-sandbox actief; berichten verlaten deze computer niet.' }
+        : { status: 'waarschuwing', detail: 'Geen SMTP: e-mail gaat naar de outbox in plaats van naar klanten.' }
+  },
+  {
+    id: 'sms', naam: 'Herstel-SMS', code: 'SMS-01', categorie: 'Integraties',
+    run: (c) => c.smsGeconfigureerd
+      ? { status: 'ok', detail: 'Echte SMS-provider actief.' }
+      : c.smsSandboxGeconfigureerd
+        ? { status: 'waarschuwing', detail: 'Lokale SMS-contractsandbox actief; codes blijven in de beveiligde outbox en bereiken geen telefoon.' }
+        : { status: 'fout', detail: 'Geen echte SMS-provider: herstel voor accounts met telefoon staat veilig geblokkeerd; outbox telt niet als bezorging.' }
   }
 ];
 

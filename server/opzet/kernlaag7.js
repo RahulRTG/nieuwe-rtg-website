@@ -17,7 +17,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, bewerkCollectie, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -172,8 +172,11 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
    opgebouwd voordat kernlaag7b de routers ophangt, zodat de domeingrens nooit
    een half gemonteerde motor kan doorgeven. */
 Object.assign(kern, require('../kern/rtgone')({ db, save, crypto }));
+const partnerstudio = require('../kern/magnaat-partnerstudio')({ db, save, crypto, findSupplier });
+Object.assign(kern, partnerstudio);
 Object.assign(kern, require('../kern/magnaatwereld')({
-  db, save, crypto, functies: require('../functies')
+  db, save, bewerkCollectie, crypto, functies: require('../functies'), sseToCustomer,
+  partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
 }));
 
 // De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en

@@ -51,6 +51,8 @@ beschikbaar. De server noemt zelf het adres waar de telefoon heen moet
 In deze volgorde, want de eerste stap kan de rest overbodig maken:
 
 ```bash
+npm run productie:installeer # veilige wizard voor .env.productie
+npm run release:gate         # build + Rust + security + audit + echte herstelproef + hashbewijs
 npm run golive        # de eigen go-live keuring: exitcode 1 zolang er iets open staat
 npm run keuring       # 41 binaire regels over de bron
 npm test              # de servertoetsen (duurt lang)
@@ -64,6 +66,11 @@ regel waarom het blokkeert. De vijf productiegeheimen en de achttien juridische
 vragen kan code niet voor je oplossen; die staan daar met naam.
 
 Voor de volledige checklist: `PRODUCTION.md` §6.
+
+Een echte Compose-uitrol loopt via `npm run deploy:productie`. De uitrol raakt
+Docker pas nadat `release:gate:productie` groen is, wacht op de healthchecks en
+herstelt bij falen automatisch de twee vorige image-ID's. De bon staat onder
+`.release/`; handmatig: `npm run deploy:terug -- .release/uitrol-...json`.
 
 ## 3. Backup en herstel
 
@@ -123,6 +130,8 @@ Voor een datalek is er een eigen draaiboek met de 72-uursklok: `DATALEK.md`.
 | hoe houdt hij het onder last? | `npm run beproeving` |
 | welke endpoints raakt niemand aan? | `npm run dekking` |
 | toegankelijkheid | `npm run a11y` |
+| klopt het gebouwde releasepakket nog byte voor byte? | `npm run release:controle` |
+| meten vanaf een andere machine | `node scripts/sonde.js https://jouwdomein --melden --token=...` |
 
 Na een wijziging aan de code horen `ARCHITECTUUR.md` en `BEWIJS.md` mee te
 verschuiven; regel 40 en 41 van `npm run keuring` maken de keuring rood zolang dat

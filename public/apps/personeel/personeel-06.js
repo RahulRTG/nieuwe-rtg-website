@@ -39,7 +39,7 @@
   async function restoreSession(){
     let t = null, c = null;
     try { t = localStorage.getItem('rtg_pda_token'); c = localStorage.getItem('rtg_pda_code'); } catch(e){}
-    if (!t || !c || !BEDRIJVEN[c]) return;
+    if (!t || !geldigeBedrijfscode(c)) return;
     // de PDA staat vast op een bedrijf: een sessie van een ander bedrijf herstellen we niet
     const vast = pdaBedrijf();
     if (vast && vast !== c){ try { localStorage.removeItem('rtg_pda_token'); localStorage.removeItem('rtg_pda_code'); } catch(e){} return; }
@@ -47,6 +47,7 @@
     try {
       const st = (await API.call('/supplier/state')).state;
       if (!st.actor || !st.actor.staffId){ API.token = null; return; } // alleen persoonlijke logins herstellen
+      onthoudBedrijf(st.supplier || { code: c, name: c });
       state = st; code = c;
       me = { name: st.actor.name, role: st.actor.role, staffId: st.actor.staffId };
       week = await API.call('/supplier/schedule', {}).catch(()=>null);

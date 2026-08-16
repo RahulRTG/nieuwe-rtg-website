@@ -13,7 +13,9 @@ const lees = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 test('live-compose ontsluit native HTTPS en schermt herstel af', () => {
   const basis = lees('docker-compose.yml');
   const live = lees('docker-compose.live.yml');
-  assert.match(basis, /RTG_CONTAINER_PORT:-3000/);
+  const app = basis.match(/^  app:\n[\s\S]*?(?=^  sentinel:\n)/m)[0];
+  assert.doesNotMatch(app, /^    ports:/m, 'de basis publiceert Node niet buiten Sentinel om');
+  assert.match(live, /RTG_PUBLISH_PORT:-443.*RTG_CONTAINER_PORT:-443/);
   assert.match(live, /:80:80\/tcp/);
   assert.match(live, /port:443/);
   assert.match(live, /NET_BIND_SERVICE/);
@@ -92,14 +94,15 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     const envPad = path.join(tmp, '.env.productie');
     const pgPad = path.join(tmp, 'postgres_password');
     const maak = spawnSync(process.execPath, [path.join(ROOT, 'scripts/sleutels.js'),
-      '--docker', '--schrijf', '--zonder-ai', '--zonder-betalen', '--native-tls', '--stil',
+      '--docker', '--schrijf', '--zonder-ai', '--zonder-betalen', '--zonder-sms', '--native-tls', '--stil',
       '--eigenaar=owner@example.test', '--url=https://app.example.test',
       '--tls-email=tls@example.test', '--smtp-url=smtps://mail.example.test:465',
       '--doel=' + envPad, '--postgres-doel=' + pgPad], { encoding: 'utf8' });
     assert.equal(maak.status, 0, maak.stderr);
     const env = leesEnv(envPad);
     for (const [naam, waarde] of Object.entries({
-      RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_TLS: '1', RTG_ACME: '1',
+      RTG_AI_UIT: '1', RTG_BETALEN_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
+      RTG_TLS: '1', RTG_ACME: '1',
       RTG_TLS_DOMAIN: 'app.example.test', RTG_PROXY_HOPS: '0'
     })) assert.equal(env[naam], waarde, naam);
     assert.ok(env.OFFICE_TOTP_SECRET.length >= 16);

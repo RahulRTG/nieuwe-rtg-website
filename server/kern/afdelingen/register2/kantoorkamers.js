@@ -1,6 +1,6 @@
 /* Afdelingsregister deel 2, kamergroep "kantoorkamers" (kern/afdelingen): de
-   vijf jongere bedrijfskamers - Support team, Ingenieurs, Consumenten-
-   abonnementen, Partner-abonnementen en de Kantine. Zelfde vorm als register.js:
+   zeven jongere bedrijfskamers - Support team, Ingenieurs, Integratiekamer, Controleregister,
+   Consumenten- en Partner-abonnementen en de Kantine. Zelfde vorm als register.js:
    per kamer de naam, KPI's en lijsten, alles defensief lezend. Kamers met
    naamInzage: true mogen via de identiteitskluis de echte naam bij een codenaam
    opvragen (elke opvraging komt in het auditlog). Verbatim uit register2.js. */
@@ -51,6 +51,42 @@ module.exports = (ctx) => {
         { titel: 'Laatste update-meldingen', items: lijst(d().doosUpdateStatus).slice(0, 6).map(s => s.doos + ': ' + (s.gelukt ? 'gelukt' : 'NIET gelukt') + (s.naar ? ' naar v' + s.naar : '') + ', ' + s.melding) },
         { titel: 'Verder kijken', items: ['Het volledige techniekbord staat op techniek.html (eigenaar-inlog); de Zaakdozen staan in de kamer Intern & IT.'] }
       ] },
+    integraties: { naam: 'Integratiekamer', icoon: 'antenne', eigenApp: true,
+      missie: 'SMTP, SMS, Connect en SEPA veilig testen, bewaken en als één keten laten samenwerken.',
+      kpis: () => {
+        const s = d().integratiekamer || {}, schakels = s.schakelaars || {}, tests = s.tests || {};
+        return [
+          ['Lokale rails aan', Object.values(schakels).filter(Boolean).length + ' / 4'],
+          ['Contractproeven groen', ['smtp', 'sms', 'connect', 'sepa'].filter(id => tests[id] && tests[id].ok).length + ' / 4'],
+          ['Schakelbesluiten open', lijst(s.verzoeken).filter(v => v.status === 'wacht').length],
+          ['Verantwoordelijken toegewezen', Object.values(s.verantwoordelijk || {}).filter(Boolean).length + ' / 4']
+        ];
+      },
+      lijsten: () => {
+        const s = d().integratiekamer || {};
+        return [
+          { titel: 'Besluiten die op de eigenaar wachten', items: lijst(s.verzoeken).filter(v => v.status === 'wacht').slice(0, 8).map(v => (v.aan ? 'AAN: ' : 'UIT: ') + String(v.kanaal || 'rail')) },
+          { titel: 'Harde grens', items: ['Live providers hebben hier geen aan-knop. De kamer bedient uitsluitend lokale contract-sandboxes.'] }
+        ];
+      } },
+    controleregister: { naam: 'RTG Controleregister', icoon: 'schild', eigenApp: true,
+      missie: 'Iedere codefunctie aantoonbaar koppelen aan kantoor, rol, stand, proef, audit, gameplay en economie.',
+      kpis: () => {
+        const c = ((d().magnaatWereld || {}).controle || {}), taken = lijst(c.taken);
+        return [
+          ['Controlepunten bijgestuurd', Object.keys(c.overrides || {}).length],
+          ['Dekkingstaken open', taken.filter(t => t.status !== 'klaar').length],
+          ['Dekkingstaken klaar', taken.filter(t => t.status === 'klaar').length],
+          ['Auditregels', lijst(c.audit).length]
+        ];
+      },
+      lijsten: () => {
+        const c = ((d().magnaatWereld || {}).controle || {}), taken = lijst(c.taken);
+        return [
+          { titel: 'Dekkingswerk voor de kantoren', items: taken.filter(t => t.status !== 'klaar').slice(0, 8).map(t => String(t.titel || t.id) + ' · ' + String(t.kantoorNaam || 'nog te verdelen')) },
+          { titel: 'Harde grens', items: ['Het register bestuurt de Magnaat-trainingskopie. Productie verandert alleen via de bestaande RTG-goedkeuringsroutes.'] }
+        ];
+      } },
     consumentenAbo: { naam: 'Consumenten-abonnementen', icoon: 'pas', missie: 'Elke pas kloppend: van aanvraag en ballotage tot verlenging en afscheid.', naamInzage: true,
       kpis: () => [
         ['Leden in de gids', ledenGeteld()],

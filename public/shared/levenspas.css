@@ -1,9 +1,9 @@
 /* De levenspas: wie mag wat van mij zien (LEVEN.md par. 2.8, fase 2).
 
-   Hoort bij /shared/levenspas.js en wordt door TWEE pagina's gelinkt:
-   /apps/leven.html (het lid) en /apps/foundation/mijnbanden.html (het
-   gezinsprofiel). Aan beide kanten van een band neemt een mens dezelfde
-   beslissing, dus hij hoort er ook hetzelfde uit te zien.
+   Hoort bij /shared/levenspas.js. De actieve pagina is
+   /apps/foundation/mijnbanden.html (het gezinsprofiel); de stijllaag blijft
+   themaneutraal zodat een toekomstige ledenadapter geen tweede afspraak of
+   tweede vormgeving hoeft te maken.
 
    Stond eerst als tekstblok in het script en ging daarmee over de tienkilobyte
    -grens van scripts/check.js regel 13. Als eigen bestand is hij bovendien
@@ -12,8 +12,8 @@
 
    DE KLEUREN KOMEN UIT HET THEMA VAN DE PAGINA, met de RTF-huisnamen als
    tweede kans en pas daarna een vaste waarde. Zo ziet dit blok er in het
-   ledenportaal uit als het ledenportaal en in het foundation-huis als het
-   foundation-huis, zonder dat er ergens een tweede palet ontstaat. */
+   foundation-huis als het foundation-huis, zonder dat er ergens een tweede
+   palet ontstaat. */
 
 .lp-rij{border:1px solid var(--rtg-line,var(--lijn,#DEDBD5));border-radius:12px;padding:.85rem 1rem;margin:.6rem 0;}
 .lp-kop{display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;}

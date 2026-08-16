@@ -38,6 +38,21 @@
     }
     var consoleBreed = Math.max(300, Math.min(460, Math.round(m.b * 0.26)));
 
+    /* De standaard Work OS-schil is een vaste linkerbank met een tabbalk.
+       Alle surfaces delen daar hetzelfde werkvlak; de actieve tab bepaalt
+       welke zichtbaar en bedienbaar is. De vrije Spatial Shell hieronder
+       behoudt zijn raster, docken en eigen meubelplan. */
+    if (schil.standaard) {
+      var bankBreed = Math.max(164, Math.min(210, Math.round(m.b * 0.12)));
+      var tabHoog = 48;
+      zet(schil.console, 0, 0, bankBreed, m.h);
+      if (schil.tabbar) zet(schil.tabbar, bankBreed, 0, m.b - bankBreed, tabHoog);
+      schil.surfaces.forEach(function (s) {
+        zet(s.el, bankBreed, tabHoog, m.b - bankBreed, m.h - tabHoog);
+      });
+      return;
+    }
+
     if (!n) {
       // niets open: de console staat midden, als commandotafel zonder werk
       zet(schil.console, Math.round((m.b - consoleBreed) / 2), g, consoleBreed, m.h - g * 2);

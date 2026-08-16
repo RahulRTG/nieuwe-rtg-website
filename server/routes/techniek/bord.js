@@ -73,6 +73,9 @@ module.exports = (bctx) => {
       uit.inzage = inzagelog.samenvatting();
       const bw = bewaren && bewaren();
       uit.bewaren = bw ? bw.statusDeel() : null;  // zie ./bewaren.js
+      // Eén centrale incident- en integriteitsstand; alleen de eigenaar ziet
+      // codepaden, hashes en de noodbediening.
+      uit.controle = bctx.controle ? bctx.controle.status() : null;
     }
     res.json(uit);
   });

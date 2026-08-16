@@ -79,11 +79,21 @@ test('selfhost:init maakt alle Docker-geheimen en overschrijft ze niet stil', ()
 
 test('Compose sluit de data-laag af en geeft geheimen niet als environment door', () => {
   const compose = fs.readFileSync(path.join(ROOT, 'docker-compose.yml'), 'utf8');
-  assert.match(compose, /RTG_PUBLISH_HOST:-127\.0\.0\.1/);
+  const app = compose.match(/^  app:\n[\s\S]*?(?=^  sentinel:\n)/m)[0];
+  const sentinel = compose.match(/^  sentinel:\n[\s\S]*?(?=^  motor:\n)/m)[0];
+  assert.doesNotMatch(app, /^    ports:/m, 'Node heeft bewust geen hostpoort');
+  assert.match(sentinel, /RTG_SENTINEL_BIND:-127\.0\.0\.1/,
+    'alleen Sentinel publiceert standaard op loopback');
+  assert.match(app, /RTG_CAPABILITY_RUST_BIN: \/app\/rtg-motor/);
+  assert.match(app, /RTG_CAPABILITY_RUST_MODE: \$\{RTG_CAPABILITY_RUST_MODE:-uit\}/);
+  assert.match(app, /RTG_RUST_ALLES_UIT: \$\{RTG_RUST_ALLES_UIT:-0\}/);
   assert.match(compose, /data:\n\s+internal: true/);
   assert.match(compose, /no-new-privileges:true/);
   assert.match(compose, /cap_drop:\n\s+- ALL/);
   assert.match(compose, /file: \$\{RTG_ENV_FILE:-\.env\.productie\}/);
+  assert.equal((compose.match(/^secrets:/gm) || []).length, 1,
+    'Compose heeft exact één top-level geheimenregister');
+  assert.match(compose, /sentinel_token:\n\s+file: \$\{RTG_SENTINEL_TOKEN_FILE:-\.sentinel-token\}/);
   assert.doesNotMatch(compose, /^\s+RTG_VAULT_KEY:/m);
   assert.doesNotMatch(compose, /POSTGRES_PASSWORD:\s*\$\{/);
   assert.match(compose, /service_healthy/);

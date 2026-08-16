@@ -96,7 +96,11 @@
   window.addEventListener('rtglang', () => { if (state) renderAll(); else stepStart(); gateTik(); });
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
   gateTik(); setInterval(gateTik, 15000);
-  stepStart();
+  async function startPersoneel(){
+    await laadOmgeving();
+    stepStart();
+    await restoreSession();
+  }
   // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon.
   // RTG Eye (de camerabril: voertuigschouw + werkvloerregister) staat als
   // eigen app op het springboard; de knop leeft in een onzichtbare houder.
@@ -131,5 +135,5 @@
   document.body.appendChild(extraHouder);
   if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'],
     extra: { houder: '#pdaExtra', knop: '.pda-app' } });
-  restoreSession();
+  startPersoneel();
 })();

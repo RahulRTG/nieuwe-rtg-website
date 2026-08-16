@@ -42,7 +42,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   // baas, exact als voorheen. In 'motor' loopt elke boeking eerst geguard langs
   // de motor en past de JS-engine daarna dezelfde bevestigde regel toe (spiegel).
   const motorklant = require('./motorklant')();
-  const geldModus = motorklant.aan ? 'motor' : 'schaduw';
+  const geldModus = motorklant.aan ? 'motor' : motorklant.modus;
 
   const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
   const MAX_CENTEN = 500000;         // tot 5000 euro per boeking

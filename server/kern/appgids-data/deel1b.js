@@ -37,6 +37,9 @@ module.exports = {
   '/apps/spelen.html': G('Spelen: bordspellen en partyspellen met vrienden, live tegen elkaar.',
     ['Start een lobby en nodig vrienden uit', 'Kies een spel: van dammen tot Magnaat', 'Praat mee in de spelchat'],
     'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.'),
+  '/apps/magnaat-partnerstudio.html': G('De Magnaat Partnerstudio: bouw als officiële RTG-partner een veilige, speelbare digitale tweeling van uw echte bedrijf.',
+    ['Beschrijf uw trainingsdoel en bevestig de gegevensgrenzen', 'Bouw locaties, afdelingen, rollen, aanbod en een volledig werkproces', 'Slaag voor de proef en dien exact die versie in voor menselijke RTG-goedkeuring'],
+    'De studio neemt nooit echt geld, productieacties, secrets of echte klantdossiers op; alleen de door RTG goedgekeurde momentopname verschijnt in de game.'),
   /* Het spelscherm heette eerst scherm.html en stond daarmee OVER het Tweede
      scherm van de zaak-app heen -- twee takken die hetzelfde pad kozen zonder
      elkaar te kennen. De kassaknop opende ineens een spelavond. Vandaar een

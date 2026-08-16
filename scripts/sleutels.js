@@ -46,6 +46,7 @@ const docker = heeft('--docker');
 const priveBeta = heeft('--prive-beta');
 const zonderAi = heeft('--zonder-ai');
 const zonderBetalen = heeft('--zonder-betalen');
+const zonderSms = heeft('--zonder-sms');
 const nativeTls = heeft('--native-tls');
 const stil = heeft('--stil');
 const schrijven = heeft('--schrijf');
@@ -84,6 +85,7 @@ if (priveBeta) {
 }
 if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
 if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
+if (zonderSms) regels.push(['RTG_HERSTEL_SMS_UIT_BEWUST', '1', 'BEWUST: telefoonherstel weigert fail-closed zolang geen echte SMS-provider is gekoppeld']);
 if (nativeTls) regels.push(
   ['RTG_TLS', '1', 'native TLS/HTTP2 in RTG zelf'],
   ['RTG_ACME', '1', 'automatisch publiek certificaat via Let\'s Encrypt'],

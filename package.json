@@ -32,6 +32,7 @@
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
     "ast-scan": "node scripts/ast-scan.js",
+    "ci-keten": "node scripts/ci-keten.js",
     "a11y": "node scripts/a11y.js",
     "build": "node scripts/build.js",
     "test": "rm -f .routejournaal && RTG_ROUTELOG=.routejournaal node --experimental-sqlite --test test/*.test.js",

@@ -1540,6 +1540,7 @@
       "werkbeleidPauzeStand"
     ],
     "stuur": [
+      "stuurBevestig",
       "stuurPaden",
       "stuurRoep"
     ],
@@ -1800,6 +1801,7 @@
       "standVan",
       "stationsForOrder",
       "stuurLus",
+      "stuurRoep",
       "stuurStyling",
       "supplierState",
       "tafelplanning",

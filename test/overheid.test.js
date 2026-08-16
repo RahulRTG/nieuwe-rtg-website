@@ -14,6 +14,13 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
+async function bevestigAi(voorstel, token) {
+  assert.equal(voorstel.body.did, false, 'de assistent stelt alleen voor');
+  const g = (voorstel.body.goedkeuringen || [])[0];
+  assert.ok(g && g.id, 'het voorstel heeft een servergoedkeuring');
+  return api(base, '/api/supplier/doe/bevestig', { goedkeuringId: g.id, akkoord: true }, token);
+}
+
 let srv, base, lid, rijk, partner;
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overheid-'));
@@ -249,7 +256,8 @@ test('16. De rijksbalie-AI behandelt een toeslag op referentie (ken toe)', async
   // de ambtenaar zegt tegen Rahul: ken die toe
   const d = await api(base, '/api/supplier/ai', { q: 'ken ' + ref + ' toe' }, rijk);
   assert.equal(d.status, 200);
-  assert.equal(d.body.did, true, 'de AI heeft daadwerkelijk gehandeld');
+  const bevestigd = await bevestigAi(d, rijk);
+  assert.equal(bevestigd.body.ok, true, 'de ambtenaar heeft zelf het exacte voorstel bevestigd');
   // controle: de toeslag staat nu op toegekend
   const mijn = await api(base, '/api/overheid/toeslagen/mijn', {}, lid);
   assert.equal(mijn.body.toeslagen.find(x => x.ref === ref).status, 'toegekend');
@@ -262,7 +270,7 @@ test('17. De rijksbalie-AI pakt "de eerste subsidie" zonder referentie', async (
   const s = await api(base, '/api/supplier/overheid/subsidie', { regeling: 'innovatie', project: 'Slimme haven-sensoren', bedrag: 10000 }, partner);
   assert.equal(s.status, 200);
   const d = await api(base, '/api/supplier/ai', { q: 'wijs de eerste subsidie af' }, rijk);
-  assert.equal(d.body.did, true);
+  assert.equal((await bevestigAi(d, rijk)).body.ok, true);
   const lijst = await api(base, '/api/supplier/overheid/subsidies', {}, partner);
   assert.ok(lijst.body.subsidies.some(x => x.status === 'afgewezen'), 'een subsidie is afgewezen door de AI');
 });
@@ -276,7 +284,7 @@ test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
   const glog = await api(base, '/api/supplier/login', { code: 'GEMEENTE', staffId: man.id, pin: '1234' });
   const gem = glog.body.token;
   const d = await api(base, '/api/supplier/ai', { q: 'verleen de eerste vergunning' }, gem);
-  assert.equal(d.body.did, true);
+  assert.equal((await bevestigAi(d, gem)).body.ok, true);
   const mijn = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
   assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
 });

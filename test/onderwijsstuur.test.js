@@ -36,7 +36,10 @@ test.after(() => {
 });
 
 test('1. Rahul schrijft je in op de ladder en leest je paspoort, met jouw inlog', async () => {
-  const inschrijf = await doe('/api/onderwijs/inschrijf', { fase: 'po-g3' });
+  const voorstel = await doe('/api/onderwijs/inschrijf', { fase: 'po-g3' });
+  assert.equal(voorstel.status, 428, 'inschrijven verandert het dossier en vraagt een mens');
+  const inschrijf = await api('/api/member/doe/bevestig',
+    { goedkeuringId: voorstel.body.goedkeuring.id, akkoord: true }, lid);
   assert.equal(inschrijf.status, 200);
   assert.equal(inschrijf.body.ok, true, 'de inschrijving loopt gewoon over de echte route');
   const mijn = await doe('/api/onderwijs/mijn', {});

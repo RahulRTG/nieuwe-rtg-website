@@ -5,17 +5,20 @@
    functie-schakelkast, dezelfde limieten en dezelfde regels reizen mee, en
    de AI kan nooit MEER dan de persoon die hem iets vraagt.
 
-   Twee vaste remmen bovenop de bestaande middleware:
+   Drie vaste remmen bovenop de bestaande middleware:
    - een korte verbodslijst voor infrastructuur (inloggen/accounts, het
      techniekbord, de zaakdoos en het stuur zelf, tegen rondzingen);
-   - de geld-drempel: paden die over geld gaan komen eerst terug als een
-     voorstel dat de gebruiker met een bevestiging moet goedkeuren
-     (dezelfde afspraak als bij Rahul).
+   - een expliciete allowlist per rol: een nieuwe route is nooit automatisch
+     AI-bedienbaar;
+   - mutaties komen eerst terug als een exact servervoorstel. Alleen een apart
+     menselijk bevestigingsendpoint kan dat eenmalige voorstel uitvoeren.
 
    maakStuur(state) volgt het vaste kern-patroon. */
 
 const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
+const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
+const { beleidVoor, toegestanePaden } = require('./stuur/beleid');
 
 // infrastructuur waar het stuur nooit aan zit, wie er ook vraagt
 const VERBODEN = [
@@ -38,12 +41,8 @@ const VERBODEN = [
      uitsprak is niet hetzelfde als dat een mens de aanvraag beoordeelde. Dat
      verschil IS de regel. */
   /^\/api\/aanmelding\//,
-  /\/doe$/                 // het stuur zelf: geen rondzingen
+  /^\/api\/(member|supplier|staff)\/doe(?:\/|$)/ // stuur + menselijke bevestiging: geen rondzingen
 ];
-// paden die over geld gaan: eerst een voorstel, dan pas doen (na bevestiging).
-// De RTG Bank-paden die geld bewegen (storten, overboeken, SEPA, de wallet-brug,
-// bulk/salaris, krediet, vaste betalingen, pasacties) horen daar nadrukkelijk bij.
-const GELD = /(betaal|\/pay(\/|$)|\/tik|giftcard|verreken|refund|terugbetaal|\/bank\/(storten|overboek|sepa|naar-wallet|van-wallet|bulk|salaris|krediet|terugkerend|pas\/))/i;
 
 /* ---- lichte vs. zware taak: bepaalt het stappen-budget ----
    Een pure functie (los getoetst): "zet een timer" of "zoek een lid" is licht
@@ -81,10 +80,19 @@ function parseSubs(tekst) {
   return arr.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim().slice(0, 140)).slice(0, 3);
 }
 
-function maakStuur({ log, anthropic, app }) {
+function maakStuur({ log, anthropic, app, crypto }) {
+  const goedkeuring = require('./stuur/goedkeuring')({ crypto, log });
+
+  // Operationele noodrem, per verzoek gelezen: na een incident kan beheer het
+  // hele AI-stuur met één omgevingsvlag dichtzetten zonder code te wijzigen.
+  // De gewone handmatige schermen blijven dan beschikbaar.
+  function stuurUit() { return process.env.RTG_AI_STUUR_UIT === '1'; }
 
   /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
-  function stuurToets(pad, body, bevestigd) {
+  function stuurToets(pad, body, opties) {
+    const o = opties || {};
+    if (stuurUit())
+      return { status: 503, error: 'Het AI-stuur staat tijdelijk uit via de centrale noodrem.' };
     if (typeof pad !== 'string' || !pad.startsWith('/api/') || pad.includes('..') || /[?#\s]/.test(pad))
       return { status: 400, error: 'Geef een geldig API-pad (begint met /api/, zonder query).' };
     if (VERBODEN.some(re => re.test(pad)))
@@ -92,9 +100,12 @@ function maakStuur({ log, anthropic, app }) {
     let tekst;
     try { tekst = JSON.stringify(body == null ? {} : body); } catch (e) { return { status: 400, error: 'De body moet JSON zijn.' }; }
     if (tekst.length > MAX_BODY) return { status: 413, error: 'De actie-body is te groot.' };
-    if (GELD.test(pad) && bevestigd !== true)
-      return { status: 428, bevestigNodig: true, pad,
-        vraag: 'Dit gaat over geld. Zal ik het doen? Bevestig en ik voer het direct uit.' };
+    const beleid = beleidVoor(pad, o.wereld);
+    if (beleid.niveau === 'verboden')
+      return { status: 403, error: beleid.reden || 'Deze actie is niet beschikbaar voor het AI-stuur.' };
+    if (beleid.niveau === 'voorstel' && o.goedgekeurd !== INTERNE_GOEDKEURING)
+      return { status: 428, bevestigNodig: true, menselijkAkkoord: true, pad,
+        vraag: 'Deze actie verandert gegevens of heeft externe gevolgen. Controleer het voorstel en bevestig het zelf.' };
     return null;
   }
 
@@ -102,7 +113,13 @@ function maakStuur({ log, anthropic, app }) {
      req levert de poort (waar dit proces echt op luistert) en de
      Authorization-header; meer heeft een actie niet nodig. */
   async function stuurRoep(req, pad, body, opties) {
-    const fout = stuurToets(pad, body, opties && opties.bevestigd);
+    const o = opties || {};
+    const fout = stuurToets(pad, body, o);
+    if (fout && fout.bevestigNodig) {
+      const voorstel = goedkeuring.maak(req, pad, body, o.wereld);
+      if (voorstel.error) return voorstel;
+      return Object.assign({}, fout, { goedkeuring: voorstel });
+    }
     if (fout) return fout;
     const poort = req.socket && req.socket.localPort;
     if (!poort) return { status: 500, error: 'Geen interne poort gevonden.' };
@@ -122,10 +139,22 @@ function maakStuur({ log, anthropic, app }) {
     }
   }
 
+  /* Alleen de aparte HTTP-route roept dit aan. Het voorstel levert zelf het
+     pad en de body; de bevestigende client kan die na controle dus niet stil
+     aanpassen. `INTERNE_GOEDKEURING` is een Symbol en kan niet uit JSON of uit
+     een model-tool-call worden nagemaakt. */
+  async function stuurBevestig(req, id, wereld) {
+    const vast = goedkeuring.neem(req, id, wereld);
+    if (vast.error) return vast;
+    return stuurRoep(req, vast.voorstel.pad, vast.voorstel.body,
+      { wereld: vast.voorstel.wereld, goedgekeurd: INTERNE_GOEDKEURING });
+  }
+
   /* ---- de kaart van het stuur: alle POST-paden die dit proces kent ----
      Rechtstreeks uit de router gelezen (dus nooit een verouderde lijst),
      gefilterd op de verbodslijst en desgewenst op een prefix per rol. */
-  function stuurPaden(app, prefixes) {
+  function stuurPaden(app, wereld) {
+    if (stuurUit()) return [];
     const uit = [];
     const stack = (app && app._router && app._router.stack) || [];
     for (const laag of stack) {
@@ -134,10 +163,9 @@ function maakStuur({ log, anthropic, app }) {
       const pad = r.path;
       if (typeof pad !== 'string' || !pad.startsWith('/api/')) continue;
       if (VERBODEN.some(re => re.test(pad))) continue;
-      if (prefixes && prefixes.length && !prefixes.some(p => pad === p || pad.startsWith(p + '/') || pad.startsWith(p))) continue;
       uit.push(pad);
     }
-    return [...new Set(uit)].sort();
+    return toegestanePaden([...new Set(uit)].sort(), wereld);
   }
 
   /* ---- de tool-lus: Rahul aan het stuur ----
@@ -147,7 +175,7 @@ function maakStuur({ log, anthropic, app }) {
      context; zie stuur/lus.js. */
   const stuurLus = require('./stuur/lus')({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs });
 
-  return { stuurToets, stuurRoep, stuurPaden, stuurLus, classificeer, parseSubs };
+  return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs };
 }
 
 module.exports = { maakStuur, classificeer, parseSubs };

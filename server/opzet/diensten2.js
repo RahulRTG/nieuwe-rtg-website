@@ -93,18 +93,7 @@ const { mailAanname } = require('../kern/mailaanname')({ rtmail, mailIn, mailBij
    Hij wordt hier GEBOUWD maar veel eerder INGEHANGEN (zie het doorgeefluik bij
    app.use(jsonGzip())), want een middleware die na een router staat ziet de
    verzoeken van die router nooit. */
-const scanNet = (req, res, next) => {
-  const m = req.method;
-  if (m !== 'POST' && m !== 'PUT' && m !== 'PATCH') return next();
-  const p = req.path || '';
-  if (p.startsWith('/api/techniek') || p.startsWith('/api/verify') || p === '/api/health' || p === '/api/ready') return next();
-  if (!req.body || (typeof req.body !== 'object' && typeof req.body !== 'string')) return next();
-  try {
-    const raak = antivirus.scanBody(req.body, { bron: req.ip, naam: p });
-    if (raak) return res.status(422).json({ error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' });
-  } catch (e) { /* een scanfout mag nooit een verzoek breken */ }
-  next();
-};
+const scanNet = require('../middleware/malwarescan')({ antivirus, log: deps.log });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key. */

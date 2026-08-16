@@ -7,7 +7,7 @@
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { addTicket, aiFindDoor, aiFindRoom, app, db, guestsFor, logActivity, posDay, save, scheduleFor, setRoomHk, sseToSupplier, supplierAuth, unlockDoor, ordersVanZaak, commGast } = kern;
+  const { aiFindDoor, aiFindRoom, app, db, guestsFor, posDay, scheduleFor, supplierAuth, ordersVanZaak, commGast } = kern;
   const { fluisterZeg } = kern.fluister;
   const ambtenaar = require('./ambtenaar')(kern);
 
@@ -16,9 +16,21 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const q = String(req.body.q || '').trim().slice(0, 300);
   if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
   const ql = q.toLowerCase();
-  const A = (reply, did) => res.json({ reply, did: !!did,
+  const A = (reply, did, extra) => res.json(Object.assign({ reply, did: !!did,
     aiBeschikbaar: !!(kern.anthropic && kern.anthropic.messages),
-    modus: 'workflow' });
+    modus: 'workflow' }, extra || {}));
+  const isAmbt = !!((kern.overheid && kern.overheid.magBehandelen && kern.overheid.magBehandelen(s)) ||
+    (kern.gemeente && kern.gemeente.magBehandelen && kern.gemeente.magBehandelen(s)));
+  const wereld = isAmbt ? 'supplier' : (req.actor && req.actor.staffId != null ? 'staff' : 'supplier');
+  const viaStuur = async (pad, body, klaar) => {
+    const uit = await kern.stuurRoep(req, pad, body, { wereld });
+    if (uit && uit.goedkeuring) return A(klaar + ' Controleer het exacte voorstel en bevestig het zelf.', false, {
+      stuur: [{ pad, status: uit.status, goedkeuring: uit.goedkeuring }],
+      goedkeuringen: [uit.goedkeuring], goedkeuringWereld: wereld
+    });
+    const fout = uit && (uit.error || (uit.antwoord && uit.antwoord.error));
+    return A(fout || klaar, !!(uit && uit.status < 400), { stuur: [{ pad, status: uit && uit.status }] });
+  };
 
   // het persoonlijke geheugen (dezelfde motor als Rahul van de leden):
   // onthouden, opvragen en wissen, per persoon binnen deze zaak
@@ -30,6 +42,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
 
   // ---- ambtenaar: de rijks-/gemeentebalie behandelt zaken via Rahul ----
   const amb = ambtenaar(s, q, req);
+  if (amb && amb.actie) return viaStuur(amb.actie.pad, amb.actie.body, amb.reply);
   if (amb) return A(amb.reply, amb.did);
 
   // ---- acties ----
@@ -40,34 +53,27 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   if (room && hkHit && /\b(zet|meld|maak|markeer|set|mark|is)\b/.test(ql)) {
     const status = hkWord[hkHit];
     const note = (q.split(/[:,]/)[1] || '').trim().slice(0, 140);
-    setRoomHk(s, room, status, status === 'defect' ? (note || 'gemeld via AI') : '', req.actor);
-    return A(status === 'defect'
+    return viaStuur('/api/supplier/room/hk', { id: room.id, status,
+      note: status === 'defect' ? (note || 'gemeld via AI') : '' }, status === 'defect'
       ? room.name + ' staat op defect: uit de verkoop en er staat een klus klaar voor onderhoud.'
-      : room.name + ' staat nu op "' + status + '".', true);
+      : room.name + ' wordt op "' + status + '" gezet.');
   }
   // deuren: "open de voordeur" / "vergrendel machiya 1"
   if (/\b(open|vergrendel|lock|sluit)\b/.test(ql) && (s.doors || []).length) {
     const door = aiFindDoor(s, ql);
     if (door) {
-      if (/\b(vergrendel|lock|sluit)\b/.test(ql)) {
-        door.locked = true; door.lastBy = req.actor.name; door.lastAt = new Date().toISOString(); save();
-        logActivity(s.code, req.actor, 'vergrendelde "' + door.name + '" via de AI-assistent');
-        sseToSupplier(s.code, 'sync', { scope: 'doors' });
-        return A(door.name + ' is vergrendeld.', true);
-      }
-      unlockDoor(s, door, req.actor.name);
-      logActivity(s.code, req.actor, 'opende "' + door.name + '" via de AI-assistent');
-      return A(door.name + ' is open en vergrendelt zichzelf over 10 seconden.', true);
+      const locked = /\b(vergrendel|lock|sluit)\b/.test(ql);
+      return viaStuur('/api/supplier/door/zet', { id: door.id, locked }, locked
+        ? door.name + ' wordt vergrendeld.'
+        : door.name + ' wordt geopend en vergrendelt zichzelf daarna weer.');
     }
   }
   // klus melden: "meld klus: lamp kapot" / "nieuwe klus ..."
   const klusMatch = q.match(/(?:meld(?:\s+een)?\s+klus|nieuwe\s+klus|new\s+job)[:\s]+(.{3,})/i);
   if (klusMatch) {
-    const t = addTicket(s.code, req.actor, klusMatch[1].trim(), room ? room.name : null);
-    save();
-    logActivity(s.code, req.actor, 'meldde een klus via de AI-assistent: ' + t.text.slice(0, 50));
-    sseToSupplier(s.code, 'sync', { scope: 'rooms' });
-    return A('Klus genoteerd' + (t.room ? ' voor ' + t.room : '') + ': "' + t.text + '". Onderhoud ziet hem in de klussenlijst.', true);
+    const text = klusMatch[1].trim().slice(0, 160);
+    return viaStuur('/api/supplier/ticket/add', { text, room: room ? room.name : null },
+      'De klus' + (room ? ' voor ' + room.name : '') + ' wordt genoteerd: "' + text + '".');
   }
 
   // ---- vragen ----
@@ -128,11 +134,17 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       'Open klussen: ' + (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length + '.';
     const lus = await kern.stuurLus(req, {
       vraag: q,
-      filter: pd => pd.startsWith('/api/supplier') || pd.startsWith('/api/staff'),
+      wereld,
+      filter: pd => wereld === 'staff' ? pd.startsWith('/api/staff') || pd.startsWith('/api/supplier')
+        : pd.startsWith('/api/supplier') || pd.startsWith('/api/overheid') || pd.startsWith('/api/gemeente'),
       systeem: require('../../../kern/rahul').RAHUL_LEAD +
         'Je bent de AI-assistent van een RTG-partner (ingelogd: ' + ((req.actor && req.actor.name) || 'Beheer') + '). Context: ' + ctx
     });
-    if (lus && lus.tekst) return A(lus.tekst, lus.acties.some(a => a.status < 400));
+    if (lus && lus.tekst) return A(lus.tekst, lus.acties.some(a => a.status < 400), {
+      stuur: lus.acties,
+      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
+      goedkeuringWereld: wereld
+    });
   }
   return A('Dat begrijp ik nog niet helemaal. U kunt mij bijvoorbeeld vragen: "dagomzet", "welke kamers zijn vuil", "zet Riverside suite op schoon", "meld Garden kamer defect: douche lekt", "open de voordeur", "meld klus: lamp vervangen", "wie is er onderweg", "onbeantwoorde berichten", "welke minibars nog tellen" of "open bestellingen".');
 });

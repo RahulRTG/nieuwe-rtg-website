@@ -8,11 +8,12 @@
    goed begrepen opdracht. Daarom staat de regel hier twee keer:
 
    1. als TWIJFELREGELS in de system prompt en in de doe-lus;
-   2. als POORT in de tool-lus (kern/stuur/lus.js): de tool `doe` heeft een
+   2. als gedragsrem in de tool-lus (kern/stuur/lus.js): de tool `doe` heeft een
       verplicht veld `zeker`. Zet het model dat niet op true, dan wordt de
-      actie NIET uitgevoerd en krijgt het model een antwoord terug dat het
+      actie niet voorgesteld en krijgt het model een antwoord terug dat het
       eerst moet vragen. Zo is "ik weet het zeker" een expliciete daad in
-      plaats van een aanname.
+   plaats van een aanname. Dit is geen beveiligingsbesluit: de server-allowlist
+   en de aparte menselijke bevestiging blijven de echte autorisatiegrens.
 
    Het verschil in de praktijk: "boek een taxi" zonder tijd, zonder bestemming
    en zonder te weten voor wie, is geen opdracht maar een begin van een

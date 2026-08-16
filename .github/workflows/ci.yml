@@ -5,6 +5,10 @@ on:
     branches: [ main, master, 'claude/**' ]
   pull_request:
 
+# Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
+permissions:
+  contents: read
+
 # Een nieuwe push vervangt de vorige run van dezelfde PR of hoofdlijn. Zonder
 # deze grens bleven oude revisies urenlang drie runners bezetten, terwijl hun
 # uitslag door de nieuwere commit al niet meer merge-bepalend kon zijn.
@@ -40,8 +44,8 @@ jobs:
           --health-cmd "redis-cli ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
           cache: 'npm'
@@ -50,6 +54,8 @@ jobs:
         run: npm run check
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
+      - name: CI-keten gebruikt alleen exact vastgezette Actions
+        run: npm run ci-keten
       # Het wettenregister mag niet stil uit elkaar lopen met de code: elke wet
       # wijst naar een letterlijke zin in zijn doctrine-document en naar de
       # bestanden die hem tegenhouden. Deze stap is STATISCH en kost seconden --
@@ -128,8 +134,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
           cache: 'npm'
@@ -142,13 +148,24 @@ jobs:
       - name: Secret-scan - faal op gelekte sleutels/tokens in de broncode
         run: npm run secrets
 
+  dependency-review:
+    name: Nieuwe dependencies beoordelen
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Blokkeer nieuwe high/critical kwetsbaarheden
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: high
+
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
           cache: 'npm'

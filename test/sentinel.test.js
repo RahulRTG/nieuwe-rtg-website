@@ -55,8 +55,24 @@ async function wachtOpBeheer(poort, token) {
 test('Sentinel bewaakt de echte procesgrens, standen en forwardingheaders',
   { timeout: 30000 }, async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sentinel-e2e-'));
+    const releaseRoot = path.join(tmp, 'release');
+    for (const map of ['server', 'public/dist', 'scripts', 'motor/src', 'motor/target/release'])
+      fs.mkdirSync(path.join(releaseRoot, map), { recursive: true });
+    const releaseBestanden = {
+      'package.json': '{"name":"rtg-sentinel-proef","version":"1"}',
+      'package-lock.json': '{}', 'motor/Cargo.toml': '[package]', 'motor/Cargo.lock': '',
+      Dockerfile: 'FROM scratch', 'docker-compose.yml': 'services: {}', '.env.example': '',
+      'SLO.json': '{}', 'RUST-MIGRATIES.json': '{"versie":1}',
+      'server/app.js': 'veilig', 'public/dist/app.js': 'gebouwd',
+      'scripts/start.js': 'start', 'motor/src/lib.rs': 'pub fn proef() {}'
+    };
+    for (const [rel, inhoud] of Object.entries(releaseBestanden))
+      fs.writeFileSync(path.join(releaseRoot, rel), inhoud);
+    fs.copyFileSync(path.join(ROOT, 'motor/target/release/rtg-motor'),
+      path.join(releaseRoot, 'motor/target/release/rtg-motor'));
+    fs.copyFileSync(BIN, path.join(releaseRoot, 'motor/target/release/rtg-sentinel'));
     const bewijs = path.join(tmp, 'release.json'); const data = path.join(tmp, 'data');
-    const tekst = JSON.stringify(maakManifest(ROOT)); fs.writeFileSync(bewijs, tekst);
+    const tekst = JSON.stringify(maakManifest(releaseRoot)); fs.writeFileSync(bewijs, tekst);
     const pin = crypto.createHash('sha256').update(tekst).digest('hex');
     const token = crypto.randomBytes(32).toString('hex'); let gezien;
     const upstream = http.createServer((req, res) => {
@@ -68,7 +84,7 @@ test('Sentinel bewaakt de echte procesgrens, standen en forwardingheaders',
     });
     const upstreamPoort = await luister(upstream);
     const publiek = await vrijePoort(); const controle = await vrijePoort();
-    const env = { ...process.env, RTG_SENTINEL_TOKEN: token, RTG_SENTINEL_ROOT: ROOT,
+    const env = { ...process.env, RTG_SENTINEL_TOKEN: token, RTG_SENTINEL_ROOT: releaseRoot,
       RTG_SENTINEL_BEWIJS: bewijs, RTG_SENTINEL_DATA: data,
       RTG_RELEASE_BEWIJS_SHA256: pin, RTG_SENTINEL_ADDR: '127.0.0.1:' + publiek,
       RTG_SENTINEL_CONTROL_ADDR: '127.0.0.1:' + controle,

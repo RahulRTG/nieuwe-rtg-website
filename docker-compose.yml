@@ -36,11 +36,6 @@ services:
       context: .
     command: ["node", "scripts/docker/start.js", "app"]
     stop_grace_period: 35s
-    ports:
-      # Bewust niet 0.0.0.0: zonder TLS-rand hoort Node niet direct op internet.
-      # De drie waarden zijn los instelbaar omdat de live-overlay native TLS op
-      # containerpoort 443 draait, terwijl de gewone self-host op 3000 blijft.
-      - "${RTG_PUBLISH_HOST:-127.0.0.1}:${RTG_PUBLISH_PORT:-3000}:${RTG_CONTAINER_PORT:-3000}"
     environment:
       NODE_ENV: production
       PORT: 3000

@@ -13,7 +13,9 @@ const lees = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 test('live-compose ontsluit native HTTPS en schermt herstel af', () => {
   const basis = lees('docker-compose.yml');
   const live = lees('docker-compose.live.yml');
-  assert.match(basis, /RTG_CONTAINER_PORT:-3000/);
+  const app = basis.match(/^  app:\n[\s\S]*?(?=^  sentinel:\n)/m)[0];
+  assert.doesNotMatch(app, /^    ports:/m, 'de basis publiceert Node niet buiten Sentinel om');
+  assert.match(live, /RTG_PUBLISH_PORT:-443.*RTG_CONTAINER_PORT:-443/);
   assert.match(live, /:80:80\/tcp/);
   assert.match(live, /port:443/);
   assert.match(live, /NET_BIND_SERVICE/);

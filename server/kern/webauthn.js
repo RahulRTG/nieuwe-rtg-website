@@ -16,11 +16,49 @@ const { generateRegistrationOptions, verifyRegistrationResponse,
 const crypto = require('crypto');
 
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
+const CHALLENGE_MAX = 5000;
 const SLEUTELS_MAX = 8;                 // passkeys per account
 const RP_NAAM = 'Rahul Travel Group';
 
+/* Eenmalige ceremonies zijn expres vluchtig, maar ook vluchtig geheugen moet
+   begrensd zijn. De oude Map ruimde pas boven 5000 op en verwijderde dan alleen
+   verlopen regels. Vijfduizend verse aanvragen bleven dus onbeperkt doorgroeien
+   en iedere volgende aanvraag liep de hele Map langs: een goedkope geheugen- en
+   CPU-aanval. Deze opslag houdt afloopvolgorde, ruimt O(1) aan de voorkant en
+   werpt bij drukte de oudste ongebruikte ceremonie af. */
+function maakCeremonieOpslag({ max = CHALLENGE_MAX, ttlMs = CHALLENGE_TTL_MS, nu = () => Date.now() } = {}) {
+  const waarden = new Map();
+  const grens = Math.min(CHALLENGE_MAX, Math.max(1, Math.floor(Number(max) || CHALLENGE_MAX)));
+  const eersteWeg = () => {
+    const eerste = waarden.keys().next();
+    if (!eerste.done) waarden.delete(eerste.value);
+  };
+  function ruimVerlopen(tijd) {
+    for (const [sleutel, waarde] of waarden) {
+      if (waarde.tot > tijd) break;
+      waarden.delete(sleutel);
+    }
+  }
+  function zet(sleutel, challenge, extra) {
+    const tijd = nu();
+    ruimVerlopen(tijd);
+    // opnieuw uitgeven voor dezelfde sleutel hoort achteraan in de aflooprij
+    waarden.delete(sleutel);
+    while (waarden.size >= grens) eersteWeg();
+    waarden.set(sleutel, { ...(extra || {}), challenge, tot: tijd + ttlMs });
+  }
+  function pak(sleutel) {
+    const tijd = nu();
+    ruimVerlopen(tijd);
+    const waarde = waarden.get(sleutel);
+    waarden.delete(sleutel);             // ook een foute/late poging is eenmalig
+    return waarde && waarde.tot > tijd ? waarde : null;
+  }
+  return { zet, pak, aantal: () => waarden.size };
+}
+
 function maakWebauthn({ db, save, accounts, schoon }) {
-  const challenges = new Map();         // sleutel -> { challenge, tot }
+  const ceremonies = maakCeremonieOpslag();
   let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
@@ -38,12 +76,10 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return credentialIndex;
   }
   function zetChallenge(sleutel, challenge, extra) {
-    challenges.set(sleutel, { challenge, tot: Date.now() + CHALLENGE_TTL_MS, ...(extra || {}) });
-    if (challenges.size > 5000) for (const [k, v] of challenges) if (v.tot < Date.now()) challenges.delete(k);
+    ceremonies.zet(sleutel, challenge, extra);
   }
   function pakChallenge(sleutel) {
-    const c = challenges.get(sleutel); challenges.delete(sleutel);
-    return c && c.tot > Date.now() ? c : null;
+    return ceremonies.pak(sleutel);
   }
 
   /* ---- registreren: een nieuwe passkey aan het eigen account hangen ---- */
@@ -70,7 +106,7 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     let uit;
     try {
       uit = await verifyRegistrationResponse({ response: antwoord, expectedChallenge: challenge,
-        expectedOrigin: origin, expectedRPID: hostnaam });
+        expectedOrigin: origin, expectedRPID: hostnaam, requireUserVerification: true });
     } catch (e) { return { status: 400, error: 'Geen geldige passkey: ' + e.message }; }
     if (!uit.verified) return { status: 400, error: 'De passkey kon niet worden geverifieerd.' };
     const c = uit.registrationInfo.credential;
@@ -129,7 +165,8 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     try {
       uit = await verifyAuthenticationResponse({ response: antwoord, expectedChallenge: challenge,
         expectedOrigin: origin, expectedRPID: hostnaam,
-        credential: { id: cred.id, publicKey: vanB64(cred.publicKey), counter: cred.counter || 0, transports: cred.transports } });
+        credential: { id: cred.id, publicKey: vanB64(cred.publicKey), counter: cred.counter || 0, transports: cred.transports },
+        requireUserVerification: true });
     } catch (e) { return { status: 401, error: 'De passkey kon niet worden geverifieerd.' }; }
     if (!uit.verified) return { status: 401, error: 'De passkey kon niet worden geverifieerd.' };
     cred.counter = uit.authenticationInfo.newCounter;
@@ -157,4 +194,4 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     webauthnWeg: weg };
 }
 
-module.exports = { maakWebauthn };
+module.exports = { maakWebauthn, maakCeremonieOpslag };

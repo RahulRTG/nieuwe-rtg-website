@@ -62,6 +62,13 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   const origin = url.origin;                 // http://127.0.0.1:<poort>
   const auth = maakAuthenticator(rpID);
 
+  const uvOpties = await api('/api/webauthn/registreer/opties', {}, lid);
+  const zonderUv = await api('/api/webauthn/registreer',
+    { antwoord: auth.registratieAntwoord(uvOpties.body.opties.challenge, origin, { zonderUv: true }),
+      naam: 'Onbeveiligde sleutel' }, lid);
+  assert.equal(zonderUv.status, 400,
+    'alleen aanwezigheid is niet genoeg: de server eist ook lokale biometrie/pincode');
+
   const opties = await api('/api/webauthn/registreer/opties', {}, lid);
   assert.equal(opties.status, 200);
   assert.equal(opties.body.opties.authenticatorSelection.residentKey, 'required',
@@ -99,6 +106,12 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   assert.equal(deurB.status, 200);
   assert.deepEqual(deurA.body.opties.allowCredentials || [], [], 'RTG stuurt vooraf geen account-hints');
   assert.notEqual(deurA.body.ceremonie, deurB.body.ceremonie, 'elke poging heeft een eigen ceremonie');
+
+  const deurZonderUv = await api('/api/webauthn/opties', {});
+  const loginZonderUv = await api('/api/webauthn/login', { ceremonie: deurZonderUv.body.ceremonie,
+    antwoord: auth.loginAntwoord(deurZonderUv.body.opties.challenge, origin, 1, { zonderUv: true }), pasApp: 'rtg' });
+  assert.equal(loginZonderUv.status, 401,
+    'ook bij inloggen controleert de server zelf de UV-vlag, niet alleen het browserverzoek');
 
   const directA = await api('/api/webauthn/login', { ceremonie: deurA.body.ceremonie,
     antwoord: auth.loginAntwoord(deurA.body.opties.challenge, origin, 1), pasApp: 'rtg' });

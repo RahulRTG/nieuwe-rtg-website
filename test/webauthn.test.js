@@ -20,8 +20,8 @@ const { startServer, stop } = require('./helper');
 let srv, base, lid, lidEmail;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-webauthn-'));
 
-function api(pad, body, token) {
-  const h = { 'Content-Type': 'application/json' };
+function api(pad, body, token, extraHeaders) {
+  const h = { 'Content-Type': 'application/json', ...(extraHeaders || {}) };
   if (token) h.Authorization = 'Bearer ' + token;
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -93,4 +93,34 @@ test('5. beheer: de lijst is leeg tot de ceremonie er een toevoegt; weghalen bes
   assert.deepEqual(lijst.body.sleutels, []);
   const weg = await api('/api/webauthn/weg', { id: 'bestaat-niet' }, lid);
   assert.equal(weg.status, 404);
+});
+
+test('6. roterende nep-sleutels omzeilen de bronrem niet', async () => {
+  const kop = { 'X-Forwarded-For': '198.51.100.77' };
+  for (let i = 0; i < 10; i++) {
+    const opties = await api('/api/webauthn/opties', {}, null, kop);
+    assert.equal(opties.status, 200);
+    const fout = await api('/api/webauthn/login', { ceremonie: opties.body.ceremonie,
+      antwoord: { id: 'roterend-nep-' + i } }, null, kop);
+    assert.notEqual(fout.status, 200);
+  }
+  const dicht = await api('/api/webauthn/opties', {}, null, kop);
+  assert.equal(dicht.status, 429,
+    'na tien ongeldige assertions krijgt dezelfde bron ook geen verse ceremonies meer');
+});
+
+test('7. APP_URL bepaalt de WebAuthn-origin; een verzoekkop kan hem niet verleggen', async t => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wa-origin-'));
+  const vast = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: map,
+    APP_URL: 'https://login.rtg.test' } });
+  t.after(() => {
+    stop(vast.child);
+    try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
+  });
+  const r = await fetch(vast.base + '/api/webauthn/opties', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://aanvaller.example' }, body: '{}' });
+  const body = await r.json();
+  assert.equal(r.status, 200);
+  assert.equal(body.opties.rpId, 'login.rtg.test',
+    'de vaste beheerconfiguratie wint van de Origin-header van de aanvrager');
 });

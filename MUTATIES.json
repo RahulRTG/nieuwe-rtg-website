@@ -2486,6 +2486,13 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "magnaat-partnerstudio-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "magnaat-partnerstudio.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

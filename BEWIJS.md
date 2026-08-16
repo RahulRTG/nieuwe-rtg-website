@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1004 bestanden en 6644 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1005 bestanden en 6648 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1004 |
-| losse beweringen (`test(...)`) | 6644 |
+| toetsbestanden | 1005 |
+| losse beweringen (`test(...)`) | 6648 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 44 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 804 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 805 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 25 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-879 bestanden, 6419 beweringen.
+880 bestanden, 6423 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -399,6 +399,7 @@ toets omvalt.
 | `magnaat-hospitality.test.js` | 10 | -- | Magnaat Hospitality Universe: speelbaarheid, foutpaden, replay en de harde grens tussen simulatieresultaat en een levende onderneming. |
 | `magnaat-leerkring.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-motorklant.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `magnaat-partnerstudio-routes.test.js` | 4 | gezakt op `liegpoort /api/` | De HTTP-grens van de Magnaat Partnerstudio. De domeintoetsen bewijzen de bedrijfsregels en de browsertoets bewijst de gebruikersweg, maar zonder deze toets bleven veertien echte routes buiten het routejournaal van de... |
 | `magnaat-partnerstudio.test.js` | 8 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-rust-integratie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-teamkamer-productie.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -14,6 +14,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     cargo build --release --locked && \
     cp /src/motor/target/release/rtg-motor /tmp/rtg-motor
 
+# De back-upsidecar gebruikt pg_dump uit het officiële PostgreSQL-image en
+# alleen de OpenSSL-CLI extra. Daarmee kan hij naar een publieke sleutel
+# versleutelen zonder ooit de offline privésleutel te bezitten.
+FROM postgres:16-alpine AS backup-runtime
+RUN apk add --no-cache openssl
+
 # RTG / RTFoundation productie-image.
 # Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
 FROM node:22-slim

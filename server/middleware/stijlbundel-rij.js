@@ -48,7 +48,46 @@ const LINK = /<link\b[^>]*>/gi;
    het ontleden, en zou na het samenvoegen stijl zien die er op dat moment nog
    niet hoorde te zijn. Een uitgesteld script draait pas na het ontleden en kan
    dat verschil niet merken. */
-const TUSSEN_OK = /^(?:\s|<!--[\s\S]*?-->|<script\b[^>]*\b(?:defer|async)\b[^>]*>\s*<\/script>)*$/i;
+const isWit = (teken) => !!teken && /\s/u.test(teken);
+const tagGrens = (teken) => !teken || teken === '>' || teken === '/' || isWit(teken);
+
+function tagEinde(tekst, vanaf) {
+  let quote = '';
+  for (let i = vanaf; i < tekst.length; i++) {
+    const c = tekst[i];
+    if (quote) { if (c === quote) quote = ''; continue; }
+    if (c === '"' || c === "'") { quote = c; continue; }
+    if (c === '>') return i;
+  }
+  return -1;
+}
+
+/* Zelfde begrenzing als de scriptbundel: lineair scannen in plaats van een
+   geneste regexp op aanvaller-gestuurde HTML. Alleen witruimte, commentaar en
+   een leeg defer/async-script mogen de stijlrij verbinden. */
+function tussenOk(tekst) {
+  const klein = tekst.toLowerCase();
+  let i = 0;
+  while (i < tekst.length) {
+    if (isWit(tekst[i])) { i++; continue; }
+    if (klein.startsWith('<!--', i)) {
+      const eindCommentaar = klein.indexOf('-->', i + 4);
+      if (eindCommentaar < 0) return false;
+      i = eindCommentaar + 3;
+      continue;
+    }
+    if (!klein.startsWith('<script', i) || !tagGrens(klein[i + 7])) return false;
+    const openEind = tagEinde(tekst, i + 7);
+    if (openEind < 0) return false;
+    const openTag = tekst.slice(i, openEind + 1);
+    if (!/\b(?:defer|async)\b/i.test(openTag)) return false;
+    const sluit = klein.indexOf('</script>', openEind + 1);
+    if (sluit < 0) return false;
+    for (let p = openEind + 1; p < sluit; p++) if (!isWit(tekst[p])) return false;
+    i = sluit + 9;
+  }
+  return true;
+}
 function herschrijfHtml(html) {
   /* Eerst alle bruikbare stijlbladen opzoeken en in rijen groeperen. Pas
      daarna herschrijven -- in een keer, van voor naar achter, zodat de
@@ -73,7 +112,7 @@ function herschrijfHtml(html) {
   let huidig = null;
   for (const l of links) {
     if (!l.bruikbaar) { huidig = null; continue; }
-    if (huidig && TUSSEN_OK.test(html.slice(huidig[huidig.length - 1].eind, l.start))) huidig.push(l);
+    if (huidig && tussenOk(html.slice(huidig[huidig.length - 1].eind, l.start))) huidig.push(l);
     else { huidig = [l]; rijen.push(huidig); }
   }
 
@@ -99,4 +138,4 @@ function herschrijfHtml(html) {
 }
 
 
-module.exports = { herschrijfHtml, codeer, decodeer, GOED_PAD, PAD };
+module.exports = { herschrijfHtml, codeer, decodeer, GOED_PAD, PAD, tussenOk };

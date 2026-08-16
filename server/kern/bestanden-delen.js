@@ -56,7 +56,7 @@ function maakBestandenDelen(basis) {
     // het quotum is van de eigenaar, ook als een gedeelde de versie plaatst
     if (gebruik(v.eigenaar) + buf.length > QUOTUM) return { status: 413, error: 'De kluis van de eigenaar is vol.' };
     // een nieuwe versie is een vers bestand: dezelfde poort als een upload
-    const besmet = scanOk ? scanOk(key, dataUrl) : null;
+    const besmet = scanOk ? await scanOk(key, dataUrl) : null;
     if (besmet) return besmet;
     it.versies = it.versies || [];
     it.versies.unshift({ ref: it.ref, bytes: it.bytes, op: it.gewijzigd || it.op, door: it.door || null });

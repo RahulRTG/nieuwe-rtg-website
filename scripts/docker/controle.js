@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { leesEnv, leesGeheim } = require('./start');
 const config = require('../../server/config');
 
@@ -82,6 +83,21 @@ if (publiek) {
       else fs.accessSync(backupDir, fs.constants.R_OK | fs.constants.W_OK);
     } catch (e) { fouten.push('Externe back-upmap is niet bestaand en lees/schrijfbaar: ' + backupDir + '.'); }
   }
+  const offsiteDir = String(live.RTG_BACKUP_OFFSITE_HOST_DIR || '');
+  if (!path.isAbsolute(offsiteDir)) fouten.push('RTG_BACKUP_OFFSITE_HOST_DIR moet een absolute off-site WORM/Object-Lock-map zijn.');
+  else if (path.resolve(offsiteDir) === path.resolve(backupDir || '/')) fouten.push('Lokale en off-site back-upmappen mogen niet dezelfde map zijn.');
+  else {
+    try {
+      const st = fs.statSync(offsiteDir);
+      if (!st.isDirectory()) fouten.push(offsiteDir + ' is geen map.');
+      else fs.accessSync(offsiteDir, fs.constants.R_OK | fs.constants.W_OK);
+    } catch (e) { fouten.push('Off-site WORM-back-upmap is niet bestaand en lees/schrijfbaar: ' + offsiteDir + '.'); }
+  }
+  if (String(live.RTG_BACKUP_OFFSITE_IMMUTABLE || '') !== '1')
+    fouten.push('Zet RTG_BACKUP_OFFSITE_IMMUTABLE=1 nadat WORM/Object Lock/retentie buiten RTG werkelijk is afgedwongen.');
+  const certPad = path.resolve(String(live.RTG_BACKUP_PUBLIC_CERT_FILE || ''));
+  try { new crypto.X509Certificate(fs.readFileSync(certPad)); }
+  catch (e) { fouten.push('Publiek back-upcertificaat ontbreekt of is ongeldig: ' + certPad + '.'); }
   if (!env.ERR_WEBHOOK_URL)
     waarschuwingen.push('Geen ERR_WEBHOOK_URL: de externe GitHub-sonde merkt totale uitval, maar interne fouten melden dan alleen op het techniekbord.');
   if (!env.TURN_URL || !env.TURN_SECRET)
@@ -96,5 +112,5 @@ if (fouten.length) {
   process.exit(1);
 }
 console.log('\n✓ Geheimen en productieconfiguratie zijn startklaar.' +
-  (publiek ? ' Native HTTPS, betalingen-uit en externe back-up zijn afgedwongen.' :
+  (publiek ? ' Native HTTPS, betalingen-uit, versleutelde en off-site back-ups zijn afgedwongen.' :
     (env.RTG_PRIVATE_BETA === '1' ? ' De app blijft een private, lokale beta.' : ' Draai voor publieke livegang ook npm run golive.')));

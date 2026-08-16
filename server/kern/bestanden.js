@@ -119,7 +119,7 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     if (!buf.length) return { status: 400, error: 'Het bestand is leeg.' };
     if (buf.length > MAX_BESTAND) return { status: 413, error: 'Een bestand mag hooguit 15 MB zijn.' };
     if (gebruik(key) + buf.length > QUOTUM) return { status: 413, error: 'Uw kluis van 200 MB is vol; ruim eerst op (de prullenbak telt mee).' };
-    const besmet = scanOk(key, dataUrl);
+    const besmet = await scanOk(key, dataUrl);
     if (besmet) return besmet;
     naam = schoonNaam(naam);
     if (!naam) return { status: 400, error: 'Geef het bestand een naam.' };

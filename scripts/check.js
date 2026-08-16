@@ -12,6 +12,7 @@ const ROOT = path.join(__dirname, '..');
 let fouten = 0;
 const fout = m => { console.error('  ✗ ' + m); fouten++; };
 const ok = m => console.log('  ✓ ' + m);
+const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /* Commentaar eruit halen (regel- en blokcommentaar), zodat een uitleg als
    "// require('x') -> 'x'" niet als echte require wordt gelezen. Strings blijven
@@ -1074,7 +1075,7 @@ console.log('\n20) een plaatselijk palet beantwoordt de globale schilderregels')
     for (const el of globaal) {
       const sleutel = v.sel + ' ' + el;
       if (MAG_GLOBAAL.has(sleutel)) continue;
-      const patroon = new RegExp(v.sel.replace('#', '#') + '\\s+' + el + '\\b');
+      const patroon = new RegExp(regexVeilig(v.sel) + '\\s+' + el + '\\b');
       if (patroon.test(alleCss)) continue;
       open++;
       fout('het vlak ' + v.sel + ' (' + v.bestand + ') verft zichzelf om, maar <' + el + '> wordt globaal' +

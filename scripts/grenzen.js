@@ -50,6 +50,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const ROUTES = path.join(WORTEL, 'server', 'routes');
+const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /* De acht echte domeinen uit opzet/routes.js. Alles daarbuiten is een losse
    routemodule; die krijgt zijn bestandsnaam als domein, want dat is precies wat
@@ -145,7 +146,7 @@ function pakVsGebruik(bron) {
     rest = rest.split(m[0]).join(' ');   // de kop zelf is geen gebruik
   }
   const ongebruikt = gepakt.filter(naam => {
-    const re = new RegExp('\\b' + naam.replace(/\$/g, '\\$') + '\\b');
+    const re = new RegExp('\\b' + regexVeilig(naam) + '\\b');
     return !re.test(rest);
   });
   return { gepakt, ongebruikt };

@@ -71,6 +71,11 @@ test('4. een GEWOON script ertussen breekt de rij', () => {
   assert.equal(bundelHrefs(herschrijfHtml(html)).length, 0, 'geen bundel over een gewoon script heen');
 });
 
+test('4b. lange onafgesloten HTML tussen bladen is een snelle, harde grens', () => {
+  const html = link('/a.css') + '<!--' + 'x'.repeat(200000) + link('/b.css');
+  assert.equal(herschrijfHtml(html), html, 'geen regexp-terugloop en geen bundel over kapotte HTML');
+});
+
 test('5. een link met een eigen gedrag doet niet mee', () => {
   for (const extra of ['media="print"', 'onload="x()"', 'fetchpriority="high"', 'disabled']) {
     const bijzonder = '<link href="/b.css" rel="stylesheet" ' + extra + '>';

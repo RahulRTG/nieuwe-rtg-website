@@ -88,4 +88,8 @@ test('Compose sluit de data-laag af en geeft geheimen niet als environment door'
   assert.doesNotMatch(compose, /POSTGRES_PASSWORD:\s*\$\{/);
   assert.match(compose, /service_healthy/);
   assert.match(compose, /scripts\/docker\/backup\.sh/);
+  assert.match(compose, /clamav\/clamav:1\.5\.3-debian13-slim/);
+  assert.match(compose, /RTG_CLAMD_HOST: clamav/);
+  assert.doesNotMatch(compose, /^\s+ports:\s*\n(?:.|\n){0,120}3310/m,
+    'de ClamAV-poort mag nooit op de Docker-host worden gepubliceerd');
 });

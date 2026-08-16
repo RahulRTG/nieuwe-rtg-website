@@ -20,6 +20,7 @@
     "live:status": "sh scripts/docker/live.sh status",
     "live:probe": "sh scripts/docker/live.sh probe",
     "live:backup": "sh scripts/docker/live.sh backup",
+    "backup:sleutel": "sh scripts/docker/backup-sleutel.sh",
     "live:rollback": "sh scripts/docker/live.sh rollback",
     "live:restore": "sh scripts/docker/live.sh restore",
     "ai:lokaal:check": "node scripts/lokale-ai-check.js",

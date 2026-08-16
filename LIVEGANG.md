@@ -16,8 +16,12 @@ bezorging van echte e-mail en een afzonderlijke plek voor back-ups.
   Let's Encrypt, vernieuwing en HTTP-naar-HTTPS. Geen Caddy/certbot nodig.
 - PostgreSQL + Redis + versleutelde identiteitskluis; geheimen staan niet in
   `docker inspect` en niet op het datavolume.
-- Dagelijkse gevalideerde back-up buiten de Docker-schijf, met een bewust
-  dubbel bevestigd herstelpad.
+- Elke upload gaat eerst naar een niet-geserveerde quarantaine en langs de
+  ingebouwde scanner én een losse ClamAV-container. Valt ClamAV uit, dan gaan
+  uploads dicht terwijl lezen beschikbaar blijft.
+- Dagelijkse gevalideerde back-up buiten de Docker-schijf, AES-256-GCM
+  versleuteld naar een publieke sleutel, plus een tweede write-once-set op een
+  off-site WORM/Object-Lock-doel en een dubbel bevestigd herstelpad.
 
 ## Eenmalig op de Linux-productieserver
 
@@ -26,9 +30,14 @@ wijst, en publiek bereikbare TCP-poorten 80/443 plus UDP 3478.
 
 ```bash
 cp deploy/live.env.example deploy/live.env
-# Pas RTG_BACKUP_HOST_DIR aan naar een bestaande map op een tweede schijf/mount.
-# De app/back-upcontainers draaien als uid 1000; geef die gebruiker toegang:
+# Pas beide back-upmappen aan: één tweede schijf en één echt off-site doel met
+# WORM/Object Lock/retentie. De containers draaien als uid 1000:
 sudo install -d -o 1000 -g 1000 -m 700 /mnt/tweede-schijf/rtg-backups
+sudo install -d -o 1000 -g 1000 -m 700 /mnt/offsite-worm/rtg
+
+# Schrijf de privésleutel rechtstreeks naar een los/offline medium. Alleen het
+# publieke certificaat blijft op de server. Bewaar ook een tweede offline kopie.
+npm run backup:sleutel -- /media/offline-kluis/rtg-backup-private.pem
 
 npm run live:init -- \
   --eigenaar=eigenaar@jouwdomein.nl \
@@ -44,10 +53,14 @@ server. Koppel `OFFICE_TOTP_SECRET` uit `.env.productie` aan de authenticator
 van de eigenaar en verwijder `RTG_OWNER_BOOTSTRAP` zodra het eigenaarsaccount
 is geclaimd.
 
+ClamAV haalt zijn handtekeningen dagelijks op via een apart update-netwerk en
+publiceert poort 3310 niet op de host. Reserveer hiervoor circa 4 GB RAM; bij te
+weinig geheugen blijft de veilige toestand gelden en worden uploads geweigerd.
+
 Controleer en rol uit:
 
 ```bash
-npm run live:check       # geheimen, native TLS, 2FA, AI/betalen uit, back-upmount
+npm run live:check       # ook publieke back-upsleutel + lokale/off-site mounts
 npm run live:deploy      # bouwt, start, wacht op ready; rollback bij mislukking
 npm run live:owner       # claimt eigenaar lokaal; geheimen worden niet getoond
 npm run live:golive      # echte containerdatabase + verplicht papierwerk
@@ -92,8 +105,13 @@ stopt alle schrijvers, controleert SHA-256 en dumpstructuur, herbouwt PostgreSQL
 zet de bijbehorende bestandsback-up terug en start daarna opnieuw:
 
 ```bash
-npm run live:restore -- 20260815T030000Z
+RTG_BACKUP_PRIVATE_KEY_FILE=/media/offline-kluis/rtg-backup-private.pem \
+  npm run live:restore -- 20260815T030000Z
 ```
+
+De privésleutel wordt alleen in de eenmalige herstelcontainer gemount. Koppel
+het offline medium na de herstelcontrole weer los. Zonder die sleutel kan ook
+een aanvaller met alle back-upbestanden de inhoud niet ontsleutelen.
 
 Daarna zijn twee handmatige controles verplicht: een bestaand lid kan inloggen
 en diens echte naam is zichtbaar. Alleen dat tweede bewijst dat de apart

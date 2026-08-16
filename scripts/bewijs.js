@@ -68,7 +68,7 @@ function kopVan(bron) {
   const stukken = tekst.split(/(?<=[.!?])\s+/);
   let uit = stukken.slice(0, 2).join(' ');
   if (uit.length > 220) uit = uit.slice(0, 217).replace(/\s+\S*$/, '') + '...';
-  return uit.replace(/\|/g, '\\|');
+  return uit.split('|').join('\\|');
 }
 
 /* De gemeten uitslag van scripts/mutatie.js. Ontbreekt het bestand, dan zegt de

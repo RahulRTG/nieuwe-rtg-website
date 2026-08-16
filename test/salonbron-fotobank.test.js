@@ -59,7 +59,7 @@ test('3. de studio uploadt een eigen foto na virusscan en bewaart de /media-url'
 
 test('4. een besmet bestand wordt door de Ontsmetter geweigerd', async () => {
   const up = await api(base, '/api/office/atelierweb/foto', { dataUrl: BOOBY }, office);
-  assert.equal(up.status, 400, 'geweigerd');
+  assert.equal(up.status, 422, 'geweigerd als inhoudelijk onveilige upload');
 });
 
 test('5. een geüploade foto laat zich weer weghalen', async () => {

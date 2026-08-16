@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 985 bestanden en 6556 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 986 bestanden en 6564 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 985 |
-| losse beweringen (`test(...)`) | 6556 |
+| toetsbestanden | 986 |
+| losse beweringen (`test(...)`) | 6564 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 31 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 782 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 31 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
-| niets van beide | 126 |
+| niets van beide | 127 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-861 bestanden, 6332 beweringen.
+862 bestanden, 6340 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -375,7 +375,7 @@ toets omvalt.
 | `life-schakelbaar.test.js` | 5 | gezakt op `liegpoort /api/` | STAAN DE RTG LIFE-DEUREN ECHT IN DE SCHAKELKAST? test/schakelkast-dekking.test.js telt of elke route in de CATALOGUS staat. |
 | `life.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Life (kern/life.js): het ene scherm. Wat hier bewezen wordt is vooral wat het scherm NIET doet: geen cijfer verzinnen waar geen bron is, geen nul waar niets gemeten is, en een kapotte laag niet stil laten... |
 | `lifestyle.test.js` | 7 | gezakt op `liegpoort /api/` | Integratietests voor De Rechterhand: de premium Lifestyle Pass-suite. Het Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). |
-| `livegang-pakket.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `livegang-pakket.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
 | `livinglab-routes.test.js` | 11 | gezakt op `liegpoort /api/` | DE OVERIGE ROUTES VAN HET LIVING LAB -- werkplaats, apparatuur, deelnemers, themas, de pijplijn, de coach en de bewonerskant. test/livinglab.test.js loopt de ONDERZOEKSCYCLUS af: de poorten, de ethiek, de bewijsmotor. |
 | `livinglab.test.js` | 20 | gezakt op `liegpoort /api/` | Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de pijplijn naar echte verandering. Draai los: node... |
@@ -683,7 +683,7 @@ toets omvalt.
 | `schooltoets.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School x leerstof-motor: de leraar vinkt leerdoelen aan en heeft een SO/proefwerk/examen klaar (verse opgaven per leerling, server kijkt na, geen goed/fout-verklikker halverwege), een MO geeft de leraar de vragen... |
 | `schoolverbonden.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de verbonden klas: het lerarenteam (max drie vast), de waarnemer die een klas van een collega overneemt, de online les voor thuiswerken, en huiswerk dat aan een leerdoel hangt en zichzelf afvinkt als het... |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
-| `scriptbundel.test.js` | 5 | overleefd | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
+| `scriptbundel.test.js` | 6 | overleefd | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `selfhost.test.js` | 5 | -- | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
 | `sessie-herstart.test.js` | 1 | gezakt op `liegpoort /api/` | Sessie-duurzaamheid: een ingelogd lid blijft na een serverherstart ingelogd, omdat de sessie (alleen de token-hash) in db.data.sessions staat en bij het opstarten terug in de Map wordt geladen. Dit dekt het... |
@@ -748,7 +748,7 @@ toets omvalt.
 | `stadsweefsel.test.js` | 12 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
-| `stijlbundel.test.js` | 10 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
+| `stijlbundel.test.js` | 11 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | gezakt op `liegpoort /api/` | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |
 | `stillepost.test.js` | 2 | overleefd | Post die nergens heen kan, moet je kunnen zien. WAT ER MIS WAS. |
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |
@@ -797,6 +797,7 @@ toets omvalt.
 | `uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | De documentenuitgifte (kern/uitgifte.js): met een druk op de knop de officiele documentatie naar oude apparatuur of een harde schijf, altijd achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak... |
 | `uitloggen.test.js` | 4 | gezakt op `liegpoort /api/` | UITLOGGEN MOET ECHT UITLOGGEN. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14), en het is het soort gat dat je alleen vindt door het te DOEN in plaats van te lezen: POST /api/logout -> { ok: true } POST... |
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
+| `uploadquarantaine.test.js` | 5 | -- | De uploadgrens in het klein: bytes staan tijdens de keuring in een aparte map, bereiken de route alleen na de eigen én externe scan, en blijven bij geen enkel oordeel als terugvindbaar virusbestand liggen. |
 | `vakken.test.js` | 4 | gezakt op `liegpoort /api/` | De vakmannen-golf: tien alledaagse vakken (autogarage, schoonmaak, hovenier, wasserij, rijschool, dierenarts, tandarts, fotograaf, verhuizer, IT-hulp) op de vakwerk-motor, elk met een demo-zaak op het Dienstenplein;... |
 | `vakpro.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro: de pro-laag van de dienstverlenende genres -- de offerte-keten (lid vraagt vrije klus, zaak biedt prijs, lid geeft akkoord en de klus staat als bevestigde boeking klaar), de digitale werkbon die met de... |
 | `vakpro2.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro, laag 2: team-capaciteit (overlappende boekingen tot het aantal vaklieden), vaste afspraken (ritmes die de volgende afspraak inplannen, door beide kanten te stoppen), de wachtlijst met automatisch seintje... |

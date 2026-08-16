@@ -29,6 +29,9 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 const dkim = require('../server/dkim');
+// Een lokale nep-MX hoort bij een mislukte TLS-handshake niet twintig seconden
+// open te blijven; productie behoudt buiten deze test zijn ruimere timeout.
+if (!process.env.MAIL_TIMEOUT_MS) process.env.MAIL_TIMEOUT_MS = '1500';
 const direct = require('../server/smtp-direct');
 
 /* Een sleutelpaar voor de hele toets. Wordt hier GEMAAKT en niet uit de repo
@@ -279,18 +282,18 @@ test('mxVan: een domein zonder MX valt terug op het domein zelf (RFC 5321)', asy
   assert.equal(r[0].viaA, true, 'de terugval is als zodanig gemerkt, niet stilletjes');
 });
 
-test('bezorgen: STARTTLS wordt gepakt als de ontvanger hem aanbiedt', { skip: !TLS_OK }, async () => {
+test('bezorgen: STARTTLS met een onbekend certificaat faalt dicht', { skip: !TLS_OK }, async () => {
   const s = await nepMx({ starttls: true });
   try {
     const uit = await direct.bezorg({ van: 'post@rtg.test', naar: 'lid@voorbeeld.test',
       bericht: 'Subject: s\r\n\r\nversleuteld', mx: [{ exchange: '127.0.0.1' }], poort: s.poort });
-    assert.equal(uit.soort, 'bezorgd', uit.waarom);
-    assert.equal(uit.pogingen[0].tls, true, 'de poging meldt dat hij versleuteld ging');
-    assert.equal(s.vangst.tls, true, 'de server is echt naar TLS gegaan');
-    assert.equal(s.vangst.cmds.filter(c => c.startsWith('EHLO')).length, 2, 'EHLO opnieuw na de upgrade');
-    // MAIL/RCPT/DATA horen NA de upgrade te komen, niet ervoor
-    assert.ok(s.vangst.cmds.indexOf('STARTTLS') < s.vangst.cmds.findIndex(c => c.startsWith('MAIL FROM')));
-    assert.match(s.vangst.data, /versleuteld/);
+    assert.equal(uit.ok, false);
+    assert.equal(uit.soort, 'tijdelijk', 'een geldig certificaat kan bij een volgende poging alsnog werken');
+    assert.match([uit.pogingen[0].waarom, uit.waarom].filter(Boolean).join(' '),
+      /self-signed|certificate|certificaat|antwoordde niet/i);
+    assert.equal(s.vangst.tls, true, 'de handshake is geprobeerd');
+    assert.equal(s.vangst.cmds.some(c => c.startsWith('MAIL FROM')), false,
+      'zonder geverifieerde tegenpartij gaat geen envelop of bericht over de lijn');
   } finally { s.srv.close(); }
 });
 

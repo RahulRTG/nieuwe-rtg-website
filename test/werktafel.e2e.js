@@ -435,7 +435,11 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
 
-    assert.deepEqual(optiesBody, {}, 'de eerste optiesvraag bevat geen e-mailadres of gebruikersnaam');
+    assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
+    assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
+    assert.equal(optiesBody.username, undefined, 'de eerste optiesvraag bevat geen gebruikersnaam');
+    assert.deepEqual(Object.keys(optiesBody).filter(k => k !== 'lang'), [],
+      'alleen de niet-identificerende taalkeuze mag naast de naamloze optiesvraag meereizen');
     assert.equal(loginBody.login, undefined, 'ook na lokale verificatie wordt geen ingevulde login verzonnen');
     assert.equal(loginBody.ceremonie, '12345678901234567890123456789012', 'de eenmalige serverceremonie gaat ongewijzigd terug');
     assert.equal(loginBody.antwoord.id, 'sleutel-uit-toestel', 'het toestel wijst de passkey aan');

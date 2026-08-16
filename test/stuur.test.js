@@ -59,6 +59,12 @@ test('2. nooit meer rechten dan de persoon zelf: leden-token blijft leden-token'
   const goed = await api('/api/supplier/doe', { pad: '/api/supplier/state', body: {} }, zaak);
   assert.equal(goed.body.ok, true, 'de zaak kan dat via haar eigen stuur wel');
   assert.ok(goed.body.antwoord.state && goed.body.antwoord.state.supplier, 'met echt antwoord');
+  const onbekendeDeur = await api('/api/supplier/door/zet',
+    { id: 'geen-deur', locked: true }, zaak);
+  assert.equal(onbekendeDeur.status, 404, 'de idempotente deuractie weigert een verzonnen deur');
+  const geenPersoneel = await api('/api/staff/doe/bevestig',
+    { goedkeuringId: 'geen-voorstel', akkoord: true }, zaak);
+  assert.equal(geenPersoneel.status, 403, 'een zaaklogin kan geen personeelsvoorstel bevestigen');
 });
 
 test('3. infrastructuur is verboden terrein en het stuur zingt niet rond', async () => {
@@ -79,6 +85,9 @@ test('4. een wijziging vraagt een exact, eenmalig serverakkoord', async () => {
   assert.equal(dan.body.ok, true);
   const replay = await bevestig(eerst, lid);
   assert.equal(replay.status, 404, 'het akkoord kan niet opnieuw worden gebruikt');
+  const onbekendZaakvoorstel = await api('/api/supplier/doe/bevestig',
+    { goedkeuringId: 'geen-voorstel', akkoord: true }, zaak);
+  assert.equal(onbekendZaakvoorstel.status, 404, 'de zaakbevestiging accepteert geen verzonnen voorstel');
 });
 
 test('5. de schakelkast geldt ook hier: boardroom zet het stuur uit voor de RTG Pass', async () => {

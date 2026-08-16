@@ -55,7 +55,7 @@ test('live-, herstel- en backupscript zijn geldige shell en herstel is dubbel be
   assert.doesNotMatch(eigenaarClaim, /rejectUnauthorized\s*:\s*false/);
 });
 
-test('de offline back-upsleutel kan een AES-GCM CMS-set echt openen', { skip: !require('fs').existsSync('/usr/bin/openssl') && !require('fs').existsSync('/opt/homebrew/bin/openssl') }, () => {
+test('de offline back-upsleutel kan een AES-GCM CMS-set echt openen', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-backup-crypto-'));
   try {
     const sleutel = path.join(tmp, 'offline', 'private.pem');

@@ -22,15 +22,8 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const isAmbt = !!((kern.overheid && kern.overheid.magBehandelen && kern.overheid.magBehandelen(s)) ||
     (kern.gemeente && kern.gemeente.magBehandelen && kern.gemeente.magBehandelen(s)));
   const wereld = isAmbt ? 'supplier' : (req.actor && req.actor.staffId != null ? 'staff' : 'supplier');
-  const viaStuur = async (pad, body, klaar) => {
-    const uit = await kern.stuurRoep(req, pad, body, { wereld });
-    if (uit && uit.goedkeuring) return A(klaar + ' Controleer het exacte voorstel en bevestig het zelf.', false, {
-      stuur: [{ pad, status: uit.status, goedkeuring: uit.goedkeuring }],
-      goedkeuringen: [uit.goedkeuring], goedkeuringWereld: wereld
-    });
-    const fout = uit && (uit.error || (uit.antwoord && uit.antwoord.error));
-    return A(fout || klaar, !!(uit && uit.status < 400), { stuur: [{ pad, status: uit && uit.status }] });
-  };
+  const viaStuur = (pad, body, klaar) =>
+    require('./stuur')(kern, req, wereld, A, pad, body, klaar);
 
   // het persoonlijke geheugen (dezelfde motor als Rahul van de leden):
   // onthouden, opvragen en wissen, per persoon binnen deze zaak

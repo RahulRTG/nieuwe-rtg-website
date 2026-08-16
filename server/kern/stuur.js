@@ -139,16 +139,9 @@ function maakStuur({ log, anthropic, app, crypto }) {
     }
   }
 
-  /* Alleen de aparte HTTP-route roept dit aan. Het voorstel levert zelf het
-     pad en de body; de bevestigende client kan die na controle dus niet stil
-     aanpassen. `INTERNE_GOEDKEURING` is een Symbol en kan niet uit JSON of uit
-     een model-tool-call worden nagemaakt. */
-  async function stuurBevestig(req, id, wereld) {
-    const vast = goedkeuring.neem(req, id, wereld);
-    if (vast.error) return vast;
-    return stuurRoep(req, vast.voorstel.pad, vast.voorstel.body,
-      { wereld: vast.voorstel.wereld, goedgekeurd: INTERNE_GOEDKEURING });
-  }
+  const stuurBevestig = require('./stuur/bevestiging')({
+    goedkeuring, stuurRoep, interneGoedkeuring: INTERNE_GOEDKEURING
+  });
 
   /* ---- de kaart van het stuur: alle POST-paden die dit proces kent ----
      Rechtstreeks uit de router gelezen (dus nooit een verouderde lijst),

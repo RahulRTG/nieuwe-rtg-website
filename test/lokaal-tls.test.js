@@ -93,7 +93,10 @@ test('4. zonder de schakelaar verandert er niets aan de gewone start', () => {
   // het CA-loket bestaat alleen in die stand, en dient uitsluitend het CA-bestand
   assert.match(bron, /rtg-ca\.crt/, 'er is een loketje om de CA op te halen');
   const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
-  assert.equal(pkg.scripts.start, 'node server/trio.js', 'npm start blijft gewoon http');
+  assert.equal(pkg.scripts.start, 'node scripts/start.js', 'npm start gebruikt de lokale, veilige env-loader');
+  const lokaleStart = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'start.js'), 'utf8');
+  assert.match(lokaleStart, /require\('\.\.\/server\/trio'\)/,
+    'de env-loader geeft daarna door aan dezelfde gewone http-start');
   assert.match(pkg.scripts.telefoon, /RTG_LOKAAL_TLS=1/, 'en npm run telefoon zet https aan');
 });
 

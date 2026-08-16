@@ -1,0 +1,71 @@
+# Publieke overlay bovenop docker-compose.yml.
+#
+# RTG termineert HTTPS zelf: Node TLS + HTTP/2 + de ingebouwde ACME-client.
+# Daardoor is voor een enkele productieserver geen Caddy, nginx, certbot of
+# externe AI nodig. Start uitsluitend via scripts/docker/live.sh; die laadt
+# deploy/live.env, controleert de geheimen en bewaart een rollback-image.
+
+services:
+  app:
+    environment:
+      PORT: 443
+      RTG_BIND: 0.0.0.0
+      STUN_PORT: ${STUN_PORT:-3478}
+    # Poort 443 staat al in de basis-compose via RTG_CONTAINER_PORT. Poort 80
+    # is uitsluitend de ingebouwde ACME HTTP-01-responder + HTTPS-redirect.
+    ports:
+      - "${RTG_PUBLISH_HOST:-0.0.0.0}:80:80/tcp"
+      - "${RTG_PUBLISH_HOST:-0.0.0.0}:${STUN_PORT:-3478}:${STUN_PORT:-3478}/udp"
+    cap_add:
+      - NET_BIND_SERVICE
+    healthcheck:
+      # Tijdens de allereerste ACME-uitgifte kan het self-signed certificaat
+      # heel even actief zijn. De lokale containercheck controleert daarom de
+      # readiness, niet de publieke certificaatketen; npm run rand doet dat wel.
+      test: ["CMD", "node", "-e", "require('https').get({hostname:'127.0.0.1',port:443,path:'/api/ready',rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+      start_period: 45s
+
+  backup:
+    # Zelfde numerieke gebruiker als `node` in het app-image. Daardoor blijven
+    # back-ups en een later herstel leesbaar zonder root-owned runtimebestanden.
+    user: "1000:1000"
+    environment:
+      # Publiek betekent: geen back-up op dezelfde Docker-schijf accepteren.
+      RTG_BACKUP_RETENTION_DAYS: ${RTG_BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - ./scripts/docker/backup.sh:/usr/local/bin/rtg-backup:ro
+      - rtg-data:/app-data:ro
+      - ${RTG_BACKUP_HOST_DIR:?Zet RTG_BACKUP_HOST_DIR in deploy/live.env op een absolute externe map}:/backups
+
+  # Alleen op expliciet verzoek starten met profiel "ops". Het script zelf
+  # eist daarnaast een timestamp én een exact bijpassende bevestiging.
+  herstel:
+    image: postgres:16-alpine
+    user: "1000:1000"
+    profiles: ["ops"]
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    entrypoint: ["/bin/sh", "/usr/local/bin/rtg-herstel"]
+    environment:
+      PGHOST: postgres
+      PGUSER: rtg
+      PGDATABASE: rtg
+      PGPASSWORD_FILE: /run/secrets/postgres_password
+      RTG_RESTORE_STAMP: ${RTG_RESTORE_STAMP:-}
+      RTG_RESTORE_CONFIRM: ${RTG_RESTORE_CONFIRM:-}
+    secrets:
+      - postgres_password
+    volumes:
+      - ./scripts/docker/herstel.sh:/usr/local/bin/rtg-herstel:ro
+      - rtg-data:/app-data
+      - ${RTG_BACKUP_HOST_DIR:?Zet RTG_BACKUP_HOST_DIR in deploy/live.env op een absolute externe map}:/backups:ro
+    networks:
+      - data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m

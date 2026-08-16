@@ -82,11 +82,14 @@ const { setMarkt } = require('./foundation/markt')(ctx);
    gezinnen en hulpaanvragen zijn bedrijfsinformatie over kwetsbare mensen, en
    een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
    achter een inlog; hier blijft alleen het leven-teken over. */
-router.get('/health', (req, res) => res.json({ ok: true, ai: anthropic ? 'claude' : 'demo' }));
+router.get('/health', (req, res) => {
+  const s = require('./ai').beschikbaarheid(anthropic);
+  res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
+});
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
-require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto });
+require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic });
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 

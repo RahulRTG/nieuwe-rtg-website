@@ -7,10 +7,10 @@ const { maakBijles } = require('../kern/bijles');
 const { FASEN } = require('../kern/onderwijs-ladder');
 
 module.exports = (sctx) => {
-  const { router, F, save, schoon, eigenVeld, K, gezinSessie, leerlingVan } = sctx;
+  const { router, F, save, schoon, eigenVeld, K, gezinSessie, leerlingVan, anthropic } = sctx;
   const motor = maakBijles({
     winkel: () => { const f = F(); if (!f.bijles) f.bijles = {}; return f.bijles; },
-    save, schoon
+    save, schoon, anthropic
   });
 
   // het niveau en de open leerdoelen van dit kind in deze klas (mag ontbreken)

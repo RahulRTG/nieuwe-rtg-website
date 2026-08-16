@@ -23,7 +23,7 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
@@ -85,45 +85,42 @@ function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
     return { ok: true, aanvraag: a };
   }
 
-  /* AI-reisadvies: het lid vertelt in vrije tekst wat het zoekt, de reisadviseur
-     wijst de best passende reis aan uit de catalogus. Met een AI-sleutel denkt
-     Claude mee; zonder sleutel kiest een deterministische regel (woorden uit de
-     wens tegen bestemming/omschrijving), zodat de functie altijd iets teruggeeft. */
-  function regelAdvies(wens) {
+  /* Lokaal reisadvies: het lid vertelt in vrije tekst wat het zoekt. Een
+     uitlegbare score wijst de best passende reis uit de bestaande catalogus
+     aan en toont de woorden waarop de overeenkomst berust. */
+  function regelRangschik(wens) {
     const lijst = reizen();
     if (!lijst.length) return null;
     const w = String(wens || '').toLowerCase();
-    const woorden = w.split(/[^a-z0-9]+/).filter(x => x.length > 2);
-    let beste = lijst[0], score = -1;
+    const woorden = [...new Set(w.split(/[^a-z0-9à-ÿ]+/).filter(x => x.length > 2))];
+    const stop = new Set(['een', 'het', 'die', 'dat', 'met', 'voor', 'naar', 'van', 'zoek', 'willen', 'graag', 'reis']);
+    const intenties = [
+      ['rust', ['rust', 'stilte', 'rustig', 'natuur', 'wandelen', 'bergen']],
+      ['zon', ['zon', 'strand', 'zee', 'warm', 'zwemmen', 'kust']],
+      ['cultuur', ['cultuur', 'kunst', 'museum', 'historie', 'stad', 'architectuur']],
+      ['culinair', ['culinair', 'eten', 'restaurant', 'wijn', 'keuken', 'proeven']],
+      ['avontuur', ['avontuur', 'actief', 'hiken', 'surfen', 'safari', 'duiken']]
+    ];
+    const uitgebreid = new Set(woorden.filter(x => !stop.has(x)));
+    for (const [, groep] of intenties) if (groep.some(x => uitgebreid.has(x))) for (const x of groep) uitgebreid.add(x);
+    let beste = lijst[0], score = -1, treffers = [];
     for (const r of lijst) {
       const hooi = ((r.bestemming || '') + ' ' + (r.titel || '') + ' ' + (r.omschrijving || '') + ' ' + (r.inbegrepen || []).join(' ')).toLowerCase();
-      let s = 0;
-      for (const woord of woorden) if (hooi.includes(woord)) s += 1;
-      if (s > score) { score = s; beste = r; }
+      const raak = [...uitgebreid].filter(woord => hooi.includes(woord));
+      const s = raak.length;
+      if (s > score) { score = s; beste = r; treffers = raak; }
     }
-    return beste;
+    return { reis: beste, score, treffers: treffers.slice(0, 4) };
   }
   async function advies(wens) {
     const lijst = reizen();
     if (!lijst.length) return { status: 404, error: 'Er staan nu geen reizen klaar.' };
-    const val = regelAdvies(wens);
-    if (!anthropic) return { ok: true, reis: val, reden: 'Deze past het best bij wat je zoekt.', bron: 'regel' };
-    try {
-      const katalogus = lijst.map(r => '- ' + r.id + ': ' + r.titel + ' (' + r.bestemming + ') EUR ' + r.prijs + ' pp. ' + (r.omschrijving || '')).join('\n');
-      const resp = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 300,
-        system: 'Je bent een RTG-reisadviseur. Kies uit de gegeven reizen de EEN die het best past bij de wens van het lid. ' +
-          'Verzin geen reizen; kies alleen uit de lijst. Antwoord uitsluitend als JSON: {"id":"<reis-id>","reden":"<een korte zin, in de taal van de wens>"}.',
-        messages: [{ role: 'user', content: 'Reizen:\n' + katalogus + '\n\nWens van het lid: ' + String(wens || '').slice(0, 400) }]
-      });
-      const tekst = (resp.content.find(c => c.type === 'text') || {}).text || '';
-      const m = tekst.match(/\{[\s\S]*\}/);
-      const j = m ? JSON.parse(m[0]) : {};
-      const reis = lijst.find(r => r.id === j.id) || val;
-      return { ok: true, reis, reden: String(j.reden || 'Deze past het best bij je wens.').slice(0, 200), bron: 'ai' };
-    } catch (e) {
-      return { ok: true, reis: val, reden: 'Deze past het best bij wat je zoekt.', bron: 'regel' };
-    }
+    const val = regelRangschik(wens);
+    const reden = val.treffers.length
+      ? 'Deze reis sluit aan op ' + val.treffers.join(', ') + '.'
+      : 'Er is geen sterke inhoudelijke match; dit is het eerste beschikbare voorstel om mee te vergelijken.';
+    return { ok: true, reis: val.reis, reden, bron: 'regel', ai: false,
+      onderbouwing: { score: val.score, treffers: val.treffers } };
   }
 
   // het reisbureau-kantoor: de openstaande aanvragen (codenamen, nooit echte namen)

@@ -87,10 +87,25 @@ test('de vingerafdruk draagt geen inhoud, geen sleutels en geen namen', () => {
     leden: [{ naam: 'Rahul Imran Ismail', email: 'roellie.i@gmail.com', iban: 'NL91ABNA0417164300' }],
     saldi: { 'rek:lid:abc': 137 }
   };
-  const tekst = JSON.stringify(vingerafdruk(geheim));
-  for (const naald of ['Rahul', 'Imran', 'Ismail', 'roellie', 'gmail', 'NL91ABNA', '137', 'rek:lid:abc', 'naam', 'email', 'iban']) {
+  const afdruk = vingerafdruk(geheim);
+  const tekst = JSON.stringify(afdruk);
+  for (const naald of ['Rahul', 'Imran', 'Ismail', 'roellie', 'gmail', 'NL91ABNA', 'rek:lid:abc', 'naam', 'email', 'iban']) {
     assert.equal(tekst.includes(naald), false, 'de vingerafdruk lekt: ' + naald);
   }
+  /* Een willekeurige hexhash kan toevallig de drie tekens "137" bevatten;
+     zoeken in de hash zelf maakte deze toets ongeveer eens per honderd
+     processen rood zonder dat er inhoud lekte. Leg daarom de uitvoervorm
+     exact vast en zoek korte waarden alleen buiten de afdrukvelden. */
+  assert.deepEqual(Object.keys(afdruk).sort(), ['aantalCollecties', 'collecties', 'zoutId']);
+  for (const collectie of Object.values(afdruk.collecties)) {
+    assert.deepEqual(Object.keys(collectie).sort(), ['h', 'n']);
+    assert.equal(collectie.n, 1);
+    assert.match(collectie.h, /^[0-9a-f]{16}$/);
+  }
+  assert.match(afdruk.zoutId, /^[0-9a-f]{8}$/);
+  const zonderAfdrukken = JSON.stringify(afdruk, (sleutel, waarde) =>
+    sleutel === 'h' || sleutel === 'zoutId' ? '<afdruk>' : waarde);
+  assert.equal(zonderAfdrukken.includes('137'), false, 'de vingerafdruk lekt de saldo-inhoud buiten een hash');
   // wat er WEL in staat: de collectienaam en een aantal
   assert.ok(tekst.includes('leden'));
   assert.ok(tekst.includes('saldi'));

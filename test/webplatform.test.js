@@ -239,11 +239,11 @@ test('8. een lid bouwt een site met meerdere pagina\'s, met dezelfde schoonmaak 
     [['Over ons', 'over-ons'], ['Contact!', 'contact']], 'de bezoeker krijgt de pagina\'s met naam en slug');
 });
 
-test('9. de AI-assistent past aan maar bewaart niets; de demostand is eerlijk over wat hij kan', async () => {
+test('9. de site-assistent past lokaal aan maar bewaart niets; de regelstand is eerlijk over zijn grens', async () => {
   const ontwerp = { titel: 'Trattoria Sole', thema: 'licht', accent: '#7F1634',
     blokken: [{ id: 'b1', type: 'hero', kop: 'Trattoria Sole' }] };
 
-  // de demostand kan "luxer": thema en accent, met uitleg -- en het ontwerp
+  // de lokale regelstand kan "luxer": thema en accent, met uitleg -- en het ontwerp
   // komt terug in plaats van te worden opgeslagen
   const lux = await api('/api/site/ai', { design: ontwerp, opdracht: 'Maak het luxer.' }, lid);
   assert.equal(lux.status, 200);
@@ -258,11 +258,12 @@ test('9. de AI-assistent past aan maar bewaart niets; de demostand is eerlijk ov
   assert.equal(pag.body.design.paginas.length, 1);
   assert.match(pag.body.design.paginas[0].naam, /bruiloften/i);
 
-  // wat de demostand niet kan, zegt hij eerlijk -- geen gedaan-vinkje zonder daad
+  // wat de regelstand niet kan, zegt hij eerlijk -- geen gedaan-vinkje zonder daad
   const nee = await api('/api/site/ai', { design: ontwerp, opdracht: 'Vertaal alles naar het Spaans.' }, lid);
   assert.equal(nee.body.gedaan, false);
   assert.equal(nee.body.design, null);
-  assert.match(nee.body.antwoord, /demostand|sleutel/i);
+  assert.match(nee.body.antwoord, /lokale regelstand/i);
+  assert.match(nee.body.antwoord, /modelprovider/i);
 
   // niets van dit alles heeft iets opgeslagen
   const mijnNa = await api('/api/site/mijn', {}, lid);

@@ -1,0 +1,50 @@
+name: Productie-image
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Releasepoort
+        run: npm run check
+      - name: Server- en integratietoetsen
+        run: npm test
+      - name: Docker Compose live-overlay is geldig
+        run: docker compose -f docker-compose.yml -f docker-compose.live.yml config --quiet
+        env:
+          RTG_BACKUP_HOST_DIR: /tmp/rtg-backups
+          RTG_PUBLISH_HOST: 0.0.0.0
+          RTG_PUBLISH_PORT: "443"
+          RTG_CONTAINER_PORT: "443"
+          RTG_ENV_FILE: .env.example
+          RTG_POSTGRES_PASSWORD_FILE: .env.example
+      - name: Bepaal immutable GHCR-tag
+        shell: bash
+        run: |
+          repo="${GITHUB_REPOSITORY,,}"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then tag="${GITHUB_REF_NAME}"; else tag="sha-${GITHUB_SHA::12}"; fi
+          echo "RTG_RELEASE_IMAGE=ghcr.io/$repo:$tag" >> "$GITHUB_ENV"
+      - name: Login op GitHub Container Registry
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bouw en publiceer exact één app/motor-image
+        run: |
+          docker build --pull --tag "$RTG_RELEASE_IMAGE" .
+          docker push "$RTG_RELEASE_IMAGE"
+          echo "Gepubliceerd: $RTG_RELEASE_IMAGE"

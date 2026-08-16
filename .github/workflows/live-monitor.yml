@@ -1,0 +1,24 @@
+name: Publieke live-sonde
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sonde:
+    if: ${{ vars.RTG_LIVE_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Meet DNS, TLS, rand en kritieke gebruikersreizen van buitenaf
+        run: node scripts/sonde.js "$RTG_LIVE_URL"
+        env:
+          RTG_LIVE_URL: ${{ vars.RTG_LIVE_URL }}

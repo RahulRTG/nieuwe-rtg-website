@@ -17,5 +17,5 @@
   .lo-top::-webkit-scrollbar{display:none}
   .lo-top>*{flex:0 0 auto}
   .lo-top button{min-width:133px}
-  .lo-main{min-width:0}
+  .lo-main{min-width:0;min-height:0}
 }

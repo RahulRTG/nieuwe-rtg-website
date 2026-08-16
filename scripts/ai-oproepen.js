@@ -24,7 +24,7 @@ const path = require('path');
 
 // de transportlaag zelf is geen aanroep-plek: die stuurt de al-opgebouwde prompt
 // door naar de aanbieder(s), en hoort geen persona te kennen.
-const TRANSPORT = new Set(['ai.js', 'anthropic.js', 'openai.js', 'gemini.js']);
+const TRANSPORT = new Set(['ai.js', 'anthropic.js', 'openai.js', 'gemini.js', 'local-ai.js']);
 
 // Twee geldige manieren om de toegangsregel te dragen:
 //  1) de gedeelde basis eronder (RAHUL_BASIS -> RAHUL_LEAD, of de per-pas aiSystemPrompt);

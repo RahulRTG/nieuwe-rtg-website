@@ -4,6 +4,8 @@
    nieuwslezer die een artikel samenvat of er vragen over beantwoordt -- op
    basis van ALLEEN de artikeltekst, zonder er iets bij te verzinnen.
    Gemount vanuit routes/member.js. */
+const { samenvat, beantwoordUitTekst } = require('../../lib/lokale-taal');
+
 module.exports = (kern) => {
   const { app, auth, anthropic, redactie } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -17,6 +19,12 @@ module.exports = (kern) => {
     if (r.error) return stuur(res, r);
     const a = r.artikel;
     const vraag = String((req.body || {}).vraag || '').slice(0, 300);
+    const bron = [a.intro || '', a.tekst || ''].filter(Boolean).join(' ');
+    const isSamenvatting = !vraag || /\b(vat|samenvat|samenvatting|in het kort|kern)\b/i.test(vraag);
+    if (isSamenvatting) return res.json({ ok: true, ai: false, bron: 'lokale-taal', modus: 'handmatig',
+      antwoord: samenvat(bron, { maxZinnen: 3, maxTekens: 750 }) || 'Dit artikel bevat nog geen tekst.' });
+    const letterlijk = beantwoordUitTekst(bron, vraag, { maxZinnen: 2 });
+    if (letterlijk) return res.json({ ok: true, ai: false, bron: 'artikel', modus: 'handmatig', antwoord: letterlijk });
     if (anthropic) {
       try {
         const resp = await anthropic.messages.create({
@@ -30,8 +38,7 @@ module.exports = (kern) => {
         if (tekst) return res.json({ ok: true, antwoord: tekst });
       } catch (e) { /* val terug */ }
     }
-    // handmatige uitwijk: de eerste zinnen als eerlijke, lokale samenvatting
-    const zinnen = (a.intro + ' ' + a.tekst).split(/(?<=[.!?])\s+/).filter(Boolean).slice(0, 3).join(' ');
-    res.json({ ok: true, ai: false, bron: 'artikel', modus: 'handmatig', antwoord: 'In het kort: ' + zinnen });
+    res.json({ ok: true, ai: false, bron: 'artikel', modus: 'handmatig',
+      antwoord: 'Ik vind hiervoor geen voldoende duidelijke bronzin in het artikel. Lees het artikel zelf of stel de vraag opnieuw zodra vrije taalhulp beschikbaar is.' });
   });
 };

@@ -6,7 +6,7 @@
       naar de taal van de bezoeker. Werkt volledig offline via een woordenboek.
    2) translate(text, to, from): losse berichten (reacties, DM's) vertalen naar
       de taal van de ontvanger. Gebruikt de echte Claude-API als die beschikbaar
-      is (ANTHROPIC_API_KEY), anders het woordenboek en een woord-voor-woord
+      is (lokaal of extern), anders het woordenboek en een woord-voor-woord
       terugval, zodat de functie ook in demo-modus iets zinnigs teruggeeft.
    ========================================================================== */
 
@@ -117,4 +117,3 @@ async function translate(text, to, from, opties) {
 }
 
 module.exports = { setAnthropic, localize, localizeList, translate, detect };
-

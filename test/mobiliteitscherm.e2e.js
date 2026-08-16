@@ -162,7 +162,8 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
        Een leeg vak zonder uitleg leest als een storing. */
     await page.waitForFunction(() => {
       const el = document.querySelector('#kaartReden');
-      return el && el.textContent.length > 20;
+      return el && !/Even kijken/i.test(el.textContent) &&
+        /Partnercontracten|overeenkomst|beschikbaar/i.test(el.textContent);
     }, null, { timeout: 20000 });
     const reden = await page.textContent('#kaartReden');
     assert.match(reden, /Partnercontracten|overeenkomst|beschikbaar/i,

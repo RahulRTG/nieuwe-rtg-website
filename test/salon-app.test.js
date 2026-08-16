@@ -221,6 +221,11 @@ test('de reactie-samenvatting kan alleen op je eigen post', async () => {
   const vreemd = await json(await raw('/salon/ai/reacties', { id: post.post.id }, b.token));
   assert.equal(vreemd.ok, false, 'het gesprek onder de post van een ander is niet het jouwe');
 
+  const eigen = await json(await raw('/salon/ai/reacties', { id: post.post.id }, a.token));
+  assert.equal(eigen.ok, true, 'de eigen reacties worden zonder model lokaal samengevat');
+  assert.equal(eigen.bron, 'lokale-taal');
+  assert.match(eigen.samenvatting, /positief/i);
+
   // waarover werkt ook zonder AI: de telling is het antwoord
   const w = await json(await raw('/salon/ai/waarover', {}, a.token));
   assert.equal(w.ok, true);

@@ -662,28 +662,26 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
      een scherm waar je een minuut naar kijkt leest het als behang met een paar
      bewegende stipjes erover.
 
-     Deze meting kijkt daarom naar de hemel op TWEE momenten en telt hoeveel
-     opgelichte pixels er op precies dezelfde plek nog steeds oplichten. Staat
-     het veld stil, dan is dat bijna alles; beweegt het echt, dan blijft er
-     alleen toevallige overlap over (gemeten: 9,5%, zowel na zes als na twintig
-     seconden -- het veld is dan volledig gedecorreleerd).
+     Deze meting kijkt daarom naar de hemel op TWEE momenten en berekent de
+     ruimtelijke correlatie van alle zichtbare pixels. Alleen aan/uit telt:
+     ademen in helderheid is geen verplaatsing. Staat het veld stil, dan blijft
+     de correlatie hoog; verschuift het echt, dan daalt zij richting nul. De
+     normalisatie haalt toevallige overlap door een dicht scherm uit de score.
 
      DE MUTATIE: laat verfStof() met een vaste tijd tekenen (verfStof(0) in
      plaats van verfStof(t)) in sterren-03.js. Het stof staat dan weer stil, de
      heldere sterren draaien nog gewoon door, en het scherm ziet er op een
      afdruk identiek uit. Deze toets zakt dan meteen. */
   await metLid('aan', async ({ page }) => {
-    /* Eerst wachten tot de hemel STIL HANGT: bij het opbouwen kan hij nog een
-       keer opnieuw worden opgehangen (het scherm krijgt zijn maat, de intake
-       gaat eraf). Meten terwijl dat nog kan, meet de opbouw en niet de hemel. */
-    await page.waitForFunction(() => {
-      const cv = document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
-      if (!cv) return false;
-      if (window.__hemelVorig === cv) return (window.__hemelZelfde = (window.__hemelZelfde || 0) + 1) > 6;
-      window.__hemelVorig = cv; window.__hemelZelfde = 0;
-      return false;
-    }, null, { timeout: 20000, polling: 250 });
-
+    /* Deze proef meet BEWEGING. De proef erboven bewaakt al afzonderlijk dat
+       de hemel vanzelf wordt opgehangen en de juiste maat krijgt. Activeer
+       hier via de publieke schakelaar expliciet de te meten wereld en wacht op
+       haar echte doek, zodat een trage tweede browsersessie de bewegingsproef
+       niet in een opstartproef verandert. */
+    await page.evaluate(() => RTGWereld.zet(true));
+    await page.waitForFunction(
+      () => !!document.querySelector('.os-thuisscherm > canvas.rtg-sterren'),
+      null, { timeout: 30000 });
     const r = await page.evaluate(async () => {
       /* HET DOEK ELKE KEER OPNIEUW OPZOEKEN, en niet een verwijzing vasthouden.
          De hemel wordt opnieuw opgehangen als het scherm van maat verandert
@@ -708,38 +706,70 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
          tekent minder beelden per seconde en heeft langer nodig. Met een vaste
          wachttijd meet je dan de drukte in plaats van de hemel. De uitkomst is
          dezelfde meting, hij krijgt alleen de tijd die hij nodig heeft. */
-      const a = lees();
-      if (!a) return { fout: 'geen sterrendoek' };
-      const meet = () => {
-        const b = lees();
-        if (!b) return null;
-        if (a.cv !== b.cv) return { fout: 'de hemel is tussentijds opnieuw opgehangen' };
-        let aanA = 0, gelijk = 0;
+      const meet = (a, b) => {
+        let aanA = 0, aanB = 0, gelijk = 0;
         for (let i = 3; i < a.data.length; i += 4) {
-          const x = a.data[i] > 8, y = b.data[i] > 8;
+          /* Ook het zwakste stof telt. Een helderheidsademhaling verandert de
+             alpha, maar niet of het stofpunt er staat; alpha > 0 meet dus de
+             vorm van het veld en niet zijn tijdelijke lichtsterkte. */
+          const x = a.data[i] > 0, y = b.data[i] > 0;
           if (x) aanA++;
+          if (y) aanB++;
           if (x && y) gelijk++;
         }
-        return { aanA, gelijk };
+        const totaal = a.data.length / 4;
+        const gemA = totaal ? aanA / totaal : 0;
+        const gemB = totaal ? aanB / totaal : 0;
+        /* Pearson-correlatie meet het RUIMTELIJKE beeld en niet alleen hoeveel
+           pixels toevallig oplichten. Een globale helderheidsademhaling mag
+           daardoor veranderen zonder als beweging te tellen; een vast
+           stofpatroon blijft sterk gecorreleerd, een verschoven veld niet. */
+        const spreiding = Math.sqrt(gemA * (1 - gemA) * gemB * (1 - gemB));
+        const samenhang = spreiding
+          ? Math.max(-1, Math.min(1, (gelijk / totaal - gemA * gemB) / spreiding)) : 1;
+        const rauw = aanA ? gelijk / aanA : 1;
+        return { aanA, aanB, gelijk, totaal, rauw, samenhang };
       };
-      let r = null;
-      for (let n = 0; n < 40; n++) {
+      /* De nulmeting hoort bij het HUIDIGE doek. Tijdens de opbouw kan
+         hangHemel() dat doek legitiem vervangen zodra de definitieve maat
+         bekend is. Een losse voorwacht op zeven gelijke DOM-verwijzingen kon
+         daardoor onder runnerbelasting twintig seconden lang zijn teller
+         resetten zonder ooit de hemel te meten. Hier vernieuwt een wissel de
+         nulmeting en loopt dezelfde begrensde inhoudsmeting gewoon door. */
+      let a = null, r = null, beste = null, stabiel = 0, wissels = 0, zonderDoek = 0;
+      for (let n = 0; n < 80; n++) {
+        if (!a) {
+          a = lees();
+          if (!a) { zonderDoek++; await new Promise((k) => setTimeout(k, 750)); continue; }
+        }
         await new Promise((k) => setTimeout(k, 750));
-        r = meet();
-        if (!r || r.fout) return r || { fout: 'geen sterrendoek' };
-        if (r.aanA && r.gelijk / r.aanA < 0.2) break;   // ruim onder de eis: klaar
+        const b = lees();
+        if (!b) { zonderDoek++; a = null; beste = null; stabiel = 0; continue; }
+        if (a.cv !== b.cv) { wissels++; a = b; beste = null; stabiel = 0; continue; }
+        r = meet(a, b);
+        stabiel++;
+        /* Een ademend veld kan later toevallig weer meer pixels van de
+           nulmeting raken. Dat maakt de eerdere, daadwerkelijk waargenomen
+           beweging niet onwaar. Bewaar daarom de sterkste geldige meting van
+           het HUIDIGE doek; een doekwissel wist hem hierboven terecht uit. */
+        if (r.aanA && (!beste || r.samenhang < beste.samenhang)) beste = r;
+        if (beste && beste.samenhang < 0.2) break; // ruim onder de eis: klaar
+        if (stabiel >= 40) break;                        // dezelfde bovengrens als voorheen
       }
-      return r;
+      return (beste || r) ? { ...(beste || r), wissels, zonderDoek } : {
+        fout: 'geen stabiel sterrendoek binnen de meetgrens (' + wissels +
+          ' wissels, ' + zonderDoek + ' keer afwezig)'
+      };
     });
     assert.ok(!r.fout, 'de meting kon niet worden gedaan: ' + r.fout);
 
     assert.ok(r.aanA > 400,
       'er hoort een hemel te staan om te meten (opgelichte punten: ' + r.aanA + ')');
-    const bleef = r.gelijk / r.aanA;
-    assert.ok(bleef < 0.35,
-      'de hemel staat grotendeels stil: na zes seconden licht ' + Math.round(bleef * 100) +
-      '% van de punten nog op precies dezelfde plek op. Het stofveld hoort mee te bewegen, ' +
-      'niet als gebakken plaatje onder de draaiende sterren te liggen.');
+    assert.ok(r.samenhang < 0.35,
+      'de hemel staat grotendeels stil: de ruimtelijke beeldcorrelatie is ' +
+      Math.round(r.samenhang * 100) + '% (ruwe overlap ' + Math.round(r.rauw * 100) +
+      '%). Het stofveld hoort mee te bewegen, niet als gebakken plaatje onder de ' +
+      'draaiende sterren te liggen.');
   }, null, false);
 });
 

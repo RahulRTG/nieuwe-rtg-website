@@ -72,7 +72,7 @@ app.post('/api/fluister', auth, async (req, res) => {
       return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
         goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
         goedkeuringWereld: 'member',
-        aiBeschikbaar: true, modus: 'ondersteund' });
+        aiBeschikbaar: true, modus: aiStatus().modus, verwerking: aiStatus().verwerking });
     }
   }
   onthoudGesprek(req, r && r.antwoord);

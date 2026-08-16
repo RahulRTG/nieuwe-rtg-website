@@ -11,6 +11,7 @@ umask 077
 : "${PGPASSWORD_FILE:=/run/secrets/postgres_password}"
 : "${RTG_BACKUP_INTERVAL:=86400}"
 : "${RTG_BACKUP_RETENTION_DAYS:=30}"
+: "${RTG_BACKUP_ONCE:=0}"
 
 geheel_getal() {
   case "$2" in ''|*[!0-9]*) echo "[backup] $1 moet een geheel getal zijn" >&2; exit 78 ;; esac
@@ -57,5 +58,6 @@ maak_backup() {
 
 while :; do
   maak_backup
+  [ "$RTG_BACKUP_ONCE" = "1" ] && exit 0
   sleep "$RTG_BACKUP_INTERVAL"
 done

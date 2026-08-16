@@ -17,5 +17,5 @@
   .po-top::-webkit-scrollbar{display:none}
   .po-top>*{flex:0 0 auto}
   .po-top button{min-width:144px}
-  .po-shell>main{min-width:0}
+  .po-shell>main{min-width:0;min-height:0}
 }

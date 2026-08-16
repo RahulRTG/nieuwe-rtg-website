@@ -30,6 +30,10 @@ function naarGemini(params) {
     const parts = [];
     for (const c of b.content) {
       if (c.type === 'text' && c.text) parts.push({ text: c.text });
+      else if (c.type === 'image' && c.source && c.source.type === 'base64' && c.source.data) {
+        const mime = /^image\/(?:jpeg|png|webp|gif)$/.test(c.source.media_type || '') ? c.source.media_type : 'image/jpeg';
+        parts.push({ inlineData: { mimeType: mime, data: c.source.data } });
+      }
       else if (c.type === 'tool_use') { naamVanId[c.id] = c.name; parts.push({ functionCall: { name: c.name, args: c.input || {} } }); }
       else if (c.type === 'tool_result') {
         const naam = naamVanId[c.tool_use_id] || c.tool_use_id;

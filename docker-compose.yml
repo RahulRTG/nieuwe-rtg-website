@@ -46,6 +46,10 @@ services:
       RTG_MOTOR_SHADOW: http://motor:3100
       RTG_MOTOR_GELD_URL: http://motor:3100
       RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}
+      # Geen upload wordt vrijgegeven als deze losse engine niet antwoordt.
+      RTG_CLAMD_HOST: clamav
+      RTG_CLAMD_PORT: 3310
+      RTG_CLAMD_TIMEOUT_MS: ${RTG_CLAMD_TIMEOUT_MS:-15000}
       # De binary zit in hetzelfde onveranderlijke image. De modus en centrale
       # noodstop blijven via .env.productie direct bedienbaar. Standaard blijft
       # deze migratie uit; een canary is altijd een bewuste productie-instelling.
@@ -70,6 +74,8 @@ services:
       postgres:
         condition: service_healthy
       motor:
+        condition: service_healthy
+      clamav:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/api/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
@@ -209,8 +215,36 @@ services:
         max-size: 10m
         max-file: "5"
 
+  # De virusscanner staat in een eigen container en is nergens op de host
+  # gepubliceerd. Alleen de app bereikt poort 3310 via het interne datanetwerk;
+  # het tweede netwerk is uitsluitend voor dagelijkse signatuurupdates.
+  clamav:
+    image: clamav/clamav:1.5.3-debian13-slim@sha256:741e6c447241220e0792a901befcaec1d55a755c5097fc9cd88d7fd8be251a5c
+    restart: unless-stopped
+    user: clamav
+    entrypoint: ["/init-unprivileged"]
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - rtg-clamav:/var/lib/clamav
+    networks:
+      - data
+      - updates
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
   backup:
-    image: postgres:16-alpine
+    image: ${RTG_BACKUP_IMAGE:-rtg-backup:local}
+    build:
+      context: .
+      target: backup-runtime
     restart: unless-stopped
     read_only: true
     security_opt:
@@ -260,10 +294,14 @@ networks:
   edge:
   data:
     internal: true
+  # Alleen ClamAV hangt hieraan om verse virusdefinities op te halen. De app en
+  # de databases blijven uitsluitend op edge/data.
+  updates:
 
 volumes:
   rtg-data:
   rtg-redis:
   rtg-pg:
   rtg-motor:
+  rtg-clamav:
   rtg-sentinel:

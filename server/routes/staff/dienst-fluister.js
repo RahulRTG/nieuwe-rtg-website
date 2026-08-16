@@ -54,11 +54,13 @@ app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
   if (stuurLus && !r.pakte) {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
+      wereld: 'staff',
       filter: p => p.startsWith('/api/staff'),
       systeem: require('../../kern/rahul').RAHUL_LEAD +
         'Je helpt ' + werkNaam(req) + ' (personeel, PDA) bij ' + req.supplier.name + ' (' + req.supplier.type + ').'
     });
-    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties });
+    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff' });
   }
   res.json(r);
 });

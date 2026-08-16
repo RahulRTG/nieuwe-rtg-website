@@ -40,9 +40,55 @@ const decodeer = (s) => {
   catch (e) { return []; }
 };
 
-const SCRIPT = /<script\b[^>]*><\/script>/gi;
-// tussen twee scripts mag alleen lucht en commentaar staan
-const TUSSEN_OK = /^(?:\s|<!--[\s\S]*?-->)*$/;
+const isWit = (teken) => !!teken && /\s/u.test(teken);
+const tagGrens = (teken) => !teken || teken === '>' || teken === '/' || isWit(teken);
+
+/* Geen HTML-filter met een brede regexp: de invoer is een volledige pagina en
+   een lang, onafgesloten attribuut of commentaar mag nooit exponentieel werk
+   veroorzaken. Deze kleine scanner loopt elke positie hooguit eenmaal langs. */
+function tagEinde(tekst, vanaf) {
+  let quote = '';
+  for (let i = vanaf; i < tekst.length; i++) {
+    const c = tekst[i];
+    if (quote) { if (c === quote) quote = ''; continue; }
+    if (c === '"' || c === "'") { quote = c; continue; }
+    if (c === '>') return i;
+  }
+  return -1;
+}
+
+function vindLegeScripts(html) {
+  const klein = html.toLowerCase();
+  const uit = [];
+  let positie = 0;
+  while (positie < html.length) {
+    const start = klein.indexOf('<script', positie);
+    if (start < 0) break;
+    if (!tagGrens(klein[start + 7])) { positie = start + 7; continue; }
+    const openEind = tagEinde(html, start + 7);
+    if (openEind < 0) break;
+    const sluit = klein.indexOf('</script>', openEind + 1);
+    if (sluit < 0) break;
+    const eind = sluit + 9;
+    // Externe scripts horen leeg te zijn; inhoud samenvoegen verandert gedrag.
+    if (sluit === openEind + 1) uit.push({ start, eind, tag: html.slice(start, eind) });
+    positie = eind;
+  }
+  return uit;
+}
+
+// Tussen twee scripts mag alleen lucht en een volledig gesloten commentaar staan.
+function tussenOk(tekst) {
+  let i = 0;
+  while (i < tekst.length) {
+    if (isWit(tekst[i])) { i++; continue; }
+    if (!tekst.startsWith('<!--', i)) return false;
+    const eind = tekst.indexOf('-->', i + 4);
+    if (eind < 0) return false;
+    i = eind + 3;
+  }
+  return true;
+}
 
 /* Is dit een script dat mee mag? Alleen src, alleen defer, verder niets: een
    type, een nonce-vrije module, een async of een integriteitscontrole hangt
@@ -59,11 +105,9 @@ function bruikbaar(tag) {
 
 function herschrijfHtml(html) {
   const scripts = [];
-  SCRIPT.lastIndex = 0;
-  let m;
-  while ((m = SCRIPT.exec(html))) {
-    const pad = bruikbaar(m[0]);
-    scripts.push({ start: m.index, eind: m.index + m[0].length, pad });
+  for (const gevonden of vindLegeScripts(html)) {
+    const pad = bruikbaar(gevonden.tag);
+    scripts.push({ start: gevonden.start, eind: gevonden.eind, pad });
   }
 
   // opeenvolgende bruikbare scripts groeperen tot rijen
@@ -74,7 +118,7 @@ function herschrijfHtml(html) {
     if (!s.pad) { if (rij.length > 1) rijen.push(rij); rij = []; continue; }
     if (rij.length) {
       const tussen = html.slice(rij[rij.length - 1].eind, s.start);
-      if (!TUSSEN_OK.test(tussen)) { if (rij.length > 1) rijen.push(rij); rij = []; }
+      if (!tussenOk(tussen)) { if (rij.length > 1) rijen.push(rij); rij = []; }
     }
     rij.push(s);
   }
@@ -91,4 +135,4 @@ function herschrijfHtml(html) {
   return uit;
 }
 
-module.exports = { herschrijfHtml, codeer, decodeer, GOED_PAD, PAD, bruikbaar };
+module.exports = { herschrijfHtml, codeer, decodeer, GOED_PAD, PAD, bruikbaar, tussenOk, vindLegeScripts };

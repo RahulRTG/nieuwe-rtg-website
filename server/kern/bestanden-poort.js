@@ -24,7 +24,16 @@
 
    Geeft null terug als het mag, of een foutobject dat de aanroeper doorgeeft. */
 module.exports = function maakBestandenPoort({ antivirus }) {
-  function scanOk(key, dataUrl) {
+  async function scanOk(key, dataUrl) {
+    if (antivirus && typeof antivirus.keurDataUrl === 'function') {
+      try {
+        const veilig = await antivirus.keurDataUrl(dataUrl, { bron: 'bestanden', door: key });
+        return veilig && veilig.ok ? null : { status: 422, error: 'Dit bestand is geweigerd door de beveiliging (mogelijke malware).' };
+      } catch (e) {
+        if (e && e.code === 'RTG_UPLOAD_GEWEIGERD') return { status: 422, error: e.message };
+        return { status: 503, error: 'De veiligheidsscan is tijdelijk niet beschikbaar. Het bestand is niet opgeslagen.' };
+      }
+    }
     if (!antivirus || typeof antivirus.veiligeFoto !== 'function') return null;
     const veilig = antivirus.veiligeFoto(dataUrl, { bron: 'bestanden', door: key });
     return veilig.ok ? null

@@ -104,7 +104,15 @@
     uit.hidden = false; uit.textContent = 'Rahul denkt mee...'; mond.praat(900);
     fetch('/api/supplier/ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + supTok }, body: JSON.stringify({ q: q.slice(0, 300) }) })
       .then(function (r) { return r.json(); })
-      .then(function (d) { uit.textContent = (d && (d.reply || d.antwoord || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })
+      .then(async function (d) {
+        uit.textContent = (d && (d.reply || d.antwoord || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400);
+        var v = ((d && d.goedkeuringen) || [])[0];
+        if (!v || !confirm('Controleer deze exacte actie:\n\n'+(v.samenvatting||v.pad)+'\n\nWilt u dit eenmalige voorstel uitvoeren?')) return;
+        var w = d.goedkeuringWereld === 'staff' ? 'staff' : 'supplier';
+        var r = await fetch('/api/'+w+'/doe/bevestig', { method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+supTok}, body:JSON.stringify({goedkeuringId:v.id,akkoord:true}) });
+        var b = await r.json();
+        uit.textContent += r.ok && b.ok ? ' Uitgevoerd na uw bevestiging.' : ' Niet uitgevoerd: '+(b.error||'de server weigerde de actie.');
+      })
       .catch(function () { uit.textContent = 'Even geen verbinding. Probeer het zo nog eens.'; })
       .then(function () { bezig = false; });
   }

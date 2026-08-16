@@ -145,6 +145,13 @@ module.exports = (ctx) => {
     return legVast(scan(buf, meta), meta);
   }
 
+  // Ook een ClamAV-treffer loopt door hetzelfde meld- en afsnijpad.
+  function registreerExtern(oordeel, meta) {
+    if (!oordeel || !['schoon', 'verdacht', 'besmet'].includes(oordeel.verdict))
+      throw new Error('Ongeldig extern malware-oordeel.');
+    return legVast(oordeel, meta || {});
+  }
+
   // De decodeer- en groottepoort staat apart om deze scanner klein te houden.
   const scanDataUrl = require('./data-url')({ legVast, verwerk });
 
@@ -197,6 +204,6 @@ module.exports = (ctx) => {
       definities: definities.length, versie: s.versie, laatste: s.laatste.slice(0, 20) };
   }
 
-  return { scan, verwerk, scanDataUrl, veiligeFoto, scanBody, voegSignatuurToe, stand,
+  return { scan, verwerk, registreerExtern, scanDataUrl, veiligeFoto, scanBody, voegSignatuurToe, stand,
     definities: () => definities.map(d => ({ id: d.id, naam: d.naam, ernst: d.ernst })) };
 };

@@ -48,6 +48,7 @@
    ========================================================================== */
 'use strict';
 const http = require('http');
+const crypto = require('crypto');
 
 /* ---------- de deur ---------- */
 
@@ -146,14 +147,14 @@ function werkbank(vraag) {
 /* ---------- het podium ---------- */
 
 let teller = 0;
-const uniek = () => Date.now().toString(36) + '-' + (++teller).toString(36) + '-' + Math.floor(Math.random() * 1e6).toString(36);
+const uniek = () => crypto.randomBytes(8).toString('hex') + '-' + (++teller).toString(36);
 
 /* Een vers lid. Gebruikt door bouwPodium (voor de vaste ploeg) en door de twee
    verhalen die echt een nieuw mens nodig hebben. */
 async function nieuwLid(wb, tier) {
   const u = uniek();
   const reg = await wb.stap('lid worden', 'POST', '/api/auth/register', null, {
-    name: 'Verhaal ' + u, email: 'v' + u + '@verhalen.test', phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
+    name: 'Verhaal ' + u, email: 'v' + u + '@verhalen.test', phone: '06' + String(crypto.randomInt(10000000, 90000000)),
     password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: tier || 'rtg', pasApp: tier || 'rtg'
   });
   wb.eis('lid worden', reg.data.token, 'registratie gaf geen token');

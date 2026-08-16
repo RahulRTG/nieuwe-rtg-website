@@ -3,6 +3,14 @@
       const d = await API.call('/supplier/ai', { q });
       aiMsgs[aiMsgs.length - 1] = { role: 'ai', text: d.reply, did: d.did };
       renderAIThread();
+      const v = (d.goedkeuringen || [])[0];
+      if (v && confirm(T('ai.check','Controleer deze exacte actie:')+'\n\n'+(v.samenvatting || v.pad)+'\n\n'+T('ai.confirm','Wilt u dit eenmalige voorstel uitvoeren?'))) {
+        const w = d.goedkeuringWereld === 'staff' ? 'staff' : 'supplier';
+        const b = await API.call('/'+w+'/doe/bevestig', { goedkeuringId: v.id, akkoord: true });
+        aiMsgs.push({ role: 'ai', text: b.ok ? T('ai.confirmed','U heeft het voorstel bevestigd; de actie is uitgevoerd.') : T('ai.refused','De server heeft de actie geweigerd.'), did: !!b.ok });
+        renderAIThread();
+        if (b.ok) await refresh();
+      }
       if (d.did) await refresh();
       openTab('ai');
     } catch(e){

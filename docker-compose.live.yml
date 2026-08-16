@@ -36,15 +36,27 @@ services:
     environment:
       # Publiek betekent: geen back-up op dezelfde Docker-schijf accepteren.
       RTG_BACKUP_RETENTION_DAYS: ${RTG_BACKUP_RETENTION_DAYS:-30}
+      RTG_BACKUP_PUBLIC_CERT_FILE: /run/secrets/backup_public_cert
+      RTG_BACKUP_OFFSITE_DIR: /offsite
+    secrets:
+      - postgres_password
+      - backup_public_cert
     volumes:
       - ./scripts/docker/backup.sh:/usr/local/bin/rtg-backup:ro
       - rtg-data:/app-data:ro
       - ${RTG_BACKUP_HOST_DIR:?Zet RTG_BACKUP_HOST_DIR in deploy/live.env op een absolute externe map}:/backups
+      # Deze tweede locatie moet buiten de server door WORM/Object Lock of een
+      # retentiebeleid worden beschermd. RTG schrijft nieuwe sets en wist hier
+      # nooit iets.
+      - ${RTG_BACKUP_OFFSITE_HOST_DIR:?Zet RTG_BACKUP_OFFSITE_HOST_DIR op een off-site WORM-mount}:/offsite
 
   # Alleen op expliciet verzoek starten met profiel "ops". Het script zelf
   # eist daarnaast een timestamp én een exact bijpassende bevestiging.
   herstel:
-    image: postgres:16-alpine
+    image: ${RTG_BACKUP_IMAGE:-rtg-backup:local}
+    build:
+      context: .
+      target: backup-runtime
     user: "1000:1000"
     profiles: ["ops"]
     read_only: true
@@ -60,13 +72,21 @@ services:
       PGPASSWORD_FILE: /run/secrets/postgres_password
       RTG_RESTORE_STAMP: ${RTG_RESTORE_STAMP:-}
       RTG_RESTORE_CONFIRM: ${RTG_RESTORE_CONFIRM:-}
+      RTG_BACKUP_PRIVATE_KEY_FILE: /run/secrets/backup_private_key
     secrets:
       - postgres_password
     volumes:
       - ./scripts/docker/herstel.sh:/usr/local/bin/rtg-herstel:ro
       - rtg-data:/app-data
       - ${RTG_BACKUP_HOST_DIR:?Zet RTG_BACKUP_HOST_DIR in deploy/live.env op een absolute externe map}:/backups:ro
+      # Alleen bij een expliciet herstel wordt het offline medium ingeplugd en
+      # via RTG_BACKUP_PRIVATE_KEY_FILE aangewezen. Normale containers zien hem nooit.
+      - ${RTG_BACKUP_PRIVATE_KEY_FILE:-/dev/null}:/run/secrets/backup_private_key:ro
     networks:
       - data
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=512m
+
+secrets:
+  backup_public_cert:
+    file: ${RTG_BACKUP_PUBLIC_CERT_FILE:?Maak eerst het publieke back-upcertificaat met npm run backup:sleutel}

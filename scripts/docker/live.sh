@@ -28,11 +28,13 @@ lees() {
 IMAGE="$(lees RTG_IMAGE)"
 [ -n "$IMAGE" ] || IMAGE="rtg-app:live"
 [ -r "$STATE" ] && IMAGE="$(sed -n '1p' "$STATE")"
+BACKUP_IMAGE="rtg-backup:live"
+[ -r "$STATE" ] && [ -n "$(sed -n '2p' "$STATE")" ] && BACKUP_IMAGE="$(sed -n '2p' "$STATE")"
 DOMAIN="$(awk -F= '$1 == "APP_URL" { sub(/^[^=]*=/, ""); print; exit }' "$ROOT/.env.productie" 2>/dev/null | sed 's#^https://##;s#/.*$##')"
 
 compose() {
   # shellcheck disable=SC2086 -- $COMPOSE is een vaste reeks argumenten uit ROOT.
-  RTG_IMAGE="$IMAGE" $COMPOSE "$@"
+  RTG_IMAGE="$IMAGE" RTG_BACKUP_IMAGE="$BACKUP_IMAGE" $COMPOSE "$@"
 }
 
 wacht_ready() {
@@ -62,12 +64,16 @@ case "$opdracht" in
     if [ -n "$vorig" ]; then docker image tag "$vorig" rtg-app:rollback; fi
     release="$(git rev-parse --short=12 HEAD 2>/dev/null || date -u +%Y%m%dT%H%M%SZ)"
     nieuw="rtg-app:release-$release"
+    nieuw_backup="rtg-backup:release-$release"
     echo "[live] bouw $nieuw"
     docker build --pull --tag "$nieuw" "$ROOT"
+    echo "[live] bouw $nieuw_backup"
+    docker build --pull --target backup-runtime --tag "$nieuw_backup" "$ROOT"
     IMAGE="$nieuw"
+    BACKUP_IMAGE="$nieuw_backup"
     compose up -d --no-build postgres redis motor app backup
     if wacht_ready; then
-      printf '%s\n' "$nieuw" > "$STATE"
+      printf '%s\n%s\n' "$nieuw" "$nieuw_backup" > "$STATE"
       echo "[live] klaar: $nieuw op https://$DOMAIN"
     else
       echo "[live] nieuwe release werd niet ready" >&2
@@ -116,9 +122,14 @@ case "$opdracht" in
   restore)
     stamp="${2:-}"
     case "$stamp" in ????????T??????Z) ;; *) echo "[live] geef de exacte back-uptimestamp" >&2; exit 78 ;; esac
+    private="${RTG_BACKUP_PRIVATE_KEY_FILE:-}"
+    [ -r "$private" ] || {
+      echo "[live] sluit het offline medium aan en zet RTG_BACKUP_PRIVATE_KEY_FILE op de privésleutel" >&2
+      exit 78
+    }
     echo "[live] stop eerst schrijvers en herstel daarna $stamp"
     compose stop app motor backup
-    RTG_RESTORE_STAMP="$stamp" RTG_RESTORE_CONFIRM="HERSTEL-$stamp" compose --profile ops run --rm herstel
+    RTG_BACKUP_PRIVATE_KEY_FILE="$private" RTG_RESTORE_STAMP="$stamp" RTG_RESTORE_CONFIRM="HERSTEL-$stamp" compose --profile ops run --rm herstel
     compose up -d postgres redis motor app backup
     wacht_ready
     echo "[live] herstel klaar; controleer nu expliciet een bestaande login en echte naam"

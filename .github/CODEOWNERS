@@ -1,0 +1,15 @@
+# Standaard moet een wijziging door de eigenaar van deze repository worden gezien.
+* @RahulRTG
+
+# De beveiligingsgrenzen krijgen daarnaast een expliciete eigenaar, zodat deze
+# regels zichtbaar blijven als de standaarddekking later wordt opgesplitst.
+/.github/workflows/ @RahulRTG
+/server/kern/stuur.js @RahulRTG
+/server/kern/stuur/ @RahulRTG
+/server/middleware/ @RahulRTG
+/server/routes/auth/ @RahulRTG
+/server/routes/stuur.js @RahulRTG
+/server/routes/bank.js @RahulRTG
+/server/routes/pay.js @RahulRTG
+/Dockerfile @RahulRTG
+/docker-compose.yml @RahulRTG

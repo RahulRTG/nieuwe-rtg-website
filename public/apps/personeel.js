@@ -1512,6 +1512,11 @@
         pkFlLaatst = '<span style="color:var(--soft);">› '+esc(q)+'</span><br>✦ '+esc(r.antwoord);
         const uit = document.getElementById('pkFlUit');
         if (uit) uit.innerHTML = pkFlLaatst;
+        const v = (r.goedkeuringen || [])[0];
+        if (v && confirm(T('pd.fl.check','Controleer deze exacte actie:')+'\n\n'+(v.samenvatting || v.pad)+'\n\n'+T('pd.fl.confirm','Wilt u dit eenmalige voorstel uitvoeren?'))) {
+          const b = await API.call('/staff/doe/bevestig', { goedkeuringId: v.id, akkoord: true });
+          toast(b.ok ? T('pd.fl.done','Voorstel bevestigd en uitgevoerd.') : T('pd.fl.stop','De server heeft de actie geweigerd.'));
+        }
       } catch(e){ toast(e.message); }
     };
     const pkfs = document.getElementById('pkFlStuur');

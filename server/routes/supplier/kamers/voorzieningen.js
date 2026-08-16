@@ -121,4 +121,26 @@ app.post('/api/supplier/door/toggle', supplierAuth, (req, res) => {
   res.json({ ok: true, doors: req.supplier.doors });
 });
 
+/* Idempotente variant voor voorstellen van de assistent. Een exact akkoord op
+   "vergrendel" mag niet door een statuswijziging tussen voorstel en uitvoering
+   opeens "open" betekenen, zoals bij een toggle zou kunnen gebeuren. */
+app.post('/api/supplier/door/zet', supplierAuth, (req, res) => {
+  const door = (req.supplier.doors || []).find(d => d.id === req.body.id);
+  if (!door) return res.status(404).json({ error: 'Deur niet gevonden.' });
+  const locked = req.body.locked !== false;
+  if (door.locked === locked) return res.json({ ok: true, doors: req.supplier.doors, ongewijzigd: true });
+  if (!locked) {
+    unlockDoor(req.supplier, door, req.actor.name);
+    logActivity(req.supplier.code, req.actor, 'opende "' + door.name + '" op afstand');
+  } else {
+    door.locked = true;
+    door.lastBy = req.actor.name;
+    door.lastAt = new Date().toISOString();
+    save();
+    logActivity(req.supplier.code, req.actor, 'vergrendelde "' + door.name + '"');
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'doors' });
+  }
+  res.json({ ok: true, doors: req.supplier.doors });
+});
+
 };

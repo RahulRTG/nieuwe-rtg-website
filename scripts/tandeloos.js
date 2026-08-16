@@ -33,6 +33,7 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const stil = process.argv.includes('--stil');
 const K = { rood: '\x1b[31m', geel: '\x1b[33m', grijs: '\x1b[90m', groen: '\x1b[32m', reset: '\x1b[0m' };
+const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /* De vier vormen die op een lege verzameling vanzelf slagen. De vangst is de
    uitdrukking waarover de bewering gaat, zodat we kunnen kijken of DIE ergens
@@ -46,8 +47,8 @@ const VORMEN = [
 /* Wat een verzameling niet-leeg verklaart. Ruim opgevat: elke bewering die
    over de lengte gaat en niet "nul" zegt, of een positieve some/find. */
 function isNietLeegVerklaard(blok, expr) {
-  const kern = expr.replace(/[.[\]()]/g, '\\$&');
-  const kop = kern.split('\\.')[0];
+  const kern = regexVeilig(expr);
+  const kop = regexVeilig(expr.split('.')[0]);
   /* Het VELD, los van de variabele waar het toevallig in zat. Dit scheelde het
      meeste ruis: heel vaak staat de niet-leeg-controle er wel, maar op een
      andere schrijfwijze --

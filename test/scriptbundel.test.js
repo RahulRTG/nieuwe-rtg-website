@@ -55,6 +55,15 @@ test('wat ertussen staat breekt de rij', () => {
   assert.match(heel, /scriptbundel/, 'commentaar en witruimte breken hem niet');
 });
 
+test('een lange onafgesloten HTML-constructie kost lineair werk en bundelt niets', () => {
+  const html = '<script src="/a.js" defer></script><!--' + 'x'.repeat(200000) +
+    '<script src="/b.js" defer></script>';
+  assert.equal(herschrijfHtml(html), html, 'onafgesloten commentaar is een harde rijgrens');
+  const metInhoud = '<script defer src="/a.js">tekst met <script src="/vals.js" defer></script></script>' +
+    '<script src="/b.js" defer></script>';
+  assert.equal(herschrijfHtml(metInhoud), metInhoud, 'scriptinhoud wordt nooit als losse HTML-tags gefilterd');
+});
+
 test('een rij van een is geen winst', () => {
   const uit = herschrijfHtml('<script src="/a.js" defer></script>\n<script src="/x.js"></script>');
   assert.ok(!/scriptbundel/.test(uit), 'een enkel script blijft gewoon staan');

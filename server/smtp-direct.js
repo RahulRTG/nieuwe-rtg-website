@@ -102,16 +102,14 @@ async function bijServer(host, poort, { van, naar, bericht, naam }) {
     if (kanTls) {
       const s = await g.zeg('STARTTLS');
       if (goed(s.code)) {
-        /* Opportunistische TLS: bij directe bezorging kent niemand elkaars
-           certificaat, dus een onvertrouwd certificaat is hier geen reden om
-           NIET te versturen -- versleuteld met een onbekende is beter dan
-           leesbaar over het internet. Dat is een andere afweging dan bij een
-           smarthost (server/smtp.js), waar we de tegenpartij wel kennen. */
+        /* STARTTLS is alleen bescherming als het certificaat ook bij de MX-host
+           hoort. Een onbekend certificaat wordt daarom een tijdelijke fout:
+           opnieuw proberen is veilig, doorsturen via een mogelijke MITM niet. */
         /* SNI alleen bij een NAAM: een IP-adres als servername is volgens
            RFC 6066 niet toegestaan, wordt door de ontvanger genegeerd en levert
            in Node alleen een waarschuwing op in het logboek. */
         const ipAdres = /^[\d.]+$/.test(host) || host.includes(':');
-        sok = tls.connect(Object.assign({ socket: sok, rejectUnauthorized: false },
+        sok = tls.connect(Object.assign({ socket: sok, rejectUnauthorized: true },
           ipAdres ? {} : { servername: host }));
         await new Promise((res, rej) => { sok.once('secure', res); sok.once('error', rej); });
         g = praat(sok);

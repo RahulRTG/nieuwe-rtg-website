@@ -37,6 +37,7 @@ const http = require('http');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 
 const WORTEL = path.join(__dirname, '..');
 const { TREDEN, maakKiezer } = require('./ladder/trappen');
@@ -126,7 +127,7 @@ async function haalRollen(vraag) {
   const rollen = { lid: null, lid2: null, lid2Codenaam: null, zaak: null, zaakCode: null, paden: ['/api/state', '/api/pay/overzicht', '/api/order', '/api/member/find', '/api/supplier/state', '/api/office/state', '/api/notifications', '/api/chat'] };
   const KYC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
   async function nieuwLid(merk) {
-    const u = merk + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+    const u = merk + crypto.randomBytes(8).toString('hex');
     const reg = await vraag('POST', '/api/auth/register', null, { name: 'Ladder ' + u, email: 'ladder' + u + '@voorbeeld.test', phone: '0612345678', password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     const tok = reg.data && reg.data.token;
     if (tok) await vraag('POST', '/api/verify/upload', tok, { image: KYC });

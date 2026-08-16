@@ -54,16 +54,14 @@ app.post('/api/fluister', auth, async (req, res) => {
   if (stuurLus && !r.pakte) {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
+      wereld: 'member',
       // streamende voortgang voor een zware taak: elke stap wordt live
       // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
       opStap: (v) => {
         try { bus && bus.publish('sse', { doel: 'tier', match: [req.session.tier],
           event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar } }); } catch (e) {}
       },
-      // alles wat het lid zelf mag: de hele leden-app EN de RTFoundation
-      // (gezin/kinderen). Alleen de zakelijke werk-apps van andere rollen
-      // (leverancier/personeel/kantoor/partner) blijven buiten bereik; de
-      // API zelf bewaakt verder wie waar recht op heeft (bv. ouder-goedkeuring).
+      // Leden- en Foundationpaden wel; werkwerelden blijven buiten bereik.
       filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w)),
       systeem: require('../../kern/rahul').RAHUL_LEAD +
         'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
@@ -72,6 +70,8 @@ app.post('/api/fluister', auth, async (req, res) => {
     if (lus && lus.tekst) {
       onthoudGesprek(req, lus.tekst);
       return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+        goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
+        goedkeuringWereld: 'member',
         aiBeschikbaar: true, modus: aiStatus().modus, verwerking: aiStatus().verwerking });
     }
   }

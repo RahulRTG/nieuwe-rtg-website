@@ -163,7 +163,7 @@ function rahulVul(){
 }
 async function rahulVraag(q){
   $('#rahulIn').value=''; $('#rahulUit').textContent='Rahul denkt na…';
-  try { const d = await api('/api/supplier/ai', { q }); $('#rahulUit').textContent = (d && (d.reply || d.error)) || 'Ik kwam er niet uit.'; if (d && d.did) laad(); }
+  try { const d = await api('/api/supplier/ai', { q }); $('#rahulUit').textContent = (d && (d.reply || d.error)) || 'Ik kwam er niet uit.'; const v=(d.goedkeuringen||[])[0]; if(v&&confirm('Controleer deze exacte actie:\n\n'+(v.samenvatting||v.pad)+'\n\nWilt u dit eenmalige voorstel uitvoeren?')){const b=await api('/api/supplier/doe/bevestig',{goedkeuringId:v.id,akkoord:true});if(b.ok){$('#rahulUit').textContent+=' Uitgevoerd na uw bevestiging.';laad();}} else if (d && d.did) laad(); }
   catch(e){ $('#rahulUit').textContent = e.message; }
 }
 document.getElementById('rahulFab').addEventListener('click',function(){ $('#rahulSheet').hidden=false; this.style.display='none'; rahulVul(); $('#rahulIn').focus(); if(!$('#rahulUit').textContent) $('#rahulUit').textContent='Vraag me om een overzicht of tik een suggestie. Ik lees mee met de meldingen.'; });

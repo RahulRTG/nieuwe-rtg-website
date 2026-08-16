@@ -27,9 +27,13 @@
    ========================================================================== */
 const fs = require('fs');
 const path = require('path');
+const rtgKlok = require('./lib/klok');
+const smsSandbox = require('./sms-sandbox');
 
 const OUTBOX = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
 const SMTP_URL = process.env.SMTP_URL || '';
+const SMTP_SANDBOX_GEVRAAGD = process.env.SMTP_SANDBOX === '1';
+const SMTP_SANDBOX = SMTP_SANDBOX_GEVRAAGD && process.env.NODE_ENV !== 'production';
 const FROM = process.env.MAIL_FROM || 'Rahul Travel Group <no-reply@rahultravelgroup.example>';
 const DIRECT = process.env.MAIL_DIRECT === '1';
 const DKIM_SLEUTEL = process.env.DKIM_PRIVATE_KEY || '';
@@ -39,13 +43,21 @@ const MAIL_DOMEIN = process.env.MAIL_DOMEIN || (/@([^>\s]+)/.exec(FROM) || [])[1
 let transporter = null;
 if (SMTP_URL) {
   try {
+    const host = new URL(SMTP_URL).hostname.toLowerCase();
+    const lokaal = host === '127.0.0.1' || host === 'localhost' || host === '::1';
+    if (SMTP_SANDBOX && !lokaal) throw new Error('SMTP_SANDBOX accepteert alleen localhost/loopback');
     transporter = require('./smtp').createTransport(SMTP_URL);
-    console.log('[mail] SMTP-transport actief.');
+    console.log('[mail] SMTP-transport actief' + (SMTP_SANDBOX ? ' (lokale sandbox).' : '.'));
   } catch (e) {
     console.warn('[mail] SMTP_URL gezet maar ongeldig (' + (e && e.message) + '); e-mail gaat naar de outbox.');
   }
 }
 const CONFIGURED = !!transporter;
+/* De lokale sandboxes krijgen bovenop hun startconfiguratie een runtime-
+   zekering. De Integratiekamer kan ze UIT zetten zonder procesherstart; AAN kan
+   alleen wanneer de veilige lokale provider bij de start echt is ingericht. */
+let smtpSandboxAan = CONFIGURED && SMTP_SANDBOX;
+let smsSandboxAan = smsSandbox.enabled;
 
 /* De outbox is niet alleen de ontwikkelstand: hij vangt ook mail op als een
    ECHTE verzending mislukt (zie send() hieronder). Dan liggen er dus op de
@@ -63,7 +75,7 @@ function toOutbox(to, subject, text) {
      na elkaar, precies de twee dingen die je allebei nodig hebt. Een van de twee
      verdween dan, terwijl het logboek beide als bewaard meldde. Zelfde soort
      fout als de rest: een storing die je niet kunt zien. */
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const stamp = rtgKlok.datum().toISOString().replace(/[:.]/g, '-');
   const staart = require('crypto').randomBytes(4).toString('hex');
   const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
   const kluis = require('./kluis');
@@ -85,7 +97,7 @@ function bouwBericht(to, subject, text) {
   const { _kopWaarde: kopWaarde, _rfcDatum: rfcDatum } = require('./smtp');
   const id = '<' + crypto.randomBytes(12).toString('hex') + '@' + (MAIL_DOMEIN || 'localhost') + '>';
   const koppen = {
-    From: FROM, To: to, Subject: kopWaarde(subject), Date: rfcDatum(new Date()),
+    From: FROM, To: to, Subject: kopWaarde(subject), Date: rfcDatum(rtgKlok.datum()),
     'Message-ID': id, 'MIME-Version': '1.0',
     'Content-Type': 'text/plain; charset=utf-8', 'Content-Transfer-Encoding': 'base64'
   };
@@ -139,8 +151,8 @@ function send(to, subject, text) {
     try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: to, mislukt: !gelukt, reden }); } catch (e) {}
   };
   const isMail = /@/.test(String(to));
-  if (!isMail) { try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); } return; }
-  if (transporter) {
+  if (!isMail) return sendSms(String(to).replace(/^sms:/i, ''), subject, text);
+  if (transporter && (!SMTP_SANDBOX || smtpSandboxAan)) {
     transporter.sendMail({ from: FROM, to, subject, text })
       .then(() => { console.log(`[mail] verzonden naar ${to}: ${subject}`); journaal(true, 'smtp'); })
       .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); journaal(false, 'smtp', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
@@ -150,9 +162,35 @@ function send(to, subject, text) {
   try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
 }
 
+/* Providerachtige SMS-aflevering, volledig lokaal. In sandboxstand valideert
+   de contractsimulator eerst het verzoek; pas bij acceptatie komt het bericht
+   in de (waar mogelijk versleutelde) outbox. Zonder sandbox blijft de outbox
+   het zichtbare lokale vangnet. */
+function sendSms(to, subject, text) {
+  const journaal = (gelukt, hoe, reden) => {
+    try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: 'sms:' + to, mislukt: !gelukt, reden }); } catch (e) {}
+  };
+  try {
+    if (smsSandbox.enabled && !smsSandboxAan) {
+      const e = new Error('De SMS-sandbox is door de Integratiekamer uitgezet.');
+      e.code = 'SMS_SANDBOX_UIT';
+      throw e;
+    }
+    const r = smsSandbox.enabled
+      ? smsSandbox.send(to, text)
+      : { ok: true, status: 'outbox', provider: 'outbox', sandbox: false, bezorgd: false };
+    toOutbox('sms:' + to, subject, text);
+    journaal(true, smsSandbox.enabled ? 'sms-sandbox' : 'outbox');
+    return r;
+  } catch (e) {
+    journaal(false, smsSandbox.enabled ? 'sms-sandbox' : 'outbox', e.message);
+    throw e;
+  }
+}
+
 async function bezorgNu(to, subject, text) {
   if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
-  if (transporter) {
+  if (transporter && (!SMTP_SANDBOX || smtpSandboxAan)) {
     try {
       await transporter.sendMail({ from: FROM, to, subject, text });
       return { ok: true, soort: 'bezorgd', via: 'smarthost' };
@@ -172,4 +210,35 @@ async function bezorgNu(to, subject, text) {
   catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'de outbox is niet te schrijven' }; }
 }
 
-module.exports = { send, bezorgNu, configured: CONFIGURED || DIRECT, direct: DIRECT, bouwBericht };
+function zetSandbox(kanaal, aan) {
+  if (process.env.NODE_ENV === 'production') return { ok: false, code: 'SANDBOX_PRODUCTIE', error: 'Een lokale sandbox kan niet in productie worden geschakeld.' };
+  if (kanaal === 'smtp') {
+    if (aan && !(CONFIGURED && SMTP_SANDBOX)) return { ok: false, code: 'SMTP_SANDBOX_NIET_INGERICHT', error: 'Richt eerst SMTP_SANDBOX met een lokale SMTP_URL in.' };
+    smtpSandboxAan = !!aan;
+    return { ok: true, aan: smtpSandboxAan };
+  }
+  if (kanaal === 'sms') {
+    if (aan && !smsSandbox.enabled) return { ok: false, code: 'SMS_SANDBOX_NIET_INGERICHT', error: 'Zet SMS_SANDBOX=1 bij de lokale start.' };
+    smsSandboxAan = !!aan;
+    return { ok: true, aan: smsSandboxAan };
+  }
+  return { ok: false, code: 'KANAAL_ONBEKEND', error: 'Onbekend postkanaal.' };
+}
+
+function sandboxStand() {
+  return {
+    smtp: { geconfigureerd: CONFIGURED && SMTP_SANDBOX, aan: smtpSandboxAan, live: (CONFIGURED && !SMTP_SANDBOX) || DIRECT },
+    sms: { geconfigureerd: smsSandbox.enabled, aan: smsSandboxAan, live: false }
+  };
+}
+
+/* Er is nog bewust geen extern SMS-kanaal aangesloten. Dit expliciete veld
+   laat herstel en het techniekbord fail-closed beslissen; een sms:...-bericht
+   in de outbox is zichtbaar, maar is géén bezorgde tweede factor. */
+module.exports = {
+  send, sendSms, bezorgNu, configured: CONFIGURED || DIRECT,
+  liveConfigured: (CONFIGURED && !SMTP_SANDBOX) || DIRECT,
+  sandboxConfigured: CONFIGURED && SMTP_SANDBOX,
+  smsConfigured: false, smsSandboxConfigured: smsSandbox.enabled,
+  smsMode: smsSandbox.mode, direct: DIRECT, bouwBericht, zetSandbox, sandboxStand
+};

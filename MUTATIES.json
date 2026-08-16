@@ -801,6 +801,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "collectie-transactie-sqlite.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-sqlite.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "collega-namen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1459,6 +1467,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "geldveilig.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/directpay/index.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "geldwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1696,6 +1712,13 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "herstel-sandbox.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "overleefd"
+    },
     "herstel2fa.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1850,6 +1873,21 @@
       "module": "server/kern/mailsleutel.js",
       "operator": "!==->===",
       "gezakt": 9
+    },
+    "incidentcontrole-route.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "incidentcontrole.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/incidentcontrole.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "inkoopketen.test.js": {
       "soort": "server",
@@ -2431,6 +2469,76 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "magnaat-economenlab.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-economie.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaat-motorklant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-motorklant.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "magnaat-partnerstudio-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "magnaat-partnerstudio.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "magnaat-partnerstudio.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-partnerstudio-basis.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaat-rust-integratie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-economie.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "magnaat-teamkamer-productie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-trainingslobby.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "magnaat-trainingslobby.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-trainingslobby.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
+    "magnaat-werkroutefabriek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-capabilities.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "mail-eigen.test.js": {
       "soort": "puur",
@@ -3636,12 +3744,36 @@
       "gezakt": 13,
       "scherp": "gezakt"
     },
+    "productie-installatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/productie-installatie.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "productie-motor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie-motor.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "productie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/config.js",
       "operator": "===->!==#0",
       "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "provider-sandbox.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sms-sandbox.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "proxykop.test.js": {
@@ -3869,6 +4001,14 @@
       "module": "public/shared/rekenschuif.js",
       "operator": "===->!==#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "release-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "rem.test.js": {
@@ -4200,6 +4340,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "rust-migraties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/rust-migraties.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "rust-noodstop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-motorklant.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "rust.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4445,6 +4601,14 @@
       ],
       "geprobeerd": 7,
       "posities": 8
+    },
+    "sentinel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "server.test.js": {
       "soort": "server",
@@ -5269,6 +5433,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "uitrol.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/uitrol.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "upload-poort.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6003,6 +6175,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "zware-bundels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bundel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     }
   }
 }

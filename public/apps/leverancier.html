@@ -1090,7 +1090,10 @@
 <!-- uitvoer.js zonder defer en voor leverancier.js: dat script meldt zijn
      eigen model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/leverancier.js"></script>
+<!-- De 788 KB hoofdbundel heeft alle bovenstaande poorten nodig, maar niet de
+     HTML-parser. Defer laat hem parallel laden en voert hem vóór
+     DOMContentLoaded uit, wanneer de complete leveranciers-shell bestaat. -->
+<script src="/apps/leverancier.js" defer></script>
 <script>
 window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',

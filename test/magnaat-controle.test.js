@@ -1,3 +1,6 @@
+/* Het RTG Controleregister: ieder gevonden codepunt heeft dezelfde veilige
+   schakelaar, taakmotor en bestuursaudit, terwijl ontbrekend bronbewijs en
+   ontbrekende echte gameplay zichtbaar rood blijven. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
@@ -33,10 +36,35 @@ test('letterlijk iedere API, scherm, functievlag en procesfamilie heeft één co
   assert.equal(d.dekking.functies, functies.FUNCTIES.length);
   assert.equal(d.dekking.werkprocessen, graph.workflows.length);
   assert.equal(d.dekking.totaal, graph.endpoints.length + graph.apps.length + functies.FUNCTIES.length + graph.workflows.length);
-  assert.equal(d.dekking.gekoppeld, d.dekking.totaal);
-  assert.equal(d.dekking.percentage, 100);
+  assert.equal(d.dekking.gekoppeld < d.dekking.totaal, true,
+    'gevonden is niet hetzelfde als volledig gekoppeld');
+  assert.ok(d.dekking.percentage > 0 && d.dekking.percentage < 100);
   assert.ok(d.dekking.totaal >= 2500);
   assert.equal(new Set(graph.controlepunten.map(p => p.id)).size, graph.controlepunten.length);
+});
+
+test('ieder soort codepunt deelt aantoonbaar de trainingsschakelaar, taakmotor en bestuursaudit', () => {
+  const { graph, controle } = omgeving();
+  for (const soort of ['api', 'scherm', 'functie', 'werkproces']) {
+    const punt = graph.controlepunten.find(p => p.soort === soort);
+    assert.ok(punt, soort + ' ontbreekt in de scan');
+    assert.equal(punt.dekking.waarden.schakelaar, true);
+    assert.equal(punt.dekking.waarden.taak, true);
+    assert.equal(punt.dekking.waarden.proef, true);
+    assert.equal(punt.dekking.waarden.audit, true);
+    assert.equal(punt.signalen.controleproef, true);
+    assert.equal(punt.signalen.bestuursaudit, true);
+
+    const gezet = controle.zet(boardroom, punt.id, { aan: false });
+    assert.equal(gezet.ok, true);
+    assert.equal(controle.beschikbaar(soort, punt.sleutel), false);
+    const taak = controle.taakMaak(boardroom, punt.id, { titel: 'Bewijs ' + soort });
+    assert.equal(taak.ok, true);
+  }
+  const log = controle._state().audit;
+  assert.equal(log.filter(x => x.actie === 'controlepunt-gewijzigd').length, 4);
+  assert.equal(log.filter(x => x.actie === 'testtaak-gemaakt').length, 4);
+  assert.ok(log.every(x => x.actor === boardroom.key));
 });
 
 test('een kantoor ziet alleen zijn eigen punten en een medewerker kan niet schakelen', () => {

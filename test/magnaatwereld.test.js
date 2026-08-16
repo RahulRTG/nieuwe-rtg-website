@@ -28,6 +28,13 @@ function voltooi(w, key, functieId, apparaat = 'computer') {
   return r;
 }
 
+function formulierInvoer(stap) {
+  return Object.fromEntries(stap.velden.map(veld => [veld.id,
+    veld.type === 'vink' ? true : veld.opties ? veld.opties[0]
+      : 'Volledige synthetische notitie voor dit overdraagbare RTG-dossier.'
+  ]));
+}
+
 test('elke geregistreerde RTG-functie heeft een veilige computer- en PDA-opdracht', () => {
   const { w } = wereld();
   assert.equal(w.catalogus.length, functies.FUNCTIES.length);
@@ -178,21 +185,62 @@ test('computer en PDA tonen de echte RTG-app in een afgeschermde spelstand', () 
   assert.match(kern, /if \(magnaatProef\) API\.enabled = false;/);
   assert.match(sandbox, /url\.pathname\.indexOf\('\/api\/'\) === 0/);
   assert.match(sandbox, /window\.RTCPeerConnection/);
+  assert.match(sandbox, /Object\.defineProperty\(window, 'localStorage'/);
+  assert.match(sandbox, /window\.XMLHttpRequest\.prototype\.send/);
+  assert.match(sandbox, /document\.addEventListener\('submit'/);
+  assert.match(magnaat, /data-ctl-open/);
+  assert.match(magnaat, /openControlScreen/);
+  assert.match(magnaat, /\^\\\/apps\\\/\[\^\?\#\]\+\\\.html\$/,
+    'alleen lokale appschermen mogen in de veilige computer worden geopend');
   assert.match(os, /'tab:reizen'/);
   assert.match(os, /'link:passkeys'/);
 });
 
-test('de wereld toont de automatische Capability Graph naast de oude 49 functieschakelaars', () => {
+test('de wereld toont de automatische Capability Graph naast de bestaande functiecatalogus', () => {
   const { w } = wereld();
   const d = w.overzicht('user-graph');
   assert.equal(d.capabilityGraph.cijfers.functieFlags, functies.FUNCTIES.length);
+  assert.equal(d.capabilityGraph.motor.bron, 'javascript');
+  assert.equal(d.capabilityGraph.motor.reden, 'uitgeschakeld');
+  assert.equal(Object.hasOwn(d.capabilityGraph.motor, 'canarySleutel'), false,
+    'de bestuurlijke status toont de motorstand maar nooit de instance-sleutel');
   assert.ok(d.capabilityGraph.cijfers.apps >= 150);
   assert.ok(d.capabilityGraph.cijfers.apiActies >= 1500);
   assert.ok(d.capabilityGraph.cijfers.werkprocessen >= 500);
   assert.ok(d.capabilityGraph.cijfers.controlepunten >= 2500);
   assert.ok(d.capabilityGraph.cijfers.ongedekteApiActies > 0);
+  assert.equal(d.capabilityGraph.dekkingsmatrix.percentage, 100);
+  assert.equal(d.capabilityGraph.dekkingsmatrix.metGaten, 0);
+  assert.equal(d.capabilityGraph.dekkingsmatrix.dimensies.length, 11);
+  assert.ok(d.capabilityGraph.dekkingsmatrix.dimensies.every(x => x.percentage === 100));
+  assert.equal(d.capabilityGraph.automatischeWerkprocessen, d.capabilityGraph.cijfers.werkprocessen);
   assert.ok(d.capabilityGraph.kantoren.some(k => k.id === 'klantenservice'));
   assert.ok(d.capabilityGraph.volledigeWerkprocessen.some(wf => wf.id === 'service-reiswijziging' && wf.stappen === 8));
+  assert.ok(d.capabilityGraph.werkprocessen.every(wf => wf.startbaar && wf.dekking.volledig),
+    'iedere ontdekte codefamilie heeft een startbare volledige route');
+});
+
+test('een automatisch ontdekt werkproces opent het echte scherm en rondt het synthetische dossier af', () => {
+  const { db, w } = wereld();
+  const key = 'user-auto-route';
+  const workflow = w.capabilityGraph().werkprocessen.find(x => x.id !== 'service-reiswijziging');
+  let r = w.werkprocesStart(key, workflow.id, 'computer');
+  assert.equal(r.ok, true);
+  assert.equal(r.taak.stappen, 5);
+  assert.equal(r.taak.huidig.schermPad, workflow.app.pad);
+  assert.match(r.taak.huidig.schermPad, /^\/apps\/.*\.html$/);
+  while (r.taak.status === 'bezig') {
+    const stap = r.taak.huidig;
+    r = stap.soort === 'software'
+      ? w.taakHandeling(key, r.taak.id, stap.doel)
+      : w.taakActie(key, r.taak.id, formulierInvoer(stap));
+    assert.equal(r.ok, true);
+  }
+  assert.equal(r.taak.dossier.werklog.length, 4);
+  assert.ok(r.taak.economischEffect);
+  assert.equal(db.data.orders, undefined);
+  assert.equal(db.data.pay, undefined);
+  assert.deepEqual(Object.keys(db.data), ['magnaatWereld']);
 });
 
 test('een volledig servicedossier gebruikt drie echte RTG-schermen en vier gevalideerde werkhandelingen', () => {
@@ -241,20 +289,20 @@ test('een onvolledige dossierhandeling wordt geweigerd en raakt de werklog niet'
   assert.equal(r.taak.dossier.werklog.length, 0);
 });
 
-test('de bestaande RTG-wereld levert een gebalanceerde economie en missie-effecten', () => {
+test('de bestaande RTG-wereld levert een gebalanceerde economie en missie-effecten', async () => {
   const { w } = wereld();
   const begin = w.overzicht('user-economie');
   assert.equal(begin.economie.grootboek.controle.inBalans, true);
   const missie = voltooi(w, 'user-economie', 'betalen');
   assert.ok(missie.taak.economischEffect);
   assert.equal(w.overzicht('user-economie').economie.werkvoorraad.aantal, 1);
-  const dag = w.economieVolgendeDag('user-economie', 'wereld-economie-dag-1');
+  const dag = await w.economieVolgendeDag('user-economie', 'wereld-economie-dag-1');
   assert.equal(dag.dag, 1);
   assert.equal(dag.grootboek.controle.verschil, 0);
   assert.equal(dag.werkvoorraad.aantal, 0);
 });
 
-test('de economische cockpit en drie ledenroutes zijn onderdeel van de echte Magnaat-app', () => {
+test('de economische cockpit en het Economenlab zijn onderdeel van de echte Magnaat-app', () => {
   const basis = path.join(__dirname, '..');
   const html = fs.readFileSync(path.join(basis, 'public/apps/magnaat.html'), 'utf8');
   const routes = fs.readFileSync(path.join(basis, 'server/routes/magnaatwereld.js'), 'utf8');
@@ -262,8 +310,13 @@ test('de economische cockpit en drie ledenroutes zijn onderdeel van de echte Mag
   assert.match(html, /id="ecoStrategy"/);
   assert.match(html, /id="ecoChart"/);
   assert.match(html, /id="ecoLedger"/);
+  assert.match(html, /id="ecoIncome"/);
+  assert.match(html, /id="ecoBalanceSheet"/);
+  assert.match(html, /id="econAnalysis"/);
+  assert.match(html, /function renderEconomistLab\(e\)/);
   assert.match(html, /function renderEconomy\(\)/);
   assert.match(routes, /\/api\/member\/magnaat\/economie\/beslis/);
+  assert.match(routes, /\/api\/member\/magnaat\/economie\/analyse/);
   assert.match(routes, /\/api\/member\/magnaat\/economie\/volgende-dag/);
   assert.match(routes, /\/api\/member\/magnaat\/economie\/schok/);
   const inline = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m => m[1]).filter(Boolean);
@@ -284,11 +337,26 @@ test('een boardroom-schakelaar zet gameplay uit zonder productie te raken', () =
   assert.deepEqual(Object.keys(db.data), ['magnaatWereld']);
 });
 
+test('het Controleregister maakt bij volledige dekking geen spooktaken', () => {
+  const { w } = wereld();
+  const voor = w.boardroomControleOverzicht('user-eigenaar', { soort: 'werkproces', gat: 'alle', limiet: 20 });
+  assert.equal(voor.dekking.percentage, 100);
+  assert.equal(voor.dekking.metGaten, 0);
+  assert.equal(voor.punten.length, 0);
+  const plan = w.boardroomControlePlanGaten('user-eigenaar', { limiet: 8 });
+  assert.equal(plan.aangemaakt, 0);
+  assert.equal(plan.bekeken, 0);
+  assert.deepEqual(plan.taken, []);
+  const nogmaals = w.boardroomControlePlanGaten('user-eigenaar', { limiet: 8 });
+  assert.equal(nogmaals.aangemaakt, 0);
+});
+
 test('medewerker en boardroom hebben beide een volledige codecontrole-interface', () => {
   const basis = path.join(__dirname, '..');
   const member = fs.readFileSync(path.join(basis, 'public/apps/magnaat.html'), 'utf8');
   const boardroom = fs.readFileSync(path.join(basis, 'public/apps/magnaat-kantoor.html'), 'utf8');
   const routes = fs.readFileSync(path.join(basis, 'server/routes/magnaatwereld.js'), 'utf8');
+  const routebronnen = routes + fs.readFileSync(path.join(basis, 'server/routes/kantoren/integraties.js'), 'utf8');
   for (const html of [member, boardroom]) {
     assert.match(html, /id="controlPoints"/);
     assert.match(html, /id="controlTasks"/);
@@ -297,6 +365,8 @@ test('medewerker en boardroom hebben beide een volledige codecontrole-interface'
     assert.doesNotThrow(() => inline.forEach(script => new Function(script)));
   }
   assert.match(member, /id="officeRoleSelect"/);
+  assert.match(member, /id="officeWorkflowSelect"/);
+  assert.match(member, /function openWorkflowScreen\(\)/);
   assert.match(boardroom, /id="officeMatrix"/);
   assert.match(boardroom, /data-ctl-office/);
   assert.match(boardroom, /data-ctl-role/);
@@ -304,4 +374,36 @@ test('medewerker en boardroom hebben beide een volledige codecontrole-interface'
   assert.match(routes, /\/api\/office\/magnaat\/controle\/zet/);
   assert.match(routes, /\/api\/member\/magnaat\/controle\/zelftest/);
   assert.match(routes, /\/api\/office\/magnaat\/controle\/zelftest/);
+  assert.match(routes, /\/api\/office\/magnaat\/controle\/gaten\/plan/);
+  const nieuweBedrijfsroutes = [
+    '/api/member/magnaat/economie/analyse',
+    '/api/member/magnaat/partner/stap',
+    '/api/member/magnaat/partner/start',
+    '/api/member/magnaat/teamkamer/actie',
+    '/api/member/magnaat/teamkamer/bedien',
+    '/api/member/magnaat/teamkamer/deelnemen',
+    '/api/member/magnaat/teamkamer/maak',
+    '/api/member/magnaat/teamkamer/mijn',
+    '/api/member/magnaat/teamkamer/rol',
+    '/api/member/magnaat/teamkamer/start',
+    '/api/office/magnaat/controle/gaten/plan',
+    '/api/office/magnaat/partner/beslis',
+    '/api/office/magnaat/partners',
+    '/api/office/techniek/integraties/noodstop',
+    '/api/office/techniek/integraties/schakel',
+    '/api/office/techniek/integraties/test',
+    '/api/office/techniek/integraties/verantwoordelijke',
+    '/api/supplier/magnaat/studio/bouwsteen',
+    '/api/supplier/magnaat/studio/bouwsteen/weg',
+    '/api/supplier/magnaat/studio/indienen',
+    '/api/supplier/magnaat/studio/indienen/intrekken',
+    '/api/supplier/magnaat/studio/proef/stap',
+    '/api/supplier/magnaat/studio/proef/start',
+    '/api/supplier/magnaat/studio/profiel',
+    '/api/supplier/magnaat/studio/relatie',
+    '/api/supplier/magnaat/studio/relatie/beslis'
+  ];
+  for (const pad of nieuweBedrijfsroutes) {
+    assert.ok(routebronnen.includes("'" + pad + "'"), pad + ' is daadwerkelijk op een gekoppelde RTG-router geregistreerd');
+  }
 });

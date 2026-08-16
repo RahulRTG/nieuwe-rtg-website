@@ -7,6 +7,9 @@ server/data/
 # runtime-staat + sleutels van de Rust-motor (state.json, secret.key, vault.key):
 # nooit committen -- privaat sleutelmateriaal en de hele geldstand
 motor-data/
+# los Sentinel-beheergeheim en blijvende noodstand/audit: nooit in git
+.sentinel-token
+sentinel-data/
 # de sleutel en brokken van de GEHEUGEN-motor: nooit committen, ook niet als
 # RTG_DATA_DIR ergens anders wijst dan server/data
 **/geheugen.key
@@ -26,6 +29,7 @@ deploy/live.env
 backups/
 .vercel
 public/dist/
+.release/
 
 # Lokale audit-, smoke- en E2E-uitvoer. Deze map kan databases, outboxberichten
 # en tijdelijke cryptografische sleutels bevatten en is nooit broncode.

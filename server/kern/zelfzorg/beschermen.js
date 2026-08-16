@@ -8,7 +8,7 @@ const techniek = require('../../techniek');
 const kluis = require('../../kluis');
 
 module.exports = (ctx) => {
-  const { db, schrijf, beveilig, pay, bank, accounts, sessions, DATA_DIR, fs, path, log } = ctx;
+  const { db, schrijf, beveilig, pay, bank, accounts, sessions, DATA_DIR, fs, path, log, mail } = ctx;
 
   async function bescherm(door) {
     const adviezen = [];
@@ -19,7 +19,11 @@ module.exports = (ctx) => {
     const checks = await techniek.draaiChecks({
       db, accounts, sessions, DATA_DIR, fs, path,
       STORE: require('../../db').STORE, pgPing: require('../../db').pgPing,
-      mailGeconfigureerd: !!(process.env.SMTP_URL || process.env.SMTP_HOST),
+      mailGeconfigureerd: !!(mail && mail.configured),
+      mailLiveGeconfigureerd: !!(mail && mail.liveConfigured),
+      mailSandboxGeconfigureerd: !!(mail && mail.sandboxConfigured),
+      smsGeconfigureerd: !!(mail && mail.smsConfigured),
+      smsSandboxGeconfigureerd: !!(mail && mail.smsSandboxConfigured),
       zekeringen: zek, pay, bank,
       fouten: log ? () => log.foutenSamenvatting() : null
     });

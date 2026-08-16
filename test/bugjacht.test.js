@@ -512,6 +512,9 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     // deze proef gaat niet over betalen; zonder deze vlag weigert productie te
     // starten omdat de demo-provider anders elke betaling zelf zou bevestigen
     STRIPE_DEMO_BEWUST: '1',
+    // er is nog geen extern SMS-kanaal; telefoonherstel blijft in deze
+    // productietoets daarom bewust en aantoonbaar fail-closed
+    RTG_HERSTEL_SMS_UIT_BEWUST: '1',
     OFFICE_CODE: 'PROEFCODE1234', SESSION_SECRET: sleutel('y')
   } });
   /* X-Forwarded-Proto: https, want in productie staat er een afdwinging op --

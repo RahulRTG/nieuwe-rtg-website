@@ -30,7 +30,7 @@ module.exports = function maakDiensten(deps) {
     DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
     ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg,
     ledenGidsZet, ledenGidsZoek, ledenPrijs, maakLive, mail,
-    onExternalChange, ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, 
+    onExternalChange, ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions,
     sseToOffice, sseToSupplier, tokenHash
   } = deps;
   /* TWEE NAMEN DIE ER NOG NIET ZIJN als dit blok draait: lidBoardUit en
@@ -96,7 +96,7 @@ module.exports = function maakDiensten(deps) {
   onExternalChange(() => {
     ledenAantalVerversen(); // externe wijziging: ledental opnieuw bepalen
     if (!db.data || !db.data.sessions) return;
-    for (const [t, s] of Object.entries(db.data.sessions)) sessions.set(t, s);
+    herbouwSessions();
   });
 
   /* Alles wat elk partnerbedrijf standaard nodig heeft; wordt gebruikt voor

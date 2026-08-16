@@ -1,7 +1,7 @@
 /* Het afdelingsregister (kern/afdelingen): de eerste twaalf kamers van het
    RTG-kantoor als configuratie - per kamer de naam, de KPI's en de lijsten,
-   alles defensief lezend uit de datastore. De vijf jongere kamers staan in
-   register2.js; kamers met naamInzage: true mogen via de identiteitskluis
+   alles defensief lezend uit de datastore. De jongere specialistische kamers staan in
+   register2/; kamers met naamInzage: true mogen via de identiteitskluis
    (afdelingen/inzage.js) de echte naam bij een codenaam opvragen. */
 module.exports = (ctx) => {
   const { d, lijst, tel, recent, ledenGeteld, functies } = ctx;

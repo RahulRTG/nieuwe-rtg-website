@@ -1,12 +1,11 @@
 /* DE LEVENSPAS: wie mag wat van mij zien (LEVEN.md par. 2.8, fase 2).
 
-   EEN COMPONENT VOOR TWEE WERELDEN, en dat is hier geen luxe maar de kern van
-   de zaak. Aan de ene kant staat het RTG-lid (/apps/leven.html, Bearer-token),
-   aan de andere kant het gezinsprofiel van de RTFoundation
-   (/apps/foundation/mijnbanden.html, gezinscode plus profieltoken). Het scherm
-   dat ze te zien krijgen MOET hetzelfde zijn: aan beide kanten van een band
-   staat een mens die dezelfde beslissing neemt, en twee schermen die dezelfde
-   afspraak anders tonen, zijn twee verschillende afspraken geworden.
+   EEN HERBRUIKBARE COMPONENT VOOR BEIDE SESSIEWERELDEN. De actieve pagina is
+   het gezinsprofiel van de RTFoundation
+   (/apps/foundation/mijnbanden.html, gezinscode plus profieltoken). Het
+   routecontract ondersteunt daarnaast het RTG-lid achter een Bearer-token;
+   daarom blijft de component zijn transport via `post` geïnjecteerd krijgen
+   en bevat hij zelf geen inlog- of routekennis.
 
    Wat per wereld verschilt is uitsluitend HOE er gevraagd wordt. Dat komt via
    `post` binnen, met het pad al voluit ingevuld door de pagina zelf -- er

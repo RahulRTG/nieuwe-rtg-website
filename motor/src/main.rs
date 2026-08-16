@@ -309,7 +309,41 @@ fn av_route(stand: &std::sync::Mutex<AvStand>, req: &Request) -> Response {
     Response { status: 200, body: b.dump() }
 }
 
+fn reken_route(req: &Request) -> Response {
+    if req.method != "POST" || req.path != "/api/reken/magnaat/markt" {
+        return fout(404, "Onbekende rekenroute.");
+    }
+    let body = match json::parse(if req.body.is_empty() { "{}" } else { &req.body }) {
+        Ok(v) => v,
+        Err(_) => return fout(400, "Kapotte JSON."),
+    };
+    match rtg_motor::magnaat::bereken_markt(&body) {
+        Ok(v) => Response { status: 200, body: v.dump() },
+        Err(e) => fout(400, &e),
+    }
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("capability-scan") {
+        let root = match args.get(2) {
+            Some(p) => std::path::Path::new(p),
+            None => {
+                eprintln!("gebruik: rtg-motor capability-scan <projectroot>");
+                std::process::exit(2);
+            }
+        };
+        match rtg_motor::capabilities::scan(root) {
+            Ok(uit) => {
+                println!("{}", uit.dump());
+                return;
+            }
+            Err(fout) => {
+                eprintln!("[capability-scan] {}", fout);
+                std::process::exit(1);
+            }
+        }
+    }
     let addr = env("RTG_MOTOR_ADDR", "127.0.0.1:3100");
     let maxconn: usize = env("RTG_MOTOR_MAXCONN", "1024").parse().unwrap_or(1024);
 
@@ -383,6 +417,9 @@ fn main() {
         }
         if req.path.starts_with("/api/av/") {
             return av_route(&router_av, req);
+        }
+        if req.path.starts_with("/api/reken/") {
+            return reken_route(req);
         }
         route(&router_state, req)
     });
@@ -500,6 +537,21 @@ mod tests {
         // zonder geconfigureerd token: geen slot (loopback-only, zie startguard)
         assert!(mag_erdoor("", &req("/api/kluis/onthul", "")));
     }
+
+    #[test]
+    fn status_noemt_de_native_motoren() {
+        let state = RwLock::new(State::new());
+        let antwoord = route(&state, &req("/api/motor/status", ""));
+        assert_eq!(antwoord.status, 200);
+        let body = json::parse(&antwoord.body).unwrap();
+        let namen = match body.get("nativeMotoren") {
+            Some(Json::Arr(v)) => v,
+            _ => panic!("nativeMotoren ontbreekt"),
+        };
+        assert!(namen.iter().any(|n| n.as_str() == Some("magnaat-markt")));
+        assert!(namen.iter().any(|n| n.as_str() == Some("capability-bronscan")));
+        assert!(namen.iter().any(|n| n.as_str() == Some("identiteitskluis-xchacha")));
+    }
 }
 
 fn route(state: &RwLock<State>, req: &Request) -> Response {
@@ -531,7 +583,16 @@ fn route(state: &RwLock<State>, req: &Request) -> Response {
             .set("klopt", Json::Bool(klopt))
             .set("som", Json::Num(som as f64))
             .set("vingerafdruk", Json::Str(s.vingerafdruk()))
-            .set("leden", Json::Num(s.ledental() as f64));
+            .set("leden", Json::Num(s.ledental() as f64))
+            .set("nativeMotoren", Json::Arr(vec![
+                Json::Str("pay-grootboek".into()),
+                Json::Str("bank-grootboek".into()),
+                Json::Str("magnaat-markt".into()),
+                Json::Str("capability-bronscan".into()),
+                Json::Str("ledengids".into()),
+                Json::Str("identiteitskluis-xchacha".into()),
+                Json::Str("ontsmetter".into()),
+            ]));
         return Response { status: 200, body: b.dump() };
     }
     // Bank-grootboek (cutover stap 3): eigen som + vingerafdruk voor de drift-detector.

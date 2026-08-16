@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '36b7467e';
+var RTG_BOUW = '0a6efb06';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -280,7 +280,26 @@ var RTG_BOUW = '36b7467e';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
+  const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
 
+  /* Een demo is een toestand, geen terugval na een storing. De melding stond
+     altijd op het homescreen en daardoor leek ook een echte installatie een
+     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
+     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
+  function zetDemoMelding(aan, tekst) {
+    const el = document.getElementById('osDemoWet');
+    if (!el) return;
+    el.hidden = !aan;
+    if (tekst) { el.removeAttribute('data-i18n'); el.textContent = tekst; }
+  }
+  if (magnaatProef) {
+    zetDemoMelding(true, 'Magnaat · afgeschermde trainingskopie · geen echte klant-, geld- of productieactie');
+  } else if (explicieteDemo) {
+    zetDemoMelding(true);
+  } else if (API.enabled) {
+    fetch('/api/health').then(r => r.ok ? r.json() : null)
+      .then(h => zetDemoMelding(!!(h && h.demo))).catch(() => zetDemoMelding(false));
+  }
   /* ---------- pas-thema (kleuren van de website) ----------
      RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
      Business blijft klassiek donker. RTG en Lifestyle mogen terug naar
@@ -412,19 +431,25 @@ var RTG_BOUW = '36b7467e';
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
+        if (!explicieteDemo){
+          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
         }
         tier = 'business'; user = {...PERSONAS[tier]};
       }
     } else {
-      user = {...PERSONAS[tier]};
       if (API.enabled){
         try {
           const data = await API.call('/login', {tier, pasApp: vastePas || undefined});
           API.token = data.token;
           applyState(data.state);
-        } catch (e) { API.enabled = false; }
+        } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
+      } else if (explicieteDemo) {
+        user = {...PERSONAS[tier]};
+      } else {
+        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;

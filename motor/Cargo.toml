@@ -7,11 +7,15 @@
 name = "rtg-motor"
 version = "0.1.0"
 edition = "2021"
-description = "RTG Pay money-engine + ledengids + kluis in Rust (zero-dependency)"
+description = "RTG Pay, Bank, Magnaat-rekenlaag, Capability Graph-scan, ledengids, scanner en kluis in Rust (zero-dependency)"
 
 [[bin]]
 name = "rtg-motor"
 path = "src/main.rs"
+
+[[bin]]
+name = "rtg-sentinel"
+path = "src/sentinel_main.rs"
 
 [lib]
 name = "rtg_motor"

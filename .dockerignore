@@ -5,6 +5,8 @@ npm-debug.log
 .github
 .env
 .env.*
+.sentinel-token
+sentinel-data
 server/data
 public/dist
 *.md
@@ -13,3 +15,4 @@ scripts/a11y.js
 .DS_Store
 /tmp
 coverage
+.release

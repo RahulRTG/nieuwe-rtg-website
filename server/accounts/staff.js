@@ -95,11 +95,23 @@ function claimStaffMember(id, memberId, memberTier) {
   const staff = getStaffById(id);
   return staff && Number(staff.member_id) === lid ? staff : null;
 }
+/* Ontkoppel uitsluitend de eigenaar die de plek nu bezit. De member-id staat
+   in de UPDATE, zodat een verouderd verzoek nooit de koppeling van een later
+   gekoppeld account kan losmaken. */
+function releaseStaffMember(id, memberId) {
+  const lid = Number(memberId);
+  if (!Number.isSafeInteger(lid) || lid < 1) return false;
+  const info = S.zin(`UPDATE supplier_staff SET member_id = NULL, member_tier = NULL
+    WHERE id = ? AND active = 1 AND member_id = ?`).run(id, lid);
+  if (!info.changes) return false;
+  mirror.markStaff(id);
+  return true;
+}
 function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, func: s.func || null, lid: s.member_id != null } : null; }
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
   createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin,
   setStaffPin, deactivateStaff, deactivateStaffVanZaak, staffByMember, staffPositions,
-  setStaffMember, claimStaffMember, publicStaff, makePin
+  setStaffMember, claimStaffMember, releaseStaffMember, publicStaff, makePin
 };

@@ -19,6 +19,7 @@
 
 const MIN_CENTEN = 50;          // € 0,50 ondergrens
 const MAX_CENTEN = 5000000;     // € 50.000 bovengrens per transactie
+const rtgKlok = require('../../lib/klok');
 
 /* De transactie-hulpjes die deze module NODIG heeft. Ze staan hier als lijst en
    niet alleen in de handtekening, zodat ze te controleren zijn. */
@@ -47,7 +48,8 @@ function maakDirectpay(ctxIn) {
   const { db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
     directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctxIn;
-  const nu = () => new Date().toISOString();
+  const nuMs = rtgKlok.nu;
+  const nu = () => rtgKlok.datum().toISOString();
   const id = (p) => (p || 'x') + crypto.randomBytes(5).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
 
@@ -83,7 +85,7 @@ function maakDirectpay(ctxIn) {
   const RATE_MAX = 12, RATE_VENSTER_MS = 60000;
   const betaalTempo = new Map(); // key -> [tijdstippen]
   function tempoOk(key) {
-    const nu2 = Date.now();
+    const nu2 = nuMs();
     const lijst = (betaalTempo.get(key) || []).filter(t => nu2 - t < RATE_VENSTER_MS);
     if (lijst.length >= RATE_MAX) { betaalTempo.set(key, lijst); return false; }
     lijst.push(nu2);
@@ -117,18 +119,19 @@ function maakDirectpay(ctxIn) {
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
+  const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe };
   // het afrekenen zelf staat in ./betalen; ctx.betaalDirect erbij omdat ./verzoek
   // een goedgekeurd betaalverzoek langs dezelfde weg afrekent
-  const { betaalDirect, registreerMuntBetaling } = require('./betalen')(ctx);
+  const { betaalDirect, registreerMuntBetaling, registreerBevestigdeBetaling } = require('./betalen')(ctx);
   ctx.betaalDirect = betaalDirect;
   const api = {
     DP_MIN_CENTEN: MIN_CENTEN, DP_MAX_CENTEN: MAX_CENTEN,
-    dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen, dpRegistreerMunt: registreerMuntBetaling
+    dpBetaalDirect: betaalDirect, dpMijnBetalingen: mijnBetalingen, dpRegistreerMunt: registreerMuntBetaling,
+    dpRegistreerBevestigd: registreerBevestigdeBetaling
   };
   Object.assign(api, require('./verzoek')(ctx));
   return api;

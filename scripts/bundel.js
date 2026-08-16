@@ -103,6 +103,11 @@ function bundel(uitvoer) {
   return Buffer.concat(delen.map((f) => fs.readFileSync(f)));
 }
 
+/* Eén definitie voor de parserveiligheid die de zware-bundeltoets bewaakt. */
+function blokkeertHtmlParser(tag) {
+  return /\b(?:defer|async)\b/i.test(String(tag || '')) === false;
+}
+
 function schrijfBundels() {
   const geschreven = [];
   for (const uit of Object.keys(bundels)) {
@@ -138,7 +143,7 @@ function controleer() {
   }
 }
 
-module.exports = { bundels, bundel, schrijfBundels, controleer };
+module.exports = { bundels, bundel, blokkeertHtmlParser, schrijfBundels, controleer };
 
 // Direct aanroepbaar: node scripts/bundel.js  -> schrijf de bundels.
 if (require.main === module) {

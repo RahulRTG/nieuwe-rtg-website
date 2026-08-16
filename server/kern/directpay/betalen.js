@@ -1,26 +1,15 @@
-/* Directpay, deelbestand "betalen": het rechtstreeks afrekenen zelf. De kant
-   met de kaart (betaalDirect, via de betaal-naad) en de kant met munten
-   (registreerMuntBetaling, waar het geld al binnen is). De idempotentie, de
-   tempolimiet, het grootboek en de publieke vorm komen via de ctx uit
-   ./index.js; dit bestand kent alleen de volgorde van de stappen.
-
-   Afgesplitst uit index.js toen die de 10 KB passeerde: die is de orkestrator,
-   dit is de handeling. */
+/* Directpay-handeling voor kaart- en reeds bevestigde muntbetalingen.
+   De gedeelde grenzen, idempotentie en boekhouding komen via index.js. */
 const betaalstaten = require('../betaalwaarheid/staten');
 
 module.exports = (ctx) => {
-  const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, ledger, publiek,
+  const { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
     idemZoek, idemBewaar, tempoOk, findSupplier, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingenVoegToe } = ctx;
 
-  /* De betalingen die op DIT moment bij de provider liggen. De idempotentie-
-     controle hieronder en het vastleggen in voerUit staan aan weerszijden van
-     `await betaal.maakBetaling`. Twee gelijktijdige verzoeken zagen allebei
-     niets en legden allebei een betaling vast: het lid werd terecht maar EEN
-     keer afgeschreven (allebei sturen dezelfde idempotencyKey naar de provider)
-     en juist daardoor viel het niet op dat de ontvangstenteller van de
-     leverancier dubbel telde. Een tweede verzoek wacht nu op het eerste. */
+  /* Verzoeken met dezelfde sleutel delen ook rond de provider-await één
+     belofte, zodat de leverancier nooit dubbel wordt gecrediteerd. */
   const inVlucht = new Map();
 
   /* Het lid betaalt een leverancier rechtstreeks. `idem` is een client-token dat
@@ -32,6 +21,11 @@ module.exports = (ctx) => {
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
+    // Een gewone platformbetaling mag nooit doorgaan voor iets dat "rechtstreeks" heet.
+    if (betaal.AANBIEDER === 'stripe' && !betaal.CONNECT_SANDBOX)
+      return { status: 503, error: 'Rechtstreeks betalen staat veilig uit totdat Stripe Connect met gecontroleerde partneraccounts is geactiveerd.' };
+    if (betaal.CONNECT_SANDBOX && !s.stripeAccount)
+      return { status: 409, error: 'Deze partner heeft nog geen Connected Account in de lokale sandbox.' };
     // idempotentie tegen dubbeltik: zelfde lid + zelfde idem = zelfde betaling
     const idemSleutel = idem ? ('dp:' + key + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
@@ -64,11 +58,33 @@ module.exports = (ctx) => {
         bestemming: s.stripeAccount || undefined
       });
     } catch (e) { return { status: 502, error: 'Betaling kon niet gestart worden: ' + e.message }; }
-    /* processing en requires_capture zijn nog geen ontvangen geld. Hier stond
-       dat allebei gelijk aan succeeded, waardoor de ontvangstenteller van de
-       ondernemer al opliep terwijl de kaart later nog kon mislukken. */
-    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start')))
-      return { status: 402, error: 'De betaling wacht nog op definitieve bevestiging. Betaal niet opnieuw.' };
+    /* Processing en requires_capture zijn nog geen ontvangen geld. Bewaar wel
+       de strikt begrensde settlementcontext, zodat uitsluitend een later
+       geverifieerd providerbericht de echte boeking kan afronden. */
+    if (!betaalstaten.definitiefBetaald(betaalstaten.providerStatus(prov.aanbieder, prov.status, 'start'))) {
+      if (prov.id) {
+        db.data.kaartWachtend = db.data.kaartWachtend && typeof db.data.kaartWachtend === 'object'
+          ? db.data.kaartWachtend : {};
+        db.data.kaartWachtend[prov.id] = {
+          soort: 'direct', betaalwijze: 'kaart', key, codename,
+          supplierCode: s.code, centen: cent,
+          omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
+          bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
+          idem: idemSleutel || ('provider:' + prov.id), at: nuMs()
+        };
+        const sleutels = Object.keys(db.data.kaartWachtend);
+        if (sleutels.length > 20000)
+          for (const k of sleutels.slice(0, sleutels.length - 20000)) delete db.data.kaartWachtend[k];
+        save();
+      }
+      return {
+        status: 402,
+        error: 'De kaartbetaling is nog niet definitief bevestigd. Er is niets bij de partner geboekt.',
+        pending: true,
+        providerId: prov.id || null,
+        clientSecret: prov.clientSecret || null
+      };
+    }
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
@@ -84,33 +100,36 @@ module.exports = (ctx) => {
   /* Een met munten (crypto) betaalde directe betaling vastleggen. Het geld is al
      binnen en door de munt-aanbieder omgezet naar euro; hier alleen registreren
      en de leverancier crediteren, zonder kaartafschrijving. */
-  function registreerMuntBetaling({ key, codename, supplierCode, bedragCenten, omschrijving }) {
+  function registreerBevestigdeBetaling({ key, codename, supplierCode, bedragCenten, omschrijving, bron, providerId, aanbieder, betaalwijze, idem }) {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Bedrag te laag.' };
-    /* DEZELFDE BOVENGRENS ALS betaalDirect, en die stond hier niet.
-
-       betaalDirect weigert boven MAX_CENTEN; deze tweeling controleerde alleen de
-       ondergrens. Het bedrag komt hier uit de munt-webhook, dus de aanbieder --
-       of wie zijn bericht kan zetten -- bepaalde zelf hoeveel er bij de
-       ontvangstenteller van de leverancier bij kwam. De doorlichting zag
-       EUR 10.000.000 bijgeschreven op een verzoek van EUR 0,50.
-
-       Pijnlijk detail: deze functie is vanmiddag door mij uit index.js gehaald.
-       De asymmetrie is meeverhuisd zonder dat ik hem zag -- twee functies naast
-       elkaar met verschillende grenzen leest als opzet zolang niemand ze naast
-       elkaar legt. */
+    /* Dezelfde harde bovengrens als betaalDirect. Ook een provider-ingang mag
+       nooit een door de afzender gekozen onbeperkte bijschrijving toelaten. */
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog voor een directe betaling.' };
+    const idemSleutel = idem || (providerId ? String(aanbieder || 'provider') + ':' + providerId : null);
+    if (idemSleutel) {
+      const al = idemZoek(idemSleutel);
+      if (al) return { status: 200, ok: true, betaling: publiek(al), herhaald: true };
+    }
+    const isMunt = betaalwijze === 'munt';
     const b = {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling (munten)',
-      bron: 'app', providerId: null, aanbieder: 'munt', betaalwijze: 'munt', idem: null, at: nu()
+      bedrag: cent, omschrijving: schoon(omschrijving, 120) || (isMunt ? 'Directe betaling (munten)' : 'Directe betaling'),
+      bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app', providerId: providerId || null,
+      aanbieder: aanbieder || (isMunt ? 'munt' : 'stripe'), betaalwijze: isMunt ? 'munt' : 'kaart', idem: idemSleutel, at: nu()
     };
-    vastleggen(b, cent, key, 'Rechtstreeks betaald (munten)', 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + ' met munten');
+    vastleggen(b, cent, key, isMunt ? 'Rechtstreeks betaald (munten)' : 'Rechtstreeks betaald',
+      'betaalde rechtstreeks € ' + (cent / 100).toFixed(2) + (isMunt ? ' met munten' : ''));
+    idemBewaar(b);
     save();
     return { status: 200, ok: true, betaling: publiek(b) };
+  }
+
+  function registreerMuntBetaling(a) {
+    return registreerBevestigdeBetaling(Object.assign({}, a, { aanbieder: 'munt', betaalwijze: 'munt' }));
   }
 
   /* De betaling in de boeken en iedereen die het aangaat een seintje. Beide
@@ -130,5 +149,5 @@ module.exports = (ctx) => {
     try { sseToOffice('sync', { scope: 'ontvangsten' }); } catch (e) {}
   }
 
-  return { betaalDirect, registreerMuntBetaling };
+  return { betaalDirect, registreerMuntBetaling, registreerBevestigdeBetaling };
 };

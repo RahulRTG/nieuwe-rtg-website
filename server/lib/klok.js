@@ -107,7 +107,7 @@ const CONTROL = {
   dekking: { register: 'KLOK.json', beproefd: 'gemeten.modulesOpDeKlok',
     totaal: 'gemeten.bestanden', eenheid: 'modules die de tijd vragen',
     tellers: { directeTijdsaanroepen: 'gemeten.totaal' } },
-  grens: 'alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 ' +
+  grens: 'alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1294 ' +
     'directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, ' +
     'niet over de hele server.'
 };

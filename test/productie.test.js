@@ -4,12 +4,14 @@
    NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js,
    omdat die de secret bij het inladen leest. */
 process.env.STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'test-webhook-secret';
+process.env.RTG_DEMO = '1';
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const config = require('../server/config');
 const betaal = require('../server/betaal');
@@ -43,10 +45,33 @@ test('config: veilige productie is foutloos', () => {
     REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm', OPENAI_API_KEY: 'test-ai-key',
     STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
+    RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
   assert.equal(r.fouten.length, 0);
   assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
+});
+
+test('config: herstel-SMS moet echt bestaan of bewust fail-closed staan', () => {
+  const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
+    RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SMTP_URL: 'smtp://x',
+    STRIPE_DEMO_BEWUST: '1' };
+  const stil = config.valideer(basis);
+  assert.ok(stil.fouten.some(f => /SMS-provider/.test(f)), 'zonder tweede kanaal hoort productie niet stil te starten');
+  const bewust = config.valideer({ ...basis, RTG_HERSTEL_SMS_UIT_BEWUST: '1' });
+  assert.ok(!bewust.fouten.some(f => /SMS-provider/.test(f)), 'de bewuste fail-closed stand is toegestaan');
+});
+
+test('config: een ongebruikte SMTP_HOST doet zich niet voor als werkende mailroute', () => {
+  const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
+    RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
+    STRIPE_DEMO_BEWUST: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' };
+  const schijn = config.valideer({ ...basis, SMTP_HOST: 'smtp.example.test' });
+  assert.ok(schijn.fouten.some(f => /SMTP_HOST.*niet.*gelezen/.test(f)),
+    'een instelling die mail.js niet leest mag productie niet groen maken');
+  const echt = config.valideer({ ...basis, SMTP_URL: 'smtps://smtp.example.test:465' });
+  assert.ok(!echt.fouten.some(f => /mailroute|mailprovider/.test(f)),
+    'de route die mail.js werkelijk gebruikt wordt wel herkend');
 });
 
 /* De twee kanten van de dode variabele, apart vastgelegd. Zonder deze toets kan
@@ -78,6 +103,22 @@ test('config: het voorbeeld-eigenaarsadres blokkeert de productiestart', () => {
   // en een te korte backoffice-code ook
   const zwak = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_OWNER_EMAIL: 'e@x.nl', OFFICE_CODE: 'kort' });
   assert.ok(zwak.fouten.some(f => /OFFICE_CODE/.test(f)));
+});
+
+test('config: VUL-IN-plaatshouders blokkeren ook een directe productiestart', () => {
+  const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
+    RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
+    RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_DEMO_BEWUST: '1' };
+  for (const [naam, waarde] of [
+    ['RTG_OWNER_EMAIL', 'VUL-IN@JOUW-DOMEIN.NL'],
+    ['APP_URL', 'https://VUL-IN.NL'],
+    ['DATABASE_URL', 'postgresql://VUL-IN'],
+    ['REDIS_URL', 'redis://VUL-IN'],
+    ['SMTP_URL', 'smtps://VUL-IN']
+  ]) {
+    const r = config.valideer({ ...basis, RTG_OWNER_EMAIL: 'eigenaar@echt.nl', SMTP_URL: 'smtps://echt', [naam]: waarde });
+    assert.ok(r.fouten.some(f => f.includes(naam) && /VUL-IN/.test(f)), naam + ' moet hard falen');
+  }
 });
 
 test('config: de kluissleutels MOETEN uit de omgeving komen in productie', () => {
@@ -144,6 +185,15 @@ test('betaal: demo-provider bevestigt en is idempotent', async () => {
   const b = await betaal.maakBetaling({ bedrag: 1500, referentie: 'inv-9', idempotentieSleutel: 'sleutel-A' });
   assert.equal(b.id, a.id, 'zelfde idempotentiesleutel geeft dezelfde betaling');
   assert.equal(b.herhaald, true);
+});
+
+test('betaal: zonder Stripe en zonder bewuste demo geeft de rail nooit fictief succes', () => {
+  const proef = spawnSync(process.execPath, ['-e',
+    "const b=require('./server/betaal'); b.maakBetaling({bedrag:100}).then(()=>process.exit(9)).catch(e=>{if(e.code!=='BETAALRAIL_UIT')process.exit(8)})"], {
+    cwd: path.join(__dirname, '..'), encoding: 'utf8',
+    env: { ...process.env, RTG_DEMO: '', STRIPE_DEMO_BEWUST: '', STRIPE_SECRET_KEY: '' }
+  });
+  assert.equal(proef.status, 0, proef.stderr || proef.stdout);
 });
 
 test('betaal: bedrag moet positief zijn', async () => {

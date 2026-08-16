@@ -66,6 +66,23 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, factuur: publiek(f) };
   }
 
+  /* Receipt Vault: alleen de koper classificeert zijn eigen document. Een
+     leverancier die dezelfde factuur kan zien mag de persoonlijke indeling
+     niet wijzigen; classificatie is metadata van de kluis, geen boekhouding. */
+  function classificeer(id, key, waarde) {
+    const f = vind(String(id || ''));
+    if (!f || !key || f.koper.key !== key) {
+      return { status: 404, error: 'Factuur niet gevonden.' };
+    }
+    const classificatie = String(waarde || '');
+    if (classificatie !== 'prive' && classificatie !== 'zakelijk') {
+      return { status: 400, error: 'Kies prive of zakelijk.' };
+    }
+    f.classificatie = classificatie;
+    save();
+    return { status: 200, ok: true, factuur: publiek(f) };
+  }
+
   // De PDF van een factuur (voor beide partijen dezelfde bon).
   function pdf(f) {
     if (factuur && factuur.transactieFactuur) return factuur.transactieFactuur(f);

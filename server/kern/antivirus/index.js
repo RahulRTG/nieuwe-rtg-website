@@ -160,12 +160,12 @@ module.exports = (ctx) => {
      elke ingesloten beeld-/PDF-data-URL. Geeft de EERSTE besmette treffer terug
      of null. Zo dekt één middleware alle upload-plekken (snaps, Salon, markt,
      clips, ...) zonder elke route apart te hoeven aanraken. */
-  const DATA_URL_RE = /^data:(image\/[a-z0-9.+-]+|application\/pdf);base64,[A-Za-z0-9+/=]+$/i;
+  const DATA_URL_KOP = /^data:(image\/[a-z0-9.+-]+|application\/pdf);base64,/i;
   function scanBody(body, meta, diepte) {
     diepte = diepte || 0;
     if (diepte > 6 || body == null) return null;
     if (typeof body === 'string') {
-      if (body.length > 64 && DATA_URL_RE.test(body)) {
+      if (body.length > 64 && DATA_URL_KOP.test(body)) {
         const r = scanDataUrl(body, meta);
         if (r.verdict === 'besmet') return r;
       }

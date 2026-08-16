@@ -19,7 +19,9 @@ function api(base, pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+const lokaleDatum = d => String(d.getFullYear()).padStart(4, '0') + '-' +
+  String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const morgen = () => lokaleDatum(new Date(Date.now() + 86400000));
 /* De eerstvolgende dag dat een zaak met standaard-openingstijden OPEN is.
    Blind "morgen" nemen leek onschuldig, maar een zaak is standaard maandag t/m
    vrijdag open (kern/vakwerk/agenda.js): op donderdag is morgen vrijdag en gaat
@@ -29,7 +31,7 @@ const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 const eerstvolgendeWerkdag = () => {
   for (let i = 1; i <= 7; i++) {
     const d = new Date(Date.now() + i * 86400000);
-    if (d.getDay() >= 1 && d.getDay() <= 5) return d.toISOString().slice(0, 10);
+    if (d.getDay() >= 1 && d.getDay() <= 5) return lokaleDatum(d);
   }
   return morgen();
 };

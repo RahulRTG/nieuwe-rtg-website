@@ -61,6 +61,23 @@
     return null;
   }
 
+  function tekenTabbar() {
+    if (!schil.tabbar) return;
+    schil.tabbar.innerHTML = '';
+    schil.surfaces.forEach(function (s) {
+      var tab = el('div', 'rtg-tab', schil.tabbar);
+      if (schil.actief === s) tab.setAttribute('data-actief', '');
+      var kies = el('button', 'rtg-tab-kies', tab);
+      kies.type = 'button'; kies.textContent = s.naam;
+      kies.setAttribute('aria-label', 'Open ' + s.naam);
+      kies.addEventListener('click', function () { maakActief(s); });
+      var dicht = el('button', 'rtg-tab-sluit', tab);
+      dicht.type = 'button'; dicht.innerHTML = '&times;';
+      dicht.setAttribute('aria-label', 'Sluit ' + esc(s.naam));
+      dicht.addEventListener('click', function () { sluit(s.id); });
+    });
+  }
+
   function sluit(id) {
     var s = vind(id); if (!s) return;
     s.el.remove();

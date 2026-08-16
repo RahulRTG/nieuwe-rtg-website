@@ -159,6 +159,11 @@
   .witem .wdt{flex:1;color:var(--muted);font-size:.8rem;min-width:9rem;}
   .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
+.kantoor-nav{display:flex;align-items:center;gap:.9rem;}.kantoor-nav a{font-size:.8rem;color:var(--muted);}.kantoor-nav a.eerst{color:var(--gold);}
+.ik-kop{margin-top:1rem;}.ik-overzicht{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;}.ik-groei{flex:1;min-width:15rem;}.ik-inline{display:inline;}.ik-noodstop{border-color:var(--burgundy);}.ik-proefuit{margin-top:.55rem;}
+.ik-tegel{padding:1rem;}.ik-tegel.aan{border-color:#1e7d4f;}.ik-tegelkop{display:flex;gap:.5rem;justify-content:space-between;align-items:center;}.ik-tegelkop h3{margin:0;}.ik-status.aan{color:#1e7d4f;}.ik-status.uit{color:var(--gold);}.ik-status.niet-ingericht{color:var(--burgundy);}
+.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
+.ik-invoer{display:flex;gap:.35rem;}.ik-invoer input{flex:1;min-width:7rem;}.ik-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.65rem;}.ik-ketenlijst{display:grid;gap:.5rem;}.ik-rij{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--line);}.ik-rijtekst{flex:1;}.ik-besluitrij{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line);}.ik-logrij{padding:.45rem 0;border-bottom:1px solid var(--line);}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
   /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
      Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
@@ -209,7 +214,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
-  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/werkruimte.html?gebied=kantoor" style="font-size:.8rem;color:var(--gold);">RTG Work OS</a><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
+  <nav class="kantoor-nav" aria-label="Kantoor"><a class="eerst" href="/apps/werkruimte.html?gebied=kantoor">RTG Work OS</a><a href="/apps/office.html?werk=kantoor">RTG Office</a><a href="/apps/foundation/kantoor.html">RTF-kantoor</a><a href="/apps/lab.html">Onderzoekslab</a><a href="/apps/partner-worden.html">Partner worden</a><a href="/apps/backoffice.html">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
 </div></header>
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
@@ -893,6 +898,34 @@
     <div class="kaart lijst" id="techRaad" style="margin-top:.6rem;"><div class="leeg">Geen open voorstellen.</div></div>
   </section>
 
+  <section id="vIntegraties" hidden>
+    <div class="kop">
+      <button class="terug" id="ikTerug">← alle kamers</button>
+      <h1 id="ikH1">Integratiekamer</h1>
+    </div>
+    <p class="deck">Hier werken SMTP, SMS, Stripe Connect en SEPA als één gecontroleerde bedrijfsketen. De knoppen bedienen uitsluitend lokale contract-sandboxes. Live providers hebben bewust geen aan-knop: daarvoor blijven contract, privacycontrole, geheimen, vergunning en een aparte livegang nodig.</p>
+
+    <div class="kaart ik-kop" id="ikKop"><div class="leeg">Laden…</div></div>
+
+    <h3 class="sec">De vier rails</h3>
+    <div class="grid" id="ikTegels"></div>
+
+    <h3 class="sec">Samen laten werken</h3>
+    <div class="kaart" id="ikKetens"></div>
+
+    <h3 class="sec">Besluiten van de eigenaar</h3>
+    <div class="kaart lijst" id="ikBesluiten"><div class="leeg">Geen besluiten open.</div></div>
+
+    <h3 class="sec">Taken en ontbrekende schakels</h3>
+    <div class="kaart lijst" id="ikTaken"></div>
+
+    <h3 class="sec">Auditlog</h3>
+    <div class="kaart lijst" id="ikLog"></div>
+
+    <h3 class="sec">De grenzen die niet vergeten mogen worden</h3>
+    <div class="kaart lijst" id="ikWaarborgen"></div>
+  </section>
+
   <!-- de ledenbalie: de derde poort, naast de boardroom en de paniekkamer en om
        dezelfde reden. Wie helpt met een abonnement of een wachtwoord raakt het
        account van een lid, en dat mag niet achter de gedeelde kantoorcode die
@@ -991,7 +1024,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vIntegraties','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -1024,6 +1057,8 @@ async function binnen(){
     else if (start === 'paniekkamer') await openPaniek();
     else if (start === 'bank') await openBank();
     else if (start === 'stad') await openStad();
+    else if (start === 'integraties') await openIntegraties();
+    else if (start === 'controleregister') location.replace('/apps/magnaat-kantoor.html');
     else if (start === 'balie') await openBalie();
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
@@ -1069,7 +1104,7 @@ async function laadKamers(){
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+ico(k.icoon)+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'balie' ? openBalie() :b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : b.dataset.kamer === 'werkplaats' ? openWerkplaats() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'integraties' ? openIntegraties() : b.dataset.kamer === 'controleregister' ? (location.href = '/apps/magnaat-kantoor.html') : b.dataset.kamer === 'balie' ? openBalie() :b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : b.dataset.kamer === 'werkplaats' ? openWerkplaats() : openKamer(b.dataset.kamer)));
   gezondBand();
 }
 
@@ -2767,6 +2802,91 @@ async function techVervers(){
     : '<div class="leeg">Geen open voorstellen - De Wacht heeft niets te melden.</div>');
 }
 $('#techTerug') && $('#techTerug').addEventListener('click', () => { clearInterval(techTimer); laadKamers(); });
+
+/* ---------- Integratiekamer: vier lokale rails, één veilige keten ---------- */
+let IK = null;
+const ikTijd = v => { try { return new Date(v).toLocaleString('nl-NL', { dateStyle:'short', timeStyle:'short' }); } catch (e) { return ''; } };
+async function openIntegraties(){
+  clearInterval(techTimer); zetKamerUrl('integraties'); toon('vIntegraties');
+  $('#ikH1').innerHTML = ico('antenne') + ' Integratiekamer';
+  await ikVervers();
+}
+async function ikVervers(){
+  try { IK = await api('techniek/integraties'); ikTeken(); }
+  catch (e) {
+    $('#ikKop').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>';
+    $('#ikTegels').innerHTML = '<div class="kaart"><b>De bedieningskast is gesloten.</b><p class="leeg">Vraag de eigenaar om boardroom-toegang. De gewone kamerkaart blijft voor het team beschikbaar.</p></div>';
+  }
+}
+function ikTeken(){
+  const d = IK, aan = d.tegels.filter(t => t.aan).length, groen = d.tegels.filter(t => t.laatsteTest && t.laatsteTest.ok).length;
+  $('#ikKop').innerHTML =
+    '<div class="ik-overzicht">'+
+      '<div class="ik-groei"><b>Lokale bedrijfsketen</b><br><span class="leeg ik-inline">'+aan+' van 4 rails aan · '+groen+' van 4 contractproeven groen · live activering '+esc(d.liveActivering)+'</span></div>'+
+      '<button class="knop" id="ikKetenProef" type="button">Ketenproef uitvoeren</button>'+
+      '<button class="knop stil ik-noodstop" id="ikNoodstop" type="button">Alles veilig UIT</button>'+
+    '</div><div id="ikProefUit" class="leeg ik-proefuit"></div>';
+  $('#ikKetenProef').addEventListener('click', () => ikTest('keten'));
+  $('#ikNoodstop').addEventListener('click', async () => {
+    if (!confirm('Alle vier lokale rails onmiddellijk veilig uitzetten? Er wordt niets live geactiveerd.')) return;
+    try { IK = await api('techniek/integraties/noodstop', { reden:'Noodstop vanuit Integratiekamer' }); meld('Alle lokale rails staan veilig uit.'); ikTeken(); }
+    catch (e) { meld(e.message); }
+  });
+
+  $('#ikTegels').innerHTML = d.tegels.map(t => {
+    const wacht = d.verzoeken.some(v => v.kanaal === t.id);
+    const magAan = t.geconfigureerd || t.aan;
+    const test = t.laatsteTest ? (t.laatsteTest.ok ? 'Groen' : 'Mislukt')+' · '+ikTijd(t.laatsteTest.at)+' · '+esc(t.laatsteTest.detail||'') : 'Nog niet getest';
+    const live = t.live ? 'Live kanaal geconfigureerd, alleen-lezen' : 'Live geblokkeerd; geen activeringsknop';
+    const statusClass = t.status === 'aan' ? 'aan' : t.status === 'uit' ? 'uit' : 'niet-ingericht';
+    return '<div class="kaart ik-tegel '+(t.aan?'aan':'')+'">'+
+      '<div class="ik-tegelkop"><h3>'+esc(t.naam)+'</h3><span class="kpi ik-status '+statusClass+'">'+esc(t.status.toUpperCase())+'</span></div>'+
+      '<p class="ik-doel">'+esc(t.doel)+'</p>'+
+      '<div class="ik-omgeving">SANDBOX · '+(t.geconfigureerd?'ingericht':'ontbreekt: '+esc(t.config))+'<br>LIVE · '+esc(live)+'</div>'+
+      '<div class="ik-laatste"><b>Laatste proef</b><br><span class="leeg ik-inline">'+test+'</span></div>'+
+      (t.laatsteStoring?'<div class="ik-storing">Storing: '+esc(t.laatsteStoring.tekst)+'</div>':'')+
+      '<label class="ik-label">Verantwoordelijke medewerker</label>'+
+      '<div class="ik-invoer"><input data-iknaam="'+t.id+'" value="'+esc(t.verantwoordelijke)+'" placeholder="nog niet toegewezen"'+(d.baas?'':' disabled')+'><button class="knop stil" data-ikbewaar="'+t.id+'" type="button"'+(d.baas?'':' disabled')+'>Bewaar</button></div>'+
+      '<div class="ik-acties"><button class="knop stil" data-iktest="'+t.id+'" type="button">Test</button>'+
+      '<button class="knop" data-ikschakel="'+t.id+'" data-aan="'+(t.aan?'0':'1')+'" type="button"'+((!magAan||wacht)?' disabled':'')+'>'+(wacht?'Besluit wacht':(t.aan?'Vraag UIT aan':'Vraag AAN aan'))+'</button></div>'+
+    '</div>';
+  }).join('');
+  $('#ikTegels').querySelectorAll('[data-iktest]').forEach(b => b.addEventListener('click', () => ikTest(b.dataset.iktest)));
+  $('#ikTegels').querySelectorAll('[data-ikschakel]').forEach(b => b.addEventListener('click', async () => {
+    try { IK = await api('techniek/integraties/schakel', { id:b.dataset.ikschakel, aan:b.dataset.aan==='1' }); meld('Schakelverzoek staat klaar voor de eigenaar.'); ikTeken(); }
+    catch (e) { meld(e.message); }
+  }));
+  $('#ikTegels').querySelectorAll('[data-ikbewaar]').forEach(b => b.addEventListener('click', async () => {
+    const invoer = $('#ikTegels').querySelector('[data-iknaam="'+b.dataset.ikbewaar+'"]');
+    try { IK = await api('techniek/integraties/verantwoordelijke', { id:b.dataset.ikbewaar, naam:invoer.value }); meld('Verantwoordelijke bijgewerkt.'); ikTeken(); }
+    catch (e) { meld(e.message); }
+  }));
+
+  $('#ikKetens').innerHTML = '<div class="ik-ketenlijst">'+d.ketens.map(k =>
+    '<div class="ik-rij"><span class="gb-stip '+(k.gereed?'groen':'oranje')+'"></span><span class="ik-rijtekst"><b>'+esc(k.naam)+'</b><br><span class="leeg ik-inline">'+k.stappen.map(x => esc(x.toUpperCase())).join(' → ')+'</span></span><span class="kpi">'+(k.gereed?'SAMEN GEREED':'NOG NIET SAMEN')+'</span></div>').join('')+'</div>';
+
+  $('#ikBesluiten').innerHTML = d.verzoeken.length ? d.verzoeken.map(v =>
+    '<div class="ik-besluitrij"><span class="ik-rijtekst"><b>'+esc(v.kanaal.toUpperCase())+' '+(v.aan?'AAN':'UIT')+'</b><br><span class="leeg ik-inline">Aangevraagd '+ikTijd(v.at)+'</span></span>'+
+      (d.baas?'<button class="knop" data-ikbesluit="'+v.id+'" data-akkoord="1">Akkoord</button><button class="knop stil" data-ikbesluit="'+v.id+'" data-akkoord="0">Weiger</button>':'<span class="kpi">EIGENAAR NODIG</span>')+'</div>').join('') : '<div class="leeg">Geen besluiten open.</div>';
+  $('#ikBesluiten').querySelectorAll('[data-ikbesluit]').forEach(b => b.addEventListener('click', async () => {
+    try { IK = await api('techniek/integraties/besluit', { verzoekId:b.dataset.ikbesluit, akkoord:b.dataset.akkoord==='1' }); meld('Besluit verwerkt.'); ikTeken(); }
+    catch (e) { meld(e.message); }
+  }));
+  $('#ikTaken').innerHTML = d.taken.length ? '<ul>'+d.taken.map(t => '<li><b>'+esc(String(t.kanaal).toUpperCase())+'</b> · '+esc(t.tekst)+'</li>').join('')+'</ul>' : '<div class="leeg">Geen open integratietaken.</div>';
+  $('#ikLog').innerHTML = d.log.length ? d.log.slice(0, 12).map(x =>
+    '<div class="ik-logrij"><b>'+esc(x.soort)+'</b> · '+esc(x.door)+'<br><span class="leeg ik-inline">'+ikTijd(x.at)+(x.kanaal?' · '+esc(String(x.kanaal).toUpperCase()):'')+'</span></div>').join('') : '<div class="leeg">Nog geen bedieningshandelingen vastgelegd.</div>';
+  $('#ikWaarborgen').innerHTML = '<ul>'+d.waarborgen.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>';
+}
+async function ikTest(id){
+  const uit = $('#ikProefUit'); if (uit) uit.textContent = id === 'keten' ? 'De vier contracten worden lokaal achter elkaar beproefd…' : 'Lokale contractproef loopt…';
+  try {
+    IK = await api('techniek/integraties/test', { id });
+    const p = IK.proef; ikTeken();
+    const nieuw = $('#ikProefUit'); if (nieuw && p) nieuw.textContent = p.stappen.map(s => s.id.toUpperCase()+': '+(s.ok?'groen':'mislukt')).join(' · ');
+    meld(id === 'keten' ? 'De volledige lokale ketenproef is groen.' : 'Contractproef is groen.');
+  } catch (e) { if (uit) uit.textContent = e.message; meld(e.message); await ikVervers(); }
+}
+$('#ikTerug') && $('#ikTerug').addEventListener('click', laadKamers);
 
 /* ---------- de ledenbalie ----------
    Alles hier draait op codenamen. Het scherm verbergt geen naam, e-mailadres,

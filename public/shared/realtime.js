@@ -47,7 +47,9 @@
       catch (e) { return; }
       this.source.addEventListener('sync', e => {
         const d = JSON.parse(e.data);
-        if (this.onSync) this.onSync(d.scope);
+        // Tweede argument bewaart de bestaande scope-callback en maakt tegelijk
+        // gerichte live-schermen mogelijk (bijv. één Magnaat-teamkamer).
+        if (this.onSync) this.onSync(d.scope, d);
       });
       this.source.addEventListener('notify', e => {
         const n = JSON.parse(e.data);

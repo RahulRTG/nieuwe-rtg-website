@@ -18,7 +18,7 @@
 'use strict';
 
 module.exports = function bouwKernAan(kern, grens) {
-  const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
+  const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
   /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
      van dit blok uit server.js kwam `logboek` hier uit de kern -- en daar is
@@ -61,7 +61,7 @@ module.exports = function bouwKernAan(kern, grens) {
      automaat. Geld en klantdata blijven altijd mensenwerk (advies, geen ingreep). */
   Object.assign(kern, require('../kern/zelfzorg')({
     db, save, accounts, sessions: kern.sessions, beveilig, pay: kern.pay, bank: kern.bank,
-    log, fs, path, DATA_DIR
+    log, fs, path, DATA_DIR, mail
   }));
   kern.zelfzorg.autoStart();
   /* De RTG AI van het RTG Kantoor (kern/rtgai.js): leest mee, traint zichzelf

@@ -32,7 +32,8 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { db, load, save, bijeen, inBundel, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const rtgKlok = require('./lib/klok');
+const { db, load, save, bijeen, inBundel, bewerkCollectie, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
@@ -484,7 +485,8 @@ function alcoholGrensVan(s) {
 // maak…(state)-fabriek; de Map komt terug zodat het herstel-/migratiepad in
 // initRealtime er ongewijzigd op blijft werken.
 const { maakSessies } = require('./kern/sessies');
-const { sessions, tokenHash, rememberSession, forgetSession, sessionFor, TOKEN_TTL_MS } =
+const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
+  koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
   maakSessies({ db, save, crypto });
 
 /* Inlogpogingen afremmen: per bron en doel hooguit tien mislukkingen,
@@ -556,11 +558,12 @@ const {
   DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n,
   ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg, ledenGidsZet,
   ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange,
-  ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, sseToOffice, sseToSupplier, 
+  ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions, sseToOffice, sseToSupplier,
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
   lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie
 });
+koppelSessiesBus(bus);
 /* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):
    beide worden per verzoek gelezen door middleware die HIERBOVEN al gemount is.
    Ze gingen eerst via een `let` die de middleware en de bedrading deelden; nu
@@ -624,7 +627,8 @@ function memberTemplate() {
 app.get('/api/health', (req, res) => {
   const model = require('./ai').beschikbaarheid(anthropic);
   res.json({
-    ok: true, ai: model.modus, verwerking: model.verwerking,
+    ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
+    betalen: betaal.AANBIEDER,
     server: Number(process.env.RTG_SERVER || 1), active: db.writable,
     domeinen: process.env.RTG_DOMAINS || 'alle',
     pid: process.pid, up: Math.round(process.uptime())
@@ -1153,7 +1157,7 @@ function sseToOffice(event, data) {
 }
 
 function notifySupplier(code, note) {
-  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: rtgKlok.datum().toISOString(), ...note };
   db.data.supplierNotifications[code] = (db.data.supplierNotifications[code] || []);
   db.data.supplierNotifications[code].unshift(n);
   db.data.supplierNotifications[code] = db.data.supplierNotifications[code].slice(0, 40);
@@ -1481,7 +1485,7 @@ betaal.koppelStore({
    naar de leverancier (in productie een Stripe destination charge). */
 const {
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
-  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt
+  dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten, dpRegistreerMunt, dpRegistreerBevestigd
 } = maakDirectpay({ db, save, crypto, findSupplier, betaal, notify, notifySupplier, sseToSupplier, sseToCustomer, sseToOffice, logActivity,
   /* De transactie-index voor de twee geldcollecties. Ze werden hier met
      unshift+slice bijgehouden, dus zonder index (O(N) zoeken) en met een
@@ -1548,7 +1552,7 @@ const { maakSettlement } = require('./kern/settlement');
    staat hij er. Zonder deze draad kan settlement een bevestigde oplading niet
    bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
    niet bijgeschreven, webhook antwoordde 200 ok. */
-const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt,
+const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null) });
 
 /* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
@@ -1975,7 +1979,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,

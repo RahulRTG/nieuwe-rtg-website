@@ -49,6 +49,7 @@
   .rkpi span{font-size:0.64rem;color:var(--soft);}
   .nvl{border-radius:8px;padding:0.3rem 0.7rem;font-size:0.75rem;border:1px solid var(--line);cursor:pointer;background:var(--card);color:var(--txt);}
   .nvl.on{border-color:var(--rood);color:var(--rood);}
+  .demo-hint{margin-top:0.6rem;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -63,7 +64,7 @@
 </header>
 <main id="inhoud">
   <section id="vLogin">
-    <p class="stil">De meldkamer van uw korps: meldingen, eenheden over land, water en door de lucht, bijstand tussen korpsen en de AI die meedenkt. Dit is het RTG-demosysteem voor besturing en oefening; het vervangt geen 112 en geen enkel officieel protocol.</p>
+    <p class="stil">De meldkamer van uw korps: meldingen, eenheden over land, water en door de lucht, bijstand tussen korpsen en de AI die meedenkt. Dit is het RTG-systeem voor besturing en oefening; het vervangt geen 112 en geen enkel officieel protocol.</p>
     <div class="kaart">
       <div class="rij">
         <input class="veld" id="lCode" placeholder="Korps-code (bijv. GUARDIA)" maxlength="20" style="text-transform:uppercase;">
@@ -75,7 +76,7 @@
         <button class="knop" id="lIn" type="button">Meld aan</button>
       </div>
       <p class="stil" id="lFout" aria-live="polite" style="margin-top:0.5rem;"></p>
-      <p class="stil" style="margin-top:0.6rem;">Demokorpsen: GUARDIA (politie), BOMBERS (brandweer), URGENCIA (ambulance), CANMISSES (ziekenhuis), CONSULTA (huisarts), FALCO (special forces, besloten), FARMACIA (apotheek), CARDIO (specialist), ESTETICA (beauty medical). Manager-PIN 1234.</p>
+      <p class="stil demo-hint" data-demo-only hidden>Demokorpsen: GUARDIA (politie), BOMBERS (brandweer), URGENCIA (ambulance), CANMISSES (ziekenhuis), CONSULTA (huisarts), FALCO (special forces, besloten), FARMACIA (apotheek), CARDIO (specialist), ESTETICA (beauty medical). Manager-PIN 1234.</p>
     </div>
   </section>
 
@@ -242,6 +243,7 @@
 </main>
 <!-- de poort is een gesprek met Rahul; beide staan hier voor meldkamer.js,
      zodat ze er zijn als die zijn inlogscherm opbouwt -->
+<script src="/shared/demostand.js" defer></script>
 <script src="/shared/mond.js" defer></script>
 <script src="/shared/rahulpoort.js" defer></script>
 <script src="/shared/uitvoer.js"></script>

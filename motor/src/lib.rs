@@ -10,3 +10,7 @@ pub mod ledengids;
 pub mod aead;
 pub mod kluis;
 pub mod ontsmetter;
+pub mod magnaat;
+pub mod capabilities;
+pub mod sha256;
+pub mod sentinel;

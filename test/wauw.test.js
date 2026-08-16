@@ -54,8 +54,10 @@ test('de verjaardagsglans: wie vandaag jarig is, krijgt overal een taartje', asy
      verschillende dagen en zakt de toets zonder dat er iets stuk is;
      binnenEenDag() doet hem dan een keer over. */
   await binnenEenDag(async () => {
-    const nu = new Date();
-    const jarigDatum = '1995-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+    /* De server bewaart zijn daggrens als ISO/UTC. De proef gebruikt exact
+       dezelfde kalenderbasis; lokale maand/dag combineren met UTC aan de
+       serverkant gaf iedere nacht rond middernacht twee verschillende dagen. */
+    const jarigDatum = '1995-' + new Date().toISOString().slice(5, 10);
     const jarig = await lid(jarigDatum);
     const niet = await lid('1995-01-15' === jarigDatum.slice(0, 10) ? '1995-06-20' : '1995-01-15');
     await raw('/member/pulse/post', { tekst: 'Vandaag is een mooie dag!' }, jarig);

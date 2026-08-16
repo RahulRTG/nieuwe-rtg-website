@@ -66,6 +66,7 @@ function planFlush() {
   pgFlushTimer = setTimeout(flushNu, Number(process.env.PG_FLUSH_MS || 150));
   if (pgFlushTimer.unref) pgFlushTimer.unref();
 }
+
 // De lokale snapshot is met Postgres alleen een warme-start-cache: Postgres is
 // de duurzame waarheid en wint bij het opstarten. Hem bij elke flush (elke
 // ~150 ms) volledig serialiseren (bij een grote kast honderden MB's) blokkeert
@@ -186,5 +187,8 @@ async function pgPing() {
 // Pool-verzadiging (alleen in Postgres-modus) voor de health/ready-checks.
 function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }
 function klaar() { return pgKlaar; }
+const bewerkCollectiePostgres = require('./collectie-postgres')({
+  store: STORE, db, motor: () => pg, klaar: () => pgKlaar
+});
 
-module.exports = { planFlush, flushVoorrangDirect, startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar };
+module.exports = { planFlush, flushVoorrangDirect, bewerkCollectiePostgres, startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar };

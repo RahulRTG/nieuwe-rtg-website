@@ -11,9 +11,10 @@ services:
       PORT: 443
       RTG_BIND: 0.0.0.0
       STUN_PORT: ${STUN_PORT:-3478}
-    # Poort 443 staat al in de basis-compose via RTG_CONTAINER_PORT. Poort 80
-    # is uitsluitend de ingebouwde ACME HTTP-01-responder + HTTPS-redirect.
+    # De basis-compose publiceert alleen Sentinel op loopback. Deze bewuste
+    # live-overlay ontsluit daarnaast native HTTPS en de ACME-responder.
     ports:
+      - "${RTG_PUBLISH_HOST:-0.0.0.0}:${RTG_PUBLISH_PORT:-443}:${RTG_CONTAINER_PORT:-443}/tcp"
       - "${RTG_PUBLISH_HOST:-0.0.0.0}:80:80/tcp"
       - "${RTG_PUBLISH_HOST:-0.0.0.0}:${STUN_PORT:-3478}:${STUN_PORT:-3478}/udp"
     cap_add:

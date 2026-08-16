@@ -14,6 +14,8 @@ const PORT = 4300 + Math.floor(Math.random() * 60);
 const BASE = 'http://127.0.0.1:' + PORT;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-golive-'));
 const SERVER = path.join(__dirname, '..', 'server', 'server.js');
+const SENTINEL_TOKEN = path.join(TMP, 'sentinel.token');
+fs.writeFileSync(SENTINEL_TOKEN, 'a'.repeat(64) + '\n', { mode: 0o600 });
 
 // een complete, veilige productieomgeving (zoals npm run sleutels die maakt)
 const PROD_ENV = {
@@ -21,6 +23,7 @@ const PROD_ENV = {
   RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
   RTG_CLUSTER_KEY: 'c'.repeat(32), OFFICE_CODE: 'KEURING-CODE-12', DEMO_PASS: 'x'.repeat(16),
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', APP_URL: 'https://rtg.example.com',
+  RTG_SENTINEL_TOKEN_FILE: SENTINEL_TOKEN,
   /* De eenmalige sleutel waarmee de eerste eigenaar zijn account claimt. Zonder
      deze komt het eigenaarsadres niet door de openbare registratie -- anders werd
      wie het adres als eerste intikte de eigenaar van het platform, en het adres
@@ -30,7 +33,7 @@ const PROD_ENV = {
   /* De eerste publieke stand kan bewust zonder AI en zonder betalen draaien.
      Anders dan STRIPE_DEMO_BEWUST is dit echt fail-closed: geen enkele demo- of
      echte rail mag een betaling bevestigen. */
-  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1',
+  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };

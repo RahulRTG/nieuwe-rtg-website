@@ -23,6 +23,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
 const { startServer, stop } = require('./helper');
 
 const post = (base) => async (pad, body) => {
@@ -41,6 +43,9 @@ test('zonder RTG_DEMO geeft de demo-inlog geen sessie weg', async () => {
   const srv = await kaleServer();
   const p = post(srv.base);
   try {
+    const h = await fetch(srv.base + '/api/health').then(r => r.json());
+    assert.equal(h.demo, false, 'de openbare omgevingsstatus zegt eerlijk dat dit geen demo is');
+    assert.equal(h.betalen, 'uit', 'zonder Stripe en zonder bewuste demo staat de betaalrail uit');
     for (const tier of ['business', 'lifestyle', 'rtg']) {
       const r = await p('/api/login', { tier });
       assert.notEqual(r.status, 200,
@@ -80,8 +85,21 @@ test('met RTG_DEMO=1 werkt de demo-stand wel gewoon', async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DEMO: '1' } });
   const p = post(srv.base);
   try {
+    const h = await fetch(srv.base + '/api/health').then(r => r.json());
+    assert.equal(h.demo, true, 'de app kan de demomelding alleen tonen wanneer de server dit bevestigt');
+    assert.equal(h.betalen, 'demo', 'de expliciete trainingsinstallatie gebruikt zichtbaar de demo-betaalrail');
     const r = await p('/api/login', { tier: 'business' });
     assert.equal(r.status, 200, 'met de vlag aan hoort de demo-inlog te werken: ' + JSON.stringify(r.body).slice(0, 140));
     assert.ok(r.body.token, 'en een sessie te geven');
   } finally { stop(srv.child); }
+});
+
+test('de expliciete demovlag staat in de app-scope en niet midden in de stemfunctie', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app-main.js'), 'utf8');
+  const vlag = bron.indexOf('const explicieteDemo =');
+  const stem = bron.indexOf('function stem(rtg, business, lifestyle)');
+  const koppen = bron.indexOf('const STEMKOPPEN', stem);
+  assert.ok(vlag > 0 && vlag < stem, 'login() moet de demovlag uit de gedeelde app-scope kunnen lezen');
+  assert.doesNotMatch(bron.slice(stem, koppen), /explicieteDemo|zetDemoMelding/,
+    'demo-initialisatie mag niet door een moduleknip midden in stem() terechtkomen');
 });

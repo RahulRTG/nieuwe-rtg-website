@@ -12,7 +12,8 @@ COPY motor/src ./src
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/src/motor/target \
     cargo build --release --locked && \
-    cp /src/motor/target/release/rtg-motor /tmp/rtg-motor
+    cp /src/motor/target/release/rtg-motor /tmp/rtg-motor && \
+    cp /src/motor/target/release/rtg-sentinel /tmp/rtg-sentinel
 
 # RTG / RTFoundation productie-image.
 # Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
@@ -35,15 +36,21 @@ RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 # De rest van de broncode.
 COPY . .
 COPY --from=motor-builder /tmp/rtg-motor /app/rtg-motor
+COPY --from=motor-builder /tmp/rtg-sentinel /app/rtg-sentinel
 
 # Frontend-build: minify de serveerbare JS naar public/dist/min en stempel de
 # service-worker caches. Alles met eigen scripts, dus niets om achteraf te
 # snoeien.
 RUN npm run build
 
+# Inhoudsbewijs in het image: na uitrol kan exact worden gecontroleerd welke
+# Node-bron, frontend-build en Rust-binary deze container draagt.
+RUN node scripts/release-bewijs.js --uit /app/release-bewijs.json
+
 # Data en back-ups op een volume, zodat ze een herbouw van de container
 # overleven. De niet-root gebruiker 'node' moet erin kunnen schrijven.
-RUN mkdir -p /app/server/data /app/motor-data && chown -R node:node /app/server/data /app/motor-data /app/rtg-motor
+RUN mkdir -p /app/server/data /app/motor-data /app/sentinel-data && \
+    chown -R node:node /app/server/data /app/motor-data /app/sentinel-data /app/rtg-motor /app/rtg-sentinel
 VOLUME ["/app/server/data"]
 
 # Nooit als root draaien.

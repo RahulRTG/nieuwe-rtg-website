@@ -24,6 +24,7 @@ const { nu: klokNu } = require('../lib/klok');
 const KANTOORWERKPROCESSEN = [{
   id: 'service-reiswijziging', naam: 'Reiswijziging volledig afhandelen',
   afdeling: 'klantenservice', afdelingNaam: 'Klantenservice', rol: 'Service-regisseur',
+  codeFamilies: ['/api/member/berichten', '/api/mob/reis', '/api/bedrijf/mijnwerk'],
   spelvorm: 'gesprek', veiligheidsniveau: 'geel',
   briefing: 'Een reiziger heeft een wijziging met een strakke aansluiting. Neem het dossier aan, controleer de reisketen, wijs eigenaarschap toe en koppel de oplossing terug.',
   stappen: [
@@ -200,13 +201,21 @@ const KANSEN = [
   }
 ];
 
-module.exports = ({ db, save, crypto, functies }) => {
+module.exports = ({
+  db, save, bewerkCollectie = null, crypto, functies,
+  partnerstudio = null, codenaamVan = null, sseToCustomer = null
+}) => {
   const nu = klokNu;
   const id = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
   const tekst = (v, max = 300) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
   const alleFuncties = Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : [];
-  const capabilityScanner = require('./magnaat-capabilities')({ functies });
+  const werkrouteFabriek = require('./magnaat-werkroutefabriek');
+  const capabilityScanner = require('./magnaat-capabilities')({
+    functies, volledigeWerkprocessen: KANTOORWERKPROCESSEN,
+    werkrouteFabriek: werkrouteFabriek.bouw
+  });
   let capabilityGraph = capabilityScanner.scan();
+  let alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
 
   function state() {
     if (!db.data.magnaatWereld || typeof db.data.magnaatWereld !== 'object') {
@@ -226,6 +235,9 @@ module.exports = ({ db, save, crypto, functies }) => {
      Daarmee kan een missie de bedrijfsvoering beïnvloeden zonder ooit orders,
      betalingen of andere productiedata van RTG aan te raken. */
   const economie = require('./magnaat-economie')({ wereldState: state, save });
+  const trainingslobbies = require('./magnaat-trainingslobby')({
+    db, save, bewerkCollectie, crypto, partnerstudio, codenaamVan, sseToCustomer
+  });
 
   function spelvormVan(f) {
     const bron = [f.id, f.naam, f.categorie, ...(f.paden || [])].join(' ').toLowerCase();
@@ -329,7 +341,14 @@ module.exports = ({ db, save, crypto, functies }) => {
       versie: capabilityGraph.versie,
       gescand: capabilityGraph.gescand,
       vingerafdruk: capabilityGraph.vingerafdruk.slice(0, 12),
+      motor: Object.assign({}, capabilityGraph.motor),
       cijfers: Object.assign({}, capabilityGraph.cijfers),
+      dekkingsmatrix: {
+        percentage: capabilityGraph.dekkingsmatrix.percentage,
+        volledig: capabilityGraph.dekkingsmatrix.volledig,
+        metGaten: capabilityGraph.dekkingsmatrix.metGaten,
+        dimensies: capabilityGraph.dekkingsmatrix.dimensies.map(d => Object.assign({}, d))
+      },
       kantoren: capabilityGraph.kantoren.map(k => Object.assign({}, k, {
         rollen: [k.naam + '-medewerker', k.naam + '-coördinator', 'Trainee']
       })),
@@ -338,12 +357,18 @@ module.exports = ({ db, save, crypto, functies }) => {
         id: w.id, naam: w.naam, familie: w.familie, domein: w.domein,
         kantoor: w.kantoor, rol: w.rol, risico: w.risico,
         geregistreerd: w.geregistreerd, actieAantal: w.actieAantal,
-        app: w.app, spelstappen: w.spelstappen.slice()
+        app: w.app, spelstappen: w.spelstappen.slice(), bronstand: w.bronstand,
+        signalen: Object.assign({}, w.signalen),
+        startbaar: w.dekking.waarden.werkroute === true,
+        dekking: { percentage: w.dekking.percentage, volledig: w.dekking.volledig,
+          ontbreekt: w.dekking.ontbreekt.slice(), waarden: Object.assign({}, w.dekking.waarden) }
       })),
       volledigeWerkprocessen: KANTOORWERKPROCESSEN.map(w => ({
         id: w.id, naam: w.naam, afdeling: w.afdeling, afdelingNaam: w.afdelingNaam,
-        rol: w.rol, stappen: w.stappen.length, veiligheidsniveau: w.veiligheidsniveau
-      }))
+        rol: w.rol, stappen: w.stappen.length, veiligheidsniveau: w.veiligheidsniveau,
+        codeFamilies: (w.codeFamilies || []).slice(), automatisch: !!w.automatisch
+      })),
+      automatischeWerkprocessen: capabilityGraph.cijfers.automatischeWerkprocessen || 0
     };
   }
 
@@ -379,6 +404,7 @@ module.exports = ({ db, save, crypto, functies }) => {
     const s = state();
     const vorig = s.capabilitySnapshot;
     capabilityGraph = capabilityScanner.scan();
+    alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
     const vorigeIds = new Set(vorig && Array.isArray(vorig.workflowIds) ? vorig.workflowIds : []);
     const toegevoegd = vorig ? capabilityGraph.workflows.filter(w => !vorigeIds.has(w.id)) : [];
     const kandidaten = (vorig ? toegevoegd : capabilityGraph.workflows.filter(w => !w.geregistreerd && w.actieAantal >= 2))
@@ -393,8 +419,9 @@ module.exports = ({ db, save, crypto, functies }) => {
       apiActies: capabilityGraph.cijfers.apiActies,
       gescand: capabilityGraph.gescand
     };
+    const gatenplan = controle.planGaten(boardroomControleContext(actor), { limiet: 25 });
     if (gewijzigd) log('code-scan', actor, capabilityGraph.cijfers.apps + ' apps · ' + capabilityGraph.cijfers.apiActies + ' API-acties · ' + capabilityGraph.cijfers.werkprocessen + ' werkprocessen');
-    return { gewijzigd, toegevoegd: toegevoegd.length, voorstellen, cijfers: capabilityGraph.cijfers };
+    return { gewijzigd, toegevoegd: toegevoegd.length, voorstellen, cijfers: capabilityGraph.cijfers, gatenplan };
   }
 
   const datumSleutel = tijd => new Intl.DateTimeFormat('en-CA', {
@@ -525,6 +552,7 @@ module.exports = ({ db, save, crypto, functies }) => {
       opties: Array.isArray(stap.opties) ? stap.opties.slice() : [],
       doel: stap.soort === 'software' ? stap.doel : undefined,
       schermNaam: stap.soort === 'software' ? stap.schermNaam : undefined,
+      schermPad: stap.soort === 'software' ? stap.schermPad : undefined,
       velden: stap.soort === 'formulier' ? (stap.velden || []).map(v => ({
         id: v.id, label: v.label, type: v.type, verplicht: !!v.verplicht,
         min: v.min, max: v.max, placeholder: v.placeholder,
@@ -600,7 +628,7 @@ module.exports = ({ db, save, crypto, functies }) => {
   }
 
   function werkprocesStart(key, workflowId, apparaat) {
-    const workflow = KANTOORWERKPROCESSEN.find(w => w.id === tekst(workflowId, 100));
+    const workflow = alleWerkprocessen.find(w => w.id === tekst(workflowId, 100));
     if (!workflow) return { status: 404, error: 'Dit volledige werkproces bestaat nog niet.' };
     if (!controle.beschikbaar('api', 'POST /api/member/magnaat/werkproces/start')) {
       return { status: 423, error: 'Volledige werkprocessen staan in de Magnaat-trainingsomgeving tijdelijk uit.' };
@@ -792,11 +820,20 @@ module.exports = ({ db, save, crypto, functies }) => {
 
   function scan(actor = 'Future Engine', geforceerd = false) {
     const s = state();
-    const codeScan = verversCapabilityGraph(actor);
+    /* Een overzicht openen is een leesactie, geen broncode-audit. De oude
+       volgorde voerde verversCapabilityGraph() al uit vóór deze daggrens en
+       startte daardoor per speler een native scan over duizenden routes. Dat
+       maakte het scherm onnodig CPU-zwaar en kon de failover-hartslag onder
+       piekbelasting laten wisselen. De boardroom kan nog altijd onmiddellijk
+       geforceerd scannen; automatisch gebeurt het eenmaal per dag. */
     if (!geforceerd && s.laatsteScan && nu() - s.laatsteScan < DAG) {
-      if (codeScan.gewijzigd || codeScan.voorstellen) save();
+      const codeScan = {
+        gewijzigd: false, toegevoegd: 0, voorstellen: 0,
+        cijfers: capabilityGraph.cijfers, gatenplan: null
+      };
       return { ok: true, nieuw: codeScan.voorstellen, overgeslagen: true, codeScan, capabilityGraph: publiekeCapabilityGraph(), voorstellen: s.voorstellen.map(voorstelPubliek) };
     }
+    const codeScan = verversCapabilityGraph(actor);
     const ids = alleFuncties.map(f => f.id.toLowerCase());
     let nieuw = 0;
     for (const kans of KANSEN) {
@@ -877,7 +914,10 @@ module.exports = ({ db, save, crypto, functies }) => {
       catalogus,
       capabilityGraph: publiekeCapabilityGraph(),
       wereld: wereld(),
-      economie: economie.overzicht(),
+      partnerWereld: partnerstudio ? partnerstudio.publiekeWereld() : { naam: 'Magnaat Partnerwereld', bedrijven: [], aantal: 0,
+        regel: 'Officiële partnerbedrijven verschijnen hier na menselijke RTG-goedkeuring.' },
+      teamkamers: trainingslobbies.mijn(key).kamers,
+      economie: economie.overzicht(key),
       controle: controle.korteSamenvatting(lidControleContext(key)),
       futureLab: state().voorstellen.map(voorstelPubliek),
       spelbrug: {
@@ -887,6 +927,26 @@ module.exports = ({ db, save, crypto, functies }) => {
         niveaus: { groen: 'lage impact, nog steeds sandbox', geel: 'persoons- of partnercontext, uitsluitend synthetisch', rood: 'geld, identiteit of regie; alleen oefenen' }
       }
     };
+  }
+
+  function partnerTrainingStart(key, code) {
+    if (!partnerstudio) return { status: 503, error: 'De Partnerwereld is nog niet aangesloten.' };
+    return partnerstudio.trainingStart(key, code);
+  }
+
+  function partnerTrainingAntwoord(key, trainingId, keuze) {
+    if (!partnerstudio) return { status: 503, error: 'De Partnerwereld is nog niet aangesloten.' };
+    const r = partnerstudio.trainingAntwoord(key, trainingId, keuze);
+    if (r.error || !r.training || r.training.status !== 'voltooid') return r;
+    const claim = partnerstudio.trainingClaim(key, trainingId);
+    if (!claim.nieuw) return r;
+    const p = speler(key), xp = claim.score * 3, virtueelBudget = claim.score * 250;
+    p.xp += xp; p.virtueelBudget += virtueelBudget; p.reputatie = Math.min(100, p.reputatie + (claim.score >= 75 ? 2 : 0));
+    r.beloning = { xp, virtueelBudget, reputatie: claim.score >= 75 ? 2 : 0 };
+    r.speler = publiekeSpeler(p);
+    log('partnertraining-voltooid', key, claim.bedrijf.naam + ' · ' + claim.score + '%');
+    save();
+    return r;
   }
 
   function kantoorStatus() {
@@ -927,10 +987,20 @@ module.exports = ({ db, save, crypto, functies }) => {
   scan('Future Engine', !state().laatsteScan);
 
   return { magnaatWereld: {
+    partnerstudio,
     overzicht, taakStart, taakAntwoord, taakHandeling, taakActie,
     werkprocesStart, kiesKantoor, scan, beslis, kantoorStatus, wereld, catalogus,
+    partnerTrainingStart, partnerTrainingAntwoord,
+    teamkamerMijn: (key, id) => trainingslobbies.mijn(key, id),
+    teamkamerMaak: (key, invoer) => trainingslobbies.maak(key, invoer),
+    teamkamerDeelnemen: (key, code) => trainingslobbies.deelnemen(key, code),
+    teamkamerRol: (key, id, rolId, revisie) => trainingslobbies.kiesRol(key, id, rolId, revisie),
+    teamkamerStart: (key, id, revisie, commandoId) => trainingslobbies.start(key, id, revisie, commandoId),
+    teamkamerActie: (key, id, invoer) => trainingslobbies.actie(key, id, invoer),
+    teamkamerBedien: (key, id, actie, revisie, commandoId) => trainingslobbies.bedien(key, id, actie, revisie, commandoId),
     economieBeslis: (key, invoer) => economie.beslis(key, invoer),
-    economieVolgendeDag: (key, commandoId) => economie.volgendeDag(key, commandoId),
+    economieAnalyse: (key, invoer) => economie.analyse(key, invoer),
+    economieVolgendeDag: (key, commandoId) => economie.volgendeDagAsync(key, commandoId),
     economieSchok: (key, schokId) => economie.kiesSchok(key, schokId),
     controleOverzicht: (key, filters) => controle.overzicht(lidControleContext(key), filters),
     controleZet: (key, puntId, wijziging) => controle.zet(lidControleContext(key), puntId, wijziging),
@@ -942,6 +1012,7 @@ module.exports = ({ db, save, crypto, functies }) => {
     boardroomControleTaakMaak: (actor, puntId, invoer) => controle.taakMaak(boardroomControleContext(actor), puntId, invoer),
     boardroomControleTaakZet: (actor, taakId, status, bewijs) => controle.taakZet(boardroomControleContext(actor), taakId, status, bewijs),
     boardroomControleZelftest: (actor, puntId) => controle.zelftest(boardroomControleContext(actor), puntId),
+    boardroomControlePlanGaten: (actor, invoer) => controle.planGaten(boardroomControleContext(actor), invoer),
     capabilityGraph: () => publiekeCapabilityGraph()
   } };
 };

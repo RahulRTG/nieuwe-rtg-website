@@ -30,7 +30,7 @@ module.exports = (deps) => {
   // hier woont. Standaard uit -> geldModus 'schaduw' = JS blijft de baas, exact als
   // voorheen (de synchrone boek-guard).
   const motorklant = require('./motorklant')();
-  const geldModus = motorklant.aan ? 'motor' : 'schaduw';
+  const geldModus = motorklant.aan ? 'motor' : motorklant.modus;
 
   const MIN_CENTEN = 1;
   const MAX_CENTEN = 100000000;      // tot 1 miljoen euro per boeking (bank, geen wallet)

@@ -19,15 +19,33 @@
    db, accounts en fonds kan meegeven. */
 module.exports = { maakSettlement };
 
-function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, payOplaadAfronden }) {
+function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd, payOplaadAfronden }) {
   return async function settleFactuur(ctx, betaling) {
-  if (!ctx) return;
-  // Een rechtstreekse betaling aan een partner met munten: de leverancier wordt
-  // gecrediteerd (het geld is al binnen en omgezet naar euro).
+  if (!ctx) return { status: 400, error: 'Settlementcontext ontbreekt.' };
+  // Een rechtstreekse betaling aan een partner: pas na een geverifieerde
+  // providerbevestiging en alleen voor exact het aangevraagde bedrag.
   if (ctx.soort === 'direct') {
-    try { dpRegistreerMunt({ key: ctx.key, codename: ctx.codename, supplierCode: ctx.supplierCode, bedragCenten: betaling.centen, omschrijving: ctx.omschrijving }); }
-    catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
-    return;
+    const binnen = Math.round(Number(betaling && betaling.centen) || 0);
+    const verwacht = Math.round(Number(ctx.centen) || binnen);
+    if (binnen <= 0 || binnen !== verwacht) {
+      if (log && log.error) log.error('settlement: directe betaling niet geboekt; bedrag wijkt af',
+        { betaalId: betaling && betaling.id, verwacht, binnen });
+      return { status: 409, error: 'Het bevestigde bedrag wijkt af van de betaalopdracht.' };
+    }
+    const registreer = ctx.betaalwijze === 'munt' ? dpRegistreerMunt : dpRegistreerBevestigd;
+    if (typeof registreer !== 'function')
+      return { status: 500, error: 'De bevestigde directe betaalroute is niet aangesloten.' };
+    try {
+      const r = registreer({ key: ctx.key, codename: ctx.codename, supplierCode: ctx.supplierCode,
+        bedragCenten: binnen, omschrijving: ctx.omschrijving, bron: ctx.bron,
+        providerId: betaling && betaling.id, idem: ctx.idem,
+        aanbieder: ctx.betaalwijze === 'munt' ? 'munt' : 'stripe', betaalwijze: ctx.betaalwijze || 'kaart' });
+      return r && r.error ? r : { ok: true, betaling: r && r.betaling };
+    } catch (e) {
+      if (log && log.error) log.error('settlement: directe betaling NIET geboekt: ' + e.message,
+        { betaalId: betaling && betaling.id });
+      return { status: 500, error: 'De bevestigde betaling kon niet worden geboekt.' };
+    }
   }
   /* Een OPLADING van de RTG Pay-wallet. Deze tak ontbrak, en daarmee viel de
      hele oplaad-stroom bij een echte aanbieder in het niets: de kaart werd
@@ -41,20 +59,21 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, payO
      regel al uit kaartWachtend gehaald voor hij ons aanroept, dus een herhaalde
      webhook boekt niets dubbel. */
   if (ctx.soort === 'oplaad') {
-    if (!payOplaadAfronden) { (log && log.error || console.error)('[settlement] oplading kan niet worden bijgeschreven: de betaalkern ontbreekt', { id: betaling && betaling.id }); return; }
+    if (!payOplaadAfronden) { (log && log.error || console.error)('[settlement] oplading kan niet worden bijgeschreven: de betaalkern ontbreekt', { id: betaling && betaling.id }); return { status: 500, error: 'Betaalkern ontbreekt.' }; }
     try {
       const r = await payOplaadAfronden({ codenaam: ctx.codenaam, centen: betaling.centen, oms: ctx.oms, ref: betaling.id });
-      if (r && r.error) (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + r.error, { id: betaling && betaling.id });
+      if (r && r.error) { (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + r.error, { id: betaling && betaling.id }); return r; }
+      return { ok: true };
     } catch (e) {
       (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + e.message, { id: betaling && betaling.id });
+      return { status: 500, error: 'Oplading kon niet worden bijgeschreven.' };
     }
-    return;
   }
-  if (ctx.soort !== 'factuur') return;
+  if (ctx.soort !== 'factuur') return { ok: true };
   const md = ctx.own ? accounts.getMemberState(ctx.accountId) : db.data;
-  if (!md) return;
+  if (!md) return { status: 404, error: 'Ledenstaat ontbreekt.' };
   const inv = (md.invoices || []).find(i => i.id === ctx.invoiceId);
-  if (!inv || inv.status === 'paid') return;
+  if (!inv || inv.status === 'paid') return { ok: true };
   /* BETAALD MAG ALLEEN BETAALD HETEN ALS HET HELE BEDRAG ER IS.
 
      Hier stond `inv.status = 'paid'` onvoorwaardelijk, met alleen de vraag OF er
@@ -73,7 +92,7 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, payO
     log.warn('settlement: te weinig ontvangen, factuur blijft open',
       { factuur: inv.id, gevraagd, binnen, totaal: inv.deelbetaald, betaalId: betaling.id, hoe: betaling.hoe });
     if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
-    return;
+    return { ok: true, gedeeltelijk: true };
   }
   inv.status = 'paid';
   inv.date = betaling.hoe;
@@ -83,5 +102,6 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, payO
     catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
   }
   if (ctx.own) accounts.saveMemberState(ctx.accountId, md); else save();
+  return { ok: true };
 }
 }

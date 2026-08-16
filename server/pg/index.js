@@ -23,6 +23,7 @@
    ./sync; hier de pool, het schema, het laden, het luisteren en het afsluiten. */
 
 const KANAAL = 'rtg_kv';
+const klok = require('../lib/klok');
 
 function maakPg({ merge3, kluis, log, url }) {
   const { Pool } = require('../pgwire');
@@ -94,6 +95,59 @@ function maakPg({ merge3, kluis, log, url }) {
   // de snelle rijstrook voor de idempotentie-boeken (zie ./sync.js)
   const flushVoorrang = (dataNu) => flush(dataNu, false, VOORRANG);
 
+  /* Eén autoritatieve read-modify-write op een top-level collectie. Dit pad is
+     bedoeld voor gedeelde toestand met een revisiecontract (zoals Magnaat-
+     teamkamers): de gewone write-behind merge kan twee gelijktijdige mutaties
+     wel samenvoegen, maar kan niet voorkomen dat twee instances dezelfde
+     revisie allebei accepteren. Het advisory slot en de rijvergrendeling maken
+     lezen, controleren en schrijven hier één database-transactie.
+
+     `werk` is bewust synchroon. Geen await binnen het slot betekent dat de
+     kritieke sectie klein en controleerbaar blijft. De lokale werkkopie wordt
+     pas NA COMMIT vervangen; bij een fout of rollback lekt dus geen half
+     uitgevoerde mutatie naar db.data of naar een volgende save(). */
+  async function bewerkCollectie(sleutel, dataNu, werk) {
+    if (!sleutel || typeof werk !== 'function') throw new Error('Collectietransactie vereist een sleutel en bewerker.');
+    const client = await pool.connect();
+    let waarde, resultaat, jsonNa, versie = null;
+    try {
+      await client.query('BEGIN');
+      await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [sleutel]);
+      const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [sleutel]);
+      const jsonVoor = huidig.rows.length
+        ? uitStore(huidig.rows[0].val)
+        : JSON.stringify(dataNu[sleutel] == null ? {} : dataNu[sleutel]);
+      waarde = JSON.parse(jsonVoor);
+      resultaat = werk(waarde);
+      if (resultaat && typeof resultaat.then === 'function')
+        throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
+      jsonNa = JSON.stringify(waarde);
+      if (jsonNa !== jsonVoor) {
+        const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
+        versie = Number(nv.rows[0].v);
+        await client.query(
+          `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
+           ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
+          [sleutel, naarStore(jsonNa), versie]
+        );
+        await client.query('SELECT pg_notify($1, $2)', [KANAAL, sleutel]);
+      } else if (huidig.rows.length) versie = Number(huidig.rows[0].ver);
+      await client.query('COMMIT');
+    } catch (e) {
+      try { await client.query('ROLLBACK'); } catch (x) {}
+      throw e;
+    } finally {
+      client.release();
+    }
+    dataNu[sleutel] = waarde;
+    laatsteJson.set(sleutel, jsonNa);
+    laatsteGrootte.set(sleutel, jsonNa.length);
+    laatsteLengte.set(sleutel, Array.isArray(waarde) ? waarde.length : (waarde && typeof waarde === 'object' ? Object.keys(waarde).length : 0));
+    laatsteCheck.set(sleutel, klok.nu());
+    if (versie != null) toegepast.set(sleutel, versie);
+    return resultaat;
+  }
+
   // Luister op NOTIFY zodat wijzigingen van andere instances vrijwel direct
   // binnenkomen (geen puur pollen). De aparte client blijft open staan.
   async function luister(onWijziging) {
@@ -114,7 +168,7 @@ function maakPg({ merge3, kluis, log, url }) {
   function poolStatus() {
     return { totaal: pool.totalCount, inactief: pool.idleCount, wachtend: pool.waitingCount, max: pool.options.max };
   }
-  return { schema, laadAlles, flush, flushVoorrang, haalNieuwer, luister, sluit, pool, poolStatus,
+  return { schema, laadAlles, flush, flushVoorrang, bewerkCollectie, haalNieuwer, luister, sluit, pool, poolStatus,
     heeftUitgesteld: () => vlag.uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }

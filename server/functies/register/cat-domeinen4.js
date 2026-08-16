@@ -68,6 +68,12 @@ module.exports = [
     uitleg: 'Het bijlesgesprek met de begeleider.', paden: ['/api/bijles'] },
   { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },
+  { id: 'ov-arrival', categorie: 'Diensten (leden)', naam: 'Invisible Arrival', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.', paden: ['/api/arrival'] },
+  { id: 'ov-instant-reality', categorie: 'Diensten (leden)', naam: 'Instant Reality', standaard: true, doelgroepen: ['business'],
+    uitleg: 'De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.', paden: ['/api/instant-reality'] },
+  { id: 'ov-rtgone', categorie: 'Werk (zaken en personeel)', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
+    uitleg: 'Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.', paden: ['/api/rtgone'] },
   { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] },
   /* De buitenpoort van RTG Mail. Deze hoort NAAR ZIJN AARD in de kast: hij is

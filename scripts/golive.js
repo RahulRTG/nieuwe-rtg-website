@@ -46,7 +46,7 @@ function leesEnvBestand(pad) {
   if (fs.existsSync(envPad)) {
     bestand = leesEnvBestand(envPad) || {};
     // HANDMATIG-plekken die nog niet zijn ingevuld tellen niet mee
-    for (const [k, v] of Object.entries(bestand)) if (/VUL-IN/.test(v)) delete bestand[k];
+    for (const [k, v] of Object.entries(bestand)) if (/VUL-IN/i.test(v)) delete bestand[k];
     goed(path.basename(envPad) + ' gevonden en meegelezen (' + Object.keys(bestand).length + ' ingevulde waarden).');
     // het geheimenbestand mag nooit in git terechtkomen
     try { if (envPad === standaardEnvPad) {
@@ -81,6 +81,21 @@ function leesEnvBestand(pad) {
   if (!r.fouten.length) goed('Configuratie: geen blokkerende fouten.');
   if (process.env.NODE_ENV !== 'production') waarschuw('NODE_ENV staat nu op "' + (process.env.NODE_ENV || 'leeg') + '"; zet hem bij de echte start op production.');
 
+  // 1b. De externe voordeur heeft een EIGEN sleutel, buiten de app-env. Wie
+  // Node overneemt mag de Sentinel niet zelf kunnen terugzetten naar normaal.
+  const sentinelTokenPad = path.resolve(env.RTG_SENTINEL_TOKEN_FILE || path.join(__dirname, '..', '.sentinel-token'));
+  try {
+    const token = fs.readFileSync(sentinelTokenPad, 'utf8').trim();
+    if (!/^[a-f0-9]{64}$/i.test(token)) blokkeer('De Sentinel-beheersleutel moet exact 32 willekeurige bytes (64 hex-tekens) zijn.');
+    else if (process.platform !== 'win32' && (fs.statSync(sentinelTokenPad).mode & 0o077))
+      blokkeer('De Sentinel-beheersleutel is leesbaar voor anderen; zet rechten 600.');
+    else goed('Sentinel heeft een aparte beheersleutel buiten de app-omgeving.');
+  } catch (e) { blokkeer('Sentinel-beheersleutel ontbreekt. Draai `npm run sentinel:init` of opnieuw de productie-installatie.'); }
+  const sentinelBin = fs.existsSync('/app/rtg-sentinel') ? '/app/rtg-sentinel'
+    : path.join(__dirname, '..', 'motor', 'target', 'release', 'rtg-sentinel');
+  if (!fs.existsSync(sentinelBin)) blokkeer('Rust Sentinel-binary ontbreekt; draai npm run motor:build.');
+  else goed('Onafhankelijke Rust Sentinel-binary staat klaar.');
+
   // 2. PostgreSQL echt aanraken (niet alleen "de variabele staat er")
   if (env.DATABASE_URL) {
     try {
@@ -95,6 +110,28 @@ function leesEnvBestand(pad) {
       blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + (e.message || e));
     }
   }
+
+  // 2b. Een ingestelde Rust-cutover ook werkelijk aanraken. Alleen een URL en
+  // vlag controleren bewijst niet dat de sidecar draait of de juiste binary is.
+  if (env.RTG_MOTOR_REKEN_URL || env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW) {
+    const motor = await require('./lib/motor-proef').motorProef(env);
+    if (!motor.ok) blokkeer('Rust-motor is geconfigureerd maar niet inzetbaar: ' + motor.fout);
+    else if (motor.noodstop) waarschuw('Rust-appmotoren zijn door RTG_RUST_ALLES_UIT=1 bewust overgeslagen; Sentinel blijft actief.');
+    else goed('Rust-motor bereikbaar (' + motor.ms + ' ms; native: ' + motor.native.join(', ') + ').');
+  }
+  if (env.RTG_CAPABILITY_RUST_BIN && env.RTG_RUST_ALLES_UIT !== '1') {
+    try {
+      const cp = require('child_process');
+      const proef = cp.spawnSync(env.RTG_CAPABILITY_RUST_BIN, ['capability-scan', path.join(__dirname, '..')], {
+        encoding: 'utf8', timeout: 20000, maxBuffer: 32 * 1024 * 1024
+      });
+      if (proef.error) throw proef.error;
+      if (proef.status !== 0) throw new Error(String(proef.stderr || 'exit ' + proef.status).trim());
+      const body = JSON.parse(proef.stdout);
+      if (!body.ok || !Array.isArray(body.apps) || !Array.isArray(body.endpoints)) throw new Error('ongeldig scanantwoord');
+      goed('Native Magnaat-capabilityscan werkt (' + body.apps.length + ' apps, ' + body.endpoints.length + ' API-deuren).');
+    } catch (e) { blokkeer('RTG_CAPABILITY_RUST_BIN werkt niet: ' + e.message); }
+  } else if (env.RTG_CAPABILITY_RUST_BIN) waarschuw('Native capabilityscan is door de centrale Rust-noodstop bewust niet uitgevoerd.');
 
   // 3. de sleutels die instances MOETEN delen
   if (env.DATABASE_URL && env.RTG_VAULT_KEY && env.RTG_SECRET_KEY)
@@ -171,7 +208,10 @@ function leesEnvBestand(pad) {
 
   console.log('');
   if (blokkers) {
-    console.log('NIET klaar om live te gaan: ' + blokkers + ' blokkerend(e) punt(en). (npm run sleutels -- --schrijf maakt de geheimen.)');
+    const hulp = bestand
+      ? 'Vul de HANDMATIG-regels in .env.productie en rond het gemelde papierwerk af.'
+      : 'Maak eerst veilig .env.productie met: npm run sleutels:bestand';
+    console.log('NIET klaar om live te gaan: ' + blokkers + ' blokkerend(e) punt(en). ' + hulp);
     process.exit(1);
   }
   console.log('Klaar om live te gaan. Start met NODE_ENV=production (of npm run vloot voor losse processen).');

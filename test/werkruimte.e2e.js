@@ -37,7 +37,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} });
     await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.rtg-surface', { timeout: 15000 });
+    await page.waitForSelector('.rtg-surface[data-actief]', { timeout: 15000 });
 
     // de ruimte begint met twee surfaces
     const begin = await page.evaluate(() => RTGSchil.surfaces.map(s => s.id));

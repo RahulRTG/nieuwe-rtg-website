@@ -15,7 +15,10 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     if (stripe) rails.push({ id: 'stripe', label: 'Stripe · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
     if (mollie) rails.push({ id: 'mollie', label: 'Mollie · iDEAL of bankbetaling', soort: 'doorsturen', echt: true });
     if (adyen) rails.push({ id: 'adyen', label: 'Adyen · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
-    if (!rails.length) rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
+    if (!rails.length && standaard === 'demo')
+      rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
+    if (!rails.length) return { standaard: 'uit', rails: [], uit: true,
+      uitleg: 'Geen betaalprovider of bewuste demo actief; de betaalrail staat fail-closed.' };
     return { standaard, rails };
   }
 
@@ -26,7 +29,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       if (gevraagd === 'stripe' && stripe) return 'stripe';
       if (gevraagd === 'mollie' && mollie) return 'mollie';
       if (gevraagd === 'adyen' && adyen) return 'adyen';
-      if (gevraagd === 'demo' && !stripe && !mollie && !adyen) return 'demo';
+      if (gevraagd === 'demo' && standaard === 'demo' && !stripe && !mollie && !adyen) return 'demo';
       throw new Error('Betaalprovider "' + gevraagd + '" is niet beschikbaar. Er is niets afgeschreven.');
     }
     if (String(opdracht && opdracht.methode || '').toLowerCase() === 'ideal' && mollie) return 'mollie';
@@ -85,9 +88,13 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       const p = await adyen.paymentLinks.create(parameters, { idempotencyKey: sleutel });
       res = { id: p.id, status: p.status, checkoutUrl: p.url, aanbieder: 'adyen',
         betaalId: p.pspReference || null, bedrag: Math.round(bedrag), valuta, referentie };
-    } else {
+    } else if (rail === 'demo') {
       res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
         aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };
+    } else {
+      const e = new Error('Geen betaalprovider actief. Stel een provider in of zet de demo-betaalstand bewust aan.');
+      e.code = 'BETAALRAIL_UIT';
+      throw e;
     }
     set(sleutel, res);
     return res;

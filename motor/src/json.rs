@@ -52,12 +52,20 @@ impl Json {
         }
     }
 
+    pub fn as_f64(&self) -> Option<f64> {
+        match self {
+            Json::Num(n) if n.is_finite() => Some(*n),
+            _ => None,
+        }
+    }
+
     pub fn as_bool(&self) -> Option<bool> {
         match self { Json::Bool(b) => Some(*b), _ => None }
     }
 
     pub fn str_at(&self, k: &str) -> Option<&str> { self.get(k).and_then(|v| v.as_str()) }
     pub fn i64_at(&self, k: &str) -> Option<i64> { self.get(k).and_then(|v| v.as_i64()) }
+    pub fn f64_at(&self, k: &str) -> Option<f64> { self.get(k).and_then(|v| v.as_f64()) }
     pub fn bool_at(&self, k: &str) -> bool { self.get(k).and_then(|v| v.as_bool()).unwrap_or(false) }
 
     /* Serialiseren. Escapet strings netjes; getallen zonder onnodige komma's. */

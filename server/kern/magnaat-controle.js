@@ -20,6 +20,34 @@ const { nu: klokNu } = require('../lib/klok');
 module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu }) => {
   if (typeof wereldState !== 'function' || typeof getGraph !== 'function') throw new Error('Magnaat Codecontrole mist de wereld of Capability Graph.');
 
+  /* De Capability Graph bevat inmiddels duizenden punten. Een lineaire find()
+     per punt maakte een overzicht daardoor ongemerkt O(punten x kantoren), en
+     taakhandelingen zochten opnieuw door de hele graaf. De graaf wordt bij een
+     codescan als compleet nieuw object vervangen; daardoor kan deze index veilig
+     op objectidentiteit worden ververst zonder ooit een oude scan te mengen. */
+  let geindexeerdeGraph = null;
+  let graphIndex = null;
+
+  function indexVoor(g) {
+    if (g === geindexeerdeGraph && graphIndex) return graphIndex;
+    const punten = Array.isArray(g.controlepunten) ? g.controlepunten : [];
+    const kantoren = Array.isArray(g.kantoren) ? g.kantoren : [];
+    const dekking = { api: 0, schermen: 0, functies: 0, werkprocessen: 0 };
+    for (const p of punten) {
+      if (p.soort === 'api') dekking.api += 1;
+      else if (p.soort === 'scherm') dekking.schermen += 1;
+      else if (p.soort === 'functie') dekking.functies += 1;
+      else if (p.soort === 'werkproces') dekking.werkprocessen += 1;
+    }
+    geindexeerdeGraph = g;
+    graphIndex = {
+      puntOpId: new Map(punten.map(p => [p.id, p])),
+      kantoorOpId: new Map(kantoren.map(k => [k.id, k])),
+      dekking
+    };
+    return graphIndex;
+  }
+
   const schoon = (v, max = 240) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
   const nieuwId = voor => voor + '-' + crypto.randomBytes(6).toString('hex');
 
@@ -48,7 +76,9 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
   }
 
   function actorContext(ctx) {
+    if (ctx && ctx._controleContext === true) return ctx;
     return {
+      _controleContext: true,
       key: schoon(ctx && ctx.key, 100) || 'onbekend',
       boardroom: !!(ctx && ctx.boardroom),
       kantoorId: schoon(ctx && ctx.kantoorId, 80),
@@ -58,7 +88,8 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
   }
 
   function kantoorOpId(id) {
-    return graph().kantoren.find(k => k.id === id) || null;
+    const g = graph();
+    return indexVoor(g).kantoorOpId.get(id) || null;
   }
 
   function rollenVoor(kantoor, puntRol) {
@@ -70,13 +101,14 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
   }
 
   function puntRuw(id) {
-    return graph().controlepunten.find(p => p.id === schoon(id, 80)) || null;
+    const g = graph();
+    return indexVoor(g).puntOpId.get(schoon(id, 80)) || null;
   }
 
-  function puntMetOverride(bron) {
+  function puntMetOverride(bron, stand = state(), ix = indexVoor(graph())) {
     if (!bron) return null;
-    const o = state().overrides[bron.id] || {};
-    const kantoor = kantoorOpId(o.kantoorId) || bron.kantoor;
+    const o = stand.overrides[bron.id] || {};
+    const kantoor = ix.kantoorOpId.get(o.kantoorId) || bron.kantoor;
     return Object.assign({}, bron, {
       kantoor: Object.assign({}, kantoor),
       rol: schoon(o.rol, 100) || bron.rol,
@@ -115,9 +147,9 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
     if (s.audit.length > 500) s.audit.length = 500;
   }
 
-  function taakAantallen() {
+  function taakAantallen(stand = state()) {
     const uit = {};
-    for (const t of state().taken) {
+    for (const t of stand.taken) {
       if (!uit[t.puntId]) uit[t.puntId] = { open: 0, totaal: 0 };
       uit[t.puntId].totaal += 1;
       if (t.status !== 'klaar') uit[t.puntId].open += 1;
@@ -125,14 +157,23 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
     return uit;
   }
 
-  function publiekPunt(ctx, bron, aantallen) {
-    const p = puntMetOverride(bron);
+  function publiekPunt(ctx, bron, aantallen, stand, ix) {
+    const p = puntMetOverride(bron, stand, ix);
+    return publiekPuntKlaar(ctx, p, aantallen);
+  }
+
+  function publiekPuntKlaar(ctx, p, aantallen) {
     const taken = aantallen[p.id] || { open: 0, totaal: 0 };
     return {
       id: p.id, soort: p.soort, sleutel: p.sleutel, naam: p.naam,
       route: p.route, methode: p.methode, bestand: p.bestand,
       toegang: p.toegang, familie: p.familie, kantoor: p.kantoor,
       rol: p.rol, risico: p.risico, aan: p.aan, status: p.status,
+      bronstand: p.bronstand || 'codepad-aanwezig',
+      functieIds: Array.isArray(p.functieIds) ? p.functieIds.slice() : [],
+      signalen: p.signalen ? Object.assign({}, p.signalen) : {},
+      dekking: p.dekking ? { percentage: p.dekking.percentage, volledig: p.dekking.volledig,
+        ontbreekt: p.dekking.ontbreekt.slice(), waarden: Object.assign({}, p.dekking.waarden) } : null,
       teststatus: p.teststatus, laatsteCheck: p.laatsteCheck,
       bijgewerkt: p.bijgewerkt, productieGewijzigd: false,
       taken, rechten: rechtenVoor(ctx, p)
@@ -146,6 +187,7 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
       kantoor: punt ? punt.kantoor : { id: t.kantoorId, naam: t.kantoorNaam },
       punt: punt ? { naam: punt.naam, soort: punt.soort, route: punt.route, risico: punt.risico } : null,
       toegewezenRol: t.toegewezenRol, prioriteit: t.prioriteit, status: t.status,
+      autoDekking: !!t.autoDekking,
       bewijs: t.bewijs || '', gemaaktDoor: t.gemaaktDoor, gemaakt: t.gemaakt,
       bijgewerkt: t.bijgewerkt, afgerond: t.afgerond || null
     };
@@ -165,22 +207,28 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
   }
 
   function samenvatting(punten) {
-    const uit = { totaal: punten.length, aan: 0, uit: 0, operationeel: 0, aandacht: 0, onderhoud: 0, gestopt: 0, getest: 0, rood: 0 };
+    const uit = { totaal: punten.length, aan: 0, uit: 0, operationeel: 0, aandacht: 0, onderhoud: 0, gestopt: 0, getest: 0, rood: 0,
+      volledigGekoppeld: 0, dekkingsgaten: 0, dekkingspercentage: 0 };
+    let dekkingSom = 0;
     for (const p of punten) {
       p.aan ? uit.aan += 1 : uit.uit += 1;
       if (uit[p.status] !== undefined) uit[p.status] += 1;
       if (p.teststatus === 'geslaagd') uit.getest += 1;
       if (p.risico === 'rood') uit.rood += 1;
+      if (p.dekking) {
+        dekkingSom += p.dekking.percentage;
+        p.dekking.volledig ? uit.volledigGekoppeld += 1 : uit.dekkingsgaten += 1;
+      }
     }
     uit.dekkingPct = punten.length ? 100 : 0;
     uit.testPct = punten.length ? Math.round(uit.getest / punten.length * 1000) / 10 : 0;
+    uit.dekkingspercentage = punten.length ? Math.round(dekkingSom / punten.length * 10) / 10 : 100;
     return uit;
   }
 
-  function kantoorSamenvattingen(ctx, alle, aantallen) {
+  function kantoorSamenvattingen(alle) {
     const per = new Map();
-    for (const bron of alle) {
-      const p = publiekPunt(ctx, bron, aantallen);
+    for (const p of alle) {
       if (!per.has(p.kantoor.id)) per.set(p.kantoor.id, { kantoor: p.kantoor, punten: [] });
       per.get(p.kantoor.id).punten.push(p);
     }
@@ -191,21 +239,32 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
   function overzicht(context, filters = {}) {
     const ctx = actorContext(context);
     const g = graph();
-    const aantallen = taakAantallen();
+    const ix = indexVoor(g);
+    const stand = state();
+    const aantallen = taakAantallen(stand);
     const gekozenKantoor = ctx.boardroom ? schoon(filters.kantoorId, 80) : ctx.kantoorId;
     const zoek = schoon(filters.zoek, 100).toLowerCase();
     const soort = ['api', 'scherm', 'functie', 'werkproces'].includes(filters.soort) ? filters.soort : '';
     const status = STATUSSEN.includes(filters.status) ? filters.status : '';
+    const gat = ['alle', 'kantoor', 'schakelaar', 'taak', 'proef', 'audit', 'gameplay', 'economie', 'werkroute'].includes(filters.gat) ? filters.gat : '';
     const pagina = Math.max(1, Math.floor(Number(filters.pagina) || 1));
     const limiet = Math.min(100, Math.max(10, Math.floor(Number(filters.limiet) || 40)));
-    // Gebruik de actuele kantoorindeling. Een door de boardroom verplaatst punt
-    // verdwijnt daarmee ook echt uit het oude kantooroverzicht.
-    const zichtbaarBron = g.controlepunten.filter(p => ctx.boardroom || puntMetOverride(p).kantoor.id === ctx.kantoorId);
-    const allePubliek = zichtbaarBron.map(p => publiekPunt(ctx, p, aantallen));
+    /* Maak ieder publiek punt precies eenmaal. Dezelfde verzameling voedt de
+       kantoor-totalen en (indien zichtbaar) de lijst. Overrides blijven hierbij
+       leidend: een heringedeeld punt verhuist meteen mee. */
+    const alleVoorKantoren = [];
+    const allePubliek = [];
+    for (const bron of g.controlepunten) {
+      const punt = publiekPunt(ctx, bron, aantallen, stand, ix);
+      alleVoorKantoren.push(punt);
+      if (ctx.boardroom || punt.kantoor.id === ctx.kantoorId) allePubliek.push(punt);
+    }
     const gefilterd = allePubliek.filter(p => {
       if (gekozenKantoor && p.kantoor.id !== gekozenKantoor) return false;
       if (soort && p.soort !== soort) return false;
       if (status && p.status !== status) return false;
+      if (gat === 'alle' && (!p.dekking || p.dekking.volledig)) return false;
+      if (gat && gat !== 'alle' && (!p.dekking || !p.dekking.ontbreekt.includes(gat))) return false;
       if (zoek && ![p.naam, p.sleutel, p.route, p.bestand, p.rol].join(' ').toLowerCase().includes(zoek)) return false;
       return true;
     });
@@ -224,16 +283,19 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
       },
       dekking: {
         totaal: g.controlepunten.length,
-        api: g.controlepunten.filter(p => p.soort === 'api').length,
-        schermen: g.controlepunten.filter(p => p.soort === 'scherm').length,
-        functies: g.controlepunten.filter(p => p.soort === 'functie').length,
-        werkprocessen: g.controlepunten.filter(p => p.soort === 'werkproces').length,
-        gekoppeld: g.controlepunten.length, percentage: g.controlepunten.length ? 100 : 0
+        api: ix.dekking.api,
+        schermen: ix.dekking.schermen,
+        functies: ix.dekking.functies,
+        werkprocessen: ix.dekking.werkprocessen,
+        gekoppeld: g.dekkingsmatrix ? g.dekkingsmatrix.volledig : 0,
+        metGaten: g.dekkingsmatrix ? g.dekkingsmatrix.metGaten : g.controlepunten.length,
+        percentage: g.dekkingsmatrix ? g.dekkingsmatrix.percentage : 0,
+        dimensies: g.dekkingsmatrix ? g.dekkingsmatrix.dimensies.map(d => Object.assign({}, d)) : []
       },
       samenvatting: samenvatting(allePubliek),
-      kantoren: kantoorSamenvattingen(ctx, g.controlepunten, aantallen),
+      kantoren: kantoorSamenvattingen(alleVoorKantoren),
       rollen: rollenVoor(kantoorVoorRollen, null),
-      filters: { kantoorId: gekozenKantoor || '', zoek, soort, status, pagina, limiet },
+      filters: { kantoorId: gekozenKantoor || '', zoek, soort, status, gat, pagina, limiet },
       paginering: { pagina, limiet, totaal: gefilterd.length, paginas: Math.max(1, Math.ceil(gefilterd.length / limiet)) },
       punten: gefilterd.slice(start, start + limiet),
       taken: zichtbareTaken(ctx, gekozenKantoor).slice(0, 120),
@@ -410,6 +472,54 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
     };
   }
 
+  /* Maak na een codescan een begrensde, idempotente werkvoorraad van de meest
+     concrete werkprocesgaten. Zo verdwijnt een nieuwe routefamilie niet in een
+     cijfer; het juiste kantoor krijgt een taak. De taak blijft synthetisch en
+     verleent geen enkele productiebevoegdheid. */
+  function planGaten(context, invoer = {}) {
+    const ctx = actorContext(context);
+    if (!ctx.boardroom) return { status: 403, error: 'Alleen de boardroom zet platformbrede dekkingsgaten om in werkvoorraad.' };
+    const limiet = Math.min(50, Math.max(1, Math.floor(Number(invoer.limiet) || 25)));
+    const kantoorId = schoon(invoer.kantoorId, 80);
+    const stand = state();
+    const kandidaten = graph().controlepunten.filter(p => {
+      const punt = puntMetOverride(p);
+      return punt.soort === 'werkproces' && punt.dekking && !punt.dekking.volledig &&
+        (!kantoorId || punt.kantoor.id === kantoorId);
+    }).sort((a, b) => {
+      const pa = puntMetOverride(a), pb = puntMetOverride(b);
+      return pb.dekking.ontbreekt.length - pa.dekking.ontbreekt.length ||
+        (pa.risico === 'rood' ? 0 : pa.risico === 'geel' ? 1 : 2) -
+          (pb.risico === 'rood' ? 0 : pb.risico === 'geel' ? 1 : 2) ||
+        pa.naam.localeCompare(pb.naam);
+    });
+    const gemaakt = [];
+    for (const bron of kandidaten) {
+      if (gemaakt.length >= limiet) break;
+      if (stand.taken.some(t => t.puntId === bron.id && t.autoDekking && t.status !== 'klaar')) continue;
+      const punt = puntMetOverride(bron);
+      const taak = {
+        id: nieuwId('ctl-taak'), puntId: punt.id,
+        titel: 'Dekkingsgat · ' + punt.naam,
+        omschrijving: 'Maak aantoonbaar: ' + punt.dekking.ontbreekt.join(', ') + '. Gebruik alleen synthetische dossiers en leg het bewijs vast.',
+        kantoorId: punt.kantoor.id, kantoorNaam: punt.kantoor.naam,
+        toegewezenRol: punt.rol, prioriteit: punt.risico === 'rood' ? 'kritiek' : 'hoog',
+        status: 'open', bewijs: '', autoDekking: true,
+        gemaaktDoor: ctx.key, gemaakt: nu(), bijgewerkt: nu(), afgerond: null
+      };
+      stand.taken.unshift(taak); gemaakt.push(taak);
+      const o = stand.overrides[punt.id] || {};
+      o.teststatus = 'bezig'; o.bijgewerkt = nu(); stand.overrides[punt.id] = o;
+    }
+    if (stand.taken.length > 2000) stand.taken.length = 2000;
+    if (gemaakt.length) {
+      audit(ctx.key, 'dekkingsplan-gemaakt', gemaakt.length + ' werkprocesgat(en) toegewezen aan de verantwoordelijke kantoren.', null, null);
+      save();
+    }
+    return { ok: true, aangemaakt: gemaakt.length, bekeken: kandidaten.length,
+      taken: gemaakt.map(publiekTaak), waarschuwing: 'Alle taken blijven in de Magnaat-trainingsomgeving.' };
+  }
+
   function beschikbaar(soort, sleutel) {
     const bron = graph().controlepunten.find(p => p.soort === soort && p.sleutel === sleutel);
     return bron ? puntMetOverride(bron).aan : true;
@@ -424,5 +534,5 @@ module.exports = ({ wereldState, getGraph, save = () => {}, crypto, nu = klokNu 
     return Object.assign({ takenOpen: zichtbareTaken(ctx).filter(t => t.status !== 'klaar').length }, samenvatting(punten));
   }
 
-  return { overzicht, zet, taakMaak, taakZet, zelftest, beschikbaar, korteSamenvatting, _state: state };
+  return { overzicht, zet, taakMaak, taakZet, zelftest, planGaten, beschikbaar, korteSamenvatting, _state: state };
 };

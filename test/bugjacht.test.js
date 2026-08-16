@@ -578,24 +578,24 @@ test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
   assert.ok(!(met.fouten || []).some(f => /STRIPE/.test(f)), 'met sleutel en webhook-secret is er niets aan de hand');
 });
 
-test('productie draait zonder AI volledig handmatig, maar niet zonder echte mail', () => {
+test('productie draait zonder modelprovider volledig regelgestuurd, maar niet zonder echte mail', () => {
   const { valideer } = require('../server/config');
   const basis = { NODE_ENV:'production', RTG_ENC_KEY:'x'.repeat(64), RTG_VAULT_KEY:'a'.repeat(64),
     RTG_SECRET_KEY:'b'.repeat(64), RTG_OWNER_EMAIL:'eigenaar@echt.nl', OFFICE_CODE:'ABCDEFGHIJKL',
     STRIPE_SECRET_KEY:'sk_live_x', STRIPE_WEBHOOK_SECRET:'whsec_x' };
   const zonder = valideer(basis);
   assert.ok(!zonder.fouten.some(f=>/AI-provider/.test(f)), 'AI is geen productiestart-afhankelijkheid');
-  assert.ok(zonder.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)), 'de handmatige stand is zichtbaar');
+  assert.ok(zonder.waarschuwingen.some(f=>/regelgestuurde werkmodus/.test(f)), 'de regelgestuurde stand is zichtbaar');
   assert.ok(zonder.fouten.some(f=>/mailprovider/.test(f)));
   const bewustUit = valideer(Object.assign({}, basis, { RTG_AI_UIT:'1', SMTP_URL:'smtp://mail.test:2525' }));
   assert.ok(!bewustUit.fouten.some(f=>/AI/.test(f)), 'AI mag bewust volledig uit');
-  assert.ok(bewustUit.waarschuwingen.some(f=>/bewust uit.*handmatige werkmodus/i.test(f)));
+  assert.ok(bewustUit.waarschuwingen.some(f=>/bewust uit.*regelgestuurde werkmodus/i.test(f)));
   const conflict = valideer(Object.assign({}, basis,
     { RTG_AI_UIT:'1', OPENAI_API_KEY:'provider-key', SMTP_URL:'smtp://mail.test:2525' }));
   assert.ok(conflict.fouten.some(f=>/RTG_AI_UIT=1 botst/i.test(f)), 'uit plus een AI-sleutel weigert hard');
   const echt = valideer(Object.assign({},basis,{OPENAI_API_KEY:'provider-key',SMTP_URL:'smtp://mail.test:2525'}));
   assert.ok(!echt.fouten.some(f=>/AI-provider|mailprovider/.test(f)));
-  assert.ok(!echt.waarschuwingen.some(f=>/handmatige werkmodus/.test(f)));
+  assert.ok(!echt.waarschuwingen.some(f=>/regelgestuurde werkmodus/.test(f)));
 });
 
 test('een betaal-webhook voor een onbekende betaling verandert niets en valt niet om', async () => {

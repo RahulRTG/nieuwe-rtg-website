@@ -14,6 +14,7 @@
    bijeenkomst plaatsen. Dat zijn handelingen tussen mensen; de AI schrijft
    hoogstens de woorden. */
 const { tekst } = require('../../ai');
+const { samenvat: lokaalSamenvatten } = require('../../lib/lokale-taal');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt bij een besloten ' +
   'genootschap van leden. Schrijf rustig, zeker en zonder opsmuk: geen uitroeptekens, geen ' +
@@ -39,17 +40,14 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
     const gr = genootschap.groepMet(groepId);
     if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
     const regels = prikbord.regels(groepId, 60);
-    if (!regels.length) return { ok: true, samenvatting: 'Er staat nog niets op het prikbord.' };
-    const t = await tekst(anthropic, TOON + ' Vat het prikbord samen in maximaal vijf korte zinnen: ' +
-      'waar gaat het over, welke vragen liggen er open, en is er iets waar iemand op zou moeten ' +
-      'reageren. Noem geen namen die er niet staan.', regels.join('\n'), { max: 400 });
-    return t ? { ok: true, aantal: regels.length, samenvatting: t } : geenAI;
+    const t = regels.length
+      ? lokaalSamenvatten(regels.join('\n'), { maxZinnen: 5, maxTekens: 900 })
+      : 'Er staat nog niets op het prikbord.';
+    return { ok: true, aantal: regels.length, samenvatting: t, bron: 'lokale-taal', ai: false };
   }
 
-  /* Welke dag past de meesten? De REKENSOM doet deze module zelf -- een AI die
-     moet tellen gaat fouten maken, en dit zijn de antwoorden van echte mensen.
-     De AI zet er alleen een leesbare zin omheen. Zonder AI blijft het cijfer
-     staan, en dat is het antwoord ook. */
+  /* Welke dag past de meesten? Zowel de rekensom als de feitelijke formulering
+     blijft lokaal: een model maakt tellen niet betrouwbaarder. */
   async function datumRaad(sess, groepId) {
     const gr = genootschap.groepMet(groepId);
     if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
@@ -64,12 +62,13 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
 
     if (!gemeten.length) return { ok: true, meting: [], tekst: 'Er staat nog niets in de agenda van dit genootschap.' };
     const beste = gemeten[0];
-    const t = await tekst(anthropic, TOON + ' Zeg in twee zinnen welke bijeenkomst de meeste leden schikt ' +
-      'en wat de gastheer daaraan kan doen. Reken niet zelf; gebruik de getallen zoals ze er staan.',
-    'Het genootschap heeft ' + leden + ' leden.\n' + gemeten.map(g =>
-      g.datum + (g.tijd ? ' ' + g.tijd : '') + ' - ' + g.wat + ': ja ' + g.ja + ', misschien ' + g.misschien +
-      ', nee ' + g.nee + ', nog niet geantwoord ' + g.stil).join('\n'), { max: 250 });
-    return { ok: true, meting: gemeten, beste: beste.datum, tekst: t || null };
+    const moment = beste.datum + (beste.tijd ? ' om ' + beste.tijd : '');
+    const t = moment + ' past op dit moment de meeste leden: ' + beste.ja + ' ja, ' +
+      beste.misschien + ' misschien en ' + beste.nee + ' nee. ' +
+      (beste.stil ? beste.stil + ' ' + (beste.stil === 1 ? 'lid heeft' : 'leden hebben') + ' nog niet geantwoord.' :
+        'Iedereen heeft geantwoord.');
+    return { ok: true, meting: gemeten, beste: beste.datum, tekst: t,
+      bron: 'lokale-regels', ai: false };
   }
 
   return { aankondiging, prikbordSamen, datumRaad };

@@ -131,18 +131,39 @@ De server start vanzelf bij het aanmelden en komt terug als hij omvalt, via
 launchctl kickstart -k gui/501/nl.rtg.server   # met de hand herstarten
 ```
 
-### Echte AI (optioneel)
+### Lokale intelligentie (optioneel, lokaal eerst)
 
-Zet een Anthropic API-key in de omgeving en de persoonlijke AI draait op Claude:
+RTG heeft voor zijn kern geen model nodig. Schermen, workflows, rechten,
+berekeningen, zoeken, sorteren, agenda-herkenning, vaste cataloguskeuzes en
+extractieve samenvattingen draaien in gewone lokale code. Alleen vrije taal,
+creatieve tekst, open vragen en beeldduiding gebruiken een model.
+
+Voor die resterende taken kan een OpenAI-compatibele modelserver volledig op
+het eigen apparaat draaien:
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-... npm start
+LOCAL_AI_URL=http://127.0.0.1:11434 \
+LOCAL_AI_MODEL=<eigen-modelnaam> \
+RTG_EXTERNE_AI_UIT=1 \
+npm start
 ```
 
-Zonder key start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
+Voor een vaste lokale installatie mogen dezelfde regels in de door git
+genegeerde `.env.local` staan. `npm start` en `npm run ai:lokaal:check` lezen
+dat bestand letterlijk in; bestaande omgevingsvariabelen houden voorrang.
+
+Controleer de verbinding en capabilities met `npm run ai:lokaal:check`. Een
+loopback-adres is standaard verplicht; een eigen modelserver elders op het LAN
+vereist de bewuste opt-in `LOCAL_AI_LAN_TOESTAAN=1`. Tekst, tool-calling en
+beeld kunnen elk een apart lokaal model krijgen via `LOCAL_AI_MODEL_KORT`,
+`LOCAL_AI_MODEL_TOOLS` en `LOCAL_AI_MODEL_VISION`. Zonder vision-model wordt
+beeld nooit stil verwijderd of aan een tekstmodel voorgelegd.
+
+Zonder model start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
 controles en regelgestuurde opdrachten blijven werken; alleen vrije
-modelverrijking valt weg. Reacties melden dit eerlijk en doen nooit alsof AI
-of een externe uitvoerder iets heeft gedaan.
+modelverrijking valt weg. Met `RTG_AI_UIT=1` is ook in productie aantoonbaar
+alles uit. Zie [`docs/lokale-intelligentie.md`](docs/lokale-intelligentie.md)
+voor de volledige grens per taak.
 
 Met key krijgt Rahul bovendien **het AI-stuur** (`server/kern/stuur.js`): in de
 drie assistenten (leden-app, partner-app, personeels-PDA) voert hij vrije
@@ -154,9 +175,11 @@ geld-actie vraagt eerst een expliciete bevestiging. De losse endpoints
 (`/api/member/doe`, `/api/supplier/doe`, `/api/staff/doe` + `/kaart`) werken
 ook zonder key en de boardroom kan de functie `stuur` per doelgroep sluiten.
 
-Elke AI-aanroep loopt via **`server/ai.js`**: één `messages.create` met een
-uitwijkketen erachter (Claude, dan OpenAI, dan Gemini; alleen aanbieders met
-een sleutel doen mee, volgorde met `AI_VOLGORDE`). Voor korte classificaties
+Elke modelaanroep loopt via **`server/ai.js`**: één `messages.create` met een
+uitwijkketen erachter (lokaal, dan pas expliciet ingestelde externe aanbieders;
+volgorde met `AI_VOLGORDE`). `RTG_EXTERNE_AI_UIT=1` sluit externe verwerking
+hard af. Met lokaal én extern heet de zichtbare stand **hybride**; “privé op dit
+apparaat” verschijnt alleen wanneer er geen externe modelroute bestaat. Voor korte classificaties
 staat daar ook `jaNee(ai, vraag, tekst)` — één plek met het lichte model
 (`AI_MODEL_KORT`) en het lezen van het antwoord, dat `true`, `false` of `null`
 geeft. `null` betekent "geen oordeel" (geen sleutel, alle aanbieders plat, of

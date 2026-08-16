@@ -4,7 +4,8 @@
      npm run golive
 
    Staat er een .env.productie in de projectmap (gemaakt met
-   npm run sleutels -- --schrijf), dan leest de keuring die vanzelf mee;
+   npm run sleutels -- --schrijf), dan leest de keuring die vanzelf mee. In
+   Docker wijst RTG_ENV_FILE naar hetzelfde bestand als gemount geheim;
    echte omgevingsvariabelen winnen altijd van het bestand. De keuring
    beoordeelt de configuratie ALSOF het productie is (ook als NODE_ENV nog
    niet op production staat), probeert PostgreSQL echt te bereiken, en drukt
@@ -34,24 +35,44 @@ function leesEnvBestand(pad) {
 }
 
 (async () => {
-  // 0. het productie-envbestand, als dat er is (echte env wint altijd)
-  const envPad = path.join(__dirname, '..', '.env.productie');
+  // 0. het productie-envbestand, als dat er is (echte env wint altijd). In
+  //    Docker is dit /run/secrets/rtg_env; op de host blijft de vertrouwde
+  //    .env.productie de standaard. Nooit `source`: waarden blijven letterlijk.
+  const standaardEnvPad = path.join(__dirname, '..', '.env.productie');
+  const envPad = process.env.RTG_ENV_FILE
+    ? path.resolve(process.env.RTG_ENV_FILE)
+    : standaardEnvPad;
   let bestand = null;
   if (fs.existsSync(envPad)) {
     bestand = leesEnvBestand(envPad) || {};
     // HANDMATIG-plekken die nog niet zijn ingevuld tellen niet mee
     for (const [k, v] of Object.entries(bestand)) if (/VUL-IN/i.test(v)) delete bestand[k];
-    goed('.env.productie gevonden en meegelezen (' + Object.keys(bestand).length + ' ingevulde waarden).');
+    goed(path.basename(envPad) + ' gevonden en meegelezen (' + Object.keys(bestand).length + ' ingevulde waarden).');
     // het geheimenbestand mag nooit in git terechtkomen
-    try {
+    try { if (envPad === standaardEnvPad) {
       const ignore = fs.readFileSync(path.join(__dirname, '..', '.gitignore'), 'utf8');
       if (!/^\.env(\.\*|\.productie)?$/m.test(ignore) || !/\.env\./.test(ignore))
         blokkeer('.env.productie staat niet in .gitignore: het geheimenbestand zou in git kunnen belanden.');
-    } catch (e) {}
+    } } catch (e) {}
+  } else if (process.env.RTG_ENV_FILE) {
+    blokkeer('RTG_ENV_FILE wijst naar een ontbrekend geheimenbestand: ' + envPad + '.');
   }
 
   // 1. de configuratie, beoordeeld op productieniveau
   const env = { ...(bestand || {}), ...process.env, NODE_ENV: 'production' };
+  // Docker bewaart het PostgreSQL-wachtwoord bewust in een tweede secret, dus
+  // DATABASE_URL staat niet in rtg_env en verschijnt niet in docker inspect.
+  // Bouw voor deze keuring exact dezelfde interne URL als de startwikkel.
+  if (!env.DATABASE_URL && env.RTG_POSTGRES_PASSWORD_FILE) {
+    try {
+      const wachtwoord = fs.readFileSync(env.RTG_POSTGRES_PASSWORD_FILE, 'utf8').replace(/[\r\n]+$/, '');
+      if (wachtwoord.length < 16) throw new Error('leeg of te kort');
+      env.DATABASE_URL = 'postgresql://rtg:' + encodeURIComponent(wachtwoord) + '@postgres:5432/rtg';
+      goed('PostgreSQL-connectie veilig uit het aparte Docker-secret opgebouwd.');
+    } catch (e) {
+      blokkeer('RTG_POSTGRES_PASSWORD_FILE is niet bruikbaar: ' + (e.message || e));
+    }
+  }
   if (env.RTG_PRIVATE_BETA === '1')
     blokkeer('RTG_PRIVATE_BETA=1 staat nog aan: deze stand is alleen voor localhost en mag nooit als publieke livegang worden goedgekeurd.');
   const r = config.valideer(env);
@@ -176,11 +197,14 @@ function leesEnvBestand(pad) {
   /* De punten die BUITEN de code liggen: geen kruisjes (de keuring kan ze
      vanaf hier niet zien), maar wel elke keer op het bord, zodat ze nooit
      stilletjes worden overgeslagen. */
-  console.log('\nBuiten de code, op de server zelf (zie PRODUCTION.md):');
-  console.log(' - TLS-terminatie (reverse proxy of load balancer) VOOR de app; trust proxy staat al aan.');
-  console.log(' - Rand-DDoS: DNS achter Cloudflare of gelijkwaardig met proxy aan; de app-WAF is de tweede linie.');
+  console.log('\nBuiten de code, op de server zelf (zie LIVEGANG.md):');
+  if (env.RTG_TLS === '1' && env.RTG_ACME === '1')
+    console.log(' - Native TLS/ACME staat klaar; DNS moet naar deze server wijzen en poort 80/443 moet publiek bereikbaar zijn.');
+  else
+    console.log(' - TLS-terminatie via de gekozen reverse proxy/load balancer moet nog buiten de app worden ingericht.');
+  console.log(' - Volumetrische DDoS-bescherming vóór de server is afhankelijk van het risicoprofiel; de app-WAF is de tweede linie.');
   console.log(' - Een onafhankelijke pentest voor de lancering; eigen tests vervangen geen vreemde ogen.');
-  console.log('   (Backups: npm test -- test/herstelproef.test.js zet er echt een terug.)');
+  console.log('   (Backups: npm run live:backup; herstel: npm run live:restore -- <timestamp>.)');
 
   console.log('');
   if (blokkers) {

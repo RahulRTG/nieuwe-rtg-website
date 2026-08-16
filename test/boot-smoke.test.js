@@ -30,7 +30,10 @@ function haal(port, pad) {
   });
 }
 
-async function wachtTotOp(port, uitInfo, tot = 15000) {
+/* De volledige server laadt duizenden routes. Op een bezette CI- of
+   ontwikkelmachine kan dat aantoonbaar langer dan 15 seconden duren, zonder
+   dat de boot defect is. Fatale fouten blijven direct afbreken. */
+async function wachtTotOp(port, uitInfo, tot = 30000) {
   const eind = Date.now() + tot;
   while (Date.now() < eind) {
     if (uitInfo.fataal) throw new Error('server crashte bij opstart:\n' + uitInfo.log.slice(-2000));

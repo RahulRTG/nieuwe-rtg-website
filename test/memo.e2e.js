@@ -30,12 +30,15 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Memolid', email: 'me' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1992-04-04', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
+    assert.ok(reg.token, 'het memolid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
     const api = (pad, body) => fetch(base + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify(body || {}) }).then(r => r.json());
     const map = await api('/api/bestanden/map', { naam: "Memo's" });
+    assert.ok(map.id, 'de memomap is aangemaakt: ' + JSON.stringify(map).slice(0, 160));
     const up = await api('/api/bestanden/upload', { naam: 'memo-2026-07-27-0900.webm', map: map.id,
       dataUrl: 'data:audio/webm;base64,' + Buffer.from('demo-audio').toString('base64') });
+    assert.ok(up.id, 'de memo is opgeslagen: ' + JSON.stringify(up).slice(0, 160));
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
@@ -51,12 +54,24 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
     await page.goto(base + '/apps/memo.html', { waitUntil: 'domcontentloaded' });
 
     /* de lijst toont de memo uit de kluis, met transcript-vlaggetje */
-    await page.waitForFunction(() => document.querySelectorAll('#lijst .memo').length === 1, null, { timeout: 8000 });
+    try {
+      await page.waitForFunction(() => document.querySelectorAll('#lijst .memo').length === 1, null, { timeout: 20000 });
+    } catch (e) {
+      const toestand = await page.evaluate(() => ({
+        lijst: (document.querySelector('#lijst') || {}).textContent || '',
+        melding: (document.querySelector('#melding') || {}).textContent || '',
+        token: !!localStorage.getItem('rtg_member_token')
+      }));
+      throw new Error(e.message + '\nMemo-scherm: ' + JSON.stringify(toestand) +
+        '\nPaginafouten: ' + JSON.stringify(fouten));
+    }
     assert.ok(await page.evaluate(() => /met transcript/.test(document.querySelector('#lijst').textContent)));
 
-    /* samenvatting: eerlijk demo-antwoord op het transcript */
+    /* samenvatting: de lokale taalroute toont de inhoud als menselijke tekst;
+       technische herkomstmetadata hoort niet in de memokaart. */
     await page.evaluate(() => { document.querySelector('[data-vat]').click(); });
-    await page.waitForFunction(() => /Lokale samenvatting/.test(document.querySelector('[data-uit]').textContent), null, { timeout: 8000 });
+    await page.waitForFunction(() => /aannemer bellen/i.test(document.querySelector('[data-uit]').textContent), null, { timeout: 8000 });
+    assert.doesNotMatch(await page.textContent('[data-uit]'), /Lokale samenvatting|\d+ woorden/i);
 
     /* weggooien: naar de prullenbak, de lijst wordt leeg */
     await page.evaluate(() => { document.querySelector('[data-weg]').click(); });

@@ -4,6 +4,7 @@
    de mens voegt in of niet. */
 
 const { MAX_VERSIES } = require('./basis');
+const { samenvat, actiepunten, zinnen } = require('../../lib/lokale-taal');
 
 module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, basis) => {
   const { nu, docMet, naamVan, magSchrijven, magLezen, faseVan, schrijfAudit } = basis;
@@ -88,48 +89,56 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
       : d.soort === 'presentatie' ? (d.inhoud.dias || []).map(x => x.titel + ': ' + x.tekst).join('\n').slice(0, 6000)
       : '';
     const w = schoon(vraag, 300);
-    if (anthropic) {
-      try {
-        const prompt = opdracht === 'formule'
-          ? 'Geef voor een eenvoudig rekenblad (functies: SOM, GEM, MIN, MAX, AANTAL, AFRONDEN en ALS, over een bereik als =SOM(A1:A5), celverwijzingen en +-*/) precies een formule voor deze wens, alleen de formule zelf: ' + w
-          : opdracht === 'samenvatten' ? 'Vat deze kantoortekst samen in drie tot vijf zinnen, in het Nederlands:\n' + kaal
-          : opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal
-          : opdracht === 'actiepunten' ? 'Haal uit deze tekst de actiepunten. Geef per punt: wie, wat, en wanneer (laat open wat er niet staat). Alleen de lijst, in het Nederlands:\n' + kaal
-          : opdracht === 'inkorten' ? 'Kort deze tekst in tot ongeveer de helft, zonder dat er inhoud verdwijnt. Nederlands:\n' + kaal
-          : opdracht === 'engels' ? 'Translate this business document into professional British English. Keep the structure. Return only the translation:\n' + kaal
-          : opdracht === 'kritisch' ? 'Lees dit stuk als een kritische lezer in de directiekamer. Noem in maximaal vijf punten wat er zwak, onduidelijk of onbeantwoord is. Adviserend, in het Nederlands; jij beslist niets:\n' + kaal
-          : 'Schrijf twee tot vier zinnen die dit stuk logisch voortzetten, in het Nederlands' + (w ? ' (wens: ' + w + ')' : '') + ':\n' + kaal;
-        const uit = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 600,
-          messages: [{ role: 'user', content: prompt }] });
-        const tekst = (uit.content || []).map(c => c.text || '').join('').trim();
-        if (tekst) return { status: 200, opdracht, voorstel: tekst.slice(0, 4000) };
-      } catch (e) {}
+
+    /* Selecteren, inkorten, rekenen en vaste kwaliteitscontroles zijn lokale
+       documentbewerkingen. Ze draaien voor een beschikbaar model langs, zodat
+       de inhoud niet zonder noodzaak naar een provider gaat. */
+    if (opdracht === 'formule') {
+      const refs = w.toUpperCase().match(/\b[A-Z]{1,2}\d{1,3}\b/g) || [];
+      const bereik = refs.length >= 2 ? refs[0] + ':' + refs[1] : refs[0] ? refs[0] + ':' + refs[0] : 'A1:A10';
+      const formule = /gemiddel/i.test(w) ? '=GEM(' + bereik + ')'
+        : /afrond/i.test(w) ? '=AFRONDEN(' + (refs[0] || 'A1') + ';2)'
+        : /als|indien|drempel/i.test(w) ? '=ALS(' + (refs[0] || 'A1') + '>100;"boven";"onder")'
+        : /minim/i.test(w) ? '=MIN(' + bereik + ')'
+        : /maxim|hoogste/i.test(w) ? '=MAX(' + bereik + ')'
+        : /aantal|tel hoeveel/i.test(w) ? '=AANTAL(' + bereik + ')'
+        : '=SOM(' + bereik + ')';
+      return { status: 200, opdracht, stand: 'lokaal', voorstel: formule };
     }
-    /* Geen AI-provider betekent geen toneelstukje. Alleen bewerkingen die
-       lokaal en controleerbaar uit de bestaande tekst volgen blijven werken;
-       herschrijven, vertalen en doorschrijven zouden nieuwe taal verzinnen en
-       melden daarom eerlijk dat Rahul nodig is. */
-    const zinnen = kaal.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
-    if (opdracht === 'formule') return { status: 200, opdracht, stand: 'lokaal', voorstel:
-      w && /som|totaal|optel/i.test(w) ? '=SOM(A1:A10)' : w && /gemiddel/i.test(w) ? '=GEM(A1:A10)'
-        : w && /afrond/i.test(w) ? '=AFRONDEN(A1;2)' : w && /als|indien|drempel/i.test(w) ? '=ALS(A1>100;"boven";"onder")' : '=SOM(A1:A5)' };
     if (opdracht === 'samenvatten') return { status: 200, opdracht, stand: 'lokaal',
-      voorstel: zinnen.slice(0, 3).join(' ').trim() || 'Dit document bevat nog geen tekst om samen te vatten.' };
-    if (opdracht === 'inkorten') return { status: 200, opdracht, stand: 'lokaal',
-      voorstel: zinnen.slice(0, Math.max(1, Math.ceil(zinnen.length / 2))).join(' ').trim()
-        || 'Dit document bevat nog geen tekst om in te korten.' };
+      voorstel: samenvat(kaal, { maxZinnen: 5, maxTekens: 1000 }) || 'Dit document bevat nog geen tekst om samen te vatten.' };
+    if (opdracht === 'inkorten') {
+      const regels = zinnen(kaal);
+      return { status: 200, opdracht, stand: 'lokaal', voorstel:
+        samenvat(kaal, { maxZinnen: Math.max(1, Math.ceil(regels.length / 2)), maxTekens: Math.max(120, Math.ceil(kaal.length / 2)) })
+          || 'Dit document bevat nog geen tekst om in te korten.' };
+    }
     if (opdracht === 'actiepunten') {
-      const acties = zinnen.filter(x => /\b(moet|zal|gaat|levert|stuurt|plant|regelt|beslist|controleert|voor\s+\w+dag)\b/i.test(x)).slice(0, 8);
-      return { status: 200, opdracht, stand: 'lokaal', voorstel: acties.length
-        ? acties.map(x => '- ' + x.trim()).join('\n')
-        : 'Geen concrete actiepunten gevonden. Voeg per actie een verantwoordelijke, handeling en datum toe.' };
+      const acties = actiepunten(kaal, { max: 8 });
+      const voorstel = acties.map(a => '- ' + a.wat + (a.wanneer && !a.wat.toLowerCase().includes(a.wanneer.toLowerCase()) ? ' · ' + a.wanneer : '')).join('\n');
+      return { status: 200, opdracht, stand: 'lokaal', voorstel: voorstel ||
+        'Geen concrete actiepunten gevonden. Voeg per actie een verantwoordelijke, handeling en datum toe.' };
     }
     if (opdracht === 'kritisch') {
       const punten = [];
       if (!/[€%]|\b\d+[.,]?\d*\b/.test(kaal)) punten.push('Cijfers of meetbare onderbouwing ontbreken.');
       if (!/\b(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag|vandaag|morgen|\d{1,2}[-/]\d{1,2})\b/i.test(kaal)) punten.push('Er staat geen concrete datum of termijn bij.');
       if (!/\b(besluit|akkoord|keuze|goedkeuring)\b/i.test(kaal)) punten.push('De gevraagde beslissing staat niet expliciet in de tekst.');
-      return { status: 200, opdracht, stand: 'lokaal', voorstel: (punten.length ? punten : ['Geen vaste structurele lacunes gevonden.']).map((x, i) => (i + 1) + ') ' + x).join('\n') };
+      return { status: 200, opdracht, stand: 'lokaal', voorstel:
+        (punten.length ? punten : ['Geen vaste structurele lacunes gevonden.']).map((x, i) => (i + 1) + ') ' + x).join('\n') };
+    }
+
+    // Alleen deze drie opdrachten maken werkelijk nieuwe taal.
+    if (anthropic) {
+      try {
+        const prompt = opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal
+          : opdracht === 'engels' ? 'Translate this business document into professional British English. Keep the structure. Return only the translation:\n' + kaal
+          : 'Schrijf twee tot vier zinnen die dit stuk logisch voortzetten, in het Nederlands' + (w ? ' (wens: ' + w + ')' : '') + ':\n' + kaal;
+        const uit = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 600,
+          messages: [{ role: 'user', content: prompt }] });
+        const tekst = (uit.content || []).map(c => c.text || '').join('').trim();
+        if (tekst) return { status: 200, opdracht, voorstel: tekst.slice(0, 4000) };
+      } catch (e) {}
     }
     return { status: 503, error: 'Rahul is nu niet beschikbaar voor deze creatieve opdracht. U kunt het document zonder AI blijven bewerken.',
       code: 'AI_NIET_BESCHIKBAAR', handmatig: true, opdracht };

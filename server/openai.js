@@ -49,9 +49,23 @@ function naarOpenAI(params) {
       uit.push(msg);
       continue;
     }
-    // user-turn: tekst wordt een user-bericht, elk tool_result een eigen tool-bericht
-    const tekst = b.content.filter(c => c.type === 'text').map(c => c.text).join('');
-    if (tekst) uit.push({ role: 'user', content: tekst });
+    // user-turn: gewone tekst mag een string blijven. Zodra er beeld in zit,
+    // blijft de volgorde als multimodale blokkenlijst behouden. Beeld stil
+    // weggooien is gevaarlijker dan een providerfout: het model zou dan doen
+    // alsof het de foto zag terwijl het alleen de vraag kreeg.
+    const multimodaal = [];
+    for (const c of b.content) {
+      if (c.type === 'text' && c.text) multimodaal.push({ type: 'text', text: String(c.text) });
+      else if (c.type === 'image' && c.source && c.source.type === 'base64' && c.source.data) {
+        const mime = /^image\/(?:jpeg|png|webp|gif)$/.test(c.source.media_type || '') ? c.source.media_type : 'image/jpeg';
+        multimodaal.push({ type: 'image_url', image_url: { url: 'data:' + mime + ';base64,' + c.source.data } });
+      }
+    }
+    if (multimodaal.some(c => c.type === 'image_url')) uit.push({ role: 'user', content: multimodaal });
+    else {
+      const tekst = multimodaal.filter(c => c.type === 'text').map(c => c.text).join('');
+      if (tekst) uit.push({ role: 'user', content: tekst });
+    }
     for (const c of b.content.filter(c => c.type === 'tool_result')) {
       uit.push({ role: 'tool', tool_call_id: c.tool_use_id, content: typeof c.content === 'string' ? c.content : JSON.stringify(c.content) });
     }
@@ -91,12 +105,17 @@ class OpenAI {
     this.baseURL = (opts.baseURL || process.env.OPENAI_BASE_URL || 'https://api.openai.com').replace(/\/+$/, '');
     this.maxRetries = opts.maxRetries != null ? opts.maxRetries : 2;
     this.timeout = opts.timeout || 600000;
+    this.modelVoor = typeof opts.modelVoor === 'function' ? opts.modelVoor : (params) => kiesModel(params && params.model);
+    this.reasoningEffort = opts.reasoningEffort || '';
     const zelf = this;
     this.messages = { async create(params) {
       const body = {
-        model: kiesModel(params.model), max_tokens: params.max_tokens || 1024,
+        model: zelf.modelVoor(params), max_tokens: params.max_tokens || 1024,
         messages: naarOpenAI(params)
       };
+      const redeneerstand = typeof zelf.reasoningEffort === 'function'
+        ? zelf.reasoningEffort(params) : zelf.reasoningEffort;
+      if (redeneerstand) body.reasoning_effort = redeneerstand;
       if (params.tools) body.tools = toolsNaarOpenAI(params.tools);
       const r = await http.vraag({ url: zelf.baseURL + '/v1/chat/completions', json: body, maxRetries: zelf.maxRetries, timeout: zelf.timeout,
         headers: { authorization: 'Bearer ' + zelf.apiKey, 'user-agent': 'rtg-openai/1' } });

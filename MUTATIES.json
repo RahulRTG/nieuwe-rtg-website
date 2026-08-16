@@ -2376,6 +2376,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "livegang-pakket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/eigenaar-claim.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "livegang.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2402,6 +2410,14 @@
       "staat": "overleefd",
       "operator": "liegpoort /api/"
     },
+    "lokaal-eerst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/agenda.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 7
+    },
     "lokaal-tls.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2416,6 +2432,14 @@
       "module": "server/lib/lokaaladres.js",
       "operator": "true->false#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "lokale-taal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/lokale-taal.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "loonstrook-portaal.test.js": {

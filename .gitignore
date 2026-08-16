@@ -23,11 +23,17 @@ sentinel-data/
 **/tls/ca/
 .env
 .env.*
+deploy/live.env
+.rtg-live-release
 .rtg-secrets/
 backups/
 .vercel
 public/dist/
 .release/
+
+# Lokale audit-, smoke- en E2E-uitvoer. Deze map kan databases, outboxberichten
+# en tijdelijke cryptografische sleutels bevatten en is nooit broncode.
+/work/
 
 # het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
 # geen bron. Wordt bij elke `npm test` opnieuw geschreven.

@@ -12,6 +12,7 @@ const http = require('http');
 const Anthropic = require('../server/anthropic');
 const OpenAI = require('../server/openai');
 const Gemini = require('../server/gemini');
+const LocalAI = require('../server/local-ai');
 const { maakAI } = require('../server/ai');
 
 // een nagemaakte provider-server: geeft per verzoek terug wat de test aandraagt
@@ -94,24 +95,80 @@ test('2. Gemini-client: Claude-vorm erin, Claude-vorm eruit (tekst en tool_use)'
   } finally { server.srv.close(); }
 });
 
-test('3. de uitwijk: valt Claude uit (500), dan neemt OpenAI het over', async () => {
+test('3. beeld blijft bij OpenAI en Gemini echt beeld, nooit alleen de vraag', async () => {
+  const openai = await nepServer(() => ({ json: { choices: [{ message: { content: 'Een kopje.' }, finish_reason: 'stop' }] } }));
+  const gemini = await nepServer(() => ({ json: { candidates: [{ content: { parts: [{ text: 'Een kopje.' }] }, finishReason: 'STOP' }] } }));
+  const beeld = { type: 'image', source: { type: 'base64', media_type: 'image/png', data: 'iVBORw0KGgo=' } };
+  const vraag = { type: 'text', text: 'Wat is dit?' };
+  try {
+    const o = new OpenAI({ apiKey: 'sk-test', baseURL: openai.base });
+    await o.messages.create({ model: 'claude-opus-4-8', messages: [{ role: 'user', content: [beeld, vraag] }] });
+    const om = openai.laatste.verzoeken[0].body.messages.find(m => m.role === 'user');
+    assert.ok(Array.isArray(om.content), 'multimodale OpenAI-inhoud blijft een blokkenlijst');
+    assert.match(om.content.find(b => b.type === 'image_url').image_url.url, /^data:image\/png;base64,iVBOR/);
+    assert.equal(om.content.find(b => b.type === 'text').text, 'Wat is dit?');
+
+    const g = new Gemini({ apiKey: 'g-test', baseURL: gemini.base });
+    await g.messages.create({ model: 'claude-opus-4-8', messages: [{ role: 'user', content: [beeld, vraag] }] });
+    const delen = gemini.laatste.verzoeken[0].body.contents.flatMap(c => c.parts || []);
+    assert.deepEqual(delen.find(p => p.inlineData).inlineData, { mimeType: 'image/png', data: 'iVBORw0KGgo=' });
+    assert.equal(delen.find(p => p.text).text, 'Wat is dit?');
+  } finally { openai.srv.close(); gemini.srv.close(); }
+});
+
+test('4. lokale provider kiest per capability een lokaal model', async () => {
+  const server = await nepServer(() => ({ json: { choices: [{ message: { content: 'Lokaal.' }, finish_reason: 'stop' }] } }));
+  try {
+    const c = new LocalAI({ baseURL: server.base, model: 'rtg-tekst', shortModel: 'rtg-kort',
+      toolsModel: 'rtg-tools', visionModel: 'rtg-vision', maxRetries: 0 });
+    await c.messages.create({ model: 'claude-sonnet-5', max_tokens: 80, messages: [{ role: 'user', content: 'kort' }] });
+    await c.messages.create({ model: 'claude-sonnet-5', max_tokens: 800, tools: [{ name: 'doe', input_schema: { type: 'object' } }], messages: [{ role: 'user', content: 'doe iets' }] });
+    await c.messages.create({ model: 'claude-opus-4-8', max_tokens: 200, messages: [{ role: 'user', content: [
+      { type: 'image', source: { type: 'base64', media_type: 'image/png', data: 'AA==' } }, { type: 'text', text: 'kijk' }
+    ] }] });
+    assert.deepEqual(server.laatste.verzoeken.map(v => v.body.model), ['rtg-kort', 'rtg-tools', 'rtg-vision']);
+    assert.deepEqual(server.laatste.verzoeken.map(v => v.body.reasoning_effort), ['none', 'low', 'none'],
+      'gewone tekst en beeld antwoorden direct; toolkeuze krijgt een klein redeneerbudget');
+    assert.equal(c.lokaal, true);
+    assert.equal(c.kan({ tools: [{}] }), true);
+    assert.equal(c.kan({ messages: [{ role: 'user', content: [{ type: 'image' }] }] }), true);
+  } finally { server.srv.close(); }
+});
+
+test('4b. de LAN-optie kan nooit een publieke host als lokaal vermommen', () => {
+  assert.throws(() => new LocalAI({ baseURL: 'https://api.example.com', model: 'rtg-local', lanToestaan: true }),
+    /publieke|eigen netwerk/i);
+});
+
+test('5. lokaal gaat voor extern; pas bij uitval neemt extern over', async () => {
+  const local = await nepServer(() => ({ status: 500, json: { error: 'uit' } }));
   const claude = await nepServer(() => ({ status: 500, json: { error: { message: 'overbelast' } } }));
   const openai = await nepServer(() => ({ json: { choices: [{ message: { content: 'OpenAI sprong bij.' }, finish_reason: 'stop' }] } }));
   try {
     const ai = maakAI({
+      localUrl: local.base,
       anthropicKey: 'sk-a', openaiKey: 'sk-o',
+      local: { baseURL: local.base, model: 'rtg-local', maxRetries: 0 },
       anthropic: { apiKey: 'sk-a', baseURL: claude.base, maxRetries: 0 },
       openai: { apiKey: 'sk-o', baseURL: openai.base, maxRetries: 0 }
     });
-    assert.deepEqual(ai.aanbieders, ['claude', 'openai'], 'beide aanbieders in de ketting, Claude eerst');
+    assert.deepEqual(ai.aanbieders, ['local', 'claude', 'openai'], 'lokaal staat voor de externe aanbieders');
     const r = await ai.messages.create({ model: 'claude-sonnet-5', max_tokens: 50, messages: [{ role: 'user', content: 'hallo' }] });
     assert.equal(r.content[0].text, 'OpenAI sprong bij.');
     assert.equal(ai.actief, 'openai', 'de actieve aanbieder is doorgeschoven naar openai');
-    assert.ok(claude.laatste.verzoeken.length >= 1 && openai.laatste.verzoeken.length === 1, 'Claude is geprobeerd, daarna OpenAI');
-  } finally { claude.srv.close(); openai.srv.close(); }
+    assert.ok(local.laatste.verzoeken.length >= 1 && claude.laatste.verzoeken.length >= 1 && openai.laatste.verzoeken.length === 1,
+      'lokaal is geprobeerd, daarna pas de externe aanbieders');
+  } finally { local.srv.close(); claude.srv.close(); openai.srv.close(); }
 });
 
-test('4. de uitwijk: alle aanbieders down -> de laatste fout borrelt op (aanroeper valt terug op demo)', async () => {
+test('6. externe uitwijk kan hard uit terwijl lokale AI beschikbaar blijft', () => {
+  const ai = maakAI({ localUrl: 'http://127.0.0.1:11434', local: { model: 'rtg-local' },
+    anthropicKey: 'sk-a', openaiKey: 'sk-o', externUit: true });
+  assert.deepEqual(ai.aanbieders, ['local']);
+  assert.equal(ai.bron, 'lokaal');
+});
+
+test('7. de uitwijk: alle aanbieders down -> de laatste fout borrelt op (aanroeper valt terug op demo)', async () => {
   const down = await nepServer(() => ({ status: 503, json: {} }));
   try {
     const ai = maakAI({ anthropicKey: 'sk-a', anthropic: { apiKey: 'sk-a', baseURL: down.base, maxRetries: 0 } });
@@ -119,14 +176,15 @@ test('4. de uitwijk: alle aanbieders down -> de laatste fout borrelt op (aanroep
   } finally { down.srv.close(); }
 });
 
-test('5. geen enkele sleutel -> maakAI geeft null (demostand blijft)', () => {
+test('8. geen enkele sleutel of lokale url -> maakAI geeft null (regelstand blijft)', () => {
   const oud = { a: process.env.ANTHROPIC_API_KEY, o: process.env.OPENAI_API_KEY, g: process.env.GEMINI_API_KEY, gg: process.env.GOOGLE_API_KEY };
-  delete process.env.ANTHROPIC_API_KEY; delete process.env.OPENAI_API_KEY; delete process.env.GEMINI_API_KEY; delete process.env.GOOGLE_API_KEY;
+  const lokaal = process.env.LOCAL_AI_URL;
+  delete process.env.ANTHROPIC_API_KEY; delete process.env.OPENAI_API_KEY; delete process.env.GEMINI_API_KEY; delete process.env.GOOGLE_API_KEY; delete process.env.LOCAL_AI_URL;
   try { assert.equal(maakAI({}), null); }
-  finally { if (oud.a) process.env.ANTHROPIC_API_KEY = oud.a; if (oud.o) process.env.OPENAI_API_KEY = oud.o; if (oud.g) process.env.GEMINI_API_KEY = oud.g; if (oud.gg) process.env.GOOGLE_API_KEY = oud.gg; }
+  finally { if (oud.a) process.env.ANTHROPIC_API_KEY = oud.a; if (oud.o) process.env.OPENAI_API_KEY = oud.o; if (oud.g) process.env.GEMINI_API_KEY = oud.g; if (oud.gg) process.env.GOOGLE_API_KEY = oud.gg; if (lokaal) process.env.LOCAL_AI_URL = lokaal; }
 });
 
-test('6. Claude-client blijft werken via de eigen HTTP-client', async () => {
+test('9. Claude-client blijft werken via de eigen HTTP-client', async () => {
   const server = await nepServer(() => ({ json: { content: [{ type: 'text', text: 'Hallo van Claude.' }], stop_reason: 'end_turn', usage: { input_tokens: 2, output_tokens: 3 } } }));
   try {
     const c = new Anthropic({ apiKey: 'sk-a', baseURL: server.base });

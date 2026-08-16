@@ -34,7 +34,7 @@ module.exports = (tctx) => {
       '- Claude stelt de wijziging voor als pull request; u keurt hem goed. Er wordt nooit zonder uw akkoord samengevoegd.\n' +
       '- De volledige testsuite en de huisstijlcheck moeten groen zijn voordat er iets wordt voorgesteld.\n' +
       '- Privacy en beveiliging blijven de strengste norm; de juridische grenzen en de kinderbescherming blijven onaantastbaar.\n' +
-      '- Gasten merken er niets van: er gaat nooit iets live zonder uw goedkeuring.\n\n(Zet ANTHROPIC_API_KEY voor een AI-advies op maat.)';
+      '- Gasten merken er niets van: er gaat nooit iets live zonder uw goedkeuring.\n\n(Configureer een lokale of externe modelprovider voor vrije analyse op maat.)';
     if (!Array.isArray(t.moderniseringen)) t.moderniseringen = [];
     const item = { id: crypto.randomBytes(6).toString('hex'), verzoek, plan, door: accounts.realNameOf(req.techUser), at: new Date().toISOString(), status: 'aangevraagd' };
     t.moderniseringen.push(item);

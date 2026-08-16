@@ -8,7 +8,7 @@
 const { nu: klokNu } = require('../lib/klok');
 
 module.exports = (kern) => {
-  const { app, supplierAuth, auth, geenGast, rtmail, codenaamVan, automatisering, anthropic, db, agenda, leren, facturatie } = kern;
+  const { app, supplierAuth, auth, geenGast, rtmail, codenaamVan, automatisering, db, agenda, leren, facturatie } = kern;
   /* Het adres draagt nu welk huis je hoort (kern/rtmail-adres.js). Een zaak
      handelt onder haar eigen code op partner.rtg. Post aan het oude "@rtmail"
      komt nog steeds aan: het postvak hangt aan het linkerdeel. */
@@ -47,10 +47,10 @@ module.exports = (kern) => {
     res.json({ ok: true, bericht: r });
   });
 
-  /* ---- de premium AI-baan (alleen voor het geverifieerde postvak) ----
-     Rahul vat het postvak samen of stelt een antwoord voor. Regelgebaseerd als
-     basis (werkt ook zonder AI-sleutel), met Claude als verfijning. De AI
-     verstuurt nooit zelf, opent nooit een link, en werkt alleen op de eigen post
+  /* ---- de premium assistentbaan (alleen voor het geverifieerde postvak) ----
+     Rahul vat het postvak samen of stelt een vast, controleerbaar antwoord voor.
+     Tellen en prioriteren is hier volledig lokaal; een model zou geen nieuwe
+     feiten mogen toevoegen. De assistent verstuurt nooit zelf, opent nooit een link, en werkt alleen op de eigen post
      van de ingelogde partij -- geld/toegang blijft achter de menselijke poort. */
   function nood(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
   function vatSamen(berichten) {
@@ -82,22 +82,6 @@ module.exports = (kern) => {
     };
     return { onderwerp: ond, tekst: sjabloon[soort] || sjabloon.zaak };
   }
-  async function claudeSamenvatting(berichten, basis) {
-    if (!anthropic) return basis;
-    try {
-      const context = (berichten || []).slice(0, 12).map(m =>
-        '- [' + (m.soort || 'bericht') + (m.gelezen ? '' : ', ongelezen') + '] ' + nood(m.onderwerp).slice(0, 90)).join('\n');
-      const r = await anthropic.messages.create({
-        model: 'claude-sonnet-5', max_tokens: 300,
-        system: 'Je bent Rahul, de rustige AI-conciërge van RTG. Vat een RTMAIL-postvak kort en zakelijk samen in het Nederlands (je/jij), ' +
-          'noem wat actie vraagt, verzin niets, en beloof nooit iets namens RTG. Max 4 zinnen. Geen opsomming van alles, alleen wat telt.',
-        messages: [{ role: 'user', content: 'Postvak:\n' + (context || '(leeg)') }]
-      });
-      const t = r && r.content && r.content[0] && r.content[0].text;
-      return nood(t) || basis;
-    } catch (e) { return basis; }
-  }
-
   async function assist(berichten, body, res) {
     const b = body || {};
     if (b.actie === 'antwoord') {
@@ -106,8 +90,7 @@ module.exports = (kern) => {
       return res.json({ ok: true, voorstel: stelAntwoordVoor(m) });
     }
     const basis = vatSamen(berichten);
-    const tekst = await claudeSamenvatting(berichten, basis);
-    res.json({ ok: true, samenvatting: tekst, ai: !!anthropic });
+    res.json({ ok: true, samenvatting: basis, ai: false, bron: 'lokale-regels' });
   }
   app.post('/api/supplier/rtmail/assist', supplierAuth, (req, res) => assist(rtmail.postvak(adresVan(req)), req.body, res));
   app.post('/api/member/rtmail/assist', auth, (req, res) => {

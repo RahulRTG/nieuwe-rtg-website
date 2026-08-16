@@ -724,7 +724,11 @@
   function hangHemel() {
     var b = el.scherm.getBoundingClientRect();
     var lb = el.scherm.clientWidth, lh = el.scherm.clientHeight;
-    if (lb < 40 || lh < 40) return false;
+    /* Een ResizeObserver is een extra vangnet, geen voorwaarde. In een drukke
+       browser kan de eerste nulmaat precies tussen observerregistratie en de
+       eerste melding vallen. Zonder eigen herpoging blijft die sessie dan
+       voorgoed zonder hemel. */
+    if (lb < 40 || lh < 40) { hemelStraks(); return false; }
     /* NIET OPHANGEN TERWIJL HET SCHERM NOG BINNENKOMT.
 
        Het beginscherm heeft een openingsanimatie die hem van 0,98 naar 1
@@ -752,7 +756,15 @@
     hemelLaadt = true;
     var s = d.createElement('script');
     s.src = '/shared/sterren.js'; s.async = true;
-    s.onload = function () { hemelMaat = ''; hangHemel(); };
+    s.onload = function () { hemelLaadt = false; hemelMaat = ''; hangHemel(); };
+    /* Een tijdelijk afgebroken statische aanvraag mag de hemel niet voor de
+       hele sessie uitschakelen. Geef de begrensde bestaande herprobeerlus de
+       kans opnieuw te laden; verwijder eerst het mislukte script-element. */
+    s.onerror = function () {
+      hemelLaadt = false; hemelMaat = '';
+      if (s.parentNode) s.parentNode.removeChild(s);
+      hemelStraks();
+    };
     (d.head || d.documentElement).appendChild(s);
     return true;
   }

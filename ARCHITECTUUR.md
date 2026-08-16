@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3961 |
-| servermodules (`server/**/*.js`) | 2144 |
+| servermodules (`server/**/*.js`) | 2146 |
 | routebestanden (`server/routes/**`) | 447 |
 | kernmodules (`server/kern/**`) | 1318 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 224 |
-| toetsbestanden (`test/*.test.js`) | 876 |
+| toetsbestanden (`test/*.test.js`) | 879 |
 | schermtoetsen (`test/*.e2e.js`) | 125 |
 
 ## 2. De weg van een verzoek
@@ -138,11 +138,11 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(167) auth(102) supplierAuth(54) officeAuth(35) db(34) status(27) liveCodename(25)
-accounts(21) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14) anthropic(13)
-boardroomWie(11) crypto(11) tooManyTries(10) geenGast(10) express(9) findSupplier(9)
-gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8) noteFailedTry(7)
-kern(7) sseToOffice(7) mail(6) stuur(6) boardroomAuth(6) talen(6) loginFails(5)
-sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
+accounts(21) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
+boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) express(9)
+findSupplier(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8)
+noteFailedTry(7) kern(7) sseToOffice(7) mail(6) stuur(6) boardroomAuth(6) talen(6)
+loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

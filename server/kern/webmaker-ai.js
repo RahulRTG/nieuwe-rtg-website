@@ -5,9 +5,8 @@
    bewaart. Er wordt hier dus niets opgeslagen; opslaan loopt daarna langs de
    gewone weg (en dus langs dezelfde schoonmaak en grenzen).
 
-   Zonder AI-sleutel draait de demostand: een paar vaste, eerlijke
-   transformaties -- en voor de rest de mededeling dat de demostand het niet
-   kan, in plaats van doen alsof. */
+   Zonder modelprovider draait de lokale regelstand: een paar vaste, eerlijke
+   transformaties -- en voor de rest een precieze uitleg van wat er nodig is. */
 module.exports = ({ anthropic, schoon }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
 
@@ -22,16 +21,16 @@ module.exports = ({ anthropic, schoon }) => {
     'Verzin geen beeld-URL\'s: gebruik alleen src-waarden die al in het ontwerp staan. ' +
     'Schrijfstijl: ingetogen en premium, geen uitroeptekens en geen superlatieven-stapeling. Nederlands, tenzij de opdracht om een andere taal vraagt.';
 
-  /* de demostand: alleen wat we echt waar kunnen maken */
-  function demo(design, opdracht) {
+  /* de lokale regelstand: alleen wat we echt waar kunnen maken */
+  function regelstand(design, opdracht) {
     const q = opdracht.toLowerCase();
     const d = JSON.parse(JSON.stringify(design));
     if (/lux|chic|premium/.test(q)) {
       d.thema = 'donker'; d.accent = '#857007';
-      return { design: d, antwoord: 'Demostand: thema op donker en het accent op goud gezet. Voor echte herschrijf-opdrachten is een AI-sleutel nodig.', gedaan: true };
+      return { design: d, antwoord: 'Lokaal uitgevoerd: thema op donker en het accent op goud gezet.', gedaan: true };
     }
-    if (/\blicht\b/.test(q)) { d.thema = 'licht'; return { design: d, antwoord: 'Demostand: thema op licht gezet.', gedaan: true }; }
-    if (/\bdonker\b/.test(q)) { d.thema = 'donker'; return { design: d, antwoord: 'Demostand: thema op donker gezet.', gedaan: true }; }
+    if (/\blicht\b/.test(q)) { d.thema = 'licht'; return { design: d, antwoord: 'Lokaal uitgevoerd: thema op licht gezet.', gedaan: true }; }
+    if (/\bdonker\b/.test(q)) { d.thema = 'donker'; return { design: d, antwoord: 'Lokaal uitgevoerd: thema op donker gezet.', gedaan: true }; }
     const pm = q.match(/pagina (?:voor|over) (.{2,40})/);
     if (pm && (d.paginas || []).length < 7) {
       const naam = pm[1].trim().replace(/\.$/, '');
@@ -40,16 +39,16 @@ module.exports = ({ anthropic, schoon }) => {
         { type: 'kop', tekst: naam.charAt(0).toUpperCase() + naam.slice(1) },
         { type: 'tekst', tekst: 'Schrijf hier over ' + naam + '.' }
       ] });
-      return { design: d, antwoord: 'Demostand: pagina "' + naam + '" toegevoegd met een kop en een tekstblok.', gedaan: true };
+      return { design: d, antwoord: 'Lokaal uitgevoerd: pagina "' + naam + '" toegevoegd met een kop en een tekstblok.', gedaan: true };
     }
-    return { design: null, antwoord: 'De demostand kan alleen: "maak het luxer", "maak het licht/donker" en "maak een pagina voor ...". Voor de rest is een AI-sleutel nodig (ANTHROPIC_API_KEY).', gedaan: false };
+    return { design: null, antwoord: 'De lokale regelstand kan alleen: "maak het luxer", "maak het licht/donker" en "maak een pagina voor ...". Voor vrije ontwerptekst is een lokale of externe modelprovider nodig.', gedaan: false };
   }
 
   /* het aangepaste ontwerp; opslaan doet de aanroeper (of niet) */
   async function schrijf(design, opdrachtIn) {
     const opdracht = scho(opdrachtIn, 500);
     if (!opdracht) return { design: null, antwoord: 'Vertel wat ik aan het ontwerp moet veranderen.', gedaan: false };
-    if (!anthropic) return demo(design, opdracht);
+    if (!anthropic) return regelstand(design, opdracht);
     try {
       const invoer = { titel: design.titel, thema: design.thema, accent: design.accent, kleuren: design.kleuren || null,
         blokken: design.blokken || [], paginas: (design.paginas || []).map(p => ({ naam: p.naam, slug: p.slug, blokken: p.blokken || [] })) };
@@ -62,7 +61,7 @@ module.exports = ({ anthropic, schoon }) => {
       if (!Array.isArray(uit.blokken)) return { design: null, antwoord: 'Het antwoord miste de blokken. Probeer het nog eens.', gedaan: false };
       return { design: uit, antwoord: 'Aangepast. Bekijk het op het doek; bewaren doe je zelf.', gedaan: true };
     } catch (e) {
-      return { design: null, antwoord: 'De AI is even niet bereikbaar. Probeer het zo nog eens.', gedaan: false };
+      return { design: null, antwoord: 'De modelprovider is even niet bereikbaar. Probeer het zo nog eens.', gedaan: false };
     }
   }
 

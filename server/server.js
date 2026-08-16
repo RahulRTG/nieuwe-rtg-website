@@ -1,7 +1,7 @@
 /* RTG Ledenportaal, backend.
    Start: npm start (of node server/server.js). Draait op http://localhost:3000.
-   Zet ANTHROPIC_API_KEY in de omgeving om de persoonlijke AI op de echte
-   Claude API te laten draaien; zonder key vallen we terug op demo-antwoorden. */
+   De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
+   aanbieders zijn optionele, expliciete uitwijk. */
 
 /* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
    een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
@@ -423,22 +423,22 @@ const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters'
   bevoegdVan: () => kern.bevoegd
 });
 
-/* ---------- Claude API (optioneel) ---------- */
+/* ---------- modelverrijking (optioneel, lokaal eerst) ---------- */
 
 let anthropic = null;
 try {
-  // De AI-uitwijk (server/ai.js): Claude eerst, dan OpenAI, dan Gemini; valt
-  // een aanbieder uit (storing/429/5xx), dan neemt de volgende het over. Alleen
-  // aanbieders met een sleutel doen mee; zonder enige sleutel blijft het demo.
+  // De uitwijk start lokaal. Alleen expliciet ingestelde externe aanbieders
+  // volgen; RTG_EXTERNE_AI_UIT sluit die route hard af.
   anthropic = require('./ai').maakAI({ log });
   if (anthropic) {
     i18n.setAnthropic(anthropic);
-    console.log('Persoonlijke AI actief; aanbieders (op volgorde): ' + anthropic.aanbieders.join(', ') + '.');
+    const aiStand = require('./ai').beschikbaarheid(anthropic);
+    console.log('Modelverrijking actief (' + aiStand.modus + '); aanbieders: ' + anthropic.aanbieders.join(', ') + '.');
   } else {
-    console.log('Persoonlijke AI: demo-antwoorden (zet ANTHROPIC_API_KEY, OPENAI_API_KEY of GEMINI_API_KEY voor echte AI).');
+    console.log('Regelgestuurde werkmodus actief; vrije modelverrijking staat uit.');
   }
 } catch (e) {
-  console.warn('AI-client kon niet starten (' + (e && e.message) + '); demo-antwoorden actief.');
+  console.warn('Modelclient kon niet starten (' + (e && e.message) + '); regelgestuurde werkmodus actief.');
 }
 
 /* ---------- personas & sessies ---------- */
@@ -624,13 +624,16 @@ function memberTemplate() {
 
 // Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
 // het proces leeft.)
-app.get('/api/health', (req, res) => res.json({
-  ok: true, demo: DEMO, ai: anthropic ? 'claude' : 'demo',
-  betalen: betaal.AANBIEDER,
-  server: Number(process.env.RTG_SERVER || 1), active: db.writable,
-  domeinen: process.env.RTG_DOMAINS || 'alle',
-  pid: process.pid, up: Math.round(process.uptime())
-}));
+app.get('/api/health', (req, res) => {
+  const model = require('./ai').beschikbaarheid(anthropic);
+  res.json({
+    ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
+    betalen: betaal.AANBIEDER,
+    server: Number(process.env.RTG_SERVER || 1), active: db.writable,
+    domeinen: process.env.RTG_DOMAINS || 'alle',
+    pid: process.pid, up: Math.round(process.uptime())
+  });
+});
 
 /* De satelliet-ping en de /api/doos/-vloot (sleutelwacht, kloon, status,
    meting, buurmelding, rapport) staan in server/routes/doos.js en worden
@@ -928,7 +931,7 @@ const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon
 const boeken = require('./kern/boeken').maakBoeken({ db, save });
 const onderwijs = require('./kern/onderwijs').maakOnderwijs({ db, save, schoon });
 const leerstof = require('./kern/leerstof').maakLeerstof({ db, save, onderwijs });
-const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon });
+const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon, anthropic });
 const vervolg = require('./kern/leerstof-vervolg').maakVervolg({ db, save, onderwijs });
 /* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,
    zoals de Thuiswacht -- en daardoor ook door Rahul te zetten. */

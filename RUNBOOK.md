@@ -40,9 +40,10 @@ bij de eerste start. `server/data/` staat in `.gitignore` en hoort daar te blijv
 
 **Met een telefoon erbij: zet TLS aan.** Buiten https (en localhost) geeft een
 browser camera, microfoon en locatie niet vrij, dus op `http://192.168.x.x` doet
-geen enkel camerascherm iets. `RTG_TLS=1 npm start` geeft meteen https met een
-self-signed certificaat; op het toestel accepteer je eenmalig de waarschuwing. De
-server noemt bij het opstarten zelf het adres waar de telefoon heen moet
+geen enkel camerascherm iets. `npm run telefoon` start de lokale drielaag met
+een self-signed certificaat; op het toestel accepteer je eenmalig de
+waarschuwing. Voor één los serverproces blijft `RTG_TLS=1 npm run single`
+beschikbaar. De server noemt zelf het adres waar de telefoon heen moet
 (`server/opzet/veiligadres.js`).
 
 ## 2. Voor je live gaat
@@ -136,14 +137,15 @@ Na een wijziging aan de code horen `ARCHITECTUUR.md` en `BEWIJS.md` mee te
 verschuiven; regel 40 en 41 van `npm run keuring` maken de keuring rood zolang dat
 niet is gebeurd. Bijwerken is een commando, geen schrijfwerk.
 
-## 6. Wat hier NIET staat, en dat is geen oversight
+## 6. Wat code nog steeds niet alleen kan
 
-- **Een gekoppelde productieomgeving.** De uitrol- en rollbackmachine staat in
-  `scripts/uitrol.js`, maar DNS, registry/host en toegangsbeleid moeten nog op de
-  echte infrastructuur worden aangesloten.
-- **Een werkelijk ingeplande externe waakhond.** `scripts/sonde.js` meet vanaf
-  buiten en kan terugmelden; hij moet nog op een tweede machine of monitorservice
-  periodiek worden ingepland. `ERR_WEBHOOK_URL` blijft nodig voor foutalarmen.
+- **De domein- en serverkeuze.** De uitrolpijplijn, automatische rollback,
+  native HTTPS, externe sonde en het herstelpad staan nu in `LIVEGANG.md`, maar
+  DNS en de echte productiemachine moet de eigenaar aanwijzen.
+- **Externe meldingen activeren.** De app meet zichzelf (`/api/health`) en de
+  GitHub-sonde meet van buitenaf. Zet repository variable `RTG_LIVE_URL`,
+  Actions-meldingen en bij voorkeur `ERR_WEBHOOK_URL` aan; code kan niet kiezen
+  wie een storing om 03:00 uur ontvangt.
 - **Een tweede persoon die dit kan.** De bus factor is één, en geen document
   verandert dat. Wat deze pagina wel doet: het verkleint wat iemand moet weten
   voordat hij begint. Wat er nog moet: iemand die het één keer echt doet, met dit

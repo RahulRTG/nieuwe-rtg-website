@@ -462,22 +462,28 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 
 **De snelste route (een avond werk):**
 
-1. `npm run productie:installeer` genereert ontbrekende geheimen en vraagt de
-   menselijke waarden uit zonder secrets terug te tonen.
-2. Rond de vragen op de technische eigenaarspagina af en laat de documenten
-   juridisch controleren.
-3. Zet TLS/DNS-rand en externe opslag klaar.
-4. `npm run deploy:productie` draait de codepoort én `golive`, bouwt daarna pas
-   de images, wacht op gezondheid en rolt bij rood automatisch terug.
+1. Volg `LIVEGANG.md`: maak `deploy/live.env` en een externe back-upmap.
+2. `npm run live:init -- --eigenaar=… --url=https://… --tls-email=…
+   --smtp-url=smtps://…` genereert alle geheimen zonder ze naar terminal- of
+   CI-logs te schrijven. AI en betalingen staan in deze route fail-closed uit.
+3. `npm run live:check` keurt native TLS/ACME, 2FA, poorten, geheimen en de
+   externe back-upmount. `npm run live:deploy` bouwt daarna een immutable image,
+   start de stack en rolt bij mislukte readiness automatisch terug.
+4. `npm run live:owner` claimt het eerste eigenaarsaccount via de lokale
+   HTTPS-poort en verwijdert daarna automatisch het eenmalige bootstrapgeheim.
+   Vul het papierwerk in en draai `npm run live:golive`: die keurt vanuit de
+   app-container de echte interne database en hetzelfde datavolume.
+   `npm run live:probe` meet daarna DNS, het publieke certificaat en de
+   veiligheidsrand vanaf buiten.
 
-- [ ] `npm run golive` geeft exitcode 0 op de productiemachine
+- [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer
 - [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] Versleuteling in rust bewezen op de echte machine: `node --experimental-sqlite --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
 - [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
 - [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
-- [ ] TLS geregeld: óf een reverse proxy/load balancer vóór de app met `trust proxy` aan, óf native in de app (`RTG_TLS=1`, evt. `RTG_ACME=1` voor een automatisch Let's Encrypt-certificaat) — poort 80 + 443 bereikbaar
+- [ ] TLS geregeld: in de lokale-eerst live-route native in de app (`RTG_TLS=1`, `RTG_ACME=1`) met poort 80 + 443 bereikbaar; een reverse proxy is alleen een bewuste alternatieve architectuur
 - [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)
 - [ ] `ERR_WEBHOOK_URL` gezet, en de **zelfproef** op het techniekbord komt
       echt aan (`POST /api/techniek/alarm/proef`, alleen de eigenaar). Dit
@@ -485,14 +491,14 @@ dev-lekken, registratie/eigenaar/backoffice werken.
       variabele wordt door niets gelezen, dus er kwam nooit een testfout
       binnen. Vink dit pas af als de proef `ok: true` teruggeeft.
 - [ ] SMTP getest (herstel-link komt echt aan)
-- [ ] Stripe live-keys + webhook-endpoint (`/api/betaal/webhook`) geregistreerd en getest
+- [ ] Betalingen: voor de eerste livegang staat `RTG_BETALEN_UIT=1` en weigert elke rail fail-closed. Alleen bij een latere betaalrelease vervangen door echte providerkeys + een geteste, ondertekende webhook
 - [ ] Back-up-volume gemount; herstel-uit-back-up één keer geoefend
 - [ ] `npm run check` en `npm test` groen in CI; image bouwt
 - [ ] `npm run release:gate:productie` is groen en `.release/release-bewijs.json` verifieert met `npm run release:controle`
 - [ ] Op het techniekbord is **Controleer alle code nu** groen en staat het releasebewijs als **extern verankerd**. `npm run deploy:productie` leest de bewijs-SHA uit het gebouwde image, geeft hem als runtime-pin terug en bewaart hem in de uitrolbon. Zie `docs/incidentcontrole.md`
 - [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
-- [ ] Uptime-/health-monitor prikt op `/api/ready`
+- [ ] GitHub repository variable `RTG_LIVE_URL` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen
 - [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; de keuring waarschuwt zolang hij ontbreekt)
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)

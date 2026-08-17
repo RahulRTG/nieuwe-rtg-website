@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'fd585ec9';
+var RTG_BOUW = '0bfc8951';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1986,6 +1986,24 @@ var RTG_BOUW = 'fd585ec9';
        raakt. renderAll() leest dit terug en zet je waar je was. */
     try { localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab, t: Date.now() })); } catch(e){}
     $('#content').scrollTop = 0;
+    /* HET SCHERM WISSELDE, MAAR DE SCHIL HOORDE HET NIET.
+
+       sync() (app-main-28.js) zet os-open op #app, en daaraan hangt de hele
+       app-modus: de terugknop en de titel in de statusbalk in plaats van het
+       woordmerk, en de schermvaste pill. Hij hing aan een MutationObserver op
+       #app zelf -- en openTab raakt #app niet aan. Hij raakt de views en de
+       tabknoppen aan. Gevolg: je opende Ter plaatse en de balk bleef die van
+       het beginscherm, zonder weg terug.
+
+       Dat viel niet op zolang het springboard eronder lag: je kon altijd nog
+       op een tegel tikken. Nu de werktafel het beginscherm is, is deze balk de
+       enige uitweg uit zo'n scherm -- en dan is "hij hoort het niet" geen
+       schoonheidsfoutje meer. De waarnemer blijft staan voor de gate-wissel
+       (in- en uitloggen); dit is de wissel die hij niet kon zien.
+
+       Via window omdat sync() in een andere scope woont dan deze functie -- zie
+       de naad in app-main-28.js. */
+    if (window.RTGOSSync) RTGOSSync();
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
     if (focusView){
@@ -4154,6 +4172,8 @@ var RTG_BOUW = 'fd585ec9';
        Eerder hing de ring aan het laden van de pagina, en die is een slag
        eerder dan de boardroom-gegevens: het beginscherm was leeg. */
     if (typeof wereldBij === 'function') wereldBij();
+    // en om dezelfde reden de deuren naar het systeem (app-main-29c.js)
+    if (typeof systeemBij === 'function') systeemBij();
   }
 
   /* ---------- mappen openen ---------- */
@@ -4465,6 +4485,12 @@ var RTG_BOUW = 'fd585ec9';
   }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
   new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
+
+  /* sync() woont in deze scope en niet in die van openTab (app-main-12.js), dus
+     kan die hem niet aanroepen -- vandaar deze naad, dezelfde vorm als
+     window.RTGVraag in app-main-27.js. Waarom openTab hem nodig heeft staat
+     daar, bij de aanroep. */
+  window.RTGOSSync = sync;
 
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
@@ -4891,6 +4917,50 @@ var RTG_BOUW = 'fd585ec9';
         teken: function () { return (window.RTGGlyf && RTGGlyf.svg(m.glyf)) || null; }
       };
     }));
+  }
+
+  /* ---------- het bedieningspaneel aanreiken aan de voet van de bank ----------
+     HET SPRINGBOARD IS ALS SCHERM VERDWENEN, EN DIT MOEST BLIJVEN.
+
+     Het bedieningspaneel hing achter de knop rechtsboven op dat scherm, en
+     draagt alles wat geen wereld is: thema, helderheid, taal, achtergrond, en de
+     tegels scannen, je Zegel, je backoffice, de Boardroom, de algemene pin,
+     push, zoeken, meldingen en uitloggen. Zonder een nieuwe deur was dat met het
+     scherm meegegaan -- inclusief de enige uitlogknop die een lid heeft.
+
+     Een deur en niet zestien. Het paneel is al de plek waar deze dingen samen
+     staan; ze los in de bank hangen zou dezelfde lijst een tweede keer maken, op
+     een plek die er niet over gaat.
+
+     We klikken de bestaande knop aan in plaats van het paneel zelf te openen.
+     Die knop draagt het gedrag (app-main-27b.js) en blijft de enige plek waar
+     dat staat -- ook nu hij zelf niet meer in beeld komt. */
+  function systeemBij() {
+    if (!window.RTGCommand || !RTGCommand.systeem) return;
+    var lijst = [], knop = $('#osCcBtn');
+    /* EN RAHUL, want die was op het beginscherm nergens meer.
+
+       Zijn balk stond onderaan het springboard. Dat scherm is weg, en de drie
+       andere plekken waar hij woont haalden het geen van alle: de console van de
+       werktafel wordt verborgen door shared/rahul-tab/style-base.js, de tab die
+       daarvoor in de plaats komt vindt op deze pagina geen gastheer, en de
+       handenvrij-balk hangt bewust weg tot je hem roept. Gemeten in de browser:
+       nul zichtbare ingangen naar Rahul op het beginscherm.
+
+       RTGRahul.open() is de manier waarop de rest van het huis hem roept -- de
+       pill, het zoekscherm, de mond. Deze deur gebruikt dezelfde, dus er komt
+       geen tweede manier bij; er komt alleen een knop bij waar er geen was.
+
+       De vraag "bestaat RTGRahul al?" stellen we bij de KLIK en niet hier. Hij
+       wordt door metgezel.js/mond.js nagelaadt en is op het moment dat de bank
+       gevuld wordt vaak nog niet binnen -- gemeten: dan verscheen de deur
+       helemaal niet. Wachten op iets dat er zo aankomt is geen reden om een
+       knop weg te laten die het huis altijd heeft. */
+    lijst.push({ naam: 'Rahul', teken: 'mens',
+      doe: function () { if (window.RTGRahul && RTGRahul.open) RTGRahul.open(); } });
+    if (knop) lijst.push({ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+      doe: function () { knop.click(); } });
+    RTGCommand.systeem(lijst);
   }
   bouw();
 

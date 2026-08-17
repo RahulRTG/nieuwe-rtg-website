@@ -61,10 +61,13 @@ materiaal, geen kleur; `test/materiaal.test.js` meet of het er nog een is.
 één, en dat is de werktafel van RTG Command. Inloggen, je laatste werkblad
 sluiten en op Home drukken komen alle drie op dezelfde lege keuze uit. De klok
 was hier ooit de kern, met de werelden als merken op een bezel eromheen; die is
-weg (17 augustus 2026) en het horloge staat nu alleen nog op het inlogscherm. De
-werelden staan bovenaan de bank, hun onderdelen op hun eigen huis, en de enige
-lijst werelden blijft `MAPPEN` in app-main. Lees ook wat er bewust NIET staat
-(een verzonnen statusstrook, een voorgekookt werkblad) vóór je er iets bij zet.
+weg (17 augustus 2026), en het springboard eronder is hem gevolgd. Het horloge
+staat nu alleen nog op het inlogscherm. De werelden staan bovenaan de bank, hun
+onderdelen op hun eigen huis, en de enige lijst werelden blijft `MAPPEN` in
+app-main; het bedieningspaneel (met uitloggen) en Rahul staan in de voet van die
+bank. De schil van `apps/app.html` bestaat nog als **la** voor die panelen, niet
+als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
+voorgekookt werkblad) vóór je er iets bij zet.
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een

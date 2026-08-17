@@ -21,7 +21,52 @@
    overal. */
 
 body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
-body.rtg-command > #shell{display:none!important;}
+
+/* ---- DE SCHIL IS GEEN SCHERM MEER, MAAR NOG WEL DE LA ----------------------
+
+   Hier stond `display:none!important` op #shell, en dat klopte zolang je er nog
+   heen kon: de knop "Beginscherm"/"Toestel" vouwde de werktafel op en dan stond
+   het springboard er weer. Die knop is weg -- er is één beginscherm en dat is
+   de werktafel -- en daarmee was het springboard onbereikbaar.
+
+   Maar in diezelfde #shell liggen de SYSTEEMPANELEN: het bedieningspaneel (met
+   scannen, je Zegel, je backoffice, de pin, taal, weergave, push, zoeken,
+   meldingen en uitloggen), het meldingenpaneel en de zoeker. Die zijn geen
+   pagina's maar laden die over alles heen komen, en met display:none gingen ze
+   met het springboard mee -- inclusief je uitlogknop.
+
+   De schil blijft daarom staan als een DOORZICHTIGE, KLIKDOORLATENDE laag boven
+   de werktafel. Wat een pagina was gaat weg (de balk en de inhoud), wat een la
+   was blijft. Drie dingen om te weten voor wie hieraan komt:
+
+   1. position:relative en niet fixed/inset:0. De schil is de container waar --e
+      aan hangt (container-query in apps/app.html); rek je hem op tot het hele
+      venster, dan groeit de hele maatvoering van de panelen mee.
+   2. pointer-events:none op de schil, auto op de panelen. Zonder dat ligt er een
+      onzichtbaar vel over de werktafel en reageert er niets meer.
+   3. Gaat er tóch een scherm open in de schil (#app.os-open, een tab uit
+      Spotlight), dan is hij even weer een scherm: ondoorzichtig en klikbaar.
+
+   Het !important op de achtergrond is geen luiheid maar het antwoord op een
+   ander !important: shared/levendekleur.js schildert elke [data-levendegrond]
+   -- en dat is deze schil -- met de levende dagkleur, en doet dat zo. Zonder
+   dit lag er een ondoorzichtige lap over de werktafel waar je alleen de kleur
+   van zag dat er iets mis was. */
+body.rtg-command > #shell{position:relative;z-index:240;margin-inline:auto;
+  background:none!important;border:0;box-shadow:none;pointer-events:none;}
+body.rtg-command > #shell #app{background:none!important;}
+body.rtg-command > #shell #app:not(.os-open) > .topbar,
+body.rtg-command > #shell #app:not(.os-open) > #content{display:none!important;}
+body.rtg-command > #shell #app.os-open{pointer-events:auto;background:var(--bg)!important;}
+body.rtg-command > #shell .os-scrim,
+body.rtg-command > #shell .notif-scrim,
+body.rtg-command > #shell .notif-panel{pointer-events:auto;}
+/* En de balk van Rahul, die aan <body> hangt en niet aan de schil: z-index 38
+   (shared/handenvrij-balk.js) ligt onder de werktafel, dus je riep hem en er
+   gebeurde zichtbaar niets. Boven de schilbalk uit, zodat hij niet half achter
+   de tabstrip onderaan valt. */
+body.rtg-command .hv-balk{z-index:260;bottom:calc(48px + env(safe-area-inset-bottom,0px));}
+@media (min-width:1000px){body.rtg-command .hv-balk{bottom:0;}}
 #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}

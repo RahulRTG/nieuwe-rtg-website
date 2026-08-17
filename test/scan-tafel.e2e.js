@@ -72,11 +72,13 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     assert.equal(rt, 'RTG-tafel', 'de QR-codec round-tript in de browser');
 
     // 5) bedieningspaneel -> Scannen -> overlay -> met de hand de tafel-QR invoeren
-    // De landing is de Command-werktafel; de knop "Toestel" vouwt die op naar
-    // de schil, waar de bovenrandbediening woont.
-    await page.waitForSelector('#rtgCommand .cmd-schil', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-schil');
     /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN GEBRUIKER DAT DOET.
+
+       Hier ging eerst een klik op de knop in de bank vooraf, die de werktafel
+       opvouwde naar het springboard. Dat springboard is als scherm weg
+       (WERELD.md) en die knop dus ook -- maar de bovenrand luistert gewoon op
+       document mee (shared/randen.js), dus die haal werkt boven de werktafel
+       precies zoals hij boven de schil werkte. Eén stap minder.
 
        Hier stond `page.click('#osCcBtn')`. Die knop stond toen nog in de
        statusbalk van het beginscherm; die balk is leeggemaakt (mappen, klok,

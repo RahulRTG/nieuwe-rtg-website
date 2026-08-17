@@ -148,10 +148,16 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 60000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForSelector('#rtgCommand .cmd-schil', { state: 'visible', timeout: 10000 });
-    await page.click('#rtgCommand .cmd-schil');
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN LID DAT DOET.
+
+       Hier stonden twee stappen: eerst de knop in de bank naar het springboard,
+       daarna de knop in de statusbalk daar. Dat springboard is als scherm weg
+       (WERELD.md) en het paneel hangt nu aan de voet van de bank -- dezelfde
+       deur die een lid ziet, één stap in plaats van twee. */
+    await page.waitForSelector('#rtgCommand .cmd-lade', { state: 'visible', timeout: 10000 });
+    await page.click('#rtgCommand .cmd-lade');
+    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
+    await page.click('#rtgCommand .cmd-bankvoet [data-systeem]');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcPin');
 

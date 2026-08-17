@@ -128,6 +128,8 @@
        Eerder hing de ring aan het laden van de pagina, en die is een slag
        eerder dan de boardroom-gegevens: het beginscherm was leeg. */
     if (typeof wereldBij === 'function') wereldBij();
+    // en om dezelfde reden de deuren naar het systeem (app-main-29c.js)
+    if (typeof systeemBij === 'function') systeemBij();
   }
 
   /* ---------- mappen openen ---------- */

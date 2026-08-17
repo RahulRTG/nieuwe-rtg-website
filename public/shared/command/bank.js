@@ -40,6 +40,42 @@
     }
     function kopje(tekst){var p=d.createElement('p');p.className='cmd-kop';p.textContent=tekst;return p}
 
+    /* DE VOET: HET SYSTEEM, EN WAAROM DAT GEEN WERELD IS.
+
+       Hier stond één knop, Instellingen, en die gaat over het werkblad dat
+       openstaat. Daar staat nu het bedieningspaneel naast: thema, helderheid,
+       taal, achtergrond, en de tegels scannen, je Zegel, je backoffice, de pin,
+       push, zoeken, meldingen en uitloggen.
+
+       Dat paneel woont in de schil (apps/app.html) en niet hier. Het stond
+       achter het springboard, en dat springboard is als scherm verdwenen -- dus
+       zou je uitlogknop met hem mee zijn gegaan. De schil blijft daarom als
+       doorzichtige la boven de werktafel staan (command.css) en dit is de kruk
+       eraan.
+
+       De lijst komt van BUITEN, net als de werelden: app-main weet welke
+       panelen er zijn en hoe je ze opent, deze module niet. Een pagina zonder
+       app-main krijgt hier gewoon niets extra's -- dan is er ook geen paneel om
+       te openen. */
+    function vulVoet(){
+      var voet=root&&root.querySelector('.cmd-bankvoet');if(!voet)return;
+      voet.querySelectorAll('[data-systeem]').forEach(function(b){b.remove()});
+      if(dicht)return;                 // voor het inloggen valt er niets te bedienen
+      var lijst=[];
+      try{lijst=(o.systeem&&o.systeem())||[]}catch(e){}
+      /* Omgekeerd doorlopen omdat elke deur VOOR de eerste wordt gezet: zo staat
+         de lijst er straks in de volgorde waarin hij is aangereikt, met
+         Instellingen (die hier vast staat) onderaan. */
+      lijst.filter(function(x){return x&&x.naam&&typeof x.doe==='function'}).reverse()
+        .forEach(function(x){
+          var b=d.createElement('button');b.dataset.systeem='1';
+          b.innerHTML=svg(x.teken||'instel');
+          var t=d.createElement('span');t.textContent=x.naam;b.appendChild(t);
+          b.onclick=function(){sluit();x.doe()};
+          voet.insertBefore(b,voet.firstChild);
+        });
+    }
+
     /* DE WERELDEN STAAN BOVENAAN, EN DIT IS WAAR ZE WONEN.
 
        Ze hingen als merken op de bezel om de klok. Die klok wás het
@@ -67,20 +103,7 @@
         nav.appendChild(kopje('Software'));
       }
       APPS.forEach(function(a){nav.appendChild(deur(a[0],a[1],null,a[2]))});
-      /* DE SCHIL ONDER DE WERKTAFEL, onderaan want het is geen bestemming maar
-         een uitweg. Hij heette "Beginscherm" en bracht je naar de klok; het
-         beginscherm is de werktafel geworden, dus zou die naam nu naar het
-         verkeerde scherm wijzen. Wat eronder ligt is je toestel: het
-         bedieningspaneel, scannen, je Zegel, je meldingen en uitloggen -- en er
-         is geen tweede weg daarheen, dus deze knop is niet optioneel.
-
-         Voor het inloggen staat hij er NIET: dan zou hij je bij een toestel
-         zonder inloggesprek achterlaten, en de weg vooruit is er maar een. */
-      if(!dicht){
-        var s=d.createElement('button');s.className='cmd-schil';
-        s.innerHTML=svg('home')+'<span>Toestel</span>';
-        s.onclick=function(){sluit();o.schil()};nav.appendChild(s);
-      }
+      vulVoet();
       // de kiezer achter de plus: hetzelfde aanbod, alleen op een breed scherm
       var kz=root.querySelector('.cmd-kiezer');
       if(!kz)return;

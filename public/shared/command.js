@@ -34,7 +34,7 @@
      vraag over het BESTAAN van de werktafel. Het is nu een vraag over zijn VORM:
      op een telefoon dezelfde bank en dezelfde tabbladen, alleen komt de bank van
      onderen als lade en staat er een blad tegelijk in beeld (command.css). Wat
-     niet verandert is het beginscherm -- dat blijft op beide de klok.
+     niet verandert is het beginscherm -- dat is op beide deze werktafel.
 
      breed() is daarmee een opmaakvraag en geen grendel. Wie hem als grendel
      gebruikt zet de breedte terug in de toegangsregel, en dat was de fout
@@ -65,8 +65,8 @@
 
   function bouwTafel(){
     if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
-      open:open,bestemming:bestemming,thuis:thuis,schil:schil,inlog:inlog,
-      werelden:function(){return werelden}});
+      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog,
+      werelden:function(){return werelden},systeem:function(){return systeem}});
     return tafel;
   }
   /* DE WERELDEN HINGEN OP DE BEZEL OM DE KLOK, en staan nu bovenaan de bank; de
@@ -81,23 +81,25 @@
     werelden=Array.isArray(lijst)?lijst:[];
     if(tafel)tafel.werelden();
   }
-  /* NAAR DE SCHIL, EN DAT IS GEEN OMWEG NAAR DE KLOK MEER.
+  /* DE SYSTEEMPANELEN, om dezelfde reden van buiten als de werelden.
 
-     Deze knop heette "Beginscherm" en bracht je naar de klok. De klok is weg;
-     de knop mocht niet met hem mee, en dat scheelde weinig. Onder de werktafel
-     ligt #shell met het bedieningspaneel, scannen, je Zegel, je meldingen en
-     uitloggen -- en er is geen tweede weg daarheen. Wat wel verandert is wat hij
-     beweert te zijn: het beginscherm is de werktafel, de schil is je toestel.
+     Hier stond schil(): die vouwde de werktafel op en zette je op het
+     springboard eronder. Dat scherm is weg, dus is er ook niets meer om naar op
+     te vouwen -- wat eronder lag en WEL moest blijven zijn de panelen (het
+     bedieningspaneel met scannen, Zegel, backoffice, pin, taal, weergave, push,
+     zoeken, meldingen en uitloggen). Die komen nu over de werktafel heen te
+     liggen in plaats van eronder vandaan; zie de schil-regels in command.css.
 
-     `opgevouwen` bestaat omdat probeer() dit anders terugdraait: die bouwt zodra
-     het mag, en zou de schil bij de eerstvolgende hertekening weer overdekken.
-     Een keuze van een mens hoort niet door een waarnemer te worden overstemd. */
-  var opgevouwen=false;
-  function schil(){opgevouwen=true;if(tafel)tafel.sloop()}
+     Wie ze kent is app-main, en dus reikt app-main ze aan. Deze module weet niet
+     welke panelen er zijn en hoe je ze opent; dat blijft op één plek staan. */
+  var systeem=[];
+  function zetSysteem(lijst){
+    systeem=Array.isArray(lijst)?lijst:[];
+    if(tafel)tafel.werelden();
+  }
   /* THUIS IS HET BEGINSCHERM, EN DAT IS DE LEGE WERKTAFEL. De home-knop op de
-     console riep hiervoor dezelfde functie aan als de knop in de bank; ze gingen
-     allebei naar de klok, dus was het toen een bestemming. Nu twee. */
-  function thuis(){if(!tafel)return;opgevouwen=false;tafel.wis();tafel.sync()}
+     console ging naar de klok; die is weg, en er is nu maar één thuis. */
+  function thuis(){if(!tafel)return;tafel.wis();tafel.sync()}
 
   /* INLOGGEN LANDT ALTIJD OP EEN LEGE KEUZE.
 
@@ -111,7 +113,6 @@
      kiest zelf een wereld; het huis opent geen activiteit of voorbeeld voor
      hem. */
   function land(){
-    opgevouwen=false;
     if(!mag())return false;
     var t=bouwTafel();
     t.zet('open');
@@ -133,7 +134,6 @@
   function open(url,titel){
     if(!poortDicht())return null;
     if(!aangemeld()){location.href=url;return null}
-    opgevouwen=false;                         // iets openen is terugkomen
     return bouwTafel().toon(url,titel);
   }
 
@@ -150,12 +150,13 @@
   /* De wachter, en tegelijk de landing. Mag de werktafel er niet staan (geen
      sessie, of de overeenkomst is nog niet getekend), dan gaat hij weg -- dat
      is de grendel uit de vorige ronde. Mag hij er wel staan, dan bouwt hij zich
-     hier op, want hij IS het beginscherm -- tenzij een mens hem heeft opgevouwen
-     om bij zijn toestel te komen (zie schil()). Landen doet hij daar nooit. */
+     hier op, want hij IS het beginscherm. Hier stond een uitzondering voor een
+     opgevouwen werktafel; opvouwen kan niet meer, want er is niets om naar op te
+     vouwen. */
   function probeer(){
     var s=stand();
     if(s==='weg'){if(tafel)tafel.sloop();return}
-    if(!opgevouwen)bouwTafel().zet(s);
+    bouwTafel().zet(s);
   }
   function init(){
     probeer();
@@ -177,6 +178,7 @@
     actief:mag,
     land:land,
     werelden:zetWerelden,
+    systeem:zetSysteem,
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

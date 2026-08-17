@@ -50,10 +50,47 @@ is de klok geworden. Wat er van hem over is:
   bediende. Een laag die zijn enige lezer verliest gaat mee; blijven staan maakt
   hem niet reversibel, alleen onvindbaar.
 
-De schil eronder (`.os-thuisscherm` in `apps/app.html`) bestaat nog: je ziet hem
-zolang de lidmaatschapsovereenkomst niet getekend is, want dan mag de werktafel
-er niet zijn (`poortDicht()`). Hij draagt de mappen, de functies en de balk van
-Rahul, en de ruimte die de klok innam gaat nu naar de lucht ertussen.
+## En toen ging het springboard er ook af
+
+De schil eronder (`.os-thuisscherm` in `apps/app.html`) bleef eerst nog staan als
+scherm: één knop in de bank vouwde de werktafel op en dan stond hij er weer. Dat
+was opnieuw een tweede beginscherm, en hij is een dag later gevolgd — **je kunt
+er niet meer komen**, en `command.css` houdt hem uit beeld ook als er iets anders
+misgaat.
+
+Wat daar woonde en NIET mocht verdwijnen, staat nu boven de werktafel in plaats
+van eronder:
+
+- **Het bedieningspaneel** — met scannen, je Zegel, je backoffice, de Boardroom,
+  de algemene pin, taal, weergave, push, zoeken, meldingen en **uitloggen**. Het
+  hing achter de knop rechtsboven op het springboard; het staat nu in de **voet
+  van de bank**, en de bovenrand omlaag halen werkt nog steeds (`shared/randen.js`
+  luistert op `document`, niet op een scherm).
+- **Rahul** — zijn balk stond onderaan het springboard. Gemeten na het weghalen:
+  nul zichtbare ingangen. Zijn console in de werktafel wordt verborgen door
+  `shared/rahul-tab/style-base.js`, de tab die daarvoor in de plaats komt vindt
+  op deze pagina geen gastheer, en de handenvrij-balk hangt bewust weg tot je hem
+  roept. Er staat nu een deur **Rahul** in dezelfde voet, die `RTGRahul.open()`
+  aanroept — dezelfde manier waarop de rest van het huis hem roept.
+
+De schil zelf blijft bestaan als **la**, niet als scherm: een doorzichtige,
+klikdoorlatende laag boven de werktafel waar die panelen in hangen. Gaat er tóch
+een scherm open (een tab uit Spotlight), dan is hij even weer een scherm —
+ondoorzichtig, met een terugknop die je op de werktafel terugzet.
+
+Twee dingen die daarbij aan het licht kwamen en hier horen te staan, want ze
+waren allebei al stuk:
+
+1. **`openTab()` vertelde de schil niet dat het scherm wisselde.** `sync()` hing
+   aan een waarnemer op `#app`, en `openTab` raakt `#app` niet aan. Gevolg: je
+   opende Ter plaatse en de statusbalk bleef die van het beginscherm, zónder weg
+   terug. Dat viel niet op zolang het springboard eronder lag.
+2. **`shared/levendekleur.js` schildert elke `[data-levendegrond]` met
+   `!important`** — en dat is deze schil. Zonder een even hard antwoord lag er
+   een ondoorzichtige lap over de werktafel.
+
+Het springboard is als *registry* niet weg: `#osMappen` blijft de plek waar de
+bank en Spotlight uit gevuld worden. Dat is een lijst, geen scherm.
 
 ## Eén lijst werelden, en waar hij woont
 
@@ -107,10 +144,13 @@ niet van het huis.
 
 ## Handhaving
 
-`test/werkscherm.e2e.js` meet de werktafel; `test/appmenu.e2e.js` en
-`test/apps-ui.e2e.js` meten de schil eronder. `test/zware-bundels.test.js` bewaakt
-dat `shared/glyf.js` vóór `apps/app-main.js` staat — zonder die volgorde dragen de
-werelden in de bank geen teken.
+`test/werkscherm.e2e.js` meet de werktafel. `test/appmenu.e2e.js` meet de bank:
+dat de drie werelden er bovenaan staan, dat ze hun eigen glyf dragen, dat ze hun
+huis als wérkblad openen, en dat het springboard niet terugkomt. `test/apps-ui.e2e.js`
+meet dat de sessie echt is hersteld en dat Rahul vanaf het beginscherm in één
+stap bereikbaar is — bóven de werktafel en niet erachter. `test/zware-bundels.test.js`
+bewaakt dat `shared/glyf.js` vóór `apps/app-main.js` staat — zonder die volgorde
+dragen de werelden in de bank geen teken.
 
 Wat hier nog **niet** machinaal gehandhaafd wordt, en dus op mensen berust: dat er
 één beginscherm blijft. De drie wegen ernaartoe komen op één toestand uit omdat ze

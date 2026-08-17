@@ -40,3 +40,47 @@
       };
     }));
   }
+
+  /* ---------- het bedieningspaneel aanreiken aan de voet van de bank ----------
+     HET SPRINGBOARD IS ALS SCHERM VERDWENEN, EN DIT MOEST BLIJVEN.
+
+     Het bedieningspaneel hing achter de knop rechtsboven op dat scherm, en
+     draagt alles wat geen wereld is: thema, helderheid, taal, achtergrond, en de
+     tegels scannen, je Zegel, je backoffice, de Boardroom, de algemene pin,
+     push, zoeken, meldingen en uitloggen. Zonder een nieuwe deur was dat met het
+     scherm meegegaan -- inclusief de enige uitlogknop die een lid heeft.
+
+     Een deur en niet zestien. Het paneel is al de plek waar deze dingen samen
+     staan; ze los in de bank hangen zou dezelfde lijst een tweede keer maken, op
+     een plek die er niet over gaat.
+
+     We klikken de bestaande knop aan in plaats van het paneel zelf te openen.
+     Die knop draagt het gedrag (app-main-27b.js) en blijft de enige plek waar
+     dat staat -- ook nu hij zelf niet meer in beeld komt. */
+  function systeemBij() {
+    if (!window.RTGCommand || !RTGCommand.systeem) return;
+    var lijst = [], knop = $('#osCcBtn');
+    /* EN RAHUL, want die was op het beginscherm nergens meer.
+
+       Zijn balk stond onderaan het springboard. Dat scherm is weg, en de drie
+       andere plekken waar hij woont haalden het geen van alle: de console van de
+       werktafel wordt verborgen door shared/rahul-tab/style-base.js, de tab die
+       daarvoor in de plaats komt vindt op deze pagina geen gastheer, en de
+       handenvrij-balk hangt bewust weg tot je hem roept. Gemeten in de browser:
+       nul zichtbare ingangen naar Rahul op het beginscherm.
+
+       RTGRahul.open() is de manier waarop de rest van het huis hem roept -- de
+       pill, het zoekscherm, de mond. Deze deur gebruikt dezelfde, dus er komt
+       geen tweede manier bij; er komt alleen een knop bij waar er geen was.
+
+       De vraag "bestaat RTGRahul al?" stellen we bij de KLIK en niet hier. Hij
+       wordt door metgezel.js/mond.js nagelaadt en is op het moment dat de bank
+       gevuld wordt vaak nog niet binnen -- gemeten: dan verscheen de deur
+       helemaal niet. Wachten op iets dat er zo aankomt is geen reden om een
+       knop weg te laten die het huis altijd heeft. */
+    lijst.push({ naam: 'Rahul', teken: 'mens',
+      doe: function () { if (window.RTGRahul && RTGRahul.open) RTGRahul.open(); } });
+    if (knop) lijst.push({ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+      doe: function () { knop.click(); } });
+    RTGCommand.systeem(lijst);
+  }

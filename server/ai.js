@@ -14,6 +14,7 @@ const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
+const { kompasStatus } = require('./ai-kompas');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -93,15 +94,6 @@ function beschikbaarheid(ai) {
   const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
   const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
   const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
-  /* RTG Kompas is de zichtbare vertrouwenslaag, niet een tweede model. De
-     applicatie bepaalt deze velden zelf, zodat een model nooit kan veinzen
-     dat iets lokaal bleef of dat een menselijke goedkeuring al is gegeven. */
-  const kompasRoute = hybride ? 'hybride' : heeftLokaal ? lokaleGrens : beschikbaar ? 'extern' : 'regels';
-  const kompasPrivacy = hybride ? 'Lokale start; externe uitwijk kan inhoud verwerken'
-    : heeftLokaal && lokaleGrens === 'op-dit-apparaat' ? 'Inhoud blijft op deze Mac'
-    : heeftLokaal ? 'Inhoud blijft binnen de eigen omgeving'
-    : beschikbaar ? 'Inhoud wordt door een externe modelprovider verwerkt'
-    : 'Geen inhoud naar een model';
   return {
     beschikbaar,
     modus,
@@ -121,15 +113,7 @@ function beschikbaarheid(ai) {
       samenvatten: 'lokale-extractie',
       beslissingen: 'menselijk-akkoord'
     },
-    kompas: {
-      naam: 'RTG Kompas',
-      route: kompasRoute,
-      privacy: kompasPrivacy,
-      ritme: ['nu', 'straks', 'let-op'],
-      uitleg: 'bron-en-grens-zichtbaar',
-      autoriteit: 'mens',
-      menselijkAkkoord: ['geld', 'publicatie', 'toegang', 'definitieve-toezegging']
-    }
+    kompas: kompasStatus({ hybride, heeftLokaal, lokaleGrens, beschikbaar })
   };
 }
 

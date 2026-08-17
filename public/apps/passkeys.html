@@ -66,9 +66,7 @@
   <section id="vLogin">
     <h2>Inloggen met een passkey</h2>
     <div class="kaart">
-      <label for="lLogin">E-mailadres van uw account</label>
       <div class="rij">
-        <input id="lLogin" type="email" autocomplete="username webauthn" placeholder="u@voorbeeld.nl">
         <button class="knop vol" id="lKnop" type="button">Log in met passkey</button>
       </div>
       <p class="stil" id="lStatus" style="margin-top:0.5rem;"></p>
@@ -139,10 +137,8 @@
 
   /* ---- inloggen: zelfde dans, andere kant op ---- */
   async function logIn() {
-    const login = $('#lLogin').value.trim();
-    if (!login) return zeg('Vul het e-mailadres van uw account in.');
     $('#lStatus').textContent = 'Uw apparaat vraagt nu om uw passkey…';
-    const o = await api('opties', { login });
+    const o = await api('opties');
     if (o.body.error) { $('#lStatus').textContent = ''; return zeg(o.body.error); }
     const pub = o.body.opties;
     pub.challenge = naarBuf(pub.challenge);
@@ -160,7 +156,7 @@
         userHandle: cred.response.userHandle ? naarB64(cred.response.userHandle) : null
       }
     };
-    const r = await api('login', { login, antwoord });
+    const r = await api('login', { ceremonie: o.body.ceremonie, antwoord });
     if (r.body.error) { $('#lStatus').textContent = ''; return zeg(r.body.error); }
     token = r.body.token;
     try { localStorage.setItem('rtg_member_token', token); } catch (e) {}

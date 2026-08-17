@@ -31,7 +31,7 @@
   if (!memTok && !supTok) return;
   if (!window.__rahulTabStandaard) {
     var rahulTabScript = document.createElement('script');
-    rahulTabScript.src = '/shared/rahul-tab.js?v=command5'; rahulTabScript.defer = true;
+    rahulTabScript.src = '/shared/rahul-tab.js?v=command7'; rahulTabScript.defer = true;
     document.head.appendChild(rahulTabScript);
   }
 

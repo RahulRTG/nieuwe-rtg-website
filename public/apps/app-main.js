@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0a6efb06';
+var RTG_BOUW = '5141b00d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -530,6 +530,7 @@ var RTG_BOUW = '0a6efb06';
         'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
       '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +
       '.ag-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 0.6rem;transition:border-color 0.2s;}' +
+      '.ag-rij[hidden]{display:none;}' +
       '.ag-rij:focus-within{border-color:var(--burgundy);}' +
       '.ag-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);' +
         "font-family:'Inter',sans-serif;font-size:0.95rem;text-align:center;padding:0.75rem 0.4rem;}" +
@@ -538,13 +539,17 @@ var RTG_BOUW = '0a6efb06';
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
       '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
-      // Face ID / passkey: een ingetogen gouden regel onder het veld, alleen
-      // zichtbaar zodra Rahul weet met wie hij praat (een terugkerend lid)
-      '.ag-passkey{margin:0.95rem auto 0;background:none;border:none;color:var(--gold,#857007);' +
-        'font-family:inherit;font-size:0.78rem;letter-spacing:0.03em;cursor:pointer;opacity:0.9;' +
-        'display:flex;align-items:center;gap:0.4rem;}' +
+      // De passkey is de voordeur: groot genoeg als eerste handeling, maar nog
+      // steeds in de stille horlogetaal van het huis.
+      '.ag-passkey{margin:0.95rem auto 0;background:color-mix(in srgb,var(--gold,#857007) 10%,transparent);' +
+        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:999px;color:var(--gold,#857007);' +
+        'font-family:inherit;font-size:0.82rem;letter-spacing:0.03em;cursor:pointer;min-height:44px;padding:0.65rem 1.15rem;' +
+        'display:flex;align-items:center;justify-content:center;gap:0.48rem;min-width:min(18rem,82vw);}' +
       '.ag-passkey[hidden]{display:none;}' +
-      '.ag-passkey svg{width:15px;height:15px;stroke:currentColor;fill:none;}' +
+      '.ag-passkey svg{width:17px;height:17px;stroke:currentColor;fill:none;}' +
+      '.ag-anders{margin:0.65rem auto 0;padding:0.4rem 0.7rem;background:none;border:0;color:var(--soft);' +
+        'font:inherit;font-size:0.72rem;letter-spacing:0.025em;cursor:pointer;text-decoration:underline;text-underline-offset:0.22rem;}' +
+      '.ag-anders[hidden]{display:none;}' +
       /* De ballotage-regalia: pas zichtbaar zodra de vier vragen beginnen.
          Een stille kopregel met haarlijnen (de horlogetaal van het huis), en
          daaronder vier Romeinse cijfers als plaatsbepaling -- een uitnodiging,
@@ -765,13 +770,14 @@ var RTG_BOUW = '0a6efb06';
       '<div class="ag-kop" id="agKop" aria-hidden="true"></div>' +
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
-      '<div class="ag-rij"><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
+      '<div class="ag-rij" hidden><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
       '<div class="ag-stappen" id="agStappen" aria-hidden="true"></div>' +
       '<div class="ag-kluis" id="agKluis"></div>' +
-      '<button type="button" class="ag-passkey" id="agPasskey" hidden>' +
+      '<button type="button" class="ag-passkey" id="agPasskey">' +
         '<svg viewBox="0 0 24 24" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2-.4 3.6-1 5"/><path d="M8 9a4 4 0 0 1 7 2c0 3-.5 5.4-1.5 7.5"/><path d="M12 13c0 3-.6 5.6-1.6 7.7"/><path d="M5.5 8a7 7 0 0 1 12 3c0 3.4-.5 6.4-1.5 9"/></svg>' +
-        '<span>' + T('ag.pk.knop','Face ID of passkey') + '</span></button>';
+        '<span>' + T('ag.pk.open','Open met Face ID of passkey') + '</span></button>' +
+      '<button type="button" class="ag-anders" id="agAnders">' + T('ag.anders','Andere manier') + '</button>';
     gate.appendChild(doos);
     // een wachtwoord-herstel-link uit de e-mail (?reset=): Rahul regelt het herstel zelf
     const herstel = new URLSearchParams(location.search).get('reset');
@@ -860,12 +866,15 @@ var RTG_BOUW = '0a6efb06';
       }
     }
     const pkKnop = doos.querySelector('#agPasskey');
+    const andersKnop = doos.querySelector('#agAnders');
+    const antwoordRij = inp.closest('.ag-rij');
+    let passkeyBezig = false, passkeyAbort = null;
     function toonPasskey(aan){
       if (!pkKnop) return;
       pkKnop.hidden = !aan;
       // het label pas hier vertalen: bij het bouwen van de poort is de i18n
       // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.knop','Face ID of passkey'); }
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.open','Open met Face ID of passkey'); }
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
@@ -879,41 +888,56 @@ var RTG_BOUW = '0a6efb06';
       toonPasskey(false);
     }
 
-    /* Face ID / passkey: dezelfde WebAuthn-dans als de aparte passkey-pagina,
-       maar binnen de poort. Rahul kent de gebruikersnaam al (loginU); het
-       toestel bewijst de identiteit, de server munt een echte sessie. */
-    async function passkeyInlog(){
-      if (!loginU || bezig) return;
+    /* RTG Deur: eerst bewijst het toestel wie er staat; pas daarna zoekt de
+       server het account bij de credential. Na "Andere manier" kan dezelfde
+       functie ook de oude, gerichte passkey van een genoemd account gebruiken. */
+    async function passkeyInlog(automatisch){
+      if (passkeyBezig) return;
       if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
-        zeg('rahul', T('ag.pk.geen','Dit toestel kent nog geen Face ID of passkey. Typ je wachtwoord.')); return;
+        zeg('rahul', T('ag.pk.geen','Dit toestel kent geen passkey. Kies Andere manier.')); return;
       }
       const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
       const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      bezig = true;
+      passkeyBezig = true;
+      passkeyAbort = window.AbortController ? new AbortController() : null;
       try {
         zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
-        const o = await API.call('/webauthn/opties', { login: loginU });
+        const o = await API.call('/webauthn/opties', loginU ? { login: loginU } : {});
         const pub = o.opties; pub.challenge = b2u(pub.challenge);
         pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
-        const cred = await navigator.credentials.get({ publicKey: pub });
+        const vraag = { publicKey: pub };
+        if (passkeyAbort) vraag.signal = passkeyAbort.signal;
+        const cred = await navigator.credentials.get(vraag);
         const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
           clientExtensionResults: cred.getClientExtensionResults(),
           response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
             signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
-        const r = await API.call('/webauthn/login', { login: loginU, antwoord });
-        bezig = false;
+        const r = await API.call('/webauthn/login', { login: loginU || undefined, ceremonie: o.ceremonie, antwoord,
+          pasApp: vastePas || undefined, lang: document.documentElement.lang || 'nl' });
+        passkeyBezig = false; passkeyAbort = null;
         if (r && r.token){
           API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
           zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
           if (typeof restoreSession === 'function') await restoreSession();
         }
       } catch(e){
-        bezig = false;
-        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) return; // afgebroken door de gebruiker
-        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Typ anders je wachtwoord.'));
+        passkeyBezig = false; passkeyAbort = null;
+        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')){
+          if (!automatisch && e.name !== 'AbortError') zeg('rahul', T('ag.pk.afgebroken','Niet geopend. Probeer opnieuw of kies Andere manier.'));
+          return;
+        }
+        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Kies Andere manier.'));
       }
     }
-    if (pkKnop) pkKnop.addEventListener('click', passkeyInlog);
+    function andereManier(stil){
+      if (passkeyAbort) passkeyAbort.abort();
+      antwoordRij.hidden = false;
+      toonPasskey(false);
+      if (andersKnop) andersKnop.hidden = true;
+      if (!stil){ start(); inp.focus(); }
+    }
+    if (pkKnop) pkKnop.addEventListener('click', () => passkeyInlog(false));
+    if (andersKnop) andersKnop.addEventListener('click', () => andereManier(false));
 
     /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
        Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het
@@ -1030,8 +1054,8 @@ var RTG_BOUW = '0a6efb06';
     // Anders begint het gewone gesprek zodra duidelijk is dat er geen sessie ligt.
     let onthouden = null;
     try { onthouden = localStorage.getItem('rtg_member_token'); } catch(e){}
-    if (herstel) setTimeout(resetStart, 400);
-    else if (!onthouden) setTimeout(start, 400);
+    if (herstel){ andereManier(true); setTimeout(resetStart, 400); }
+    else if (!onthouden) setTimeout(() => passkeyInlog(true), 400);
     inp.addEventListener('focus', () => { if (!herstel && !resetStap) start(); }, { once: true });
   })();
   /* ================= SALON-CONNECTIES =================
@@ -1166,11 +1190,23 @@ var RTG_BOUW = '0a6efb06';
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
 
+  // Na de onboarding kiest het lid zelf een wereld; de inlog opent niets voor.
+  function naarWereldkeuze(){
+    if (window.RTGCommand && typeof RTGCommand.land === 'function') RTGCommand.land();
+  }
+
   async function checkOnboarding(){
-    if (!API.live || !API.token || onbBezig) return;
-    let st; try { st = await API.call('/onboarding/status'); } catch(e){ return; }
-    if (!st || st.klaar){ const g0 = onbEl('onbGate'); if (g0) g0.hidden = true; return; }
+    // Een bewuste lokale demo heeft geen onboardingroute.
+    if (!API.live){ naarWereldkeuze(); return true; }
+    if (!API.token || onbBezig) return false;
+    let st; try { st = await API.call('/onboarding/status'); } catch(e){ return false; }
+    if (!st || st.klaar){
+      const g0 = onbEl('onbGate'); if (g0) g0.hidden = true;
+      naarWereldkeuze();
+      return true;
+    }
     onbStartGesprek(st);
+    return false;
   }
   function onbStartGesprek(st){
     const g = onbEl('onbGate'); if (!g) return;
@@ -1287,6 +1323,7 @@ var RTG_BOUW = '0a6efb06';
     const g = onbEl('onbGate'); if (g) g.hidden = true;
     onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
+    naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
   }
   async function onbInvoer(tekst){

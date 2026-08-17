@@ -62,11 +62,24 @@ gebruikt.
   duidelijke `maak…(state)`-fabriek.
 
 ## 5. i18n compleet maken
-248 `data-i18n`-attributen, maar er staan nog hardcoded NL-teksten (o.a. in
-`leverancier.html`). Engelstalige gebruikers zien dan half Nederlands.
+Alle 114 registertalen staan nu standaard aan. De handmatige `data-i18n`- en
+`T(...)`-sleutels blijven leidend, maar `shared/i18n.js` vertaalt ook resterende
+hardcoded DOM-tekst, placeholders en toegankelijkheidslabels. Een
+`MutationObserver` neemt later door JavaScript getekende interface mee. Iedere
+blijvende apppagina bereikt deze laag via `shared/basis.js`; de CI-toets
+`i18n-auto.test.js` bewaakt dat contract.
 
-- [ ] Sweep resterende zichtbare strings naar `T(...)` / `data-i18n`.
-- [ ] CI-check die zichtbare tekst zonder i18n-sleutel markeert.
+- [x] Alle 114 talen standaard actief, inclusief eenmalige migratie van de oude
+  NL/EN-stand; bewuste afwijkende beheerlijsten blijven behouden.
+- [x] Resterende zichtbare strings centraal opvangen, statisch én dynamisch.
+- [x] Gebruikersinhoud, code, adressen en formuliertekst uitsluiten; alleen
+  aantoonbare UI-brontekst uit de repository mag naar een modelprovider.
+- [x] RTL-richting voor Arabische, Hebreeuwse en verwante schriften.
+- [x] CI-check op universeel laden, selectiegrenzen, RTL en bronregistratie.
+
+Zonder ingestelde lokale of externe modelprovider blijft de interface heel en
+gebruikt hij het ingebouwde woordenboek; volledige vrije zinsvertaling in alle
+114 talen vereist een geconfigureerde tekstprovider.
 
 ## 6. Inline styles → klassen
 `app.html` 396 en `leverancier.html` 353 inline `style="…"`-attributen.

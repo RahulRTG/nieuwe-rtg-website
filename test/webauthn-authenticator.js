@@ -65,15 +65,17 @@ function maakAuthenticator(rpID) {
 
   /* De twee complete antwoorden, zoals een browser ze zou afleveren. Ze staan
      hier en niet in de toets, want de vorm hoort bij de authenticator. */
-  function registratieAntwoord(challenge, origin) {
-    const attObj = cMap(new Map([['fmt', 'none'], ['attStmt', new Map()], ['authData', authData(0x45, 0, true)]]));
+  function registratieAntwoord(challenge, origin, opties) {
+    const flags = opties && opties.zonderUv ? 0x41 : 0x45; // UP|AT, normaal ook UV
+    const attObj = cMap(new Map([['fmt', 'none'], ['attStmt', new Map()], ['authData', authData(flags, 0, true)]]));
     return { id: b64u(credId), rawId: b64u(credId), type: 'public-key',
       response: { clientDataJSON: clientData('webauthn.create', challenge, origin),
         attestationObject: b64u(attObj), transports: ['internal'] } };
   }
-  function loginAntwoord(challenge, origin, teller) {
+  function loginAntwoord(challenge, origin, teller, opties) {
     const cd = clientData('webauthn.get', challenge, origin);
-    const authD = authData(0x05, teller == null ? 1 : teller, false);   // UP|UV
+    const authD = authData(opties && opties.zonderUv ? 0x01 : 0x05,
+      teller == null ? 1 : teller, false);   // UP, normaal ook UV
     const teTekenen = Buffer.concat([authD, crypto.createHash('sha256').update(Buffer.from(cd, 'base64url')).digest()]);
     return { id: b64u(credId), rawId: b64u(credId), type: 'public-key',
       response: { authenticatorData: b64u(authD), clientDataJSON: cd,
@@ -83,7 +85,7 @@ function maakAuthenticator(rpID) {
   return { privateKey, credId, authData, registratieAntwoord, loginAntwoord };
 }
 
-const clientData = (type, challenge, origin) =>
-  b64u(Buffer.from(JSON.stringify({ type, challenge, origin, crossOrigin: false })));
+const clientData = (type, challenge, origin, extra) =>
+  b64u(Buffer.from(JSON.stringify({ type, challenge, origin, crossOrigin: false, ...(extra || {}) })));
 
 module.exports = { maakAuthenticator, clientData, b64u, cMap };

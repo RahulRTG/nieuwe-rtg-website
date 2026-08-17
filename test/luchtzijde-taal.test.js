@@ -91,7 +91,8 @@ test('4. de moedertaal van het account: alleen actieve wereldtalen, netjes bewaa
   assert.equal(lijst.status, 200);
   assert.ok(lijst.body.talen.some(t => t.code === 'en'), 'de basistalen staan altijd aan');
   assert.equal((await api(base, '/api/member/taal/zet', { code: 'xx' }, lidA)).status, 400, 'onbekende taal geweigerd');
-  assert.equal((await api(base, '/api/member/taal/zet', { code: 'es' }, lidA)).status, 400, 'niet-actieve taal geweigerd (de Boardroom beslist)');
+  assert.equal((await api(base, '/api/member/taal/zet', { code: 'es' }, lidA)).status, 200, 'alle 114 wereldtalen staan standaard aan');
+  assert.equal((await api(base, '/api/member/taal', {}, lidA)).body.taal, 'es');
   assert.equal((await api(base, '/api/member/taal/zet', { code: 'en' }, lidA)).status, 200);
   assert.equal((await api(base, '/api/member/taal', {}, lidA)).body.taal, 'en');
 });

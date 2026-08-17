@@ -50,6 +50,7 @@ test('2. de hele app-UI in een actieve wereldtaal: /api/vertaal/ui vertaalt het 
 });
 
 test('3. een taal die de boardroom NIET aanzette valt veilig terug (tekst blijft heel)', async () => {
+  assert.equal((await api(base, '/api/boardroom/taal', { code: 'jv', aan: false }, owner)).status, 200);
   const r = await api(base, '/api/vertaal/ui', { naar: 'jv', teksten: ['wijn'] });
   assert.equal(r.status, 200);
   assert.equal(r.body.naar, 'nl', 'niet-actief: terug naar de basistaal');
@@ -67,4 +68,16 @@ test('5. elke net toegevoegde taal is aan te zetten en meteen kiesbaar in de app
   assert.equal((await api(base, '/api/boardroom/taal', { code: 'jv', aan: true }, owner)).status, 200);
   const pub = await api(base, '/api/talen', {});
   assert.ok(pub.body.talen.some(t => t.code === 'jv' && t.naam === 'Basa Jawa'), 'Javaans staat in de kiezer');
+});
+
+test('6. de vaste GitHub Pages-voordeur mag de taal-API cross-origin gebruiken', async () => {
+  const origin = 'https://rahulrtg.github.io';
+  const pre = await fetch(base + '/api/talen', { method: 'OPTIONS', headers: {
+    Origin: origin, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type'
+  } });
+  assert.equal(pre.status, 204);
+  assert.equal(pre.headers.get('access-control-allow-origin'), origin);
+  const r = await fetch(base + '/api/talen', { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('access-control-allow-origin'), origin);
 });

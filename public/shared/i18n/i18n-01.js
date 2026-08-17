@@ -13,7 +13,15 @@
      RTGi18n.t('sleutel', 'standaard') gebruiken.
    ========================================================================== */
 (function () {
+  if (window.__rtgI18nActief) return;
+  window.__rtgI18nActief = true;
   const STORE = 'rtg_lang';
+  const apiMeta = document.querySelector('meta[name="rtg-api-base"]');
+  const assetMeta = document.querySelector('meta[name="rtg-asset-base"]');
+  const API_BASIS = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
+  const ASSET_BASIS = String(assetMeta && assetMeta.getAttribute('content') || '').replace(/\/+$/, '');
+  const apiPad = pad => API_BASIS + pad;
+  const assetPad = pad => ASSET_BASIS + pad;
   const LANGS = {
     nl: { label: 'Nederlands', native: 'Nederlands' },
     en: { label: 'Engels', native: 'English' }
@@ -133,6 +141,13 @@
         el.setAttribute('placeholder', (val != null && lang !== 'nl') ? val : o.ph);
       });
 
+      // Ook tekst zonder handmatig woordenboeksleuteltje en later door JS
+      // getekende interface gaat via de centrale, gebatchte vangnetlaag.
+      // Activeer dat vangnet pas na een opgeslagen of expliciete taalkeuze:
+      // de voorgeselecteerde toestel-taal mag een Nederlandstalig scherm niet
+      // al op de achtergrond half vertalen voordat de bezoeker kiest.
+      if (window.RTGAutoVertaling) window.RTGAutoVertaling.apply(this.chosen ? lang : 'nl');
+
       this.updateSwitch();
       window.dispatchEvent(new CustomEvent('rtglang', { detail: { lang } }));
     },
@@ -166,7 +181,7 @@
       let dict = null;
       try { dict = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
       if (dict) return zet(dict);
-      fetch('/api/vertaal/ui', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      fetch(apiPad('/api/vertaal/ui'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ naar: lang, teksten: keys.map(k => en[k]) }) })
         .then(r => r.json())
         .then(d => {
@@ -219,6 +234,7 @@
       const scrim = document.createElement('div');
       scrim.id = 'rtg-lang-modal';
       scrim.className = 'rtg-lang-scrim';
+      scrim.setAttribute('data-i18n-ignore', '');
       // de matcher kent de HELE wereld (alle 114) als die binnen is; anders de
       // actieve set. Er staan geen vlagknoppen meer: je kiest door te typen of
       // te spreken, Rahul herkent je land of taal en stelt hem voor.
@@ -267,4 +283,3 @@
       zoek.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); kies(); } });
       scrim.querySelector('#rtg-lang-rahul').addEventListener('click', () => kies());
       hint.addEventListener('click', () => kies(hint.getAttribute('data-lang')));
-

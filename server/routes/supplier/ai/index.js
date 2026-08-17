@@ -4,6 +4,8 @@
    binnen. De rijks-/gemeentebalie (ambtenaar via Rahul) is een eigen laag in
    ./ambtenaar; hier de acties (kamers, deuren, klussen), de vragen (omzet,
    status, berichten) en de vrije vraag via het AI-stuur. */
+const { maakLiveTwin } = require('../../../ai-live-twin');
+
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
@@ -16,17 +18,21 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const q = String(req.body.q || '').trim().slice(0, 300);
   if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
   const ql = q.toLowerCase();
-  const A = (reply, did, extra) => {
-    const stand = require('../../../ai').beschikbaarheid(kern.anthropic);
-    return res.json(Object.assign({ reply, did: !!did,
-      aiBeschikbaar: stand.beschikbaar,
-      modus: stand.beschikbaar ? stand.modus : 'workflow',
-      verwerking: stand.verwerking,
-      kompas: stand.kompas }, extra || {}));
-  };
   const isAmbt = !!((kern.overheid && kern.overheid.magBehandelen && kern.overheid.magBehandelen(s)) ||
     (kern.gemeente && kern.gemeente.magBehandelen && kern.gemeente.magBehandelen(s)));
   const wereld = isAmbt ? 'supplier' : (req.actor && req.actor.staffId != null ? 'staff' : 'supplier');
+  const A = (reply, did, extra) => {
+    const stand = require('../../../ai').beschikbaarheid(kern.anthropic);
+    const antwoord = Object.assign({ reply, did: !!did,
+      aiBeschikbaar: stand.beschikbaar,
+      modus: stand.beschikbaar ? stand.modus : 'workflow',
+      verwerking: stand.verwerking,
+      kompas: stand.kompas }, extra || {});
+    antwoord.liveTwin = maakLiveTwin({ vraag: q, context: req.body.context, wereld,
+      actor: (req.actor && req.actor.name) || 'beheer', stand, gedaan: antwoord.did,
+      goedkeuringen: antwoord.goedkeuringen });
+    return res.json(antwoord);
+  };
   const viaStuur = (pad, body, klaar) =>
     require('./stuur')(kern, req, wereld, A, pad, body, klaar);
 

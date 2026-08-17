@@ -24,7 +24,7 @@
      bestaande werkbladstrook en maakt nooit een zwevende balk. */
   if (typeof document !== 'undefined' && !root.__rahulTabStandaard) {
     var rahulTab = document.createElement('script');
-    rahulTab.src = '/shared/rahul-tab.js?v=command5'; rahulTab.defer = true;
+    rahulTab.src = '/shared/rahul-tab.js?v=command6'; rahulTab.defer = true;
     document.head.appendChild(rahulTab);
   }
 

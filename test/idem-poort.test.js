@@ -1,4 +1,4 @@
-/* De idem-poort: dezelfde opdracht twee keer sturen mag nooit twee keer werken.
+/* De idem-poort: hetzelfde verzoek twee keer sturen mag nooit twee keer werken.
 
    Deze toets draait op de middleware zelf, met een nagebootst verzoek/antwoord.
    Dat is met opzet: de poort is een regel over herhalingen en niet over een
@@ -6,10 +6,17 @@
    echte server bijna niet kunt afdwingen (twee gelijktijdige verzoeken die
    elkaar in de vlucht tegenkomen, en het verlopen van een sleutel).
 
-   Wat hier bewust WEL wordt getoetst en makkelijk vergeten wordt: dat een
-   MISLUKT antwoord niet bewaard wordt. Dat is de regel waarmee deze laag staat
-   of valt -- zou hij een fout bewaren, dan krijgt de retry waar idem-sleutels
-   voor bestaan een oude fout terug en probeert het nooit meer echt. */
+   Twee dingen worden hier bewust vastgelegd omdat ze makkelijk verloren gaan:
+
+   1. Een MISLUKT antwoord wordt niet bewaard. Dat is de regel waarmee deze laag
+      staat of valt -- zou hij een fout bewaren, dan krijgt de retry waar
+      idem-sleutels juist voor bestaan een oude fout terug en probeert het nooit
+      meer echt.
+
+   2. `idem` in de BODY wordt met rust gelaten. Dat veld is van de applicatie:
+      routes als /api/pakket/koop en /api/wbw/verreken gebruiken het zelf en
+      geven bij een herhaling met opzet een ander antwoord. Zie de kop van
+      server/lib/idem-poort.js. */
 'use strict';
 
 const test = require('node:test');
@@ -18,9 +25,11 @@ const { EventEmitter } = require('events');
 
 const maakIdemPoort = require('../server/lib/idem-poort');
 
-/* Een verzoek/antwoord-paar dat net genoeg van Express nabootst. */
-function nepReq({ methode = 'POST', pad = '/api/concern/nieuw', body = {}, auth = 'Bearer lid-a', kop = {} } = {}) {
-  const koppen = Object.assign({ authorization: auth }, kop);
+/* Een verzoek/antwoord-paar dat net genoeg van Express nabootst. Elk verzoek
+   krijgt zijn EIGEN body-object, want zo werkt express.json ook. */
+function nepReq({ methode = 'POST', pad = '/api/concern/nieuw', body = {}, auth = 'Bearer lid-a', sleutel = null } = {}) {
+  const koppen = { authorization: auth };
+  if (sleutel) koppen['idempotency-key'] = sleutel;
   return {
     method: methode,
     path: pad,
@@ -69,14 +78,60 @@ test('zonder sleutel verandert er niets: elk verzoek doet gewoon het werk', asyn
   assert.ok(!b.res.verzonden.herhaald, 'zonder sleutel is er niets om te herhalen');
 });
 
-test('dezelfde sleutel doet het werk EEN keer en herhaalt daarna het antwoord', async () => {
+/* ---------------------------------------------------------------------------
+   DE GRENS: DE BODY IS NIET VAN DEZE LAAG.
+
+   Deze twee zijn niet verzonnen. De volledige suite ving met
+   test/synergie.test.js en test/wbw.test.js dat een poort die `idem` uit de
+   body pakt het eigen gedrag van die routes sloopt: /api/pakket/koop antwoordt
+   bij een herhaling met opzet {alBetaald:true} in plaats van {betaald:...}, en
+   /api/wbw/verreken met een 409. De poort legde daar het EERSTE antwoord
+   overheen en maakte van "al betaald" weer "zojuist betaald".
+   ------------------------------------------------------------------------- */
+
+test('idem in de BODY laat de poort met rust -- dat veld is van de route', async () => {
+  const poort = maakIdemPoort();
+  let keer = 0;
+  const route = (req, res) => {
+    keer++;
+    if (keer === 1) return res.status(200).json({ ok: true, betaald: 25000 });
+    res.status(200).json({ ok: true, alBetaald: true });
+  };
+  const lijf = () => ({ id: 'deal-1', idem: 'syn-koop-1' });
+
+  const a = await doe(poort, nepReq({ body: lijf() }), route);
+  const b = await doe(poort, nepReq({ body: lijf() }), route);
+
+  assert.equal(a.res.verzonden.betaald, 25000);
+  assert.equal(b.res.verzonden.alBetaald, true, 'de route mag zijn eigen tweede antwoord geven');
+  assert.ok(!b.res.verzonden.herhaald, 'de poort hoort hier helemaal niet in te grijpen');
+});
+
+test('ook idempotentieSleutel in de body blijft van de route', async () => {
+  const poort = maakIdemPoort();
+  let keer = 0;
+  const route = (req, res) => {
+    keer++;
+    if (keer === 1) return res.status(200).json({ ok: true, verrekend: 5000 });
+    res.status(409).json({ error: 'er is geen schuld meer' });
+  };
+  const lijf = () => ({ idempotentieSleutel: 'wbw-1' });
+
+  await doe(poort, nepReq({ body: lijf() }), route);
+  const b = await doe(poort, nepReq({ body: lijf() }), route);
+
+  assert.equal(b.res.statusCode, 409, 'de 409 van de route mag niet door een bewaarde 200 worden vervangen');
+});
+
+/* ------------------------- de header, wel van ons ------------------------ */
+
+test('dezelfde header-sleutel doet het werk EEN keer en herhaalt daarna', async () => {
   const poort = maakIdemPoort();
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: 'concern-' + keer }); };
-  const lijf = { naam: 'RTG', idem: 'sleutel-1' };
 
-  const a = await doe(poort, nepReq({ body: lijf }), route);
-  const b = await doe(poort, nepReq({ body: lijf }), route);
+  const a = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  const b = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
 
   assert.equal(keer, 1, 'de herhaling mag de route NIET opnieuw draaien');
   assert.equal(a.res.verzonden.id, 'concern-1');
@@ -85,26 +140,13 @@ test('dezelfde sleutel doet het werk EEN keer en herhaalt daarna het antwoord', 
   assert.ok(!a.res.verzonden.herhaald, 'het eerste antwoord is geen herhaling');
 });
 
-test('de Idempotency-Key header werkt net zo goed als de body', async () => {
-  const poort = maakIdemPoort();
-  let keer = 0;
-  const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: keer }); };
-  const kop = { 'idempotency-key': 'via-de-header' };
-
-  await doe(poort, nepReq({ body: { naam: 'RTG' }, kop }), route);
-  const b = await doe(poort, nepReq({ body: { naam: 'RTG' }, kop }), route);
-
-  assert.equal(keer, 1);
-  assert.equal(b.res.verzonden.herhaald, true);
-});
-
 test('een verse sleutel doet het werk WEL opnieuw -- anders is het geen idempotentie maar een slot', async () => {
   const poort = maakIdemPoort();
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: 'concern-' + keer }); };
 
-  await doe(poort, nepReq({ body: { naam: 'RTG', idem: 'k1' } }), route);
-  const c = await doe(poort, nepReq({ body: { naam: 'RTG', idem: 'k2' } }), route);
+  await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  const c = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k2' }), route);
 
   assert.equal(keer, 2, 'een NIEUWE opdracht met een verse sleutel hoort gewoon te werken');
   assert.equal(c.res.verzonden.id, 'concern-2');
@@ -114,8 +156,8 @@ test('dezelfde sleutel met een ANDER verzoek is een 409 en geen stille herhaling
   const poort = maakIdemPoort();
   const route = (req, res) => res.status(200).json({ ok: true, naam: req.body.naam });
 
-  await doe(poort, nepReq({ body: { naam: 'RTG', idem: 'k1' } }), route);
-  const b = await doe(poort, nepReq({ body: { naam: 'IETS ANDERS', idem: 'k1' } }), route);
+  await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  const b = await doe(poort, nepReq({ body: { naam: 'IETS ANDERS' }, sleutel: 'k1' }), route);
 
   assert.equal(b.res.statusCode, 409);
   assert.match(b.res.verzonden.error, /al gebruikt voor een ander verzoek/);
@@ -126,8 +168,8 @@ test('vrije tekst is geen ander verzoek: een andere notitie mag geen 409 geven',
   const poort = maakIdemPoort();
   const route = (req, res) => res.status(200).json({ ok: true, id: 1 });
 
-  await doe(poort, nepReq({ body: { naam: 'RTG', notitie: 'eerste poging', idem: 'k1' } }), route);
-  const b = await doe(poort, nepReq({ body: { naam: 'RTG', notitie: 'tweede poging', idem: 'k1' } }), route);
+  await doe(poort, nepReq({ body: { naam: 'RTG', notitie: 'eerste poging' }, sleutel: 'k1' }), route);
+  const b = await doe(poort, nepReq({ body: { naam: 'RTG', notitie: 'tweede poging' }, sleutel: 'k1' }), route);
 
   assert.equal(b.res.statusCode, 200);
   assert.equal(b.res.verzonden.herhaald, true);
@@ -141,10 +183,9 @@ test('een MISLUKT antwoord wordt niet bewaard: de retry mag het echt opnieuw doe
     if (keer === 1) return res.status(500).json({ error: 'even niet' });
     res.status(200).json({ ok: true, id: 'gelukt-bij-poging-' + keer });
   };
-  const lijf = { naam: 'RTG', idem: 'k1' };
 
-  const a = await doe(poort, nepReq({ body: lijf }), route);
-  const b = await doe(poort, nepReq({ body: lijf }), route);
+  const a = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  const b = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
 
   assert.equal(a.res.statusCode, 500);
   assert.equal(keer, 2, 'na een mislukking hoort de retry de route WEL te bereiken');
@@ -159,10 +200,9 @@ test('een 200 met ok:false telt als mislukking -- zelfde regel als de geldlaag',
     if (keer === 1) return res.status(200).json({ ok: false, reden: 'saldo ontoereikend' });
     res.status(200).json({ ok: true, id: 2 });
   };
-  const lijf = { bedrag: 5, idem: 'k1' };
 
-  await doe(poort, nepReq({ body: lijf }), route);
-  await doe(poort, nepReq({ body: lijf }), route);
+  await doe(poort, nepReq({ body: { bedrag: 5 }, sleutel: 'k1' }), route);
+  await doe(poort, nepReq({ body: { bedrag: 5 }, sleutel: 'k1' }), route);
 
   assert.equal(keer, 2, 'ok:false in een 200 mag niet bewaard worden');
 });
@@ -177,10 +217,9 @@ test('twee gelijktijdige dubbeltikken: de tweede wacht en doet het werk niet nog
     await traag;                                  // echte I/O: hier past een tweede verzoek doorheen
     res.status(200).json({ ok: true, id: 'concern-' + keer });
   };
-  const lijf = { naam: 'RTG', idem: 'k1' };
 
-  const a = doe(poort, nepReq({ body: lijf }), route);
-  const b = doe(poort, nepReq({ body: lijf }), route);
+  const a = doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  const b = doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
   laatDoor();
   const [ra, rb] = await Promise.all([a, b]);
 
@@ -194,10 +233,9 @@ test('de sleutel van iemand anders geeft NOOIT jouw antwoord', async () => {
   const poort = maakIdemPoort();
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, van: req.get('authorization') }); };
-  const lijf = { naam: 'RTG', idem: 'geraden-sleutel' };
 
-  const a = await doe(poort, nepReq({ body: lijf, auth: 'Bearer lid-a' }), route);
-  const b = await doe(poort, nepReq({ body: lijf, auth: 'Bearer lid-b' }), route);
+  const a = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'geraden', auth: 'Bearer lid-a' }), route);
+  const b = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'geraden', auth: 'Bearer lid-b' }), route);
 
   assert.equal(keer, 2, 'dezelfde sleutel van een ander is een ander verzoek');
   assert.equal(a.res.verzonden.van, 'Bearer lid-a');
@@ -209,22 +247,21 @@ test('dezelfde sleutel op een ANDER pad is een ander verzoek', async () => {
   const poort = maakIdemPoort();
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, pad: req.path }); };
-  const lijf = { idem: 'k1' };
 
-  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf }), route);
-  const b = await doe(poort, nepReq({ pad: '/api/agenda/toevoegen', body: lijf }), route);
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', sleutel: 'k1' }), route);
+  const b = await doe(poort, nepReq({ pad: '/api/agenda/toevoegen', sleutel: 'k1' }), route);
 
   assert.equal(keer, 2);
   assert.equal(b.res.verzonden.pad, '/api/agenda/toevoegen');
 });
 
-test('GET blijft ongemoeid, ook met een sleutel erin', async () => {
+test('GET blijft ongemoeid, ook met een sleutel erbij', async () => {
   const poort = maakIdemPoort();
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, keer }); };
 
-  await doe(poort, nepReq({ methode: 'GET', body: { idem: 'k1' } }), route);
-  await doe(poort, nepReq({ methode: 'GET', body: { idem: 'k1' } }), route);
+  await doe(poort, nepReq({ methode: 'GET', sleutel: 'k1' }), route);
+  await doe(poort, nepReq({ methode: 'GET', sleutel: 'k1' }), route);
 
   assert.equal(keer, 2, 'lezen is al idempotent en hoort niet gecachet te worden');
 });
@@ -234,15 +271,14 @@ test('een verlopen sleutel doet het werk opnieuw', async () => {
   const poort = maakIdemPoort({ nu: () => t, ttl: 60000 });
   let keer = 0;
   const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: keer }); };
-  const lijf = { naam: 'RTG', idem: 'k1' };
 
-  await doe(poort, nepReq({ body: lijf }), route);
+  await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
   t += 59000;
-  await doe(poort, nepReq({ body: lijf }), route);
+  await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
   assert.equal(keer, 1, 'binnen de termijn blijft het een herhaling');
 
   t += 2000; // nu voorbij de ttl
-  const c = await doe(poort, nepReq({ body: lijf }), route);
+  const c = await doe(poort, nepReq({ body: { naam: 'RTG' }, sleutel: 'k1' }), route);
   assert.equal(keer, 2, 'na het verlopen mag het werk weer echt gebeuren');
   assert.equal(c.res.verzonden.id, 2);
 });
@@ -252,20 +288,19 @@ test('de ring loopt niet vol: oude sleutels vallen eruit', async () => {
   const route = (req, res) => res.status(200).json({ ok: true });
 
   for (let i = 0; i < 40; i++) {
-    await doe(poort, nepReq({ body: { i, idem: 'k' + i } }), route);
+    await doe(poort, nepReq({ body: { i }, sleutel: 'k' + i }), route);
   }
   assert.ok(poort.omvang() <= 5, 'de ring hoort begrensd te zijn, kreeg ' + poort.omvang());
 });
 
 test('een te lange sleutel telt niet als sleutel', () => {
-  const req = nepReq({ body: { idem: 'x'.repeat(5000) } });
-  assert.equal(maakIdemPoort._sleutelVan(req), null);
+  assert.equal(maakIdemPoort._sleutelVan(nepReq({ sleutel: 'x'.repeat(5000) })), null);
 });
 
-test('de afdruk negeert de sleutel zelf, maar niet de inhoud', () => {
+test('de afdruk negeert de sleutelvelden, maar niet de inhoud', () => {
   const a = maakIdemPoort._afdrukVan({ naam: 'RTG', idem: 'k1' });
   const b = maakIdemPoort._afdrukVan({ naam: 'RTG', idem: 'k2' });
   const c = maakIdemPoort._afdrukVan({ naam: 'ANDERS', idem: 'k1' });
-  assert.equal(a, b, 'een andere sleutel is geen ander verzoek');
+  assert.equal(a, b, 'een ander sleutelveld is geen ander verzoek');
   assert.notEqual(a, c, 'een andere naam is WEL een ander verzoek');
 });

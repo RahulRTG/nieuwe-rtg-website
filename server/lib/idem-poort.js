@@ -14,10 +14,38 @@
    doen. De regel hangt daarom aan EEN plek, net als de progressiegrens in
    server/kern/spellen/grens.js. Wie route 95 toevoegt, krijgt hem gratis.
 
-   WAAROM HIJ NIETS DOET ZONDER SLEUTEL. Deze poort verandert het gedrag alleen
-   voor een verzoek dat ZELF om idempotentie vraagt, via de `Idempotency-Key`
-   header of `idem`/`idempotentieSleutel` in de body. Geen sleutel, geen
-   afwijking -- dus geen enkele bestaande client of toets merkt er iets van.
+   WAAROM ALLEEN DE HEADER, EN NIET `idem` IN DE BODY. Dit is de belangrijkste
+   grens van deze laag, en hij is duur geleerd.
+
+   De eerste opzet las ook `idem`/`idempotentieSleutel` uit de body, want dat is
+   wat de idemproef stuurt. Dat brak twee toetsen die er al stonden, en ze hadden
+   gelijk: sommige routes gebruiken dat veld ZELF en geven bij een herhaling met
+   opzet een ANDER antwoord dan de eerste keer.
+
+     /api/pakket/koop     eerste keer {betaald: 25000}, daarna {alBetaald: true}
+     /api/wbw/verreken    eerste keer 200, daarna 409 "er is geen schuld meer"
+
+   Die tweede antwoorden zijn de bedoeling: ze vertellen de gebruiker dat het al
+   gebeurd is. Een generieke poort die er het eerste antwoord overheen legt,
+   maakt van "al betaald" weer "zojuist betaald" -- erger dan het probleem dat
+   hij oplost.
+
+   Er is een poging gedaan om dat te onderscheiden door waar te nemen of de route
+   het veld zelf leest (een getter op het body-veld). Die werkt niet: tussen deze
+   poort en de route lopen lagen die de hele body nalopen, en dan slaat de
+   waarneming altijd aan. Op HTTP-niveau is "de route bezit dit veld" niet te
+   scheiden van "een tussenlaag liep de body na".
+
+   Dus claimt deze laag dat veld niet. `idem` in de body is van de applicatie;
+   de `Idempotency-Key` HEADER is van het HTTP-niveau, is de gangbare standaard,
+   en wordt vandaag door geen enkele route gelezen. Geen header, geen afwijking
+   -- dus geen bestaande client of toets merkt hier iets van.
+
+   WAT DAT BETEKENT VOOR DE 94. Die routes worden hier NIET vanzelf beschermd:
+   scripts/lib/idemproef.js stuurt zijn sleutel in de body, en dat blijft het
+   domein van de kern. Deze poort geeft de clients een correcte, standaard manier
+   om een retry veilig te maken; de 94 routes echt idempotent maken blijft werk
+   in de kern, per route, met de duurzame laag van lib/idem.js eronder.
 
    DE VERHOUDING TOT server/lib/idem.js. Dat is de GELDLAAG: duurzaam op schijf,
    in een commit met de boeking zelf, en die blijft de baas over geld. Deze poort
@@ -42,6 +70,31 @@
    antwoord opleveren. De opslagsleutel is daarom een hash over (wie, methode,
    pad, sleutel) en niet over de sleutel alleen. Zonder die binding kon een
    geraden `idemproef-apiconcernnieuw-1` het antwoord van een ander lid teruggeven.
+
+   EN DIT IS DE REGEL DIE DEZE POORT BIJNA VERKEERD MAAKTE. `idem` in de body is
+   niet van deze laag -- sommige routes gebruiken dat veld ZELF, en geven bij een
+   herhaling met opzet een ANDER antwoord dan de eerste keer:
+
+     /api/pakket/koop     eerste keer {betaald: 25000}, daarna {alBetaald: true}
+     /api/wbw/verreken    eerste keer 200, daarna 409 "er is geen schuld meer"
+
+   Die twee antwoorden zijn geen fout maar de bedoeling: ze vertellen de gebruiker
+   dat het al gebeurd is. Een generieke poort die er het EERSTE antwoord overheen
+   legt, maakt van "al betaald" weer "zojuist betaald" -- en dat is erger dan het
+   probleem dat hij oplost. De volledige suite ving dit met twee toetsen; ze
+   stonden er al, en ze hadden gelijk.
+
+   Daarom stapt deze poort opzij zodra de route het veld zelf aanraakt. Dat is
+   niet aan een lijst op te hangen (die veroudert), dus wordt het WAARGENOMEN:
+   het idem-veld krijgt een getter, en leest de route hem, dan bewaart de poort
+   niets. Bij de volgende oproep valt er dus ook niets te herhalen en handelt de
+   route het af zoals hij altijd deed.
+
+   Die waarneming faalt bewust naar de VEILIGE kant. Ziet hij een leesactie die
+   geen eigenaarschap betekent (`{...req.body}` raakt het veld ook aan), dan doet
+   de poort niets -- precies de oude situatie. Een gemiste leesactie zou wel erg
+   zijn, en die kan niet: elke manier om aan de waarde te komen loopt langs de
+   getter, ook via een kopie of via JSON.stringify.
    ========================================================================== */
 'use strict';
 
@@ -79,12 +132,10 @@ function wieVan(req) {
   return 'anon:' + (req.ip || '');
 }
 
+/* Alleen de header. Zie de kop voor waarom `idem` uit de body hier bewust NIET
+   meetelt: dat veld is van de applicatielaag. */
 function sleutelVan(req) {
-  const kop = (typeof req.get === 'function' && req.get('idempotency-key')) || '';
-  const lijf = req.body && typeof req.body === 'object'
-    ? (req.body.idem || req.body.idempotentieSleutel)
-    : null;
-  const ruw = kop || lijf;
+  const ruw = (typeof req.get === 'function' && req.get('idempotency-key')) || '';
   if (typeof ruw !== 'string' || !ruw) return null;
   const s = ruw.trim();
   if (!s || s.length > MAX_SLEUTEL) return null;

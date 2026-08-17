@@ -7,9 +7,14 @@
    server/opzet/lijfpoort.js, dan slagen de losse toetsen nog steeds en doet de
    server niets.
 
-   De proef is dezelfde die scripts/lib/idemproef.js over alle routes doet:
-   A met sleutel K1, B met K1 opnieuw, C met een verse K2. B mag niets nieuws
-   doen; C moet WEL werken -- anders is het geen idempotentie maar een slot.
+   De proef heeft dezelfde vorm als scripts/lib/idemproef.js: A met sleutel K1,
+   B met K1 opnieuw, C met een verse K2. B mag niets nieuws doen; C moet WEL
+   werken -- anders is het geen idempotentie maar een slot.
+
+   Het verschil met die proef is de PLAATS van de sleutel: hier de
+   `Idempotency-Key` header, daar het body-veld `idem`. Dat is geen detail maar
+   de grens van deze laag: het body-veld is van de applicatie en wordt door
+   sommige routes zelf gebruikt. Zie de kop van server/lib/idem-poort.js.
 
    Draai los: node --experimental-sqlite --test test/idem-poort-echt.test.js */
 'use strict';
@@ -21,9 +26,10 @@ const fs = require('fs'); const os = require('os'); const path = require('path')
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-idem-')); }
 
-async function api(base, pad, body, token) {
+async function api(base, pad, body, token, sleutel) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
+  if (sleutel) h['Idempotency-Key'] = sleutel;
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   let lijf = null;
   try { lijf = await r.json(); } catch (e) { lijf = null; }
@@ -42,15 +48,15 @@ test('een herhaald verzoek met dezelfde sleutel maakt niet twee concerns', async
     const tok = await lidToken(base);
     assert.ok(tok, 'ingelogd');
 
-    const lijf = { naam: 'Proefconcern', idem: 'idemtoets-concern-1' };
-    const a = await api(base, '/api/concern/nieuw', lijf, tok);
+    const lijf = { naam: 'Proefconcern' };
+    const a = await api(base, '/api/concern/nieuw', lijf, tok, 'idemtoets-concern-1');
     /* HARD, en niet in een `if`. Zou deze route om welke reden dan ook een fout
        geven, dan slaagt de rest hieronder hol -- twee mislukkingen zijn immers
        ook aan elkaar gelijk. Dan toetst dit bestand niets en zegt het toch ja. */
     assert.ok(a.status >= 200 && a.status < 300, 'de eerste oproep moet echt slagen, kreeg ' + a.status + ': ' + JSON.stringify(a.body));
     assert.notEqual(a.body && a.body.ok, false, 'de eerste oproep moet echt werk doen');
 
-    const b = await api(base, '/api/concern/nieuw', lijf, tok);
+    const b = await api(base, '/api/concern/nieuw', lijf, tok, 'idemtoets-concern-1');
     assert.equal(a.status, b.status, 'de herhaling geeft dezelfde status');
     assert.equal(b.body.herhaald, true, 'de herhaling draagt het merk van de idem-laag');
     assert.deepEqual(
@@ -60,7 +66,7 @@ test('een herhaald verzoek met dezelfde sleutel maakt niet twee concerns', async
     );
 
     // C: een VERSE sleutel moet wel gewoon werken
-    const c = await api(base, '/api/concern/nieuw', { naam: 'Proefconcern', idem: 'idemtoets-concern-2' }, tok);
+    const c = await api(base, '/api/concern/nieuw', { naam: 'Proefconcern' }, tok, 'idemtoets-concern-2');
     assert.ok(c.status >= 200 && c.status < 300, 'een verse sleutel hoort gewoon te werken');
     assert.ok(!c.body.herhaald, 'een verse sleutel is geen herhaling');
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
@@ -83,9 +89,9 @@ test('dezelfde sleutel met een ander verzoek geeft 409 en nooit stil het oude an
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const tok = await lidToken(base);
-    const a = await api(base, '/api/concern/nieuw', { naam: 'Eerste', idem: 'idemtoets-bots' }, tok);
+    const a = await api(base, '/api/concern/nieuw', { naam: 'Eerste' }, tok, 'idemtoets-bots');
     assert.ok(a.status >= 200 && a.status < 300, 'de eerste oproep moet echt slagen, kreeg ' + a.status);
-    const b = await api(base, '/api/concern/nieuw', { naam: 'Heel iets anders', idem: 'idemtoets-bots' }, tok);
+    const b = await api(base, '/api/concern/nieuw', { naam: 'Heel iets anders' }, tok, 'idemtoets-bots');
     assert.equal(b.status, 409, 'een andere opdracht op dezelfde sleutel botst');
     assert.match(String(b.body.error), /al gebruikt voor een ander verzoek/);
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }

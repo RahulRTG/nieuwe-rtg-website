@@ -1,5 +1,5 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten: uitgelogd en ingelogd. De uitgelogde ronde is volledig schoon en is een harde poort op nul. De ingelogde ronde is nieuw en bracht 25 contrastfouten aan het licht die nooit eerder gemeten zijn; die staan hier als bovengrens. Dit is GEEN uitzonderingslijst en geen advies: het getal mag alleen omlaag. Komt er een fout bij, dan zakt de scan. Verdwijnt er een, dan meldt hij dat de grens strakker kan -- zelfde ratel als NORM.json. Structurele fouten (alt, label, naam, lang, titel) zijn in BEIDE staten hard nul.",
+  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten: uitgelogd en ingelogd. Sinds 17 augustus 2026 zijn beide staten hard nul, op structuur EN op contrast. Dit bestand is daarmee geen uitzonderingslijst meer maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
   "gemeten": "2026-08-17",
   "uitgelogd": {
     "structureel": 0,
@@ -7,23 +7,23 @@
   },
   "ingelogd": {
     "structureel": 0,
-    "contrast": 25
+    "contrast": 0
   },
-  "bekendeContrastfouten": [
-    "/apps/wereld.html  .kop .wie b        RTG          #C23A5E op #151312",
-    "/apps/mall.html    .tref .wie.part    RTG          #C23A5E op #151312",
-    "/apps/magnaat.html span.wie.part      RTG          #C23A5E op #151312",
-    "/apps/wereld.html  span.ni            01/03/04     #C23A5E op #0C0C0B",
-    "/apps/wereld.html  b                  RTG Pass     #C23A5E op #0C0C0B",
-    "/apps/stad.html    div.w              42.3 vrij    #C23A5E op #1B1817",
-    "/apps/bestellen.html button           Alles        #0C0C0B OP #C23A5E (omgekeerd: 3,65:1)",
-    "/apps/magnaat.html button.rtg-rahul-tab RahulKOMPAS grijs op bijna-wit",
-    "/apps/mall.html    small              KOMPAS       grijs op #0C0C0B"
-  ],
-  "patroon": "Vrijwel alles is hetzelfde: --burgundy-on-dark (#C23A5E) als KLEINE tekst op een donkere grond haalt 3,78:1. De kleurregel in CLAUDE.md zegt sinds deze ronde dat die kleur voor grote tekst is en dat kleine tekst op zwart wit hoort te zijn. Deze lijst is dus die regel toepassen op negen plekken, en dat is mechanisch werk -- geen ontwerpbesluit.",
-  "LET OP: het getal is niet stabiel": "Twee opeenvolgende ronden op dezelfde boom gaven 25 en 24. De ingelogde ronde is dus tijdsafhankelijk: sommige bevindingen hangen ervan af of een animatie of async inhoud binnen de wachttijd van 600ms is gerend. Daarmee is een ratel op een EXACT getal het verkeerde instrument -- een ronde die per ongeluk 26 meet zou rood worden zonder dat er iets stuk is. Deze grens staat er daarom als tijdelijke bovengrens, niet als norm, en hij verdwijnt zodra de negen plekken hieronder gerepareerd zijn (dan is de ingelogde ronde ook nul en kan de poort hard). Wie hem strakker wil zetten moet EERST de wachttijd deterministisch maken, niet het getal verlagen.",
-  "harde poorten (die zijn wel stabiel)": [
+  "hoe het nul werd": {
+    "stand bij het openen van de ingelogde ronde": "0 structureel, 25 contrast -- negen unieke plekken, want de scan noemt hoogstens drie voorbeelden per soort",
+    "het patroon": "Vrijwel alles was hetzelfde: het accent (#C23A5E, --burgundy-on-dark) als KLEINE tekst op een donkere grond, 3,78:1 waar WCAG AA 4,5 vraagt onder 24px. Dat accent is voor grote tekst; kleine tekst op zwart hoort wit te zijn. Die regel stond al in CLAUDE.md, hij was alleen op negen plekken niet toegepast.",
+    "wat er is veranderd": [
+      "wereld.html  .kop .wie b -> --rtg-txt (het accent als pasnaam-label, 11,8px)",
+      "wereld.html  .werelden button[aria-current] -> --rtg-acc-inkt (bijna-zwart OP het accent, dezelfde fout omgekeerd; de inkt volgt nu de dagkleur mee)",
+      "mall.html    .tref .wie.part -> wit, rand blijft bordeaux (partnermerker, 9,9px)",
+      "magnaat.html een blok van veertien accent-als-tekst-rollen -> wit; dit scherm zet --gold in zijn RTG-thema op #C23A5E, dus het raakte exit, eyebrow, ni, btn.subtle, mode .tag, cap-code, country, verified, lane, dt, guard i, task-seal, dienst-effect en d-status tegelijk",
+      "shared/rahul-tab.js  de inkt van de Rahul-tab wordt nu GEMETEN in plaats van vastgezet: style-base.js had twee vaste grijzen die voor een donkere balk zijn gekozen (#99918a, #746d67), en die haalden 2,85:1 op een lichte balk en 3,78:1 op een donkere. Er bestaat geen middengrijs dat allebei haalt, dus leest de tab de helderheid van zijn eigen balk en kiest #F2EEE8/#8A8680 (donker) of #3A3733/#5A5651 (licht)."
+    ]
+  },
+  "waarom hier geen bovengrens meer staat": "Tot vandaag stond hier 25 als tijdelijke bovengrens, met de reden erbij: op dag een hard afkeuren zou de poort rood zetten tot iemand negen CSS-plekken had nagelopen, en dan wordt zo'n poort uitgezet. Die negen zijn nagelopen, dus vervalt de constructie. Een bovengrens die niet meer nodig is, hoort weg -- anders leest hij als ruimte die er niet is.",
+  "de instabiliteit die hier stond, en wat ervan over is": "Twee ronden op dezelfde boom gaven eerder 25 en 24: de ingelogde staat is tijdsafhankelijk, want sommige bevindingen hangen ervan af of async inhoud binnen de wachttijd van 600ms is gerenderd. Dat ging over WELKE van de negen bekende plekken op tijd in beeld stond, niet over verzonnen bevindingen. Nu de negen weg zijn, is er niets meer om te flakkeren. Duikt er ooit toch een enkele bevinding op die de volgende ronde weer verdwijnt, dan is het antwoord de wachttijd deterministisch maken -- niet dit getal verhogen.",
+  "harde poorten": [
     "structureel = 0 in BEIDE staten",
-    "contrast uitgelogd = 0"
+    "contrast = 0 in BEIDE staten"
   ]
 }

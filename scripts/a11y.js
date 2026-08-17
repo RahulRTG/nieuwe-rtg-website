@@ -183,15 +183,21 @@ function startEchteServer() {
   server.stop();
 
   for (const r of perRonde) console.log(`[a11y] ${r.naam.padEnd(10)} ${r.struct} structureel · ${r.contr} contrast`);
-  /* DE INGELOGDE RONDE IS NIEUW, EN BRACHT 25 CONTRASTFOUTEN MEE die nooit
-     gemeten zijn. Die op dag een hard afkeuren zou betekenen: de poort staat
-     rood tot iemand negen CSS-plekken heeft nagelopen, en dan wordt hij uitgezet.
-     Die op nul zetten zou liegen.
+  /* DE RATEL IS OP NUL AANGEKOMEN, EN DAT IS DE HELE BEDOELING GEWEEST.
 
-     Dus een ratel op EEN getal, zichtbaar in A11Y-INGELOGD.json: het mag alleen
-     omlaag. Komt er een fout bij, dan zakt de scan. Verdwijnt er een, dan meldt
-     hij dat de grens strakker kan. Structureel blijft in beide staten hard nul,
-     en de uitgelogde ronde ook -- daar is geen ruimte, want die is schoon. */
+     De ingelogde ronde bracht 25 contrastfouten mee die nooit eerder gemeten
+     waren -- negen unieke plekken, vrijwel allemaal het accent als kleine tekst
+     op een donkere grond. Die op dag een hard afkeuren zou betekenen: de poort
+     staat rood tot iemand negen CSS-plekken heeft nagelopen, en dan wordt hij
+     uitgezet. Die op nul zetten zou liegen. Dus stond er een bovengrens die
+     alleen omlaag mocht.
+
+     Op 17 augustus 2026 zijn die negen plekken gerepareerd en meet de ingelogde
+     ronde nul. De grens in A11Y-INGELOGD.json staat daarmee op nul en de poort
+     is hard in BEIDE staten, op structuur en op contrast. De constructie
+     hieronder blijft staan zoals hij is: hij leest het getal uit het register,
+     dus als iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven,
+     met een reden, en niet hier in de code wegwerken. */
   const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
   const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
   const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };

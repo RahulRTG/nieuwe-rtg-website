@@ -317,6 +317,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 |---|---|
 | 51 codeafspraken, binair | `scripts/check.js` |
 | de INVOER van elke bronkeuring: commentaar eruit, maar geen code opeten | `scripts/lib/bron.js` + `test/bron.test.js` |
+| toegankelijkheid van elk scherm, uitgelogd EN ingelogd, hard op nul | `scripts/a11y.js` + `A11Y-INGELOGD.json` |
 | elk media-element een besluit over ondertiteling, met een reden | `scripts/check.js` regel 49 |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |

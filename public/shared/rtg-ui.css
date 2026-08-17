@@ -77,6 +77,9 @@
   /* het accent ademt mee met de levende dagkleur (shared/dagkleur.css); staat
      die niet aan, dan is het gewoon het bordeaux van het huis */
   --rtg-acc:var(--dag-kleur, #C23A5E);
+  /* De inkt die OP het accent leesbaar is; zie shared/dagkleur.css. Zonder
+     dagkleur valt hij terug op wit, dat op de bordeaux-terugval 5,17:1 haalt. */
+  --rtg-acc-inkt:var(--dag-inkt, #FFFFFF);
   --rtg-rond:18px;      /* kaarten */
   --rtg-rond-klein:12px; /* velden en meldingen */
 }
@@ -270,7 +273,7 @@ body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud)
 
    Hier hoort hij, in de kit, op dezelfde hoogte als de regel die hem overschreef,
    met het accent uit het palet in plaats van een kleur per pagina. */
-body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:#fff;font-weight:700;}
+body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);font-weight:700;}
 body.rtg-stijl .knop.prim:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}

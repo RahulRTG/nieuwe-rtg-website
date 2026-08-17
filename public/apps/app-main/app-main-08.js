@@ -68,6 +68,7 @@
     const g = onbEl('onbGate'); if (g) g.hidden = true;
     onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
+    naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
   }
   async function onbInvoer(tekst){

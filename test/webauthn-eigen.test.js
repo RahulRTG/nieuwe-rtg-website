@@ -17,6 +17,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const wa = require('../server/webauthn');
+const { maakCeremonieOpslag } = require('../server/kern/webauthn');
 const { maakAuthenticator, clientData, b64u, cMap } = require('./webauthn-authenticator');
 
 const RP = 'localhost', ORIGIN = 'https://localhost';
@@ -53,6 +54,15 @@ test('registratie: verkeerde origin, verkeerde challenge en verkeerde rpID falen
   assert.throws(() => wa.verifyRegistrationResponse({ response: resp, expectedChallenge: opt.challenge, expectedOrigin: 'https://kwaad.nl', expectedRPID: RP }), /origin/);
   assert.throws(() => wa.verifyRegistrationResponse({ response: resp, expectedChallenge: 'ander', expectedOrigin: ORIGIN, expectedRPID: RP }), /challenge/);
   assert.throws(() => wa.verifyRegistrationResponse({ response: resp, expectedChallenge: opt.challenge, expectedOrigin: ORIGIN, expectedRPID: 'ander.nl' }), /rpIdHash/);
+  assert.throws(() => wa.verifyRegistrationResponse({ response: { ...resp, rawId: 'ander' },
+    expectedChallenge: opt.challenge, expectedOrigin: ORIGIN, expectedRPID: RP }), /rawId/,
+  'de buitenste credentialvelden mogen de geattesteerde sleutel niet tegenspreken');
+
+  const overGrens = { ...resp, response: { ...resp.response,
+    clientDataJSON: clientData('webauthn.create', opt.challenge, ORIGIN, { crossOrigin: true }) } };
+  assert.throws(() => wa.verifyRegistrationResponse({ response: overGrens, expectedChallenge: opt.challenge,
+    expectedOrigin: ORIGIN, expectedRPID: RP }), /cross-origin/,
+  'een toekomstige cross-origin browserstroom staat niet stilzwijgend open');
 });
 
 test('login: een echte handtekening slaagt, kapot faalt, teller loopt vooruit', () => {
@@ -104,6 +114,29 @@ test('login: teller-regressie (gekloonde sleutel) wordt geweigerd', () => {
   // opgeslagen teller staat al op 5 -> 3 is een teruggang
   assert.throws(() => wa.verifyAuthenticationResponse({ response: resp, expectedChallenge: lOpt.challenge, expectedOrigin: ORIGIN, expectedRPID: RP,
     credential: { id: b64u(a.credId), publicKey: reg.registrationInfo.credential.publicKey, counter: 5 } }), /teller/);
+
+  const authNul = a.authData(0x05, 0, false);
+  const sigNul = crypto.sign('sha256', Buffer.concat([authNul,
+    crypto.createHash('sha256').update(Buffer.from(cd, 'base64url')).digest()]), a.privateKey);
+  const respNul = { ...resp, response: { ...resp.response, authenticatorData: b64u(authNul), signature: b64u(sigNul) } };
+  assert.throws(() => wa.verifyAuthenticationResponse({ response: respNul, expectedChallenge: lOpt.challenge,
+    expectedOrigin: ORIGIN, expectedRPID: RP,
+    credential: { id: b64u(a.credId), publicKey: reg.registrationInfo.credential.publicKey, counter: 5 } }), /teller/,
+  'een teller die van positief terugvalt naar nul schakelt de kloondetectie niet uit');
+});
+
+test('eenmalige ceremonies blijven hard begrensd en verlopen in afloopvolgorde', () => {
+  let tijd = 100;
+  const opslag = maakCeremonieOpslag({ max: 3, ttlMs: 10, nu: () => tijd });
+  opslag.zet('a', 'A'); opslag.zet('b', 'B'); opslag.zet('c', 'C');
+  assert.equal(opslag.aantal(), 3);
+  opslag.zet('d', 'D');
+  assert.equal(opslag.aantal(), 3, 'verse aanvraag vier kan de opslag niet laten groeien');
+  assert.equal(opslag.pak('a'), null, 'bij drukte valt alleen de oudste ongebruikte ceremonie af');
+  assert.equal(opslag.pak('d').challenge, 'D', 'de nieuwste ceremonie blijft bruikbaar');
+  tijd = 111;
+  assert.equal(opslag.pak('b'), null, 'verlopen ceremonies zijn niet meer bruikbaar');
+  assert.equal(opslag.aantal(), 0, 'verlopen regels worden zonder volledige scan opgeruimd');
 });
 
 test('de CBOR-lezer geeft de exacte bytelengte terug (voor het knippen van de COSE-sleutel)', () => {

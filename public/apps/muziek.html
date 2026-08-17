@@ -139,7 +139,11 @@
   </div>
 </footer>
 
-<script src="/shared/spraak.js" defer></script>
+<!-- ZONDER defer, en dat is geen slordigheid maar de reparatie: het inline
+     script hieronder draait tijdens het parsen en doet `if (window.Spraak)`.
+     Een defer-script draait PAS na het parsen, dus die voorwaarde was hier
+     altijd onwaar en de microfoonknop is nooit gekoppeld geweest. -->
+<script src="/shared/spraak.js"></script>
 <script src="/shared/speler.js"></script>
 <script src="/shared/geluid.js"></script>
 <!-- Sneltoetsen (onderaan): "/" springt naar het zoekveld boven de stations,

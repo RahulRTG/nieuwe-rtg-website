@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1015 bestanden en 6723 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1016 bestanden en 6735 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1015 |
-| losse beweringen (`test(...)`) | 6723 |
+| toetsbestanden | 1016 |
+| losse beweringen (`test(...)`) | 6735 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 844 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 845 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-890 bestanden, 6496 beweringen.
+891 bestanden, 6508 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -595,6 +595,7 @@ toets omvalt.
 | `pulse.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Pulse (kern/pulse.js): het 9+-microblog op codenaam. Posten met de 9+-poort, volgen, de chronologische feed, reacties, melden (3x = verborgen) en de 9+-poort op De Salon en de vriendenchat. |
 | `qr.test.js` | 6 | gezakt op `===->!==#0` | RTG QR-codec (public/shared/qr.js): eigen QR encode + decode. Getoetst met (1) een externe grondwaarheid -- de Reed-Solomon EC-codewoorden van het ISO- voorbeeld "01234567" -- en (2) een encode->decode round-trip... |
 | `qrscan.test.js` | 3 | gezakt op `>=->>#0` | RTG QR-scanner (public/shared/qrscan.js): de beeld-decoder. We renderen een met onze eigen codec gemaakte QR naar een pixelbeeld (met stille rand) en halen dat door decodeImage -- die de zoekpatronen vindt, de... |
+| `raakvlak.test.js` | 12 | gezakt op `true->false#0` | DE RAAKVLAKPOORT MOET DICHT KUNNEN, EN OP DE JUISTE MOMENTEN OPEN BLIJVEN. WCAG 2.5.8 vraagt 24 bij 24 CSS-pixels voor alles wat je aanwijst. |
 | `rahul-eerlijk.test.js` | 12 | gezakt op `+->-#1` | De eerlijkheidsdoctrine van Rahul: liever te hard dan een liegbeest. Deze bewaking houdt de doctrine in ALLE gespreks-prompts: het gedeelde karakter (RAHUL_LEAD), de leden-AI met het volledige verhaal, en de tool-lus... |
 | `rahul-hart.test.js` | 2 | overleefd | Het hart van Rahul: de liefhebberijen (horloges, F1, jetset zonder tent, gangen met wijnarrangement, 70's en Frenna) en het datahuis-verhaal (RTG verwerkt alles zelf, met de kluis en de hashes) staan in het GEDEELDE... |
 | `rahul-mens.test.js` | 8 | gezakt op `return-weg#0` | Rahul als mens: geen AI-taal, een echte bui, en iedereen welkom. De meeste toetsen hier zijn zuivere functietoetsen (geen server nodig), want dit is grotendeels tekst- en rekenwerk. |

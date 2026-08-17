@@ -202,8 +202,9 @@ jobs:
           npx playwright install --with-deps chromium
       # De naam stond hier tot 17 augustus 2026 als "de vlaggenschip-schermen",
       # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
-      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd.
-      - name: Eigen a11y-scan van alle schermen, uitgelogd en ingelogd
+      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd -- en sinds
+      # de raakvlakronde over alle schermen nog een derde keer, op telefoonformaat.
+      - name: Eigen a11y-scan, uitgelogd + ingelogd + raakvlak op telefoonformaat
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'

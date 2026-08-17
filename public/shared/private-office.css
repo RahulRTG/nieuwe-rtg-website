@@ -19,3 +19,12 @@
   .po-top button{min-width:144px}
   .po-shell>main{min-width:0;min-height:0}
 }
+
+/* ---- raakvlak: 24x24 als ondergrens (WCAG 2.5.8) --------------------------
+   Deze schermen staan in de Command-modus van ONTWERP.md: tekst van 7 tot 9
+   pixels, dicht op elkaar, veel dichtheid. Dat is een bewuste keuze en die
+   blijft. Maar een KNOP van 8px tekst meet 11 pixels hoog, en dat is voor een
+   hand met tremor niet te raken. Alleen de maat gaat omhoog; de tekst, de
+   kleur en de dichtheid blijven precies zoals ze waren. */
+header button{min-height:24px;display:inline-flex;align-items:center;}
+.po-silence button,.po-matter>button{min-height:24px;}

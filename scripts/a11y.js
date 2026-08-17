@@ -103,6 +103,7 @@ function startEchteServer() {
     process.exit(STRICT ? 1 : 0);
   }
   const { BRON, velt } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
+  const raakvlak = require('./raakvlakkeuring');   // WCAG 2.5.8, derde ronde op telefoonformaat
   const server = await startEchteServer();
   const basis = server.basis;
 
@@ -179,6 +180,69 @@ function startEchteServer() {
     console.log(`[a11y] ronde ${ronde.naam}: ${struct} structureel, ${contr} contrast`);
   }
 
+  /* ===== DERDE RONDE: HET RAAKVLAK (WCAG 2.5.8) =====================
+     Apart, en om drie redenen die er alle drie toe doen.
+
+     TELEFOONFORMAAT. 2.5.8 gaat over aanwijzen met een vinger, dus meet deze
+     ronde op 390x844 en niet op het bureaubladvenster van de twee ronden
+     hierboven. Diezelfde knop kan op een breed scherm ruim genoeg zijn.
+
+     INGELOGD. Uitgelogd zie je op de meeste schermen alleen de poort. De maat
+     van een knop hangt bovendien nauwelijks van de sessie af, dus een tweede
+     staat zou vooral tijd kosten.
+
+     EN WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
+     schaal-animatie staat een halve seconde op 99,8%, en dan meet een knop van
+     precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Zie de
+     opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
+     alle animaties is geworden. */
+  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await telefoon.addInitScript((t) => {
+    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+  }, lid.token);
+  const tel = await telefoon.newPage();
+  const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
+  let raakTotaal = 0;
+  console.log(`\n[a11y] ===== ronde RAAKVLAK (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
+  for (const pad of PAGINAS) {
+    await tel.goto(basis + pad, { waitUntil: 'load' });
+    await tel.waitForTimeout(600);
+    let res;
+    try { res = await tel.evaluate(RAAK); }
+    catch (e) {
+      console.error(`[a11y] ${pad} (raakvlak): de meting kon niet draaien -- ${e.message.split('\n')[0]}`);
+      continue;
+    }
+    /* WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
+       schaal-animatie staat 600ms na load op 99,827%, en dan meet een knop van
+       precies 24 pixels er 23,96 -- dat is een moment en geen maat. Zo meldde
+       zorgbalie.html een pil die klopte.
+
+       Wachten tot ALLE animaties uit zijn was de eerste poging, en die kostte te
+       veel: op de meeste schermen loopt er altijd iets (de wereldklok tikt), dus
+       liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo
+       traag. Een tweede meting kost alleen iets op de schermen die iets vinden,
+       en dat zijn er hopelijk nul. Een scherm dat PERMANENT geschaald is, meldt
+       zich in die tweede meting gewoon weer -- en terecht, want dan is de knop
+       ook echt te klein. */
+    if (res.klein.length) {
+      try {
+        await tel.waitForFunction(
+          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+          null, { timeout: 1500 });
+      } catch (e) { /* een scherm dat blijft bewegen meten we zoals het staat */ }
+      await tel.waitForTimeout(300);
+      try { res = await tel.evaluate(RAAK); } catch (e) { /* de eerste meting blijft staan */ }
+    }
+    if (res.klein.length) {
+      raakTotaal += res.klein.length;
+      console.log(`\n[a11y] ${pad} (raakvlak): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+      for (const w of res.klein.slice(0, 6)) console.log(`  · ${w}`);
+    }
+  }
+  await telefoon.close();
+  console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+
   await browser.close();
   server.stop();
 
@@ -207,13 +271,20 @@ function startEchteServer() {
     fouten.push(`${uitgelogd.contr} contrastfouten uitgelogd, de grens is ${grens.uitgelogd.contrast}`);
   if (ingelogd.contr > grens.ingelogd.contrast)
     fouten.push(`${ingelogd.contr} contrastfouten ingelogd, de grens is ${grens.ingelogd.contrast} -- er is er een BIJGEKOMEN`);
+  /* Het raakvlak leest zijn grens uit hetzelfde register, en zijn oordeel staat
+     in raakvlakkeuring.veltRaakvlak -- puur, dus test/raakvlak.test.js kan het
+     zonder browser laten zakken. */
+  const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
+  if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
     for (const f of fouten) console.error('  · ' + f);
     process.exit(1);
   }
+  if (raakOordeel.melding) console.log(raakOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
-    `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}.`);
+    `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}. ` +
+    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

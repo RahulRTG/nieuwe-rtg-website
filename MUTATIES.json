@@ -4076,6 +4076,14 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "raakvlak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/raakvlakkeuring.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "rahul-eerlijk.test.js": {
       "soort": "puur",
       "staat": "gezakt",

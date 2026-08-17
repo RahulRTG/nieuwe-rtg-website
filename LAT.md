@@ -320,6 +320,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | toegankelijkheid van elk scherm, uitgelogd EN ingelogd, hard op nul | `scripts/a11y.js` + `A11Y-INGELOGD.json` |
 | elk media-element een besluit over ondertiteling, met een reden | `scripts/check.js` regel 49 |
 | de onderhoudsveger lost de rem niet, en is aan te roepen met een eigen klok | `server/opzet/onderhoud.js` + `test/onderhoud.test.js` |
+| elk raakvlak 24x24 op telefoonformaat, en de uitzonderingen niet te ruim | `scripts/raakvlakkeuring.js` + `test/raakvlak.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |

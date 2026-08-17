@@ -27,6 +27,8 @@
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;display:block;}
   .rij{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
+  /* de aanvinkvakjes: 13x13 is te klein om te raken (WCAG 2.5.8) */
+  .rij input[type="checkbox"],label input[type="checkbox"]{width:24px;height:24px;flex:0 0 auto;}
   .knop{background:var(--gold);color:#000;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}

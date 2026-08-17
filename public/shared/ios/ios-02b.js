@@ -130,6 +130,24 @@
     (document.head || document.documentElement).appendChild(st);
   }
 
+  /* DEZELFDE LES ALS BIJ DE PIL, EEN LAAG HOGER. ios.js bouwt de navigatiebalk
+     op elk scherm dat hem laadt, maar tweeentwintig schermen laden ios.js ZONDER
+     ios.css. Daar valt de maat weg die ios.css aan de acties rechtsboven geeft
+     (17px tekst met 0.3rem padding, ruim boven de 24), en dan meet een actie 15
+     tot 22 pixels: te klein om te raken (WCAG 2.5.8).
+
+     Dus brengt de component ook hier zijn eigen ondergrens mee. Alleen min-*:
+     waar ios.css er wel is, verandert er niets -- die zet de padding met
+     !important en komt ruim boven deze grens uit. */
+  function navStijlEenmalig() {
+    if (document.getElementById('rtg-ios-acties-basis')) return;
+    var st = document.createElement('style');
+    st.id = 'rtg-ios-acties-basis';
+    st.textContent = '.ios-nav-acties > *{min-width:24px;min-height:24px;box-sizing:border-box;' +
+      'display:inline-flex;align-items:center;justify-content:center;}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+
   function homeIndicator() {
     pilStijlEenmalig();
     var pil = el('button', 'ios-thuis');

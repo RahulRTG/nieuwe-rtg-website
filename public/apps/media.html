@@ -42,6 +42,10 @@
     font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;
     border-bottom:2px solid transparent;}
   .standen button[aria-current="true"]{color:var(--txt);border-bottom-color:var(--gold);}
+  /* de rij eronder zijn LINKS naar de losse apps en geen knoppen -- ze horen er
+     ook anders uit te zien, dus hier alleen de MAAT: 20px hoog was onder de 24
+     van WCAG 2.5.8. Verder blijft hun uiterlijk zoals het was. */
+  .standen a{padding:0.32rem 0.4rem;min-height:24px;display:inline-flex;align-items:center;white-space:nowrap;}
 
   main{padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 8rem);}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 0.6rem;}
@@ -54,7 +58,8 @@
   .stuk .waarom{font-size:0.72rem;color:var(--soft);border-left:2px solid var(--line);padding-left:0.5rem;}
   .stuk .rij{display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;}
   .stuk.mijn{border-color:rgba(201,162,75,0.45);}
-  .maker{background:none;border:0;color:var(--txt);padding:0;font-size:0.74rem;text-decoration:underline;text-underline-offset:2px;}
+  /* padding in plaats van 0: een makersnaam is een knop en hoort 24px hoog (WCAG 2.5.8) */
+  .maker{background:none;border:0;color:var(--txt);padding:5px 0;font-size:0.74rem;text-decoration:underline;text-underline-offset:2px;min-height:24px;}
 
   .kader{border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.85rem;margin:0.8rem 0;background:var(--card2);}
   .kader b{font-weight:600;}

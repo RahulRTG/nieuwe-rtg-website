@@ -1,5 +1,5 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten: uitgelogd en ingelogd. Sinds 17 augustus 2026 zijn beide staten hard nul, op structuur EN op contrast. Dit bestand is daarmee geen uitzonderingslijst meer maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
+  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Sinds 17 augustus 2026 staan alle drie op nul. Dit bestand is daarmee geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
   "gemeten": "2026-08-17",
   "uitgelogd": {
     "structureel": 0,
@@ -8,6 +8,31 @@
   "ingelogd": {
     "structureel": 0,
     "contrast": 0
+  },
+  "raakvlak": {
+    "onder24": 0,
+    "waar": "de derde ronde: 390x844, ingelogd, 600ms na load -- en wie iets vindt, meet nog een keer",
+    "stand bij het openen van deze ronde": "267 raakvlakken op 188 van de 259 schermen",
+    "de twee oorzaken die het leeuwendeel droegen": [
+      "de home-indicator van de iOS-schil stond op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146 gevallen)",
+      "op 22 schermen zet ios.js die pil neer terwijl het scherm ios.css NIET laadt; zonder stijl krimpt een lege knop tot zijn inhoud (4x4 op comm.html, 16x6 op geld.html) en staat hij toch in de tabvolgorde"
+    ],
+    "en de staart van 82 die daarna overbleef": [
+      ".fx-kop (de kaartkop van \"een ding tegelijk\") en .rp-pad (de drie paden onder de Rahulpoort): gedeelde componenten, dus een regel per component",
+      "de terugweg: .rtg-terug en body.rtg-stijl .terug kregen min-height EN min-width -- vaak is het alleen een pijl. Bewust min-* en geen padding: deze selector is specifieker dan de .terug van een pagina, en padding hier overschreef die van residentie.html (dat brak bij de eerste poging en kwam terug op 13x27)",
+      "zes kale aanvinkvakjes van 13x13 (memo, scanner, thuis, partner-worden, en veilig/wacht.js voor veilig + thuiswacht): het label klikte al mee, het vakje zelf niet",
+      "twee rijen navigatielinks (geld.html tien stuks op 18 hoog, media.html acht op 20)",
+      "de Command-modus-schermen (living-os, partner-network, private-office): knoppen van 8px tekst meten 11 hoog. Alleen de maat is omhoog; tekst, kleur en dichtheid blijven",
+      "zes losse links die in hun eentje een alinea vullen -- geen link IN een zin, dus geen WCAG-uitzondering",
+      ".ios-nav-acties: dezelfde les als de pil, een laag hoger. De component brengt nu ook daar zijn ondergrens mee, want vier schermen laden ios.js zonder ios.css",
+      ".gback in de kantoorpoort (49x16): een element, vier schermen -- backoffice, kantoorpda, magnaat-kantoor en het Foundation OS sturen allemaal door naar /apps/personeel.html?kantoor=1"
+    ],
+    "twee dingen die geen maatprobleem bleken maar een defect": [
+      "pay.html: de drie hoofdknoppen heetten .knop.merk, en rtg-ui.css gebruikt .merk voor een statuslabel (body.rtg-stijl .status,.merk,.badge) -- die selector is specifieker. De betaalknop rendeerde als badge van 9,9px hoofdletters in een pilletje van 19 hoog in plaats van een schermbrede bordeaux knop. Hernoemd naar .knop.hoofd, de naam die de rest van dit huis gebruikt.",
+      "muziek.html en camera.html laadden shared/spraak.js met defer terwijl het inline script eronder tijdens het parsen `if (window.Spraak)` doet. Die voorwaarde was dus altijd onwaar en de microfoonknop is nooit gekoppeld geweest -- hij stond er als lege knop van 0x0, onzichtbaar en onraakbaar, met de naam \"Spraaksturing: zeg wat u wilt horen\" in de tabvolgorde. defer eraf, en spraak.js zet het rusticoon nu meteen in plaats van pas bij de eerste klik."
+    ],
+    "de meetfout die deze ronde zelf maakte": "zorgbalie.html meldde een pil van precies 24 pixels als te klein. De pil klopte; de PAGINA stond 600ms na load nog midden in een schaal-animatie op 99,827%, en dan meet 24 er 23,96. Eerste reparatie was wachten tot document.getAnimations() leeg was, en die was fout om een andere reden: op de meeste schermen loopt er ALTIJD iets (de wereldklok tikt), dus liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo traag. Nu meet hij een keer, en alleen waar hij iets vindt nog een tweede keer na het uitlopen. Dat kost niets op een schoon scherm, en een scherm dat PERMANENT geschaald is meldt zich in die tweede meting gewoon weer -- terecht, want dan is de knop ook echt te klein.",
+    "wat de ronde vond dat niemand zocht": "De navigatielinks op geld.html bleven na de reparatie 20px hoog. De oorzaak was niet de regel maar een DEEL dat niemand laadde: ik had de stijl van het Overzicht-paneel naar overzicht-a.js verplaatst (het bestand liep tegen de 10 KB-maat aan) en public/apps/geld/ blijkt geen bundelmap maar een reeks losse <script src>. Het nieuwe deel stond dus in geen enkele pagina, stijl() viel stil terug op een lege string en het hele paneel tekende ongestyled door. Contrast en structuur bleven groen; alleen de raakvlakronde zag het, en die noemde het een te kleine knop. Twee dingen gerepareerd: het script staat nu in geld.html, en die stille terugval is weg -- een ontbrekend deel schreeuwt nu in de console in plaats van door te tekenen."
   },
   "hoe het nul werd": {
     "stand bij het openen van de ingelogde ronde": "0 structureel, 25 contrast -- negen unieke plekken, want de scan noemt hoogstens drie voorbeelden per soort",
@@ -26,6 +51,7 @@
   "bekende grens van deze meting": "De scan bekijkt elk scherm 600ms na load, in EEN toestand van de data. Kleuren die van gegevens afhangen (een drempelwaarde, een status, een telling) kunnen daardoor tussen ronden verschijnen en verdwijnen. Wie deze poort scherper wil: geef de ingelogde ronde een vaste, geseede dataset in plaats van wat er toevallig staat. Zolang dat er niet is, is een groene ronde een sterk signaal en geen bewijs voor elke toestand.",
   "harde poorten": [
     "structureel = 0 in BEIDE staten",
-    "contrast = 0 in BEIDE staten"
+    "contrast = 0 in BEIDE staten",
+    "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd"
   ]
 }

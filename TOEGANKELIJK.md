@@ -21,10 +21,12 @@ op telefoonformaat (390x844).
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
+| raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
 
-Die vier zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
-elke push over alle schermen in twee staten; `check.js` regel 49 doet het
-ondertitelregister.
+Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
+elke push over alle schermen -- structuur en contrast in twee staten, het
+raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd, na het
+uitlopen van de animaties). `check.js` regel 49 doet het ondertitelregister.
 
 ## De instellingen die een lid zelf zet
 
@@ -93,23 +95,40 @@ rest van de pagina af met `inert`, zodat je er niet meer uit tabt zonder het te
 merken -- gemeten op app.html: dertien focusbare elementen stonden buiten het
 venster open, nu nul.
 
-**Houdt op bij: knoppen onder 24x24** (WCAG 2.5.8). De meting begon op 267 stuks
-over 188 schermen, en twee oorzaken droegen het leeuwendeel:
+**Werkt ook: elk raakvlak is minstens 24x24** (WCAG 2.5.8), gemeten op
+telefoonformaat. De meting begon op 267 stuks over 188 schermen en staat nu op
+nul, met een poort eronder die zakt zodra er een bijkomt.
 
-  - de home-indicator van de iOS-schil stond op 150x22 -- twee pixels te laag,
-    op elk scherm dat de schil laadt. Nu 24, en dat scheelde 146 gevallen.
-  - op 22 schermen bleek `ios.js` die pil neer te zetten terwijl het scherm
-    `ios.css` NIET laadt. Zonder stijl krimpt een lege knop tot zijn inhoud: 4x4
-    op comm.html, 16x6 op geld.html. Onzichtbaar, onraakbaar, en tóch in de
-    tabvolgorde met de naam "Omhoog vegen brengt je naar de homescreen" -- de
-    slechtst denkbare combinatie. De component brengt zijn maat nu zelf mee.
+Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
+op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146
+gevallen). En op 22 schermen zet `ios.js` die pil neer terwijl het scherm
+`ios.css` NIET laadt: zonder stijl krimpt een lege knop tot zijn inhoud, 4x4 op
+comm.html en 16x6 op geld.html. Onzichtbaar, onraakbaar, en tóch in de
+tabvolgorde met de naam "Omhoog vegen brengt je naar de homescreen". De
+component brengt zijn maat nu zelf mee, en dat geldt sinds vandaag ook voor de
+acties rechtsboven in diezelfde balk en voor de microfoonknop.
 
-Na die twee staat de teller op **82 knoppen over 41 schermen**, en dat is een
-staart van losse gevallen: kleurstalen 22x22, terugpijlen en verversknoppen van
-14 tot 20 hoog, een selectievakje van 13x13. Die staan open. Het zijn per scherm
-een paar regels CSS en geen gedeeld patroon, dus ze horen per scherm gedaan te
-worden door wie dat scherm kent -- een blinde `min-height` over alles heen zou
-259 lay-outs verschuiven om 82 knoppen te repareren.
+De staart van 82 daarna was géén gedeeld patroon maar een reeks losse gevallen,
+en die zijn per scherm gedaan: kaartkoppen, terugwegen, twee rijen
+navigatielinks, zes kale aanvinkvakjes van 13x13, de knoppen in de
+Command-modus-schermen, en zes links die in hun eentje een alinea vullen. Wat er
+NIET is gebeurd: een blinde `min-height` over alles heen. De ene keer dat ik in
+de buurt daarvan kwam -- padding op de gedeelde `.terug` -- overschreef die
+meteen de padding van `residentie.html`, dat zijn terugknop al netjes had staan,
+en kwam die terug op 13x27. Sindsdien staat er in de gedeelde regels alleen
+`min-height`/`min-width`: dat kan een pagina niet overrulen, alleen te kleine
+dingen groter maken.
+
+**Twee van de 82 bleken geen maatprobleem maar een defect**, en dat is het beste
+argument voor deze ronde. Op `pay.html` heetten de drie hoofdknoppen
+`.knop.merk`, terwijl `rtg-ui.css` `.merk` gebruikt voor een statuslabel -- die
+selector is specifieker, dus de betaalknop rendeerde als badge van 9,9px
+hoofdletters in een pilletje van 19 hoog in plaats van een schermbrede bordeaux
+knop. En `muziek.html` en `camera.html` laadden `spraak.js` met `defer` terwijl
+het script eronder tijdens het parsen `if (window.Spraak)` doet: die voorwaarde
+was altijd onwaar, dus de microfoonknop is daar nooit gekoppeld geweest. Hij
+stond er als lege knop van 0x0 -- onzichtbaar, onraakbaar, en wel in de
+tabvolgorde met de naam "Spraaksturing: zeg wat u wilt horen".
 
 ### Wie moeite heeft met drukte, taal of geheugen
 
@@ -137,6 +156,18 @@ data**. Kleuren en knoppen die van gegevens afhangen kunnen daardoor tussen
 ronden verschijnen en verdwijnen. Dat is geen theorie: `stad.html` kleurde een
 waarde alleen bordeaux als een domein op dat moment druk was, en die bevinding
 ontbrak in een gerichte meting terwijl hij er wel degelijk was.
+
+De raakvlakronde heeft daar één ding aan toegevoegd dat de andere twee nog niet
+doen: **wie iets vindt, meet nog een keer**. Hij meldde `zorgbalie.html` voor een
+knop van precies 24 pixels, en die knop klopte -- de pagina stond 600 ms na het
+laden nog midden in een schaal-animatie op 99,827%, en dan meet 24 er 23,96. Een
+meting die niet wacht, meet een moment.
+
+Wachten tot álle animaties uit zijn was de eerste reparatie, en die was om een
+andere reden fout: op de meeste schermen loopt er altijd iets (de wereldklok
+tikt), dus liep bijna elke pagina tegen de tijdgrens aan. Een tweede meting kost
+alleen iets op de schermen die iets vinden -- en een scherm dat permanent
+geschaald is, meldt zich dan gewoon weer.
 
 Een groene ronde is dus een sterk signaal en geen bewijs voor elke toestand. Wie
 deze poort scherper wil: geef de ingelogde ronde een vaste, geseede dataset.

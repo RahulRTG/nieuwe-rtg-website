@@ -105,14 +105,22 @@
 
   function start() {
     springNaarInhoud();
+    /* de twee helpers uit basis-01c.js: meldingen die worden voorgelezen, en een
+       venster dat de rest van de pagina afsluit zolang het open staat */
+    meldingenHoorbaar();
+    modaalAfsluiten();
     begrens(document);
     try {
       new MutationObserver(function (muts) {
         for (var i = 0; i < muts.length; i++) for (var j = 0; j < muts[i].addedNodes.length; j++) {
           var n = muts[i].addedNodes[j];
-          if (n && n.nodeType === 1) begrens(n);
+          if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
-      }).observe(document.body, { childList: true, subtree: true });
+        /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
+           element -- daarom ook op attributen letten, gebundeld in een frame. */
+        if (!modaalGepland) { modaalGepland = true; requestAnimationFrame(function () { modaalGepland = false; modaalAfsluiten(); }); }
+      }).observe(document.body, { childList: true, subtree: true,
+        attributes: true, attributeFilter: ['hidden', 'class', 'style', 'aria-modal'] });
     } catch (e) {}
 
     /* ---- 4. de app-gids als rustige leerlaag ----

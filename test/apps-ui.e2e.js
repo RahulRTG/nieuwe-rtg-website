@@ -57,6 +57,15 @@ async function bootTest(opts) {
     const keys = await opts.tokens(base); // { rtg_sup_token: '...', ... }
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
+    /* DE INTAKE STAAT BUITEN DIT STRAMIEN. Een vers geregistreerd lid is niet
+       `klaar`, dus opent app-main het onboardinggesprek en gaat #onbGate open
+       -- en daar mag de werktafel niet overheen (shared/command.js). Deze
+       toetsen gaan over "komt het scherm beveiligd op na herstel van de
+       sessie", niet over de ondertekening; die heeft zijn eigen toets in
+       test/werktafel.e2e.js, en dat is de plek waar de grendel hoort te zakken.
+       Mocken is wat de rest van deze suite hieronder ook doet. */
+    await page.route('**/api/onboarding/status', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await page.addInitScript((kv) => {

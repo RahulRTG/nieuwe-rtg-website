@@ -65,12 +65,21 @@ body.rtg-command > #shell .notif-panel{pointer-events:auto;}
    (shared/handenvrij-balk.js) ligt onder de werktafel, dus je riep hem en er
    gebeurde zichtbaar niets.
 
+   HET GESPREK HOORT ERBIJ, en dat was de helft die hier eerst ontbrak. De balk
+   en zijn gespreksvenster (.hv-chat, shared/handenvrij-chat.js) zijn twee losse
+   position:fixed-elementen -- 38 en 37 -- en alleen de balk werd opgetild. Wat
+   je dan krijgt is geen leeg scherm maar iets vervelenders: het gesprek staat
+   er, je LEEST de bevestigingsvraag ("Ja, doorzetten" bij een betaling), en de
+   knop reageert niet, want .cmd-leeg van de werktafel ligt eroverheen en vangt
+   de muis af. Een dode knop op een vraag over geld.
+
    Alleen de hoogte wordt hier gecorrigeerd, en alleen op een telefoon: daar
    ligt de schilbalk (48px) onderaan en zou de balk er half achter vallen. Op een
    breed scherm laten we hem met rust -- daar maakt shared/handenvrij-bureau.js
    er een verplaatsbaar paneel rechtsonder van, en dat is zijn eigen vorm. */
 body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bottom,0px));}
-@media (min-width:1000px){body.rtg-command .hv-balk{bottom:auto;}}
+body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bottom,0px));}
+@media (min-width:1000px){body.rtg-command .hv-balk,body.rtg-command .hv-chat{bottom:auto;}}
 #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}

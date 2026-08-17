@@ -1049,6 +1049,25 @@ app.post('/api/translate', require('./rem')({ windowMs: 60000, limit: 30 }), asy
 // sleutel is de handtekening van de actieve set, dus een taal aan/uit zetten
 // verandert de sleutel en de cache is meteen ongeldig (geen staleness).
 const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, sleutel: () => 'talen:' + talen.handtekening() });
+/* De losse GitHub Pages-voordeur (index.html in de repositoryroot) draait op
+   rahulrtg.github.io en gebruikt dezelfde taal-API. Alleen die vaste publieke
+   voordeuren krijgen CORS; andere oorsprongen kunnen de response niet lezen. */
+const UI_CORS_ORIGINS = new Set([
+  'https://rahulrtg.github.io',
+  'https://rahultravelgroup.com',
+  'https://www.rahultravelgroup.com'
+]);
+app.use(['/api/talen', '/api/vertaal/ui'], (req, res, next) => {
+  const origin = String(req.get('origin') || '');
+  if (UI_CORS_ORIGINS.has(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Vary', 'Origin');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  next();
+});
 // talen: de actieve set (voor autodetectie + vertaling) en de VOLLEDIGE wereld
 // (alle 114, met een aan/uit-vlag) zodat de taalkiezer alle landvlaggen toont.
 app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve(), alle: talen.alle() }));
@@ -1130,16 +1149,22 @@ app.post('/api/supplier/aanwezig/leeg', supplierAuth, (req, res) => {
 });
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
-   boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)
-   en zwaar gecachet in de vertaallaag; met een AI-sleutel vertaalt Claude
-   volledig, zonder sleutel valt hij terug op het woordenboek (nooit kapot). */
-app.post('/api/vertaal/ui', async (req, res) => {
+   boardroom aan laat staan. De route is publiek omdat ook de voordeur vóór
+   inloggen in de toesteltaal moet staan. Twee remmen begrenzen modelkosten:
+   per IP én installatiebreed. De vertaallaag groepeert de regels bovendien in
+   echte batches in plaats van één modelaanroep per knop te doen. */
+const uiVertaalPerIp = require('./rem')({ windowMs: 60000, limit: 30 });
+const uiVertaalGlobaal = require('./rem')({ windowMs: 60000, limit: 180, key: () => 'alle-ui' });
+const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.join(PUBLIC_DIR, '..', 'index.html')]);
+app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
   try {
     const naar = talen.taalVan(req.body && req.body.naar);
+    let totaal = 0;
     const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
-      .map(t => String(t == null ? '' : t).slice(0, 300));
-    const uit = [];
-    for (const t of teksten) uit.push((await i18n.translate(t, naar)).text);
+      .map(t => String(t == null ? '' : t).slice(0, 300))
+      .filter(t => { totaal += t.length; return totaal <= 24000; });
+    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan });
+    const uit = regels.map(r => r.text);
     res.json({ ok: true, naar, teksten: uit });
   } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
 });

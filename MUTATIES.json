@@ -1944,6 +1944,15 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "i18n-auto.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/lib/ui-bronnen.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 8
+    },
     "ideeen.test.js": {
       "soort": "server",
       "staat": "gezakt",

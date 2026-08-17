@@ -2,8 +2,9 @@
 
    Het register van alle talen die RTG kan voeren, met per taal de eigen naam
    (endoniem) en de Engelse naam (voor de vertaal-AI). De RTG Boardroom zet per
-   taal een schakelaar aan of uit; alleen actieve talen zijn te kiezen in de
-   apps. Nederlands en Engels zijn de basistalen en staan altijd aan.
+   taal een schakelaar aan of uit; alle 114 staan standaard aan en alleen
+   bewust uitgezette talen verdwijnen uit de apps. Nederlands en Engels zijn
+   de basistalen en staan altijd aan.
 
    Iedereen chat in de eigen taal en de ander leest alles in de zijne: elk
    bericht draagt zijn brontaal (m.lang) en de leespaden vertalen per kijker
@@ -136,52 +137,16 @@ const TALEN = [
 
 const OP_CODE = new Map(TALEN.map(t => [t.code, t]));
 const BASIS = ['nl', 'en']; // altijd aan; kan niet uit
+/* Een verse RTG-installatie spreekt de hele wereld. De Boardroom kan talen
+   daarna bewust uitzetten, maar beschikbaarheid is opt-out en niet langer
+   opt-in. De versie maakt de eenmalige migratie van de oude nl/en-stand
+   onderscheidbaar van een latere, bewuste keuze van de eigenaar. */
+const STANDAARD = Object.freeze(TALEN.map(t => t.code));
+const STANDAARD_VERSIE = 2;
 
 function bestaat(code) { return OP_CODE.has(String(code || '').toLowerCase()); }
 function taal(code) { return OP_CODE.get(String(code || '').toLowerCase()) || null; }
 function naamEn(code) { const t = taal(code); return t ? t.en : 'English'; }
+const maakTalen = require('./talen-beheer')({ TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat });
 
-/* De beheerde laag: welke talen staan aan. Bewaard in db.data.talen.actief. */
-function maakTalen({ db, save }) {
-  function actieveSet() {
-    if (!db.data.talen || !Array.isArray(db.data.talen.actief)) db.data.talen = { actief: BASIS.slice() };
-    for (const b of BASIS) if (!db.data.talen.actief.includes(b)) db.data.talen.actief.push(b);
-    return db.data.talen.actief;
-  }
-  function isActief(code) { return actieveSet().includes(String(code || '').toLowerCase()); }
-  // volledige lijst met aan/uit-status, voor de Boardroom
-  function alle() {
-    const set = new Set(actieveSet());
-    return TALEN.map(t => ({ code: t.code, naam: t.naam, en: t.en, aan: set.has(t.code), basis: BASIS.includes(t.code) }));
-  }
-  // alleen de actieve talen, voor de taalkiezers in de apps
-  function actieve() {
-    const set = new Set(actieveSet());
-    return TALEN.filter(t => set.has(t.code)).map(t => ({ code: t.code, naam: t.naam, en: t.en }));
-  }
-  // Een goedkope handtekening van de actieve set: verandert zodra er een taal
-  // aan- of uitgaat. Handig als cache-sleutel voor /api/talen zodat een
-  // Boardroom-schakelaar de response-cache meteen ongeldig maakt (geen staleness).
-  function handtekening() { return actieveSet().slice().sort().join(','); }
-  // schakelaar; de basistalen kunnen niet uit
-  function zet(code, aan) {
-    code = String(code || '').toLowerCase();
-    if (!bestaat(code)) return { error: 'Deze taal kennen we niet.', status: 404 };
-    if (!aan && BASIS.includes(code)) return { error: 'Nederlands en Engels zijn de basistalen en blijven altijd aan.', status: 409 };
-    const set = actieveSet();
-    const i = set.indexOf(code);
-    if (aan && i === -1) set.push(code);
-    if (!aan && i !== -1) set.splice(i, 1);
-    save();
-    return { ok: true, code, aan: set.includes(code) };
-  }
-  /* De taal van een verzoek: elke ACTIEVE taal mag, anders Nederlands. Dit
-     vervangt de oude nl/en-klem op alle chat- en vertaalpaden. */
-  function taalVan(bodyLang) {
-    const code = String(bodyLang || '').toLowerCase();
-    return isActief(code) ? code : 'nl';
-  }
-  return { alle, actieve, isActief, zet, taalVan, handtekening };
-}
-
-module.exports = { TALEN, BASIS, bestaat, taal, naamEn, maakTalen };
+module.exports = { TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat, taal, naamEn, maakTalen };

@@ -32,7 +32,79 @@
     var velden = (root.querySelectorAll ? root.querySelectorAll('input:not([maxlength]),textarea:not([maxlength])') : []);
     for (var i = 0; i < velden.length; i++) zetGrens(velden[i]);
   }
+  /* ---- SPRING NAAR DE INHOUD ----
+
+     Gemeten: 1 van de 258 schermen had een route naar de inhoud, en die ENE
+     werkte niet (zie hieronder). Wie met een toetsenbord of schermlezer werkt,
+     tabt dus op elk scherm eerst door de hele navigatie voordat de inhoud
+     begint -- bij elke paginawissel opnieuw. Gemeten wat dat kost tot in de
+     main: 15 tabs op wereld.html, 11 op salon.html, 4 op mall.html.
+
+     Dat is geen fout die een scan vindt: alles IS bereikbaar. Het is een fout
+     die pas opvalt als je het zelf een dag doet.
+
+     Hier en niet in 258 bestanden, want dit blad is het vangnet dat elke pagina
+     draagt. Let op: basis.js is GEGENEREERD uit deze map (scripts/bundel.js), dus
+     een wijziging hoort hier en niet in de bundel -- die wordt door de volgende
+     build overschreven. Dat is precies hoe deze functie een keer verloren ging.
+
+     Het doel krijgt tabindex=-1, anders verplaatst de browser de focus niet echt
+     naar een element dat zelf niet focusbaar is: de pagina springt dan wel, maar
+     de volgende Tab begint weer bovenaan. Dat is het verschil tussen een link
+     die lijkt te werken en een link die werkt. */
+  function springNaarInhoud() {
+    if (document.querySelector('.rtg-spring')) return;          // al gezet
+    /* WIJKEN VOOR EEN EIGEN SPRINGLINK, MAAR ALLEEN ALS DIE WERKT.
+       app.html en backoffice.html hebben hun eigen <a class="skip" href="#content">,
+       en die is daar gemeten als eerste focusbare element -- dus krijgen ze er
+       geen tweede bij. Dat een eerste Tab daar op een knop landt komt doordat die
+       inlogschermen zelf focus op een veld zetten; de link is dan al voorbij.
+       De test hieronder kijkt daarom naar de tabVOLGORDE en niet naar waar de
+       focus toevallig staat. Alleen wat de browser echt focust telt: rects
+       alleen is niet genoeg (visibility:hidden heeft rects), tabindex<0 valt
+       buiten de volgorde. */
+    var eigen = document.querySelector('a.skip, a.skiplink, a[href^="#"][class*="skip"]');
+    if (eigen) {
+      var eersteFocus = null;
+      var kand = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      for (var i = 0; i < kand.length; i++) {
+        /* "Zal de browser hier naartoe tabben" is meer dan rects hebben: een
+           element op visibility:hidden heeft wel rects en krijgt geen focus, en
+           tabindex<0 valt buiten de volgorde. Twee eerdere versies keken alleen
+           naar rects en weken daardoor voor de kapotte a.skip op app.html. */
+        var e = kand[i];
+        if (!e.getClientRects().length) continue;
+        var cs = window.getComputedStyle(e);
+        if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+        if (e.disabled || e.tabIndex < 0) continue;
+        eersteFocus = e; break;
+      }
+      if (eersteFocus === eigen) return;                        // die van hen doet het werk al
+    }
+    var doel = document.querySelector('#main, main, [role="main"]') || document.querySelector('h1');
+    if (!doel) return;                                          // niets om naartoe te springen
+    if (!doel.id) doel.id = 'rtg-inhoud';
+    if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
+
+    var a = document.createElement('a');
+    a.className = 'rtg-spring';
+    a.href = '#' + doel.id;
+    a.textContent = 'Naar de inhoud';
+    a.addEventListener('click', function () {
+      try { doel.focus({ preventScroll: false }); } catch (e) { doel.focus(); }
+    });
+
+    var st = document.createElement('style');
+    st.textContent = '.rtg-spring{position:fixed;left:-9999px;top:0;z-index:99999;' +
+      'background:#0C0C0B;color:#fff;padding:.6rem 1rem;font:600 .82rem Inter,system-ui,sans-serif;' +
+      'border:1px solid #857007;text-decoration:none}' +
+      '.rtg-spring:focus{left:.5rem;top:.5rem}';
+    document.head.appendChild(st);
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+
   function start() {
+    springNaarInhoud();
     begrens(document);
     try {
       new MutationObserver(function (muts) {

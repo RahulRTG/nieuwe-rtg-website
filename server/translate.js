@@ -31,6 +31,17 @@ function setAnthropic(a) { anthropic = a; }
 const cache = new Map();
 const CACHE_MAX = 5000;
 
+function cacheLees(key) {
+  if (!cache.has(key)) return null;
+  const hit = cache.get(key);
+  cache.delete(key); cache.set(key, hit);
+  return hit;
+}
+function cacheSchrijf(key, waarde) {
+  cache.set(key, waarde);
+  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
+}
+
 /* Ruwe taalherkenning voor het geval de bron-taal niet is meegegeven. */
 function detect(text) {
   const t = ' ' + String(text).toLowerCase() + ' ';
@@ -68,6 +79,7 @@ function wordLevel(text, to) {
 }
 
 const { naamEn, bestaat } = require('./talen');
+const vertaalModelBatch = require('./translate/batch-model');
 
 async function claudeTranslate(text, to) {
   const target = to === 'nl' ? 'Dutch' : naamEn(to);
@@ -94,11 +106,8 @@ async function translate(text, to, from, opties) {
   if (from === to) return { text, translated: false, from };
 
   const key = to + '|' + text;
-  if (cache.has(key)) {
-    const hit = cache.get(key);
-    cache.delete(key); cache.set(key, hit); // vers gebruikt: naar achteren
-    return { text: hit, translated: hit !== text, from };
-  }
+  const hit = cacheLees(key);
+  if (hit != null) return { text: hit, translated: hit !== text, from };
 
   let out = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
   /* De AI-weg alleen voor wie we kennen. Zonder deze grens is een open
@@ -111,9 +120,70 @@ async function translate(text, to, from, opties) {
   if (!out && anthropic && magAi) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
   if (!out) out = wordLevel(text, to); // woordenboek of wereld-kern: elke registertaal doet mee
   const result = out || text;
-  cache.set(key, result);
-  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
+  cacheSchrijf(key, result);
   return { text: result, translated: result !== text, from };
 }
 
-module.exports = { setAnthropic, localize, localizeList, translate, detect };
+/* Dezelfde vertaallogica voor een schermwoordenboek, maar met echte batching.
+   Hoogstens 40 regels / 6000 tekens gaan in één modelaanroep. Alles daarbuiten
+   wordt in een volgende begrensde groep verwerkt. Een mislukte groep valt per
+   regel terug op het lokale woordenboek en laat de interface nooit verdwijnen. */
+async function translateBatch(teksten, to, from, opties) {
+  teksten = Array.isArray(teksten) ? teksten.map(t => String(t == null ? '' : t)) : [];
+  to = bestaat(to) ? String(to).toLowerCase() : 'nl';
+  const magAiVoor = typeof (opties && opties.ai) === 'function'
+    ? opties.ai : () => (!opties || opties.ai !== false);
+  const uit = new Array(teksten.length);
+  const wacht = [];
+
+  for (let i = 0; i < teksten.length; i++) {
+    const text = teksten[i];
+    const bron = bestaat(from) ? String(from).toLowerCase() : detect(text);
+    if (!text.trim() || bron === to) {
+      uit[i] = { text, translated: false, from: bron };
+      continue;
+    }
+    const key = to + '|' + text;
+    const hit = cacheLees(key);
+    if (hit != null) {
+      uit[i] = { text: hit, translated: hit !== text, from: bron };
+      continue;
+    }
+    let vast = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
+    if (vast) {
+      cacheSchrijf(key, vast);
+      uit[i] = { text: vast, translated: vast !== text, from: bron };
+    } else wacht.push({ i, text, bron, key, ai: !!magAiVoor(text) });
+  }
+
+  /* Eerst de toegestane modelregels bij elkaar, daarna de lokale regels. Een
+     gemengde invoerlijst kan zo nooit per ongeluk een privéreeks meenemen in
+     dezelfde provider-aanroep, en kost ook geen losse aanroep per afwisseling. */
+  for (const reeks of [wacht.filter(x => x.ai), wacht.filter(x => !x.ai)]) {
+    for (let vanaf = 0; vanaf < reeks.length;) {
+      const groep = [];
+      let tekens = 0;
+      while (vanaf < reeks.length && groep.length < 40) {
+        const volgende = reeks[vanaf];
+        if (groep.length && tekens + volgende.text.length > 6000) break;
+        groep.push(volgende); tekens += volgende.text.length; vanaf++;
+      }
+      let model = null;
+      if (anthropic && groep[0] && groep[0].ai) {
+        try { model = await vertaalModelBatch({ anthropic, teksten: groep.map(x => x.text), to, naamEn }); }
+        catch (e) { model = null; }
+      }
+      groep.forEach((item, j) => {
+        const lokaal = wordLevel(item.text, to);
+        const result = (model && model[j]) || lokaal || item.text;
+        /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
+           cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
+        if (result !== item.text) cacheSchrijf(item.key, result);
+        uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
+      });
+    }
+  }
+  return uit;
+}
+
+module.exports = { setAnthropic, localize, localizeList, translate, translateBatch, detect };

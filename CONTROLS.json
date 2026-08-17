@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.594Z",
+        "at": "2026-08-17T21:47:53.455Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -50,24 +50,28 @@
       "wat": "wijziging en verwijdering MIDDEN in het auditspoor breken de keten aantoonbaar",
       "eigenaar": "Security",
       "bewijs": [
-        "test/keten.test.js"
+        "test/keten.test.js",
+        "test/securitylog-keten.test.js",
+        "test/boardlog-keten.test.js"
       ],
-      "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop())",
+      "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)",
       "dekking": {
-        "beproefd": 1,
+        "beproefd": 4,
         "totaal": 4,
         "eenheid": "auditjournalen aan de keten",
         "tellers": {},
-        "pct": 25
+        "pct": 100
       },
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 30,
+        "beweringen": 45,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.768Z",
+        "at": "2026-08-17T21:48:17.316Z",
         "bestanden": [
-          "test/keten.test.js"
+          "test/keten.test.js",
+          "test/securitylog-keten.test.js",
+          "test/boardlog-keten.test.js"
         ]
       }
     },
@@ -93,7 +97,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.925Z",
+        "at": "2026-08-17T21:48:17.518Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +133,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.620Z",
+        "at": "2026-08-17T21:48:18.744Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -165,7 +169,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.787Z",
+        "at": "2026-08-17T21:48:19.003Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -181,20 +185,20 @@
       ],
       "bewijsstuk": "KLOK.json -- hoeveel code nog buiten de tijdmachine staat",
       "dekking": {
-        "beproefd": 2,
-        "totaal": 659,
+        "beproefd": 36,
+        "totaal": 655,
         "eenheid": "modules die de tijd vragen",
         "tellers": {
-          "directeTijdsaanroepen": 1298
+          "directeTijdsaanroepen": 1284
         },
-        "pct": 0.3
+        "pct": 5.5
       },
-      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
+      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1294 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:20.237Z",
+        "at": "2026-08-17T21:48:21.017Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -224,7 +228,7 @@
       "laatstGroen": {
         "staat": "niet gemeten",
         "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-12T14:59:28.787Z",
+        "at": "2026-08-17T21:48:33.186Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -257,7 +261,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:28.931Z",
+        "at": "2026-08-17T21:48:33.457Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -290,7 +294,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.085Z",
+        "at": "2026-08-17T21:48:33.639Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -322,7 +326,7 @@
         "staat": "GROEN",
         "beweringen": 12,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.233Z",
+        "at": "2026-08-17T21:48:33.860Z",
         "bestanden": [
           "test/idemproef.test.js"
         ]
@@ -358,7 +362,7 @@
         "staat": "GROEN",
         "beweringen": 27,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.487Z",
+        "at": "2026-08-17T21:48:34.360Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -389,7 +393,7 @@
         "staat": "GROEN",
         "beweringen": 17,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.822Z",
+        "at": "2026-08-17T21:48:34.901Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

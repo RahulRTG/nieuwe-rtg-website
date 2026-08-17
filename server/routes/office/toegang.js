@@ -3,7 +3,7 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
-          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog } = kern;
+          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
@@ -28,9 +28,15 @@ app.post('/api/office/login', (req, res) => {
   res.json({ token, state: officeState() });
 });
 
-/* het inlog-auditlog: elke poging op elk kanaal, alleen voor het kantoor */
+/* het inlog-auditlog: elke poging op elk kanaal, alleen voor het kantoor.
+
+   `keten` erbij, want een auditlog zonder zichtbare ketenstand vraagt van de
+   lezer dat hij aanneemt dat er niet aan gesleuteld is. Nu staat het er:
+   `ok` als het spoor met zichzelf klopt, `gebroken` waar niet, `afgekapt` als
+   de oudste regels eruit gelopen zijn (normaal bij 5000) en `zonderKeten` voor
+   de regels van vóór deze voorziening. */
 app.post('/api/office/securitylog', officeAuth, (req, res) => {
-  res.json({ log: (db.data.securityLog || []).slice(0, 200) });
+  res.json({ log: (db.data.securityLog || []).slice(0, 200), keten: securityLogKeten() });
 });
 
 app.post('/api/office/timeline', officeAuth, (req, res) => {

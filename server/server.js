@@ -56,6 +56,9 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const rtgKlok = require('./lib/klok');
+/* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
+   dat log eraan hangt. */
+const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
 const { db, load, save, bijeen, inBundel, bewerkCollectie, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
@@ -554,12 +557,32 @@ function checkCred(username, password) {
 /* ---------- het inlog-auditlog ----------
    Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
    log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
-   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ. */
+   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ.
+
+   AAN DE KETEN. Dit log is precies wat iemand die binnen is als eerste zou
+   willen bijstellen: één mislukte reeks pogingen wegpoetsen en het bezoek is
+   nooit gebeurd. Elke regel draagt daarom de hash van de vorige, zodat een
+   wijziging of een verwijdering MIDDEN in het log aantoonbaar breekt. Wat dat
+   wel en niet tegenhoudt staat in de kop van lib/keten.js -- kort: het ziet
+   niet dat iemand de NIEUWSTE regels wegknipt, daar is het anker voor.
+
+   Regels van vóór deze keten dragen geen hash; verifieer() telt die apart en
+   veroordeelt ze niet, dus een bestaande installatie gaat hier niet stuk op. */
 function logInlog(kanaal, ok, wie, req) {
   const lijst = db.data.securityLog = db.data.securityLog || [];
-  lijst.unshift({ at: new Date().toISOString(), kanaal, ok: !!ok, wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '') });
-  if (lijst.length > 5000) lijst.length = 5000;
+  ketenNoteerIn(lijst, {
+    at: new Date().toISOString(), kanaal, ok: !!ok,
+    wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
+  }, 5000);
   save();
+}
+
+/* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()
+   voor het inzagejournaal geeft. Het kantoor toont hem naast het log, zodat
+   "klopt dit spoor nog" een antwoord heeft in plaats van een aanname. */
+function securityLogKeten() {
+  const lijst = (db.data && db.data.securityLog) || [];
+  return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
 }
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
@@ -1953,6 +1976,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
+  securityLogKeten,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,

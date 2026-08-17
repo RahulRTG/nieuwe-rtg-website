@@ -24,6 +24,10 @@ module.exports = (kern) => {
      het personeel na te kijken in plaats van alleen in een terminal. Zie
      ./office/dekking.js. */
   require('./office/dekking')(octx);
+  /* Het routedossier: dezelfde routes, maar dan wat we er over ELF schakels van
+     weten. De dekking zegt of een route is aangeraakt; dit zegt of hij dicht
+     zit, rommel weigert en een spoor achterlaat. Zie ./office/dossier.js. */
+  require('./office/dossier')(octx);
   /* De ledenbalie: de derde poort van het kantoor. Zie ./office/balie.js. */
   /* De ledenbalie hangt in server/routes/ledenbalie.js, met een eigen zetel en
      een eigen kern (kern/ledenbalie*.js). Hier stond een TWEEDE balie uit een

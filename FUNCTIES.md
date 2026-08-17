@@ -82,7 +82,7 @@ ook blokkeert.
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Communicatieplatform** (`kern-comm`) — Het ene gespreksmodel: de inbox met al zijn laden, threads, reacties, zoeken over alles, en @Rahul die opstelt maar nooit verstuurt. Ook de gesprekken die modules aanmaken (een rit, een bestelling) lopen hierlangs.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Taal en vertaling** (`kern-taal`) — De talenlijst en het vertalen van schermteksten en berichten.  
+- **Taal en vertaling** (`kern-taal`) — Alle 114 talen staan standaard aan; de gedeelde laag vertaalt vaste én dynamisch getekende schermtekst en berichten, met een veilige lokale terugval zonder modelprovider.
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 - **Locatie delen** (`kern-locatie`) — Het delen van de eigen positie onderweg, en het stoppen daarvan.  
   _voor: rtg, lifestyle, business_

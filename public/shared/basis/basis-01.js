@@ -25,6 +25,16 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
+  /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
+     Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
+     daardoor geen taalkeuze en hielden hun hardcoded tekst. De basis ligt op
+     ieder blijvend appscherm en laadt de taalrail precies één keer. */
+  if (!window.RTGi18n && !document.querySelector('script[src^="/shared/i18n.js"]')) {
+    var taalScript = document.createElement('script');
+    taalScript.src = '/shared/i18n.js'; taalScript.async = false;
+    (document.head || document.documentElement).appendChild(taalScript);
+  }
+
   /* In een SPLIT-paneel (same-origin iframe uit shared/split.js) staat de app
      in een halve breedte naast een andere app. De vensterbeheerder en het
      desktopframe die deze class ook zetten bestaan niet meer -- het OS is iOS

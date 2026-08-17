@@ -2224,6 +2224,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['routes/techniek/beheer.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
     ['routes/techniek/functie.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
     ['translate.js', 'vertaalmachine, geen gesprek'],
+    ['translate/batch-model.js', 'JSON-lijstvertaler voor aantoonbare UI-brontekst, geen gesprek'],
   ]);
   const sites = scan(ROOT);
   const buiten = new Set(sites.filter(s => !s.draagtRegel).map(s => s.bestand));

@@ -1,6 +1,8 @@
 /* Startdata, deel "partners": het partnerkanaal (boeken zonder pas) met demo-
    partners en -reizen, plus de lege grootboeken (fonds, munten), de bookings en
    de wereldtalen-stand. Afgesplitst uit seed.js; puur data. */
+const { STANDAARD, STANDAARD_VERSIE } = require('../talen');
+
 module.exports = {
   /* ---------- partnerkanaal (boeken zonder pas) ----------
      Niet-leden boeken via een partnerlink (boeken.html?via=CODE).
@@ -41,7 +43,7 @@ module.exports = {
   // Grootboek van munt-ontvangsten (kern/munten.js; crypto meteen omgezet naar
   // euro via een vergunninghoudende aanbieder). Leeg tot de eerste ontvangst.
   muntOntvangsten: [],
-  // Wereldtalen: welke talen staan aan (Boardroom-schakelaars; server/talen.js).
-  // Nederlands en Engels zijn de basis en staan altijd aan.
-  talen: { actief: ['nl', 'en'] }
+  // Alle 114 talen staan standaard aan. De Boardroom kan niet-benodigde talen
+  // bewust uitzetten; Nederlands en Engels blijven de niet-uitschakelbare basis.
+  talen: { actief: STANDAARD.slice(), standaardVersie: STANDAARD_VERSIE }
 };

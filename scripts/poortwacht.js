@@ -112,8 +112,38 @@ const PUBLIEK = new Map([
      bewuste keuze (zie server/routes/doos.js), maar hij hangt hiermee wel aan
      de publieke kant van de server. Bedrijfstelemetrie, geen ledengegevens. */
   ['/api/doos/status', 'de zaakdoos meldt zijn status op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
-  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf']
+  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf'],
+  /* Gevonden door een verse ronde tegen een wegwerpserver: deze route bestond
+     nog niet toen POORTWACHT.json voor het laatst werd geschreven, en stond dus
+     nergens. Hij is bewust open -- hij zet vrije tekst om in een CONCEPT en zegt
+     dat er zelf bij ("Controleer dit plan; er is nog niets aangevraagd"). Er
+     wordt niets opgeslagen en niets aangevraagd; de aanvraag zelf
+     (/api/arrival/request) staat er los van en controleert wel. Wel een eigen
+     snelheidsrem (interpretRem). */
+  ['/api/arrival/interpret', 'zet vrije tekst om in een CONCEPTplan en slaat niets op; de aanvraag is een aparte route met eigen controle']
 ]);
+
+/* ---- DE TWEE METRICS-DEUREN ZIJN CONFIGURATIE, GEEN CODE ----
+
+   Ze staan met opzet NIET in PUBLIEK hierboven, en dat verdient uitleg, want een
+   lokale ronde meldt ze altijd als open.
+
+   server/meetpoort.js maakt /api/metrics en /api/metrics/kort afhankelijk van de
+   OPSTELLING: met RTG_METRICS_TOKEN gezet moet dat token mee; zonder token gaat
+   de deur alleen open vanaf een intern adres. Deze sonde klopt aan vanaf
+   127.0.0.1 en dat IS een intern adres, dus zonder token ziet hij ze altijd open
+   -- precies zoals bedoeld voor een ontwikkelopstelling.
+
+   Ze op de publieke lijst zetten zou daarom het verkeerde repareren: dan valt
+   het ook niet meer op wanneer ze in PRODUCTIE opengaan, en dat is nu juist het
+   geval dat ertoe doet. Ze horen open te heten op een lokale ronde en dicht op
+   een productieronde, en het verschil zit in de omgeving en niet in de code.
+
+   Wat daar wel uit volgt: een uitslag is pas te lezen als je weet TEGEN WELKE
+   opstelling hij is gemaakt. Daarom staat dat sinds deze ronde in de uitvoer
+   (zie `gemeten` onderaan) -- twee rondes tegen verschillend geconfigureerde
+   servers zijn anders niet met elkaar te vergelijken, en dat is precies hoe een
+   configuratieverschil er als een bevinding uit gaat zien. */
 
 const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };
 /* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
@@ -177,7 +207,26 @@ async function ronde() {
 
 ronde().then(() => {
   if (jsonUit) {
-    console.log(JSON.stringify(perRouteUit ? { ...uit, perRoute } : uit, null, 1));
+    /* DE OPSTELLING HOORT BIJ DE UITSLAG. Zonder dit veld is een ronde niet te
+       lezen: /api/metrics staat open of dicht afhankelijk van RTG_METRICS_TOKEN
+       en RTG_CLUSTER_KEY (zie meetpoort.js en het blok bij PUBLIEK), en twee
+       rondes tegen verschillend geconfigureerde servers verschillen dan zonder
+       dat iemand kan zien waarom. Zo'n verschil leest als een bevinding, en dat
+       is de duurste soort ruis.
+
+       Bewust alleen of ze GEZET zijn en niet wat erin staat: dit bestand wordt
+       gecommit. */
+    const gemeten = {
+      adres: BASIS,
+      op: new Date().toISOString(),
+      metricsToken: !!process.env.RTG_METRICS_TOKEN,
+      clusterSleutel: !!process.env.RTG_CLUSTER_KEY,
+      domeinen: !!process.env.RTG_DOMAINS,
+      let: 'Deze uitslag geldt voor DEZE opstelling. /api/metrics gaat zonder token open ' +
+        'vanaf een intern adres; een lokale ronde meldt hem daarom als open zonder dat er ' +
+        'iets mis is. Vergelijk alleen rondes met dezelfde vlaggen.'
+    };
+    console.log(JSON.stringify(perRouteUit ? { gemeten, ...uit, perRoute } : { gemeten, ...uit }, null, 1));
     process.exit(uit.open.length ? 1 : 0);
   }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');

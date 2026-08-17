@@ -35,7 +35,7 @@
   .as .balk i{display:block;height:100%;}
   .as small{display:block;font-size:.66rem;color:var(--rtg-soft);
     font-variant-numeric:var(--rtg-cijfers);}
-  .as[data-instrument="nee"] b::after{content:' — geen instrument';letter-spacing:0;
+  .as[data-instrument="nee"] b::after{content:' -- geen instrument';letter-spacing:0;
     text-transform:none;font-weight:400;color:var(--rtg-soft);}
   .zoekrij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.7rem 0;}
   .zoekrij input,.zoekrij select{border:1px solid var(--rtg-line);background:var(--rtg-card2);
@@ -84,7 +84,7 @@
        van deze route GEMETEN is, en door wie". Ongemeten is geen oordeel over de
        route; het is een oordeel over ons. -->
   <p class="uitleg">Van elke route van dit huis: wat we er werkelijk van weten, over elf schakels.
-    De routedekking zegt of een route ooit door een toets is aangeroepen — dit zegt of hij dicht zit,
+    De routedekking zegt of een route ooit door een toets is aangeroepen -- dit zegt of hij dicht zit,
     of een verkeerde rol eruit blijft, of rommel wordt geweigerd en of er een spoor achterblijft.
     <b>Ongemeten betekent niet onveilig</b>: het betekent dat niemand het heeft nagevraagd.</p>
 
@@ -151,10 +151,12 @@
     return d;
   }
 
-  /* Vier staten, vier tekens. Het teken zit in het attribuut zodat het ook
+  /* Vijf staten, vijf tekens. Het teken zit in het attribuut zodat het ook
      leesbaar is zonder kleur, en `verklaard` krijgt met opzet GEEN vinkje: het
-     staat in de brontekst en niemand heeft het nagevraagd. */
-  const TEKEN = { bewezen: '✓', gezakt: '×', nvt: '–', verklaard: '?', ongemeten: '·' };
+     staat in de brontekst en niemand heeft het nagevraagd. `nvt` draagt de lege
+     verzameling en geen streepje: de huisregel verbiedt em- en en-streepjes in
+     de bron (keuringsregel 3), ook als glyf. */
+  const TEKEN = { bewezen: '✓', gezakt: '×', nvt: '∅', verklaard: '?', ongemeten: '·' };
 
   function tekenAssen(d) {
     schakels = d.schakels;
@@ -165,7 +167,7 @@
       return '<button class="as" type="button" data-as="' + esc(s.id) + '"' +
         ' data-instrument="' + (s.bron ? 'ja' : 'nee') + '"' +
         ' aria-pressed="' + (schakel === s.id) + '"' +
-        ' title="' + esc(s.uitleg) + (s.nodig ? ' — ' + esc(s.nodig) : '') + '">' +
+        ' title="' + esc(s.uitleg) + (s.nodig ? ' -- ' + esc(s.nodig) : '') + '">' +
         '<b>' + esc(s.id) + '</b>' +
         '<span class="balk">' +
           '<i style="width:' + breed(p.bewezen) + ';background:var(--rtg-goud)"></i>' +
@@ -264,7 +266,7 @@
         '<div class="wat">' + esc(s.uitleg) + '</div>' +
         (detail ? '<div class="bron">' + esc(detail) + '</div>' : '') +
         '<div class="bron">' + (c.bron ? 'gemeten door ' + esc(c.bron)
-          : (s.bron ? 'instrument: ' + esc(s.bron) : 'geen instrument — ' + esc(s.nodig || 'nog te bouwen'))) +
+          : (s.bron ? 'instrument: ' + esc(s.bron) : 'geen instrument -- ' + esc(s.nodig || 'nog te bouwen'))) +
         '</div></div>';
     }).join('');
     $('#dossier').showModal();

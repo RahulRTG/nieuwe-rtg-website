@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#74152f">
+  <meta name="description" content="Begin met uw eigen gegevens in uw persoonlijke RTG-omgeving. Geen demo-activiteiten of voorbeeldinformatie.">
+  <meta name="rtg-api-base" content="https://app.rahultravelgroup.com">
+  <meta name="rtg-asset-base" content="./public">
+  <title>Uw persoonlijke RTG-omgeving | Rahul Travel Group</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --wijn: #74152f;
+      --wijn-diep: #4d0f22;
+      --goud: #b99a49;
+      --inkt: #241b1e;
+      --zacht: #766a6d;
+      --lijn: #e6dcde;
+      --papier: #fffdf9;
+      --roze: #f7eef0;
+      --wit: #fff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--inkt);
+      background:
+        radial-gradient(circle at 88% 8%, rgba(185, 154, 73, .16), transparent 28rem),
+        linear-gradient(180deg, #fff 0%, var(--papier) 62%, #f8f2f1 100%);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+
+    .pagina {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 92px;
+      border-bottom: 1px solid var(--lijn);
+    }
+
+    .merk {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+    }
+
+    .merk img {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      box-shadow: 0 8px 26px rgba(77, 15, 34, .15);
+    }
+
+    .merk strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+
+    .merk span {
+      display: block;
+      color: var(--zacht);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--wijn);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .taal-knop {
+      border: 1px solid var(--lijn);
+      border-radius: 999px;
+      background: var(--wit);
+      color: var(--wijn);
+      padding: 9px 14px;
+      font: 700 12px/1 Inter, ui-sans-serif, sans-serif;
+      cursor: pointer;
+    }
+
+    .status::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--goud);
+      content: "";
+      box-shadow: 0 0 0 5px rgba(185, 154, 73, .13);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(360px, .97fr);
+      gap: clamp(42px, 8vw, 104px);
+      align-items: center;
+      padding: clamp(70px, 11vw, 132px) 0 90px;
+    }
+
+    .label {
+      margin: 0 0 18px;
+      color: var(--wijn);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(46px, 7vw, 76px);
+      font-weight: 500;
+      letter-spacing: -.045em;
+      line-height: 1.02;
+    }
+
+    h1 em {
+      color: var(--wijn);
+      font-style: normal;
+    }
+
+    .intro {
+      max-width: 660px;
+      margin: 28px 0 0;
+      color: #5d5154;
+      font-size: clamp(18px, 2vw, 21px);
+    }
+
+    .belofte {
+      display: grid;
+      gap: 14px;
+      margin: 34px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .belofte li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 15px;
+    }
+
+    .vink {
+      display: inline-grid;
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      margin-top: 1px;
+      border: 1px solid #d7c2c7;
+      border-radius: 50%;
+      color: var(--wijn);
+      font-size: 12px;
+      font-weight: 900;
+      background: var(--roze);
+    }
+
+    .kaart {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(30px, 5vw, 46px);
+      border: 1px solid rgba(116, 21, 47, .14);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 28px 80px rgba(77, 15, 34, .12);
+      backdrop-filter: blur(8px);
+    }
+
+    .kaart::before {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      border-radius: 0 0 0 100%;
+      background: linear-gradient(135deg, rgba(185, 154, 73, .18), rgba(116, 21, 47, .04));
+      content: "";
+    }
+
+    .leegte-icoon {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      place-items: center;
+      margin-bottom: 27px;
+      border-radius: 20px;
+      color: var(--wijn);
+      background: var(--roze);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 31px;
+    }
+
+    .kaart h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 500;
+      line-height: 1.12;
+    }
+
+    .kaart > p {
+      margin: 17px 0 0;
+      color: var(--zacht);
+      font-size: 16px;
+    }
+
+    .stappen {
+      display: grid;
+      gap: 0;
+      margin: 30px 0;
+      border-top: 1px solid var(--lijn);
+      border-bottom: 1px solid var(--lijn);
+    }
+
+    .stap {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 12px;
+      padding: 15px 0;
+    }
+
+    .stap + .stap { border-top: 1px solid var(--lijn); }
+
+    .nummer {
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border-radius: 9px;
+      color: var(--wijn);
+      background: var(--roze);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .stap strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .stap span {
+      display: block;
+      color: var(--zacht);
+      font-size: 13px;
+    }
+
+    .knop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      color: var(--wit);
+      background: var(--wijn);
+      box-shadow: 0 12px 26px rgba(116, 21, 47, .22);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .knop:hover { background: var(--wijn-diep); transform: translateY(-2px); }
+    .knop:focus-visible { outline: 3px solid rgba(185, 154, 73, .7); outline-offset: 3px; }
+
+    .privacy {
+      margin: 13px 5px 0 !important;
+      font-size: 12px !important;
+      text-align: center;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px 0 40px;
+      border-top: 1px solid var(--lijn);
+      color: var(--zacht);
+      font-size: 12px;
+    }
+
+    @media (max-width: 820px) {
+      main { grid-template-columns: 1fr; padding-top: 64px; }
+      .kaart { max-width: 620px; }
+    }
+
+    @media (max-width: 540px) {
+      .pagina { width: min(100% - 28px, 1120px); }
+      header { min-height: 78px; }
+      .status { display: none; }
+      main { gap: 42px; padding: 48px 0 58px; }
+      h1 { font-size: 43px; }
+      .intro { font-size: 17px; }
+      .kaart { padding: 27px 22px; border-radius: 24px; }
+      footer { display: block; }
+      footer span { display: block; margin-top: 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .knop { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <header>
+      <a class="merk" href="./" aria-label="Rahul Travel Group">
+        <img src="./public/icon.svg" alt="" width="45" height="45">
+        <span>
+          <strong>Rahul Travel Group</strong>
+          <span>Persoonlijke omgeving</span>
+        </span>
+      </a>
+      <span class="status">Geen voorbeelddata</span>
+    </header>
+
+    <main>
+      <section aria-labelledby="hoofdtitel">
+        <p class="label">Uw informatie, uw omgeving</p>
+        <h1 id="hoofdtitel">Uw RTG-omgeving begint <em>leeg.</em></h1>
+        <p class="intro">Wij vullen niets voor u in. Geen demo-activiteiten, nepboekingen of voorbeeldpersonen. U ziet alleen informatie die u zelf toevoegt.</p>
+
+        <ul class="belofte" aria-label="Onze belofte">
+          <li><span class="vink" aria-hidden="true">✓</span><span>Uw overzicht wordt pas gevuld met uw eigen gegevens.</span></li>
+          <li><span class="vink" aria-hidden="true">✓</span><span>Een activiteit verschijnt alleen nadat u die zelf heeft toegevoegd.</span></li>
+          <li><span class="vink" aria-hidden="true">✓</span><span>Voorbeeldinformatie wordt nooit als echte informatie gepresenteerd.</span></li>
+        </ul>
+      </section>
+
+      <section class="kaart" aria-labelledby="starttitel">
+        <div class="leegte-icoon" aria-hidden="true">＋</div>
+        <h2 id="starttitel">Nog geen eigen informatie</h2>
+        <p>Begin bij uzelf. Daarna ontstaat een overzicht dat echt bij u hoort.</p>
+
+        <div class="stappen" aria-label="Stappen om te beginnen">
+          <div class="stap">
+            <span class="nummer">1</span>
+            <span><strong>Maak uw persoonlijke omgeving</strong>Gebruik uw eigen naam en contactgegevens.</span>
+          </div>
+          <div class="stap">
+            <span class="nummer">2</span>
+            <span><strong>Geef uw voorkeuren door</strong>U bepaalt welke informatie voor u relevant is.</span>
+          </div>
+          <div class="stap">
+            <span class="nummer">3</span>
+            <span><strong>Voeg uw eigen activiteiten toe</strong>Uw overzicht blijft leeg totdat u iets toevoegt.</span>
+          </div>
+        </div>
+
+        <a class="knop" href="https://app.rahultravelgroup.com/">Start met uw eigen gegevens</a>
+        <p class="privacy">U gaat naar de beveiligde persoonlijke RTG-omgeving. Op deze openbare pagina slaan wij niets op.</p>
+      </section>
+    </main>
+
+    <footer>
+      <strong>Rahul Travel Group</strong>
+      <span>Geen demo’s vermomd als echte activiteit.</span>
+      <button class="taal-knop" id="taalKnop" type="button">Taal / Language</button>
+    </footer>
+  </div>
+  <script src="./public/shared/i18n.js"></script>
+  <script>
+    document.getElementById('taalKnop').addEventListener('click', function () {
+      if (window.RTGi18n) window.RTGi18n.openModal();
+    });
+  </script>
+</body>
+</html>

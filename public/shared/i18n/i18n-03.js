@@ -35,7 +35,7 @@
       if (window.RTGMond) go();
       else if (!this._mondLaadt) {
         this._mondLaadt = true;
-        const s = document.createElement('script'); s.src = '/shared/mond.js'; s.async = true;
+        const s = document.createElement('script'); s.src = assetPad('/shared/mond.js'); s.async = true;
         s.onload = go; document.head.appendChild(s);
       }
       this._startSterren();
@@ -48,7 +48,7 @@
       if (window.RTGSterren) return go();
       if (this._sterLaadt) return;
       this._sterLaadt = true;
-      const s = document.createElement('script'); s.src = '/shared/sterren.js'; s.async = true;
+      const s = document.createElement('script'); s.src = assetPad('/shared/sterren.js'); s.async = true;
       s.onload = go; document.head.appendChild(s);
     },
     openModal() {
@@ -146,7 +146,7 @@
     /* De actieve wereldtalen ophalen (Boardroom-schakelaars). Faalt dit (bijv.
        op de noodserver), dan blijven Nederlands en Engels gewoon werken. */
     laadTalen() {
-      return fetch('/api/talen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      return fetch(apiPad('/api/talen'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
         .then(r => r.json())
         .then(d => {
           if (Array.isArray(d.talen) && d.talen.length >= 2) {

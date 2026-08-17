@@ -57,10 +57,11 @@
   function stand(){return !poortDicht()?'weg':(aangemeld()?'open':'gesloten')}
   function magBestaan(){return poortDicht()}
   /* Het inloggesprek staat in #gate en wordt door app-main gebouwd; wij
-     verplaatsen dat blok alleen naar de werkvloer. Een wereld aanraken zet de
-     cursor in datzelfde gesprek -- meer belooft deze laag niet, want inloggen
-     is niet van haar. */
-  function inlog(){var i=d.getElementById('agIn');if(i)i.focus()}
+     verplaatsen dat blok alleen naar de werkvloer. De passkey is nu de eerste
+     deur, dus een wereld aanraken zet de cursor daar. Pas na "Andere manier"
+     is het antwoordveld zichtbaar en wordt dat de bestemming. */
+  function inlog(){var p=d.getElementById('agPasskey'),i=d.getElementById('agIn');
+    if(p&&!p.hidden)p.focus();else if(i)i.focus()}
 
   function bouwTafel(){
     if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
@@ -80,6 +81,27 @@
      hoort niet door een waarnemer te worden overstemd. */
   var opgevouwen=false;
   function thuis(){opgevouwen=true;if(tafel)tafel.sloop()}
+
+  /* INLOGGEN LANDT ALTIJD OP EEN LEGE KEUZE.
+
+     probeer() houdt de werktafel normaal via DOM-waarnemers gelijk met de
+     sessie. Dat is een goed vangnet, maar niet de navigatiebelofte zelf: een
+     geslaagde inlog hoort niet afhankelijk te zijn van het moment waarop een
+     class-mutatie wordt gezien. De inloglaag roept land() daarom rechtstreeks
+     aan zodra de onboarding klaar is.
+
+     Ook een eerder open blad wordt hier bewust gewist. Wie opnieuw binnenkomt
+     kiest zelf een wereld; het huis opent geen activiteit of voorbeeld voor
+     hem. */
+  function land(){
+    opgevouwen=false;
+    if(!mag())return false;
+    var t=bouwTafel();
+    t.zet('open');
+    t.wis();
+    t.sync();
+    return true;
+  }
 
   /* TWEE REDENEN OM NIET TE OPENEN, MET TWEE VERSCHILLENDE UITKOMSTEN.
 
@@ -136,6 +158,7 @@
   w.RTGCommand={open:open,bestemming:bestemming,
     herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
     actief:mag,
+    land:land,
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

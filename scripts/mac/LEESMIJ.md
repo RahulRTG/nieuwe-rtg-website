@@ -123,6 +123,21 @@ sudo pmset -a sleep 0 disksleep 0 autorestart 1 womp 1
 `installeer.sh` doet dit alleen als je `--slaap-uit` meegeeft; zonder die vlag
 laat hij je instellingen met rust en laat hij alleen zien hoe ze nu staan.
 
+## Eigen AI: RTG Kompas
+
+Op een Apple Silicon Mac installeert dit de lokale AI, de afgeschermde
+`rtg-kompas`-variant en een LaunchAgent die Metal gebruikt:
+
+```bash
+scripts/mac/ollama-kompas.sh
+scripts/mac/ollama-kompas.sh --controle
+```
+
+De service luistert alleen op `127.0.0.1:11434`, Ollama Cloud staat uit en er
+wordt maximaal één model en één berekening tegelijk geladen. Neem daarna de
+niet-geheime `LOCAL_AI_*`-regels over die het script toont. Zie voor de
+privacyroute, uitwijk en menselijke grens `docs/lokale-intelligentie.md`.
+
 ## Van buitenaf bereikbaar
 
 Standaard draait de site op poort 3000 op je eigen netwerk. Er zijn twee wegen

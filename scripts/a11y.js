@@ -3,7 +3,7 @@
    browser, injecteert de EIGEN keuring (scripts/a11ykeuring.js, verving axe-core)
    en faalt bij een ondubbelzinnige structurele overtreding (afbeelding zonder
    alt, veld zonder label, knop/link zonder naam, geen lang, lege titel).
-   Kleurcontrast wordt adviserend getoond, niet-fataal.
+   Kleurcontrast telt mee als fout (was adviserend; zie velt() in a11ykeuring.js).
 
    De scan heeft een browser nodig. Is Playwright of Chromium er niet (zoals
    op een kale CI zonder browsers), dan slaat de scan zichzelf netjes over met
@@ -105,7 +105,7 @@ function statischeServer() {
     console.log('[a11y] Playwright niet beschikbaar; scan overgeslagen (statische a11y-regels draaien in check.js).');
     process.exit(STRICT ? 1 : 0);
   }
-  const { BRON } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
+  const { BRON, velt } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
   const server = statischeServer();
   await new Promise((r) => server.listen(0, r));
   const poort = server.address().port;
@@ -134,7 +134,7 @@ function statischeServer() {
       console.log(`\n[a11y] ${pad}: ${res.overtredingen.length} soort(en) structurele overtreding`);
       for (const v of res.overtredingen) {
         console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
-        /* WAAR, net als bij het contrastadvies hieronder. Zonder plaats is een
+        /* WAAR, net als bij de contrastmelding hieronder. Zonder plaats is een
            structurele overtreding op een pagina met veertig velden een zoektocht
            -- en juist deze meldingen laten de bouw falen, dus daar wil je het
            adres het hardst. */
@@ -143,11 +143,25 @@ function statischeServer() {
     } else {
       console.log(`[a11y] ${pad}: schoon`);
     }
-    // contrast is ADVISEREND (niet-fataal): tonen, niet laten falen (meetverschil met axe)
+    /* CONTRAST IS NU FATAAL, EN DAT WAS EEN GOEDKOOP MOMENT.
+
+       Het stond adviserend om een goede reden: de achtergrond-heuristiek van
+       axe (door lagen en gradients heen) wordt hier niet volledig nagemaakt, en
+       een bouw rood maken op een meetverschil is erger dan de melding missen.
+       Maar die reden dekt alleen de TWIJFELGEVALLEN, en de keuring meet die al
+       niet: hij slaat alleen aan op een element met eigen zichtbare tekst, vol
+       dekkende voorgrondkleur en een oplosbare, SOLIDE achtergrond. Wat
+       overblijft is geen meetverschil maar een leesbaar/niet-leesbaar oordeel.
+
+       Gemeten op het moment van omzetten: nul contrastmeldingen over alle
+       vlaggenschip-pagina's. De poort kostte dus vandaag niets -- en dat is
+       precies wanneer je hem moet sluiten, want CLAUDE.md heeft de regel al
+       ("bordeaux is nooit een tekstkleur op zwart") en tot nu toe stond die
+       regel op papier en niet in de machine. */
     if (res.contrast.length) {
       contrastTotaal += res.contrast.reduce((n, v) => n + v.aantal, 0);
       for (const v of res.contrast) {
-        console.log(`  · (advies) ${v.help} (${v.aantal}x)`);
+        console.log(`  · contrast: ${v.help} (${v.aantal}x)`);
         // WAAR: zonder plaats is een contrastmelding niet te repareren.
         for (const w of (v.waar || [])) console.log(`      ${w}`);
       }
@@ -155,7 +169,8 @@ function statischeServer() {
   }
   await browser.close();
   server.close();
-  if (contrastTotaal) console.log(`\n[a11y] ${contrastTotaal} contrast-advies(en) -- adviserend, laat de bouw niet falen.`);
-  if (totaal) { console.error(`\n[a11y] MISLUKT: ${totaal} structurele overtreding(en).`); process.exit(1); }
+  const oordeel = velt(totaal, contrastTotaal);
+  for (const regel of oordeel.melding) console.error(regel);
+  if (oordeel.faalt) process.exit(1);
   console.log('\n[a11y] Alle vlaggenschip-pagina’s structureel schoon.');
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

@@ -81,6 +81,22 @@ test('mistLabel: veld zonder label/aria/title/placeholder (conservatief, geen va
   assert.equal(k.mistLabel(metLabel), false);
 });
 
+/* De poort die contrast fataal maakt. Stond eerder als twee losse if-regels
+   onderin scripts/a11y.js, en was daarmee alleen te bewijzen door een echte
+   pagina met een echt contrastgat te bouwen -- dus in de praktijk niet. */
+test('velt: contrast laat de keuring nu falen, net als een structurele fout', () => {
+  assert.equal(k.velt(0, 0).faalt, false, 'schoon is schoon');
+  assert.deepEqual(k.velt(0, 0).melding, [], 'en dan valt er niets te melden');
+
+  const alleenContrast = k.velt(0, 3);
+  assert.equal(alleenContrast.faalt, true,
+    'drie contrastovertredingen zonder structurele fout horen de bouw te laten falen; adviserend was de oude stand');
+  assert.match(alleenContrast.melding.join(' '), /3 contrastovertreding/);
+
+  assert.equal(k.velt(2, 0).faalt, true, 'structureel blijft fataal');
+  assert.equal(k.velt(2, 3).melding.length, 2, 'allebei gemeld, zodat een ronde beide laat zien');
+});
+
 test('BRON is syntactisch geldige browsercode en bevat de instap', () => {
   assert.match(k.BRON, /window\.__a11yKeur = keurInPagina/);
   // parse-check zonder uitvoeren: new Function gooit bij een syntaxfout

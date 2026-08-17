@@ -159,6 +159,22 @@ jobs:
         with:
           fail-on-severity: high
 
+  # PR #58 wilde het runtime-image van node:22-slim naar node:26-slim tillen en
+  # kreeg zes groene vinkjes, terwijl geen enkele job de container aanraakte:
+  # release-image.yml bouwt pas bij een release, en de keuring hierboven draait
+  # op de Node van de runner. Deze job draait de echte server met de echte CMD
+  # in de Node uit de Dockerfile -- geen imagebouw, dus geen Rust-fase van
+  # minuten op elke PR. Wat hij niet dekt (Rust-fase, COPY, rechten) staat in
+  # de kop van het script.
+  container:
+    name: De container komt op
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: De Node uit de Dockerfile draait de CMD uit de Dockerfile
+        run: node scripts/containerproef.js
+
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest

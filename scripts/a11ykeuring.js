@@ -7,10 +7,11 @@
    <html>, een lege <title> -- precies de dingen die axe ook als serious/critical
    markeert. Omdat we alleen aanslaan als er GEEN enkele naamgevings-/label-manier
    is, blijven de (al schone) pagina's stil: we onder-melden liever dan vals
-   alarm. Kleurcontrast melden we ADVISEREND (niet-fataal): de exacte contrast-
-   heuristiek van axe (effectieve achtergrond door lagen/gradients heen) is het ene
-   stuk dat we niet volledig namaken, dus dat mag de bouw niet rood maken op een
-   meetverschil.
+   alarm. Kleurcontrast telt sinds de contrastronde OOK fataal: de heuristiek meet
+   alleen tekst met een dekkende voorgrondkleur op een oplosbare, SOLIDE
+   achtergrond, en juist de twijfelgevallen (lagen, gradients) slaat hij al niet
+   aan. Wat overblijft is geen meetverschil met axe maar een leesbaarheidsfout.
+   Zie velt() onderaan; het oordeel staat daar apart zodat het te toetsen is.
 
    De browsercode wordt als BRON-string geïnjecteerd; de pure helpers zijn apart
    exporteerbaar zodat test/a11ykeuring.test.js ze in Node kan toetsen. */
@@ -143,7 +144,7 @@ function keurInPagina() {
   if (!html.getAttribute('lang')) tel(structureel, 'html-taal', '<html> zonder lang-attribuut');
   if (!(document.title || '').trim()) tel(structureel, 'titel', 'Document zonder <title>');
 
-  // contrast (adviserend): alleen elementen met eigen zichtbare tekst en een oplosbare, solide achtergrond
+  // contrast (fataal): alleen elementen met eigen zichtbare tekst en een oplosbare, solide achtergrond
   document.querySelectorAll('body *').forEach(el => {
     const eigenTekst = Array.prototype.some.call(el.childNodes, n => n.nodeType === 3 && n.textContent.trim());
     if (!eigenTekst || !zichtbaar(el)) return;
@@ -167,4 +168,20 @@ function keurInPagina() {
 const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar, achtergrond, adres, keurInPagina]
   .map(f => f.toString()).join('\n\n') + '\nwindow.__a11yKeur = keurInPagina;\n';
 
-module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel };
+/* HET OORDEEL, apart en puur, zodat het toetsbaar is zonder browser.
+
+   Dit stond als twee losse if-regels onder in scripts/a11y.js, en daarmee was
+   de enige manier om te bewijzen dat de poort dichtslaat: een echte pagina met
+   een echt contrastgat bouwen. Een poort die je nooit hebt zien dichtgaan is
+   geen poort (LAT.md regel 9), dus hoort het oordeel hier bij de andere pure
+   helpers -- test/a11ykeuring.test.js komt er in Node bij. */
+function velt(structureel, contrast) {
+  const melding = [];
+  if (structureel) melding.push('\n[a11y] MISLUKT: ' + structureel + ' structurele overtreding(en).');
+  if (contrast) melding.push('\n[a11y] MISLUKT: ' + contrast + ' contrastovertreding(en). ' +
+    'Dit is sinds de contrastronde fataal: de keuring meet alleen tekst met een oplosbare, ' +
+    'solide achtergrond, dus dit is geen meetverschil maar een leesbaarheidsfout.');
+  return { faalt: structureel > 0 || contrast > 0, melding };
+}
+
+module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, velt };

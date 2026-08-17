@@ -12,7 +12,6 @@
    A11Y_STRICT=1. */
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
@@ -39,10 +38,11 @@ const STRICT = process.env.A11Y_STRICT === '1';
    EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
    ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
 const { alleSchermen } = require('./schermen');
-const PAGINAS = alleSchermen();
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
-  '.svg': 'image/svg+xml', '.json': 'application/json', '.webmanifest': 'application/manifest+json',
-  '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
+/* alleSchermen() loopt public/apps af. Het 404-scherm staat in public/site en
+   viel daarmee buiten de keuring -- terwijl het juist een scherm is dat een
+   bezoeker onverwacht krijgt. Er is geen derde plek: dit zijn alle .html onder
+   public. */
+const PAGINAS = alleSchermen().concat(['/site/404.html']);
 
 function laadPlaywright() {
   const paden = [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules'];
@@ -56,16 +56,42 @@ function laadPlaywright() {
   return null;
 }
 
-function statischeServer() {
-  return http.createServer((req, res) => {
-    let rel = decodeURIComponent(req.url.split('?')[0]);
-    if (rel.endsWith('/')) rel += 'index.html';
-    const bestand = path.join(PUB, path.normalize(rel));
-    if (!bestand.startsWith(PUB)) { res.writeHead(403); return res.end(); }
-    fs.readFile(bestand, (err, data) => {
-      if (err) { res.writeHead(404); return res.end('niet gevonden'); }
-      res.writeHead(200, { 'content-type': MIME[path.extname(bestand)] || 'application/octet-stream' });
-      res.end(data);
+/* DE ECHTE SERVER, NIET EEN STATISCHE MAP.
+
+   Hier stond een klein http-servertje dat public/ uitdeelde. Dat kan geen
+   ingelogde staat leveren: geen /api, geen sessie, dus keurde de scan alleen de
+   uitgelogde eerste render. Voor vrijwel elk scherm in dit huis is dat de
+   buitenkant van de deur -- gemeten op /apps/app.html: uitgelogd 367 tekens
+   zichtbare tekst, ingelogd 769. Meer dan de helft was ongemeten.
+
+   Twee dingen die daarbij veranderen. De echte server stuurt een CSP mee met een
+   nonce, en daardoor wordt een geinjecteerd inline script GEBLOKKEERD: de keuring
+   gaat nu via page.evaluate (dat loopt buiten de CSP om) in plaats van via
+   addScriptTag. En hij heeft een wegwerpdatamap nodig, want de scan maakt een
+   echt proeflid aan. Zelfde opzet als de proef-familie in scripts/. */
+function startEchteServer() {
+  const net = require('net');
+  const { spawn } = require('child_process');
+  const os = require('os');
+  return new Promise((klaar, mis) => {
+    const s = net.createServer();
+    s.unref(); s.on('error', mis);
+    s.listen(0, '127.0.0.1', () => {
+      const poort = s.address().port;
+      s.close(async () => {
+        const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
+        const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(ROOT, 'server', 'server.js')], {
+          cwd: ROOT, stdio: 'ignore',
+          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1' }
+        });
+        const basis = 'http://127.0.0.1:' + poort;
+        const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
+        for (let i = 0; i < 300; i++) {
+          try { if ((await fetch(basis + '/api/health')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
+          await new Promise(r => setTimeout(r, 200));
+        }
+        stop(); mis(new Error('de server kwam niet op'));
+      });
     });
   });
 }
@@ -77,71 +103,111 @@ function statischeServer() {
     process.exit(STRICT ? 1 : 0);
   }
   const { BRON, velt } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
-  const server = statischeServer();
-  await new Promise((r) => server.listen(0, r));
-  const poort = server.address().port;
-  const basis = `http://127.0.0.1:${poort}`;
+  const server = await startEchteServer();
+  const basis = server.basis;
 
   let browser;
   try {
-    browser = await pw.chromium.launch();
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   } catch (e) {
     console.log('[a11y] Kon Chromium niet starten; scan overgeslagen:', e.message);
-    server.close();
+    server.stop();
     process.exit(STRICT ? 1 : 0);
   }
 
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  let totaal = 0, contrastTotaal = 0;
-  for (const pad of PAGINAS) {
-    await page.goto(basis + pad, { waitUntil: 'load' });
-    await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen; anders een tijdelijk lager contrast
-    await page.addScriptTag({ content: BRON });
-    const res = await page.evaluate(() => window.__a11yKeur());
-    // structurele overtredingen falen hard (ondubbelzinnig, zoals axe serious/critical)
-    if (res.overtredingen.length) {
-      totaal += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
-      console.log(`\n[a11y] ${pad}: ${res.overtredingen.length} soort(en) structurele overtreding`);
-      for (const v of res.overtredingen) {
-        console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
-        /* WAAR, net als bij de contrastmelding hieronder. Zonder plaats is een
-           structurele overtreding op een pagina met veertig velden een zoektocht
-           -- en juist deze meldingen laten de bouw falen, dus daar wil je het
-           adres het hardst. */
-        for (const w of (v.waar || [])) console.log(`      ${w}`);
-      }
-    } else {
-      console.log(`[a11y] ${pad}: schoon`);
-    }
-    /* CONTRAST IS NU FATAAL, EN DAT WAS EEN GOEDKOOP MOMENT.
-
-       Het stond adviserend om een goede reden: de achtergrond-heuristiek van
-       axe (door lagen en gradients heen) wordt hier niet volledig nagemaakt, en
-       een bouw rood maken op een meetverschil is erger dan de melding missen.
-       Maar die reden dekt alleen de TWIJFELGEVALLEN, en de keuring meet die al
-       niet: hij slaat alleen aan op een element met eigen zichtbare tekst, vol
-       dekkende voorgrondkleur en een oplosbare, SOLIDE achtergrond. Wat
-       overblijft is geen meetverschil maar een leesbaar/niet-leesbaar oordeel.
-
-       Gemeten op het moment van omzetten: nul contrastmeldingen over alle
-       vlaggenschip-pagina's. De poort kostte dus vandaag niets -- en dat is
-       precies wanneer je hem moet sluiten, want CLAUDE.md heeft de regel al
-       ("bordeaux is nooit een tekstkleur op zwart") en tot nu toe stond die
-       regel op papier en niet in de machine. */
-    if (res.contrast.length) {
-      contrastTotaal += res.contrast.reduce((n, v) => n + v.aantal, 0);
-      for (const v of res.contrast) {
-        console.log(`  · contrast: ${v.help} (${v.aantal}x)`);
-        // WAAR: zonder plaats is een contrastmelding niet te repareren.
-        for (const w of (v.waar || [])) console.log(`      ${w}`);
-      }
-    }
+  /* Een echt proeflid, zodat de tweede ronde een ECHTE sessie heeft en niet een
+     verzonnen token dat de server toch weigert. */
+  const u = Date.now().toString().slice(-8);
+  const lid = await fetch(basis + '/api/auth/register', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Keurlid', email: 'keur' + u + '@x.nl', phone: '06' + u,
+      password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' })
+  }).then(r => r.json()).catch(() => ({}));
+  if (!lid || !lid.token) {
+    console.error('[a11y] MISLUKT: geen proeflid, dus de ingelogde ronde zou stil worden overgeslagen.');
+    await browser.close(); server.stop(); process.exit(1);
   }
+
+  /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
+     een CSP met nonce mee en die blokkeert een inline script. In een IIFE, want
+     evaluate met een string verwacht een expressie en BRON begint met functies. */
+  const KEUR = '(function(){' + BRON + '\nreturn window.__a11yKeur()})()';
+
+  let totaal = 0, contrastTotaal = 0;
+  const perRonde = [];
+
+  for (const ronde of [{ naam: 'uitgelogd', token: null }, { naam: 'ingelogd', token: lid.token }]) {
+    const context = await browser.newContext({ serviceWorkers: 'block' });
+    if (ronde.token) {
+      await context.addInitScript((t) => {
+        try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+      }, ronde.token);
+    }
+    const page = await context.newPage();
+    let struct = 0, contr = 0;
+    console.log(`\n[a11y] ===== ronde ${ronde.naam.toUpperCase()} (${PAGINAS.length} schermen) =====`);
+
+    for (const pad of PAGINAS) {
+      await page.goto(basis + pad, { waitUntil: 'load' });
+      await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen
+      let res;
+      try { res = await page.evaluate(KEUR); }
+      catch (e) {
+        console.error(`[a11y] ${pad} (${ronde.naam}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
+        struct += 1; continue;
+      }
+      if (res.overtredingen.length) {
+        struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
+        console.log(`\n[a11y] ${pad} (${ronde.naam}): ${res.overtredingen.length} soort(en) structurele overtreding`);
+        for (const v of res.overtredingen) {
+          console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+          for (const w of (v.waar || [])) console.log(`      ${w}`);
+        }
+      }
+      if (res.contrast.length) {
+        contr += res.contrast.reduce((n, v) => n + v.aantal, 0);
+        console.log(`\n[a11y] ${pad} (${ronde.naam}):`);
+        for (const v of res.contrast) {
+          console.log(`  · contrast: ${v.help} (${v.aantal}x)`);
+          for (const w of (v.waar || [])) console.log(`      ${w}`);
+        }
+      }
+    }
+    await context.close();
+    perRonde.push({ naam: ronde.naam, struct, contr });
+    totaal += struct; contrastTotaal += contr;
+    console.log(`[a11y] ronde ${ronde.naam}: ${struct} structureel, ${contr} contrast`);
+  }
+
   await browser.close();
-  server.close();
-  const oordeel = velt(totaal, contrastTotaal);
-  for (const regel of oordeel.melding) console.error(regel);
-  if (oordeel.faalt) process.exit(1);
-  console.log(`\n[a11y] Alle ${PAGINAS.length} schermen schoon: structuur en contrast.`);
+  server.stop();
+
+  for (const r of perRonde) console.log(`[a11y] ${r.naam.padEnd(10)} ${r.struct} structureel · ${r.contr} contrast`);
+  /* DE INGELOGDE RONDE IS NIEUW, EN BRACHT 25 CONTRASTFOUTEN MEE die nooit
+     gemeten zijn. Die op dag een hard afkeuren zou betekenen: de poort staat
+     rood tot iemand negen CSS-plekken heeft nagelopen, en dan wordt hij uitgezet.
+     Die op nul zetten zou liegen.
+
+     Dus een ratel op EEN getal, zichtbaar in A11Y-INGELOGD.json: het mag alleen
+     omlaag. Komt er een fout bij, dan zakt de scan. Verdwijnt er een, dan meldt
+     hij dat de grens strakker kan. Structureel blijft in beide staten hard nul,
+     en de uitgelogde ronde ook -- daar is geen ruimte, want die is schoon. */
+  const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
+  const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
+  const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };
+  const fouten = [];
+  if (totaal > 0) fouten.push(`${totaal} structurele overtreding(en) -- die zijn in beide staten hard nul`);
+  if (uitgelogd.contr > grens.uitgelogd.contrast)
+    fouten.push(`${uitgelogd.contr} contrastfouten uitgelogd, de grens is ${grens.uitgelogd.contrast}`);
+  if (ingelogd.contr > grens.ingelogd.contrast)
+    fouten.push(`${ingelogd.contr} contrastfouten ingelogd, de grens is ${grens.ingelogd.contrast} -- er is er een BIJGEKOMEN`);
+  if (fouten.length) {
+    console.error('\n[a11y] MISLUKT:');
+    for (const f of fouten) console.error('  · ' + f);
+    process.exit(1);
+  }
+  if (ingelogd.contr < grens.ingelogd.contrast)
+    console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
+  console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
+    `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

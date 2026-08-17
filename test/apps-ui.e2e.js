@@ -38,7 +38,7 @@ async function naarLedenThuis(page) {
     await lade.click();
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
-  await page.click('#rtgCommand .cmd-klok');
+  await page.click('#rtgCommand .cmd-schil');
   await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
 }
 
@@ -57,11 +57,11 @@ async function bootTest(opts) {
     await page.addInitScript((kv) => {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-      /* Het beginscherm opent standaard in de wereldstand (de kring om de klok,
-         shared/wereld.js); daar staan de maprijen op display:none en levert een
-         meting van hun plaats nullen op. Deze toetsen gaan over het ROOSTER, dus
-         zetten ze dat aan. De wereldstand wordt in test/wereld.e2e.js gemeten. */
-      localStorage.setItem('rtg_os_wereld', 'uit');
+      /* HIER STOND rtg_os_wereld = 'uit', om het rooster af te dwingen: het
+         beginscherm had daarnaast een wereldstand (de kring om de klok) waarin
+         de maprijen op display:none stonden. Die stand bestaat niet meer -- de
+         klok is met het beginscherm meegegaan, zie WERELD.md -- dus is het
+         rooster de enige vorm en zet deze toets niets meer voor. */
     }, keys);
     await page.goto(base + opts.pad, { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
@@ -99,18 +99,19 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(reg.token, 'lid-registratie geeft een token');
       return { rtg_member_token: reg.token };
     },
-    /* Het beginscherm is het OS: de begroeting, de mappen boven de klok, de
-       klok zelf, de functierij eronder en de balk van Rahul. De ledenpas
-       staat er bewust NIET meer op -- die ligt in de wallet (zie de toets
+    /* De SCHIL onder de werktafel: de passregel, de mappen, de functierij en de
+       balk van Rahul. De klok stond hier tussen de mappen en de functierij; die
+       is weg (WERELD.md) en het beginscherm is de werktafel geworden. De
+       ledenpas staat hier bewust NIET op -- die ligt in de wallet (zie de toets
        hieronder). De reiskaart is verhuisd naar de app Reizen, maar wordt nog
        steeds bij het opstarten gevuld, dus die controleren we hier gewoon. */
     na: async (page) => {
-      /* De begroeting ("Ha <naam>, goed je te zien.") stond hier; die is van het
-         beginscherm af (zie de opmerking bij .os-thuisscherm in apps/app.html).
-         Wat er staat is de regel eronder: welke pas, en sinds wanneer. Die is
-         geen begroeting maar een stand van zaken, en hij is nog steeds het
-         eerste dat het scherm zelf invult -- dus nog steeds het teken dat het
-         beginscherm echt is opgebouwd. */
+      /* De begroeting ("Ha <naam>, goed je te zien.") stond hier; die is van dit
+         scherm af (zie de opmerking bij .os-thuisscherm in apps/app.html). Wat
+         er staat is de regel eronder: welke pas, en sinds wanneer. Die is geen
+         begroeting maar een stand van zaken, en hij is nog steeds het eerste dat
+         het scherm zelf invult -- dus nog steeds het teken dat de schil echt is
+         opgebouwd. */
       await page.waitForSelector('#homeSub', { timeout: 5000 });
       await page.waitForFunction(() => {
         const e = document.getElementById('homeSub');
@@ -124,13 +125,19 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         tegels: [...document.querySelectorAll('#osMappen .os-app')]
           .map(b => ({ sleutel: b.dataset.sleutel || '', naam: (b.getAttribute('aria-label') || '').trim() })),
         functies: [...document.querySelectorAll('#osFuncties .os-app')].map(b => b.getAttribute('aria-label')),
-        klok: !!document.querySelector('#homeKlok svg'),
+        /* #homeKlok en .os-klokvak stonden hier: de ronde klok in het midden,
+           als tweede van vier lagen. Die is weg met het beginscherm dat hij
+           droeg (WERELD.md), dus wordt hier ook niet meer naar hem gekeken --
+           een meting op een element dat niet meer bestaat, is geen meting.
+           Wat blijft is dat hij ook echt niet terugkomt: zie hieronder. */
+        klok: !!document.querySelector('#homeKlok'),
         balk: !!document.querySelector('#osAiBalk #osAiIn'),
-        // de vier lagen staan in deze volgorde onder elkaar
-        y: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
+        // de drie lagen staan in deze volgorde onder elkaar
+        y: ['#osMappen', '#osFuncties', '#osAiBalk']
           .map(s => Math.round(document.querySelector(s).getBoundingClientRect().top))
       }));
-      assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
+      assert.equal(thuis.klok, false,
+        'de klok hoort van dit scherm af te zijn -- het beginscherm is de werktafel');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
 
       /* DRIE HOOFDWERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
@@ -158,7 +165,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.deepEqual(thuis.functies, [],
         'de functierij hoort leeg te zijn -- de drie hoofdwerelden dragen alles: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
-        'de volgorde is mappen, klok, functies, balk');
+        'de volgorde is mappen, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
     }
   });
@@ -412,18 +419,12 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     await page.addInitScript(t => {
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
-      /* DEZE TOETS MEET DE DRAAD, dus zet hij de stand aan waarin de draad
-         openstaat: het rooster. Het beginscherm opent tegenwoordig standaard in
-         de wereldstand, en daar houdt Rahul het bewust bij EEN zin in een gouden
-         ring; de draad blijft dicht tot je hem opent, anders staat dezelfde zin
-         er twee keer onder elkaar (zie wereld.css).
-
-         De belofte hierboven verandert daar niet door -- hij begint nog steeds
-         uit zichzelf en antwoordt nog steeds zonder dat je het beginscherm
-         verlaat -- alleen de VORM verschilt, en die vorm wordt gemeten in
-         test/wereld.e2e.js ("Rahul zegt het EEN keer"). Wie deze regel weghaalt,
-         meet de ene vorm met de eisen van de andere. */
-      localStorage.setItem('rtg_os_wereld', 'uit');
+      /* HIER STOND rtg_os_wereld = 'uit'. Deze toets meet de DRAAD, en die stond
+         alleen open in de roosterstand; in de wereldstand hield Rahul het bij
+         EEN zin in een gouden ring om de klok, zodat dezelfde zin er niet twee
+         keer onder elkaar stond. Die tweede vorm bestaat niet meer (WERELD.md):
+         er is nog een draad, en de belofte hierboven -- hij begint uit zichzelf
+         en antwoordt zonder dat je weg hoeft -- wordt dus zonder omweg gemeten. */
     }, reg.token);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });

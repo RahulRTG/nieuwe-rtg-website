@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="5141b00d">
+<meta name="rtg-bouw" content="fd585ec9">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -32,10 +32,6 @@
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
-<!-- de levende wereld: de kring om de klok, de bezel, het Command Wheel en de
-     levende grond. Hier tussen de andere bladen om dezelfde reden als media.css
-     hierboven: een blad erbij mag geen tweede stijlbundel opleveren. -->
-<link rel="stylesheet" href="/shared/wereld.css">
 <style>
   :root{
     --bg:var(--rtg-bg);
@@ -1112,12 +1108,20 @@
     #content.os-veeg-weg{transition:transform var(--rtg-tempo) var(--rtg-ease-uit),opacity var(--rtg-tempo) var(--rtg-ease-uit);transform:scale(0.85) translateY(-10vh);opacity:0;}
   }
 
-  /* ================= HET BEGINSCHERM: VIER LAGEN =================
+  /* ================= DE SCHIL: DRIE LAGEN =================
 
-     Van boven naar beneden: de mappen, de klok, de functies, de balk van
-     Rahul. Eén scherm, nooit scrollen, geen tweede blad. De klok krijgt de
-     ruimte die overblijft (flex:1) en blijft daarmee altijd het midden --
-     op een telefoon net zo goed als op de tablet. */
+     Van boven naar beneden: de mappen, de functies, de balk van Rahul. Eén
+     scherm, nooit scrollen, geen tweede blad.
+
+     DE KLOK STOND HIER TUSSEN, en dat was vier lagen. Zij was de kop van dit
+     scherm en pakte met flex:1 alle ruimte die de andere lagen overlieten. Het
+     beginscherm is de werktafel van RTG Command geworden (shared/command.js) en
+     de klok is met hem meegegaan; de werelden die op haar bezel hingen staan nu
+     bovenaan de bank. Wat overblijft is deze schil, die je nog ziet zolang de
+     overeenkomst niet getekend is -- daar ligt #onbGate overheen en mag de
+     werktafel er niet zijn. De overgebleven ruimte gaat sindsdien naar de leegte
+     tussen de mappen en de functies (margin-top:auto hieronder), zodat de balk
+     van Rahul aan de onderrand blijft waar je duim hem zoekt. */
   #content.os-thuis{padding:0;overflow:hidden;display:flex;flex-direction:column;}
   .view[data-view="home"].active{display:flex;flex-direction:column;flex:1;min-height:0;}
   /* ============ HET RTG-BEWEGINGSSYSTEEM ============
@@ -1152,7 +1156,7 @@
   .os-thuisscherm > *{width:100%;max-width:var(--os-kolom);margin-inline:auto;}
 
   /* de passregel: welke pas, en sinds wanneer. Eén dunne regel, en de enige
-     tekst boven de mappen -- de klok is de kop van dit scherm.
+     tekst boven de mappen.
      (.os-groet stond hier, voor de begroeting die van dit scherm af is; een
      klasse zonder element is de soort rommel waar niemand meer aan durft te
      komen omdat je niet weet of hij nog ergens vandaan komt.) */
@@ -1164,10 +1168,10 @@
 
   /* 1. de hoofdwerelden, bovenaan -- één gecentreerde rij van drie.
 
-        De voordeur toont RTG, RTG Kantoor en RTFoundation als één rustige
-        vorm. De tegels houden de compacte rastermaat; ze worden niet uitgerekt
-        om de beschikbare breedte te vullen, want dan verdringen ze de klok en
-        voelt drie als een leeg raster in plaats van een bewuste keuze. */
+        RTG, RTG Kantoor en RTFoundation als één rustige vorm. De tegels houden
+        de compacte rastermaat; ze worden niet uitgerekt om de beschikbare
+        breedte te vullen, want dan voelt drie als een leeg raster in plaats van
+        een bewuste keuze. */
   .os-mappen{
     display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
     margin-top:calc(var(--e) * 0.9);flex-shrink:0;
@@ -1177,50 +1181,21 @@
     width:calc((100% - var(--e) * 2.25) / 4);
   }
 
-  /* 2. de ronde klok, in het midden. Dit vak pakt alle ruimte die de andere
-        lagen overlaten en centreert de klok daarin -- dus staat er evenveel
-        lucht boven als onder, en dat is precies wat een horloge nodig heeft
-        om een horloge te blijven en geen tegel te worden.
+  /* 2. de functies, onder de lucht.
 
-        HIER HEEFT EEN BOVENGRENS OP GESTAAN, en die is er weer af. Bedoeling
-        was de klok omhoog te halen; gevolg was dat alle overtollige ruimte
-        naar het einde van de kolom zakte, de balk van Rahul los van de
-        onderrand kwam te hangen en er een gat van 155 punten onder het scherm
-        stond. De balk hoort aan de onderrand -- daar zoekt je duim hem -- en
-        de klok hoort lucht om zich heen. Allebei krijg je terug door dit vak
-        gewoon zijn werk te laten doen.
+        Hier stond .os-klokvak: het vak met de ronde klok, dat met flex:1 alle
+        overgebleven ruimte pakte en de klok erin centreerde. De klok is weg (zie
+        de kop van dit blok), en zonder vervanging zou de hele kolom naar boven
+        klappen en de balk van Rahul los van de onderrand komen te hangen -- een
+        fout die hier eerder is gemaakt met een bovengrens op datzelfde vak.
 
-        Wil je de laag ERBOVEN of ERONDER verschuiven, doe dat dan met een
-        marge op die laag zelf (zie .os-aibalk): dit vak krimpt dan mee en de
-        onderrand blijft waar hij staat. */
-  .os-klokvak{
-    flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
-    padding:calc(var(--e) * 0.5) 0;
-  }
-  .os-klokvak .os-home-klok.rtg-ring{
-    width:auto;height:100%;aspect-ratio:1;
-    /* zo groot als de overgebleven ruimte toelaat, maar nooit breder dan de
-       kolom: op een telefoon vult hij het midden, op de tablet blijft hij een
-       horloge en wordt hij geen schotel.
-
-       De twee grenzen moeten DEZELFDE zijn, en dat is geen schoonheidsfoutje.
-       Met height:100% en aspect-ratio:1 rekent de browser de breedte uit de
-       hoogte; knijpt max-width die breedte daarna af, dan blijft de hoogte
-       gewoon staan en is het vak niet langer vierkant (gemeten op een telefoon:
-       228 breed, 384 hoog). De wijzerplaat zelf blijft rond, want de SVG houdt
-       zijn verhouding -- maar de schaduw in .rtg-ring::before krijgt
-       border-radius:50% op dat uitgerekte vak en werd zo een ellips van 384
-       hoog: het donkere ei rond de klok, dat niemand aan de schaduwkleur kon
-       wijten. Dezelfde bovengrens op de hoogte houdt het vak vierkant, en de
-       schaduw dus rond om de kast. */
-    max-width:min(100%, calc(var(--e) * 19));
-    max-height:min(100%, calc(var(--e) * 19));
-  }
-
-  /* 3. de functies, onder de klok */
-  .os-functies{margin-top:0;flex-shrink:0;}
+        margin-top:auto zet die ruimte nu op deze laag: mappen bovenaan,
+        functies en de balk van Rahul aan de onderrand, lucht ertussen. Wil je
+        een laag verschuiven, doe dat met een marge op die laag zelf; de leegte
+        krimpt dan mee en de onderrand blijft waar hij staat. */
+  .os-functies{margin-top:auto;flex-shrink:0;}
   /* bellen, berichten en videobellen zijn het telefoongedeelte: iets warmer
-     dan de rest, zodat de rij onder de klok als één ding leest */
+     dan de rest, zodat de rij als één ding leest */
   .os-functies .os-app[data-sleutel="os:bellen"] .os-tegel,
   .os-functies .os-app[data-sleutel="os:videobellen"] .os-tegel,
   .os-functies .os-app[data-sleutel="link:berichten"] .os-tegel{
@@ -1230,10 +1205,10 @@
     background:linear-gradient(160deg,#8A6D14,#5C4A0E);
   }
 
-  /* 4. het gesprek met Rahul, boven zijn balk
+  /* 3. het gesprek met Rahul, boven zijn balk
      De draad groeit vanaf de balk omhoog en neemt hoogstens een derde van het
-     scherm; wat erboven staat (de klok) krimpt mee, want die heeft flex:1. Zo
-     blijft het beginscherm een beginscherm en wordt het geen chat-app. */
+     scherm; de lucht erboven krimpt mee. Zo blijft dit een schil en wordt het
+     geen chat-app. */
   .os-aidraad{
     flex-shrink:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
     max-height:34%;margin-top:calc(var(--e) * 0.9);
@@ -1724,11 +1699,16 @@
 
           <nav class="os-grid os-mappen" id="osMappen" aria-label="Mappen met apps"></nav>
 
-          <!-- De RTG-klok is de enige tijd in het OS: hetzelfde horloge als op
-               het inlogscherm, hier groot in het midden van het beginscherm. -->
-          <div class="os-klokvak">
-            <div class="os-home-klok" id="homeKlok" data-rtg-klok="ring" aria-label="RTG-horloge"></div>
-          </div>
+          <!-- HIER STOND DE RTG-KLOK, groot in het midden.
+
+               Zij was de kern van het beginscherm: de werelden hingen als merken
+               op haar bezel en je draaide eraan om te reizen. Het beginscherm is
+               de werktafel van RTG Command geworden, en een klok die het midden
+               is van een scherm dat niemand meer als eerste ziet, is geen kern
+               meer maar een widget. De werelden staan nu bovenaan de bank van de
+               werktafel (shared/command/bank.js), de tijd staat waar hij op een
+               telefoon hoort, en het horloge zelf blijft op het inlogscherm --
+               daar is het nog steeds het eerste wat je ziet. -->
 
           <nav class="os-grid os-functies" id="osFuncties" aria-label="Functies"></nav>
 
@@ -1966,17 +1946,14 @@
           </div>
           <small class="os-aiwet">De achtergrond ‘Beeld’ is een AI-gegenereerd campagnebeeld zonder echte personen.</small>
         </div>
-        <!-- Het beginscherm: de levende wereld (de kring om de klok) of het
-             vertrouwde rooster met tegels. Dit is EEN schakelaar en geen tweede
-             beginscherm: beide standen tonen dezelfde klok, dezelfde werelden
-             en dezelfde balk van Rahul (zie shared/wereld.js). -->
-        <div class="os-cc-rij" id="osCcWereldRij">
-          <span class="os-cc-label" data-i18n="os.cc.wereld">Beginscherm</span>
-          <div class="os-cc-knoppen" id="osCcWereld">
-            <button type="button" data-wereld="aan" data-i18n="os.cc.wereld.kring">Wereld</button>
-            <button type="button" data-wereld="uit" data-i18n="os.cc.wereld.raster">Rooster</button>
-          </div>
-        </div>
+        <!-- HIER STOND DE SCHAKELAAR WERELD/ROOSTER.
+
+             Twee standen van hetzelfde beginscherm: de kring om de klok, of het
+             rooster met tegels. Het beginscherm is de werktafel van RTG Command
+             geworden en de klok is met de kring meegegaan, dus schakelt deze
+             knop tussen twee dingen die er geen van beide meer zijn. Er is nu
+             één beginscherm en dat is precies de belofte die WERELD.md al deed
+             -- alleen is het een ander scherm geworden. -->
         <div class="os-cc-tegels">
           <button id="osCcScan"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M4 12h16"/></svg></b><span data-i18n="os.cc.scan">Scannen</span></button>
           <button id="osCcZegel"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></b><span data-i18n="os.cc.zegel">Mijn Zegel</span></button>
@@ -2243,12 +2220,6 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<!-- De levende wereld: het beginscherm als kring om de klok. Moet VOOR
-     app-main.js staan en zonder defer, want app-main reikt hem de werelden aan
-     (app-main-26c.js) op het moment dat het zelf draait. De zware hoofdbundel
-     zelf mag wel uitgesteld: dan downloadt hij naast het HTML-parsen en draait
-     hij vóór DOMContentLoaded, nadat de volledige shell bestaat. -->
-<script src="/shared/wereld.js"></script>
 <script src="/apps/magnaat-sandbox.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>

@@ -65,22 +65,39 @@
 
   function bouwTafel(){
     if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
-      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog});
+      open:open,bestemming:bestemming,thuis:thuis,schil:schil,inlog:inlog,
+      werelden:function(){return werelden}});
     return tafel;
   }
-  /* THUIS IS DE KLOK, MAAR NIET MEER DE LANDING.
+  /* DE WERELDEN HINGEN OP DE BEZEL OM DE KLOK, en staan nu bovenaan de bank; de
+     klok is met zijn beginscherm verdwenen (WERELD.md).
 
-     De werktafel is het beginscherm geworden: inloggen brengt je daar, en het
-     laatste blad sluiten laat hem leeg staan in plaats van hem af te breken.
-     De klok blijft bestaan -- daar hangen de werelden op hun bezel (WERELD.md)
-     -- en staat bovenaan de bank. Hem kiezen vouwt de werktafel op.
+     De lijst wordt AANGEREIKT en niet hier verzonnen: app-main kent hem
+     (MAPPEN), inclusief de vraag wat bij jouw pas hoort. Een tweede lijst hier
+     zou twee waarheden geven over wat er bestaat -- LAT.md regel 4. Leeg is een
+     geldige stand (een gast, een pagina zonder app-main). */
+  var werelden=[];
+  function zetWerelden(lijst){
+    werelden=Array.isArray(lijst)?lijst:[];
+    if(tafel)tafel.werelden();
+  }
+  /* NAAR DE SCHIL, EN DAT IS GEEN OMWEG NAAR DE KLOK MEER.
 
-     `opgevouwen` bestaat omdat probeer() anders zijn werk terugdraait: die
-     bouwt zodra het mag, en zou de klok bij de eerstvolgende hertekening (een
-     resize, een klasse die verspringt) weer overdekken. Een keuze van een mens
-     hoort niet door een waarnemer te worden overstemd. */
+     Deze knop heette "Beginscherm" en bracht je naar de klok. De klok is weg;
+     de knop mocht niet met hem mee, en dat scheelde weinig. Onder de werktafel
+     ligt #shell met het bedieningspaneel, scannen, je Zegel, je meldingen en
+     uitloggen -- en er is geen tweede weg daarheen. Wat wel verandert is wat hij
+     beweert te zijn: het beginscherm is de werktafel, de schil is je toestel.
+
+     `opgevouwen` bestaat omdat probeer() dit anders terugdraait: die bouwt zodra
+     het mag, en zou de schil bij de eerstvolgende hertekening weer overdekken.
+     Een keuze van een mens hoort niet door een waarnemer te worden overstemd. */
   var opgevouwen=false;
-  function thuis(){opgevouwen=true;if(tafel)tafel.sloop()}
+  function schil(){opgevouwen=true;if(tafel)tafel.sloop()}
+  /* THUIS IS HET BEGINSCHERM, EN DAT IS DE LEGE WERKTAFEL. De home-knop op de
+     console riep hiervoor dezelfde functie aan als de knop in de bank; ze gingen
+     allebei naar de klok, dus was het toen een bestemming. Nu twee. */
+  function thuis(){if(!tafel)return;opgevouwen=false;tafel.wis();tafel.sync()}
 
   /* INLOGGEN LANDT ALTIJD OP EEN LEGE KEUZE.
 
@@ -132,9 +149,9 @@
 
   /* De wachter, en tegelijk de landing. Mag de werktafel er niet staan (geen
      sessie, of de overeenkomst is nog niet getekend), dan gaat hij weg -- dat
-     is de grendel uit de vorige ronde. Mag hij er wel staan, dan is hij het
-     beginscherm en bouwt hij zich hier op, tenzij een mens hem heeft
-     opgevouwen om de klok te zien. */
+     is de grendel uit de vorige ronde. Mag hij er wel staan, dan bouwt hij zich
+     hier op, want hij IS het beginscherm -- tenzij een mens hem heeft opgevouwen
+     om bij zijn toestel te komen (zie schil()). Landen doet hij daar nooit. */
   function probeer(){
     var s=stand();
     if(s==='weg'){if(tafel)tafel.sloop();return}
@@ -159,6 +176,7 @@
     herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
     actief:mag,
     land:land,
+    werelden:zetWerelden,
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

@@ -50,6 +50,18 @@ body.rtg-command > #shell{display:none!important;}
 .cmd-nav button:hover,.cmd-bankvoet button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}
 .cmd-nav button.actief{color:var(--rtg-txt);border-left-color:#7F1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08));}
 .cmd-nav svg,.cmd-bankvoet svg{width:19px;height:19px;flex:none;stroke:currentColor}
+/* De twee kopjes in de bank: WERELDEN boven, SOFTWARE eronder. Ze staan er
+   omdat het twee soorten bestemmingen zijn -- een wereld is een huis, een app is
+   een stuk gereedschap -- en zonder onderscheid wordt het een lijst van vijftien
+   waarin de drie huizen wegvallen. Ze zijn geen knop en vangen dus geen tik. */
+.cmd-kop{margin:.9rem .72rem .3rem;flex:none;pointer-events:none;
+  font:600 .56rem/1 var(--rtg-interface);letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-soft)}
+.cmd-kop:first-child{margin-top:.15rem}
+/* De glyf van een wereld komt uit shared/glyf.js: hetzelfde teken als op het
+   huis zelf, dunne lijn in currentColor. Goud, omdat een wereld hier geen app
+   is maar een huis -- dat is het enige verschil dat de bank maakt. */
+.cmd-glyf{width:19px;height:19px;flex:none;display:grid;place-items:center;color:var(--gold-tekst,#C0A544)}
+.cmd-glyf svg{width:100%;height:100%}
 .cmd-bankvoet{border-top:1px solid var(--rtg-line);padding-top:.55rem}
 .cmd-bank span{white-space:nowrap;overflow:hidden;opacity:1;transition:opacity 180ms var(--rtg-veer)}
 

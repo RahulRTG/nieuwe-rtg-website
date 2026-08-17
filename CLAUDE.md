@@ -57,14 +57,14 @@ champagnegoud, mat), Onyx (pianolak, nooit egaal), Bordeaux (fluweel, absorbeert
 licht) en Royal (satijn, als enige koel). Plus de twee letterrollen. Kies een
 materiaal, geen kleur; `test/materiaal.test.js` meet of het er nog een is.
 
-**`WERELD.md` beschrijft het beginscherm** — de klok is geen widget maar de
-kern: de acht werelden hangen als merken op een bezel eromheen, je draait eraan
-om te reizen en je zoomt een wereld in zonder de cirkel te verlaten. De harde
-regel daar: er zijn geen twee beginschermen. De wereldstand en het rooster delen
-dezelfde lijst werelden, dezelfde klok, dezelfde balk van Rahul en dezelfde
-manier om een app te openen; omschakelen verplaatst de klok en zet één attribuut.
-Lees ook wat er bewust NIET staat (een verzonnen statusstrook) vóór je er iets
-bij zet.
+**`WERELD.md` beschrijft het beginscherm** — en de harde regel daar is: er is er
+één, en dat is de werktafel van RTG Command. Inloggen, je laatste werkblad
+sluiten en op Home drukken komen alle drie op dezelfde lege keuze uit. De klok
+was hier ooit de kern, met de werelden als merken op een bezel eromheen; die is
+weg (17 augustus 2026) en het horloge staat nu alleen nog op het inlogscherm. De
+werelden staan bovenaan de bank, hun onderdelen op hun eigen huis, en de enige
+lijst werelden blijft `MAPPEN` in app-main. Lees ook wat er bewust NIET staat
+(een verzonnen statusstrook, een voorgekookt werkblad) vóór je er iets bij zet.
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een

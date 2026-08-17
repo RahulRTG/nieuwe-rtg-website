@@ -90,13 +90,15 @@ async function metLid(fn) {
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
+        /* HIER STOND rtg_os_wereld = 'uit'.
+
+           Het beginscherm had twee standen -- de kring om de klok en het rooster
+           met tegels -- en deze toetsen meten het rooster, dus zetten ze die
+           stand aan; in de wereldstand stonden de tegels op display:none en mat
+           je nullen. De wereldstand bestaat niet meer (de klok is met het
+           beginscherm meegegaan, zie WERELD.md), het rooster is de enige vorm
+           die er nog is, en een sleutel zetten die niemand meer leest maakt een
+           toets alleen maar moeilijker te geloven. */
       } catch (e) {}
     }, tok);
     await fn({ base, ctx });
@@ -118,11 +120,14 @@ async function wachtRooster(page) {
       document.querySelector('.view[data-view="home"].active') &&
       document.querySelectorAll('#osMappen .os-app').length === 3);
   }, null, { timeout: 60000 });
-  /* RTG Command is na de intake de landing. Deze toetsen meten de kloklaag
-     eronder, dus volgen dezelfde knop "Beginscherm" als een lid. Rechtstreeks
-     klikken via de DOM werkt ook wanneer de mobiele bank nog dicht is. */
+  /* RTG Command is na de intake de landing en blijft dat. Deze toetsen meten de
+     SCHIL eronder -- het toestel met de mappen, de functies en de statusbalk --
+     dus volgen ze dezelfde knop "Toestel" als een lid. (Die heette "Beginscherm"
+     en had klasse cmd-klok; het beginscherm is de werktafel geworden, zie
+     WERELD.md.) Rechtstreeks klikken via de DOM werkt ook wanneer de mobiele
+     bank nog dicht is. */
   await page.evaluate(() => {
-    const k = document.querySelector('#rtgCommand .cmd-klok');
+    const k = document.querySelector('#rtgCommand .cmd-schil');
     if (k) k.click();
   });
   await page.evaluate(() => RTGWereld.zet(false));
@@ -265,13 +270,13 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
          "ondertekening open" staan. */
       if (g) g.hidden = true;
     });
-    /* RTG Command is de nieuwe landing. Deze toets meet bewust de stille
-       statusbalk van het beginscherm eronder, dus volgt dezelfde zichtbare
-       ingang als een lid. */
+    /* RTG Command is de landing. Deze toets meet bewust de stille statusbalk
+       van de schil eronder, dus volgt dezelfde zichtbare ingang als een lid: de
+       knop "Toestel" in de bank. */
     await page.waitForFunction(() => {
       const g = document.getElementById('onbGate');
       if (g) g.hidden = true;
-      const k = document.querySelector('#rtgCommand .cmd-klok');
+      const k = document.querySelector('#rtgCommand .cmd-schil');
       if (!k) return false;
       k.click();
       if (g) g.remove();
@@ -363,7 +368,7 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
   });
 });
 
-test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klok staat erboven',
+test('de schil draagt één gecentreerde rij van drie werelden, en de balk van Rahul staat onderaan',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
@@ -392,16 +397,13 @@ test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klo
       };
       const onder = [...document.querySelectorAll('#osAiWet, #osDemoWet')]
         .filter((e) => getComputedStyle(e).display !== 'none').at(-1);
-      const klokvak = vak('.os-klokvak'), klok = vak('#homeKlok');
       const tips = document.querySelector('#osAiTips');
       const boven = tips && !tips.hidden ? vak('#osAiTips') : vak('#osAiDraad');
       return {
         mappen: tegels.length, rijen: rijen.size, marge: marge,
         breedtes: [...new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().width)))],
-        volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
-          .map((s) => vak(s).top),
-        luchtBovenKlok: klok.top - klokvak.top,
-        luchtOnderKlok: klokvak.bodem - klok.bodem,
+        volgorde: ['#osMappen', '#osFuncties', '#osAiBalk'].map((s) => vak(s).top),
+        klok: !!document.querySelector('#homeKlok'),
         gatNaarBalk: vak('#osAiBalk').top - boven.bodem,
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
@@ -411,38 +413,36 @@ test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klo
     /* DE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. Links en rechts even
        veel marge maakt er één bewuste voordeur van, in plaats van drie tegels
        die toevallig vanaf de linkerkant zijn neergelegd. De tegels houden
-       bovendien dezelfde compacte maat; drie uitgerekte tegels zouden de klok
-       en de rustige hiërarchie verdringen. */
+       bovendien dezelfde compacte maat; drie uitgerekte tegels zouden de rustige
+       hiërarchie verdringen. */
     assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
       'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
       ', rechts ' + r.marge.rechts + ')');
     assert.equal(r.breedtes.length, 1,
       'niet alle maptegels zijn even breed: ' + r.breedtes.join(', '));
     assert.deepEqual(r.volgorde.slice().sort((a, b) => a - b), r.volgorde,
-      'de volgorde is mappen, klok, functies, balk');
+      'de volgorde is mappen, functies, balk');
 
-    /* DRIE DINGEN DIE ELKAAR IN DE WEG ZITTEN, en daarom hier bij elkaar staan.
+    /* DRIE EISEN DIE ELKAAR IN DE WEG ZITTEN, en daarom in één meting staan.
 
-       Er heeft een bovengrens op het klokvak gestaan om de klok omhoog te
-       halen. Gevolg: alle overtollige ruimte zakte naar het einde van de kolom,
-       de balk van Rahul kwam los van de onderrand en er stond een gat van 155
-       punten onder het scherm. Die grens is er weer af, en dat maakt deze drie
-       eisen tegelijk waar -- verschuif er één en de andere twee bewegen mee, dus
-       ze horen in één meting.
+       DE KLOK STOND HIER TUSSEN, als tweede laag, en pakte met flex:1 alle
+       overgebleven ruimte. Er heeft een bovengrens op dat vak gestaan om hem
+       omhoog te halen; gevolg was dat alle overtollige ruimte naar het einde van
+       de kolom zakte, de balk van Rahul loskwam van de onderrand en er een gat
+       van 155 punten onder het scherm stond. De klok is nu helemaal weg (het
+       beginscherm is de werktafel, zie WERELD.md) en die ruimte gaat naar
+       margin-top:auto op de functierij -- dezelfde val, andere regel, dus de
+       meting blijft.
 
-       1. DE BALK STAAT ONDERAAN. Daar zoekt je duim hem.
-       2. DE KLOK HEEFT LUCHT OM ZICH HEEN, boven en onder ongeveer evenveel;
-          een horloge zonder marge wordt een tegel.
+       1. DE KLOK KOMT NIET TERUG. Wie hem hier weer neerzet, zet ook zijn vak
+          met flex:1 terug, en dan is eis 2 weer een gok.
+       2. DE BALK STAAT ONDERAAN. Daar zoekt je duim hem.
        3. HET GESPREK PLAKT NIET AAN DE BALK. Anders leest het als één blok in
           plaats van gesprek en invoer. */
+    assert.equal(r.klok, false,
+      'de klok hoort van dit scherm af te zijn -- het beginscherm is de werktafel');
     assert.ok(r.hoogte - r.onderrand < 60,
       'de balk van Rahul hangt los van de onderrand (' + (r.hoogte - r.onderrand) + 'px eronder)');
-    assert.ok(r.luchtBovenKlok > 25 && r.luchtOnderKlok > 25,
-      'de klok heeft te weinig lucht om zich heen (boven ' + r.luchtBovenKlok +
-      ', onder ' + r.luchtOnderKlok + ')');
-    assert.ok(Math.abs(r.luchtBovenKlok - r.luchtOnderKlok) < 20,
-      'de klok hangt niet in het midden van zijn vak (boven ' + r.luchtBovenKlok +
-      ', onder ' + r.luchtOnderKlok + ')');
     assert.ok(r.gatNaarBalk > 22,
       'de berichten van Rahul plakken aan zijn balk (' + r.gatNaarBalk + 'px ertussen)');
     await page.close();
@@ -468,13 +468,15 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
+        /* HIER STOND rtg_os_wereld = 'uit'.
+
+           Het beginscherm had twee standen -- de kring om de klok en het rooster
+           met tegels -- en deze toetsen meten het rooster, dus zetten ze die
+           stand aan; in de wereldstand stonden de tegels op display:none en mat
+           je nullen. De wereldstand bestaat niet meer (de klok is met het
+           beginscherm meegegaan, zie WERELD.md), het rooster is de enige vorm
+           die er nog is, en een sleutel zetten die niemand meer leest maakt een
+           toets alleen maar moeilijker te geloven. */
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();
@@ -559,13 +561,15 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
+        /* HIER STOND rtg_os_wereld = 'uit'.
+
+           Het beginscherm had twee standen -- de kring om de klok en het rooster
+           met tegels -- en deze toetsen meten het rooster, dus zetten ze die
+           stand aan; in de wereldstand stonden de tegels op display:none en mat
+           je nullen. De wereldstand bestaat niet meer (de klok is met het
+           beginscherm meegegaan, zie WERELD.md), het rooster is de enige vorm
+           die er nog is, en een sleutel zetten die niemand meer leest maakt een
+           toets alleen maar moeilijker te geloven. */
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();

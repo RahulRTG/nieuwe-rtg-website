@@ -45,6 +45,9 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+/* Wat voor SOORT deur elke bewaker is. Eén kaart voor het hele huis; zie de kop
+   van dat bestand voor waarom dat er zeven soorten zijn en niet één. */
+const bewakerskaart = require('./bewakers.js');
 
 const WORTEL = path.join(__dirname, '..', '..');
 
@@ -171,22 +174,28 @@ function alleRoutes() {
    er ergens een getal omhoog ging. Een meter zonder invoer hoort te zakken, niet
    te zwijgen (LAT.md regel 3). Daarom hoort bij null altijd een REDEN, en
    verdeelOpRol() hieronder geeft die redenen geteld terug zodat elke proef ze in
-   zijn register kan zetten. */
+   zijn register kan zetten.
+
+   HIJ BESLIST HIER NIET MEER ZELF. De regexjes die hier stonden kenden drie
+   namen en zetten 359 routes weg onder "bewaker zonder bekende rol". Die zin
+   belooft het verkeerde -- hij leest als "er ontbreekt een token" -- terwijl er
+   in werkelijkheid VIJF groepen achter zaten die om vijf verschillende
+   reparaties vragen. Bij één ervan (138 routes) was er niets te repareren: die
+   waren al te kruisen en werden alleen niet herkend. Bij de andere vier is
+   rollen kruisen simpelweg de verkeerde vraag, en ze toch kruisen zou groen
+   opleveren dat niets bewijst. Welke soort een deur is, staat nu uitputtend in
+   scripts/lib/bewakers.js en wordt daar bewaakt door een toets. Hier alleen nog
+   de doorgeefluiken, want vier proeven en twee toetsen roepen deze namen aan. */
 function rolVan(bewakers) {
-  const b = (bewakers || []).join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
+  return bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: bewakers || [] }).rol;
 }
 
-/* De reden waarom een rol niet te bepalen valt. Vier soorten, want ze vragen om
-   vier verschillende reparaties -- en "ongemeten" op een hoop is precies hoe
-   1257 routes jarenlang onzichtbaar bleven. */
+/* De reden waarom een rol niet te bepalen valt. Zie bewakers.js: de reden bepaalt
+   de reparatie, en "ongemeten" op een hoop is precies hoe 1257 routes jarenlang
+   onzichtbaar bleven. */
 function redenZonderRol(r) {
-  if (!r.bewakersBekend) return 'de router kon geen bewakers noemen';
-  if (!r.bewakers.length) return 'geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)';
-  return 'bewaker zonder bekende rol: ' + r.bewakers.join('+');
+  return bewakerskaart.beoordeel(r).reden ||
+    'geen reden -- deze route heeft wel degelijk een rol (' + rolVan(r.bewakers) + ')';
 }
 
 /* Splitst een routelijst in wat beproefbaar is en wat niet, met de redenen
@@ -232,4 +241,4 @@ const SCHAKELPADEN = [
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
 module.exports = { alleRoutes, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
-  rolVan, redenZonderRol, verdeelOpRol, meldZonderRol };
+  rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart };

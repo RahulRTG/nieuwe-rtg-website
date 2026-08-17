@@ -1,93 +1,65 @@
 {
  "uitleg": "Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. Een route die hier NIET in staat is niet beproefd. Zie scripts/lib/staatproef.js voor de grens.",
- "nietBeproefbaar": 846,
+ "nietBeproefbaar": 737,
  "redenenNietBeproefbaar": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "aantal": 522
   },
   {
-   "reden": "bewaker zonder bekende rol: huisAuth",
+   "reden": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
    "aantal": 62
   },
   {
-   "reden": "bewaker zonder bekende rol: boardroomAuth",
-   "aantal": 51
-  },
-  {
-   "reden": "bewaker zonder bekende rol: huisPoort",
+   "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
    "aantal": 44
   },
   {
-   "reden": "bewaker zonder bekende rol: techAuth+eigenaarAlleen",
-   "aantal": 34
-  },
-  {
-   "reden": "bewaker zonder bekende rol: gezinsPoort",
+   "reden": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 28
   },
   {
-   "reden": "bewaker zonder bekende rol: mw",
+   "reden": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache",
    "aantal": 23
   },
   {
-   "reden": "bewaker zonder bekende rol: mw+mw",
+   "reden": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache",
    "aantal": 22
   },
   {
-   "reden": "bewaker zonder bekende rol: rtfPoort",
+   "reden": "lichaamssleutel: rtfPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 17
   },
   {
-   "reden": "bewaker zonder bekende rol: gastAuth",
+   "reden": "lichaamssleutel: gastAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 16
   },
   {
-   "reden": "bewaker zonder bekende rol: techAuth",
-   "aantal": 12
-  },
-  {
-   "reden": "bewaker zonder bekende rol: boardroomAuth+alleenBaas",
-   "aantal": 4
-  },
-  {
-   "reden": "bewaker zonder bekende rol: techAuth+eigenaarAlleen+alleenBaas",
-   "aantal": 4
-  },
-  {
-   "reden": "bewaker zonder bekende rol: baasAuth",
-   "aantal": 3
-  },
-  {
-   "reden": "bewaker zonder bekende rol: mw+arrivalPassAuth",
+   "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 2
   },
   {
-   "reden": "bewaker zonder bekende rol: mw+scimAuth",
-   "aantal": 1
-  },
-  {
-   "reden": "bewaker zonder bekende rol: meetpoort",
+   "reden": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker",
    "aantal": 1
   }
  ],
  "routesGevonden": 4099,
  "gemeten": {
-  "routesMetRol": 3253,
-  "beoordeeld": 2601,
-  "oproepen": 6522,
-  "state": 252,
-  "sideEffect": 252,
-  "rollback": 2342,
-  "rollbackGezakt": 7,
-  "idemBewezen": 137,
+  "routesMetRol": 3362,
+  "beoordeeld": 2713,
+  "oproepen": 6740,
+  "state": 255,
+  "sideEffect": 255,
+  "rollback": 2452,
+  "rollbackGezakt": 6,
+  "idemBewezen": 140,
   "idemGezakt": 115,
-  "ongemeten": 652,
+  "ongemeten": 649,
   "tokensHernieuwd": 16,
   "blindeRondes": 0,
   "collectiesInVingerafdruk": 144,
   "ruisCollecties": 2,
-  "begrenzing": 0
+  "begrenzing": 8000
  },
  "omgevingsruis": [
   "doorgeefjournaal",
@@ -1528,11 +1500,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "techniek",
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in techniek, wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -1696,8 +1665,11 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "techniek",
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in techniek, wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -1855,6 +1827,246 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
    "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: bijles"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/ai",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/keuze",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/proef",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/stap",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/status",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/onboarding",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/onboarding/ai",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/persoon",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/reset",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/status",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/storing",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/taal",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/talen",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/toepassen",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/wachter",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/zet",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -5913,8 +6125,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -6066,10 +6280,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -8923,12 +9135,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -9110,9 +9325,9 @@
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
    "collecties": [
-    "wacht"
+    "veilig"
    ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "reden": "geweigerd (status 404); de eenmalige wijziging in veilig was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -9264,15 +9479,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "veilig"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -13696,8 +13908,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -13790,10 +14004,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -15815,12 +16027,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -16305,12 +16520,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
+   "idempotentie": "GEZAKT",
    "collecties": [
     "spellen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandAlarmen"
   },
   {
    "methode": "POST",
@@ -16355,10 +16570,9 @@
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
    "collecties": [
-    "commandAlarmen",
     "spellen"
    ],
-   "reden": "geweigerd (status 409); de eenmalige wijziging in commandAlarmen, spellen was inrichting -- de herhaling liet alles met rust"
+   "reden": "geweigerd (status 409); de eenmalige wijziging in spellen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -17773,7 +17987,7 @@
     "muziek"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: muziek, wacht"
+   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: muziek"
   },
   {
    "methode": "POST",
@@ -18352,6 +18566,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/aidata/export",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/architect",
    "rol": "office",
    "statussen": [
@@ -18898,6 +19127,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/balie/zetel",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/balie/zetels",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/balie/zoek",
    "rol": "office",
    "statussen": [
@@ -18943,6 +19202,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/autoriseer/annuleer",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/autoriseer/bevestig",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/bevoegdheid",
    "rol": "office",
    "statussen": [
@@ -18955,6 +19244,21 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/draai",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -19090,6 +19394,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/modus",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/nood",
    "rol": "office",
    "statussen": [
@@ -19154,6 +19473,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/operationeel",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/partnerrail",
    "rol": "office",
    "statussen": [
@@ -19175,12 +19509,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -19310,6 +19647,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/vergunning",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/betalingen/status",
    "rol": "office",
    "statussen": [
@@ -19340,6 +19692,201 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/ai",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/genre",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/magnaat/besluit",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/magnaat/leren",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/rahul",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/rahul/zet",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/schakel",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/schakel-fijn",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang/geef",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang/weg",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/verbeter",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -19913,6 +20460,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/journaal",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/journaal/beeld",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/kachat",
    "rol": "office",
    "statussen": [
@@ -20326,6 +20903,186 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/ledenregister",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/beslis",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/gaten/plan",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/overzicht",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/taak/maak",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/taak/zet",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/zelftest",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/zet",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/partner/beslis",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/partners",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/scan",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/status",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/mail/opnieuw",
    "rol": "office",
    "statussen": [
@@ -20480,6 +21237,21 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/mall/zet",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -21008,6 +21780,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/paniek/besluit",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/paniek/stel",
    "rol": "office",
    "statussen": [
@@ -21020,6 +21807,96 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/antwoord",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/document",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/documenten",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/partner/decide",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/partner/status",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -21989,6 +22866,36 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/salon/belang",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/belang/beoordeel",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/school/decide",
    "rol": "office",
    "statussen": [
@@ -22274,10 +23181,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -22452,6 +23357,126 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/besluit",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/noodstop",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/schakel",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/test",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/verantwoordelijke",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/lastafworp",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -22722,12 +23747,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -23889,6 +24917,21 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/wereld/actie",
+   "rol": "boardroom",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/werkplaats",
    "rol": "office",
    "statussen": [
@@ -24233,8 +25276,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -25181,8 +26226,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -26118,10 +27165,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -26367,8 +27412,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -28572,8 +29619,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -29638,10 +30687,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -30654,8 +31701,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -31721,15 +32770,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -31745,6 +32791,21 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/scim/v2/Users",
+   "rol": "scim",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -31942,10 +33003,9 @@
    "rollback": "ongemeten",
    "idempotentie": "bewezen",
    "collecties": [
-    "commandAlarmen",
     "ledenSites"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
@@ -32662,8 +33722,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -32722,10 +33784,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -33692,12 +34752,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -33712,10 +34775,9 @@
    "rollback": "ongemeten",
    "idempotentie": "GEZAKT",
    "collecties": [
-    "agendas",
-    "wacht"
+    "agendas"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: agendas"
   },
   {
@@ -33724,7 +34786,7 @@
    "rol": "supplier",
    "statussen": [
     200,
-    503
+    200
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
@@ -34640,8 +35702,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 409) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 409); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -35564,9 +36628,10 @@
    "rollback": "ongemeten",
    "idempotentie": "GEZAKT",
    "collecties": [
+    "wacht",
     "zaakCommand"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
    "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: zaakCommand"
   },
   {
@@ -35595,12 +36660,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "zaakCommand"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: wacht"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -36504,8 +37569,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -36552,10 +37619,9 @@
    "collecties": [
     "facturen",
     "factuurTeller",
-    "rtmail",
-    "wacht"
+    "rtmail"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (4)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
    "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: facturen, factuurTeller, rtmail"
   },
   {
@@ -37335,8 +38401,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -37586,15 +38654,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -38138,9 +39203,10 @@
    "rollback": "ongemeten",
    "idempotentie": "bewezen",
    "collecties": [
-    "horeca"
+    "horeca",
+    "wacht"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
@@ -38341,12 +39407,12 @@
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
-   "rollback": "GEZAKT",
+   "rollback": "bewezen",
    "idempotentie": "ongemeten",
    "collecties": [
     "horeca"
    ],
-   "reden": "geweigerd (status 400) en de toestand veranderde toch, ook bij de herhaling: horeca"
+   "reden": "geweigerd (status 400); de eenmalige wijziging in horeca was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -38949,8 +40015,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -39763,8 +40831,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -40443,12 +41513,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -40998,10 +42071,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -41304,8 +42375,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 503) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 503); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -41679,10 +42752,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -41759,8 +42830,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 409) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 409); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -43057,10 +44130,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 409); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 409) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -43119,8 +44190,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 409) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 409); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -43746,10 +44819,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -44405,8 +45476,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -45096,8 +46169,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 400); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -46180,8 +47255,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -46504,10 +47581,9 @@
    "rollback": "ongemeten",
    "idempotentie": "bewezen",
    "collecties": [
-    "wacht",
     "werkmail"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
@@ -46802,8 +47878,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -46942,6 +48020,516 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/techniek/ai",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/alarm/proef",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/archief",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/keuze",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/proef",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/stap",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/beveiliging/afhandelen",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/beveiliging/auto",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/bewaren/veeg",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/controle/incident",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/controle/integriteit",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/eigenaar",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/fouten/wis",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie/ai",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie/besluit",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/moderniseer",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/antwoord",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/document",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/documenten",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/spelcijfers",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/proef",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/schakel",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/scimsleutel",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/toegang",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/analyseer",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/av-test",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/beslis",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/lastafworp",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/opruimen",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/quarantaine",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/zekering",
+   "rol": "techniek",
+   "statussen": [
+    401,
+    401
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 401) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/theater/abonneer",
    "rol": "member",
    "statussen": [
@@ -46952,8 +48540,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -47135,10 +48725,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -48200,8 +49788,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -48260,8 +49850,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -48824,8 +50416,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -49145,10 +50739,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -49385,6 +50977,53 @@
    "methode": "POST",
    "pad": "/api/wereld/zoek",
    "rol": "member",
+   "statussen": [
+    403,
+    403
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang",
+   "rol": "werkplekbaas",
+   "statussen": [
+    403,
+    403
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [
+    "wacht"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-geef",
+   "rol": "werkplekbaas",
+   "statussen": [
+    403,
+    403
+   ],
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
+   "rollback": "bewezen",
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-weg",
+   "rol": "werkplekbaas",
    "statussen": [
     403,
     403
@@ -49772,10 +51411,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",

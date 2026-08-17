@@ -578,6 +578,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "bewakers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/routes.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "bewakersketen.test.js": {
       "soort": "puur",
       "staat": "gezakt",

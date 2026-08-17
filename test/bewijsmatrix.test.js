@@ -144,11 +144,35 @@ test('een route waar de poortwacht ZONDER TOKEN binnenkwam is gezakt, niet bewez
 test('een dichte en een bewust publieke route zijn wel bewezen', () => {
   assert.equal(metPoort('dicht').staat, 'bewezen');
   assert.equal(metPoort('publiek').staat, 'bewezen');
-  assert.equal(metPoort('stil').staat, 'bewezen');
 });
 
 test('onbereikbaar is ongemeten: daar kwam geen antwoord', () => {
   assert.equal(metPoort('onbereikbaar').staat, 'ongemeten');
+});
+
+test('STIL is ONBESLIST en dus geen bewijs van authenticatie', () => {
+  /* Deze bewering stond hier omgekeerd: `metPoort('stil').staat === 'bewezen'`.
+     De toets legde daarmee vast wat er fout was.
+
+     De poortwacht klopt aan met een LEEG lichaam en noemt alleen 401 en 403
+     dicht; al het andere dat geen 2xx is heet stil. Dat waren 294 cellen -- 272
+     met status 404, 20 met 400, 2 met 503 -- en die telden allemaal als
+     aangetoonde authenticatie. Een 404 op een leeg verzoek betekent dat de
+     handler iets opzocht dat er niet was, een 400 dat de validatie eerder aan de
+     beurt was dan de autorisatie. Geen van beide zegt of deze route een sleutel
+     eist.
+
+     Nagetrokken op veertien van die 294: opnieuw aankloppen met een onzin-token
+     in de Authorization-kop geeft EXACT dezelfde status. Er is van buitenaf dus
+     geen authenticatie aan te tonen; mogelijk is er een ander mechanisme (een
+     opzoeking op een ongeraden code is zelf een controle), maar dat is geen
+     AUTH-dekking.
+
+     De reden hoort erbij, anders is dit niet te onderscheiden van een route waar
+     nooit op geklopt is. */
+  const c = metPoort('stil');
+  assert.equal(c.staat, 'ongemeten', 'een onbeslist antwoord is geen dekking');
+  assert.match(c.reden, /onbeslist/, 'en zegt waarom het onbeslist is');
 });
 
 /* ---------- de twee nieuwe kolommen ---------- */

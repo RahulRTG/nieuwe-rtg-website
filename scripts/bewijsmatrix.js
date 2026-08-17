@@ -311,12 +311,36 @@ function bouw(invoer) {
              'open' -- een route waar een vreemde zonder token binnenkwam. Dan
              telt precies de bevinding waar deze kolom voor bestaat, mee als
              dekking. ACL en PRIVACY hieronder deden het al goed; AUTH niet.
-             'onbereikbaar' is evenmin een meting: daar kwam geen antwoord. */
+             'onbereikbaar' is evenmin een meting: daar kwam geen antwoord.
+
+             EN 'STIL' WAS DE DERDE, EN DIE STOND ER NOG. De poortwacht klopt aan
+             met een LEEG lichaam ({}), en noemt alleen 401 en 403 'dicht'. Alles
+             wat daar niet onder valt en geen 2xx is, heet 'stil' -- en dat waren
+             294 cellen, waarvan 272 een 404 en 20 een 400.
+
+             Een 404 op een leeg verzoek betekent: de handler heeft iets opgezocht
+             dat er niet was. Een 400 betekent: de validatie was eerder aan de
+             beurt dan de autorisatie. Geen van beide zegt IETS over de vraag of
+             deze route een sleutel eist -- ze zeggen alleen dat hij niet
+             opengevallen is op een leeg verzoek. Dat als 'bewezen' tellen is
+             precies dezelfde fout als bij 'open', een slag zachter: een
+             ONBESLIST antwoord dat als dekking meetelt.
+
+             Ze worden nu 'ongemeten' met de status erbij, zodat te zien is
+             waarom. Dat kost 294 cellen dekking en levert een eerlijker matrix
+             op. De echte reparatie ligt een laag dieper en staat nog open: de
+             poortwacht zou bij een 400/404 een TWEEDE keer moeten aankloppen met
+             een plausibel lichaam (scripts/lib/rolproef.js plausibelLijf), want
+             dan valt het onderscheid alsnog -- 401/403 is dicht, 2xx is een
+             bevinding. Tot die tijd is 'onbeslist' het eerlijke woord. */
           cellen[s.id] = gemeten.oordeel === 'open'
             ? { staat: 'gezakt', bron: 'poortwacht', reden: 'zonder token binnengekomen (status ' + gemeten.status + ')' }
             : gemeten.oordeel === 'onbereikbaar'
               ? { staat: 'ongemeten', bron: 'poortwacht', reden: 'geen antwoord tijdens de ronde' }
-              : { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
+              : gemeten.oordeel === 'stil'
+                ? { staat: 'ongemeten', bron: 'poortwacht',
+                    reden: 'onbeslist: status ' + gemeten.status + ' op een leeg verzoek zegt niets over een slot' }
+                : { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
         } else if (bron && bron.bewakers.length) {
           cellen[s.id] = { staat: 'verklaard', bron: bron.bewakers.join('+'), waar: bron.waar };
         } else {

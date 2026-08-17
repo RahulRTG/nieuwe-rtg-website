@@ -6,18 +6,18 @@
   "schakels": 11,
   "cellen": 46013,
   "telling": {
-    "bewezen": 16252,
+    "bewezen": 15958,
     "verklaard": 195,
     "nvt": 272,
-    "ongemeten": 29155,
+    "ongemeten": 29449,
     "gezakt": 139
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 3987,
+      "bewezen": 3693,
       "verklaard": 195,
       "nvt": 0,
-      "ongemeten": 1,
+      "ongemeten": 295,
       "gezakt": 0
     },
     "ACL": {
@@ -90,6 +90,5 @@
       "ongemeten": 929,
       "gezakt": 0
     }
-  },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+  }
 }

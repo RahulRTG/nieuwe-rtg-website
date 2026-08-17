@@ -55,6 +55,17 @@ module.exports = function lijfpoort(deps) {
     next();
   });
 
+  /* 3b. De idem-poort: een verzoek dat zelf om idempotentie vraagt (header
+     Idempotency-Key, of idem/idempotentieSleutel in de body) krijgt bij een
+     herhaling het bewaarde antwoord in plaats van het werk nog een keer.
+
+     Hij staat HIER en niet in de routebedrading, want hij heeft de ontlede body
+     nodig (de sleutel mag erin zitten) en hij moet vóór elke route komen. Zonder
+     sleutel doet hij niets, dus geen bestaande client verandert van gedrag.
+     De regels en de verhouding tot de duurzame geldlaag staan in
+     ../lib/idem-poort.js. */
+  app.use(require('../lib/idem-poort')());
+
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
      journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
      Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */

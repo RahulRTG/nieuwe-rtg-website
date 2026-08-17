@@ -3,6 +3,29 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
+/* DE ONDERGRENS VAN DE RUNTIME, en waarom hij hier hard staat.
+
+   De accountsdatabase draait op `node:sqlite`, en die bestaat pas vanaf Node 22.
+   Op een oudere Node slaagt de herstart hieronder gewoon (de vlag wordt stil
+   genegeerd) en klapt het pas veel later stuk op een `require('node:sqlite')`
+   diep in de opslaglaag -- een foutmelding die niets zegt over de echte oorzaak.
+   `LAUNCH.md` beloofde bovendien jarenlang "Node 18+", dus dit was geen
+   theoretisch scenario maar een gedocumenteerde valkuil.
+
+   Een `engines`-veld in package.json waarschuwt alleen bij `npm install` en doet
+   niets bij `node server/server.js`. Daarom staat de grens hier, vóór het eerste
+   require: falen op de eerste regel met de reden erbij. */
+const NODE_MINIMAAL = 22;
+const nodeMajor = Number(process.versions.node.split('.')[0]);
+if (!Number.isFinite(nodeMajor) || nodeMajor < NODE_MINIMAAL) {
+  console.error(
+    '[start] Node ' + process.versions.node + ' is te oud. RTG vereist Node ' +
+    NODE_MINIMAAL + ' of nieuwer, omdat de accountsdatabase op de ingebouwde ' +
+    'node:sqlite draait. Zie LIVEGANG.md.'
+  );
+  process.exit(78);
+}
+
 /* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
    een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
    onszelf ermee, zodat zowel `npm start` als `node server/server.js` werkt. */

@@ -3,6 +3,19 @@
 Alles wat zonder externe accounts kon, is gedaan en getest. Dit document is de
 lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 
+> **Lees eerst `LIVEGANG.md`.** Dat is de kortste ondersteunde productieroute en
+> beschrijft de techniek zoals die NU is: Docker, PostgreSQL, Redis, TLS en
+> Let's Encrypt in de app zelf, versleutelde back-ups met een off-site
+> WORM-kopie. Dit bestand gaat over de rest — het juridische, commerciële en
+> organisatorische werk dat daarnaast moet gebeuren, en dat geen enkel script
+> voor je kan doen.
+>
+> Waar de twee elkaar tegenspraken, is `LIVEGANG.md` leidend en is dit bestand
+> bijgewerkt. Die tegenspraak was echt: hier stond "Node 18+" terwijl de
+> accountsdatabase Node 22 eist, en "zet een reverse proxy met TLS ervoor"
+> terwijl de app zijn eigen certificaten regelt. Wie deze lijst volgde, bouwde
+> de verkeerde opstelling.
+
 ## Al geregeld (zit in de code)
 
 - [x] Alle apps en flows: leden, partners per genre, personeel, backoffice
@@ -23,8 +36,13 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 - [x] Privacybeleid en algemene voorwaarden (kloppen met de techniek), 404-pagina,
       robots.txt, security.txt
 - [x] HTTPS-redirect en HSTS zodra `NODE_ENV=production`
-- [x] Dagelijkse back-ups (14 dagen) van db.json en rtg.db, netjes afsluiten bij herstart
-- [x] Waarschuwingen bij het opstarten als demo-instellingen mee naar productie gaan
+- [x] Dagelijkse back-ups, netjes afsluiten bij herstart. In de livegangroute
+      versleuteld (AES-256-GCM), gevalideerd, buiten de Docker-schijf én met een
+      tweede write-once-kopie off-site — zie punt 6 en `LIVEGANG.md`
+- [x] Onveilige productieconfiguratie blokkeert de start (exitcode 1) in plaats
+      van alleen te waarschuwen: ontbrekende `RTG_ENC_KEY`, kluissleutels uit de
+      omgeving, demo-betaalprovider, webhook zonder secret. `server/config/productie.js`
+- [x] Node-ondergrens wordt bij de start afgedwongen (Node 22+, wegens `node:sqlite`)
 - [x] Failover: `npm start` draait drie servers (poort 3001-3003) achter een
       poortwachter op poort 3000. Valt de actieve server uit, dan neemt de
       volgende gezonde server het binnen enkele seconden over (met de laatste
@@ -36,37 +54,82 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 
 ## Nog te doen voor livegang (extern)
 
-1. **Domein + hosting.** Node 18+, `npm install && NODE_ENV=production npm start` achter
-   een reverse proxy (Caddy/Nginx/hosting-platform) met TLS-certificaat.
-   De app leunt op `trust proxy`; zet de proxy zo dat `X-Forwarded-Proto` meekomt.
+1. **Domein + hosting.** **Node 22 of nieuwer** (de accountsdatabase draait op de
+   ingebouwde `node:sqlite`; op Node 18 weigert de server nu te starten met die
+   reden erbij). Een domein waarvan A/AAAA naar de server wijst, en publiek
+   bereikbare poorten 80/443 TCP plus 3478 UDP.
+
+   Een reverse proxy is **niet meer nodig**: met `RTG_TLS=1` en `RTG_ACME=1`
+   regelt de app zelf HTTP/2, TLS 1.2/1.3, Let's Encrypt en de vernieuwing. Zet
+   je er tóch Caddy/Nginx voor, geef dan `X-Forwarded-Proto` door, want de app
+   leunt op `trust proxy`.
+
    Het failover-trio vangt vastlopers en crashes van de software op; kies bij
    de hoster daarnaast een pakket met redundante hardware (of twee machines),
    want tegen een kapotte machine of stroomuitval helpt alleen een tweede machine.
-2. **Omgevingsvariabelen zetten:**
+   Reserveer circa 4 GB RAM extra voor de ClamAV-container die uploads scant.
+2. **Omgevingsvariabelen zetten.** `npm run live:init` schrijft ze voor je (zie
+   `LIVEGANG.md`); onderstaande lijst is wat je bewust moet kiezen:
    - `NODE_ENV=production`
+   - `RTG_ENC_KEY` en de twee kluissleutels — zonder deze weigert de start
    - `OFFICE_CODE=<eigen sterke code>` (vervangt RTG-OFFICE)
    - `DEMO_USER` / `DEMO_PASS` wijzigen of demo-account uitzetten
    - `SMTP_URL=smtp://user:pass@host:587` + `MAIL_FROM="Rahul Travel Group <no-reply@domein.nl>"`
-   - `ANTHROPIC_API_KEY=...` voor echte AI en vloeiende chatvertaling
+   - **AI:** de standaard livegangroute zet `RTG_AI_UIT=1` — geen externe
+     modelserver, de handmatige werkmodus blijft volledig bruikbaar. Wil je wél
+     vrije taal, geef dan de voorkeur aan `LOCAL_AI_URL` (lokaal, eigen
+     omgeving). Een externe sleutel is een bewuste, aparte keuze en geen
+     voorwaarde om live te gaan.
+   - **Betalen:** de standaard livegangroute zet `RTG_BETALEN_UIT=1`, waardoor
+     elke betaalactie fail-closed weigert. Zie punt 4: zonder provider kun je
+     live, maar dan kun je nog geen geld innen.
+
+   De productiestart *weigert* (exitcode 1) bij een onveilige combinatie in
+   plaats van te waarschuwen — zie `server/config/productie.js`.
 3. **E-maildomein:** SPF/DKIM/DMARC instellen bij de DNS zodat mail aankomt.
 4. **Betalingen:** Mollie of Adyen koppelen. Alles wat zij vragen is er:
    KvK 82273510 (statutair RTG, handelsnamen RTG Lifestyle en RTG Business),
    btw-id NL002291440B89 en zakelijke rekening NL62 INGB 0111 1775 88 t.n.v. RTG
-   (tenaamstelling komt overeen met de KvK-naam). Aanmelden kan per direct. Tot de koppeling blijven app-betalingen gesimuleerd; leden zien
-   in het betaalscherm wel al de overboekingsinstructie met deze IBAN en hun
-   codenaam als kenmerk.
+   (tenaamstelling komt overeen met de KvK-naam). Aanmelden kan per direct.
+
+   **In productie blijven betalingen niet "gesimuleerd" — dat kan niet meer.**
+   Zonder echte provider weigert de productiestart, juist omdat de demo-provider
+   elke betaling zelf bevestigt; dat is precies de stille onveilige stand die
+   `server/config/productie.js` uitsluit. Je hebt dus twee eerlijke opties:
+   koppel een provider, óf ga live met `RTG_BETALEN_UIT=1`, waarbij elke
+   betaalactie fail-closed weigert en leden in het betaalscherm de
+   overboekingsinstructie zien met bovenstaande IBAN en hun codenaam als
+   kenmerk. Dat tweede is een geldige start, maar reken erop dat je dan
+   handmatig incasseert en afletteren mensenwerk is.
 5. **Kluis-sleutels:** `server/data/secret.key` en `vault.key` verhuizen naar een
    secrets manager van de hosting; nooit in git.
-6. **Database en schaal (belangrijk, eerlijk):** de operationele data staat nu in
-   een enkel `db.json` dat bij elke wijziging in zijn geheel wordt herschreven.
-   Dat is bewust simpel en veilig (atomisch, nooit een half bestand), maar het
-   schaalt niet: bij duizenden gelijktijdige gebruikers moet `db.json` vervangen
-   worden door PostgreSQL (de SQLite-accounts kunnen langer mee). Let ook op wat
-   het failover-trio wel en niet doet: het vangt een vastloper of crash van de
-   software op (crashbestendigheid), maar geeft GEEN extra capaciteit; er schrijft
-   maar een server tegelijk, op dezelfde schijf. Meer capaciteit en bescherming
-   tegen kapotte hardware komen pas met een echte database en meerdere machines.
-   Back-ups extern opslaan (nu lokaal, 14 dagen).
+6. **Database en schaal (belangrijk, eerlijk):** PostgreSQL is er inmiddels en is
+   in de livegangroute de standaard — de opslagkeuze volgt uit de omgeving
+   (`DATABASE_URL`, of `RTG_STORE` als die is gezet; zie `server/db/keuze.js`).
+   Zonder `DATABASE_URL` valt de app terug op het enkele `db.json` dat bij elke
+   wijziging in zijn geheel atomisch wordt herschreven: veilig en simpel, maar
+   het schaalt niet naar duizenden gelijktijdige gebruikers. **Ga niet live op
+   de json-stand.** Controleer na de uitrol expliciet dat je op Postgres draait
+   en niet stil op het bestand bent teruggevallen.
+
+   Twee dingen om open over te zijn:
+   - De Postgres-client is er een van eigen makelij (`server/pgwire/`, ruim 400
+     regels op `node:net`/`node:tls`, met SCRAM en een eigen pool) in plaats van
+     het `pg`-pakket. Dat past bij de nul-dependency-lijn en het is getoetst,
+     maar het mist zaken die `pg` wél heeft — onder meer het annuleren van een
+     lopende query (`CancelRequest`) en het COPY-protocol. Er wordt een
+     `statement_timeout` gezet, en dat is op dit moment je enige rem op een
+     doorgeslagen query. Houd dit in de gaten bij de eerste echte belasting.
+   - Het failover-trio vangt een vastloper of crash van de software op
+     (crashbestendigheid), maar geeft GEEN extra capaciteit; er schrijft maar
+     één server tegelijk. Bescherming tegen kapotte hardware komt pas met
+     meerdere machines.
+
+   Back-ups: de livegangroute maakt dagelijks een gevalideerde, met AES-256-GCM
+   versleutelde back-up buiten de Docker-schijf, plus een tweede write-once-set
+   op een off-site WORM/Object-Lock-doel. Bewaar de privésleutel offline en
+   test het herstelpad — een back-up die je nooit hebt teruggezet is geen
+   back-up.
 7. **Juridisch nalopen (voor livegang door een advocaat laten toetsen):**
    - De drie documenten: privacybeleid, algemene voorwaarden en partnervoorwaarden
      (gebundeld in de juridische ROS-app: `/apps/juridisch/privacy.html`,

@@ -100,8 +100,8 @@ test('de centrale bedieningslaag houdt een handmatige route zichtbaar', () => {
   assert.match(twin, /RTG LIVE TWIN · VERIFIED PRE-FLIGHT/);
   assert.match(twin, /PROOF RAIL/);
   assert.match(twin, /RTGLiveTwin/);
-  assert.match(twin, /5 DOMEINEN GESIMULEERD/);
-  assert.match(twin, /CONTROLE GEOPEND/);
+  assert.match(twin, /PREFLIGHT GESTART/);
+  assert.match(twin, /Serverbronnen bevestigen/);
   assert.match(twin, /0 acties uitgevoerd/);
   assert.match(twin, /data-approve/);
   assert.match(tab, /werkblad, navigatie en alle handmatige functies blijven gewoon beschikbaar/i);

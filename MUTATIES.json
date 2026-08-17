@@ -3509,6 +3509,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "ondertitels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ondertitels.js",
+      "operator": "<=-><#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "onderwijs.test.js": {
       "soort": "server",
       "staat": "gezakt",

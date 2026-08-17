@@ -54,6 +54,12 @@
   .film .mb{position:absolute;right:0.5rem;top:0.5rem;font-size:0.62rem;background:rgba(12,12,11,0.75);
     border-radius:999px;padding:0.2rem 0.5rem;font-variant-numeric:tabular-nums;}
   /* de bioscoop */
+  /* het ondertitelvel: drie maten die anders als style="" in de markup zouden
+     staan -- en elk inline style-attribuut houdt style-src-attr in de CSP open
+     (NORM.json telt ze daarom). */
+  .ondvel{margin-top:0.8rem;}
+  .ondvel textarea{width:100%;font:inherit;font-size:0.85rem;}
+  .ondrij{margin-top:0.5rem;}
   .doek{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;
     /* relative: de ondertitelband (shared/ondertitelband.js) hangt hierin */
     position:relative;}
@@ -131,12 +137,12 @@
          tekst al ergens staan en willen hem plakken, en een tekstvak kan dat.
          Wat een GELDIGE regel is, beslist de server (kern/ondertitels.js) --
          hier staat alleen hoe tekst in cues verandert en terug. -->
-    <div class="kaart" id="ondVel" hidden style="margin-top:0.8rem;">
+    <div class="kaart ondvel" id="ondVel" hidden>
       <p class="stil">Een video zonder ondertiteling is een video die een deel van de mensen niet kan volgen.
         Een regel per ondertitel: <code>0:05 - 0:09 wat er gezegd wordt</code>.</p>
       <label for="ondTekst">Ondertitels</label>
-      <textarea id="ondTekst" rows="8" style="width:100%;font:inherit;font-size:0.85rem;"></textarea>
-      <div class="rij" style="margin-top:0.5rem;">
+      <textarea id="ondTekst" rows="8"></textarea>
+      <div class="rij ondrij">
         <button class="knop vol" id="ondBewaar" type="button">Bewaar de ondertitels</button>
         <button class="knop" id="ondDicht" type="button">Sluiten</button>
       </div>

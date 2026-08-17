@@ -21,7 +21,7 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5928,
     "browserpoortToetsen": 200,
-    "kernBreedte": 1395,
+    "kernBreedte": 1396,
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -31,6 +31,12 @@
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-17",
+      "meter": "kernBreedte 1395 -> 1396 (VERHOOGD); toetsenNietGemeten en inlineStijlAttributen NIET verhoogd",
+      "reden": "Eén kernnaam erbij: theaterOndertitels. Het Theater bewaarde geen ondertitels bij een video -- dat is wat TAKEN 4.21 als niet-gebouwd noemde en wat check.js regel 49 als 'onbedekt' telde. De maker schrijft ze nu zelf, de kijker krijgt ze mee met de zaal, en de Media OS toont dezelfde lijst. Dat is één nieuwe bewerking in de kern en geen tweede: wat een geldige ondertitelregel is, staat op één plek (server/kern/ondertitels.js) en wordt gedeeld met de clip-kant, dus de clip-studio kreeg er geen naam bij. Een tweede validator zou de teller gespaard hebben en precies de dubbeling opleveren die LAT.md regel 4 verbiedt.",
+      "eerlijkheidshalve": "De twee andere meters die na deze ronde rood stonden zijn NIET opgehoogd maar teruggebracht. toetsenNietGemeten kwam op 151 door het nieuwe test/ondertitels.test.js; de mutatiemotor is er overheen gegaan (hij zakt op de eerste bronmutatie in kern/ondertitels.js) en de meter staat weer op 150. inlineStijlAttributen kwam op 5931 door drie style=\"\"-attributen in het nieuwe ondertitelvel van theater.html; die zijn drie klassen in het stijlblok van dat scherm geworden en de meter staat weer op 5928. Een meter ophogen hoort te gaan over wat je echt hebt bewogen, en dit waren twee dingen die ik gewoon netter kon doen."
+    },
     {
       "datum": "2026-08-17",
       "meter": "inlineStijlAttributen 5878 -> 5928 (VERHOOGD, en er is geen enkel style-attribuut bijgebouwd)",

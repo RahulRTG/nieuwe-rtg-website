@@ -578,6 +578,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "bewakersketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/routedekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "bewijsmatrix.test.js": {
       "soort": "puur",
       "staat": "gezakt",

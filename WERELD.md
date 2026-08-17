@@ -120,6 +120,15 @@ breed scherm bestaat de schilbalk niet; daar verschijnt dezelfde balk alleen in
 de vraagstand, als strook rechtsonder. Eén ding, twee vormen — net als de bank,
 die daar een rail is en op een telefoon een lade.
 
+**De mond blijft rechts, en de greep blijft bereikbaar.** In de vraagstand week
+eerst ook de greep van de bank, en daarmee de enige weg naar de werelden: stond
+Rahul open, dan zat je vast tot je hem sloot. Wat wijkt zijn de bladen en de
+sluitknop — die gaan over het blad dat je las, en dat blad blijft waar het is. De
+volgorde is greep, veld, mond, en dat is DOM-volgorde en geen `order`: zo staat
+de mond in beide standen op dezelfde plek en leest een schermlezer hem waar hij
+staat. Op een breed scherm vervalt de greep, want daar staat de bank al als
+vaste rail in beeld.
+
 **Eén instrument, geen rij widgets.** De eerste versie had drie behandelingen in
 achtenveertig pixels: een goud getint vlak achter de mond, een afgerond
 invoerveld met binnenschaduw, en een gevulde gouden schijf met een pijl. Elk voor

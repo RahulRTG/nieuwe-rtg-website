@@ -139,16 +139,22 @@ body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bot
 }
 .cmd-mondknop canvas{display:block!important;width:44px!important;height:auto!important;pointer-events:none}
 .cmd-mondknop:hover{opacity:1}
-/* Open: hij staat vol in het licht en de haarlijn wisselt van kant, want hij
-   staat nu vóór het veld in plaats van erachter. Geen vlak eromheen -- dat las
-   als een knop-in-een-balk, en de mond is geen knop maar een gezicht. */
-.cmd-balk.vraagt .cmd-mondknop{opacity:1;border-left:0;border-right:1px solid var(--rtg-line)}
-/* De vraagstand: het veld neemt de plek van de bank, de bladen en de
-   sluitknop in. Alles wat daar stond komt terug zodra je hem sluit -- er gaat
-   niets weg, het staat even ergens anders. */
+/* Open staat hij vol in het licht, en verder verandert er niets aan hem: hij
+   blijft rechts, waar je duim hem heeft leren zoeken. Geen vlak eromheen -- dat
+   las als een knop-in-een-balk, en de mond is geen knop maar een gezicht. */
+.cmd-balk.vraagt .cmd-mondknop{opacity:1}
+/* DE VRAAGSTAND NEEMT DE BLADEN IN, NIET DE GREEP.
+
+   Hier verdween ook .cmd-lade, en daarmee de enige weg naar de bank met de
+   werelden: stond Rahul open, dan zat je vast tot je hem sloot. De greep blijft
+   dus staan. Wat wijkt zijn de bladen en de sluitknop -- die gaan over het blad
+   dat je aan het lezen was, en dat blad blijft gewoon waar het is.
+
+   De volgorde is DOM-volgorde en geen `order`: greep, veld, mond. Zo staat de
+   mond in beide standen op dezelfde plek, en leest een schermlezer hem in de
+   volgorde waarin hij staat. */
 .cmd-vraagvorm{display:none;flex:1 1 auto;min-width:0;align-items:stretch;margin:0}
 .cmd-balk.vraagt .cmd-vraagvorm{display:flex}
-.cmd-balk.vraagt .cmd-lade,
 .cmd-balk.vraagt .cmd-balkbladen,
 .cmd-balk.vraagt .cmd-balksluit{display:none}
 /* De !important-en zijn niet van mij maar van rtg-ui.css: dat geeft elke input
@@ -216,7 +222,10 @@ body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bot
     backdrop-filter:blur(24px) saturate(1.05);-webkit-backdrop-filter:blur(24px) saturate(1.05);
     box-shadow:0 18px 44px rgba(0,0,0,.4);
   }
-  .cmd-balk.vraagt .cmd-mondknop{border:0;border-right:1px solid var(--rtg-line)}
+  /* Op een breed scherm staat de bank als vaste rail al in beeld, dus heeft de
+     greep daar niets te openen; het veld begint meteen. */
+  .cmd-balk.vraagt .cmd-lade{display:none}
+  .cmd-balk.vraagt .cmd-vraagveld{padding-left:1rem!important}
   .cmd-praat{position:fixed;z-index:243;left:auto;right:24px;bottom:76px;
     width:min(560px,calc(100% - 3rem));
     border:1px solid var(--rtg-line);box-shadow:0 18px 44px rgba(0,0,0,.4)}

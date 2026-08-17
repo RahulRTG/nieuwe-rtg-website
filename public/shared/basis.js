@@ -239,17 +239,95 @@
      Dit doet BEWUST geen Escape-afhandeling: of een venster gesloten mag worden
      hangt af van wat het vraagt (een onboardingpoort is niet hetzelfde als een
      tip), en dat weet de pagina en niet deze laag. */
-  var inertGezet = [], modaalGepland = false;
-  function modaalAfsluiten() {
-    var open = null;
+  var inertGezet = [], modaalGepland = false, kwamVan = null;
+
+  /* WAAR DE FOCUS VANDAAN KWAM, bijgehouden terwijl het gebeurt.
+
+     Eerste poging onthield hem op het moment dat deze laag de focus in het
+     venster zette, en die kwam altijd te laat: een pagina die zijn venster
+     opent, zet de focus er zelf al in (shared/uitvoer.js doet `laag.hidden =
+     false; knop.focus()` in EEN tik). De waarnemer draait pas daarna, en ziet
+     dan alleen nog een focus die al binnen staat. Wie wil weten waar iemand
+     vandaan kwam, moet meekijken en niet achteraf vragen. */
+  var kwamVanBuiten = null;
+  function focusSpoor() {
+    document.addEventListener('focusin', function (e) {
+      var m = openModaal();
+      if (!m || !m.contains(e.target)) kwamVanBuiten = e.target;
+    }, true);
+  }
+
+  /* Welk venster staat er OPEN -- apart, want twee plekken hebben het nodig en
+     de tweede mag niet wachten (zie modaalLos hieronder).
+
+     DE LAATSTE WINT, EN DAT KOSTTE EEN TOETS. Eerst nam deze de EERSTE in de
+     boom, en op app.html staat dat vast: de onboardingpoort staat in de markup,
+     en een venster dat later opengaat wordt aan het eind van <body> gehangen.
+     Toen pin-herstel zijn eigen scherm opende, sloot deze laag dus alles buiten
+     de ONBOARDING af -- inclusief dat nieuwe scherm. Het stond bovenop, in
+     beeld, en was onaanklikbaar; de tik viel door naar het veld eronder.
+     test/pinherstel.e2e.js zakte erop.
+
+     Later in de boom is bovenop, dus telt de laatste. */
+  function openModaal() {
     var kandidaten = document.querySelectorAll('[aria-modal="true"]');
-    for (var i = 0; i < kandidaten.length; i++) {
+    for (var i = kandidaten.length - 1; i >= 0; i--) {
       var k = kandidaten[i];
       if (k.hidden || !k.getClientRects().length) continue;
       var cs = window.getComputedStyle(k);
       if (cs.display === 'none' || cs.visibility === 'hidden') continue;
-      open = k; break;
+      return k;
     }
+    return null;
+  }
+
+  /* LOSLATEN MAG NOOIT EEN FRAME WACHTEN, en die regel komt uit een fout die ik
+     zelf heb gemaakt. Het afsluiten hangt in een requestAnimationFrame om een
+     regen van mutaties te bundelen, en het loslaten hing daar aan vast. Gevolg:
+     na het sluiten van een venster stond de rest van de pagina nog een frame
+     lang op inert. Een mens merkt dat zelden, maar wat er in dat frame gebeurt
+     is niet niets -- een pagina die na het sluiten de focus terugzet op de knop
+     waar de tik vandaan kwam, zet hem op een INERT element, en dan valt de focus
+     terug op body. Twee schermtoetsen in test/premium.e2e.js zakten er precies
+     op ("in een veld komt de letter gewoon in het veld", "de focus gaat terug
+     naar de knop waar de tik vandaan kwam").
+
+     Dus: sluiten mag wachten, loslaten niet.
+
+     EN DE FOCUS TERUG, WANT WIJ HEBBEN HEM WEGGEHAALD. Zelfs zonder dat frame
+     vertraging kan een pagina hem niet zelf terugzetten: zij sluit het venster
+     en zet de focus op de knop waar de tik vandaan kwam, allebei in dezelfde
+     tik -- en op dat moment staat die knop nog op inert, dus de focus valt op
+     body. De waarnemer draait pas daarna. Dat is geen fout van de pagina: hij
+     deed het goed voordat deze laag bestond.
+
+     Dus onthoudt deze laag waar de focus vandaan kwam en zet hem terug als hij
+     bij het loslaten NERGENS staat. Heeft de pagina hem intussen zelf ergens
+     neergezet, dan blijft die keuze staan -- de pagina weet beter waar hij
+     hoort dan wij. */
+  function modaalLos() {
+    if (!inertGezet.length || openModaal()) return false;
+    for (var i = 0; i < inertGezet.length; i++) inertGezet[i].inert = false;
+    inertGezet = [];
+    /* "Nergens" is meer dan body. In het echte geval (shared/uitvoer.js) doet de
+       pagina `laag.hidden = true; knop.focus();` in EEN tik: die focus valt weg
+       omdat de knop nog inert is, en de focus BLIJFT dan staan op de knop in het
+       zojuist verborgen venster -- een element zonder afmetingen, waar niemand
+       iets aan heeft. Pas een tel later laat de browser hem los naar body. Wie
+       alleen op body test, komt te laat. */
+    var actief = document.activeElement;
+    var nergens = !actief || actief === document.body ||
+      !actief.getClientRects || !actief.getClientRects().length;
+    var terug = kwamVan || kwamVanBuiten;
+    if (terug && nergens && document.contains(terug)) {
+      try { terug.focus({ preventScroll: true }); } catch (e) { try { terug.focus(); } catch (e2) {} }
+    }
+    kwamVan = null;
+    return true;
+  }
+
+  function modaalAfsluiten() {
+    var open = openModaal();
     // eerst terugdraaien wat we eerder hebben afgesloten
     for (var j = 0; j < inertGezet.length; j++) inertGezet[j].inert = false;
     inertGezet = [];
@@ -270,6 +348,8 @@
     /* En de focus hoort erin te staan. Zonder dit blijft de focus achter op de
        knop die het venster opende -- in een inerte tak, dus nergens. */
     if (!open.contains(document.activeElement)) {
+      // waar hij vandaan kwam, zodat modaalLos() hem straks kan teruggeven
+      if (document.activeElement && document.activeElement !== document.body) kwamVan = document.activeElement;
       var eerste = open.querySelector('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])');
       var doel = eerste || open;
       if (!eerste && !open.hasAttribute('tabindex')) open.setAttribute('tabindex', '-1');
@@ -399,6 +479,7 @@
     /* de twee helpers uit basis-01c.js: meldingen die worden voorgelezen, en een
        venster dat de rest van de pagina afsluit zolang het open staat */
     meldingenHoorbaar();
+    focusSpoor();
     modaalAfsluiten();
     begrens(document);
     try {
@@ -408,7 +489,12 @@
           if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
         /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
-           element -- daarom ook op attributen letten, gebundeld in een frame. */
+           element -- daarom ook op attributen letten, gebundeld in een frame.
+
+           LOSLATEN GAAT WEL METEEN. Zie modaalLos() in basis-01c.js: een frame
+           wachten met het opheffen van inert betekent dat een pagina die na het
+           sluiten de focus terugzet, hem op een inert element zet. */
+        modaalLos();
         if (!modaalGepland) { modaalGepland = true; requestAnimationFrame(function () { modaalGepland = false; modaalAfsluiten(); }); }
       }).observe(document.body, { childList: true, subtree: true,
         attributes: true, attributeFilter: ['hidden', 'class', 'style', 'aria-modal'] });

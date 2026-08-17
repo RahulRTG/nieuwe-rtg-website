@@ -108,6 +108,7 @@
     /* de twee helpers uit basis-01c.js: meldingen die worden voorgelezen, en een
        venster dat de rest van de pagina afsluit zolang het open staat */
     meldingenHoorbaar();
+    focusSpoor();
     modaalAfsluiten();
     begrens(document);
     try {
@@ -117,7 +118,12 @@
           if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
         /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
-           element -- daarom ook op attributen letten, gebundeld in een frame. */
+           element -- daarom ook op attributen letten, gebundeld in een frame.
+
+           LOSLATEN GAAT WEL METEEN. Zie modaalLos() in basis-01c.js: een frame
+           wachten met het opheffen van inert betekent dat een pagina die na het
+           sluiten de focus terugzet, hem op een inert element zet. */
+        modaalLos();
         if (!modaalGepland) { modaalGepland = true; requestAnimationFrame(function () { modaalGepland = false; modaalAfsluiten(); }); }
       }).observe(document.body, { childList: true, subtree: true,
         attributes: true, attributeFilter: ['hidden', 'class', 'style', 'aria-modal'] });

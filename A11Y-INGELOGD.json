@@ -53,5 +53,12 @@
     "structureel = 0 in BEIDE staten",
     "contrast = 0 in BEIDE staten",
     "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd"
-  ]
+  ],
+  "wat de vensterafsluiting kapotmaakte, en wat dat leerde": {
+    "waarom dit hier staat": "De maatregel van 17 augustus -- een open venster sluit de rest van de pagina af met inert -- brak drie schermtoetsen. Ze stonden alle drie in de CI en niet in de a11y-poort, dus de poort bleef groen terwijl er iets stuk was. Dat hoort in dit register, want het zegt iets over de grens van deze poort: hij meet of een scherm TOEGANKELIJK is, niet of het nog WERKT.",
+    "1. loslaten mocht niet wachten": "Het afsluiten hangt in een requestAnimationFrame om mutaties te bundelen, en het loslaten hing daaraan vast. Een pagina die haar venster sluit en in dezelfde tik de focus terugzet op de knop waar de tik vandaan kwam, zet hem dan op een INERT element -- de focus valt weg. Loslaten gebeurt nu meteen (modaalLos in shared/basis/basis-01c.js).",
+    "2. de focus terugzetten is nu de taak van de laag die hem wegnam": "Zelfs zonder dat frame lukt het de pagina niet: zij sluit en focust in EEN tik, terwijl inert pas daarna weggaat. De gedeelde laag houdt daarom bij waar de focus vandaan kwam (een focusin-luisteraar; achteraf vragen is te laat, want de pagina zet de focus zelf al in het venster) en geeft hem terug als hij bij het loslaten nergens meer staat. \"Nergens\" is meer dan body: de focus blijft eerst nog even staan op de knop in het zojuist verborgen venster, een element zonder afmetingen.",
+    "3. de laatste modaal wint, niet de eerste": "Op app.html staat de onboardingpoort in de markup en wordt een later venster aan het eind van body gehangen. De laag nam de EERSTE aria-modal en sloot alles daarbuiten af -- inclusief het nieuwere venster van pin-herstel, dat bovenop stond, in beeld was en onaanklikbaar werd; de tik viel door naar het veld eronder. Later in de boom is bovenop, dus telt de laatste.",
+    "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
+  }
 }

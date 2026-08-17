@@ -93,7 +93,17 @@ die heeft pijltjes, Escape en een sneltoets naast het draaien met een vinger
 een `:focus-visible`-rand op elk scherm. Een open venster sluit sinds vandaag de
 rest van de pagina af met `inert`, zodat je er niet meer uit tabt zonder het te
 merken -- gemeten op app.html: dertien focusbare elementen stonden buiten het
-venster open, nu nul.
+venster open, nu nul. En als het venster dichtgaat, geeft die laag de focus terug
+aan de knop waar hij vandaan kwam.
+
+Dat laatste stond er niet meteen, en het staat hier omdat het iets zegt over de
+grens van de poort. Diezelfde maatregel brak drie schermtoetsen: het loslaten van
+`inert` wachtte een frame, waardoor een pagina die zelf de focus terugzette hem op
+een inert element zette; en de laag nam het EERSTE venster in de boom in plaats
+van het laatste, waardoor een nieuwer venster dat er bovenop opende zelf werd
+afgesloten -- zichtbaar, en niet aan te klikken. De a11y-poort bleef al die tijd
+groen. **Een poort die meet of een scherm toegankelijk is, meet niet of het nog
+werkt.** Alleen de gewone schermtoetsen zagen dit.
 
 **Werkt ook: elk raakvlak is minstens 24x24** (WCAG 2.5.8), gemeten op
 telefoonformaat. De meting begon op 267 stuks over 188 schermen en staat nu op

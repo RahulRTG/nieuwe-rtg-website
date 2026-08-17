@@ -319,6 +319,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de INVOER van elke bronkeuring: commentaar eruit, maar geen code opeten | `scripts/lib/bron.js` + `test/bron.test.js` |
 | toegankelijkheid van elk scherm, uitgelogd EN ingelogd, hard op nul | `scripts/a11y.js` + `A11Y-INGELOGD.json` |
 | elk media-element een besluit over ondertiteling, met een reden | `scripts/check.js` regel 49 |
+| de onderhoudsveger lost de rem niet, en is aan te roepen met een eigen klok | `server/opzet/onderhoud.js` + `test/onderhoud.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |

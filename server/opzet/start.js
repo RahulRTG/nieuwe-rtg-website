@@ -50,22 +50,13 @@ module.exports = function start(deps) {
   require('./opslagstart')({ log, accounts, initRealtime, startGedeeld, startSqliteSync,
     startPostgres, DEMO, zetEigenaarsAccount });
 
-  // Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
-  // opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
-  setInterval(() => {
-    const nu = Date.now();
-    /* Alleen opruimen wat niets tegenhoudt EN niets meer telt. Zonder die
-       tweede voorwaarde verdween elke vijf minuten ook een emmer die nog aan
-       het tellen was, en dan is de inlogrem te doseren: negen gokken per ronde
-       en de grens komt nooit in zicht. Een kwartier stilte is ruim genoeg om
-       het geheugen niet te laten vollopen, en te lang om een aanval te kunnen
-       uitzitten. */
-    for (const [k, f] of loginFails) {
-      if (f.until < nu && (f.laatst || 0) < nu - 15 * 60000) loginFails.delete(k);
-    }
-    pinSlot.opruimen(); // ruimt alleen op wat niets meer tegenhoudt EN niets meer telt
-    ruimBuffer();
-  }, 5 * 60 * 1000).unref();
+  /* Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
+     opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke
+     bezoekers. De ronde zelf staat in ./onderhoud.js en niet hier, want in een
+     `setInterval` van vijf minuten kan geen enkele toets erbij -- en juist deze
+     veger heeft twee keer de inlogrem gelost. Hier blijft alleen de klok. */
+  const { onderhoudsronde, RONDE_MS } = require('./onderhoud');
+  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer }), RONDE_MS).unref();
 
   backupData();
   setInterval(backupData, 24 * 60 * 60 * 1000);

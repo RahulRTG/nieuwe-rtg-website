@@ -3305,6 +3305,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "onderhoud.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/onderhoud.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",

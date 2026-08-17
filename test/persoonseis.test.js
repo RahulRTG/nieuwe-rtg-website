@@ -313,9 +313,12 @@ test('9. het bedrijfsbewijs verloopt en komt op de herkeuringslijst', () => {
       -> toets 7b zakte: "een personeelslid draagt een staffId en is dus geen
          gedeelde inlog".
 
-   AFGESLAGEN (de mutatie beet niet, en dat is een bevinding):
+   AFGESLAGEN, EN INMIDDELS OPGELOST (het spoor blijft staan, want de bevinding
+   was echt):
    - In routes/vakbewijs.js de soortcontrole bij /api/vakbewijs/zet weggehaald.
-     Geen enkele toets in dit bestand zakte -- die controle zit op de route en
-     dit bestand is puur. Hij hangt dus alleen op mensenwerk; een routetoets
-     eromheen staat op de takenlijst.
+     Geen enkele toets in DIT bestand zakte -- die controle zit op de route en
+     dit bestand is puur. Hij hing dus alleen op mensenwerk.
+     Dat gat is gedicht: test/vakbewijs-routes.test.js loopt dezelfde keten over
+     echte HTTP, en daar is precies deze mutatie RAAK (toets 2). Wat hier een
+     afgeslagen mutatie was, is daar een toets die zakt.
    ========================================================================== */

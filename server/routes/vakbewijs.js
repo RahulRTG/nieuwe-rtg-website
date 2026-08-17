@@ -88,8 +88,12 @@ module.exports = (kern) => {
       if (v.afgetekend || v.ingetrokken) continue;
       open.push(Object.assign({}, v, { wie: codenaamBijSleutel(v.sleutel) }));
     }
-    res.json({ ok: true, open, verlopend: vakbewijzenVerlopend(null, 60).map(v =>
-      Object.assign({}, v, { wie: codenaamBijSleutel(v.sleutel) })) });
+    /* De soortenlijst gaat mee: het scherm hoort "een Verklaring Omtrent het
+       Gedrag" te tonen en niet "vog". Een tweede lijst in de client zou de
+       tweede plek zijn die dezelfde namen vasthoudt (LAT-regel 4). */
+    res.json({ ok: true, open, soorten: persoonseis.SOORTEN,
+      verlopend: vakbewijzenVerlopend(null, 60).map(v =>
+        Object.assign({}, v, { wie: codenaamBijSleutel(v.sleutel) })) });
   });
 
   /* DE CODENAAM EN NIET DE ECHTE NAAM. Die staat in de kluis, en elke blik erin

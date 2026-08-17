@@ -26,12 +26,13 @@ const REGELS = [
      de route bij Intern & IT leggen terwijl het scherm ernaast nergens op
      matchte en op de terugval bleef staan. Dan wijst dezelfde capability naar
      twee kamers, en dat is precies wat deze lijst moet voorkomen. Een regel voor
-     beide, zodat route en scherm bij elkaar horen. */
-  /* Het routedossier hoort bij dezelfde kamer en staat in dezelfde regel: het is
-     dezelfde routelijst, een laag dieper. Twee losse regels zouden na een
-     hernoeming uit elkaar kunnen lopen en dan hangt het ene scherm bij de
-     Ingenieurs en het andere op de terugval. */
-  [/routedekking|routedossier/, 'ingenieurs', 'Ingenieurs'],
+     alle drie, zodat route en scherm bij elkaar horen.
+
+     Het routedossier en het platformregister staan in DEZELFDE regel en niet in
+     een eigen regel ernaast: het is dezelfde routelijst, een laag dieper en een
+     laag breder. Losse regels lopen na een hernoeming uit elkaar, en dan hangt
+     het ene scherm bij de Ingenieurs en het andere op de terugval. */
+  [/routedekking|routedossier|platformregister/, 'ingenieurs', 'Ingenieurs'],
   [/office\/ideeen|\/ideeen/, 'ideeen', 'De Ideeënkamer'],
   [/office\/kantine/, 'kantine', 'Kantine'],
   [/office\/(?:koppel|onboarding|conversations)|\/integratie|\/webhook/, 'integraties', 'Integratiekamer'],

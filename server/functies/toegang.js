@@ -3,6 +3,9 @@
    nette blokkadereden voor de gebruiker. */
 const { inCanary } = require('./canaryas');
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS } = require('./register');
+/* Met een GRENS: '/api/bank' eist niet ook '/api/bankzaken' op, en '/' niet
+   alles. Geexporteerd omdat kern/platformregister dezelfde vraag stelt; daar
+   stond een lossere kopie, en die maakte een toets onzakbaar (LAT.md regel 4). */
 function prefixLengte(pad, prefix) {
   if (!pad.startsWith(prefix)) return 0;
   const rest = pad.slice(prefix.length);
@@ -187,6 +190,6 @@ function doelgroepVanVerzoek(pad, user) {
 // De volledige catalogus met de huidige stand, geordend per categorie (voor het
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
-module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
+module.exports = { prefixLengte, functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd,
   doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, inCanary };

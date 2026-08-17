@@ -2,19 +2,19 @@
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
-  "routes": 4183,
+  "routes": 4185,
   "schakels": 11,
-  "cellen": 46013,
+  "cellen": 46035,
   "telling": {
-    "bewezen": 16549,
+    "bewezen": 16551,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 29054,
+    "ongemeten": 29074,
     "gezakt": 138
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 3883,
+      "bewezen": 3885,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 300,
@@ -24,70 +24,70 @@
       "bewezen": 3377,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 806,
+      "ongemeten": 808,
       "gezakt": 0
     },
     "INPUT": {
       "bewezen": 2808,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1375,
+      "ongemeten": 1377,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4183,
+      "ongemeten": 4185,
       "gezakt": 0
     },
     "STATE": {
       "bewezen": 255,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3860,
+      "ongemeten": 3862,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
       "bewezen": 255,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3860,
+      "ongemeten": 3862,
       "gezakt": 0
     },
     "AUDIT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4183,
+      "ongemeten": 4185,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
       "bewezen": 141,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3844,
+      "ongemeten": 3846,
       "gezakt": 130
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4181,
+      "ongemeten": 4183,
       "gezakt": 0
     },
     "ROLLBACK": {
       "bewezen": 2451,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 1656,
+      "ongemeten": 1658,
       "gezakt": 8
     },
     "PRIVACY": {
       "bewezen": 3377,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 806,
+      "ongemeten": 808,
       "gezakt": 0
     }
   },

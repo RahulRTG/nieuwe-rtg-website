@@ -3935,6 +3935,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "platformregister.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "podium.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4350,6 +4357,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "routedossier.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "routelog.test.js": {

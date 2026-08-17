@@ -22,6 +22,9 @@
     border-bottom:1px solid var(--rtg-line);max-width:60rem;margin:0 auto;}
   header .weg{margin-left:auto;color:var(--rtg-soft);text-decoration:none;font-size:.78rem;}
   header .weg:hover,header .weg:focus-visible{color:var(--rtg-goud);}
+  /* Twee wegwijzers naast elkaar: de tweede krijgt zijn lucht uit CSS en niet
+     uit een style-attribuut, zodat style-src-attr dicht kan blijven. */
+  header .weg + .weg{margin-left:.9rem;}
   .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud);}
   h1{font-size:1.3rem;margin:.1rem 0 0;}
   h2{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
@@ -62,7 +65,7 @@
   <!-- Dezelfde routes, een laag dieper: aangeraakt is niet hetzelfde als bewaakt,
        en dat verschil hoort een klik weg te zijn en niet in een terminal. -->
   <a class="weg" href="/apps/routedossier.html">Routedossier →</a>
-  <a class="weg" style="margin-left:.9rem" href="/apps/kantoor.html">← Kantoor</a>
+  <a class="weg" href="/apps/kantoor.html">← Kantoor</a>
 </header>
 <main id="inhoud">
   <!-- WAT DIT SCHERM BEWEERT, EN WAT NIET. Het toont geen opgeslagen cijfer maar

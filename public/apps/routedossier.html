@@ -20,6 +20,9 @@
     border-bottom:1px solid var(--rtg-line);max-width:64rem;margin:0 auto;}
   header .weg{margin-left:auto;color:var(--rtg-soft);text-decoration:none;font-size:.78rem;}
   header .weg:hover,header .weg:focus-visible{color:var(--rtg-goud);}
+  /* Twee wegwijzers naast elkaar: de tweede krijgt zijn lucht uit CSS en niet
+     uit een style-attribuut, zodat style-src-attr dicht kan blijven. */
+  header .weg + .weg{margin-left:.9rem;}
   .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-goud);}
   h1{font-size:1.3rem;margin:.1rem 0 0;}
   h2{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
@@ -33,6 +36,12 @@
   .as b{display:block;font-size:.72rem;letter-spacing:.1em;}
   .as .balk{display:flex;height:4px;margin:.4rem 0 .3rem;background:var(--rtg-line);}
   .as .balk i{display:block;height:100%;}
+  /* De KLEUR van elk segment hoort in CSS; alleen de BREEDTE is een meetwaarde
+     en die wordt na het invoegen via de DOM gezet (el.style.width). Zo staat er
+     geen stijlattribuut in de HTML-bron en kan style-src-attr in de CSP dicht. */
+  .as .balk i.bewezen{background:var(--rtg-goud);}
+  .as .balk i.gezakt{background:var(--rtg-bordeaux,#9E1C40);}
+  .as .balk i.nvt{background:var(--rtg-soft);}
   .as small{display:block;font-size:.66rem;color:var(--rtg-soft);
     font-variant-numeric:var(--rtg-cijfers);}
   .as[data-instrument="nee"] b::after{content:' -- geen instrument';letter-spacing:0;
@@ -77,7 +86,8 @@
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header>
   <div><div class="ey">RTG Kantoor</div><h1 class="rtg-ceremonie">Routedossier</h1></div>
-  <a class="weg" href="/apps/routedekking.html">← Routedekking</a>
+  <a class="weg" href="/apps/platformregister.html">Platformregister -&gt;</a>
+  <a class="weg" href="/apps/routedekking.html">&lt;- Routedekking</a>
 </header>
 <main id="inhoud">
   <!-- WAT DIT SCHERM BEWEERT. Niet "deze route is veilig" maar "dit is wat er
@@ -170,14 +180,17 @@
         ' title="' + esc(s.uitleg) + (s.nodig ? ' -- ' + esc(s.nodig) : '') + '">' +
         '<b>' + esc(s.id) + '</b>' +
         '<span class="balk">' +
-          '<i style="width:' + breed(p.bewezen) + ';background:var(--rtg-goud)"></i>' +
-          '<i style="width:' + breed(p.gezakt) + ';background:var(--rtg-bordeaux,#9E1C40)"></i>' +
-          '<i style="width:' + breed(p.nvt) + ';background:var(--rtg-soft)"></i>' +
+          '<i class="bewezen" data-w="' + breed(p.bewezen) + '"></i>' +
+          '<i class="gezakt" data-w="' + breed(p.gezakt) + '"></i>' +
+          '<i class="nvt" data-w="' + breed(p.nvt) + '"></i>' +
         '</span>' +
         '<small>' + p.bewezen.toLocaleString('nl-NL') + ' bewezen · ' +
           p.ongemeten.toLocaleString('nl-NL') + ' ongemeten' +
           (p.gezakt ? ' · ' + p.gezakt + ' GEZAKT' : '') + '</small></button>';
     }).join('');
+    /* De breedtes na het invoegen, via de DOM en niet via een attribuut in de
+       bron -- zie de opmerking bij .as .balk i in de stijl hierboven. */
+    for (const i of document.querySelectorAll('.as .balk i')) i.style.width = i.dataset.w;
     for (const b of document.querySelectorAll('.as')) {
       b.addEventListener('click', () => {
         schakel = (schakel === b.dataset.as) ? '' : b.dataset.as;

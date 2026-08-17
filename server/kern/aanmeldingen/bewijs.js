@@ -39,18 +39,63 @@ module.exports = ({ save, kap, nu }) => {
 
   const eisVan = (genre) => EISEN[genre] || 'het stuk waaruit blijkt dat u dit beroep mag uitoefenen';
 
-  /* De stand op een aanmelding. Drie standen, en "niet nodig" is er een van:
-     een restaurant hoort hier geen leeg vakje te zien. */
+  const DATUM = /^\d{4}-\d{2}-\d{2}$/;
+  const vandaag = () => new Date(nu()).toISOString().slice(0, 10);
+  const verlopen = (b) => !!(b && b.geldigTot && b.geldigTot < vandaag());
+
+  /* De stand op een aanmelding. VIER standen sinds de houdbaarheid, en
+     "niet nodig" is er een van: een restaurant hoort hier geen leeg vakje te
+     zien.
+
+     WAAROM ER EEN VIERDE BIJ MOEST. Een afgetekend stuk was hier voor eeuwig
+     gezien. Een BIG-registratie die volgend jaar wordt doorgehaald, een
+     LRK-inschrijving die vervalt, een beveiligingsvergunning die afloopt --
+     alle drie bleven ze staan als 'gezien', omdat er geen datum was die ooit
+     iets kon zeggen. Dat is dezelfde fout als een bewijsvlag die niemand
+     handhaaft, alleen een jaar later zichtbaar.
+
+     WAT DEZE STAND WEL EN NIET DOET. Hij zet geen zaak stil. RTG is geen
+     inspectie en een aflopende datum in ons dossier is geen bewijs dat een
+     vergunning is ingetrokken -- doorhalen op grond van een veld dat wij zelf
+     hebben overgetypt zou precies de schijnzekerheid zijn waar de kop van dit
+     bestand voor waarschuwt. Hij zorgt dat het OPVALT: bewijsHerkeuring() zet
+     ze op een lijst voor het kantoor, en een mens kijkt er opnieuw naar. */
   function bewijsStand(a) {
     if (!a || !a.bedrijf || !a.bedrijf.bewijsNodig) return { nodig: false, stand: 'niet-nodig' };
     const b = a.bewijs || null;
     if (!b) return { nodig: true, stand: 'ontbreekt', vraag: eisVan(a.bedrijf.type),
       uitleg: 'Uw aanvraag staat op de stapel. Uw zaak wordt klaargezet zodra een medewerker uw ' +
         eisVan(a.bedrijf.type) + ' heeft gezien.' };
+    if (b.afgetekend && verlopen(b)) return { nodig: true, stand: 'verlopen', bewijs: b,
+      uitleg: 'Het stuk dat wij van u zagen liep af op ' + b.geldigTot + '. Dien het vernieuwde stuk in; ' +
+        'een medewerker kijkt er opnieuw naar.' };
     if (b.afgetekend) return { nodig: true, stand: 'gezien', bewijs: b,
-      uitleg: 'Gezien en afgetekend door ' + b.afgetekend.door + ' op ' + String(b.afgetekend.at).slice(0, 10) + '.' };
+      uitleg: 'Gezien en afgetekend door ' + b.afgetekend.door + ' op ' + String(b.afgetekend.at).slice(0, 10) + '.' +
+        (b.geldigTot ? ' Geldig tot ' + b.geldigTot + '.' : '') };
     return { nodig: true, stand: 'ingediend', bewijs: b,
       uitleg: 'U heeft een stuk ingediend. Een medewerker kijkt ernaar; wij beoordelen het niet inhoudelijk.' };
+  }
+
+  /* De herkeuringslijst: aanmeldingen waarvan het bewijsstuk is verlopen of dat
+     binnen `dagen` gaat doen. Dit is de tegenhanger van "voor eeuwig gezien" --
+     zonder een lijst die vooruitkijkt, is een houdbaarheidsdatum alleen een
+     veld dat niemand ooit leest (LAT-regel 6). */
+  function bewijsHerkeuring(lijst, dagen) {
+    /* nu() geeft hier een ISO-STRING (zie ../aanmeldingen.js), geen milliseconden.
+       Zonder de Date.parse eromheen plakt de `+` er een getal achter en komt er
+       een datum uit die nooit ergens boven ligt -- dan staat de lijst altijd leeg
+       en meldt de herkeuring eeuwig "niets te doen". */
+    const grens = new Date(Date.parse(nu()) + (Number(dagen) || 60) * 86400000).toISOString().slice(0, 10);
+    const uit = [];
+    for (const a of (lijst || [])) {
+      const b = a && a.bewijs;
+      if (!b || !b.afgetekend || !b.geldigTot) continue;
+      if (b.geldigTot > grens) continue;
+      uit.push({ id: a.id, genre: a.bedrijf ? a.bedrijf.type : null,
+        naam: a.bedrijf ? a.bedrijf.naam || null : null,
+        geldigTot: b.geldigTot, verlopen: verlopen(b), vraag: eisVan(a.bedrijf && a.bedrijf.type) });
+    }
+    return uit.sort((x, y) => String(x.geldigTot).localeCompare(String(y.geldigTot)));
   }
 
   /* De aanvrager dient een stuk in. Dit is een MELDING en geen bewijs: er
@@ -65,7 +110,11 @@ module.exports = ({ save, kap, nu }) => {
       return { status: 400, error: 'Welk stuk dient u in?',
         uitleg: 'Noem het soort (bijvoorbeeld "' + eisVan(a.bedrijf.type) + '") en het nummer ervan.' };
     }
-    a.bewijs = { soort: soort || null, nummer: nummer || null,
+    /* De houdbaarheid. Optioneel, want niet elk stuk heeft er een -- een
+       inschrijving in een register loopt door tot hij wordt doorgehaald. Staat
+       hij er wel, dan is dit het veld waarmee 'gezien' ooit kan aflopen. */
+    const tot = DATUM.test(String((data || {}).geldigTot || '')) ? String((data || {}).geldigTot) : null;
+    a.bewijs = { soort: soort || null, nummer: nummer || null, geldigTot: tot,
       toelichting: kap((data || {}).toelichting, 400) || null,
       ingediend: nu(), afgetekend: null };
     a.bijgewerkt = nu();
@@ -94,10 +143,15 @@ module.exports = ({ save, kap, nu }) => {
      precies loopt zoals altijd. */
   function bewijsKlaar(a) {
     if (!a || !a.bedrijf || !a.bedrijf.bewijsNodig) return true;
-    return !!(a.bewijs && a.bewijs.afgetekend);
+    /* Een VERLOPEN stuk zet hier geen zaak klaar. Bij de provisioning kan dat
+       ook zonder terughoudendheid: er bestaat nog niets dat we stilzetten, en
+       een zaak openen op een vergunning waarvan wij zelf hebben genoteerd dat
+       hij is afgelopen, is geen "wij zijn geen inspectie" maar wegkijken. */
+    return !!(a.bewijs && a.bewijs.afgetekend && !verlopen(a.bewijs));
   }
 
-  return { BEWIJS_EISEN: EISEN, bewijsStand, bewijsIndien, bewijsTeken, bewijsKlaar, bewijsEisVan: eisVan };
+  return { BEWIJS_EISEN: EISEN, bewijsStand, bewijsIndien, bewijsTeken, bewijsKlaar,
+    bewijsHerkeuring, bewijsEisVan: eisVan };
 };
 
 module.exports.EISEN_IDS = ['ziekenhuis', 'huisarts', 'specialist', 'apotheek',

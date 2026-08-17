@@ -70,6 +70,10 @@ module.exports = function hangRoutesOp(kern) {
   // RTG Concern (CONCERN.md): naast de domeinen om dezelfde reden als SSO --
   // het raakt member, supplier en staff, en hoort in elk daarvan half thuis.
   require('../routes/concern')(grens('concern'));
+  /* Het vakbewijs (kern/vakbewijs.js + kern/persoonseis.js): naast de domeinen
+     om dezelfde reden als concern -- het stuk is van het LID, RTG tekent het af
+     in het kantoor, en de zaak wil weten of haar ploeg erdoor komt. */
+  require('../routes/vakbewijs')(grens('vakbewijs'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

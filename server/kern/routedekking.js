@@ -60,12 +60,28 @@ function domeinVan(pad) {
    niet als drift gemeld worden. */
 const BUITEN = (pad) => String(pad).startsWith('/api/test/');
 
-/* DE INVENTARIS: elke meetbare route precies één keer.
+/* DE INVENTARIS: elke meetbare route precies één keer, met zijn bewakers.
 
    Slikt beide vormen waarin een routekaart hier binnenkomt -- app._routes()
-   geeft één regel per LAAG ({pad, methode}, dus een route met drie middlewares
-   staat er drie keer), scripts/routekaart.js geeft de gebundelde vorm
-   ({pad, methoden: [...]}). Eén normalisatie hier, geen tweede elders. */
+   geeft één regel per LAAG ({pad, methode, laagNaam}, dus een route met drie
+   middlewares staat er drie keer), scripts/routekaart.js geeft de gebundelde
+   vorm ({pad, methoden: [...], bewakers: {...}}). Eén normalisatie hier, geen
+   tweede elders.
+
+   DE BEWAKERS, EN WAAROM DIE HIER WORDEN AFGELEID EN NIET ELDERS
+
+   Een route is in deze router EEN LAAG PER MIDDLEWARE, alle met hetzelfde pad en
+   dezelfde methode, in de volgorde waarin ze zijn opgehangen. De laatste is de
+   handler, alles daarvoor is een bewaker. Die regel is een feit over deze router
+   en hoort dus bij de routerkennis te staan -- niet overgeschreven in elk script
+   dat hem nodig heeft, want dan is hij op vier plekken anders (LAT.md regel 4).
+
+   `bewakers: null` betekent NIET GEEN BEWAKERS maar ONBEKEND: de invoer droeg
+   geen laagnamen. Dat verschil moet blijven staan. Een leeg lijstje leest als
+   "deze route is onbeschermd" en dat is een heel andere bewering dan "we weten
+   het niet" (LAT.md regel 3). 578 routes van dit huis hebben werkelijk geen
+   bewakerslaag omdat ze in de handler een capability-token controleren; die
+   verdienen [] en de rest verdient null. */
 function inventaris(rauw) {
   const per = new Map();
   const onmeetbaar = [];
@@ -77,6 +93,8 @@ function inventaris(rauw) {
     const pad = r && r.pad ? String(r.pad) : '';
     if (!pad || BUITEN(pad)) continue;
     const methoden = Array.isArray(r.methoden) ? r.methoden : [r.methode];
+    // per laag (app._routes) is er EEN naam; per bundel (routekaart) een lijst per methode
+    const heeftLaag = r && Object.prototype.hasOwnProperty.call(r, 'laagNaam');
     for (const m of methoden) {
       /* EEN ROUTE ZONDER EIGEN METHODE IS NIET TE METEN, EN DAT MOET OPVALLEN.
          web/routing.js noteert een patroon alleen als de laag een methode
@@ -86,10 +104,25 @@ function inventaris(rauw) {
          apart terug en noemt de poort hem bij naam (LAT.md regel 3). */
       const naam = normaalMethode(m);
       if (naam === 'ALL') { onmeetbaar.push({ methode: 'ALL', pad, domein: domeinVan(pad) }); continue; }
-      per.set(naam + ' ' + pad, { methode: naam, pad, domein: domeinVan(pad) });
+      const sleutel = naam + ' ' + pad;
+      const al = per.get(sleutel);
+      if (!al) {
+        const gebundeld = r.bewakers && !Array.isArray(r.bewakers) ? r.bewakers[naam] : null;
+        per.set(sleutel, { methode: naam, pad, domein: domeinVan(pad),
+          lagen: heeftLaag ? [String(r.laagNaam || '')] : null,
+          bewakers: Array.isArray(gebundeld) ? gebundeld.slice() : (Array.isArray(r.bewakers) ? r.bewakers.slice() : null) });
+      } else if (al.lagen && heeftLaag) {
+        al.lagen.push(String(r.laagNaam || ''));
+      }
     }
   }
-  const lijst = [...per.values()].sort((a, b) =>
+  /* De bewakers uit de laagreeks: alles behalve de laatste, zonder de anonieme.
+     Alleen wanneer de reeks er is -- anders blijft `bewakers` null (onbekend). */
+  const lijst = [...per.values()].map(r => {
+    if (r.bewakers == null && Array.isArray(r.lagen)) r.bewakers = r.lagen.slice(0, -1).filter(Boolean);
+    delete r.lagen;
+    return r;
+  }).sort((a, b) =>
     a.pad === b.pad ? (a.methode < b.methode ? -1 : 1) : (a.pad < b.pad ? -1 : 1));
   return { routes: lijst, onmeetbaar };
 }

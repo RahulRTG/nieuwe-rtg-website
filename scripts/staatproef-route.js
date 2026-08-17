@@ -29,20 +29,16 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { draaiStaatproef } = require('./lib/staatproef');
 const { plausibelLijf } = require('./lib/rolproef');
-const { alleRoutes, isSchakel } = require('./lib/routes');
+const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'STAATPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
 
-function rolVan(bewakers) {
-  const b = bewakers.join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
-}
+/* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
+   te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
+   eens -- vier kopieen van dezelfde afleiding (LAT.md regel 4). */
 
 function vrijePoort() {
   const net = require('net');
@@ -127,15 +123,21 @@ async function wacht(basis, ms) {
      eerste ronde negentien loze 'geweigerd en toch veranderd' op rij.
      Empirisch en niet met de hand: een geschreven lijst loopt achter zodra er
      een journaal bijkomt, en dan komen de valse bevindingen terug. */
-  const routes = alleRoutes()
+  const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
     .filter(r => !r.pad.includes(':'))
     /* De vingerafdruk-routes zelf niet bestoken: een proef die zijn eigen
        meetinstrument als proefkonijn gebruikt, meet zichzelf. */
-    .filter(r => !r.pad.startsWith('/api/techniek/vingerafdruk'))
-    .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
-    .filter(r => r.rol);
+    .filter(r => !r.pad.startsWith('/api/techniek/vingerafdruk'));
+  /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
+     honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
+     komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
+  const verdeling = verdeelOpRol(kandidaten);
+  const routes = verdeling.metRol;
+  console.log('  routes gevonden                      : ' + kandidaten.length);
+  console.log('  routes met een herkenbare rol        : ' + routes.length);
+  meldZonderRol(verdeling);
 
   const ruwRoutes = routes;
 
@@ -209,6 +211,12 @@ async function wacht(basis, ms) {
     uitleg: 'Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: ' +
       'bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. ' +
       'Een route die hier NIET in staat is niet beproefd. Zie scripts/lib/staatproef.js voor de grens.',
+    /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
+       routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
+       bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
+    nietBeproefbaar: verdeling.zonderRol.length,
+    redenenNietBeproefbaar: verdeling.redenen,
+    routesGevonden: kandidaten.length,
     gemeten: { routesMetRol: routes.length, beoordeeld, oproepen: uit.oproepen,
       state: t.state, sideEffect: t.sideEffect, rollback: t.rollback, rollbackGezakt: t.rollbackGezakt,
       idemBewezen: t.idemBewezen, idemGezakt: t.idemGezakt, ongemeten: t.ongemeten,

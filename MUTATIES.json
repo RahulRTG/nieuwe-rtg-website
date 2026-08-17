@@ -1402,6 +1402,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "foutisolatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/foutisolatie.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "foutmelder.test.js": {
       "soort": "puur",
       "staat": "gezakt",

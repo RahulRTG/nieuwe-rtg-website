@@ -1,95 +1,101 @@
 {
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
-  "routes": 3987,
+  "journaalGelezen": ".routejournaal",
+  "routes": 4183,
   "schakels": 11,
-  "cellen": 43857,
+  "cellen": 46013,
   "telling": {
     "bewezen": 15044,
-    "verklaard": 0,
-    "nvt": 260,
-    "ongemeten": 28431,
+    "verklaard": 195,
+    "nvt": 272,
+    "ongemeten": 30380,
     "gezakt": 122
   },
   "perSchakel": {
     "AUTH": {
       "bewezen": 3987,
-      "verklaard": 0,
+      "verklaard": 195,
       "nvt": 0,
-      "ongemeten": 0,
+      "ongemeten": 1,
       "gezakt": 0
     },
     "ACL": {
       "bewezen": 2935,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1052,
+      "ongemeten": 1248,
       "gezakt": 0
     },
     "INPUT": {
       "bewezen": 2508,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1479,
+      "ongemeten": 1675,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3987,
+      "ongemeten": 4183,
       "gezakt": 0
     },
     "STATE": {
       "bewezen": 224,
       "verklaard": 0,
-      "nvt": 65,
-      "ongemeten": 3698,
+      "nvt": 68,
+      "ongemeten": 3891,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
       "bewezen": 224,
       "verklaard": 0,
-      "nvt": 65,
-      "ongemeten": 3698,
+      "nvt": 68,
+      "ongemeten": 3891,
       "gezakt": 0
     },
     "AUDIT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3987,
+      "ongemeten": 4183,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
       "bewezen": 125,
       "verklaard": 0,
-      "nvt": 65,
-      "ongemeten": 3684,
+      "nvt": 68,
+      "ongemeten": 3877,
       "gezakt": 113
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985,
+      "ongemeten": 4181,
       "gezakt": 0
     },
     "ROLLBACK": {
       "bewezen": 2104,
       "verklaard": 0,
-      "nvt": 65,
-      "ongemeten": 1809,
+      "nvt": 68,
+      "ongemeten": 2002,
       "gezakt": 9
     },
     "PRIVACY": {
       "bewezen": 2935,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1052,
+      "ongemeten": 1248,
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN.",
+  "metDeHandVastgelegd": {
+    "datum": "2026-08-17",
+    "wat": "routes 3987 -> 4183, ongemeten 28431 -> 30380, bewezen ONVERANDERD op 15044",
+    "reden": "De ratel weigerde dit terecht en het is toch vastgelegd, want er is geen bewijs verdwenen: bewezen staat op de cent hetzelfde. Wat er veranderde is de NOEMER. scripts/lib/routes.js leidde zijn routelijst af met een regex over de brontekst en zag daardoor niet wat via app.use('/api/foundation', router) of een voorvoegsel-hulpje hangt: 2934 routes waar de router er 4191 heeft. Die lijst komt nu uit de levende router (scripts/routekaart.js). De 196 routes die deze matrix erbij kreeg waren dus niet ongemeten-en-nu-slechter, ze waren ONZICHTBAAR -- ze stonden in geen enkele noemer. Een matrix die 3987 routes toont terwijl het huis er 4191 heeft, is een gunstiger cijfer over een kleinere werkelijkheid. Vanaf deze stand mag ongemeten weer alleen krimpen.",
+    "eerlijkheidshalve": "Deze stand is geen verbetering en hoort niet als succes gelezen te worden. Er staan nu 1949 lege cellen meer, en die lege cellen bestonden gisteren ook al -- ze waren alleen niet te tellen. Het echte werk (de vier bewijsproeven over die 196 routes laten lopen) is NIET gedaan in deze ronde; wel is de rol van 3254 routes nu uit de router bepaalbaar in plaats van 2934 uit de bron, en staan de 861 die geen rol krijgen met hun REDEN in de proefregisters in plaats van stil weg te vallen achter een filter."
+  }
 }

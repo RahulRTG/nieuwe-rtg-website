@@ -97,8 +97,15 @@ module.exports = (octx) => {
     const zoek = String(vraag.zoek || '').trim().toLowerCase().slice(0, 120);
     const domein = String(vraag.domein || '').trim().slice(0, 40);
     const alleenGaten = !!vraag.alleenGaten;
+    /* DE BEWAKER STAAT ERBIJ. Sinds de foutwikkel zijn naam doorgeeft
+       (lib/foutisolatie.js) kan de router zeggen welke middleware voor een route
+       hangt, en dan hoeft het kantoor niet meer te vertrouwen dat "beproefd" ook
+       "bewaakt" betekent -- dat zijn twee dingen. Een leeg lijstje betekent hier
+       aantoonbaar geen bewakerslaag; ruim vijfhonderd routes controleren een
+       capability-token IN de handler en dat is geen leemte maar een andere vorm. */
     const rijen = routedekking.inventaris(kaart()).routes
       .map(r => ({ methode: r.methode, pad: r.pad, domein: r.domein,
+        bewakers: Array.isArray(r.bewakers) ? r.bewakers : null,
         gedekt: !ongedekt.has(r.methode + ' ' + r.pad) }))
       .filter(r => (!domein || r.domein === domein) && (!alleenGaten || !r.gedekt) &&
         (!zoek || (r.methode + ' ' + r.pad).toLowerCase().includes(zoek)));

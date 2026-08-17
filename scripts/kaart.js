@@ -178,9 +178,12 @@ function bouw() {
   }
   p('');
   p('"Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware');
-  p('op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist');
-  p('per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een');
-  p('wegwijzer, geen verdict.');
+  p('als EIGEN LAAG voor de handler -- gelezen uit de router zelf (`app._routes()`), niet');
+  p('meer geraden uit de brontekst. Dat is niet hetzelfde als onbeveiligd, en dat verschil');
+  p('is hier echt: honderden routes controleren een capability-token IN de handler (de');
+  p('lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen');
+  p('bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de');
+  p('publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.');
   p('');
   p('Daarnaast ' + buitenDomein + ' `/api/`-endpoints buiten deze acht: de infra (health, stream, push,');
   p('cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken');

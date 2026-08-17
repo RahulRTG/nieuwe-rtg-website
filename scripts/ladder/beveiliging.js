@@ -366,9 +366,33 @@ BEVEILIGING.push({
     let routes;
     try { routes = require('../lib/routes').alleRoutes(); }
     catch (e) { return w.nietGeprobeerd('de routetabel is niet te lezen: ' + e.message); }
-    // alleen de eigen API, en geen router-paden (die staan onder een mount die
-    // hier niet bekend is -- de dwaler zou dan op een niet-bestaand pad kloppen)
-    const doelen = routes.filter(r => r.pad.startsWith('/api/') && !r.viaRouter
+    /* Alleen de eigen API. De beperking tot routes die rechtstreeks op `app`
+       staan is sinds vandaag een KEUZE en geen noodzaak meer, en dat verdient
+       uitleg.
+
+       Hier stond: "geen router-paden (die staan onder een mount die hier niet
+       bekend is -- de dwaler zou dan op een niet-bestaand pad kloppen)". Dat was
+       waar zolang lib/routes.js de paden uit de brontekst raadde: een route in
+       een gemounte router staat daar met zijn pad BINNEN de mount, dus
+       '/leden' in plaats van '/api/tak/leden'. Kloppen op zo'n pad meet een 404.
+
+       Sinds lib/routes.js de LEVENDE router vraagt (scripts/routekaart.js) zijn
+       alle paden volledig en zou de dwaler er wel op kunnen kloppen -- ruim
+       zevenhonderd deuren meer, waaronder de RTFoundation.
+
+       Dat is niet stilletjes aan te zetten. Onder die deuren zitten routes die
+       met opzet zonder inlog werken (de lessen en schoolborden van foundation
+       controleren een capability-token IN de handler), en die zouden hier
+       massaal als "gaf zonder inlog een geslaagd antwoord" opduiken. Zo'n
+       uitslag is geen bevinding maar ruis, en ruis leert je een trede te
+       negeren. De verbreding hoort samen met een publieke-lijst met redenen, en
+       dat is eigen werk.
+
+       Dus houden we het doelwit voorlopig exact zoals het was: routes waarvan we
+       WETEN dat ze rechtstreeks op app staan (viaRouter === false). Een route
+       waarvan de bron niet te vinden was (viaRouter === null) valt daar bewust
+       buiten -- die zou de trede stil verbreden. */
+    const doelen = routes.filter(r => r.pad.startsWith('/api/') && r.viaRouter === false
       && !NIET_KLOPPEN.some(([re]) => re.test(r.pad)));
     if (!doelen.length) return w.nietGeprobeerd('geen routes gevonden om aan te kloppen');
 

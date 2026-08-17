@@ -3162,5 +3162,120 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
   }
 }
 
+/* ============================================================================
+   49) GEEN NIEUWE PRIVE-ROUTELIJST
+
+   WAAROM DEZE REGEL BESTAAT. "Welke routes heeft deze server" werd op ACHT
+   plekken los uitgezocht, en elke plek kwam op een ander getal:
+
+     scripts/lib/routes.js            2934   (regex over de bron)
+     magnaat-capabilities-bronnen.js  3679   (regex over de bron)
+     POORTWACHT-ronde                 3987
+     scripts/routekaart.js            4191   (de levende router)
+     plus prive-scanners in beproeving.js, tot-crash.js en schakelbaar.js
+
+   Geen van die verschillen was ergens te zien. De vier bewijsproeven leunden op
+   de eerste en misten daardoor alle vier dezelfde 1257 routes -- waaronder de
+   hele RTFoundation. Dat is niet "een scanner die iets mist": dat is een huis
+   waarvan niemand weet hoe groot het is.
+
+   Er is nu EEN antwoord: scripts/routekaart.js vraagt het aan de router
+   (app._routes(), server/web/routing.js), en scripts/lib/routes.js verdeelt dat
+   onder de afnemers. Deze regel houdt dat zo. Wie een nieuwe eigen scanner
+   schrijft, ziet hem hier zakken -- met de reden erbij, want de verleiding is
+   begrijpelijk: een regex is in vijf regels klaar en een routekaart kost een
+   kindproces.
+
+   WAT HIJ MEET. Een bestand in scripts/ dat zelf een `app.post('/pad'`-achtige
+   uitdrukking over de BRON legt, terwijl het de routekaart of lib/routes niet
+   gebruikt. De drie bekende gevallen staan met naam op de lijst en mogen blijven
+   staan tot ze zijn omgezet; ze mogen alleen niet met een vierde vermeerderen.
+
+   WAT HIJ NIET MEET. Of de routekaart zelf klopt -- dat doet
+   test/routedekking.test.js, en de achterstand van de bronscanner van de
+   Capability Graph staat als ratel in test/magnaat-capabilities.test.js. */
+console.log('\n49) geen nieuwe prive-routelijst: EEN plek bepaalt welke routes er zijn');
+{
+  /* De drie die er al zijn, met wat er nodig is om ze op te ruimen. Deze lijst
+     MAG ALLEEN KRIMPEN -- zelfde afspraak als BEKEND hierboven en als de
+     schuldlijst in BEREIK.json. */
+  const BEKENDE_SCANNERS = new Map([
+    ['scripts/beproeving.js', 'eigen alleRoutes(); draait zelf een server en kan de routekaart lenen'],
+    ['scripts/tot-crash.js', 'eigen alleRoutes(); zelfde omzetting als beproeving.js'],
+    ['scripts/schakelbaar.js', 'leest paden voluit om ze te kunnen tellen (keuringsregel 45); een eigen soort']
+  ]);
+  /* HET KENMERK VAN EEN EIGEN SCANNER, en dat is niet te verzinnen: een
+     reguliere uitdrukking met `\.(` gevolgd door een HTTP-methode-alternatie.
+     Alle vier de bestaande scanners hebben precies die vorm --
+
+       /\b(app|router)\.(post|get|put|delete|patch)\(     lib/routes.js
+       /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(  capabilities-bronnen
+       /app\.(get|post|put|delete)\(\s*'(\/api\/...        beproeving, tot-crash
+       /app\.(get|post|put|delete|patch|all)\(             schakelbaar
+
+     Plus de eis dat het bestand ook echt de servermap afloopt; anders vlagt
+     deze regel elke toevallige `/x\.(get|set)/` in een script dat met routes
+     niets te maken heeft. Twee kenmerken samen, want een van de twee is te
+     grof -- en een keuring die roept bij dingen die kloppen, leert je hem te
+     negeren (zie de kop van test/blindevlek.test.js). */
+  const METHODE_ALTERNATIE = /\\\.\s*\(\??:?\s*(?:get|post|put|delete|patch|all)\s*\|/i;
+  const LOOPT_SERVER_AF = /(?:readdirSync|readFileSync)[\s\S]{0,400}?['"]server['"]|['"]server['"][\s\S]{0,400}?(?:readdirSync|readFileSync)/;
+  const eigenScanner = (bron) => METHODE_ALTERNATIE.test(bron) && LOOPT_SERVER_AF.test(bron);
+
+  const nieuw = [];
+  let bekeken = 0;
+  const scanMap = (d) => {
+    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, f.name);
+      if (f.isDirectory()) { scanMap(p); continue; }
+      if (!f.name.endsWith('.js')) continue;
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      /* Drie bestanden horen hier niet in: de twee die de ENE routelijst maken,
+         en deze keuring zelf -- die draagt het patroon in zijn eigen detectie en
+         zou zichzelf aanwijzen. Dat is precies wat er gebeurde bij het schrijven. */
+      if (rel === 'scripts/lib/routes.js' || rel === 'scripts/routekaart.js' ||
+          rel === 'scripts/check.js') continue;
+      bekeken++;
+      const bron = fs.readFileSync(p, 'utf8');
+      const bouwtRegex = eigenScanner(bron);
+      /* DE OVERTREDING IS DE EIGEN UITDRUKKING, niet het ontbreken van een
+         require. Hier stond eerst "gebruikt hij lib/routes? dan is het goed", en
+         dat gaf meteen een valse vrijspraak: scripts/beproeving.js importeert
+         `isSchakel` uit lib/routes EN heeft daarnaast zijn eigen alleRoutes().
+         Een module lenen voor iets anders is geen bewijs dat je haar routelijst
+         gebruikt. Wie zijn eigen scanner niet meer heeft, is klaar -- dat is de
+         enige toets die niet te omzeilen is met een import erbij. */
+      if (!bouwtRegex) continue;
+      if (BEKENDE_SCANNERS.has(rel)) continue;
+      nieuw.push(rel);
+    }
+  };
+  scanMap(path.join(ROOT, 'scripts'));
+
+  /* De lijst mag alleen krimpen: een naam die zijn eigen scanner kwijt is, hoort
+     eraf. Anders slijt hij tot namen die niets meer zeggen. */
+  const opgelost = [...BEKENDE_SCANNERS.keys()].filter(rel => {
+    const p = path.join(ROOT, rel);
+    if (!fs.existsSync(p)) return true;
+    return !eigenScanner(fs.readFileSync(p, 'utf8'));
+  });
+
+  if (nieuw.length) {
+    for (const rel of nieuw) {
+      fout(rel + ' leidt zijn eigen routelijst uit de brontekst af. Gebruik ' +
+        'scripts/lib/routes.js (die vraagt het aan de router) -- een tweede lijst ' +
+        'komt op een ander getal en niemand ziet het verschil.');
+    }
+  } else if (opgelost.length) {
+    for (const rel of opgelost) {
+      fout(rel + ' gebruikt de gedeelde routelijst nu wel; haal hem van BEKENDE_SCANNERS ' +
+        'in keuringsregel 49 (die lijst mag alleen krimpen).');
+    }
+  } else {
+    ok(bekeken + ' scripts bekeken; geen nieuwe eigen routelijst, ' + BEKENDE_SCANNERS.size +
+      ' erkend op de lijst (die alleen mag krimpen)');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

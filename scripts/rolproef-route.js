@@ -39,24 +39,17 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { draaiRolproef } = require('./lib/rolproef');
-const { alleRoutes } = require('./lib/routes');
+const { alleRoutes, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'ROLPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 600;
 
-/* De rol die een route TOEBEHOORT, uit de bewaker in de bron. Ruw maar
-   voldoende: we hoeven alleen te weten welke rollen de VERKEERDE zijn, en een
-   route waarvan we de rol niet kennen slaan we over in plaats van te gokken --
-   met de juiste rol aankloppen bewijst niets over scheiding. */
-function rolVan(bewakers) {
-  const b = bewakers.join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
-}
+/* rolVan() stond hier woordelijk, en in de drie andere proef-scripts nog eens.
+   Hij woont nu in ./lib/routes.js, samen met de REDEN waarom een rol soms niet te
+   bepalen valt -- want die redenen horen geteld te worden en niet stil te
+   verdwijnen achter een filter. */
 
 function vrijePoort() {
   const net = require('net');
@@ -120,13 +113,18 @@ async function wacht(basis, ms) {
     klaar(); process.exit(2);
   }
 
-  const routes = alleRoutes()
-    .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
-    .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
-    .filter(r => r.rol);
+  const kandidaten = alleRoutes()
+    .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET');
+  /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier 937
+     routes verdwijnen zonder dat er ergens een getal omhoog ging; nu komen ze
+     met hun reden terug en staan ze straks ook in het uitslagbestand. */
+  const verdeling = verdeelOpRol(kandidaten);
+  const routes = verdeling.metRol;
 
   console.log('\n=== DE ROL-SCHEIDING PER ROUTE ===\n');
+  console.log('  schrijfroutes gevonden               : ' + kandidaten.length);
   console.log('  schrijfroutes met een herkenbare rol : ' + routes.length);
+  meldZonderRol(verdeling);
   console.log('  begrenzing (pogingen in totaal)      : ' + MAX);
 
   const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPogingen: MAX });
@@ -153,6 +151,12 @@ async function wacht(basis, ms) {
     uitleg: 'Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. ' +
       'Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. ' +
       'Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.',
+    /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
+       routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
+       bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
+    nietBeproefbaar: verdeling.zonderRol.length,
+    redenenNietBeproefbaar: verdeling.redenen,
+    routesGevonden: kandidaten.length,
     gemeten: { routesMetRol: routes.length, beproefd: perRoute.length, pogingen: uit.pogingen,
       aclOpen: open.length, privacyLek: lek.length,
       /* Blijvende wijziging na afloop: een handler die eerst schrijft en daarna

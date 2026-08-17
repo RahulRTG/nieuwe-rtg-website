@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { db, save, DATA_DIR } = require('./../db');
 const { eigenVeld } = require('./../kern/util'); // veilige objecttoegang (geen prototype-pollution)
+const foutisolatie = require('../lib/foutisolatie');
 
 module.exports = function maakBasis() {
   /* ---------- versleuteling van gevoelige gezinsdata ----------
@@ -87,20 +88,16 @@ module.exports = function maakBasis() {
   catch (e) { /* regelantwoorden blijven volledig bruikbaar */ }
 
   const router = express.Router();
-  /* Zelfde foutisolatie als in server.js: de app-omhulling dekt alleen app.get/post,
-     niet deze router. Een (async) fout in een handler wordt netjes next(err). */
-  for (const metode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
-    const orig = router[metode].bind(router);
-    router[metode] = (...args) => orig(...args.map(f => {
-      if (typeof f !== 'function') return f;
-      return (req, res, next) => {
-        try {
-          const r = f(req, res, next);
-          if (r && typeof r.catch === 'function') r.catch(next);
-        } catch (e) { next(e); }
-      };
-    }));
-  }
+  /* Zelfde foutisolatie als voor de app: die omhulling dekt alleen app.get/post,
+     niet deze router -- foundation wordt voor de hoofdkern gemount.
+
+     De wikkel stond hier woordelijk overgeschreven uit opzet/verzoekketen.js, en
+     dat was precies een plek te veel. Toen de wikkel de NAAM van zijn functie
+     moest gaan doorgeven (zodat uit de router te lezen is welke bewaker voor een
+     route hangt), moest die reparatie op twee plekken -- en de tweede vergeten is
+     hoe de RTFoundation al eens buiten een meting viel. Nu een aanroep naar de
+     ene plek waar hij woont: lib/foutisolatie.js. */
+  foutisolatie.isoleer(router);
   router.use(express.json({ limit: '4mb' }));
 
   function F() {

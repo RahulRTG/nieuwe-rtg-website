@@ -35,7 +35,27 @@ function mountMatch(prefix, pn) {
    er niet in. Wie op dat halve beeld toetst, meldt kloppende paden als kapot.
 
    Deze functie loopt de mounts wel na en geeft elk ECHT pad terug met zijn
-   methode. Ze leest alleen; er verandert niets aan het routeren zelf. */
+   methode. Ze leest alleen; er verandert niets aan het routeren zelf.
+
+   EN MET DE NAAM VAN DE FUNCTIE OP DIE LAAG (`laagNaam`).
+
+   Waarom dat een eigen veld is en geen bijzaak: een route is hier EEN laag per
+   middleware, alle met hetzelfde pad en dezelfde methode, in de volgorde waarin
+   ze zijn opgehangen. De laatste is de handler, alles daarvoor is een bewaker.
+   Met de naam erbij is dus uit de ROUTER te lezen wie een route beschermt --
+   `officeAuth`, `supplierAuth`, `techAuth` -- en hoeft niemand dat meer uit de
+   brontekst te raden.
+
+   Dat raden was echt duur. scripts/lib/routes.js deed het met een regex over
+   server/**.js, en een regex ziet niet wat via app.use('/api/foundation', router)
+   of een voorvoegsel-hulpje hangt. De vier bewijsproeven (rol, idempotentie,
+   invoer, staat) leunen op die bewakersnaam om te weten welke rol de JUISTE is,
+   en misten daardoor alle vier exact dezelfde 1257 routes.
+
+   `laagNaam` is leeg als de functie anoniem is; dat is bij de meeste handlers zo
+   (een arrow zonder naam) en dat hoort ook: alleen de bewakers zijn hier
+   benoemd. De wikkel in opzet/verzoekketen.js geeft zijn naam door, anders was
+   dit veld op het topniveau altijd leeg. */
 function leesLagen(lagen, voorvoegsel) {
   const uit = [];
   for (const l of lagen) {
@@ -48,7 +68,7 @@ function leesLagen(lagen, voorvoegsel) {
     }
     if (typeof l.pad !== 'string') continue;              // RegExp-pad: niet te noemen
     const pad = (voorvoegsel + l.pad).replace(/\/+$/, '') || '/';
-    uit.push({ pad, methode: l.method || 'ALL' });
+    uit.push({ pad, methode: l.method || 'ALL', laagNaam: (l.fn && l.fn.name) || '' });
   }
   return uit;
 }

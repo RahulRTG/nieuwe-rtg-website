@@ -81,6 +81,25 @@ if (!jsonUit) Object.assign(console, echt);
 const routes = (app && typeof app._routes === 'function' ? app._routes() : [])
   .filter(r => r.pad);
 
+/* DE BEWAKERS ERBIJ, want dit is de plek waar de routekaart wordt gemaakt.
+
+   Waarom dat hier hoort en niet bij de lezers: wie een route wil beproeven moet
+   weten welke rol de JUISTE is, anders bewijst aankloppen niets over scheiding.
+   Dat werd tot nu toe geraden met een regex over de brontekst
+   (scripts/lib/routes.js), en zo'n regex ziet niet wat via
+   app.use('/api/foundation', router) of een voorvoegsel-hulpje hangt. Vier
+   bewijsproeven misten daardoor alle vier exact dezelfde 1257 routes.
+
+   De afleiding zelf (laatste laag = handler, de rest = bewaker) staat in
+   server/kern/routedekking.js en NIET hier -- dat is een feit over deze router en
+   het hoort op een plek te staan (LAT.md regel 4). Dit script vraagt het daar op
+   en zet het in de uitvoer. */
+const routedekking = require(path.join(__dirname, '..', 'server', 'kern', 'routedekking'));
+const bewakersVan = new Map();
+for (const r of routedekking.inventaris(routes).routes) {
+  bewakersVan.set(r.methode + ' ' + r.pad, r.bewakers);
+}
+
 // per pad de methoden bundelen; hetzelfde pad met GET en POST is een pad
 const perPad = new Map();
 for (const r of routes) {
@@ -88,7 +107,18 @@ for (const r of routes) {
   perPad.get(r.pad).add(r.methode);
 }
 const lijst = [...perPad].sort((a, b) => a[0] < b[0] ? -1 : 1)
-  .map(([pad, m]) => ({ pad, methoden: [...m].sort() }));
+  .map(([pad, m]) => {
+    const methoden = [...m].sort();
+    /* Per methode een eigen bewakerslijst: op /api/office/papieren hangt GET
+       anders dan POST kan hangen, en dat verschil mag niet platgeslagen worden.
+       null blijft null -- onbekend is geen leeg lijstje (LAT.md regel 3). */
+    const bewakers = {};
+    for (const mm of methoden) {
+      const b = bewakersVan.get(routedekking.normaalMethode(mm) + ' ' + pad);
+      bewakers[mm] = b === undefined ? null : b;
+    }
+    return { pad, methoden, bewakers };
+  });
 
 /* AFSLUITEN MAG PAS ALS DE UITVOER DE DEUR UIT IS.
 

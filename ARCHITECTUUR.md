@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3966 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4191 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3966 |
-| servermodules (`server/**/*.js`) | 2160 |
+| API-endpoints | 4191 |
+| servermodules (`server/**/*.js`) | 2161 |
 | routebestanden (`server/routes/**`) | 449 |
 | kernmodules (`server/kern/**`) | 1325 |
 | schermen (`public/**/*.html`) | 260 |
 | gedeelde browsermodules (`public/shared/*.js`) | 226 |
-| toetsbestanden (`test/*.test.js`) | 887 |
+| toetsbestanden (`test/*.test.js`) | 888 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -102,8 +102,8 @@ zie §5 -- er zijn nog 188 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 641 | 56 | 10 | 398 |
-| `supplier` | 562 | 102 | 10 | 294 |
-| `office` | 41 | 8 | 5 | 64 |
+| `supplier` | 562 | 102 | 6 | 294 |
+| `office` | 41 | 8 | 3 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 57 | 14 | 1 | 51 |
@@ -111,11 +111,14 @@ zie §5 -- er zijn nog 188 kern-namen die meer dan één domein aanraakt.
 | `wereld` | 15 | 3 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
-op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
-per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
-wegwijzer, geen verdict.
+als EIGEN LAAG voor de handler -- gelezen uit de router zelf (`app._routes()`), niet
+meer geraden uit de brontekst. Dat is niet hetzelfde als onbeveiligd, en dat verschil
+is hier echt: honderden routes controleren een capability-token IN de handler (de
+lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
+bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
+publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 2248 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2754 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

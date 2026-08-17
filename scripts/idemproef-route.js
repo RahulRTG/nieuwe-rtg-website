@@ -25,20 +25,16 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { draaiIdemproef } = require('./lib/idemproef');
 const { plausibelLijf } = require('./lib/rolproef');
-const { alleRoutes, isSchakel } = require('./lib/routes');
+const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;   // 0 = alles
 
-function rolVan(bewakers) {
-  const b = bewakers.join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
-}
+/* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
+   te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
+   eens -- vier kopieen van dezelfde afleiding (LAT.md regel 4). */
 
 function vrijePoort() {
   const net = require('net');
@@ -103,15 +99,20 @@ async function wacht(basis, ms) {
     return false;
   };
 
-  const routes = alleRoutes()
+  const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
-    .filter(r => !r.pad.includes(':'))
-    .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
-    .filter(r => r.rol);
+    .filter(r => !r.pad.includes(':'));
+  /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
+     honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
+     komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
+  const verdeling = verdeelOpRol(kandidaten);
+  const routes = verdeling.metRol;
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
+  console.log('  routes gevonden                      : ' + kandidaten.length);
   console.log('  routes met een herkenbare rol        : ' + routes.length);
+  meldZonderRol(verdeling);
   console.log('  oproepen per route                   : 3  (K1, K1 opnieuw, K2 vers)');
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
@@ -141,6 +142,12 @@ async function wacht(basis, ms) {
       'IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en ' +
       'pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. ' +
       '"onbeschermd" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.',
+    /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
+       routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
+       bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
+    nietBeproefbaar: verdeling.zonderRol.length,
+    redenenNietBeproefbaar: verdeling.redenen,
+    routesGevonden: kandidaten.length,
     gemeten: { routesMetRol: routes.length, beoordeeld,
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,

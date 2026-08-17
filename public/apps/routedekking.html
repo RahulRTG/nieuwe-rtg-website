@@ -44,6 +44,8 @@
   button:disabled{opacity:.4;cursor:default;}
   .rij .methode{display:inline-block;min-width:4.2rem;font-size:.7rem;letter-spacing:.08em;
     color:var(--rtg-soft);}
+  .rij .bewaker{font-size:.72rem;color:var(--rtg-soft);white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;max-width:14rem;}
   .domeinen{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.4rem;}
   .domeinen div{border:1px solid var(--rtg-line);padding:.5rem .6rem;display:flex;
     justify-content:space-between;gap:.6rem;font-size:.82rem;}
@@ -201,6 +203,13 @@
       '<div class="rij rtg-rail" data-sig="' + (r.gedekt ? 'gezond' : 'incident') + '">' +
       '<span class="methode">' + esc(r.methode) + '</span>' +
       '<span class="rtg-ref">' + esc(r.pad) + '</span>' +
+      /* BEWAAKT EN BEPROEFD ZIJN TWEE DINGEN, en die staan hier naast elkaar.
+         Een route kan door een toets zijn aangeraakt en toch geen bewaker hebben,
+         en omgekeerd. Sinds de router zijn bewakers bij naam noemt hoeft dit
+         scherm dat niet meer te laten raden. Geen bewakerslaag is geen leemte:
+         ruim vijfhonderd routes controleren een token in de handler. */
+      '<span class="bewaker">' + (r.bewakers === null ? 'bewaker onbekend'
+        : r.bewakers.length ? esc(r.bewakers.join(' + ')) : 'in de handler') + '</span>' +
       '<span class="rek"></span>' +
       '<span class="rtg-status" data-sig="' + (r.gedekt ? 'gezond' : 'incident') + '" data-teken="' +
       (r.gedekt ? '✓' : '×') + '">' + (r.gedekt ? 'beproefd ' : 'geen toets ') + '</span></div>').join('') ||

@@ -47,7 +47,17 @@
       if(!strip||!tekst)return null;
       var r=d.createElement('p');
       r.className='cmd-praatregel'+(vanMij?' mij':'');
-      r.textContent=tekst;
+      /* WIE ER AAN HET WOORD IS, STAAT ER ALS WOORD. Hier stond een gouden stip
+         voor de eigen zin; een teken dat je moet kennen om te lezen. Alleen de
+         vraag draagt het label -- Rahul is de stem die er standaard staat, en
+         "RAHUL" boven elke regel is ruis (ONTWERP.md par. 5).
+
+         "Vraag" en niet "u" of "jij": de aanspreekvorm verschilt per pas
+         (CLAUDE.md), en een label dat op de ene pas beleefd is en op de andere
+         mis, is geen label maar een fout die wacht. */
+      if(vanMij){var lab=d.createElement('span');lab.className='cmd-praatwie';lab.textContent='Vraag';r.appendChild(lab)}
+      r.appendChild(d.createTextNode(tekst));
+      r._zin=tekst;
       strip.appendChild(r);
       /* De strook gaat NIET vanzelf open. Bij het opbouwen staat er al een zin
          van Rahul in de draad, en die zette hem hier meteen in beeld -- een
@@ -77,7 +87,10 @@
              weggehaald element, en kwam er in de nieuwe strook nooit meer een
              regel -- stil, want er ging niets kapot: er verscheen alleen niets. */
           if(x._spiegel&&x._spiegel.parentNode===strip){
-            if(x._spiegel.textContent!==tekst){x._spiegel.textContent=tekst;
+            /* Vergelijk de ZIN en niet textContent: bij een vraagregel staat het
+               label "Vraag" daar ook in, en dan zou hij elke ronde als gewijzigd
+               tellen. `_zin` is wat we er zelf in zetten. */
+            if(x._spiegel._zin!==tekst){x._spiegel._zin=tekst;x._spiegel.lastChild.nodeValue=tekst;
               if(!x.classList.contains('van-mij')&&mond)try{mond.praat(Math.min(4200,420+tekst.length*38))}catch(e){}}
             return}
           x._spiegel=regel(tekst,x.classList.contains('van-mij'));

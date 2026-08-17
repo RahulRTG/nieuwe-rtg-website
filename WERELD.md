@@ -117,8 +117,26 @@ je werkbladen. Wat hij zegt komt in een strook erboven, van hetzelfde glas.
 (`shared/handenvrij-balk.js`) bovenop een balk die er al was — een tweede meubel
 voor iets wat één ding is. Nu verandert het meubel dat je hebt van taak. Op een
 breed scherm bestaat de schilbalk niet; daar verschijnt dezelfde balk alleen in
-de vraagstand, als zwevende console rechtsonder. Eén ding, twee vormen — net als
-de bank, die daar een rail is en op een telefoon een lade.
+de vraagstand, als strook rechtsonder. Eén ding, twee vormen — net als de bank,
+die daar een rail is en op een telefoon een lade.
+
+**Eén instrument, geen rij widgets.** De eerste versie had drie behandelingen in
+achtenveertig pixels: een goud getint vlak achter de mond, een afgerond
+invoerveld met binnenschaduw, en een gevulde gouden schijf met een pijl. Elk voor
+zich te verdedigen, samen een kermis — precies wat ONTWERP.md par. 7 bedoelt met
+*niet elk stuk informatie hoort in een afgerond rechthoekje*. Wat er nu staat
+volgt het ritme dat de balk zelf al had: zones naast elkaar, gescheiden door een
+haarlijn, geen enkel gevuld vlak. Het veld draagt geen eigen kader — de balk ís
+het veld — en goud draagt alleen de pijl, want sturen is de enige handeling met
+autoriteit (ONTWERP.md par. 4).
+
+**Wat hij zegt is een register, geen chatvenster.** Rijen op haarlijnen, dezelfde
+vorm als `.rtg-register`, in dezelfde strook als de balk eronder. Wie er aan het
+woord is staat er als **woord** en niet als kleur of bolletje — dezelfde regel als
+bij status (par. 5). Alleen de vraag draagt dat label, want Rahul is de stem die
+er standaard staat en "RAHUL" boven elke regel is ruis. Het label is *Vraag* en
+niet *u* of *jij*: de aanspreekvorm verschilt per pas, en een label dat op de ene
+pas beleefd is en op de andere mis, is geen label maar een fout die wacht.
 
 De laag staat in `shared/command/praat.js` en **verzint niets**. Een opdracht
 ("open Geld") gaat naar `o.bestemming()`, dezelfde router die de console

@@ -1996,6 +1996,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "inlogrem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "overleefd"
+    },
     "instant-reality.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2603,20 +2610,20 @@
       "gezakt": 8,
       "geprobeerd": 4
     },
-    "magnaat-economie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/magnaat-economie.js",
-      "operator": "!==->===#0",
-      "gezakt": 7,
-      "geprobeerd": 2
-    },
     "magnaat-economenlab.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/magnaat-economie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "magnaat-economie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/magnaat-economie.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
       "geprobeerd": 2
     },
     "magnaat-hospitality.test.js": {
@@ -2634,10 +2641,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 5
-    },
-    "magnaatwereld.test.js": {
-      "soort": "puur",
-      "staat": "geen toetsen gedraaid"
     },
     "magnaat-motorklant.test.js": {
       "soort": "puur",
@@ -2700,6 +2703,10 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "magnaatwereld.test.js": {
+      "soort": "puur",
+      "staat": "geen toetsen gedraaid"
     },
     "mail-eigen.test.js": {
       "soort": "puur",

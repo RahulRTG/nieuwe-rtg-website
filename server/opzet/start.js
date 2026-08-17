@@ -54,7 +54,15 @@ module.exports = function start(deps) {
   // opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke bezoekers.
   setInterval(() => {
     const nu = Date.now();
-    for (const [k, f] of loginFails) if (f.until < nu) loginFails.delete(k);
+    /* Alleen opruimen wat niets tegenhoudt EN niets meer telt. Zonder die
+       tweede voorwaarde verdween elke vijf minuten ook een emmer die nog aan
+       het tellen was, en dan is de inlogrem te doseren: negen gokken per ronde
+       en de grens komt nooit in zicht. Een kwartier stilte is ruim genoeg om
+       het geheugen niet te laten vollopen, en te lang om een aanval te kunnen
+       uitzitten. */
+    for (const [k, f] of loginFails) {
+      if (f.until < nu && (f.laatst || 0) < nu - 15 * 60000) loginFails.delete(k);
+    }
     pinSlot.opruimen(); // ruimt alleen op wat niets meer tegenhoudt EN niets meer telt
     ruimBuffer();
   }, 5 * 60 * 1000).unref();

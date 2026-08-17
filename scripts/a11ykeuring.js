@@ -144,6 +144,69 @@ function keurInPagina() {
   if (!html.getAttribute('lang')) tel(structureel, 'html-taal', '<html> zonder lang-attribuut');
   if (!(document.title || '').trim()) tel(structureel, 'titel', 'Document zonder <title>');
 
+  /* DE EERSTE TABSTOP SPRINGT NAAR DE INHOUD (WCAG 2.4.1, Bypass Blocks).
+
+     Elk scherm hier draagt dezelfde schil: een balk, een wereldkiezer, een
+     app-menu, de Rahul-tab. Wie met het toetsenbord werkt loopt daar op ELK
+     scherm opnieuw doorheen voordat hij bij de inhoud is -- gemeten op drie
+     schermen: 15, 11 en 4 tabs. shared/basis.js zet daarom een springlink als
+     eerste element van de body.
+
+     WAAROM DIT HIER STAAT EN NIET ALS BRONREGEL IN check.js. Een bronregel kan
+     hoogstens zien DAT de code bestaat. Deze keuring kijkt naar wat de browser
+     werkelijk als eerste tabstop aanbiedt, en dat is de belofte zelf. Hij vangt
+     dus ook het geval dat een scherm zijn eigen element vooraan zet, of dat de
+     link wel bestaat maar buiten de tabvolgorde valt.
+
+     TWEE UITZONDERINGEN, ALLEBEI GEMETEN EN GEEN NAMENLIJST. Een eerste ronde
+     over alle 259 schermen meldde er 57, en geen van die 57 was een defect:
+
+     53x EEN OPEN MODAAL. De RTFoundation-schermen zetten een <dialog
+         aria-modal> met "Kies een profiel" zodra je geen gezinsprofiel hebt. Een
+         modaal HOORT de tabvolgorde over te nemen -- alles erbuiten is inert, de
+         springlink dus ook. Op die 53 stond hij er wel degelijk (gemeten:
+         springlink=JA, modaal=JA). Een regel die daar afgaat, vraagt om een
+         springlink die de browser met opzet onbereikbaar maakt.
+      4x EEN DEUR DIE DE HELE PAGINA IS. kantoren, kassa, payroll en societeit
+         vervangen bij weigering het HELE document door section.rtgdeur -- de
+         basis-laag staat daarna niet eens meer in de DOM (gemeten:
+         basisGeladen=false). Er is dan geen herhaalde schil om over te slaan;
+         de deur is de inhoud. Zelfde geval als /site/404.html, dat de gedeelde
+         laag nooit laadt.
+
+     DE VOORWAARDE MEET DE HERHAALDE SCHIL ZELF, en dat is de tweede poging. De
+     eerste keek of shared/basis.js als <script src> in de DOM stond -- en dat
+     leverde overal `false` op, ook op schermen waar de springlink er gewoon was.
+     De regel stond daarmee op ELK scherm uit, en de nulmeting betekende niets.
+     Dat kwam alleen aan het licht door de mutatie (springNaarInhoud uitzetten en
+     kijken of de keuring hem mist): die bleef groen, en een regel die onder zijn
+     eigen mutatie groen blijft, meet niets.
+
+     Nu is de voorwaarde het ding waar WCAG 2.4.1 werkelijk over gaat: staan er
+     focusbare elementen VOOR de inhoud? Dat is de herhaalde schil, en dat is
+     precies wat een springlink overslaat. Geen inhoud (de vier deur-schermen),
+     of niets ervoor (het 404-scherm), dan is er ook niets over te slaan. */
+  const hoofd = document.querySelector('main, [role="main"], #main');
+  if (hoofd) {
+    const tabbaar = [];
+    document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])')
+      .forEach(el => { if (zichtbaar(el) && !el.disabled && el.tabIndex >= 0) tabbaar.push(el); });
+    // wat staat er VOOR de inhoud (en niet erin)? dat is de schil
+    const ervoor = tabbaar.filter(el => !hoofd.contains(el) &&
+      (hoofd.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
+    const eerste = tabbaar[0];
+    const inModaal = eerste && eerste.closest('dialog[open],[aria-modal="true"]');
+    if (ervoor.length >= 3 && eerste && !inModaal) {
+      const href = eerste.tagName === 'A' ? (eerste.getAttribute('href') || '') : '';
+      const doel = /^#./.test(href) ? document.getElementById(href.slice(1)) : null;
+      if (!doel) {
+        tel(structureel, 'springlink',
+          'De eerste tabstop springt niet naar de inhoud, en er staan ' + ervoor.length +
+          ' focusbare elementen voor de inhoud (WCAG 2.4.1)', eerste);
+      }
+    }
+  }
+
   // contrast (fataal): alleen elementen met eigen zichtbare tekst en een oplosbare, solide achtergrond
   document.querySelectorAll('body *').forEach(el => {
     const eigenTekst = Array.prototype.some.call(el.childNodes, n => n.nodeType === 3 && n.textContent.trim());

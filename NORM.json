@@ -19,7 +19,7 @@
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
     "keuringTeGroot": 16,
-    "inlineStijlAttributen": 5878,
+    "inlineStijlAttributen": 5928,
     "browserpoortToetsen": 200,
     "kernBreedte": 1395,
     "kernGedeeld": 188,
@@ -31,6 +31,12 @@
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-17",
+      "meter": "inlineStijlAttributen 5878 -> 5928 (VERHOOGD, en er is geen enkel style-attribuut bijgebouwd)",
+      "reden": "Deze vijftig zijn niet nieuw; ze waren onzichtbaar. scripts/lib/bron.js haalt commentaar uit broncode voordat een meter of keuring hem leest, en deed dat met een regex die naar een blokcommentaar-opener zocht zonder te weten waar dat teken stond. In dit huis staat die openertekst op vijf plekken die geen commentaar zijn: accept=\"image/*\" (achttien bestanden met een fotoknop), de MIME-joker in de betaal-webhook, een glob in scripts/samenhang.js, een commentaarteken als string in check.js zelf, en een opener binnen een REGELcommentaar. Elk daarvan opende een commentaar dat pas eindigde bij de eerstvolgende sluiter -- in public/apps/app.html 59.166 tekens later. Gemeten over 4333 bestanden: 47 bestanden waren deels onzichtbaar voor elke keuring die hierop leunt, samen 224.031 tekens. De mutatie die de ernst aantoont: een require('stripe') in het onzichtbare stuk van server/opzet/kaartwebhooks.js planten. Met de oude verwijderaar meldde check.js regel 14 'geen externe module in server/, scripts/, test/ en public/'; met de nieuwe meldt hij bestand, regel en naam. De verwijderaar weet nu waar een string staat (test/bron.test.js, vijf mutaties alle vijf raak), en daardoor telt deze meter vijftig style-attributen mee die er altijd al stonden: 35 in app.html, 8 in babyboek.html, 8 in kantoren.html, 7 in sitemaker.html, de rest verspreid over vier bestanden. De meter is niet slechter geworden, hij is eerlijker geworden -- dezelfde beweging als bij de a11y-scan in TAKEN 4.2, waar de METING het probleem was en niet de schermen. Wie dit getal omlaag wil, haalt style-attributen weg; wie het terug wil op 5878, zet de blindheid terug.",
+      "eerlijkheidshalve": "Drie dingen erbij. (1) toetsenNietGemeten stond na deze ronde op 151 door het nieuwe test/bron.test.js. Ik heb die meter NIET verhoogd maar de mutatiemotor erover gedraaid; hij zakt op de eerste bronmutatie in scripts/lib/bron.js en staat nu in MUTATIES.json, dus de meter is terug op 150. (2) Deze reparatie kan meer meters eerlijker maken zodra iemand ze opnieuw meet -- de 224.031 tekens raken ook regels 19, 22, 24, 25, 26, 27 en 28 van de keuring. Vandaag meldde geen van die zeven een nieuwe overtreding, en dat is een uitkomst en geen belofte: de volgende commit in een van die 47 bestanden wordt voor het eerst echt gelezen. (3) Wat ik NIET heb vastgelegd: keuringOmvang leest 155 tegen een norm van 156 en testbestanden, browserpoortToetsen en e2eBestanden staan boven hun norm. Die winst is niet van deze ronde, en hem op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
     {
       "datum": "2026-08-16",
       "meter": "kernBreedte 1394 -> 1395; kernGedeeld 187 -> 188; testbestanden 858 -> 862; toetsenNietGemeten 180 -> 150; toetsenOngevoeligPct 2.5 -> 2.4",

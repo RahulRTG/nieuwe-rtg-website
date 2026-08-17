@@ -146,7 +146,11 @@
           '<button class="knop hoofd" id="rcCamAan" type="button">Open de camera</button>' +
           '<button class="knop" id="rcCamUit" type="button" hidden>Stop</button>' +
         '</div>' +
-        '<video id="rcCam" playsinline></video>' +
+        /* muted: dit beeld is een leesinstrument en geen inhoud. shared/media.js
+           vraagt bij een camera nooit geluid, dus er is vandaag niets te horen --
+           en met dit attribuut blijft dat zo als iemand die wens ooit uitbreidt.
+           check.js regel 49 houdt de belofte vast. */
+        '<video id="rcCam" playsinline muted></video>' +
         '<div class="rcRij">' +
           '<input id="rcPlak" type="text" placeholder="Of plak hier een RTG-code om te testen" aria-label="RTG-code plakken">' +
           '<button class="knop" id="rcCheck" type="button">Verifieer</button>' +

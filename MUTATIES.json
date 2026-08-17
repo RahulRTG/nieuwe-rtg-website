@@ -690,6 +690,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "btw-aangifte.test.js": {
       "soort": "server",
       "staat": "gezakt",

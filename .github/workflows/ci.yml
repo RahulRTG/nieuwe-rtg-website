@@ -200,7 +200,10 @@ jobs:
         run: |
           npm i --no-save playwright@^1.49.0
           npx playwright install --with-deps chromium
-      - name: Eigen a11y-scan van de vlaggenschip-schermen
+      # De naam stond hier tot 17 augustus 2026 als "de vlaggenschip-schermen",
+      # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
+      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd.
+      - name: Eigen a11y-scan van alle schermen, uitgelogd en ingelogd
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'

@@ -1,5 +1,5 @@
 /* Toegankelijkheids-scan (npm run a11y):
-   serveert public/ statisch, opent elke vlaggenschip-pagina in een echte
+   serveert public/ statisch, opent ELK scherm onder public/apps in een echte
    browser, injecteert de EIGEN keuring (scripts/a11ykeuring.js, verving axe-core)
    en faalt bij een ondubbelzinnige structurele overtreding (afbeelding zonder
    alt, veld zonder label, knop/link zonder naam, geen lang, lege titel).
@@ -18,57 +18,28 @@ const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 const STRICT = process.env.A11Y_STRICT === '1';
 
-// vlaggenschip-schermen: de eerste render (uitgelogd) van de belangrijkste apps
-const PAGINAS = [
-  '/apps/foundation/index.html',
-  '/apps/foundation/vrienden.html',
-  '/apps/foundation/school.html',
-  '/apps/app.html',
-  // het schakelbord waarop een lid zijn privacy regelt: als er ergens geen
-  // schermlezer-gat mag zitten, is het hier
-  '/apps/boardroom.html',
-  '/apps/leverancier.html',
-  '/apps/backoffice.html',
-  '/apps/personeel.html',
-  '/apps/camera.html',
-  '/apps/muziek.html',
-  '/apps/podium.html',
-  '/apps/oog.html',
-  '/apps/ghost.html',
-  '/apps/flits.html',
-  '/apps/theater.html',
-  '/apps/geld.html',
-  '/apps/passkeys.html',
-  /* RTG Veilig staat hier omdat het de app is waarin iemand onder spanning iets
-     moet kunnen invullen: een zin typen terwijl er iemand meekijkt, een knop
-     vinden terwijl de klok loopt. De vier schermen die hierin opgingen stonden
-     nooit in deze lijst; dat was een gat, niet een keuze. */
-  '/apps/veilig.html',
-  /* RTG Reizen: de wereld boven de reisapps. Staat hier omdat een lijst met
-     komende reizen alleen werkt als hij ook zonder muis en met een schermlezer
-     te doorlopen is -- het is de app waarin iemand op een station kijkt. */
-  '/apps/reizen.html',
-  '/apps/ov.html',
-  '/apps/ovdienst.html',
-  '/apps/ovroutes.html',
-  '/apps/clips.html',
-  '/apps/scherm.html',
-  '/apps/spelscherm.html',
-  '/apps/office.html',
-  '/apps/vonk.html',
-  '/apps/berichten.html',
-  '/apps/salon.html',
-  '/apps/genootschap.html',
-  /* De sociale super-app. Een nieuw scherm hoort meteen in de keuring te staan,
-     anders is 'schoon' een aanname in plaats van een meting -- en dat is hier
-     nagetrokken: haal de tekst uit een link in de onderbalk weg en deze scan
-     meldt 'link-naam' op /apps/wereld.html. Wat hij NIET ziet is wat achter de
-     inlog zit (de panelen Ontdek en Profiel staan bij de eerste render op
-     hidden); dat geldt voor elk scherm in deze lijst en is de reikwijdte van
-     deze scan, niet iets wat dit scherm apart heeft. */
-  '/apps/wereld.html',
-];
+/* ALLE SCHERMEN, EN NIET MEER EEN LIJST MET DE HAND.
 
+   Hier stond een opsomming van 32 "vlaggenschip"-schermen. Dat was 12% van de
+   258 schermen onder public/apps, en de andere 227 kregen alleen de statische
+   regels uit check.js. Een poort die als volledig voelt en een achtste meet is
+   erger dan geen poort: hij maakt "schoon" tot een aanname.
+
+   Erger nog: die lijst moest met de hand bij. Bij /apps/wereld.html staat in de
+   oude opmerking letterlijk "een nieuw scherm hoort meteen in de keuring te
+   staan, anders is 'schoon' een aanname" -- en dat is precies wat een handmatige
+   lijst niet kan garanderen.
+
+   De inventaris komt nu uit scripts/schermen.js, dezelfde functie waarmee de
+   schermdekking wordt geteld. Die heeft er ook het principe bij staan: geen
+   uitzonderingslijst, want wie een scherm niet wil laten toetsen moet dat kunnen
+   uitleggen, en die uitleg hoort in TAKEN.md en niet in een filter hier.
+
+   WAT DE SCAN NOG STEEDS NIET ZIET: de ingelogde staat. Elk scherm wordt bij de
+   EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
+   ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
+const { alleSchermen } = require('./schermen');
+const PAGINAS = alleSchermen();
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.svg': 'image/svg+xml', '.json': 'application/json', '.webmanifest': 'application/manifest+json',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
@@ -172,5 +143,5 @@ function statischeServer() {
   const oordeel = velt(totaal, contrastTotaal);
   for (const regel of oordeel.melding) console.error(regel);
   if (oordeel.faalt) process.exit(1);
-  console.log('\n[a11y] Alle vlaggenschip-pagina’s structureel schoon.');
+  console.log(`\n[a11y] Alle ${PAGINAS.length} schermen schoon: structuur en contrast.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

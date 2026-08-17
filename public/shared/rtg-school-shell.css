@@ -10,17 +10,19 @@ body.school-shell{min-height:100%;padding:0!important;overflow-x:hidden}
 .school-merk strong{display:block;font-family:'Bodoni Moda',serif;font-size:1.02rem;font-weight:600}.school-merk small{display:block;margin-top:.08rem;color:var(--rtg-muted,var(--zacht));font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}
 .school-navkop{padding:.55rem .7rem .35rem;color:var(--rtg-soft,var(--zacht));font-size:.58rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
 .school-nav{display:flex;align-items:center;gap:.64rem;padding:.64rem .7rem;margin:.12rem 0;border-radius:.72rem;color:var(--rtg-muted,var(--zacht));text-decoration:none;font-size:.83rem}
-.school-nav:hover,.school-nav.aan{background:#191a19;color:var(--rtg-txt,var(--txt))}
-/* Het stapcijfer erft de kleur van zijn eigen navigatie-item. Het droeg het
-   accent (#C23A5E via --rtg-acc als er geen dagkleur staat), en dat haalt op
-   deze donkere grond 3,78:1 -- genoeg voor grote tekst, te weinig voor een
-   cijfer van deze maat. Zie de kleurregel in CLAUDE.md. */
-.school-nav i{color:inherit}.school-nav.aan{box-shadow:inset 3px 0 var(--school-accent)}
-.school-nav i{width:1.55rem;height:1.55rem;border:1px solid var(--rtg-line,var(--lijn));border-radius:.5rem;display:grid;place-items:center;color:var(--school-accent);font-size:.62rem;font-style:normal;font-weight:800}
+.school-nav:hover,.school-nav.aan{background:#191a19;color:var(--rtg-txt,var(--txt))}.school-nav.aan{box-shadow:inset 3px 0 var(--school-accent)}
+/* Het cijferbadge stond op --school-accent (#C23A5E). Op deze donkere grond
+   haalt dat 3,78:1 en het cijfer is 9,9px -- genoeg voor grote tekst, te weinig
+   voor dit. Wit haalt 19,57:1; de rand houdt de vorm, het accent leeft verder
+   in .school-ey en de actieve nav. Zie de kleurregel in CLAUDE.md. */
+.school-nav i{width:1.55rem;height:1.55rem;border:1px solid var(--rtg-line,var(--lijn));border-radius:.5rem;display:grid;place-items:center;color:#fff;font-size:.62rem;font-style:normal;font-weight:800}
 .school-veilig{margin-top:auto;padding:.72rem;border:1px solid color-mix(in oklab,var(--school-groen) 48%,var(--rtg-line,var(--lijn)));border-radius:.8rem;color:var(--rtg-muted,var(--zacht));font-size:.68rem;line-height:1.45}.school-veilig b{display:block;color:#91d39a;margin-bottom:.18rem}
 .school-werk{min-width:0;min-height:100vh;background:var(--rtg-bg,var(--bg))}
 .school-boven{position:sticky;top:0;z-index:15;min-height:4.35rem;padding:.72rem 1.2rem!important;display:flex!important;align-items:center!important;gap:.8rem!important;flex-wrap:nowrap!important;border-bottom:1px solid var(--rtg-line,var(--lijn))!important;background:color-mix(in oklab,var(--rtg-bg,var(--bg)) 90%,transparent)!important;backdrop-filter:blur(14px)}
-.school-boven .school-boventitel{min-width:0}.school-boven .school-ey{display:block;color:var(--school-accent);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase}.school-boven h1{font-family:'Bodoni Moda',serif!important;font-size:1.08rem!important;font-weight:600!important;margin:.06rem 0 0!important}
+.school-boven .school-boventitel{min-width:0}/* Het eyebrow-label is 9,3px en stond in --school-accent: 3,78:1 op de zwarte
+   grond. Dat is de maat waarvoor de kleurregel in CLAUDE.md wit voorschrijft;
+   het accent blijft op de plekken waar het groot genoeg is. */
+.school-boven .school-ey{display:block;color:#fff;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase}.school-boven h1{font-family:'Bodoni Moda',serif!important;font-size:1.08rem!important;font-weight:600!important;margin:.06rem 0 0!important}
 .school-bovenruimte{flex:1}.school-toplink{border:1px solid var(--rtg-line,var(--lijn));background:var(--rtg-card,var(--paneel));color:var(--rtg-txt,var(--txt));border-radius:.68rem;padding:.5rem .68rem;text-decoration:none;font-size:.75rem;white-space:nowrap}
 .school-context{display:flex;align-items:center;gap:.42rem;min-width:0;padding:.36rem .58rem;border:1px solid var(--rtg-line,var(--lijn));border-radius:999px;background:var(--rtg-card,var(--paneel));font-size:.7rem;color:var(--rtg-muted,var(--zacht))}.school-context[hidden]{display:none}.school-context-dot{width:.45rem;height:.45rem;border-radius:50%;background:var(--school-groen);box-shadow:0 0 0 3px color-mix(in oklab,var(--school-groen) 17%,transparent)}.school-context span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.school-context b{color:var(--rtg-txt,var(--txt));font-size:.64rem;text-transform:uppercase;letter-spacing:.08em}
 .school-sessiebalk:empty{display:none}.school-sessiebalk{min-width:0}.school-sessiebalk .sb-balk{padding:0!important;border:0!important}.school-sessiebalk .sb-brand,.school-sessiebalk .sb-terug{display:none!important}

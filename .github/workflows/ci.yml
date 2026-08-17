@@ -69,8 +69,18 @@ jobs:
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/
       # functies): zakt de in-proces-dekking onder de vloer, dan faalt de stap.
-      # De vloeren staan bewust een paar punten onder de gemeten basislijn
-      # (63/80/51) zodat normale ruis niet flaket, maar echte terugval hard opvalt.
+      # De vloeren staan bewust een paar punten onder de gemeten basislijn zodat
+      # normale ruis niet flaket, maar echte terugval hard opvalt.
+      #
+      # GEMETEN OP 17 AUGUSTUS 2026, volledige suite (6520 toetsen):
+      #   regels 80,63  takken 80,60  functies 67,73   -> vloer 78 / 78 / 65
+      #
+      # Daarvoor stonden de vloeren op 58/74/47 terwijl deze opmerking 63/80/51
+      # als basislijn noemde: twee getallen die geen van beide meer klopten, en
+      # ruim 22 punten lucht op regels en functies. Een vloer die zo diep onder
+      # de stand ligt bewaakt niets -- er kon een vijfde van de dekking wegvallen
+      # zonder dat de stap rood werd. Bij de volgende meting hoort de vloer weer
+      # mee op te schuiven; dat is dezelfde ratel als NORM.json.
       # RTG_ROUTELOG laat elke kindserver opschrijven welk ROUTEPATROON hij heeft
       # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
       # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht

@@ -64,8 +64,22 @@ try {
 }
 if (!jsonUit) Object.assign(console, echt);
 
+/* DE VOORDEUR HOORT ERBIJ. Hier stond `.filter(r => r.pad && r.pad !== '/')`, en
+   dat knipte precies EEN route weg: `GET /`, de meest bezochte pagina van het
+   huis (middleware/voordeur.js hangt hem op). Zolang deze kaart alleen werd
+   gebruikt om te kijken of een /api-pad bestond, viel dat niemand op.
+
+   Sinds de dekkingsmeting ALLE routes meet, viel het meteen op -- van de
+   verkeerde kant: het journaal noteerde `GET /` als geraakt, de kaart kende hem
+   niet, en de meting meldde hem als drift tussen router en kaart. Dat is de
+   melding die precies goed werkte, en het antwoord erop is niet de melding
+   dempen maar de kaart compleet maken.
+
+   Waarom dit veilig is voor de andere lezers: die filteren allemaal zelf op
+   /api/ (poortwacht, samenhang, bewijsmatrix, grens-sweep) of gebruiken de lijst
+   als verzameling BEKENDE paden (blindevlek), en daar hoort de voordeur in. */
 const routes = (app && typeof app._routes === 'function' ? app._routes() : [])
-  .filter(r => r.pad && r.pad !== '/');
+  .filter(r => r.pad);
 
 // per pad de methoden bundelen; hetzelfde pad met GET en POST is een pad
 const perPad = new Map();

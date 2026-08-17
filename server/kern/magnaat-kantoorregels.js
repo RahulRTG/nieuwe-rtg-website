@@ -21,6 +21,13 @@ const REGELS = [
   [/office\/hardware|\/hardware|\/doos|\/toestellen/, 'hardware', 'RTG Hardwarelab'],
   [/office\/architect|\/architect/, 'architect', 'RTG Architectenbureau'],
   [/office\/werkplaats|\/werkplaats|\/gereedschap/, 'werkplaats', 'RTG Werkplaats'],
+  /* De routedekking hoort bij de Ingenieurs ("de motor van het platform gezond,
+     snel en meetbaar houden") en staat VOOR de brede /api/office-regel: die zou
+     de route bij Intern & IT leggen terwijl het scherm ernaast nergens op
+     matchte en op de terugval bleef staan. Dan wijst dezelfde capability naar
+     twee kamers, en dat is precies wat deze lijst moet voorkomen. Een regel voor
+     beide, zodat route en scherm bij elkaar horen. */
+  [/routedekking/, 'ingenieurs', 'Ingenieurs'],
   [/office\/ideeen|\/ideeen/, 'ideeen', 'De Ideeënkamer'],
   [/office\/kantine/, 'kantine', 'Kantine'],
   [/office\/(?:koppel|onboarding|conversations)|\/integratie|\/webhook/, 'integraties', 'Integratiekamer'],

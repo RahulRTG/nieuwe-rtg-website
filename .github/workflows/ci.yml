@@ -121,8 +121,18 @@ jobs:
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
       # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
-      # De vloer staat in NORM.json (dekkingWaargenomenPct).
-      - name: Waargenomen endpoint-dekking (uit het routejournaal)
+      #
+      # HIER STOND "de vloer staat in NORM.json (dekkingWaargenomenPct)", en dat
+      # is niet meer waar: 100% is geen norm meer maar een EIS. De stap zakt op
+      # elk gat -- elke route (methode + patroon, ook buiten /api/) die tijdens de
+      # hele suite geen enkele keer is aangeraakt, of die niet te meten valt -- en
+      # leest daarvoor geen norm meer uit NORM.json. De twee meters worden nog
+      # wel vastgelegd; ze zijn de historie, niet de lat.
+      #
+      # Het personeel ziet dezelfde meting in het RTG Kantoor
+      # (/apps/routedekking.html); die rekent met dezelfde functie als deze poort,
+      # server/kern/routedekking.js.
+      - name: Waargenomen routedekking, 100% is de eis (uit het routejournaal)
         run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build

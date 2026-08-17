@@ -182,6 +182,17 @@ test('het besluitenregister is openbaar en draagt geen personen', async () => {
   assert.ok(b.stemmen.every(s => typeof s.zetels === 'number'), 'fracties stemmen met zetels');
   assert.ok(!JSON.stringify(open.besluiten).includes('codenaam'), 'er staat geen enkele codenaam in het register');
   assert.ok(b.mandaatUitleg, 'en bij een bedrag staat welk mandaat erbij hoort: ' + b.mandaatUitleg);
+
+  /* HETZELFDE REGISTER VIA POST. routes/stad.js hangt beide werkwoorden op, maar
+     alleen de GET was ooit aangeroepen: de dekkingsmeting telde per PAD en zette
+     de POST daarmee gratis op groen. Sinds ze per METHODE telt, valt dat op.
+     Let op de LEGE body: de POST-variant leest filters uit req.body, en zonder
+     filters hoort hij hetzelfde openbare register te geven als de GET. */
+  const viaPost = await fetch(base + '/api/stad/besluiten',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    .then(async r => ({ status: r.status, body: await r.json() }));
+  assert.equal(viaPost.status, 200, 'het besluitenregister antwoordt ook op POST');
+  assert.deepEqual(viaPost.body, open, 'en geeft zonder filters precies hetzelfde register');
 });
 
 /* ---------------- 5. Inwonersraadpleging ----------------

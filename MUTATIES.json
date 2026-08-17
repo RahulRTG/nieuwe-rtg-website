@@ -3631,6 +3631,11 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "paginaroutes.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
+    },
     "paginascripts.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -4315,6 +4320,13 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "routedekking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "routelog.test.js": {
       "soort": "server",

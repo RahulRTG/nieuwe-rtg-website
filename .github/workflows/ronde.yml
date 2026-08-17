@@ -111,9 +111,12 @@ jobs:
         run: npm test
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
-      # Deze poort is wel hard: dekking is machine-onafhankelijk. De vloer staat
-      # in NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt).
-      - name: Waargenomen endpoint-dekking (uit het journaal)
+      # Deze poort is wel hard: dekking is machine-onafhankelijk. En hij is sinds
+      # de dekkingsronde ook onvoorwaardelijk hard -- hier stond "de vloer staat in
+      # NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt)", maar 100% is
+      # geen norm meer die je kunt verlagen: de stap zakt op elke route (methode +
+      # patroon, ook buiten /api/) die de suite niet heeft aangeraakt.
+      - name: Waargenomen routedekking, 100% is de eis (uit het journaal)
         run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       # De census: welke handhaver bewaakt welke categorie. Hij zakt als een
       # categorie zonder bewaker komt te staan.

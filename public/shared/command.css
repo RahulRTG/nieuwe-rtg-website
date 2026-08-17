@@ -63,10 +63,14 @@ body.rtg-command > #shell .notif-scrim,
 body.rtg-command > #shell .notif-panel{pointer-events:auto;}
 /* En de balk van Rahul, die aan <body> hangt en niet aan de schil: z-index 38
    (shared/handenvrij-balk.js) ligt onder de werktafel, dus je riep hem en er
-   gebeurde zichtbaar niets. Boven de schilbalk uit, zodat hij niet half achter
-   de tabstrip onderaan valt. */
-body.rtg-command .hv-balk{z-index:260;bottom:calc(48px + env(safe-area-inset-bottom,0px));}
-@media (min-width:1000px){body.rtg-command .hv-balk{bottom:0;}}
+   gebeurde zichtbaar niets.
+
+   Alleen de hoogte wordt hier gecorrigeerd, en alleen op een telefoon: daar
+   ligt de schilbalk (48px) onderaan en zou de balk er half achter vallen. Op een
+   breed scherm laten we hem met rust -- daar maakt shared/handenvrij-bureau.js
+   er een verplaatsbaar paneel rechtsonder van, en dat is zijn eigen vorm. */
+body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bottom,0px));}
+@media (min-width:1000px){body.rtg-command .hv-balk{bottom:auto;}}
 #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}

@@ -78,6 +78,21 @@ klikdoorlatende laag boven de werktafel waar die panelen in hangen. Gaat er tóc
 een scherm open (een tab uit Spotlight), dan is hij even weer een scherm —
 ondoorzichtig, met een terugknop die je op de werktafel terugzet.
 
+**En ze zijn van hetzelfde gemaakt als de werktafel.** Allebei kwamen ze uit de
+oude OS-laag en droegen ze die vormtaal nog: het bedieningspaneel was gebouwd uit
+`--card`/`--card2` — geen materiaal maar een mengsel waar `levendekleur.js` de
+dagkleur doorheen mengt, en die is overdag blauw, dus het paneel had een paarse
+zweem naast een werktafel van onyx. De balk van Rahul was een platte strook met
+een harde gouden bovenlijn en twee grijzen (`#333`, `#444`) die nergens uit het
+merk komen.
+
+Beide dragen nu het materiaal van de console van RTG Command: **onyxglas met een
+haarlijn van champagnegoud**, licht dat langs de bovenrand invalt, Inter, en goud
+uitsluitend voor "geselecteerd" (ONTWERP.md par. 4). Kies een materiaal, geen
+kleur — MATERIAAL.md. Twee dingen die daarbij bovenkwamen en al stuk waren: de
+kaart "Nu speelt" stond altijd leeg bovenaan het paneel (`display:flex` op een
+klasse wint van `[hidden]`), en de schuif Beweging stond op systeemblauw.
+
 Twee dingen die daarbij aan het licht kwamen en hier horen te staan, want ze
 waren allebei al stuk:
 

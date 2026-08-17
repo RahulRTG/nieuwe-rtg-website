@@ -1308,8 +1308,10 @@
   .os-scrim{
     position:absolute;inset:0;z-index:50;display:none;
     align-items:flex-start;justify-content:center;
-    background:rgba(0,0,0,0.45);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    /* Onyx en geen neutraal zwart: de was eronder hoort van hetzelfde materiaal
+       te zijn als het paneel erop. */
+    background:rgba(5,5,5,0.58);
+    backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
   }
   .os-scrim.open{display:flex;}
   .os-map-paneel{
@@ -1416,53 +1418,101 @@
     color:var(--soft);font-size:0.8rem;text-align:center;line-height:1.5;
   }
 
+  /* HET BEDIENINGSPANEEL IS VAN ONYXGLAS MET EEN GOUDEN HAARLIJN.
+
+     Het was gebouwd uit --card en --card2, en die twee zijn geen materiaal maar
+     een MENGSEL: shared/levendekleur.js mengt er de levende dagkleur doorheen,
+     en die is overdag blauw. Gevolg: een paneel met een paarse zweem, naast een
+     werktafel van onyx en goud. Precies waar MATERIAAL.md voor waarschuwt --
+     wie een kleur kiest in plaats van een materiaal, drijft weg zonder dat
+     iemand het merkt.
+
+     Dit paneel hangt sinds het springboard verdween BOVEN de werktafel, dus is
+     het van hetzelfde gemaakt als de console daar (shared/command.css): onyxglas,
+     een haarlijn van champagnegoud, licht dat langs de bovenrand invalt. Een
+     materiaal, en overal hetzelfde.
+
+     Goud is hier gereserveerd voor "geselecteerd" (ONTWERP.md par. 4) en groen
+     voor "staat aan" -- niet voor versiering. */
   .os-cc{
     margin-top:calc(env(safe-area-inset-top, 0px) + 3.6rem);
     width:min(340px, 90%);
-    background:color-mix(in srgb, var(--card) 72%, transparent);
-    border:1px solid var(--line);border-radius:18px;
-    padding:1rem;box-shadow:0 24px 60px rgba(0,0,0,0.5);
-    display:flex;flex-direction:column;gap:0.85rem;
+    background:linear-gradient(158deg, rgba(28,25,24,0.86), rgba(5,5,5,0.80));
+    backdrop-filter:blur(30px) saturate(1.08);
+    -webkit-backdrop-filter:blur(30px) saturate(1.08);
+    border:1px solid color-mix(in srgb, var(--gold-tekst,#C0A544) 24%, rgba(255,255,255,0.1));
+    border-radius:22px;
+    padding:1.05rem;
+    box-shadow:0 1px 0 rgba(255,255,255,0.16) inset,
+               0 -1px 0 rgba(192,165,68,0.09) inset,
+               0 22px 56px rgba(0,0,0,0.5);
+    display:flex;flex-direction:column;gap:1rem;
+    color:var(--rtg-txt,#F4F0E9);
   }
   /* -------- Now Playing: je muziek bedienen vanaf de ROS -------- */
   .os-nu{display:flex;align-items:center;gap:0.6rem;
-    background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:0.55rem 0.65rem;}
+    background:rgba(255,255,255,0.035);border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    border-radius:16px;padding:0.55rem 0.65rem;}
+  /* EN HIJ GAAT OOK ECHT WEG ALS ER NIETS SPEELT.
+
+     app-main-31.js zet `hidden` op deze kaart zodra er geen titel is -- maar
+     `display:flex` op een klasse wint van de `[hidden]`-regel van de browser,
+     dus stond er bovenaan het bedieningspaneel altijd een lege bak met een
+     noot, een leeg tekstvak en drie knoppen die nergens over gingen. Het viel
+     niet op zolang het paneel zelf al een verzameling doosjes was; met een
+     rustig vlak eromheen is het het eerste wat je ziet. */
+  .os-nu[hidden]{display:none;}
   .os-nu-open{display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;padding:0;color:var(--txt);}
-  .os-nu-hoes{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 30%, var(--card)), var(--card));font-size:1.25rem;color:var(--gold);}
+  .os-nu-hoes{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(140deg, rgba(192,165,68,0.20), rgba(255,255,255,0.03));
+    font-size:1.25rem;color:var(--gold-tekst,#C0A544);}
   .os-nu-hoes svg{display:block;}
   .os-nu-tekst{display:flex;flex-direction:column;min-width:0;}
   .os-nu-tekst b{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .os-nu-tekst small{font-size:0.66rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .os-nu-tekst small{font-size:0.66rem;color:var(--rtg-soft,rgba(244,240,233,0.56));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .os-nu-knoppen{display:flex;align-items:center;gap:0.15rem;flex-shrink:0;}
-  .os-nu-knoppen button{background:none;border:none;color:var(--txt);font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
-  .os-nu-knoppen button:hover{color:var(--gold);}
+  .os-nu-knoppen button{background:none;border:none;color:var(--rtg-muted,rgba(244,240,233,0.72));font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
+  .os-nu-knoppen button:hover{color:var(--gold-tekst,#C0A544);background:rgba(255,255,255,0.04);}
   #osNuSpeel{font-size:1.3rem;}
 
-  .os-cc-rij{display:flex;flex-direction:column;gap:0.45rem;}
-  .os-cc-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .os-cc-rij{display:flex;flex-direction:column;gap:0.5rem;}
+  /* Hetzelfde kopje als in de bank van de werktafel (.cmd-kop in command.css):
+     zelfde gewicht, zelfde spatiëring, zelfde toon. Twee bijna-gelijke kopjes
+     naast elkaar lezen als twee systemen. */
+  .os-cc-label{font:600 0.56rem/1 var(--rtg-interface,'Inter',system-ui,sans-serif);
+    letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-soft,rgba(244,240,233,0.56));}
   .os-cc-knoppen{display:flex;gap:0.4rem;}
   .os-cc-knoppen button{
-    flex:1;padding:0.55rem 0;border-radius:10px;border:1px solid var(--line);
-    background:var(--card2);color:var(--txt);font-size:0.72rem;
-    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
+    flex:1;padding:0.6rem 0;border-radius:999px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    background:transparent;color:var(--rtg-muted,rgba(244,240,233,0.72));
+    font:500 0.72rem/1 var(--rtg-interface,'Inter',system-ui,sans-serif);
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
   }
-  .os-cc-knoppen button.actief{border-color:var(--gold);color:var(--gold);}
+  .os-cc-knoppen button:hover{color:var(--rtg-txt,#F4F0E9);background:rgba(255,255,255,0.04);}
+  .os-cc-knoppen button.actief{
+    border-color:color-mix(in srgb, var(--gold-tekst,#C0A544) 42%, transparent);
+    background:rgba(192,165,68,0.14);color:var(--gold-tekst,#C0A544);}
   .os-cc-thema button{display:flex;align-items:center;justify-content:center;gap:0.4rem;}
   .os-thema-stip{width:0.85rem;height:0.85rem;border-radius:50%;flex:0 0 auto;
     box-shadow:0 0 0 1px var(--line) inset;}
   .os-cc-thema button.actief .os-thema-stip{box-shadow:0 0 0 1.5px var(--gold) inset;}
-  #osCcHelder{width:100%;accent-color:var(--gold);}
-  .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
+  /* Beide schuiven dragen dezelfde accentkleur. De tweede stond op de
+     browserstandaard -- systeemblauw -- en dat is hier geen ingetogen keuze maar
+     een kleur van buiten: Royal is het enige koele materiaal en gaat niet over
+     helderheid of beweging (MATERIAAL.md). */
+  #osCcHelder,#osCcBeweging{width:100%;accent-color:var(--gold-tekst,#C0A544);}
+  .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.45rem;}
   .os-cc-tegels button{
-    display:flex;flex-direction:column;align-items:center;gap:0.3rem;
-    padding:0.65rem 0;border-radius:12px;border:1px solid var(--line);
-    background:var(--card2);color:var(--txt);font-size:0.6rem;
-    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
+    display:flex;flex-direction:column;align-items:center;gap:0.35rem;
+    padding:0.7rem 0.2rem;border-radius:14px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    background:rgba(255,255,255,0.035);color:var(--rtg-muted,rgba(244,240,233,0.72));
+    font:500 0.6rem/1.25 var(--rtg-interface,'Inter',system-ui,sans-serif);text-align:center;
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
   }
+  .os-cc-tegels button:hover{color:var(--rtg-txt,#F4F0E9);background:rgba(255,255,255,0.06);}
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
   .os-cc-tegels button b svg{display:block;}
-  .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
+  .os-cc-tegels button.aan{border-color:color-mix(in srgb, var(--green) 45%, transparent);color:var(--green);}
   /* het aantal ongelezen meldingen op de tegel: hetzelfde stipje als de bel-badge
      had, want hij vertelt hetzelfde */
   .os-cc-tegels button{position:relative;}

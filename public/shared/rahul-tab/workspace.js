@@ -2,7 +2,7 @@
 (function(w){
   'use strict';
   var command=w.__rahulTabCommand;
-  if(!command)return;
+  if(!command||!w.RTGRahulTabHelpers)return;
   var page=command.page;
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
   function zet(sel,waarde){var el=page.querySelector(sel);if(el)el.textContent=waarde}

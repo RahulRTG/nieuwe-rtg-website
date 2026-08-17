@@ -93,6 +93,8 @@ test('de centrale bedieningslaag houdt een handmatige route zichtbaar', () => {
   assert.match(tab, /RTG Kompas · lokaal in eigen omgeving/);
   assert.match(tab, /RTG Kompas · externe uitwijk zichtbaar/);
   assert.match(tab, /RTG KOMPAS · LOCAL-FIRST/);
+  assert.match(tab, /script\.async=false/, 'dynamische onderdelen laden in vaste volgorde');
+  assert.match(twin, /!command\|\|!w\.RTGRahulTabHelpers/, 'Live Twin stopt veilig als de contextmodule ontbreekt');
   assert.match(kompas, /MENS BESLIST/);
   assert.match(kompas, /RTGKompas/);
   assert.match(twin, /RTG LIVE TWIN · VERIFIED PRE-FLIGHT/);

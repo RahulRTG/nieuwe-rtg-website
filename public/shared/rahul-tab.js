@@ -3,7 +3,7 @@
   if(window.__rahulTabStandaard)return;
   window.__rahulTabStandaard=true;
 
-  function laadStijl(src){var script=document.createElement('script');script.src=src;script.defer=true;document.head.appendChild(script)}
+  function laadStijl(src){var script=document.createElement('script');script.src=src;script.async=false;document.head.appendChild(script)}
   laadStijl('/shared/rahul-tab/style-base.js');
   laadStijl('/shared/rahul-tab/style-twin.js');
   laadStijl('/shared/rahul-tab/helpers.js');

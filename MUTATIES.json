@@ -5725,6 +5725,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "uitvoerproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/uitvoerproef.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "upload-poort.test.js": {
       "soort": "server",
       "staat": "gezakt",

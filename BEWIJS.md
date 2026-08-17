@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1009 bestanden en 6672 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1010 bestanden en 6681 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1009 |
-| losse beweringen (`test(...)`) | 6672 |
+| toetsbestanden | 1010 |
+| losse beweringen (`test(...)`) | 6681 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 839 |
 | **overleefd**: geen mutatie kreeg hem rood | 20 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
-| niets van beide | 93 |
+| niets van beide | 94 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-884 bestanden, 6445 beweringen.
+885 bestanden, 6454 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -306,6 +306,7 @@ toets omvalt.
 | `hulpdienst.test.js` | 5 | gezakt op `liegpoort /api/` | De hulpdiensten-toren: zes korpsen met een meldkamer, eenheden over land, water en door de lucht, bijstand tussen korpsen (special forces alleen via de politie), de keten ambulance -> ziekenhuis (beddenbord en... |
 | `hulpdiensten-bord.test.js` | 5 | gezakt op `liegpoort /api/` | HET BORD VAN DE HULPDIENSTEN -- 5 endpoints uit de supplier-groep. def/eenheid/maak, def/materieel/maak, def/gewonde/zet, hulp/eenheid/maak en hulp/eenheid/zet stonden als nooit aangeroepen in de waargenomen... |
 | `human-reality.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `i18n-auto.test.js` | 5 | -- | Het universele 114-talige vangnet. De browserlaag is bewust dependency-vrij; met een klein DOM-dubbel bewijzen we de selectie en RTL-richting, en met de paginascan dat ieder blijvend appscherm de gedeelde taalrail... |
 | `ideeen.test.js` | 4 | gezakt op `liegpoort /api/` | De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier ontwerpbureaus. Een idee met bureau-tags, reacties, AI-uitwerking per bureau en een spin-off die echt een concept in het gekozen bureau aanmaakt. |
 | `idemproef.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `identiteit-opvraag.test.js` | 6 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
@@ -785,8 +786,8 @@ toets omvalt.
 | `synergie.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Synergie: zaken maken samen deals en pakketten. Pas als elke deelnemer heeft getekend staat het pakket live; RTG Pay splitst elke aankoop exact volgens de afgesproken aandelen (de som moet kloppen). |
 | `tafeldek.test.js` | 4 | gezakt op `liegpoort /api/` | De gedekte tafel (kern/tafeldek.js): wijst de zaak een tafel toe aan een bevestigde reservering, dan staat het gedeelde zorgprofiel van de gast als stoel 1 op de tafellijst (kern/tafelwensen.js) -- codenaam,... |
 | `tafelticket.test.js` | 2 | gezakt op `liegpoort /api/` | Tafelticket: de bonnen van dezelfde tafel op EEN gezegeld ticket, en in EEN keer afrekenen aan de kassa. Getoetst: het samenvoegen (uitsplitsing per gast + totaal + zegel), en de ingebouwde beveiliging: een... |
-| `talen.test.js` | 7 | gezakt op `liegpoort /api/` | Wereldtalen: het register, de Boardroom-schakelaars en het overal-in-je-eigen- taal-chatten. Iedereen schrijft in de eigen taal; de ander leest alles in de zijne (vertaling per bericht, gecachet). |
-| `talen114.test.js` | 5 | gezakt op `liegpoort /api/` | 114 wereldtalen: het register telt er 114, en de app kan in ELKE actieve taal draaien. Het publieke /api/vertaal/ui vertaalt het UI-woordenboek van een pagina in een keer naar een actieve wereldtaal (shared/i18n.js... |
+| `talen.test.js` | 10 | gezakt op `liegpoort /api/` | Wereldtalen: het register, de Boardroom-schakelaars en het overal-in-je-eigen- taal-chatten. Iedereen schrijft in de eigen taal; de ander leest alles in de zijne (vertaling per bericht, gecachet). |
+| `talen114.test.js` | 6 | gezakt op `liegpoort /api/` | 114 wereldtalen: het register telt er 114, en de app kan in ELKE actieve taal draaien. Het publieke /api/vertaal/ui vertaalt het UI-woordenboek van een pagina in een keer naar een actieve wereldtaal (shared/i18n.js... |
 | `techniek-functies.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert. |
 | `techniek-sso-scim.test.js` | 7 | gezakt op `liegpoort /api/` | DE BEDIENINGSLAAG VAN HET PLATFORM -- techniek, SSO, SCIM en de meting. Negenentwintig endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees, en ze horen bij elkaar: dit is de keten waarmee een... |
 | `techniek.test.js` | 11 | gezakt op `!==->===#0` | Tests voor de techniek-motor (server/techniek.js): de gezondheidschecks en de zekeringen. Zuiver, met een nagemaakte ctx; geen server of database nodig. |

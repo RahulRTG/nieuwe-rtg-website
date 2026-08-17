@@ -38,8 +38,9 @@ module.exports = (kern) => {
           .map(b => b.text)
           .join('\n')
           .trim();
+        const stand = aiStatus();
         return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true,
-          modus: aiStatus().modus, verwerking: aiStatus().verwerking });
+          modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas });
       } catch (e) {
         console.error('AI-provider niet bereikbaar; handmatige werkmodus blijft actief:', e.message);
       }
@@ -48,7 +49,9 @@ module.exports = (kern) => {
        RTG tutoyeert, Lifestyle en Business spreken met u). Deze regel gaf hem
        eerst niet mee, en dit is de aanroep die zonder API-sleutel ALTIJD loopt
        -- dus in elke demo en de hele suite kreeg een RTG Pass-lid de u-vorm. */
-    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'regels', ai: false, modus: 'handmatig' });
+    const stand = aiStatus();
+    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'regels', ai: false,
+      modus: 'handmatig', verwerking: 'geen-model', kompas: stand.kompas });
   });
 
   app.post('/api/chat/history', auth, (req, res) => {

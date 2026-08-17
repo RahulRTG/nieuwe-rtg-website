@@ -41,7 +41,7 @@ LOCAL_AI_MODEL_KORT=<optioneel-kort-model>
 LOCAL_AI_MODEL_TOOLS=<optioneel-toolmodel>
 LOCAL_AI_MODEL_VISION=<optioneel-visionmodel>
 LOCAL_AI_REASONING=none
-LOCAL_AI_REASONING_TOOLS=low
+LOCAL_AI_REASONING_TOOLS=none
 RTG_EXTERNE_AI_UIT=1
 ```
 
@@ -77,3 +77,27 @@ Een model mag voorbereiden, vergelijken of een concept schrijven. Het mag nooit
 zelf betaling, publicatie, toegang, definitieve boeking, juridisch besluit of
 fiscale beslissing bevestigen. Dat blijft een harde workflowgrens, ongeacht of
 het model lokaal of extern draait.
+
+## RTG Kompas op een Mac mini
+
+`scripts/mac/ollama-kompas.sh` maakt de lokale route reproduceerbaar. De
+standaard is `qwen3.5:4b` onder de naam `rtg-kompas`: compact genoeg voor een
+Apple Silicon Mac met 8 GB, maar met tekst, beeld en tool-calling in één model.
+De installatie bindt uitsluitend aan `127.0.0.1`, schakelt Ollama Cloud dubbel
+uit (omgeving én `server.json`), gebruikt Metal, laat maar één verzoek tegelijk
+rekenen en haalt het model na drie minuten rust uit het geheugen.
+
+```bash
+scripts/mac/ollama-kompas.sh
+scripts/mac/ollama-kompas.sh --controle
+```
+
+De ingecheckte `Modelfile.rtg-kompas` voegt de gedragsgrens toe. De server blijft
+de echte autoriteit: de modeltekst kan nooit zelf de status `lokaal` bepalen,
+een recht verlenen of een goedkeuring afronden. De zichtbare Kompas-kaart krijgt
+privacyroute en menselijke grens alleen uit `server/ai.js`.
+
+RTG Kompas vat een ingewikkelde situatie waar nuttig samen als **NU**,
+**STRAKS** en **LET OP**. Dat is een antwoordvorm, geen verborgen redeneerspoor;
+interne modelgedachten worden niet gevraagd, opgeslagen of aan een gebruiker
+getoond.

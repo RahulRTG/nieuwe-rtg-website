@@ -16,9 +16,14 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
   const q = String(req.body.q || '').trim().slice(0, 300);
   if (!q) return res.status(400).json({ error: 'Stel een vraag.' });
   const ql = q.toLowerCase();
-  const A = (reply, did, extra) => res.json(Object.assign({ reply, did: !!did,
-    aiBeschikbaar: !!(kern.anthropic && kern.anthropic.messages),
-    modus: 'workflow' }, extra || {}));
+  const A = (reply, did, extra) => {
+    const stand = require('../../../ai').beschikbaarheid(kern.anthropic);
+    return res.json(Object.assign({ reply, did: !!did,
+      aiBeschikbaar: stand.beschikbaar,
+      modus: stand.beschikbaar ? stand.modus : 'workflow',
+      verwerking: stand.verwerking,
+      kompas: stand.kompas }, extra || {}));
+  };
   const isAmbt = !!((kern.overheid && kern.overheid.magBehandelen && kern.overheid.magBehandelen(s)) ||
     (kern.gemeente && kern.gemeente.magBehandelen && kern.gemeente.magBehandelen(s)));
   const wereld = isAmbt ? 'supplier' : (req.actor && req.actor.staffId != null ? 'staff' : 'supplier');

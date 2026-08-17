@@ -515,7 +515,13 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
   });
 });
 
-/* De klok op het beginscherm is rond, en zijn vak hoort dat ook te zijn.
+/* De klok is rond, en zijn vak hoort dat ook te zijn.
+
+   DEZE TOETS IS MEEVERHUISD MET DE KLOK. Hij mat de klok op het beginscherm;
+   dat beginscherm is de werktafel geworden en de klok is er af (WERELD.md).
+   Het horloge staat nog op een plek -- de inlogpoort -- en de belofte die deze
+   toets bewaakt is precies dezelfde gebleven, want het is dezelfde kast uit
+   shared/klok.js. Weghalen zou de wachter kwijtmaken samen met het scherm.
 
    Waarom dit een toets verdient. De schaduw van de klok zit op een
    pseudo-element met border-radius:50% over het VAK van .rtg-ring. Zolang dat
@@ -531,26 +537,25 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
    browser de hoogte staan. Beide bovengrenzen moeten dus gelijk zijn. Deze
    toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
    vak alsnog scheef wordt getrokken. */
-test('Leden-app: het vak van de klok op het beginscherm is vierkant, dus de schaduw is rond',
+test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const reg = await api(base, '/api/auth/register', { name: 'Klok Lid', email: 'klokvak@x.nl', phone: '0612345702',
-      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    assert.ok(reg.token, 'lid-registratie geeft een token');
-
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     // een smalle, hoge telefoon: juist daar knijpt max-width de breedte af
     const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
-    await ctx.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    await ctx.addInitScript(() => {
+      try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+    });
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    // zonder token: dan staat de poort er, en daar hangt de klok
+    await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
 
-    await page.waitForSelector('.os-home-klok.rtg-ring svg', { timeout: 15000 });
+    await page.waitForSelector('#gate .rtg-ring svg', { timeout: 15000 });
     const vak = await page.evaluate(() => {
-      const k = document.querySelector('.os-home-klok.rtg-ring');
+      const k = document.querySelector('#gate .rtg-ring');
       const b = k.getBoundingClientRect();
       return { breed: Math.round(b.width), hoog: Math.round(b.height) };
     });

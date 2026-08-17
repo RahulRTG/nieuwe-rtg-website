@@ -436,8 +436,24 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
   #rtgCommand{grid-template-columns:156px minmax(0,1fr);transition:grid-template-columns 340ms var(--rtg-veer)}
   #rtgCommand.bank-klein{grid-template-columns:70px minmax(0,1fr)}
   #rtgCommand.bank-klein:has(.cmd-bank:hover),#rtgCommand.bank-klein:has(.cmd-bank:focus-within){grid-template-columns:156px minmax(0,1fr)}
-  .cmd-bank{position:static;max-height:none;overflow:visible;transform:none;border-top:0;border-radius:0;box-shadow:1px 0 rgba(255,255,255,.025) inset;
+  /* DE RAIL IS EEN KOZIJN, DE LIJST SCHUIFT ERIN.
+
+     Hier stond overflow:visible, en dat klopte zolang de bank alleen software
+     droeg: veertien deuren plus Instellingen past in elk venster. Sinds de
+     werelden hierheen zijn verhuisd (WERELD.md) staan er twee kopjes, drie
+     werelden en twee systeemdeuren bij -- samen ruim 1030px. In een venster
+     van 720 (een gewone laptop) viel de onderkant daarmee ONDER de vouw, en
+     omdat de werktafel position:fixed is, scrollt er niets: Rahul, het
+     bedieningspaneel en de instellingen waren simpelweg niet meer te bereiken.
+
+     Niet de bank zelf scrollt maar de NAV erin. Dan blijven de systeemdeuren
+     in de voet altijd staan waar ze horen -- onderaan, in beeld -- en schuift
+     alleen de lijst waar je doorheen zoekt. min-height:0 hoort erbij: een
+     grid- en flexkind mag standaard niet kleiner worden dan zijn inhoud, en
+     zonder die twee nullen loopt de overflow gewoon weer door. */
+  .cmd-bank{position:static;max-height:none;overflow:hidden;min-height:0;transform:none;border-top:0;border-radius:0;box-shadow:1px 0 rgba(255,255,255,.025) inset;
     border-right:1px solid var(--rtg-line);padding-bottom:1rem;}
+  .cmd-nav{overflow-y:auto;min-height:0;scrollbar-width:thin}
   .cmd-bank::before{display:none}
   .cmd-adem{display:block}
   #rtgCommand.bank-klein:not(:has(.cmd-bank:hover)):not(:has(.cmd-bank:focus-within)) .cmd-bank span{opacity:0;width:0}

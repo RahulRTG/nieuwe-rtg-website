@@ -85,6 +85,24 @@ async function metLid(fn) {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
+
+       Een vers geregistreerd lid is niet `klaar`, dus opent app-main het
+       onboardinggesprek en gaat #onbGate open. Daar mag niets overheen
+       (shared/command.js), dus is er dan geen werktafel om te meten.
+
+       Deze toetsen deden dat met `onbGate.hidden = true` vlak na
+       domcontentloaded. Dat is een wedloop die je verliest: /onboarding/status
+       is een serveraanroep, en het antwoord zet de poort even later gewoon
+       weer open. De werktafel week zoals hij hoort, kwam niet terug, en de
+       toets wachtte zich dood op werelden in een bank die niet bestond.
+
+       Mocken op de status is wat de rest van deze suite ook doet
+       (apps-ui, handenvrij, verzorging-scherm): dan is er niets te tekenen,
+       zet app-main de poort zelf dicht, en is er geen moment waarop het
+       andersom kan uitpakken. */
+    await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     await ctx.addInitScript((t) => {
       try {
         localStorage.setItem('rtg_member_token', t);
@@ -128,6 +146,9 @@ async function wachtWerelden(page) {
     return !!(app && app.classList.contains('active') &&
       document.querySelectorAll('#osMappen .os-app').length === 3);
   }, null, { timeout: 60000 });
+  /* De werktafel hoort er dan ook te zijn: de intake staat buiten deze toetsen
+     (zie metLid), dus is #onbGate dicht en is er geen grendel meer. */
+  await page.waitForSelector('#rtgCommand .cmd-nav', { state: 'attached', timeout: 20000 });
   await page.waitForFunction(() => {
     const nav = document.querySelector('#rtgCommand .cmd-nav');
     if (!nav) return false;
@@ -295,7 +316,6 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
        over het hele scherm. hidden is het signaal waarop Command wacht;
        verwijderen vóór die MutationObserver heeft gelopen laat de werktafel in
        de toestand "ondertekening open" staan. */
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await wachtWerelden(page);
 
     /* HET BEGINSCHERM IS DE RUSTPLEK, en dat is nu de werktafel.
@@ -351,7 +371,10 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
       [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')].map((b) => b.textContent.trim()));
     assert.ok(deuren.some((t) => /Bedieningspaneel/i.test(t)),
       'de voet van de bank heeft geen deur naar het bedieningspaneel, gevonden: ' + deuren.join(', '));
-    await page.click('#rtgCommand .cmd-bankvoet [data-systeem]');
+    /* Op NAAM en niet op positie: er staan twee systeemdeuren in de voet
+       (Rahul boven het bedieningspaneel), dus `[data-systeem]` pakte de
+       eerste en opende het vraagveld van Rahul. */
+    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Bedieningspaneel' }).first().click();
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim').getBoundingClientRect();
@@ -378,7 +401,6 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
        het springboard werkte -- maar dat is precies het soort ding dat stil
        stukgaat als er een laag bij komt. */
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await wachtWerelden(page);
     await page.mouse.move(196, 4);
     await page.mouse.down();
@@ -416,7 +438,6 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await wachtWerelden(page);
     // op een telefoon is de bank een lade; open hem zoals een lid dat doet
     await openLade(page);
@@ -484,7 +505,6 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await wachtWerelden(page);
     await openLade(page);
 
@@ -518,7 +538,6 @@ test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await wachtWerelden(page);
 
     const b = await werelden(page);

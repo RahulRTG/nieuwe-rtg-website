@@ -359,7 +359,10 @@
 
       // Ook tekst zonder handmatig woordenboeksleuteltje en later door JS
       // getekende interface gaat via de centrale, gebatchte vangnetlaag.
-      if (window.RTGAutoVertaling) window.RTGAutoVertaling.apply(lang);
+      // Activeer dat vangnet pas na een opgeslagen of expliciete taalkeuze:
+      // de voorgeselecteerde toestel-taal mag een Nederlandstalig scherm niet
+      // al op de achtergrond half vertalen voordat de bezoeker kiest.
+      if (window.RTGAutoVertaling) window.RTGAutoVertaling.apply(this.chosen ? lang : 'nl');
 
       this.updateSwitch();
       window.dispatchEvent(new CustomEvent('rtglang', { detail: { lang } }));

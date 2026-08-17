@@ -81,3 +81,9 @@ test('de losse GitHub Pages-voordeur gebruikt dezelfde 114-talige app-API', () =
   assert.match(html, /name="rtg-api-base" content="https:\/\/app\.rahultravelgroup\.com"/);
   assert.match(html, /public\/shared\/i18n\.js/);
 });
+
+test('het automatische vangnet wacht op de bewuste taalkeuze', () => {
+  const bron = fs.readFileSync(path.join(ROOT, 'public/shared/i18n/i18n-01.js'), 'utf8');
+  assert.match(bron, /RTGAutoVertaling\.apply\(this\.chosen \? lang : 'nl'\)/,
+    'toestel-detectie alleen mag de Nederlandstalige eerste pagina niet vertalen');
+});

@@ -3166,13 +3166,13 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    49) ELK MEDIA-ELEMENT DRAAGT EEN BESLUIT OVER ONDERTITELING, MET EEN REDEN
 
    WAAROM DIT GEEN "ELKE <video> EEN <track>"-POORT IS. Die poort is in vijf
-   minuten geschreven en zou hier meteen negentien keer onterecht afgaan. Van de
-   dertig media-elementen in dit huis is de meerderheid namelijk geen INHOUD maar
+   minuten geschreven en zou hier meteen twintig keer onterecht afgaan. Van de
+   negenentwintig media-elementen in dit huis is de meerderheid geen INHOUD maar
    een INSTRUMENT: de camera die een paspoort leest, de QR-scanner van de
    RTG-code, het oog dat een werkvloer schouwt, het onzichtbare element dat een
    affiche uit het eerste frame haalt, en je eigen beeld in de hoek van een
    gesprek. Daar valt niets te ondertitelen -- er is geen geluid en er wordt niets
-   gezegd. Een poort die daar toch een <track> eist levert negentien loze alarmen
+   gezegd. Een poort die daar toch een <track> eist levert twintig loze alarmen
    op, en na drie loze alarmen zet iemand de poort uit. Dat is exact het patroon
    van de vals-alarmronde in scripts/lib/rolproef.js.
 
@@ -3182,8 +3182,8 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    ondertitels zijn, maar dat over elk element iemand heeft nagedacht, en dat je
    kunt nalezen wie en waarom.
 
-   HET REGISTER LIEGT DE GATEN NIET WEG. Negen van de dertig staan als OPEN, en
-   dat is de eerlijke stand en geen slordigheid:
+   HET REGISTER LIEGT DE GATEN NIET WEG. Acht van de negenentwintig staan als
+   OPEN, en dat is de eerlijke stand en geen slordigheid:
 
      live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
                          Wat een dove deelnemer hier nodig heeft is live tekst
@@ -3192,13 +3192,13 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
                          wel, en die is niet gehaald.
      live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
                          naar het kantoor.
-     opgenomen (1)       Een spraakbericht in de teamchat heeft geen tekstversie.
-                         Dit waren er drie: het Theater en de filmspeler van de
-                         Media OS hadden geen veld voor ondertitels in het model.
-                         Dat veld is er nu (kern/ondertitels.js, dezelfde bron als
+     opgenomen (0)       Dit waren er drie. Het Theater en de filmspeler van de
+                         Media OS hadden geen veld voor ondertitels in het model;
+                         dat veld is er nu (kern/ondertitels.js, dezelfde bron als
                          de clip-kant), met een route, een vel waar de maker ze
-                         intypt en een gedeelde band die ze toont -- dus staan die
-                         twee nu als 'ondertiteld' met hun anker erbij.
+                         intypt en een gedeelde band die ze toont. De derde, een
+                         spraakbericht in de teamchat, bleek dood hout: het veld
+                         `m.audio` wordt nergens geschreven. Weggehaald.
 
    WAT HIJ MACHINAAL NAKIJKT, want een register met alleen woorden erin is een
    document en geen poort:
@@ -3242,10 +3242,15 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     uitzending:  { open: true },                // live, eenrichting
     onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
   };
-  /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, daarna 9 nadat
-     het Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
-     clip-kant) en de Media OS dezelfde cue-lijst meekrijgt. Mag alleen omlaag. */
-  const OPEN_MAX = 9;
+  /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, toen 9 nadat het
+     Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
+     clip-kant), en nu 8 van 29 -- het spraakbericht in de teamchat bleek DOOD
+     HOUT. De speler stond in personeel-23.js achter `m.audio`, en niets in dit
+     huis schrijft dat veld ooit: /api/supplier/team/message neemt alleen `text`
+     aan, en geen enkele aanroeper stuurt iets anders. Het was dus geen
+     ondertitelgat maar een knop voor een functie die niet bestaat, en die is
+     weggehaald in plaats van beschreven. Mag alleen omlaag. */
+  const OPEN_MAX = 8;
   /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
      Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
      shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
@@ -3270,7 +3275,6 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/personeel/personeel-23.js#1', ['onbedekt', 'een spraakbericht in de teamchat, en daar bestaat geen tekstversie van; dat is een gat']],
     ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],

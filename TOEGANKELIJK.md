@@ -20,7 +20,7 @@ op telefoonformaat (390x844).
 | contrast, beide staten | **0** van 259 | tekst die te bleek is om te lezen |
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
-| ondertitels | 21 van 30 media-elementen geregeld | video die je zonder geluid niet kunt volgen |
+| ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 
 Die vier zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen in twee staten; `check.js` regel 49 doet het
@@ -73,9 +73,15 @@ niet. **Dit is een besluit en geen taak**: zolang het niet genomen is, kan een
 dove deelnemer niet meedoen aan een gesprek in dit huis, en dat hoort zo hard te
 staan.
 
-Ook open: een spraakbericht in de teamchat heeft geen tekstversie, terwijl RTG
-Memo op hetzelfde toestel wél een transcript maakt. Dat is de eerstvolgende die
-te bouwen is.
+Wat hier eerst stond als "ook open" -- een spraakbericht in de teamchat zonder
+tekstversie -- bleek bij het narekenen geen gat maar DOOD HOUT. De speler stond
+in de code achter een veld `m.audio`, en niets in dit huis schrijft dat veld ooit:
+de route neemt alleen tekst aan en geen enkele aanroeper stuurt iets anders. Het
+was dus een knop voor een functie die niet bestaat. Weggehaald in plaats van
+beschreven; het register telt nu 29 media-elementen in plaats van 30.
+
+**Daarmee zijn ALLE opgenomen vormen gedekt.** Wat als open overblijft, is
+uitsluitend live.
 
 ### Wie een motorische beperking heeft
 

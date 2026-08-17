@@ -114,6 +114,92 @@ body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bot
 .cmd-bankvoet{border-top:1px solid var(--rtg-line);padding-top:.55rem}
 .cmd-bank span{white-space:nowrap;overflow:hidden;opacity:1;transition:opacity 180ms var(--rtg-veer)}
 
+/* ---------------------------------------------------------------- Rahul ----
+   RAHUL WOONT IN DE SCHILBALK. Rechts staat zijn mond -- hetzelfde gezicht als overal (shared/mond.js) --
+   en een tik maakt van DEZE balk een vraagveld. Geen paneel dat opkomt: de
+   balk die er al was verandert van taak, en dat scheelt een heel meubel.
+   De logica staat in shared/command/praat.js.
+
+   De maat is die van de andere zones: 48px hoog, want dat is de minimale
+   aanraakmaat. De mond is breder omdat een mond breder is dan hij hoog is;
+   het canvas komt uit RTGMond.fab() en krijgt zijn maat hier, net als in de
+   console (.cmd-mond in dit blad). */
+.cmd-mondknop{
+  flex:0 0 auto;width:60px;border:0;border-left:1px solid var(--rtg-line);
+  background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;
+  color:var(--gold-tekst,#C0A544);transition:background 140ms ease;
+}
+.cmd-mondknop canvas{display:block!important;width:44px!important;height:auto!important;pointer-events:none}
+.cmd-mondknop:hover{background:rgba(255,255,255,.04)}
+.cmd-balk.vraagt .cmd-mondknop{background:rgba(192,165,68,.12);border-left:0;border-right:1px solid var(--rtg-line)}
+/* De vraagstand: het veld neemt de plek van de bank, de bladen en de
+   sluitknop in. Alles wat daar stond komt terug zodra je hem sluit -- er gaat
+   niets weg, het staat even ergens anders. */
+.cmd-vraagvorm{display:none;flex:1 1 auto;min-width:0;align-items:center;gap:.4rem;margin:0;padding:0 .5rem 0 .35rem}
+.cmd-balk.vraagt .cmd-vraagvorm{display:flex}
+.cmd-balk.vraagt .cmd-lade,
+.cmd-balk.vraagt .cmd-balkbladen,
+.cmd-balk.vraagt .cmd-balksluit{display:none}
+.cmd-vraagveld{flex:1 1 auto;min-width:0;height:34px!important;padding:0 .8rem!important;
+  background:rgba(5,5,5,.42)!important;border:1px solid var(--rtg-line)!important;
+  border-radius:12px!important;color:var(--rtg-txt)!important;
+  font:400 .82rem var(--rtg-interface)!important;
+  box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important;}
+.cmd-vraagveld::placeholder{color:var(--rtg-soft)}
+/* Sturen is de enige handeling met autoriteit in deze balk, dus de enige die
+   goud draagt (ONTWERP.md par. 4). */
+.cmd-vraagstuur{flex:0 0 auto;width:32px;height:32px;padding:0;border:0;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;color:#0C0C0B;
+  background:var(--gold-glans,linear-gradient(145deg,#C0A544,#857007));}
+.cmd-vraagstuur svg{width:16px;height:16px;stroke:currentColor;fill:none}
+
+/* ---- wat hij zegt ----
+   Een strook boven de balk, van hetzelfde glas, die alleen bestaat als er
+   iets gezegd is. Geen chatvenster: hoogstens een derde van het scherm, en
+   hij scrolt in zichzelf zodat de werkvloer eronder blijft staan. */
+.cmd-praat{
+  position:absolute;left:12px;right:12px;bottom:calc(48px + env(safe-area-inset-bottom,0px) + 10px);
+  z-index:22;max-height:34vh;overflow-y:auto;overscroll-behavior:contain;
+  padding:.5rem;border-radius:18px;
+  border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 20%,rgba(255,255,255,.08));
+  background:linear-gradient(158deg,rgba(28,25,24,.9),rgba(5,5,5,.84));
+  backdrop-filter:blur(24px) saturate(1.06);-webkit-backdrop-filter:blur(24px) saturate(1.06);
+  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 14px 38px rgba(0,0,0,.4);
+}
+.cmd-praat[hidden]{display:none}
+.cmd-praatregel{
+  margin:0;padding:.4rem .55rem;font:400 .8rem/1.5 var(--rtg-interface);
+  color:var(--rtg-muted);
+}
+.cmd-praatregel+.cmd-praatregel{border-top:1px solid var(--rtg-line)}
+/* Wat jij zei staat er stiller bij: het is de vraag en niet het antwoord. */
+.cmd-praatregel.mij{color:var(--rtg-soft);font-style:normal}
+.cmd-praatregel.mij::before{content:"\2022";margin-right:.5rem;color:var(--gold-tekst,#C0A544)}
+
+/* Op een breed scherm bestaat de schilbalk niet: daar is de bank een vaste rail
+   en zijn de tabbladen bovenin. Rahul moet er wel kunnen komen -- de deur in de
+   voet van de bank is daar zijn enige ingang -- dus verschijnt DEZELFDE balk
+   daar alleen in de vraagstand, als een zwevende console onderaan de werkvloer.
+   Eén ding met twee vormen, net als de bank zelf. */
+@media (min-width:1000px){
+  /* Vast aan het VENSTER en niet aan .cmd-werk: dat vak loopt op een breed
+     scherm langer door dan het beeld (de bladen bepalen zijn hoogte), dus een
+     balk die zich daaraan ophangt zakt eronderuit. Gemeten: 113px onder de
+     onderrand. Rechtsonder, dezelfde hoek waar Rahul op een breed scherm altijd
+     al zit (shared/handenvrij-bureau.js). */
+  .cmd-balk.vraagt{
+    display:flex;position:fixed;z-index:243;
+    right:24px;bottom:18px;width:min(560px,calc(100% - 3rem));
+    height:56px;border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));
+    border-radius:22px;overflow:hidden;
+    background:linear-gradient(145deg,rgba(28,25,24,.88),rgba(5,5,5,.82));
+    backdrop-filter:blur(30px) saturate(1.08);-webkit-backdrop-filter:blur(30px) saturate(1.08);
+    box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 14px 38px rgba(0,0,0,.34);
+  }
+  .cmd-balk.vraagt .cmd-mondknop{border:0;border-right:1px solid var(--rtg-line)}
+  .cmd-praat{position:fixed;z-index:243;left:auto;right:24px;width:min(560px,calc(100% - 3rem));bottom:86px}
+}
+
 /* ---------------------------------------------------------------- het werk -- */
 body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-width:none;margin:0;padding:0;display:grid;grid-template-rows:56px minmax(0,1fr);position:relative;}
 .cmd-tabs{display:flex;align-items:stretch;overflow-x:auto;border-bottom:1px solid var(--rtg-line);background:rgba(12,12,11,.88);scrollbar-width:none;padding-right:3rem;

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0bfc8951';
+var RTG_BOUW = '7d173fdd';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4937,30 +4937,13 @@ var RTG_BOUW = '0bfc8951';
      dat staat -- ook nu hij zelf niet meer in beeld komt. */
   function systeemBij() {
     if (!window.RTGCommand || !RTGCommand.systeem) return;
-    var lijst = [], knop = $('#osCcBtn');
-    /* EN RAHUL, want die was op het beginscherm nergens meer.
-
-       Zijn balk stond onderaan het springboard. Dat scherm is weg, en de drie
-       andere plekken waar hij woont haalden het geen van alle: de console van de
-       werktafel wordt verborgen door shared/rahul-tab/style-base.js, de tab die
-       daarvoor in de plaats komt vindt op deze pagina geen gastheer, en de
-       handenvrij-balk hangt bewust weg tot je hem roept. Gemeten in de browser:
-       nul zichtbare ingangen naar Rahul op het beginscherm.
-
-       RTGRahul.open() is de manier waarop de rest van het huis hem roept -- de
-       pill, het zoekscherm, de mond. Deze deur gebruikt dezelfde, dus er komt
-       geen tweede manier bij; er komt alleen een knop bij waar er geen was.
-
-       De vraag "bestaat RTGRahul al?" stellen we bij de KLIK en niet hier. Hij
-       wordt door metgezel.js/mond.js nagelaadt en is op het moment dat de bank
-       gevuld wordt vaak nog niet binnen -- gemeten: dan verscheen de deur
-       helemaal niet. Wachten op iets dat er zo aankomt is geen reden om een
-       knop weg te laten die het huis altijd heeft. */
-    lijst.push({ naam: 'Rahul', teken: 'mens',
-      doe: function () { if (window.RTGRahul && RTGRahul.open) RTGRahul.open(); } });
-    if (knop) lijst.push({ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
-      doe: function () { knop.click(); } });
-    RTGCommand.systeem(lijst);
+    var knop = $('#osCcBtn');
+    /* RAHUL STOND HIER OOK, en is verhuisd naar shared/command.js: de werktafel
+       levert zijn eigen deur, want zijn plek is de mond in de schilbalk. Hier
+       riep hij RTGRahul.open() aan -- de zwevende handenvrij-balk -- en dat zou
+       een tweede Rahul zijn naast die in de balk. */
+    RTGCommand.systeem(knop ? [{ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+      doe: function () { knop.click(); } }] : []);
   }
   bouw();
 

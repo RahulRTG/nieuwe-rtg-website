@@ -70,8 +70,7 @@ van eronder:
   nul zichtbare ingangen. Zijn console in de werktafel wordt verborgen door
   `shared/rahul-tab/style-base.js`, de tab die daarvoor in de plaats komt vindt
   op deze pagina geen gastheer, en de handenvrij-balk hangt bewust weg tot je hem
-  roept. Er staat nu een deur **Rahul** in dezelfde voet, die `RTGRahul.open()`
-  aanroept — dezelfde manier waarop de rest van het huis hem roept.
+  roept. Hij woont nu **in de schilbalk zelf** — zie hieronder.
 
 De schil zelf blijft bestaan als **la**, niet als scherm: een doorzichtige,
 klikdoorlatende laag boven de werktafel waar die panelen in hangen. Gaat er tóch
@@ -106,6 +105,41 @@ waren allebei al stuk:
 
 Het springboard is als *registry* niet weg: `#osMappen` blijft de plek waar de
 bank en Spotlight uit gevuld worden. Dat is een lijst, geen scherm.
+
+## Rahul woont in de balk
+
+De balk onderaan zegt *"Kies een wereld"*. Rechts staat **zijn mond** — hetzelfde
+gezicht als overal in dit huis (`shared/mond.js`) — en een tik erop maakt van
+diezelfde balk een vraagveld. Nog een tik, of Escape, en hij is weer de balk met
+je werkbladen. Wat hij zegt komt in een strook erboven, van hetzelfde glas.
+
+**Geen paneel dat opkomt.** Dat is de hele keuze: er lag eerst een zwevende balk
+(`shared/handenvrij-balk.js`) bovenop een balk die er al was — een tweede meubel
+voor iets wat één ding is. Nu verandert het meubel dat je hebt van taak. Op een
+breed scherm bestaat de schilbalk niet; daar verschijnt dezelfde balk alleen in
+de vraagstand, als zwevende console rechtsonder. Eén ding, twee vormen — net als
+de bank, die daar een rail is en op een telefoon een lade.
+
+De laag staat in `shared/command/praat.js` en **verzint niets**. Een opdracht
+("open Geld") gaat naar `o.bestemming()`, dezelfde router die de console
+gebruikt; al het andere naar `RTGThuisRahul.vraag()`. Wat terugkomt leest hij van
+één plek af: de draad `#osAiDraad` die app-main vult. Vandaar een spiegel en geen
+tweede gesprekslijst.
+
+Drie dingen die daarbij zijn misgegaan en hier horen te staan, want ze zijn alle
+drie stil:
+
+1. **Het merkje op een bronregel moet naar de HUIDIGE strook wijzen.** De
+   werktafel wordt opnieuw opgebouwd zodra de stand wisselt (gesloten → open na
+   het inloggen). Zonder die voorwaarde wees het merkje naar een weggehaald
+   element en verscheen er in de nieuwe strook nooit meer een regel.
+2. **Een laag die verdwijnt moet ook worden afgebroken.** De oude praat-laag
+   verloor alleen zijn verwijzing; zijn waarnemer bleef luisteren. Twee levende
+   lagen kaatsten elkaars merkje heen en weer en zetten elke zin dubbel neer —
+   een keer vaker bij elke herbouw.
+3. **De strook gaat niet vanzelf open.** Bij het opbouwen staat er al een zin van
+   Rahul in de draad, en die zette hem meteen in beeld: een gesprek dat begint
+   zonder dat je erom vroeg, boven een balk die zegt "kies een wereld".
 
 ## Eén lijst werelden, en waar hij woont
 

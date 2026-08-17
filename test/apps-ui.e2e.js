@@ -437,16 +437,28 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
        handenvrij-balk hangt weg tot je hem roept. Precies het soort gat dat
        niemand ziet: er staat gewoon niets.
 
+       Sinds hij in de SCHILBALK woont (shared/command/praat.js) is dat ook wat
+       hier gemeten wordt: de balk die er al was verandert van taak, met zijn
+       mond ernaast. De zwevende handenvrij-balk die hier eerst stond was een
+       tweede meubel boven een balk die er al was.
+
        DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: haal de Rahul-deur uit
-       systeemBij() in app-main-29c.js, of haal de z-index-regel voor .hv-balk
-       uit command.css -- dan gaat hij wel open maar achter de werktafel. */
+       deuren() in shared/command.js, of haal `.cmd-balk.vraagt{display:flex}`
+       uit het brede-scherm-blok in command.css -- dan doet de deur wel iets
+       maar zie je er niets van. */
     await bankDeur(page, 'Rahul');
-    await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
+    await page.waitForSelector('#rtgCommand .cmd-balk.vraagt .cmd-vraagveld', { state: 'visible', timeout: 15000 });
+    /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
+       vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
+    await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
+    await page.waitForTimeout(350);
     assert.equal(await page.evaluate(() => {
-      const e = document.querySelector('.hv-balk'), r = e.getBoundingClientRect();
+      const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
-      return !!(boven && boven.closest('.hv-balk'));
-    }), true, 'de balk van Rahul gaat open achter de werktafel in plaats van erboven');
+      return !!(boven && boven.closest('.cmd-balk'));
+    }), true, 'de vraagbalk van Rahul gaat open achter iets anders in plaats van erboven');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#rtgCommand .cmd-mondknop canvas')), true,
+      'de mond van Rahul staat niet in de balk');
 
     // en we zijn de werktafel niet kwijt: hij roepen is geen navigatie
     assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/,

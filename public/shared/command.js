@@ -28,17 +28,11 @@
      onboarding zelf zet. Gaat de deur alsnog open (checkOnboarding is
      asynchroon), dan wijkt een werktafel die er al stond; zie init(). */
   function poortDicht(){var g=d.getElementById('onbGate');return !g||g.hidden}
-  /* DE WERKTAFEL DRAAIT OVERAL; `mq` ZEGT ALLEEN NOG HOE HIJ ERUITZIET.
-
-     Hier stond `mq.matches` in de voorwaarde, en dat maakte de breedte tot een
-     vraag over het BESTAAN van de werktafel. Het is nu een vraag over zijn VORM:
-     op een telefoon dezelfde bank en dezelfde tabbladen, alleen komt de bank van
-     onderen als lade en staat er een blad tegelijk in beeld (command.css). Wat
-     niet verandert is het beginscherm -- dat is op beide deze werktafel.
-
-     breed() is daarmee een opmaakvraag en geen grendel. Wie hem als grendel
-     gebruikt zet de breedte terug in de toegangsregel, en dat was de fout
-     hierboven. */
+  /* DE WERKTAFEL DRAAIT OVERAL; `mq` ZEGT ALLEEN NOG HOE HIJ ERUITZIET: op een
+     telefoon komt de bank van onderen als lade en staat er een blad tegelijk in
+     beeld (command.css). Hier stond `mq.matches` in de toegangsvoorwaarde, en
+     dat maakte de breedte tot een vraag over het BESTAAN van de werktafel.
+     breed() is een opmaakvraag en geen grendel. */
   function breed(){return mq.matches}
   function mag(){return aangemeld()&&poortDicht()}
   /* DRIE STANDEN, EN MAAR EEN DAARVAN IS "WEG".
@@ -66,7 +60,7 @@
   function bouwTafel(){
     if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
       open:open,bestemming:bestemming,thuis:thuis,inlog:inlog,
-      werelden:function(){return werelden},systeem:function(){return systeem}});
+      werelden:function(){return werelden},systeem:deuren});
     return tafel;
   }
   /* DE WERELDEN HINGEN OP DE BEZEL OM DE KLOK, en staan nu bovenaan de bank; de
@@ -97,6 +91,15 @@
     systeem=Array.isArray(lijst)?lijst:[];
     if(tafel)tafel.werelden();
   }
+  /* RAHUL HOORT BIJ DE WERKTAFEL, dus levert de werktafel zijn deur zelf. Hij
+     stond eerst in de lijst van app-main en riep RTGRahul.open() aan -- de
+     zwevende handenvrij-balk. Dat is een tweede Rahul naast die in de schilbalk;
+     nu wijzen ze allebei naar dezelfde. De deur blijft nodig naast de mond in
+     die balk, want de balk bestaat alleen op een telefoon. */
+  function deuren(){
+    return [{naam:'Rahul',teken:'mens',doe:rahul}].concat(systeem);
+  }
+  function rahul(){if(!mag())return;bouwTafel().praat()}
   /* THUIS IS HET BEGINSCHERM, EN DAT IS DE LEGE WERKTAFEL. De home-knop op de
      console ging naar de klok; die is weg, en er is nu maar één thuis. */
   function thuis(){if(!tafel)return;tafel.wis();tafel.sync()}
@@ -179,6 +182,7 @@
     land:land,
     werelden:zetWerelden,
     systeem:zetSysteem,
+    rahul:rahul,
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

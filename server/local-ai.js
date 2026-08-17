@@ -59,7 +59,7 @@ class LocalAI extends OpenAI {
     const visionModel = opts.visionModel || process.env.LOCAL_AI_MODEL_VISION || '';
     const tools = opts.tools != null ? opts.tools !== false : process.env.LOCAL_AI_TOOLS !== '0';
     const gewoonRedeneren = opts.reasoningEffort || process.env.LOCAL_AI_REASONING || 'none';
-    const toolRedeneren = opts.toolsReasoningEffort || process.env.LOCAL_AI_REASONING_TOOLS || 'low';
+    const toolRedeneren = opts.toolsReasoningEffort || process.env.LOCAL_AI_REASONING_TOOLS || 'none';
     const beeldRedeneren = opts.visionReasoningEffort || process.env.LOCAL_AI_REASONING_VISION || gewoonRedeneren;
     const baseURL = normaliseerUrl(opts.baseURL || process.env.LOCAL_AI_URL || process.env.LOCAL_AI_BASE_URL,
       opts.lanToestaan === true || process.env.LOCAL_AI_LAN_TOESTAAN === '1');

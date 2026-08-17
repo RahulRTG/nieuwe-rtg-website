@@ -14,6 +14,7 @@ const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
+const { kompasStatus } = require('./ai-kompas');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -91,10 +92,12 @@ function beschikbaarheid(ai) {
   const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
   const hybride = heeftLokaal && heeftExtern;
   const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
+  const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
+  const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
   return {
     beschikbaar,
-    modus: hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig',
-    verwerking: hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
+    modus,
+    verwerking,
     privacy: hybride ? 'kan-extern-verwerken' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
     aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
     mogelijkheden: {
@@ -109,7 +112,8 @@ function beschikbaarheid(ai) {
       uitvoering: 'schermen-en-workflows',
       samenvatten: 'lokale-extractie',
       beslissingen: 'menselijk-akkoord'
-    }
+    },
+    kompas: kompasStatus({ hybride, heeftLokaal, lokaleGrens, beschikbaar })
   };
 }
 

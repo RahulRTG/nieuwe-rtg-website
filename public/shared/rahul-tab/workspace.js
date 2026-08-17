@@ -78,12 +78,24 @@
   }
 
   page.querySelector('[data-build-plan]').onclick=function(){
-    if(command.stel)command.stel('Wat vraagt nu aandacht? Maak een veilige route met NU, STRAKS en LET OP.');
+    var c=command.context();
+    context(c);
+    zet('[data-twin-state]','5 DOMEINEN GESIMULEERD');
+    zet('[data-flow-evidence]','5 domeinen');
+    zet('[data-live-now]','Vijf domeinen lokaal doorgerekend');
+    zet('[data-live-next]','Controleer gevolgen en actieve grens');
+    zet('[data-live-watch]','0 acties uitgevoerd');
+    zet('[data-twin-reason]','Context, rol, bewijs, gevolg en akkoord zijn als pre-flight gesimuleerd.');
+    command.voeg('rahul','Het beslispakket is lokaal gesimuleerd. Context, rol, bewijs, gevolgen en akkoordgrens zijn zichtbaar; er is niets uitgevoerd.');
   };
   page.querySelector('[data-one-decision]').onclick=function(){
     var knop=page.querySelector('[data-approve]');
     if(knop&&!knop.hidden)return knop.click();
-    command.voeg('rahul','Er wacht nu geen uitvoerbaar voorstel. Ik kan wel vergelijken, simuleren en een controleerbare route voorbereiden.');
+    var box=page.querySelector('.rtg-one'),open;
+    box.classList.toggle('reviewing');open=box.classList.contains('reviewing');
+    zet('[data-decision-state]',open?'CONTROLE GEOPEND':'GEEN UITVOERING');
+    this.textContent=open?'Sluit actieve grens':'Bekijk actieve grens →';
+    command.voeg('rahul',open?'Controle geopend. Ik toon gevolgen, bronnen en uitvoeringsstatus; er is nog niets uitgevoerd.':'Controle gesloten. Het beslispakket blijft alleen als voorbereiding zichtbaar.');
   };
   context();
   w.RTGLiveTwin={context:context,denkt:denkt,toon:toon,bevestigd:bevestigd};

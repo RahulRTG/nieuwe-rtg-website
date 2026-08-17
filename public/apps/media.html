@@ -82,6 +82,7 @@
   #clipvlak{margin-bottom:0.5rem;}
   #clipvlak[hidden]{display:none;}
   #clipvlak video{display:block;max-height:40vh;}
+  #filmvlak{position:relative;}
   #clipvlak .ondert{text-align:center;font-size:0.85rem;padding:0.3rem 0;}
   #clipvlak .ondert span{background:rgba(0,0,0,0.7);padding:0.1rem 0.4rem;border-radius:4px;}
 
@@ -193,7 +194,10 @@
 </div>
 
 <footer class="speler" aria-label="Speler">
-  <video id="film" playsinline controls></video>
+  <!-- het eigen vlak om de filmspeler: de ondertitelband (shared/ondertitelband.js)
+       hangt hierin, en niet in de hele spelerbalk -- daar zou hij over de
+       knoppen en de titel vallen. Zelfde vorm als #clipvlak hieronder. -->
+  <div id="filmvlak"><video id="film" playsinline controls></video></div>
   <!-- de clip speelt in zijn eigen vlak: de deler zet er het beeld, de
        ondertitelband en de statusregel in -->
   <div id="clipvlak" hidden>
@@ -222,6 +226,7 @@
      uitdient. Geen tweede exemplaar van het P2P-protocol (LAT.md regel 4);
      hierdoor speelt FLOW een clip hier ter plekke, en dient dit scherm de
      eigen clips ook uit zolang het openstaat. -->
+<script src="/shared/ondertitelband.js"></script>
 <script src="/shared/clipdeler.js"></script>
 <script src="/apps/media/speler.js"></script>
 <script src="/apps/media/wereld.js"></script>

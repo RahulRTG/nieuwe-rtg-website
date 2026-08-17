@@ -14,47 +14,13 @@
   if(!host||document.getElementById('wkRahulTab')||host.querySelector('.rtg-rahul-tab'))return;
 
   var tab=document.createElement('button');tab.type='button';tab.className='rtg-rahul-tab';tab.innerHTML='Rahul<small>KOMPAS</small>';host.appendChild(tab);
-
-  /* DE INKT VAN DE TAB HANGT AF VAN DE BALK WAAR HIJ IN HANGT, en dat kan CSS
-     hier niet weten. style-base.js zette twee vaste grijzen (#99918a voor het
-     woord, #746d67 voor KOMPAS) en die zijn gekozen voor een donkere balk. De
-     a11y-scan mat wat dat oplevert:
-
-       bestellen.html  balk #F7F5F1 (licht)   #99918a  ->  2,85:1
-       wereld.html     balk #0C0C0B (donker)  #746d67  ->  3,78:1
-
-     Allebei te weinig, en in tegengestelde richting -- op een lichte balk is het
-     grijs te licht, op een donkere is de KOMPAS-regel te donker. Een derde vast
-     grijs lost dat niet op: er bestaat geen middengrijs dat op #F7F5F1 EN op
-     #0C0C0B 4,5:1 haalt. Dus meten we de grond en kiezen we de inkt, hetzelfde
-     patroon als de dagkleur-inkt in shared/dagkleur.css.
-
-     De gekozen waarden, doorgerekend: op donker #F2EEE8 (ruim) en #8A8680
-     (5,41:1, de --grey-soft uit CLAUDE.md); op licht #3A3733 (10,9:1) en
-     #5A5651 (6,18:1). !important omdat style-base.js dat ook gebruikt. */
-  (function inkt(){
-    function grondVan(el){
-      for(var n=el;n&&n!==document.documentElement;n=n.parentElement){
-        var m=/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(getComputedStyle(n).backgroundColor||'');
-        if(m&&(m[4]===undefined||Number(m[4])>0.5))return[+m[1],+m[2],+m[3]];
-      }
-      var b=/^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(document.body).backgroundColor||'');
-      return b?[+b[1],+b[2],+b[3]]:[12,12,11];   // zonder grond: de huiskleur, donker
-    }
-    function helderheid(rgb){
-      var k=rgb.map(function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});
-      return 0.2126*k[0]+0.7152*k[1]+0.0722*k[2];
-    }
-    var licht=helderheid(grondVan(host))>0.35;
-    tab.style.setProperty('color',licht?'#3A3733':'#F2EEE8','important');
-    var sub=tab.querySelector('small');
-    if(sub)sub.style.setProperty('color',licht?'#5A5651':'#8A8680','important');
-  })();
   var page=document.createElement('section');page.className='rtg-rahul-page';page.hidden=true;page.setAttribute('aria-label','Rahul Command Workspace');
   page.innerHTML='<header class="rtg-command-head"><button class="rtg-mouth" type="button" aria-label="Praat met Rahul">◡</button><span><b>Rahul</b><small>RTG KOMPAS · LOCAL-FIRST</small></span><span class="rtg-command-state" data-ai-state><i></i>Kompas controleert de veilige route</span><button class="rtg-command-close" type="button" aria-label="Terug naar werkblad">↙</button></header><main class="rtg-command-grid"><section class="rtg-command-context"><span class="rtg-command-ey">LIVE CONTEXT</span><h2 data-greeting>Uw werkruimte is begrepen.</h2><p class="rtg-command-lead" data-context></p><div class="rtg-command-fact"><span>ACTIEVE OMGEVING</span><b data-app></b><small data-selection>Geen selectie gemeten</small></div><div class="rtg-command-rule"><i></i><span>Rahul bereidt voor. Geld, publicatie, toegang en definitieve toezegging vragen menselijk akkoord.</span></div></section><section class="rtg-command-chat"><span class="rtg-command-ey">COMMAND CONVERSATION</span><h1>Van bedoeling<br>naar resultaat.</h1><div class="rtg-command-suggest"></div><div class="rtg-command-log" role="log" aria-live="polite"></div><form class="rtg-command-form"><input aria-label="Vraag Rahul" placeholder="Beschrijf het resultaat dat u wilt…" maxlength="500"><button type="submit" aria-label="Verstuur naar Rahul">→</button></form></section><section class="rtg-command-decisions"><span class="rtg-command-ey">DECISION INBOX</span><h2>Alleen wat u nodig heeft.</h2><div class="rtg-decision"><i>✓</i><p><b>Automatisch uitgevoerd</b><small data-done>Geen uitvoering in deze sessie</small></p><em>LOGBOEK</em></div><div class="rtg-decision"><i>→</i><p><b>Ter controle</b><small>Context en voorstel worden eerst zichtbaar</small></p><em>VEILIG</em></div><div class="rtg-decision"><i>!</i><p><b>Uw beslissing</b><small data-approval>Geen open voorstel</small><button type="button" data-approve hidden>Controleer en bevestig</button></p><em>MENS</em></div><div class="rtg-automation"><header><span>AUTONOMOUS OPERATIONS</span><em>VOORBEREIDEN</em></header><p>Rahul mag binnen uw rol zoeken, vergelijken en voorbereiden. Onomkeerbare stappen blijven geblokkeerd.</p><button type="button" data-policy>Bekijk grenzen</button></div></section></main>';
   document.body.appendChild(page);
   window.__rahulTabDialoog={tab:tab,page:page};
   laadStijl('/shared/rahul-tab/dialog.js');
+  // de inkt van de tab hangt af van de balk waar hij in hangt; zie dat bestand
+  laadStijl('/shared/rahul-tab/inkt.js');
 
 
   var input=page.querySelector('input'),log=page.querySelector('.rtg-command-log'),suggest=page.querySelector('.rtg-command-suggest');

@@ -3182,8 +3182,8 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    ondertitels zijn, maar dat over elk element iemand heeft nagedacht, en dat je
    kunt nalezen wie en waarom.
 
-   HET REGISTER LIEGT DE GATEN NIET WEG. Elf van de dertig staan als OPEN, en dat
-   is de eerlijke stand en geen slordigheid:
+   HET REGISTER LIEGT DE GATEN NIET WEG. Negen van de dertig staan als OPEN, en
+   dat is de eerlijke stand en geen slordigheid:
 
      live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
                          Wat een dove deelnemer hier nodig heeft is live tekst
@@ -3192,11 +3192,13 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
                          wel, en die is niet gehaald.
      live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
                          naar het kantoor.
-     opgenomen (3)       Hier hoort WEL een ondertitelspoor, en het model heeft er
-                         geen veld voor. Het Theater bewaart geen ondertitels bij
-                         een video (TAKEN.md 4.21 noemt dat met zoveel woorden als
-                         niet gebouwd) en een spraakbericht in de teamchat heeft
-                         geen tekstversie.
+     opgenomen (1)       Een spraakbericht in de teamchat heeft geen tekstversie.
+                         Dit waren er drie: het Theater en de filmspeler van de
+                         Media OS hadden geen veld voor ondertitels in het model.
+                         Dat veld is er nu (kern/ondertitels.js, dezelfde bron als
+                         de clip-kant), met een route, een vel waar de maker ze
+                         intypt en een gedeelde band die ze toont -- dus staan die
+                         twee nu als 'ondertiteld' met hun anker erbij.
 
    WAT HIJ MACHINAAL NAKIJKT, want een register met alleen woorden erin is een
    document en geen poort:
@@ -3240,9 +3242,16 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     uitzending:  { open: true },                // live, eenrichting
     onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
   };
-  /* De ratel. Gemeten op 17 augustus 2026: 11 open van 30. Mag alleen omlaag. */
-  const OPEN_MAX = 11;
-  const CLIPBAND = ['public/shared/clipdeler/clipdeler-01.js', 'toonOndertitels'];
+  /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, daarna 9 nadat
+     het Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
+     clip-kant) en de Media OS dezelfde cue-lijst meekrijgt. Mag alleen omlaag. */
+  const OPEN_MAX = 9;
+  /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
+     Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
+     shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
+     oude anker (toonOndertitels in clipdeler-01.js) viel weg en twee elementen
+     zakten. Dat is precies waar een anker voor is. */
+  const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
@@ -3256,7 +3265,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
-    ['public/apps/media.html#film', ['onbedekt', 'een opgenomen film uit het Theater, en daar hangt geen ondertitelspoor bij een video (TAKEN.md 4.21)']],
+    ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
     ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
@@ -3265,7 +3274,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
-    ['public/apps/theater.html#doekVideo', ['onbedekt', 'de bioscoop van het Theater: opgenomen video, zonder veld voor ondertitels in het model (TAKEN.md 4.21)']],
+    ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
     ['public/apps/theater.html#vVoorbeeld', ['spiegel', 'de voorvertoning van je eigen upload, stil, voordat je hem publiceert']],
     ['public/apps/theater.html#js1', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
     ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],

@@ -101,20 +101,14 @@
         if (vid.readyState >= 1) begin();
         vid.addEventListener('timeupdate', function () { if (vid.currentTime >= knip.tot) vid.pause(); });
       }
-      if (c && c.ondertitels && c.ondertitels.length) toonOndertitels(vlak, vid, c.ondertitels);
+      /* De band staat sinds vandaag in shared/ondertitelband.js: het Theater en
+         de Media OS tonen dezelfde cue-lijst, en drie kopieen van "welke regel
+         hoort nu in beeld" lopen uiteen op wat je niet ziet (springen in de
+         tijd, opruimen bij een volgende video). Valt die laag weg, dan speelt de
+         clip gewoon door -- zonder band, en dat is zichtbaar. */
+      if (w.RTGOndertitelband) w.RTGOndertitelband.zet(vlak, vid, (c && c.ondertitels) || []);
       vid.play().catch(function () { vid.muted = true; vid.play().catch(function () {}); });
       var p = vlak.querySelector('img.poster'); if (p) p.remove();
       statusVan(vlak, 'Speelt: rechtstreeks ontvangen, niets bij RTG bewaard');
-    }
-    function toonOndertitels(vlak, vid, regels) {
-      var band = vlak.querySelector('.ondert');
-      if (!band) { band = document.createElement('div'); band.className = 'ondert'; vlak.appendChild(band); }
-      vid.addEventListener('timeupdate', function () {
-        var t = vid.currentTime;
-        var nu = null;
-        for (var i = 0; i < regels.length; i++) if (t >= regels[i].van && t <= regels[i].tot) { nu = regels[i]; break; }
-        band.textContent = '';
-        if (nu) { var s = document.createElement('span'); s.textContent = nu.tekst; band.appendChild(s); }
-      });
     }
 

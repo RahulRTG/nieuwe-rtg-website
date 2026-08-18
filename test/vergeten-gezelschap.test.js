@@ -23,6 +23,26 @@ const fs = require('fs'); const os = require('os'); const path = require('path')
 
 const CODE = 'VERGEETALLEN9';
 
+/* De drie passen in de volgorde waarin ze aan de beurt komen. Staat hier omdat
+   zowel het achterlaten van sporen als het opruimen ervan dezelfde drie
+   doorloopt, en twee lijstjes voor dezelfde drie lopen uiteen. */
+const passenLijst = ['rtg', 'lifestyle', 'business'];
+
+/* Wachten tot iets WAAR is, met een ruime bovengrens. Geen `setTimeout(700)`
+   meer: dat is een gok over de snelheid van de machine, en die gok verliest een
+   toets op een drukke runner zonder dat er iets mis is met de code. Loopt de
+   grens af, dan valt hij gewoon door naar de bewering eronder -- die zakt dan
+   met zijn eigen melding, en niet met "timeout". */
+async function totdat(klopt, wat, ms) {
+  const eind = Date.now() + (Number(ms) || 20000);
+  for (;;) {
+    let ok = false;
+    try { ok = !!(await klopt()); } catch (e) { ok = false; }
+    if (ok || Date.now() >= eind) return ok;
+    await new Promise(r => setTimeout(r, 100));
+  }
+}
+
 /* Takken die een verwijderd lid met NAAM mogen blijven noemen, met de reden.
    Elk hiervan is een keuze die elders is vastgelegd; ze staan hier zodat je ze
    ziet in plaats van dat ze stil door de mazen glippen. */
@@ -66,7 +86,7 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
 
     /* Elk lid laat eerst sporen na. Niet uitputtend -- dat kan niet met ruim
        honderdvijftig takken -- maar wel in de hoeken die per pas verschillen. */
-    for (const naam of ['rtg', 'lifestyle', 'business']) {
+    for (const naam of passenLijst) {
       const lid = g.passen[naam];
       const t = lid.token;
       await post('/api/salon/plaats', { tekst: 'Een woord van ' + lid.naam + '.' }, t);
@@ -85,10 +105,19 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
       assert.equal(r.status, 200, hoger + ' spreekt het RTG-lid aan (anders bewijst de rest niets)');
     }
 
-    await new Promise(r => setTimeout(r, 600));
+    /* WACHTEN OP EEN TOESTAND, NIET OP DE KLOK. Hier stond `setTimeout(600)`:
+       een gok dat de sporen binnen zes tienden op schijf staan. Op een rustige
+       machine klopte die gok altijd, op een belaste CI-runner niet -- en dan
+       zakte deze toets op iets waar hij niets over zegt (job 95666993024,
+       18 augustus 2026). Nu wacht hij tot de sporen er ECHT staan. */
+    const opSchijf = () => {
+      try { return fs.readFileSync(path.join(TMP, 'db.json'), 'utf8'); } catch (e) { return ''; }
+    };
+    await totdat(() => passenLijst.every(n => opSchijf().includes(g.passen[n].key)),
+      'de sporen van alle drie de leden staan op schijf');
 
     // ---- en dan een voor een verwijderen, met de bezem erachteraan ----
-    for (const naam of ['rtg', 'lifestyle', 'business']) {
+    for (const naam of passenLijst) {
       const lid = g.passen[naam];
       const weg = await post('/api/privacy/delete', {}, lid.token);
       assert.equal(weg.status, 200, naam + ': de verwijderroute meldt succes');
@@ -96,22 +125,31 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
       const na = await post('/api/state', {}, lid.token);
       assert.ok(na.status >= 400, naam + ': de sessie is beeindigd');
 
-      await new Promise(r => setTimeout(r, 700));
       const bestand = path.join(TMP, 'db.json');
-      assert.ok(fs.existsSync(bestand), 'er staat een databasebestand');
-      const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));
-
-      const raak = [];
-      for (const [tak, waarde] of Object.entries(data)) {
-        if (MAG_BLIJVEN.has(tak)) continue;
-        const tekst = JSON.stringify(waarde == null ? null : waarde);
-        if (!tekst) continue;
-        const wat = [];
-        if (lid.key && tekst.includes('"' + lid.key + '"')) wat.push('sleutel');
-        if (lid.codenaam && tekst.includes(lid.codenaam)) wat.push('codenaam');
-        if (tekst.includes(lid.naam) || tekst.includes(lid.email)) wat.push('NAAM/E-MAIL');
-        if (wat.length) raak.push(tak + ' (' + wat.join(' + ') + ')');
-      }
+      /* En hetzelfde aan deze kant: de bezem loopt achter het verzoek aan, dus
+         kijken we tot hij klaar is in plaats van tot de klok afloopt. Blijft er
+         werkelijk iets staan, dan zakt hij nog steeds -- met dezelfde takken in
+         de melding. Alleen de gok over HOE SNEL is eruit. */
+      const sporen = () => {
+        if (!fs.existsSync(bestand)) return ['db.json (ontbreekt)'];
+        let data;
+        try { data = JSON.parse(fs.readFileSync(bestand, 'utf8')); }
+        catch (e) { return ['db.json (halverwege een schrijfbeurt)']; }
+        const uit = [];
+        for (const [tak, waarde] of Object.entries(data)) {
+          if (MAG_BLIJVEN.has(tak)) continue;
+          const tekst = JSON.stringify(waarde == null ? null : waarde);
+          if (!tekst) continue;
+          const wat = [];
+          if (lid.key && tekst.includes('"' + lid.key + '"')) wat.push('sleutel');
+          if (lid.codenaam && tekst.includes(lid.codenaam)) wat.push('codenaam');
+          if (tekst.includes(lid.naam) || tekst.includes(lid.email)) wat.push('NAAM/E-MAIL');
+          if (wat.length) uit.push(tak + ' (' + wat.join(' + ') + ')');
+        }
+        return uit;
+      };
+      await totdat(() => sporen().length === 0, naam + ': de bezem is klaar');
+      const raak = sporen();
       assert.deepEqual(raak, [],
         'na het verwijderen van het ' + naam.toUpperCase() + '-lid staat het nog in deze takken; ' +
         'elke tak hier is een plek waar het recht op vergetelheid niet is nagekomen:\n  ' + raak.join('\n  '));

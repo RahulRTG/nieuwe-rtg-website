@@ -205,9 +205,9 @@
     },
     "wereld-geen-twee-beginschermen": {
       "stand": "blind",
-      "afdruk": "acdd3776421c2bd8",
-      "reden": "deze wachter was al rood voordat er iets gesaboteerd was (zonder voorkeur opent het beginscherm in de wereldstand, met de tegels weg); zijn rood bewijst hier niets",
-      "wachter": "e2e:test/wereld.e2e.js"
+      "afdruk": "132d10527e2099dd",
+      "reden": "deze wachter was al rood voordat er iets gesaboteerd was (Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur); zijn rood bewijst hier niets",
+      "wachter": "e2e:test/appmenu.e2e.js"
     },
     "techniek-geen-productie-zonder-grootboek": {
       "stand": "raak",

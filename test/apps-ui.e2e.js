@@ -28,18 +28,23 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) })).json();
 }
 
-// RTG Command is de landing op elke breedte. Op een telefoon zit de bank in
-// een lade; via Beginscherm vouwt de gebruiker de werktafel op naar de klok en
-// de thuislaag. Schermtests die juist die thuislaag meten volgen dezelfde weg.
-async function naarLedenThuis(page) {
+/* RTG Command is de landing op elke breedte, en sinds het springboard als
+   scherm verdween (WERELD.md) is er niets meer om naar op te vouwen. Deze helper
+   klikte de knop die dat deed; hij opent nu de deur in de VOET van de bank, en
+   dat is dezelfde weg die een lid heeft. `naam` is de tekst op die deur. */
+async function bankDeur(page, naam) {
   await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
   const lade = page.locator('#rtgCommand .cmd-lade');
   if (await lade.isVisible()) {
     await lade.click();
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
-  await page.click('#rtgCommand .cmd-klok');
-  await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
+  await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
+    .some((b) => b.textContent.trim() === n), naam, { timeout: 15000 });
+  await page.evaluate((n) => {
+    [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
+      .find((b) => b.textContent.trim() === n).click();
+  }, naam);
 }
 
 // Gedeeld stramien: zet tokens/keys in localStorage, open de app, wacht tot het
@@ -52,16 +57,25 @@ async function bootTest(opts) {
     const keys = await opts.tokens(base); // { rtg_sup_token: '...', ... }
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
+    /* DE INTAKE STAAT BUITEN DIT STRAMIEN. Een vers geregistreerd lid is niet
+       `klaar`, dus opent app-main het onboardinggesprek en gaat #onbGate open
+       -- en daar mag de werktafel niet overheen (shared/command.js). Deze
+       toetsen gaan over "komt het scherm beveiligd op na herstel van de
+       sessie", niet over de ondertekening; die heeft zijn eigen toets in
+       test/werktafel.e2e.js, en dat is de plek waar de grendel hoort te zakken.
+       Mocken is wat de rest van deze suite hieronder ook doet. */
+    await page.route('**/api/onboarding/status', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
     await page.addInitScript((kv) => {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
-      /* Het beginscherm opent standaard in de wereldstand (de kring om de klok,
-         shared/wereld.js); daar staan de maprijen op display:none en levert een
-         meting van hun plaats nullen op. Deze toetsen gaan over het ROOSTER, dus
-         zetten ze dat aan. De wereldstand wordt in test/wereld.e2e.js gemeten. */
-      localStorage.setItem('rtg_os_wereld', 'uit');
+      /* HIER STOND rtg_os_wereld = 'uit', om het rooster af te dwingen: het
+         beginscherm had daarnaast een wereldstand (de kring om de klok) waarin
+         de maprijen op display:none stonden. Die stand bestaat niet meer -- de
+         klok is met het beginscherm meegegaan, zie WERELD.md -- dus is het
+         rooster de enige vorm en zet deze toets niets meer voor. */
     }, keys);
     await page.goto(base + opts.pad, { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
@@ -99,66 +113,57 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(reg.token, 'lid-registratie geeft een token');
       return { rtg_member_token: reg.token };
     },
-    /* Het beginscherm is het OS: de begroeting, de mappen boven de klok, de
-       klok zelf, de functierij eronder en de balk van Rahul. De ledenpas
-       staat er bewust NIET meer op -- die ligt in de wallet (zie de toets
-       hieronder). De reiskaart is verhuisd naar de app Reizen, maar wordt nog
-       steeds bij het opstarten gevuld, dus die controleren we hier gewoon. */
+    /* HET BEGINSCHERM IS DE WERKTAFEL, EN DEZE TOETS IS MEEVERHUISD.
+
+       Hij mat het springboard: de passregel, de mappen, de functierij, de klok
+       ertussen en de balk van Rahul onderaan. Dat scherm is er niet meer
+       (WERELD.md) -- wie inlogt landt op de werktafel van RTG Command, met de
+       drie werelden bovenaan de bank.
+
+       Wat blijft is dat de sessie ECHT is hersteld, en dat is nog steeds waar
+       deze toets over gaat: de registry achter de bank is gevuld (dat is
+       dezelfde MAPPEN als altijd), de werktafel staat open op een lege keuze,
+       en de reisgegevens zijn opgehaald. */
     na: async (page) => {
-      /* De begroeting ("Ha <naam>, goed je te zien.") stond hier; die is van het
-         beginscherm af (zie de opmerking bij .os-thuisscherm in apps/app.html).
-         Wat er staat is de regel eronder: welke pas, en sinds wanneer. Die is
-         geen begroeting maar een stand van zaken, en hij is nog steeds het
-         eerste dat het scherm zelf invult -- dus nog steeds het teken dat het
-         beginscherm echt is opgebouwd. */
-      await page.waitForSelector('#homeSub', { timeout: 5000 });
+      await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 15000 });
+      await page.waitForFunction(() => {
+        const nav = document.querySelector('#rtgCommand .cmd-nav');
+        return !!nav && [...nav.querySelectorAll('button[data-url]')]
+          .some((b) => /\/apps\/rtg\.html$/.test(b.dataset.url));
+      }, null, { timeout: 20000 });
+
+      const start = await page.evaluate(() => {
+        const nav = document.querySelector('#rtgCommand .cmd-nav');
+        const zicht = (s) => { const e = document.querySelector(s); if (!e) return null;
+          const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+        return {
+          koppen: [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim()),
+          werelden: [...nav.querySelectorAll('button[data-url]')].map((b) => b.dataset.url)
+            .filter((u) => /^\/apps\/(rtg|kantoor|foundation)/.test(u)),
+          leeg: (document.querySelector('#rtgCommand .cmd-leeg') || {}).textContent || '',
+          springboard: zicht('.os-thuisscherm'),
+          klok: !!document.getElementById('homeKlok')
+        };
+      });
+      assert.deepEqual(start.koppen, ['Werelden', 'Software'],
+        'de bank scheidt de werelden niet van de software: ' + start.koppen.join(', '));
+      assert.deepEqual(start.werelden,
+        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
+        'de drie werelden staan niet in de bank');
+      assert.match(start.leeg, /Kies een wereld/i,
+        'de werktafel begint niet op een lege keuze: "' + start.leeg + '"');
+      assert.equal(start.springboard, false, 'het springboard staat weer in beeld');
+      assert.equal(start.klok, false, 'de klok is terug op het beginscherm');
+
+      /* De passregel en de reiskaart worden nog steeds bij het opstarten gevuld
+         -- ze staan alleen niet meer op een scherm. Dat ze gevuld ZIJN is het
+         teken dat de sessie werkelijk is hersteld, en dat is wat hier telt. */
       await page.waitForFunction(() => {
         const e = document.getElementById('homeSub');
         return e && e.textContent.trim().length > 0;
-      }, null, { timeout: 5000 });
+      }, null, { timeout: 10000 });
       assert.match(await page.textContent('#homeSub'), /lid sinds|member since/i,
-        'de passregel staat er');
-      assert.equal(await page.evaluate(() => !!document.getElementById('homeGreeting')), false,
-        'de begroeting hoort van het beginscherm af te zijn');
-      const thuis = await page.evaluate(() => ({
-        tegels: [...document.querySelectorAll('#osMappen .os-app')]
-          .map(b => ({ sleutel: b.dataset.sleutel || '', naam: (b.getAttribute('aria-label') || '').trim() })),
-        functies: [...document.querySelectorAll('#osFuncties .os-app')].map(b => b.getAttribute('aria-label')),
-        klok: !!document.querySelector('#homeKlok svg'),
-        balk: !!document.querySelector('#osAiBalk #osAiIn'),
-        // de vier lagen staan in deze volgorde onder elkaar
-        y: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
-          .map(s => Math.round(document.querySelector(s).getBoundingClientRect().top))
-      }));
-      assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
-      assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
-
-      /* DRIE HOOFDWERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
-
-         HIER STOND DE VORIGE AFSPRAAK, en die is een eigenaarsbesluit later
-         vervangen. De eis was: vier vaste tegels onder de klok (Bellen,
-         Berichten, Videobellen, Wallet -- later Berichten, Camera, Wallet en
-         Snaps). Die rij bestaat niet meer. Bellen en videobellen zijn opgegaan
-         in de ene communicatie-app, Berichten en Camera wonen in Sociaal, en de
-         wallet IS de Geld-wereld. FUNCTIES in app-main-24.js staat daarom
-         bewust leeg, met de reden erbij.
-
-         Deze toets bewaakte dus de afgeschafte regel en stond rood om iets dat
-         met opzet zo is -- en een toets die rood staat om een besluit, is een
-         toets die niemand meer leest. Wat hij nu bewaakt is de regel die WEL
-         geldt, en die is scherper dan "de rij is leeg": elke tegel op het
-         beginscherm hoort een WERELD te zijn. Zet iemand er een losse app naast
-         (precies de uitzondering die de afspraak uitholt), dan zakt hij. */
-      assert.deepEqual(thuis.tegels.map((t) => t.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
-        'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
-      const geenWereld = thuis.tegels.filter(t => !/^map-/.test(t.sleutel));
-      assert.deepEqual(geenWereld, [],
-        'er staat iets op het beginscherm dat geen wereld is: ' +
-        geenWereld.map(t => t.naam + ' (' + t.sleutel + ')').join(', '));
-      assert.deepEqual(thuis.functies, [],
-        'de functierij hoort leeg te zijn -- de drie hoofdwerelden dragen alles: ' + thuis.functies.join(', '));
-      assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
-        'de volgorde is mappen, klok, functies, balk');
+        'de passregel is niet gevuld; dan is de sessie niet echt hersteld');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
     }
   });
@@ -360,16 +365,25 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
-    await naarLedenThuis(page);
 
     /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
 
-       De weg erheen is een tik op Rahuls mond in de balk onderaan het
-       beginscherm: dan opent zijn hele app. Typen in de balk zelf doet iets
-       anders sinds die balk een gesprek werd -- dan antwoordt hij daar, op het
-       beginscherm, en blijf je thuis. (De oude tabbalk bestaat nog als model,
-       maar is onzichtbaar; daar klikken loopt vast op een timeout.) */
-    await page.click('#osAiOrb');
+       DE WEG ERHEEN IS VERHUISD, DE MEETPLEK NIET. Hier stond een tik op Rahuls
+       mond in de balk onderaan het springboard. Dat scherm is weg (WERELD.md);
+       wat een lid nu heeft is het bedieningspaneel uit de voet van de bank, en
+       daarin Zoeken -- dat is Spotlight, en die brengt je met "Laat Rahul dit
+       doen" naar precies hetzelfde scherm. Wat er daarna gemeten wordt is
+       ongewijzigd: #chat mag de payload nooit uitvoeren. */
+    await bankDeur(page, 'Bedieningspaneel');
+    await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
+    await page.click('#osCcZoek');
+    await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
+    await page.fill('#osZoekInput', 'iets vragen');
+    await page.evaluate(() => {
+      const b = [...document.querySelectorAll('#osZoekLijst button')]
+        .find((x) => /Laat Rahul dit doen/i.test(x.textContent));
+      b.click();
+    });
     await page.waitForSelector('#askInput', { state: 'visible', timeout: 10000 });
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
@@ -412,40 +426,54 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     await page.addInitScript(t => {
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
-      /* DEZE TOETS MEET DE DRAAD, dus zet hij de stand aan waarin de draad
-         openstaat: het rooster. Het beginscherm opent tegenwoordig standaard in
-         de wereldstand, en daar houdt Rahul het bewust bij EEN zin in een gouden
-         ring; de draad blijft dicht tot je hem opent, anders staat dezelfde zin
-         er twee keer onder elkaar (zie wereld.css).
-
-         De belofte hierboven verandert daar niet door -- hij begint nog steeds
-         uit zichzelf en antwoordt nog steeds zonder dat je het beginscherm
-         verlaat -- alleen de VORM verschilt, en die vorm wordt gemeten in
-         test/wereld.e2e.js ("Rahul zegt het EEN keer"). Wie deze regel weghaalt,
-         meet de ene vorm met de eisen van de andere. */
-      localStorage.setItem('rtg_os_wereld', 'uit');
     }, reg.token);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
-    await naarLedenThuis(page);
 
-    // 1. hij begint uit zichzelf: er staat een zin van Rahul in de draad
-    await page.waitForSelector('#osAiDraad .os-bel.van-rahul', { timeout: 10000 });
-    const opening = await page.textContent('#osAiDraad .os-bel.van-rahul');
-    assert.ok(opening && opening.trim().length > 5, 'Rahul opent met een zin: ' + opening);
+    /* DE BELOFTE IS DEZELFDE, DE PLEK NIET.
 
-    // 2. een vraag wordt daar beantwoord, en we blijven op het beginscherm
-    await page.fill('#osAiIn', '<b>wat kun je</b>');
-    await page.evaluate(() => document.getElementById('osAiBalk').requestSubmit());
-    await page.waitForSelector('#osAiDraad .os-bel.van-mij', { timeout: 10000 });
-    await page.waitForFunction(() => document.querySelectorAll('#osAiDraad .os-bel.van-rahul').length >= 2, null, { timeout: 15000 });
-    assert.equal(await page.evaluate(() => document.querySelector('.view.active').dataset.view), 'home',
-      'we zijn niet weggenavigeerd; het antwoord komt op het beginscherm');
+       Deze toets mat de draad van Rahul onderaan het springboard: hij begon uit
+       zichzelf, je stelde er een vraag, en het antwoord kwam daar terug zonder
+       dat je het beginscherm verliet. Dat springboard is weg (WERELD.md), en
+       daarmee ook zijn draad -- als SCHERM. De belofte niet: op de werktafel
+       roep je hem uit de voet van de bank, en dan staat hij er.
 
-    // 3. wat er staat is tekst, geen opmaak die is uitgevoerd
-    assert.equal(await page.evaluate(() => document.querySelectorAll('#osAiDraad b').length), 0,
-      'de <b> uit het bericht is niet als opmaak uitgevoerd');
-    assert.match(await page.textContent('#osAiDraad .os-bel.van-mij'), /<b>/, 'hij staat leesbaar als tekst');
+       Dat die deur er staat is geen detail maar de reden dat deze toets
+       herschreven is en niet geschrapt: gemeten in de browser was Rahul na het
+       verdwijnen van het springboard NERGENS meer aanklikbaar -- zijn console in
+       de werktafel wordt verborgen door shared/rahul-tab/style-base.js, de tab
+       die daarvoor in de plaats komt vindt hier geen gastheer, en de
+       handenvrij-balk hangt weg tot je hem roept. Precies het soort gat dat
+       niemand ziet: er staat gewoon niets.
+
+       Sinds hij in de SCHILBALK woont (shared/command/praat.js) is dat ook wat
+       hier gemeten wordt: de balk die er al was verandert van taak, met zijn
+       mond ernaast. De zwevende handenvrij-balk die hier eerst stond was een
+       tweede meubel boven een balk die er al was.
+
+       DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: haal de Rahul-deur uit
+       deuren() in shared/command.js, of haal `.cmd-balk.vraagt{display:flex}`
+       uit het brede-scherm-blok in command.css -- dan doet de deur wel iets
+       maar zie je er niets van. */
+    await bankDeur(page, 'Rahul');
+    await page.waitForSelector('#rtgCommand .cmd-balk.vraagt .cmd-vraagveld', { state: 'visible', timeout: 15000 });
+    /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
+       vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
+    await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
+    await page.waitForTimeout(350);
+    assert.equal(await page.evaluate(() => {
+      const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
+      const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
+      return !!(boven && boven.closest('.cmd-balk'));
+    }), true, 'de vraagbalk van Rahul gaat open achter iets anders in plaats van erboven');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#rtgCommand .cmd-mondknop canvas')), true,
+      'de mond van Rahul staat niet in de balk');
+
+    // en we zijn de werktafel niet kwijt: hij roepen is geen navigatie
+    assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/,
+      'Rahul roepen bracht ons van de werktafel af');
+    assert.equal(await page.evaluate(() => !!document.getElementById('rtgCommand')), true,
+      'de werktafel is verdwenen toen Rahul openging');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het gesprek');
   } finally {
@@ -496,7 +524,13 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
   });
 });
 
-/* De klok op het beginscherm is rond, en zijn vak hoort dat ook te zijn.
+/* De klok is rond, en zijn vak hoort dat ook te zijn.
+
+   DEZE TOETS IS MEEVERHUISD MET DE KLOK. Hij mat de klok op het beginscherm;
+   dat beginscherm is de werktafel geworden en de klok is er af (WERELD.md).
+   Het horloge staat nog op een plek -- de inlogpoort -- en de belofte die deze
+   toets bewaakt is precies dezelfde gebleven, want het is dezelfde kast uit
+   shared/klok.js. Weghalen zou de wachter kwijtmaken samen met het scherm.
 
    Waarom dit een toets verdient. De schaduw van de klok zit op een
    pseudo-element met border-radius:50% over het VAK van .rtg-ring. Zolang dat
@@ -512,26 +546,25 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
    browser de hoogte staan. Beide bovengrenzen moeten dus gelijk zijn. Deze
    toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
    vak alsnog scheef wordt getrokken. */
-test('Leden-app: het vak van de klok op het beginscherm is vierkant, dus de schaduw is rond',
+test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const reg = await api(base, '/api/auth/register', { name: 'Klok Lid', email: 'klokvak@x.nl', phone: '0612345702',
-      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
-    assert.ok(reg.token, 'lid-registratie geeft een token');
-
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     // een smalle, hoge telefoon: juist daar knijpt max-width de breedte af
     const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
-    await ctx.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    await ctx.addInitScript(() => {
+      try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+    });
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    // zonder token: dan staat de poort er, en daar hangt de klok
+    await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
 
-    await page.waitForSelector('.os-home-klok.rtg-ring svg', { timeout: 15000 });
+    await page.waitForSelector('#gate .rtg-ring svg', { timeout: 15000 });
     const vak = await page.evaluate(() => {
-      const k = document.querySelector('.os-home-klok.rtg-ring');
+      const k = document.querySelector('#gate .rtg-ring');
       const b = k.getBoundingClientRect();
       return { breed: Math.round(b.width), hoog: Math.round(b.height) };
     });

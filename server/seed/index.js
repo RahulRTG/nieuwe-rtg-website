@@ -23,6 +23,11 @@ module.exports = function seed() {
     partners: [],       // geen demo-partnerkanalen (influencer/bedrijf)
     partnerTrips: [],   // geen fictieve reizen op boeken.html
     invoices: [],
+    /* En de voorbeeldREIS ook niet. Die bleef hier staan terwijl de facturen al
+       weg waren, en werd via db.data.trip alsnog getoond als "de komende reis"
+       -- in de system prompt van Rahul en in de partnerlijst per stad. Een
+       productie-installatie hoort geen bestemming te kennen die niemand boekte. */
+    trip: null,
     contacts: [],
     /* Het Living Lab start in productie leeg: een echt lab hoort door de RTF
        zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt

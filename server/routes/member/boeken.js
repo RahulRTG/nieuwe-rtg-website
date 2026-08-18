@@ -8,7 +8,7 @@ module.exports = (kern) => {
     optieAan, zorgVoor, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
     notifySupplier, sseToSupplier, sseToOffice, gcCode, PERSONAS, publicSupplier,
     isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
-    txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop} = kern;
+    txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop, ledenInhoudVan} = kern;
 
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -104,7 +104,12 @@ module.exports = (kern) => {
     // De Salon is verplicht: partners zonder compleet Salon-profiel tonen we niet
     const list = db.data.suppliers.filter(s => (!city || s.city === city) && salonZichtbaar(s))
       .map(s => ({ ...publicSupplier(s, req.body.lang), favoriet: isFavoriet(req.session.key, s.code) }));
-    res.json({ suppliers: list, city: db.data.trip.dest });
+    /* De stad die terugkomt is die van de EIGEN reis van het lid. Hier stond
+       `db.data.trip.dest`, de bestemming uit de demo-seed: elk lid kreeg "RTG-partners
+       in Ibiza" te lezen, ook wie nergens heen ging. Zonder reis blijft het veld
+       leeg en zegt het scherm zelf wat er nodig is. */
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(req.session.key) || {}) : {}).trip || null;
+    res.json({ suppliers: list, city: city || (eigenReis ? eigenReis.dest : null) });
   });
 
   app.post('/api/order', auth, (req, res) => {

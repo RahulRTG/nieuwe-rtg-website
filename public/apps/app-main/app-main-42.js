@@ -43,19 +43,41 @@
 
     // Deze twee kaarten met Util.el: tekst structureel veilig, data-goto blijft
     // (de globale [data-goto]-binding onderaan pakt de knoppen op).
-    Util.vervang($('#homeTrip'),
-      E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
-      E('div', { class: 'big' }, trip.dest),
-      E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
-      E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →'));
+    /* GEEN REIS IS EEN UITNODIGING, GEEN LEEG VAK.
+
+       Een nieuw account begint leeg (server/kern/lid.js), dus dit is het eerste
+       dat een echt nieuw lid hier ziet. Vroeger stond er de reis van de demo --
+       Ibiza, een villa in Cala Jondal -- en dat leek een boeking op zijn naam.
+       Nu staat er wat dit vak IS en wat het lid moet doen om het te vullen. */
+    Util.vervang($('#homeTrip'), trip
+      ? [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+         E('div', { class: 'big' }, trip.dest),
+         E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
+         E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →')]
+      : [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+         E('div', { class: 'big' }, T('app.notrip', 'Nog niets gepland')),
+         E('div', { class: 'meta' }, stem(
+             'Zeg Rahul waar je heen wilt. Hij zoekt het uit, vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.',
+             'Geef Rahul de bestemming en de data. Hij vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.',
+             'Zegt u Rahul waar het heen mag. Hij zoekt het uit, vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.')
+           || T('app.notrip.sub', 'Tell Rahul where you want to go. He arranges it with our partners and it appears here: flight, stay, transfer and tables in one place.')),
+         E('button', { class: 'go', dataset: { goto: 'ai' } },
+           (stem('Vertel Rahul waar je heen wilt', 'Geef Rahul de bestemming', 'Vertelt u Rahul waar het heen mag')
+             || T('app.notrip.go', 'Tell Rahul where to')) + ' →')]);
     Util.vervang($('#homePay'), open.length
       ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
          E('div', { class: 'big accent' }, eur(openSum)),
          E('div', { class: 'meta' }, open.length + ' ' + (open.length === 1 ? T('app.payment', 'betaling') : T('app.payments', 'betalingen')) + ' · ' + T('app.onetapfid', 'één tik met Face ID')),
          E('button', { class: 'go', dataset: { goto: 'betalen' } }, T('app.paynow', 'Nu betalen') + ' →')]
-      : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
-         E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
-         E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]);
+      : invoices.length
+        ? [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+           E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
+           E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]
+        // nog nooit een factuur: zeg wat hier komt te staan in plaats van
+        // "alles voldaan" over een lijst die niet bestaat
+        : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+           E('div', { class: 'big' }, T('app.nobills', 'Nog geen rekeningen')),
+           E('div', { class: 'meta' }, T('app.nobills.sub', 'Wat RTG voor u regelt en wat u bij partners besteedt, komt hier te staan, met btw en afboekcode erbij.'))]);
     $('#homeSalon').innerHTML =
       '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
       '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +

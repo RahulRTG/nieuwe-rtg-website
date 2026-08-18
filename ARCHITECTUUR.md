@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3965 |
-| servermodules (`server/**/*.js`) | 2160 |
-| routebestanden (`server/routes/**`) | 449 |
+| servermodules (`server/**/*.js`) | 2161 |
+| routebestanden (`server/routes/**`) | 450 |
 | kernmodules (`server/kern/**`) | 1324 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 217 |
-| toetsbestanden (`test/*.test.js`) | 885 |
+| toetsbestanden (`test/*.test.js`) | 886 |
 | schermtoetsen (`test/*.e2e.js`) | 124 |
 
 ## 2. De weg van een verzoek
@@ -100,8 +100,8 @@ zie §5 -- er zijn nog 188 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 5 | 8 | 46 |
-| `member` | 641 | 57 | 10 | 398 |
+| `auth` | 19 | 5 | 8 | 53 |
+| `member` | 641 | 57 | 10 | 399 |
 | `supplier` | 562 | 102 | 10 | 294 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -123,9 +123,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1395 |
+| kern-namen die routes aanraken | 1403 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 188 |
-| daarvan door precies één domein | 1207 |
+| daarvan door precies één domein | 1215 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -150,6 +150,7 @@ loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
+| 42 | `server/routes/auth/account.js` |
 | 41 | `server/routes/member/voertuigen/huur.js` |
 | 40 | `server/routes/member/voertuigen/charter.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
@@ -157,7 +158,6 @@ loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 36 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
-| 35 | `server/routes/auth/account.js` |
 | 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat

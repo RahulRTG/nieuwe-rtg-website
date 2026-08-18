@@ -20,6 +20,23 @@
   /* ---------- reizen ---------- */
 
   function renderTrip(){
+    /* Nog geen reis: dan staat hier wat een reisoverzicht IS en hoe het ontstaat.
+       Een nieuw account begint leeg en erft de demo-reis niet meer. */
+    if (!trip){
+      $('#tripSub').textContent = T('app.trip.emptysub','Uw reisoverzicht is nog leeg.');
+      const uitleg = (k, kop, tekst) =>
+        '<div class="rowitem"><div class="t"><b>' + T('app.trip.' + k, kop) + '</b><span>' +
+          T('app.trip.' + k + 's', tekst) + '</span></div></div>';
+      $('#tripList').innerHTML =
+        uitleg('e1', 'Vlucht, verblijf en transfer',
+          'Alles wat RTG aanvraagt komt hier per dag onder elkaar te staan, met de status erbij.') +
+        uitleg('e2', 'Wat nog niet vaststaat',
+          'Een aanvraag blijft een aanvraag tot de partner ja zegt. RTG bevestigt niets namens hen.') +
+        uitleg('e3', 'Beginnen doe je bij Rahul',
+          'Zeg waar het heen mag en wanneer. Hij zoekt het uit, legt het voor en zet het hier neer.');
+      renderAgenda();
+      return;
+    }
     $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
     $('#tripList').innerHTML = trip.items.map(it =>
       '<div class="rowitem">' +
@@ -74,7 +91,7 @@
       for (const inv of targets){
         inv.status = 'paid'; inv.date = 'Zojuist betaald';
         foundation += Math.round(inv.bijdrage * 0.3);
-        for (const t of trip.items) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+        for (const t of (trip ? trip.items : [])) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
       }
     }
     return foundation;

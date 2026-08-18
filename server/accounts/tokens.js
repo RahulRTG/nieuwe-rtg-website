@@ -5,6 +5,7 @@
 const crypto = require('crypto');
 const S = require('./state');
 const kluis = require('./kluis');
+const { veiligGelijk } = require('../kern/util');
 const mirror = require('./mirror');
 
 /* DE ENE VORM VAN EEN TOKEN.
@@ -118,7 +119,12 @@ function maakTokens(getUserById) {
       const [b64, sig] = String(token).split('.');
       if (!b64 || !sig) return null;
       const body = Buffer.from(b64, 'base64url').toString();
-      if (kluis.sign(body) !== sig) return null;
+      /* veiligGelijk en geen !==: dit is de handtekening van het SESSIETOKEN.
+         Een gewone stringvergelijking stopt bij het eerste verschillende teken,
+         dus de tijd verraadt hoeveel tekens er klopten. Precies deze redenering
+         staat al bij de clustersleutel in server.js -- en uitgerekend de deur
+         waar elk verzoek langskomt stond nog op de kale vergelijking. */
+      if (!veiligGelijk(kluis.sign(body), sig)) return null;
       const [id, exp, uitgegeven] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
@@ -146,7 +152,10 @@ function maakTokens(getUserById) {
     if (!token) return null;
     try {
       const [b64, sig] = String(token).split('.');
-      if (!b64 || !sig || kluis.sign(Buffer.from(b64, 'base64url').toString()) !== sig) return null;
+      if (!b64 || !sig) return null;
+      // zelfde reden als bij verifyToken hierboven: de handtekening van een
+      // actie-token (e-mailbevestiging, SSO-overdracht) is net zo goed een geheim
+      if (!veiligGelijk(kluis.sign(Buffer.from(b64, 'base64url').toString()), sig)) return null;
       const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
       if (p !== purpose || Number(exp) < Date.now()) return null;
       /* Zonder deze regel is trekInActie een gebaar: het token staat dan wel op

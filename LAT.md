@@ -315,7 +315,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 36 codeafspraken, binair | `scripts/check.js` |
+| 49 codeafspraken, binair | `scripts/check.js` |
+| geen geheim uit `Math.random()`, geen handtekening met `!==` vergeleken | `scripts/check.js` regel 49 |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |

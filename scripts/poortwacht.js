@@ -38,6 +38,9 @@
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');
+/* Hetzelfde plausibele lijf als de rolproef; twee versies van "geloofwaardige
+   invoer" lopen gegarandeerd uiteen (LAT.md regel 4). */
+const { plausibelLijf } = require('./lib/rolproef');
 const { stempel } = require('./lib/stempel');
 
 const args = process.argv.slice(2);
@@ -146,7 +149,10 @@ const PUBLIEK = new Map([
    servers zijn anders niet met elkaar te vergelijken, en dat is precies hoe een
    configuratieverschil er als een bevinding uit gaat zien. */
 
-const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };
+/* `pasNaLijf`: routes die pas bij de TWEEDE klop lieten zien dat ze een slot
+   hebben. Apart geteld, want dat is precies de winst van die tweede klop -- en
+   zonder eigen getal is niet te zien of hij nog iets oplevert. */
+const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0, pasNaLijf: 0 };
 /* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
    hetzelfde oordeel dat hierboven wordt opgeteld -- geen tweede waarheid. */
 const perRoute = [];
@@ -164,17 +170,50 @@ function routekaart() {
    toetsen de poort, niet of het ding bestaat. */
 const vulPad = (pad) => pad.replace(/:([A-Za-z0-9_]+)/g, 'zzz-bestaat-niet');
 
-async function klop(pad, methode) {
+async function klop(pad, methode, lijf) {
   const url = BASIS + vulPad(pad);
   const opt = { method: methode === 'ALL' ? 'POST' : methode, redirect: 'manual' };
   if (opt.method !== 'GET' && opt.method !== 'HEAD') {
     opt.headers = { 'Content-Type': 'application/json' };
-    opt.body = '{}';
+    opt.body = JSON.stringify(lijf || {});
   }
   try {
     const r = await fetch(url, opt);
     return { status: r.status, tekst: (await r.text()).slice(0, 300) };
   } catch (e) { return { status: 0, tekst: String(e.message) }; }
+}
+
+/* ---- HET OORDEEL, ALS PURE FUNCTIE ----
+
+   EEN PLEK WAAR HET OORDEEL VALT, en buiten de meetlus zodat een toets hem kan
+   vastpakken zonder een server te starten. Dat is geen nettigheid: bij de
+   OUTPUT-as zat precies zo'n oordeel opgesloten in de lus, en daardoor kon
+   niemand met een mutatie natrekken of de regel wel ooit kon vuren. Hij kon het
+   niet -- nul bewezen op 4185 routes, en de suite bleef groen.
+
+   `eerste` en `tweede` zijn statuscodes (0 = onbereikbaar); `tweede` is null als
+   er geen tweede klop nodig was. `publiek` zegt of dit pad met opzet open staat.
+
+   DE TWEEDE KLOP, EN WAAROM HIJ ER IS. Een lege `{}` naar een route die eerst
+   zijn invoer valideert geeft 400 of 404, en dat zegt NIETS over een slot: de
+   validatie was gewoon eerder aan de beurt dan de autorisatie. 300 routes
+   heetten daarom `stil` -- eerlijk, en onbeslist. De tweede klop stuurt hetzelfde
+   plausibele lijf als de rolproef en nog steeds GEEN token. Komt er dan 401 of
+   403, dan is de route wel degelijk dicht. Komt er 2xx, dan gaat hij zonder
+   sleutel open, en dat is een bevinding die de eerste klop niet zag. */
+function oordeelVan(eerste, tweede, publiek) {
+  const dicht = (s) => s === 401 || s === 403;
+  const open = (s) => s >= 200 && s < 300;
+  if (eerste === 0) return { oordeel: 'onbereikbaar', pasNaLijf: false };
+  if (dicht(eerste)) return { oordeel: 'dicht', pasNaLijf: false };
+  if (open(eerste)) return { oordeel: publiek ? 'publiek' : 'open', pasNaLijf: false };
+  /* Vanaf hier was de eerste klop onbeslist. Zonder tweede klop blijft dat zo --
+     en dat is met opzet geen 'dicht': niet weten is iets anders dan weten dat er
+     iets is (LAT.md regel 3). */
+  if (tweede === null || tweede === undefined) return { oordeel: 'stil', pasNaLijf: false };
+  if (dicht(tweede)) return { oordeel: 'dicht', pasNaLijf: true };
+  if (open(tweede)) return { oordeel: publiek ? 'publiek' : 'open', pasNaLijf: true };
+  return { oordeel: 'stil', pasNaLijf: false };
 }
 
 async function ronde() {
@@ -190,21 +229,41 @@ async function ronde() {
            Eerst stond het oordeel in de tellingen zelf verweven; wie er een
            tweede uitvoer naast zet, bouwt dan onvermijdelijk een tweede
            waarheid die er langzaam naast gaat lopen. */
-        let oordeel;
-        if (a.status === 0) { uit.fout++; oordeel = 'onbereikbaar'; }
-        else if (a.status === 401 || a.status === 403) { uit.dicht++; oordeel = 'dicht'; }
-        else if (a.status >= 200 && a.status < 300) {
-          if (PUBLIEK.has(r.pad)) { uit.publiek++; oordeel = 'publiek'; }
-          else {
-            uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
-            oordeel = 'open';
-          }
-        } else { uit.stil++; oordeel = 'stil'; }
-        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status, oordeel });
+        const publiek = PUBLIEK.has(r.pad);
+        /* De tweede klop alleen waar de eerste onbeslist bleef; de kosten van
+           deze sonde blijven zo begrensd tot de routes die er iets aan hebben. */
+        const onbeslist = a.status !== 0 && !(a.status === 401 || a.status === 403) &&
+          !(a.status >= 200 && a.status < 300);
+        const b = onbeslist ? await klop(r.pad, m, plausibelLijf(r.pad)) : null;
+        const u = oordeelVan(a.status, b ? b.status : null, publiek);
+        const oordeel = u.oordeel;
+        const tweede = b && oordeel === 'stil' ? b.status : null;
+        if (oordeel === 'onbereikbaar') uit.fout++;
+        else if (oordeel === 'dicht') { uit.dicht++; if (u.pasNaLijf) uit.pasNaLijf++; }
+        else if (oordeel === 'publiek') uit.publiek++;
+        else if (oordeel === 'stil') uit.stil++;
+        else {
+          const bron = u.pasNaLijf ? b : a;
+          uit.open.push({ pad: r.pad, methode: m, status: bron.status,
+            ...(u.pasNaLijf ? { viaLijf: true } : {}),
+            begin: bron.tekst.replace(/\s+/g, ' ').slice(0, 120) });
+        }
+        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status,
+          ...(tweede ? { statusMetLijf: tweede } : {}), oordeel });
       }
     }));
   }
 }
+
+module.exports = { oordeelVan };
+
+/* DE WACHT. Hieronder start een volledige ronde: een server, een routekaart en
+   tweeduizend kloppen. Zonder deze regel gebeurde dat ook bij een gewone
+   `require('./poortwacht')` -- en dat is precies hoe ROLPROEF.json ooit van 3377
+   beproefde routes werd teruggezet naar 292 door een onschuldige laadcontrole.
+   oordeelVan() staat er expres BOVEN, zodat een toets hem kan pakken zonder ook
+   maar iets te starten. */
+if (require.main !== module) return;
 
 ronde().then(() => {
   if (jsonUit) {
@@ -239,7 +298,8 @@ ronde().then(() => {
         'waaruit niets valt af te leiden.',
       grens: 'klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de validatie of ' +
         'een opzoeking eerder aan de beurt was dan de autorisatie, en zegt NIETS over een slot -- ' +
-        'die heten daarom stil en niet dicht. Zegt ook niets over wie er met een GELDIG token ' +
+        'die heten daarom stil en niet dicht. Sinds de TWEEDE klop met een plausibel lijf ' +
+        '(nog steeds zonder token) is die groep kleiner: wie dan alsnog 401 of 403 geeft, telt als dicht. Zegt ook niets over wie er met een GELDIG token ' +
         'binnenkomt; dat is de rolproef.'
     };
     console.log(JSON.stringify(perRouteUit ? { ...kop, gemeten, ...uit, perRoute } : { ...kop, gemeten, ...uit }, null, 1));
@@ -257,7 +317,8 @@ ronde().then(() => {
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
   console.log('  aangeklopt        : ' + uit.totaal);
   console.log('  netjes geweigerd  : ' + uit.dicht + '  (401/403)');
-  console.log('  stil afgeslagen   : ' + uit.stil + '  (400/404/5xx -- geen gegevens eruit)');
+  console.log('  stil afgeslagen   : ' + uit.stil + '  (400/404/5xx op BEIDE kloppen -- geen gegevens eruit)');
+  console.log('  pas na een lijf   : ' + uit.pasNaLijf + '  (leeg verzoek strandde op de validatie; met een plausibel lijf kwam het slot tevoorschijn)');
   console.log('  bewust publiek    : ' + uit.publiek);
   console.log('  onbereikbaar      : ' + uit.fout);
   if (!uit.open.length) {

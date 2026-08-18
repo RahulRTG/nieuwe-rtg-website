@@ -156,3 +156,63 @@ test('6. kan de staart niet weg, dan wordt er niet gekapt', () => {
 });
 
 test.after(() => { try { fs.rmSync(DATA, { recursive: true, force: true }); } catch (e) {} });
+
+/* "OPZOEKEN ZONDER SCAN" -- EEN BELOFTE DIE NIEMAND CONTROLEERDE.
+
+   De kop van dit bestand zegt het met zoveel woorden: gebrek 2 was dat opzoeken
+   met .find() over de hele array ging, O(N) per aanvraag, en punt 1 van "wat
+   hier wordt vastgelegd" luidt "de index werkt: op ref, op klant en op zaak,
+   ZONDER SCAN".
+
+   Geen van de toetsen hierboven kan dat laatste zien. Ze vergelijken uitkomsten,
+   en de uitkomst van een scan is identiek aan die van een index -- alleen de
+   prijs verschilt. txZorg() in server/db/tx/index.js herbouwt de hele index
+   zodra de gecachete lengte niet klopt, dus sloop je het incrementele bijhouden,
+   dan valt alles terug op een volledige herbouw per lezing en blijft elke
+   bewering hierboven groen. Op twee collecties met GELD erin.
+
+   Dat is precies waarom de mutatiemotor dit bestand als overlever noteerde: hij
+   probeerde zeventien mutaties in de eigen module en geen ervan werd gezien.
+
+   HOE DIT HET WEL MEET. Een herbouw loopt de array langs en leest van elk item
+   `ref`. Een spion die dat telt maakt zichtbaar OF er herbouwd is -- zonder
+   klok, zonder drempel, zonder aanname over snelheid.
+
+   MUTATIE-BEWIJS: haal `st.len++` uit txVoegToe en deze toets zakt op beide
+   geldcollecties, terwijl de zes beweringen hierboven groen blijven. */
+test('7. de geldcollecties zoeken op via de index, niet met een scan', () => {
+  /* De cap staat in dit bestand op 4 (zie de env hierboven), dus zetten we hem
+     hier ruim, anders kapt de collectie en herbouwt hij om die reden -- dan zou
+     de toets iets anders meten dan hij beweert. */
+  const oudeCapDp = process.env.TX_DIRECTBETALINGEN_CAP;
+  process.env.TX_DIRECTBETALINGEN_CAP = '100000';
+  try {
+    let gelezen = 0;
+    const spion = {
+      get ref() { gelezen++; return 'DP-SPION'; },
+      key: 'user-spion', codename: 'ALK', supplierCode: 'PONTO', supplierName: 'Ponto',
+      bedrag: 4242, omschrijving: 'spion', betaalwijze: 'kaart', at: new Date().toISOString()
+    };
+    db.data = { orders: [], boekingen: [], directBetalingen: [spion], betaalVerzoeken: [] };
+    for (let i = 0; i < 100; i++) directBetalingenVoegToe(betaling(i));
+
+    assert.equal(directBetalingMetRef('DP-SPION'), spion, 'de spion staat in de index');
+    const na = gelezen;
+    assert.ok(na > 0, 'de index is echt gebouwd -- anders meet deze toets niets');
+
+    for (let i = 100; i < 110; i++) directBetalingenVoegToe(betaling(i));
+    assert.equal(directBetalingMetRef('DP105').ref, 'DP105', 'de nieuwe betaling is vindbaar');
+    assert.deepEqual(directBetalingenVanKlant('user-spion'), [spion], 'en de klantlijst klopt nog');
+    assert.equal(gelezen, na,
+      'de index werd opnieuw opgebouwd na een nieuwe BETALING (' + (gelezen - na) + ' extra lezingen) -- ' +
+      'dan is opzoeken weer O(N) over een geldcollectie, precies het gebrek dat dit bestand zegt te hebben opgelost');
+
+    // en het zelfherstel leeft nog: buitenom schrijven hoort wel te herbouwen
+    db.data.directBetalingen.unshift(betaling(999));
+    assert.equal(directBetalingMetRef('DP999').ref, 'DP999');
+    assert.ok(gelezen > na, 'buitenom geschreven werk wordt alsnog gezien -- het zelfherstel is intact');
+  } finally {
+    if (oudeCapDp === undefined) delete process.env.TX_DIRECTBETALINGEN_CAP;
+    else process.env.TX_DIRECTBETALINGEN_CAP = oudeCapDp;
+  }
+});

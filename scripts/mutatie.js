@@ -359,6 +359,28 @@ const EIGEN_MODULE = new Map([
   ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
   /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
   ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* DE TRANSACTIE- EN SAMENVOEGTOETSEN, en waarom ze "overleefden".
+
+     Deze vier stonden als overlever in MUTATIES.json, en dat is het zwaarste
+     verwijt dat deze motor kan maken: de toets legt het gedrag niet vast. Hier
+     was dat niet waar. Ze laden alle vier `require('../server/db')` -- de
+     ORKESTRATOR -- terwijl hun onderwerp een laag dieper woont: het afkappen en
+     archiveren in db/tx/index.js, de index in db/tx/ledger.js, en de
+     driewegsamenvoeging in db/merge.js. De motor muteerde dus achtentwintig keer
+     een bestand waar deze toetsen niets over beweren, en noteerde vervolgens dat
+     ZIJ tekortschoten.
+
+     Dat is exact de fout die vier regels hierboven al eens is gemaakt en
+     opgeschreven ("dat is de toets de schuld geven van iets wat hij niet heeft
+     gedaan"). Een overlever is pas een bevinding als de mutatie het juiste
+     bestand raakte; anders is het een bevinding over de toewijzing.
+
+     Nagemeten na deze verhuizing: alle vier zakken op een echte bronmutatie in
+     hun eigen module. */
+  ['txkap.test.js', ['server/db/tx/index.js']],
+  ['txindex.test.js', ['server/db/tx/index.js']],
+  ['txgeld.test.js', ['server/db/tx/index.js', 'server/db/tx/collecties.js']],
+  ['merge3.property.test.js', ['server/db/merge.js']],
   /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
      is sinds de samenvoeging een schil van dertig regels: twee paden, twee
      namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet

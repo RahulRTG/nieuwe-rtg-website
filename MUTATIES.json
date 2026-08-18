@@ -2980,12 +2980,11 @@
     },
     "merge3.property.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/merge.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "meterijk.test.js": {
       "soort": "puur",
@@ -5682,31 +5681,27 @@
     },
     "txgeld.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js",
-        "server/db/tx/collecties.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "txindex.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "txkap.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",

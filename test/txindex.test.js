@@ -84,3 +84,63 @@ test('boekingen: zelfde semantiek + de 50000-cap knipt zonder kopie per toevoegi
   boekingenVoegToe(dubbel);
   assert.equal(boekingMetRef('RTG-B-7'), dubbel, 'de nieuwste met die ref wint, zoals .find op nieuwste-eerst');
 });
+
+/* DOET DE INDEX NOG WERK, OF GEEFT HIJ ALLEEN HET JUISTE ANTWOORD?
+
+   De toetsen hierboven vergelijken de index met een naieve scan. Dat is de
+   goede vraag voor CORRECTHEID, maar hij kan niet zakken op de vraag waar deze
+   index voor bestaat. txZorg() in server/db/tx/index.js herbouwt namelijk de
+   HELE index zodra de gecachete lengte niet meer klopt -- dat zelfherstel is er
+   met opzet, want code buiten de helpers om mag db.data ook aanraken.
+
+   Gevolg: sloop je het incrementele bijhouden in txVoegToe (de st.len++, het
+   byRef.set, de byKlant-lijst), dan merkt txZorg de scheefstand en bouwt hij
+   alles opnieuw op. De antwoorden blijven exact goed en elke bewering hierboven
+   blijft groen -- terwijl elke lezing voortaan O(n) is over een grootboek dat
+   tot vijftigduizend regels draagt. Precies wat de index moest voorkomen, stil
+   weg, met een groene suite erboven.
+
+   Dat is LAT.md regel 9: een toets die niet kan zakken op zijn eigen onderwerp.
+   De mutatiemotor zag het ook -- txindex.test.js overleefde zeventien mutaties
+   in zijn eigen module.
+
+   HOE DIT HET WEL MEET. Een herbouw loopt de hele array langs en leest van elk
+   item `ref`. Een spion met een teller op die eigenschap maakt dus zichtbaar
+   OF er herbouwd is, zonder op tijd of geheugen te meten -- deterministisch,
+   geen klok, geen drempel.
+
+   MUTATIE-BEWIJS: haal `st.len++` uit txVoegToe en deze toets zakt op de
+   spionteller, terwijl alle beweringen hierboven groen blijven. Precies het
+   verschil dat hij moet vangen. */
+test('de index werkt incrementeel: toevoegen bouwt hem niet opnieuw op', () => {
+  let gelezen = 0;
+  const spion = {
+    get ref() { gelezen++; return 'RTG-O-SPION'; },
+    supplierCode: 'KIKUNOI', customerKey: 'user-spion', customerTier: 'rtg', at: new Date().toISOString()
+  };
+  db.data = { orders: [spion], boekingen: [] };
+  for (let i = 0; i < 200; i++) ordersVoegToe(maakOrder(i));
+
+  // eerste lezing: de index staat (of wordt gebouwd); daarna is de teller stil
+  assert.equal(orderMetRef('RTG-O-SPION'), spion, 'de spion zit gewoon in de index');
+  const na = gelezen;
+  assert.ok(na > 0, 'de index is echt opgebouwd -- anders meet deze toets niets');
+
+  /* Nu het punt: nog eens toevoegen en lezen mag de spion NIET opnieuw
+     aanraken. Doet hij dat wel, dan is er herbouwd en werkt het incrementele
+     pad niet meer. */
+  for (let i = 200; i < 210; i++) ordersVoegToe(maakOrder(i));
+  assert.equal(orderMetRef('RTG-O-205').ref, 'RTG-O-205', 'het nieuwe ticket is gewoon vindbaar');
+  assert.deepEqual(ordersVanKlant('user-spion'), [spion], 'en de klantlijst klopt nog');
+  assert.equal(gelezen, na,
+    'de index is opnieuw opgebouwd na een toevoeging (' + (gelezen - na) + ' extra herbouw-lezingen) -- ' +
+    'het incrementele pad werkt niet meer en elke lezing wordt O(n)');
+
+  /* En de tegenkant, zodat dit geen toets is die alleen maar stil kan blijven:
+     raakt db.data BUITEN de helpers om aan, dan HOORT hij juist wel te
+     herbouwen. Zonder deze helft zou "de teller staat stil" ook groen zijn als
+     de index helemaal niets meer deed. */
+  db.data.orders.unshift(maakOrder(999));
+  assert.equal(orderMetRef('RTG-O-999').ref, 'RTG-O-999', 'buitenom geschreven werk wordt alsnog gevonden');
+  assert.ok(gelezen > na, 'en daarvoor is de index wel degelijk opnieuw opgebouwd -- het zelfherstel leeft');
+});

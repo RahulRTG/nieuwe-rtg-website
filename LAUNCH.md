@@ -19,48 +19,82 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 ## De scope van de eerste livegang
 
 Alles is gebouwd. Lanceren is daarom geen bouwvraag maar een **scopevraag**, en
-die staat als voorinstelling in de kast: één klik in de boardroom zet het hele
-platform in de stand van een fase.
+die staat als trap in de kast: zeven treden, elk een klik, en de bovenste is de
+volledige catalogus.
 
-| fase | wat er open is |
-|---|---|
-| **Fase 0 · De smalle snee** | Binnenkomen, je gegevens beheren, je aanmelden voor een pas, de leden-app en De Salon. 19 van de 189 functies. |
-| Fase 1 · Het fundament (de wig) | Daarbovenop: bestellen en betalen bij partners, kassa, personeel, identiteit. |
-| Fase 2 · De stad | Tickets, vervoer, kamers, events, de sociale laag, de eerste eigen apps, de RTFoundation. |
-| Fase 3 · Alles open | De volledige catalogus. |
+| trede | wat erbij open gaat | mensrem |
+|---|---|---|
+| **0 · De smalle snee** | Binnenkomen, je gegevens beheren, aanmelden voor een pas, de leden-app, De Salon | |
+| 1 · Leden onder elkaar | Vrienden, DM, gesprekken, ontmoetingen, de sociale laag | **ja** |
+| 2 · De partners erbij | Partner-app, vacatures, solliciteren. Nog geen geld | |
+| 3 · De vloer draait | Bestellen en bezorgen, kassa, personeel, aansturing. Nog geen betaalrail | |
+| 4 · Het fundament (de wig) | De betaalrail, wallet, partnerfinanciën, uitbetalingen | **ja** |
+| 5 · De stad | Tickets, vervoer, kamers, events, eigen apps, RTFoundation | |
+| 6 · Alles open | De volledige catalogus | |
 
-**Ga live op fase 0.** Niet omdat de rest niet werkt — de suite is groen — maar
+**Ga live op trede 0.** Niet omdat de rest niet werkt — de suite is groen — maar
 omdat je bij de eerste echte leden niet wilt ontdekken hoe 189 functies zich
-onder echt verkeer houden. Elke fase is één klik verder, en één klik terug.
+onder echt verkeer houden.
 
-Wat fase 0 open zet, met de reden waar die niet vanzelf spreekt:
+### De trap klimt vanzelf
 
-- **binnenkomen**: inloggen, account, pincode, zegels
-- **je gegevens**: ophalen en laten wissen. Dit hoort in de eerste snee en niet
-  in een latere fase — een livegang waarin een lid zijn AVG-rechten niet kan
-  uitoefenen is niet smal maar onrechtmatig
-- **aanmelden voor een pas**, en de identiteitslaag eronder (verificatie,
-  paspoort, passkeys) waar ook de 18+-grens op leunt
-- **de leden-app** met de laag die hem draaiende houdt: staat, live-verbinding,
-  meldingen, **taal** (zonder de vertaallaag is de app alleen Nederlands, en dat
-  is geen kleinere scope maar een kapotte scope), gids, Rahul, waarderen
-- **De Salon**, met de partnerhelft die er in de catalogus aan vastzit
+`POST /api/command/uitrol/klim` zet de automaat aan. Die kijkt elke minuut naar
+het foutpercentage over **al** het verkeer sinds de huidige trede werd gezet, op
+dezelfde tellers als `/api/metrics` en de servicedoelen. Houdt een trede zich
+een half uur, met genoeg antwoorden om iets te durven zeggen en onder 2%
+serverfouten, dan gaat de volgende open. Gaat het mis, dan zakt hij een tree
+terug en stopt met klimmen tot een mens hem hervat.
 
-Bewust dicht in fase 0: bestellen, betalen, de partner- en personeelskant, de
-RTFoundation, de spellen, de eigen apps, en de **directe berichten tussen
-leden** — dat laatste is geen technisch oordeel maar een bewuste keuze: DM's
-brengen moderatie en misbruikafhandeling mee, en die begin je niet in dezelfde
-week als je inlog.
+Drie dingen die die automaat met opzet **niet** doet:
 
-**De backoffice blijft in elke fase open.** Dat is geen uitzondering maar
-voorwaarde: een Lifestyle- of Business-pas wordt door een mens toegekend, en dat
-gebeurt in de backoffice. Zonder die uitzondering zou fase 0 de aanmelding
-openzetten en het besluit erover dichtzetten.
+- **Doorklimmen op een onbekende.** Een herstart wist de nulmeting; dan staat het
+  verschil lager dan de basis. Stilzwijgend doorrekenen geeft een negatief
+  foutaantal en dus altijd groen — precies de kant waarop een uitrolautomaat niet
+  fout mag gaan. Hij meldt "nulmeting kwijt" en wacht.
+- **Alleen de nieuwe paden meten.** Een trede openzetten kan iets breken dat er
+  niet in staat. Daarom weegt hij al het verkeer.
+- **De twee treden met de mensrem openen.** Zie hieronder.
 
-De fases staan in `server/functies/register/index.js`; `test/fases.test.js`
-loopt fase 0 af als een echt lid en controleert ook dat de rest werkelijk dicht
-zit. Zet hem met de knop in de boardroom, of via
-`POST /api/office/boardroom/fase {"fase":"start"}`.
+### De mensrem, en waarom die geen instelling is
+
+Twee treden gaan nooit vanzelf open, hoe groen elk cijfer ook staat:
+
+> **geld verlaat het huis nooit autonoom** — `GELD.md`
+>
+> alles wat een tweede persoon bereikt blijft maximaal "klaarzetten"; er is geen
+> regel, geen instelling en geen vertrouwensniveau waarmee dat "automatisch"
+> wordt — `LIFE.md`
+
+Trede 1 opent het kanaal waarop het ene lid het andere rechtstreeks bereikt.
+Trede 4 opent de betaalrail. Een automaat die die twee openzet omdat het
+foutpercentage laag is, overtreedt die twee zinnen letterlijk. De regie klimt er
+dus naartoe, meet, en blijft staan met `wacht-op-mens`: de trede staat **klaar**,
+bevestigen doet de mens (`POST /api/command/uitrol/bevestig`).
+
+De rem geldt alleen omhoog. Terugzakken mag altijd vanzelf — een rem die ook het
+dichtdraaien tegenhoudt is geen rem maar een klem, en dan blijft een kapotte
+betaalrail openstaan tot iemand wakker wordt.
+
+Bij trede 1 is dat trouwens niet alleen een principe: wat daar open gaat is niet
+techniek maar **moderatie en misbruikafhandeling**, en die moeten bemenst zijn
+vóór de trede open gaat, niet erna.
+
+### De voordeur zit in elke trede
+
+Inloggen, account, pincode, zegels, de gegevenspoort en de laag die de leden-app
+draaiende houdt staan in **elke** trede open. Dat is een reparatie en geen
+ontwerpkeuze: `fundament` en `stad` noemden de leden-app wel en `tg-inlog` niet,
+en wie daarop klikte zette `/api/auth` op 503 — niemand kon meer inloggen, en de
+AVG-gegevenspoort ging mee dicht. Gemeten op een draaiende server, niet afgeleid.
+
+De catalogus dwingt het nu bij het laden af: een trede die de voordeur sluit, of
+die iets sluit wat zijn voorganger opende, laat de server niet meer starten.
+
+De trap staat in `server/functies/register/index.js`, de automaat in
+`server/kern/command/uitrolregie.js`. `test/fases.test.js` loopt trede 0 af als
+een echt lid; `test/uitrolregie-echt.test.js` logt op **elke** trede opnieuw in,
+juist omdat de oude toets dat niet deed en de fout daardoor jaren onzichtbaar
+bleef.
 
 ## Al geregeld (zit in de code)
 

@@ -36,10 +36,19 @@ test.after(() => {
 test('1. de fases staan op het bord, met naam en omvang', async () => {
   const b = await api('/api/office/boardroom', {}, office);
   const ids = (b.body.fases || []).map(f => f.id);
-  assert.deepEqual(ids, ['start', 'fundament', 'stad', 'alles'], 'vier stapelende fases');
-  const [start, fundament, stad] = b.body.fases;
-  assert.ok(start.aantalAan < stad.aantalAan, 'de smalle snee is smaller dan de stad');
-  assert.ok(fundament.aantalAan < stad.aantalAan, 'de stad is ruimer dan het fundament');
+  assert.deepEqual(ids, ['start', 'ontmoeten', 'partners', 'bestellen', 'fundament', 'stad', 'alles'],
+    'zeven treden');
+  /* ECHT stapelen, en niet alleen in omvang. Hiervoor sloten fundament en stad
+     de voordeur -- ze noemden de leden-app wel en tg-inlog niet -- en dan is
+     "groter" geen "meer open". Elke trede hoort alles te bevatten wat zijn
+     voorganger opende; de catalogus dwingt dat bij het laden af, en dit is de
+     controle op wat het BORD toont. */
+  for (let i = 1; i < b.body.fases.length; i++) {
+    const vorige = b.body.fases[i - 1], deze = b.body.fases[i];
+    if (deze.aantalAan == null) continue; // 'alles' telt niet op
+    assert.ok(deze.aantalAan > vorige.aantalAan,
+      'trede ' + deze.id + ' hoort ruimer te zijn dan ' + vorige.id);
+  }
 });
 
 /* FASE 0 -- DE SMALLE SNEE, als doorloop en niet als opsomming.

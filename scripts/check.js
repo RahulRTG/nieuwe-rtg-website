@@ -1691,6 +1691,19 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
     ['/api/auth/register', 'registreren kan alleen zonder account'],
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+    /* WebAuthn-inlog. Hij stond er niet op en kwam er tot nu toe DOOR HET
+       TOEVAL van de tekstafstand doorheen: ergens binnen de 800 tekens stond
+       een `403`, en die hoort bij `accounts.isActief(user)` -- een controle die
+       pas draait NADAT de ceremonie is geslaagd. Dat is geen poort maar een
+       gevolg. Zestien tekens erbij (een bron meegeven aan noteFailedTry) duwden
+       die 403 uit het venster en de regel sloeg alsnog aan; terecht, en de
+       goedkeuring ervoor was de valse kant op.
+
+       Hij hoort hier thuis, om dezelfde reden als de drie hierboven: dit IS de
+       deur. Het bewijs is de ondertekende WebAuthn-assertion in de body, en die
+       kun je zonder de sleutel niet maken. Er staan twee remmen voor (per bron
+       tegen roterende nep-id's, per doel tegen een verspreide aanval). */
+    ['/api/webauthn/login', 'de deur zelf: de ondertekende WebAuthn-assertion IS het bewijs, en die kan niemand zonder de sleutel maken'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en

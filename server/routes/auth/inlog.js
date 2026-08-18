@@ -21,7 +21,7 @@ app.post('/api/login', (req, res) => {
     const bucket = 'demo:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       logInlog('lid', false, req.body.username, req);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     }
@@ -63,7 +63,7 @@ app.post('/api/auth/login', async (req, res) => {
   if (tooManyTries(res, bucket)) return;
   const user = accounts.findByLogin(login);
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);

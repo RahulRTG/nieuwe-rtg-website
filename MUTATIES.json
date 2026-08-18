@@ -3225,6 +3225,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "noodrem-bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/beveiliging.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "normprestatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",

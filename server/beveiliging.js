@@ -80,16 +80,40 @@ module.exports = (ctx) => {
     return arr[0];
   }
 
-  /* De automatische noodrem: telt hoeveel VERSCHILLENDE bronnen binnen het
-     venster een brute-force-alarm gaven. Vanaf drie bronnen gaat de
-     registratie-zekering eruit (geen nieuwe accounts), vanaf zes de
-     onderhouds-zekering (hele app op slot, alleen de eigenaar erin). */
+  /* De automatische noodrem: telt hoeveel VERSCHILLENDE AANVALLERS binnen het
+     venster een brute-force-alarm gaven. Vanaf drie gaat de registratie-
+     zekering eruit (geen nieuwe accounts), vanaf zes de onderhouds-zekering
+     (hele app op slot, alleen de eigenaar erin).
+
+     AANVALLERS, EN NIET DEUREN -- dat was de fout. Hier stond `.map(m => m.sleutel)`,
+     en die sleutel is `brute-force|<bucket>`. Een bucket is fijnmazig met opzet:
+     'auth:<ip>:<inlognaam>' (server/server.js). De inlognaam hoort daarin voor de
+     snelheidsrem, want anders zet iemand het account van een ander op slot door
+     het fout te raden -- maar hij hoort NIET in de telling van deze noodrem.
+
+     Wat er daardoor gebeurde: een script vanaf EEN adres dat zes gebruikersnamen
+     probeert leverde zes "bronnen" op, en het hele platform ging in onderhoud.
+     Dat is credential stuffing, de meest gewone aanval die er is, en het
+     antwoord erop was een zelf toegebrachte storing voor alle echte gebruikers.
+     De aanvaller had geen enkel account nodig, alleen zes namen. Hetzelfde gold
+     voor de tien route-families met hun eigen prefix ('sup:', 'join:', 'tech:'):
+     een aanvaller die langs zes deuren liep telde als zes aanvallers.
+
+     De maat is nu `meta.aanvaller` -- het adres dat klopte. Ontbreekt die (een
+     aanroep die hem vergat), dan valt hij terug op de sleutel: dat is de oude,
+     te schrikachtige stand, en server.js zegt het er hoorbaar bij.
+
+     GEVONDEN MET EEN METING en niet met nadenken: de A/B van npm run beproeving
+     liet rondes zien met 87.963 keer 503 en een server die na de storm helemaal
+     niet meer openging, afgewisseld met rondes die schoon waren -- op dezelfde
+     code. Het was een race om deze drempel. test/noodrem-bron.test.js legt hem
+     vast zonder storm. */
   function noodrem() {
     if (!autoStaat().aan) return;
     const nu = Date.now();
     const bronnen = new Set(lijst()
       .filter(m => m.type === 'brute-force' && (nu - m.atMs) < NOODREM_VENSTER_MS)
-      .map(m => m.sleutel));
+      .map(m => (m.meta && m.meta.aanvaller) || m.sleutel));
     if (bronnen.size >= NOODREM_REGISTRATIE) spring('registratie', bronnen.size);
     if (bronnen.size >= NOODREM_ONDERHOUD) spring('onderhoud', bronnen.size);
   }

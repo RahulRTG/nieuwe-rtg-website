@@ -9,7 +9,7 @@ app.post('/api/office/login', (req, res) => {
   if (tooManyTries(res, bucket)) return;
   // tijd-veilig vergeleken: de reactietijd verraadt niets over de code
   if (!veiligGelijk(String(req.body.code || '').trim().toUpperCase(), OFFICE_CODE)) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     logInlog('office', false, null, req);
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
@@ -17,7 +17,7 @@ app.post('/api/office/login', (req, res) => {
      de omgeving, dan is de code alleen niet genoeg; er moet ook een geldige
      zescijferige authenticator-code bij */
   if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, req.body.totp)) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     logInlog('office-2fa', false, null, req);
     return res.status(401).json({ error: 'Tweede factor vereist: voer de zescijferige code uit uw authenticator-app in.' });
   }

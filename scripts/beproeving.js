@@ -478,13 +478,39 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
-  //    geeft 428 (bevestigNodig). Mét bevestiging is dat 428 in elk geval weg.
+  /* 2. De AI beweegt GEEN geld zonder bevestiging.
+
+     DEZE PROEF WAS VERLOPEN, en hij zakte daardoor op iets goeds. Hij stuurde
+     `bevestigd: true` MEE IN DE BODY van /doe en verwachtte dat de 428 dan weg
+     was. Zo werkte het ooit; sindsdien levert een wijziging een EENMALIG
+     servervoorstel en kan alleen /doe/bevestig dat exacte voorstel uitvoeren
+     (server/routes/stuur.js, server/kern/stuur/bevestiging.js). Een vlaggetje
+     in de body doet niets meer -- en dat hoort ook zo: een client die zijn
+     eigen bevestiging mag zetten is geen bevestiging.
+
+     De proef meldde dus "de AI vraagt geen bevestiging voor geld" terwijl de
+     werkelijkheid was dat de bevestiging STRENGER was geworden dan de proef
+     kende. Dat is de gevaarlijkste soort rood: hij wijst naar het onderwerp en
+     niet naar de oorzaak, en je gaat repareren wat heel is.
+
+     Nu loopt hij de echte weg, en hij toetst er meteen twee dingen bij die de
+     oude vorm helemaal niet kon zien: een verzonnen goedkeurings-id voert niets
+     uit, en hetzelfde voorstel kan geen twee keer worden ingewisseld. */
   {
-    const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
+    const geld = { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } };
+    const zonder = await post('/api/member/doe', geld, lid);
+    const id = zonder.data && zonder.data.goedkeuring && zonder.data.goedkeuring.id;
+    const verzonnen = await post('/api/member/doe/bevestig', { goedkeuringId: 'bestaat-niet', akkoord: true }, lid);
+    const met = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const nogmaals = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && !!id
+      && met.status !== 428
+      && !(verzonnen.status >= 200 && verzonnen.status < 300)
+      && !(nogmaals.status >= 200 && nogmaals.status < 300);
+    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok,
+      detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') +
+        ', voorstel=' + (id ? 'ja' : 'GEEN') + ', met=' + met.status +
+        ', verzonnen-id=' + verzonnen.status + ', tweede keer=' + nogmaals.status });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
@@ -910,7 +936,22 @@ async function misbruikBeproeving(tok) {
     { m: 'POST', p: '/api/pay/overzicht', rol: 'member' }, { m: 'POST', p: '/api/office/state', rol: 'office' },
     { m: 'POST', p: '/api/supplier/backoffice', rol: 'supplier' }
   ];
-  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (st.status >= 500) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } await new Promise(res => setTimeout(res, 1 + rint(4))); } }
+  /* DEZELFDE REGEL ALS DE GAUNTLET, EN DAT WAS HIER NIET ZO.
+
+     Hier stond `st.status >= 500`, en 503 is >= 500. De kop van dit bestand
+     belooft nadrukkelijk het tegendeel -- "nul onverwachte 5xx (503 feature-uit
+     en 429 tellen niet mee)" -- en de gauntlet hierboven houdt zich daar netjes
+     aan met een eigen tak per code. Deze lus telde ze wel mee, in dezelfde
+     buckets.s5xx.
+
+     Wat dat kostte: een ronde waarin De Wacht de app in onderhoud zette meldde
+     87.963 "onverwachte serverfouten" die allemaal 503 waren. Het cijfer wees
+     naar een kapotte server terwijl het een dichte deur was, en de echte
+     bevinding -- de app gaat in onderhoud en komt niet terug -- stond een regel
+     lager veel zachter opgeschreven. Een meter die zijn eigen regel niet volgt
+     wijst de verkeerde kant op precies wanneer het spannend is (LAT-regel 10). */
+  const echteServerfout = (s) => s >= 500 && s !== 503;
+  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (echteServerfout(st.status)) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } else if (st.status === 503) buckets.r503++; await new Promise(res => setTimeout(res, 1 + rint(4))); } }
   async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
   async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
   const lekMin = LEK_MS / 60000;

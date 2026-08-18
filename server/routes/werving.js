@@ -51,7 +51,7 @@ module.exports = (kern) => {
     if (tooManyTries(res, bucket)) return;
     const g = zoekInvite(req.body && req.body.kassacode);
     if (!g) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
     }
     loginFails.delete(bucket);
@@ -71,7 +71,7 @@ module.exports = (kern) => {
 
     const g = zoekInvite(req.body && req.body.kassacode);
     if (!g) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
     }
     if (accounts.staffByMember(g.s.code, lid.id)) {

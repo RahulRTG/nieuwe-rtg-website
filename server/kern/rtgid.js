@@ -93,14 +93,36 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     if (k.status === 'bevestigd' && k.tokenEenmalig) { uit.idToken = k.tokenEenmalig; delete k.tokenEenmalig; save(); }
     return uit;
   }
+  /* EEN INLOG IS EEN REGEL IN HET LOG; EEN OPHALING WAS DAT NIET.
+
+     Bevestigen werd genoteerd, en daarna kon een dienst binnen zijn sessie van
+     twintig minuten zo vaak `wie` aanroepen als hij wilde -- elke keer met
+     dezelfde attributen terug, en het lid zag er een regel van: "inlog". Wie
+     zijn inzagelog las, wist dus dat er een deur was opengegaan, maar niet
+     hoeveel er doorheen was gelopen.
+
+     De TELLER staat op de sessie, en er komt hoogstens een extra regel per
+     sessie bij. Een regel per ophaling zou het log vullen met ruis van een
+     dienst die elke seconde ververst; een teller zegt hetzelfde in een getal
+     dat blijft kloppen. */
   function wie(idToken) {
     const s = S();
     const h = hash(String(idToken || ''));
     const sess = s.sessies.find(x => x.tokenHash === h);
     if (!sess || sess.ingetrokken || nu() > sess.verloopt)
       return { status: 403, error: 'Deze iD-sessie is niet (meer) geldig.' };
+    sess.opgehaald = (sess.opgehaald || 0) + 1;
+    if (sess.opgehaald === 2) {
+      /* Pas bij de TWEEDE: de eerste ophaling hoort bij de inlog die er al
+         staat, en die twee keer melden leest als twee gebeurtenissen. */
+      const log = logVan(sess.memberKey);
+      log.unshift({ om: iso(), dienst: sess.dienst, attributen: sess.attributen,
+        soort: 'haalde uw gegevens opnieuw op binnen dezelfde inlog' });
+      cap(log, MAX_LOG);
+    }
+    save();
     return { status: 200, dienst: sess.dienst, attributen: attributenVoor(sess.memberKey, sess.attributen),
-      namens: sess.namens || undefined, verloopt: iso(sess.verloopt) };
+      namens: sess.namens || undefined, verloopt: iso(sess.verloopt), opgehaald: sess.opgehaald };
   }
 
   /* De app-kant -- de code opzoeken, bevestigen met een passkey, weigeren --

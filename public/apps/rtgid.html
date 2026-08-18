@@ -248,7 +248,11 @@
     STAND = d;
     $('#sessies').innerHTML = d.sessies.length ? d.sessies.map(s =>
       '<div class="item"><span class="rek">' + esc(s.dienst) + (s.namens ? ' <small>via gemachtigde ' + esc(s.namens) + '</small>' : '') +
-      '<small>tot ' + new Date(s.verloopt).toLocaleTimeString('nl-NL').slice(0,5) + ' · ' + s.attributen.map(esc).join(', ') + '</small></span>' +
+      '<small>tot ' + new Date(s.verloopt).toLocaleTimeString('nl-NL').slice(0,5) + ' · ' + s.attributen.map(esc).join(', ') +
+      /* Hoe vaak deze dienst uw gegevens heeft opgehaald. Een inlog is een
+         deur; dit is hoeveel er doorheen is gelopen. Bij een keer zeggen we
+         niets: dat is de inlog zelf. */
+      (s.opgehaald > 1 ? ' · ' + s.opgehaald + '\u00d7 opgehaald' : '') + '</small></span>' +
       '<button class="knop rood" data-intrek="' + esc(s.dienst) + '">Trek in</button></div>').join('')
       : 'Geen dienst heeft nu toegang.';
     $('#machtigingen').innerHTML = d.machtigingen.length ? d.machtigingen.map(m =>

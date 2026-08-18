@@ -460,3 +460,33 @@ test('22. een onleesbare datum wordt geweigerd, niet half opgeslagen', async () 
   // en zonder datum mag de keuring gewoon door: de bron blijft dan eerlijk 'opgegeven'
   assert.equal((await api('/api/office/verify', { userId: mij.id, decision: 'approve', faceMatch: true }, office)).status, 200);
 });
+
+test('23. een dienst die uw gegevens blijft ophalen, staat in het log', async () => {
+  /* EEN INLOG IS EEN DEUR; DIT IS HOEVEEL ER DOORHEEN LOOPT. Bevestigen werd
+     genoteerd, en daarna kon een dienst binnen zijn twintig minuten zo vaak
+     `wie` aanroepen als hij wilde. Het lid zag daar een regel van: "inlog". Wie
+     zijn log las, wist dus dat er een deur open was gegaan maar niet hoeveel
+     er doorheen was gelopen. */
+  const { idToken } = await inlog('Gemeente Ibiza', ['codenaam'], lidA);
+  const eerste = await api('/api/rtgid/wie', { idToken });
+  assert.equal(eerste.body.opgehaald, 1, 'de eerste ophaling hoort bij de inlog');
+
+  let log = (await api('/api/rtgid/inzage', {}, lidA)).body.log;
+  assert.equal(log.filter(l => /opnieuw op/.test(l.soort)).length, 0,
+    'en levert dus geen tweede regel: dat zou een gebeurtenis verzinnen');
+
+  await api('/api/rtgid/wie', { idToken });
+  const derde = await api('/api/rtgid/wie', { idToken });
+  assert.equal(derde.body.opgehaald, 3, 'de teller loopt door');
+
+  const inz = await api('/api/rtgid/inzage', {}, lidA);
+  const herhaald = inz.body.log.filter(l => /opnieuw op/.test(l.soort));
+  assert.equal(herhaald.length, 1,
+    'maar er komt hoogstens EEN extra regel bij: een regel per ophaling zou het log vullen met ruis');
+  const sess = inz.body.sessies.find(s => s.dienst === 'Gemeente Ibiza');
+  assert.equal(sess.opgehaald, 3, 'het getal staat bij de sessie zelf, en dat blijft kloppen');
+
+  // en na intrekken kan er niets meer worden opgehaald
+  await api('/api/rtgid/intrek', { dienst: 'Gemeente Ibiza' }, lidA);
+  assert.equal((await api('/api/rtgid/wie', { idToken })).status, 403);
+});

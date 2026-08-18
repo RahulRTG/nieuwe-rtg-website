@@ -13,7 +13,11 @@ module.exports = (ctx) => {
     return { status: 200,
       log: logVan(key).slice(0, MAX_LOG),
       sessies: s.sessies.filter(x => x.memberKey === key && !x.ingetrokken && t <= x.verloopt)
-        .map(x => ({ dienst: x.dienst, attributen: x.attributen, namens: x.namens || null, verloopt: iso(x.verloopt) })),
+        /* Hoe vaak deze dienst uw gegevens heeft OPGEHAALD binnen de lopende
+           sessie. Een inlog is een deur; dit is hoeveel er doorheen is gelopen,
+           en dat stond nergens. */
+        .map(x => ({ dienst: x.dienst, attributen: x.attributen, namens: x.namens || null,
+          verloopt: iso(x.verloopt), opgehaald: x.opgehaald || 0 })),
       machtigingen: s.machtigingen.filter(m => (m.vanKey === key || m.naarKey === key) && !m.ingetrokken && t <= m.tot)
         .map(m => ({ id: m.id, van: codenaamUit(m.vanKey), naar: codenaamUit(m.naarKey), dienst: m.dienst, tot: iso(m.tot), ik: m.vanKey === key ? 'geef' : 'krijg' })),
       attributen: ATTRIBUTEN };

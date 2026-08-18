@@ -87,12 +87,17 @@
       "color:var(--txt,#F4F1EC);font-family:'Inter',system-ui,sans-serif;font-size:.95rem;" +
       "text-align:center;text-align-last:center;padding:.75rem .4rem;}" +
     ".rp .rp-rij select[hidden],.rp .rp-rij input[hidden]{display:none;}" +
+    /* min-width, want de pijl is 22 BREED en 35 hoog: bij een pictogramknop is
+       de breedte het gat (WCAG 2.5.8 vraagt 24 in beide richtingen). */
     ".rp-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#A98F1C);font-size:1.15rem;" +
-      "padding:.4rem .2rem;opacity:0;transition:opacity .2s;font-family:inherit;}" +
+      "padding:.4rem .2rem;min-width:24px;opacity:0;transition:opacity .2s;font-family:inherit;}" +
     ".rp-rij:focus-within button,.rp-rij.vol button{opacity:.85;}" +
     ".rp-paden{margin-top:1.6rem;display:flex;flex-direction:column;gap:.7rem;align-items:center;}" +
+    /* padding en niet min-height: deze drie staan onder elkaar in een kolom, en
+       met padding blijft de tekst in het midden van zijn raakvlak staan. 19px
+       tekst plus tweemaal 3 is 25 -- net over de 24 van WCAG 2.5.8. */
     ".rp-pad{background:none;border:none;color:var(--muted,rgba(244,241,236,.7));font:inherit;font-size:.8rem;" +
-      "cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:0;}" +
+      "cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:3px 0;}" +
     ".rp-pad:hover{color:var(--gold,#A98F1C);}";
 
   function stijl() {

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3980 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3966 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3980 |
-| servermodules (`server/**/*.js`) | 2174 |
-| routebestanden (`server/routes/**`) | 453 |
-| kernmodules (`server/kern/**`) | 1333 |
+| API-endpoints | 3966 |
+| servermodules (`server/**/*.js`) | 2162 |
+| routebestanden (`server/routes/**`) | 449 |
+| kernmodules (`server/kern/**`) | 1325 |
 | schermen (`public/**/*.html`) | 259 |
-| gedeelde browsermodules (`public/shared/*.js`) | 217 |
-| toetsbestanden (`test/*.test.js`) | 892 |
+| gedeelde browsermodules (`public/shared/*.js`) | 220 |
+| toetsbestanden (`test/*.test.js`) | 891 |
 | schermtoetsen (`test/*.e2e.js`) | 124 |
 
 ## 2. De weg van een verzoek
@@ -86,6 +86,7 @@ start
 afsluiters
 backup
 opslagstart
+onderhoud
 bewaarveger
 startcontrole
 luister
@@ -100,10 +101,10 @@ zie §5 -- er zijn nog 188 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 5 | 8 | 53 |
-| `member` | 641 | 57 | 10 | 399 |
+| `auth` | 19 | 5 | 8 | 46 |
+| `member` | 641 | 57 | 10 | 398 |
 | `supplier` | 562 | 102 | 10 | 294 |
-| `office` | 45 | 9 | 6 | 67 |
+| `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 57 | 14 | 1 | 51 |
@@ -115,7 +116,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2258 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2249 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -123,9 +124,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1407 |
+| kern-namen die routes aanraken | 1396 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 188 |
-| daarvan door precies één domein | 1219 |
+| daarvan door precies één domein | 1208 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -150,7 +151,6 @@ loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
-| 42 | `server/routes/auth/account.js` |
 | 41 | `server/routes/member/voertuigen/huur.js` |
 | 40 | `server/routes/member/voertuigen/charter.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
@@ -158,6 +158,7 @@ loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 36 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
+| 35 | `server/routes/auth/account.js` |
 | 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat

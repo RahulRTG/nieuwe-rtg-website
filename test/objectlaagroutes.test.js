@@ -25,6 +25,24 @@ const { startServer } = require('./helper');
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
 const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+/* EN EEN DATUM DIE ALTIJD OP DE LIJN STAAT, wat voor dag het vandaag ook is.
+
+   Hier stond alleen STRAKS, en de lijn-toets hieronder eiste dat die
+   bijeenkomst in een vak met een naam belandt. Dat klopte -- op ongeveer twee
+   van de drie dagen. De lijn eindigt namelijk bij de KALENDERMAAND: alles
+   daarbuiten wordt `later`, en dat is met opzet een telling en geen staart
+   (LIFE.md par. "de momentlijn", en vakVan() in kern/socialegraaf/lijn.js).
+   Veertien dagen vooruit valt de ene helft van de maand nog binnen die grens en
+   de andere helft niet, dus zakte deze toets vanzelf zodra vandaag + 14 over de
+   maandgrens viel. Op 17 augustus stond hij groen, op 18 augustus rood, zonder
+   dat er een regel code was veranderd.
+
+   Drie dagen vooruit valt altijd binnen deze week of volgende week (n <= rest+7
+   geldt voor elke n <= 7), dus dit is de eis zonder de gok. De vakindeling zelf
+   -- ook de grens naar `later` -- staat deterministisch in
+   test/socialelijn.test.js, met een vaste maandag als `nu`; dat is de plek waar
+   die regel hoort te zakken en niet hier. */
+const OPDELIJN = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -47,7 +65,7 @@ test.before(async () => {
     { naam: 'De Objectkring', soort: 'besloten', over: 'voor de toets' }, lidToken));
   groepId = (g.groep && g.groep.id) || g.id;
   const b = await json(await api('/api/genootschap/roep-bijeen',
-    { groep: groepId, wat: 'Proefborrel', datum: STRAKS, tijd: '20:00', waar: 'De Salon' }, lidToken));
+    { groep: groepId, wat: 'Proefborrel', datum: OPDELIJN, tijd: '20:00', waar: 'De Salon' }, lidToken));
   bijeenkomstId = (b.bijeenkomst && b.bijeenkomst.id) || b.id;
 });
 test.after(() => {
@@ -75,7 +93,7 @@ test('een groep waar ik in zit levert caps, met de reden erbij', async () => {
 test('een bijeenkomst levert zijn echte titel en de antwoord-cap', async () => {
   const d = await json(await api('/api/sociaal/object', { soort: 'event', id: bijeenkomstId }, lidToken));
   assert.equal(d.titel, 'Proefborrel', 'de titel komt uit het veld dat het domein echt levert');
-  assert.equal(d.over.datum, STRAKS);
+  assert.equal(d.over.datum, OPDELIJN);
   assert.equal(d.over.waar, 'De Salon');
   const ids = d.caps.map(c => c.id).sort();
   assert.deepEqual(ids, ['antwoord', 'gastheer', 'vandegroep']);

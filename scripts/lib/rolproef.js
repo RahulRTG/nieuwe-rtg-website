@@ -38,7 +38,21 @@ const LEKMERKERS = [
   { naam: 'e-mailadres', re: /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i },
   { naam: 'IBAN', re: /\b[A-Z]{2}\d{2}[A-Z]{4}\d{6,10}\b/ },
   { naam: 'echte naam uit de kluis', re: /\b(Rahul|Imran|Ismail|roellie)\b/i },
-  { naam: 'geheim veld', re: /"(wachtwoord|password|hash|secret|sleutel|apiKey|token|pin)"\s*:\s*"[^"]{6,}/i },
+  /* DE VELDNAAM MOCHT EERST NIETS OM ZICH HEEN HEBBEN, en dat liet juist het
+     veld door dat dit huis echt gebruikt. De accountstabel heeft
+     `password_hash` (zie server/routes/auth/inlog.js, dat er user.password_hash
+     uit leest) en die matchte niet: de merker eiste "password" met de
+     aanhalingstekens er direct om. Gevonden doordat test/uitvoerproef.test.js
+     hem als kanarie gebruikte en de toets groen bleef waar hij rood hoorde.
+
+     Nu mag er een met een liggend streepje gescheiden voor- of achtervoegsel
+     bij (`password_hash`, `reset_token`, `api_key`). Bewust GEEN losse letters
+     eromheen: met [a-z]* zou "shipping" op `pin` matchen en "hashtag" op
+     `hash`, en een lekmerker die bij een verzendadres afgaat wordt binnen een
+     week uitgezet. Wat hiermee nog niet gedekt is: dezelfde namen in
+     camelCase (`tokenHash`), want die vorm valt niet te scheiden van gewone
+     samenstellingen zonder de valse alarmen terug te halen. */
+  { naam: 'geheim veld', re: /"(?:[a-z0-9]+_)?(wachtwoord|password|hash|secret|sleutel|apikey|api_key|token|pin)(?:_[a-z0-9]+)?"\s*:\s*"[^"]{6,}/i },
   { naam: 'telefoonnummer', re: /\b06[-\s]?\d{8}\b/ }
 ];
 

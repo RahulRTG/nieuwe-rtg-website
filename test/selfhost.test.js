@@ -41,7 +41,8 @@ function veiligeBasis(extra) {
   return Object.assign({
     NODE_ENV: 'production', RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.test',
-    OFFICE_CODE: 'KANTOOR-CODE-12', DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',
+    OFFICE_CODE: 'KANTOOR-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
+    DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',
     REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1'
   }, extra || {});
 }

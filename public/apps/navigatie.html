@@ -23,7 +23,9 @@
   .kop{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:0.7rem;
     padding:calc(env(safe-area-inset-top,0px) + 0.8rem) 1rem 1.4rem;
     background:linear-gradient(180deg,rgba(12,12,11,0.82),rgba(12,12,11,0));z-index:5;}
-  .kop a.terug{color:var(--txt);text-decoration:none;font-size:1.2rem;line-height:1;}
+  /* een pijl is smal: hier is de BREEDTE het probleem, niet de hoogte (WCAG 2.5.8) */
+  .kop a.terug{color:var(--txt);text-decoration:none;font-size:1.2rem;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.2rem;}
   .kop .badge{font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--soft);
     border:1px solid var(--line);border-radius:999px;padding:0.22rem 0.55rem;white-space:nowrap;}

@@ -68,9 +68,24 @@
       rij.append(nee, ja);
       doos.append(p, rij);
       document.body.appendChild(doos);
+      /* De focus gaat de kaart in: anders staat er een vraag in beeld waar een
+         toetsenbordgebruiker pas na tien tabs bij is, en die hij met een
+         schermlezer helemaal niet hoort. */
+      var vorigeFocus = document.activeElement;
       ja.focus();
 
-      function sluit(antwoord) { doos.remove(); st.remove(); klaar(antwoord); }
+      /* Escape is "nu niet". Een vraag die je niet met het toetsenbord kunt
+         wegleggen, houdt iemand vast in een keuze die hij niet wil maken. */
+      function opToets(ev) { if (ev.key === 'Escape') { ev.preventDefault(); geweigerd = true; sluit(false); } }
+      doos.addEventListener('keydown', opToets);
+
+      function sluit(antwoord) {
+        doos.remove(); st.remove();
+        /* En de focus terug waar hij vandaan kwam: wie na het antwoord op
+           <body> achterblijft, is zijn plek in het scherm kwijt. */
+        try { if (vorigeFocus && vorigeFocus.focus && document.contains(vorigeFocus)) vorigeFocus.focus({ preventScroll: true }); } catch (e) {}
+        klaar(antwoord);
+      }
       ja.addEventListener('click', function () { sluit(true); });
       nee.addEventListener('click', function () { geweigerd = true; sluit(false); });
     });

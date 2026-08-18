@@ -8,23 +8,13 @@
    allebei mee. Zo is het cijfer op dat scherm hetzelfde cijfer als het cijfer
    in de poort; twee optellingen voor een waarheid lopen uiteen (LAT.md regel 4).
 
-   WAT HIER VERANDERDE, EN WAAROM HET GEEN SMAAK IS
-
-   De meting keek eerst alleen naar paden die met /api/ beginnen, en telde per
-   PAD. Dat liet twee gaten open die met geen mogelijkheid te zien waren, ook
-   niet door wie het cijfer las:
-
-     - zeven routes buiten /api/ (/apps, /apps/index.html, /apps/bureau.html,
-       /media/:naam, /werken/:code, /scriptbundel.js, /stijlbundel.css) stonden
-       buiten de meting. Ze waren niet ONGEDEKT -- ze bestonden niet voor het
-       cijfer. Een van de twee bundelroutes draagt elke pagina van het huis.
-     - dertien methode/pad-paren vielen samen met hun buurman. Op
-       /api/scim/v2/Users/:id hangen DELETE, GET, PATCH en PUT; een toets op
-       een van de vier zette alle vier op groen. Datzelfde gold voor elf paden
-       met GET naast POST.
-
-   Honderd procent over een deelverzameling is geen honderd procent. De eenheid
-   is daarom METHODE + PATROON, over alles wat de router kent.
+   DE EENHEID IS METHODE + PATROON, over alles wat de router kent. Dat was eerst
+   een PAD onder /api/, en die twee versimpelingen kostten samen twintig routes
+   die het cijfer niet kende: zeven pagina-routes (waaronder de bundelroutes die
+   elke pagina van het huis dragen) en dertien methode/pad-paren die samenvielen
+   met hun buurman -- op /api/scim/v2/Users/:id zette een toets op GET ook DELETE,
+   PATCH en PUT op groen. Honderd procent over een deelverzameling is geen
+   honderd procent.
 
    WAT ER NIET BIJ ZIT, en met opzet: de SCHERM-regels uit het journaal. Een
    pagina komt langs de statische laag en is geen route; die meting heeft zijn
@@ -128,8 +118,18 @@ function inventaris(rauw) {
 }
 
 /* De geraakte sleutels uit de regels van het routejournaal (server/routelog.js).
-   Slikt een Set, een array of een tekst met regels. SCHERM-regels vallen eruit:
-   die dragen een url plus een toetsnaam en zijn een andere meting. */
+   Slikt een Set, een array of een tekst met regels.
+
+   DRIE REGELSOORTEN VALLEN ERUIT: SCHERM (een pagina, voor scripts/schermen.js),
+   TOETS (een route met de toets die hem raakte, voor de OUTPUT-as) en AUDIT (de
+   journalen die tijdens dat verzoek groeiden, voor de AUDIT-as). Het journaal
+   draagt meer dan een meting.
+
+   Zonder deze filter komen ze binnen als sleutel 'TOETS GET /api/x foo.js', die
+   op geen enkele route past. Ze zouden dan als VREEMD PATROON gelden -- drift
+   tussen router en journaal -- en de dekkingspoort laten zakken op regels die er
+   met opzet in staan. Gemeten: twaalf valse vreemden op achttien regels. Elke
+   nieuwe regelsoort hoort hier langs. */
 function geraaktUit(regels) {
   const uit = new Set();
   const bron = typeof regels === 'string' ? regels.split('\n')
@@ -140,7 +140,7 @@ function geraaktUit(regels) {
     if (ruimte <= 0) continue;
     const methode = regel.slice(0, ruimte);
     const pad = regel.slice(ruimte + 1).trim();
-    if (methode === 'SCHERM' || !pad || BUITEN(pad)) continue;
+    if (methode === 'SCHERM' || methode === 'TOETS' || methode === 'AUDIT' || !pad || BUITEN(pad)) continue;
     uit.add(sleutelVan(methode, pad));
   }
   return uit;

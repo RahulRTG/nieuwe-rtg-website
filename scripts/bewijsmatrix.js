@@ -89,6 +89,11 @@ const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inW
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
 const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
+/* De twee assen die tot voor kort geen instrument hadden. Ze lezen allebei uit
+   het routejournaal van de gewone suite; zie scripts/outputproef.js en
+   scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
+const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
+const AUDITP = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -111,14 +116,14 @@ const SCHAKELS = [
   { id: 'INPUT', uitleg: 'wordt rommel geweigerd zonder 5xx',
     bron: 'scripts/invoerproef-route.js (rommel MET de juiste rol; anoniem meet je alleen de voordeur)' },
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
-    bron: null, nodig: 'de liegpoort per ROUTE i.p.v. per toetsbestand (RTG_LIEG neemt nu /api/ in één keer)' },
+    bron: 'scripts/outputproef.js (de liegpoort per toetsbestand, gekoppeld aan de routes die dat bestand raakt)' },
   { id: 'STATE', uitleg: 'staat de toestand na afloop zoals beloofd',
     bron: 'scripts/staatproef-route.js (vingerafdruk voor en na, per route geijkt)', nvtBijLezen: true },
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
+    bron: 'scripts/auditproef.js (groeide er een journaal tijdens het verzoek) + server/lib/keten.js (is dat journaal onuitwisbaar)' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -173,6 +178,20 @@ function routetabel() {
 /* De bewakers staan alleen in de BRON: daar staat de middleware naast de route.
    Sleutel op METHODE + pad, want dezelfde weg kan met GET open en met POST
    dicht staan. */
+/* Een register met `perRoute` als OBJECT (route -> oordeel) inlezen. De vier
+   oudere proeven gebruiken een array; deze twee een object, omdat ze per route
+   precies een uitspraak hebben en geen lijst pogingen. Een plek die beide
+   vormen aankan zou hier de verkeerde soort netheid zijn: dan verdwijnt het
+   verschil dat de registers zelf maken. */
+function objectRegister(pad) {
+  if (!pad) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
+    if (!j || !j.perRoute || Array.isArray(j.perRoute)) return null;
+    return new Map(Object.entries(j.perRoute));
+  } catch (e) { return null; }
+}
+
 function bewakersPerRoute() {
   const kaart = new Map();
   for (const r of alleRoutes()) {
@@ -293,6 +312,8 @@ function bouw(invoer) {
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
+  const output = inv.output !== undefined ? inv.output : objectRegister(OUTPUT);
+  const auditp = inv.auditp !== undefined ? inv.auditp : objectRegister(AUDITP);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -347,6 +368,30 @@ function bouw(invoer) {
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
+        continue;
+      }
+
+      if (s.id === 'OUTPUT') {
+        const o = output && output.get(sleutel);
+        /* Alleen 'bewezen' telt als bewijs. 'onbeslist' betekent dat er wel
+           inhoudgevoelige toetsen op deze route zitten, maar dat ze er meer
+           raken -- dan is niet te zeggen op WELKE inhoud ze zakken, en dat als
+           dekking tellen is precies de fout die de AUTH-as 294 cellen kostte. */
+        cellen[s.id] = !o ? { staat: 'ongemeten' }
+          : o.staat === 'bewezen' ? { staat: 'bewezen', bron: 'outputproef', reden: o.reden }
+            : { staat: 'ongemeten', bron: 'outputproef', reden: o.reden };
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        const a = auditp && auditp.get(sleutel);
+        /* 'wisselend' is een BEVINDING en geen bewijs: soms wel en soms geen
+           spoor betekent dat het ergens van afhangt. 'geen spoor' is voor een
+           leesroute juist en voor een schrijfroute een vraag -- maar in beide
+           gevallen geen bewijs dat er iets wordt vastgelegd. */
+        cellen[s.id] = !a ? { staat: 'ongemeten' }
+          : a.staat === 'bewezen' ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
+            : { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
         continue;
       }
 

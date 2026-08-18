@@ -68,6 +68,43 @@ function noteer(methode, patroon) {
   schrijf(k);
 }
 
+/* ---- WELKE TOETS RAAKTE WELKE ROUTE ----
+
+   Een TWEEDE regelsoort naast de gewone, en met opzet niet een uitbreiding van
+   de bestaande. `METHODE /pad` wordt gelezen door scripts/dekking.js, door
+   kern/routedekking.js en door het routedossier in het kantoor; daar een veld
+   aan toevoegen zou drie afnemers tegelijk raken voor een vraag die zij niet
+   stellen. Deze regel begint daarom met TOETS en valt bij die drie vanzelf weg
+   (ze lezen "METHODE patroon", en TOETS is geen methode -- net als SCHERM).
+
+   WAAROM. De OUTPUT-as vraagt of iemand naar de INHOUD van een antwoord kijkt.
+   De mutatiemotor meet dat al met de liegpoort, maar per TOETSBESTAND, en de
+   matrix vraagt het per ROUTE. Die vertaling ontbrak.
+
+   Ontdubbeld per route EN per toets: een route die zes toetsen raakt levert zes
+   regels op. Het journaal groeit daardoor van ongeveer 11k naar 40k regels, en
+   dat is de prijs voor een vraag die anders onbeantwoordbaar blijft. */
+function noteerToets(methode, patroon) {
+  if (!bestand || !patroon) return;
+  noteer('TOETS', (methode || 'GET') + ' ' + patroon + ' ' +
+    (process.env.RTG_TOETS || 'onbekend'));
+}
+
+/* ---- LIET DEZE ROUTE EEN SPOOR NA? ----
+
+   De AUDIT-as vraagt of er een spoor achterblijft. Er is geen doorgang waar
+   auditregels ontstaan, dus dit wordt van buiten gemeten (server/opzet/
+   auditmeting.js). Zo levert de gewone suite dit bewijs gratis mee.
+
+   `AUDIT METHODE /pad spoor|geen`, ontdubbeld op de hele regel. Een route die de
+   ene keer wel en de andere keer geen spoor nalaat levert dus beide regels op,
+   en dat is juist: dan hangt het ergens van af. */
+function noteerAudit(methode, patroon, sporen) {
+  if (!bestand || !patroon) return;
+  noteer('AUDIT', (methode || 'GET') + ' ' + patroon + ' ' +
+    (sporen && sporen.length ? sporen.join(',') : 'geen'));
+}
+
 /* Een scherm is geen route: een pagina komt langs de statische laag en niet
    bij de routematcher, dus stond er in dit journaal nooit iets over. Daardoor
    was "deze app is af" een bewering die niemand kon natrekken -- de vraag "heeft
@@ -133,7 +170,11 @@ function begin(pad) {
   stuk = false;
   // aan de router hangen we onszelf alleen als er echt een journaal is: staat
   // het uit, dan is er geen haak en kost dit de router helemaal niets
-  try { require('./web/routing').opPatroon(bestand ? noteer : null); } catch (e) { /* zonder router ook goed */ }
+  /* EEN haak, TWEE regels: de gewone (welke route is geraakt) en de
+     toets-gekoppelde (door WIE). Beide ontdubbelen zichzelf, dus dit kost per
+     nieuw paar een append en verder niets. */
+  const beide = (m, p) => { noteer(m, p); noteerToets(m, p); };
+  try { require('./web/routing').opPatroon(bestand ? beide : null); } catch (e) { /* zonder router ook goed */ }
   try { require('./web/bestanden').opBestand(bestand ? noteerScherm : null); } catch (e) { /* zonder statische laag ook goed */ }
   try { require('./middleware/voordeur').opPagina(bestand ? noteerScherm : null); } catch (e) { /* zonder nonce-laag ook goed */ }
   return !!bestand;
@@ -153,4 +194,4 @@ function lees(pad) {
   return uit;
 }
 
-module.exports = { noteer, noteerScherm, begin, lees, aan: () => !!bestand };
+module.exports = { noteer, noteerToets, noteerAudit, noteerScherm, begin, lees, aan: () => !!bestand };

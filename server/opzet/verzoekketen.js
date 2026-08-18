@@ -65,6 +65,10 @@ module.exports = function verzoekketen(deps) {
      een tekstzoektocht door de tests -- zie server/routelog.js. */
   require('../routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
 
+  /* De auditmeting (liet dit verzoek een spoor na) staat in ./auditmeting.js --
+     een eigen onderwerp, en dit bestand ging er met dat blok erin over de 10 KB. */
+  require('./auditmeting')({ app, db: deps && deps.db });
+
   // In productie: alles naar https, en HSTS zodat browsers het onthouden.
   // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
   // gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)

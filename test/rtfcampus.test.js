@@ -26,6 +26,20 @@ test('2. iedere cataloguscategorie landt in een zichtbare Campuswereld', () => {
   const gekoppeld = new Set(Object.values(werelden).flatMap(w => w.cats));
   const mist = CATEGORIEEN.map(c => c.id).filter(id => !gekoppeld.has(id));
   assert.deepEqual(mist, [], 'deze cataloguscategorieen zijn niet verbonden met de Campus');
+
+  /* EN DE ANDERE KANT OP, want die ontbrak en dat is de helft die stukgaat.
+
+     Hierboven staat: elke categorie heeft een wereld. Wat er niet stond is:
+     elke wereld wijst een categorie aan die BESTAAT. Die asymmetrie is geen
+     detail -- verdwijnt er een categorie uit de catalogus, dan blijft de
+     Campuswereld ernaar verwijzen en toont hij een lege of kapotte tegel,
+     terwijl deze toets vrolijk groen blijft. Nagemeten: een categorie uit
+     server/kern/rtfappcatalogus-data.js halen werd niet opgemerkt.
+
+     Nu wel, en daarmee bijt de toets op de fout die hij zegt te bewaken. */
+  const bestaat = new Set(CATEGORIEEN.map(c => c.id));
+  const wees = [...gekoppeld].filter(id => !bestaat.has(id));
+  assert.deepEqual(wees, [], 'deze Campuswerelden wijzen naar een categorie die niet in de catalogus staat');
 });
 
 test('3. Game Hall en Magnaat zijn echte catalogusonderdelen achter dezelfde leeftijdspoort', () => {

@@ -524,7 +524,31 @@ const GEEN_BRONMUTATIE = new Map([
      juiste mutatie is een module toevoegen of uit het register halen. En die
      ijkt de toets al zelf: zijn derde bewering is "de scan kan een nieuwe laag
      ook echt vinden", dus hij toont zijn eigen gevoeligheid. */
-  ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden']
+  ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden'],
+  /* Nagetrokken: een aanroep verzinnen die niet bestaat (accounts.bestaatNietXX)
+     laat toets 1 zakken, en verifyToken uit de users-export halen laat beide
+     toetsen zakken. Wat hij vergelijkt is een EXPORTLIJST tegen aanroepen in de
+     bron; geen enkele operator (true->false, een vergelijking omdraaien) raakt
+     dat. Let op de vorm: de eerste bewering groeit en krimpt mee met de code,
+     dus alleen de harde ondergrens in toets 2 vangt een verdwenen export. */
+  ['wiring-contract.test.js', 'vergelijkt de accounts-exportlijst met de aanroepen in de bron; geen bronoperator raakt een exportlijst. Met de hand tweemaal raak: een verzonnen aanroep laat toets 1 zakken, verifyToken uit de export halen laat beide toetsen zakken'],
+  /* bundeldelen ijkt zichzelf al, en beter dan deze motor kan: zijn tweede
+     bewering trekt een ECHT bundelbestand scheef op schijf en eist dat de
+     meting uitslaat, met een finally die het terugzet. Een bronoperator op
+     scripts/bundel.js raakt de vergelijking niet die hij maakt. */
+  ['bundeldelen.test.js', 'ijkt zichzelf: de tweede bewering trekt een echt bundelbestand op schijf scheef en eist dat de meting uitslaat. Een bronoperator op scripts/bundel.js raakt die vergelijking niet'],
+  /* rtfcampus leest APPS en CATEGORIEEN, die uit ./rtfappcatalogus-data.js
+     komen -- een bestand met louter literalen. De betekenisvolle mutatie is
+     "haal een categorie weg", en daar heeft deze motor geen operator voor
+     (net als bij voertuigscherm.e2e.js hierboven).
+
+     Die mutatie bracht hier wel een ECHT gat aan het licht, en dat is de reden
+     dat deze regel er staat in plaats van een schouderophalen. Toets 2 eiste
+     dat elke categorie een Campuswereld heeft, maar niet dat elke wereld een
+     BESTAANDE categorie aanwijst. Een categorie weghalen liet dus een wereld
+     naar het niets wijzen en bleef groen. De tegenkant staat er nu bij, en
+     precies dezelfde handmutatie zakt sindsdien. */
+  ['rtfcampus.test.js', 'leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

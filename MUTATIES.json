@@ -750,12 +750,8 @@
     },
     "bundeldelen.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bundel.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "ijkt zichzelf: de tweede bewering trekt een echt bundelbestand op schijf scheef en eist dat de meting uitslaat. Een bronoperator op scripts/bundel.js raakt die vergelijking niet"
     },
     "bureau.test.js": {
       "soort": "server",
@@ -4364,12 +4360,8 @@
     },
     "rtfcampus.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rtfbieb.js"
-      ],
-      "geprobeerd": 3,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)"
     },
     "rtfcoderem.test.js": {
       "soort": "server",
@@ -6305,12 +6297,8 @@
     },
     "wiring-contract.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/accounts/index.js"
-      ],
-      "geprobeerd": 8,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "vergelijkt de accounts-exportlijst met de aanroepen in de bron; geen bronoperator raakt een exportlijst. Met de hand tweemaal raak: een verzonnen aanroep laat toets 1 zakken, verifyToken uit de export halen laat beide toetsen zakken"
     },
     "wisselen-en-historie.test.js": {
       "soort": "server",

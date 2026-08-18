@@ -1532,6 +1532,14 @@
       "gezakt": 4,
       "geprobeerd": 11
     },
+    "geld-rollen-werkruimte.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "geld-rollen-zaken.test.js": {
       "soort": "puur",
       "staat": "gezakt",

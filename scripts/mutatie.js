@@ -438,6 +438,7 @@ const EIGEN_MODULE = new Map([
   ['geld-rollen-school.test.js', ['server/school/rollen.js', 'server/school/financien.js', 'server/school/financien-beheer.js']],
   ['geld-rollen-zaken.test.js', ['server/routes/supplier/horeca/rekening.js', 'server/routes/supplier/horeca/betalen.js']],
   ['geld-rollen-buiten-bank.test.js', ['server/routes/member/rechterhand.js']],
+  ['geld-rollen-werkruimte.test.js', ['server/bedrijf/index.js', 'server/bedrijf/it.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van

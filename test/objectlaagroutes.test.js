@@ -24,24 +24,25 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
+const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+/* EN EEN DATUM DIE ALTIJD OP DE LIJN STAAT, wat voor dag het vandaag ook is.
 
-/* DE KLOK STAAT VAST, EN DAT IS EEN REPARATIE.
+   Hier stond alleen STRAKS, en de lijn-toets hieronder eiste dat die
+   bijeenkomst in een vak met een naam belandt. Dat klopte -- op ongeveer twee
+   van de drie dagen. De lijn eindigt namelijk bij de KALENDERMAAND: alles
+   daarbuiten wordt `later`, en dat is met opzet een telling en geen staart
+   (LIFE.md par. "de momentlijn", en vakVan() in kern/socialegraaf/lijn.js).
+   Veertien dagen vooruit valt de ene helft van de maand nog binnen die grens en
+   de andere helft niet, dus zakte deze toets vanzelf zodra vandaag + 14 over de
+   maandgrens viel. Op 17 augustus stond hij groen, op 18 augustus rood, zonder
+   dat er een regel code was veranderd.
 
-   Hiervoor rekende deze toets met de ECHTE dag en zette hij een bijeenkomst
-   veertien dagen vooruit. Die valt in de eerste helft van een maand in het vak
-   "deze maand" (een vak met regels) en in de tweede helft in "later" -- en
-   "later" is in socialegraaf/lijn.js bewust een TELLING en geen lijst, want een
-   lijn hoort geen oneindige staart te hebben.
-
-   Gevolg: deze toets was groen op 5 augustus en rood op 18 augustus, zonder dat
-   er een regel code veranderde. Hij mat de kalender in plaats van de software.
-
-   RTG_KLOK zet de dag vast op een woensdag in de eerste helft van de maand, dus
-   +14 blijft binnen dezelfde maand en landt in een vak dat regels toont. De
-   klok weigert zichzelf in productie (zie server/lib/klok.js), dus dit kan
-   alleen hier iets verschuiven. */
-const KLOK = '2026-08-05T09:00:00Z';
-const STRAKS = new Date(Date.parse(KLOK) + 14 * 864e5).toISOString().slice(0, 10);
+   Drie dagen vooruit valt altijd binnen deze week of volgende week (n <= rest+7
+   geldt voor elke n <= 7), dus dit is de eis zonder de gok. De vakindeling zelf
+   -- ook de grens naar `later` -- staat deterministisch in
+   test/socialelijn.test.js, met een vaste maandag als `nu`; dat is de plek waar
+   die regel hoort te zakken en niet hier. */
+const OPDELIJN = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -51,7 +52,7 @@ async function api(pad, body, token) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_KLOK: KLOK } }));
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   const een = await json(await api('/api/auth/register', { name: 'Object Lid', email: 'obj1@x.nl',
     phone: '0612345601', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }));
   lidToken = een.token;
@@ -64,7 +65,7 @@ test.before(async () => {
     { naam: 'De Objectkring', soort: 'besloten', over: 'voor de toets' }, lidToken));
   groepId = (g.groep && g.groep.id) || g.id;
   const b = await json(await api('/api/genootschap/roep-bijeen',
-    { groep: groepId, wat: 'Proefborrel', datum: STRAKS, tijd: '20:00', waar: 'De Salon' }, lidToken));
+    { groep: groepId, wat: 'Proefborrel', datum: OPDELIJN, tijd: '20:00', waar: 'De Salon' }, lidToken));
   bijeenkomstId = (b.bijeenkomst && b.bijeenkomst.id) || b.id;
 });
 test.after(() => {
@@ -92,7 +93,7 @@ test('een groep waar ik in zit levert caps, met de reden erbij', async () => {
 test('een bijeenkomst levert zijn echte titel en de antwoord-cap', async () => {
   const d = await json(await api('/api/sociaal/object', { soort: 'event', id: bijeenkomstId }, lidToken));
   assert.equal(d.titel, 'Proefborrel', 'de titel komt uit het veld dat het domein echt levert');
-  assert.equal(d.over.datum, STRAKS);
+  assert.equal(d.over.datum, OPDELIJN);
   assert.equal(d.over.waar, 'De Salon');
   const ids = d.caps.map(c => c.id).sort();
   assert.deepEqual(ids, ['antwoord', 'gastheer', 'vandegroep']);

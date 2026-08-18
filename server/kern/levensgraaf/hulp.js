@@ -27,13 +27,24 @@ const OPEN = 0, PERSOONLIJK = 1, VERTROUWELIJK = 2, BESLOTEN = 3;
    klopt in de eerste helft van een maand (dan valt +14 in "deze maand", een vak
    met regels) en niet in de tweede (dan valt hij in "later", en dat is bewust
    een TELLING en geen lijst -- zie socialegraaf/lijn.js). Dezelfde toets was in
-   augustus dus groen op de 5e en rood op de 18e, zonder dat er een regel code
+   augustus dus groen op de 17e en rood op de 18e, zonder dat er een regel code
    veranderde. Zo'n toets meet de kalender en niet de software.
 
-   Via server/lib/klok.js is de dag nu te verzetten met RTG_KLOK, precies waar
-   die module voor bestaat. Zonder RTG_KLOK is dit exact hetzelfde als voorheen:
-   dezelfde waarde, geen omweg. En in productie weigert de klok zich te laten
-   verzetten, dus dit kan daar niets verschuiven. */
+   DIE TOETS IS INMIDDELS ANDERS OPGELOST -- hij kiest een datum die altijd
+   binnen het venster valt, en de vakgrens zelf wordt deterministisch getoetst
+   in test/socialelijn.test.js met een vaste maandag. Dat is de betere plek: de
+   grens hoort daar te zakken en niet in een toets over genootschappen.
+
+   Deze regel blijft toch op de klok staan, en niet omdat die ene toets hem
+   nodig had. Alles wat deze helper gebruikt -- de levensgraaf, de sociale
+   graaf, de Control Tower, de momentlijn -- rekende op een dag waar niets aan
+   te draaien viel, en daarmee was een hele klasse vragen onbeantwoordbaar:
+   wat gebeurt er op 29 februari, wat doet een termijn die gisteren verliep, wat
+   ziet iemand die vandaag precies 18 wordt. Zie de kop van server/lib/klok.js.
+
+   Zonder RTG_KLOK is dit exact hetzelfde als voorheen: dezelfde waarde, geen
+   omweg. En in productie weigert de klok zich te laten verzetten, dus dit kan
+   daar niets verschuiven. */
 const { datum: klokDatum } = require('../../lib/klok');
 const vandaag = () => klokDatum().toISOString().slice(0, 10);
 /* EEN VORMCONTROLE IS GEEN CONTROLE (regel 8 van de lat). Dit stond hier als

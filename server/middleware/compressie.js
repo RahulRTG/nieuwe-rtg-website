@@ -72,30 +72,23 @@ function jsonGzip() {
       if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
       /* ASYNCHROON, EN DAT IS HIER GEEN SMAAKKWESTIE.
 
-         Dit stond op brotliCompressSync/gzipSync. Comprimeren is puur rekenwerk,
-         en de synchrone vorm doet dat OP DE EVENT-LOOP: zolang zlib bezig is
-         staat de hele server stil -- ook voor verzoeken die niets met dit
-         antwoord te maken hebben. Gemeten op een echt API-antwoord:
+         Dit stond op brotliCompressSync/gzipSync, en die doen hun rekenwerk OP
+         DE EVENT-LOOP: zolang zlib bezig is staat de hele server stil, ook voor
+         verzoeken die niets met dit antwoord te maken hebben. Gemeten met gzip-6
+         op een echt API-antwoord: 0,8 ms bij 164 kB, 4,2 ms bij 827 kB, 16,3 ms
+         bij 3320 kB (brotli-4 vergelijkbaar). Dat lijkt weinig tot je het maal
+         de doorvoer doet -- bij 300 van die verzoeken per seconde is het een
+         kwart seconde per seconde, en het slaat neer op de p99 van ELK verzoek,
+         ook de kleine die zelf niet eens gecomprimeerd worden.
 
-           164 kB   gzip-6  0,8 ms   brotli-4  0,7 ms
-           827 kB   gzip-6  4,2 ms   brotli-4  2,9 ms
-          3320 kB   gzip-6 16,3 ms   brotli-4 17,1 ms
+         De asynchrone vorm rekent in de threadpool en levert byte-voor-byte
+         dezelfde uitvoer (nagemeten met Buffer.equals). De statische laag
+         hieronder blijft synchroon: die comprimeert een bestand EEN keer en
+         bewaart het, dus daar valt geen herhaald werk weg te halen.
 
-         Dat lijkt weinig tot je het maal de doorvoer doet: bij 300 verzoeken
-         per seconde van 164 kB is dat een kwart seconde per seconde die niemand
-         anders kan gebruiken, en het slaat neer op de p99 van ELK verzoek --
-         ook op de kleine, die zelf niet eens gecomprimeerd worden.
-
-         De asynchrone vorm rekent in de libuv-threadpool, naast de loop, en
-         levert byte-voor-byte dezelfde uitvoer (nagemeten met Buffer.equals op
-         beide vormen). De statische laag hieronder blijft wel synchroon: die
-         comprimeert een bestand EEN keer en bewaart het resultaat, dus daar is
-         geen herhaald werk om weg te halen.
-
-         De koppen worden nu pas gezet als de compressie GELUKT is. Dat is de
-         volgorde die de asynchrone vorm afdwingt: zou Content-Encoding er al
-         staan en de compressie daarna falen, dan beloofde het antwoord een
-         verpakking die er niet is. */
+         De koppen worden pas gezet als de compressie GELUKT is: zou
+         Content-Encoding er al staan en de compressie daarna falen, dan beloofde
+         het antwoord een verpakking die er niet is. */
       const bron = Buffer.from(s);
       const klaar = (err, uit) => {
         if (res.headersSent) return;

@@ -131,20 +131,15 @@ function setPasswordSync(userId, password) {
 
 /* DE HASH OPWAARDEREN ZONDER IEMAND UIT TE LOGGEN.
 
-   Dit lijkt op setPassword en is er met opzet NIET hetzelfde aan. setPassword
-   zet ook `sessies_vanaf`, en dat hoort daar: wie zijn wachtwoord wijzigt gooit
-   elke lopende sessie eruit, want dat was meestal de hele reden.
+   Lijkt op setPassword en mist met opzet een ding: `sessies_vanaf`. Daar hoort
+   dat wel -- wie zijn wachtwoord WIJZIGT gooit elke sessie eruit. Hier is het
+   wachtwoord onveranderd en gaan alleen de scrypt-kosten omhoog (zie
+   ./wachtwoord.js); zou dit sessies_vanaf zetten, dan vloog elk lid met een
+   oude hash er bij zijn volgende inlog overal uit en voelde een stille
+   verbetering als een storing. reset_hash blijft er om dezelfde reden af.
 
-   Hier is het wachtwoord juist ONVERANDERD -- alleen de kosten waarmee het
-   gehasht is gaan omhoog (zie de scrypt-uitleg in ./kluis.js). Zou deze functie
-   sessies_vanaf zetten, dan werd elk lid met een oude hash bij zijn volgende
-   inlog meteen weer overal uitgelogd, en zou een stille verbetering voelen als
-   een storing. Ook reset_hash blijft ongemoeid: een lopend herstelverzoek gaat
-   dit niet aan.
-
-   De aanroeper heeft de klaartekst alleen op het moment van een GESLAAGDE
-   inlog. Dat is het enige moment waarop opwaarderen kan, en daarom staat de
-   aanroep daar en nergens anders. */
+   De klaartekst is er alleen bij een GESLAAGDE inlog; daarom staat de aanroep
+   daar en nergens anders. */
 async function vernieuwWachtwoordHash(userId, password) {
   const u = getUserById(userId);
   if (!u || !kluis.moetVernieuwen(u.password_hash)) return false;

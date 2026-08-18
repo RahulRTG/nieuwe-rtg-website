@@ -107,6 +107,11 @@
 
   /* slimme laag: actiecentrum, briefing, zoeken, prestaties en weekomzet */
   .panel h2.ph{display:flex;justify-content:space-between;align-items:center;gap:0.8rem;}
+  /* Drie vormen die als style="..." op tientallen plekken stonden. Als klasse
+     staan ze een keer, en houden ze style-src-attr in de CSP dicht. */
+  .cols.na{margin-top:1.5rem;}
+  .panel > .sub{margin:0 1.25rem;}   /* alleen de uitleg onder een kop, niet de .sub in de rijen */
+  .uitgifte{display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;}
   .hbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.35rem 0.85rem;font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
   .hbtn:hover{background:rgba(255,255,255,0.05);}
   .alert{display:flex;align-items:center;gap:0.9rem;padding:0.85rem 1.25rem;border-bottom:1px solid var(--line);font-size:0.85rem;}
@@ -195,7 +200,7 @@
         </div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.aanmeldingen">Aanmeldingen per pas</h2>
         <p style="font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;" data-i18n="bo.aanmuitleg">De AI verzorgt de hele aanmelding automatisch (berichten, onboarding, rondleiding, RTF, veiligheid en privacy). Alleen dit blijft aan jou: accepteren of afwijzen. Lifestyle en Business krijgen nooit automatisch toegang.</p>
@@ -210,7 +215,7 @@
         <div class="rows" id="concierge"></div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
         <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
@@ -242,14 +247,14 @@
         <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
         <div class="rows" id="appsList"></div>
       </div>
       <div class="panel">
         <h2 data-i18n="panel.pa">Partner-aanvragen</h2>
-        <div id="paResult" style="display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;"></div>
+        <div id="paResult" class="uitgifte"></div>
         <div class="rows" id="paList"></div>
       </div>
     </div>
@@ -257,10 +262,10 @@
          zeiden dat ze een bedrijf hebben en het in de RTG-catalogus willen. Op
          codenaam. Een besluit hier maakt GEEN zaak -- dat blijft de
          partner-aanvraag hierboven, met ledenbewijs. -->
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.cw">Bedrijven uit de onboarding</h2>
-        <p class="sub" style="margin:0 1.25rem;" data-i18n="cw.uitleg">Leden die bij het aanmelden een bedrijf opgaven en vroegen of het in de catalogus mag. Een partnerplek loopt via een aanvraag als lid; de pas erbij zegt wie het is, niet of het mag. Hier houdt u bij wie er contact mee had.</p>
+        <p class="sub" data-i18n="cw.uitleg">Leden die bij het aanmelden een bedrijf opgaven en vroegen of het in de catalogus mag. Een partnerplek loopt via een aanvraag als lid; de pas erbij zegt wie het is, niet of het mag. Hier houdt u bij wie er contact mee had.</p>
         <div class="rows" id="cwList"></div>
       </div>
     </div>
@@ -269,10 +274,10 @@
          RTG_DEMO leeg. Een echte installatie had dus nul reizen en elke
          aanvraag gaf 404. Hier ontstaat het aanbod, en hiernaast handelt de
          reisadviseur de aanvragen af. -->
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.ra">Reisaanbod</h2>
-        <p class="sub" style="margin:0 1.25rem;" data-i18n="ra.uitleg">De samengestelde reizen van RTG. Leden zien de nettoprijs, zonder opslag. Staat hier niets, dan is het reisbureau leeg en valt er niets aan te vragen.</p>
+        <p class="sub" data-i18n="ra.uitleg">De samengestelde reizen van RTG. Leden zien de nettoprijs, zonder opslag. Staat hier niets, dan is het reisbureau leeg en valt er niets aan te vragen.</p>
         <div class="rows" id="raList"></div>
         <div class="invoerrij">
           <input id="raTitel" placeholder="Titel, bv. Lissabon, lang weekend" data-i18n-ph="ra.ph.titel" autocomplete="off">
@@ -286,7 +291,7 @@
       </div>
       <div class="panel">
         <h2 data-i18n="panel.rb">Reisaanvragen</h2>
-        <p class="sub" style="margin:0 1.25rem;" data-i18n="rb.uitleg">Leden die een reis aanvroegen. Bevestigen zet hem in hun dossier op bevestigd; afwijzen haalt hem eruit. Er wordt niets geboekt en niets betaald.</p>
+        <p class="sub" data-i18n="rb.uitleg">Leden die een reis aanvroegen. Bevestigen zet hem in hun dossier op bevestigd; afwijzen haalt hem eruit. Er wordt niets geboekt en niets betaald.</p>
         <div class="rows" id="rbList"></div>
       </div>
     </div>
@@ -294,11 +299,11 @@
          genres komen niet via het partnerformulier binnen (het register zegt
          dat ze bij de wereld zelf horen) -- en kwamen daardoor alleen uit de
          demo. Dit is hun deur, en hij zit bij de boardroom. -->
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2 data-i18n="panel.inst">Instellingen aansluiten</h2>
-        <p class="sub" style="margin:0 1.25rem;" data-i18n="inst.uitleg">Een gemeente, luchthaven, vervoerder of dienst hoort bij de wereld zelf en vraagt zichzelf niet aan via het partnerformulier. Aansluiten maakt een bedrijfscode en een beheer-inlog; de instelling begint offline.</p>
-        <div id="instResult" style="display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;"></div>
+        <p class="sub" data-i18n="inst.uitleg">Een gemeente, luchthaven, vervoerder of dienst hoort bij de wereld zelf en vraagt zichzelf niet aan via het partnerformulier. Aansluiten maakt een bedrijfscode en een beheer-inlog; de instelling begint offline.</p>
+        <div id="instResult" class="uitgifte"></div>
         <div class="rows" id="instList"></div>
         <div class="invoerrij">
           <select id="instGenre"></select>
@@ -309,7 +314,7 @@
         </div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols na">
       <div class="panel">
         <h2>Partnerstatus &amp; toegang</h2>
         <div class="rows" id="partnerList"></div>

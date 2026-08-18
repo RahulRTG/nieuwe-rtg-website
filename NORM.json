@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
-    "keuringOmvang": 155,
+    "keuringOmvang": 156,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,16 +21,22 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5927,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1396,
+    "kernBreedte": 1408,
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 150,
+    "toetsenNietGemeten": 156,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "keuringOmvang 155 -> 156, kernBreedte 1396 -> 1408, toetsenNietGemeten 150 -> 156 (VERHOOGD)",
+      "reden": "Deze tak zet twee nieuwe kernmodules neer met een deur erachter: kern/reisaanbod.js (de enige schrijver van db.data.partnerTrips, die tot nu toe niemand had) en kern/instelling.js (de weg waarlangs een echte gemeente, luchthaven of vervoerder binnenkomt, die alleen uit de demo-seed kwam). Daar horen routes bij, en daarmee groeit kernBreedte met twaalf eigenschappen. keuringOmvang komt op 156 doordat het opknippen van kernlaag2 (die over de 10 kB ging) er een bestand in de band vlak onder de grens bij zet -- de keerzijde van een overtreding oplossen. toetsenNietGemeten stijgt met zes omdat er zes toetsbestanden bij komen waar de mutatiemotor nog niet langs is geweest; die motor draait uren en is hier niet gedraaid.",
+      "eerlijkheidshalve": "Dit is een verhoging en dus een bewuste keuze, geen verbetering. Wat ik NIET doe is de meter wegpoetsen: inlineStijlAttributen stond ook rood (5938 tegen 5927) en die heb ik WEL gerepareerd in plaats van bijgesteld, door drie vormen die als style-attribuut op tientallen plekken stonden naar klassen te halen (.cols.na, .panel > .sub, .uitgifte); die meter staat nu onder de norm en die norm laat ik op 5927 staan. En over toetsenNietGemeten: de motor is er niet langs geweest, maar de zeven nieuwe grenzen in deze tak zijn wel met de hand gemuteerd en alle zeven zagen we de juiste toets laten zakken -- dat staat in de commits. De meter meet de dekking van het INSTRUMENT, niet van de code; dat onderscheid staat in scripts/norm.js zelf."
+    },
     {
       "datum": "2026-08-18",
       "meter": "browserpoortToetsen 203 -> 189 en e2eBestanden 125 -> 124 (VERLAAGD bij het samengaan met main)",

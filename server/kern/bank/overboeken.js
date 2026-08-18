@@ -7,10 +7,16 @@
    De brug met de RTG Pay-wallet staat in ./walletbrug: dat is het enige pad dat
    twee grootboeken tegelijk raakt, en die regel hoort niet tussen deze.
    Krijgt de gedeelde ctx van kern/bank/index.js. */
+const { magBij } = require('./eigendom');
+
 module.exports = (ctx) => {
   const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
 
-  const eigenaar = (iban, codenaam) => { const m = rekMeta(iban); return m && (!codenaam || m.codenaam === String(codenaam).trim()); };
+  /* Dezelfde eigendomsvraag als in de andere bankmodules, en dus dezelfde
+     ene plek (./eigendom.js). Deze helper had de fail-open vorm onder een
+     andere naam -- `!codenaam ||` -- en dekt uitgerekend het UITGAANDE
+     geldpad: storten, overboeken, SEPA en naar-wallet. */
+  const eigenaar = (iban, aanvrager) => magBij(rekMeta(iban), aanvrager);
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. */

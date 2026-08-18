@@ -30,9 +30,14 @@
       '<div class="vrow" data-sleutel="'+escHtml(v.sleutel)+'" data-wat="'+escHtml(v.wat)+'">' +
         '<div class="vi"><div class="nm">'+escHtml(vakLabel(v.wat)) +
           ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.wie || '-')+'</span></div>' +
-          '<div class="sub">'+escHtml(v.nummer || T('bo.vak.geennr','zonder nummer')) +
-            (v.tot ? ' · '+T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot) : ' · '+T('bo.vak.geendatum','geen einddatum')) +
+          '<div class="sub" data-nr>' +
+            (v.tot ? T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot) : T('bo.vak.geendatum','geen einddatum')) +
             (v.toelichting ? ' · '+escHtml(v.toelichting) : '') + '</div></div>' +
+        /* Het NUMMER staat er niet bij. Het ligt in de identiteitskluis, en die
+           gaat alleen open met een reden die in het inzagejournaal landt en waar
+           de betrokkene bericht van krijgt. Een lijst die het nummer gewoon
+           toont, zou van elke blik een ongemerkte blik maken. */
+        '<button class="vbtn" data-nummer>'+T('bo.vak.nummer','Nummer inzien')+'</button>' +
         '<button class="vbtn ok" data-teken>'+T('bo.vak.teken','Gezien en aftekenen')+'</button>' +
       '</div>';
     el.innerHTML = (open.length ? open.map(rij).join('')
@@ -52,6 +57,10 @@
       const row = e.target.closest('.vrow');
       teken(row.dataset.sleutel, row.dataset.wat);
     }));
+    el.querySelectorAll('[data-nummer]').forEach(b => b.addEventListener('click', e => {
+      const row = e.target.closest('.vrow');
+      nummerInzien(row);
+    }));
     el.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', e =>
       intrek(e.target.dataset.sleutel, e.target.dataset.wat)));
   }
@@ -61,6 +70,22 @@
      maar nooit een leeg vakje waar een mens op moet gokken. */
   let VAK_SOORTEN = null;
   const vakLabel = id => (VAK_SOORTEN && VAK_SOORTEN[id] && VAK_SOORTEN[id].naam) || id;
+
+  /* HET NUMMER OPVRAGEN. De reden wordt hier GEVRAAGD en niet verzonnen; de
+     server weigert een lege of nietszeggende reden met 400. Wat er terugkomt
+     zetten we in de rij zelf, met de grens eronder -- zodat wie het leest ook
+     ziet dat de betrokkene hier bericht van heeft gekregen. */
+  async function nummerInzien(row){
+    const reden = prompt(T('bo.vak.reden','Waarvoor heeft u dit nummer nodig? De betrokkene krijgt uw reden te zien.'));
+    if (reden === null) return;
+    let r;
+    try { r = await call('/office/vakbewijs/nummer', { sleutel: row.dataset.sleutel, wat: row.dataset.wat, reden: (reden||'').trim() }); }
+    catch(e){ alert(e.message); return; }
+    const sub = row.querySelector('[data-nr]');
+    if (sub) sub.innerHTML = '<b>'+escHtml(r.nummer || T('bo.vak.geennr','zonder nummer'))+'</b> · ' + sub.innerHTML +
+      '<div style="color:var(--soft);margin-top:0.2rem;">'+escHtml(r.grens || '')+'</div>';
+    const knop = row.querySelector('[data-nummer]'); if (knop) knop.remove();
+  }
 
   async function teken(sleutel, wat){
     const door = prompt(T('bo.vak.wie','Wie tekent af dat dit stuk is gezien? (uw naam)'));

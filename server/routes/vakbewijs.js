@@ -23,9 +23,8 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, accounts, officeAuth, supplierAuth, persoonseis, sleutelLid,
-    vakbewijsZet, vakbewijsTeken, vakbewijsIntrek, vakbewijzenVan, vakbewijzenVerlopend,
-    notify } = kern;
+  const { app, auth, accounts, supplierAuth, persoonseis, sleutelLid,
+    vakbewijsZet, vakbewijzenVan } = kern;
 
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
@@ -55,8 +54,13 @@ module.exports = (kern) => {
         if (s && s.type && !genres.some(g => g.genre === s.type)) genres.push(persoonseis.eisenVoorGenre(s.type));
       }
     } catch (e) { /* geen werkplekken is geen fout: dan is de eisenlijst gewoon leeg */ }
-    res.json({ ok: true, soorten: persoonseis.SOORTEN,
-      vakbewijzen: vakbewijzenVan(sleutel), eisen: genres });
+    /* Het eigen nummer gaat WEL mee. Dat is zelf-inzage en geen inzage in
+       andermans gegevens; server/inzagelog.js slaat die om precies dezelfde
+       reden over. Wie zijn eigen stuk niet kan terugzien, kan ook niet
+       controleren of hij het goed heeft ingevoerd. */
+    const mijne = vakbewijzenVan(sleutel).map(v =>
+      Object.assign({}, v, { nummer: kern.vakbewijsNummer(sleutel, v.wat) || null }));
+    res.json({ ok: true, soorten: persoonseis.SOORTEN, vakbewijzen: mijne, eisen: genres });
   });
 
   /* Vastleggen. Dit VERLEENT NIETS: tot een mens van RTG het heeft gezien,
@@ -77,60 +81,12 @@ module.exports = (kern) => {
     stuur(res, vakbewijsZet(sleutel, b));
   });
 
-  /* ---- 2. het kantoor: zien en aftekenen ---- */
-
-  /* De stapel. Alleen wat nog niet is gezien; een kantoor dat door afgetekende
-     stukken moet bladeren om het openstaande te vinden, tekent uiteindelijk
-     alles af om van de lijst af te zijn. */
-  app.post('/api/office/vakbewijzen', officeAuth, (req, res) => {
-    const open = [];
-    for (const v of (kern.db.data.vakbewijzen || [])) {
-      if (v.afgetekend || v.ingetrokken) continue;
-      open.push(Object.assign({}, v, { wie: codenaamBijSleutel(v.sleutel) }));
-    }
-    /* De soortenlijst gaat mee: het scherm hoort "een Verklaring Omtrent het
-       Gedrag" te tonen en niet "vog". Een tweede lijst in de client zou de
-       tweede plek zijn die dezelfde namen vasthoudt (LAT-regel 4). */
-    res.json({ ok: true, open, soorten: persoonseis.SOORTEN,
-      verlopend: vakbewijzenVerlopend(null, 60).map(v =>
-        Object.assign({}, v, { wie: codenaamBijSleutel(v.sleutel) })) });
-  });
-
-  /* DE CODENAAM EN NIET DE ECHTE NAAM. Die staat in de kluis, en elke blik erin
-     hoort door het inzagejournaal (zie pendingVerifications in
-     kern/kantoor/index.js, dat daar precies om die reden een `wie` voor vraagt).
-     Voor deze stapel is dat ook niet nodig: wie aftekent bekijkt een STUK, en
-     de koppeling tussen dat stuk en de mens is de identiteitsverificatie die al
-     eerder is gedaan. Een naam erbij zou de kluis opentrekken voor gemak. */
-  function codenaamBijSleutel(sleutel) {
-    const m = /^lid:(\d+)$/.exec(String(sleutel || ''));
-    if (!m) return null;
-    try { return (accounts.getUserById(Number(m[1])) || {}).codename || null; } catch (e) { return null; }
-  }
-
-  app.post('/api/office/vakbewijs/teken', officeAuth, (req, res) => {
-    const b = req.body || {};
-    const door = String(b.door || (req.session && req.session.naam) || '').trim();
-    stuur(res, vakbewijsTeken(String(b.sleutel || ''), String(b.wat || ''), door));
-  });
-
-  /* Intrekken. Dit is de knop die er nooit was: een afgetekend stuk kon alleen
-     verlopen, en een ingetrokken BIG-registratie wacht niet netjes op zijn
-     einddatum. */
-  app.post('/api/office/vakbewijs/intrek', officeAuth, (req, res) => {
-    const b = req.body || {};
-    const door = String(b.door || (req.session && req.session.naam) || '').trim();
-    const r = vakbewijsIntrek(String(b.sleutel || ''), String(b.wat || ''), door, b.reden);
-    if (!r.error && notify) {
-      const m = /^lid:(\d+)$/.exec(String(b.sleutel || ''));
-      /* De betrokkene hoort het te weten. Dat is niet alleen netjes: het is de
-         enige manier waarop iemand kan merken dat er iets misgaat met zijn
-         papieren, in plaats van het bij de deur te ontdekken. */
-      if (m) { try { kern.sendPushToUser(Number(m[1]), { title: 'Vakbewijs ingetrokken',
-        body: 'Uw ' + String(b.wat) + ' telt niet meer mee voor uw werk bij RTG-partners.' }); } catch (e) {} }
-    }
-    stuur(res, r);
-  });
+  /* ---- 2. het kantoor: zien, het nummer inzien, aftekenen en intrekken ----
+     Staat in ./vakbewijs-kantoor.js. Dat is niet alleen de 10 KB-grens: daar
+     zit de KLUISDEUR (een reden, het inzagejournaal, bericht aan de betrokkene)
+     en die hoort bij elkaar te staan, niet verspreid tussen de leden- en
+     zaakroutes. */
+  require('./vakbewijs-kantoor')(kern, { stuur });
 
   /* ---- 3. de zaak: staat mijn ploeg erdoor? ---- */
 

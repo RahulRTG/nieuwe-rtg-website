@@ -57,7 +57,7 @@ function stukkenVoor(genre, rol) {
    account al, dan wordt het niet opnieuw gemaakt, en een al afgetekend stuk
    blijft staan zoals het staat. */
 function zaaiPapieren({ db, save, accounts, findSupplier, log }) {
-  const vakbewijs = require('./vakbewijs')({ db, save,
+  const vakbewijs = require('./vakbewijs')({ db, save, accounts,
     schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200) });
   let accountsGemaakt = 0, stukkenGezet = 0;
 

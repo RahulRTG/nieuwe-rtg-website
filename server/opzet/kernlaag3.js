@@ -35,7 +35,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
+  const { DATA_DIR, accounts, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
 
 /* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
    vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
@@ -97,7 +97,7 @@ Object.assign(kern, require('../kern/hulpdienst')({ db, save, crypto, anthropic,
    VOOR hun eerste lezer -- de zorgketen hieronder toetste het genre van de zaak
    en niet de mens die voorschreef. De identiteitsstand komt laat gebonden uit
    payrollOS: de enige lezer van `verified` in dit huis. */
-Object.assign(kern, require('../kern/vakbewijs')({ db, save, schoon }));
+Object.assign(kern, require('../kern/vakbewijs')({ db, save, schoon, accounts }));
 Object.assign(kern, { persoonseis: require('../kern/persoonseis')({
   vakbewijsHeeft: kern.vakbewijsHeeft, sleutelLid: kern.sleutelLid,
   identiteitVan: (p) => kern.payrollOS.identiteit.stand(p.lid) }) });

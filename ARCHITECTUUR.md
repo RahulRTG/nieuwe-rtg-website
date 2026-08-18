@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3972 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3973 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3972 |
-| servermodules (`server/**/*.js`) | 2167 |
-| routebestanden (`server/routes/**`) | 450 |
-| kernmodules (`server/kern/**`) | 1329 |
+| API-endpoints | 3973 |
+| servermodules (`server/**/*.js`) | 2171 |
+| routebestanden (`server/routes/**`) | 452 |
+| kernmodules (`server/kern/**`) | 1331 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 226 |
-| toetsbestanden (`test/*.test.js`) | 887 |
+| toetsbestanden (`test/*.test.js`) | 888 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -96,7 +96,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 189 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -115,7 +115,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2255 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2256 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -123,13 +123,13 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1403 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 189 |
-| daarvan door precies één domein | 1214 |
+| kern-namen die routes aanraken | 1404 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 191 |
+| daarvan door precies één domein | 1213 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
-Dat derde getal is de opening: 87% van wat er in de gedeelde zak zit, wordt door
+Dat derde getal is de opening: 86% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat
 domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen zakken.
 
@@ -137,12 +137,12 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(168) auth(103) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(25)
-accounts(22) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
+app(169) auth(103) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(25)
+accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
 boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) findSupplier(10)
 express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8)
-noteFailedTry(7) kern(7) sseToOffice(7) mail(6) stuur(6) boardroomAuth(6) talen(6)
-loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) notify(5) sseToCustomer(5)
+noteFailedTry(7) kern(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6) talen(6)
+loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

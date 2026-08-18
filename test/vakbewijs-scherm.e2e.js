@@ -208,13 +208,22 @@ test('het kantoor ziet de stapel, met de codenaam en niet de echte naam',
 
     const beeld = await page.evaluate(() => {
       const el = document.querySelector('#vakbewijzen');
-      return { tekst: el.innerText || '', teken: el.querySelectorAll('[data-teken]').length };
+      return { tekst: el.innerText || '', html: el.innerHTML,
+        teken: el.querySelectorAll('[data-teken]').length,
+        inzien: el.querySelectorAll('[data-nummer]').length };
     });
 
     assert.ok(/Verklaring Omtrent het Gedrag/i.test(beeld.tekst),
       'het stuk staat er bij zijn leesbare naam: ' + beeld.tekst);
-    assert.ok(/VOG-9/.test(beeld.tekst), 'met het nummer, want daar tekent een mens op af');
     assert.equal(beeld.teken, 1, 'en er is precies een knop om op af te tekenen');
+
+    /* HET NUMMER STAAT ER NIET, en dat is sinds de kluis-verhuizing het punt:
+       een BIG-registratie staat in een openbaar register, dus een nummer naast
+       een codenaam voert die codenaam terug naar een echte naam. Het gaat alleen
+       open met een reden, en dan weet de betrokkene het. */
+    assert.equal(beeld.html.includes('VOG-9'), false,
+      'het documentnummer hoort niet zomaar op het bord te staan: ' + beeld.tekst);
+    assert.equal(beeld.inzien, 1, 'er is wel een weg ernaartoe, met een reden');
 
     /* DE PRIVACYREGEL, en die is het punt van deze toets: de echte naam ligt in
        de kluis en elke blik daarin hoort door het inzagejournaal. Op dit bord

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1013 bestanden en 6706 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1014 bestanden en 6712 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1013 |
-| losse beweringen (`test(...)`) | 6706 |
+| toetsbestanden | 1014 |
+| losse beweringen (`test(...)`) | 6712 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 839 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 22 |
+| alleen in de kop *genoemd*, nog niet gemeten | 23 |
 | niets van beide | 93 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-887 bestanden, 6477 beweringen.
+888 bestanden, 6483 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -821,7 +821,8 @@ toets omvalt.
 | `uitrol.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
 | `uploadquarantaine.test.js` | 5 | gezakt op `===->!==#0` | De uploadgrens in het klein: bytes staan tijdens de keuring in een aparte map, bereiken de route alleen na de eigen én externe scan, en blijven bij geen enkel oordeel als terugvindbaar virusbestand liggen. |
-| `vakbewijs-routes.test.js` | 8 | genoemd | DE WEG VAN EEN VAKBEWIJS, OVER ECHTE ROUTES. WAAROM DIT BESTAAT, EN HET STAAT ZWART OP WIT IN test/persoonseis.test.js: daar is een mutatie AFGESLAGEN. |
+| `vakbewijs-kluis.test.js` | 5 | genoemd | HET NUMMER WOONT IN DE KLUIS -- gemeten aan de OPSLAG, niet aan de uitgang. WAAROM DIT EEN EIGEN BESTAND IS. |
+| `vakbewijs-routes.test.js` | 9 | genoemd | DE WEG VAN EEN VAKBEWIJS, OVER ECHTE ROUTES. WAAROM DIT BESTAAT, EN HET STAAT ZWART OP WIT IN test/persoonseis.test.js: daar is een mutatie AFGESLAGEN. |
 | `vakken.test.js` | 4 | gezakt op `liegpoort /api/` | De vakmannen-golf: tien alledaagse vakken (autogarage, schoonmaak, hovenier, wasserij, rijschool, dierenarts, tandarts, fotograaf, verhuizer, IT-hulp) op de vakwerk-motor, elk met een demo-zaak op het Dienstenplein;... |
 | `vakpro.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro: de pro-laag van de dienstverlenende genres -- de offerte-keten (lid vraagt vrije klus, zaak biedt prijs, lid geeft akkoord en de klus staat als bevestigde boeking klaar), de digitale werkbon die met de... |
 | `vakpro2.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro, laag 2: team-capaciteit (overlappende boekingen tot het aantal vaklieden), vaste afspraken (ritmes die de volgende afspraak inplannen, door beide kanten te stoppen), de wachtlijst met automatisch seintje... |

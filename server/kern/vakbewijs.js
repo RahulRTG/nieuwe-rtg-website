@@ -6,26 +6,26 @@
    daarna iedereen binnen met dezelfde vier cijfers.
 
    Dit bestand houdt de FEITEN vast; ./persoonseis.js zegt wat een genre ervan
-   verlangt. Die knip is dezelfde als bij de bedrijfskant: het genre-register
-   draagt de STAND, de bewijsmodule draagt de EIS.
+   verlangt -- dezelfde knip als bij de bedrijfskant.
 
    DRIE DINGEN DIE HIER BEWUST ZO ZIJN.
 
-   1. EEN INGEDIEND STUK IS GEEN BEWIJS. Zetten legt een BEWERING vast. Pas een
-      aftekening met een naam erop draagt een poort -- dezelfde vorm als
-      bewijsTeken() bij de aanmeldingen, en om dezelfde reden: een vlag die
-      niemand handhaaft is een open deur met een bordje ernaast.
+   1. EEN INGEDIEND STUK IS GEEN BEWIJS. Zetten legt een BEWERING vast; pas een
+      aftekening met een naam erop draagt een poort (./vakbewijs-aftekenen.js).
+      Een vlag die niemand handhaaft is een open deur met een bordje ernaast.
 
    2. RTG IS GEEN INSPECTIE, OOK HIER NIET. Wij bellen het BIG-register niet en
-      doen niet alsof. Vastgelegd wordt dat een mens het stuk heeft gezien, met
-      een nummer en twee datums. Doen alsof wij een registratie valideren zou
-      schijnzekerheid geven en de aansprakelijkheid verschuiven naar de partij
-      die dat niet kan dragen (CONCERN.md, De grenzen).
+      doen niet alsof. Vastgelegd wordt dat een mens het stuk heeft GEZIEN.
+      Doen alsof wij een registratie valideren zou schijnzekerheid geven en de
+      aansprakelijkheid verschuiven naar wie dat niet kan dragen (CONCERN.md).
 
    3. EEN BEWIJS VERLOOPT, EN DAT IS HET HELE PUNT. De bedrijfskant tekende voor
       eeuwig af: een doorgehaalde BIG-registratie bleef voorgoed "gezien". Hier
       is `tot` daarom geen sierveld -- geldigheid wordt bij ELKE vraag opnieuw
       gerekend, nooit opgeslagen als vlag.
+
+   WAAR HET NUMMER WOONT: in de identiteitskluis, niet hier. Zie
+   ./vakbewijs-nummer.js.
 
    WAT HIER NIET WOONT. Het document zelf. Een scan of foto gaat naar de
    bestaande identiteitsverificatie (routes/auth/verificatie.js, versleuteld,
@@ -37,12 +37,12 @@
 'use strict';
 
 /* De sleutel zegt WELKE MENS, en uit welke wereld hij komt:
-     lid:<accountId>    personeel in het leverancierskanaal; dat heeft altijd een
+     lid:<accountId>    personeel in het leverancierskanaal; heeft altijd een
                         eigen RTG-account (routes/werving.js dwingt dat af)
-     concern:<persoon>  de codenaam uit de concernwereld, die geen RTG-account
-                        hoeft te hebben -- een bestuurder van buiten bestaat
-   Een sleutel zonder wereld weigeren we: 'jan' hoort bij twee verschillende
-   mensen, en dat is precies de fout die een kale naam als sleutel maakt. */
+     concern:<persoon>  de codenaam uit de concernwereld, die geen account hoeft
+                        te hebben -- een bestuurder van buiten bestaat
+   Een sleutel zonder wereld weigeren we: 'jan' hoort bij twee mensen, en dat is
+   precies de fout die een kale naam als sleutel maakt. */
 function sleutelLid(id) { return id == null ? null : 'lid:' + Number(id); }
 function sleutelConcern(persoon) {
   const p = String(persoon == null ? '' : persoon).trim();
@@ -52,19 +52,26 @@ const geldigeSleutel = (s) => typeof s === 'string' && /^(lid:\d+|concern:.+)$/.
 
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
-module.exports = ({ db, save, schoon, tijdVandaag }) => {
+module.exports = ({ db, save, schoon, tijdVandaag, accounts }) => {
   const vandaag = tijdVandaag || (() => new Date().toISOString().slice(0, 10));
   const nu = () => new Date().toISOString();
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 80);
 
-  // de eenmalige verhuizing van de concern-kwalificaties: ./vakbewijs-verhuis.js
-  const verhuisConcern = require('./vakbewijs-verhuis')({ db, save, vandaag, sleutelConcern });
+  // de eenmalige verhuizingen (concern-kwalificaties, en de nummers naar de
+  // kluis): ./vakbewijs-verhuis.js
+  const verhuis = require('./vakbewijs-verhuis')({ db, save, vandaag, sleutelConcern, accounts });
 
   function bak() {
     if (!Array.isArray(db.data.vakbewijzen)) db.data.vakbewijzen = [];
-    verhuisConcern();
+    verhuis.concern();
+    verhuis.nummers();
     return db.data.vakbewijzen;
   }
+
+  /* Waar het NUMMER woont en waarom, staat in ./vakbewijs-nummer.js. Kort: in
+     de identiteitskluis en niet hier, want een BIG-registratie staat in een
+     openbaar register en zou een codenaam terugvoeren naar een echte naam. */
+  const { nummerVan, nummerZet } = require('./vakbewijs-nummer')({ accounts, kap, vind: (s2, w) => vind(s2, w) });
 
   const vind = (sleutel, wat) => bak().find(v => v.sleutel === sleutel && v.wat === wat) || null;
 
@@ -79,20 +86,26 @@ module.exports = ({ db, save, schoon, tijdVandaag }) => {
     return true;
   }
 
+  /* De leesbare vorm van een rij. Het NUMMER zit er met opzet niet in: wie het
+     nodig heeft vraagt het apart op, en op de kantoorweg gaat daar een reden en
+     een journaalregel overheen. Zou toon() hem meesturen, dan lekt hij mee in
+     elke lijst die ooit op deze functie wordt gebouwd. */
   function toon(v, d) {
-    return Object.assign({}, v, {
+    const uit = Object.assign({}, v, {
       geldig: geldigOp(v, d),
       verlopen: !!(v.tot && v.tot < (d || vandaag())),
       gezien: !!v.afgetekend
     });
+    delete uit.nummer;
+    return uit;
   }
 
   /* ---- vastleggen ----
-     `zet` is een BEWERING en verandert niets aan toegang. Een bestaand bewijs
-     opnieuw zetten wist de aftekening: een nieuw nummer of een nieuwe einddatum
-     is een ANDER stuk, en dat is niet gezien. Zonder die regel is de aftekening
-     met een enkele wijziging over te schrijven naar een stuk dat niemand ooit
-     heeft bekeken -- de goedkoopste fraude die er is. */
+     `zet` is een BEWERING en verandert niets aan toegang. Opnieuw zetten wist de
+     aftekening: een nieuw nummer of een nieuwe einddatum is een ANDER stuk, en
+     dat is niet gezien. Zonder die regel is de aftekening met een enkele
+     wijziging over te schrijven naar een stuk dat niemand ooit heeft bekeken --
+     de goedkoopste fraude die er is. */
   function vakbewijsZet(sleutel, body) {
     if (!geldigeSleutel(sleutel)) return { status: 400, error: 'Voor wie is dit vakbewijs?' };
     const b = body || {};
@@ -109,9 +122,17 @@ module.exports = ({ db, save, schoon, tijdVandaag }) => {
     if (tot && eigenVan && tot < van) return { status: 400, error: 'De einddatum ligt voor de begindatum.' };
     const nummer = kap(b.nummer, 60) || null;
     const bestaand = vind(sleutel, wat);
-    const anders = !bestaand || bestaand.nummer !== nummer || bestaand.tot !== tot || bestaand.van !== van;
+    /* Het OUDE nummer komt uit de kluis (of, voor een concern-rij, uit de rij
+       zelf). Dit is een schrijfpad van de mens over zijn eigen stuk, dus geen
+       inzage in andermans gegevens en geen journaalregel -- zie mag() in
+       server/inzagelog.js, dat zelf-inzage om dezelfde reden overslaat. */
+    const oudNummer = bestaand ? nummerVan(sleutel, wat) : null;
+    const anders = !bestaand || oudNummer !== nummer || bestaand.tot !== tot || bestaand.van !== van;
     const v = bestaand || { sleutel, wat, ingediend: nu() };
-    v.nummer = nummer;
+    /* Het nummer gaat NIET in deze rij maar in de kluis. Lukt dat niet (een
+       concern-rij, of een opzet zonder accounts), dan valt hij terug op de rij
+       -- en dat is dan de enige plek, niet een tweede. */
+    if (!nummerZet(sleutel, wat, nummer)) v.nummer = nummer; else delete v.nummer;
     v.van = van;
     v.tot = tot;
     v.opent = Array.isArray(b.opent) ? b.opent.slice(0, 12).map(x => kap(x, 60)).filter(Boolean) : (v.opent || []);
@@ -125,32 +146,12 @@ module.exports = ({ db, save, schoon, tijdVandaag }) => {
         : 'Vastgelegd. Dit telt pas mee zodra iemand van RTG het stuk heeft gezien; RTG beoordeelt het niet inhoudelijk.' };
   }
 
-  /* Een mens tekent af. Op een NAAM, want een aftekening zonder naam is geen
-     aftekening -- zelfde regel en zelfde zin als bij de bedrijfskant. */
-  function vakbewijsTeken(sleutel, wat, door) {
-    const v = vind(sleutel, kap(wat, 60));
-    if (!v) return { status: 404, error: 'Dit stuk is hier niet ingediend.' };
-    if (v.ingetrokken) return { status: 409, error: 'Dit stuk is ingetrokken.' };
-    if (v.afgetekend) return { status: 409, error: 'Dit stuk is al afgetekend.' };
-    const naam = kap(door, 60);
-    if (!naam) return { status: 400, error: 'Wie tekent af? Een aftekening zonder naam is geen aftekening.' };
-    v.afgetekend = { door: naam, at: nu() };
-    save();
-    return { ok: true, vakbewijs: toon(v),
-      grens: 'Vastgelegd is dat ' + naam + ' het stuk heeft gezien. RTG is geen inspectie en toetst de inhoud niet.' };
-  }
-
-  /* Intrekken. Een stuk verdwijnt NIET uit de lijst: wie het weggooit, gooit ook
-     weg dat het er ooit was, en juist dat wil je terugzien als er iets misgaat. */
-  function vakbewijsIntrek(sleutel, wat, door, reden) {
-    const v = vind(sleutel, kap(wat, 60));
-    if (!v) return { status: 404, error: 'Dit stuk is hier niet ingediend.' };
-    const naam = kap(door, 60);
-    if (!naam) return { status: 400, error: 'Wie trekt dit in?' };
-    v.ingetrokken = { door: naam, at: nu(), reden: kap(reden, 200) || null };
-    save();
-    return { ok: true, vakbewijs: toon(v) };
-  }
+  /* Aftekenen en intrekken -- de twee handelingen die een MENS VAN RTG met een
+     stuk doet -- staan in ./vakbewijs-aftekenen.js. Ze horen bij elkaar en niet
+     bij het vastleggen erboven: dat is de aanvrager die iets beweert, dit is
+     RTG die er zijn naam onder zet of hem er weer afhaalt. */
+  const { vakbewijsTeken, vakbewijsIntrek } =
+    require('./vakbewijs-aftekenen')({ vind, toon, nu, kap, save });
 
   const vakbewijzenVan = (sleutel, d) => !geldigeSleutel(sleutel) ? []
     : bak().filter(v => v.sleutel === sleutel).map(v => toon(v, d));
@@ -181,8 +182,8 @@ module.exports = ({ db, save, schoon, tijdVandaag }) => {
     return { ok: true, vakbewijs: toon(geldig[0], d) };
   }
 
-  /* Wat er binnen `dagen` verloopt. Zonder een lijst die vooruitkijkt merkt een
-     zaak het pas op de ochtend dat er iemand niet meer naar binnen kan. */
+  /* Wat er binnen `dagen` verloopt. Zonder vooruitkijken merkt een zaak het pas
+     op de ochtend dat er iemand niet meer naar binnen kan. */
   function vakbewijzenVerlopend(sleutels, dagen) {
     const grens = new Date(Date.now() + (Number(dagen) || 60) * 86400000).toISOString().slice(0, 10);
     const d = vandaag();
@@ -191,6 +192,6 @@ module.exports = ({ db, save, schoon, tijdVandaag }) => {
       (!set || set.has(v.sleutel))).map(v => toon(v, d));
   }
 
-  return { vakbewijsZet, vakbewijsTeken, vakbewijsIntrek, vakbewijzenVan, vakbewijsHeeft,
+  return { vakbewijsZet, vakbewijsTeken, vakbewijsIntrek, vakbewijzenVan, vakbewijsHeeft, vakbewijsNummer: nummerVan,
     vakbewijzenVerlopend, sleutelLid, sleutelConcern, vakbewijsGeldigOp: geldigOp };
 };

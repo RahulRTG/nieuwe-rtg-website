@@ -53,7 +53,11 @@ module.exports = (ctx) => {
      velden die de concernkant nooit had (aftekening, intrekking) gaan hier niet
      mee: ze zouden een betekenis suggereren die deze wereld niet kent. */
   function naarKwalificatie(v, persoon) {
-    return { persoon, wat: v.wat, nummer: v.nummer || null,
+    /* Het nummer komt apart op, want ../vakbewijs.js houdt hem sinds de
+       kluis-verhuizing uit de leesbare vorm van een rij. Voor een concernrij
+       verandert er niets: die heeft geen RTG-account om een dossier aan te
+       hangen, dus vakbewijsNummer() leest hem gewoon uit de rij zelf. */
+    return { persoon, wat: v.wat, nummer: store.vakbewijsNummer(sleutelConcern(persoon), v.wat) || null,
       van: v.van || null, tot: v.tot || null, opent: v.opent || [], geldig: v.geldig };
   }
 

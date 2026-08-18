@@ -111,6 +111,10 @@ test('3. een ingediend stuk opent nog niets; RTG moet het eerst zien', async () 
   assert.equal(mijn.status, 200);
   assert.equal(mijn.body.vakbewijzen.length, 1);
   assert.equal(mijn.body.vakbewijzen[0].gezien, false);
+  /* Zijn EIGEN nummer ziet hij gewoon: zelf-inzage is geen inzage in andermans
+     gegevens, en die gaat dus ook niet door het journaal (zie mag() in
+     server/inzagelog.js, dat om dezelfde reden zelf-inzage overslaat). */
+  assert.equal(mijn.body.vakbewijzen[0].nummer, 'VOG-2026-77');
   const eis = mijn.body.eisen.find(e => e.genre === 'kinderopvang');
   assert.ok(eis, 'de eisen van de zaak waar hij werkt staan erbij');
   assert.deepEqual(eis.werk.map(w => w.id).sort(), ['identiteit', 'vog']);
@@ -118,10 +122,17 @@ test('3. een ingediend stuk opent nog niets; RTG moet het eerst zien', async () 
 
 test('4. het kantoor tekent af -- op een naam, en niet de werkgever', async () => {
   const stapel = await api('/api/office/vakbewijzen', {}, office);
-  const rij = stapel.body.open.find(v => v.wat === 'vog' && v.nummer === 'VOG-2026-77');
+  const rij = stapel.body.open.find(v => v.wat === 'vog');
   assert.ok(rij, 'het stuk staat op de stapel van het kantoor');
   assert.ok(rij.wie, 'met de codenaam erbij, zodat een mens weet van wie het is');
   assert.equal(/^lid:\d+$/.test(rij.sleutel), true);
+
+  /* HET NUMMER STAAT ER NIET BIJ, en dat is de hele wijziging: een
+     BIG-registratie staat in een openbaar register, dus een nummer naast een
+     codenaam voert die codenaam terug naar een echte naam. Het woont nu in de
+     kluis en gaat alleen open met een reden. */
+  assert.equal(JSON.stringify(stapel.body).includes('VOG-2026-77'), false,
+    'het documentnummer hoort niet zomaar op de stapel te staan');
 
   const zonderNaam = await api('/api/office/vakbewijs/teken', { sleutel: rij.sleutel, wat: 'vog', door: '  ' }, office);
   assert.equal(zonderNaam.status, 400, 'een aftekening zonder naam is geen aftekening');
@@ -169,8 +180,9 @@ test('7. de zaak ziet ja of nee, en niets van een ander', async () => {
 });
 
 test('8. intrekken werkt zonder op een einddatum te wachten', async () => {
+  const eigenSleutel = (await api('/api/vakbewijs', {}, lid)).body.vakbewijzen[0].sleutel;
   const stapel = await api('/api/office/vakbewijzen', {}, office);
-  assert.equal(stapel.body.open.some(v => v.nummer === 'VOG-2026-77'), false,
+  assert.equal(stapel.body.open.some(v => v.sleutel === eigenSleutel && v.wat === 'vog'), false,
     'een afgetekend stuk staat niet meer op de stapel');
 
   const mijn = await api('/api/vakbewijs', {}, lid);
@@ -182,6 +194,35 @@ test('8. intrekken werkt zonder op een einddatum te wachten', async () => {
   const nee = await inloggen();
   assert.equal(nee.status, 403, 'ingetrokken telt meteen, niet pas op de einddatum');
   assert.equal(nee.body.persoonseis[0].reden, 'ingetrokken');
+});
+
+test('9. het nummer gaat alleen open met een reden, en dat staat in het journaal', async () => {
+  /* Een nieuw stuk om op te vragen; het vorige is in toets 8 ingetrokken. */
+  assert.equal((await api('/api/vakbewijs/zet',
+    { wat: 'vog', nummer: 'VOG-KLUIS-42', tot: '2031-01-01' }, lid)).status, 200);
+  const sleutel = (await api('/api/vakbewijs', {}, lid)).body.vakbewijzen.find(v => v.wat === 'vog').sleutel;
+
+  const zonder = await api('/api/office/vakbewijs/nummer', { sleutel, wat: 'vog' }, office);
+  assert.equal(zonder.status, 400, 'zonder reden gaat de kluis niet open');
+  const kort = await api('/api/office/vakbewijs/nummer', { sleutel, wat: 'vog', reden: 'ok' }, office);
+  assert.equal(kort.status, 400, 'en een reden die niets zegt telt niet als reden');
+
+  const met = await api('/api/office/vakbewijs/nummer',
+    { sleutel, wat: 'vog', reden: 'aftekenen van de VOG bij de kinderopvang' }, office);
+  assert.equal(met.status, 200);
+  assert.equal(met.body.nummer, 'VOG-KLUIS-42');
+  assert.ok(/journaal/i.test(met.body.grens), met.body.grens);
+
+  /* En de blik staat er ook echt in -- gelezen door DE BETROKKENE zelf, want
+     dat is waar het journaal voor bestaat (AVG art. 15: wie heeft mijn gegevens
+     opgevraagd, en waarvoor). */
+  const log = await api('/api/privacy/inzage', {}, lid);
+  const regels = log.body.inzage || [];
+  const mijne = regels.filter(r => /vakbewijs/.test(String(r.bron || '')));
+  assert.ok(mijne.length >= 1, 'de inzage staat in het journaal: ' + JSON.stringify(regels));
+  assert.ok(/aftekenen van de VOG/.test(String(mijne[0].waarom || '')), 'met de reden erbij');
+  assert.equal(JSON.stringify(regels).includes('VOG-KLUIS-42'), false,
+    'het journaal bewaart het nummer niet; dat zou een tweede kopie van de kluis zijn');
 });
 
 /* ============================================================================

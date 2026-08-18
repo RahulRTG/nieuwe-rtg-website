@@ -8570,7 +8570,13 @@ var RTG_BOUW = '5141b00d';
         '<div><b>'+esc(naam)+'</b> <span class="vaksub">'+esc(n.waarvoor === 'werk'
           ? T('vak.voorwerk','nodig om hier te werken')
           : T('vak.voor','nodig om ')+esc(n.waarvoor))+'</span>' +
-        '<div class="vaksub vak-'+klasse+'">'+stateTekst+'</div></div>' +
+        '<div class="vaksub vak-'+klasse+'">'+stateTekst+'</div>' +
+        /* Je EIGEN nummer, gewoon zichtbaar. Dat is zelf-inzage en geen inzage
+           in andermans gegevens; het journaal slaat die om dezelfde reden over.
+           Wie zijn eigen stuk niet kan terugzien, kan ook niet nakijken of hij
+           het goed heeft ingevoerd -- en dat is precies wat je wilt dat iemand
+           doet voordat RTG ernaar kijkt. */
+        (v && v.nummer ? '<div class="vaksub">'+esc(v.nummer)+'</div>' : '') + '</div>' +
         (klasse === 'ok' ? '' : '<button class="vbtn" data-vak="'+esc(id)+'">' +
           (v ? T('vak.opnieuw','Opnieuw indienen') : T('vak.indienen','Indienen')) + '</button>') +
         '</div>';

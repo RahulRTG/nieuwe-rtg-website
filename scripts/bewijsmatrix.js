@@ -70,6 +70,27 @@ const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 
 const argv = process.argv.slice(2);
 const VASTLEGGEN = argv.includes('--vastleggen');
+/* DE ENIGE MANIER OM EEN VERSLECHTERING VAST TE LEGGEN, en hij vraagt een reden.
+
+   De ratel verderop weigert een stand waarin "ongemeten" groeit. Dat is goed,
+   maar er is een geval waarin die weigering te streng is: de CODEBASE groeit.
+   Komen er tweehonderd routes bij, dan groeit het aantal cellen met tweeduizend
+   en staat er meer ongemeten -- ook als elke kolom PROPORTIONEEL gelijk bleef of
+   vooruitging. Zo stond het er toen de AUDIT-kolom voor het eerst gemeten werd:
+   elf kolommen gelijk of beter, AUDIT van 0 naar 13,7 procent, en toch een
+   groeiende noemer.
+
+   De kop van dit bestand zei daarover: "pas BEWIJSMATRIX.json met de hand aan
+   als dit een bewuste keuze is, dan staat het in de git-historie". Dat klopt als
+   principe en deugt niet als handeling -- met de hand een JSON van vierhonderd
+   kilobyte bijwerken is precies hoe er stil een cijfer verschuift dat niemand
+   heeft gemeten.
+
+   Vandaar deze vlag. Hij legt dezelfde GEMETEN stand vast als --vastleggen, maar
+   staat een groei van ongemeten toe EN schrijft de opgegeven reden in het
+   bestand. Zonder reden doet hij niets. De reden staat daarmee naast het cijfer
+   in plaats van in een commit-tekst die niemand terugzoekt. */
+const REDEN = (argv.find(a => a.startsWith('--reden=')) || '').slice(8);
 const JSONUIT = argv.includes('--json');
 /* DE REGISTERS WORDEN NU STANDAARD GELEZEN, en dat was een val.
 
@@ -84,6 +105,7 @@ const JSONUIT = argv.includes('--json');
 const inWortel = (naam) => { const p = path.join(WORTEL, naam); return fs.existsSync(p) ? p : ''; };
 const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13) || inWortel('POORTWACHT.json');
 const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) || inWortel('ROLPROEF.json');
+const HANDELINGPROEF = (argv.find(a => a.startsWith('--handelingproef=')) || '').slice(17) || inWortel('HANDELINGPROEF.json');
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
@@ -120,8 +142,11 @@ const SCHAKELS = [
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
-  { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
+    { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
+    bron: 'scripts/handelingproef-route.js (klopt aan met de JUISTE rol en kijkt of er een geketende regel verscheen)',
+    nodig: 'de voorziening is server/lib/handelingsspoor.js; wat deze kolom NIET zegt is dat het spoor ' +
+      'volledig is -- hij kijkt of er een regel verscheen, niet of alles wat erin staat klopt. En het ' +
+      'wegknippen van de NIEUWSTE regels valt hier niet op; daarvoor is het anker nodig' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -205,6 +230,20 @@ function rolproefUitslag() {
   if (!ROLPROEF) return null;
   try {
     const j = JSON.parse(fs.readFileSync(ROLPROEF, 'utf8'));
+    if (!Array.isArray(j.perRoute)) return null;
+    const kaart = new Map();
+    for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    return kaart;
+  } catch (e) { return null; }
+}
+
+/* De handelingproef per route: liet een geslaagde oproep een geketende regel na
+   in het handelingsspoor? Zelfde vorm als de rolproef -- een route die er niet
+   in staat is niet beproefd, en dat is ongemeten en geen groen. */
+function handelingproefUitslag() {
+  if (!HANDELINGPROEF) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(HANDELINGPROEF, 'utf8'));
     if (!Array.isArray(j.perRoute)) return null;
     const kaart = new Map();
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
@@ -297,6 +336,7 @@ function bouw(invoer) {
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOER);
+  const handeling = inv.handeling !== undefined ? inv.handeling : handelingproefUitslag();
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -365,6 +405,21 @@ function bouw(invoer) {
             ...(s.id === 'SIDE_EFFECT' ? { collecties: st.collecties } : {}) };
         } else if (st) {
           cellen[s.id] = { staat: 'ongemeten', bron: 'staatproef', reden: st.reden };
+        } else {
+          cellen[s.id] = { staat: 'ongemeten' };
+        }
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        const beproefd = handeling && handeling.get(sleutel);
+        /* 'ongemeten' in de proef betekent: de oproep gaf geen 2xx, dus er is
+           niets gebeurd en er HOORT geen regel te zijn. Dat is geen bewijs en
+           ook geen bevinding -- het is niet gemeten. */
+        if (beproefd && beproefd.audit === 'bewezen') {
+          cellen[s.id] = { staat: 'bewezen', bron: 'handelingproef' };
+        } else if (beproefd && beproefd.audit === 'gezakt') {
+          cellen[s.id] = { staat: 'gezakt', bron: 'handelingproef', reden: beproefd.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
@@ -581,9 +636,16 @@ if (VASTLEGGEN) {
     console.log('\n  GEWEIGERD: ongemeten ' + oud.telling.ongemeten + ' -> ' + matrix.telling.ongemeten +
       ', bewezen ' + oud.telling.bewezen + ' -> ' + matrix.telling.bewezen + '.');
     for (const r of slechter) console.log(r);
-    console.log('  De ratel legt geen verslechtering vast; pas BEWIJSMATRIX.json met de hand');
-    console.log('  aan als dit een bewuste keuze is, dan staat het in de git-historie.');
-    process.exit(1);
+    if (!REDEN) {
+      console.log('  De ratel legt geen verslechtering vast. Is dit een bewuste keuze --');
+      console.log('  bijvoorbeeld omdat de codebase groeide en elke kolom proportioneel');
+      console.log('  gelijk bleef -- leg hem dan vast MET een reden:');
+      console.log('    node scripts/bewijsmatrix.js --vastleggen --reden="..."');
+      console.log('  Die reden komt in BEWIJSMATRIX.json te staan, naast het cijfer.');
+      process.exit(1);
+    }
+    matrix.verslechteringToegestaan = { reden: REDEN, cellenVoor: oud.routes * 11, cellenNa: matrix.routes * 11 };
+    console.log('\n  VASTGELEGD MET REDEN: ' + REDEN);
   }
   fs.writeFileSync(UITSLAG, JSON.stringify(zonderRijen(matrix), null, 2) + '\n');
   console.log('\n  vastgelegd in BEWIJSMATRIX.json');

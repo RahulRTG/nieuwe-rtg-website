@@ -303,14 +303,38 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
      gevolgd worden door een cijfer (anders is user-50 een valse treffer), maar
      wat eraan VOORAF gaat maakt niet uit. */
   const sleutelRe = sleutel ? new RegExp(sleutel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![0-9])') : null;
+
+  /* HET AUDITSPOOR, en waarom het NIET blanco is vrijgesteld.
+
+     Het handelingsspoor (server/lib/handelingsspoor.js) bewaart per geslaagde
+     schrijfactie de pseudonieme sleutel, en die blijft na wissing staan. Dat is
+     een besluit met drie grondslagen die alle drie ergens anders staan dan
+     hier: VERWERKINGSREGISTER.md punt 9 legt het doel en de afweging vast,
+     server/bewaarbeleid.js geeft hem een termijn van een jaar, en AVG art. 17
+     lid 3 laat de ruimte.
+
+     Er is ook een technische reden die zwaarder weegt dan een voorkeur: het
+     spoor is een HASHKETEN. Een regel achteraf bijstellen -- ook om er een
+     sleutel uit te halen -- breekt de keten precies zoals een aanvaller dat zou
+     doen, en dan is er geen auditspoor meer om iets mee vast te stellen. Wissen
+     kan hier dus niet stil; het kan alleen door het bewijs zelf op te geven.
+
+     Waarom dan niet gewoon de hele tak overslaan: dan ziet deze bezem er nooit
+     meer iets. Zet iemand hier later een naam of een codenaam in -- door de
+     body alsnog mee te loggen bijvoorbeeld -- dan hoort dat gewoon te zakken.
+     Alleen de sleutel valt weg, de rest niet. */
+  const AUDITTAK = new Map([['handelingLog', ['sleutel']]]);
+
   const raak = [];
   for (const [tak, waarde] of Object.entries(data)) {
     const tekst = JSON.stringify(waarde == null ? null : waarde);
     if (!tekst) continue;
-    const wat = [];
+    let wat = [];
     if (sleutelRe && sleutelRe.test(tekst)) wat.push('sleutel');
     if (codenaam && tekst.includes(codenaam)) wat.push('codenaam');
     if (tekst.includes(NAAM) || tekst.includes(MAIL)) wat.push('NAAM/E-MAIL');
+    const vrij = AUDITTAK.get(tak);
+    if (vrij) wat = wat.filter(w => !vrij.includes(w));
     if (wat.length) raak.push(tak + ' (' + wat.join(' + ') + ')');
   }
 

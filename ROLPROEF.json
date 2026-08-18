@@ -1,14 +1,14 @@
 {
  "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",
  "gemeten": {
-  "routesMetRol": 3075,
-  "beproefd": 3075,
-  "pogingen": 6150,
+  "routesMetRol": 3081,
+  "beproefd": 3081,
+  "pogingen": 6162,
   "aclOpen": 0,
   "privacyLek": 0,
   "zijeffecten": 0,
   "blindeRondes": 0,
-  "begrenzing": 8000
+  "begrenzing": 7000
  },
  "perRoute": [
   {
@@ -2687,6 +2687,61 @@
   {
    "methode": "POST",
    "pad": "/api/command/start",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/bevestig",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/klim",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/pauze",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/uitrol/zet",
    "rol": "office",
    "geprobeerd": [
     "member",
@@ -12972,6 +13027,17 @@
   {
    "methode": "POST",
    "pad": "/api/office/ghost",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/handelingen",
    "rol": "office",
    "geprobeerd": [
     "member",

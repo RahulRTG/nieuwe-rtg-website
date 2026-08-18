@@ -24,7 +24,7 @@ const BEWAAR_MIN = 12;      // maanden; centraal, lokaal niet te onderschrijden
 const BEWAAR_MAX = 120;
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, getal, lijst, S, audit, vindLab, save } = ctx;
+  const { nu, rid, schoon, getal, lijst, S, audit, auditKeten, vindLab, save } = ctx;
 
   const pub = l => ({ id: l.id, stad: l.stad, naam: l.naam, land: l.land, actief: l.actief,
     soorten: l.soorten, bewaarMaanden: l.bewaarMaanden, toegang: l.toegang, taal: l.taal,
@@ -141,12 +141,17 @@ module.exports = (ctx) => {
   }
 
   /* Het auditspoor van een lab, nieuwste eerst. Filterbaar op studie, want een
-     toezichthouder die één studie onderzoekt wil niet het hele lab doorspitten. */
+     toezichthouder die één studie onderzoekt wil niet het hele lab doorspitten.
+
+     `keten` gaat over het HELE spoor en niet over de gefilterde regels
+     hieronder; zie de uitleg bij audit() in ./opslag.js. Dat is met opzet: een
+     filter mag nooit bepalen of het bewijs klopt. */
   function auditlog(labId, over, max) {
     const l = vindLab(labId); if (!l) return { status: 404, error: 'Dit lab bestaat niet.' };
     let rijen = S().audit.filter(a => a.labId === l.id);
     if (over) rijen = rijen.filter(a => a.over === String(over));
-    return { ok: true, totaal: rijen.length, regels: rijen.slice(0, getal(max || 200, 1, 1000)) };
+    return { ok: true, totaal: rijen.length, regels: rijen.slice(0, getal(max || 200, 1, 1000)),
+      keten: auditKeten() };
   }
 
   /* De bewaarveger van dit domein. Studies ouder dan de bewaartermijn van hun

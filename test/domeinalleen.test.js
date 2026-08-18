@@ -53,6 +53,10 @@ const http = require('http');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+/* Alleen voor drukte(): het geduld dat meeschaalt met de belasting. helper.js
+   laadt zelf niets zwaars, dus deze toets blijft verder gewoon zelfstandig --
+   hij start zijn eigen servers met een eigen RTG_DOMAINS. */
+const { drukte } = require('./helper');
 
 const ROOT = path.join(__dirname, '..');
 
@@ -83,7 +87,18 @@ function vraag(port, pad, methode) {
    Nu wacht hij op precies de vraag die erna komt, met dezelfde methode. Sterft
    de server, dan loopt hij af met de opstartlog erbij in plaats van met een
    ECONNRESET waar niemand iets aan heeft. */
-async function wachtTotOp(port, uitInfo, pad, methode, tot = 25000) {
+/* HET GEDULD SCHAALT MEE MET DE MACHINE.
+
+   Hier stond een harde 25 seconden. Die is in test/helper.js al twee keer
+   opgehoogd en uiteindelijk vervangen door geduld dat meeschaalt met de
+   belasting -- maar deze toets start zijn eigen server en had dus zijn eigen
+   wachtlus, die de reparatie nooit kreeg. Gevolg: hij zakte in een volle
+   testronde ("server antwoordde niet binnen 25000ms") en slaagde er los naast.
+   Dat is geen defect maar drukte, en het kost elke keer zoekwerk naar een fout
+   die er niet is.
+
+   drukte() woont in helper.js, zodat er geen derde kopie van deze regel ontstaat. */
+async function wachtTotOp(port, uitInfo, pad, methode, tot = 25000 * drukte().extra) {
   const eind = Date.now() + tot;
   let laatste = null;
   while (Date.now() < eind) {

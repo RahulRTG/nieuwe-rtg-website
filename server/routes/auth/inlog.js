@@ -104,9 +104,24 @@ app.post('/api/auth/login', async (req, res) => {
     noteFailedTry(doelBucket, req.ip, 25);
     const doel = loginFails.get(doelBucket);
     if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, 2000));
+    /* IN HET BEVEILIGINGSLOGBOEK, en dat ontbrak hier.
+
+       De demo-inlog, de partner-inlog, SSO en de kantoordeur schreven allemaal
+       een regel; juist de ECHTE accountinlog niet. Een brute-force tegen echte
+       leden was daardoor onzichtbaar in het ene log dat er is om zoiets terug te
+       vinden -- terwijl het verwerkingsregister bij punt 8 als doel noemt:
+       "inbraakpogingen achteraf kunnen herleiden".
+
+       WAT ER WEL EN NIET IN GAAT. Het account-id als het bestaat, en anders
+       "onbekend". NIET het ingetypte e-mailadres: dat is persoonsgegeven van
+       iemand die hier misschien niet eens klant is, en het register zegt met
+       zoveel woorden "geen namen". Het IP staat er al bij, en dat is wat een
+       reeks mislukte pogingen zichtbaar maakt. */
+    logInlog('lid', false, user ? 'user-' + user.id : 'onbekend', req);
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket); loginFails.delete(bronBucket); loginFails.delete(doelBucket);
+  logInlog('lid', true, 'user-' + user.id, req);
   /* DE HASH STIL OPWAARDEREN. Het wachtwoord klopt, dus we hebben de klaartekst
      precies een keer in handen -- het enige moment waarop een hash met oude
      scrypt-kosten naar de huidige kan (zie server/accounts/kluis.js). De inlog

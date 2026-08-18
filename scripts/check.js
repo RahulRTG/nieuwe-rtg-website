@@ -412,7 +412,27 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['server/opzet/kernlaag1.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
     ['server/opzet/kernlaag2.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
     ['server/opzet/routes.js', 'de mountlijst van alle routers: geen naad, alleen volgorde, net als de kernlagen'],
-    ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
+    ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE'],
+
+    /* DEZE TWEE ZIJN GEMETEN VOOR ZE HIER KWAMEN, en dat getal hoort erbij te
+       staan. Een uitzondering met alleen een verhaal is niet na te rekenen.
+
+         server/bewaarbeleid.js   10,3 KB waarvan 5,2 KB code
+         server/lib/keten.js      10,4 KB waarvan 2,9 KB code
+
+       Bij allebei zit de helft of meer in de kop, en dat is hier geen luxe maar
+       de inhoud: het bewaarbeleid is een TABEL waarin elke regel een termijn
+       met een grondslag is (dezelfde soort als livinglab/kader.js hierboven),
+       en keten.js legt in zijn kop uit wat een hashketen NIET tegenhoudt --
+       precies het stuk dat je moet lezen voor je erop vertrouwt.
+
+       En let op wat hier NIET is gebeurd: de maat is niet verzet naar "alleen
+       codebytes". Dat is nagerekend en het zou 21 van de 23 bestaande
+       uitzonderingen in een klap laten slagen, ook server/db/index.js van 23 KB.
+       Een ratel die je losdraait omdat je er zelf tegenaan loopt, is geen
+       ratel. */
+    ['server/bewaarbeleid.js', 'de bewaartabel: een regel per tak met termijn en grondslag, geen logica -- 5,2 KB code van 10,3 KB'],
+    ['server/lib/keten.js', 'een ketenprimitief van 2,9 KB code; de rest is de kop die uitlegt wat het middel NIET tegenhoudt, en dat hoort bij de code die het beweert']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
      dat is bij een servermodule geen byte-knip: het vraagt echte bedrading
@@ -420,6 +440,30 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
+       alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
+       hoort geknipt te worden, niet vrijgesteld.
+
+         server/lib/idem-poort.js          11,3 KB / 4,1 KB code
+           de bewaarkast IS eruit (./idem-kast.js, 4,3 KB): de ring, het venster
+           en de regel dat alleen een geslaagd antwoord erin mag, staan nu los
+           en zonder een enkel begrip uit het web erin. Wat hier over is, is het
+           http-deel -- en dat ligt nog boven de maat. De volgende naad is de
+           SLEUTELBEPALING (welke sleutel geldt, en van wie) los van wat de
+           poort met een herhaling doet.
+
+         server/kern/command/uitrolregie.js  12,7 KB / 7,6 KB code
+           naad: het METEN (5xx over al het verkeer sinds de sport) los van het
+           BESLUIT (klimmen, zakken, wachten op een mens). Nu deelt het een
+           bestand omdat het meten er ooit bij hoorde.
+
+         server/functies/register/index.js  12,8 KB / 5,8 KB code
+           naad: de FASES-ladder los van het register zelf. Ze hangen aan elkaar
+           via een controle bij het laden, en die controle hoort mee te
+           verhuizen -- anders valt de ladder stil naast het register. */
+    'server/lib/idem-poort.js',
+    'server/kern/command/uitrolregie.js',
+    'server/functies/register/index.js',
     /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
        ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
        (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
@@ -2047,7 +2091,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
-      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/lib/idem-poort.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
+      'hasht de kop tot een SCOPE en beslist er niets mee: de idem-poort verleent geen toegang, hij zorgt ' +
+      'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
+      'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {

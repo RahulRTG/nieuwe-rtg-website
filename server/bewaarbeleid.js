@@ -35,6 +35,11 @@ const BELEID = [
     vorm: 'lijst', datum: 'at', waarom: 'een betrokkene moet kunnen navragen wie in zijn dossier keek' },
   { tak: 'securityLog', label: 'beveiligingslogboek', dagen: JAAR / DAG, grond: 'audit',
     vorm: 'lijst', datum: 'at', waarom: 'inbraakpogingen achteraf kunnen herleiden' },
+  { tak: 'handelingLog', label: 'handelingsspoor (wie deed wat)', dagen: JAAR / DAG, grond: 'audit',
+    vorm: 'lijst', datum: 'at', waarom: 'een incident moet na te vertellen zijn, en een betrokkene moet ' +
+      'kunnen navragen wat er onder zijn sleutel is gedaan. Een jaar, net als het beveiligingslogboek: ' +
+      'lang genoeg om iets te reconstrueren, kort genoeg om geen permanent dossier te worden. Het spoor ' +
+      'bewaart de body NIET, alleen een hash ervan' },
 
   // --- operationeel: weg zodra het zijn doel heeft gediend ---
   { tak: 'applications', label: 'sollicitaties', dagen: 365, grond: 'nodig',

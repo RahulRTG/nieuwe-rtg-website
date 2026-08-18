@@ -3,12 +3,34 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
-/* De accountsdatabase gebruikt de ingebouwde SQLite van Node (node:sqlite).
-   Sinds Node 22.13 laadt die zonder vlag; de zelf-herstart met
-   --experimental-sqlite die hier stond is daarmee vervallen, en de
-   ondergrens staat in package.json (engines) en .nvmrc. Draait er toch een
-   oudere Node, dan is de foutmelding van require('node:sqlite') zelf
-   duidelijk genoeg. */
+/* DE ONDERGRENS VAN DE RUNTIME, en waarom hij hier hard staat.
+
+   De accountsdatabase draait op `node:sqlite`. Die bestaat vanaf Node 22 en
+   laadt sinds 22.13 ZONDER `--experimental-sqlite`; de zelf-herstart met die
+   vlag die hier stond is daarmee vervallen. Op een oudere Node klapt het pas
+   veel later stuk op een `require('node:sqlite')` diep in de opslaglaag -- een
+   foutmelding die niets zegt over de echte oorzaak. `LAUNCH.md` beloofde
+   bovendien jarenlang "Node 18+", dus dit was geen theoretisch scenario maar een
+   gedocumenteerde valkuil.
+
+   Een `engines`-veld in package.json waarschuwt alleen bij `npm install` en doet
+   niets bij `node server/server.js`. Daarom staat de grens hier, vóór het eerste
+   require: falen op de eerste regel met de reden erbij. De grens staat op 22.13
+   en niet op 22.0, want dat is de versie waarop node:sqlite zonder vlag laadt --
+   precies wat deze server doet. Zelfde getal als in package.json en .nvmrc. */
+const NODE_MINIMAAL = [22, 13];
+const nodeDelen = process.versions.node.split('.').map(Number);
+if (!Number.isFinite(nodeDelen[0]) ||
+    nodeDelen[0] < NODE_MINIMAAL[0] ||
+    (nodeDelen[0] === NODE_MINIMAAL[0] && nodeDelen[1] < NODE_MINIMAAL[1])) {
+  console.error(
+    '[start] Node ' + process.versions.node + ' is te oud. RTG vereist Node ' +
+    NODE_MINIMAAL.join('.') + ' of nieuwer, omdat de accountsdatabase op de ' +
+    'ingebouwde node:sqlite draait. Zie LIVEGANG.md.'
+  );
+  process.exit(78);
+}
+
 const { idVanKey } = require('./lib/lidsleutel');
 
 /* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
@@ -29,6 +51,9 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const rtgKlok = require('./lib/klok');
+/* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
+   dat log eraan hangt. */
+const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
 const { db, load, save, bijeen, inBundel, bewerkCollectie, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
@@ -584,12 +609,54 @@ function checkCred(username, password) {
 /* ---------- het inlog-auditlog ----------
    Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
    log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
-   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ. */
+   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ.
+
+   AAN DE KETEN. Dit log is precies wat iemand die binnen is als eerste zou
+   willen bijstellen: één mislukte reeks pogingen wegpoetsen en het bezoek is
+   nooit gebeurd. Elke regel draagt daarom de hash van de vorige, zodat een
+   wijziging of een verwijdering MIDDEN in het log aantoonbaar breekt. Wat dat
+   wel en niet tegenhoudt staat in de kop van lib/keten.js -- kort: het ziet
+   niet dat iemand de NIEUWSTE regels wegknipt, daar is het anker voor.
+
+   Regels van vóór deze keten dragen geen hash; verifieer() telt die apart en
+   veroordeelt ze niet, dus een bestaande installatie gaat hier niet stuk op. */
 function logInlog(kanaal, ok, wie, req) {
   const lijst = db.data.securityLog = db.data.securityLog || [];
-  lijst.unshift({ at: new Date().toISOString(), kanaal, ok: !!ok, wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '') });
-  if (lijst.length > 5000) lijst.length = 5000;
+  ketenNoteerIn(lijst, {
+    at: new Date().toISOString(), kanaal, ok: !!ok,
+    wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
+  }, 5000);
   save();
+}
+
+/* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()
+   voor het inzagejournaal geeft. Het kantoor toont hem naast het log, zodat
+   "klopt dit spoor nog" een antwoord heeft in plaats van een aanname. */
+/* HET HANDELINGSSPOOR, als EEN instantie.
+
+   De lijfpoort maakt er zelf ook een aan om de middleware te hangen. Dat mag,
+   want het spoor houdt geen staat in het geheugen -- alles staat in
+   db.data.handelingLog en de keten wordt per regel uitgerekend. Twee instanties
+   schrijven dus in hetzelfde journaal en zien elkaars regels. Wat NIET mag is
+   twee verschillende opslagplekken, en die zijn er niet.
+
+   Deze instantie bestaat voor het LEZEN: het kantoor vraagt het hele spoor op,
+   een lid alleen zijn eigen regels. Zie ../lib/handelingsspoor.js. */
+const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
+
+/* DE ANKERDIENST: het ene getal dat naar buiten moet.
+
+   De keten ziet gesleutel MIDDEN in een spoor. Kopafknipping ziet hij niet --
+   wie de nieuwste regels weggooit houdt een kloppende keten over. Daarvoor moet
+   er een blok naar een GESCHEIDEN plek, en dat besluit is van een mens.
+
+   Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
+   dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
+   software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+function securityLogKeten() {
+  const lijst = (db.data && db.data.securityLog) || [];
+  return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
 }
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
@@ -2048,6 +2115,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
+  securityLogKeten, handelingsspoor, ankerdienst,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,

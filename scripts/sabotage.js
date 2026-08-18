@@ -102,7 +102,7 @@ function opruimen(stil) {
   let terug = 0;
   for (const r of rijen) {
     const vol = path.join(WORTEL, r.bestand);
-    try { fs.writeFileSync(vol, r.origineel); terug++; }
+    try { fs.writeFileSync(vol, r.origineel); plakBundelBij(r.bestand); terug++; }
     catch (e) { console.error('  ' + K.rood + 'KON NIET TERUGZETTEN' + K.uit + ': ' + r.bestand + ' -- ' + e.message); return 2; }
   }
   journaalWeg();
@@ -114,6 +114,41 @@ function opruimen(stil) {
    moet BESTAAN en het moet er PRECIES EEN keer staan. Twee treffers betekent
    dat het recept niet weet wat het raakt, en dan is de uitslag ervan niets
    waard -- dat is een losgeraakt recept en geen geslaagde proef. */
+/* ---------------------------------------------------------------------------
+   DE BUNDEL MOET MEE. De grote app-scripts worden geserveerd als samengeplakte
+   bundel (public/apps/app-main.js en de rest, zie scripts/bundel.js); de losse
+   NN-delen zijn de bron en bereiken de browser nooit rechtstreeks. Een sabotage
+   in zo'n deel zonder de bundel opnieuw te plakken is een EQUIVALENTE MUTANT:
+   er verandert niets aan wat draait, geen wachter kan rood worden, en de
+   uitslag heet AFGESLAGEN alsof er iets is beproefd.
+
+   Zo is het echt gegaan: wereld-geen-twee-beginschermen stond twee rondes als
+   afgeslagen -- eerst met een recept dat een dode lijst toevoegde, daarna met
+   een recept dat het gedrag WEL veranderde. Pas toen de handmatige naspeel-run
+   ook groen bleef, viel het kwartje: de snede lag in app-main-29c.js en de
+   browser las app-main.js.
+
+   Daarom: na elke snede EN elke terugzetting in een deelmap wordt de
+   bijbehorende bundel opnieuw geplakt. Ook in opruimen(), want een afgebroken
+   ronde laat anders een gesaboteerde BUNDEL achter terwijl het journaal alleen
+   het deel kent. */
+const { bundels, bundel } = require('./bundel');
+function plakBundelBij(relPad) {
+  /* Absolute EN relatieve paden. herstel() gaf het absolute pad mee en deze
+     hulp herkende alleen relatieve: de snede ging de bundel IN en kwam er bij
+     het terugzetten niet meer UIT. De byte-vergelijking van herstel() zag
+     niets, want die vergelijkt het DEEL -- vandaar de controle hieronder die
+     ook de bundel byte voor byte naast zijn delen legt. */
+  const rel = String(relPad || '').replace(/\\/g, '/')
+    .replace(WORTEL.replace(/\\/g, '/') + '/', '').replace(/^public\//, '');
+  for (const [uitvoer, deelMap] of Object.entries(bundels)) {
+    if (!rel.startsWith(deelMap + '/')) continue;
+    fs.writeFileSync(path.join(WORTEL, 'public', uitvoer), bundel(uitvoer));
+    return uitvoer;
+  }
+  return null;
+}
+
 function keurRecept(wet) {
   const rel = wet.sabotage.bestand;
   const vol = path.join(WORTEL, rel);
@@ -129,10 +164,19 @@ function keurRecept(wet) {
 function breng(gekeurd, wet) {
   journaalSchrijf([{ bestand: wet.sabotage.bestand, origineel: gekeurd.origineel }]);
   fs.writeFileSync(gekeurd.vol, gekeurd.stukken[0] + wet.sabotage.zet + gekeurd.stukken[1]);
+  gekeurd.bundel = plakBundelBij(wet.sabotage.bestand);
   return gekeurd;
 }
 function herstel(gebracht) {
   fs.writeFileSync(gebracht.vol, gebracht.origineel);
+  if (gebracht.bundel) {
+    const terug = plakBundelBij(gebracht.vol);
+    if (terug !== gebracht.bundel) throw new Error('de bundel ' + gebracht.bundel + ' is niet teruggeplakt');
+    const doel = path.join(WORTEL, 'public', gebracht.bundel);
+    if (!bundel(gebracht.bundel).equals(fs.readFileSync(doel))) {
+      throw new Error('de bundel ' + gebracht.bundel + ' is na het terugzetten niet gelijk aan zijn delen');
+    }
+  }
   const na = fs.readFileSync(gebracht.vol, 'utf8');
   journaalWeg();
   /* Byte voor byte, niet "we hebben geschreven". Een terugzetting die je niet

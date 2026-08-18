@@ -609,15 +609,15 @@
         "public/apps/app-main/app-main-24a2.js"
       ],
       "sabotage": {
-        "wat": "geef de wereldstand een eigen tweede lijst werelden naast die van het rooster",
-        "bestand": "public/apps/app-main/app-main-24a2.js",
-        "zoek": "const MAPPEN = [",
-        "zet": "const MAPPEN_WERELD = [];\n  const MAPPEN = [",
+        "wat": "geef de wereldstand een ECHT afwijkende eigen lijst: twee van de drie werelden",
+        "bestand": "public/apps/app-main/app-main-29c.js",
+        "zoek": "RTGWereld.werelden(MAPPEN.filter(function (m) {",
+        "zet": "const MAPPEN_WERELD = MAPPEN.slice(0, 2);\n    RTGWereld.werelden(MAPPEN_WERELD.filter(function (m) {",
         "wachters": [
           "e2e:test/wereld.e2e.js"
         ]
       },
-      "kanttekening": "De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan."
+      "kanttekening": "De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan. En het EERSTE recept was een equivalente mutant: het voegde een dode tweede lijst toe die niets gebruikte, dus veranderde er geen gedrag en kon geen wachter rood worden. De uitslag heette AFGESLAGEN terwijl er niets was beproefd. Dit recept laat de wereldstand echt een andere lijst lezen (twee werelden in plaats van drie), en dat hoort test/wereld.e2e.js te zien."
     },
     {
       "id": "techniek-geen-productie-zonder-grootboek",

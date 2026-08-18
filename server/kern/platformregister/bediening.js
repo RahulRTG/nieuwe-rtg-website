@@ -52,14 +52,21 @@ module.exports = [
   ['/media', 'Medialevering', 'Het uitleveren van geuploade bestanden op naam.',
     'de levering zelf is geen functie; wat je met media MAG staat in de functies die ze maken en tonen'],
   /* WAARSCHIJNLIJK HOORT DEZE BIJ EEN FUNCTIE EN NIET HIER. /werken/:code is de
-     publieke ingang van de wervingslink, en 'tg-werving' is een van de vier
-     functies die geen enkele route bleken te hebben. Hem daar aanhangen zou
-     betekenen dat het uitzetten van die functie ook de ingang sluit -- wat
-     waarschijnlijk de bedoeling is, maar het VERANDERT wat een schakelaar doet.
-     Dat is een besluit en geen reparatie, dus staat hij tot dat besluit hier,
-     met deze aantekening erbij. */
+     publieke ingang van de wervingslink. De functie die daarbij hoort heet
+     'werving' (cat-partners, pad /api/werving).
+
+     Deze notitie noemde eerst 'tg-werving', en dat was een dubbele schakelaar
+     die exact hetzelfde pad claimde en daardoor niets deed; die is inmiddels
+     verwijderd. Een notitie die naar een verdwenen functie verwijst is precies
+     de stille veroudering waar dit register tegen is gebouwd, dus hier de
+     gecorrigeerde versie.
+
+     Wat NIET is gedaan en waarom: /werken aan de functie 'werving' hangen zou
+     betekenen dat het uitzetten van die functie ook de publieke ingang sluit.
+     Dat is waarschijnlijk de bedoeling, maar het VERANDERT wat een schakelaar
+     uitzet, en dat is een besluit en geen reparatie. */
   ['/werken', 'Wervingsingang', 'De publieke link waarmee een werkgever iemand binnenhaalt; stuurt door naar de inlog.',
-    'staat hier als BEKENDE onvolkomenheid: hij hoort vermoedelijk bij de functie Wervingslink (tg-werving), maar hem daar aanhangen verandert wat die schakelaar uitzet'],
+    'staat hier als BEKENDE onvolkomenheid: hij hoort vermoedelijk bij de functie Wervingslink (werving), maar hem daar aanhangen verandert wat die schakelaar uitzet'],
   ['/', 'De ingang', 'Wie naar / gaat, komt via een interne herschrijving op de inlog uit.',
     'de ingang van het huis is geen functie die je uit kunt zetten; zonder ingang is er niets om in te schakelen']
 ];

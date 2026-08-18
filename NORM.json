@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
-    "keuringOmvang": 156,
+    "keuringOmvang": 158,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,16 +21,22 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5878,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1395,
-    "kernGedeeld": 188,
+    "kernBreedte": 1404,
+    "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 150,
+    "toetsenNietGemeten": 154,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "keuringOmvang 156 -> 158; kernBreedte 1395 -> 1404; kernGedeeld 188 -> 191; toetsenNietGemeten 150 -> 154",
+      "reden": "De persoonseis: acht genres hielden de ZAAK tegen tot een medewerker een vergunning had gezien, en daarna kwam iedereen die zaak binnen met dezelfde vier cijfers. Die tak sluit dat gat met een register (kern/persoonseis.js en kern/persoonseis-lijst.js), een vakbewijs (kern/vakbewijs.js met -nummer, -aftekenen en -verhuis) en een handhavingspunt in supplierAuth. Dat verklaart de twee kern-meters: negen extra kern-eigenschappen die routes aanraken, waarvan drie door meer dan een domein -- de poort hangt namelijk met opzet op EEN plek en wordt door de leden-, kantoor- en zaakkant alledrie gevraagd. Een tweede kopie per domein zou de teller sparen en de regel dupliceren; dat is precies de ruil die LAT-regel 4 verbiedt.\n\nkeuringOmvang gaat met twee omhoog: server/kern/vakbewijs.js (10234 bytes), server/kern/socialegraaf/lijn.js en server/opzet/kernlaag3.js zitten nu vlak onder de 10 kB-grens. Die eerste is al op zijn naden gesplitst -- het nummer, het aftekenen en de eenmalige verhuizing staan in eigen bestanden. Nog een keer knippen zou een knip om een getal zijn en niet om een naad, en dat is de truc die dit huis niet uithaalt. Wel eerlijk vermeld: 10234 is zes bytes onder de grens, dus wie hem als volgende aanraakt loopt er tegenaan; de volgende echte naad daar is de vraagkant (vakbewijsHeeft en vakbewijzenVerlopend) los van de schrijfkant.\n\ntoetsenNietGemeten stijgt met vier omdat deze tak vier toetsbestanden toevoegt (persoonseis, vakbewijs-routes, vakbewijs-kluis, gezakte-toetsen) waar de mutatiemotor nog niet langs is geweest. De beweringen erin zijn wel met de hand gemuteerd -- dat staat per bestand aan het slot -- maar de motor kent ze nog niet, en die telt hier.",
+      "eerlijkheidshalve": "Twee meters die ook rood stonden zijn NIET opgehoogd maar hersteld. endpointsZonderTest (1192 -> 1193) en keuringDekkingAdvies (56 -> 57) kwamen van precies een endpoint: /api/aanmelding/bewijs/herkeuring, de herkeuringslijst van het bedrijfsbewijs. Die was puur getoetst op de kernfunctie en over de route door niemand. Daar staat nu een toets op (test/vakbewijs-routes.test.js, toets 10), die ook vastlegt dat de lijst van het kantoor is en dat de gedeelde kantoorcode niet aftekent. Beide meters staan daardoor weer op hun norm.\n\nDe rest van de meters is niet aangeraakt: ik heb --vastleggen niet gebruikt, want dat tilt ook meters op die deze ronde niemand heeft bewogen. Vier meters staan beter dan de norm (testbestanden 889, browserpoortToetsen 193, e2eBestanden 125, inlineStijlAttributen 5868) en die zijn bewust NIET vastgezet: winst die nog kan schommelen hoort niet meteen een nieuwe ondergrens te worden."
+    },
     {
       "datum": "2026-08-17",
       "meter": "browserpoortToetsen 200 -> 189",

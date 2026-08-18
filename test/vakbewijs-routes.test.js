@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakb-'));
 let child, BASE, mgr, office, lid, staffId, bedrijf;
@@ -223,6 +223,65 @@ test('9. het nummer gaat alleen open met een reden, en dat staat in het journaal
   assert.ok(/aftekenen van de VOG/.test(String(mijne[0].waarom || '')), 'met de reden erbij');
   assert.equal(JSON.stringify(regels).includes('VOG-KLUIS-42'), false,
     'het journaal bewaart het nummer niet; dat zou een tweede kopie van de kluis zijn');
+});
+
+/* ============================================================================
+   10. DE HERKEURING, OVER DE ROUTE.
+
+   De houdbaarheid van het BEDRIJFSbewijs is in test/persoonseis.test.js puur
+   getoetst -- op de kernfunctie, zonder route. Daardoor stond
+   /api/aanmelding/bewijs/herkeuring in geen enkele toets, en dat is precies wat
+   de dekkingsmeting meldde: een endpoint dat niemand aanraakt. Een lijst die
+   alleen in theorie bestaat, is dezelfde open deur met een bordje ernaast als
+   de vlag die niemand handhaaft.
+
+   Er staat hier meer dan dekking. De aftekening over HTTP moet een NAAM dragen,
+   en de gedeelde kantoorcode is geen naam -- dat is dezelfde regel als bij het
+   pasbesluit, en zonder toets zou een terugval op "RTG-personeel" er zo weer
+   in sluipen (die fout is in dit huis al een keer gemaakt; zie de kop van
+   routes/aanmeldingen.js).
+   ========================================================================== */
+test('10. een verlopen bedrijfsbewijs komt over de route op de herkeuringslijst', async () => {
+  const aanvraag = await api('/api/aanmelding/aanvraag', {
+    naam: 'Nienke Vos', email: 'nido-herkeur@test.example', telefoon: '0612349999',
+    pas: 'business', motivatie: 'Ik begin een kinderopvang.',
+    bedrijf: { naam: 'Opvang De Vlinder', type: 'kinderopvang', plaats: 'Utrecht' }
+  });
+  assert.equal(aanvraag.status, 200, 'de aanvraag komt binnen: ' + JSON.stringify(aanvraag.body).slice(0, 200));
+  const id = aanvraag.body.aanmelding.id;
+  assert.equal(aanvraag.body.aanmelding.bedrijf.bewijsNodig, true,
+    'een kinderopvang vraagt om een stuk; anders meet de rest van deze toets niets');
+
+  /* Het stuk is AL verlopen bij het indienen. Dat moet kunnen: zo legt een
+     medewerker een ingetrokken of afgelopen vergunning vast. */
+  const indienen = await api('/api/aanmelding/bewijs',
+    { id, soort: 'LRK', nummer: '123456789', geldigTot: '2020-01-01' });
+  assert.equal(indienen.status, 200, 'het stuk is ontvangen: ' + JSON.stringify(indienen.body).slice(0, 200));
+
+  /* De gedeelde kantoorcode is geen mens, dus tekent zij niet af. */
+  const zonderNaam = await api('/api/aanmelding/bewijs/teken', { id }, office);
+  assert.equal(zonderNaam.status, 400, 'de gedeelde kantoorcode tekent niet af (kreeg ' + zonderNaam.status + ')');
+  assert.match(String(zonderNaam.body.error || ''), /naam/i, 'en zegt waarom');
+
+  const mens = await kantoorAlsPersoon(BASE);
+  assert.ok(mens, 'de eigenaar kan als persoon in het kantoor');
+  const tekenen = await api('/api/aanmelding/bewijs/teken', { id }, mens);
+  assert.equal(tekenen.status, 200, 'een herleidbaar mens tekent wel af: ' + JSON.stringify(tekenen.body).slice(0, 200));
+  assert.match(String(tekenen.body.grens || ''), /geen inspectie/,
+    'met de grens erbij: gezien is niet hetzelfde als goedgekeurd');
+
+  /* De lijst is van het kantoor. Zonder token valt er niets te lezen -- een
+     herkeuringslijst noemt zaken bij naam en zegt wat er aan hun papieren
+     mankeert. */
+  const open = await api('/api/aanmelding/bewijs/herkeuring', { dagen: 60 });
+  assert.ok(open.status === 401 || open.status === 403,
+    'zonder kantoor-inlog geen herkeuringslijst (kreeg ' + open.status + ')');
+
+  const lijst = await api('/api/aanmelding/bewijs/herkeuring', { dagen: 60 }, office);
+  assert.equal(lijst.status, 200, 'het kantoor krijgt de lijst');
+  const regel = (lijst.body.herkeuring || []).find(r => r.id === id);
+  assert.ok(regel, 'de verlopen zaak staat erop: ' + JSON.stringify(lijst.body).slice(0, 300));
+  assert.equal(regel.verlopen, true, 'en staat als verlopen gemarkeerd');
 });
 
 /* ============================================================================

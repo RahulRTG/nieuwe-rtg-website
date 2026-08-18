@@ -53,6 +53,9 @@
     }
 
     var rij = el('div', 'ios-nav-rij');
+    // de acties krijgen hun ondergrens van de component zelf, want niet elk
+    // scherm dat ios.js laadt laadt ook ios.css (zie navStijlEenmalig)
+    navStijlEenmalig();
     var actieVak = el('div', 'ios-nav-acties');
     var extra = el('div', 'ios-nav-extra');
 

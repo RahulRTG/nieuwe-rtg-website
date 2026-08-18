@@ -27,6 +27,8 @@
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;display:block;}
   .rij{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
+  /* de aanvinkvakjes: 13x13 is te klein om te raken (WCAG 2.5.8) */
+  .rij input[type="checkbox"],label input[type="checkbox"]{width:24px;height:24px;flex:0 0 auto;}
   .knop{background:var(--gold);color:#000;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}
@@ -86,9 +88,9 @@
   <section id="secZoek">
     <div class="rij" style="margin-top:1rem;">
       <span><span class="lbl">Waarheen</span><input class="veld" id="zPlaats" placeholder="Plaats, land of titel" style="width:12rem;"></span>
-      <span><span class="lbl">Aankomst</span><input class="veld" id="zVan" type="date"></span>
-      <span><span class="lbl">Vertrek</span><input class="veld" id="zTot" type="date"></span>
-      <span><span class="lbl">Gasten</span><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
+      <span><label class="lbl" for="zVan">Aankomst</label><input class="veld" id="zVan" type="date"></span>
+      <span><label class="lbl" for="zTot">Vertrek</label><input class="veld" id="zTot" type="date"></span>
+      <span><label class="lbl" for="zGasten">Gasten</label><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
       <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="zInstant"> Instant boeken</label>
       <button class="knop" id="zGo">Zoek</button>
     </div>

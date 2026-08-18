@@ -189,7 +189,7 @@
     if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
-  /* De stijl van dit paneel staat bij die van deel 1 (OVCSS in overzicht.js):
+  /* De stijl van dit paneel staat bij die van deel 1 (Deel.ovcss in overzicht-a.js):
      een stand hoort EEN stijlblad te hebben, niet twee die elkaar in de head
      verdringen -- en het scheelt hier de ruimte om uit te leggen waarom de
      dingen staan zoals ze staan. */

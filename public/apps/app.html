@@ -923,7 +923,8 @@
   .onb-rij:focus-within{border-color:var(--burgundy);}
   .onb-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);font-family:'Inter',sans-serif;font-size:.95rem;text-align:center;padding:.75rem .4rem;}
   .onb-rij input::placeholder{color:var(--soft);}
-  .onb-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;padding:.4rem .2rem;font-family:inherit;}
+  /* de pijl is 22px BREED en dus onder de 24 van WCAG 2.5.8; de hoogte was al goed */
+  .onb-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;padding:.4rem .2rem;font-family:inherit;min-width:24px;}
   .onb-acties{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1rem;}
   .onb-acties button{background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.72rem;color:var(--txt);font-family:inherit;cursor:pointer;letter-spacing:.02em;}
   .onb-acties button.prim{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}
@@ -1265,6 +1266,11 @@
     background:none;border:1px solid var(--line);border-radius:999px;color:var(--txt);
     font-family:'Inter',sans-serif;font-size:calc(var(--e) * 0.72);
     padding:calc(var(--e) * 0.28) calc(var(--e) * 0.7);cursor:pointer;
+    /* Op telefoonformaat mat deze chip 20px hoog en dat is onder de 24 van WCAG
+       2.5.8. De maat hangt hier aan --e, dus hij loopt mee met het scherm en
+       wordt op een kleine telefoon vanzelf te klein; een harde ondergrens vangt
+       precies dat geval en verandert niets waar --e al ruim genoeg is. */
+    min-height:24px;display:inline-flex;align-items:center;
   }
   .os-aitips button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   #app.os-gast .os-aidraad,#app.os-gast .os-aitips{display:none;}

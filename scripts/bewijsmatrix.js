@@ -88,6 +88,7 @@ const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inW
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
 const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
+const UITVOER = (argv.find(a => a.startsWith('--uitvoer=')) || '').slice(10) || inWortel('UITVOERPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -110,7 +111,10 @@ const SCHAKELS = [
   { id: 'INPUT', uitleg: 'wordt rommel geweigerd zonder 5xx',
     bron: 'scripts/invoerproef-route.js (rommel MET de juiste rol; anoniem meet je alleen de voordeur)' },
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
-    bron: null, nodig: 'de liegpoort per ROUTE i.p.v. per toetsbestand (RTG_LIEG neemt nu /api/ in één keer)' },
+    bron: 'scripts/uitvoerproef-route.js (kanaries van een ANDER account in een 2xx-antwoord)',
+    nodig: 'de HELFT die hier nog niet in zit: de liegpoort per ROUTE i.p.v. per toetsbestand ' +
+      '(RTG_LIEG neemt nu /api/ in een keer). De uitvoerproef toont aan dat een antwoord geen ANDERMANS ' +
+      'gegevens bevat; de liegpoort zou aantonen dat het antwoord uit de ECHTE bron komt. Beide horen in OUTPUT.' },
   { id: 'STATE', uitleg: 'staat de toestand na afloop zoals beloofd',
     bron: 'scripts/staatproef-route.js (vingerafdruk voor en na, per route geijkt)', nvtBijLezen: true },
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
@@ -292,6 +296,7 @@ function bouw(invoer) {
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
+  const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOER);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -389,6 +394,18 @@ function bouw(invoer) {
            anders is hij niet te onderscheiden van een route waar niemand ooit
            aan heeft geklopt. */
         else if (iv) cellen[s.id] = { staat: 'ongemeten', bron: 'invoerproef', reden: iv.reden };
+        else cellen[s.id] = { staat: 'ongemeten' };
+        continue;
+      }
+
+      if (s.id === 'OUTPUT') {
+        const uv = uitvoerKaart && uitvoerKaart.get(sleutel);
+        if (uv && uv.uitvoer === 'schoon') cellen[s.id] = { staat: 'bewezen', bron: 'uitvoerproef' };
+        else if (uv && uv.uitvoer === 'GEZAKT') cellen[s.id] = { staat: 'gezakt', bron: 'uitvoerproef' };
+        /* 'poort' betekent: geprobeerd, nooit een 2xx gekregen, dus niets te
+           wegen. Geprobeerd-en-ongemeten hoort zichtbaar te blijven, anders is
+           het niet te onderscheiden van een route waar niemand aanklopte. */
+        else if (uv) cellen[s.id] = { staat: 'ongemeten', bron: 'uitvoerproef', reden: 'nooit een 2xx' };
         else cellen[s.id] = { staat: 'ongemeten' };
         continue;
       }

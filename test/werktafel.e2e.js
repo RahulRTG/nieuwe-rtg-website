@@ -77,6 +77,20 @@ const stand = () => {
     poortBovenop: !!(midden && g && g.contains(midden)),
     appActief: !!(document.getElementById('app') || {}).classList?.contains('active'),
     shellZichtbaar: !!(S && getComputedStyle(S).display !== 'none' && S.getBoundingClientRect().width > 0),
+    /* DE SCHIL BESTAAT NOG, EN DAT IS DE BEDOELING -- maar als LA en niet als
+       scherm (WERELD.md). De panelen wonen erin (bedieningspaneel, Zegel,
+       meldingen), dus "de schil is weg" is niet meer de vraag. De vraag is of
+       hij de werktafel afvangt: ligt er een onzichtbaar vel overheen, dan
+       reageert er niets meer en zie je daar niets van. Dat is hier al een keer
+       gebeurd -- shared/levendekleur.js schilderde de schil met !important --
+       en een meting op zichtbaarheid zag dat niet. Deze wel: wie raakt de muis
+       in het midden van de werkvloer? */
+    schilVangt: (() => {
+      const w = document.querySelector('.cmd-werk'); if (!w || !S) return null;
+      const b = w.getBoundingClientRect();
+      const t = document.elementFromPoint(Math.round(b.x + b.width / 2), Math.round(b.y + b.height / 2));
+      return !!(t && S.contains(t));
+    })(),
     klok: document.querySelectorAll('.os-app').length,
     commandActief: !!(window.RTGCommand && window.RTGCommand.actief()),
     // de lade: `inBeeld` is de echte vraag, want dicht staat hij onder de rand
@@ -91,7 +105,13 @@ const stand = () => {
     gateBestaat: !!document.getElementById('gate'),
     gateInShell: !!(S && S.contains(document.getElementById('gate'))),
     greep: !!document.querySelector('.cmd-lade'),
-    klokIngang: !!document.querySelector('.cmd-klok'),
+    /* De ingang naar het systeem. Dit was `.cmd-klok`, de knop die de werktafel
+       opvouwde naar het klokscherm; dat scherm bestaat niet meer (WERELD.md) en
+       die knop dus ook niet. Wat de belofte eronder was -- er is vanaf de
+       werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
+       leeft door in de voet van de bank. */
+    paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
+      .some(b => /Bedieningspaneel/i.test(b.textContent)),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
@@ -161,8 +181,8 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const thuis = await page.evaluate(stand);
     assert.equal(thuis.bladen, 0, 'de werktafel hoort leeg te beginnen, niet met apps die het huis koos');
-    assert.equal(thuis.shellZichtbaar, false, 'en hij is het beginscherm, dus de klok ligt eronder');
-    assert.equal(thuis.klokIngang, true, 'de klok hoort wel bovenaan de bank te staan als ingang');
+    assert.equal(thuis.schilVangt, false, 'de schil ligt als een vel over de werktafel; dan reageert er niets meer');
+    assert.equal(thuis.paneelIngang, true, 'de voet van de bank hoort de weg naar het bedieningspaneel te dragen');
     assert.equal(thuis.commandActief, true, 'en een app opent hier als blad');
 
     // 3) een app openen vult de werkvloer; de lege staat maakt plaats
@@ -179,14 +199,21 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(terug.werktafel, true, 'het laatste blad sluiten hoort niet de hele werktafel op te ruimen');
     assert.equal(terug.bladen, 0, 'maar hem leeg achter te laten');
 
-    /* 4b) de klok is bereikbaar gebleven: hem kiezen vouwt de werktafel op. Dat
-       is de enige weg terug naar de wereldring, dus als deze knop niets doet is
-       de klok onbereikbaar geworden -- precies wat we niet wilden. */
-    await page.click('.cmd-klok');
-    await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
-    const bijKlok = await page.evaluate(stand);
-    assert.equal(bijKlok.shellZichtbaar, true, 'Beginscherm hoort de klok terug te brengen');
-    assert.equal(bijKlok.klok, 3, 'met exact de drie hoofdwerelden eromheen');
+    /* 4b) EN ER IS GEEN WEG MEER TERUG NAAR EEN ANDER BEGINSCHERM.
+
+       Hier stond het spiegelbeeld van deze toets: klik .cmd-klok, de werktafel
+       vouwt zich op en de klok komt terug. Dat was toen juist -- de klok WAS
+       het beginscherm en de werktafel klapte ervoor. Nu is de werktafel het
+       beginscherm (WERELD.md), en een knop die hem opvouwt zou je op een leeg
+       scherm achterlaten zonder iets om naar terug te keren.
+
+       Wat ervoor in de plaats komt is de andere helft van dezelfde belofte, en
+       hij hoort net zo hard te zakken: er is GEEN knop meer die de werktafel
+       weghaalt, en de weg naar het systeem staat in de voet van de bank. */
+    assert.equal(await page.evaluate(() => !!document.querySelector('.cmd-klok')), false,
+      'de opvouwknop is terug; die laat je achter op een scherm dat er niet meer is');
+    assert.equal(terug.paneelIngang, true,
+      'en de weg naar het bedieningspaneel is uit de bank verdwenen -- dan is uitloggen onbereikbaar');
 
 
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT
@@ -228,7 +255,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalThuis = await page.evaluate(stand);
     assert.equal(smalThuis.bladen, 0, 'ook op een telefoon begint de werktafel leeg');
-    assert.equal(smalThuis.shellZichtbaar, false, 'en is hij het beginscherm');
+    assert.equal(smalThuis.schilVangt, false, 'en de schil vangt hem ook op een telefoon niet af');
 
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
@@ -259,12 +286,13 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
-    // de lade halen: dezelfde twaalf werelden als in de rail op een computer
+    // de lade halen: dezelfde vijftien deuren als in de rail op een computer
+    // (drie werelden boven, twaalf stukken software eronder)
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
-    assert.equal(laOpen.lade.werelden, 12, 'met alle werelden erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(laOpen.lade.werelden, 15, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'true', 'en dat hoort een schermlezer ook te horen');
 
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
@@ -287,7 +315,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalTerug = await page.evaluate(stand);
     assert.equal(smalTerug.bladen, 0, 'het laatste blad sluiten laat de werktafel ook hier leeg staan');
-    assert.equal(smalTerug.klokIngang, true, 'met de klok als ingang in de lade');
+    assert.equal(smalTerug.paneelIngang, true, 'met het bedieningspaneel als ingang in de lade');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
@@ -342,7 +370,8 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         passkeyZichtbaar: !!document.getElementById('agPasskey')?.getBoundingClientRect().width,
         andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
-        klokIngang: !!document.querySelector('.cmd-klok'),
+        paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
+          .some(b => /Bedieningspaneel/i.test(b.textContent)),
         tabs: tabs ? getComputedStyle(tabs).display : null,
       };
     });
@@ -353,8 +382,12 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     assert.equal(uit.veldZichtbaar, false, 'maar vraagt niet eerst om informatie van de bezoeker');
     assert.equal(uit.passkeyZichtbaar, true, 'de passkey hoort de zichtbare eerste deur te zijn');
     assert.equal(uit.andereManier, true, 'met een veilige terugval voor bestaande accounts');
-    assert.equal(uit.werelden, 12, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
-    assert.equal(uit.klokIngang, false, 'maar geen Beginscherm-knop: die vouwt de werktafel op en laat je zonder gesprek achter');
+    /* Twaalf stukken software plus de drie werelden die er sinds WERELD.md
+       bovenaan staan. Het getal is geen doel op zich -- wat het bewaakt is dat
+       de bank in de gesloten stand LAAT ZIEN wat er achter de deur zit, en dus
+       niet stilletjes leegloopt. */
+    assert.equal(uit.werelden, 15, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    assert.equal(uit.paneelIngang, false, 'voor het inloggen valt er niets te bedienen: geen systeemdeur in de bank');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
 
     /* EEN WERELD AANRAKEN OPENT GEEN DEUR. Dit is de kern van de keuze: de bank

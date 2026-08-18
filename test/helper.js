@@ -408,7 +408,56 @@ async function installeerNepMicrofoon(context) {
   });
 }
 
+/* DE BANK OPENEN, WAT VOOR SCHERM HET OOK IS.
+
+   De bank van de werktafel heeft twee vormen, en dat is ontwerp: op een smal
+   scherm ligt hij als lade onder de rand en haal je hem met de greep
+   (.cmd-lade); vanaf 1000px staat hij als vaste rail altijd open en is die
+   greep er niet (shared/command.css: "de greep heeft hier geen werk").
+
+   Een toets die een deur in de bank nodig heeft, gaat niet over die twee
+   vormen. Toch stond in twee toetsen letterlijk `waitForSelector('.cmd-lade',
+   {state:'visible'})` -- op de standaardbreedte van Playwright (1280) wacht
+   die tien seconden op een knop die daar met opzet niet bestaat, en de
+   foutmelding ("resolved to hidden") wijst naar de knop en niet naar de
+   aanname eronder. Vandaar dit hulpje: het opent de bank en laat het aan de
+   pagina welke van de twee vormen dat is.
+
+   Het GOKT niet. Is de bank er niet, dan gooit het, want dan is er geen
+   werktafel en hoort de toets daarop te zakken en niet stil door te lopen. */
+async function openBank(page, opties) {
+  const t = (opties && opties.timeout) || 10000;
+  await page.waitForSelector('#rtgCommand .cmd-bank', { state: 'attached', timeout: t });
+  const greep = page.locator('#rtgCommand .cmd-lade');
+  if (await greep.isVisible()) {
+    await greep.click();
+    await page.waitForSelector('#rtgCommand.bank-open', { timeout: t });
+    return 'lade';
+  }
+  // brede stand: de rail staat er al. Even nagaan dat hij ook echt in beeld is.
+  await page.waitForSelector('#rtgCommand .cmd-bank', { state: 'visible', timeout: t });
+  return 'rail';
+}
+
+/* EEN DEUR IN DE VOET VAN DE BANK, OP NAAM.
+
+   Hier stond `click('.cmd-bankvoet [data-systeem]')` -- de EERSTE systeemdeur.
+   Dat werkte zolang er één was. Er staan er nu twee (Rahul boven het
+   bedieningspaneel), en toen opende diezelfde regel opeens het vraagveld van
+   Rahul. De toets faalde daarna een stap verderop, op een scrim die nooit zou
+   komen, en de melding wees naar het paneel in plaats van naar de klik.
+
+   Op naam en niet op positie: welke deuren er staan en in welke volgorde is een
+   ontwerpkeuze die mag bewegen; WELKE deur deze toets nodig heeft niet. */
+async function bankDeur(page, naam, opties) {
+  const t = (opties && opties.timeout) || 10000;
+  await openBank(page, opties);
+  const knop = page.locator('#rtgCommand .cmd-bankvoet button', { hasText: naam });
+  await knop.first().waitFor({ state: 'visible', timeout: t });
+  await knop.first().click();
+}
+
 module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
-  binnenEenDag, nepMediaArgs, installeerNepMicrofoon,
+  binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

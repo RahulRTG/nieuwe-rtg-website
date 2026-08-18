@@ -85,18 +85,38 @@ async function metLid(fn) {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
+
+       Een vers geregistreerd lid is niet `klaar`, dus opent app-main het
+       onboardinggesprek en gaat #onbGate open. Daar mag niets overheen
+       (shared/command.js), dus is er dan geen werktafel om te meten.
+
+       Deze toetsen deden dat met `onbGate.hidden = true` vlak na
+       domcontentloaded. Dat is een wedloop die je verliest: /onboarding/status
+       is een serveraanroep, en het antwoord zet de poort even later gewoon
+       weer open. De werktafel week zoals hij hoort, kwam niet terug, en de
+       toets wachtte zich dood op werelden in een bank die niet bestond.
+
+       Mocken op de status is wat de rest van deze suite ook doet
+       (apps-ui, handenvrij, verzorging-scherm): dan is er niets te tekenen,
+       zet app-main de poort zelf dicht, en is er geen moment waarop het
+       andersom kan uitpakken. */
+    await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     await ctx.addInitScript((t) => {
       try {
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
+        /* HIER STOND rtg_os_wereld = 'uit'.
+
+           Het beginscherm had twee standen -- de kring om de klok en het rooster
+           met tegels -- en deze toetsen meten het rooster, dus zetten ze die
+           stand aan; in de wereldstand stonden de tegels op display:none en mat
+           je nullen. De wereldstand bestaat niet meer (de klok is met het
+           beginscherm meegegaan, zie WERELD.md), het rooster is de enige vorm
+           die er nog is, en een sleutel zetten die niemand meer leest maakt een
+           toets alleen maar moeilijker te geloven. */
       } catch (e) {}
     }, tok);
     await fn({ base, ctx });
@@ -107,30 +127,69 @@ async function metLid(fn) {
   }
 }
 
-/* Deze toetsen meten bewust de alternatieve rasterstand. Wacht eerst tot het
-   lid en de wereldmodule volledig zijn hersteld; een DOM-tegel kan al bestaan
-   terwijl de sessie nog bezig is en de standaardring hem een tel later
-   verbergt. Daarna schakelen we via dezelfde publieke bediening als de app. */
-async function wachtRooster(page) {
+/* WACHT TOT DE WERELDEN IN DE BANK STAAN.
+
+   Deze helper heette wachtRooster en deed twee dingen die geen van beide nog
+   bestaan: hij schakelde met RTGWereld.zet(false) naar de rasterstand van het
+   beginscherm, en hij klikte daarna de knop in de bank die de werktafel opvouwde
+   naar het springboard. De wereldstand is weg met de klok, en het springboard is
+   als scherm weg (WERELD.md) -- de werelden staan nu bovenaan de bank van de
+   werktafel, en dat is wat deze toetsen meten.
+
+   Twee wachtmomenten en niet een: #osMappen is nog steeds de registry waar de
+   bank uit gevuld wordt (app-main reikt hem aan, zie app-main-29c.js), dus de
+   bank kan pas kloppen als die registry klaar is. Wachten op alleen de bank
+   levert een toets op die soms een tel te vroeg meet. */
+async function wachtWerelden(page) {
   await page.waitForFunction(() => {
     const app = document.getElementById('app');
-    return !!(app && app.classList.contains('active') && window.RTGWereld &&
-      document.querySelector('.view[data-view="home"].active') &&
+    return !!(app && app.classList.contains('active') &&
       document.querySelectorAll('#osMappen .os-app').length === 3);
   }, null, { timeout: 60000 });
-  /* RTG Command is na de intake de landing. Deze toetsen meten de kloklaag
-     eronder, dus volgen dezelfde knop "Beginscherm" als een lid. Rechtstreeks
-     klikken via de DOM werkt ook wanneer de mobiele bank nog dicht is. */
-  await page.evaluate(() => {
-    const k = document.querySelector('#rtgCommand .cmd-klok');
-    if (k) k.click();
+  /* De werktafel hoort er dan ook te zijn: de intake staat buiten deze toetsen
+     (zie metLid), dus is #onbGate dicht en is er geen grendel meer. */
+  await page.waitForSelector('#rtgCommand .cmd-nav', { state: 'attached', timeout: 20000 });
+  await page.waitForFunction(() => {
+    const nav = document.querySelector('#rtgCommand .cmd-nav');
+    if (!nav) return false;
+    return [...nav.querySelectorAll('button[data-url]')]
+      .some((b) => /\/apps\/rtg\.html$/.test(b.dataset.url));
+  }, null, { timeout: 20000 });
+}
+
+/* De drie werelden zoals ze in de bank staan, in volgorde. De software eronder
+   blijft buiten beeld: die komt uit de catalogus van Command en niet uit MAPPEN,
+   en deze toetsen gaan over de werelden. */
+async function werelden(page) {
+  return page.evaluate(() => {
+    const nav = document.querySelector('#rtgCommand .cmd-nav');
+    const koppen = [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim());
+    const grens = nav.querySelector('.cmd-kop:nth-of-type(2)');
+    const uit = [];
+    for (const el of [...nav.children]) {
+      if (el === grens) break;
+      if (el.tagName !== 'BUTTON') continue;
+      const r = el.getBoundingClientRect();
+      uit.push({
+        url: el.dataset.url || '', naam: el.textContent.trim(),
+        glyf: !!el.querySelector('.cmd-glyf svg'),
+        breed: Math.round(r.width), hoog: Math.round(r.height),
+        top: Math.round(r.top)
+      });
+    }
+    return { koppen, werelden: uit };
   });
-  await page.evaluate(() => RTGWereld.zet(false));
-  await page.waitForFunction(() => !RTGWereld.aan() &&
-    !!document.querySelector('.view[data-view="home"].active') &&
-    [...document.querySelectorAll('#osMappen .os-app')]
-      .every((t) => t.getBoundingClientRect().width >= 8 && t.getBoundingClientRect().height >= 8),
-  null, { timeout: 10000 });
+}
+
+/* De lade openen ALS hij dicht is. Nog een keer klikken sluit hem, en zolang hij
+   openstaat ligt hij over de greep heen -- dan wacht een klik zich dood op een
+   knop die eronder zit. Dat is precies wat er in de lus hieronder gebeurde. */
+async function openLade(page) {
+  if (await page.evaluate(() => !!document.querySelector('#rtgCommand.bank-open'))) return;
+  const lade = page.locator('#rtgCommand .cmd-lade');
+  if (!(await lade.isVisible())) return;      // breed scherm: de bank staat vast
+  await lade.click();
+  await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
 }
 
 test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
@@ -248,43 +307,32 @@ test('het menu opent en brengt je terug naar het beginscherm',
   });
 });
 
-test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenrand is de ingang',
+test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank en van de bovenrand',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osAiBalk', { timeout: 10000 });
     /* Een vers geregistreerd lid staat nog in de intake, en die legt een blad
-       over het hele scherm. Wat we hier meten ligt eronder: de statusbalk van
-       het beginscherm. Het blad gaat dus opzij -- de intake heeft een eigen
-       toets en hoort niet in deze. */
-    await page.evaluate(() => {
-      const g = document.getElementById('onbGate');
-      /* hidden is het signaal waarop Command wacht; verwijderen vóór die
-         MutationObserver heeft gelopen laat de werktafel in de toestand
-         "ondertekening open" staan. */
-      if (g) g.hidden = true;
-    });
-    /* RTG Command is de nieuwe landing. Deze toets meet bewust de stille
-       statusbalk van het beginscherm eronder, dus volgt dezelfde zichtbare
-       ingang als een lid. */
-    await page.waitForFunction(() => {
-      const g = document.getElementById('onbGate');
-      if (g) g.hidden = true;
-      const k = document.querySelector('#rtgCommand .cmd-klok');
-      if (!k) return false;
-      k.click();
-      if (g) g.remove();
-      return true;
-    }, null, { timeout: 10000 });
-    await page.waitForTimeout(400);
+       over het hele scherm. hidden is het signaal waarop Command wacht;
+       verwijderen vóór die MutationObserver heeft gelopen laat de werktafel in
+       de toestand "ondertekening open" staan. */
+    await wachtWerelden(page);
 
-    /* HET BEGINSCHERM IS DE RUSTPLEK. Geen batterij, geen bel, geen paneelknop
-       en ook geen hamburger: mappen, klok, functies, de balk van Rahul, en
-       verder niets. De knoppen mogen wel BESTAAN -- het bedieningspaneel en de
-       rest van de app klikken ze aan, en dat is de enige plek waar hun gedrag
-       staat -- ze horen alleen niet in beeld. */
-    const balk = await page.evaluate(() => {
+    /* HET BEGINSCHERM IS DE RUSTPLEK, en dat is nu de werktafel.
+
+       Deze toets mat de statusbalk van het springboard: geen batterij, geen
+       bel, geen hamburger, en precies EEN deur (die naar het bedieningspaneel).
+       Het springboard is geen scherm meer (WERELD.md), dus is die hele balk uit
+       beeld -- en daarmee zou de eis verdampen tot "je ziet niets", wat elke
+       kapotte versie ook haalt.
+
+       Wat de eis WAS blijft daarom staan, alleen op de plek waar hij nu geldt:
+       de knoppen mogen bestaan (het paneel en de rest van de app klikken ze
+       aan, en dat is de enige plek waar hun gedrag staat), ze horen alleen niet
+       in beeld. En de weg naar het systeem moet er wel zijn -- dat is de helft
+       die stil kapot kan. Knoppen weghalen is zichtbaar; een ingang die niemand
+       meer heeft niet. */
+    const beeld = await page.evaluate(() => {
       const zichtbaar = (id) => {
         const e = document.getElementById(id);
         if (!e) return null;                  // null = bestaat niet meer
@@ -293,9 +341,10 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
           Number(s.opacity || 1) > 0 && b.width > 0 && b.height > 0;
       };
       return {
-        bel: zichtbaar('bell'), paneel: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
+        bel: zichtbaar('bell'), paneelknop: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
         hamburger: !!document.getElementById('osMenuBtn'),
         groet: !!document.getElementById('homeGreeting'),
+        paneelBestaat: !!document.getElementById('osCcBtn'),
         zichtbaarRechts: [...document.querySelectorAll('.topbar .os-rechts button')]
           .filter((e) => { const b = e.getBoundingClientRect(), s = getComputedStyle(e);
             return !e.hidden && s.display !== 'none' && s.visibility !== 'hidden' &&
@@ -303,37 +352,56 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
           .map((b) => b.id || b.className)
       };
     });
-    /* EEN DEUR, EN VERDER NIETS.
+    assert.equal(beeld.bel, false, 'de bel staat in beeld op het beginscherm');
+    assert.equal(beeld.accu, false, 'de batterij staat in beeld op het beginscherm');
+    assert.equal(beeld.hamburger, false, 'het beginscherm hoort geen hamburger te hebben');
+    assert.equal(beeld.groet, false, 'de begroeting hoort van het beginscherm af te zijn');
+    assert.equal(beeld.paneelknop, false, 'de statusbalk van het springboard staat weer in beeld');
+    assert.deepEqual(beeld.zichtbaarRechts, [],
+      'er staat nog een knop van de oude statusbalk in beeld: ' + beeld.zichtbaarRechts.join(', '));
+    /* De knop moet wel BLIJVEN bestaan: de deur in de bank klikt hem aan, en
+       daar staat het gedrag. Verdwijnt hij, dan valt die deur stil. */
+    assert.equal(beeld.paneelBestaat, true,
+      'de knop van het bedieningspaneel is uit de DOM verdwenen; dan klikt de deur in de bank niets meer aan');
 
-       Hier stond `paneel === false` en `zichtbaarRechts === []`: de statusbalk
-       moest helemaal leeg zijn. Dat klopte tot de balk werd leeggemaakt --
-       scannen, Zegel, backoffice en de bel verhuisden allemaal NAAR het
-       bedieningspaneel -- en de knop van dat paneel per ongeluk meeging in de
-       opruiming. Toen was het paneel waar ze allemaal in zitten alleen nog te
-       openen via Rahuls "zoek ..."-opdracht, en dus praktisch onvindbaar.
+    /* DEUR EEN: de voet van de bank. Dit is de vervanger van de knop in de
+       statusbalk, en de enige zichtbare weg naar uitloggen. */
+    await openLade(page);
+    const deuren = await page.evaluate(() =>
+      [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')].map((b) => b.textContent.trim()));
+    assert.ok(deuren.some((t) => /Bedieningspaneel/i.test(t)),
+      'de voet van de bank heeft geen deur naar het bedieningspaneel, gevonden: ' + deuren.join(', '));
+    /* Op NAAM en niet op positie: er staan twee systeemdeuren in de voet
+       (Rahul boven het bedieningspaneel), dus `[data-systeem]` pakte de
+       eerste en opende het vraagveld van Rahul. */
+    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Bedieningspaneel' }).first().click();
+    await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
+    assert.equal(await page.evaluate(() => {
+      const s = document.getElementById('osCcScrim').getBoundingClientRect();
+      return s.width > 0 && s.height > 0;
+    }), true, 'het bedieningspaneel gaat wel open maar staat niet in beeld boven de werktafel');
 
-       Die knop is daarom bewust teruggezet, met de reden erbij in app.html. De
-       eis is niet veranderd -- de bovenrand is de ingang en de balk is geen
-       gereedschapskist -- maar "leeg" is nu "precies EEN deur". Deze toets
-       bewaakt dat scherper dan een lege lijst: hij noemt de enige knop die er
-       mag staan, dus zowel een knop erbij als deze deur die verdwijnt, zakt. */
-    assert.equal(balk.bel, false, 'de bel staat nog in de statusbalk');
-    assert.equal(balk.accu, false, 'de batterij staat nog in de statusbalk');
-    assert.equal(balk.hamburger, false, 'het beginscherm hoort geen hamburger te hebben');
-    assert.equal(balk.groet, false, 'de begroeting hoort van het beginscherm af te zijn');
-    assert.equal(balk.paneel, true,
-      'de deur naar het bedieningspaneel is uit de statusbalk verdwenen; dan is alles wat ' +
-      'daarin verhuisd is (scannen, Zegel, backoffice, meldingen) alleen nog via Rahul te openen');
-    assert.deepEqual(balk.zichtbaarRechts, ['osCcBtn'],
-      'in de statusbalk hoort alleen de deur naar het bedieningspaneel te staan, gevonden: ' +
-      (balk.zichtbaarRechts.join(', ') || '(niets)'));
+    const tegels = await page.evaluate(() =>
+      [...document.querySelectorAll('.os-cc-tegels button')].filter((b) => !b.hidden)
+        .map((b) => b.textContent.trim()));
+    for (const woord of ['Meldingen', 'Zoeken', 'Scannen', 'Zegel', 'backoffice', 'Uitloggen']) {
+      assert.ok(tegels.some((t) => new RegExp(woord, 'i').test(t)),
+        woord + ' ontbreekt in het bedieningspaneel');
+    }
+    // en de tegel doet het echt: hij klikt de verborgen bel aan
+    await page.click('#osCcBel');
+    await page.waitForTimeout(500);
+    assert.equal(await page.evaluate(() => {
+      const p = document.getElementById('notifPanel');
+      return !!(p && p.classList.contains('open'));
+    }), true, 'de tegel Meldingen opent het meldingenpaneel niet');
 
-    /* ...EN DAN MOET DE WEG NAAR HET SYSTEEM ER WEL ZIJN. Dit is de helft die
-       stil kapot kan: knoppen weghalen is zichtbaar, een ingang die niemand
-       meer heeft niet. De bovenrand omlaag halen (shared/randen.js) opent het
-       bedieningspaneel, en dat paneel draagt alles wat uit de balk is gehaald
-       -- meldingen incluis, want zonder die tegel was er na het leegmaken geen
-       enkele ingang meer naar wat er voor je klaarligt. */
+    /* DEUR TWEE: de bovenrand omlaag halen (shared/randen.js). Die luistert op
+       document mee, dus hij werkt boven de werktafel net zo goed als hij boven
+       het springboard werkte -- maar dat is precies het soort ding dat stil
+       stukgaat als er een laag bij komt. */
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await wachtWerelden(page);
     await page.mouse.move(196, 4);
     await page.mouse.down();
     for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
@@ -342,109 +410,67 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim');
       return !!(s && s.classList.contains('open'));
-    }), true, 'de bovenrand opent het bedieningspaneel niet');
-
-    const tegels = await page.evaluate(() =>
-      [...document.querySelectorAll('.os-cc-tegels button')].filter((b) => !b.hidden)
-        .map((b) => b.textContent.trim()));
-    for (const woord of ['Meldingen', 'Zoeken', 'Scannen', 'Zegel', 'backoffice']) {
-      assert.ok(tegels.some((t) => new RegExp(woord, 'i').test(t)),
-        woord + ' ontbreekt in het bedieningspaneel');
-    }
-
-    // en de tegel doet het echt: hij klikt de verborgen bel aan
-    await page.click('#osCcBel');
-    await page.waitForTimeout(500);
-    assert.equal(await page.evaluate(() => {
-      const p = document.getElementById('notifPanel');
-      return !!(p && p.classList.contains('open'));
-    }), true, 'de tegel Meldingen opent het meldingenpaneel niet');
+    }), true, 'de bovenrand opent het bedieningspaneel niet boven de werktafel');
     await page.close();
   });
 });
 
-test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klok staat erboven',
+test('de bank zet de drie werelden boven de software, en het springboard is weg',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
+
+     Hij mat de voordeur: drie wereldtegels als één gecentreerde rij op het
+     springboard, met de klok eronder en de balk van Rahul aan de onderrand.
+     Dat springboard is geen scherm meer -- het beginscherm is de werktafel van
+     RTG Command (WERELD.md) -- en de werelden staan nu bovenaan de bank.
+
+     Wat hetzelfde bleef is de VRAAG: staan de drie werelden er, staan ze
+     bovenaan, en zijn ze echt te zien? Een rij die op nul pixels staat of onder
+     de software wegzakt komt door elke telling heen. Wat er bij komt is de
+     andere helft van dezelfde afspraak: het springboard mag NIET meer in beeld
+     komen. Zonder die meting is "de pagina is weg" een bewering.
+
+     DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: haal in shared/command/bank.js
+     het kopje "Werelden" en de wereld-lus uit vul() -- dan houdt de bank alleen
+     software. Of haal de springboard-regel uit command.css: dan staat het
+     scherm er weer onder. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await wachtRooster(page);
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForTimeout(400);
-    await wachtRooster(page);
+    await wachtWerelden(page);
+    // op een telefoon is de bank een lade; open hem zoals een lid dat doet
+    await openLade(page);
 
-    const r = await page.evaluate(() => {
-      const vak = (s) => {
-        const b = document.querySelector(s).getBoundingClientRect();
-        return { top: Math.round(b.top), bodem: Math.round(b.bottom) };
+    const b = await werelden(page);
+    assert.deepEqual(b.koppen, ['Werelden', 'Software'],
+      'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
+    assert.deepEqual(b.werelden.map((w) => w.url),
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
+      'de bank hoort exact RTG, RTG Kantoor en RTFoundation bovenaan te dragen');
+    const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
+    assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
+      'deze werelden staan wel in de bank maar zijn nul groot');
+    const volgorde = b.werelden.map((w) => w.top);
+    assert.deepEqual(volgorde.slice().sort((x, y) => x - y), volgorde,
+      'de werelden staan niet op volgorde onder elkaar');
+
+    /* EN HET SPRINGBOARD KOMT NIET TERUG. Het bestaat nog als registry -- de
+       bank en Spotlight worden eruit gevuld -- maar het is geen scherm meer. */
+    const schil = await page.evaluate(() => {
+      const zichtbaar = (s) => {
+        const e = document.querySelector(s);
+        if (!e) return null;
+        const r = e.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
       };
-      const nav = document.getElementById('osMappen');
-      const navVak = nav.getBoundingClientRect();
-      const tegels = [...nav.querySelectorAll('.os-app')];
-      const rijen = new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
-      // de ene rij hoort als geheel gecentreerd te staan
-      const laatsteTop = Math.max(...tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
-      const laatste = tegels.filter((t) => Math.round(t.getBoundingClientRect().top) === laatsteTop);
-      const marge = {
-        links: Math.round(laatste[0].getBoundingClientRect().left - navVak.left),
-        rechts: Math.round(navVak.right - laatste[laatste.length - 1].getBoundingClientRect().right)
-      };
-      const onder = [...document.querySelectorAll('#osAiWet, #osDemoWet')]
-        .filter((e) => getComputedStyle(e).display !== 'none').at(-1);
-      const klokvak = vak('.os-klokvak'), klok = vak('#homeKlok');
-      const tips = document.querySelector('#osAiTips');
-      const boven = tips && !tips.hidden ? vak('#osAiTips') : vak('#osAiDraad');
-      return {
-        mappen: tegels.length, rijen: rijen.size, marge: marge,
-        breedtes: [...new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().width)))],
-        volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
-          .map((s) => vak(s).top),
-        luchtBovenKlok: klok.top - klokvak.top,
-        luchtOnderKlok: klokvak.bodem - klok.bodem,
-        gatNaarBalk: vak('#osAiBalk').top - boven.bodem,
-        onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
-      };
+      return { springboard: zichtbaar('.os-thuisscherm'), balk: zichtbaar('#osAiBalk'),
+        topbar: zichtbaar('.topbar'), klok: !!document.getElementById('homeKlok') };
     });
-    assert.equal(r.mappen, 3, 'de voordeur hoort exact drie hoofdwerelden te dragen');
-    assert.equal(r.rijen, 1, 'de drie hoofdwerelden staan niet in één rij (rijen: ' + r.rijen + ')');
-    /* DE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. Links en rechts even
-       veel marge maakt er één bewuste voordeur van, in plaats van drie tegels
-       die toevallig vanaf de linkerkant zijn neergelegd. De tegels houden
-       bovendien dezelfde compacte maat; drie uitgerekte tegels zouden de klok
-       en de rustige hiërarchie verdringen. */
-    assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
-      'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
-      ', rechts ' + r.marge.rechts + ')');
-    assert.equal(r.breedtes.length, 1,
-      'niet alle maptegels zijn even breed: ' + r.breedtes.join(', '));
-    assert.deepEqual(r.volgorde.slice().sort((a, b) => a - b), r.volgorde,
-      'de volgorde is mappen, klok, functies, balk');
-
-    /* DRIE DINGEN DIE ELKAAR IN DE WEG ZITTEN, en daarom hier bij elkaar staan.
-
-       Er heeft een bovengrens op het klokvak gestaan om de klok omhoog te
-       halen. Gevolg: alle overtollige ruimte zakte naar het einde van de kolom,
-       de balk van Rahul kwam los van de onderrand en er stond een gat van 155
-       punten onder het scherm. Die grens is er weer af, en dat maakt deze drie
-       eisen tegelijk waar -- verschuif er één en de andere twee bewegen mee, dus
-       ze horen in één meting.
-
-       1. DE BALK STAAT ONDERAAN. Daar zoekt je duim hem.
-       2. DE KLOK HEEFT LUCHT OM ZICH HEEN, boven en onder ongeveer evenveel;
-          een horloge zonder marge wordt een tegel.
-       3. HET GESPREK PLAKT NIET AAN DE BALK. Anders leest het als één blok in
-          plaats van gesprek en invoer. */
-    assert.ok(r.hoogte - r.onderrand < 60,
-      'de balk van Rahul hangt los van de onderrand (' + (r.hoogte - r.onderrand) + 'px eronder)');
-    assert.ok(r.luchtBovenKlok > 25 && r.luchtOnderKlok > 25,
-      'de klok heeft te weinig lucht om zich heen (boven ' + r.luchtBovenKlok +
-      ', onder ' + r.luchtOnderKlok + ')');
-    assert.ok(Math.abs(r.luchtBovenKlok - r.luchtOnderKlok) < 20,
-      'de klok hangt niet in het midden van zijn vak (boven ' + r.luchtBovenKlok +
-      ', onder ' + r.luchtOnderKlok + ')');
-    assert.ok(r.gatNaarBalk > 22,
-      'de berichten van Rahul plakken aan zijn balk (' + r.gatNaarBalk + 'px ertussen)');
+    assert.equal(schil.springboard, false, 'het springboard staat weer in beeld');
+    assert.equal(schil.balk, false, 'de balk van Rahul van het springboard staat weer in beeld');
+    assert.equal(schil.topbar, false, 'de statusbalk van het springboard staat weer in beeld');
+    assert.equal(schil.klok, false, 'de klok is terug op het beginscherm');
     await page.close();
   });
 });
@@ -455,172 +481,81 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
      dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
      instappas: geen hoofdwereld mag daar terugvallen op een kaal monogram of
-     verdwijnen. */
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  let browser;
-  try {
-    const tok = await lidToken(base, 'mappen' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
-    await ctx.addInitScript((t) => {
-      try {
-        localStorage.setItem('rtg_member_token', t);
-        localStorage.setItem('rtg_lang', 'nl');
-        localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
-      } catch (e) {}
-    }, tok);
+     verdwijnen.
+
+     DE METING IS DRIE KEER VERHUISD, en dat hoort hier te staan.
+
+     Eerst telde deze toets tegels in een OPENGEKLIKTE map. Toen werelden apps
+     werden, telde hij de minitegels op de wereldtegel -- en die telling ving
+     meteen iets echts: de minitegels toonden alleen wat op JOUW pas zichtbaar
+     is, dus op de instappas stond RTG Leven er met drie snippers en
+     RTFoundation met een. De instap oogde budget, precies wat de merkregel
+     verbiedt. De oplossing was niet een lagere lat maar EEN glyf die op elke
+     pas even vol is.
+
+     Nu is de tegel zelf verhuisd: het springboard is geen scherm meer en de
+     werelden staan in de bank van de werktafel (WERELD.md). De glyf ging mee --
+     dezelfde uit RTGGlyf, dezelfde als op hun huis -- en de eis dus ook.
+
+     DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: geef een wereld in
+     app-main-24a2.js een glyf-naam die niet bestaat ('map-rtg' ->
+     glyf: 'bestaatniet'). De deur in de bank valt dan terug op het standaard
+     icoon van Command in plaats van het eigen merkteken. */
+  await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await wachtRooster(page);
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForTimeout(400);
-    await wachtRooster(page);
+    await wachtWerelden(page);
+    await openLade(page);
 
-    /* DE METING IS TWEE KEER VERHUISD, en dat hoort hier te staan.
-
-       Eerst telde deze toets tegels in een OPENGEKLIKTE map. Toen werelden
-       apps werden, telde hij de minitegels op de wereldtegel -- en die telling
-       ving meteen iets echts: de minitegels toonden alleen wat op JOUW pas
-       zichtbaar is, dus op de instappas stond RTG Leven er met drie snippers
-       en RTFoundation met een. De instap oogde budget, precies wat de
-       merkregel verbiedt.
-
-       De oplossing is niet een lagere lat maar een andere tegel: een wereld is
-       een app en ziet eruit als een app, met EEN glyf die op elke pas even vol
-       is. Wat deze toets dus nu bewaakt: elke wereldtegel draagt een echte
-       getekende glyf (svg), geen monogram-terugval en geen leeg vlak. De
-       monogram-terugval bestaat voor een glyf die ontbreekt, en op het
-       beginscherm is "de glyf ontbreekt" geen smaakverschil maar een kale
-       voordeur.
-
-       De dubbelcheck ("een app staat in precies EEN wereld") is apart
-       verhuisd, naar regel 44 in scripts/check.js -- die leest de bron.
-
-       DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: geef een wereld in
-       app-main-24a2.js een glyf-naam die niet bestaat ('map-rtg' ->
-       glyf: 'bestaatniet'). De tegel valt dan terug op het monogram. */
-    const mappen = await page.evaluate(() =>
-      [...document.querySelectorAll('#osMappen .os-app')].map((map) => ({
-        sleutel: map.dataset.sleutel || '',
-        naam: (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim(),
-        glyf: !!map.querySelector('.os-tegel svg'),
-        monogram: !!map.querySelector('.os-monogram')
-      })));
-
-    assert.deepEqual(mappen.map((m) => m.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
-      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
-    const kaal = mappen.filter((m) => !m.glyf);
-    assert.deepEqual(kaal.map((m) => m.naam + (m.monogram ? ' (monogram)' : ' (leeg)')), [],
-      'deze wereldtegels dragen geen getekende glyf:\n' +
-      mappen.map((m) => '  ' + m.naam + ': ' + (m.glyf ? 'glyf' : (m.monogram ? 'monogram' : 'leeg'))).join('\n'));
-  } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-  }
+    const b = await werelden(page);
+    assert.deepEqual(b.werelden.map((w) => w.url),
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
+      'de bank hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+    const kaal = b.werelden.filter((w) => !w.glyf);
+    assert.deepEqual(kaal.map((w) => w.naam), [],
+      'deze werelden dragen geen eigen glyf maar het standaard icoon:\n' +
+      b.werelden.map((w) => '  ' + w.naam + ': ' + (w.glyf ? 'glyf' : 'terugval')).join('\n'));
+    await page.close();
+  });
 });
 
-test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
+test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
-     De voorganger van deze toets mat de tegels in een GEOPENDE map. Sinds het
-     beginscherm drie hoofdwerelden toont (PLATFORM.md par. 0) opent een tegel de
-     app zelf en is er geen tussenscherm meer. De fout waar die toets voor
-     bestond is niet verdwenen -- hij is verhuisd: tegels die over elkaar
-     liggen, buiten hun vak vallen of de helft van de breedte onbenut laten,
-     staan nu op het beginscherm zelf. Tellen is geen kijken, en dat gold toen
-     en geldt nu.
+     Een deur die er goed uitziet en niets doet komt door elke telling heen. Dat
+     gold toen de werelden tegels op het springboard waren -- die navigeerden
+     naar hun huis -- en het geldt nu ze deuren in de bank zijn. Alleen de
+     uitkomst is anders: een wereld opent nu als WERKBLAD in de werktafel en
+     verlaat de pagina niet. Dat verschil is het hele punt van de werktafel, dus
+     wordt het hier gemeten en niet aangenomen.
 
-     Wat er bij komt en er niet in kon staan: dat een wereld ook echt zijn app
-     opent. Dat is het hele punt van de drie hoofdwerelden; een tegel die niets doet
-     zou door elke telling heen komen.
-
-     De mutatie die hem hoort te laten zakken: haal `wereld` van een van de
-     mappen in app-main-24a2.js weg. De tegel opent dan weer een tegelveld en
-     navigeert nergens heen. */
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werelden-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  let browser;
-  try {
-    const tok = await lidToken(base, 'werelden' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
-    await ctx.addInitScript((t) => {
-      try {
-        localStorage.setItem('rtg_member_token', t);
-        localStorage.setItem('rtg_lang', 'nl');
-        localStorage.setItem('rtg_cookieinfo_v1', '1');
-        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
-           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
-           om de klok, shared/wereld.js) en daar staan de tegels op
-           display:none -- dan meet je nullen en zakt de toets om een stand en
-           niet om een fout. De wereldstand heeft een eigen toets
-           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
-        localStorage.setItem('rtg_os_wereld', 'uit');
-      } catch (e) {}
-    }, tok);
+     DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: haal `wereld` van een van de
+     mappen in app-main-24a2.js weg. Die wereld valt dan uit de aanreiking
+     (app-main-29c.js filtert erop) en staat niet meer in de bank. */
+  await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-    await wachtRooster(page);
-    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForTimeout(400);
-    await wachtRooster(page);
+    await wachtWerelden(page);
 
-    const beeld = await page.evaluate(() => {
-      const tegels = [...document.querySelectorAll('#osMappen .os-app')];
-      const vak = document.getElementById('osMappen').getBoundingClientRect();
-      const doosjes = tegels.map((t) => t.getBoundingClientRect());
-      const overlap = [];
-      for (let i = 0; i < doosjes.length; i++) {
-        for (let j = i + 1; j < doosjes.length; j++) {
-          const a = doosjes[i], b = doosjes[j];
-          if (a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
-              a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5) overlap.push(i + '/' + j);
-        }
-      }
-      return {
-        aantal: tegels.length,
-        sleutels: tegels.map((t) => t.dataset.sleutel || ''),
-        namen: tegels.map((t) => (t.getAttribute('aria-label') || '').replace(/^Map /, '').trim()),
-        overlap: overlap.length,
-        buiten: doosjes.filter((r) => r.left < vak.left - 0.5 || r.right > vak.right + 0.5).length,
-        nul: doosjes.filter((r) => r.width < 8 || r.height < 8).length
-      };
-    });
-
-    assert.deepEqual(beeld.sleutels, ['map-rtg', 'map-werk', 'map-rtf'],
-      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te tekenen');
-    assert.equal(beeld.overlap, 0,
-      'wereldtegels liggen over elkaar heen (' + beeld.overlap + ' paren): ' + beeld.namen.join(', '));
-    assert.equal(beeld.buiten, 0, 'deze wereldtegels vallen buiten hun eigen vak');
-    assert.equal(beeld.nul, 0, 'een wereldtegel is nul groot; die is er wel en je ziet hem niet');
-
-    /* EN NU OPENT HIJ OOK ECHT. Een voor een, want elke klik navigeert weg. */
-    for (let i = 0; i < beeld.aantal; i++) {
-      await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
-      await wachtRooster(page);
-      await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-      await page.waitForTimeout(250);
-      await wachtRooster(page);
-      await page.evaluate((n) => document.querySelectorAll('#osMappen .os-app')[n].click(), i);
-      await page.waitForTimeout(900);
-      const pad = new URL(page.url()).pathname;
-      assert.notEqual(pad, '/apps/app.html',
-        'de wereld "' + beeld.namen[i] + '" opent geen app; hij bleef op het beginscherm staan');
-      assert.match(pad, /^\/apps\//, 'een wereld hoort naar een app te wijzen, niet naar ' + pad);
+    const b = await werelden(page);
+    for (const w of b.werelden) {
+      await openLade(page);
+      await page.click('#rtgCommand .cmd-nav button[data-url="' + w.url + '"]');
+      await page.waitForFunction((url) => {
+        const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe') ||
+                  document.querySelector('#rtgCommand .cmd-pane iframe');
+        return !!(f && f.getAttribute('src') === url);
+      }, w.url, { timeout: 10000 });
+      // en we zijn de werktafel niet kwijtgeraakt: een blad is geen navigatie
+      assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/,
+        'de wereld "' + w.naam + '" verliet de werktafel in plaats van een werkblad te openen');
+      const titels = await page.evaluate(() =>
+        [...document.querySelectorAll('#rtgCommand .cmd-balkblad')].map((t) => t.textContent.trim()));
+      assert.ok(titels.length > 0, 'de wereld "' + w.naam + '" opende geen werkblad');
     }
-  } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-  }
+    await page.close();
+  });
 });

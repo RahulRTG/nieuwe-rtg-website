@@ -21,7 +21,65 @@
    overal. */
 
 body.rtg-command{display:block;background:var(--onyx-glans,#0C0C0B);overflow:hidden;}
-body.rtg-command > #shell{display:none!important;}
+
+/* ---- DE SCHIL IS GEEN SCHERM MEER, MAAR NOG WEL DE LA ----------------------
+
+   Hier stond `display:none!important` op #shell, en dat klopte zolang je er nog
+   heen kon: de knop "Beginscherm"/"Toestel" vouwde de werktafel op en dan stond
+   het springboard er weer. Die knop is weg -- er is één beginscherm en dat is
+   de werktafel -- en daarmee was het springboard onbereikbaar.
+
+   Maar in diezelfde #shell liggen de SYSTEEMPANELEN: het bedieningspaneel (met
+   scannen, je Zegel, je backoffice, de pin, taal, weergave, push, zoeken,
+   meldingen en uitloggen), het meldingenpaneel en de zoeker. Die zijn geen
+   pagina's maar laden die over alles heen komen, en met display:none gingen ze
+   met het springboard mee -- inclusief je uitlogknop.
+
+   De schil blijft daarom staan als een DOORZICHTIGE, KLIKDOORLATENDE laag boven
+   de werktafel. Wat een pagina was gaat weg (de balk en de inhoud), wat een la
+   was blijft. Drie dingen om te weten voor wie hieraan komt:
+
+   1. position:relative en niet fixed/inset:0. De schil is de container waar --e
+      aan hangt (container-query in apps/app.html); rek je hem op tot het hele
+      venster, dan groeit de hele maatvoering van de panelen mee.
+   2. pointer-events:none op de schil, auto op de panelen. Zonder dat ligt er een
+      onzichtbaar vel over de werktafel en reageert er niets meer.
+   3. Gaat er tóch een scherm open in de schil (#app.os-open, een tab uit
+      Spotlight), dan is hij even weer een scherm: ondoorzichtig en klikbaar.
+
+   Het !important op de achtergrond is geen luiheid maar het antwoord op een
+   ander !important: shared/levendekleur.js schildert elke [data-levendegrond]
+   -- en dat is deze schil -- met de levende dagkleur, en doet dat zo. Zonder
+   dit lag er een ondoorzichtige lap over de werktafel waar je alleen de kleur
+   van zag dat er iets mis was. */
+body.rtg-command > #shell{position:relative;z-index:240;margin-inline:auto;
+  background:none!important;border:0;box-shadow:none;pointer-events:none;}
+body.rtg-command > #shell #app{background:none!important;}
+body.rtg-command > #shell #app:not(.os-open) > .topbar,
+body.rtg-command > #shell #app:not(.os-open) > #content{display:none!important;}
+body.rtg-command > #shell #app.os-open{pointer-events:auto;background:var(--bg)!important;}
+body.rtg-command > #shell .os-scrim,
+body.rtg-command > #shell .notif-scrim,
+body.rtg-command > #shell .notif-panel{pointer-events:auto;}
+/* En de balk van Rahul, die aan <body> hangt en niet aan de schil: z-index 38
+   (shared/handenvrij-balk.js) ligt onder de werktafel, dus je riep hem en er
+   gebeurde zichtbaar niets.
+
+   HET GESPREK HOORT ERBIJ, en dat was de helft die hier eerst ontbrak. De balk
+   en zijn gespreksvenster (.hv-chat, shared/handenvrij-chat.js) zijn twee losse
+   position:fixed-elementen -- 38 en 37 -- en alleen de balk werd opgetild. Wat
+   je dan krijgt is geen leeg scherm maar iets vervelenders: het gesprek staat
+   er, je LEEST de bevestigingsvraag ("Ja, doorzetten" bij een betaling), en de
+   knop reageert niet, want .cmd-leeg van de werktafel ligt eroverheen en vangt
+   de muis af. Een dode knop op een vraag over geld.
+
+   Alleen de hoogte wordt hier gecorrigeerd, en alleen op een telefoon: daar
+   ligt de schilbalk (48px) onderaan en zou de balk er half achter vallen. Op een
+   breed scherm laten we hem met rust -- daar maakt shared/handenvrij-bureau.js
+   er een verplaatsbaar paneel rechtsonder van, en dat is zijn eigen vorm. */
+body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bottom,0px));}
+body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bottom,0px));}
+@media (min-width:1000px){body.rtg-command .hv-balk,body.rtg-command .hv-chat{bottom:auto;}}
 #rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}
@@ -50,8 +108,137 @@ body.rtg-command > #shell{display:none!important;}
 .cmd-nav button:hover,.cmd-bankvoet button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}
 .cmd-nav button.actief{color:var(--rtg-txt);border-left-color:#7F1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08));}
 .cmd-nav svg,.cmd-bankvoet svg{width:19px;height:19px;flex:none;stroke:currentColor}
+/* De twee kopjes in de bank: WERELDEN boven, SOFTWARE eronder. Ze staan er
+   omdat het twee soorten bestemmingen zijn -- een wereld is een huis, een app is
+   een stuk gereedschap -- en zonder onderscheid wordt het een lijst van vijftien
+   waarin de drie huizen wegvallen. Ze zijn geen knop en vangen dus geen tik. */
+.cmd-kop{margin:.9rem .72rem .3rem;flex:none;pointer-events:none;
+  font:600 .56rem/1 var(--rtg-interface);letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-soft)}
+.cmd-kop:first-child{margin-top:.15rem}
+/* De glyf van een wereld komt uit shared/glyf.js: hetzelfde teken als op het
+   huis zelf, dunne lijn in currentColor. Goud, omdat een wereld hier geen app
+   is maar een huis -- dat is het enige verschil dat de bank maakt. */
+.cmd-glyf{width:19px;height:19px;flex:none;display:grid;place-items:center;color:var(--gold-tekst,#C0A544)}
+.cmd-glyf svg{width:100%;height:100%}
 .cmd-bankvoet{border-top:1px solid var(--rtg-line);padding-top:.55rem}
 .cmd-bank span{white-space:nowrap;overflow:hidden;opacity:1;transition:opacity 180ms var(--rtg-veer)}
+
+/* ---------------------------------------------------------------- Rahul ----
+   RAHUL WOONT IN DE SCHILBALK. Rechts staat zijn mond -- hetzelfde gezicht als
+   overal (shared/mond.js) -- en een tik maakt van DEZE balk een vraagveld. Geen
+   paneel dat opkomt: de balk die er al was verandert van taak. De logica staat
+   in shared/command/praat.js.
+
+   DE VORM IS EEN INSTRUMENT EN GEEN RIJ WIDGETS, en dat is de tweede ronde.
+   Hier stonden drie behandelingen in achtenveertig pixels: een goud getint vlak
+   achter de mond, een afgerond invoerveld met een binnenschaduw, en een gevulde
+   gouden schijf met een pijl. Elk voor zich te verdedigen, samen een kermis --
+   precies wat ONTWERP.md par. 7 bedoelt met "niet elk stuk informatie hoort in
+   een afgerond rechthoekje".
+
+   Wat er nu staat volgt het ritme dat de balk zelf al had: zones naast elkaar,
+   gescheiden door een haarlijn, geen enkel gevuld vlak. Mond, veld, sturen. Het
+   veld draagt geen eigen kader meer -- de balk ís het veld. Goud draagt alleen
+   de pijl, want sturen is de enige handeling met autoriteit (ONTWERP.md par. 4);
+   alles daaromheen is haarlijn en tekst. */
+.cmd-mondknop{
+  flex:0 0 auto;width:60px;border:0;border-left:1px solid var(--rtg-line);
+  background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;
+  opacity:.78;transition:opacity 140ms ease;
+}
+.cmd-mondknop canvas{display:block!important;width:44px!important;height:auto!important;pointer-events:none}
+.cmd-mondknop:hover{opacity:1}
+/* Open staat hij vol in het licht, en verder verandert er niets aan hem: hij
+   blijft rechts, waar je duim hem heeft leren zoeken. Geen vlak eromheen -- dat
+   las als een knop-in-een-balk, en de mond is geen knop maar een gezicht. */
+.cmd-balk.vraagt .cmd-mondknop{opacity:1}
+/* DE VRAAGSTAND NEEMT DE BLADEN IN, NIET DE GREEP.
+
+   Hier verdween ook .cmd-lade, en daarmee de enige weg naar de bank met de
+   werelden: stond Rahul open, dan zat je vast tot je hem sloot. De greep blijft
+   dus staan. Wat wijkt zijn de bladen en de sluitknop -- die gaan over het blad
+   dat je aan het lezen was, en dat blad blijft gewoon waar het is.
+
+   De volgorde is DOM-volgorde en geen `order`: greep, veld, mond. Zo staat de
+   mond in beide standen op dezelfde plek, en leest een schermlezer hem in de
+   volgorde waarin hij staat. */
+.cmd-vraagvorm{display:none;flex:1 1 auto;min-width:0;align-items:stretch;margin:0}
+.cmd-balk.vraagt .cmd-vraagvorm{display:flex}
+.cmd-balk.vraagt .cmd-balkbladen,
+.cmd-balk.vraagt .cmd-balksluit{display:none}
+/* De !important-en zijn niet van mij maar van rtg-ui.css: dat geeft elke input
+   in dit huis een oppervlak, een rand en een binnenschaduw, met een selector die
+   zwaarder weegt dan een klasse. Hier hoort het veld juist niets te zijn. */
+.cmd-vraagveld{flex:1 1 auto;min-width:0;height:auto!important;padding:0 .9rem!important;
+  background:none!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;color:var(--rtg-txt)!important;
+  font:400 .82rem var(--rtg-interface)!important;}
+.cmd-vraagveld::placeholder{color:var(--rtg-soft)}
+.cmd-vraagveld:focus-visible{outline:0}
+.cmd-vraagstuur{flex:0 0 auto;width:48px;border:0;border-left:1px solid var(--rtg-line);
+  background:transparent;color:var(--gold-tekst,#C0A544);display:grid;place-items:center;
+  cursor:pointer;padding:0;transition:background 140ms ease}
+.cmd-vraagstuur:hover{background:rgba(255,255,255,.04)}
+.cmd-vraagstuur svg{width:18px;height:18px;stroke:currentColor;fill:none}
+
+/* ---- wat hij zegt: een REGISTER, geen chatvenster ----
+   Hier zweefde een afgeronde glazen bak boven de balk, met een gouden stip voor
+   je eigen zin. Dat is de kaartenstapel waar ONTWERP.md par. 7 vanaf wil.
+
+   Het is nu wat de rest van dit huis ook is: rijen op haarlijnen, in dezelfde
+   strook als de balk eronder (.rtg-register in shared/rtg-ontwerp.css is
+   dezelfde vorm). Wie er aan het woord is staat er als WOORD en niet als kleur
+   of bolletje -- dezelfde regel als bij status, ONTWERP.md par. 5. Alleen de
+   vraag draagt dat label: Rahul is de stem die er standaard staat, en "RAHUL"
+   boven elke regel is ruis.
+
+   Hoogstens een derde van het scherm, en hij scrolt in zichzelf: de werkvloer
+   eronder blijft staan. */
+.cmd-praat{
+  position:absolute;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom,0px));
+  z-index:22;max-height:34vh;overflow-y:auto;overscroll-behavior:contain;
+  background:rgba(12,12,11,.96);border-top:1px solid var(--rtg-line);
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+}
+.cmd-praat[hidden]{display:none}
+.cmd-praatregel{
+  margin:0;padding:.65rem .9rem;font:400 .8rem/1.55 var(--rtg-interface);
+  color:var(--rtg-muted);border-bottom:1px solid var(--rtg-line);
+}
+.cmd-praatregel:last-child{border-bottom:0}
+.cmd-praatregel.mij{color:var(--rtg-soft)}
+.cmd-praatwie{
+  display:block;margin-bottom:.3rem;
+  font:600 .56rem/1 var(--rtg-interface);letter-spacing:.22em;text-transform:uppercase;
+  color:var(--rtg-soft);
+}
+
+/* Op een breed scherm bestaat de schilbalk niet: daar is de bank een vaste rail
+   en zijn de tabbladen bovenin. Rahul moet er wel kunnen komen -- de deur in de
+   voet van de bank is daar zijn enige ingang -- dus verschijnt DEZELFDE balk
+   daar alleen in de vraagstand, als een strook onderaan de werkvloer. Eén ding
+   met twee vormen, net als de bank zelf.
+
+   Vast aan het VENSTER en niet aan .cmd-werk: dat vak loopt op een breed scherm
+   langer door dan het beeld (de bladen bepalen zijn hoogte), dus een balk die
+   zich daaraan ophangt zakt eronderuit. Gemeten: 113px onder de onderrand. */
+@media (min-width:1000px){
+  .cmd-balk.vraagt{
+    display:flex;align-items:stretch;position:fixed;z-index:243;
+    right:24px;bottom:24px;width:min(560px,calc(100% - 3rem));height:52px;
+    border:1px solid var(--rtg-line);
+    background:rgba(12,12,11,.96);
+    backdrop-filter:blur(24px) saturate(1.05);-webkit-backdrop-filter:blur(24px) saturate(1.05);
+    box-shadow:0 18px 44px rgba(0,0,0,.4);
+  }
+  /* Op een breed scherm staat de bank als vaste rail al in beeld, dus heeft de
+     greep daar niets te openen; het veld begint meteen. */
+  .cmd-balk.vraagt .cmd-lade{display:none}
+  .cmd-balk.vraagt .cmd-vraagveld{padding-left:1rem!important}
+  .cmd-praat{position:fixed;z-index:243;left:auto;right:24px;bottom:76px;
+    width:min(560px,calc(100% - 3rem));
+    border:1px solid var(--rtg-line);box-shadow:0 18px 44px rgba(0,0,0,.4)}
+}
 
 /* ---------------------------------------------------------------- het werk -- */
 body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-width:none;margin:0;padding:0;display:grid;grid-template-rows:56px minmax(0,1fr);position:relative;}
@@ -258,8 +445,24 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
   #rtgCommand{grid-template-columns:156px minmax(0,1fr);transition:grid-template-columns 340ms var(--rtg-veer)}
   #rtgCommand.bank-klein{grid-template-columns:70px minmax(0,1fr)}
   #rtgCommand.bank-klein:has(.cmd-bank:hover),#rtgCommand.bank-klein:has(.cmd-bank:focus-within){grid-template-columns:156px minmax(0,1fr)}
-  .cmd-bank{position:static;max-height:none;overflow:visible;transform:none;border-top:0;border-radius:0;box-shadow:1px 0 rgba(255,255,255,.025) inset;
+  /* DE RAIL IS EEN KOZIJN, DE LIJST SCHUIFT ERIN.
+
+     Hier stond overflow:visible, en dat klopte zolang de bank alleen software
+     droeg: veertien deuren plus Instellingen past in elk venster. Sinds de
+     werelden hierheen zijn verhuisd (WERELD.md) staan er twee kopjes, drie
+     werelden en twee systeemdeuren bij -- samen ruim 1030px. In een venster
+     van 720 (een gewone laptop) viel de onderkant daarmee ONDER de vouw, en
+     omdat de werktafel position:fixed is, scrollt er niets: Rahul, het
+     bedieningspaneel en de instellingen waren simpelweg niet meer te bereiken.
+
+     Niet de bank zelf scrollt maar de NAV erin. Dan blijven de systeemdeuren
+     in de voet altijd staan waar ze horen -- onderaan, in beeld -- en schuift
+     alleen de lijst waar je doorheen zoekt. min-height:0 hoort erbij: een
+     grid- en flexkind mag standaard niet kleiner worden dan zijn inhoud, en
+     zonder die twee nullen loopt de overflow gewoon weer door. */
+  .cmd-bank{position:static;max-height:none;overflow:hidden;min-height:0;transform:none;border-top:0;border-radius:0;box-shadow:1px 0 rgba(255,255,255,.025) inset;
     border-right:1px solid var(--rtg-line);padding-bottom:1rem;}
+  .cmd-nav{overflow-y:auto;min-height:0;scrollbar-width:thin}
   .cmd-bank::before{display:none}
   .cmd-adem{display:block}
   #rtgCommand.bank-klein:not(:has(.cmd-bank:hover)):not(:has(.cmd-bank:focus-within)) .cmd-bank span{opacity:0;width:0}

@@ -343,6 +343,52 @@ zekerheid. Het origineel blijft, de codes blijven van de uitgever.
 *Klaar als:* acht bestanden erin één reis opleveren, met de onzekere velden
 zichtbaar gemarkeerd en geen enkel verzonnen veld ertussen.
 
+**Waar fase 2 staat: de eerste helft** (18 augustus 2026). `kern/invoer.js` (de
+balie) en `kern/invoer-lezer.js` (de lezers), `/api/reis/invoer/*`, en de balie
+zelf op `/apps/reizen.html`. De reiswereld heeft er een vijfde bron bij; De Reis
+groepeert een ingevoerd onderdeel zonder er iets van te weten.
+
+**Twee stappen, en die volgorde ís het ontwerp.** `lees` maakt een VOORSTEL en
+verandert niets; pas `bevestig` maakt er een onderdeel van. Een extractie die
+zichzelf in een reisplan zet, zet daar vroeg of laat een verkeerde datum in.
+
+**Wat er verifieerbaar gelezen wordt.** De boardingpass-strook (IATA BCBP,
+formaat M1) heeft vaste posities: op 31 t/m 33 staat het vertrekvliegveld en
+nergens anders. Elk veld wordt op zijn eigen vorm gecontroleerd; wat niet klopt
+komt niet mee. Geen model, geen sleutel, geen netwerk — precies de
+"controleerbare extractie" uit `CLAUDE.md`. En één eerlijke uitzondering die
+niet weg te poetsen is: **het jaar staat niet in een boardingpass.** De standaard
+kent alleen een dagnummer. Het jaar wordt afgeleid, dat veld draagt de vlag
+`afgeleid`, staat onder de drempel en komt op het scherm als *na te kijken*.
+
+Uit vrije tekst wordt weinig beweerd: een bestemming alleen als hij in de
+plaatsenlijst van de Reiswijzer staat, een boekingsnummer alleen als er een woord
+voor staat dat zegt dat het er een is. Zes hoofdletters op zichzelf zijn geen
+boekingsnummer, en die gok zou een verkeerd kenmerk in een reisdossier zetten.
+
+**Drie grenzen die in code staan en niet alleen hier:**
+
+1. het origineel gaat naar de **eigen kluis** van het lid (RTG Bestanden, met
+   quotum, virusscan en verwijderknop) en niet naar een tweede opslag; haalt hij
+   het onderdeel weg, dan blijft het bewijsstuk van hem (par. 4.8);
+2. de zekerheden komen van de lezer en **nooit van de aanvrager**; een mens mag
+   corrigeren, en dan staat er `door u ingevuld` bij dat veld — met de lezing
+   ernaast bewaard, niet eroverheen;
+3. een ingevoerd onderdeel krijgt de stand `ingelezen` en **geen vinkje**: RTG
+   bevestigt hier niets, het document zegt het, en van wie dat document is staat
+   in de herkomst (par. 4.3). Bleef er een veld onder de drempel, dan is de stand
+   `tecontroleren` en vraagt de reis er aandacht voor.
+
+**Twee dingen anders dan hierboven gepland, allebei met reden.** De balie is
+eerst voor het **lid** gebouwd en niet voor het kantoor: die weg heeft geen
+codenaam-opzoeking en geen kluis-inzage nodig, het origineel hoort in de kluis
+van het lid zelf, en het is de kant waar de acquisitie zit — RTG hoeft de boeking
+niet te winnen om de reisrelatie te winnen. De kantoorkant loopt straks over
+dezelfde kern. En hij **leest geen pdf's en geen foto's**: dat vraagt OCR of een
+model. Wat als bestand binnenkomt wordt bewaard als bewijsstuk; gelezen wordt de
+tekst die u erbij geeft of een tekstbestand. Doen alsof we een pdf lezen en er
+dan een lege extractie uit halen, zou de ergste van de twee zijn.
+
 ### Fase 3 -- De bewaking
 
 Wat er verandert, en wat dat raakt. Begint bij de bronnen die dit huis echt

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1012 bestanden en 6689 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1014 bestanden en 6700 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1012 |
-| losse beweringen (`test(...)`) | 6689 |
+| toetsbestanden | 1014 |
+| losse beweringen (`test(...)`) | 6700 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 839 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
-| niets van beide | 95 |
+| niets van beide | 97 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-886 bestanden, 6474 beweringen.
+887 bestanden, 6484 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -315,6 +315,7 @@ toets omvalt.
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
 | `instant-reality.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `invoer.test.js` | 9 | -- | DE INVOERBALIE (kern/invoer.js + kern/invoer-lezer.js) -- REIZEN.md fase 2. WAT HIER BEWEZEN MOET WORDEN. |
 | `invoerproef.test.js` | 11 | geen bruikbare mutatie | HET OORDEEL VAN DE INVOERPROEF, los van een server. scripts/invoerproef-route.js heeft een echte server nodig en duurt minuten; daar komt niemand ooit met een mutatie bij. |
 | `inzagelog.test.js` | 10 | gezakt op `===->!==` | Het inzagejournaal: wie keek er in wiens identiteitskluis. De twee regels die dit journaal bruikbaar EN veilig maken staan hier als test, want ze zijn allebei makkelijk stuk te maken zonder dat je het merkt: 1. |
 | `journaalschrijf.test.js` | 3 | gezakt op `true->false#0` | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
@@ -611,7 +612,7 @@ toets omvalt.
 | `reisbieb.test.js` | 6 | gezakt op `liegpoort /api/` | De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen redactie. Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. |
 | `reisbureau.test.js` | 9 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |
 | `reisplan.test.js` | 9 | gezakt op `liegpoort /api/` | De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte reis waarin ze samen EEN reis zijn. Draai los: node --experimental-sqlite --test test/reisplan.test.js Wat deze toetsen bewaken: 1. |
-| `reiswereld.test.js` | 10 | gezakt op `===->!==#0` | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
+| `reiswereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Reizen: de samenhanglaag over de reisdomeinen (PLATFORM.md, laag 2). Wat hier bewezen moet worden is niet "er komt een lijst uit" maar de twee dingen die een orkestratielaag kapot kunnen maken: 1. |
 | `reiswijzer.test.js` | 7 | gezakt op `liegpoort /api/` | De Reiswijzer: van elk land van de wereld alle reisregels (visum, rijrichting, alarmnummer, water, fooi, let-op), automatisch bijgehouden door de Regelwacht en automatisch uitgereikt zodra iemand ergens naartoe gaat... |
 | `reizen.test.js` | 12 | genoemd | DE REIS (kern/reizen.js): de losse regels van de reiswereld gegroepeerd tot reizen -- fase 1 van REIZEN.md. WAT HIER BEWEZEN MOET WORDEN, en het is niet "er komt een groepering uit". |
 | `rekening.test.js` | 2 | gezakt op `liegpoort /api/` | "De rekening" (betalen na het eten): een zaak die achteraf laat betalen laat het lid tijdens het bezoek meerdere rondes bestellen; aan het eind worden alle lopende bonnen als een rekening opgeteld en in een keer... |
@@ -926,7 +927,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-126 bestanden, 215 beweringen.
+127 bestanden, 216 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -969,6 +970,7 @@ toets omvalt.
 | `horecaschermen.e2e.js` | 3 | -- | DE ZEVEN WERKSCHERMEN VAN HET HORECA OS, IN EEN ECHTE BROWSER. /apps/horeca.html (zaal en keuken) heeft zijn eigen toets. |
 | `huis.e2e.js` | 1 | -- | Scherm-test voor Het Huis: het reisdossier op blad 02 van het magazine. test/huis.test.js bewijst de server-kant; deze bewijst dat het blad de reis toont, elke stand als woord draagt, en dat "wat er nog moet"... |
 | `identiteitschermen.e2e.js` | 2 | -- | DRIE SCHERMEN DIE OVER IDENTITEIT EN RUST GAAN. Uit de 104 schermen waar geen enkele toets de weg aflegt (TAKEN 4.9) zijn dit er drie waar het duurste misverstand mogelijk is: ze gaan over wie u bent en over hoe dit... |
+| `invoerbalie.e2e.js` | 1 | -- | Scherm-toets op DE INVOERBALIE in /apps/reizen.html (REIZEN.md fase 2). WAAROM DIT BESTAND ER IS. |
 | `ioslaag.e2e.js` | 3 | genoemd | De iOS-laag (public/shared/ios.js): gooit hij niets weg dat de app nog nodig heeft, en ruimt hij op wat er weg moest? WAAROM DEZE TOETS BESTAAT. |
 | `juridischeschermen.e2e.js` | 1 | -- | DE VIER JURIDISCHE PAGINA'S: STAAT ERIN WAT ERIN MOET? WAAROM DIT EEN TOETS VERDIENT Dit zijn de saaiste schermen van het huis en tegelijk de enige waar een ontbrekende alinea een boete oplevert. |
 | `kantoor.e2e.js` | 1 | -- | Scherm-test voor RTG Kantoor, de samenhanglaag over de kantoorwereld. Wat hier bewezen wordt is de belofte van laag 2 uit PLATFORM.md, en niet of de agenda werkt -- dat toetst test/agenda.e2e.js. |

@@ -45,6 +45,14 @@ Object.assign(kern, require('../kern/bank')({ db, save, bijeen, crypto, schoon, 
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
 Object.assign(kern, require('../kern/reis')({ LANDEN }));
+/* DE INVOERBALIE (kern/invoer.js): een reis die elders geboekt is, alsnog in
+   RTG krijgen -- REIZEN.md fase 2. Staat hier omdat hij twee dingen nodig heeft
+   die hierboven pas ontstaan: de plaatsbepaling van de Reiswijzer (om een
+   bestemming in vrije tekst te herkennen) en de kluis van het lid (waar het
+   originele bewijsstuk heen gaat, met quotum en virusscan en al -- deze module
+   krijgt geen eigen opslag). */
+Object.assign(kern, require('../kern/invoer').maakInvoer({
+  db, save, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd

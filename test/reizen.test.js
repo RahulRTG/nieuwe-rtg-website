@@ -39,7 +39,8 @@ function reizenMet(over) {
   const kern = Object.assign({
     mijnVerblijven: () => [],
     reisbureau: { mijn: () => [] },
-    lucht: { mijn: () => ({ boekingen: [], charters: [] }) }
+    lucht: { mijn: () => ({ boekingen: [], charters: [] }) },
+    invoer: { mijnRegels: () => [] }
   }, over || {});
   Object.assign(kern, maakReiswereld({ kern }));
   return maakReizen({ kern }).reizen;

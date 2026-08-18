@@ -82,6 +82,30 @@
   </div>
   <div id="komend"><p class="stil">Laden...</p></div>
 
+  <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
+       anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
+       LEEST en zet klaar, de mens BEVESTIGT. Wat er gelezen is staat er met
+       zoveel woorden bij -- waaruit, en hoe zeker -- want een extractie die
+       zichzelf in een reisplan zet, zet daar vroeg of laat een verkeerde datum
+       in. -->
+  <div class="regkop"><h2>Zelf iets toevoegen</h2><span class="tel" id="invTel"></span></div>
+  <div class="rtg-groep" id="invoer">
+    <p class="rtg-uitleg">Ergens anders geboekt? Plak de bevestiging of kies het bestand. RTG leest eruit
+      wat het zeker weet, bewaart het origineel in uw eigen kluis, en zet het pas bij uw reizen
+      nadat u het heeft nagekeken.</p>
+    <label class="rtg-label" for="invTekst">De tekst van uw bevestiging, of de strook van een boardingpass</label>
+    <textarea class="rtg-veld" id="invTekst" rows="3" maxlength="20000"
+      placeholder="Plak hier de e-mail, de voucher of de M1-strook van uw instapkaart"></textarea>
+    <div class="rtg-acties" style="margin-top:.7rem;align-items:center;">
+      <input type="file" id="invBestand" hidden accept=".txt,.pdf,image/*,text/plain,application/pdf">
+      <button class="rtg-knop" id="invKies" type="button">Kies een bestand</button>
+      <span class="rtg-sub" id="invBestandNaam"></span>
+      <button class="rtg-knop vol" id="invLees" type="button">Lees voor</button>
+    </div>
+    <div id="invUit" aria-live="polite"></div>
+    <div id="invMijn"></div>
+  </div>
+
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
 </main>
@@ -332,7 +356,7 @@
     });
   })();
 
-  (async function laad() {
+  async function laad() {
     /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
        onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets
        aan de hand', en dat is de enige uitkomst die hij nooit mag suggereren. */
@@ -355,7 +379,133 @@
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
       $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
     }
-  })();
+  }
+  laad();
+
+  /* ---------- DE INVOERBALIE ----------
+
+     Twee knoppen, en het verschil ertussen is het hele ontwerp: "Lees voor"
+     maakt een VOORSTEL en verandert niets aan uw reizen; pas "Voeg toe" maakt
+     er een onderdeel van. Wat de lezer eruit haalde staat er per veld bij --
+     waaruit, en hoe zeker -- en wat onder de drempel bleef staat als na te
+     kijken gemarkeerd in plaats van als gegeven gepresenteerd.
+
+     De zekerheden komen van de server en gaan er nooit heen: dit scherm stuurt
+     alleen wat een mens intikt. */
+  const api = (pad, body) => fetch('/api/reis/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+    body: JSON.stringify(body || {})
+  }).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+  const VELDNAAM = { soort: 'Soort', titel: 'Naam', bestemming: 'Bestemming', van_datum: 'Van',
+    tot_datum: 'Tot', kenmerk: 'Kenmerk', vlucht: 'Vlucht', van: 'Vertrek vanaf', naar: 'Aankomst op',
+    reiziger: 'Reiziger', stoel: 'Stoel' };
+  let BESTAND = null, VOORSTEL = null, DREMPEL = 0.85;
+
+  $('#invKies').addEventListener('click', () => $('#invBestand').click());
+  $('#invBestand').addEventListener('change', () => {
+    const f = $('#invBestand').files[0];
+    if (!f) { BESTAND = null; $('#invBestandNaam').textContent = ''; return; }
+    const lezer = new FileReader();
+    lezer.onload = () => { BESTAND = { naam: f.name, dataUrl: String(lezer.result) };
+      $('#invBestandNaam').textContent = f.name; };
+    lezer.onerror = () => { BESTAND = null; $('#invBestandNaam').textContent = 'Dat bestand kon niet gelezen worden.'; };
+    lezer.readAsDataURL(f);
+  });
+
+  $('#invLees').addEventListener('click', async () => {
+    const knop = $('#invLees');
+    knop.disabled = true;
+    $('#invUit').innerHTML = '<p class="stil">Lezen...</p>';
+    try {
+      const d = await api('invoer/lees', Object.assign({ tekst: $('#invTekst').value }, BESTAND || {}));
+      VOORSTEL = d.voorstel; DREMPEL = d.drempel || DREMPEL;
+      tekenVoorstel(d);
+    } catch (e) { $('#invUit').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+    knop.disabled = false;
+  });
+
+  /* Het voorstel: eerst WAT ER GELEZEN IS met de onderbouwing, daarna pas de
+     velden om aan te vullen. Die volgorde is met opzet -- wie eerst een
+     ingevuld formulier ziet, leest de herkomst niet meer. */
+  function tekenVoorstel(d) {
+    const v = d.voorstel, velden = v.velden || {};
+    const namen = Object.keys(velden);
+    const gelezen = namen.length ? namen.map((n) => {
+      const f = velden[n];
+      const onzeker = f.zekerheid < DREMPEL;
+      return '<div class="rtg-rij"><span class="rtg-tekst">' +
+        '<span class="rtg-naam">' + esc(VELDNAAM[n] || n) + ': ' + esc(String(f.waarde)) +
+        (onzeker ? ' <span style="color:var(--rtg-acc);">&middot; na te kijken</span>' : '') + '</span>' +
+        '<span class="rtg-sub">' + esc(f.uitleg) + '</span></span></div>';
+    }).join('') : '<p class="rtg-leeg">Wij konden er niets uit lezen. Het origineel is bewaard; vul de gegevens zelf in.</p>';
+
+    const w = (n) => (velden[n] || {}).waarde || '';
+    const soorten = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'tafel', 'evenement', 'spoor'];
+    $('#invUit').innerHTML =
+      '<h2 style="margin-top:1rem;">Wat wij eruit lezen</h2>' +
+      '<p class="rtg-uitleg">' + esc(d.opmerking || '') + '</p>' + gelezen +
+      '<h2 style="margin-top:1rem;">Nakijken en aanvullen</h2>' +
+      '<div class="rtg-rij" style="gap:.6rem;flex-wrap:wrap;">' +
+        veldje('bTitel', 'Naam', w('titel') || w('vlucht') || w('kenmerk')) +
+        '<span style="flex:1 1 8rem;"><label class="rtg-label" for="bSoort">Soort</label>' +
+        '<select class="rtg-veld" id="bSoort">' + soorten.map((x) =>
+          '<option value="' + x + '"' + (w('soort') === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+        '</select></span>' +
+        veldje('bBestemming', 'Bestemming', w('bestemming')) +
+        veldje('bVan', 'Van (jjjj-mm-dd)', w('van_datum')) +
+        veldje('bTot', 'Tot (leeg mag)', w('tot_datum')) +
+      '</div>' +
+      '<div class="rtg-acties" style="margin-top:.8rem;">' +
+        '<button class="rtg-knop vol" id="invVoegToe" type="button">Voeg toe aan mijn reizen</button>' +
+        '<span class="rtg-sub">Pas hierna staat het bij uw reizen.</span>' +
+      '</div>';
+    $('#invVoegToe').addEventListener('click', voegToe);
+  }
+  function veldje(id, label, waarde) {
+    return '<span style="flex:1 1 9rem;"><label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
+      '<input class="rtg-veld" id="' + id + '" value="' + esc(waarde || '') + '" maxlength="120"></span>';
+  }
+
+  async function voegToe() {
+    if (!VOORSTEL) return;
+    const knop = $('#invVoegToe');
+    knop.disabled = true;
+    try {
+      await api('invoer/bevestig', { id: VOORSTEL.id, velden: {
+        titel: $('#bTitel').value, soort: $('#bSoort').value, bestemming: $('#bBestemming').value,
+        van_datum: $('#bVan').value, tot_datum: $('#bTot').value
+      } });
+      VOORSTEL = null; BESTAND = null;
+      $('#invTekst').value = ''; $('#invBestandNaam').textContent = '';
+      $('#invBestand').value = '';
+      $('#invUit').innerHTML = '<p class="stil">Toegevoegd. Het staat nu bij uw reizen hierboven.</p>';
+      laad(); laadMijnInvoer();
+    } catch (e) { $('#invUit').innerHTML += '<p class="stil">' + esc(e.message) + '</p>'; knop.disabled = false; }
+  }
+
+  /* Wat u zelf invoerde, met een knop om het weer weg te halen. Die knop hoort
+     erbij: wie zijn reis hier onderbrengt, moet hem er ook uit kunnen halen --
+     het bewijsstuk blijft daarbij gewoon in zijn eigen kluis staan. */
+  async function laadMijnInvoer() {
+    let d; try { d = await api('invoer/mijn'); } catch (e) { return; }
+    const rij = d.onderdelen || [];
+    $('#invTel').textContent = rij.length ? rij.length + (rij.length === 1 ? ' toegevoegd' : ' toegevoegd') : '';
+    $('#invMijn').innerHTML = !rij.length ? '' :
+      '<h2 style="margin-top:1rem;">Door u toegevoegd</h2>' + rij.map((x) =>
+        '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(x.titel) +
+          (x.bestemming ? ' &middot; ' + esc(x.bestemming) : '') + '</span>' +
+          '<span class="rtg-sub">' + esc(x.van) + (x.tot ? ' t/m ' + esc(x.tot) : '') +
+          ' &middot; ' + esc(x.status === 'tecontroleren' ? 'nog na te kijken' : 'ingelezen') +
+          ' &middot; uit ' + esc(x.herkomst) + '</span></span>' +
+          '<button class="rtg-knop" type="button" data-weg="' + esc(x.id) + '">Weghalen</button></div>').join('');
+    $('#invMijn').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('invoer/weg', { id: b.dataset.weg }); laad(); laadMijnInvoer(); }
+      catch (e) { b.disabled = false; }
+    }));
+  }
+  laadMijnInvoer();
 })();
 </script>
 <script src="/shared/deelmenu.js" defer></script>

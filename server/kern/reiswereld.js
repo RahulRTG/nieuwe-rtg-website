@@ -29,6 +29,7 @@ module.exports.maakReiswereld = ({ kern }) => {
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
   const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+  const bronnen = require('./reiswereld-bronnen');
 
   /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
      (CANVAS.md). Bij Reizen betekent 'aandacht' bijna altijd hetzelfde ding --
@@ -61,7 +62,15 @@ module.exports.maakReiswereld = ({ kern }) => {
     ingecheckt:  { sig: 'gezond', teken: '✓' },
     aangevraagd: { sig: 'actief', teken: '◷', wacht: 'reisadviseur' },
     afgewezen:   { sig: 'incident', teken: '!' },
-    vertraagd:   { sig: 'aandacht', teken: '!' }
+    vertraagd:   { sig: 'aandacht', teken: '!' },
+    /* De twee standen van de Invoerbalie. `ingelezen` krijgt met opzet GEEN
+       vinkje: een vinkje leest als "RTG bevestigt dit", en dat doet RTG hier
+       niet -- het document zegt het, en van wie dat document is staat in de
+       herkomst (REIZEN.md par. 4.3). En een lezing waarvan een veld onder de
+       drempel bleef, is niet "waarschijnlijk goed" maar na te kijken; die vraagt
+       dus aandacht in plaats van groen te staan (par. 4.4). */
+    ingelezen:     { sig: 'gezond', teken: '\u25c7' },
+    tecontroleren: { sig: 'aandacht', teken: '!', wacht: 'uw controle' }
   };
   /* Door de poort: betekenisVan weigert een status die een signaal noemt
      dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
@@ -105,37 +114,12 @@ module.exports.maakReiswereld = ({ kern }) => {
 
   function komend(key) {
     const uit = [], stil = [];
-
-    bron('verblijven', () => (kern.mijnVerblijven(key) || [])
-      .filter(v => v.status !== 'geannuleerd')
-      .map(v => regel('verblijf', {
-        titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
-        status: v.status, kenmerk: v.id, herkomst: 'partner',
-        app: 'Verblijven', link: '/apps/hotels.html'
-      })), uit, stil);
-
-    bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
-      .filter(a => a.status !== 'geannuleerd')
-      .map(a => regel('reis', {
-        titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
-        status: a.status, kenmerk: a.ref, herkomst: 'rtg',
-        app: 'Reisbureau', link: '/apps/reisbureau.html'
-      })), uit, stil);
-
-    bron('vluchten', () => {
-      const d = kern.lucht.mijn(key) || {};
-      const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
-        titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
-        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
-        status: x.status, kenmerk: x.code, herkomst: 'rtg',
-        app: 'Vluchten', link: '/apps/vluchten.html'
-      }));
-      const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
-        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
-        status: x.status, kenmerk: x.code, herkomst: 'rtg', app: 'Hangar', link: '/apps/hangar.html'
-      }));
-      return b.concat(c);
-    }, uit, stil);
+    /* De bronnen zelf staan in ./reiswereld-bronnen.js: welk domein welke rij
+       levert, is iets anders dan wat deze wereld met die rijen DOET (sorteren,
+       oordelen, tellen). Ze stonden hier samen tot de invoerbalie erbij kwam en
+       het bestand over de grens van tien kilobyte ging; het is geen slechte
+       plek om die twee uit elkaar te halen. */
+    bronnen({ kern, regel, bron }, key, uit, stil);
 
     /* Alleen wat nog komt, en wat vandaag speelt. Een verblijf loopt door tot
        de vertrekdatum, dus dat telt zolang `tot` niet gepasseerd is; een vlucht
@@ -171,7 +155,7 @@ module.exports.maakReiswereld = ({ kern }) => {
          Het scherm zegt dit hardop, want een lege reiswereld die eigenlijk een
          storing is, laat iemand een vlucht missen. */
       stil,
-      bronnen: ['verblijven', 'reisbureau', 'vluchten']
+      bronnen: ['verblijven', 'reisbureau', 'vluchten', 'ingevoerd']
     };
   }
 

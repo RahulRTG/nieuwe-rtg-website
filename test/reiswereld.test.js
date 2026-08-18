@@ -25,7 +25,9 @@ function wereldMet(over) {
   const kern = Object.assign({
     mijnVerblijven: () => [],
     reisbureau: { mijn: () => [] },
-    lucht: { mijn: () => ({ boekingen: [], charters: [] }) }
+    lucht: { mijn: () => ({ boekingen: [], charters: [] }) },
+    // de vierde bron: de Invoerbalie (kern/invoer.js), sinds REIZEN.md fase 2
+    invoer: { mijnRegels: () => [] }
   }, over || {});
   return maakReiswereld({ kern }).reiswereld;
 }
@@ -90,15 +92,37 @@ test('een bron die stilvalt neemt de andere niet mee, en verzwijgt zichzelf niet
     'de stille bron hoort met naam gemeld te worden, niet stil te verdwijnen');
 });
 
-test('alle drie stil: dan is het een storing en geen lege agenda', () => {
+test('alle bronnen stil: dan is het een storing en geen lege agenda', () => {
   const stuk = () => { throw new Error('plat'); };
   const w = wereldMet({
-    mijnVerblijven: stuk, reisbureau: { mijn: stuk }, lucht: { mijn: stuk }
+    mijnVerblijven: stuk, reisbureau: { mijn: stuk }, lucht: { mijn: stuk },
+    invoer: { mijnRegels: stuk }
   });
   const r = w.komend('k');
   assert.deepEqual(r.komend, []);
-  assert.deepEqual(r.stil, ['verblijven', 'reisbureau', 'vluchten'],
-    'drie stille bronnen horen alle drie genoemd te worden');
+  assert.deepEqual(r.stil, ['verblijven', 'reisbureau', 'vluchten', 'ingevoerd'],
+    'elke stille bron hoort genoemd te worden');
+});
+
+test('de Invoerbalie is een bron als elk ander, met een eigen herkomst per rij', () => {
+  const w = wereldMet({
+    invoer: { mijnRegels: () => [
+      { soort: 'verblijf', titel: 'Hilton Dubai', bestemming: 'Dubai', van: morgen(30), tot: morgen(34),
+        status: 'ingelezen', kenmerk: 'XY77', herkomst: 'document' },
+      { soort: 'vlucht', titel: 'AC834', bestemming: 'Dubai', van: morgen(30),
+        status: 'tecontroleren', kenmerk: 'ABC123', herkomst: 'beeld' }
+    ] }
+  });
+  const r = w.komend('k');
+  assert.equal(r.komend.length, 2, 'de ingevoerde onderdelen staan in de tijdlijn');
+  assert.deepEqual(r.komend.map(x => x.herkomst).sort(), ['beeld', 'document'],
+    'en dragen hun eigen herkomst, niet een vaste van de bron');
+  const ingelezen = r.komend.find(x => x.status === 'ingelezen');
+  assert.equal(ingelezen.sig, 'gezond');
+  assert.notEqual(ingelezen.teken, '\u2713', 'geen vinkje: RTG bevestigt dit niet, het document zegt het');
+  const nakijken = r.komend.find(x => x.status === 'tecontroleren');
+  assert.equal(nakijken.sig, 'aandacht', 'een onzekere lezing vraagt aandacht en staat niet groen');
+  assert.equal(nakijken.wacht, 'uw controle');
 });
 
 /* De laag bezit niets: hij leest de kern LAAT en heeft geen eigen opslag. Deze

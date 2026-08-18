@@ -1292,6 +1292,7 @@
       "werkvormen"
     ],
     "reis": [
+      "invoer",
       "reisLanden",
       "reiswereld",
       "reiswijzer",

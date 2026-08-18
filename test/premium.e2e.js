@@ -26,16 +26,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 /* Vierentwintig zelfstandige RTG- en kantoorruimtes werden alleen door de
    algemene paginascan aangeraakt. Dit is hun eigen zichtbare contract zonder
@@ -89,12 +82,12 @@ async function lidMetNotities(base) {
 }
 
 test('premium: meenemen geeft echte velden, en weigert schermtekst',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -163,12 +156,12 @@ test('premium: meenemen geeft echte velden, en weigert schermtekst',
 });
 
 test('premium: sneltoetsen wijzen naar knoppen die er echt zijn',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
@@ -213,12 +206,12 @@ test('premium: sneltoetsen wijzen naar knoppen die er echt zijn',
    een open venster hoort de toetsen eronder stil te leggen -- inVeld()
    dekte dat niet, want in een venster staat de focus op een KNOP. */
 test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen stil',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     await context.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t);
@@ -296,12 +289,12 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
    voor een gebruiker weg. Deze toets meet de getekende maat, niet of het
    element bestaat. */
 test('premium: de knop blijft getekend als de app zijn gastheer sluit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     await context.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t);
@@ -338,11 +331,11 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
    om zichzelf te corrigeren. Hij zakt zodra inBeeld() in shared/uitvoer niet
    meer meeweegt. */
 test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await page.setViewportSize({ width: 390, height: 844 });
     const buiten = [];
@@ -367,11 +360,11 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
 });
 
 test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige bediening',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ serviceWorkers: 'block' });
     await context.addInitScript(() => {
       try {

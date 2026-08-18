@@ -26,16 +26,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const PAPIEREN_OK = { kenteken: '2030-01-01', verzekering: '2030-01-01', apk: '2030-01-01',
   taxivergunning: '2030-01-01', boordcomputer: '2030-01-01' };
@@ -66,7 +59,7 @@ async function zaakToken(base) {
 }
 
 async function open(base, url, sleutel, token) {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const page = await browser.newPage();
   const fouten = [];
   letOpFouten(page, fouten);
@@ -80,7 +73,7 @@ async function open(base, url, sleutel, token) {
 }
 
 test('de reizigersapp plant een reis, toont de opties en boekt er een',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -148,7 +141,7 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
 });
 
 test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er wel een als het mag',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-SCHERM-1' } });
   let browser;
   try {
@@ -212,7 +205,7 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
 });
 
 test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -276,7 +269,7 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
    dat een API-toets niet kan zien -- daar is een code een string, hier moet er
    een leesbare QR staan en moet een tweede scherm er een oordeel over geven. */
 test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-QR-1' } });
   let browser;
   try {
@@ -375,7 +368,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
    rit blijft liggen tot de medewerker belt. Dat is precies de situatie die een
    drempel had moeten voorkomen. */
 test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {

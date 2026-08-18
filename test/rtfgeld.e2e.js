@@ -3,22 +3,15 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('Geldschool: ouder zet weekgeld en verzilvert sterren; het kind ziet het in zijn potje',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfgeld-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const post = async (p, b) => (await fetch(base + p, { method: 'POST',
@@ -34,7 +27,7 @@ test('Geldschool: ouder zet weekgeld en verzilvert sterren; het kind ziet het in
     await post('/api/foundation/gezin/klus/gedaan', { code: g.code, token: kindToken, klusId: kl.klus.id });
     await post('/api/foundation/gezin/klus/keur', { code: g.code, token: g.token, klusId: kl.klus.id, goed: true });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

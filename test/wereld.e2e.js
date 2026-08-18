@@ -17,19 +17,13 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
-const overslaan = pw ? false : 'playwright niet beschikbaar in deze omgeving';
+const pw = laadPlaywright({ eigenDriver: false });
+const overslaan = geenBrowser(pw);
 
 async function api(base, pad, body) {
   const r = await fetch(base + pad, { method: 'POST',
@@ -65,7 +59,7 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
       email: 'wereld' + process.pid + Date.now() + '@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 393, height: 852 },
       reducedMotion: rustig === false ? 'no-preference' : 'reduce' });
     await ctx.addInitScript(([t, s, r]) => {

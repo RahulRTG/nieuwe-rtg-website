@@ -24,21 +24,14 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
-test('kantoren: de pagina draait heel, en de console is te verplaatsen', { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+test('kantoren: de pagina draait heel, en de console is te verplaatsen', { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkblad-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -60,7 +53,7 @@ test('kantoren: de pagina draait heel, en de console is te verplaatsen', { skip:
     }).then(r => r.json());
     assert.ok(kantoor.token, 'kantoor-inlog mislukt: ' + JSON.stringify(kantoor).slice(0, 120));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     await ctx.addInitScript((t) => {
       try { localStorage.setItem('rtg_member_token', t.lid); localStorage.setItem('rtg_office_token', t.kantoor); } catch (e) {}

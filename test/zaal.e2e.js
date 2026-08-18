@@ -18,19 +18,12 @@
    slaagt hij in beide. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
@@ -92,7 +85,7 @@ async function naarDeel(page, zoek) {
 }
 
 test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zaal-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR123' } });
   let browser;
@@ -105,7 +98,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     const maat = await maak('Zaal Maat', 2);
     const maatCode = (await api(base, '/api/state', {}, maat.token)).state.user.codename;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
+    browser = await pw.chromium.launch(browserOpties(pw, { args: ['--autoplay-policy=no-user-gesture-required'] }));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

@@ -129,9 +129,17 @@ module.exports = (octx) => {
        `npm run e2e` geschreven, niet door de gewone suite. */
     let waarneming = null;
     try {
-      const w = schermenMeter.geopendeSchermen(path.join(WORTEL, '.schermjournaal'));
+      const journaalPad = path.join(WORTEL, '.schermjournaal');
+      const w = schermenMeter.geopendeSchermen(journaalPad);
       if (w && w.afgelegd) {
+        /* HEEFT DIE RONDE GEDRAAID. Een journaal dat er ligt is nog geen ronde
+           die is afgelopen: viel de browser om, dan staan er wel TOETS-regels en
+           geen enkele SCHERM-regel, en leest dat als 262 nooit geopende
+           schermen. rondeVerslag() geeft `af: false` met de reden, en dan is de
+           schermstatus ONGEMETEN -- een uitspraak over ons, niet over de app. */
+        const ronde = schermenMeter.rondeVerslag(journaalPad);
         waarneming = { afgelegd: w.afgelegd, neven: w.neven,
+          af: ronde ? ronde.af : true, reden: ronde ? ronde.reden : null,
           vegers: schermenMeter.veegToetsen(w.afgelegd, schermen.length) };
       }
     } catch (e) { waarneming = null; }

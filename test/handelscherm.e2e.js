@@ -16,19 +16,12 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-handel-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende pad */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 async function api(base, pad, body) {
@@ -58,7 +51,7 @@ async function zaakPagina(browser, base, token, fouten) {
 }
 
 test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de wasserij ziet hem staan',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -68,7 +61,7 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     const was = await beheerToken(base, 'LAVANDA');
     assert.ok(club && was, 'beide demozaken horen een beheerder met PIN 1234 te hebben');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     /* ---- de koper: een aanvraag uitzetten, helemaal vanaf het scherm ---- */
     const clubPagina = await zaakPagina(browser, base, club, fouten);

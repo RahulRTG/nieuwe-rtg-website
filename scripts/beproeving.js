@@ -78,6 +78,8 @@ const belasting = require('./lib/belasting');
 /* De hardere rol-scheidingsproef: lekkende weigeringen en half uitgevoerde
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
+/* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
+const { stempel } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -539,7 +541,16 @@ async function misbruikBeproeving(tok) {
 
 /* ============================================================================
    HOOFDLOOP
+
+   DE WACHT. Alles hieronder draait een echte beproeving en OVERSCHRIJFT
+   BEPROEVING.json. Zonder deze regel gebeurde dat ook bij een gewone
+   `require('./beproeving')` -- en dat is niet theoretisch: bij de vier
+   rolproeven zette een enkele laadcontrole (`node -e "require(...)"`)
+   ROLPROEF.json van 3377 beproefde routes terug op 292, zonder dat het register
+   er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
+   je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
+if (require.main !== module) { module.exports = {}; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
@@ -1126,6 +1137,17 @@ async function misbruikBeproeving(tok) {
      vraag welke stand er toevallig draaide. */
   const cijfers = {
     gedraaid: new Date().toISOString(),
+    stempel: stempel(),
+    uitleg: 'Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder ' +
+      'belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en ' +
+      'herstel (komt de gewone aanroep terug binnen zijn grens na de storm).',
+    /* DE GRENS. Zonder dit veld leest elk getal hier als een garantie, en dat is
+       het niet: dit is EEN machine, EEN seed en EEN duur. */
+    grens: 'Dit zegt niets over gedrag op andere hardware, over een langere duur dan ' +
+      'deze ronde, of over endpoints die niet zijn bestookt (zie meters.endpointsOnbereikt). ' +
+      '"0% verkeerde-rol-2xx" is een ondergrens en geen bewijs van rolscheiding -- daarvoor ' +
+      'is scripts/rolproef-route.js er. Een groene beproeving betekent: onder DEZE last, op ' +
+      'DEZE machine, is er niets omgevallen.',
     modus: MODE,
     machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version },
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',

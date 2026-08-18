@@ -31,16 +31,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfkind-'));
 
 const GESLOTEN = ['foundation/arena', 'foundation/bieb', 'foundation/geloofbieb', 'foundation/schoolbieb'];
@@ -87,11 +80,11 @@ async function toon(page, base, app) {
 }
 
 test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -136,11 +129,11 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
 });
 
 test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten niets persoonlijks',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -173,11 +166,11 @@ test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten nie
 });
 
 test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen reeks',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -221,11 +214,11 @@ test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen r
 });
 
 test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -259,7 +252,7 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
 });
 
 test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar doel',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -275,7 +268,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     assert.equal(toegangRes.status, 200,
       'de Foundation-server laat het beheerprofiel bij het begeleidersbord: ' + (toegang.reden || toegang.error || 'onbekend'));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     await ctx.addInitScript(() => {
       try {

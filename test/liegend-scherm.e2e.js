@@ -48,17 +48,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { vindKlachten, vergelijk } = require('../scripts/lib/schermleugen');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const WORTEL = path.join(__dirname, '..');
 const SCHULD = path.join(WORTEL, 'SCHERMLEUGEN.json');
@@ -107,7 +100,7 @@ const zichtbareTekst = (page) => page.evaluate(() => {
 });
 
 test('geen scherm liegt als de backend leeg antwoordt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegscherm-'));
   const { child, base } = await startServer({ env: {
     SMTP_URL: '', RTG_DATA_DIR: TMP,
@@ -124,7 +117,7 @@ test('geen scherm liegt als de backend leeg antwoordt',
     }).then(r => r.json());
     assert.ok(reg && reg.token, 'de deur mag niet liegen, anders meet deze toets de inlog');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     for (const scherm of SCHERMEN) {
       const klachten = [];

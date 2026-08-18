@@ -11,17 +11,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -31,7 +24,7 @@ async function post(base, pad, body, token) {
 }
 
 test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantdata',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-partnerstudio-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
   let browser;
@@ -44,7 +37,7 @@ test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantda
     assert.equal(login.status, 200);
     assert.ok(login.body.token, 'de manager ontvangt zijn eigen zaak-token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ serviceWorkers: 'block' });
     await context.addInitScript(token => {
       localStorage.setItem('rtg_sup_token', token);

@@ -24,20 +24,13 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkscherm-'));
 
 test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startscherm dat niet liegt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -54,7 +47,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     const later = await api('/taak/maak', Object.assign({ titel: 'Opening plannen', projectId: p.project.id, wie: 'Pia' }, S));
     await api('/taak/wacht-op', Object.assign({ taakId: later.taak.id, wachtOpId: eerst.taak.id }, S));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -135,7 +128,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
 });
 
 test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over te typen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkeig-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
   let browser;
@@ -146,7 +139,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       .then(r => r.json());
     assert.ok(inlog.token, 'de eigenaar kan inloggen: ' + JSON.stringify(inlog).slice(0, 120));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -278,7 +271,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
 });
 
 test('de handelingen staan op het scherm, en een weigering komt voluit in beeld',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP3 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkactie-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP3 } });
   let browser;
@@ -289,7 +282,7 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
       .then(r => r.json());
     assert.ok(inlog.token, 'de eigenaar kan inloggen');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

@@ -32,16 +32,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function nieuwLid(base) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
@@ -73,7 +66,7 @@ async function bankZet(base, aan) {
 }
 
 async function opScherm(base, token) {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext();
   await ctx.addInitScript(t => {
     localStorage.setItem('rtg_member_token', t);
@@ -90,7 +83,7 @@ async function opScherm(base, token) {
 }
 
 test('bank, schakelaar UIT: het scherm zegt eerlijk dat er nog geen rekening is',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -128,7 +121,7 @@ test('bank, schakelaar UIT: het scherm zegt eerlijk dat er nog geen rekening is'
 });
 
 test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bedrag erop',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -183,7 +176,7 @@ test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bed
 });
 
 test('bank, schakelaar AAN: het hart toont de boeking, en meenemen geeft er echte velden van',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {

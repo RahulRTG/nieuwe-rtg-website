@@ -35,19 +35,12 @@
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 /* De standaardtekst uit de HTML. Bewering 2 eist dat die VERVANGEN wordt; stond
    hier alleen "de melding is zichtbaar", dan zou de toets ook groen blijven met
@@ -55,14 +48,13 @@ const pw = laadBrowser();
 const STANDAARDTEKST = 'Geef de browser toegang tot de camera';
 
 test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-camerascherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser = null;
   try {
     /* ---- 1) MET camera: het beeld komt binnen ---- */
-    browser = await pw.chromium.launch({ args: ['--no-sandbox',
-      '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
+    browser = await pw.chromium.launch(browserOpties(pw, { args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] }));
     let ctx = await browser.newContext({ permissions: ['camera'] });
     let page = await ctx.newPage();
     const fouten = [];
@@ -130,7 +122,7 @@ test('camera.html: het beeld opent, en zonder camera zegt het scherm WAAROM',
        apparaat er niet is. De NotSupportedError-vondst is niet weggegooid: hij
        staat nu in de vertaaltabel van shared/media.js, met de meting erbij. */
     await browser.close();
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     ctx = await browser.newContext({ permissions: [] });
     page = await ctx.newPage();
     const fouten2 = [];

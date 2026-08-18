@@ -115,7 +115,16 @@ function schermRecords(schermen, gids, waarneming) {
      ontbrekend bestand (LAT.md regel 3) -- en juist dat gebeurde hier: 260 van de
      260 kwamen als nooit geopend terug omdat geopendeSchermen() zonder pad werd
      aangeroepen en netjes null gaf. */
-  const w = waarneming;
+  /* EEN RONDE DIE NIET HEEFT GEDRAAID IS GEEN RONDE MET EEN SLECHTE UITSLAG.
+     De e2e-ronde van 2026-08-18 viel op alle 122 browsertoetsen om omdat de
+     omgeving een andere chromium had dan playwright vroeg. Het journaal zag er
+     daarna uit als dat van een geslaagde ronde waarin niemand een scherm opende,
+     en dit register zou 262 schermen "nooit geopend" hebben genoemd -- een
+     uitspraak over de schermen op grond van een storing in de meetopstelling.
+     scripts/schermen.js rondeVerslag() kent het verschil; hier wordt het
+     doorgegeven met de reden erbij. */
+  const w = waarneming && waarneming.af === false ? null : waarneming;
+  const onaf = waarneming && waarneming.af === false ? waarneming.reden : null;
   return schermen.map(pad => {
     const g = (gids && gids[pad]) || null;
     let staat;
@@ -136,7 +145,7 @@ function schermRecords(schermen, gids, waarneming) {
         : pad.startsWith('/apps/juridisch/') ? 'Juridisch' : 'Apps',
       schakel: { schakelbaar: false, stand: 'via zijn functie',
         reden: 'een pagina is geen schakelaar; wat hem aan- of uitzet is de functie erachter' },
-      status: { staat, pct: null, routes: 0, cellen: 0, bewezen: 0, ongemeten: 0, gezakt: 0 },
+      status: { staat, pct: null, routes: 0, cellen: 0, bewezen: 0, ongemeten: 0, gezakt: 0, reden: onaf },
       /* ZONDER GIDSTEKST IS EEN SCHERM ONBESCHREVEN, en dat hoort op te vallen:
          "wat doet dit" is een van de vier vragen die dit register beantwoordt. */
       onbeschreven: !g,

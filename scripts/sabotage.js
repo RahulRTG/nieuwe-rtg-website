@@ -69,6 +69,7 @@
    ========================================================================== */
 'use strict';
 const fs = require('fs');
+const { stempel } = require('./lib/stempel');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const W = require('./lib/wetboek');
@@ -324,7 +325,15 @@ function main() {
      enkele wet de rest niet wist. Anders wordt "even een wet natrekken" een
      stille manier om veertig metingen weg te gooien. */
   const oud = W.leesUitslag();
-  const samen = { uitleg: 'Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.',
+  const samen = { stempel: stempel(), uitleg: 'Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.',
+    /* DE GRENS. Een wet die "raak" heet, is EEN keer met EEN zet gesaboteerd.
+       Dat bewijst dat de handhaver aan staat, niet dat hij elke omweg dicht
+       heeft. En een ronde over een enkele wet laat de rest ongemoeid, dus de
+       stempels binnen dit bestand kunnen uit verschillende rondes komen. */
+    grens: 'Per wet is EEN sabotagezet geprobeerd. "Raak" betekent: deze handhaver ' +
+      'staat aan en merkt DEZE zet. Het is geen bewijs dat de wet langs geen enkele ' +
+      'andere weg te omzeilen is. Wetten met "mensenwerk" zijn helemaal niet machinaal ' +
+      'beproefd.',
     wetten: Object.assign({}, oud && oud.wetten, uitslag.wetten) };
   fs.writeFileSync(W.UITSLAG_PAD, JSON.stringify(samen, null, 2) + '\n');
 

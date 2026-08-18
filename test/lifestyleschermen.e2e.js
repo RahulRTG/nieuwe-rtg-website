@@ -38,16 +38,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, elevateTier } = require('./helper');
+const { startServer, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lsscherm-'));
 
 /* Per app: het scherm, wat we er via de API in zetten, op welk tabblad de lijst
@@ -102,12 +95,12 @@ async function open(page, base, app, token) {
 const schermtekst = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
 test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en geen invoerveld',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -164,7 +157,7 @@ test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en gee
 });
 
 test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet alleen een lege huls',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;
   try {
@@ -185,7 +178,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
       assert.ok(!r.error, a.app + ' is gevuld via de API: ' + JSON.stringify(r).slice(0, 140));
     }
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof

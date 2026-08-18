@@ -3277,5 +3277,56 @@ console.log('\n49) geen nieuwe prive-routelijst: EEN plek bepaalt welke routes e
   }
 }
 
+/* ---------------------------------------------------------------------------
+   50) EEN BROWSER START OP EEN PLEK
+
+   WAT ER GEBEURDE. Deze suite laadde playwright op 123 plekken met dezelfde
+   zesregelige functie onder twee namen (laadBrowser en laadPlaywright), startte
+   hem op 164 plekken met dezelfde letterlijke opties, en sloeg zich over met
+   vijf verschillende zinnen. Op de dag dat de omgeving een andere chromium had
+   dan playwright vroeg, vielen alle 122 browsertoetsen om -- en er was geen plek
+   waar dat te repareren viel. Een waarheid in bijna driehonderd kopieen is geen
+   waarheid maar een gerucht (LAT.md regel 4).
+
+   Erger dan de storing was wat de storing NALIET: het schermjournaal van die
+   ronde zag er identiek uit aan dat van een geslaagde ronde waarin geen enkel
+   scherm werd geopend. Zie test/schermronde.test.js.
+
+   WAT HIJ MEET. Een toetsbestand dat zelf playwright opzoekt of zelf
+   launch-opties samenstelt, in plaats van het aan test/helper.js te vragen.
+
+   WAT HIJ NIET MEET. Of de browser het DOET -- dat merk je vanzelf. Deze regel
+   gaat alleen over waar het antwoord op "hoe start hier een browser" staat. */
+console.log('\n50) een browser start op EEN plek: test/helper.js');
+{
+  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+  const EIGEN_LADER = /function\s+laad(?:Browser|Playwright)\s*\(/;
+  const EIGEN_OPTIES = /\.launch\(\s*\{/;
+  const EIGEN_REDEN = /skip:\s*\w+\s*\?\s*false\s*:/;
+  const overtreders = [];
+  let bekeken = 0;
+  for (const f of fs.readdirSync(path.join(ROOT, 'test'))) {
+    if (!f.endsWith('.js') || f === 'helper.js') continue;
+    /* ZONDER COMMENTAAR. De eerste versie las de hele bron en wees
+       test/skipwacht.test.js aan, die de oude schrijfwijze in zijn KOPTEKST
+       aanhaalt om uit te leggen wat er mis mee was. Een keuring die een
+       toelichting voor een overtreding aanziet, leert je hem te negeren. */
+    const bron = zonderCommentaar(fs.readFileSync(path.join(ROOT, 'test', f), 'utf8'));
+    if (!/chromium/.test(bron)) continue;
+    bekeken++;
+    const wat = [];
+    if (EIGEN_LADER.test(bron)) wat.push('zoekt zelf playwright op');
+    if (EIGEN_OPTIES.test(bron)) wat.push('stelt zelf launch-opties samen');
+    if (EIGEN_REDEN.test(bron)) wat.push('verzint zijn eigen overslaan-reden');
+    if (wat.length) overtreders.push('test/' + f + ': ' + wat.join(', '));
+  }
+  if (overtreders.length) {
+    for (const r of overtreders) fout(r);
+    fout('Vraag het aan test/helper.js: laadPlaywright(), browserOpties(pw) en geenBrowser(pw).');
+  } else {
+    ok(bekeken + ' browsertoetsen halen hun browser bij test/helper.js');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

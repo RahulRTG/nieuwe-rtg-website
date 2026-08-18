@@ -16,20 +16,13 @@
    Draai los: node --experimental-sqlite --test test/routedekking.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('het dekkingsscherm toont het cijfer van de server, en de routes zijn door te bladeren',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dekking-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'SCHERMDEKKING1' } });
   let browser;
@@ -45,7 +38,7 @@ test('het dekkingsscherm toont het cijfer van de server, en de routes zijn door 
     }).then(r => r.json());
     assert.ok(api.totaal > 1000, 'de server kent zijn routes (' + api.totaal + ')');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ viewport: { width: 1100, height: 900 } });
     /* HET TOKEN ZETTEN ZONDER EERST EEN ANDERE PAGINA TE OPENEN, en dat is geen
        stijlkeuze maar een meetkwestie.

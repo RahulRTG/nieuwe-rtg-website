@@ -3,7 +3,7 @@
 
    Elke andere e2e in deze map begint met dezelfde regel:
 
-       { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }
+       { skip: geenBrowser(pw) }
 
    Dat is met opzet: wie de suite draait zonder Playwright hoort niet op een
    muur van rode toetsen te stuiten voor iets wat niet zijn schuld is. Maar het
@@ -30,33 +30,37 @@
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-
-/* Dezelfde zoektocht als in elke andere e2e -- bewust letterlijk hetzelfde, want
-   deze toets moet vinden wat zij vinden, niet iets soepelers. */
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* Dezelfde zoektocht als in elke andere e2e -- letterlijk dezelfde functies,
+   want deze toets moet vinden wat zij vinden en niet iets soepelers. Daarom uit
+   test/helper.js en niet uit een kopie hier. */
+const { laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 test('een omgeving die schermtoetsen belooft, heeft ook een browser', (t) => {
-  const pw = laadBrowser();
+  const pw = laadPlaywright();
+  const reden = geenBrowser(pw);
   const streng = process.env.RTG_E2E_STRICT === '1';
 
   if (!streng) {
-    t.diagnostic('RTG_E2E_STRICT staat niet aan; browser ' + (pw ? 'gevonden' : 'NIET gevonden') +
+    t.diagnostic('RTG_E2E_STRICT staat niet aan; browser ' + (reden ? 'NIET bruikbaar: ' + reden : 'gevonden en startbaar') +
       '. In CI staat de vlag wel aan, daar is dit een harde poort.');
     /* Geen stille exit: ook zonder de vlag legt deze toets een bewering vast,
        namelijk dat de zoektocht naar een browser uberhaupt een antwoord geeft.
-       Een laadBrowser() die zou crashen valt hier om. */
+       Een laadPlaywright() die zou crashen valt hier om. */
     assert.ok(pw === null || typeof pw === 'object', 'de browserzoektocht geeft een bruikbaar antwoord');
     return;
   }
 
-  assert.ok(pw, 'RTG_E2E_STRICT=1 zegt dat deze omgeving schermtoetsen draait, maar er is geen browser gevonden.\n' +
-    '  Alle e2e-bestanden slaan zichzelf dan over en de suite meldt 0 fail -- groen zonder iets gezien te hebben.\n' +
-    '  Installeer playwright + chromium, of zet RTG_E2E_STRICT uit als deze omgeving inderdaad geen schermen toetst.');
-  assert.equal(typeof pw.chromium.launch, 'function', 'de gevonden browser kan ook echt starten');
+  /* HET MODULE-GAT. Hier stond `assert.ok(pw)` gevolgd door
+     `typeof pw.chromium.launch === 'function'`, met als tekst "de gevonden
+     browser kan ook echt starten". Dat is precies wat het NIET aantoont: op
+     18 augustus 2026 bestond die functie gewoon, en toch startte er geen enkele
+     browser -- de omgeving had chromium 1194 en playwright vroeg om bouw 1234.
+     Deze poort zou onder RTG_E2E_STRICT=1 groen zijn gebleven terwijl alle 122
+     browsertoetsen omvielen. Een aanwezige functie is geen startende browser. */
+  assert.equal(reden, false, 'RTG_E2E_STRICT=1 zegt dat deze omgeving schermtoetsen draait, maar: ' + reden + '\n' +
+    '  Alle e2e-bestanden slaan zichzelf dan over of vallen om op een installatiebanner, en dan is\n' +
+    '  er niets bewezen over of een scherm werkt.\n' +
+    '  Installeer playwright + chromium, wijs er een aan met RTG_BROWSER_PATH, of zet RTG_E2E_STRICT\n' +
+    '  uit als deze omgeving inderdaad geen schermen toetst.');
+  assert.ok(browserOpties(pw), 'er zijn startopties voor deze browser');
 });

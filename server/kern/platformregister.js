@@ -98,7 +98,7 @@ function statusUitCellen(rijen) {
 const UITLEG = {
   'gezakt': 'een schakel is GEZAKT: er is iets gemeten dat niet in orde was.',
   'zonder routes': 'dit ding heeft geen enkele route. Een schakelaar die niets schakelt is een knop die niets doet.',
-  'ongemeten': 'geen enkele schakel is bewezen. Dat is een uitspraak over ons meetwerk, niet over dit ding.',
+  'ongemeten': 'geen enkele schakel is bewezen, of de meetronde heeft niet gedraaid. Dat is een uitspraak over ons meetwerk, niet over dit ding.',
   'deels bewezen': 'een deel van de schakels is bewezen; de rest is niet nagevraagd.',
   'beproefd': 'een toets heeft dit scherm echt afgelegd, en niet alleen in het voorbijgaan.',
   'alleen geveegd': 'alleen een veegtoets kwam langs. Die bewijst dat de pagina laadt, niet dat hij werkt.',

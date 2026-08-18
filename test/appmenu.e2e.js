@@ -37,7 +37,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,13 +45,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+const pw = laadPlaywright({ eigenDriver: false });
 
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   for (const naam of fs.readdirSync(dir)) {
@@ -83,7 +77,7 @@ async function metLid(fn) {
   let browser;
   try {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.addInitScript((t) => {
       try {
@@ -134,7 +128,7 @@ async function wachtRooster(page) {
 }
 
 test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   await metLid(async ({ base, ctx }) => {
     /* Alle vier de ingangen van de homescreen (zie voordeur.js) plus een paar
        gewone app-pagina's, want daar hoort de balk van metgezel.js juist WEL te
@@ -172,7 +166,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
        veilige uitweg. Eén pagina tegelijk houdt samen met de tweede fileworker
        de totale browserparalleliteit op twee. */
     await t.test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
-      { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+      { skip: geenBrowser(pw) }, async () => {
       const menuFouten = [];
       let gemeten = 0;
       for (const pad of appPaden()) {
@@ -210,7 +204,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
 });
 
 test('het menu opent en brengt je terug naar het beginscherm',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
@@ -249,7 +243,7 @@ test('het menu opent en brengt je terug naar het beginscherm',
 });
 
 test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenrand is de ingang',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
@@ -364,7 +358,7 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
 });
 
 test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klok staat erboven',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.setViewportSize({ width: 393, height: 852 });
@@ -450,7 +444,7 @@ test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klo
 });
 
 test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
      dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
@@ -461,7 +455,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
   let browser;
   try {
     const tok = await lidToken(base, 'mappen' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
     await ctx.addInitScript((t) => {
       try {
@@ -529,7 +523,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 });
 
 test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
      De voorganger van deze toets mat de tegels in een GEOPENDE map. Sinds het
@@ -552,7 +546,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
   let browser;
   try {
     const tok = await lidToken(base, 'werelden' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
     await ctx.addInitScript((t) => {
       try {

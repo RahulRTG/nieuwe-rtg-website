@@ -29,22 +29,15 @@
    Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met u aan',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-levenspas-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -69,7 +62,7 @@ test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met
     const eigen = await post('/api/rtf/leven/band/vraag', { code: g.code, token: kies.token, codenaam: zus.profiel.codenaam, soort: 'familie' });
     assert.equal(eigen.ok, true, 'het kind mag zelf ook vragen: ' + JSON.stringify(eigen));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });
     await ctx.addInitScript((s) => {
       try {

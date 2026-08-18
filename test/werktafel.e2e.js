@@ -25,18 +25,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) {}
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) {}
-  return null;
-}
 const pw = laadPlaywright();
 
 async function opzet() {
@@ -114,9 +107,9 @@ const stand = () => {
 };
 
 test('werktafel: niet over de ondertekening heen, en hij begint leeg',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { srv, token, dataDir } = await opzet();
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -308,9 +301,9 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
    weg. Gaat #gate mee als de werktafel wordt opgeruimd, dan kan er niemand meer
    naar binnen, en dat is geen fout die je pas in productie wilt zien. */
 test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { srv, dataDir } = await opzet();
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -401,10 +394,10 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
    zonder login ophalen, de eenmalige ceremonie terugsturen en daarna precies
    op de lege wereldkiezer landen. */
 test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { srv, token, dataDir } = await opzet();
   await tekenOnboarding(srv.base, token);
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -469,10 +462,10 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
    uit de productbeslissing: een terugkerend lid, op telefoonformaat, nul
    geopende bladen en alleen de uitnodiging om zelf een wereld te kiezen. */
 test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { srv, token, dataDir } = await opzet();
   await tekenOnboarding(srv.base, token);
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];

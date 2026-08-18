@@ -50,7 +50,7 @@ const REGISTERS = [
   ['BEWIJSMATRIX.json', 'npm run bewijsmatrix:vast', 'de elf schakels per route, uit de vijf registers hierboven'],
   ['MUTATIES.json', 'npm run mutatie', 'welke toetsen kunnen zakken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
-  ['SCHERMLEUGEN.json', 'node scripts/schermleugen.js', 'of een scherm iets toont dat er niet is'],
+  ['SCHERMLEUGEN.json', 'node --experimental-sqlite --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat']
 ];
 
@@ -65,9 +65,25 @@ function stempelVan(naam) {
   } catch (e) { return undefined; }   // undefined = het bestand is er niet
 }
 
+/* HET REGISTER ZEGT ZELF HOE HET WORDT VERVERST, en dat wint van de tabel
+   hierboven. Hier stond alleen die tabel, en hij liep uiteen: SCHERMLEUGEN.json
+   droeg `"hoe": "node --experimental-sqlite --test test/liegend-scherm.e2e.js"`
+   terwijl de tabel `node scripts/schermleugen.js` beloofde -- een bestand dat
+   niet bestaat. Twee plekken met een antwoord op dezelfde vraag, en de ene had
+   ongelijk (LAT.md regel 4). De tabel blijft staan voor registers die het zelf
+   niet zeggen; wie het wel zegt, wordt geloofd. */
+function hoeVan(naam, uitTabel) {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
+    if (j && typeof j.hoe === 'string' && j.hoe.trim()) return j.hoe.trim();
+  } catch (e) { /* dan de tabel */ }
+  return uitTabel;
+}
+
 function meet() {
   const nu = nuCommit();
-  const rijen = REGISTERS.map(([naam, hoe, wat]) => {
+  const rijen = REGISTERS.map(([naam, tabelHoe, wat]) => {
+    const hoe = hoeVan(naam, tabelHoe);
     const s = stempelVan(naam);
     if (s === undefined) {
       return { register: naam, hoe, wat, staat: 'ontbreekt',

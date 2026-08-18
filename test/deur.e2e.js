@@ -15,23 +15,16 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 // wat een poort NOOIT mag zeggen: alles wat klinkt als zelf toegang geven
 const BELOFTES = [/u krijgt (?:de |een )?(?:pas|toegang)/i, /wij? (?:geven|verlenen) u toegang/i,
   /toegang aanvragen en direct/i, /meteen toegang/i, /wordt (?:direct|meteen) geopend/i];
 
 test('poort: toont wat erachter zit, de weg naar binnen, en belooft nooit toegang',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -42,7 +35,7 @@ test('poort: toont wat erachter zit, de weg naar binnen, en belooft nooit toegan
       body: JSON.stringify({ name: 'Poortlid', email: 'pt' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -96,11 +89,11 @@ test('poort: toont wat erachter zit, de weg naar binnen, en belooft nooit toegan
    toets legt vast dat je blijft staan waar je was, met een deur die
    vertelt wat de app is en hoe je binnenkomt. */
 test('deur: een RTF-app zonder gezinssessie gooit je niet weg maar legt het uit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await page.goto(base + '/apps/foundation/klusjes.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#rtf-toegang-slot', { timeout: 10000 });

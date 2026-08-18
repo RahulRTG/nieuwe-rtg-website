@@ -313,6 +313,14 @@ async function draai(keten, verraadAan) {
       'als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): ' +
       'injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst ' +
       'gemeten, invariant beoordeeld, rollback beoordeeld.',
+    /* DE GRENS. Deze ronde saboteert de ketens die in KETENS staan, met EEN
+       seed. Wat er niet in staat is niet beproefd, en een keten die de lat haalt
+       is beproefd op DEZE zeven punten en niet op alles wat er mis kan gaan. */
+    grens: 'Alleen de ketens in scripts/lib/ketens; een businessproces dat daar niet ' +
+      'in staat is niet gesaboteerd. Per scenario EEN seed (' + SEED + '), dus dit is ' +
+      'geen uitputtende zoektocht naar verraad maar een herhaalbare steekproef. ' +
+      '"rollbackBewezen" zegt dat de terugdraai is WAARGENOMEN, niet dat elke ' +
+      'gedeeltelijke schrijfactie in het huis terugdraait.',
     seed: SEED,
     gemeten: { ketens: Object.keys(KETENS).length, scenarios: uitslagen.filter(u => u.verraad).length,
       voldoetAanLat: beoordeeld.length, rollbackBewezen: rollbackBewezen.length,

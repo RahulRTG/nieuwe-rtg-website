@@ -1605,9 +1605,9 @@
       "operator": "liegpoort /api/"
     },
     "genretoegang.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken"
     },
     "gerechtkennis.test.js": {
       "soort": "server",
@@ -2520,9 +2520,9 @@
       "scherp": "gezakt"
     },
     "loghygiene.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "beweert AFWEZIGHEID (geen querystring, geen stack, geen persoonsgegeven in het log) en een leeg antwoord bevestigt dat juist; bovendien roept hij de middleware rechtstreeks aan, buiten de poort om. Met de hand raak: req.path vervangen door req.originalUrl in server/log.js zet de querystring met token en e-mailadres in de log en laat toets 1 zakken. Hij heeft ook de positieve tegenhanger, dus hij kan niet leeg slagen: \"het pad staat er wel in\""
     },
     "lokaal-eerst.test.js": {
       "soort": "puur",
@@ -5400,9 +5400,9 @@
       "scherp": "gezakt"
     },
     "strenge-poort.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "toetst de POORT zelf (test/helper.js), niet een endpoint -- de liegpoort zit een laag lager dan zijn onderwerp. Met de hand raak: de FATAAL-regex onherkenbaar maken laat beide toetsen zakken, want dan telt een crash niet meer mee"
     },
     "stripe-eigen.test.js": {
       "soort": "puur",

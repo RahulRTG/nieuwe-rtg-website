@@ -548,7 +548,21 @@ const GEEN_BRONMUTATIE = new Map([
      BESTAANDE categorie aanwijst. Een categorie weghalen liet dus een wereld
      naar het niets wijzen en bleef groen. De tegenkant staat er nu bij, en
      precies dezelfde handmutatie zakt sindsdien. */
-  ['rtfcampus.test.js', 'leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)']
+  ['rtfcampus.test.js', 'leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)'],
+  /* DRIE SERVERTOETSEN DIE DE LIEGPOORT NIET KAN BEOORDELEN, en om een reden
+     die het opschrijven waard is: ze beweren allemaal iets over AFWEZIGHEID.
+
+     De liegpoort laat elk endpoint een geldig maar LEEG antwoord geven, en een
+     toets die groen blijft kijkt dus niet naar de inhoud. Dat werkt zolang de
+     bewering is "hier hoort iets te staan". Maar "hier hoort GEEN token, GEEN
+     stack, GEEN persoonsgegeven te staan" wordt door een leeg antwoord juist
+     BEVESTIGD. De mutatie duwt precies de goede kant op, en dan zegt overleven
+     niets over de toets.
+
+     Alle drie met de hand nagetrokken op hun eigen foutklasse, alle drie raak. */
+  ['loghygiene.test.js', 'beweert AFWEZIGHEID (geen querystring, geen stack, geen persoonsgegeven in het log) en een leeg antwoord bevestigt dat juist; bovendien roept hij de middleware rechtstreeks aan, buiten de poort om. Met de hand raak: req.path vervangen door req.originalUrl in server/log.js zet de querystring met token en e-mailadres in de log en laat toets 1 zakken. Hij heeft ook de positieve tegenhanger, dus hij kan niet leeg slagen: "het pad staat er wel in"'],
+  ['strenge-poort.test.js', 'toetst de POORT zelf (test/helper.js), niet een endpoint -- de liegpoort zit een laag lager dan zijn onderwerp. Met de hand raak: de FATAAL-regex onherkenbaar maken laat beide toetsen zakken, want dan telt een crash niet meer mee'],
+  ['genretoegang.test.js', 'beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

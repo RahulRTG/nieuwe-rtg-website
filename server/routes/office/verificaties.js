@@ -1,3 +1,4 @@
+const klok = require('../../lib/klok');
 /* Backoffice (deelmodule): de identiteitsverificaties.
 
    De wachtrij, het besluit (goedkeuren of afwijzen) en wat er daarna met het
@@ -48,7 +49,7 @@ module.exports = (octx, gedeeld) => {
       const gebIn = String(req.body.geboortedatum || '').slice(0, 10);
       if (gebIn) {
         const jaar = Number(gebIn.slice(0, 4));
-        const nuJaar = new Date().getFullYear();
+        const nuJaar = klok.datum().getFullYear();
         if (!/^\d{4}-\d{2}-\d{2}$/.test(gebIn) || isNaN(Date.parse(gebIn)) || jaar < nuJaar - 120 || jaar > nuJaar) {
           return res.status(400).json({ error: 'Die geboortedatum lijkt niet te kloppen; controleer hem op het document.' });
         }
@@ -61,7 +62,7 @@ module.exports = (octx, gedeeld) => {
       /* De klok van de bewaartermijn: een jaar na DEZE datum wist de
          bewaarveger de scan en de selfie (besluit van de eigenaar in het
          papierwerkregister, 2 augustus 2026). */
-      md.geverifieerdOp = new Date().toISOString();
+      md.geverifieerdOp = klok.datum().toISOString();
       accounts.saveMemberState(user.id, md);
     } else {
       /* Afgewezen = direct wissen. De afwijzingsmail vraagt om een nieuwe,

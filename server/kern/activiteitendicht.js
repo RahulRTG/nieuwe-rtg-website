@@ -19,6 +19,7 @@
    De lijst leeft op de zaak zelf (s.activiteitenDicht), net als de
    activiteiten: een sluitdag is aanbodsbeheer, geen aparte administratie. */
 'use strict';
+const klok = require('../lib/klok');
 
 const MAX = 200;
 const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
@@ -46,7 +47,7 @@ function sluit(s, { datum, activiteitId, reden }, boekingenOpDag) {
   if (!rij.some(r => r.datum === datum && (r.activiteitId || null) === actId)) {
     rij.push({ datum, activiteitId: actId,
       reden: String(reden || '').replace(/[<>]/g, '').trim().slice(0, 120) || null,
-      at: new Date().toISOString() });
+      at: klok.datum().toISOString() });
   }
   const bestaand = (boekingenOpDag || []).length;
   return { ok: true, dicht: rij,

@@ -1,3 +1,4 @@
+const klok = require('./lib/klok');
 /* Techniek-motor voor het beveiligde Backoffice-statusbord.
 
    Twee dingen:
@@ -69,7 +70,7 @@ const CHECKS = [
       const f = c.fouten ? c.fouten() : null;
       if (!f) return { status: 'ok', detail: 'Geen fout-aggregatie beschikbaar.' };
       if (!f.totaal) return { status: 'ok', detail: 'Geen storingen sinds de start.' };
-      const nu = Date.now();
+      const nu = klok.nu();
       const recentAantal = (f.recent || []).filter(g => nu - g.laatst < 15 * 60000).reduce((n, g) => n + g.aantal, 0);
       const status = recentAantal > 20 ? 'fout' : recentAantal > 0 ? 'waarschuwing' : 'ok';
       const top = (f.recent || [])[0];
@@ -86,7 +87,7 @@ const CHECKS = [
         const dagen = c.fs.readdirSync(bdir).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
         if (!dagen.length) return { status: 'waarschuwing', detail: 'Geen dagback-up gevonden.' };
         const laatste = dagen[dagen.length - 1];
-        const ouderdomDagen = Math.floor((Date.now() - new Date(laatste).getTime()) / 86400000);
+        const ouderdomDagen = Math.floor((klok.nu() - new Date(laatste).getTime()) / 86400000);
         return { status: ouderdomDagen > 1 ? 'waarschuwing' : 'ok', detail: `Laatste back-up: ${laatste} (${ouderdomDagen} dag(en) geleden). ${dagen.length} bewaard.` };
       } catch (e) { return { status: 'waarschuwing', detail: 'Kon back-ups niet lezen.' }; }
     }
@@ -136,7 +137,7 @@ function standaardZekeringen() {
    opnieuw, en de eerstvolgende gewone save neemt hem mee. */
 function zekeringGesprongen(z) {
   if (!z || z.aan !== false) return false;
-  if (z.tot && z.tot <= Date.now()) {
+  if (z.tot && z.tot <= klok.nu()) {
     z.aan = true; z.reden = null; z.sindsGesprongen = null; z.tot = null;
     return false;
   }

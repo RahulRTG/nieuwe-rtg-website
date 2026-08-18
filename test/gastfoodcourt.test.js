@@ -23,7 +23,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 let BASE, child, LID, ZAAK_A, ZAAK_B;
 const A = 'KIKUNOI';           // Sal de Mar
@@ -49,6 +49,10 @@ test.before(async () => {
     geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   LID = reg.body.token;
   assert.ok(LID, 'een lid kan zich registreren');
+  /* Door de keuring: op de kaart van het foodcourt staat ook drank, en zonder
+     geverifieerde leeftijd weigert de gegevenspoort de bestelling -- dan meten
+     de loket-toetsen de keuringspoort in plaats van de rekening per zaak. */
+  await keurLidGoed(BASE, LID, reg.body.state.user.codename, '1990-05-05');
 
   ZAAK_A = await zaakInlog(A);
   assert.ok(ZAAK_A, 'de eerste zaak kan inloggen');

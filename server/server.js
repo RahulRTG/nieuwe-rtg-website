@@ -1092,7 +1092,15 @@ function geenGast(req, res) {
    weg. Een anonieme demo-gast zonder account telt nooit als bekend. */
 function idGeverifieerd(sess) {
   if (!sess) return false;
-  if (!sess.account) return false;        // gast of demo-persona: geen dossier
+  if (!sess.account) {
+    /* Geen dossier. Voor een GAST is het antwoord altijd nee. Een DEMO-PERSONA
+       (inloggen met alleen een pas-tier, kan uitsluitend met RTG_DEMO aan) is
+       iets anders: die speelt een volledig geballoteerd lid -- de zaaiset geeft
+       hem een dossier, reizen en facturen -- en de demo bestaat juist om de
+       hele stroom te tonen, inclusief wat er achter de keuring zit. In
+       productie staat DEMO uit en bestaat deze sessie niet eens. */
+    return DEMO && sess.tier !== 'guest' && !String(sess.key || '').startsWith('guest-');
+  }
   const u = accounts.getUserById(sess.account.id);
   return !!u && u.verified === 'verified';
 }

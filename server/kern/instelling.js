@@ -28,11 +28,12 @@
    echte instelling, door een mens neergezet. Zou het teken er wel op staan, dan
    ruimde de eerstvolgende start hem op. */
 'use strict';
+const klok = require('../lib/klok');
 
 const register = require('../seed/genres');
 
 function maakInstelling({ db, save, accounts, ensureSupplierDefaults, makeSupplierCode }) {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const internGenres = () => Object.keys(register.GENRES).filter(id => register.GENRES[id].status === 'intern');
 

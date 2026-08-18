@@ -9,6 +9,7 @@
    locatie en hun gezondheidsgegevens. Deze teller is het enige wat tussen een
    rader en die gegevens staat. */
 'use strict';
+const klok = require('../lib/klok');
 
 const pogingen = new Map(); // bucket -> { n, until }
 
@@ -40,7 +41,7 @@ const GEEN_LIMIET = process.env.RTG_GEZIN_REM_UIT === '1';
 function teVaak(res, bucket) {
   if (GEEN_LIMIET) return false;
   const f = pogingen.get(bucket);
-  if (f && f.until > Date.now()) {
+  if (f && f.until > klok.nu()) {
     res.status(429).json({ error: 'Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.' });
     return true;
   }
@@ -51,7 +52,7 @@ function misluktePoging(bucket, max = 10, minuten = 5) {
   if (GEEN_LIMIET) return;
   const f = pogingen.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
-  if (f.n >= max) { f.until = Date.now() + minuten * 60000; f.n = 0; }
+  if (f.n >= max) { f.until = klok.nu() + minuten * 60000; f.n = 0; }
   pogingen.set(bucket, f);
 }
 

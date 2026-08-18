@@ -27,6 +27,7 @@
    BEIDE ZIJN VRIJWILLIG. Wie ze overslaat merkt er niets van; er is geen poort,
    geen herinnering en geen tweede vraag. */
 'use strict';
+const klok = require('../../lib/klok');
 
 const { heeftPas, PAS_FOUT } = require('../paseis');
 
@@ -114,7 +115,7 @@ module.exports = (ctx) => {
     if (wens) {
       const o = ((ondernemingenVan && ondernemingenVan(key)) || []).find(x => x.naam === naam);
       if (o) {
-        o.catalogusWens = { at: new Date().toISOString() };
+        o.catalogusWens = { at: klok.datum().toISOString() };
         save();
       }
     }

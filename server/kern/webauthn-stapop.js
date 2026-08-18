@@ -20,6 +20,7 @@
    een challenge-opslag bestaat. */
 
 'use strict';
+const klok = require('../lib/klok');
 
 const crypto = require('crypto');
 
@@ -74,7 +75,7 @@ module.exports = (ctx) => {
     } catch (e) { return { status: 401, error: 'De passkey kon niet worden geverifieerd.' }; }
     if (!uit.verified) return { status: 401, error: 'De passkey kon niet worden geverifieerd.' };
     cred.counter = uit.authenticationInfo.newCounter;
-    cred.laatstGebruikt = new Date().toISOString();
+    cred.laatstGebruikt = klok.datum().toISOString();
     save();
     return { status: 200, ok: true };
   }

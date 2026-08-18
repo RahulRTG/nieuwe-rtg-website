@@ -33,11 +33,12 @@
 
    Leest alleen; bezit niets; geen eigen collectie (REIZEN.md par. 4.1). */
 'use strict';
+const klok = require('../lib/klok');
 
 const { agendaLidSleutel } = require('./agenda');
 
 module.exports.maakReiswacht = ({ kern }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const vandaag = () => nu().slice(0, 10);
   const dagenTot = (d) => Math.round((Date.parse(d + 'T00:00:00Z') - Date.parse(vandaag() + 'T00:00:00Z')) / 86400000);
 

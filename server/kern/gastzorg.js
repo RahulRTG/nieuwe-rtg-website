@@ -1,3 +1,4 @@
+const klok = require('../lib/klok');
 /* De zorgvolle keten: het zorgprofiel van de gast (allergenen, dieet en
    medische aandachtspunten) en het live meekijken met de locatie.
 
@@ -23,7 +24,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     if (!db.data.zorgProfielen) db.data.zorgProfielen = {};   // per gast: allergenen, dieet, medisch + delen-schakelaar
     if (!db.data.locatieDelen) db.data.locatieDelen = [];      // toestemmingen om live mee te kijken, per gast en zaak
   };
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
 
   /* ---- het zorgprofiel ---- */
   function zorgVan(key) {
@@ -69,7 +70,7 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     lijsten();
     if (!db.data.zorgInzageStil || typeof db.data.zorgInzageStil !== 'object') db.data.zorgInzageStil = {};
     const sleutel = key + '|' + zaak;
-    const nu = Date.now();
+    const nu = klok.nu();
     if (nu - (db.data.zorgInzageStil[sleutel] || 0) < INZAGE_STIL_MS) return;
     db.data.zorgInzageStil[sleutel] = nu;
     const s = findSupplier ? findSupplier(zaak) : null;

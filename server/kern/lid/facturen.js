@@ -18,6 +18,7 @@
    is afgesproken. maandCentenUit geeft voor business null, en null is hier een
    antwoord: dan blijft staan wat er stond en verzinnen we niets. */
 'use strict';
+const klok = require('../../lib/klok');
 const { maandCentenUit } = require('../pasprijs');
 
 const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
@@ -90,7 +91,7 @@ function maakFacturen({ i18n, deps }) {
 
   function eersteBijdrageFactuur(tier, userId, opDatum) {
     if (!['rtg', 'lifestyle', 'business'].includes(tier)) return null;
-    const d = opDatum ? new Date(opDatum) : new Date();
+    const d = opDatum ? new Date(opDatum) : klok.datum();
     if (isNaN(d.getTime())) return null;
     const m2 = String(d.getMonth() + 1).padStart(2, '0');
     const verval = new Date(d.getFullYear(), d.getMonth() + 1, 1);

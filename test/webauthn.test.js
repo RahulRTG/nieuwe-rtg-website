@@ -105,8 +105,13 @@ test('6. roterende nep-sleutels omzeilen de bronrem niet', async () => {
     assert.notEqual(fout.status, 200);
   }
   const dicht = await api('/api/webauthn/opties', {}, null, kop);
-  assert.equal(dicht.status, 429,
-    'na tien ongeldige assertions krijgt dezelfde bron ook geen verse ceremonies meer');
+  /* 429 van de bronrem OF 403 van de quarantaine: sinds de noodrem-ladder het
+     aanvallende ADRES isoleert (trede 1, zie test/inlogrem.test.js voor dezelfde
+     afweging) komt De Wacht vaak eerder dan de rem. Beide betekenen wat deze
+     toets eist -- deze bron krijgt geen verse ceremonies meer -- en haalt
+     iemand allebei de remmen weg, dan is de status 200 en zakt hij alsnog. */
+  assert.ok(dicht.status === 429 || dicht.status === 403,
+    'na tien ongeldige assertions krijgt dezelfde bron ook geen verse ceremonies meer (kreeg ' + dicht.status + ')');
 });
 
 test('7. APP_URL bepaalt de WebAuthn-origin; een verzoekkop kan hem niet verleggen', async t => {

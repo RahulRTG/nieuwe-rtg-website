@@ -1,3 +1,4 @@
+const klok = require('../lib/klok');
 /* Accounts, deel "intreklijst": welke uitgegeven tokens niet meer gelden.
 
    Afgesplitst uit ./tokens.js. De naad is echt en niet cosmetisch: al het
@@ -37,10 +38,10 @@ module.exports = function maakIntreklijst(strikt) {
       const body = Buffer.from(String(token).split('.')[0], 'base64url').toString();
       exp = Number(body.split('.')[1]) || 0;
     } catch (e) { return false; }
-    if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
+    if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
     try {
       // meteen opruimen wat toch al verlopen was: geen aparte taak nodig
-      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
       S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
         .run(kluis.sign(String(token)), exp);
       return true;
@@ -68,9 +69,9 @@ module.exports = function maakIntreklijst(strikt) {
       if (doel !== undefined && delen[1] !== String(doel)) return false; // ander doel: niet aan zitten
       exp = Number(delen[2]) || 0;
     } catch (e) { return false; }
-    if (!exp || exp < Date.now()) return true; // al verlopen: niets te onthouden
+    if (!exp || exp < klok.nu()) return true; // al verlopen: niets te onthouden
     try {
-      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(Date.now());
+      S.zin('DELETE FROM ingetrokken_tokens WHERE verloopt < ?').run(klok.nu());
       S.zin('INSERT OR REPLACE INTO ingetrokken_tokens (hash, verloopt) VALUES (?, ?)')
         .run(kluis.sign(String(token)), exp);
       return true;
@@ -82,7 +83,7 @@ module.exports = function maakIntreklijst(strikt) {
     try {
       const r = S.zin('SELECT verloopt FROM ingetrokken_tokens WHERE hash = ?')
         .get(kluis.sign(String(token)));
-      return !!r && Number(r.verloopt) >= Date.now();
+      return !!r && Number(r.verloopt) >= klok.nu();
     } catch (e) { return false; }
   }
 

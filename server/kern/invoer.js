@@ -40,6 +40,7 @@
    Doen alsof we een pdf lezen en er dan een lege extractie uit halen, zou de
    ergste van de twee zijn. */
 'use strict';
+const klok = require('../lib/klok');
 
 const lezer = require('./invoer-lezer');
 
@@ -49,7 +50,7 @@ const MENSVELDEN = ['soort', 'titel', 'bestemming', 'van_datum', 'tot_datum', 'k
 const SOORTEN = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'tafel', 'evenement', 'spoor'];
 
 module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const bak = () => {
     if (!db.data.reisInvoer) db.data.reisInvoer = { voorstellen: [], items: [] };

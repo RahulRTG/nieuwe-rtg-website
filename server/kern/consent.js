@@ -1,3 +1,4 @@
+const klok = require('../lib/klok');
 /* Het Consent Center: wie raakt mijn gegevens aan, en waar zet ik dat stop.
 
    Net als RTG Life bewaart deze laag NIETS. Hij leest de lagen die de
@@ -69,7 +70,7 @@ module.exports = ({ kern }) => {
        schijnzekerheid waar dit bestand bovenaan voor waarschuwt. Vervallen is
        hier dus WEG, niet grijs. */
     const pas = pak('Paspoort', kern.paspoortMijn && (() => kern.paspoortMijn(key)));
-    const nuMs = Date.now();
+    const nuMs = klok.nu();
     for (const v of pas || []) {
       if (v.status !== 'goedgekeurd') continue;
       if (v.vervalt && Date.parse(v.vervalt) < nuMs) continue;

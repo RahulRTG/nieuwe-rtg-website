@@ -30,11 +30,12 @@
    stuurt bepaalt nooit wat er in de agenda belandt (zelfde principe als bij de
    Invoerbalie: een bewijsstuk dat de aanvrager zelf invult is er geen). */
 'use strict';
+const klok = require('../lib/klok');
 
 const { agendaLidSleutel } = require('./agenda');
 
 module.exports.maakReisoplosser = ({ kern }) => {
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => klok.datum().toISOString().slice(0, 10);
   const kort = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
 
   const GRENS = 'RTG voert hier niets uit. Een taak zet u met één klik in uw eigen agenda; boeken en betalen gebeurt in de app van het domein zelf.';

@@ -22,6 +22,7 @@
    DoS-versterker. Dat is gemeten en niet bedacht -- zie de kop van
    test/noodrem-bron.test.js. */
 'use strict';
+const klok = require('./lib/klok');
 
 const NOODREM_VENSTER_MS = 10 * 60000; // aanvalsvenster voor de automatische noodrem
 const NOODREM_REGISTRATIE = 3;   // brute force vanaf zoveel bronnen -> registratie tijdelijk dicht
@@ -82,7 +83,7 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
      vast zonder storm. */
   function noodrem() {
     if (!autoStaat().aan) return;
-    const nu = Date.now();
+    const nu = klok.nu();
     /* Het ADRES DAT KLOPT (meta.aanvaller), niet de deur waarop geklopt werd
        (meta.bron is de bucket, met de inlognaam erin) en niet de meldings-
        sleutel: de quarantaine van trede 1 moet een adres isoleren en geen
@@ -103,8 +104,8 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
     if (!z || z.aan === false) return; // al gesprongen: niets te doen
     z.aan = false;
     z.reden = 'automatische noodrem: brute force vanaf ' + aantalBronnen + ' bronnen';
-    z.sindsGesprongen = Date.now();
-    z.tot = Date.now() + (totMs || NOODREM_LOGIN_MS);   // tijdgebonden: dooft vanzelf
+    z.sindsGesprongen = klok.nu();
+    z.tot = klok.nu() + (totMs || NOODREM_LOGIN_MS);   // tijdgebonden: dooft vanzelf
     save();
     meld('auto-reactie', 'kritiek',
       'Automatische noodrem: de zekering "' + z.naam + '" is eruit gehaald (brute force vanaf ' +

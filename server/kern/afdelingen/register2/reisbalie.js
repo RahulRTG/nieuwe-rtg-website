@@ -1,3 +1,4 @@
+const klok = require('../../../lib/klok');
 /* Afdelingsregister deel 2, kamergroep "reisbalie" (kern/afdelingen): DE KAMER
    REISBUREAU van het RTG-kantoor.
 
@@ -19,7 +20,7 @@ module.exports = (ctx) => {
       kpis: () => {
         const alle = lijst(d().reisAanvragen);
         const open = alle.filter(a => a.status === 'aangevraagd');
-        const grens = Date.now() - 2 * 86400000;
+        const grens = klok.nu() - 2 * 86400000;
         return [
           ['Aanvragen open', open.length],
           ['Wacht langer dan twee dagen', open.filter(a => a.at && new Date(a.at).getTime() < grens).length],

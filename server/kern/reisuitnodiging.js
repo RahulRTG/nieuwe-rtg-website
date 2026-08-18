@@ -43,12 +43,13 @@
    link doorstuurt of kwijtraakt, lekt daarmee geen boekingsnummers. Na het
    opeisen staat alles gewoon in het eigen dossier van de opeiser. */
 'use strict';
+const klok = require('../lib/klok');
 
 const DAGEN_GELDIG = 30;
 const SOORTEN_UIT = ['klaargezet', 'reisgenoot'];
 
 module.exports.maakReisuitnodiging = ({ db, save, crypto, invoer, idGeverifieerd }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const datum = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : null;
 
@@ -78,7 +79,7 @@ module.exports.maakReisuitnodiging = ({ db, save, crypto, invoer, idGeverifieerd
     const rij = schoneOnderdelen(onderdelen);
     if (!rij.length) return { status: 400, error: 'Zet eerst minstens één reisonderdeel klaar (met een naam en een datum).' };
     const dagen = rij.map(o => o.tot || o.van).concat(rij.map(o => o.van)).sort();
-    const tot = new Date(Date.now() + DAGEN_GELDIG * 86400000).toISOString().slice(0, 10);
+    const tot = new Date(klok.nu() + DAGEN_GELDIG * 86400000).toISOString().slice(0, 10);
     const u = {
       id: 'U-' + crypto.randomBytes(4).toString('hex'),
       // 128 bits: dit is het slot. Zie de kop.

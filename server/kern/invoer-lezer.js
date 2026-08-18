@@ -40,6 +40,7 @@
    bescheidenheid maar de waarheid: een datum in een e-mail is een datum in een
    e-mail, niet noodzakelijk uw vertrekdatum. */
 'use strict';
+const klok = require('../lib/klok');
 
 /* Boven deze grens noemen we een veld zeker genoeg om zonder tegenspraak over
    te nemen. Eronder komt het als "na te kijken" terug -- het wordt niet
@@ -61,7 +62,7 @@ const stuk = (s, van, tot) => s.slice(van, tot).trim();
    eerstvolgende keer dat die dag voorkomt, gerekend vanaf vandaag met een marge
    van een week terug (wie gisteren vloog, importeert vandaag zijn pas). */
 function uitDagnummer(dagnr, vandaag) {
-  const nu = vandaag ? new Date(vandaag + 'T00:00:00Z') : new Date();
+  const nu = vandaag ? new Date(vandaag + 'T00:00:00Z') : klok.datum();
   const grens = new Date(nu.getTime() - 7 * 86400000);
   for (const jaar of [nu.getUTCFullYear(), nu.getUTCFullYear() + 1]) {
     const d = new Date(Date.UTC(jaar, 0, 1) + (dagnr - 1) * 86400000);

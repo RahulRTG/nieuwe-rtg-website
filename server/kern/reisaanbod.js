@@ -32,6 +32,7 @@
    echte merken als bevestigde partner opvoeren geldt hier onverkort. Wat er in
    `includes` staat is wat RTG zelf regelt. */
 'use strict';
+const klok = require('../lib/klok');
 
 const MAX_REIZEN = 500;
 
@@ -40,7 +41,7 @@ const MAX_REIZEN = 500;
 const SNIJ = { title: 80, dest: 60, dates: 60, desc: 600, regel: 120, visual: 40 };
 
 function maakReisaanbod({ db, save, crypto }) {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const rij = () => (Array.isArray(db.data.partnerTrips) ? db.data.partnerTrips : (db.data.partnerTrips = []));
   const aanvragen = () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []);

@@ -19,24 +19,42 @@
    belofte in tekst die geen belofte in code was (LAT.md regel 6), en die is
    hier een belofte in code geworden.
 
-   DE SCHAKELAAR-AS LEGT ZICH WEL UIT, OOK ZONDER INLOG, EN DAT IS EEN BESLUIT.
-   Ik heb dat eerst dichtgezet -- een anonieme POST op /api/site/domein gaf
+   DE SCHAKELAAR-AS ZWIJGT NU OOK, EN DAT IS EEN BESLUIT VAN 18 AUGUSTUS 2026.
+
+   Hij deed dat eerst niet. Een anonieme POST op /api/site/domein gaf
    `functie: dom-eigendomein` met naam en reden, terwijl de buurroute met
-   dezelfde auth-deur 401 gaf, en wie dat over alle paden herhaalt tekent de
-   schakelkast na. Twee bestaande toetsen spraken dat tegen, met zoveel woorden:
-   test/boardroom.test.js eist 503 met `functie: 'charter'` "ook zonder inlog",
-   en test/techniek-functies.test.js hetzelfde voor het schoolkanaal. Charter
-   heeft doelgroepen LEDEN -- precies als dom-eigendomein -- dus er is geen
-   regel in de gegevens die het ene geval van het andere scheidt.
+   dezelfde auth-deur 401 gaf -- en wie dat over alle paden herhaalt, tekent de
+   schakelkast na zonder account: welke functies bestaan, hoe ze heten, welke
+   uitstaan. Ik heb dat eerst dichtgezet en meteen weer teruggedraaid, want twee
+   bestaande toetsen eisten het tegendeel met zoveel woorden ("ook zonder
+   inlog"): test/boardroom.test.js (503 met `functie: 'charter'`) en
+   test/techniek-functies.test.js (het schoolkanaal). Charter heeft doelgroepen
+   LEDEN, precies als dom-eigendomein, dus geen enkele regel in de gegevens
+   scheidt het ene geval van het andere. Dat maakte het een KEUZE en geen bug,
+   en die is toen als open punt blijven staan (TAKEN.md 4.13).
 
-   Dat maakt het een keuze en geen bug, en die keuze is niet aan deze laag om
-   stilletjes te herzien. Wat resteert staat als open punt genoteerd: een
-   uitgeschakelde LEDEN-functie legt zich uit aan wie niet ingelogd is. Wie dat
-   wil sluiten, sluit het bewust en past die twee toetsen aan.
+   De keuze is nu gemaakt: de catalogus van functies is geen publieke
+   informatie. Wie zich niet heeft bekendgemaakt, krijgt alleen de neutrale zin
+   -- dezelfde vorm als de bevoegdheids-as hierboven. Dat de twee assen
+   verschilden was zelf de helft van de verwarring.
 
-   Bewaakt door test/schakelaar-zwijgt.test.js, die beide kanten vasthoudt --
-   inclusief de kant die WEL vertelt, zodat een volgende reparatie niet opnieuw
-   het verkeerde half dichtzet. */
+   WAT DE KEUZE KOST, want dat hoort erbij te staan. Een anonieme beller ziet
+   nog steeds een 503 en weet dus DAT er iets op dit pad uitstaat; hij weet
+   alleen niet meer wat, waarom of voor wie. Dat verschil is met opzet blijven
+   staan: deze laag weet niet of de route erachter een deur heeft, en een 401
+   verzinnen op een werkelijk publieke route die uitstaat zou de beller een
+   onwaarheid vertellen -- inloggen helpt daar niet. De naam van de functie is
+   het gevoelige deel, niet het bestaan van een storing.
+
+   DE TWEE TOETSEN ZIJN AANGEPAST EN NIET GESLOOPT. Wat zij werkelijk moesten
+   bewijzen -- "uitzetten blokkeert ook echt" -- bewijzen ze nu met een INGELOGD
+   lid, wat een strengere eis is dan met een vreemde: het blokkeert de mens voor
+   wie de functie bedoeld was. Daar is per toets de anonieme kant bij gezet, die
+   nu eist dat er niets uitlekt.
+
+   Bewaakt door test/schakelaar-zwijgt.test.js, dat beide assen vasthoudt --
+   inclusief wat een BEKENDE beller wel hoort te lezen, zodat een volgende
+   reparatie niet het verkeerde half dichtzet. */
 'use strict';
 
 const ZIN = {
@@ -67,10 +85,18 @@ function bevoegdheid(bekend, f, oordeel) {
     nodig: oordeel.nodig || undefined };
 }
 
-/* En de schakelaar zelf. Voor een onbekende beller ook de NEUTRALE zin en niet
-   die van de reden: "in jouw land uitgeschakeld" verklapt dat we iets over hem
-   hebben opgezocht. */
+/* En de schakelaar zelf. Voor een onbekende beller de NEUTRALE zin en verder
+   niets: geen id, geen naam, geen reden en geen doelgroep. Twee dingen tegelijk
+   -- de catalogus blijft binnen ("welke functies bestaan en hoe heten ze"), en
+   de reden verklapt niet dat we iets over hem hebben opgezocht ("in jouw land
+   uitgeschakeld" zegt dat we zijn land kennen).
+
+   Deze parameter stond hier al voordat hij iets deed. Het commentaar beloofde de
+   neutrale zin voor een vreemde, de code gaf hem die van de reden: een belofte
+   in tekst die geen belofte in code was (LAT.md regel 6), en het derde geval van
+   die vorm in deze twee bestanden. */
 function dicht(bekend, geblokkeerd, doelgroep) {
+  if (!bekend) return { error: ZIN.globaal };
   return { error: ZIN[geblokkeerd.reden] || ZIN.globaal,
     functie: geblokkeerd.id, naam: geblokkeerd.naam, reden: geblokkeerd.reden,
     doelgroep: doelgroep || undefined };

@@ -165,10 +165,11 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
 
     const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, plaats, persoon, genre: zaakGenre });
     if (dicht) {
-      /* Deze as legt zich WEL uit aan een beller zonder inlog, en dat is een
-         besluit dat twee bestaande toetsen vastleggen (boardroom.test.js en
-         techniek-functies.test.js, allebei met "ook zonder inlog" erbij). Zie de
-         kop van schakelaar-antwoord.js voor wat daar tegenover staat. */      return res.status(503).json(antwoord.dicht(bekendeBeller(user, sessie), dicht, doelgroep));
+      /* Wie zich niet heeft bekendgemaakt, hoort alleen de neutrale zin -- de
+         naam van een functie is geen publieke informatie. Sinds 18 augustus
+         2026, en het is een besluit: zie de kop van schakelaar-antwoord.js voor
+         wat het kost en waarom de statuscode 503 blijft. */
+      return res.status(503).json(antwoord.dicht(bekendeBeller(user, sessie), dicht, doelgroep));
     }
     next();
   };

@@ -1,5 +1,5 @@
 /* WAT EEN BELLER TE HOREN KRIJGT ALS IETS DICHT STAAT -- en waarom de twee
-   assen daarin NIET gelijk zijn.
+   assen daarin uiteindelijk WEL gelijk zijn, na een omweg van een dag.
 
    HOE DIT BEGON. `node scripts/ladder.js`, de trede "de dwaler", die op elke
    deur klopt zonder sleutel. Hij meldde twee keer "een verzoek zonder token gaf
@@ -26,18 +26,27 @@
    /api/foundation leveren er een op zonder gebruiker. Een belofte in tekst die
    geen belofte in code was (LAT.md regel 6).
 
-   De SCHAKELAAR-as is NIET veranderd, en dat is de belangrijkste helft van dit
-   bestand. Ik had hem eerst ook dichtgezet. Twee bestaande toetsen spraken dat
-   tegen, allebei met zoveel woorden "ook zonder inlog": test/boardroom.test.js
-   (503 met `functie: 'charter'`) en test/techniek-functies.test.js (hetzelfde
-   voor het schoolkanaal). En charter heeft doelgroepen LEDEN -- precies als
-   dom-eigendomein -- dus geen enkele regel in de gegevens scheidt het ene geval
-   van het andere. Dat maakt het een keuze en geen fout, en niet een die deze
-   laag stilletjes hoort te herzien.
+   De SCHAKELAAR-as is dat OOK, maar pas later en met een omweg die hier hoort te
+   staan. Hij is eerst dichtgezet en meteen weer teruggedraaid, want twee
+   bestaande toetsen eisten het tegendeel met zoveel woorden "ook zonder inlog":
+   test/boardroom.test.js (503 met `functie: 'charter'`) en
+   test/techniek-functies.test.js (het schoolkanaal). Charter heeft doelgroepen
+   LEDEN, precies als dom-eigendomein, dus geen enkele regel in de gegevens
+   scheidde het ene geval van het andere. Dat maakte het een KEUZE en geen fout,
+   en niet een die een reparatie stilletjes hoort te maken; hij is als open punt
+   blijven staan (TAKEN.md 4.13) tot hij op 18 augustus 2026 bewust is genomen.
 
-   Daarom staat die kant hier ook als PROEF en niet alleen als opmerking: een
-   volgende reparatie die dit opnieuw tegenkomt, moet het verschil zien voordat
-   hij het verkeerde half dichtzet.
+   De keuze: de catalogus van functies is geen publieke informatie. Een beller
+   zonder inlog krijgt de neutrale zin en verder niets -- geen id, geen naam,
+   geen reden, geen doelgroep. Wat dat kost staat in de kop van
+   server/middleware/schakelaar-antwoord.js: hij ziet nog steeds een 503 en weet
+   dus DAT er iets uitstaat, en op een werkelijk publieke route (een school
+   aanmelden) leest hij nu een zin zonder naam.
+
+   Daarom staat BEIDE kanten hier als proef: wat een vreemde niet mag zien, en
+   wat een bekende beller wel hoort te lezen. Een volgende reparatie die alleen
+   het eerste leest, zou de uitleg voor iedereen weghalen -- en dat is geen
+   beveiliging maar een verslechtering.
 
    Draai: node --experimental-sqlite --test test/schakelaar-zwijgt.test.js */
 const test = require('node:test');
@@ -85,17 +94,32 @@ test('bekendeBeller gaat over WIE er belt, niet over of er iets is meegestuurd',
   assert.equal(antwoord.bekendeBeller(null, { tier: 'gast' }), true, 'een sessie telt: een gast is ook iemand');
 });
 
-/* ==================== 2. DE SCHAKELAAR VERTELT HET WEL ====================
-   Vastgelegd omdat het een besluit is en geen toeval. Zou iemand deze kant
-   "ook maar even" dichtzetten, dan zakken boardroom.test.js en
-   techniek-functies.test.js -- maar pas nadat hij de wijziging heeft gemaakt.
-   Deze proef zegt het vooraf, op de plek waar hij aan het werk is. */
+/* ==================== 2. DE SCHAKELAAR ZWIJGT OOK ====================
+   Vastgelegd omdat het een besluit is en geen toeval, en met beide kanten erin.
+   Zou iemand deze as weer opengooien, dan zakt de eerste proef; zou iemand hem
+   te ver dichtzetten en ook de bekende beller in het donker laten, dan zakt de
+   tweede. Dat is het verschil dat hier eerder is misgegaan. */
 
-test('een uitgeschakelde functie noemt zichzelf, ook tegen een beller zonder inlog', () => {
-  const uit = antwoord.dicht(false, { id: 'charter', naam: 'Boten & jachten', reden: 'globaal' }, null);
-  assert.equal(uit.functie, 'charter', 'dit is bewust zo -- zie de kop van dit bestand');
+test('een uitgeschakelde functie noemt zichzelf NIET tegen een beller zonder inlog', () => {
+  const uit = antwoord.dicht(false, { id: 'charter', naam: 'Boten & jachten', reden: 'land' }, 'leden');
+  assert.equal(uit.error, antwoord.ZIN.globaal,
+    'de neutrale zin, en niet die van de reden -- "in jouw land" verklapt dat we zijn land kennen');
+  for (const veld of ['functie', 'naam', 'reden', 'doelgroep']) {
+    assert.equal(veld in uit, false,
+      'met "' + veld + '" erbij is de schakelkast na te tekenen zonder account; gekregen: ' + JSON.stringify(uit));
+  }
+});
+
+test('wie zich WEL heeft bekendgemaakt, leest welke functie uitstaat en waarom', () => {
+  /* De andere helft, en even hard: een lid dat een knop niet ziet werken hoort
+     te lezen waarom, en de schermen lezen `functie` om de juiste uitleg te
+     tonen. Een reparatie die dit ook wegneemt is een verslechtering. */
+  const uit = antwoord.dicht(true, { id: 'charter', naam: 'Boten & jachten', reden: 'land' }, 'leden');
+  assert.equal(uit.functie, 'charter');
   assert.equal(uit.naam, 'Boten & jachten');
-  assert.equal(uit.reden, 'globaal');
+  assert.equal(uit.reden, 'land');
+  assert.equal(uit.doelgroep, 'leden');
+  assert.equal(uit.error, antwoord.ZIN.land, 'en de zin van de reden, niet de neutrale');
 });
 
 /* ==================== 3. DE DEUR BLIJFT DE DEUR ====================

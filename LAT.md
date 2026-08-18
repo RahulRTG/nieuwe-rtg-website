@@ -133,9 +133,21 @@ staat moet waar zijn, of weg.
 "gezet en er komt een testfout binnen". Niets las die variabele. Wie de checklist
 netjes afliep ging live zonder alarmering.
 
+*Tweede voorbeeld, 18 augustus 2026, en het is een parameter die er al stond.*
+`dicht()` in `server/middleware/schakelaar-antwoord.js` kreeg `bekend`
+meegestuurd en het commentaar erboven beloofde een vreemde "ook de NEUTRALE zin
+en niet die van de reden". De functie las die parameter nooit. Het was daarmee
+het derde geval van deze vorm in dezelfde twee bestanden -- eerst
+functieschakelaars.js dat beloofde "nooit voor de deur" te antwoorden, toen de
+bevoegdheids-as die maar half zweeg, en nu de schakelaar-as. De vorm om op te
+letten: een parameter die alleen in het commentaar iets doet leest als
+werkende beveiliging, ook voor wie de code ernaast bekijkt.
+
 **Handhaver:** `check.js` regel 27 (elke aangeraden omgevingsvariabele wordt
 ergens gelezen). Voor commentaar bestaat geen handhaver; dat is regel 2 en
-mensenwerk.
+mensenwerk. Voor deze derde: `test/schakelaar-zwijgt.test.js` houdt nu beide
+kanten van beide assen vast, dus de belofte en de code kunnen niet meer los van
+elkaar bewegen zonder dat er iets zakt.
 
 ### 7. Een grendel hangt aan het doel, niet aan de aanvrager
 

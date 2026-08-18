@@ -74,7 +74,16 @@ const ZIN = {
    sessie telt (een gast op de gratis app of een demo-pas is ook iemand). Een
    verzonnen of verlopen token levert geen van beide op en telt dus niet -- ging
    deze vraag over "is er een token meegestuurd", dan stond het lek met een
-   willekeurige hex-string weer open. */
+   willekeurige hex-string weer open.
+
+   EEN SESSIE IS MEER DAN EEN TIER, en dat kostte een dag. De aanroeper gaf
+   eerst alleen `tier` mee, en een LEVERANCIERSSESSIE draagt een rol en geen
+   tier. De ingelogde zaakmanager gold daardoor als niemand: bij een dichte
+   partnerrail kreeg hij alleen de neutrale zin, terwijl juist hij hoort te
+   lezen waarom zijn uitbetaling niet doorgaat. Zwijgen tegen een vreemde is de
+   bedoeling; zwijgen tegen wie er wel degelijk hoort te zijn is een
+   verslechtering. test/bank.test.js zag het -- alleen niet meteen, want de
+   volledige toetsronde was na die reparatie niet gedraaid. */
 function bekendeBeller(gebruiker, sessieOfTier) { return !!(gebruiker || sessieOfTier); }
 
 /* "Hiervoor is een vergunning nodig" is geen antwoord op een verkeerd token. */

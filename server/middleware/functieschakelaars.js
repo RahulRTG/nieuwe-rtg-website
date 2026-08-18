@@ -78,14 +78,8 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
         let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        /* DE SESSIE ZELF WORDT BEWAARD EN NIET ALLEEN ZIJN TIER, want een
-           leverancierssessie draagt een ROL en geen tier. Toen deze laag ging
-           zwijgen tegen een onbekende beller, viel de ingelogde zaakmanager
-           daaronder: `tier` bleef null, dus hij gold als niemand en kreeg bij
-           een dichte partnerrail alleen de neutrale zin. Zwijgen tegen een
-           vreemde is de bedoeling; zwijgen tegen wie er wel degelijk hoort te
-           zijn is een verslechtering, en test/bank.test.js zag dat -- alleen
-           niet meteen, want de volledige toetsronde was toen niet gedraaid. */
+        /* De sessie ZELF gaat mee en niet alleen zijn tier -- waarom, staat bij
+           bekendeBeller() in schakelaar-antwoord.js. */
         if (tok && !gebruiker) { try { sessie = sessionFor(tok) || null; if (sessie && sessie.tier) tier = sessie.tier; } catch (e) {} }
         const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
           (tier ? functies.tierNaarDoelgroep(tier) : null);

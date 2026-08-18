@@ -54,6 +54,26 @@ function ensureSupplierDefaults(s) {
     m.price = ledenPrijs(m.publiekePrijs, m.price);
     if (m.station !== 'keuken' && m.station !== 'bar')
       m.station = (s.type === 'bar' || s.type === 'club') ? 'bar' : 'keuken';
+    /* BEVAT DIT ALCOHOL? Dat is een EIGENSCHAP van het gerecht en geen gevolg
+       van waar het wordt gemaakt.
+
+       De leeftijdspoort in kern/lidacties/bestellen.js las hiervoor de
+       WERKPLEK: alles met `station: 'bar'` gold als alcohol. In een restaurant
+       klopt dat ongeveer, want daar staat alleen drank aan de bar. In een bar
+       of club krijgt ELK item die werkplek -- de regel hierboven zet hem zo --
+       en dan telt een Virgin Colada 0% als alcohol, en de patatas bravas ook.
+       Een zestienjarige kon aan een strandbar geen frietjes bestellen.
+
+       De standaard blijft met opzet STRENG: wat we niet weten van een bar-item
+       telt als alcohol. Fout gokken naar de milde kant betekent drank aan een
+       minderjarige; fout gokken naar de strenge kant is lastig maar veilig. Wat
+       de zaak zelf opgeeft wint, en een item dat zichzelf alcoholvrij noemt ook
+       -- dat is geen gok maar wat er op de kaart staat. */
+    if (typeof m.alcohol !== 'boolean') {
+      const t = ((m.cat || '') + ' ' + (m.name || '') + ' ' + (m.desc || '')).toLowerCase();
+      const vrij = /alcoholvrij|zonder alcohol|non-?alcoholic|mocktail|virgin|0\s*%|0\.0/.test(t);
+      m.alcohol = m.station === 'bar' && !vrij;
+    }
     // binnen de keuken: de sectie (warme kant, koude kant, snacks, dessert)
     if (m.station === 'keuken' && !['warm', 'koud', 'snack', 'dessert'].includes(m.sectie)) {
       const t = ((m.cat || '') + ' ' + (m.name || '') + ' ' + (m.desc || '')).toLowerCase();

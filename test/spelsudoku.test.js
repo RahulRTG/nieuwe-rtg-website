@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 const motor = require('../server/kern/spellen/sudoku')({ crypto: require('crypto') });
 const { NIVEAUS, MIN_PUNTEN, maakPuzzel, aantalOplossingen, isRooster, punten, spel } = motor;
@@ -158,6 +158,12 @@ async function nieuwLid(geboren = '1990-01-01') {
   const r = await json(await raw('/auth/register', { name: 'Sudoku ' + t, email: 'su' + t + '@v.test',
     phone: '0633' + String(t).slice(-6), password: 'geheim123', geboortedatum: geboren, tier: 'rtg' }));
   assert.ok(r.token, 'aanmelden lukte niet: ' + JSON.stringify(r).slice(0, 200));
+  /* Door de keuring, tenzij de toets juist een minderjarige wil: de 18+-poort
+     kijkt sinds deze ronde echt naar het identiteitsbewijs
+     (server/kern/volwassen.js) en niet meer alleen naar een zelf ingetypt
+     jaartal. Een minderjarige komt er ook mét keuring niet door, en dat is
+     precies wat die toetsen willen zien. */
+  await keurLidGoed(BASE, r.token, r.state.user.codename);
   return { tok: r.token, cn: r.state.user.codename };
 }
 const lid = async (geboren) => (await nieuwLid(geboren)).tok;
@@ -319,7 +325,7 @@ test('onder de 18+-grens: je speelt en je hoort je tijd, er wordt alleen niets b
   assert.ok(r.punten > 0, 'en je hoort hoe snel je was');
   assert.equal(r.bewaard, false, 'maar er wordt niets bewaard');
   assert.equal(r.beste, undefined, 'en er komt geen record terug');
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 
   const bord = await json(await su('arcade-bord', { spel: 'sudoku' }, tok));
   assert.equal(bord.ranglijst, false, 'het bord bestaat niet, en is niet "leeg"');

@@ -13,6 +13,7 @@ const REDENEN = [
   ['/api/ready', 'de startsignalering van de load balancer moet altijd antwoorden'],
   ['/api/privacy', 'inzage, export en verwijdering zijn AVG-rechten en niet uitschakelbaar'],
   ['/api/toestemming', 'toestemming intrekken is een recht en niet uitschakelbaar'],
+  ['/api/inzagekaart', 'zien wie in uw gegevens keek is hetzelfde AVG-recht; een knop die dat dichtzet hoort niet te bestaan'],
   ['/api/toestel/meting', 'de toestelsleutel wordt door het lid zelf ingetrokken'],
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],

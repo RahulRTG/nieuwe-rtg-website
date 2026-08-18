@@ -92,7 +92,7 @@ test('onder de progressiegrens bestaan er geen prestaties', () => {
   const r = u.spelPrestaties('kind1');
   assert.deepEqual(r.prestaties, []);
   assert.equal(r.progressie, false);
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 });
 
 test('het venster reist mee, zodat het scherm het kan zeggen', () => {

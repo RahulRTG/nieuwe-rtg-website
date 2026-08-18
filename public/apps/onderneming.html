@@ -692,12 +692,26 @@ function vakBestuur(){
     return '<div class="vak"><h2>Bestuur</h2><p class="subtxt">'+esc(b.uitleg)+'</p></div>';
   }
   const rij=(l,r)=>'<div class="bron"><span>'+l+'</span><span>'+r+'</span></div>';
-  const best=(b.bestuurders||[]).map(x=>rij(esc(x.codenaam)+'<br><span class="bu">'+esc(x.rolLabel)+
+  /* De GROND achter een naam: kent RTG deze persoon, en hoe goed. Een naam
+     zonder die aanduiding leest als een vaststelling, terwijl een externe
+     opgave een bewering is. Alleen "extern" en een laag niveau krijgen een
+     merkteken -- een vinkje bij alles wat klopt leert niemand iets. */
+  const grond=g=>!g?'':(g.bron!=='lid'
+    ? ' <span class="bu" title="'+esc(g.tekst)+'">&middot; opgave</span>'
+    : (g.niveau==='A3'||g.niveau==='A4' ? ''
+      : ' <span class="bu" title="'+esc(g.tekst)+'">&middot; niet gecontroleerd</span>'));
+  const best=(b.bestuurders||[]).map(x=>rij(esc(x.codenaam)+grond(x.grond)+'<br><span class="bu">'+esc(x.rolLabel)+
     (x.tekent?'':' &middot; tekent niet')+'</span>','sinds '+esc(x.sinds))).join('')
     ||'<p class="stil">Nog niemand ingeschreven.</p>';
   const aand=b.magAandelen
-    ? (b.aandelen||[]).map(a=>rij(esc(a.codenaam),a.percentage+'%')).join('')||'<p class="stil">Nog niets uitgegeven.</p>'
+    ? (b.aandelen||[]).map(a=>rij(esc(a.codenaam)+grond(a.grond),a.percentage+'%')).join('')||'<p class="stil">Nog niets uitgegeven.</p>'
     : '<p class="stil">'+esc(b.aandelenGeweerd)+'</p>';
+  /* Wie er HIELD. Staat apart van wie er houdt: dat verschil is waar een
+     geschil over gaat, en door elkaar zou het de verdeling onleesbaar maken. */
+  const hist=(b.aandelenHistorie||[]).length
+    ? '<p class="subtxt kopje">Eerder gehouden</p>'+(b.aandelenHistorie||[])
+      .map(a=>rij(esc(a.codenaam),a.percentage+'% &middot; tot '+esc(a.tot))).join('')
+    : '';
   const verd=b.verdeeld&&b.verdeeld.melding
     ? '<p class="subtxt r4">'+esc(b.verdeeld.melding)+'</p>':'';
   const u=b.ubo;
@@ -705,10 +719,14 @@ function vakBestuur(){
     '<div class="bk">UBO: '+(u.personen.length
       ? u.personen.map(p=>esc(p.codenaam)+(p.percentage?' ('+p.percentage+'%)':'')).join(', ')
       : 'nog niet vast te stellen')+'</div>'+
-    '<div class="bw">'+esc(u.regel)+(u.let?' '+esc(u.let):'')+'</div></div>';
+    '<div class="bw">'+esc(u.regel)+(u.let?' '+esc(u.let):'')+
+    /* Waar de opgave op rust. De rekenregel klopt altijd; of de personen zijn
+       wie ze zeggen te zijn is een andere vraag, en die hoort hier te staan --
+       dit is het scherm waarmee iemand een UBO-opgave voorbereidt. */
+    (u.grondslag&&u.grondslag.let?'<br>'+esc(u.grondslag.let):'')+'</div></div>';
   return '<div class="vak"><h2>Bestuur</h2>'+
     '<p class="subtxt o6">'+esc(b.rechtsvorm)+'</p>'+best+
-    '<p class="subtxt kopje">Wie bezit</p>'+aand+verd+
+    '<p class="subtxt kopje">Wie bezit</p>'+aand+verd+hist+
     '<div class="r9">'+ubo+'</div>'+
     '<p class="subtxt r9">'+esc(b.voorbehoud)+'</p></div>';
 }

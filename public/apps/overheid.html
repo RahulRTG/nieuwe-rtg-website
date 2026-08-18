@@ -249,7 +249,7 @@ if (!TOKEN) {
   const idApi = (pad, body) => fetch('/api/rtgid/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body || {}) }).then(r => r.json());
   let idPoll = null;
-  $('#idStart').addEventListener('click', async () => {
+  bind('#idStart', 'click', async () => {
     const s = await idApi('start', { dienst: 'MijnOverheid', attributen: ['codenaam', '18plus'] });
     if (s.error) return meld(s.error);
     $('#idFlow').style.display = ''; $('#idKlaar').style.display = 'none';
@@ -346,10 +346,26 @@ function toonUit(u, host){
 }
 /* Vanaf hier hoort er een ingelogd lid te zijn. De uitgelogde tak hierboven
    vervangt #main door het RTG iD-scherm (met zijn eigen knop, die daar wel
-   gebonden wordt); de elementen van het loket zelf bestaan dan niet meer en
-   het script liep hier stuk -- zonder dat iemand het zag. */
-if (TOKEN) {
-$('#ibAiGo').addEventListener('click', async () => {
+   gebonden wordt); de elementen van het loket bestaan dan niet meer, en een
+   binding daarop liet het script stuklopen.
+
+   DAT WERD OPGELOST MET `if (TOKEN) { ... }` OM DE HELE REST, EN DAT WAS ERGER
+   DAN DE KWAAL. Alle laadfuncties van de loketten kwamen daarmee IN een blok te
+   staan, terwijl toon() ze van BUITEN dat blok aanroept. Gevolg: elk tabblad
+   behalve de Berichtenbox gooide een ReferenceError zodra je erop klikte, en
+   het paneel bleef op "Laden..." staan. Zonder foutmelding op het scherm, dus
+   het viel niet op -- precies de klasse fout waar LAT.md regel 2 over gaat: een
+   belofte (acht tabbladen) die door niets werd nagelopen.
+
+   De echte oorzaak was niet de plek van de functies maar de BINDING op een
+   element dat er niet is. Dus staat hier nu een binder die dat opvangt, en
+   hoeft er niets meer in een blok. */
+function bind(kiezer, gebeurtenis, fn) {
+  const el = $(kiezer);
+  if (el) el.addEventListener(gebeurtenis, fn);
+  return !!el;
+}
+bind('#ibAiGo', 'click', async () => {
   const tekst = $('#ibAi').value.trim();
   if (tekst.length < 6){ meld('Vertel Rahul kort over je inkomen.'); return; }
   const btn = $('#ibAiGo'); btn.disabled = true; btn.textContent = 'Rahul leest mee…';
@@ -361,11 +377,11 @@ $('#ibAiGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
   btn.disabled = false; btn.textContent = 'Rahul vult de velden in';
 });
-$('#ibBereken').addEventListener('click', async () => {
+bind('#ibBereken', 'click', async () => {
   try { const d = await api('/api/overheid/belasting/bereken', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value }); toonUit(d.uitkomst, '#ibUit'); }
   catch(e){ meld(e.message); }
 });
-$('#ibGo').addEventListener('click', async () => {
+bind('#ibGo', 'click', async () => {
   if (!(parseInt($('#ibInkomen').value,10) > 0)){ meld('Vul je bruto jaarinkomen in.'); return; }
   try { const d = await api('/api/overheid/aangifte', { inkomen: $('#ibInkomen').value, aftrek: $('#ibAftrek').value, ingehouden: $('#ibIngehouden').value });
     toonUit(d.aanslag, '#ibUit'); meld('Aangifte ingediend. Zie je Berichtenbox.'); laadAanslagen(); vernieuwBadge();
@@ -385,7 +401,7 @@ async function laadAanslagen(){
     try { await api('/api/overheid/aanslag/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadAanslagen(); vernieuwBadge(); } catch(e){ meld(e.message); }
   }));
 }
-$('#tsGo').addEventListener('click', async () => {
+bind('#tsGo', 'click', async () => {
   try { const d = await api('/api/overheid/toeslag', { soort: tsSoort, inkomen: $('#tsInkomen').value });
     meld(d.toeslag.maandbedrag>0 ? 'Aangevraagd: € '+d.toeslag.maandbedrag+' per maand (voorlopig).' : 'Op dit inkomen is er geen recht.'); laadToeslagen(); vernieuwBadge();
   } catch(e){ meld(e.message); }
@@ -404,10 +420,10 @@ async function laadRijbewijs(){
   const r = d.rijbewijs || {};
   $('#rbInfo').textContent = 'Categorieën: ' + (r.categorieen||[]).join(', ') + ' · geldig tot ' + (r.geldigTot||'·');
 }
-$('#rbVerleng').addEventListener('click', async () => {
+bind('#rbVerleng', 'click', async () => {
   try { const d = await api('/api/overheid/rijbewijs/verleng'); meld('Verlengd tot ' + d.rijbewijs.geldigTot + '.'); laadRijbewijs(); vernieuwBadge(); } catch(e){ meld(e.message); }
 });
-$('#vtGo').addEventListener('click', async () => {
+bind('#vtGo', 'click', async () => {
   if ($('#vtKenteken').value.trim().length < 4){ meld('Vul een geldig kenteken in.'); return; }
   try { await api('/api/overheid/voertuig/meld', { kenteken: $('#vtKenteken').value, merk: $('#vtMerk').value });
     $('#vtKenteken').value=''; $('#vtMerk').value=''; meld('Voertuig op je naam gezet.'); laadVoertuigen();
@@ -425,7 +441,7 @@ async function laadVoertuigen(){
   }));
 }
 
-$('#chkGo').addEventListener('click', async () => {
+bind('#chkGo', 'click', async () => {
   if ($('#chkKenteken').value.trim().length < 4){ meld('Vul een kenteken in.'); return; }
   try { const d = await api('/api/overheid/rdw/check', { kenteken: $('#chkKenteken').value });
     $('#chkUit').innerHTML = d.bekend
@@ -435,7 +451,7 @@ $('#chkGo').addEventListener('click', async () => {
 });
 
 // KVK
-$('#kvGo').addEventListener('click', async () => {
+bind('#kvGo', 'click', async () => {
   if ($('#kvNaam').value.trim().length < 2){ meld('Vul een bedrijfsnaam in.'); return; }
   try { const d = await api('/api/overheid/kvk/inschrijven', { naam: $('#kvNaam').value, rechtsvorm: kvVorm, sbi: $('#kvSbi').value });
     $('#kvNaam').value=''; meld('Ingeschreven onder KVK ' + d.inschrijving.kvkNummer + '.'); laadKvk(); vernieuwBadge();
@@ -450,7 +466,7 @@ async function laadKvk(){
 }
 
 // Sociaal
-$('#szGo').addEventListener('click', async () => {
+bind('#szGo', 'click', async () => {
   try { await api('/api/overheid/uitkering', { soort: szSoort, toelichting: $('#szToe').value });
     $('#szToe').value=''; meld('Aanvraag ingediend.'); laadUitkeringen(); vernieuwBadge();
   } catch(e){ meld(e.message); }
@@ -463,7 +479,7 @@ async function laadUitkeringen(){
   $('#szMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn aanvragen</h3>'+l.map(u =>
     '<div class="item"><h4>'+esc(u.soortLabel)+'</h4><span class="status '+(u.status==='toegekend'?'op':u.status==='afgewezen'?'af':'')+'">'+esc(u.status)+'</span></div>').join('') : '';
 }
-$('#bzGo').addEventListener('click', async () => {
+bind('#bzGo', 'click', async () => {
   if ($('#bzTegen').value.trim().length < 3 || $('#bzReden').value.trim().length < 6){ meld('Vul in waartegen en waarom.'); return; }
   try { await api('/api/overheid/bezwaar', { tegen: $('#bzTegen').value, reden: $('#bzReden').value });
     $('#bzTegen').value=''; $('#bzReden').value=''; meld('Bezwaar ingediend.'); laadBezwaren(); vernieuwBadge();
@@ -477,7 +493,7 @@ async function laadBezwaren(){
 }
 
 // Provincie (subsidies)
-$('#sbGo').addEventListener('click', async () => {
+bind('#sbGo', 'click', async () => {
   if ($('#sbProject').value.trim().length < 6){ meld('Omschrijf je project.'); return; }
   try { const d = await api('/api/overheid/subsidie', { regeling: sbReg, project: $('#sbProject').value, bedrag: $('#sbBedrag').value });
     $('#sbProject').value=''; $('#sbBedrag').value=''; meld('Aangevraagd: € '+d.subsidie.gevraagd+'.'); laadSubsidies(); vernieuwBadge();
@@ -507,7 +523,7 @@ async function laadWaterbelasting(){
     try { await api('/api/overheid/waterschap/betaal', { ref: b.dataset.bet }); meld('Betaald. Bedankt.'); laadWaterbelasting(); vernieuwBadge(); } catch(e){ meld(e.message); }
   }));
 }
-$('#wmGo').addEventListener('click', async () => {
+bind('#wmGo', 'click', async () => {
   if ($('#wmTekst').value.trim().length < 4){ meld('Omschrijf kort wat er is.'); return; }
   try { await api('/api/overheid/water/meld', { soort: wmSoort, tekst: $('#wmTekst').value, locatie: $('#wmLoc').value });
     $('#wmTekst').value=''; $('#wmLoc').value=''; meld('Melding verstuurd.'); laadWaterMeldingen();
@@ -527,10 +543,21 @@ async function laadStem(){
   let d; try { d = await api('/api/overheid/verkiezing'); } catch(e){ return; }
   const v = d.verkiezing;
   if (!v){ $('#stemKaart').innerHTML = '<div class="leeg">Er loopt op dit moment geen stemming.</div>'; return; }
+  /* Het stemrecht komt van de server mee, ook als het antwoord nee is. Een
+     stemknop die zomaar verdwijnt leest als een storing; hier staat wat er
+     ontbreekt en wat eraan te doen is. De uitslag blijft altijd zichtbaar --
+     niet mogen stemmen is iets anders dan niet mogen meekijken. */
+  const recht = v.stemrecht || { ok: true };
+  const magStemmen = v.open && !v.alGestemd && recht.ok;
   $('#stemKaart').innerHTML = '<h3>'+esc(v.titel)+'</h3><p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin:.3rem 0 .7rem;">'+esc(v.toelichting||'')+'</p>'+
     v.opties.map(o => '<div class="stemopt"><div style="flex:1;"><b>'+esc(o.label)+'</b><div class="balk" style="width:'+o.pct+'%;"></div></div>'+
       '<div style="text-align:right;min-width:3rem;"><div style="font-variant-numeric:tabular-nums;">'+o.pct+'%</div>'+
-      ((v.open && !v.alGestemd)?'<button class="knop" data-stem="'+esc(o.id)+'" style="padding:.25rem .7rem;font-size:.78rem;margin-top:.2rem;">Stem</button>':'')+'</div></div>').join('')+
+      (magStemmen?'<button class="knop" data-stem="'+esc(o.id)+'" style="padding:.25rem .7rem;font-size:.78rem;margin-top:.2rem;">Stem</button>':'')+'</div></div>').join('')+
+    ((v.open && !v.alGestemd && !recht.ok)
+      ? '<p style="color:var(--muted);font-size:.84rem;line-height:1.55;border-left:2px solid var(--goud,#C9A24B);padding:.2rem 0 .2rem .8rem;margin:.7rem 0 0;">'+
+        esc(recht.reden||'U kunt op dit moment niet stemmen.')+
+        (recht.niveau?'<br><span style="font-size:.78rem;">Uw niveau: '+esc(recht.niveau.id)+' \u00b7 '+esc(recht.niveau.naam)+'.</span>':'')+'</p>'
+      : '')+
     '<div class="meta">'+(v.open ? (v.alGestemd?'Je hebt gestemd. ':'') : 'Stemming gesloten. ')+v.totaal+' stem(men)</div>';
   $('#stemKaart').querySelectorAll('button[data-stem]').forEach(b => b.addEventListener('click', async () => {
     try { await api('/api/overheid/stem', { keuze: b.dataset.stem }); meld('Je stem is geteld.'); laadStem(); } catch(e){ meld(e.message); }
@@ -549,7 +576,6 @@ async function laadBekend(){
    TOESLAGEN en VORMEN, en die worden met const pas hierboven gemaakt. Een
    const aanraken voordat hij bestaat gooit, dus bleef het scherm leeg. */
 if (TOKEN) start();
-}
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>
 <section class="rahulsheet" id="rahulSheet" aria-label="Vraag Rahul" hidden>

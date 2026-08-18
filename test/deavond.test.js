@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-avond-'));
 
@@ -40,13 +40,19 @@ function post(base) {
 }
 
 let teller = 0;
-async function nieuwLid(P, naam) {
+async function nieuwLid(P, naam, base) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
+  const geboren = '1990-01-01';
   const r = await P('/api/auth/register', {
     name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
+    password: 'geheim123', geboortedatum: geboren, geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  /* Door de keuring als de toets de basis meegeeft. idGeverifieerd() nam
+     hiervoor aan dat elke pas-houder geballoteerd was; nu wordt het gevraagd,
+     en zonder deze stap valt een lid aan de bar af op de VERIFICATIE in plaats
+     van op zijn leeftijd -- dan slaagt de toets om de verkeerde reden. */
+  if (base) await keurLidGoed(base, r.body.token, r.body.state.user.codename, geboren);
   return r.body.token;
 }
 
@@ -118,6 +124,11 @@ test('alcohol: de leeftijd van het paspoort beslist, en de zaak hoort die niet',
       password: 'geheim123', geboortedatum: '2010-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
     });
     assert.ok(jong.body.token, 'een zestienjarige is wel gewoon lid: ' + JSON.stringify(jong.body).slice(0, 160));
+    /* Ook de zestienjarige gaat door de keuring, met de datum van zijn
+       document. Anders zou hij aan de bar afvallen omdat RTG hem niet kent, en
+       niet omdat hij zestien is -- en juist dat laatste is wat deze toets
+       beweert te laten zien. */
+    await keurLidGoed(base, jong.body.token, jong.body.state.user.codename, '2010-05-05');
 
     const geweigerd = await P('/api/order',
       { supplierCode: 'KIKUNOI', items: [{ id: bar.id, qty: 1 }] }, jong.body.token);
@@ -132,9 +143,26 @@ test('alcohol: de leeftijd van het paspoort beslist, en de zaak hoort die niet',
     assert.equal(eten1.status, 200, 'eten kan hij gewoon bestellen');
 
     /* De volwassene mag wel. Zonder deze kant zou "alles weigeren" ook slagen. */
-    const oud = await nieuwLid(P, 'Oudere');
+    const oud = await nieuwLid(P, 'Oudere', base);
     const mag = await P('/api/order', { supplierCode: 'KIKUNOI', items: [{ id: bar.id, qty: 1 }] }, oud);
     assert.equal(mag.status, 200, 'een volwassen lid kan wel bestellen: ' + JSON.stringify(mag.body).slice(0, 160));
+
+    /* EN EEN VOLWASSENE DIE RTG NIET HEEFT GEKEURD, KRIJGT OOK NIETS.
+       idGeverifieerd() gaf hiervoor `true` voor iedereen die geen gast was --
+       "pas-leden: met paspoort geballoteerd" -- en dat werd nergens nagegaan.
+       Een lid dat zich zojuist had aangemeld en nog in de keuringsrij stond,
+       gold dus al als geverifieerd, met een geboortedatum die hij zelf had
+       ingetypt. Terwijl de foutmelding aan de bar zei dat de leeftijd via het
+       paspoort was geverifieerd. */
+    const ongekeurd = await nieuwLid(P, 'Ongekeurd');          // geen `base`: dus niet gekeurd
+    const zonder = await P('/api/order',
+      { supplierCode: 'KIKUNOI', items: [{ id: bar.id, qty: 1 }] }, ongekeurd);
+    assert.equal(zonder.status, 403, 'volwassen op papier is niet genoeg');
+    assert.match(String(zonder.body.error), /geverifieerde leeftijd|verifieren/i,
+      'en de reden gaat over de keuring, niet over de leeftijd: ' + zonder.body.error);
+    const etenMag = await P('/api/order',
+      { supplierCode: 'KIKUNOI', items: [{ id: eten.id, qty: 1 }] }, ongekeurd);
+    assert.equal(etenMag.status, 200, 'de rest van de kaart blijft gewoon open');
 
     /* DE MERKREGEL erachter: de partner ziet DAT de leeftijd geverifieerd is,
        niet WELKE. Een geboortedatum hoort niet op een keukenscherm. */

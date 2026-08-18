@@ -12,12 +12,16 @@
    maakVonk(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
    poort, het profiel/de wensen en de dagselectie wonen hier; de like/match,
    het betalen, de chat en het blokkeren/melden in ./match. */
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const { coord } = require('../util');
 
 const MIN_LEEFTIJD = 18;
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
 const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling bij de zaak
+
+const { maakLidstand } = require('../betrouwbaarheid');
 
 function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan, keyVanCodenaam,
   haversine, reserveerTafel, pay, notify, sseToCustomer, sseToOffice }) {
@@ -31,9 +35,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
 
   /* ---- de poort: 18+ met actief geverifieerd paspoort (zelfde lat als Podium) ---- */
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   function mag(key) {
     const u = accountVanKey(key);
@@ -68,8 +72,27 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     save();
     return { status: 200, ok: true, profiel: publiek(key, p, true) };
   }
+  /* HOE ZEKER RTG WEET DAT DIT DEZE MENS IS, en waarom dat hier hoort.
+
+     De poort hierboven zegt tegen wie hem niet haalt: "Activeer eerst uw
+     RTG-geverifieerde paspoort (KYC); zo weet iedereen op Vonk dat de ander
+     echt is." Dat is een belofte aan de ANDER -- en die bereikte hem nooit. Op
+     een kaartje stond een codenaam, een leeftijd en een stad, precies zoals op
+     elk ander datingprofiel ter wereld.
+
+     De poort garandeert al minstens A3, dus dit is geen zeef maar een
+     onderscheid: A4 betekent dat RTG de selfie naast het document heeft gelegd
+     en dus dat dit gezicht bij dat paspoort hoort. Dat is exact wat je wilt
+     weten voordat je met een vreemde afspreekt, en het staat nergens anders in
+     dit huis waar iemand het kan lezen. */
+  const lidstandVan = maakLidstand({ accounts });
+  const niveauVan = key => {
+    try { const st = lidstandVan(key); return st && st.niveau ? { id: st.niveau.id, naam: st.niveau.naam } : null; }
+    catch (e) { return null; }
+  };
   const publiek = (key, p, zelf) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
-    stad: p.stad, interesses: p.interesses, ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt,
+    stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key),
+    ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt,
       leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax, maxKm: p.maxKm, actief: p.actief } : {}) });
 
   /* ---- de dagselectie: eindig en wederzijds passend ---- */
@@ -105,7 +128,7 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine,
+  const ctx = { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN };
   const api = { vonkProfielZet: profielZet, vonkSelectie: selectie };
   Object.assign(api, require('./match')(ctx));

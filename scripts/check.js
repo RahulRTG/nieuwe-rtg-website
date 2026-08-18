@@ -398,6 +398,19 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        volgorde is precies de inhoud: kernlaag4b hangt het concern op NA de
        onderneming, omdat het er een bestaande onderneming in aanwijst. */
     ['server/opzet/kernlaag4b.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    /* kernlaag1 en kernlaag2 zijn dezelfde soort lijst en stonden er alleen nog
+       niet op omdat ze er nog net onder bleven -- kernlaag2 met 118 bytes
+       speling. Een grens die je haalt door niets meer toe te voegen, is geen
+       grens maar een rem, en dat is niet wat regel 13 wil zeggen. Ze horen in
+       MAG om precies dezelfde reden als hun twee broers hierboven: een
+       ophanglijst in tweeën hakken levert twee halve lijsten op waarvan de
+       volgorde tussen de helften niet meer te lezen is.
+
+       LET OP WAT DIT NIET IS: een uitzondering voor "het paste net niet". De
+       reden staat erbij en geldt voor dit SOORT bestand; een gewone module die
+       erover gaat, hoort nog steeds geknipt te worden. */
+    ['server/opzet/kernlaag1.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    ['server/opzet/kernlaag2.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
     ['server/opzet/routes.js', 'de mountlijst van alle routers: geen naad, alleen volgorde, net als de kernlagen'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);

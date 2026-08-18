@@ -17,6 +17,8 @@
    dienstverband dat via de sleutelbos met een PIN is aangetoond. Dat is de
    omkering waar het hier om gaat -- de bevestiging is hard, de naam blijft jouw
    keuze. Op de gewone netwerken is het precies andersom. */
+const { idVanKey } = require('../../lib/lidsleutel');
+
 module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplier, notifySupplier, notify }) => {
   const LOG_MAX = 200;
   const nu = () => new Date().toISOString();
@@ -103,8 +105,8 @@ module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplie
       logInzage(tref.key, c, false);
       return { status: 403, error: 'Dit lid heeft u geen inzage in zijn naam gegeven. Vraag het hem in het gesprek; hij geeft het zelf vrij.' };
     }
-    const mm = /^user-(\d+)$/.exec(String(tref.key));
-    const u = mm && accounts ? accounts.getUserById(Number(mm[1])) : null;
+    const lidId = idVanKey(tref.key);
+    const u = lidId != null && accounts ? accounts.getUserById(lidId) : null;
     if (!u) {
       logInzage(tref.key, c, false);
       return { status: 404, error: 'Bij deze codenaam hoort geen accountdossier.' };

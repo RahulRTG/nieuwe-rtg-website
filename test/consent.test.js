@@ -152,6 +152,8 @@ test('het register en het scherm lopen niet uiteen', () => {
           { id: 'm2', naar: 'IK', dienst: 'Gemeente', tot: '2026-12-01T00:00:00.000Z', ik: 'krijg' }]
       })
     },
+    paspoortMijn: () => ([{ id: 'p1', supplierName: 'Hotel Aurora', niveau: 'idkaart',
+      status: 'goedgekeurd', vervalt: '2099-01-01T00:00:00.000Z', incident: false }]),
     vastleggingenVan: () => ({ vastleggingen: [{ id: 'v1', aanbiederNaam: 'Kliniek Clara', sinds: '2026-08-01' }] }),
     wachtlijstVan: () => ({ lijsten: [{ id: 'w1', aanbiederNaam: 'Zenith Spa', sinds: '2026-08-01' }] }),
     locMijn: () => ({ actief: [{ id: 'l1', supplierName: 'Kikunoi' }] }),
@@ -172,6 +174,52 @@ test('het register en het scherm lopen niet uiteen', () => {
     'elke regel zegt wie, wat en welke kant het op gaat');
 });
 
+test('de paspoort-inzage: alleen een venster dat NU nog openstaat', () => {
+  /* Deze laag is de enige op het scherm met een venster van minuten in plaats
+     van dagen, en de bron schoont haar eigen lijst niet op -- alleen de
+     partnerkant doet dat. Een verlopen goedkeuring staat er dus nog met status
+     'goedgekeurd' bij. Zou dit scherm die overnemen, dan meldt het een inzage
+     die allang dicht is: precies de schijnzekerheid die dit scherm hoort te
+     voorkomen. Vandaar deze drie gevallen naast elkaar. */
+  const maak = require('../server/kern/consent');
+  let ingetrokken = null;
+  const c = maak({ kern: {
+    paspoortMijn: () => ([
+      { id: 'open', supplierName: 'Hotel Aurora', niveau: 'idkaart', status: 'goedgekeurd',
+        vervalt: new Date(Date.now() + 5 * 60000).toISOString(), incident: false },
+      { id: 'verlopen', supplierName: 'Slijterij De Kurk', niveau: 'idkaart', status: 'goedgekeurd',
+        vervalt: new Date(Date.now() - 60000).toISOString(), incident: false },
+      { id: 'gevraagd', supplierName: 'Vage Webshop', niveau: 'paspoort', status: 'aangevraagd', vervalt: null }
+    ]),
+    paspoortTrekIn: (key, id) => { ingetrokken = [key, id]; return { ok: true }; }
+  } });
+
+  const rijen = c.consentVan('sleutel').toestemmingen.filter(t => t.laag === 'paspoort-inzage');
+  assert.deepEqual(rijen.map(r => r.id), ['open'],
+    'een verlopen venster en een verzoek dat nog wacht zijn geen lopende toestemming');
+  assert.equal(rijen[0].wie, 'Hotel Aurora');
+  assert.match(rijen[0].wat, /ID-kaart/, 'het lid leest welk niveau er openstaat, niet de code ervan');
+  assert.match(rijen[0].tot, /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/,
+    'een venster van tien minuten toont de klok; alleen een dag leest als "de hele dag nog"');
+
+  /* En de knop raakt de bron, niet een vlaggetje van dit scherm. */
+  assert.deepEqual(c.consentIntrek('sleutel', { laag: 'paspoort-inzage', id: 'open' }), { ok: true });
+  assert.deepEqual(ingetrokken, ['sleutel', 'open']);
+});
+
+test('een vrijgegeven incident staat er met die reden bij', () => {
+  /* RTG kan bij een incident een identiteit vrijgeven zonder dat het lid
+     goedkeurde. Dat venster staat wel degelijk open, dus het hoort op deze
+     lijst -- maar dan met de reden erbij, anders leest het als iets wat het lid
+     zelf heeft aangezet. */
+  const maak = require('../server/kern/consent');
+  const c = maak({ kern: { paspoortMijn: () => ([{ id: 'i1', supplierName: 'Bar Vesper',
+    niveau: 'paspoort', status: 'goedgekeurd',
+    vervalt: new Date(Date.now() + 5 * 60000).toISOString(), incident: true }]) } });
+  const rij = c.consentVan('sleutel').toestemmingen.find(t => t.laag === 'paspoort-inzage');
+  assert.match(rij.wat, /incident/i, 'het lid ziet waarom dit openstaat');
+});
+
 test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () => {
   /* Op dit scherm is stilte gevaarlijker dan elders: een ontbrekende regel
      leest als "niemand kijkt mee". */
@@ -180,5 +228,5 @@ test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () =
   const d = stuk.consentVan('sleutel');
   assert.ok(d.storingen.length >= 1);
   assert.match(d.storingen[0], /Zorg/i, 'de laag die stukging staat met naam in de melding');
-  assert.equal(d.storingen.length, 7, 'en de zes lagen die ontbreken melden zich ook, geen stilte');
+  assert.equal(d.storingen.length, 8, 'en de zeven lagen die ontbreken melden zich ook, geen stilte');
 });

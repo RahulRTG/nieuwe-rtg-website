@@ -5,7 +5,7 @@
    RTG Pay; pas als beiden betaald hebben komt de echte reservering. Plus de chat, de
    eigen matches, en blokkeren/melden. Krijgt de gedeelde ctx van kern/vonk/index.js. */
 module.exports = (ctx) => {
-  const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine,
+  const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine, niveauVan,
     reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN } = ctx;
 
   /* ---- like / voorbij; wederzijds = match + automatisch een tafel in het midden ---- */
@@ -101,7 +101,11 @@ module.exports = (ctx) => {
     const poort = mag(key);
     if (!poort.ok) return { status: 403, error: poort.reden };
     const rijen = d().matches.filter(m => m.a === key || m.b === key).slice(0, 50).map(m => ({
+      /* Ook bij een match, en niet alleen in de dagselectie: dit is het moment
+         waarop er een tafel wordt geboekt en twee mensen elkaar echt gaan
+         zien. Zie de uitleg bij `publiek` in ./index.js. */
       id: m.id, met: codenaamVan(m.a === key ? m.b : m.a), at: m.at, status: m.status,
+      betrouwbaarheid: niveauVan ? niveauVan(m.a === key ? m.b : m.a) : null,
       tafel: m.tafel, ikBetaalde: !!m.betaald[key], anderBetaalde: !!m.betaald[m.a === key ? m.b : m.a],
       berichten: m.berichten.slice(-30)
     }));

@@ -238,6 +238,10 @@
       "consentVan",
       "status"
     ],
+    "inzagekaart": [
+      "inzagekaartVan",
+      "status"
+    ],
     "dagcoach": [
       "dagVoor"
     ],
@@ -1330,8 +1334,10 @@
       "schoolbieb"
     ],
     "rtgid": [
+      "appUrl",
       "rtgid",
-      "status"
+      "status",
+      "webauthnStapOpOpties"
     ],
     "rtgkantoor": [
       "onderzoeker",

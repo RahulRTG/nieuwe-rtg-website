@@ -477,7 +477,38 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld,
+/* EEN LID DOOR DE KEURING HALEN, langs de echte weg: bewijs insturen, RTG-kantoor
+   keurt goed, en de geboortedatum van het document wordt overgenomen.
+
+   Hij staat hier omdat de 18+-poort sinds deze ronde echt naar die keuring kijkt
+   (server/kern/volwassen.js). Daarvoor was "18 jaar oud" genoeg -- op een
+   geboortedatum die het lid zelf intypte -- en kon elke toets een volwassene
+   maken door een jaartal te kiezen. Nu moet dat via het kantoor, en dat is in
+   drie toetsbestanden nodig. Drie kopieen van deze stappen lopen uiteen zodra
+   de keuringsstroom verandert; deze ene niet.
+
+   De geboortedatum is optioneel: laat je hem weg, dan blijft de opgegeven staan
+   en blijft de bron eerlijk 'opgegeven'. Voor de 18+-poort is de keuring zelf
+   genoeg; voor een stemming niet (zie kern/overheid/bestuur.js). */
+const KEUR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+async function keurLidGoed(base, token, codenaam, geboortedatum) {
+  const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  if (!office) throw new Error('kantoor-inlog mislukt; is RTG_DEMO aan?');
+  await post('/api/verify/upload', { image: KEUR_PNG }, token);
+  await post('/api/verify/selfie', { image: KEUR_PNG }, token);
+  const pend = await post('/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === codenaam);
+  if (!mij) throw new Error('lid ' + codenaam + ' staat niet in de keuringsrij');
+  const r = await post('/api/office/verify', Object.assign({ userId: mij.id, decision: 'approve',
+    faceMatch: true }, geboortedatum ? { geboortedatum } : {}), office);
+  if (r.status !== 200) throw new Error('keuring mislukt: ' + JSON.stringify(r.body).slice(0, 160));
+  return mij.id;
+}
+
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld, keurLidGoed,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

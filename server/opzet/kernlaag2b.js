@@ -36,7 +36,8 @@ kern.gemeente.seed();
 Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto, anthropic,
   findSupplier, notify, notifySupplier, sseToSupplier,
   bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
-  bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i) }));
+  bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i),
+  lidstandVan: require('../kern/betrouwbaarheid').maakLidstand({ accounts }) }));
 kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft

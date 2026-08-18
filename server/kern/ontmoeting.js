@@ -19,6 +19,8 @@
    maakOntmoeting(state) volgt het vaste kern-patroon: draagt state, praat niet
    rechtstreeks met de buitenwereld, en is los te testen. */
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 const RADIUS_M = 250;                        // "in de buurt": binnen deze straal
 const POS_TTL_MS = 6 * 60 * 1000;            // een positie is zo lang vers voor de radar
 const VOORSTEL_TTL_MS = 12 * 60 * 1000;      // een voorstel verloopt vanzelf (niets doen = afwijzen)
@@ -46,9 +48,9 @@ function maakOntmoeting({ db, save, crypto, accounts, leeftijdVan, notify, sseTo
 
   /* ---- wie mag meedoen: 18+ met actief RTG-geverifieerd paspoort ---- */
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   function memberState(u) { try { return accounts.getMemberState(u.id) || {}; } catch (e) { return {}; } }
   function geslachtVan(key) {

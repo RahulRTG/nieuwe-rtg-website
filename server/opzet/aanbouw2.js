@@ -16,7 +16,16 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   /* RTG iD (kern/rtgid.js): de DigiD-vervanger op de eigen identiteitskluis;
      koppelcode-inlog met bevestiging in de app, selectieve gegevensdeling,
      inzagelog met intrekken en herroepbare machtigingen. */
-  Object.assign(kern, require('../kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam }));
+  Object.assign(kern, require('../kern/rtgid').maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam,
+    /* Bevestigen vraagt een passkey (kern/rtgid.js legt uit waarom die eis daar
+       staat en niet in de route). De MECHANIEK blijft in kern/webauthn.js: het
+       doel waaraan de ceremonie hangt is de koppel-id, zodat een assertie die
+       bij de ene inlog hoort niet op een andere past. De origin en de hostnaam
+       komen uit het verzoek en reizen mee in `bewijs` -- die horen bij de deur
+       en niet bij deze module. */
+    stapOp: ({ user, doel, bewijs }) => kern.webauthnStapOpMaak(user, bewijs.ceremonie, bewijs.antwoord,
+      bewijs.origin, bewijs.hostnaam, doel),
+    passkeysVan: user => kern.webauthnAantal(user) }));
   require('../routes/rtgid')(grens('rtgid'));
   /* RTG Wallet (kern/wallet.js) en de zorgtak van de verzekeraar
      (kern/zorgpolis.js): de zorgpas op codenaam ligt direct in de wallet. */

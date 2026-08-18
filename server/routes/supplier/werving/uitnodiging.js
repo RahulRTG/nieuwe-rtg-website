@@ -20,6 +20,8 @@
    ging het over de 10 KB-lat. De uitnodiging is een eigen onderwerp -- hem
    maken, hem terugvinden, en er iemand mee verbinden -- dus die knip loopt
    langs een naad die er toch al lag. */
+const { idVanKey } = require('../../../lib/lidsleutel');
+
 module.exports = ({ kern }) => {
   const { accounts, crypto, db, logActivity, notifySupplier, save } = kern;
 
@@ -150,10 +152,10 @@ module.exports = ({ kern }) => {
      hier null op en houdt de code plus de wervingslink -- die moet nog een
      account maken, en daar is de link nou juist voor. */
   async function neemAan(supplier, inv, sollicitatieKey) {
-    const m = /^user-(\d+)$/.exec(String(sollicitatieKey || ''));
-    if (!m) return null;
+    const id = idVanKey(sollicitatieKey);
+    if (id == null) return null;
     try {
-      const lid = accounts.getUserById(Number(m[1]));
+      const lid = accounts.getUserById(id);
       if (!lid || accounts.staffByMember(supplier.code, lid.id)) return null;
       const v = await verbindLid(supplier, inv, lid, {});
       return { staffId: v.staff.id, naam: v.naam };

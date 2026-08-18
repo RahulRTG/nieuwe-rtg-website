@@ -44,7 +44,7 @@ test.after(() => {
 test('het zorgprofiel reist alleen mee als de gast delen aanzet', async () => {
   // profiel invullen, delen nog uit: de bestelling blijft schoon
   const zet = await api('zorgprofiel/zet', { allergenen: 'noten, schaaldieren', dieet: 'vegetarisch', medisch: 'diabetes type 1', delen: false }, lid);
-  assert.equal(zet.status, 200);
+  assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0,200));
   assert.deepEqual(zet.body.zorg.allergenen, ['noten', 'schaaldieren']);
   const o1 = await api('order', { supplierCode: 'PONTO', items: [{ id: 'b3', qty: 1 }] }, lid);
   assert.equal(o1.status, 200);

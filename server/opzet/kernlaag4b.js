@@ -87,6 +87,10 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
      Uit de sociale kern, die eerder is gebouwd -- zo staat er ook daar geen
      echte naam in een lijst. */
   codenaamVan: kern.codenaamVan, tierVan: kern.soortVan,
+  /* Een bestuurder of aandeelhouder wijst naar een MENS, en niet naar zestig
+     tekens tekst: kern/onderneming/bestuur-persoon.js zoekt de codenaam op en
+     legt het betrouwbaarheidsniveau vast dat er op dat moment stond. */
+  keyVanCodenaam, lidstandVan: require('../kern/betrouwbaarheid').maakLidstand({ accounts }),
   ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
   /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
      (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur

@@ -26,6 +26,16 @@
     margin:.6rem 0;font-size:.82rem;color:var(--soft);}
   .voorbehoud{border-left:2px solid var(--goldlicht);padding:.2rem 0 .2rem .9rem;
     color:var(--soft);font-size:.84rem;line-height:1.6;margin:1rem 0;}
+  .kijk{display:flex;gap:.9rem;border-bottom:1px solid var(--line);padding:.7rem 0;}
+  .kijk .om{color:var(--soft);font-size:.76rem;white-space:nowrap;min-width:6.5rem;}
+  .kijk .rek{flex:1;min-width:0;}
+  .kijk .wie{font-size:.95rem;}
+  .kijk .wat{color:var(--soft);font-size:.82rem;line-height:1.5;}
+  .kijk .waarom{color:var(--soft);font-size:.82rem;line-height:1.5;font-style:italic;}
+  /* Geen text-transform hier, anders dan bij .kant hierboven: die labels zijn
+     gewone woorden, deze zijn namen. Uppercase maakt van "RTG iD" een "RTG ID",
+     en de kleine i is geen opmaak maar het merk. */
+  .kijk .bron{font-size:.64rem;letter-spacing:.14em;color:var(--goldlicht);}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -47,6 +57,17 @@
   <section aria-label="Wat er nu mag">
     <h2>Wat er nu mag</h2>
     <div id="lijst"><p class="stil">Laden...</p></div>
+  </section>
+
+  <!-- De tweede helft van dezelfde vraag. Hierboven staat wat er OPENSTAAT,
+       hieronder wat er IS GEBEURD. Bewust twee lijsten en niet een: door elkaar
+       gehaald ziet een afgeronde inzage eruit als een openstaande toegang, en
+       dan zou intrekken iets beloven wat er niet meer is. -->
+  <section aria-label="Wie heeft er gekeken">
+    <h2>Wie heeft er gekeken</h2>
+    <p class="stil" id="kaartKop">Laden...</p>
+    <div id="kaart"></div>
+    <div id="kaartGrenzen"></div>
   </section>
 
   <section aria-label="Waar deze lijst ophoudt">
@@ -95,9 +116,37 @@
       ? '<p class="voorbehoud">' + esc(d.voorbehoud) + '</p>' : '';
   }
 
+  /* De inzagekaart: wie heeft er gekeken. Een eigen aanroep en een eigen lijst,
+     want het is een andere vraag dan hierboven -- en een die niet stukgaat als
+     de toestemmingenlijst hapert, en omgekeerd. */
+  function tekenKaart(d) {
+    const storingen = (d.storingen || []).map(t =>
+      '<div class="storing" role="status">' + esc(t) + ' Deze kaart is daardoor niet compleet.</div>').join('');
+
+    const rijen = (d.kaart || []).map(r => {
+      const om = String(r.om || '');
+      return '<div class="kijk"><span class="om">' + esc(om.slice(0, 10)) + '<br>' + esc(om.slice(11, 16)) + '</span>' +
+        '<span class="rek"><span class="bron">' + esc(r.bron) + '</span>' +
+        '<div class="wie">' + esc(r.wie) + '</div>' +
+        '<div class="wat">' + esc(r.wat) + '</div>' +
+        (r.waarom ? '<div class="waarom">Reden: ' + esc(r.waarom) + '</div>' : '') +
+        '</span></div>';
+    }).join('');
+
+    $('#kaartKop').textContent = rijen
+      ? 'Er is ' + d.gekeken + ' keer iets van u opgevraagd. Uw eigen goedkeuringen staan er ook bij, want zonder die regel is de inzage erboven niet te volgen.'
+      : 'Er heeft nog niemand iets van u opgevraagd.';
+    $('#kaart').innerHTML = storingen + rijen;
+    $('#kaartGrenzen').innerHTML = ((d.nietZichtbaar || []).map(x =>
+      '<div class="grens"><b>' + esc(x.naam) + '</b><span>' + esc(x.reden) + '</span></div>').join('')) +
+      (d.voorbehoud ? '<p class="voorbehoud">' + esc(d.voorbehoud) + '</p>' : '');
+  }
+
   async function laad() {
     try { teken(await Veilig.api('/api/toestemming')); }
     catch (e) { $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+    try { tekenKaart(await Veilig.api('/api/inzagekaart')); }
+    catch (e) { $('#kaartKop').textContent = e.message; }
   }
 
   if (document.readyState !== 'loading') laad();

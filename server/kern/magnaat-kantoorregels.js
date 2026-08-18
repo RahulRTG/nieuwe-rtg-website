@@ -55,7 +55,7 @@ const REGELS = [
 
   /* Mensen, recht en de eigen organisatie. */
   [/staff|personeel|vacature|sollicit|\/werving|\/cv\b|\/werkvloer|\/training|\/werk\.html/, 'hr', 'HR'],
-  [/contract|juridisch|paspoort|machtig|privacy|avg|toestemming|rechtsvorm|\/drm\b/, 'juridisch', 'Juridisch'],
+  [/contract|juridisch|paspoort|machtig|privacy|avg|toestemming|inzagekaart|rechtsvorm|\/drm\b/, 'juridisch', 'Juridisch'],
   [/ingenieur|engineering/, 'ingenieurs', 'Ingenieurs'],
   [/\/bedrijf|\/onderneming|\/concern|\/genootschap|\/zakelijk|\/metier/, 'support', 'Support team'],
   [/supplier|partner|\/gast/, 'support', 'Support team'],

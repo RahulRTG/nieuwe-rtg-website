@@ -6,8 +6,7 @@ module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
           forgetSession, logActivity, mail, makeSupplierCode, officeAuth, save, sessions, schoon,
-          sseClients, sseSend, sseToOffice, sseToSupplier,
-          ondernemingRegie, ondernemingProvisioningZet, ondernemingBijdrageZet, rechtsvormwacht } = kern;
+          sseClients, sseSend, sseToOffice, sseToSupplier } = kern;
 app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   const a = db.data.partnerApplications.find(x => x.id === req.body.id);
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
@@ -150,40 +149,4 @@ app.post('/api/office/trust/reply', officeAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-  /* ---- de ondernemersregie: twee knoppen van de boardroom ----
-     Achter de kantoorpoort, en elke wijziging komt met een naam in het
-     journaal. Zie kern/onderneming/regie.js voor waarom soepeler zetten een
-     naam vraagt en strenger zetten niet. */
-  app.post('/api/office/ondernemersregie', officeAuth, (req, res) => {
-    res.json({ ok: true, regie: ondernemingRegie() });
-  });
-
-  app.post('/api/office/ondernemersregie/provisioning', officeAuth, (req, res) => {
-    const r = ondernemingProvisioningZet(String((req.body || {}).stand || ''), boardroomWie(req));
-    res.status(r.status || 200).json(r);
-  });
-
-  app.post('/api/office/ondernemersregie/bijdrage', officeAuth, (req, res) => {
-    const r = ondernemingBijdrageZet(req.body || {}, boardroomWie(req));
-    res.status(r.status || 200).json(r);
-  });
-
-  /* ---- de rechtsvormwacht ----
-     De stand van het rechtsvormenregister en een handmatige controle. Zetten
-     kan ook met de hand, maar langs dezelfde gevalideerde weg als een bron:
-     een tweede, soepelere ingang zou de grendels omzeilen die er juist voor de
-     bron staan. Zie kern/onderneming/rechtsvormwacht.js. */
-  app.post('/api/office/rechtsvormwacht', officeAuth, (req, res) => {
-    res.json({ ok: true, wacht: rechtsvormwacht.status() });
-  });
-
-  app.post('/api/office/rechtsvormwacht/check', officeAuth, async (req, res) => {
-    const r = await rechtsvormwacht.check();
-    res.json(Object.assign({ ok: true }, r, { wacht: rechtsvormwacht.status() }));
-  });
-
-  app.post('/api/office/rechtsvormwacht/zet', officeAuth, (req, res) => {
-    const r = rechtsvormwacht.pasToe(req.body || {}, 'kantoor: ' + boardroomWie(req));
-    res.json(Object.assign({}, r, { wacht: rechtsvormwacht.status() }));
-  });
 };

@@ -83,6 +83,10 @@ Object.assign(kern, require('../kern/werkvormen')({ db }));
    levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
    net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
 Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  /* Codenaam en pas van de eigenaar, voor de catalogus-wensen op het kantoor.
+     Uit de sociale kern, die eerder is gebouwd -- zo staat er ook daar geen
+     echte naam in een lijst. */
+  codenaamVan: kern.codenaamVan, tierVan: kern.soortVan,
   ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
   /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
      (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur

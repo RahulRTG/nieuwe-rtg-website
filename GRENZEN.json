@@ -1146,7 +1146,7 @@
       "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
-      "conciergeDesk",
+      "catalogusWensBesluit", "catalogusWensen", "conciergeDesk",
       "conciergeInbox",
       "conciergeVoortgang",
       "eigenaar",

@@ -373,3 +373,18 @@ test('wetwacht slotcode: gewijzigd is 1, afgehandeld met vastleggen is 0, niets 
   assert.equal(wetwacht.slotcode([{ code: 'BRON_GEWIJZIGD', ernst: 'melden' }], true), 0);
   assert.equal(wetwacht.slotcode([]), 0);
 });
+
+/* De vooruitkijkende TLS-meting: de sonde meldt een certificaat dat binnen
+   veertien dagen verloopt als mislukte reis, terwijl al het andere nog
+   gewoon doorkomt. De triage moet dat als TLS duiden -- niet als 'deels'
+   (dan gaat iemand in een route zoeken) en zeker niet als aanleiding om
+   terug te rollen (een oude versie draagt hetzelfde certificaat). */
+test('triage: een verlopend certificaat is TLS, ook als de reizen nog slagen', () => {
+  const u = triage.duid([
+    { pad: '/', status: 200 },
+    { pad: '/api/gezond', status: 200 },
+    { reis: 'tls-geldigheid', status: 0, gelukt: false, reden: 'certificaat verloopt over 9 dagen -- de vernieuwing hoort rond dag 30 te draaien' }
+  ]);
+  assert.equal(u.laag, 'tls', 'vooraankondiging hoort bij de TLS-laag, niet bij een route');
+  assert.equal(u.terugrollen, false, 'een oude versie draagt hetzelfde certificaat');
+});

@@ -33,7 +33,7 @@ const fs = require('fs');
 /* De handtekeningen per laag. Ze staan bewust op volgorde van "verder weg" naar
    "dichterbij": lost de naam niet op, dan zegt een 502 verderop niets meer. */
 const DNS = /ENOTFOUND|EAI_AGAIN|ERR_NAME_NOT_RESOLVED|getaddrinfo/i;
-const TLS = /CERT_|ERR_TLS|DEPTH_ZERO|UNABLE_TO_VERIFY|SELF_SIGNED|ERR_SSL|handshake/i;
+const TLS = /CERT_|ERR_TLS|DEPTH_ZERO|UNABLE_TO_VERIFY|SELF_SIGNED|ERR_SSL|handshake|certificaat verloopt/i;
 const VERBINDING = /ECONNREFUSED|ECONNRESET|ETIMEDOUT|EHOSTUNREACH|ENETUNREACH|socket hang up/i;
 
 /* De sonde noemt zijn velden reis/reden, een toets schrijft liever pad/fout.

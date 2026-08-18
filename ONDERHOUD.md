@@ -73,6 +73,10 @@ Afspraken die de lus in bedwang houden:
   reacties.
 - **Alleen de hoofdlijn en de schema's.** Een rode feature-tak is werk in
   uitvoering, geen onderhoudsincident.
+- **Groen sluit het issue zelf.** Wordt de workflow na de fix weer groen,
+  dan sluit het bijbehorende issue zichzelf met de groene run als bewijs.
+  Flapperen levert bewust een spoor van korte issues op — dat is zichtbaar
+  waar één stil openstaand issue het juist verbergt.
 - **`herstel.yml` kan alleen issues schrijven.** Niet pushen, niet mergen,
   niet terugrollen, geen workflows starten. Wat de lus mag, staat in de
   `permissions:` van het bestand zelf — dat is de handhaving, geen belofte.
@@ -87,6 +91,14 @@ ding** — een app die stuk ging door wat er als laatste in ging. Bij `dns`,
 verdachte, en dan nog blijft de knop bij een mens. Een enkele stukke route
 (`deels`) rolt nooit terug: alles terugzetten voor iets wat op één plek zit
 is duurder dan de storing.
+
+De sonde kijkt sinds deze laag ook vooruit: elke ronde leest hij de
+einddatum van het certificaat via een kale TLS-handdruk. Onder de veertien
+dagen wordt dat een mislukte reis — niet omdat er iets stuk is, maar omdat
+gangbare vernieuwing rond dag dertig draait: wie op veertien zit heeft geen
+krap certificaat maar een kapotte vernieuwing, en dat is een incident dat
+alleen nog geen pijn doet. De triage duidt hem als `tls`, en terugrollen
+blijft daar uitdrukkelijk uit: een oude versie draagt hetzelfde certificaat.
 
 ## De wetwacht is de uitzondering
 

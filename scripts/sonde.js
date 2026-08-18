@@ -64,6 +64,31 @@ async function loop(reis) {
   };
 }
 
+/* Het certificaat van de basis-URL bekijken zonder er een verzoek overheen te
+   sturen: een kale TLS-handdruk, de einddatum lezen, weer weg. Levert null
+   als er niets te meten valt (http, of de handdruk faalt -- een kapotte
+   handdruk valt al op de reizen zelf en hoort daar thuis). */
+function certMonster(basisUrl) {
+  if (!/^https:/.test(basisUrl)) return Promise.resolve(null);
+  const { hostname, port } = new URL(basisUrl);
+  return new Promise(resolve => {
+    const tls = require('tls');
+    let klaar = false;
+    const af = uit => { if (!klaar) { klaar = true; try { s.destroy(); } catch {} resolve(uit); } };
+    const s = tls.connect({ host: hostname, port: Number(port) || 443, servername: hostname, timeout: 10000 }, () => {
+      const c = s.getPeerCertificate();
+      const dagen = Math.floor((new Date(c.valid_to).getTime() - Date.now()) / 86400000);
+      af({
+        at: new Date().toISOString(), reis: 'tls-geldigheid', status: 0, ms: 0, dagen,
+        gelukt: dagen >= 14, traag: false,
+        reden: dagen >= 14 ? null : 'certificaat verloopt over ' + dagen + ' dagen -- de vernieuwing hoort rond dag 30 te draaien'
+      });
+    });
+    s.on('error', () => af(null));
+    s.on('timeout', () => af(null));
+  });
+}
+
 (async () => {
   if (!REIZEN.length) {
     console.error('SLO.json draagt geen reizen. Zonder reizen is er niets te lopen.');
@@ -80,6 +105,19 @@ async function loop(reis) {
     console.log((m.gelukt ? (m.traag ? '⚠' : '✓') : '✗') + ' ' + reis.naam.padEnd(30) +
       String(m.status).padStart(4) + '  ' + String(m.ms).padStart(5) + ' ms' +
       (m.reden ? '  ' + m.reden : (m.traag ? '  trager dan de afgesproken ' + reis.maxMs + ' ms' : '')));
+  }
+
+  /* De vooruitkijkende TLS-meting. De reizen hierboven zien een verlopen
+     certificaat pas als het al stuk is; het certificaat zelf kondigt dat
+     weken eerder aan. Veertien dagen is de drempel omdat gangbare
+     vernieuwing (Let's Encrypt) rond dertig dagen voor het einde draait:
+     wie op veertien zit heeft geen krap certificaat maar een kapotte
+     vernieuwing, en dat is een incident dat alleen nog niet pijn doet. */
+  const cert = await certMonster(BASIS);
+  if (cert) {
+    monsters.push(cert);
+    console.log((cert.gelukt ? '\u2713' : '\u2717') + ' ' + 'tls-geldigheid'.padEnd(30) + '   -' +
+      '      - ms  ' + (cert.reden || ('certificaat nog ' + cert.dagen + ' dagen geldig')));
   }
 
   if (JSON_UIT) fs.writeFileSync(JSON_UIT, JSON.stringify({ basis: BASIS, monsters }, null, 2) + '\n');

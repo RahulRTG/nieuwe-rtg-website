@@ -103,3 +103,42 @@ jobs:
             gh issue create --repo "$REPO" --title "$TITEL" --label herstel --body "$BODY"
             echo "Geopend: $TITEL"
           fi
+
+  afmelden:
+    name: Groen sluit het fix-issue
+    # De andere helft van de lus. Een issue openen bij rood en het daarna
+    # laten staan is half werk: na de merge van de fix bleef het issue open
+    # tot iemand het met de hand sloot -- precies het soort handwerk dat
+    # deze laag wegneemt. Wordt de workflow weer groen op de hoofdlijn of op
+    # schema, dan sluit het bijbehorende issue zichzelf, met de groene run
+    # als bewijs erbij.
+    #
+    # Flappert een workflow (rood, groen, rood), dan ontstaat er per rode
+    # fase een nieuw issue. Dat is met opzet: flapperen is zelf een
+    # bevinding, en een spoor van korte issues maakt dat zichtbaar waar een
+    # issue dat stil open blijft staan het juist verbergt.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.head_branch == github.event.repository.default_branch ||
+       github.event.workflow_run.event == 'schedule')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Bijbehorend issue sluiten
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WF_NAAM: ${{ github.event.workflow_run.name }}
+          WF_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          set -eu
+          TITEL="herstel: ${WF_NAAM} is rood"
+          BESTAAND=$(gh issue list --repo "$REPO" --state open --label herstel \
+            --search "\"$TITEL\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$BESTAAND" ]; then
+            gh issue close "$BESTAAND" --repo "$REPO" \
+              --comment "Weer groen: ${WF_URL}. Dit issue sluit zichzelf; heropen het als de storing terugkomt."
+            echo "Gesloten: issue #$BESTAAND"
+          else
+            echo "Geen open herstel-issue voor deze workflow; niets te sluiten."
+          fi

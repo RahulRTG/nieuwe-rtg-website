@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 # De back-upsidecar gebruikt pg_dump uit het officiële PostgreSQL-image en
 # alleen de OpenSSL-CLI extra. Daarmee kan hij naar een publieke sleutel
 # versleutelen zonder ooit de offline privésleutel te bezitten.
-FROM postgres:16-alpine AS backup-runtime
+FROM postgres:18-alpine AS backup-runtime
 RUN apk add --no-cache openssl
 
 # RTG / RTFoundation productie-image.

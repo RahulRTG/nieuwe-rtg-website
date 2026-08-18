@@ -65,8 +65,8 @@
     // dat vak uitgerekt, dan wordt deze schaduw een ellips die ver boven en
     // onder de wijzerplaat uitloopt -- en de wijzerplaat verraadt dat niet,
     // want de SVG houdt zijn eigen verhouding en blijft rond. Wie de klok
-    // ergens een maat geeft: houd breedte en hoogte gelijk (zie de twee
-    // gelijke bovengrenzen bij .os-klokvak in apps/app.html, en de toets
-    // "het vak van de klok op het beginscherm is vierkant").
+    // ergens een maat geeft: houd breedte en hoogte gelijk. (Het voorbeeld hier
+    // was .os-klokvak op het beginscherm van apps/app.html, met twee gelijke
+    // bovengrenzen; die klok is weg -- zie WERELD.md -- maar de val niet.)
     '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
       'box-shadow:0.18rem 0.22rem 0.7rem rgba(0,0,0,0.34), 0.7rem 0.85rem 2.2rem rgba(0,0,0,0.22);}' +

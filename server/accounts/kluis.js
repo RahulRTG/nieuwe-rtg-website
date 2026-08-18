@@ -71,7 +71,7 @@ function phoneHash(phone) {
    naar buiten, zodat aanroepers niets van de knip merken -- zelfde vorm als
    ./users.js met ./tokens.js. */
 const wachtwoord = require('./wachtwoord');
-const { scryptAsync, hashPasswordSync, hashPassword, verifyPassword, moetVernieuwen,
+const { scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen,
   SCRYPT_N, SCRYPT_R, SCRYPT_P } = wachtwoord;
 
 
@@ -84,6 +84,6 @@ function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).
 
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
-  scryptAsync, hashPasswordSync, hashPassword, verifyPassword, moetVernieuwen, makeCodename, sign,
+  scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen, makeCodename, sign,
   SCRYPT_N, SCRYPT_R, SCRYPT_P
 };

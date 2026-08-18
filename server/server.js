@@ -328,7 +328,12 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      /* createStaffDemo en niet createStaffSync: dit zijn 183 rijen met een
+         pincode die twee regels hierboven te lezen is. Op volle scrypt-kosten
+         duurde deze lus alleen al twintig seconden voor 'listen' -- zie
+         server/accounts/wachtwoord.js bij hashDemoSync voor het waarom en de
+         drie grendels eromheen. */
+      people.forEach(([name, role, func], i) => accounts.createStaffDemo({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,

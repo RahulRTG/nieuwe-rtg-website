@@ -12,6 +12,7 @@
    als een kist gaat boarden terwijl de grenscontrole nog niet rond is.
    De AI-wachtcommandant adviseert; beslissen doet de marechaussee zelf.
    Vast patroon: maakMarechaussee(state) -> { kmar: api }. */
+const { demoAan } = require('./demostand');
 
 const ZONES = ['Terminal', 'Security-filters', 'Luchtzijde', 'Platform', 'Koninklijke Vleugel', 'Landzijde'];
 const BESLUITEN = ['akkoord', 'nader-onderzoek', 'vrijgegeven'];
@@ -32,9 +33,13 @@ function maakMarechaussee({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     require('../seed/genres').zetGenre(db, 'marechaussee');
+    // verzonnen instelling: alleen in demostand aanmaken (kern/demostand.js)
+    if (!demoAan()) return;
     if (!db.data.suppliers.find(s => s.code === 'KMAR')) {
       db.data.suppliers.push({
         code: 'KMAR', name: 'Brigade RTG Airport', type: 'marechaussee', city: 'Ibiza',
+        // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
+        geseed: true,
         loc: { lat: 38.872, lng: 1.371, label: 'Brigade RTG Airport' }, rate: 0, menu: [], photos: [], marechaussee: {}
       });
     }

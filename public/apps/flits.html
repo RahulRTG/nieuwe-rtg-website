@@ -123,8 +123,13 @@
   // rustige spraak, alleen als het ertoe doet (nadering); geen gebabbel
   const spreek = t => { try { const u = new SpeechSynthesisUtterance(t); u.lang = 'nl-NL'; u.rate = 1.02; speechSynthesis.speak(u); } catch (e) {} };
 
-  const LAND = 'ES';                        // demo: Ibiza; in productie uit de live-locatie
-  let hier = { lat: 38.9089, lng: 1.4330 }; // demo-startpunt tot de gps spreekt
+  const LAND = 'ES';
+  /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
+     de gps spreekt". Dat is geen startpunt maar een bewering: dit scherm meldt
+     flitsers en files ROND JOU, en met dat punt keek je naar een eiland waar je
+     niet bent. Zonder locatie weten we niet waar je bent, en dat zegt het
+     scherm dan ook. */
+  let hier = null;
   let rond = null, alarmMelding = null, gesproken = {};
 
   /* Meenemen (shared/uitvoer.js): de meldingen die het netwerk rond u heeft
@@ -143,9 +148,11 @@
   /* ---- gps: snelheid en positie ---- */
   /* De schakelaar blijft de baas, maar zwijgen is hier geen optie: een
      snelheidsmeter zonder je positie meet niets. shared/plek.js vraagt het een
-     keer met de reden erbij; zeg je nee, dan blijft het demo-startpunt staan en
-     vraagt hij deze sessie niet opnieuw. De rauwe watchPosition blijft, want we
-     hebben coords.speed nodig en niet alleen de plek. */
+     keer met de reden erbij; zeg je nee, dan blijft het scherm leeg en zegt het
+     waarom. De rauwe watchPosition blijft, want we hebben coords.speed nodig en
+     niet alleen de plek. `opPlek` laat de opstart weten dat de eerste fix er is:
+     zonder plek valt er niets te tonen, met plek begint alles. */
+  let opPlek = null;
   async function gpsStart() {
     if (!('geolocation' in navigator)) return;
     if (window.RTGPlek && !RTGPlek.aan()) {
@@ -157,9 +164,11 @@
     }
     {
     navigator.geolocation.watchPosition(p => {
+      const eerste = !hier;
       hier = { lat: p.coords.latitude, lng: p.coords.longitude };
       const kmu = p.coords.speed != null ? Math.max(0, Math.round(p.coords.speed * 3.6)) : null;
       if (kmu != null) $('#snelheid').textContent = kmu;
+      if (eerste && opPlek) { const f = opPlek; opPlek = null; f(); }
     }, () => {}, { enableHighAccuracy: true });
     }
   }
@@ -177,6 +186,7 @@
     if (!gesproken[m.id]) { gesproken[m.id] = true; spreek(m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' meter' : m.afstandKm + ' kilometer')); }
   }
   async function ververs() {
+    if (!hier) return;                       // zonder plek is "rond mij" een lege vraag
     const r = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
     if (r.status !== 200) return;
     rond = r.body;
@@ -191,6 +201,7 @@
       const b = document.createElement('button'); b.type = 'button';
       b.innerHTML = '<span class="i" aria-hidden="true">' + s.icoon + '</span>' + s.naam;
       b.addEventListener('click', async () => {
+        if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om te kunnen melden.');
         const m = await api('meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND });
         if (m.body.error) return zeg(m.body.error);
         zeg(m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
@@ -240,6 +251,19 @@
   /* ---- start ---- */
   (async () => {
     if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    /* Zonder plek valt er niets te tonen. We wachten op de eerste fix in plaats
+       van een punt te verzinnen; komt hij niet, dan zegt de poort waarom. */
+    if (!hier) {
+      const gekregen = await new Promise(klaar => {
+        opPlek = () => klaar(true);
+        setTimeout(() => { if (opPlek) { opPlek = null; klaar(false); } }, 12000);
+      });
+      if (!gekregen) {
+        $('#poortReden').textContent = 'Dit scherm werkt op je locatie: flitsers, files en gevaar rond jou. Zet je locatie aan in het bedieningspaneel en open hem opnieuw.';
+        $('#vPoort').classList.remove('weg');
+        return;
+      }
+    }
     const eerste = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
     if (eerste.status !== 200) { $('#poortReden').textContent = eerste.body.error || 'Log eerst in via de app.'; $('#vPoort').classList.remove('weg'); return; }
     $('#vRit').classList.remove('weg');

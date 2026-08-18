@@ -24,24 +24,24 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
-/* DRIE DAGEN, EN DAT GETAL IS EEN BESLUIT.
+/* VEERTIEN DAGEN, en dat getal staat er weer omdat het PRODUCT is veranderd.
 
-   Hier stond veertien, en daarmee was deze toets een tijdbom die op sommige
-   kalenderdagen afging. kern/socialegraaf/lijn.js toont alleen GEVULDE vakken
-   tot en met "deze maand"; wat in het vak `later` valt wordt geteld en niet
-   getoond. Veertien dagen vooruit springt over een maandgrens zodra je na
-   ongeveer de zestiende van de maand draait -- dan belandt de bijeenkomst in
-   `later` en staat hij dus niet op de lijn, terwijl de toets dat wel eist.
+   Deze toets stond even op drie dagen. Reden: de momentlijn eindigde op "deze
+   maand", en die krimpt naar nul aan het eind van een maand -- veertien dagen
+   vooruit sprong dan over de maandgrens, viel in de telling `later` en stond
+   dus niet op de lijn. De toets was daarmee afhankelijk van de kalenderdag
+   waarop je hem draaide, en dat is een tijdbom.
 
-   Op 18 augustus 2026 gebeurde dat: +14 = 1 september, vak `later`, toets rood
-   -- en dat gold ook op de basis van deze tak, dus het is geen regressie maar
-   een toets die zijn eigen aanname niet waarmaakte.
+   De toets terugbuigen was toen het eerlijke antwoord op een rode suite, maar
+   niet het goede antwoord op de vraag eronder: waarom zou een afspraak over
+   twee weken onzichtbaar zijn? Dat is nu opgelost waar het hoorde, in
+   kern/socialegraaf/lijn.js: de lijn heeft een uitgesproken horizon van vijf
+   weken en noemt de maanden daarbinnen bij naam. Veertien dagen valt daar
+   altijd binnen, op elke dag van de maand.
 
-   Drie dagen valt ALTIJD in een getoond vak: n <= rest + 7 is waar voor elke
-   dag van de week, want rest is minstens nul. Daarmee toetst deze toets weer
-   wat hij bedoelt -- dat een echte bijeenkomst de lijn haalt -- in plaats van
-   ook nog waar we in de maand staan. */
-const STRAKS = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
+   Dat het hier weer veertien is, is dus geen terugdraaiing maar de bewering die
+   de wijziging draagt. */
+const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -140,7 +140,7 @@ test('een echte bijeenkomst belandt op de lijn, in een vak met een naam', async 
   const d = await json(r);
   const alle = (d.vakken || []).flatMap(v => v.regels.map(x => x.titel));
   assert.ok(alle.includes('Proefborrel'),
-    'de bijeenkomst van over drie dagen hoort op de lijn te staan');
+    'de bijeenkomst van over twee weken hoort op de lijn te staan');
 
   for (const v of d.vakken) {
     assert.ok(v.label, 'elk vak draagt een naam');

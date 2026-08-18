@@ -1,8 +1,8 @@
 {
   "vastgelegd": "2026-08-18",
   "vervalregel": {
-    "vanaf": "2026-08-18",
-    "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). De 62 notities van voor deze datum zijn het register zoals het is geschreven en worden niet met terugwerkende kracht ingedeeld -- scripts/normverval.js keurt alleen wat vanaf hier bij komt. Zonder die grens zou de regel over de eigen historie struikelen en binnen een dag zijn uitgezet."
+    "vanaf": "2026-08-19",
+    "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). De 64 notities van voor deze datum zijn het register zoals het is geschreven en worden niet met terugwerkende kracht ingedeeld -- scripts/normverval.js keurt alleen wat vanaf hier bij komt. Zonder die grens zou de regel over de eigen historie struikelen en binnen een dag zijn uitgezet. DE GRENS STOND EERST OP 18 AUGUSTUS EN IS EEN DAG OPGESCHOVEN, en dat is geen verzachting maar dezelfde redenering nog een keer: main schreef diezelfde dag twee notities op een eigen tak, waar deze regel niet bestond. CI ving dat op bij het samengaan. Allebei dragen ze een uitgebreide reden; wat ze missen is het veld dat er toen nog niet was. Ze alsnog indelen zou betekenen dat ik een andere schrijver een soort in de mond leg -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Vanaf 19 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "meters": {
     "endpointsZonderTest": 1192,

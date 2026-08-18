@@ -48,7 +48,10 @@ module.exports = function start(deps) {
   });
 
   require('./opslagstart')({ log, accounts, initRealtime, startGedeeld, startSqliteSync,
-    startPostgres, DEMO, zetEigenaarsAccount });
+    startPostgres, DEMO, zetEigenaarsAccount,
+    // de papieren van het demopersoneel; draait daar direct na initRealtime()
+    demoPapieren: () => require('../kern/staffseed-papieren').zaaiPapieren({
+      db, save, accounts, findSupplier: kern.findSupplier, log }) });
 
   /* Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
      opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke

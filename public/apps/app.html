@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="69430752">
+<meta name="rtg-bouw" content="c4dc548f">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -191,6 +191,19 @@
   .vbtn{align-self:flex-start;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .vbtn:active{opacity:0.85;}
   .vbanner .vbtn{margin-top:0.55rem;}
+  /* De regels in de vakbewijs-banner: een dunne lijn per stuk, verder niets --
+     geen tweede visueel device naast de banner die er al staat. De kleur zegt
+     de stand en is het enige signaal: goud = wacht op RTG, bordeaux = er moet
+     iets van jou komen. */
+  .vakrij{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;
+    border-top:1px solid var(--line);padding:0.6rem 0 0.2rem;margin-top:0.5rem;}
+  .vakrij .vbtn{margin-top:0;}
+  .vaksub{font-size:0.72rem;color:var(--muted);line-height:1.45;}
+  .vak-ok{color:var(--muted);}
+  .vak-pending{color:var(--gold);}
+  /* --burgundy en niet --burgundy-on-dark: dat laatste bestaat in dit scherm
+     niet, en dan gooit de browser de hele regel weg zonder iets te melden. */
+  .vak-open{color:var(--burgundy);}
 
   /* ---------- app-chroom ---------- */
 
@@ -1806,6 +1819,10 @@
         <!-- Je identiteit hoort bij je reis: geverifieerd boeken gaat in één
              tik, en partners vragen hier je paspoort op voor de check-in. -->
         <div id="verifyBanner"></div>
+        <!-- En de papieren die bij je WERK horen (VOG, BIG, legitimatiebewijs).
+             Dezelfde beweging als de identiteit hierboven, maar over een beroep;
+             hij verschijnt alleen als je werk erom vraagt. -->
+        <div id="vakbewijsBanner"></div>
         <input type="file" id="verifyFile" accept="image/*" style="display:none;">
         <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
         <div id="paspoortInbox"></div>

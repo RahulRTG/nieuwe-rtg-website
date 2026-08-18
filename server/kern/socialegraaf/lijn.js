@@ -3,7 +3,27 @@
    LEVEN IN PLAATS VAN POSTS. Een sociale app toont een stroom berichten,
    nieuwste eerst, en die stroom houdt nooit op. Deze lijn toont iets anders:
    wat er in uw leven aankomt, in de tijdvakken waarin een mens denkt. Vandaag.
-   Morgen. Vrijdag. Volgende week. Deze maand. Later.
+   Morgen. Vrijdag. Volgende week. Deze maand. September.
+
+   DE HORIZON IS EEN BESLUIT EN GEEN BIJWERKING VAN DE KALENDER, en dat was hij
+   wel. De ladder eindigde op "deze maand", en die krimpt: op de derde van de
+   maand reikt hij dertig dagen vooruit, op de vijfentwintigste nog vijf. Alles
+   daarachter viel in `later`, en `later` is een telling en geen vak. Dus:
+
+     op 3 augustus zag je een afspraak op 20 augustus;
+     op 25 augustus zag je een afspraak op 8 september NIET.
+
+   Dezelfde afstand -- veertien dagen -- en toch een ander antwoord, puur omdat
+   er toevallig een maandgrens tussen lag. Voor wie de lijn leest is dat niet
+   uit te leggen: zijn eigen horizon zwabberde tussen een week en vijf weken,
+   zonder dat iemand daarvoor had gekozen.
+
+   Nu staat er wel een keuze: VIJF WEKEN (`HORIZON_DAGEN`). Dat is de afstand
+   waarop een mens nog vooruit plant -- "over twee weken", "over een maand" --
+   en hij overspant hooguit twee maandgrenzen, dus de ladder blijft kort. Wat
+   binnen de horizon valt en niet meer in deze maand past, krijgt de NAAM van
+   zijn maand ("September"), want zo zegt een mens het ook. Wat erbuiten valt,
+   blijft een telling.
 
    HIJ HAALT NIETS OP, EN DAT IS DE HELE OPZET. De bronnen staan in ./bronnen.js
    en de termijnen komen uit de Control Tower; deze laag krijgt het BEELD van de
@@ -43,6 +63,25 @@ const { vandaag, isDatum } = require('./hulp');
    schermtaal; de sleutel blijft machineleesbaar. */
 const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
+/* De maandnamen, voor de vakken voorbij deze maand. Schermtaal, net als WD --
+   en met opzet zonder jaartal: binnen vijf weken is "September" niet dubbelzinnig,
+   en een jaartal in een vaklabel zou een getal zijn waar er geen hoort. */
+const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni',
+  'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+
+/* HOE VER DE LIJN VOORUIT KIJKT. Vijf weken: ver genoeg voor "over twee weken"
+   en "over een maand", kort genoeg om geen archief te worden. Verander je dit
+   getal, dan verandert wat een lid van zijn eigen leven ziet -- dat is een
+   besluit en geen instelling. */
+const HORIZON_DAGEN = 35;
+
+/* Hoeveel maanden ligt deze datum voorbij de huidige? Op de maand gerekend en
+   niet op dagen, want dat is wat het vak betekent. */
+function maandAfstand(nu, datum) {
+  return (Number(datum.slice(0, 4)) - Number(nu.slice(0, 4))) * 12 +
+    (Number(datum.slice(5, 7)) - Number(nu.slice(5, 7)));
+}
+
 /* Op het middaguur rekenen, zodat een zomertijdgrens nooit een dag verschuift --
    dezelfde truc als in levensgraaf/hulp.js, en om dezelfde reden. */
 const dagen = (van, tot) =>
@@ -74,7 +113,19 @@ module.exports = () => {
       return { sleutel: 'wd' + wd, label: WD[wd].charAt(0).toUpperCase() + WD[wd].slice(1), rang: 2 + n };
     }
     if (n <= rest + 7) return { sleutel: 'volgendeweek', label: 'Volgende week', rang: 20 };
-    if (datum.slice(0, 7) === nu.slice(0, 7)) return { sleutel: 'dezemaand', label: 'Deze maand', rang: 30 };
+
+    /* Voorbij volgende week telt de MAAND, niet de kalendergrens alleen. Een
+       datum in deze maand heet "Deze maand"; een datum daarna heet bij zijn
+       naam, zolang hij binnen de horizon valt. Een formule en geen twee takken:
+       de afstand in maanden bepaalt zowel de sleutel als de volgorde, dus een
+       derde maand kan er nooit tussenuit vallen. */
+    if (n <= HORIZON_DAGEN) {
+      const m = maandAfstand(nu, datum);
+      if (m === 0) return { sleutel: 'dezemaand', label: 'Deze maand', rang: 30 };
+      const naam = MAANDEN[Number(datum.slice(5, 7)) - 1];
+      return { sleutel: 'maand:' + datum.slice(0, 7),
+        label: naam.charAt(0).toUpperCase() + naam.slice(1), rang: 30 + m };
+    }
     return { sleutel: 'later', label: 'Later', rang: 40 };
   }
 

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '69430752';
+var RTG_BOUW = 'c4dc548f';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -88,10 +88,44 @@ var RTG_BOUW = '69430752';
   const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   let user = null;
-  let invoices = [];
-  let trip = null;
-  let posts = [];
-  let creatorLikes = 0;
+  let invoices = [
+    {id:'RTG-2026-0158', desc:'Ibiza, Aguamarina, 3 nachten', netto:1740, bijdrage:150, status:'open', date:'Vervalt 28 juli 2026'},
+    {id:'RTG-2026-0141', desc:'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto:2240, bijdrage:180, status:'open', date:'Vervalt 15 augustus 2026'},
+    {id:'RTG-2026-0093', desc:'Privejet Schiphol - Ibiza (retour, gedeeld)', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
+    {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
+  ];
+  let trip = {
+    dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
+    items:[
+      {when:'18 jul', title:'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
+      {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
+      {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
+      {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · 21:00 uur', status:'req', label:'In aanvraag'},
+      {when:'20 jul', title:'Privéboot naar Formentera', sub:'Met de groep · 10:00 uur', status:'paid', label:'Bevestigd'},
+      {when:'21-25 jul', title:'Villa Bahia Ibiza, Cala Jondal', sub:'4 nachten, eigen zwembad', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
+    ]
+  };
+  let posts = [
+    {id:1, author:'Katja Kiss', tier:'rtg', place:'Ibiza', visual:'v-ibiza',
+     text:'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Rahul kwam met de privéjet, wij pakten de ochtendvlucht, en toch checken we samen in.',
+     likes:168, liked:false, comments:[{who:'Timothy de Groot', tier:'rtg', text:'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.'}]},
+    {id:2, author:'Rahul Imran', tier:'business', place:'Ibiza', visual:'v-ibiza',
+     text:'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De jet stond klaar op Schiphol Business Aviation.',
+     likes:96, liked:false, comments:[]},
+    {id:3, author:'Fleur Johanna', tier:'lifestyle', place:'Gstaad', visual:'v-gstaad',
+     text:'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen de piste op. Op je 69e mag dat.',
+     likes:132, liked:false, comments:[
+       {who:'Marieke Hooi', tier:'lifestyle', text:'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.'},
+       {who:'William Draak', tier:'business', text:'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.'}
+     ]},
+    {id:4, author:'Dani da Cruz Carvalho', tier:'business', place:'Monaco', visual:'v-monaco',
+     text:'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw.',
+     likes:214, liked:false, comments:[]},
+    {id:5, author:'Feroz Mohammed', tier:'business', place:'Dubai', visual:'v-dubai',
+     text:'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.',
+     likes:78, liked:false, comments:[]}
+  ];
+  let creatorLikes = 320;
   let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
 
   /* ---------- backend-koppeling ---------- */
@@ -110,61 +144,6 @@ var RTG_BOUW = '69430752';
   }
   // Een PDF (factuur, overzicht) ophalen met het token en als download aanbieden.
   async function downloadPdf(pad, body, filename){
-  /* ---------- de inhoud van de expliciete demostand ----------
-
-     Deze drie lijsten stonden als BEGINWAARDE van `invoices`, `trip` en `posts`
-     in app-main-01.js. applyState() overschrijft wat de server stuurt -- maar
-     een reis die er niet is, stuurt de server niet mee (`if (state.trip)`), en
-     dan bleef de reis naar Ibiza gewoon staan. Wie zich echt aanmeldde zag
-     daardoor op zijn eigen beginscherm een villa in Cala Jondal en vier
-     facturen op zijn naam. De server begint een nieuw account leeg
-     (server/kern/lid.js); dit was de laatste plek waar de demo nog voor
-     persoonlijke gegevens doorging.
-
-     De demo gaat nergens heen, hij staat alleen apart: laadDemoData() in
-     app-main-03.js zet hem klaar in de expliciete demostand (?demo=1, zonder
-     backend), waar er per definitie geen echt account is om iets van te tonen. */
-  const DEMO_DATA = {
-    invoices: [
-      {id:'RTG-2026-0158', desc:'Ibiza, Aguamarina, 3 nachten', netto:1740, bijdrage:150, status:'open', date:'Vervalt 28 juli 2026'},
-      {id:'RTG-2026-0141', desc:'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto:2240, bijdrage:180, status:'open', date:'Vervalt 15 augustus 2026'},
-      {id:'RTG-2026-0093', desc:'Privejet Schiphol - Ibiza (retour, gedeeld)', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
-      {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
-    ],
-    trip: {
-      dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
-      items:[
-        {when:'18 jul', title:'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
-        {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
-        {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
-        {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · 21:00 uur', status:'req', label:'In aanvraag'},
-        {when:'20 jul', title:'Privéboot naar Formentera', sub:'Met de groep · 10:00 uur', status:'paid', label:'Bevestigd'},
-        {when:'21-25 jul', title:'Villa Bahia Ibiza, Cala Jondal', sub:'4 nachten, eigen zwembad', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
-      ]
-    },
-    posts: [
-      {id:1, author:'Katja Kiss', tier:'rtg', place:'Ibiza', visual:'v-ibiza',
-       text:'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Rahul kwam met de privéjet, wij pakten de ochtendvlucht, en toch checken we samen in.',
-       likes:168, liked:false, comments:[{who:'Timothy de Groot', tier:'rtg', text:'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.'}]},
-      {id:2, author:'Rahul Imran', tier:'business', place:'Ibiza', visual:'v-ibiza',
-       text:'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De jet stond klaar op Schiphol Business Aviation.',
-       likes:96, liked:false, comments:[]},
-      {id:3, author:'Fleur Johanna', tier:'lifestyle', place:'Gstaad', visual:'v-gstaad',
-       text:'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen de piste op. Op je 69e mag dat.',
-       likes:132, liked:false, comments:[
-         {who:'Marieke Hooi', tier:'lifestyle', text:'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.'},
-         {who:'William Draak', tier:'business', text:'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.'}
-       ]},
-      {id:4, author:'Dani da Cruz Carvalho', tier:'business', place:'Monaco', visual:'v-monaco',
-       text:'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw.',
-       likes:214, liked:false, comments:[]},
-      {id:5, author:'Feroz Mohammed', tier:'business', place:'Dubai', visual:'v-dubai',
-       text:'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.',
-       likes:78, liked:false, comments:[]}
-    ],
-    creatorLikes: {rtg:320, lifestyle:680, business:210}
-  };
-
     if (!API.token) return;
     try {
       const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });
@@ -430,17 +409,6 @@ var RTG_BOUW = '69430752';
       .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
-  /* De expliciete demostand (?demo=1, zonder backend) laadt zijn inhoud hier,
-     op het moment dat iemand er echt voor kiest. Stond die inhoud als
-     beginwaarde in app-main-01.js, dan droeg ELK scherm hem -- ook dat van een
-     echt, leeg account (zie de uitleg bij DEMO_DATA). */
-  function laadDemoData(tier){
-    invoices = JSON.parse(JSON.stringify(DEMO_DATA.invoices));
-    trip = JSON.parse(JSON.stringify(DEMO_DATA.trip));
-    posts = JSON.parse(JSON.stringify(DEMO_DATA.posts));
-    creatorLikes = DEMO_DATA.creatorLikes[tier] || 0;
-  }
-
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
@@ -469,7 +437,7 @@ var RTG_BOUW = '69430752';
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
         }
-        tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
+        tier = 'business'; user = {...PERSONAS[tier]};
       }
     } else {
       if (API.enabled){
@@ -479,11 +447,12 @@ var RTG_BOUW = '69430752';
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (explicieteDemo) {
-        user = {...PERSONAS[tier]}; laadDemoData(tier);
+        user = {...PERSONAS[tier]};
       } else {
         toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
       }
     }
+    if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
@@ -1350,40 +1319,9 @@ var RTG_BOUW = '69430752';
       if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
   }
-  /* Het inrichten: ná het tekenen biedt Rahul één keer aan in te vullen wat de
-     gegevenspoort anders per keer komt vragen. Een aanbod, geen poort -- waarom
-     en waar het landt staat in server/kern/onboarding/inrichten.js. */
-  let onbInr = [], onbInrHuidig = null;
-  async function onbInrichtenAanbod(){
-    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbMeebouwen(); }
-    if (!st || st.klaar || !(st.open || []).length) return onbMeebouwen();
-    onbInr = st.open.slice(); onbStap = 'inrichten-aanbod';
-    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.inr.aanbod','Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Zal ik ze nu in één keer doorlopen?'));
-    onbActies([{ txt: T('onb.inr.ja','Ja, nu meteen'), prim: true, doe: onbInrVolgende },
-      { txt: T('onb.inr.later','Liever later'), doe: onbMeebouwen }]);
-  }
-  function onbInrVolgende(){
-    if (!onbInr.length) return onbMeebouwen();
-    onbInrHuidig = onbInr.shift(); onbStap = 'inrichten';
-    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
-    if (rij) rij.style.display = '';
-    if (inp){ inp.type = onbInputType(onbInrHuidig.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
-    // het waarom staat erbij: nooit een veld zonder de handeling die erom vraagt
-    onbZeg(onbInrHuidig.vraag + ' ' + (onbInrHuidig.waarom || ''));
-    onbActies([{ txt: T('onb.inr.sla','Sla dit over'), doe: onbInrVolgende }]);
-    if (inp) inp.focus();
-  }
-  async function onbInrOpslaan(t){
-    const velden = {}; velden[onbInrHuidig.id] = t;
-    onbBezig = true;
-    try { await API.call('/onboarding/inricht', { velden }); } catch(e){}
-    onbBezig = false; onbInrVolgende();
-  }
-
   function onbKlaar(){
     const g = onbEl('onbGate'); if (g) g.hidden = true;
-    onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null; onbMb = []; onbMbHuidig = null;
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
     naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
@@ -1404,19 +1342,13 @@ var RTG_BOUW = '69430752';
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
       } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
-    } else if (onbStap === 'inrichten'){
-      if (!tekst || !onbInrHuidig) return;
-      return onbInrOpslaan(tekst);
-    } else if (onbStap === 'meebouw'){
-      if (!tekst || !onbMbHuidig) return;
-      return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
       if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
       onbBezig = true;
       try {
         const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
         onbBezig = false; onbSt = r;
-        if (r && r.klaar) return onbInrichtenAanbod();
+        if (r && r.klaar) return onbKlaar();
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
@@ -1457,64 +1389,6 @@ var RTG_BOUW = '69430752';
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
-  /* Vervolg van app-main-08: het meebouwen aan het eind van de onboarding.
-     Apart bestand omdat deel 08 over de 10 kB van het modulebeleid ging; de
-     naad ligt op een top-niveau-grens, dus de functies staan nog gewoon in
-     dezelfde omhulling als de rest van de poort. */
-  /* Meebouwen: het eerste Salon-bericht en het eigen bedrijf. Hier staat WEL een
-     vinkje en bij het inrichten niet, en dat is het verschil: deze twee verlaten
-     het lid echt. Uit staat uit. Zie server/kern/onboarding/meebouwen.js. */
-  let onbMb = [], onbMbHuidig = null, onbMbJa = false;
-  async function onbMeebouwen(){
-    let st; try { st = await API.call('/onboarding/meebouwen'); } catch(e){ return onbKlaar(); }
-    if (!st || st.klaar || !(st.open || []).length) return onbKlaar();
-    onbMb = st.open.slice(); onbMbVolgende();
-  }
-  function onbMbVolgende(){
-    if (!onbMb.length) return onbKlaar();
-    onbMbHuidig = onbMb.shift(); onbMbJa = false; onbStap = 'meebouw';
-    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
-    if (rij) rij.style.display = '';
-    if (inp){ inp.type = 'text'; inp.value = '';
-      inp.placeholder = onbMbHuidig.id === 'salon' ? T('onb.mb.ph1','Schrijf iets') : T('onb.mb.ph2','Naam van je bedrijf'); }
-    onbZeg(onbMbHuidig.vraag);
-    onbMbKnoppen();
-    if (inp) inp.focus();
-  }
-  /* Het vinkje als knop: uit is uit, en je ziet wat aan staat. Kan het gegeven
-     niet -- de gratis laag mag geen bedrijf aanmelden voor de catalogus -- dan
-     is er geen schakelaar maar een zin: een vinkje dat niets doet is erger dan
-     geen vinkje. De server zegt dat met catalogusMag. */
-  function onbMbKnoppen(){
-    if (onbMbHuidig.catalogusMag === false){
-      onbZeg(onbMbHuidig.vraag + ' ' + onbMbHuidig.toestemming);
-      return onbActies([{ txt: T('onb.mb.sla','Sla dit over'), doe: onbMbVolgende }]);
-    }
-    onbActies([
-      { txt: (onbMbJa ? '\u2713 ' : '') + onbMbHuidig.toestemming, doe: function(){ onbMbJa = !onbMbJa; onbMbKnoppen(); } },
-      { txt: T('onb.mb.sla','Sla dit over'), doe: onbMbVolgende }
-    ]);
-  }
-  async function onbMbOpslaan(t){
-    onbBezig = true;
-    const fout = onbEl('onbFout');
-    try {
-      if (onbMbHuidig.id === 'salon') await API.call('/onboarding/salonpost', { tekst: t, promoMag: onbMbJa });
-      else {
-        const r = await API.call('/onboarding/bedrijf', { naam: t, catalogus: onbMbJa });
-        // Rahul zegt wat er NU gebeurt; nooit "geregeld"
-        if (r && r.vervolg) toast(r.vervolg);
-      }
-    } catch(e){ if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
-    onbBezig = false; onbMbVolgende();
-  }
-
-  /* Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart.
-     Geknipt toen deel 08 met het inrichten (de onboarding-stap erboven) over de
-     10 KB-lat ging, en langs de enige naad die er zat: hierboven is het gesprek
-     bij de voordeur, hieronder De Salon. Let op de STAART: renderSnapsStories
-     loopt door in deel 09, precies zoals hij dat in 08 deed -- die grens is
-     alleen van bestand veranderd, niet van plek. */
   function snapOverlay(){
     let ov = document.getElementById('snapOv'); if (ov) return ov;
     ov = document.createElement('div'); ov.id='snapOv';
@@ -3229,18 +3103,10 @@ var RTG_BOUW = '69430752';
       return;
     }
     try {
-      /* De stad komt van de EIGEN reis. Stond hier onvoorwaardelijk trip.dest,
-         en trip was altijd gevuld -- desnoods met de demo-reis, waardoor elk lid
-         "RTG-partners in Ibiza" te zien kreeg. Zonder reis vragen we de hele
-         lijst op en zegt de ondertitel dat ook. */
-      const stad = trip ? trip.dest : null;
-      const [sd, od] = await Promise.all([API.call('/suppliers', stad ? { city: stad } : {}), API.call('/orders/mine')]);
+      const [sd, od] = await Promise.all([API.call('/suppliers', { city: trip.dest }), API.call('/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
-      const waar = sd.city || stad;
-      $('#tpSub').textContent = waar
-        ? T('app.tp.partnersin','RTG-partners in') + ' ' + waar + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.')
-        : T('app.tp.partnersall','Alle RTG-partners: bestel, betaal en reserveer. Zodra er een reis staat, ziet u hier de partners op uw bestemming.');
+      $('#tpSub').textContent = T('app.tp.partnersin','RTG-partners in') + ' ' + (sd.city || trip.dest) + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.');
     } catch (e) { return; }
 
     renderLive();  // live "onderweg"-paneel bovenaan
@@ -6468,6 +6334,7 @@ var RTG_BOUW = '69430752';
 
   function renderHome(){
     renderVerifyBanner();
+    laadVakbewijs();
     laadPaspoortInbox();
     // gratis gebruiker (zonder pas): beperkte, veilige startpagina
     if (user.tier === 'guest'){ renderHomeGuest(); return; }
@@ -6491,50 +6358,19 @@ var RTG_BOUW = '69430752';
 
     // Deze twee kaarten met Util.el: tekst structureel veilig, data-goto blijft
     // (de globale [data-goto]-binding onderaan pakt de knoppen op).
-    /* GEEN REIS IS EEN UITNODIGING, GEEN LEEG VAK.
-
-       Een nieuw account begint leeg (server/kern/lid.js), dus dit is het eerste
-       dat een echt nieuw lid hier ziet. Vroeger stond er de reis van de demo --
-       Ibiza, een villa in Cala Jondal -- en dat leek een boeking op zijn naam.
-       Nu staat er wat dit vak IS en wat het lid moet doen om het te vullen. */
-    Util.vervang($('#homeTrip'), trip
-      ? [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
-         E('div', { class: 'big' }, trip.dest),
-         E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
-         E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →')]
-      : [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
-         E('div', { class: 'big' }, T('app.notrip', 'Nog niets gepland')),
-         E('div', { class: 'meta' }, stem(
-             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.',
-             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier: eerst als aanvraag, bevestigd zodra een reisadviseur hem rond heeft.',
-             'Vraagt u een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.')
-           || T('app.notrip.sub', 'Request a trip at the travel desk. From that moment it stands here: as a request first, and confirmed once a travel adviser has it settled.')),
-         E('button', { class: 'go js-naarreisbureau' },
-           (stem('Naar het reisbureau', 'Naar het reisbureau', 'Naar het reisbureau')
-             || T('app.notrip.go', 'To the travel desk')) + ' →')]);
-    /* De knop wijst naar de plek waar een reis ECHT ontstaat: het reisbureau
-       (/apps/reisbureau.html). Daar vraag je een reis aan, en vanaf dat moment
-       staat hij in je dossier -- als aanvraag, tot een reisadviseur hem
-       bevestigt (server/kern/lid/reisdossier.js). Het is een eigen app en geen
-       tabblad hier, dus geen data-goto maar een gewone navigatie. */
-    const naarRb = $('#homeTrip .js-naarreisbureau');
-    if (naarRb) naarRb.addEventListener('click', () => {
-      location.href = '/apps/reisbureau.html' + (vastePas ? '?pas=' + encodeURIComponent(vastePas) : '');
-    });
+    Util.vervang($('#homeTrip'),
+      E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+      E('div', { class: 'big' }, trip.dest),
+      E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
+      E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →'));
     Util.vervang($('#homePay'), open.length
       ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
          E('div', { class: 'big accent' }, eur(openSum)),
          E('div', { class: 'meta' }, open.length + ' ' + (open.length === 1 ? T('app.payment', 'betaling') : T('app.payments', 'betalingen')) + ' · ' + T('app.onetapfid', 'één tik met Face ID')),
          E('button', { class: 'go', dataset: { goto: 'betalen' } }, T('app.paynow', 'Nu betalen') + ' →')]
-      : invoices.length
-        ? [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
-           E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
-           E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]
-        // nog nooit een factuur: zeg wat hier komt te staan in plaats van
-        // "alles voldaan" over een lijst die niet bestaat
-        : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
-           E('div', { class: 'big' }, T('app.nobills', 'Nog geen rekeningen')),
-           E('div', { class: 'meta' }, T('app.nobills.sub', 'Wat RTG voor u regelt en wat u bij partners besteedt, komt hier te staan, met btw en afboekcode erbij.'))]);
+      : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+         E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
+         E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]);
     $('#homeSalon').innerHTML =
       '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
       '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +
@@ -6767,23 +6603,6 @@ var RTG_BOUW = '69430752';
   /* ---------- reizen ---------- */
 
   function renderTrip(){
-    /* Nog geen reis: dan staat hier wat een reisoverzicht IS en hoe het ontstaat.
-       Een nieuw account begint leeg en erft de demo-reis niet meer. */
-    if (!trip){
-      $('#tripSub').textContent = T('app.trip.emptysub','Uw reisoverzicht is nog leeg.');
-      const uitleg = (k, kop, tekst) =>
-        '<div class="rowitem"><div class="t"><b>' + T('app.trip.' + k, kop) + '</b><span>' +
-          T('app.trip.' + k + 's', tekst) + '</span></div></div>';
-      $('#tripList').innerHTML =
-        uitleg('e1', 'Vlucht, verblijf en transfer',
-          'Alles wat RTG aanvraagt komt hier per dag onder elkaar te staan, met de status erbij.') +
-        uitleg('e2', 'Wat nog niet vaststaat',
-          'Een aanvraag blijft een aanvraag tot de partner ja zegt. RTG bevestigt niets namens hen.') +
-        uitleg('e3', 'Beginnen doe je bij het reisbureau',
-          'Vraag daar een reis aan; vanaf dat moment staat hij hier, en Rahul denkt mee over de rest.');
-      renderAgenda();
-      return;
-    }
     $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
     $('#tripList').innerHTML = trip.items.map(it =>
       '<div class="rowitem">' +
@@ -6838,7 +6657,7 @@ var RTG_BOUW = '69430752';
       for (const inv of targets){
         inv.status = 'paid'; inv.date = 'Zojuist betaald';
         foundation += Math.round(inv.bijdrage * 0.3);
-        for (const t of (trip ? trip.items : [])) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+        for (const t of trip.items) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
       }
     }
     return foundation;
@@ -7073,13 +6892,7 @@ var RTG_BOUW = '69430752';
           (jaren.length > 1 ? '<span style="width:1px;height:1rem;background:var(--line);margin:0 0.2rem;"></span>' + chip(payFilterJaar === 'alle', 'alle', 'jaar', T('fin.f.jaren','Alle jaren')) + jaren.map(j => chip(payFilterJaar === j, j, 'jaar', j)).join('') : '') +
         '</div>'
       : '';
-    /* Nog nooit een factuur gehad is iets anders dan "niets in deze selectie".
-       Een nieuw account begint leeg, dus dit is wat een nieuw lid hier leest:
-       niet dat het filter niets vond, maar wat er komt te staan en waarom. */
-    const leegTekst = invoices.length
-      ? T('fin.f.leeg','Geen facturen in deze selectie.')
-      : T('fin.f.nognooit','Hier komen uw facturen te staan: wat RTG voor u regelt, wat u bij partners besteedt en uw maandbijdrage. Btw en afboekcode staan er meteen bij, zodat het zo de boekhouding in kan. Van elke bijdrage gaat 30% naar de RTFoundation.');
-    $('#payList').innerHTML = finKaart + filterBar + (zichtbaar.length ? '' : '<div style="color:var(--soft);font-size:0.8rem;padding:0.5rem 0;line-height:1.6;">' + leegTekst + '</div>') + zichtbaar.map(inv => {
+    $('#payList').innerHTML = finKaart + filterBar + (zichtbaar.length ? '' : '<div style="color:var(--soft);font-size:0.8rem;padding:0.5rem 0;">' + T('fin.f.leeg','Geen facturen in deze selectie.') + '</div>') + zichtbaar.map(inv => {
       const total = inv.netto + inv.bijdrage;
       return '<div class="rowitem">' +
         '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +
@@ -7319,38 +7132,15 @@ var RTG_BOUW = '69430752';
     });
   }
 
-  /* De AI-kant van de app: de opener van Rahul en zijn regelantwoorden zonder
-     backend. Afgesplitst van app-main-49.js (de zzp-rekenhulp) toen dat bestand
-     de 10 KB-lat passeerde; dat was ook de natuurlijke naad, want een
-     belastingrekenaar en een gesprek zijn twee onderwerpen. De staart van
-     aiAnswer staat in app-main-50.js -- die grens lag er al. */
   /* ---------- AI ---------- */
 
   const chatHistory = [];
 
   function aiOpener(){
     const first = user.full.split(' ')[0];
-    const groet = (lang()==='en' ? 'Good day' : 'Goedendag') + (user.tier === 'business' ? '.' : ', ' + first + '.');
-    /* ZONDER REIS OPENT RAHUL MET EEN VRAAG. Hier stond onvoorwaardelijk "Uw reis
-       naar " + trip.dest, en trip was altijd gevuld -- desnoods met de demo-reis,
-       zodat een vers lid werd begroet met een reis die het nooit boekte. */
-    if (!trip) return [
-      groet + ' ' + (lang()==='en'
-        ? 'There is nothing planned yet. Tell me where you want to go and when, and I will take it from there:'
-        : (stem('Er staat nog niets gepland. Zeg me waar je heen wilt en wanneer, dan neem ik het over:',
-                'Er staat nog niets gepland. Geef me de bestemming en de data, dan neem ik het over:',
-                'Er staat nog niets gepland. Zegt u mij waar het heen mag en wanneer, dan neem ik het over:'))),
-      (lang()==='en'
-        ? '• Flight, stay, transfer and tables: I request them with our partners; the status stands in your travel overview.'
-        : '• Vlucht, verblijf, transfer en tafels: ik vraag ze aan bij onze partners; de status staat in het reisoverzicht.'),
-      (lang()==='en'
-        ? '• Nothing is confirmed until a partner says yes, and I will never tell you otherwise.'
-        : '• Niets staat vast tot een partner ja zegt; ik zeg nooit dat iets geregeld is als dat niet zo is.'),
-      (lang()==='en' ? '• Where would you like to go?' : (stem('• Waar wil je heen?', '• Waar mag het heen?', '• Waar mag het heen?')))
-    ].join('\n');
-    const lines = [ lang()==='en'
-      ? (groet + ' Your journey to ' + trip.dest + ' begins in ' + trip.days + ' days. I have already thought ahead:')
-      : (groet + ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:') ];
+    const lines = [ (lang()==='en'
+      ? ('Good day' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Your journey to ' + trip.dest + ' begins in ' + trip.days + ' days. I have already thought ahead:')
+      : ('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:')) ];
     const open = invoices.filter(i => i.status === 'open');
     if (open.length){
       const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
@@ -7368,42 +7158,21 @@ var RTG_BOUW = '69430752';
 
   function aiAnswer(q){
     const l = q.toLowerCase().trim();
-    /* DE ANTWOORDEN VAN DE APP ZELF, ZONDER SERVER. Deze stonden woordelijk op de
-       DEMO-reis (Ibiza, Formentera, Sal de Mar) en het eerste begon met
-       "Geregeld. De paklijst staat klaar ... is ingepland", terwijl er niets
-       geboekt wordt -- dezelfde fout die serverkant al recht stond
-       (kern/ai/demoantwoorden.js). En hij liep niet alleen in de demostand: dit
-       bestand valt ook op aiAnswer terug als de SERVERAANROEP MISLUKT, dus een
-       echt lid met een haperende verbinding kreeg hem net zo goed. Nu dragen ze
-       de eigen reis; zonder reis vraagt Rahul waar het heen mag. */
-    const dest = trip && trip.dest ? trip.dest : null;
-    const heen = T('ai.a.ask','Waar mag het heen, en wanneer? Zodra ik dat weet zet ik het hele voortraject klaar.');
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
-      return dest
-        ? T('ai.a.yes','Ik zet het in gang: het voorstel komt in het reisoverzicht en wat een partner moet bevestigen gaat als aanvraag de deur uit. Niets staat vast tot zij ja zeggen; ik laat het weten zodra dat zo is.')
-        : T('ai.a.yesleeg','Ik pak het op. Alleen staat er nog geen reis in het systeem: er is dus niets in aanvraag en niets bevestigd. ') + heen;
+      return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte kleding, zwemkleding, zonnebrand, lichte trui voor de avond) en het dagplan voor 20 juli is ingepland: 10:00 boot naar Formentera, lunch aan boord, 21:00 tafel bij Sal de Mar.\n\nIk bewaak nu de bevestiging van Sal de Mar. U hoeft niets te doen.');
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('pack'))
-      return dest
-        ? T('ai.a.pack','Voor ') + dest + T('ai.a.pack2',' loop ik het per dag na: kleding voor buiten, iets nets voor de avonden, en documenten en medicijnen apart. Zal ik er een afvinklijst van maken?')
-        : T('ai.a.packleeg','Een paklijst maak ik op de bestemming, het seizoen en wat u daar gaat doen. ') + heen;
+      return T('ai.a.pack','Voor Ibiza in juli (25-31°C, zonnig):\n• Lichte kleding + zwemkleding\n• Zonnebrand en een hoed\n• Nette outfit voor Sal de Mar\n• Lichte trui voor de avond\n\nZal ik er een afvinklijst van maken?');
     if (l.includes('visum') || l.includes('paspoort') || l.includes('visa') || l.includes('passport'))
-      return dest
-        ? T('ai.a.visa','Ik zoek de document- en visumeisen na voor ') + dest + T('ai.a.visa2',' bij uw nationaliteit en geef het antwoord met de bron erbij. Zal ik dat nu uitzoeken?')
-        : T('ai.a.visaleeg','Welke documenten u nodig heeft hangt af van de bestemming en uw paspoort; ik zoek dat liever op dan dat ik het gok. ') + heen;
+      return T('ai.a.visa','Voor Ibiza (Spanje, EU) heeft u geen visum nodig; een geldige ID-kaart of paspoort volstaat. Ik zet uw boekingsbevestigingen klaar in de app.');
     if (l.includes('weer') || l.includes('weather'))
-      return dest
-        ? T('ai.a.weather','De verwachting voor ') + dest + T('ai.a.weather2',' houd ik bij en trek ik vlak voor vertrek na; ver vooruit is het een aanname en geen voorspelling.')
-        : T('ai.a.weatherleeg','Het weer haal ik op voor de plek en de dagen waar het om gaat. ') + heen;
+      return T('ai.a.weather','Ibiza medio juli: 25-31°C, veel zon en warme avonden. Zal ik de boot naar Formentera vroeg in de ochtend laten aanhouden?');
     if (l.includes('plan') || l.includes('dag') || l.includes('day'))
-      return dest
-        ? T('ai.a.plan','Ik zet een dagindeling voor ') + dest + T('ai.a.plan2',' als voorstel klaar: ochtend rustig, het uitje midden op de dag, de avond op tafel. Alles wat een partner moet bevestigen gaat als aanvraag.')
-        : T('ai.a.planleeg','Een dagplan bouw ik op wat er op de bestemming te doen is en op uw tempo. ') + heen;
+      return T('ai.a.plan','Voorstel voor 20 juli:\n• 10:00 boot naar Formentera\n• 13:00 lunch aan boord\n• 18:00 borrel bij Sunset Ibiza\n• 21:00 diner bij Sal de Mar\n\nZal ik de strandlunch reserveren?');
     if (l.includes('restaurant') || l.includes('diner') || l.includes('eten') || l.includes('dinner') || l.includes('eat'))
-      return dest
-        ? T('ai.a.rest','Voor ') + dest + T('ai.a.rest2',' leg ik u twee of drie adressen uit ons netwerk voor, tegen normale prijs, en vraag ik de tafel aan zodra u kiest. Voor welke avond en met hoeveel personen?')
-        : T('ai.a.restleeg','Een tafel regel ik via ons netwerk, tegen de normale prijs. Waar bent u, of waar gaat u heen, en met hoeveel personen?');
+      return T('ai.a.rest','Uw tafel bij Sal de Mar (19 jul, 21:00) is in aanvraag, bevestiging volgt doorgaans binnen 48 uur. Wilt u een reservelijst? Ik denk aan een strandrestaurant in Cala Jondal.');
     return T('ai.a.default','Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.');
   }
+
   function bubble(text, who){
     const el = document.createElement('div');
     el.className = 'bubble ' + who;
@@ -8688,4 +8457,103 @@ var RTG_BOUW = '69430752';
   // persona. Normaal blijft de bestaande sessieherstelroute ongewijzigd.
   if (magnaatProef) login(vastePas === 'lifestyle' ? 'lifestyle' : vastePas === 'rtg' ? 'rtg' : 'business');
   else restoreSession();
+
+  /* ---- HET VAKBEWIJS: de stukken die bij je WERK horen ----
+
+     WAAROM DIT SCHERM ER MOEST KOMEN. server/kern/persoonseis.js houdt personeel
+     in een kinderopvang, een praktijk, een beveiligingsteam of een korps tegen
+     tot hun stuk is gezien. Zonder deze plek kon je dat stuk nergens indienen --
+     en dan is de poort geen beveiliging maar een storing: je staat op het
+     rooster en komt er niet in, zonder weg terug.
+
+     WAAROM HET HIER STAAT EN NIET BIJ DE IDENTITEITSVERIFICATIE IN DEEL 41,
+     waar het inhoudelijk hoort. De delen van app-main zijn op GROOTTE geknipt
+     en niet op structuur: deel 41 eindigt midden in laadPaspoortInbox() en deel
+     42 zet diezelfde functie voort. Een nieuw bestand ertussen belandt dus
+     BINNEN die functie, en dan is laadVakbewijs() vanuit renderHome() niet te
+     zien. Dat is precies wat er gebeurde -- de banner bleef leeg en renderHome
+     brak stil af na de verificatiebanner, zonder dat er iets klaagde. Het einde
+     van het laatste deel is de enige echte top-niveau grens in deze reeks.
+
+     HIJ VERSCHIJNT ALLEEN ALS HIJ ERGENS OVER GAAT. Wie niet in zo'n genre
+     werkt, ziet niets. Een banner die iedereen om papieren vraagt die 55 van de
+     73 genres niet kennen, is ruis -- en door ruis leren mensen heen klikken.
+
+     WAT ER NIET GEBEURT. Geen foto, geen scan, geen upload. Er wordt vastgelegd
+     WELK stuk je hebt, met zijn nummer en tot wanneer het geldt; het document
+     zelf blijft waar het hoort. Dezelfde regel die kern/gegevenspoort.js al
+     trekt: geen tweede intake naast de eerste. */
+  async function laadVakbewijs(){
+    const el = document.getElementById('vakbewijsBanner');
+    if (!el || !user || !user.account) return;
+    let r = null;
+    try { r = await API.call('/vakbewijs', {}); } catch(e){ return; }
+    const eisen = r.eisen || [], mijn = r.vakbewijzen || [], soorten = r.soorten || {};
+
+    /* Wat vraagt mijn werk, en wat heb ik daarvan? De handeling-eisen tellen
+       mee: een arts die niet kan voorschrijven staat niet buiten de deur, maar
+       hij hoort wel te weten waarom die knop niets doet. */
+    const nodig = new Map();
+    for (const e of eisen){
+      for (const s of (e.werk || [])) nodig.set(s.id, { soort: s, waarvoor: 'werk' });
+      for (const h of Object.values(e.handelingen || {}))
+        for (const s of (h.nodig || [])) if (!nodig.has(s.id)) nodig.set(s.id, { soort: s, waarvoor: h.wat });
+    }
+    /* `identiteit` staat er niet bij: die loopt over de verificatie hierboven en
+       heeft daar zijn eigen banner. Twee plekken die om hetzelfde vragen, laten
+       een mens twee keer hetzelfde doen. */
+    nodig.delete('identiteit');
+    if (!nodig.size){ el.innerHTML = ''; return; }
+
+    const stand = id => mijn.find(v => v.wat === id) || null;
+    const regels = [...nodig.entries()].map(([id, n]) => {
+      const v = stand(id), naam = (soorten[id] && soorten[id].naam) || id;
+      let stateTekst, klasse;
+      if (!v){ stateTekst = T('vak.geen','nog niet ingediend'); klasse = 'open'; }
+      else if (v.ingetrokken){ stateTekst = T('vak.in','ingetrokken'); klasse = 'open'; }
+      else if (v.verlopen){ stateTekst = T('vak.verlopen','verlopen op')+' '+esc(v.tot || ''); klasse = 'open'; }
+      else if (!v.gezien){ stateTekst = T('vak.wacht','ingediend, RTG kijkt ernaar'); klasse = 'pending'; }
+      else { stateTekst = T('vak.ok','gezien en afgetekend') + (v.tot ? ' · '+T('vak.tot','geldig tot')+' '+esc(v.tot) : ''); klasse = 'ok'; }
+      return '<div class="vakrij" data-soort="'+esc(id)+'">' +
+        '<div><b>'+esc(naam)+'</b> <span class="vaksub">'+esc(n.waarvoor === 'werk'
+          ? T('vak.voorwerk','nodig om hier te werken')
+          : T('vak.voor','nodig om ')+esc(n.waarvoor))+'</span>' +
+        '<div class="vaksub vak-'+klasse+'">'+stateTekst+'</div>' +
+        /* Je EIGEN nummer, gewoon zichtbaar. Dat is zelf-inzage en geen inzage
+           in andermans gegevens; het journaal slaat die om dezelfde reden over.
+           Wie zijn eigen stuk niet kan terugzien, kan ook niet nakijken of hij
+           het goed heeft ingevoerd -- en dat is precies wat je wilt dat iemand
+           doet voordat RTG ernaar kijkt. */
+        (v && v.nummer ? '<div class="vaksub">'+esc(v.nummer)+'</div>' : '') + '</div>' +
+        (klasse === 'ok' ? '' : '<button class="vbtn" data-vak="'+esc(id)+'">' +
+          (v ? T('vak.opnieuw','Opnieuw indienen') : T('vak.indienen','Indienen')) + '</button>') +
+        '</div>';
+    }).join('');
+
+    el.innerHTML = '<div class="vbanner"><b>'+T('vak.h','Papieren voor uw werk')+'</b>' +
+      '<span>'+T('vak.b','Uw werk vraagt om een stuk op uw eigen naam. U legt hier vast welk stuk dat is en tot wanneer het geldt; een medewerker van RTG tekent af dat hij het heeft gezien. RTG beoordeelt de inhoud niet en uw werkgever ziet alleen of het rond is.')+'</span>' +
+      regels + '</div>';
+    el.querySelectorAll('[data-vak]').forEach(b =>
+      b.addEventListener('click', () => vakIndienen(b.dataset.vak, (soorten[b.dataset.vak] || {}))));
+  }
+
+  /* Indienen. Drie vragen, want dat is precies wat de server bewaart: welk stuk,
+     welk nummer, tot wanneer. Het uitleg-zinnetje van het register komt mee, dus
+     de vraag heet bij de naam die de mens zelf kent ("uw BIG-nummer"). */
+  async function vakIndienen(soort, def){
+    const nummer = prompt((def.uitleg || T('vak.watnr','Wat is het nummer van dit stuk?')) + '\n\n' +
+      T('vak.nr','Nummer:'));
+    if (nummer === null) return;
+    if (!nummer.trim()){ toast(T('vak.nrnodig','Zonder nummer kan RTG het stuk niet terugvinden.')); return; }
+    const tot = prompt(T('vak.totvraag','Tot wanneer is het geldig? (jjjj-mm-dd; leeg laten mag als er geen einddatum op staat)'), '');
+    if (tot === null) return;
+    if (tot.trim() && !/^\d{4}-\d{2}-\d{2}$/.test(tot.trim())){
+      toast(T('vak.datumfout','Een datum ziet eruit als 2030-01-31.')); return;
+    }
+    try {
+      const r = await API.call('/vakbewijs/zet', { wat: soort, nummer: nummer.trim(), tot: tot.trim() || null });
+      toast(r.uitleg || T('vak.ontvangen','Vastgelegd.'));
+    } catch(e){ toast(e.message); return; }
+    laadVakbewijs();
+  }
 })();

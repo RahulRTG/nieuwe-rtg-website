@@ -102,10 +102,24 @@ function maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity
        journaal. */
     const verzoekId = 'inz_' + tijd().replace(/\D/g, '').slice(-12) + '-' + String(staff.id);
     try {
+      /* DE VORM VAN DEZE AANROEP IS HET HELE PUNT, en hij was fout. Er stond
+         `{ wie, wieRol, wieBedrijf, accountId, wat }` -- vijf sleutels die
+         server/inzagelog.js niet leest. Alleen `waarom` landde; `doorId`,
+         `over` en `bron` bleven leeg.
+
+         Het gevolg was niet een lelijke regel maar een blinde: voorBetrokkene()
+         filtert op overId, dus een medewerker die via /api/privacy/inzage vroeg
+         wie er in zijn dossier had gekeken, kreeg zijn EIGEN werkgever niet te
+         zien. Precies de vraag waarvoor het journaal bestaat (AVG art. 15).
+
+         Het viel niet op omdat test/identiteit-opvraag.test.js een nep-journaal
+         gebruikte dat elk object slikt -- een dubbel dat ruimer is dan het
+         echte ding meet niets. Die toets draait nu op het ECHTE inzagelog. */
       if (inzagelog && inzagelog.noteer) inzagelog.noteer({
-        wie: door, wieRol: doorRol || 'werkgever', wieBedrijf: supplierCode,
-        accountId: Number(memberId), waarom: String(reden).trim().slice(0, 300),
-        wat: 'identiteit:' + niveau
+        door: { naam: String(door || 'werkgever') + ' (' + (doorRol || 'werkgever') + ')' },
+        over: { id: Number(memberId) },
+        waarom: String(reden).trim().slice(0, 300),
+        bron: 'werkgever/' + supplierCode + ':identiteit:' + niveau
       });
     } catch (e) { /* het journaal mag de inzage niet blokkeren, wel altijd geprobeerd */ }
 

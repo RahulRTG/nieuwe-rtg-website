@@ -82,15 +82,36 @@ function startCloud() {
   });
   alleClouds.push(cloudChild);
 }
-async function wachtOp(pad, base, keur, pogingen = 100) {
+/* EEN RUIME GRENS, EN OP EEN PLEK.
+
+   Deze toets start echte servers op: een doos, en voor de failover twee clouds
+   tegelijk. De grens stond op honderd pogingen van 200 ms, dus twintig seconden,
+   en op een CI-runner met dekkingsmeting erbij haalt een verse server dat niet
+   altijd. Op 18 augustus 2026 zakte 'cloud-failover' precies op 20,2 s met
+   "kwam niet op: /api/health" -- geen foutmelding van de server, geen gestopt
+   proces, alleen een klok die eerder klaar was dan de opstart.
+
+   Twee call-sites hadden hun eigen grotere getal gekregen (150, 200, 300). Dat
+   is drie keer hetzelfde antwoord op dezelfde vraag, en dan blijft de vierde
+   staan. De grens staat nu een keer, ruim: een minuut. Een poll kost niets, en
+   een server die er echt niet komt zakt straks net zo hard, alleen later.
+
+   DE MELDING DRAAGT NU WEL IETS. "kwam niet op: /api/health" zei niet welke
+   server, hoe lang er is gewacht of wat er laatst wel terugkwam. Bij een toets
+   met drie servers is dat het verschil tussen weten en gokken. */
+const POGINGEN = 300;   // 300 x 200 ms = een minuut
+async function wachtOp(pad, base, keur, pogingen = POGINGEN) {
+  let laatste = null;
   for (let i = 0; i < pogingen; i++) {
     try {
       const r = await fetch(base + pad, { headers: { 'X-Forwarded-Proto': 'https' } });
-      if (r.ok) { const d = await r.json(); if (!keur || keur(d)) return d; }
+      if (r.ok) { const d = await r.json(); laatste = d; if (!keur || keur(d)) return d; }
     } catch (e) { /* nog niet op */ }
     await new Promise(res => setTimeout(res, 200));
   }
-  throw new Error('kwam niet op: ' + pad);
+  throw new Error('kwam niet op: ' + base + pad + ' na ' + pogingen + ' pogingen (' +
+    Math.round(pogingen * 200 / 1000) + 's). Laatst gezien: ' +
+    (laatste ? JSON.stringify(laatste).slice(0, 200) : 'geen enkel antwoord'));
 }
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -131,7 +152,7 @@ test('online: de doos is een doorgeefluik en haalt de datakloon binnen', async (
   itemId = (state.menu && state.menu[0] && state.menu[0].id) || null;
   assert.ok(itemId, 'het menu is er (nodig voor de keuken-actie straks)');
   // de kloon is (of komt) binnen
-  await wachtOp('/api/doos/status', doos.base, d => d.laatsteKloon > 0, 150);
+  await wachtOp('/api/doos/status', doos.base, d => d.laatsteKloon > 0);
   // en de kloon-route zelf is dicht zonder sleutel
   const dicht = await fetch(cloudBase() + '/api/doos/kloon');
   assert.equal(dicht.status, 403);
@@ -271,7 +292,7 @@ test('de lijn komt terug: het journaal wordt nagespeeld en de cloud kent de acti
   startCloud(); // zelfde poort, zelfde data
   await wachtOp('/api/health', cloudBase());
   // de doos merkt het (pinger elke 10s), speelt na en wordt weer doorgeefluik
-  const st = await wachtOp('/api/doos/status', doos.base, d => d.modus === 'cloud' && d.journaal === 0, 200);
+  const st = await wachtOp('/api/doos/status', doos.base, d => d.modus === 'cloud' && d.journaal === 0);
   assert.equal(st.journaal, 0, 'het journaal is leeg nagespeeld');
   // rechtstreeks op de cloud controleren dat de keuken-actie er echt staat
   const login = await api(cloudBase(), '/api/supplier/login', { username: 'rahul', password: 'Imran' });
@@ -313,16 +334,16 @@ test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', 
       RTG_DOOS_SLEUTEL: SLEUTEL, RTG_DOOS_USER: 'rahul', RTG_DOOS_WACHTWOORD: 'Imran',
       RTG_DOOS_NAAM: 'failoverdoos'
     } });
-    // online op de primaire (cloud A). Ruim wachten: op een trage CI-runner
-    // (drie processen + coverage-instrumentatie) kan het opkomen en de
-    // failover-detectie samen ruim boven de oude 24s uitkomen; polls zijn
-    // goedkoop, dus een failover-test hoort geduldig te zijn.
-    const st0 = await wachtOp('/api/doos/status', box.base, d => d.modus === 'cloud' && d.actieveCloud === 0, 300);
+    // online op de primaire (cloud A). Het geduld zit in POGINGEN hierboven, en
+    // niet meer in een getal per regel: drie processen met coverage-instrumentatie
+    // op een trage runner hebben het nodig, en dat geldt voor elke wachtregel in
+    // dit bestand.
+    const st0 = await wachtOp('/api/doos/status', box.base, d => d.modus === 'cloud' && d.actieveCloud === 0);
     assert.equal(st0.clouds, 2, 'twee clouds geconfigureerd');
     // de primaire cloud valt weg
     cloudA.kill('SIGKILL');
     // de doos springt naar de replica (cloud B) en blijft doorgeefluik (niet lokaal)
-    const st1 = await wachtOp('/api/doos/status', box.base, d => d.actieveCloud === 1, 300);
+    const st1 = await wachtOp('/api/doos/status', box.base, d => d.actieveCloud === 1);
     assert.equal(st1.actieveCloud, 1, 'overgeschakeld naar de replica');
     assert.equal(st1.modus, 'cloud', 'gebleven als doorgeefluik, niet naar lokaal geschakeld');
   } finally {

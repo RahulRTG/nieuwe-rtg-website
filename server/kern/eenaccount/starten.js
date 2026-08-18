@@ -20,7 +20,15 @@
 module.exports = (ctx) => {
   const { db, save, crypto, accounts, findSupplier, rememberSession, logInlog,
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
-    lijst, zelfde, eigenaarKantoor, afgeleid, nu } = ctx;
+    lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort } = ctx;
+
+  /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
+     die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in
+     accounts: die zou hetzelfde antwoord op een tweede manier berekenen. */
+  const lidVanKey = (k) => {
+    const m = /^user-(\d+)$/.exec(String(k || ''));
+    return m ? Number(m[1]) : null;
+  };
 
   /* ---- met het ene account een werk-sessie starten (zelfde munt als de
      losse inlog: rememberSession met exact dezelfde velden en logs) ---- */
@@ -85,10 +93,20 @@ module.exports = (ctx) => {
       const w = magWerken(s, { staffId: actor.staffId, manager: actor.manager }, null, (body || {}).positie);
       if (!w.ok) return { status: 403, error: w.error, venster: w.venster || null, ...(w.locatieNodig ? { locatieNodig: true } : {}) };
     }
+    /* En de persoonseis van het genre, om dezelfde reden als het werkvenster
+       erboven: het ene account is geen achterdeur. Dezelfde functie als
+       supplierAuth, zodat er niet twee besluiten over dezelfde vraag ontstaan. */
+    const lidId = lidVanKey(key);
+    if (persoonsPoort) {
+      const pp = persoonsPoort(s, { manager: actor.manager, lid: lidId });
+      if (!pp.ok) return { status: 403, error: pp.error, persoonseis: pp.missend || null };
+    }
     const token = crypto.randomBytes(24).toString('hex');
-    // lidKey reist mee zodat Rahuls werkadvies (alleen lezend) naar de eigen
-    // agenda van dit lid kan kijken; nooit naar die van iemand anders
-    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key });
+    /* lidKey reist mee zodat Rahuls werkadvies (alleen lezend) naar de eigen
+       agenda van dit lid kan kijken; nooit naar die van iemand anders. `lid`
+       reist mee omdat de persoonseis en de loonlaag het lidnummer zelf nodig
+       hebben -- dat ontbrak hier, net als in kern/werkbijlogin.js. */
+    rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, lidKey: key, lid: lidId });
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
     logActivity(s.code, actor, actor.name + ' logde in met het RTG-account');
     /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --

@@ -10,12 +10,12 @@ module.exports = (kern) => {
   app.post('/api/supplier/zorg/overzicht', supplierAuth, (req, res) => stuur(res, zorgketen.zorgOverzicht(req.supplier)));
   // recepten: voorschrijven en afhandelen
   app.post('/api/supplier/zorg/recept/maak', supplierAuth, (req, res) => {
-    const r = zorgketen.receptMaak(req.supplier.code, { apotheek: String(req.body.apotheek || '').toUpperCase(), middel: req.body.middel, dosering: req.body.dosering });
+    const r = zorgketen.receptMaak(req.supplier.code, { apotheek: String(req.body.apotheek || '').toUpperCase(), middel: req.body.middel, dosering: req.body.dosering }, req.actor);
     if (!r.error) { logActivity(req.supplier.code, req.actor, 'schreef een recept voor'); sync(r.recept.apotheek); }
     stuur(res, r);
   });
   app.post('/api/supplier/zorg/recept/zet', supplierAuth, (req, res) => {
-    const r = zorgketen.receptZet(req.supplier.code, String(req.body.id || ''), String(req.body.status || ''));
+    const r = zorgketen.receptZet(req.supplier.code, String(req.body.id || ''), String(req.body.status || ''), req.actor);
     if (!r.error) sync(req.supplier.code);
     stuur(res, r);
   });
@@ -32,7 +32,7 @@ module.exports = (kern) => {
   });
   // verwijzingen: sturen en afhandelen
   app.post('/api/supplier/zorg/verwijs/maak', supplierAuth, (req, res) => {
-    const r = zorgketen.verwijsMaak(req.supplier.code, { naar: String(req.body.naar || '').toUpperCase(), reden: req.body.reden });
+    const r = zorgketen.verwijsMaak(req.supplier.code, { naar: String(req.body.naar || '').toUpperCase(), reden: req.body.reden }, req.actor);
     if (!r.error) { logActivity(req.supplier.code, req.actor, 'verwees een patient door'); sync(r.verwijzing.naar); }
     stuur(res, r);
   });

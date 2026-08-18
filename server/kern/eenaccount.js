@@ -18,7 +18,7 @@
 
 function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, hasCred, DEMO,
   DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, rememberSession, logInlog, logActivity,
-  supplierState, officeState, magWerken, pinInfo, pinCheck, pinSlot }) {
+  supplierState, officeState, magWerken, pinInfo, pinCheck, pinSlot, persoonsPoort }) {
   const nu = () => new Date().toISOString();
   function lijst(key) {
     if (!db.data.accountRollen || typeof db.data.accountRollen !== 'object') db.data.accountRollen = {};
@@ -113,7 +113,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
      zwaarste en het stond de hele tijd in hetzelfde bestand. */
   const { accStart } = require('./eenaccount/starten')({ db, save, crypto, accounts,
     findSupplier, rememberSession, logInlog, logActivity, supplierState, officeState,
-    magWerken, pinInfo, pinCheck, lijst, zelfde, eigenaarKantoor, afgeleid, nu });
+    magWerken, pinInfo, pinCheck, lijst, zelfde, eigenaarKantoor, afgeleid, nu, persoonsPoort });
 
   return { accRollen, accKoppel, accStart, accOntkoppel };
 }

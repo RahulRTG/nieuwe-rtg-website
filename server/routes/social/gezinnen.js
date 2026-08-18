@@ -6,5 +6,6 @@ module.exports = (sctx) => {
   /* De vrienden- en toezichtlaag staan als deelmodules in gezinnen/;
      hier alleen de mounts. */
   require('./gezinnen/vrienden')(sctx);
+  require('./gezinnen/pin')(sctx);
   require('./gezinnen/toezicht')(sctx);
 };

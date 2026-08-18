@@ -80,6 +80,9 @@ module.exports = (ctx) => {
 
   // Salon-connecties: leden vinden elkaar op codenaam, chatten en bellen 1-op-1
   if (!db.data.connections) db.data.connections = [];              // { a, b, requestedBy, status, at }
+  // De contactpin: de eigen code waarmee twee mensen elkaar toevoegen zonder te
+  // zoeken (kern/sociaal/pin.js). Geen geheim maar een adres -- zie de kop daar.
+  if (!db.data.contactPins) db.data.contactPins = {};             // handle -> { pin, at }
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
   if (!db.data.memberDir) db.data.memberDir = {};                  // sleutel -> { codename, tier }
   for (const t of GIDS_SEED_TIERS)

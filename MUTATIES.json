@@ -1025,6 +1025,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "contactpin.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "context-lijn.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -22,7 +22,18 @@ test('2. kas en entree', () => {
   assert.deepEqual(C.lees(C.bouwEntree('CLUB1')), { soort: 'entree', code: 'CLUB1' });
 });
 
-test('3. gewone tekst (Zegel-token) blijft tekst, met trim', () => {
+/* De contactpin (server/kern/sociaal/pin.js) reist als 'rtg:pin:<pin>'. Het
+   scherm toont hem met een streepje ertussen; de code draagt hem zonder, want
+   korter scant prettiger. Allebei komen ze op dezelfde pin uit. */
+test('3. contactpin: het streepje van het scherm hoort niet in de code', () => {
+  assert.equal(C.bouwPin('7K2M-9XPQ'), 'rtg:pin:7K2M9XPQ');
+  assert.equal(C.bouwPin('7k2m9xpq'), 'rtg:pin:7K2M9XPQ', 'kleine letters mogen');
+  assert.deepEqual(C.lees(C.bouwPin('7K2M-9XPQ')), { soort: 'pin', pin: '7K2M9XPQ' });
+  // en een pin-QR is geen kas-QR: de twee voorvoegsels zijn even lang
+  assert.equal(C.lees('rtg:kas:7K2M9XPQ').soort, 'kas');
+});
+
+test('4. gewone tekst (Zegel-token) blijft tekst, met trim', () => {
   const token = 'v1.eyJhIjoxfQ.zzz-_AAA';
   assert.deepEqual(C.lees('  ' + token + '  '), { soort: 'tekst', tekst: token });
   assert.equal(C.lees('').soort, 'tekst');

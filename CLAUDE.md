@@ -31,6 +31,18 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**`REIZEN.md` is het diepte-document van RTG Reizen** — het Travel OS: niet een
+reisbureau met een boekingssite, maar een wereld die reizen beheert, ook de reis
+die RTG niet verkocht heeft. Het werkwoord daar is **vóór zijn**: opmerken en
+klaarzetten voordat de reiziger het merkt, en uitvoeren alleen waar het domein
+dat al mocht. De zin die het ontwerp stuurt: het maakt niet uit waar een
+onderdeel vandaan komt, het maakt wel uit dat RTG dat weet — vandaar dat elk
+reisonderdeel een **soort** (wat de reiziger ziet) én een **herkomst** (wat het
+systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
+grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
+bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
+wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
 concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan

@@ -4,6 +4,7 @@
      bankregie
      bank
      reis
+     invoerbalie + reisuitnodiging
      fiscaal/regelwacht
      fiscaal/btwaangifte
      thuis
@@ -45,6 +46,22 @@ Object.assign(kern, require('../kern/bank')({ db, save, bijeen, crypto, schoon, 
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
 Object.assign(kern, require('../kern/reis')({ LANDEN }));
+/* DE INVOERBALIE (kern/invoer.js): een reis die elders geboekt is, alsnog in
+   RTG krijgen -- REIZEN.md fase 2. Staat hier omdat hij twee dingen nodig heeft
+   die hierboven pas ontstaan: de plaatsbepaling van de Reiswijzer (om een
+   bestemming in vrije tekst te herkennen) en de kluis van het lid (waar het
+   originele bewijsstuk heen gaat, met quotum en virusscan en al -- deze module
+   krijgt geen eigen opslag). */
+Object.assign(kern, require('../kern/invoer').maakInvoer({
+  db, save, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
+/* DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis plus een
+   link. Het kantoor zet een reis klaar voor iemand die nog geen lid is, en een
+   lid nodigt zijn reisgenoot uit. Krijgt de Invoerbalie mee (daar landen de
+   overgenomen onderdelen; een tweede plek zou een tweede antwoord geven op
+   "waar staat mijn reis") en de bestaande identiteitscontrole -- er komt geen
+   eigen manier bij om vast te stellen wie iemand is. */
+Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
+  db, save, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd
@@ -70,6 +87,17 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    reisbureau en de tafelplanning roepen de laat gebonden, optionele haken
    visumtaakVan/tafeldekVan aan, die vanaf hier iets teruggeven. */
 Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.agenda, reiswijzer: kern.reiswijzer }));
+/* DE REISWACHT (kern/reiswacht.js): wat er speelt rond de komende reizen --
+   REIZEN.md fase 3. Een momentopname bij opvraging en uitdrukkelijk geen
+   achtergrondwachter; elke bron meldt zichzelf, ook (juist) de bronnen die er
+   niet zijn. Leest laat uit de kern, want hij hangt aan De Reis (kernlaag3w),
+   Entourage (kernlaag4) en de agenda. */
+Object.assign(kern, require('../kern/reiswacht').maakReiswacht({ kern }));
+/* DE OPLOSSER (kern/reisoplosser.js): de knop "Los het op" -- REIZEN.md fase 5.
+   Leest de wacht en de domeinen, zet hoogstens een taak in de eigen agenda
+   (na een klik van de mens, idempotent); boeken en betalen blijft bij het
+   domein. Zelfde late lezing als de wacht, om dezelfde reden. */
+Object.assign(kern, require('../kern/reisoplosser').maakReisoplosser({ kern }));
 Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft

@@ -1,6 +1,7 @@
 /* Afdelingsregister deel 2, kamergroep "kantoorkamers" (kern/afdelingen): de
    zeven jongere bedrijfskamers - Support team, Ingenieurs, Integratiekamer, Controleregister,
-   Consumenten- en Partner-abonnementen en de Kantine. Zelfde vorm als register.js:
+   Consumenten- en Partner-abonnementen en de Kantine (het Reisbureau staat in
+   ./reisbalie.js). Zelfde vorm als register.js:
    per kamer de naam, KPI's en lijsten, alles defensief lezend. Kamers met
    naamInzage: true mogen via de identiteitskluis de echte naam bij een codenaam
    opvragen (elke opvraging komt in het auditlog). Verbatim uit register2.js. */

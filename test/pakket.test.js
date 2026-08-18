@@ -2,7 +2,7 @@
    indeling voor de eigen zaak. De catalogus is pure data; de interne
    RTG-kantoorfuncties (afdelingen/boardroom) blijven bedrijfsgeheim en komen
    hier niet voor. Draai los:
-   node --experimental-sqlite --test test/pakket.test.js */
+   node --test test/pakket.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

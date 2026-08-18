@@ -4,7 +4,7 @@
    een uitvalt. Getest tegen nagemaakte provider-servers (geen echte API's,
    geen sleutels): de vertaling heen en terug klopt (ook voor tool_use), en
    de uitwijk pakt de tweede aanbieder als de eerste 500 geeft.
-   Draai los: node --experimental-sqlite --test test/ai-uitwijk.test.js */
+   Draai los: node --test test/ai-uitwijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('http');

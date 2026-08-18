@@ -124,7 +124,7 @@ const perRoute = [];
    en niet de lijst toetst die iemand met de hand heeft bijgehouden. */
 function routekaart() {
   const rauw = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+    [path.join(__dirname, 'routekaart.js'), '--json'],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, timeout: 120000 });
   return JSON.parse(rauw).routes.filter(r => r.pad.startsWith('/api/'));
 }

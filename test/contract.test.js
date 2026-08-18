@@ -2,7 +2,7 @@
    aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen
    digitaal; pas als beide handtekeningen staan is het contract getekend, en
    de tekst verandert daarna niet meer.
-   Draai: node --experimental-sqlite --test test/contract.test.js */
+   Draai: node --test test/contract.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

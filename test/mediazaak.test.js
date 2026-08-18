@@ -20,7 +20,7 @@
      - alleen de leiding begint een interne bibliotheek, en alleen voor een zaak
        waar die leiding ook werkelijk zit.
 
-   Draai los: node --experimental-sqlite --test test/mediazaak.test.js */
+   Draai los: node --test test/mediazaak.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

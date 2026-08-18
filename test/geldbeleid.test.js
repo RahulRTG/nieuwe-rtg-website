@@ -8,7 +8,7 @@
    zakken (LAT.md regel 2: een toets die je niet hebt zien zakken is geen
    toets); de geziene mutatie staat per toets in het commentaar.
 
-   Draai los: node --experimental-sqlite --test test/geldbeleid.test.js */
+   Draai los: node --test test/geldbeleid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, binnenEenDag } = require('./helper');

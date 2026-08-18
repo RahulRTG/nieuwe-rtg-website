@@ -61,7 +61,7 @@ er iets breekt en wijst dan de plek aan.
 
 ```bash
 cd ~/rtg
-node --experimental-sqlite scripts/tot-crash.js 2>&1 | tee ~/crashtest.log
+node scripts/tot-crash.js 2>&1 | tee ~/crashtest.log
 ```
 
 **Lees in de uitslag "rondes met ECHTE druk", niet "rondes gedraaid".** Werkers

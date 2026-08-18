@@ -10,7 +10,7 @@
       een behandelaar vastgelegd is bij terugkijken het hele verhaal.
    4. EEN KAPOTTE LAAG WORDT GEMELD. In een tijdlijn leest een gat als "toen
       gebeurde er niets", en dat is het ergste wat een gat kan betekenen.
-   Draai los: node --experimental-sqlite --test test/tijdlijn.test.js */
+   Draai los: node --test test/tijdlijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

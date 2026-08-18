@@ -1,6 +1,6 @@
 /* De gereedschappen die elke zaak krijgt: reageren op reviews (met melding
    aan de gast) en de lichte voorraad met drempelmeldingen.
-   Draai: node --experimental-sqlite --test test/zaaktools.test.js */
+   Draai: node --test test/zaaktools.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

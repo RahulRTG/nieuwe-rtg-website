@@ -11,7 +11,7 @@
 
    En het risico was niet theoretisch. De CMD in de Dockerfile is
 
-     CMD ["node", "--experimental-sqlite", "server/server.js"]
+     CMD ["node", "server/server.js"]
 
    en `node:sqlite` is sinds Node 24 stabiel. Bestaat die vlag in een volgende
    major niet meer, dan weigert node te starten op een onbekende optie: de
@@ -106,15 +106,20 @@ async function gezond(url, seconden) {
       console.log((r.stderr || '').trim().split('\n').slice(0, 3).map(l => '    ' + l).join('\n'));
       klaar(1, '\n  DE STARTVLAG BESTAAT NIET MEER: ' + image + ' weigert "node ' + vlag + '".\n' +
                '  De CMD in de Dockerfile gebruikt hem wel, dus deze container komt niet op.\n' +
-               '  Pas de CMD aan (en server/server.js, die zichzelf met die vlag herstart)\n' +
+               '  Pas de CMD aan\n' +
                '  voordat de Node-major omhoog gaat.');
     }
   }
-  if (vlaggen.includes('--experimental-sqlite')) {
-    const r = docker(['run', '--rm', image, 'node', '--experimental-sqlite', '-e', "require('node:sqlite')"]);
+  /* ONVOORWAARDELIJK sinds de vlag-opruiming: --experimental-sqlite staat
+     nergens meer (node:sqlite laadt sinds 22.13 zonder vlag), maar de
+     accountsdatabase hangt er nog net zo hard aan. Deze proef aan de vlag
+     ophangen zou hem stil laten wegvallen precies nu hij het belangrijkst
+     is: bij de eerstvolgende basis-image-sprong. */
+  {
+    const r = docker(['run', '--rm', image, 'node', '-e', "require('node:sqlite')"]);
     if (r.status !== 0)
       klaar(1, '  node:sqlite laadt niet in ' + image + ': de accountsdatabase komt daar niet op.');
-    console.log('  ✓ ' + image + ' accepteert ' + vlaggen.join(' ') + ' en laadt node:sqlite');
+    console.log('  ✓ ' + image + ' laadt node:sqlite' + (vlaggen.length ? ' en accepteert ' + vlaggen.join(' ') : ''));
   }
 
   /* ---------- 3. en dan de echte server, met de echte CMD ----------

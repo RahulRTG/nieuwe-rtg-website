@@ -25,7 +25,7 @@
    niet omdat ze niet bestaan, maar omdat ze een defect aan de ANDERE kant zijn
    en hier dus niets over deze reparatie zouden zeggen.
 
-   Draai los: node --experimental-sqlite --test test/lidfactuur.test.js */
+   Draai los: node --test test/lidfactuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, keurLidGoed } = require('./helper');

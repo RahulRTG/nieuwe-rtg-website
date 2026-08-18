@@ -3,7 +3,7 @@
    pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met
    check-in, groepslessen met capaciteit, baanboekingen zonder overlap,
    personal training en de cap-poorten.
-   Draai los: node --experimental-sqlite --test test/clubs.test.js */
+   Draai los: node --test test/clubs.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

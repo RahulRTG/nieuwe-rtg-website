@@ -14,7 +14,7 @@
    Elke toets is tegen een tijdelijk kapotgemaakte kern gezien zakken
    (LAT.md regel 2); de geziene mutatie staat per toets in het commentaar.
 
-   Draai los: node --experimental-sqlite --test test/geldgraaf.test.js */
+   Draai los: node --test test/geldgraaf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

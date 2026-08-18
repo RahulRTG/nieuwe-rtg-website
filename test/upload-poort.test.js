@@ -19,7 +19,7 @@
    En de tweede helft: wat je in de kluis stopt mag je terugkrijgen, maar niet
    met een etiket waar een browser zelf iets mee gaat doen.
 
-   Draai los: node --experimental-sqlite --test test/upload-poort.test.js
+   Draai los: node --test test/upload-poort.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -26,7 +26,7 @@
    De mutatie die hem hoort te laten zakken: haal de 422 uit
    server/routes/staff/dienst.js, of de payrollOS.verzuim.meld-aanroep eronder.
 
-   Draai los: node --experimental-sqlite --test test/ziekmelding-privacy.test.js */
+   Draai los: node --test test/ziekmelding-privacy.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

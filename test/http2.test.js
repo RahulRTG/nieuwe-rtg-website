@@ -3,7 +3,7 @@
    h2c, geen certificaat nodig) en doen er een echte HTTP/2-call op: de route komt
    op, de body/JSON klopt, en de verbinding is aantoonbaar HTTP/2. Zo staat vast
    dat ons framework ongewijzigd over HTTP/2 draait (compat-laag).
-   Draai los: node --experimental-sqlite --test test/http2.test.js */
+   Draai los: node --test test/http2.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http2 = require('http2');

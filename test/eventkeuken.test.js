@@ -19,7 +19,7 @@
    dubbele taken opleveren. Een draaiboek dat elke klik langer wordt, wordt op
    de werkvloer niet meer gelezen.
 
-   Draai los: node --experimental-sqlite --test test/eventkeuken.test.js
+   Draai los: node --test test/eventkeuken.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

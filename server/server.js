@@ -3,19 +3,13 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
-/* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
-   een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
-   onszelf ermee, zodat zowel `npm start` als `node server/server.js` werkt. */
+/* De accountsdatabase gebruikt de ingebouwde SQLite van Node (node:sqlite).
+   Sinds Node 22.13 laadt die zonder vlag; de zelf-herstart met
+   --experimental-sqlite die hier stond is daarmee vervallen, en de
+   ondergrens staat in package.json (engines) en .nvmrc. Draait er toch een
+   oudere Node, dan is de foutmelding van require('node:sqlite') zelf
+   duidelijk genoeg. */
 const { idVanKey } = require('./lib/lidsleutel');
-
-if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
-  const r = require('child_process').spawnSync(
-    process.execPath,
-    ['--experimental-sqlite', __filename, ...process.argv.slice(2)],
-    { stdio: 'inherit' }
-  );
-  process.exit(r.status == null ? 1 : r.status);
-}
 
 /* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
    maar 4 draden heeft, ongeacht de machine. scrypt is puur rekenwerk, dus de

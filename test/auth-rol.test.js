@@ -26,7 +26,7 @@
    Achtergrond: de chaos-soak (scripts/mega65-storm.js) vond dat de leden-auth
    een niet-leden-sessie (leverancier/kantoor, zonder persona-tier) accepteerde,
    waarna de ledengids crashte -> 500. Deze test dekt die klasse fouten af voor
-   het hele oppervlak. Draai: node --experimental-sqlite --test test/auth-rol.test.js */
+   het hele oppervlak. Draai: node --test test/auth-rol.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

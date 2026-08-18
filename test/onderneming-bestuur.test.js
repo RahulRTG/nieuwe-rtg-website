@@ -16,7 +16,7 @@
    5. AFTREDEN IS GEEN WISSEN. Wie er ooit bestuurder was, was dat -- en juist
       die geschiedenis is waar een aansprakelijkheidsvraag over gaat.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-bestuur.test.js */
+   Draai los: node --test test/onderneming-bestuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

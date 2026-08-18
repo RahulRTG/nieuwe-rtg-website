@@ -14,7 +14,7 @@
    domein van vorm veranderd -- en dat is exact het signaal dat hier hoort te
    staan.
 
-   Draai: node --experimental-sqlite --test test/objectlaagroutes.test.js */
+   Draai: node --test test/objectlaagroutes.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

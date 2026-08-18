@@ -1,7 +1,7 @@
 /* Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt
    een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert.
    Weigeren laat alles zoals het was. Draait tegen een echte server.
-   Draai los: node --experimental-sqlite --test test/techniek-functies.test.js */
+   Draai los: node --test test/techniek-functies.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

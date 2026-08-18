@@ -10,7 +10,7 @@
       raakt, is erger dan geen knop. Daarom wordt elke intrek heen en terug
       nagelopen: weg uit de lijst EN weg bij de bron zelf.
 
-   Draai los: node --experimental-sqlite --test test/consent.test.js */
+   Draai los: node --test test/consent.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

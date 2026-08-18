@@ -14,8 +14,8 @@
    kloppende paden als kapot. Dus vragen we het aan de server zelf: we starten de
    app in dit proces en lezen de router uit (app._routes(), web/routing.js).
 
-   Draai: node --experimental-sqlite scripts/routekaart.js
-          node --experimental-sqlite scripts/routekaart.js --json
+   Draai: node scripts/routekaart.js
+          node scripts/routekaart.js --json
    Zet de app op een vrije poort en in een tijdelijke datamap, zodat dit nooit
    aan een echte installatie zit. */
 'use strict';

@@ -2,7 +2,7 @@
    taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan
    schakelen (globaal en per doelgroep, en het werkt echt: het pad gaat dicht)
    en een verbeterkamer bijhoudt. Draai los:
-   node --experimental-sqlite --test test/kantoren.test.js */
+   node --test test/kantoren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

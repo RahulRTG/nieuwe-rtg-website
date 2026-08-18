@@ -3,7 +3,7 @@
    Zegel met de uitgevende kant (server/lib/zegel.js), en toetsen dat de losse
    controle geldig zegt, een gemanipuleerd token afwijst, en een verlopen token
    herkent -- allemaal met alleen de publieke sleutel, zonder server.
-   Draai los: node --experimental-sqlite --test test/zegelcheck.test.js */
+   Draai los: node --test test/zegelcheck.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

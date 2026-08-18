@@ -19,7 +19,7 @@
    6. EEN HERSTART VERLIEST NOOIT EEN UPDATE, en zonder bron draait alles op de
       ingebouwde tabel door.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-rechtsvormen.test.js */
+   Draai los: node --test test/onderneming-rechtsvormen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

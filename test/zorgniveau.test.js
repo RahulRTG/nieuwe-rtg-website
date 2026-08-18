@@ -8,7 +8,7 @@
 
    En: de grens is code, geen prompt. Er is geen veld en geen route waarmee een
    aanroeper hem kan overrulen.
-   Draai los: node --experimental-sqlite --test test/zorgniveau.test.js */
+   Draai los: node --test test/zorgniveau.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

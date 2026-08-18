@@ -3,7 +3,7 @@
    het leerpaspoort) en het schoolkind (niveau uit de klas, doelen uit het
    open huiswerk). Zonder ANTHROPIC_API_KEY antwoordt de demo-terugval, en
    die is net zo geduldig -- daar rekenen deze tests op.
-   Draai los: node --experimental-sqlite --test test/bijles.test.js */
+   Draai los: node --test test/bijles.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

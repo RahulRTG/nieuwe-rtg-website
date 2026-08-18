@@ -149,7 +149,7 @@ function draai(w) {
   let cmd;
   if (w.soort === 'check') cmd = 'node scripts/check.js 2>&1';
   else if (w.soort === 'script') cmd = w.doel + ' 2>&1';
-  else cmd = 'node --experimental-sqlite --test ' + JSON.stringify(w.doel) + ' 2>&1';
+  else cmd = 'node --test ' + JSON.stringify(w.doel) + ' 2>&1';
   /* Met een shell EN de omleiding, zodat de twee stromen door EEN pijp gaan.
      Twee losse pijpen komen in willekeurige volgorde binnen, en dan staat het
      kruis van keuringsregel 23 zomaar onder de kop van regel 24 -- en wijzen

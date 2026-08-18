@@ -148,7 +148,7 @@ function meet(bewijs) {
   let uit;
   try {
     uit = execFileSync(process.execPath,
-      ['--experimental-sqlite', '--test', ...bestanden],
+      ['--test', ...bestanden],
       { encoding: 'utf8', cwd: WORTEL, timeout: 900000, maxBuffer: 32 * 1024 * 1024 });
   } catch (e) {
     uit = String((e && e.stdout) || '');

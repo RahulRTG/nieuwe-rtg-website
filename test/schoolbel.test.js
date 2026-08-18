@@ -2,7 +2,7 @@
    belsignalen. Ouders bellen de leraar of een boom-tak-gezin; kinderen
    bewust niet (geen privekanaal leraar-kind). Geen telefoonnummers nodig:
    alles blijft binnen de app.
-   Draai los: node --experimental-sqlite --test test/schoolbel.test.js */
+   Draai los: node --test test/schoolbel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

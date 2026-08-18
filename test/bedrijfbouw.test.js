@@ -11,7 +11,7 @@
    - EEN APPARAAT DAT NIET TERUG IS blokkeert de stap "apparaten terug"; het
      systeem weet het, dus het hoort het te weigeren.
    - HET UITDIENSTPROCES SLUIT NIET VANZELF: zes stappen, elk met een naam.
-   Draai los: node --experimental-sqlite --test test/bedrijfbouw.test.js */
+   Draai los: node --test test/bedrijfbouw.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

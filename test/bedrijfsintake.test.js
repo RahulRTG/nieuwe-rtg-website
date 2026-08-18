@@ -3,7 +3,7 @@
    akkoord gebeurt er niets; na akkoord + eerste termijn voldaan staat de
    zaak er (met dorp van het genre en de wensen uit de intake), en de
    eigenaar kan met de eenmalige PIN op de zaak inloggen.
-   Draai los: node --experimental-sqlite --test test/bedrijfsintake.test.js */
+   Draai los: node --test test/bedrijfsintake.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

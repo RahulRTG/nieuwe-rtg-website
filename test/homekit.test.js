@@ -1,6 +1,6 @@
 /* De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de
    vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan.
-   Draai los: node --experimental-sqlite --test test/homekit.test.js */
+   Draai los: node --test test/homekit.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

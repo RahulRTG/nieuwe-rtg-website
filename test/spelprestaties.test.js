@@ -4,7 +4,7 @@
    10", geen lijst van wat je nog kunt halen), er zijn geen reeksen, en het
    venster is dat van de log -- dus een prestatie kan weer verdwijnen.
 
-   Draai los: node --experimental-sqlite --test test/spelprestaties.test.js */
+   Draai los: node --test test/spelprestaties.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

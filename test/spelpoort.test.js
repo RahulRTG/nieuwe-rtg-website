@@ -17,7 +17,7 @@
    de dekkingsmeter -- die letterlijke paden in de toetstekst zoekt -- zien dat
    deze routes geraakt worden.
 
-   Draai los: node --experimental-sqlite --test test/spelpoort.test.js */
+   Draai los: node --test test/spelpoort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

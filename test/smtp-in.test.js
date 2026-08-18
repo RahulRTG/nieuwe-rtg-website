@@ -15,7 +15,7 @@
      echt luisteren  hetzelfde gesprek over een echte socket, want een protocol
                    dat alleen met arrays werkt is nog geen server
 
-   Draai: node --experimental-sqlite --test test/smtp-in.test.js */
+   Draai: node --test test/smtp-in.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const net = require('net');

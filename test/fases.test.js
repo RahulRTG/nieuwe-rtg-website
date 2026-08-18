@@ -1,6 +1,6 @@
 /* Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd;
    lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten.
-   Draai los: node --experimental-sqlite --test test/fases.test.js */
+   Draai los: node --test test/fases.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

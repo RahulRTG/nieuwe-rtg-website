@@ -2,7 +2,7 @@
    waarnemer die een klas van een collega overneemt, de online les voor
    thuiswerken, en huiswerk dat aan een leerdoel hangt en zichzelf afvinkt
    als het kind goed geoefend heeft.
-   Draai los: node --experimental-sqlite --test test/schoolverbonden.test.js */
+   Draai los: node --test test/schoolverbonden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

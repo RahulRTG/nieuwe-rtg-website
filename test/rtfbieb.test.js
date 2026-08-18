@@ -2,7 +2,7 @@
    (cadeau van de stichting), met de leeftijdspoort van het profiel: een kind
    ziet en installeert nooit iets boven zijn groep. Elke tegel opent een
    bestaande pagina. Draai los:
-   node --experimental-sqlite --test test/rtfbieb.test.js */
+   node --test test/rtfbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

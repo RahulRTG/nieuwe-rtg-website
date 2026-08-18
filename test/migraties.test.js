@@ -2,7 +2,7 @@
    Schemamigraties: genummerd, precies een keer, en met een weigering om te
    starten op een database die nieuwer is dan de code.
 
-   Draai los: node --experimental-sqlite --test test/migraties.test.js
+   Draai los: node --test test/migraties.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

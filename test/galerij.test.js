@@ -1,6 +1,6 @@
 /* RTG Galerij: de tijdlijn leest De Salon en RTG Bestanden (geen dubbele
    opslag), albums zijn verwijzingen en favorieten blijven van het lid.
-   Draai los: node --experimental-sqlite --test test/galerij.test.js */
+   Draai los: node --test test/galerij.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

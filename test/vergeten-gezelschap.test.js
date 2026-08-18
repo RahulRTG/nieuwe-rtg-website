@@ -14,7 +14,7 @@
    Deze test verwijdert daarom EEN LID PER PAS en veegt na elk daarvan opnieuw.
    Wat overblijft staat met tak en al in de foutmelding.
 
-   Draai los: node --experimental-sqlite --test test/vergeten-gezelschap.test.js */
+   Draai los: node --test test/vergeten-gezelschap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

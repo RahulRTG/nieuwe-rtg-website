@@ -3,7 +3,7 @@
    voorbeeld "01234567" -- en (2) een encode->decode round-trip over veel invoer
    en lengtes, wat meerdere QR-versies afdwingt. Zonder scanner is dit de manier
    om de codec waterdicht te controleren.
-   Draai los: node --experimental-sqlite --test test/qr.test.js */
+   Draai los: node --test test/qr.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const QR = require('../public/shared/qr');

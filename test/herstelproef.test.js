@@ -17,7 +17,7 @@
    nieuws is, maar omdat het de eigenschap is die je moet kennen VOOR je hem
    op een slechte dag ontdekt.
 
-   Draai los: node --experimental-sqlite --test test/herstelproef.test.js */
+   Draai los: node --test test/herstelproef.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -70,7 +70,7 @@ const wacht = (ms) => new Promise(r => setTimeout(r, ms));
 
 /* Start een server op de gegeven datamap en wacht tot hij antwoordt. */
 async function start(poort, extra) {
-  const kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
+  const kind = spawn(process.execPath, [SERVER], {
     env: {
       ...process.env, NODE_ENV: 'test', PORT: String(poort), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '0', RTG_VAULT_KEY: VAULT, RTG_SECRET_KEY: SECRET, ...extra

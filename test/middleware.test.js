@@ -11,7 +11,7 @@
    We rijden hier geen echte HTTP-server op: de lagen krijgen een nagebouwd
    req/res-paar met precies de methoden die de webmotor ze aanreikt. Dat is
    sneller, bindt geen poorten, en laat per laag zien wat hij doet.
-   Draai los: node --experimental-sqlite --test test/middleware.test.js */
+   Draai los: node --test test/middleware.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');

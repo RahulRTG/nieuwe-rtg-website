@@ -12,7 +12,7 @@
    lijkt het alsof de AI in haar naam sprak. Dat is precies de grens die het
    merk stelt, en toets 2 en 3 houden hem vast.
 
-   Draai los: node --experimental-sqlite --test test/gesprekdraad.test.js */
+   Draai los: node --test test/gesprekdraad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, elevateTier } = require('./helper');

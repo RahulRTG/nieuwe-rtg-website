@@ -9,7 +9,7 @@
    (WAL + synchronous=NORMAL); een proces-SIGKILL verliest een gecommitte WAL niet
    (de bytes staan bij de kernel, de herstart speelt de WAL terug). Deze test
    bewaakt dat contract. Draai los:
-   node --experimental-sqlite --test test/duurzaamheid-kill.test.js */
+   node --test test/duurzaamheid-kill.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

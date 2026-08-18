@@ -2,7 +2,7 @@
    wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten),
    een woord per dag (vandaag herzien mag, gisteren blijft staan), en
    nooit een score of streak.
-   Draai los: node --experimental-sqlite --test test/rtfwelzijn.test.js */
+   Draai los: node --test test/rtfwelzijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

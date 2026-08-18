@@ -29,7 +29,7 @@
    geeft kan tussen twee ingelogde leden nog steeds lekken"). Dit is die tweede
    klasse.
 
-   Draai los: node --experimental-sqlite --test test/grens-sweep.test.js
+   Draai los: node --test test/grens-sweep.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -49,7 +49,7 @@ const A_NAAM = 'Alfa Kluisnaam Zeldzaam';
 const A_MAIL_LOKAAL = 'alfa-kluis-zeldzaam';
 
 const routekaart = () => JSON.parse(execFileSync(process.execPath,
-  ['--experimental-sqlite', path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
+  [path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
   { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 })).routes || [];
 
 async function nieuwLid(naam, mailLokaal, n) {

@@ -22,7 +22,7 @@
      3. ZE LEZEN ALLEEN. Geen van de drie heeft een tegenhanger die iets
         opslaat; boeken en wijzigen blijft in de app die het echte werk doet.
 
-   Draai los: node --experimental-sqlite --test test/wereldroutes.test.js */
+   Draai los: node --test test/wereldroutes.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

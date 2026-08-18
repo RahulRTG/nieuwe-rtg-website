@@ -31,7 +31,7 @@
       werkend adres: niets zichtbaars;
    5. de tempering laat een fout-storm de ontvanger niet plat gooien.
 
-   Draai los: node --experimental-sqlite --test test/alarmweg.test.js
+   Draai los: node --test test/alarmweg.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

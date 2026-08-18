@@ -1,7 +1,7 @@
 /* De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de
    lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met
    het aantal aangemelde koks).
-   Draai: node --experimental-sqlite --test test/context-lijn.test.js */
+   Draai: node --test test/context-lijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

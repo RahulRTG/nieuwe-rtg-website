@@ -19,7 +19,7 @@
    een nieuwe meter niet ongemerkt ongeijkt meeliften, en wordt het gat
    kleiner in plaats van vergeten.
 
-   Draai los: node --experimental-sqlite --test test/meterijk.test.js */
+   Draai los: node --test test/meterijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -111,7 +111,7 @@ function journaalMetGat(weglaten) {
   const os = require('os');
   const { execFileSync, spawnSync } = require('child_process');
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 }));
   const routes = (kaart.routes || []).filter(r => r && r.pad && r.pad.startsWith('/api/'));
   assert.ok(routes.length > 100, 'de routekaart geeft routes (' + routes.length + ')');
@@ -123,7 +123,7 @@ function journaalMetGat(weglaten) {
     const regels = routes.slice(0, routes.length - n).map(r => (r.methode || 'POST').toUpperCase() + ' ' + r.pad);
     fs.writeFileSync(bestand, regels.join('\n') + '\n');
     const r = spawnSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
+      [path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
       { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 });
     let d = null;
     try { d = JSON.parse(r.stdout); } catch (e) { d = null; }
@@ -889,14 +889,32 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
+  /* EEN HERIJKING BIJ EEN MISSER, en waarom dat geen wegmoffelen is. In de
+     volle CI-suite draaien honderden toetsen naast deze; de nulmeting
+     ('voor') is dan een momentopname van een boom die onder je voeten kan
+     bewegen. Een proef die tegen die verschoven nulmeting 0 meet, zegt
+     niets over de meter -- alleen over de gelijktijdigheid. Bij een misser
+     meten we daarom EERST een verse nul en proberen we een keer opnieuw:
+     een echte regressie (de meter ziet de geplante fout niet) zakt ook
+     tegen de verse nul; een verbouwing ernaast niet. En als het dan nog
+     mis is, noemt de melding ALLE gezakte meters met hun verschillen --
+     de vorige vorm stopte bij de eerste en de CI-samenvatting herhaalt
+     alleen de toetsnaam, waardoor het echte detail onvindbaar bleef. */
+  const missers = [];
   for (const sleutel of geijkt) {
     meld('start ' + sleutel);
-    const verschil = IJKINGEN[sleutel].proef(voor);
+    let verschil = IJKINGEN[sleutel].proef(voor);
+    if (!(verschil > 0)) {
+      const versNul = norm.meet();
+      verschil = IJKINGEN[sleutel].proef(versNul);
+      meld('herijking ' + sleutel + ' tegen een verse nulmeting: verschil ' + verschil);
+    }
     meld('klaar ' + sleutel + ': verschil ' + verschil);
-    assert.ok(verschil > 0,
-      'meter "' + sleutel + '" zag de bekend-foute invoer NIET (verschil ' + verschil + '). ' +
-      'Een meter die niet uitslaat op iets wat fout is, meet niets.');
+    if (!(verschil > 0)) missers.push(sleutel + ' (verschil ' + verschil + ')');
   }
+  assert.deepEqual(missers, [],
+    'meters die de bekend-foute invoer NIET zagen, ook niet tegen een verse nulmeting: ' +
+    missers.join(', ') + '. Een meter die niet uitslaat op iets wat fout is, meet niets.');
 });
 
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {

@@ -15,7 +15,7 @@
         statements van de oude handle. Zonder de handle-controle zou de cache ze
         blijven uitdelen en dan lees je uit een database die je niet meer hebt.
 
-   Draai los: node --experimental-sqlite --test test/zinnencache.test.js */
+   Draai los: node --test test/zinnencache.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -5,7 +5,7 @@
 
    Draaien (lege motor met debug-vlag):
      RTG_MOTOR_DEBUG=1 motor/target/release/rtg-motor &
-     RTG_MOTOR_SHADOW=http://127.0.0.1:3100 node --experimental-sqlite scripts/motor-schaduw.js
+     RTG_MOTOR_SHADOW=http://127.0.0.1:3100 node scripts/motor-schaduw.js
 */
 'use strict';
 const http = require('http');

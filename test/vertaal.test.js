@@ -1,7 +1,7 @@
 /* RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder
    AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk
    over wat niet lukt (vertaald:false), nooit kapot. Dicht zonder token.
-   Draai los: node --experimental-sqlite --test test/vertaal.test.js */
+   Draai los: node --test test/vertaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

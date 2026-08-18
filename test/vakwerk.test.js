@@ -2,7 +2,7 @@
    wellness). Zelfde aanbod-/boekingsmodel als voorheen, maar met een
    vandaag-bord, de aanvragen die op bevestiging wachten, het aanbod met
    boek-cijfers, omzet-KPI's en een genre-bewuste AI-assistent.
-   Draai: node --experimental-sqlite --test test/vakwerk.test.js */
+   Draai: node --test test/vakwerk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

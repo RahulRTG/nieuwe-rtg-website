@@ -20,7 +20,7 @@
    - de herkomst is de EERSTE werkgever en verschuift niet bij een tweede baan;
    - een verlopen, gebruikte of verzonnen code opent niets.
 
-   Draai los: node --experimental-sqlite --test test/werving-link.test.js */
+   Draai los: node --test test/werving-link.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

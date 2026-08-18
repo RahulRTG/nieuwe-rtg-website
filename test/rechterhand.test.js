@@ -1,7 +1,7 @@
 /* Integratietests voor de extra premium ROS-apps van de Lifestyle Pass:
    Reisboek (reisdossier + documenten-attentie), Cellier (wijnkelder + drinkvenster),
    Table (diners: gasten + menu) en Maison (staf + taken). Gated op de Lifestyle Pass.
-   Draai los: node --experimental-sqlite --test test/rechterhand.test.js */
+   Draai los: node --test test/rechterhand.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

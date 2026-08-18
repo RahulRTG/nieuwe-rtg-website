@@ -1,5 +1,5 @@
 /* DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN.
-   Draai los: node --experimental-sqlite --test test/staff-inzet-mob.test.js
+   Draai los: node --test test/staff-inzet-mob.test.js
 
      /api/staff/mob/kaart/storingen   de storingslijst van de OV-vervoerder
      /api/staff/mob/mijn              het dispatchbeeld op de PDA

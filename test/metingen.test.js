@@ -3,7 +3,7 @@
    zegt over hoeveel dagen het gaat (een gemiddelde over een enkele nacht is
    geen weekbeeld), een herkomst die er niet is wordt geweigerd, en een lid ziet
    alleen zijn eigen dagen.
-   Draai los: node --experimental-sqlite --test test/metingen.test.js */
+   Draai los: node --test test/metingen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

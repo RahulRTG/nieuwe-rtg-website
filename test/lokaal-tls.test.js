@@ -8,7 +8,7 @@
    die telefoon binnenkomt (en niet alleen op 'localhost').
 
    Volledig offline; er gaat geen verkeer het netwerk op.
-   Draai los: node --experimental-sqlite --test test/lokaal-tls.test.js */
+   Draai los: node --test test/lokaal-tls.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -2,7 +2,7 @@
    water en door de lucht, bijstand tussen korpsen (special forces alleen via
    de politie), de keten ambulance -> ziekenhuis (beddenbord en opnames), de
    consulten van de huisarts en de meldkamer-AI. Draai los:
-   node --experimental-sqlite --test test/hulpdienst.test.js */
+   node --test test/hulpdienst.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

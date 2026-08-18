@@ -6,7 +6,7 @@
    Draaien:
      1) motor starten met de debug-vlag (voor de saldi-dump):
         RTG_MOTOR_DEBUG=1 RTG_MOTOR_ADDR=127.0.0.1:3100 motor/target/release/rtg-motor
-     2) node --experimental-sqlite scripts/motor-pariteit.js
+     2) node scripts/motor-pariteit.js
 */
 'use strict';
 const http = require('http');

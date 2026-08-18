@@ -3,7 +3,7 @@
    Schatduel (vijf ronden, het dichtstbij pakt het punt). Jong-profielen
    zijn niet beschermd en dus gewoon vindbaar op codenaam -- dat pad wordt
    hier ook bewezen. Overal alleen codenamen.
-   Draai los: node --experimental-sqlite --test test/societeit.test.js */
+   Draai los: node --test test/societeit.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

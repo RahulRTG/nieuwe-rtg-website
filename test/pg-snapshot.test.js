@@ -22,7 +22,7 @@
    komen), niet bij elke melding.
 
    Draai:  DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
-           node --experimental-sqlite --test test/pg-snapshot.test.js
+           node --test test/pg-snapshot.test.js
    ========================================================================== */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF (zie leden-gids-pg). */
 const test = require('node:test');

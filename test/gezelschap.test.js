@@ -17,7 +17,7 @@
       op een systeem waarin dat ook voor een kind van zeven geldt. Daarom wordt
       hier van BEIDE kanten geduwd.
 
-   Draai los: node --experimental-sqlite --test test/gezelschap.test.js */
+   Draai los: node --test test/gezelschap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

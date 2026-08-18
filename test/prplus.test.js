@@ -2,7 +2,7 @@
    campagneplanner (inplannen, valideren, weghalen, en het rijpe plan dat
    bij het overzicht vanzelf op De Salon verschijnt), de nieuwsbrief met de
    7-dagenrem, en de rolgrens (alleen management).
-   Draai los: node --experimental-sqlite --test test/prplus.test.js */
+   Draai los: node --test test/prplus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

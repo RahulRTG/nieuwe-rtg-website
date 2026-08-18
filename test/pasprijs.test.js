@@ -20,7 +20,7 @@
    dus NUL euro per lid, terwijl het betaalschema 65 euro in rekening bracht.
    Twee kopieen, twee antwoorden op dezelfde vraag.
 
-   Draai los: node --experimental-sqlite --test test/pasprijs.test.js
+   Draai los: node --test test/pasprijs.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

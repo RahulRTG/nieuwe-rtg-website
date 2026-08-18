@@ -15,7 +15,7 @@
    gesteld: de geldketen in de ketenronde (KETENS.json), het bord van een lid in
    test/notitiesduurzaam.test.js.
 
-   Draai los: node --experimental-sqlite --test test/saveduurzaam.test.js */
+   Draai los: node --test test/saveduurzaam.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -24,7 +24,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
-const inProces = (env, code) => execFileSync(process.execPath, ['--experimental-sqlite', '-e', code],
+const inProces = (env, code) => execFileSync(process.execPath, ['-e', code],
   { encoding: 'utf8', env: { ...process.env, ...env }, cwd: WORTEL }).trim().split('\n').pop();
 const verseMap = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sd-'));
 
@@ -118,7 +118,7 @@ test('sterf-na-commit doodt het proces NA de duurzame schrijfactie', () => {
   const map = verseMap();
   let gestorven = false;
   try {
-    execFileSync(process.execPath, ['--experimental-sqlite', '-e',
+    execFileSync(process.execPath, ['-e',
       "const db=require('./server/db');(async()=>{await db.load();" +
       "db.db.data.overleefdit={t:1};db.saveDuurzaam();" +
       "console.log('DIT MAG NIET GEBEUREN')})()"],

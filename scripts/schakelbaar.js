@@ -27,7 +27,7 @@
    WETTELIJKE RECHTEN, en een knop waarmee RTG die kan uitzetten hoort niet te
    bestaan.
 
-   Draai: node --experimental-sqlite scripts/schakelbaar.js [--json]
+   Draai: node scripts/schakelbaar.js [--json]
    ========================================================================== */
 'use strict';
 const fs = require('fs');

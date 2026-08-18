@@ -12,7 +12,7 @@
       server niet laten opstarten. Stil overslaan zou het spel spoorloos uit de
       lobby laten verdwijnen, en dan is het register zijn eigen doel kwijt.
 
-   Draai los: node --experimental-sqlite --test test/spelregister.test.js */
+   Draai los: node --test test/spelregister.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

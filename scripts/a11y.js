@@ -80,7 +80,7 @@ function startEchteServer() {
       const poort = s.address().port;
       s.close(async () => {
         const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
-        const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(ROOT, 'server', 'server.js')], {
+        const kind = spawn(process.execPath, [path.join(ROOT, 'server', 'server.js')], {
           cwd: ROOT, stdio: 'ignore',
           env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1' }
         });

@@ -7,11 +7,9 @@ module.exports = (actx) => {
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern } = actx;
   const keurAanmelding = require('./aanmeldcontrole')({ accounts, crypto, schoon, leeftijdVan, pasAppOk, PAS_FOUT });
 app.post('/api/auth/register', async (req, res) => {
-  // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
-  // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
-  // technische pagina.
+  // Registratie-zekering (een noodrem-trede dooft vanzelf; zie techniek.js).
   const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
-  if (zReg && zReg.aan === false) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
+  if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
   /* De poortcontrole staat in ./aanmeldcontrole.js: wat mag er binnenkomen en
      met welke pas. Die geeft een fout terug of de schoongemaakte velden; hier
      blijft staan wat we met een GOEDGEKEURDE aanmelding doen. */

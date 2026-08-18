@@ -2,7 +2,7 @@
    Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en
    Rahul stelt een jetset-date voor op een gedeelde locatie. Gated op de Lifestyle
    Pass; op codenaam. Draai los:
-   node --experimental-sqlite --test test/rendezvous.test.js */
+   node --test test/rendezvous.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -11,7 +11,7 @@
      - venster uit  -> altijd open zodra je bent ingelogd
    Allebei worden hier afgerekend, want de werkgever moet kunnen kiezen.
 
-   Draai los: node --experimental-sqlite --test test/werk-bij-inloggen.test.js */
+   Draai los: node --test test/werk-bij-inloggen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

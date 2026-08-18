@@ -1,7 +1,7 @@
 /* Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid
    over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken,
    saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de
-   tienercoach. Draai los: node --experimental-sqlite --test test/tiener.test.js */
+   tienercoach. Draai los: node --test test/tiener.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

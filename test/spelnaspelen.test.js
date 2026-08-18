@@ -7,7 +7,7 @@
    scherm een stand die er nooit zo heeft gestaan -- en dat ziet er precies zo
    echt uit als een goede.
 
-   Draai los: node --experimental-sqlite --test test/spelnaspelen.test.js */
+   Draai los: node --test test/spelnaspelen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

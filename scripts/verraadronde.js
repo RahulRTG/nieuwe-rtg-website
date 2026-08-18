@@ -35,8 +35,8 @@
    scenario moet zonder verraad wel degelijk zijn spoor achterlaten. Doet het dat
    niet, dan meet de waarnemer niets en mag hij niet oordelen.
 
-   Draai:  node --experimental-sqlite scripts/verraadronde.js
-           node --experimental-sqlite scripts/verraadronde.js --seed=99
+   Draai:  node scripts/verraadronde.js
+           node scripts/verraadronde.js --seed=99
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -67,7 +67,7 @@ function vrijePoort() {
 async function start(datamap, extra) {
   const poort = await vrijePoort();
   const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
       RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra }

@@ -3,7 +3,7 @@
    bedrijfsnaam + kassacode + eigen RTG-inlog. Elk echt account is genoeg (ook
    het gratis gast-account, een betaalde pas is niet nodig); zonder geldige
    uitnodiging komt niemand erin, en tweemaal met dezelfde code lukt niet.
-   Draai: node --experimental-sqlite --test test/staffinvite.test.js */
+   Draai: node --test test/staffinvite.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

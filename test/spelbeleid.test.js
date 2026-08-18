@@ -10,7 +10,7 @@
    vraag is dan starten, en dat de context van een potje nooit uit het verzoek
    komt.
 
-   Draai los: node --experimental-sqlite --test test/spelbeleid.test.js */
+   Draai los: node --test test/spelbeleid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

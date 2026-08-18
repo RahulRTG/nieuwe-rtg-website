@@ -41,7 +41,7 @@
    langs, zodat een gat in die deur niet op een enkele route onopgemerkt
    blijft.
 
-   Draai los: node --experimental-sqlite --test test/vakwerk-pro.test.js
+   Draai los: node --test test/vakwerk-pro.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

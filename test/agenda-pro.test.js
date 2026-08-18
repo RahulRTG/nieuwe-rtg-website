@@ -1,7 +1,7 @@
 /* De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op
    codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator
    terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:
-   node --experimental-sqlite --test test/agenda-pro.test.js */
+   node --test test/agenda-pro.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

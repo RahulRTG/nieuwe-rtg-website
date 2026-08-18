@@ -17,7 +17,7 @@
    - een bron is een https-adres per land, en de bijwerkronde pakt hem op
      zonder dat er code verandert. Dat is wat "wereldwijd" hier betekent.
 
-   Draai los: node --experimental-sqlite --test test/payroll-dekking.test.js */
+   Draai los: node --test test/payroll-dekking.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

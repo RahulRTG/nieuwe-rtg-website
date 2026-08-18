@@ -33,7 +33,7 @@
        de zin naar de taal van de hulpvrager. Daarna bijt de mutatie op de
        gedeelde controle wel.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-doelgroepen.test.js
+   Draai los: node --test test/rtfos-doelgroepen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

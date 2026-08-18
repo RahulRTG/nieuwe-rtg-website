@@ -23,7 +23,7 @@
    - EEN SOLLICITATIEGESPREK IS VAN DE WERKGEVER EN DE SOLLICITANT. Een chat
      van een andere zaak bestaat hier niet, en schrijven doet het management.
 
-   Draai los: node --experimental-sqlite --test test/zaak-loket-en-dossier.test.js
+   Draai los: node --test test/zaak-loket-en-dossier.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

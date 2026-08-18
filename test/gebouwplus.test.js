@@ -2,7 +2,7 @@
    Getoetst: de manager van de demo-toren legt een huurcontract vast,
    verlengt en beeindigt het; leads schuiven door de fasen; energie-weken
    worden geklemd en de signalenlijst ziet een aflopend contract.
-   Draai los: node --experimental-sqlite --test test/gebouwplus.test.js */
+   Draai los: node --test test/gebouwplus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

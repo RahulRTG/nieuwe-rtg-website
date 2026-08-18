@@ -3,7 +3,7 @@
    wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag aanBalie,
    dat de bon meteen loopt (status nieuw, onbetaald), dat de kassa hem met de
    code afrekent en uitgeeft, en dat een jeugdlid toch eerst moet betalen.
-   Draai los: node --experimental-sqlite --test test/naarkassa.test.js */
+   Draai los: node --test test/naarkassa.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, keurLidGoed } = require('./helper');

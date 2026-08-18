@@ -1,7 +1,7 @@
 /* De btw-aangifte van een zaak: de periodevakken, de telling over het
    factuurregister, de twee controles die weigeren, de correctie en de poorten
    van de leverancier-endpoints.
-   Draai: node --experimental-sqlite --test test/btw-aangifte.test.js */
+   Draai: node --test test/btw-aangifte.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

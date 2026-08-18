@@ -22,7 +22,7 @@
    6. een geparkeerd antwoord blijft OPEN staan, zodat de go-live-keuring erop
       blijft blokkeren. "Ik weet het nog niet" hoort zichtbaar te blijven.
 
-   Draai los: node --experimental-sqlite --test test/papieren-boardroom.test.js
+   Draai los: node --test test/papieren-boardroom.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

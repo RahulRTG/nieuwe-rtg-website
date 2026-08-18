@@ -26,7 +26,7 @@
         bewaard; een beheerscherm dat geheimen toont, lekt ze zodra iemand
         meekijkt of een schermafdruk maakt.
 
-   Draai los: node --experimental-sqlite --test test/techniek-sso-scim.test.js
+   Draai los: node --test test/techniek-sso-scim.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

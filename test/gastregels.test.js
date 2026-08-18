@@ -3,7 +3,7 @@
    mag pas een restaurant reserveren als het ID geverifieerd is, telt tot
    die verificatie standaard als "onder de 18" (geen alcohol), en kan wel
    gewoon met een QR-kassacode betalen.
-   Draai: node --experimental-sqlite --test test/gastregels.test.js */
+   Draai: node --test test/gastregels.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

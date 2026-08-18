@@ -2,7 +2,7 @@
    en land meteen op de juiste bedrijfspagina. Wie bij meer bedrijven op het
    rooster staat, wisselt met één tik van werkplek, zonder opnieuw in te loggen.
    Inloggen zet je nooit automatisch aan het werk: de klok is een aparte knop.
-   Draai: node --experimental-sqlite --test test/pda-aanmelden.test.js */
+   Draai: node --test test/pda-aanmelden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

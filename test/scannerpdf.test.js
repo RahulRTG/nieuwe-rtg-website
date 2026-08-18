@@ -1,7 +1,7 @@
 /* RTG Scanner: de eigen PDF-bouwer (public/apps/scanner/pdfje.js) is puur
    en draait ook in Node -- dus toetsen we hem zonder browser: een geldige
    PDF-structuur, een beeld per pagina, en een kloppende xref-verwijzing.
-   Draai los: node --experimental-sqlite --test test/scannerpdf.test.js */
+   Draai los: node --test test/scannerpdf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maak } = require('../public/apps/scanner/pdfje');

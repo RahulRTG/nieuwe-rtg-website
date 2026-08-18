@@ -19,7 +19,7 @@
    - Een review kan pas na het uitchecken, een keer per richting. Een sterrental
      buiten een tot vijf is geen oordeel maar een tikfout.
 
-   Draai los: node --experimental-sqlite --test test/thuis-zaak.test.js
+   Draai los: node --test test/thuis-zaak.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

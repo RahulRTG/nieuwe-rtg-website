@@ -19,7 +19,7 @@
       aangeroepen, en de inzetbaarheid kon door niemand worden gezet, dus stond
       hij eeuwig op "niets".
 
-   Draai los: node --experimental-sqlite --test test/payroll-register-verzuim.test.js */
+   Draai los: node --test test/payroll-register-verzuim.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

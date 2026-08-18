@@ -4,7 +4,7 @@
    is druk), het ouder-beheer van een kindritme, en het gezinsbord. Dicht voor
    gasten.
 
-   Draai los: node --experimental-sqlite --test test/ochtend.test.js */
+   Draai los: node --test test/ochtend.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

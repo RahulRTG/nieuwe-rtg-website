@@ -5,7 +5,7 @@
    op), (2) de schilden die de ingebouwde niet heeft (__proto__ geweerd,
    diepte-grens, strikte afwijzing van rommel), (3) end-to-end door de echte
    server: een verzoek gaat er via de eigen parser in en via de eigen
-   stringifier uit. Draai los: node --experimental-sqlite --test test/rtgjson.test.js */
+   stringifier uit. Draai los: node --test test/rtgjson.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

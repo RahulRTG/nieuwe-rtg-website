@@ -43,7 +43,7 @@
    een vertrouwensmelding van een medewerker, het team van een geheim
    labproject, en het wissen van een medisch dossier.
 
-   Draai los: node --experimental-sqlite --test test/rollenmatrix.test.js
+   Draai los: node --test test/rollenmatrix.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

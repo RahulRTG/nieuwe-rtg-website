@@ -47,7 +47,7 @@ async function wachtTotOp(port, uitInfo, tot = 30000) {
 // kan gebeuren naast de vele parallelle testservers van de suite) gooien we
 // een herkenbare fout zodat de test het met een verse poort opnieuw probeert
 function boot(port, dataDir) {
-  const kind = cp.spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
+  const kind = cp.spawn(process.execPath, ['server/server.js'], {
     cwd: ROOT,
     env: Object.assign({}, process.env, {
       PORT: String(port), RTG_DATA_DIR: dataDir, RTG_CSP_NONCE: '0',

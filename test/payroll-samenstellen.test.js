@@ -18,7 +18,7 @@
    geklokte feiten lopen in plaats van over het personeel met een contract, of
    haal de verzuim-tak uit `voorMens()`.
 
-   Draai los: node --experimental-sqlite --test test/payroll-samenstellen.test.js */
+   Draai los: node --test test/payroll-samenstellen.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

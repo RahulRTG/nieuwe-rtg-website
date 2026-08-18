@@ -20,7 +20,7 @@
    Dat was aangenomen, niet nagetrokken, en het klopte niet. Deze toets maakt het
    waar in plaats van beweerd.
 
-   Draai los: node --experimental-sqlite --test test/opslagpoort.test.js
+   Draai los: node --test test/opslagpoort.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

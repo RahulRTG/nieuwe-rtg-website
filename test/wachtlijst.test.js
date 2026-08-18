@@ -8,7 +8,7 @@
       ander afzegde -- u krijgt bericht en boekt zelf.
    2. Een gemiste afspraak is GEEN cijfer dat met u meereist. Hij staat bij de
       aanbieder waar het gebeurde, en een andere zaak ziet hem niet.
-   Draai los: node --experimental-sqlite --test test/wachtlijst.test.js */
+   Draai los: node --test test/wachtlijst.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

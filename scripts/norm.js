@@ -27,8 +27,8 @@
    het als "kan beter" in een lijst van 127 punten die niemand meer leest. Deze
    ratel is precies dat verschil.
 
-   Draai:  node --experimental-sqlite scripts/norm.js
-           node --experimental-sqlite scripts/norm.js --vastleggen
+   Draai:  node scripts/norm.js
+           node scripts/norm.js --vastleggen
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -455,7 +455,7 @@ function meet(bronnen) {
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
   const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
+    [path.join(__dirname, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
   let k = null;
   try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
@@ -547,6 +547,15 @@ function meet(bronnen) {
       if (!m) { nietGemeten++; continue; }
       if (m.staat === 'overleefd') overleefd++;
       else if (m.staat === 'gezakt') gezakt++;
+      /* 'geen bronmutatie mogelijk' is GEEN niet-gemeten: de motor is er wel
+         degelijk langs geweest en het oordeel staat gedocumenteerd in
+         GEEN_BRONMUTATIE, elk met zijn foutklasse met de hand nagetrokken.
+         Toen deze staat hier nog als niet-gemeten telde, werd de meter rood
+         van precies het eerlijke werk -- dertien overlevers herklasseren
+         duwde hem van 150 naar 158, terwijl er alleen MEER bekend was
+         geworden. Een meter die eerlijkheid bestraft, leert iedereen om
+         vaag te blijven (zelfde les als bij toetsenOngevoeligPct hierboven). */
+      else if (m.staat === 'geen bronmutatie mogelijk') { /* gekend, eigen categorie */ }
       else nietGemeten++;      // 'al rood', 'geen module gevonden', 'slaat zichzelf over', ...
     }
     const gemeten = overleefd + gezakt;
@@ -648,7 +657,7 @@ function meet(bronnen) {
      Dus zakt hij, net als hierboven bij een ontbrekende ijkregistratie. */
   if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
     throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
-      '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
+      '(draai: node scripts/routekaart.js --json)');
   }
 
   return {
@@ -892,7 +901,7 @@ function main() {
     console.log('\n\x1b[32m  De norm is gehaald\x1b[0m' +
       (beterDan.length + presBeter.length ? ', en op ' + (beterDan.length + presBeter.length) + ' punt(en) ruim' : '') +
       (nieuw.length + presNieuw.length ? '; ' + (nieuw.length + presNieuw.length) + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
-    console.log('  \x1b[2mLeg dat vast met: node --experimental-sqlite scripts/norm.js --vastleggen\x1b[0m\n');
+    console.log('  \x1b[2mLeg dat vast met: node scripts/norm.js --vastleggen\x1b[0m\n');
     return 0;
   }
   /* HIER STOND `if (beterDan.length && vastleggen)`. Een meter die je toevoegt

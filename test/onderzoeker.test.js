@@ -1,7 +1,7 @@
 /* De Onderzoeker: de tweede AI van het RTG Kantoor. De RTG AI bouwt hem met
    zijn meelees-kennis als leerstof; daarna doet hij agentisch onderzoek
    (plan, bronnen, analyse, rapport) en adviseert hij alleen.
-   Draai los: node --experimental-sqlite --test test/onderzoeker.test.js */
+   Draai los: node --test test/onderzoeker.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -9,7 +9,7 @@
    - wat je typte staat na het versturen niet meer in het veld, en er blijft geen
      bellenrij met je code op het scherm achter.
 
-   Draai los: node --experimental-sqlite --test test/kantoorgesprek.e2e.js */
+   Draai los: node --test test/kantoorgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten } = require('./helper');

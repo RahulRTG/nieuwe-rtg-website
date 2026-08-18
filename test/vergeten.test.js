@@ -13,7 +13,7 @@
 
    Zo blijft de belofte meegroeien met het systeem in plaats van erachteraan.
 
-   Draai los: node --experimental-sqlite --test test/vergeten.test.js */
+   Draai los: node --test test/vergeten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -81,7 +81,7 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      alleen het doosje verschilt. Met de JSON-opslag kan de bezem hieronder
      rechtstreeks lezen wat er op schijf staat, zonder dat de test een
      databaseschema hoeft te kennen dat met elke functie kan veranderen. */
-  kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
+  kind = spawn(process.execPath, [SERVER], {
     env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '1', RTG_STORE: 'json' },
     // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)

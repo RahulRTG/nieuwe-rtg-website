@@ -14,7 +14,7 @@
       eigen post niet wegstrepen. Dat is ongemakkelijk, en het staat in het
       antwoord in plaats van dat iemand denkt dat de lijst kapot is.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-crediteuren.test.js */
+   Draai los: node --test test/onderneming-crediteuren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

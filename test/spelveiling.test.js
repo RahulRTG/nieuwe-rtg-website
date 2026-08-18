@@ -21,7 +21,7 @@
    6. HET GELD KLOPT. Bij een zaak gaat het naar de verkoper, bij grond naar de
       Foundation-pot van de stad -- en nergens naar niemand.
 
-   Draai los: node --experimental-sqlite --test test/spelveiling.test.js */
+   Draai los: node --test test/spelveiling.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

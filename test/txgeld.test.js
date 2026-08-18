@@ -32,7 +32,7 @@
    De grenzen staan hier laag (TX_*_CAP) -- zelfde gedrag als op 200.000, alleen
    beproefbaar. Eigen bestand, want die variabelen worden bij het laden gelezen.
 
-   Draai los: node --experimental-sqlite --test test/txgeld.test.js
+   Draai los: node --test test/txgeld.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -43,10 +43,16 @@ const path = require('path');
 const DATA = process.env.RTG_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-txgeld-'));
 process.env.TX_DIRECTBETALINGEN_CAP = '4';
 process.env.TX_BETAALVERZOEKEN_CAP = '4';
+const { db } = require('../server/db');
+/* De functies komen hier rechtstreeks uit server/db/tx: dat is de module
+   waarvan dit bestand het gedrag vastlegt. Via de gevel (server/db) laden
+   werkte ook, maar dan muteert de mutatiemotor de her-exports in plaats van
+   de logica -- deze toets stond als 'overleefd' in MUTATIES.json terwijl hij
+   inhoudelijk prima beet. De meter wijst nu naar de goede module. */
 const {
-  db, directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
+  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
   betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe
-} = require('../server/db');
+} = require('../server/db/tx');
 const { COLLECTIES, NAMEN } = require('../server/db/tx/collecties');
 
 const leeg = () => { db.data = { orders: [], boekingen: [], directBetalingen: [], betaalVerzoeken: [] }; };

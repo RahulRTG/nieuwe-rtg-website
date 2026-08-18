@@ -1,7 +1,7 @@
 /* De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de
    oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI
    weigert alles wat richting wapeninzet of doelbestrijding gaat. Draai los:
-   node --experimental-sqlite --test test/defensie.test.js */
+   node --test test/defensie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

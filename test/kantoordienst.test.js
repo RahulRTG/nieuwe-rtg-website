@@ -30,7 +30,7 @@
       faalvorm is overal gelijk: het voorstel schakelt meteen, en niemand merkt
       het omdat de knop precies doet wat er staat.
 
-   Draai los: node --experimental-sqlite --test test/kantoordienst.test.js
+   Draai los: node --test test/kantoordienst.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

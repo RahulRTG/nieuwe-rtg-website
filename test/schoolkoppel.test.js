@@ -16,7 +16,7 @@
    daarom staat RTG_SCHOOL_WEBHOOK_INTERN=1 aan (zelfde schakelaar als bij de
    fout-melder). Zonder die vlag weigert de SSRF-afweer een intern adres, en dat
    hoort ook zo.
-   Draai los: node --experimental-sqlite --test test/schoolkoppel.test.js */
+   Draai los: node --test test/schoolkoppel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

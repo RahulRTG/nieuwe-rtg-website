@@ -18,7 +18,7 @@
    niet naar een geval. Vind je een nieuw soort stille fout, dan komt er hier
    een scanner bij, zodat dezelfde soort nooit twee keer kan gebeuren.
 
-   Draai los: node --experimental-sqlite --test test/blindevlek.test.js */
+   Draai los: node --test test/blindevlek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -101,7 +101,7 @@ let _kaart = null;
 function routekaart() {
   if (_kaart) return _kaart;
   const uit = require('child_process').execFileSync(
-    process.execPath, ['--experimental-sqlite', path.join(ROOT, 'scripts', 'routekaart.js'), '--json'],
+    process.execPath, [path.join(ROOT, 'scripts', 'routekaart.js'), '--json'],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'],
       env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
   _kaart = JSON.parse(uit);

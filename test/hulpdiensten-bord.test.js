@@ -35,7 +35,7 @@
    iets anders zeggen over dezelfde persoon, en de meldkamer stuurt op het
    bord dat ernaast zit.
 
-   Draai los: node --experimental-sqlite --test test/hulpdiensten-bord.test.js
+   Draai los: node --test test/hulpdiensten-bord.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

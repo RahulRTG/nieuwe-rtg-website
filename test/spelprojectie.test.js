@@ -7,7 +7,7 @@
    en het antwoord moet nee zijn omdat die kaart niet in die laag ZIT, niet
    omdat we hem niet meesturen.
 
-   Draai los: node --experimental-sqlite --test test/spelprojectie.test.js */
+   Draai los: node --test test/spelprojectie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

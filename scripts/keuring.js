@@ -17,8 +17,8 @@
    Geen enkele check raadt. Wat de Keuring niet zeker weet, meldt zij als
    vermoeden met de reden erbij, zodat een mens het kan wegen.
 
-   Draai los: node --experimental-sqlite scripts/keuring.js
-              node --experimental-sqlite scripts/keuring.js --json  */
+   Draai los: node scripts/keuring.js
+              node scripts/keuring.js --json  */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -82,7 +82,7 @@ function zinnen(tekst) {
 function dekking() {
   let routes = [];
   try {
-    const uit = execFileSync(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+    const uit = execFileSync(process.execPath, [path.join(__dirname, 'routekaart.js'), '--json'],
       { cwd: WORTEL, encoding: 'utf8', timeout: 120000, maxBuffer: 32 * 1024 * 1024 });
     const d = JSON.parse(uit);
     routes = (d.routes || d || []).map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean);
@@ -197,7 +197,9 @@ const GEWOGEN = new Map([
   ['public/apps/app-main/app-main-48.js | Uw deel is betaald.',
     'bevestiging na een geslaagde betaling via /splits/betaal'],
   ['server/kern/fluister/acties.js | is betaald;',
-    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen']
+    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen'],
+  ['server/kern/mobiliteit/reis.js | De vervoerbewijzen zijn betaald.',
+    'staat achter nuBetaald > 0: de som van etappes die e.betaald dragen -- een stand melden mag, zie de kop van dit blok']
 ]);
 
 function beloftes() {

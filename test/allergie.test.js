@@ -5,7 +5,7 @@
    profiel niet mee en wordt er niets tegengehouden (privacy by design).
    Omdat de menukaart, de kassa EN Rahul allemaal dezelfde /api/order roepen,
    weigeren die allemaal automatisch hetzelfde botsende gerecht.
-   Draai los: node --experimental-sqlite --test test/allergie.test.js */
+   Draai los: node --test test/allergie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

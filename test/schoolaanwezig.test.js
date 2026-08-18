@@ -9,7 +9,7 @@
    - de ontruimingslijst valt terug op de presentie van vandaag als er geen
      poortjes zijn;
    - er wordt GEEN looproute per pas bewaard.
-   Draai los: node --experimental-sqlite --test test/schoolaanwezig.test.js */
+   Draai los: node --test test/schoolaanwezig.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

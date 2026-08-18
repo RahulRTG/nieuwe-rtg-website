@@ -27,7 +27,7 @@
    pincode van zijn eigen manager (Sal de Mar en Aguamarina, twee losse zaken
    uit de seed).
 
-   Draai los: node --experimental-sqlite --test test/supplier-post-drive.test.js
+   Draai los: node --test test/supplier-post-drive.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -1,6 +1,6 @@
 /* De CDT-laag: rittenregistratie en arbeids-, rij- en rusttijden voor het
    Nederlandse taxivervoer. Draai los:
-   node --experimental-sqlite --test test/cdt.test.js
+   node --test test/cdt.test.js
 
    Wat deze toetsen bewaken:
 

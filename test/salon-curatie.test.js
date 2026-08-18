@@ -5,7 +5,7 @@
    dat de aanroep via de centrale AI-laag loopt (uitwijkketen, geen eigen
    modelnaam in de gate-module), en de route zelf: de boardroom-deur, de stand,
    een echte ronde tegen een nagemaakte provider en de audit-regel.
-   Draai los: node --experimental-sqlite --test test/salon-curatie.test.js */
+   Draai los: node --test test/salon-curatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

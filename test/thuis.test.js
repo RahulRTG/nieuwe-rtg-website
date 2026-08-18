@@ -4,7 +4,7 @@
    instant boeken vs aanvraag + hostbeslissing, dubbele periodes geweigerd,
    keyless deurcode pas dichtbij aankomst, annuleringsbeleid, reviews twee
    kanten op, wenslijst, berichten, het hostbord en de Reiswijzer die met de
-   boeking meereist. Draai los: node --experimental-sqlite --test test/thuis.test.js */
+   boeking meereist. Draai los: node --test test/thuis.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

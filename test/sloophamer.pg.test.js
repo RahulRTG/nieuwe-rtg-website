@@ -18,7 +18,7 @@
    Draait alleen met DATABASE_URL EN REDIS_URL gezet (anders overgeslagen):
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtggrand \
      REDIS_URL=redis://127.0.0.1:6399 \
-     node --experimental-sqlite --test test/sloophamer.pg.test.js */
+     node --test test/sloophamer.pg.test.js */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel

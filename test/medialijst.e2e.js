@@ -11,7 +11,7 @@
    uitgaven uit de eigen klankmotor. Dat is met opzet de enige vorm die dit huis
    zelf kan opwekken -- een geseede clip zou eeuwig "maker offline" zijn.
 
-   Draai: npm run e2e (of los: node --experimental-sqlite --test test/medialijst.e2e.js) */
+   Draai: npm run e2e (of los: node --test test/medialijst.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -15,7 +15,7 @@
       en dat spoor gaat mee in de AVG-export en weg bij "verwijder mij".
    7. REM: een lus met schakelverzoeken loopt tegen een grens.
 
-   Draai los: node --experimental-sqlite --test test/lidboard.test.js */
+   Draai los: node --test test/lidboard.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

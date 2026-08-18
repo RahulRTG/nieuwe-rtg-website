@@ -18,7 +18,7 @@
    en krijgt gewoon punten. Dat is geen gat dat we hier dichten, dat is de
    eerlijke grens van de maatregel (zie de kop van spellen/sudoku.js).
 
-   Draai los: node --experimental-sqlite --test test/spelsudoku.test.js */
+   Draai los: node --test test/spelsudoku.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

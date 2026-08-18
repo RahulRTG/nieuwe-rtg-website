@@ -2,7 +2,7 @@
    en de verdeling man/vrouw. Alleen geaggregeerd -- nooit per persoon. Getoetst:
    optellen en aftrekken per groep, het totaal, niet onder nul, de teller legen,
    en dat het alleen met een leverancier-login mag.
-   Draai los: node --experimental-sqlite --test test/aanwezig.test.js */
+   Draai los: node --test test/aanwezig.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

@@ -8,7 +8,7 @@
       naam) en de doorstroom vooruit door de keten.
    4. Elke afdeling zijn eigen hotel: het komt er vanzelf, boeken kan, en
       dubbelboeken van hetzelfde kamertype wordt geweigerd.
-   Draai los: node --experimental-sqlite --test test/werkvormen.test.js */
+   Draai los: node --test test/werkvormen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

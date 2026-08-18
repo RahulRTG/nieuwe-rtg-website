@@ -4,7 +4,7 @@
    een geldig zegel; manipuleren maakt het zegel ongeldig; alleen zaak-paden gaan
    erin (nooit inloggen, accounts, de doos zelf of een pad met ..); en een te
    grote body wordt geweigerd.
-   Draai los: node --experimental-sqlite --test test/doos-journaal.test.js */
+   Draai los: node --test test/doos-journaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

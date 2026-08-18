@@ -16,7 +16,7 @@
       Chatten kan daarom alleen als ELK PAAR aan tafel elkaar buiten dit potje
       ook al mag bereiken.
 
-   Draai los: node --experimental-sqlite --test test/spelpraat.test.js */
+   Draai los: node --test test/spelpraat.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

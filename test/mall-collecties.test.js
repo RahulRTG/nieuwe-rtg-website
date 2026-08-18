@@ -14,7 +14,7 @@
         van de buren belooft iets wat zij niet kan leveren.
 
    Elke toets is met een mutatie nagetrokken (LAT-regel 2).
-   Draai los: node --experimental-sqlite --test test/mall-collecties.test.js */
+   Draai los: node --test test/mall-collecties.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

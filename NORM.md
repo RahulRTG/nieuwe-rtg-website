@@ -13,8 +13,8 @@ verschil tussen "we halen het" en "we blijven het halen".
 ## De ratel
 
 ```
-node --experimental-sqlite scripts/norm.js              # controleren
-node --experimental-sqlite scripts/norm.js --vastleggen # verbetering vastleggen
+node scripts/norm.js              # controleren
+node scripts/norm.js --vastleggen # verbetering vastleggen
 ```
 
 Draait mee in CI. De regel is eenvoudig:

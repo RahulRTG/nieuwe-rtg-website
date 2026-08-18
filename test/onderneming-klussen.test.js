@@ -17,7 +17,7 @@
       factuur `betaald`; eisen dat ze allebei staan, toont een betaalde klus als
       onbetaald.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-klussen.test.js */
+   Draai los: node --test test/onderneming-klussen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

@@ -153,7 +153,7 @@ function boot() {
     const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
       ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
       NODE_OPTIONS: '--max-old-space-size=2048' }; // bewust krap: een lek slaat sneller toe (dat is de bedoeling)
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
+    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), 'server/server.js'],
       { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
     child.on('exit', (c, s) => { gestopt = { code: c, signal: s }; });
     (async () => {

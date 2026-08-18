@@ -10,7 +10,7 @@
    - een koppeling deelt alleen de velden die zijn aangevinkt, en zorg,
      incidenten en het journaal staan niet eens in de lijst;
    - toestemming is intrekbaar, en geen antwoord telt nooit als ja.
-   Draai los: node --experimental-sqlite --test test/schoolbeeld.test.js */
+   Draai los: node --test test/schoolbeeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

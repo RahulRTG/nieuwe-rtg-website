@@ -14,7 +14,7 @@
        op de kaart heeft gezet -- want RTG bezorgt niets, en dat mag het scherm
        dus ook niet beloven.
 
-   Draai los: node --experimental-sqlite --test test/podiumhandel.test.js */
+   Draai los: node --test test/podiumhandel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

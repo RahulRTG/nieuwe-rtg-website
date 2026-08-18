@@ -11,7 +11,7 @@
    - EEN ARTIKEL VEROUDERT ZICHTBAAR: de stand komt uit de datum en niet uit
      een vinkje, en een nieuwe versie laat de oude leesbaar staan als vervallen.
    - AFSCHERMING GELDT OOK IN DE ZOEKUITSLAG, niet pas bij het openen.
-   Draai los: node --experimental-sqlite --test test/bedrijfwerk.test.js */
+   Draai los: node --test test/bedrijfwerk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

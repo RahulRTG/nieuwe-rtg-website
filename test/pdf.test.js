@@ -13,7 +13,7 @@
 
    De PDF's in dit bestand worden hier ter plekke gebouwd; er is geen
    testbestand nodig en dus ook geen bestand dat kan verouderen.
-   Draai los: node --experimental-sqlite --test test/pdf.test.js */
+   Draai los: node --test test/pdf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -4,7 +4,7 @@
    nergens op slaan, "ja" roepen zonder dat er iets openstaat en plakwerk
    met HTML erin. De lat: NOOIT een 5xx, altijd een net antwoord, en wat
    een voorstel belooft is wat de uitvoering waarmaakt.
-   Draai los: node --experimental-sqlite --test test/onnozel.test.js */
+   Draai los: node --test test/onnozel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

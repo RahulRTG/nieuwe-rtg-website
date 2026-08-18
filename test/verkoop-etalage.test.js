@@ -17,7 +17,7 @@
      showroom aanzet is geen showroom maar een fout.
    - DE ETALAGE VAN DE BUREN IS EEN ANDERE ETALAGE.
 
-   Draai los: node --experimental-sqlite --test test/verkoop-etalage.test.js
+   Draai los: node --test test/verkoop-etalage.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

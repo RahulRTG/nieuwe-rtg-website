@@ -19,8 +19,8 @@
    herhaling iets doet, en de reden dat hij nooit ergens anders dan op een
    wegwerpmap draait.
 
-   Draai:  node --experimental-sqlite scripts/staatproef-route.js
-           node --experimental-sqlite scripts/staatproef-route.js --max=200
+   Draai:  node scripts/staatproef-route.js
+           node scripts/staatproef-route.js --max=200
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -64,7 +64,7 @@ async function wacht(basis, ms) {
   const poort = await vrijePoort();
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-staatproef-'));
   const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
       RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }

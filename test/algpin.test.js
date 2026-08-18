@@ -3,7 +3,7 @@
    het slot tegen raden, wijzigen alleen met de oude pin, en de echte tanden:
    is de pin gezet, dan munt /api/account/start GEEN werksessie meer zonder
    geldige pin (het ene account = bevoegdheid, de pin = bewijs).
-   Draai los: node --experimental-sqlite --test test/algpin.test.js */
+   Draai los: node --test test/algpin.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

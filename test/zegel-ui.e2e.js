@@ -3,7 +3,7 @@
    /api/zegel/maak een token te halen en er met onze eigen codec een QR van te
    tekenen, met de badge "RTG-geverifieerd" en de bewezen claim. Zo is de hele
    ID-check-kant (lid toont) in een echte browser getoetst. Overgeslagen zonder
-   browser. Draai: node --experimental-sqlite --test test/zegel-ui.e2e.js */
+   browser. Draai: node --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, bankDeur } = require('./helper');

@@ -28,7 +28,7 @@
      - de eis dat de campagnesleutel op 1000 promille sluit weghalen;
      - de magInStad-controle bij het koppelen weghalen.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-netwerk.test.js
+   Draai los: node --test test/rtfos-netwerk.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

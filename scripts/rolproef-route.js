@@ -30,8 +30,8 @@
    is het niet: de verleiding is om "geen bevinding" als groen te lezen, en dan
    dekt deze ronde 3985 routes af terwijl hij er een paar honderd heeft geraakt.
 
-   Draai:  node --experimental-sqlite scripts/rolproef-route.js
-           node --experimental-sqlite scripts/rolproef-route.js --max=300
+   Draai:  node scripts/rolproef-route.js
+           node scripts/rolproef-route.js --max=300
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -81,7 +81,7 @@ async function wacht(basis, ms) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rolproef-'));
   const basis = 'http://127.0.0.1:' + poort;
 
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     /* RTG_DEMO=1 op de EIGEN wegwerpserver, en dat verdient uitleg. De demo-inlogs
        zijn in de gewone stand uitgeschakeld; zonder die schakelaar komt deze proef

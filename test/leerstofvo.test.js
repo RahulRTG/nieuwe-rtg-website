@@ -2,7 +2,7 @@
    Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind
    terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert
    en nooit beslist.
-   Draai los: node --experimental-sqlite --test test/leerstofvo.test.js */
+   Draai los: node --test test/leerstofvo.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

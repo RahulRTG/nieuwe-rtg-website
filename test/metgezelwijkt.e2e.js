@@ -13,7 +13,7 @@
    de nieuwe architectuur: de tab is er, een dialoog ligt erboven en vangt de
    tik, en na sluiten is Rahul direct weer bereikbaar.
 
-   Draai: npm run e2e (of los: node --experimental-sqlite --test test/metgezelwijkt.e2e.js) */
+   Draai: npm run e2e (of los: node --test test/metgezelwijkt.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -10,7 +10,7 @@
    uberhaupt samen mag. Zonder die regels is samenvoegen geen optimalisatie maar
    een andere pagina.
 
-   Draai los: node --experimental-sqlite --test test/scriptbundel.test.js */
+   Draai los: node --test test/scriptbundel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { herschrijfHtml, omwikkel } = require('../server/middleware/scriptbundel');

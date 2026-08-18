@@ -62,7 +62,7 @@ function bouwOmgeving(env = process.env) {
 function start(doel, env = process.env) {
   bouwOmgeving(env);
   let opdracht;
-  if (doel === 'app') opdracht = [process.execPath, ['--experimental-sqlite', 'server/server.js']];
+  if (doel === 'app') opdracht = [process.execPath, ['server/server.js']];
   else if (doel === 'motor') opdracht = ['/app/rtg-motor', []];
   else throw new Error('onbekend Docker-doel: ' + doel);
 

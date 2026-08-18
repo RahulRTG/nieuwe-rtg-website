@@ -18,7 +18,7 @@
    de codec het kan decoderen doet er niet toe, de vraag is of de bytes
    aankomen en of de speler ze in beeld zet.
 
-   Draai: npm run e2e   (of los: node --experimental-sqlite --test test/clipdeler.e2e.js) */
+   Draai: npm run e2e   (of los: node --test test/clipdeler.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

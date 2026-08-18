@@ -8,7 +8,7 @@
 
    Elke toets is met een mutatie nagetrokken (LAT-regel 2); wat er is omgezet en
    welke toets zakte staat in het commit-bericht.
-   Draai los: node --experimental-sqlite --test test/mall-supplieros.test.js */
+   Draai los: node --test test/mall-supplieros.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

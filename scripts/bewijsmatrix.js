@@ -70,6 +70,27 @@ const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 
 const argv = process.argv.slice(2);
 const VASTLEGGEN = argv.includes('--vastleggen');
+/* DE ENIGE MANIER OM EEN VERSLECHTERING VAST TE LEGGEN, en hij vraagt een reden.
+
+   De ratel verderop weigert een stand waarin "ongemeten" groeit. Dat is goed,
+   maar er is een geval waarin die weigering te streng is: de CODEBASE groeit.
+   Komen er tweehonderd routes bij, dan groeit het aantal cellen met tweeduizend
+   en staat er meer ongemeten -- ook als elke kolom PROPORTIONEEL gelijk bleef of
+   vooruitging. Zo stond het er toen de AUDIT-kolom voor het eerst gemeten werd:
+   elf kolommen gelijk of beter, AUDIT van 0 naar 13,7 procent, en toch een
+   groeiende noemer.
+
+   De kop van dit bestand zei daarover: "pas BEWIJSMATRIX.json met de hand aan
+   als dit een bewuste keuze is, dan staat het in de git-historie". Dat klopt als
+   principe en deugt niet als handeling -- met de hand een JSON van vierhonderd
+   kilobyte bijwerken is precies hoe er stil een cijfer verschuift dat niemand
+   heeft gemeten.
+
+   Vandaar deze vlag. Hij legt dezelfde GEMETEN stand vast als --vastleggen, maar
+   staat een groei van ongemeten toe EN schrijft de opgegeven reden in het
+   bestand. Zonder reden doet hij niets. De reden staat daarmee naast het cijfer
+   in plaats van in een commit-tekst die niemand terugzoekt. */
+const REDEN = (argv.find(a => a.startsWith('--reden=')) || '').slice(8);
 const JSONUIT = argv.includes('--json');
 /* DE REGISTERS WORDEN NU STANDAARD GELEZEN, en dat was een val.
 
@@ -598,9 +619,16 @@ if (VASTLEGGEN) {
     console.log('\n  GEWEIGERD: ongemeten ' + oud.telling.ongemeten + ' -> ' + matrix.telling.ongemeten +
       ', bewezen ' + oud.telling.bewezen + ' -> ' + matrix.telling.bewezen + '.');
     for (const r of slechter) console.log(r);
-    console.log('  De ratel legt geen verslechtering vast; pas BEWIJSMATRIX.json met de hand');
-    console.log('  aan als dit een bewuste keuze is, dan staat het in de git-historie.');
-    process.exit(1);
+    if (!REDEN) {
+      console.log('  De ratel legt geen verslechtering vast. Is dit een bewuste keuze --');
+      console.log('  bijvoorbeeld omdat de codebase groeide en elke kolom proportioneel');
+      console.log('  gelijk bleef -- leg hem dan vast MET een reden:');
+      console.log('    node scripts/bewijsmatrix.js --vastleggen --reden="..."');
+      console.log('  Die reden komt in BEWIJSMATRIX.json te staan, naast het cijfer.');
+      process.exit(1);
+    }
+    matrix.verslechteringToegestaan = { reden: REDEN, cellenVoor: oud.routes * 11, cellenNa: matrix.routes * 11 };
+    console.log('\n  VASTGELEGD MET REDEN: ' + REDEN);
   }
   fs.writeFileSync(UITSLAG, JSON.stringify(zonderRijen(matrix), null, 2) + '\n');
   console.log('\n  vastgelegd in BEWIJSMATRIX.json');

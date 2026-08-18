@@ -436,6 +436,38 @@ zijn -- en tot die tijd zegt de reis dat ze er niet zijn.
 *Klaar als:* een verandering in een domein binnen één scherm zichtbaar is als
 gevolg voor de rest van de reis, en een weggevallen bron zichzelf meldt.
 
+**Waar fase 3 staat: de eerste helft** (18 augustus 2026). `kern/reiswacht.js`,
+`/api/reis/wacht`, en De Reiswacht op `/apps/reizen.html`. De drie
+eerlijkheidsregels van par. 4.2 staan in code én in toetsen:
+
+1. **Een momentopname, geen achtergrondwachter.** Alles wordt berekend bij het
+   opvragen; het antwoord zegt dat zelf (`momentopname: true` plus de zin "RTG
+   waakt niet op de achtergrond door"). Een echte achtergrondwachter met
+   meldingen is een eigen stap met een eigen besluit — niet iets dat hier
+   stilletjes bij groeit.
+2. **Elke bron meldt zichzelf** — gemeten, stil of `ontbreekt`. De externe
+   luchtvaart- en spoorbronnen bestaan niet en staan er precies zo bij, met "RTG
+   kijkt hier nu niet mee". Een bron die omvalt wordt `stil` en de rest rekent
+   door; valt De Reis zelf om, dan is de wacht stuk (503) en niet "rustig". De
+   Reiswijzer loopt per reis, dus zijn bronregel wordt pas ná de lus gezet:
+   viel hij bij ook maar één reis om, dan heet hij stil.
+3. **Niets beweren zonder eigen bron.** Wat de wacht kan zien: onderdelen die
+   aandacht vragen (met hun domein als bron), documenten van het gezelschap die
+   verlopen vóór het einde van precies díe reis (uit de datums die het lid zelf
+   invulde), en het visum — een open taak is een feit, een ontbrekende taak is
+   een **vraag** ("Al geregeld? Dan is dit signaal klaar."), want of het
+   geregeld is weet alleen het lid.
+
+Op het scherm is rust een zin ("er speelt op dit moment niets") en geen leegte,
+en de bronnenregel staat er **altijd** onder — wie "alles rustig" leest, ziet in
+dezelfde oogopslag met hoeveel ogen er gekeken is.
+
+**Wat er nog niet is, en waarom dat er zo bij staat:** de externe vervoersbronnen
+(daar is niets aan te sluiten dat dit huis heeft), en de achtergrondwacht met
+meldingen. Die tweede kan wél — de SSE- en meldingslaag bestaan — maar hij
+verandert het karakter van de functie (RTG belooft dan te waken terwijl u weg
+bent) en hoort daarom een eigen besluit te zijn.
+
 ### Fase 4 -- De partnerkant
 
 Product, variant, voorraad, tijdslot, voorwaarden, media, afdracht -- met

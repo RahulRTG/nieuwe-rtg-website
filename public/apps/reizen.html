@@ -82,6 +82,14 @@
   </div>
   <div id="komend"><p class="stil">Laden...</p></div>
 
+  <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
+       aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
+       gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
+       niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
+       en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
+  <div class="regkop"><h2>De reiswacht</h2></div>
+  <div id="wacht"><p class="stil">Laden...</p></div>
+
   <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
        anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
        LEEST en zet klaar, de mens BEVESTIGT. Wat er gelezen is staat er met
@@ -390,6 +398,54 @@
   }
   laad();
 
+  /* DE REISWACHT. Drie stukken, in deze volgorde: de signalen (alleen die),
+     de rustzin als er niets is, en ALTIJD de bronnenregel eronder -- ook de
+     bronnen die stilvielen of niet bestaan. Die volgorde is het ontwerp: wie
+     "alles rustig" leest, hoort in dezelfde oogopslag te zien met hoeveel ogen
+     er gekeken is. */
+  async function laadWacht() {
+    const el = $('#wacht');
+    let d;
+    try {
+      const res = await fetch('/api/reis/wacht', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'De reiswacht gaf geen antwoord.');
+    } catch (e) {
+      /* De wacht die stuk is, is STUK -- geen leeg vak dat als rust leest. */
+      el.innerHTML = '<p class="stil">' + esc(e.message) + ' Dit betekent niet dat er niets speelt.</p>';
+      return;
+    }
+    const TEKEN = { incident: '!', aandacht: '\u25B3' };
+    const blokken = [];
+    for (const r of (d.reizen || [])) {
+      if (!r.signalen.length) continue;
+      blokken.push('<div class="rtg-rij" style="flex-direction:column;align-items:stretch;gap:.3rem;">' +
+        '<span class="rtg-naam">' + esc(r.bestemming) + '</span>' +
+        r.signalen.map((s) => '<span class="rtg-sub" style="color:' +
+          (s.ernst === 'incident' ? 'var(--rtg-acc)' : 'var(--rtg-txt)') + ';">' +
+          TEKEN[s.ernst] + ' ' + esc(s.tekst) + '</span>' +
+          '<span class="rtg-sub">Bron: ' + esc(s.bron) + ' &middot; ' + esc(s.grond) + '</span>').join('') +
+        '</div>');
+    }
+    if ((d.stil || []).length) blokken.push('<p class="stil">Let op: de bron' +
+      (d.stil.length === 1 ? '' : 'nen') + ' ' + d.stil.map(esc).join(', ') +
+      ' deed' + (d.stil.length === 1 ? '' : 'en') + ' niet mee. Dit beeld is onvolledig.</p>');
+    const rust = blokken.length ? '' :
+      '<p class="stil">Er speelt op dit moment niets rond uw reizen.</p>';
+    const bronnen = (d.bronnen || []).map((b) =>
+      '<span class="rtg-sub"' + (b.stand !== 'gemeten' ? ' style="color:var(--rtg-soft);"' : '') + '>' +
+      (b.stand === 'gemeten' ? '\u25CF' : b.stand === 'stil' ? '\u25CB' : '\u2014') + ' ' +
+      esc(b.naam) + (b.stand === 'gemeten' ? '' : ': ' + esc(b.uitleg)) + '</span>').join('<br>');
+    el.innerHTML = rust + blokken.join('') +
+      '<p class="stil" style="margin-top:.7rem;">' + esc(d.uitleg || '') + '</p>' +
+      '<div style="margin-top:.4rem;line-height:1.7;">' + bronnen + '</div>';
+  }
+  laadWacht();
+
   /* Een reisgenoot uitnodigen: de regels van deze reis gaan mee, en verder
      niets. De link is een sleutel -- hij staat er daarom uitgeschreven bij, met
      een knop om hem te kopieren, en het scherm zegt erbij dat de ontvanger zich
@@ -515,7 +571,7 @@
       $('#invTekst').value = ''; $('#invBestandNaam').textContent = '';
       $('#invBestand').value = '';
       $('#invUit').innerHTML = '<p class="stil">Toegevoegd. Het staat nu bij uw reizen hierboven.</p>';
-      laad(); laadMijnInvoer();
+      laad(); laadMijnInvoer(); laadWacht();
     } catch (e) { $('#invUit').innerHTML += '<p class="stil">' + esc(e.message) + '</p>'; knop.disabled = false; }
   }
 
@@ -536,7 +592,7 @@
           '<button class="rtg-knop" type="button" data-weg="' + esc(x.id) + '">Weghalen</button></div>').join('');
     $('#invMijn').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
       b.disabled = true;
-      try { await api('invoer/weg', { id: b.dataset.weg }); laad(); laadMijnInvoer(); }
+      try { await api('invoer/weg', { id: b.dataset.weg }); laad(); laadMijnInvoer(); laadWacht(); }
       catch (e) { b.disabled = false; }
     }));
   }

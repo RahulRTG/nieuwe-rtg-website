@@ -87,6 +87,12 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    reisbureau en de tafelplanning roepen de laat gebonden, optionele haken
    visumtaakVan/tafeldekVan aan, die vanaf hier iets teruggeven. */
 Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.agenda, reiswijzer: kern.reiswijzer }));
+/* DE REISWACHT (kern/reiswacht.js): wat er speelt rond de komende reizen --
+   REIZEN.md fase 3. Een momentopname bij opvraging en uitdrukkelijk geen
+   achtergrondwachter; elke bron meldt zichzelf, ook (juist) de bronnen die er
+   niet zijn. Leest laat uit de kern, want hij hangt aan De Reis (kernlaag3w),
+   Entourage (kernlaag4) en de agenda. */
+Object.assign(kern, require('../kern/reiswacht').maakReiswacht({ kern }));
 Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft

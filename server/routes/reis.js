@@ -23,6 +23,14 @@ module.exports = (kern) => {
      niet te plaatsen was komt mee terug in `los`, met de reden. */
   app.post('/api/reis/reizen', auth, (req, res) => res.json(kern.reizen.mijn(req.session.key)));
 
+  /* DE REISWACHT (REIZEN.md fase 3): de signalen rond de komende reizen, met
+     per bron of hij gemeten is, stilviel of simpelweg niet bestaat. Alleen
+     lezen; en het antwoord zegt zelf dat het een momentopname is. */
+  app.post('/api/reis/wacht', auth, (req, res) => {
+    const r = kern.reiswacht.wacht(req.session.key);
+    r.ok ? res.json(r) : res.status(r.status || 503).json(r);
+  });
+
   /* DE INVOERBALIE (REIZEN.md fase 2). Twee stappen, en dat is de kern van het
      ontwerp: LEZEN maakt een voorstel, BEVESTIGEN maakt er pas een onderdeel
      van. Een extractie die zichzelf in uw reisplan zet, zet daar vroeg of laat

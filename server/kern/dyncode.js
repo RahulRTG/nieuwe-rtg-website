@@ -30,7 +30,14 @@ module.exports = ({ crypto, dataDir }) => {
 
   const DEFAULT_TTL = 45000;                 // 45 seconden: dynamisch, kort houdbaar
   const MAX_TTL = 5 * 60000;                 // nooit langer dan 5 minuten
-  const SOORTEN = ['kas', 'tafel', 'entree', 'zegel', 'deur', 'pas'];
+  /* 'contact' hoort hier maar staat NIET in de lijst van routes/code.js: die
+   codes zijn geen geheim en de echte controle zit bij het afrekenen of
+   inchecken, terwijl een contactcode zelf een mens aanwijst. Hij wordt daarom
+   alleen gemaakt en gelezen door kern/sociaal/pin-live.js, langs een eigen
+   deur. Wat hier gedeeld is, is de ONDERTEKENING -- en dat is precies wat je
+   wilt delen: een tweede plek waar een HMAC wordt gezet, is een tweede plek
+   waar hij fout kan staan. */
+const SOORTEN = ['kas', 'tafel', 'entree', 'zegel', 'deur', 'pas', 'contact'];
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => Buffer.from(String(s), 'base64url');
 

@@ -37,7 +37,8 @@ const EIGEN_TAKKEN = [
   'lifestyle',          // uw rechterhand-voorkeuren
   'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
   'accountRollen',      // uw koppelingen aan werkplekken
-  'ledenBoard'          // uw eigen boardroom: wat u wel en niet deelt
+  'ledenBoard',         // uw eigen boardroom: wat u wel en niet deelt
+  'contactPins'         // uw contactpin: het adres waarmee anderen u toevoegden
 ];
 
 module.exports = ({ db, lidBoardLogWis }) => {

@@ -7,7 +7,15 @@
 
    Nodig op de pagina: /shared/qr.js en /shared/qrteken.js.
    Gebruik: RTGDyn.plaats(el, { soort:'kas', code:'BETAAL9', merk:'lippen' }).
-            RTGDyn.verifieer(token) -> belofte met { ok, soort, code } of fout. */
+            RTGDyn.verifieer(token) -> belofte met { ok, soort, code } of fout.
+
+   EEN ANDERE DEUR MAG OOK. Met opts.pad (en desnoods opts.lijf) haalt dezelfde
+   toner zijn code bij een ander loket. Dat is er niet voor de sier: de levende
+   contactcode (kern/sociaal/pin-live.js) heeft een EIGEN deur nodig, omdat daar
+   de server bepaalt wat er in de code komt en de client dus niets mag meegeven
+   -- terwijl /api/code/dyn juist een code aanneemt. Het tekenen, het aftellen en
+   het naadloos doorrollen zijn hetzelfde werk, en dat hoort niet twee keer
+   geschreven te worden om die ene reden. */
 (function (root) {
   'use strict';
   function tok() {
@@ -59,7 +67,7 @@
     }
 
     function ververs() {
-      post('/api/code/dyn', { soort: opts.soort, code: opts.code, ttlMs: opts.ttlMs })
+      post(opts.pad || '/api/code/dyn', opts.lijf || { soort: opts.soort, code: opts.code, ttlMs: opts.ttlMs })
         .then(function (r) {
           if (!levend) return;
           if (r.ok && r.d.token) { toon(r.d.token, r.d.exp); plan(r.d.exp); }

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3974 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3990 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3974 |
-| servermodules (`server/**/*.js`) | 2173 |
-| routebestanden (`server/routes/**`) | 452 |
-| kernmodules (`server/kern/**`) | 1332 |
+| API-endpoints | 3990 |
+| servermodules (`server/**/*.js`) | 2179 |
+| routebestanden (`server/routes/**`) | 454 |
+| kernmodules (`server/kern/**`) | 1336 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 221 |
-| toetsbestanden (`test/*.test.js`) | 895 |
-| schermtoetsen (`test/*.e2e.js`) | 125 |
+| toetsbestanden (`test/*.test.js`) | 896 |
+| schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
 
@@ -106,7 +106,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 | `supplier` | 562 | 102 | 10 | 295 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
-| `social` | 55 | 7 | 31 | 52 |
+| `social` | 71 | 9 | 39 | 60 |
 | `techniek` | 57 | 14 | 1 | 51 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
 | `wereld` | 15 | 3 | 0 | 0 |
@@ -124,9 +124,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1405 |
+| kern-namen die routes aanraken | 1413 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 191 |
-| daarvan door precies één domein | 1214 |
+| daarvan door precies één domein | 1222 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

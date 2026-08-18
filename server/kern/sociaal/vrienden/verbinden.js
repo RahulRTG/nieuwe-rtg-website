@@ -52,8 +52,16 @@ async function socialZoek(mij, q) {
 }
 /* vriendschapsverzoek van 'mij' naar 'naar'. doorOuder=true betekent: een
    ouder/verzorger doet dit namens zijn beschermde kind (via ouderVerbind); dan
-   geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven. */
-async function socialVerbind(mij, naar, doorOuder) {
+   geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven.
+
+   'via' zegt langs WELKE weg dit verzoek binnenkwam: 'pin' (iemand typte of
+   scande de vaste contactpin), 'code' (een levende code die de ontvanger op dat
+   moment ophield) of niets (het gewone zoeken op codenaam). Dat is geen
+   boekhouding maar een signaal aan de ONTVANGER: staat er "via je pin" bij een
+   verzoek van iemand die je niet verwacht, dan weet je dat de pin die je ooit
+   ergens neerzette nog rondgaat -- en dat is precies het moment om hem te
+   vernieuwen. Zonder dat verschil merk je dat nooit. */
+async function socialVerbind(mij, naar, doorOuder, via) {
   if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
   /* De wachtende bestaanscheck: dit 404-besluit mag niet op een koude cache
      rusten (in Postgres-stand kreeg een net gevonden codenaam hier onder last
@@ -74,7 +82,8 @@ async function socialVerbind(mij, naar, doorOuder) {
   // is de ANDER ook een beschermd kind (kan alleen via doorOuder), dan moet
   // diens eigen ouder nog akkoord geven
   if (isBeschermdHandle(naar)) voogdWacht.push(naar);
-  c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht };
+  c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht,
+    via: via === 'pin' || via === 'code' ? via : null };
   db.data.connections.push(c); save();
   sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
   return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };
@@ -94,9 +103,30 @@ async function ouderVerbind(gezinCode, kidHandle, doel) {
      zichzelf via de gewone weg. */
   const sp = rtf.socialProfielen().find(x => x.handle === kidHandle && x.gezinCode === gezinCode && x.beschermd);
   if (!sp) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
-  // doel mag een handle zijn of een exacte codenaam (zo typt een ouder gewoon de codenaam over)
+  // doel mag een handle zijn, een contactpin of een exacte codenaam (zo typt of
+  // scant een ouder gewoon over wat de andere ouder hem gaf)
   let naar = String(doel || '').trim();
   if (!(await codeBestaat(naar))) {
+    /* De contactpin (../pin.js) eerst, want die is eenduidig. Hij mag hier WEL
+       een beschermd profiel aanwijzen: twee ouders wisselen de pin van hun
+       kinderen uit, precies zoals ze nu de codenaam overtypen, en de ouder van
+       het andere kind moet daarna alsnog akkoord geven (voogdWacht hieronder).
+       Laat gelezen van ctx: de pinlaag wordt na deze opgebouwd.
+
+       Met een eigen rem erop, want anders is dit het ene loket waar een pin
+       ongeremd geraden kan worden -- en juist hier wijst hij kinderen aan.
+
+       Vindt de pin niets, dan valt hij DOOR naar de codenaam en geeft hij hier
+       geen 404. Een codenaam van acht letters ('Rode Mier') leest als een
+       geldige pin, en die ouder hoort geen "deze pin kennen we niet" te
+       krijgen op een codenaam die gewoon bestaat. */
+    const alsPin = ctx.pinNormaliseer && ctx.pinNaarHandle && ctx.pinNormaliseer(naar) ? naar : null;
+    if (alsPin) {
+      if (!sociaalRate(kidHandle, 'pinzoek', 30, 60 * 60 * 1000))
+        return { status: 429, error: 'Te veel pins geprobeerd. Probeer het over een uur opnieuw.' };
+      const viaPin = ctx.pinNaarHandle(alsPin);
+      if (viaPin) return socialVerbind(kidHandle, viaPin, true);
+    }
     const q = naar.toLowerCase();
     const kandidaten = [];
     for (const m of await gidsZoekCodenaam(q, true)) kandidaten.push(m.key);
@@ -104,7 +134,9 @@ async function ouderVerbind(gezinCode, kidHandle, doel) {
     // hun kinderen verbinden (codenaam offline uitgewisseld), en de ouder van het
     // andere kind moet daarna alsnog akkoord geven (voogdWacht).
     for (const p of rtf.socialProfielen()) if (p.codenaam.toLowerCase() === q) kandidaten.push(p.handle);
-    if (kandidaten.length !== 1) return { status: 404, error: 'Geen (eenduidige) codenaam gevonden. Typ de volledige codenaam over.' };
+    if (kandidaten.length !== 1) return { status: 404, error: alsPin
+      ? 'Deze pin of codenaam kennen we niet. Kijk hem na, of typ de volledige codenaam over.'
+      : 'Geen (eenduidige) codenaam gevonden. Typ de volledige codenaam over.' };
     naar = kandidaten[0];
   }
   // ook een ouder kan zijn kind niet met een ander beschermd kind verbinden

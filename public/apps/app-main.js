@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'c4dc548f';
+var RTG_BOUW = '78494809';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1445,10 +1445,23 @@ var RTG_BOUW = 'c4dc548f';
 
   function renderSocialBar(){
     const el = $('#socialBar'); if (!el) return;
+    /* Eerst de camera vrijgeven. Deze balk wordt ook opnieuw opgebouwd door een
+       binnenkomend bericht, en dan verdwijnt het video-vak uit de DOM terwijl
+       de scanner er nog op draait -- met een camera die aan blijft staan als
+       gevolg. Dat is geen schoonheidsfoutje maar een lampje dat blijft branden.
+       pinScanUit staat in ./app-main-09a.js. */
+    pinScanUit();
     if (!socialOK){ el.innerHTML = ''; return; }
     let html = '';
     for (const r of (social.requests || [])){
-      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + T('sal.wilverbinden','wil verbinden') + '</span>' +
+      /* WAARLANGS dit verzoek binnenkwam, en dat is meer dan een detail: staat
+         er "via je pin" bij iemand die je niet verwacht, dan gaat de pin die je
+         ooit ergens neerzette nog rond -- en dan is dit het moment om hem te
+         vernieuwen. Zonder dat verschil merk je dat nooit. */
+      const langs = r.via === 'pin' ? T('sal.viapin','via je pin')
+                  : r.via === 'code' ? T('sal.viacode','via je live code')
+                  : T('sal.wilverbinden','wil verbinden');
+      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + langs + '</span>' +
         '<button class="ja" data-scja="' + escT(r.key) + '">' + T('sal.accepteer','Accepteer') + '</button>' +
         '<button data-scnee="' + escT(r.key) + '">✕</button></div>';
     }
@@ -1460,7 +1473,9 @@ var RTG_BOUW = 'c4dc548f';
           '<span>' + escT(nm.split(' ')[0]) + '</span></button>'); }
       ).join('') + '</div>';
     html += '<div class="sc-zoek" id="scZoek"><input id="scQ" placeholder="' + T('sal.zoekph','Zoek op codenaam, bijv. Gouden Ibis') + '"><button id="scGo">' + T('sal.zoek','Zoek') + '</button></div>' +
-      '<div class="sc-res" id="scRes"></div>';
+      '<div class="sc-res" id="scRes"></div>' +
+      // en de tweede weg naar dezelfde vriendschap: de contactpin (zie ./app-main-09a.js)
+      '<div class="sc-pin" id="scPin"></div>';
     el.innerHTML = html;
 
     el.querySelectorAll('[data-scja]').forEach(b => b.addEventListener('click', async () => {
@@ -1470,7 +1485,11 @@ var RTG_BOUW = 'c4dc548f';
       try { await API.call('/member/connect/respond', { key: b.dataset.scnee, action: 'decline' }); loadSocial(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-scdm]').forEach(b => b.addEventListener('click', () => openDm(b.dataset.scdm, b.dataset.cn)));
-    const add = $('#scAddBtn'); if (add) add.addEventListener('click', () => { $('#scZoek').classList.toggle('open'); const q = $('#scQ'); if (q) q.focus(); });
+    const add = $('#scAddBtn'); if (add) add.addEventListener('click', () => {
+      const open = $('#scZoek').classList.toggle('open');
+      $('#scPin').classList.toggle('open', open);
+      if (open) { pinBlokVul(); const q = $('#scQ'); if (q) q.focus(); } else pinScanUit();
+    });
     const go = $('#scGo'); if (go) go.addEventListener('click', zoekLeden);
     const q = $('#scQ'); if (q) q.addEventListener('keydown', e => { if (e.key === 'Enter') zoekLeden(); });
   }
@@ -1491,6 +1510,253 @@ var RTG_BOUW = 'c4dc548f';
         try { await API.call('/member/connect', { key: b.dataset.scvz }); toast(T('sal.verzonden','Verzoek verstuurd.')); zoekLeden(); } catch(e){ toast(e.message); }
       }));
     } catch(e){ toast(e.message); }
+  }
+
+  /* ---- de contactpin: je eigen code, als tekst en als QR ----
+
+     Zoeken op codenaam vraagt dat je iets van de ander AL weet. Een pin draait
+     dat om: hij staat op je eigen scherm, je geeft hem af -- voorgelezen,
+     gedeeld of voorgehouden -- en pas dan kan iemand er iets mee. De QR draagt
+     precies dezelfde pin (rtg:pin:..., zie /shared/rtgcode.js), dus scannen en
+     overtypen komen op hetzelfde uit.
+
+     Zoeken en versturen staan met opzet uit elkaar: het scherm laat eerst zien
+     WIE er achter de pin zit, en pas daarna is er een knop. Een gescande code
+     die meteen een verzoek de deur uit doet, is een verzoek dat niemand
+     bewust deed. */
+  let mijnPin = null, pinScanner = null;
+
+  function pinBlokVul(){
+    const el = $('#scPin'); if (!el) return;
+    el.innerHTML =
+      '<div class="sc-pin-mijn">' +
+        '<div class="sc-pin-kop"><span>' + T('pin.mijn','Jouw pin') + '</span>' +
+          '<b id="scPinCode">' + (mijnPin ? escT(mijnPin.toon) : '····-····') + '</b></div>' +
+        '<div class="sc-pin-akt">' +
+          '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
+          '<button id="scPinQr">' + T('pin.qr','Toon QR') + '</button>' +
+          '<button id="scPinNieuw">' + T('pin.nieuw','Nieuwe pin') + '</button>' +
+          '<button id="scPinLive">' + T('pin.live','Live code') + '</button>' +
+          '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
+        '</div>' +
+        '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
+        '<div id="scPinLiveDoek" hidden></div>' +
+        '<div id="scPinUitNoot" class="sc-pin-noot"' + (mijnPin && mijnPin.uit ? '' : ' hidden') + '>' +
+          T('pin.uitnoot','Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel: die houd je bewust op.') + '</div>' +
+      '</div>' +
+      '<div class="sc-zoek open">' +
+        '<input id="scPinIn" maxlength="12" autocapitalize="characters" spellcheck="false" placeholder="' + T('pin.ph','Pin van de ander, bijv. 7K2M-9XPQ') + '">' +
+        '<button id="scPinGo">' + T('pin.zoek','Zoek') + '</button>' +
+        '<button id="scPinScan" class="grijs">' + T('pin.scan','Scan') + '</button>' +
+      '</div>' +
+      '<video id="scPinCam" playsinline muted hidden></video>' +
+      '<div class="sc-res" id="scPinRes"></div>';
+    $('#scPinKopie').addEventListener('click', pinKopieer);
+    $('#scPinQr').addEventListener('click', pinQrWissel);
+    $('#scPinNieuw').addEventListener('click', pinNieuw);
+    $('#scPinLive').addEventListener('click', pinLiveWissel);
+    $('#scPinUit').addEventListener('click', pinUitWissel);
+    $('#scPinGo').addEventListener('click', () => pinOpzoeken($('#scPinIn').value));
+    $('#scPinScan').addEventListener('click', pinScanWissel);
+    $('#scPinIn').addEventListener('keydown', e => { if (e.key === 'Enter') pinOpzoeken($('#scPinIn').value); });
+    if (!mijnPin) pinHalen();
+  }
+
+  async function pinHalen(){
+    try { mijnPin = await API.call('/member/pin', {}); } catch(e){ return; }
+    pinStandTonen();
+  }
+  // een uitgezette pin blijft leesbaar (het is je pin, je mag hem zien) maar
+  // draagt zichtbaar dat hij niemand aanwijst
+  function pinStandTonen(){
+    const c = $('#scPinCode'); if (!c || !mijnPin) return;
+    c.textContent = mijnPin.toon;
+    c.classList.toggle('uit', !!mijnPin.uit);
+    const u = $('#scPinUit'); if (u) u.textContent = mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten');
+    const n = $('#scPinUitNoot'); if (n) n.hidden = !mijnPin.uit;
+  }
+  async function pinNieuw(){
+    if (!confirm(T('pin.nieuwvraag','Een nieuwe pin maken? Wie je oude pin nog heeft, kan je daarmee niet meer toevoegen. Je huidige vrienden merken er niets van.'))) return;
+    try { mijnPin = await API.call('/member/pin/nieuw', {}); } catch(e){ toast(e.message); return; }
+    pinStandTonen();
+    const b = $('#scPinQrBeeld'); if (b && !b.hidden) pinQrTeken();
+    toast(T('pin.nieuwok','Je hebt een nieuwe pin.'));
+  }
+  function pinKopieer(){
+    if (!mijnPin) return;
+    /* Zonder klembord (oudere webweergaven, of een pagina zonder toestemming)
+       niet stil mislukken: dan selecteren we de pin zodat hij met de hand te
+       kopieren is. Een knop die niets doet en niets zegt is erger dan geen knop. */
+    const klaar = () => toast(T('pin.gekopieerd','Pin gekopieerd.'));
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(mijnPin.toon).then(klaar, () => pinSelecteer());
+    } else pinSelecteer();
+  }
+  function pinSelecteer(){
+    const el = $('#scPinCode'); if (!el || !window.getSelection) return;
+    const r = document.createRange(); r.selectNodeContents(el);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast(T('pin.selecteer','Kopieer de pin met de hand.'));
+  }
+  function pinQrWissel(){
+    const b = $('#scPinQrBeeld'); if (!b) return;
+    if (!b.hidden) { b.hidden = true; return; }
+    if (!pinQrTeken()) return;
+    b.hidden = false;
+  }
+  function pinQrTeken(){
+    const b = $('#scPinQrBeeld');
+    if (!b || !mijnPin || !window.RTGQRteken || !window.RTGCode) { toast(T('pin.qrniet','De QR-code kan hier niet getekend worden.')); return false; }
+    try { b.src = RTGQRteken.dataURLRTG(RTGCode.bouwPin(mijnPin.pin), { schaal: 5 }); }
+    catch(e){ toast(T('pin.qrniet','De QR-code kan hier niet getekend worden.')); return false; }
+    return true;
+  }
+
+  /* Scannen: het beeld verlaat het toestel niet -- elk frame wordt lokaal
+     ontleed (/shared/scanner.js). Een gescande code die geen RTG-pin is, zegt
+     dat gewoon; we sturen hem nergens heen. */
+  function pinScanWissel(){
+    if (pinScanner) { pinScanUit(); return; }
+    if (!window.RTGScanner) { toast(T('pin.scanniet','Scannen kan hier niet. Typ de pin over.')); return; }
+    const cam = $('#scPinCam'); if (!cam) return;
+    cam.hidden = false;
+    pinScanner = new RTGScanner.Scanner({ video: cam, onCode: c => {
+      const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort: 'tekst', tekst: c.tekst };
+      /* Twee soorten, want er zijn er twee: de vaste pin staat leesbaar in de
+         code (rtg:pin:...), de levende is een ondertekend token (RTG1....) dat
+         alleen de server kan duiden. Voor wie scant is dat hetzelfde gebaar. */
+      if (g.soort === 'rtg1') { pinScanUit(); pinLiveKijken(g.token); return; }
+      if (g.soort !== 'pin') { toast(T('pin.geenpin','Dit is geen RTG-pin.')); return; }
+      pinScanUit();
+      $('#scPinIn').value = g.pin;
+      pinOpzoeken(g.pin);
+    } });
+    pinScanner.start().catch(() => { toast(T('pin.camniet','Geen toegang tot de camera.')); pinScanUit(); });
+    $('#scPinScan').textContent = T('pin.scanstop','Stop');
+  }
+  function pinScanUit(){
+    // ook de levende code stopt hier: hij ververst zichzelf elke minuut, en dat
+    // hoort niet door te lopen in een la die dicht is of een balk die weg is
+    pinLiveUit();
+    if (pinScanner) { try { pinScanner.stop(); } catch(e){} pinScanner = null; }
+    const cam = $('#scPinCam'); if (cam) cam.hidden = true;
+    const knop = $('#scPinScan'); if (knop) knop.textContent = T('pin.scan','Scan');
+  }
+
+  // stap 1: wie is dit? (nog niets versturen)
+  /* De trefferregel, EEN KEER. Hij stond hier en in ./app-main-09a2.js in twee
+     kopieen die alleen in de knop verschilden -- en dat is precies het soort
+     verdubbeling dat een half jaar later uit elkaar loopt, met een vaste pin
+     die "verbonden" zegt waar de levende code "vriend" zegt. De opmaak zit nu
+     in klassen (zie .sc-st in apps/app.html) in plaats van in style-attributen;
+     die houden style-src-attr in de CSP open. */
+  function pinRegel(codename, status, knopHtml){
+    const staat = status === 'verbonden' ? '<span class="sc-st ok">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
+      : status === 'aangevraagd' ? '<span class="sc-st">' + T('sal.gevraagd','aangevraagd') + '</span>'
+      : status === 'geen' ? knopHtml
+      : '<span class="sc-st wacht">' + T('sal.wachtu','wacht op u') + '</span>';
+    return '<div class="sc-hit"><span class="sc-av klein">' + initCN(codename) + '</span><b>' +
+      escT(codename) + '</b>' + staat + '</div>';
+  }
+  const pinMelding = tekst => '<div class="sc-hit"><span class="sc-st">' + escT(tekst) + '</span></div>';
+
+  async function pinOpzoeken(ruw){
+    const res = $('#scPinRes'); if (!res) return;
+    const pin = String(ruw || '').trim();
+    if (!pin) return;
+    res.innerHTML = '';
+    let d;
+    try { d = await API.call('/member/pin/zoek', { pin }); }
+    catch(e){ res.innerHTML = pinMelding(e.message); return; }
+    res.innerHTML = pinRegel(d.codename, d.status,
+      '<button data-pinvz="' + escT(pin) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>');
+    const b = res.querySelector('[data-pinvz]');
+    if (b) b.addEventListener('click', () => pinVerbinden(b.dataset.pinvz));
+  }
+  /* stap 2: en nu pas versturen -- omdat een mens erop drukte.
+
+     GEEN loadSocial() erna, en dat is geen vergeetachtigheid. renderSocialBar
+     bouwt de hele balk opnieuw op (innerHTML), dus die la klapt eronder dicht
+     terwijl je er nog in staat -- en de regel die net "aangevraagd" ging zeggen
+     is dan al weg. De regel zelf werken we hieronder bij; een verstuurd verzoek
+     verandert aan de vriendenlijst nog niets, dus er valt ook niets te
+     verversen. Zoeken op codenaam doet het om dezelfde reden zo. */
+  async function pinVerbinden(pin){
+    try { await API.call('/member/pin/connect', { pin }); }
+    catch(e){ toast(e.message); return; }
+    toast(T('sal.verzonden','Verzoek verstuurd.'));
+    await pinOpzoeken(pin);
+  }
+
+  /* ---- de levende code en de aan/uit-schakelaar ----
+
+     De vaste pin uit ./app-main-09a.js is een adres: hij blijft werken, ook als
+     je allang niet meer weet aan wie je hem gaf. Dat is precies wat je wilt
+     wanneer hij in je profiel staat, en precies wat je NIET wilt wanneer je
+     tegenover iemand staat. Daar hoort een code bij die na een minuut niets
+     meer is en je pin niet eens draagt (server/kern/sociaal/pin-live.js).
+
+     De toner is dezelfde als die van de RTG-code (/shared/dyncode.js): hij
+     tekent, telt af en haalt net voor het verval vanzelf een verse. Alleen de
+     deur is een andere, want bij een contactcode bepaalt de SERVER wat erin
+     komt te staan -- de client mag daar niets over te zeggen hebben. */
+  let pinLive = null;
+
+  function pinLiveWissel(){
+    const doek = $('#scPinLiveDoek'); if (!doek) return;
+    if (pinLive) { pinLiveUit(); return; }
+    if (!window.RTGDyn || !window.RTGQRteken) { toast(T('pin.qrniet','De QR-code kan hier niet getekend worden.')); return; }
+    // de vaste QR en de levende code delen een plek: twee codes naast elkaar
+    // is precies de verwarring die dit onderscheid juist moet wegnemen
+    const beeld = $('#scPinQrBeeld'); if (beeld) beeld.hidden = true;
+    doek.hidden = false;
+    // het volledige pad, want RTGDyn praat rechtstreeks met fetch en niet via
+    // API.call (die zet er zelf /api voor)
+    pinLive = RTGDyn.plaats(doek, { pad: '/api/member/pin/live', lijf: {}, ttlMs: 60000, schaal: 6 });
+    $('#scPinLive').textContent = T('pin.livestop','Verberg live code');
+  }
+  function pinLiveUit(){
+    if (pinLive) { try { pinLive.stop(); } catch(e){} pinLive = null; }
+    const doek = $('#scPinLiveDoek'); if (doek) { doek.hidden = true; doek.innerHTML = ''; }
+    const knop = $('#scPinLive'); if (knop) knop.textContent = T('pin.live','Live code');
+  }
+
+  /* Een gescande levende code. Zelfde volgorde als bij de vaste pin: eerst zien
+     wie het is, dan pas een knop -- en de code gaat pas op bij het verbinden,
+     zodat een blik op de verkeerde persoon niet andermans code verbrandt.
+     De sleutel komt hier niet mee terug: de code zelf is het bewijs, dus het
+     scherm hoeft nooit te weten hoe iemand in de database heet. */
+  async function pinLiveKijken(token){
+    const res = $('#scPinRes'); if (!res) return;
+    res.innerHTML = '';
+    let d;
+    try { d = await API.call('/member/pin/live/kijk', { livecode: token }); }
+    catch(e){ res.innerHTML = pinMelding(e.message); return; }
+    // dezelfde regel als bij de vaste pin (pinRegel in ./app-main-09a.js): het
+    // is dezelfde mens en dezelfde stand, alleen langs een andere weg gevonden
+    res.innerHTML = pinRegel(d.codename, d.status,
+      '<button data-pinlv="1">' + T('sal.verzoek','Verzoek sturen') + '</button>');
+    const b = res.querySelector('[data-pinlv]');
+    if (b) b.addEventListener('click', async () => {
+      try { await API.call('/member/pin/live/verbind', { livecode: token }); }
+      catch(e){ toast(e.message); return; }
+      toast(T('sal.verzonden','Verzoek verstuurd.'));
+      b.replaceWith(Object.assign(document.createElement('span'),
+        { className: 'sc-st', textContent: '✓ ' + T('sal.gevraagd','aangevraagd') }));
+    });
+  }
+
+  /* De pin uitzetten. Vernieuwen helpt tegen een pin die is rondgegaan; dit is
+     het andere verzoek -- ik wil helemaal niet zo gevonden worden. Het scherm
+     zegt er meteen bij wat er dan nog wel werkt, want een schakelaar die meer
+     uitzet dan je denkt is erger dan geen schakelaar. */
+  async function pinUitWissel(){
+    if (!mijnPin) return;
+    const uit = !mijnPin.uit;
+    if (uit && !confirm(T('pin.uitvraag','Je vaste pin uitzetten? Niemand kan je er dan nog mee toevoegen. Je vrienden merken er niets van, en een live code werkt gewoon.'))) return;
+    try { mijnPin = await API.call('/member/pin/uit', { uit }); } catch(e){ toast(e.message); return; }
+    pinStandTonen();
+    toast(uit ? T('pin.uitok','Je pin staat uit.') : T('pin.aanok','Je pin staat weer aan.'));
   }
 
   /* ---- dm ---- */

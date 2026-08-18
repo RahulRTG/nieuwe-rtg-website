@@ -87,7 +87,14 @@ const bronVan = md => ((md || {}).geborenBron === 'paspoort' ? 'paspoort' : 'opg
    en of dat uit een document komt. Alle drie in een antwoord, uit een lezing
    van de kluis, zodat een poort ze niet elk apart hoeft op te halen en ze niet
    uit elkaar kunnen lopen. */
-function maakLidstand({ accounts, leeftijdVan, idVanKey }) {
+/* De twee hulpjes hebben in dit huis maar EEN implementatie, dus staan ze hier
+   als standaard in plaats van als verplichte injectie. Een aanroeper hoeft dan
+   alleen te zeggen welke kluis hij bedoelt; een toets kan ze nog steeds
+   vervangen, en dat is de enige reden dat ze uberhaupt te overschrijven zijn. */
+const { leeftijdVan: STD_LEEFTIJD } = require('../lib/leeftijd');
+const { idVanKey: STD_SLEUTEL } = require('../lib/lidsleutel');
+
+function maakLidstand({ accounts, leeftijdVan = STD_LEEFTIJD, idVanKey = STD_SLEUTEL }) {
   return function lidstandVan(key) {
     const id = idVanKey(key);
     let u = null;

@@ -156,12 +156,7 @@ Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto,
   findSupplier, notify, notifySupplier, sseToSupplier,
   bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
   bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i),
-  /* De ledenstand voor de stempoort (kern/overheid/bestuur.js): trede, leeftijd
-     en of die leeftijd van het document komt. De overheidslaag kent de kluis
-     niet en hoort dat ook niet te doen, dus komt het antwoord van hier. */
-  lidstandVan: require('../kern/betrouwbaarheid').maakLidstand({
-    accounts, leeftijdVan: require('../lib/leeftijd').leeftijdVan,
-    idVanKey: require('../lib/lidsleutel').idVanKey }) }));
+  lidstandVan: require('../kern/betrouwbaarheid').maakLidstand({ accounts }) }));
 kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft

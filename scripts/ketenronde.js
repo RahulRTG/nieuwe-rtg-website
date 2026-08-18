@@ -233,6 +233,13 @@ async function draai(keten, verraadAan) {
   } finally { try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} }
 }
 
+/* DE WACHT. Hieronder start een echte ketenronde: servers, sabotage, en een
+   KETENS.json dat wordt overschreven. Zonder deze regel gebeurde dat ook bij een
+   gewone `require('./ketenronde')`. Bij de vier rolproeven kostte precies dat een
+   meting -- een laadcontrole zette ROLPROEF.json van 3377 beproefde routes terug
+   op 292, en het register zag er daarna volkomen normaal uit. */
+if (require.main !== module) { module.exports = {}; return; }
+
 (async () => {
   console.log('\n=== DE KETENRONDE ===\n  seed : ' + SEED + '\n');
   const uitslagen = [];

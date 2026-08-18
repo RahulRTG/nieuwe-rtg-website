@@ -301,14 +301,21 @@ function meetEen(route, toets, opties) {
   if ((r.gezakt || 0) === 0) return { staat: 'blind' };
   if (kentBasis) return { staat: 'merkt' };   // basislijn zei groen, leugen maakt rood: toe te rekenen
 
-  /* DE CONTROLERUN (zonder basislijn). Een toets die onder de leugen zakt, kan
+  /* DE CONTROLERUN (basislijn onbekend). Een toets die onder de leugen zakt, kan
      ook zakken door iets anders -- een trage machine, een poortbotsing, een toets
      die net vandaag stuk is. Dat als MERKT tellen maakt een valse bewezen-cel in
      de matrix, precies het bewijs dat niemand ooit nakijkt (LAT.md regel 10).
      Alleen als dezelfde toets ZONDER leugen groen is, bewijst de zakking iets
-     over de inhoud. */
+     over de inhoud.
+
+     `basis` geeft door WAT de controlerun zag, zodat de aanroeper het per toets
+     kan onthouden: een tweede route met dezelfde toets hoeft de controle dan niet
+     over te doen. Zo is de basislijn niet langer een aparte fase die een
+     herstart wegvaagt, maar een gememoriseerd bijproduct dat in het (gecommitte)
+     register blijft staan. */
   const controle = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
-  return { staat: (controle.gezakt || 0) > 0 ? 'stoornis' : 'merkt' };
+  const groen = (controle.gezakt || 0) === 0;
+  return { staat: groen ? 'merkt' : 'stoornis', basis: groen ? 'groen' : 'rood' };
 }
 
 /* Draait EEN toets zonder leugen en zegt of hij groen was. De basislijn van de

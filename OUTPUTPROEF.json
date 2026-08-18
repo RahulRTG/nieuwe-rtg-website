@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-18T14:59:16.671Z",
-  "commit": "fc87bd3",
+  "op": "2026-08-18T16:57:37.263Z",
+  "commit": "97d2770",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 73,
-  "onbeslist": 4102,
+  "bewezen": 88,
+  "onbeslist": 4087,
   "blind": 12,
   "ongemeten": 8
  },
@@ -3098,20 +3098,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/ik/toegankelijk": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "toegankelijk.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en toegankelijk.test.js zakte daarop"
   },
   "POST /api/ik/toegankelijk/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "toegankelijk.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en toegankelijk.test.js zakte daarop"
   },
   "POST /api/ik/vandaag": {
    "staat": "onbeslist",
@@ -4169,25 +4169,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 15); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/chat/history": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "gesprekdraad.test.js",
-    "rust.test.js",
-    "talen.test.js"
+    "rust.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rust.test.js zakte daarop"
   },
   "POST /api/chat/send": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "berichten.test.js",
-    "gesprekdraad.test.js",
-    "rust.test.js",
-    "talen.test.js"
+    "rust.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rust.test.js zakte daarop"
   },
   "POST /api/member/berichten": {
    "staat": "onbeslist",
@@ -5469,28 +5464,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 25); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/reserveer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "ervaring.test.js",
-    "fluister.test.js",
-    "foodcourt.test.js",
-    "gastregels.test.js",
-    "gastzorg.test.js"
+    "foodcourt.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foodcourt.test.js zakte daarop"
   },
   "POST /api/reserveringen/mijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "avond.test.js",
-    "ervaring.test.js",
-    "fluister.test.js",
-    "foodcourt.test.js",
-    "gegevenspoort.test.js"
+    "foodcourt.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foodcourt.test.js zakte daarop"
   },
   "POST /api/reservering/annuleer": {
    "staat": "onbeslist",
@@ -7132,16 +7119,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/fluister": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "care.test.js",
-    "fluister.test.js",
-    "gegevenspoort.test.js",
-    "gesprekdraad.test.js",
-    "onnozel.test.js"
+    "sparren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en sparren.test.js zakte daarop"
   },
   "POST /api/fluister/profiel": {
    "staat": "onbeslist",
@@ -7180,28 +7163,28 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 9); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/spar/lijst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "sparren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en sparren.test.js zakte daarop"
   },
   "POST /api/spar/parkeer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "sparren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en sparren.test.js zakte daarop"
   },
   "POST /api/spar/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "sparren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en sparren.test.js zakte daarop"
   },
   "POST /api/privacy/export": {
    "staat": "onbeslist",
@@ -8285,13 +8268,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/salon/profiel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "media.test.js",
-    "salon-verplicht.test.js"
+    "media.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en media.test.js zakte daarop"
   },
   "POST /api/salon/deal/claim": {
    "staat": "onbeslist",
@@ -8967,21 +8949,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/foodcourt": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "foodcourt.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foodcourt.test.js zakte daarop"
   },
   "POST /api/foodcourt/tijden": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "foodcourt.test.js",
-    "mall-extern.test.js"
+    "foodcourt.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foodcourt.test.js zakte daarop"
   },
   "POST /api/mall": {
    "staat": "onbeslist",
@@ -9333,26 +9314,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 6); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/metingen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "life-schakelbaar.test.js",
-    "metingen.test.js",
-    "toestellen.test.js",
-    "trainingsschema.test.js",
-    "vastleggen.test.js"
+    "metingen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en metingen.test.js zakte daarop"
   },
   "POST /api/metingen/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "metingen.test.js",
-    "toestellen.test.js",
-    "vastleggen.test.js"
+    "metingen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en metingen.test.js zakte daarop"
   },
   "POST /api/metingen/weg": {
    "staat": "onbeslist",
@@ -32978,6 +32953,89 @@
    "toets": "toegankelijk.test.js",
    "merkt": true,
    "op": "2026-08-18T14:58:22.637Z"
+  },
+  "POST /api/ik/toegankelijk": {
+   "toets": "toegankelijk.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:51:38.026Z"
+  },
+  "POST /api/ik/toegankelijk/zet": {
+   "toets": "toegankelijk.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:51:38.026Z"
+  },
+  "POST /api/chat/history": {
+   "toets": "rust.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:51:38.026Z"
+  },
+  "POST /api/chat/send": {
+   "toets": "rust.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:53:02.711Z"
+  },
+  "POST /api/reserveer": {
+   "toets": "foodcourt.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:53:02.711Z"
+  },
+  "POST /api/reserveringen/mijn": {
+   "toets": "foodcourt.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:53:02.711Z"
+  },
+  "POST /api/fluister": {
+   "toets": "sparren.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:55:16.554Z"
+  },
+  "POST /api/spar/lijst": {
+   "toets": "sparren.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:55:16.554Z"
+  },
+  "POST /api/spar/parkeer": {
+   "toets": "sparren.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:55:16.554Z"
+  },
+  "POST /api/spar/status": {
+   "toets": "sparren.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:56:13.737Z"
+  },
+  "POST /api/salon/profiel": {
+   "toets": "media.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:56:13.942Z"
+  },
+  "POST /api/foodcourt": {
+   "toets": "foodcourt.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:56:13.943Z"
+  },
+  "POST /api/foodcourt/tijden": {
+   "toets": "foodcourt.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:57:09.915Z"
+  },
+  "POST /api/metingen": {
+   "toets": "metingen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:57:09.915Z"
+  },
+  "POST /api/metingen/zet": {
+   "toets": "metingen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T16:57:09.915Z"
   }
+ },
+ "basislijn": {
+  "toegankelijk.test.js": "groen",
+  "rust.test.js": "groen",
+  "foodcourt.test.js": "groen",
+  "sparren.test.js": "groen",
+  "media.test.js": "groen",
+  "metingen.test.js": "groen"
  }
 }

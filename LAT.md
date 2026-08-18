@@ -383,6 +383,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
 | dertien treden van kleuter tot aanvaller tegen een ECHTE server | `scripts/ladder.js` + `LADDER.json` + `ci.yml` |
 | welke rol waar binnenkomt, gevraagd aan de server en niet aan de bron | `scripts/rolronde.js` + `ROLRONDE.json` + `ci.yml` |
+| mag lid A bij de spullen van lid B (horizontaal), met een zelfproef erop | `scripts/gluurronde.js` + `GLUURRONDE.json` + `ci.yml` |
 | geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
@@ -400,6 +401,27 @@ openbare routes stonden niet in zijn publieke lijst, een 503 uit de schakelkast
 telde als serverfout, en de begane grond toetste op seed-gegevens die
 weggedreven waren (KIKUNOI staat allang niet meer in de seed). Achttien keer
 RAAK, elke ronde, geen van alle een bevinding.
+
+En de derde helft kwam uit het instrument dat ik er zelf bij bouwde. De
+gluurronde (`scripts/gluurronde.js`) meldde bij zijn eerste draaien netjes "A
+kwam nergens bij de spullen van B" -- over 1084 vragen die allemaal **uitgelogd**
+waren. A klopt in zijn passieve veeg op elke route, en daar zit
+`/api/auth/logout` bij, alfabetisch vooraan; A logde zichzelf uit en kreeg
+daarna 401 op alles. Groen, over een proef die niets had geprobeerd.
+
+Het is exact dezelfde fout die een dag eerder in `scripts/rolronde.js` was
+gevonden en gerepareerd. Hij kwam terug omdat de LES niet meeverhuisde, alleen
+de reparatie. Vandaar dat de kanarie nu op de plek zit waar de vraag gesteld
+wordt (`vraagA`) en niet in een losse controle ernaast: er is geen weg omheen.
+
+En daaronder ligt de reden dat die ronde nu ook een ZELFPROEF heeft. Drie
+pogingen om zijn scherpste controle -- ziet hij dat A iets van B heeft
+weggegooid? -- met een opzettelijk gat te beproeven sloegen alle drie af, en
+niet omdat de controle deugde: de mutatie werkte alleen zolang de notities van
+het slachtoffer niet in een bundel waren opgeborgen. **Een ijking die van de
+opslagvorm afhangt, is geen ijking.** Met `GLUUR_ZELFPROEF=1` laat B nu zelf
+een stuk verdwijnen langs de gewone weg, en de ronde eist van zichzelf dat hij
+dat ziet. Die stap draait in CI, naast de ronde zelf.
 
 Dezelfde week kwam de tweede helft van die les uit een andere hoek.
 `test/auth-rol.test.js` opende met "Uitputtende auth-scoping-test. Niet een

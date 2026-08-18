@@ -33,12 +33,14 @@
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 40,
+    "ratelTanden": 42,
     "metingenZonderRatel": 6,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
-    "rolscheidingGemeten": 1444
+    "rolscheidingGemeten": 1444,
+    "gluurGaten": 0,
+    "gluurProeven": 7908
   },
   "notities": [
     {

@@ -754,6 +754,36 @@ const IJKINGEN = {
      herkende er 1374 van de 1444, omdat een grendel in de body van de handler
      buiten zijn uitdrukking viel. Deze meter maakt van "minder beproeven" een
      verslechtering. */
+  /* DE TWEE METERS VAN DE GLUURRONDE (de horizontale scheiding). Zelfde vorm
+     als bij de ladder en de rolronde: het OORDEEL krijgt een bekend-foute
+     uitslag, want de ronde zelf duurt minuten met twee echte leden.
+
+     De ronde heeft daarnaast een eigen zelfproef (GLUUR_ZELFPROEF=1) die zijn
+     vernielingscontrole aantoonbaar laat uitslaan; die draait in CI. Dat is er
+     omdat drie pogingen om die controle met een opzettelijk gat te beproeven
+     afsloegen op de OPSLAGVORM (bundelde notities), en een ijking die van de
+     opslagvorm afhangt is geen ijking. */
+  gluurGaten: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurProeven: 7908 };
+      assert.equal(g.beoordeel({ gaten: 0, proeven: 7908 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = g.beoordeel({ gaten: 1, proeven: 7908 }, norm);
+      assert.equal(stuk.zakt, true, 'een lek tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /1 lek/);
+      return 1;
+    }
+  },
+  gluurProeven: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const blind = g.beoordeel({ gaten: 0, proeven: 400 }, { gluurGaten: 0, gluurProeven: 7908 });
+      assert.equal(blind.zakt, true,
+        'nul lekken over 400 vragen terwijl er 7908 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder beproeven is geen betere uitslag/);
+      return 1;
+    }
+  },
   rolscheidingGaten: {
     proef: () => {
       const rol = require('../scripts/rolronde.js');

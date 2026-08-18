@@ -1328,8 +1328,10 @@
       "schoolbieb"
     ],
     "rtgid": [
+      "appUrl",
       "rtgid",
-      "status"
+      "status",
+      "webauthnStapOpOpties"
     ],
     "rtgkantoor": [
       "onderzoeker",

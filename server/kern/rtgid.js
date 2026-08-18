@@ -3,8 +3,13 @@
    efficienter en veiliger door ontwerp:
 
    - Sneller: een dienst start een inlog en krijgt een koppelcode; het lid
-     bevestigt met een tik in de eigen app (die al met passkey/inlog is
-     beveiligd). Geen wachtwoord, geen sms.
+     bevestigt in de eigen app met zijn passkey -- gezicht, vinger of pincode
+     op het eigen toestel. Geen wachtwoord, geen sms.
+   - Het is de PERSOON die bevestigt, niet het toestel. Een tik alleen bewees
+     dat iemand de telefoon had waarop de sessie leeft; een geleend of gestolen
+     toestel met een openstaande app kon dus een identiteit weggeven. De
+     passkey-ceremonie hangt bovendien aan DEZE koppel, dus een opgevangen
+     assertie past niet op een andere inlog. Zie bevestig() hieronder.
    - Veiliger (phishing-bestendig): de code loopt van het scherm van de
      dienst NAAR het lid, en het lid ziet in de eigen app welke dienst er
      aanklopt en welke gegevens die vraagt, voor er iets gebeurt. Een
@@ -27,7 +32,7 @@ const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twint
 const MAX_LOG = 100, MAX_KOPPELS = 300, MAX_SESSIES = 300;
 const ATTRIBUTEN = ['codenaam', '18plus', 'leeftijd', 'nationaliteit', 'naam'];
 
-function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam }) {
+function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan }) {
   const nu = () => Date.now();
   const iso = t => new Date(t == null ? Date.now() : t).toISOString();
   const hash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
@@ -109,9 +114,32 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     // de machtigingen waarmee dit lid ook namens een ander kan inloggen
     const machtigingen = s.machtigingen.filter(m => m.naarKey === key && !m.ingetrokken && nu() <= m.tot)
       .map(m => ({ id: m.id, van: codenaamUit(m.vanKey), dienst: m.dienst }));
-    return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen };
+    /* Hoeveel passkeys dit lid heeft, gaat mee. Bevestigen kan niet zonder, en
+       een scherm dat dat pas bij de knop ontdekt, laat iemand tegen een dichte
+       deur lopen zonder te zeggen welke sleutel eraan hoort. */
+    const u = accountVanKey(key);
+    return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen,
+      passkeys: typeof passkeysVan === 'function' ? passkeysVan(u) : 0, eigenAccount: !!u };
   }
-  function bevestig(key, koppelId, machtigingId) {
+  /* Bevestigen vraagt ALTIJD een passkey, en die eis staat HIER en niet in de
+     route.
+
+     Waarom hier: dit is de enige plek waar een iD-inlog wordt bevestigd. Zou de
+     eis in routes/rtgid.js staan, dan draagt hij de deur en niet de handeling
+     -- en de eerstvolgende die een tweede weg naar bevestigen bouwt (een
+     scan-knop, een sneltoets, een AI-actie) heeft de eis stilletjes niet.
+
+     Waarom een tik in de app niet genoeg was: die tik bewijst dat iemand het
+     TOESTEL heeft waarop de sessie leeft. Een gestolen of geleende telefoon met
+     een openstaande app kon dus een identiteit weggeven. De passkey bewijst de
+     PERSOON, en de ceremonie is aan deze koppel gebonden (zie
+     kern/webauthn.js), dus een assertie van elders past er niet op.
+
+     Wat dit kost, en dat is bewust: een demo-persona of gast heeft geen eigen
+     account en kan dus geen passkey maken. Die kan met RTG iD niet meer
+     bevestigen, en krijgt dat met zoveel woorden te horen in plaats van een
+     vage weigering. */
+  async function bevestig(key, koppelId, machtigingId, bewijs) {
     const s = S();
     const k = s.koppels.find(x => x.id === String(koppelId || ''));
     if (!k || k.status !== 'wacht') return { status: 404, error: 'Deze inlog wacht niet (meer).' };
@@ -123,13 +151,27 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
       if (m.dienst !== k.dienst) return { status: 403, error: 'Deze machtiging geldt voor ' + m.dienst + ', niet voor ' + k.dienst + '.' };
       voorKey = m.vanKey; namens = codenaamUit(key);
     }
+    /* De passkey van wie er STAAT, niet van wie hij vertegenwoordigt: bij een
+       machtiging tekent de gemachtigde met zijn eigen sleutel. Anders zou een
+       machtiging betekenen dat iemand met de biometrie van een ander bevestigt,
+       en dat kan niet bestaan. */
+    const ik = accountVanKey(key);
+    if (!ik) return { status: 403, error: 'Bevestigen met RTG iD vraagt een passkey, en die hoort bij een eigen RTG-account. Een demo-persona of gast heeft er geen.' };
+    if (typeof stapOp !== 'function') return { status: 500, error: 'De passkey-controle is niet aangesloten; bevestigen kan nu niet.' };
+    const bewijsUit = await stapOp({ user: ik, doel: k.id, bewijs: bewijs || {} });
+    if (!bewijsUit || bewijsUit.error) return bewijsUit || { status: 401, error: 'De passkey kon niet worden geverifieerd.' };
+    /* De koppel kan tijdens de ceremonie zijn verlopen of door een tweede
+       tabblad zijn afgehandeld; na een await is de eerdere controle een
+       momentopname van daarnet. */
+    if (k.status !== 'wacht') return { status: 409, error: 'Deze inlog is inmiddels afgehandeld.' };
+    if (nu() > k.verloopt) { k.status = 'verlopen'; save(); return { status: 410, error: 'De code is tijdens het bevestigen verlopen; laat de dienst een nieuwe tonen.' }; }
     const raw = crypto.randomBytes(24).toString('hex');
     const sess = { tokenHash: hash(raw), dienst: k.dienst, memberKey: voorKey, attributen: k.attributen,
       namens, gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
     s.sessies.unshift(sess); cap(s.sessies, MAX_SESSIES);
     k.status = 'bevestigd'; k.tokenEenmalig = raw;
     const log = logVan(voorKey);
-    log.unshift({ om: iso(), dienst: k.dienst, attributen: k.attributen,
+    log.unshift({ om: iso(), dienst: k.dienst, attributen: k.attributen, met: 'passkey',
       soort: namens ? 'inlog door gemachtigde ' + namens : 'inlog' });
     cap(log, MAX_LOG); save();
     return { status: 200, ok: true, dienst: k.dienst, namens: namens || undefined };

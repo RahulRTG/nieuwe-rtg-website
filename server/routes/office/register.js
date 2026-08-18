@@ -23,6 +23,7 @@ const fs = require('fs');
 const path = require('path');
 const pr = require('../../kern/platformregister');
 const sam = require('../../kern/platformregister/samenstellen');
+const schermstand = require('../../kern/platformregister/schermstand');
 const matrix = require('../../../scripts/bewijsmatrix');
 const schermenMeter = require('../../../scripts/schermen');
 
@@ -87,6 +88,10 @@ module.exports = (octx) => {
     return versheid(s, nuCommit());
   };
 
+  const gidsVan = () => {
+    try { return require('../../kern/appgids').GIDS || {}; } catch (e) { return {}; }
+  };
+
   const leesWaarom = () => {
     try {
       const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'WAAROM.json'), 'utf8'));
@@ -116,46 +121,13 @@ module.exports = (octx) => {
     const alle = [].concat(
       sam.functieRecords(functies.FUNCTIES, perDing, standVan, waarom),
       sam.bedieningRecords(perDing, waarom),
-      schermRecordsVeilig(),
+      schermstand.schermRecords(schermenMeter, sam, WORTEL, gidsVan()),
       sam.controlRecords(controls(), versheidVan)
     );
 
     const reg = { dingen: alle, onbenoemd, herkomst: m.herkomst, routes: m.routes };
     cache = { stempel: nu, reg };
     return reg;
-  }
-
-  /* De schermmeter leest het journaal van de laatste e2e-ronde. Ligt dat er niet,
-     dan is de schermstatus ONBEKEND en zeggen we dat -- een scherm stil op
-     "nooit geopend" zetten omdat het journaal ontbreekt, is een meting verzinnen
-     (LAT.md regel 3). */
-  function schermRecordsVeilig() {
-    let schermen = [], gids = {};
-    try { schermen = schermenMeter.alleSchermen(); } catch (e) { return []; }
-    try { gids = require('../../kern/appgids').GIDS || {}; } catch (e) { gids = {}; }
-
-    /* geopendeSchermen() NEEMT EEN PAD en geeft {afgelegd, neven} terug. Zonder
-       pad leest hij undefined, geeft netjes null, en dan kwamen alle 260 schermen
-       als "nooit geopend" uit dit register -- een meting verzonnen uit een
-       ontbrekend bestand. Het journaal heet .schermjournaal en wordt door
-       `npm run e2e` geschreven, niet door de gewone suite. */
-    let waarneming = null;
-    try {
-      const journaalPad = path.join(WORTEL, '.schermjournaal');
-      const w = schermenMeter.geopendeSchermen(journaalPad);
-      if (w && w.afgelegd) {
-        /* HEEFT DIE RONDE GEDRAAID. Een journaal dat er ligt is nog geen ronde
-           die is afgelopen: viel de browser om, dan staan er wel TOETS-regels en
-           geen enkele SCHERM-regel, en leest dat als 262 nooit geopende
-           schermen. rondeVerslag() geeft `af: false` met de reden, en dan is de
-           schermstatus ONGEMETEN -- een uitspraak over ons, niet over de app. */
-        const ronde = schermenMeter.rondeVerslag(journaalPad);
-        waarneming = { afgelegd: w.afgelegd, neven: w.neven,
-          af: ronde ? ronde.af : true, reden: ronde ? ronde.reden : null,
-          vegers: schermenMeter.veegToetsen(w.afgelegd, schermen.length) };
-      }
-    } catch (e) { waarneming = null; }
-    return sam.schermRecords(schermen, gids, waarneming);
   }
 
   function overzicht(vraag) {

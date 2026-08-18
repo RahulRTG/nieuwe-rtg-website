@@ -1,10 +1,12 @@
 {
   "stempel": {
-    "op": "2026-08-18T07:17:59.979Z",
-    "commit": "4ad6a5a",
+    "op": "2026-08-18T10:52:43.651Z",
+    "commit": "b5ed149",
     "boomVuil": true,
     "node": "v22.22.2"
   },
+  "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
+  "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -607,6 +609,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "bewijsschuld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsschuld.js",
+      "operator": "===->!==#2",
+      "gezakt": 1,
+      "geprobeerd": 10
     },
     "bezorg.test.js": {
       "soort": "server",
@@ -2101,6 +2111,13 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "kantoorregisters.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "kantoorwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2995,6 +3012,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "meetkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/meetkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "memo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3624,6 +3649,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "outputaudit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/routedekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ov-operatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3995,6 +4028,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
+    },
+    "poortwacht-oordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/poortwacht.js",
+      "operator": ">=->>#0",
+      "gezakt": 4,
+      "geprobeerd": 3
     },
     "poortwacht.test.js": {
       "soort": "puur",
@@ -4795,6 +4836,14 @@
       "operator": "&&->||#0",
       "gezakt": 10,
       "geprobeerd": 1
+    },
+    "schermronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/platformregister/samenstellen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "schild.test.js": {
       "soort": "server",
@@ -6057,6 +6106,14 @@
         "server/kern/events.js"
       ],
       "posities": 1
+    },
+    "waarom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/waarom.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "wacht.test.js": {
       "soort": "puur",

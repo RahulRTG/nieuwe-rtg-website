@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5141b00d';
+var RTG_BOUW = '5134029c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1986,6 +1986,24 @@ var RTG_BOUW = '5141b00d';
        raakt. renderAll() leest dit terug en zet je waar je was. */
     try { localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab, t: Date.now() })); } catch(e){}
     $('#content').scrollTop = 0;
+    /* HET SCHERM WISSELDE, MAAR DE SCHIL HOORDE HET NIET.
+
+       sync() (app-main-28.js) zet os-open op #app, en daaraan hangt de hele
+       app-modus: de terugknop en de titel in de statusbalk in plaats van het
+       woordmerk, en de schermvaste pill. Hij hing aan een MutationObserver op
+       #app zelf -- en openTab raakt #app niet aan. Hij raakt de views en de
+       tabknoppen aan. Gevolg: je opende Ter plaatse en de balk bleef die van
+       het beginscherm, zonder weg terug.
+
+       Dat viel niet op zolang het springboard eronder lag: je kon altijd nog
+       op een tegel tikken. Nu de werktafel het beginscherm is, is deze balk de
+       enige uitweg uit zo'n scherm -- en dan is "hij hoort het niet" geen
+       schoonheidsfoutje meer. De waarnemer blijft staan voor de gate-wissel
+       (in- en uitloggen); dit is de wissel die hij niet kon zien.
+
+       Via window omdat sync() in een andere scope woont dan deze functie -- zie
+       de naad in app-main-28.js. */
+    if (window.RTGOSSync) RTGOSSync();
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
     if (focusView){
@@ -3847,44 +3865,19 @@ var RTG_BOUW = '5141b00d';
       localStorage.setItem('rtg_os_gebruik_' + pas, JSON.stringify(g));
     } catch (e) {}
   }
-  /* ---------- het ritme: WANNEER je iets opent ----------
-     De teller hierboven weet WAT je vaak opent; dit weet wanneer. Samen zijn ze
-     "normaal open je nu Kantoor". Zelfde principe als hierboven, en daarom
-     bewust dezelfde vorm: lokaal op het toestel, met verval per dag, zodat een
-     gewoonte die je loslaat vanzelf uitdooft in plaats van jaren mee te wegen.
+  /* HIER STOND HET RITME: WANNEER je iets opende.
 
-     ER GAAT NIETS NAAR DE SERVER. Niet je uren, niet je ritme, niets. Dat is
-     dezelfde afspraak als bij de codenamen: wat je niet verstuurt, kan ook niet
-     uitlekken.
+     Een tweede teller naast die hierboven, met wereld + uur als sleutel, zodat
+     Rahul op de wereldring kon zeggen "normaal opent u nu Kantoor". Die ring
+     hing om de klok, de klok was het beginscherm, en dat beginscherm is de
+     werktafel geworden -- de enige lezer van deze teller is dus verdwenen.
 
-     De sleutel is wereld + uur. Uren zijn grof genoeg om een gewoonte te
-     vangen en te grof om een dag mee te reconstrueren -- dat is precies de
-     bedoeling. */
-  function ritmeLees() { try { return JSON.parse(localStorage.getItem('rtg_os_ritme_' + pas) || '{}'); } catch (e) { return {}; } }
-  function telRitme(sleutel) {
-    try {
-      const r = ritmeLees(), nu = Date.now(), k = sleutel + '|' + new Date().getHours();
-      const oud = r[k] || { n: 0, t: nu };
-      const dagen = Math.max(0, (nu - (oud.t || nu)) / 86400000);
-      r[k] = { n: (oud.n || 0) * Math.pow(0.85, dagen) + 1, t: nu };
-      localStorage.setItem('rtg_os_ritme_' + pas, JSON.stringify(r));
-    } catch (e) {}
-  }
-  /* Wat open je normaal OP DIT UUR? Alleen als het echt een patroon is:
-     minstens DREMPEL keer, en duidelijk vaker dan de nummer twee. Anders zwijgt
-     hij -- liever stil dan een gok die als inzicht klinkt. */
-  const RITME_DREMPEL = 3;
-  function ritmeNu() {
-    const r = ritmeLees(), nu = Date.now(), uur = new Date().getHours();
-    const scores = Object.entries(r)
-      .filter(([k]) => Number(k.split('|')[1]) === uur)
-      .map(([k, v]) => [k.split('|')[0], (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
-      .sort((a, b) => b[1] - a[1]);
-    if (!scores.length || scores[0][1] < RITME_DREMPEL) return null;
-    // een koploper die nauwelijks voorloopt is geen gewoonte maar een muntworp
-    if (scores[1] && scores[0][1] < scores[1][1] * 1.5) return null;
-    return scores[0][0];
-  }
+     Hij is meegegaan en niet blijven staan. Een teller die gedrag per uur
+     wegschrijft en die niemand meer leest, is geen ongebruikte functie maar een
+     verzameling die geen doel meer heeft; dat is precies wat je in een huis dat
+     op codenamen draait niet wilt laten liggen. De teller die WEL een lezer
+     heeft (gebruik/topGebruik, voor de rij "Voor u" in Spotlight) staat
+     hierboven en blijft. */
 
   function topGebruik(k) {
     const g = gebruik(), nu = Date.now();
@@ -4179,6 +4172,8 @@ var RTG_BOUW = '5141b00d';
        Eerder hing de ring aan het laden van de pagina, en die is een slag
        eerder dan de boardroom-gegevens: het beginscherm was leeg. */
     if (typeof wereldBij === 'function') wereldBij();
+    // en om dezelfde reden de deuren naar het systeem (app-main-29c.js)
+    if (typeof systeemBij === 'function') systeemBij();
   }
 
   /* ---------- mappen openen ---------- */
@@ -4211,7 +4206,7 @@ var RTG_BOUW = '5141b00d';
        indexeert ze en zonder die index is er halverwege de verhuizing van
        alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
        lijst vanzelf leeg. */
-    if (map.wereld) { telRitme(map.sleutel); location.href = map.wereld; return; }
+    if (map.wereld) { location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);
@@ -4299,8 +4294,22 @@ var RTG_BOUW = '5141b00d';
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
   }
-  function zoekRij(icoonNode, label, meta, doe) {
+  /* `sleutel` is optioneel en alleen gezet op rijen die een APP zijn.
+
+     Waarom hij er is: Spotlight is sinds het springboard verdween de enige
+     plek waar de onderdelen van een wereld nog te vinden zijn (zie openMap in
+     app-main-26b.js -- de `items` blijven bestaan zodat deze index ze kan
+     indexeren). Een rij droeg alleen zijn ZICHTBARE naam, en die namen
+     veranderen met beleid: "Werk OS" werd "Mijn werkplekken", "RTG Office"
+     werd "Documenten". Wie wil nagaan of een app nog vindbaar is, moest dus
+     op een etiket zoeken dat juist hoort te mogen schuiven.
+
+     De sleutel schuift niet: die verandert alleen als de app echt een andere
+     app wordt. Hij staat hier dus naast het etiket, net als op een tegel
+     (app-main-26b.js doet hetzelfde met dataset.sleutel). */
+  function zoekRij(icoonNode, label, meta, doe, sleutel) {
     const b = document.createElement('button');
+    if (sleutel) b.dataset.sleutel = sleutel;
     const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
     b.appendChild(zi);
     b.appendChild(document.createTextNode(label));
@@ -4324,13 +4333,13 @@ var RTG_BOUW = '5141b00d';
       const top = topGebruik(4);
       if (top.length) {
         zoekSectie('Voor u');
-        for (const s of top) zoekRij(tegelInhoud(s), itemNaam(s), null, () => { sluitScrims(); openItem(s); });
+        for (const s of top) zoekRij(tegelInhoud(s), itemNaam(s), null, () => { sluitScrims(); openItem(s); }, s);
         zoekSectie('Alle apps');
       }
     }
     for (const { item, uit } of alleItems()) {
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
-      zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); });
+      zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
     // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
     if (q) {
@@ -4490,6 +4499,12 @@ var RTG_BOUW = '5141b00d';
   }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
   new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
+
+  /* sync() woont in deze scope en niet in die van openTab (app-main-12.js), dus
+     kan die hem niet aanroepen -- vandaar deze naad, dezelfde vorm als
+     window.RTGVraag in app-main-27.js. Waarom openTab hem nodig heeft staat
+     daar, bij de aanroep. */
+  window.RTGOSSync = sync;
 
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');
@@ -4747,12 +4762,10 @@ var RTG_BOUW = '5141b00d';
     draadOpen = true;
     aiDraad.scrollTop = aiDraad.scrollHeight;
     if (window.RTGMond && aiOrbMond && wie !== 'mij') aiOrbMond.praat(Math.min(4200, 420 + tekst.length * 38));
-    /* In de wereldstand staat de draad niet open te wachten: daar komt Rahul
-       op als een gouden ring met EEN zin, en pas als hij werkelijk iets heeft.
-       Die zin is dus deze zin -- hij wordt daar niet opnieuw bedacht, want dan
-       zouden er twee Rahuls zijn die net iets anders zeggen. Wat ik zelf typ is
-       geen mededeling van hem, dus dat blijft eruit. */
-    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst, leeg === true);
+    /* Hier ging deze zin ook naar de gouden ring van Rahul in de wereldstand.
+       Die stand hing om de klok van het beginscherm; dat beginscherm is de
+       werktafel geworden en de ring is met hem verdwenen. Rahul zegt zijn zin nu
+       op één plek -- hier, in de draad -- in plaats van op twee. */
     return b;
   }
 
@@ -4877,140 +4890,75 @@ var RTG_BOUW = '5141b00d';
      Rahuls opening hier aan het venster: dat is de enige draad tussen die twee,
      en zo begint hij pas als er echt iets te vertellen valt. */
   window.RTGThuisRahul = { opent: osRahulOpent, vraag: osRahulVraag, kijkt: osRahulKijkt };
+  /* ---------- de werelden aanreiken aan de bank van RTG Command ----------
+     WAAR DIT VANDAAN KOMT. Hier stond de aanreiking aan shared/wereld.js: het
+     beginscherm als kring om de klok, met de werelden als merken op een bezel.
+     Dat beginscherm is weg -- de werktafel van RTG Command is het geworden -- en
+     de klok is met hem meegegaan. De werelden niet. Ze staan nu bovenaan de
+     bank, en dit blok is de plek waar ze daarheen gaan.
 
-  /* ---------- de levende wereld aanreiken ----------
-     shared/wereld.js tekent het beginscherm als kring om de klok in plaats van
-     als rooster met tegels. Die module weet met opzet NIETS: niet welke
-     werelden er zijn, niet hoe je er een opent, niet welke onderdelen jouw pas
-     draagt. Dat staat hier al -- in MAPPEN, itemZichtbaar, itemNaam,
-     tegelInhoud en openItem -- en dit blok geeft het door.
+     De regel eromheen is niet veranderd: shared/command.js weet met opzet NIETS
+     over welke werelden er zijn en welke onderdelen bij jouw pas horen. Dat
+     staat hier al -- in MAPPEN, itemZichtbaar en mapNaam -- en wordt van hieruit
+     doorgegeven. Wie daar ooit een eigen lijst werelden ziet ontstaan, heeft de
+     fout te pakken waar LAT.md regel 4 over gaat.
 
-     Dat is de reden dat de omschakeling geen tweede beginscherm oplevert: beide
-     standen lezen DEZELFDE lijst, tonen DEZELFDE klok en openen apps met
-     DEZELFDE openItem(). Wie hier ooit een eigen lijst werelden ziet ontstaan,
-     of een tweede manier om een app te openen, heeft de fout te pakken waar
-     LAT.md regel 4 over gaat.
+     WAT ER PER WERELD MEEGAAT, en wat bewust niet. Naam, huis en teken: genoeg
+     om een deur te zijn. De onderdelen gaan NIET mee. Ze horen bij de wereld en
+     staan op het huis zelf (/apps/rtg.html en de andere twee dragen ze alle drie
+     compleet); ze een tweede keer in de bank hangen zou een rail van veertig
+     regels maken en de vraag oproepen welke van de twee lijsten de echte is.
 
-     Ontbreekt de module (een oude service-worker-cache, een geblokkeerd
-     script), dan gebeurt er niets en staat het rooster er gewoon. Een
-     beginscherm dat leeg blijft omdat een sierlaag niet laadde, is erger dan
-     geen sierlaag. */
+     Ontbreekt de schil (een pagina zonder shared/command.js, een oude
+     service-worker-cache), dan gebeurt er niets. Een beginscherm dat leeg blijft
+     omdat een aanreiking niet aankwam is erger dan een bank zonder kopje. */
 
   /* Wordt aan het eind van bouw() aangeroepen, dus op precies het moment dat
-     ook de tegels worden bijgewerkt. De module vergelijkt zelf of er iets
-     veranderd is en doet niets als het antwoord nee is. */
+     ook de tegels worden bijgewerkt. De schil vergelijkt zelf niets, maar
+     opnieuw vullen kost een rij knoppen -- en het houdt de bank gelijk met een
+     pas die intussen veranderd is. */
   function wereldBij() {
-    if (!window.RTGWereld || !RTGWereld.werelden) return;
-    RTGWereld.werelden(MAPPEN.filter(function (m) {
+    if (!window.RTGCommand || !RTGCommand.werelden) return;
+    RTGCommand.werelden(MAPPEN.filter(function (m) {
       return m.wereld && m.items.some(itemZichtbaar);
     }).map(function (m) {
       return {
         sleutel: m.sleutel,
         naam: mapNaam(m),
         url: m.wereld,
-        /* De glyf van de wereld: hetzelfde teken als op de tegel, uit dezelfde
+        /* De glyf van de wereld: hetzelfde teken als op zijn huis, uit dezelfde
            bron. Een tweede tekenset zou twee werelden geven die anders heten. */
-        teken: function () { return (window.RTGGlyf && RTGGlyf.svg(m.glyf)) || null; },
-        delen: m.items.filter(itemZichtbaar).map(function (item) {
-          return {
-            sleutel: item,
-            naam: itemNaam(item),
-            teken: function () { try { return tegelInhoud(item); } catch (e) { return null; } }
-          };
-        })
+        teken: function () { return (window.RTGGlyf && RTGGlyf.svg(m.glyf)) || null; }
       };
     }));
   }
 
-  (function () {
-    var scherm = document.querySelector('.os-thuisscherm');
-    var vak = document.querySelector('.os-klokvak');
-    var klok = $('#homeKlok');
-    if (!scherm || !vak || !klok || !window.RTGWereld) return;
+  /* ---------- het bedieningspaneel aanreiken aan de voet van de bank ----------
+     HET SPRINGBOARD IS ALS SCHERM VERDWENEN, EN DIT MOEST BLIJVEN.
 
-    RTGWereld.start({
-      scherm: scherm, vak: vak, klok: klok, werelden: [],
-      openUrl: function (url) { location.href = url; },
-      openDeel: function (sleutel) { openItem(sleutel); },
-      /* Een werkwoord uit het Command Wheel gaat naar de balk van Rahul, met de
-         wereld erbij waar je het vandaan haalde. Niet meteen VERSTUREN: je hebt
-         gezegd wat je wilt doen, nog niet waarmee. De cursor staat klaar achter
-         de zin, zodat je hem afmaakt in plaats van hem te lezen. */
-      zegRahul: function (zin) {
-        var invoer = $('#osAiIn');
-        if (!invoer) return;
-        invoer.value = zin + ' ';
-        invoer.focus();
-        try { invoer.setSelectionRange(invoer.value.length, invoer.value.length); } catch (e) {}
-      }
-    });
+     Het bedieningspaneel hing achter de knop rechtsboven op dat scherm, en
+     draagt alles wat geen wereld is: thema, helderheid, taal, achtergrond, en de
+     tegels scannen, je Zegel, je backoffice, de Boardroom, de algemene pin,
+     push, zoeken, meldingen en uitloggen. Zonder een nieuwe deur was dat met het
+     scherm meegegaan -- inclusief de enige uitlogknop die een lid heeft.
 
-    /* ---------- de momenten van vandaag op de wijzerplaat ----------
-       Uit /agenda/mijn, dezelfde bron als het dagprogramma bij je reis
-       (app-main-45.js) -- er wordt hier niets bijgemaakt. Alleen VANDAAG, want
-       een wijzerplaat toont een dag; morgen om half tien heeft op deze klok
-       geen plek die van morgen is.
+     Een deur en niet zestien. Het paneel is al de plek waar deze dingen samen
+     staan; ze los in de bank hangen zou dezelfde lijst een tweede keer maken, op
+     een plek die er niet over gaat.
 
-       Heeft een lid vandaag niets, dan komen er GEEN stipjes. Een ring met
-       streepjes die suggereert dat er een dag is, is precies de verzonnen stand
-       waar CANVAS.md over gaat. */
-    async function momentenBij() {
-      if (!window.RTGWereld || !RTGWereld.momenten || !API.live || gast()) return;
-      var dagen = [];
-      try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch (e) { return; }
-      var nu = new Date();
-      var vandaag = nu.getFullYear() + '-' +
-        String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
-      var dag = dagen.filter(function (d) { return d && d.datum === vandaag; })[0];
-      var items = (dag && dag.items) || [];
-      RTGWereld.momenten(items.map(function (it) {
-        // "hele dag" heeft geen plek op een wijzerplaat: zonder tijd geen stip
-        var m = /^(\d{1,2}):(\d{2})/.exec(String(it.tijd || ''));
-        if (!m) return null;
-        return {
-          tijd: it.tijd, uur: Number(m[1]), min: Number(m[2]),
-          titel: it.titel || '', sub: it.status ? tStatus(it.status) : ''
-        };
-      }).filter(Boolean));
-    }
-    momentenBij();
-    // en nog eens als je terugkomt: een dag verandert terwijl je weg bent
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) momentenBij(); });
-
-    /* ---------- wat je normaal op dit uur opent ----------
-       ritmeNu() (app-main-25b.js) leest de lokale telling en geeft alleen een
-       wereld terug als het ECHT een patroon is. Geeft hij niets, dan zegt Rahul
-       niets -- en dat is de normale uitkomst voor een lid dat hier net is.
-
-       De naam komt uit MAPPEN, net als overal: de ring krijgt een sleutel en een
-       naam en verzint er zelf niets bij. */
-    function ritmeBij() {
-      if (!window.RTGWereld || !RTGWereld.ritme) return;
-      var sleutel = ritmeNu();
-      if (!sleutel) { RTGWereld.ritme(null); return; }
-      var map = MAPPEN.filter(function (m) { return m.sleutel === sleutel; })[0];
-      if (!map || !map.wereld || !map.items.some(itemZichtbaar)) { RTGWereld.ritme(null); return; }
-      RTGWereld.ritme({ sleutel: map.sleutel, naam: mapNaam(map) });
-    }
-    ritmeBij();
-    // het uur verschuift terwijl de app openstaat; elk kwartier opnieuw kijken
-    setInterval(ritmeBij, 15 * 60 * 1000);
-
-    /* De schakelaar in het bedieningspaneel. Hij zet niets zelf: hij vraagt de
-       module om te wisselen en leest daarna terug wat de stand IS, zodat de
-       knop niet kan gaan afwijken van het scherm. */
-    var knoppen = document.querySelectorAll('#osCcWereld button');
-    function merk() {
-      knoppen.forEach(function (b) {
-        b.classList.toggle('actief', (b.dataset.wereld === 'aan') === RTGWereld.aan());
-      });
-    }
-    knoppen.forEach(function (b) {
-      b.addEventListener('click', function () { RTGWereld.zet(b.dataset.wereld === 'aan'); merk(); });
-    });
-    window.addEventListener('rtg-wereld', merk);
-    merk();
-  })();
+     We klikken de bestaande knop aan in plaats van het paneel zelf te openen.
+     Die knop draagt het gedrag (app-main-27b.js) en blijft de enige plek waar
+     dat staat -- ook nu hij zelf niet meer in beeld komt. */
+  function systeemBij() {
+    if (!window.RTGCommand || !RTGCommand.systeem) return;
+    var knop = $('#osCcBtn');
+    /* RAHUL STOND HIER OOK, en is verhuisd naar shared/command.js: de werktafel
+       levert zijn eigen deur, want zijn plek is de mond in de schilbalk. Hier
+       riep hij RTGRahul.open() aan -- de zwevende handenvrij-balk -- en dat zou
+       een tweede Rahul zijn naast die in de balk. */
+    RTGCommand.systeem(knop ? [{ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+      doe: function () { knop.click(); } }] : []);
+  }
   bouw();
 
   /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet

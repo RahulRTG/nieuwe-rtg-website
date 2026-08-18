@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-18T10:52:43.651Z",
-    "commit": "b5ed149",
+    "op": "2026-08-18T12:25:31.422Z",
+    "commit": "5e53998",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -1504,6 +1504,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "gastscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "gastverzoek.test.js": {

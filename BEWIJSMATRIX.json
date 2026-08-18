@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-18T09:08:42.089Z",
-    "commit": "5b13f2b",
+    "op": "2026-08-18T12:23:04.138Z",
+    "commit": "5e53998",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,19 +12,19 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 16546,
+    "bewezen": 16580,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 29078,
-    "gezakt": 139
+    "ongemeten": 29042,
+    "gezakt": 141
   },
   "perSchakel": {
     "AUTH": {
       "bewezen": 3885,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 300,
-      "gezakt": 0
+      "ongemeten": 297,
+      "gezakt": 3
     },
     "ACL": {
       "bewezen": 3379,
@@ -41,39 +41,39 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 0,
+      "bewezen": 10,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4185,
+      "ongemeten": 4175,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 254,
+      "bewezen": 252,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3863,
+      "ongemeten": 3865,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 254,
+      "bewezen": 252,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3863,
+      "ongemeten": 3865,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 0,
+      "bewezen": 29,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4185,
+      "ongemeten": 4156,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
       "bewezen": 139,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3848,
-      "gezakt": 130
+      "ongemeten": 3850,
+      "gezakt": 128
     },
     "FAILURE": {
       "bewezen": 2,
@@ -83,11 +83,11 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2450,
+      "bewezen": 2449,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 1658,
-      "gezakt": 9
+      "gezakt": 10
     },
     "PRIVACY": {
       "bewezen": 3379,

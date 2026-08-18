@@ -38,6 +38,7 @@
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const args = process.argv.slice(2);
 const jsonUit = args.includes('--json');
@@ -216,18 +217,30 @@ ronde().then(() => {
 
        Bewust alleen of ze GEZET zijn en niet wat erin staat: dit bestand wordt
        gecommit. */
-    const gemeten = {
+    /* Het stempel (wanneer, welke commit, vuile boom) komt uit de gedeelde
+       helper; de opstelling komt daar bovenop, want die is van deze sonde
+       alleen. Zonder commit kan scripts/versheid.js niet zien of deze uitslag
+       nog bij de huidige code hoort. */
+    const gemeten = Object.assign(stempel(), {
       adres: BASIS,
-      op: new Date().toISOString(),
       metricsToken: !!process.env.RTG_METRICS_TOKEN,
       clusterSleutel: !!process.env.RTG_CLUSTER_KEY,
       domeinen: !!process.env.RTG_DOMAINS,
       let: 'Deze uitslag geldt voor DEZE opstelling. /api/metrics gaat zonder token open ' +
         'vanaf een intern adres; een lokale ronde meldt hem daarom als open zonder dat er ' +
         'iets mis is. Vergelijk alleen rondes met dezelfde vlaggen.'
-    };
+    });
     console.log(JSON.stringify(perRouteUit ? { gemeten, ...uit, perRoute } : { gemeten, ...uit }, null, 1));
-    process.exit(uit.open.length ? 1 : 0);
+    /* process.exitCode EN NIET process.exit(), en dat verschil is hier 146 KB
+       waard. Naar een BESTAND schrijft node synchroon, dus `> POORTWACHT.json`
+       ging altijd goed. Naar een PIPE schrijft hij asynchroon, en process.exit()
+       wacht daar niet op: wie deze uitslag opving met spawnSync kreeg hem
+       AFGEKAPT op precies 146176 bytes -- geldige tekst, kapotte JSON, en een
+       exitcode 0 erbij. Dat is de ergste soort fout: hij ziet er geslaagd uit.
+       Gevonden doordat scripts/meetronde.js de poortwacht als kindproces draait.
+       Met exitCode loopt het proces netjes leeg en klopt de code nog steeds. */
+    process.exitCode = uit.open.length ? 1 : 0;
+    return;
   }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
   console.log('  aangeklopt        : ' + uit.totaal);

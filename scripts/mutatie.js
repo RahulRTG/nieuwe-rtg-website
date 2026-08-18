@@ -65,6 +65,9 @@ const { spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
+/* Wanneer gemeten en waartegen; zonder stempel is een register niet na te
+   lopen (scripts/lib/stempel.js). */
+const { stempel } = require('./lib/stempel');
 const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
 /* DE VOORTGANG STAAT BUITEN DE REPO, en dat is geen detail.
 
@@ -709,7 +712,7 @@ if (require.main === module) {
     const op = {};
     for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
     fs.mkdirSync(path.dirname(doel), { recursive: true });
-    fs.writeFileSync(doel, JSON.stringify({ toetsen: op }, null, 2) + '\n');
+    fs.writeFileSync(doel, JSON.stringify({ stempel: stempel(), toetsen: op }, null, 2) + '\n');
   };
   const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo

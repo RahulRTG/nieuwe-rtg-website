@@ -65,6 +65,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
 
+const { stempel } = require('./lib/stempel');
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 
@@ -498,7 +499,13 @@ function vorige() {
    onleesbaar. De rijen zijn met --json altijd op te vragen. */
 function zonderRijen(m) {
   const { rijen, ...rest } = m;
-  return { ...rest, uitleg: 'Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN.' };
+  /* HET STEMPEL VOOROP. Deze matrix is samengesteld uit vijf andere registers;
+     als een daarvan achterloopt, loopt deze mee achter zonder dat de getallen
+     dat verraden. Zonder stempel is dat pas te zien nadat iemand het vermoedt --
+     en dat kostte hier al een keer een halve sessie (de poortwacht liep 196
+     routes achter). Zie scripts/lib/stempel.js. */
+  return { stempel: stempel(), ...rest,
+    uitleg: 'Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN.' };
 }
 
 /* WELKE SCHAKEL IS ACHTERUIT GEGAAN. Zonder dit meldt de ratel alleen een
@@ -554,7 +561,10 @@ if (require.main !== module) return;
 
 const matrix = bouw();
 
-if (JSONUIT) { console.log(JSON.stringify(matrix, null, 1)); process.exit(0); }
+/* exitCode en geen exit(): deze uitvoer is megabytes groot en process.exit()
+   kapt een PIPE af zonder iets te melden (zie scripts/poortwacht.js voor het
+   geval waarin dat echt misging). */
+if (JSONUIT) { console.log(JSON.stringify(matrix, null, 1)); process.exitCode = 0; return; }
 
 const oud = vorige();
 console.log('\n=== DE ENDPOINT-BEWIJSMATRIX ===\n');

@@ -27,6 +27,9 @@ const { spawn } = require('child_process');
 const { draaiInvoerproef } = require('./lib/invoerproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 const { maakTeller, maakRommel } = require('./lib/rommel');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INVOERPROEF.json');
@@ -56,6 +59,18 @@ async function wacht(basis, ms) {
   }
   return false;
 }
+
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een
+   VOLLEDIGE meetronde zodra iets dit bestand require't -- een toets, de keuring,
+   of iemand die alleen even wil kijken of het laadt. Dat is hier echt gebeurd:
+   een onschuldige laadcontrole draaide de rolproef met de STANDAARDbegrenzing en
+   schreef ROLPROEF.json van 3377 beproefde routes terug naar 292. Het register
+   zag er daarna volkomen normaal uit.
+
+   scripts/bewijsmatrix.js heeft deze wacht al sinds hij ooit de hele testrunner
+   meenam. Dezelfde wacht hoort op elk instrument dat bij het draaien een register
+   OVERSCHRIJFT. */
+if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
   const poort = await vrijePoort();
@@ -155,6 +170,7 @@ async function wacht(basis, ms) {
   for (const b of uit.bevindingen.sporen.slice(0, 15)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per route: rommel met de JUISTE rol, en of er een 5xx of een intern spoor uit kwam. ' +
       'Een route die hier NIET in staat is niet beproefd. Een route met invoer:"poort" stond achter ' +
       'een tweede grendel en is ONGEMETEN, geen groen. Zie scripts/lib/invoerproef.js voor de grens.',

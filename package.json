@@ -121,7 +121,10 @@
     "sentinel:audit:verify": "node scripts/sentinel-beheer.js verify-audit",
     "sentinel:audit:recover": "node scripts/sentinel-beheer.js recover-audit",
     "start:rust": "node scripts/start-met-motor.js",
-    "prestaties": "node --experimental-sqlite scripts/prestaties.js"
+    "prestaties": "node --experimental-sqlite scripts/prestaties.js",
+    "meetronde": "node --experimental-sqlite scripts/meetronde.js",
+    "meetronde:snel": "node --experimental-sqlite scripts/meetronde.js --snel",
+    "versheid": "node scripts/versheid.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

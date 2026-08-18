@@ -34,6 +34,9 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { CATALOGUS } = require('../server/lib/verraad');
 const { beoordeel, isStilVerlies, voldoetAanLat, financieelOordeel } = require('./lib/ketenproef');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'KETENS.json');
@@ -305,6 +308,7 @@ async function draai(keten, verraadAan) {
   console.log('  ----------------------------------------');
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Sabotage op echte businessketens, acht velden per scenario. Een verraad telt pas ' +
       'als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): ' +
       'injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst ' +

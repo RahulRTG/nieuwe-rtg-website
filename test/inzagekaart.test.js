@@ -152,3 +152,30 @@ test('de deur: een lid krijgt zijn kaart, een gast en een vreemde niet', async (
   assert.deepEqual(r.body.storingen, [], 'en alle bronnen zijn in een echte server bereikbaar');
   assert.ok(r.body.nietZichtbaar.length >= 1, 'met de grens van de lijst erbij');
 });
+
+test('een zorgprofiel-lezing staat er als zichzelf, niet als kluisopvraging', async () => {
+  /* HET VIERDE SPOOR, en het kwam precies zo binnen als deze kaart voorspelde:
+     het voorbehoud zei dat een nieuwe weg er niet vanzelf op komt. Allergieen,
+     dieet en medische aandachtspunten reisden mee naar een zaak zonder dat een
+     lid ooit kon zien wie ze had gelezen -- de zwaarste inhoud met het lichtste
+     spoor. Ze staan in hetzelfde journaal, maar zeggen iets anders, en dat moet
+     een lezer kunnen zien zonder de reden te hoeven ontcijferen. */
+  const db = { data: { inzageLog: [], paspoortLog: [] } };
+  inzagelog.zet(db, () => {});
+  inzagelog.noteer({ door: { id: 42, naam: 'Jansen van HR' }, over: { id: 7 },
+    waarom: 'loonadministratie', bron: '/api/payroll/identiteit' });
+  inzagelog.noteer({ door: 'Kikunoi', over: { id: 7 },
+    waarom: 'tafel dekken op allergenen en dieet', bron: 'zorgprofiel' });
+
+  const kaart = maakKaart({ kern: { db, findSupplier: () => null } }).inzagekaartVan('user-7');
+  const rijen = kaart.kaart;
+  const zorg = rijen.find(r => r.bron === 'Zorgprofiel');
+  const kluis = rijen.find(r => r.bron === 'Ledendossier');
+  assert.ok(zorg && kluis, 'de twee soorten staan er allebei, en uit elkaar');
+  assert.match(zorg.wat, /allergieen/i, 'de zorgregel zegt wat er gelezen is');
+  assert.match(kluis.wat, /naam uit de kluis/, 'en de kluisregel iets anders');
+  assert.doesNotMatch(zorg.wie, /Kikunoi/,
+    'welke zaak precies staat er niet: dat is de naam van de lezer, en die laat het journaal bewust weg');
+  assert.ok(kaart.bronnen.includes('Zorgprofiel'));
+  assert.match(kaart.voorbehoud, /vier sporen/, 'de kaart telt zichzelf goed');
+});

@@ -27,6 +27,13 @@
    voor de paspoortlaag hetzelfde, want anders zou dezelfde naam via de ene weg
    wel en via de andere niet naar buiten komen.
 
+   HET ZORGPROFIEL KWAM ER LATER BIJ, en precies zoals hieronder voorspeld: het
+   voorbehoud zei dat een vierde weg er niet vanzelf op komt en dat het
+   mensenwerk blijft. Dat was het ook. Allergieen, dieet en medische
+   aandachtspunten reisden mee naar een zaak zonder dat een lid ooit kon zien
+   welke zaak ze had gelezen; kern/gastzorg.js schrijft die lezingen nu in
+   hetzelfde journaal als de kluisopvragingen, en daarmee staan ze hier vanzelf.
+
    WAT ER NIET IN KAN, en dat staat op de kaart zelf. Een ID-check met het Zegel
    (public/shared/zegelcheck.js) wordt bij de ZAAK vastgelegd en niet bij het
    lid: het Zegel draagt een paarsgewijs pseudoniem, dus de server kan een
@@ -108,8 +115,16 @@ module.exports = ({ kern }) => {
     const lidId = idVanKey(key);
     const kluis = lidId == null ? [] : pak('Ledendossier', () => inzagelog.voorBetrokkene(lidId));
     for (const r of kluis || []) {
-      uit.push({ om: r.at, bron: 'Ledendossier', wie: r.bron || 'RTG',
-        wat: 'haalde uw naam uit de kluis', waarom: r.waarom || null, gekeken: true });
+      /* Het journaal draagt twee soorten regels: een kluisopvraging (iemand haalde
+         uw NAAM op) en een zorgprofiel-lezing (een zaak zag uw allergieen). Ze
+         staan in dezelfde lijst omdat het dezelfde vraag is -- wie keek er in
+         mijn gegevens -- maar ze zeggen iets anders, en dat hoort een lezer te
+         zien zonder de reden te moeten ontcijferen. */
+      const zorg = r.bron === 'zorgprofiel';
+      uit.push({ om: r.at, bron: zorg ? 'Zorgprofiel' : 'Ledendossier',
+        wie: zorg ? 'een zaak waar u besteld of verbleven heeft' : (r.bron || 'RTG'),
+        wat: zorg ? 'las uw allergieen, dieet en medische aandachtspunten' : 'haalde uw naam uit de kluis',
+        waarom: r.waarom || null, gekeken: true });
     }
 
     uit.sort((a, b) => String(b.om || '').localeCompare(String(a.om || '')));
@@ -117,12 +132,12 @@ module.exports = ({ kern }) => {
     return {
       ok: true, kaart, storingen,
       gekeken: kaart.filter(r => r.gekeken).length,
-      bronnen: ['RTG iD', 'Identiteitsbewijs', 'Ledendossier'],
+      bronnen: ['RTG iD', 'Identiteitsbewijs', 'Ledendossier', 'Zorgprofiel'],
       nietZichtbaar: [
         { naam: 'Een ID-/leeftijdscheck met het Zegel',
           reden: 'Het Zegel draagt een pseudoniem dat per partner verschilt, zodat zaken u niet aan elkaar kunnen herkennen. Diezelfde bescherming maakt dat RTG een controle niet aan uw account kan terugkoppelen; de controle staat wel in het activiteitenlog van de zaak zelf.' }
       ],
-      voorbehoud: 'Deze kaart brengt drie sporen samen. Een vierde weg die iemand morgen bouwt, staat er niet vanzelf op -- dat blijft mensenwerk, en test/inzagekaart.test.js zegt bij welke bronnen het is gebleven.'
+      voorbehoud: 'Deze kaart brengt vier sporen samen. Een vijfde weg die iemand morgen bouwt, staat er niet vanzelf op -- dat blijft mensenwerk, en test/inzagekaart.test.js zegt bij welke bronnen het is gebleven.'
     };
   }
 

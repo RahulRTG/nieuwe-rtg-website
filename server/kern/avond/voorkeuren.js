@@ -118,7 +118,7 @@ module.exports = ({ db, save, schoon, zorgVoor }) => {
     }
     /* Het zorgprofiel komt uit zijn EIGEN laag met zijn eigen toestemming. Hier
        staat alleen de doorgifte; de regel eromheen blijft van gastzorg.js. */
-    const zorg = zorgVoor ? zorgVoor(key) : null;
+    const zorg = zorgVoor ? zorgVoor(key, zaakcode ? { zaak: zaakcode, reden: 'voorkeuren klaarzetten voor een verblijf' } : null) : null;
     if (zorg) uit.zorg = zorg;
     return uit;
   }
@@ -136,7 +136,7 @@ module.exports = ({ db, save, schoon, zorgVoor }) => {
         ziet: zaakcode ? (standVoor(v, id, zaakcode) === 'altijd' && !!v.waarden[id]) : null
       })),
       standen: STANDEN,
-      zorgDeeltMee: !!(zorgVoor && zorgVoor(key)),
+      zorgDeeltMee: !!(zorgVoor && zorgVoor(key)),   // geen zaak: dit is de eigen stand, geen inzage
       let: 'Wat hier staat schrijf je zelf op. RTG leidt geen voorkeuren af uit je bestellingen.'
     };
   }

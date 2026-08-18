@@ -167,7 +167,7 @@ function eenRegel(args) {
     } catch (e) { process.stdout.write('  (commit overgeslagen: ' + String((e && e.message) || e).slice(0, 80) + ')\n'); }
   }
   let sindsCommit = 0;
-  const commitBundel = 300;
+  const commitBundel = 150;
 
   async function werker(nr) {
     while (volgende < rij.length) {

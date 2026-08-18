@@ -255,7 +255,7 @@ function zetEigenaarsAccount() {
       accounts.setVerification(u.id, 'verified');
     } else {
       u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-      accounts.saveMemberState(u.id, memberTemplate());
+      accounts.saveMemberState(u.id, demoLidInhoud());
       accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
     }
   } else {
@@ -615,16 +615,26 @@ const talen = maakTalen({ db, save });
    Zonder deze regel viel lid.js terug op eigen, hard ingetikte bedragen. */
 const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) };
-const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
-  maakLid(lidDeps);
+const lidKern = maakLid(lidDeps);
+const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications,
+  ledenInhoudVan, eersteBijdrageFactuur } = lidKern;
 
-/* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
-   -facturen. Hoisted en dus ook bruikbaar door de demo-seed hierboven (die vóór
-   de leden-kern draait); de lid-module heeft intern zijn eigen kopie. */
+/* Startinhoud voor een nieuw account: LEEG -- waarom staat in kern/lid.js, bij
+   dezelfde functie. Hoisted en dus ook bruikbaar door de demo-seed hierboven
+   (die vóór de leden-kern draait); kern/lid.js is de bron, dit is de doorgifte. */
 function memberTemplate() {
+  return lidKern.memberTemplate();
+}
+
+/* De DEMO-inhoud voor het geseede demo-account: een eigen kopie van de
+   voorbeeldreis en -facturen uit de seed. Alleen zetEigenaarsAccount() gebruikt
+   dit, en dat draait uitsluitend onder DEMO. Zo blijft de demo een volle app om
+   te laten zien wat RTG doet, zonder dat iemand die zich ECHT aanmeldt de reis
+   en de rekeningen van een ander in zijn app aantreft. */
+function demoLidInhoud() {
   return {
-    invoices: JSON.parse(JSON.stringify(db.data.invoices)),
-    trip: JSON.parse(JSON.stringify(db.data.trip)),
+    invoices: JSON.parse(JSON.stringify(db.data.invoices || [])),
+    trip: db.data.trip ? JSON.parse(JSON.stringify(db.data.trip)) : null,
     creatorCredit: 0,
     creatorLikes: 0
   };
@@ -1950,7 +1960,7 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
 const geloof = require('./kern/geloof')({ accounts });
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
+  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
     stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
       const m = /^user-(\d+)$/.exec(String(key || ''));
       return m ? geloof.promptRegel(Number(m[1]), null) : null;
@@ -1989,7 +1999,7 @@ const kern = {
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
-  leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
+  eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,

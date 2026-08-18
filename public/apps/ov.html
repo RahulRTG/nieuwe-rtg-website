@@ -311,7 +311,11 @@
   const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
   const glyf = n => (window.RTGGlyf && RTGGlyf.heeft(n)) ? RTGGlyf.svgHTML(n, { klasse: 'gl-inline' }) : '';
 
-  let hier = { lat: 38.908, lng: 1.432 };   // demo-startpunt tot de gps spreekt
+  /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
+     de gps spreekt". Deze app toont haltes en ritten BIJ JOU; met dat punt keek
+     je naar een eiland waar je niet bent, en een incheck-tik zou daar landen.
+     Zonder locatie weten we het niet, en dan zegt het scherm dat ook. */
+  let hier = null;
   // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
   // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
   /* De schakelaar blijft de baas, maar hier stil overslaan betekent: de app
@@ -457,7 +461,9 @@
        met "zet GPS aan", terwijl deze app al lang een punt heeft waarmee hij de
        haltes in de buurt ophaalt. En het klopt ook beter: de reiziger zegt waar
        hij opgehaald wil worden; dat is niet de server zijn oordeel. */
-    if (w === 'hier') return { lat: hier.lat, lng: hier.lng, label: 'Huidige locatie' };
+    // zonder plek laten we de server het symbool afhandelen in plaats van een
+    // coordinaat te verzinnen; hij zegt dan zelf dat de locatie nodig is
+    if (w === 'hier') return hier ? { lat: hier.lat, lng: hier.lng, label: 'Huidige locatie' } : { hier: true };
     const [soort, code] = w.split(':');
     if (soort === 'zaak') return { zaak: code };
     if (soort === 'halte') return { halte: code };
@@ -705,7 +711,7 @@
   });
 
   async function verversOv() {
-    const r = await api('kaart', hier);
+    const r = await api('kaart', hier || {});
     if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
     // de actieve rit
     const rit = r.body.rit;
@@ -754,6 +760,7 @@
 
   /* ---- snelle optie 2: een tik op GPS ---- */
   $('#knopGps').addEventListener('click', async () => {
+    if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om met een tik in te checken.');
     const r = await api('hier', hier);
     if (r.body.error) return zeg(r.body.error);
     zeg('Ingecheckt met één tik. Goede reis.');
@@ -762,6 +769,7 @@
 
   /* ---- uitchecken ---- */
   $('#uitKnop').addEventListener('click', async () => {
+    if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om uit te checken.');
     const r = await api('uit', { ...hier, idem: RTGIdem('ov') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');

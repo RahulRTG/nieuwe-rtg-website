@@ -17,6 +17,7 @@
      burgerzaken.js  balie-afspraken, tijdsloten, verhuizing
      vergunningen.js aanvragen + beoordelen (inwoner en onderneming)
      info.js         afval, grofvuil, aanslagen, bekendmakingen, regie */
+const { demoAan } = require('../demostand');
 
 /* De categorieen en de ploegen stonden hier als eigen consts. Ze horen bij de
    STAD en niet bij deze ene app: kern/stad sprak over dezelfde dingen met
@@ -59,9 +60,13 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
     if (!Array.isArray(db.data.gemeenteBekend)) db.data.gemeenteBekend = [];
     if (db.data._gemeenteSeed) return;
     db.data._gemeenteSeed = true;
+    // verzonnen instelling: alleen in demostand aanmaken (kern/demostand.js)
+    if (!demoAan()) return;
     if (!db.data.suppliers.find(s => s.code === 'GEMEENTE')) {
       db.data.suppliers.push({
         code: 'GEMEENTE', name: 'Gemeente Eivissa', type: 'gemeente', city: 'Ibiza',
+        // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
+        geseed: true,
         loc: { lat: 38.909, lng: 1.432, label: 'Ajuntament, Vara de Rey, Eivissa' }, rate: 0, menu: [], photos: [],
         gemeente: {
           balie: { open: true, capaciteitPerSlot: 2 },

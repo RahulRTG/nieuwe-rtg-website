@@ -91,7 +91,7 @@ module.exports = Object.assign({
   '/apps/ovcontrol.html': G('De OV Control Tower: live zicht op voertuigen, lijnen en geaggregeerde private operaties.',
     ['Bewaak voertuigen en bezetting', 'Vergelijk prestaties per lijn', 'Grijp als bevoegd personeelslid in bij uitzonderingen'],
     'Privéreizen blijven need-to-know: het bord toont capaciteit, nooit het profiel of de route van de hoofdgast.'),
-  '/apps/partner-worden.html': G('Partner worden: een gecontroleerde aanvraag voor een Business Pass en zakelijke RTG-werkplek.',
-    ['Meld aan met de Business Pass', 'Vul bedrijfs- en contactgegevens in', 'Volg de menselijke beoordeling en inrichting'],
+  '/apps/partner-worden.html': G('Partner worden: een gecontroleerde aanvraag voor een zakelijke RTG-werkplek, door elk lid met een pas.',
+    ['Meld aan met uw pas', 'Vul bedrijfs- en contactgegevens in', 'Volg de menselijke beoordeling en inrichting'],
     'Een aanvraag zet niets automatisch live; een bevoegde medewerker beoordeelt en activeert.'),
 }, require('./deel1b'));

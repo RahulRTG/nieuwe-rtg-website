@@ -3532,6 +3532,29 @@ Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adre
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
+**Een pas, niet DE Business Pass.** `POST /api/partner/apply` eiste een actieve
+**Business Pass**. Dat stelde twee dingen gelijk die niets met elkaar te maken
+hebben: een pas is een lidmaatschapsniveau, geen vergunning om te ondernemen.
+Wie met een gewone RTG Pass een zaak runt was niet minder ondernemer -- hij kon
+alleen zijn bedrijf niet aanmelden. Dezelfde vorm van grens die `CONCERN.md` aan
+de werknemerskant al verbiedt: niemand koopt hier een pas om te mogen werken.
+
+Wat blijft staan is dat er een **lid** achter de aanvraag hoort, want er gaat een
+bedrijfscode en een beheer-inlog de deur uit; de gratis gast-laag valt er dus
+buiten. Die lijst staat op één plek (`server/kern/paseis.js`) en wordt door
+allebei de deuren gelezen: het formulier *Partner worden* en het vinkje in de
+onboarding (`kern/onboarding/meebouwen.js`). Het kantoor keurt alleen goed met
+ledenbewijs op de aanvraag en leest daarbij zowel het nieuwe veld `pas` als het
+oude `businessPass`, zodat aanvragen van vóór deze wijziging behandelbaar
+blijven. Op het kantoorscherm is de pas een **inlichting**, geen drempel: je ziet
+met wie je spreekt, en verder niets.
+
+Getoetst in `test/partnerpas.test.js` (zonder pas geen aanvraag; een gewone RTG
+Pass levert een bedrijfscode op), `test/office-tweede-helft.test.js` (de echte
+accountweg, van registreren tot bedrijfscode) en `test/catalogus-wensen.test.js`
+(de pas wordt echt opgezocht -- een Business-lid leest als `business` -- en de
+gratis laag krijgt geen catalogus-wens, wel zijn eigen bedrijf).
+
 E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af, en de verzendlaag is helemaal van onszelf -- er zit geen pakket meer onder. `server/mail.js` kent drie standen, in deze volgorde:
 
 1. **`SMTP_URL`** (+ optioneel `MAIL_FROM`): afleveren bij een ingehuurde smarthost via de eigen SMTP-client `server/smtp.js` (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA, MIME met base64 en dot-stuffing; credentials gaan nooit over een onversleutelde verbinding).
@@ -3543,6 +3566,52 @@ Aanzetten gaat met **`npm run eigenpost -- <domein> <ip>`**: dat meet eerst of u
 Wat stand 2 *niet* kan oplossen staat hardop in de kop van `server/smtp-direct.js`, omdat een verzendlaag die dat verzwijgt post wegstuurt die nergens aankomt: uitgaand poort 25 is bij de meeste hosters dicht (`beschikbaar()` **probeert** het in plaats van het te beweren), PTR hoort bij de hosting, en SPF en DMARC zijn DNS-records -- `dkim.dnsRegels()` schrijft die drie voor u uit, publiceren is mensenwerk. `test/mail-eigen.test.js` rekent elke handtekening ook echt na met de publieke sleutel en kijkt of hij breekt zodra het lijf of een ondertekende kop wijzigt.
 
 Zie **LAUNCH.md** voor de volledige livegang-checklist (hosting, domein, betalingen, sleutels).
+
+## Het reisaanbod & de instellingsweg
+
+Twee bakken werden wel gelezen maar door niets geschreven, en dat viel pas op
+toen de demo-inhoud eruit ging (`RTG_DEMO`). Op een echte installatie stond
+daardoor iets stil.
+
+**Het reisaanbod.** `db.data.partnerTrips` had geen enkele schrijver: de seed was
+de enige bron. Zonder demo toonde het reisbureau nul reizen, gaf `reisbureau.boek()`
+op elke aanvraag een 404, en kreeg het reisdossier van een lid dus nooit iets te
+schrijven -- de kern van een reismembership. `server/kern/reisaanbod.js` is nu de
+**enige** schrijver, met de balie in `routes/kantoren/reizen.js`
+(`/api/office/reisaanbod{,/zet,/weg}`, achter de kantoorinlog, naast de bestaande
+aanvraag-routes die daar nu ook wonen). De veldnamen liggen vast omdat drie
+lezers ze delen (`reisAanbod()`, `publicTrip()` en de Mall-vindlaag): een reis die
+hier anders heet, bestaat in het ene scherm en is leeg in het andere.
+
+Twee regels die het aanbod eerlijk houden: een reis met een **open aanvraag**
+verdwijnt niet (409 -- die aanvraag staat in het dossier van een lid en moet eerst
+af), en een **ontbrekende prijs is geen nul**. Dat laatste was een echte fout:
+`Number(null)` is 0, dus een reis zonder prijsveld kwam er als gratis in te staan,
+zonder melding. Een uitdrukkelijke 0 mag wel; dat is een keuze die iemand maakt.
+
+**De instellingsweg.** Acht genres staan in het register op `status: 'intern'` --
+ov, luchthaven, gemeente, rijk, politie, brandweer, ambulance, marechaussee -- met
+als uitleg "hoort bij de wereld zelf en wordt niet door een partner aangevraagd".
+Dat is juist, maar er was ook geen *andere* weg: die instellingen kwamen alleen uit
+de demo-seed. Vier werelden stonden op een echte installatie dus permanent leeg,
+met een eerlijke lege stand en geen deur ernaast. `server/kern/instelling.js` is die
+deur, achter **boardroomAuth** (aansluiten maakt een bedrijfscode en een
+beheer-inlog -- hetzelfde gewicht als een partnerbesluit). De keuzelijst komt uit
+het register zelf, en een aangesloten instelling krijgt géén `geseed`-merkteken,
+anders ruimt de eerstvolgende start hem op.
+
+Daarbij hoorde een tweede reparatie: `POST /api/partner/apply` controleerde alleen
+óf een genre bestond, niet de **genrepoort**. `genreToegang()` werd al gehandhaafd
+in de aanmeldingsstroom en de onderneming-intake, maar niet daar -- dus 'intern' en
+'op uitnodiging' stonden via dat formulier gewoon open, terwijl het register iets
+anders beweerde. Nu leest die route dezelfde poort, met de uitleg uit het register.
+
+Beide schermen staan in de backoffice (`#raList`, `#rbList`, `#instList`). Getoetst
+in `test/reisaanbod.test.js` (de hele keten zonder `RTG_DEMO`: leeg → samengesteld →
+aangevraagd → bevestigd in het dossier) en `test/instellingsweg.test.js`. Vier
+mutaties gedaan, alle vier zagen we de juiste toets zakken: de prijscontrole
+weghalen, de open-aanvraag-grendel weghalen, elk genre als instelling toestaan, en
+de genrepoort op het partnerformulier negeren.
 
 ## Live updates & push-notificaties
 

@@ -75,29 +75,3 @@
     });
   }
 
-  /* ---------- AI ---------- */
-
-  const chatHistory = [];
-
-  function aiOpener(){
-    const first = user.full.split(' ')[0];
-    const lines = [ (lang()==='en'
-      ? ('Good day' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Your journey to ' + trip.dest + ' begins in ' + trip.days + ' days. I have already thought ahead:')
-      : ('Goedendag' + (user.tier === 'business' ? '.' : ', ' + first + '.') + ' Uw reis naar ' + trip.dest + ' begint over ' + trip.days + ' dagen. Ik heb alvast vooruitgedacht:')) ];
-    const open = invoices.filter(i => i.status === 'open');
-    if (open.length){
-      const sum = open.reduce((s,i) => s + i.netto + i.bijdrage, 0);
-      lines.push(lang()==='en'
-        ? ('• There ' + (open.length === 1 ? 'is 1 payment' : 'are ' + open.length + ' payments') + ' still open (' + eur(sum) + '). One tap in Payments and it is done.')
-        : ('• Er ' + (open.length === 1 ? 'staat nog 1 betaling' : 'staan nog ' + open.length + ' betalingen') + ' open (' + eur(sum) + '). Eén tik in Betalen en het is geregeld.'));
-    }
-    const pending = trip.items.find(i => i.status === 'req');
-    if (pending) lines.push(lang()==='en'
-      ? ('• ' + pending.title.replace('Diner, ', 'Your table at ') + ' is still being requested; I am watching for the confirmation.')
-      : ('• ' + pending.title.replace('Diner, ', 'Uw tafel bij ') + ' is nog in aanvraag; ik bewaak de bevestiging.'));
-    lines.push(T('ai.opener.plan','• Zal ik vast een paklijst en een dagplan voor 14 oktober klaarzetten? Eén "ja" is genoeg.'));
-    return lines.join('\n');
-  }
-
-  function aiAnswer(q){
-    const l = q.toLowerCase().trim();

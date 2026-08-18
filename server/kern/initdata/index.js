@@ -66,7 +66,8 @@ function merkGeseed(ctx, voorZaaien) {
 
 /* Livegang-schoonmaak: zonder RTG_DEMO horen de demozaken niet in de catalogus,
    ook niet als de database ooit als demo begon. Echte partners (via de aanvraag
-   met een Business Pass) blijven onaangeroerd.
+   als lid) en aangesloten instellingen (kern/instelling.js) blijven
+   onaangeroerd: die dragen het merkteken niet.
 
    DIT STOND IN deel7-salon.js, EN DAAR ZAG HET DE HELFT NIET. deel8, deel9 en
    deel10 zetten hun zaken pas na deel7 neer, dus die overleefden de opruiming

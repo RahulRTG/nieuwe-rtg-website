@@ -83,6 +83,10 @@ Object.assign(kern, require('../kern/werkvormen')({ db }));
    levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
    net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
 Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  /* Codenaam en pas van de eigenaar, voor de catalogus-wensen op het kantoor.
+     Uit de sociale kern, die eerder is gebouwd -- zo staat er ook daar geen
+     echte naam in een lijst. */
+  codenaamVan: kern.codenaamVan, tierVan: kern.soortVan,
   ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
   /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
      (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur
@@ -100,6 +104,13 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
      poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
      data. Zie kern/onderneming/ontwerper.js. */
   anthropic, magAi }));
+/* De onboarding kan nu pas weten hoe De Salon en de bedrijvenkant heten: ze
+   worden later gebouwd dan zij. Hier gaan de haken erin, zodat het meebouwen
+   (het eerste Salon-bericht en het eigen bedrijf) echt ergens op uitkomt.
+   Bewust ZONDER `if`: raakt deze bedrading zoek, dan hoort dat bij het opstarten
+   om te vallen en niet stil een onboarding op te leveren die niets doet. */
+kern.onboarding.zetHaken({ salon: kern.salon, ondernemingNieuw: kern.ondernemingNieuw,
+  ondernemingVanEigenaar: kern.ondernemingVanEigenaar });
 /* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
    Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
    in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een

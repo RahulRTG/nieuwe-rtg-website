@@ -1,6 +1,8 @@
-/* De toegangseis voor nieuwe partners: alleen een bedrijf waar minstens een
-   persoon een Business Pass heeft, kan een bedrijfscode krijgen. Zonder pass
-   geen aanvraag; en het kantoor keurt alleen aanvragen met pass-bewijs goed.
+/* De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID.
+   Elke pas telt -- RTG, Lifestyle en Business -- want een bedrijf beginnen is
+   niet aan de elite voorbehouden; alleen wie helemaal geen pas heeft komt er
+   niet in. Het kantoor geeft ook alleen een code uit bij een aanvraag met
+   ledenbewijs.
    Draai: node --experimental-sqlite --test test/partnerpas.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -11,7 +13,7 @@ const { startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pp-'));
-let child, businessToken, rtgToken, officeToken, eigenaarToken;
+let child, businessToken, rtgToken, gastToken, officeToken, eigenaarToken;
 let partnerCode, partnerPin;
 
 async function api(pad, body, token) {
@@ -29,6 +31,7 @@ test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   businessToken = (await json(await api('/api/login', { username: 'Rahul', password: 'Imran' }))).token;
   rtgToken = (await json(await api('/api/login', { tier: 'rtg' }))).token;
+  gastToken = (await json(await api('/api/login', { tier: 'guest' }))).token;
   officeToken = (await json(await api('/api/office/login', { code: 'RTG-OFFICE' }))).token;
   eigenaarToken = (await json(await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran' }))).token;
 });
@@ -37,22 +40,39 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('zonder Business Pass geen aanvraag (en dus geen code)', async () => {
+test('zonder pas geen aanvraag (en dus geen code)', async () => {
   const kaal = await api('/api/partner/apply', aanvraag());
   assert.equal(kaal.status, 403);
-  assert.match((await kaal.json()).error, /Business Pass/);
-  // een gewone RTG Pass telt niet: het moet een Business Pass zijn
-  const rtg = await api('/api/partner/apply', aanvraag({ passToken: rtgToken }));
-  assert.equal(rtg.status, 403);
+  assert.match((await kaal.json()).error, /pas|lid/i);
+  // en een verzonnen token opent de deur evenmin
+  const nep = await api('/api/partner/apply', aanvraag({ passToken: 'zomaar-wat' }));
+  assert.equal(nep.status, 403);
+  /* EN DE GRATIS LAAG, met een ECHTE sessie. Dit geval is het enige dat de
+     paseis zelf meet: zonder token valt de aanvraag al af op "geen sessie", dus
+     een eis die iedereen toelaat zou hierboven niets veranderen. Deze aanvrager
+     is wel binnen, alleen zonder pas. */
+  assert.ok(gastToken, 'de gratis laag kan inloggen');
+  const gast = await api('/api/partner/apply', aanvraag({ company: 'Gast Onderneming', passToken: gastToken }));
+  assert.equal(gast.status, 403, 'een ingelogde gast zonder pas komt er niet in');
 });
 
-test('met Business Pass: aanvraag met pass-bewijs, en het kantoor geeft de code uit', async () => {
+test('een gewone RTG Pass is genoeg: een bedrijf beginnen is niet aan de elite', async () => {
+  const rtg = await api('/api/partner/apply', aanvraag({ company: 'Casa Marisol', passToken: rtgToken }));
+  assert.equal(rtg.status, 200, 'een RTG Pass mag een partnerplek aanvragen');
+  const st = await json(await api('/api/office/state', {}, officeToken));
+  const a = (st.state.partnerApplications || []).find(x => x.company === 'Casa Marisol');
+  assert.ok(a && a.pas && a.pas.tier === 'rtg', 'het ledenbewijs zit op de aanvraag, met de pas erbij');
+  const besluit = await json(await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, eigenaarToken));
+  assert.ok(besluit.code, 'het kantoor geeft ook op een RTG Pass een bedrijfscode uit');
+});
+
+test('met Business Pass: aanvraag met ledenbewijs, en het kantoor geeft de code uit', async () => {
   const ok = await api('/api/partner/apply', aanvraag({ passToken: businessToken }));
   assert.equal(ok.status, 200);
-  // het kantoor ziet de aanvraag met het pass-bewijs en keurt goed
+  // het kantoor ziet de aanvraag met het ledenbewijs en keurt goed
   const st = await json(await api('/api/office/state', {}, officeToken));
   const a = (st.state.partnerApplications || []).find(x => x.company === 'Bodega Norte');
-  assert.ok(a && a.businessPass && a.businessPass.key === 'business', 'het pass-bewijs zit op de aanvraag');
+  assert.ok(a && a.pas && a.pas.tier === 'business', 'het ledenbewijs zit op de aanvraag');
   assert.equal((await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, officeToken)).status, 403,
     'de gedeelde kantoordeur mag geen partners toelaten');
   const besluit = await json(await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, eigenaarToken));

@@ -274,19 +274,37 @@ function gerichteRonde(aantal) {
   const doen = kandidaten.slice(0, Math.max(1, aantal));
   console.log('\n  gericht meten: ' + doen.length + ' routes van de ' + kandidaten.length + ' die nog kunnen\n');
   const gericht = Object.assign({}, al);
-  let merkt = 0, blind = 0;
+  let merkt = 0, blind = 0, stoornis = 0;
   for (let i = 0; i < doen.length; i++) {
     const d = doen[i];
     const pad = d.route.slice(d.route.indexOf(' ') + 1);
     const r = draaiToets(path.join(WORTEL, 'test', d.toets),
       { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
     const zakte = (r.gezakt || 0) > 0;
-    gericht[d.route] = { toets: d.toets, merkt: zakte, op: new Date().toISOString() };
-    if (zakte) merkt++; else blind++;
+    /* DE CONTROLERUN. Een toets die onder de leugen zakt, kan ook zakken door
+       iets anders -- een trage machine, een poortbotsing, een toets die net
+       vandaag stuk is. Dat telde hier als MERKT, en een vals MERKT wordt een
+       valse bewezen-cel in de matrix: precies het soort bewijs dat niemand ooit
+       nakijkt (LAT.md regel 10). Alleen als dezelfde toets ZONDER leugen groen
+       is, bewijst de zakking iets over de inhoud van deze route. Faalt hij ook
+       zonder leugen, dan heet het STOORNIS en wordt er niets vastgelegd -- een
+       latere batch probeert het opnieuw. De controle draait alleen bij een
+       zakking; een groene toets heeft niets te controleren. */
+    let uitslag;
+    if (!zakte) { uitslag = 'blind '; blind++; }
+    else {
+      const controle = draaiToets(path.join(WORTEL, 'test', d.toets), {}, 240000);
+      if ((controle.gezakt || 0) > 0) { uitslag = 'STOORNIS'; stoornis++; }
+      else { uitslag = 'MERKT '; merkt++; }
+    }
+    if (uitslag !== 'STOORNIS') {
+      gericht[d.route] = { toets: d.toets, merkt: uitslag === 'MERKT ', op: new Date().toISOString() };
+    }
     process.stdout.write('  ' + String(i + 1).padStart(4) + '/' + doen.length + '  ' +
-      (zakte ? 'MERKT ' : 'blind ') + d.route.slice(0, 58).padEnd(60) + d.toets + '\n');
+      uitslag + ' ' + d.route.slice(0, 58).padEnd(60) + d.toets + '\n');
   }
-  console.log('\n  gemeten: ' + merkt + ' merken de leugen, ' + blind + ' niet.');
+  console.log('\n  gemeten: ' + merkt + ' merken de leugen, ' + blind + ' niet' +
+    (stoornis ? ', ' + stoornis + ' stoornis (toets faalt ook zonder leugen; niet vastgelegd)' : '') + '.');
   return gericht;
 }
 

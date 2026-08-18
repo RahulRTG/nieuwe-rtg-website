@@ -90,11 +90,51 @@ test('noodrem: brute force vanaf 3 bronnen laat de registratie-zekering springen
   assert.ok(bev.samenvatting().recent.some(m => m.type === 'auto-reactie'));
 });
 
-test('noodrem: vanaf 6 bronnen gaat ook de onderhouds-zekering eruit', () => {
+test('noodrem: vanaf 6 bronnen komt de INLOGPAUZE -- en nooit meer de onderhoudsstand', () => {
   const { db, bev } = opzet();
   for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
   assert.equal(zekering(db, 'registratie').aan, false);
-  assert.equal(zekering(db, 'onderhoud').aan, false, 'brede aanval: hele app op slot');
+  assert.equal(zekering(db, 'inlogpauze').aan, false, 'brede aanval: de inlogpaden dicht');
+  /* De regressie die de mega-beproeving blootlegde: de oude noodrem trok hier
+     de ONDERHOUDS-zekering -- hele app op slot, permanent, door zes gespoofte
+     bronnen. Dat mag nooit terugkomen. */
+  assert.notEqual(zekering(db, 'onderhoud').aan, false,
+    'de onderhoudsstand is van de eigenaar; een noodrem zet nooit de hele app op slot');
+});
+
+test('noodrem: elke trede is tijdgebonden en dooft vanzelf (flood-principe)', () => {
+  const { db, bev } = opzet();
+  for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
+  const reg = zekering(db, 'registratie'), login = zekering(db, 'inlogpauze');
+  assert.ok(reg.tot > Date.now(), 'de registratie draagt een einde');
+  assert.ok(login.tot > Date.now(), 'de inlogpauze ook');
+  assert.ok(login.tot <= Date.now() + 10 * 60000 + 1000, 'de inlogpauze duurt hooguit tien minuten');
+  assert.ok(reg.tot > login.tot, 'de registratie mag langer dicht dan de inlog');
+
+  /* En het doven zelf, echt gemeten: zet het einde in het verleden en lees
+     via dezelfde poort-helper die de middleware gebruikt. */
+  const { zekeringGesprongen } = require('../server/techniek');
+  login.tot = Date.now() - 1;
+  assert.equal(zekeringGesprongen(login), false, 'verstreken = gedoofd bij de eerstvolgende lezing');
+  assert.equal(login.aan, true, 'en de stroom staat er dan echt weer op');
+});
+
+test('noodrem: een HANDMATIG getrokken zekering dooft nooit vanzelf', () => {
+  const z = { aan: false, reden: 'handmatig', sindsGesprongen: Date.now() };   // geen tot
+  const { zekeringGesprongen } = require('../server/techniek');
+  assert.equal(zekeringGesprongen(z), true, 'zonder tot blijft hij eruit tot de eigenaar hem reset');
+  assert.equal(z.aan, false, 'en er wordt niet stiekem aan de stand gezeten');
+});
+
+test('noodrem trede 1: elke brute-force-bron gaat de quarantaine in via de haak', () => {
+  const { bev } = opzet();
+  const geisoleerd = [];
+  bev.zetIsoleer((bron, reden) => geisoleerd.push({ bron, reden }));
+  bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip1' });
+  bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip2' });
+  assert.ok(geisoleerd.some(g => g.bron === 'ip1') && geisoleerd.some(g => g.bron === 'ip2'),
+    'lokaal eerst: de bronnen zelf, voordat er een zekering aan te pas komt');
+  assert.ok(geisoleerd.every(g => /noodrem/.test(g.reden)));
 });
 
 test('noodrem: uitgezet door de eigenaar -> er springt niets', () => {
@@ -102,7 +142,7 @@ test('noodrem: uitgezet door de eigenaar -> er springt niets', () => {
   bev.zetAuto(false);
   for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'ip' + i });
   assert.notEqual(zekering(db, 'registratie').aan, false);
-  assert.notEqual(zekering(db, 'onderhoud').aan, false);
+  assert.notEqual(zekering(db, 'inlogpauze').aan, false);
   assert.equal(bev.autoAan(), false);
   bev.zetAuto(true);
   assert.equal(bev.autoAan(), true);
@@ -114,4 +154,44 @@ test('noodrem: springt niet dubbel en de melding erover escaleert naar de eigena
   const ingrepen = bev.samenvatting().recent.filter(m => m.type === 'auto-reactie');
   assert.equal(ingrepen.length, 1, 'de registratie-zekering springt maar één keer');
   assert.ok(meldingen.some(n => /noodrem/i.test(n.body)), 'de eigenaar hoort van de ingreep');
+});
+
+/* ---------- de inlogpauze-poort: de scope IS de garantie ---------- */
+const { inlogpauzePoort, INLOG_PADEN } = require('../server/middleware/remmen');
+
+function nepRes() {
+  const res = { code: null, kop: {}, body: null };
+  res.set = (k, v) => { res.kop[k] = v; return res; };
+  res.status = (c) => { res.code = c; return res; };
+  res.json = (b) => { res.body = b; return res; };
+  return res;
+}
+
+test('inlogpauze: de inlogpaden gaan dicht, al het andere blijft gewoon open', () => {
+  const db = { data: { techniek: { zekeringen: { inlogpauze: { aan: false, tot: Date.now() + 60000 } } } } };
+  const poort = inlogpauzePoort({ db });
+
+  for (const pad of INLOG_PADEN) {
+    const res = nepRes(); let door = false;
+    poort({ path: pad }, res, () => { door = true; });
+    assert.equal(door, false, pad + ' hoort dicht te zijn');
+    assert.equal(res.code, 503);
+    assert.ok(res.kop['Retry-After'], 'met een Retry-After, want hij dooft vanzelf');
+  }
+
+  /* De pointe van de ladder: een bestaande sessie merkt NIETS. */
+  for (const pad of ['/api/member/state', '/api/pay/overzicht', '/api/auth/me', '/api/salon/promo']) {
+    const res = nepRes(); let door = false;
+    poort({ path: pad }, res, () => { door = true; });
+    assert.equal(door, true, pad + ' hoort gewoon door te kunnen: de schade-scope is de aanvals-scope');
+  }
+});
+
+test('inlogpauze: verstreken pauze laat iedereen weer binnen, ook op de inlog', () => {
+  const db = { data: { techniek: { zekeringen: { inlogpauze: { aan: false, tot: Date.now() - 1 } } } } };
+  const poort = inlogpauzePoort({ db });
+  let door = false;
+  poort({ path: '/api/login' }, nepRes(), () => { door = true; });
+  assert.equal(door, true, 'de pauze is voorbij: de poort heelt zichzelf bij de eerstvolgende lezing');
+  assert.equal(db.data.techniek.zekeringen.inlogpauze.aan, true, 'en de zekering staat weer echt aan');
 });

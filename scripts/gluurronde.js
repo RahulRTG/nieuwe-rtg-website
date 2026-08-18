@@ -84,8 +84,21 @@ const VASTLEGGEN = process.argv.includes('--vastleggen');
    volledig aan wat de veegronde weet aan te leggen. */
 const METER = 'gluurGaten';
 const RICHTING = 'omlaag';           // een plafond: meer lekken is slechter
-const METER_N = 'gluurProeven';
-const RICHTING_N = 'omhoog';         // een vloer: minder beproeven is slechter
+/* HIER STOND `gluurProeven`, EN DAT WAS DE VERKEERDE MAAT.
+
+   Die meter telde VERZOEKEN. Toen de vernielingscontrole werd herbouwd -- van
+   per stuk een familie aflopen naar een momentopname over 796 leesroutes --
+   controleerde de ronde meer en vroeg hij minder: 9349 in plaats van 9540
+   verzoeken. De ratel zag dat als achteruitgang en zakte, terwijl de dekking
+   juist was gegroeid. Een meter die geklets beloont, duwt de volgende
+   verbetering de verkeerde kant op.
+
+   `gluurGecontroleerd` telt wat er werkelijk is NAGEKEKEN: elk endpoint dat A
+   antwoordde, elke vraag met een identificator van B, en elk stuk dat tegen
+   vernieling bewaakt wordt. Dat getal stijgt als de dekking stijgt en beweegt
+   niet mee met hoe zuinig de ronde zijn verzoeken doet. */
+const METER_N = 'gluurGecontroleerd';
+const RICHTING_N = 'omhoog';         // een vloer: minder nakijken is slechter
 const UITSLAGBESTAND = path.join(WORTEL, 'GLUURRONDE.json');
 
 const NIET_KLOPPEN = /\/api\/(sse|stream|live-)|\/sse|\/stream|\/api\/test\/|\/api\/cluster\//;
@@ -134,10 +147,20 @@ const IDVELDEN = ['id', 'ref', 'code', 'sleutel', 'key', 'nummer', 'uuid'];
    NB: alleen wat de route ZELF aanmaakt valt hieronder. Elk aanmaakverzoek van
    B draagt een eigen merk, dus het merk van een gedeelde route wordt apart
    uitgesloten en de rest van B's spullen blijft volledig herkenbaar. */
+/* Per aanmaakroute: waarom hij deelt, en WAAR dat delen zichtbaar wordt. Dat
+   tweede is nodig omdat delen niet altijd binnen de eigen familie blijft: een
+   site die je publiceert onder /api/site/* verschijnt in de gids onder
+   /api/browser/*, mét de codenaam van de maker erbij. Dat is attributie en geen
+   lek -- dezelfde regel als "Uit De Salon - naam" in de huisstijl. Zonder dat
+   veld zou de ronde die attributie elke draai als bevinding melden, en dan is
+   hij binnen een week niet meer serieus te nemen. */
 const GEDEELD_BEDOELD = new Map([
-  ['/api/labfonds/locatie/maak', 'een locatie in het Lab-fonds is juist openbaar: leden doneren eraan en stemmen erover'],
-  ['/api/meet/maak', 'de code van een ontmoeting IS de uitnodiging: wie hem heeft mag erbij, net als een vergaderlink'],
-  ['/api/samen/maak', 'idem voor een samen-sessie: meedoen gebeurt met de code, dat is het hele mechanisme']
+  ['/api/labfonds/locatie/maak', { reden: 'een locatie in het Lab-fonds is juist openbaar: leden doneren eraan en stemmen erover' }],
+  ['/api/meet/maak', { reden: 'de code van een ontmoeting IS de uitnodiging: wie hem heeft mag erbij, net als een vergaderlink' }],
+  ['/api/samen/maak', { reden: 'idem voor een samen-sessie: meedoen gebeurt met de code, dat is het hele mechanisme' }],
+  ['/api/les/maak', { reden: 'de code van een les is de uitnodiging: de klas doet ermee mee' }],
+  ['/api/site/bewaar', { reden: 'een gepubliceerde site staat in de browsergids -- openbaar zijn IS het doel van publiceren',
+    toont: ['/api/browser'] }]
 ]);
 
 /* WAT DIT REGISTER WEL EN NIET VRIJSTELT, en dat onderscheid is er een die deze
@@ -184,12 +207,16 @@ function maakVraag(basis, telOp) {
 
 async function nieuwLid(vraag, merk) {
   const u = merk + crypto.randomBytes(8).toString('hex');
+  const email = 'gluur' + u + '@voorbeeld.test', wachtwoord = 'Geheim' + u + '!';
   const reg = await vraag('POST', '/api/auth/register', null, {
-    name: 'Gluur ' + u, email: 'gluur' + u + '@voorbeeld.test', phone: '0612345678',
-    password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    name: 'Gluur ' + u, email, phone: '0612345678',
+    password: wachtwoord, geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   let tok = null; try { tok = JSON.parse(reg.tekst).token; } catch (e) {}
   if (tok) await vraag('POST', '/api/verify/upload', tok, { image: KYC });
-  return tok;
+  /* De inloggegevens gaan mee terug, want B mag NOOIT opnieuw worden aangemaakt:
+     dan zijn zijn spullen weg en meet de hele ronde niets meer. Hij logt opnieuw
+     in met hetzelfde account. */
+  return tok ? { token: tok, email, wachtwoord } : null;
 }
 async function codenaamVan(vraag, tok) {
   const r = await vraag('POST', '/api/pay/overzicht', tok, {});
@@ -205,9 +232,9 @@ function beoordeel(uitslag, normMeters) {
   const vloer = normMeters ? normMeters[METER_N] : undefined;
   if (plafond !== undefined && uitslag.gaten > plafond)
     redenen.push('De gluurronde vond ' + uitslag.gaten + ' lek(ken) tegen een norm van ' + plafond + '.');
-  if (vloer !== undefined && uitslag.proeven < vloer)
-    redenen.push('De gluurronde stelde ' + uitslag.proeven + ' vragen tegen een norm van ' + vloer +
-      '. Minder beproeven is geen betere uitslag.');
+  if (vloer !== undefined && uitslag.gecontroleerd < vloer)
+    redenen.push('De gluurronde keek ' + uitslag.gecontroleerd + ' dingen na tegen een norm van ' + vloer +
+      '. Minder nakijken is geen betere uitslag.');
   return { zakt: redenen.length > 0, redenen };
 }
 
@@ -227,8 +254,9 @@ async function main() {
     proefserver.stop(srv); return 2;
   }
 
-  let A = await nieuwLid(vraag, 'a');
-  const B = await nieuwLid(vraag, 'b');
+  const lidA = await nieuwLid(vraag, 'a'), lidB = await nieuwLid(vraag, 'b');
+  let A = lidA && lidA.token;
+  let B = lidB && lidB.token;
   if (!A || !B) {
     console.error('  ' + K.rood + 'Er kwamen geen twee leden rond; zonder twee is er geen scheiding te beproeven.' + K.reset + '\n');
     proefserver.stop(srv); return 2;
@@ -252,6 +280,25 @@ async function main() {
      Een NIEUWE A na een uitlog kan geen kwaad: A's identiteit doet er niet toe,
      alleen dat hij een geldig lid is dat B niet is. Wat B bezit blijft staan --
      die wordt nooit opnieuw aangemaakt, want dan waren zijn spullen weg. */
+  /* ---- DE KANARIE VAN B, en die werkt anders dan die van A ----
+
+     B doet straks een MOMENTOPNAME over elk endpoint dat hem antwoordt, en daar
+     zit /api/auth/logout net zo goed bij. Maar B mag niet opnieuw worden
+     aangemaakt zoals A: dan zijn zijn spullen weg en meet de hele ronde niets.
+     Hij logt dus opnieuw in met hetzelfde account, en houdt alles. */
+  let herstelB = 0;
+  const vraagB = async (methode, pad, lijf, andereSleutel) => {
+    const sleutel = andereSleutel || B;
+    let res = await vraag(methode, pad, sleutel, lijf);
+    if (res.status !== 401 || andereSleutel) return res;
+    if ((await vraag('POST', '/api/state', B, {})).status !== 401) return res;
+    const opnieuw = await vraag('POST', '/api/auth/login', null, { email: lidB.email, password: lidB.wachtwoord });
+    let vers = null; try { vers = JSON.parse(opnieuw.tekst).token; } catch (e) {}
+    if (!vers) return res;
+    B = vers; herstelB++;
+    return vraag(methode, pad, B, lijf);
+  };
+
   let herstelA = 0;
   const vraagA = async (methode, pad, lijf) => {
     let res = await vraag(methode, pad, A, lijf);
@@ -260,7 +307,7 @@ async function main() {
     if (leeft) return res;                       // echt geweigerd, niet uitgelogd
     const vers = await nieuwLid(vraag, 'a');
     if (!vers) return res;
-    A = vers; herstelA++;
+    A = vers.token; herstelA++;
     return vraag(methode, pad, A, lijf);
   };
   console.log('  ' + K.grijs + 'A: ' + codeA + '   B: ' + codeB + K.reset);
@@ -329,18 +376,71 @@ async function main() {
      notitie liet weggooien er ongezien doorheen. Een meting die geen oordeel
      draagt, is precies wat LAT.md regel 10 een liegende meter noemt. */
   const familieVan = (pad) => String(pad || '').split('/').slice(0, 3).join('/');
-  const kanVinden = async (tok, id) => {
-    const familie = familieVan(bezitB.bronnen.get(id));
-    for (const r of routes.filter(x => x.pad.startsWith(familie + '/') || x.pad === familie)) {
-      const res = await vraag(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), tok, {});
-      if (res.status >= 200 && res.status < 300 && res.tekst.includes(id)) return true;
+
+  /* EEN MOMENTOPNAME IN PLAATS VAN ZOEKEN PER STUK, en dat is tegelijk breder EN
+     goedkoper. Hiervoor keek deze controle alleen in de eigen FAMILIE van de
+     aanmaakroute: `/api/notities/*` voor een notitie. Elf van B's zesentwintig
+     stukken hebben daar geen leesroute, en die vielen dus buiten de bewaking --
+     wat B nooit kan opvragen, kan hij ook niet missen, dus een schrijflek op zo'n
+     stuk bleef onzichtbaar (TAKEN.md 4.16).
+
+     Nu wordt er EEN opname gemaakt van alles wat B antwoordt, en wordt elk stuk
+     daarin gezocht. Dat is niet alleen breder maar ook minder werk: eerst
+     zesentwintig keer een familie aflopen (ruim duizend verzoeken), nu een ronde
+     van een paar honderd. Zoeken doe je in de opname, niet op de server.
+
+     De opname loopt via vraagB, want ook B klopt hier op /api/auth/logout. */
+  /* ALLEEN LEESACHTIGE ROUTES IN DE OPNAME, en dat is geen voorzichtigheid maar
+     een reparatie. De eerste versie riep ELK endpoint aan als B, en die opname
+     vond veertien van B's zesentwintig stukken terwijl de smalle familiezoektocht
+     er vijftien vond. Een bredere zoektocht die MINDER vindt, vernietigt
+     onderweg: tussen die duizenden aanroepen zitten wis-, archiveer- en
+     uitlogroutes, en met een leeg lijf doen sommige daarvan gewoon hun werk. Het
+     meetinstrument sloopte de spullen die het moest tellen, en meldde dat
+     vervolgens als veertien lekken.
+
+     De verbwoorden hieronder komen uit de padnamen van dit huis zelf. Het is een
+     naamheuristiek en dus niet waterdicht -- een leesroute die toevallig "zet"
+     heet valt eruit, en dat kost dekking maar geen waarheid. De andere kant op
+     fout gaan zou erger zijn: dan meet de controle zichzelf kapot. */
+  const MUTEERT = /\/(weg|wis|verwijder|reset|leeg|archiveer|archief|sluit|stop|uitlog|logout|afmeld|zet|bewaar|maak|nieuw|voeg|deel|vink|betaal|stuur|oplaad|koop|annuleer|start|kom|mee|join|verlaat|update|wijzig|schrijf|upload|wissel|intrekken|opzeg)(\/|$)/;
+  /* EN DE OPNAME BLIJFT KLEIN, want een meting die de SNELHEIDSREM uitlokt meet
+     de rem. Een eerdere versie riep alle 3071 niet-muterende routes aan: de
+     eerste opname gaf nog 299 keer 2xx, de tweede nog maar 36 -- met 2700 keer
+     401. B was niet bestolen, hij was geremd, en de controle meldde veertien
+     lekken die geen van alle bestonden.
+
+     Dus alleen de echte LEZERS: paden die eindigen op mijn/lijst/overzicht/
+     alles/staat/status/gids/kaart (237 stuks), plus de niet-muterende routes uit
+     de families waar B iets heeft. Twee opnames kosten daarmee een paar honderd
+     verzoeken in plaats van zesduizend, en dat blijft ruim onder de rem. */
+  const LEZER = /\/(mijn|lijst|lijsten|overzicht|alles|staat|status|gids|kaart)$/;
+  const families = new Set([...bezitB.bronnen.values()].map(familieVan));
+  const leesRoutes = routes.filter(r => !r.pad.startsWith('/api/auth/') && !MUTEERT.test(r.pad)
+    && (LEZER.test(r.pad) || [...families].some(f => r.pad === f || r.pad.startsWith(f + '/'))));
+  const momentopname = async (merk) => {
+    const uit = []; const status = new Map();
+    for (const r of leesRoutes) {
+      const res = await vraagB(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), {});
+      status.set(res.status, (status.get(res.status) || 0) + 1);
+      if (res.status >= 200 && res.status < 300) uit.push(res.tekst);
     }
-    return false;
+    console.log('  ' + K.grijs + 'opname ' + (merk || '') + ': ' + uit.length + ' van ' + leesRoutes.length +
+      ' gaven 2xx  [' + [...status].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([s, n]) => s + ':' + n).join(' ') + ']' + K.reset);
+    return uit.join('\n');
   };
-  const vindbaarVooraf = [];
-  for (const id of vanB) if (await kanVinden(B, id)) vindbaarVooraf.push(id);
+  const opnameVooraf = await momentopname('vooraf');
+  console.log('  ' + K.grijs + leesRoutes.length + ' leesachtige routes in de momentopname (van ' + routes.length + ')' + K.reset);
+  const vindbaarVooraf = vanB.filter(id => opnameVooraf.includes(id));
+  /* WAT NIET BEWAAKT WORDT, MET NAAM. Een getal ("15 van de 27") laat zich
+     lezen als een detail; de lijst laat zien welke aanmaakroutes iets opleveren
+     dat daarna door geen enkele leesroute meer wordt getoond. Dat is geen lek --
+     maar wat B nooit kan opvragen, kan hij ook niet missen, en een schrijflek
+     daarop blijft dus onzichtbaar. Het hoort zichtbaar te zijn, niet weggeteld. */
+  const onbewaakt = vanB.filter(id => !vindbaarVooraf.includes(id))
+    .map(id => bezitB.bronnen.get(id)).filter((v, i, a) => a.indexOf(v) === i);
   console.log('  ' + K.grijs + 'nulmeting: B vindt ' + vindbaarVooraf.length + ' van zijn ' + vanB.length +
-    ' stukken zelf terug (de rest heeft geen leesroute in zijn familie)' + K.reset);
+    ' stukken zelf terug' + (herstelB ? '; de sessie van B is ' + herstelB + ' keer hersteld' : '') + K.reset);
 
   /* ---- DE ZELFPROEF: SLAAT DE VERNIELINGSCONTROLE ECHT UIT? ----
 
@@ -366,8 +466,8 @@ async function main() {
       const weghaler = routes.find(r => r.pad.startsWith(familie + '/') && /\/(weg|verwijder|wis)$/.test(r.pad));
       if (!weghaler) continue;
       const lijf = {}; for (const veld of IDVELDEN) lijf[veld] = id;
-      const res = await vraag(weghaler.methode, weghaler.pad, B, lijf);
-      if (res.status >= 200 && res.status < 300 && !(await kanVinden(B, id))) { zelfproefId = id; break; }
+      const res = await vraagB(weghaler.methode, weghaler.pad, lijf);
+      if (res.status >= 200 && res.status < 300 && !(await momentopname('zelfproef')).includes(id)) { zelfproefId = id; break; }
     }
     console.log('  ' + (zelfproefId
       ? K.geel + 'ZELFPROEF: B heeft ' + zelfproefId + ' zelf weggegooid; de controle hoort hem als kwijt te melden' + K.reset
@@ -381,9 +481,12 @@ async function main() {
   const gedeeldeMerken = new Set([...bezitB.merken].filter(([, pad]) => GEDEELD_BEDOELD.has(pad)).map(([m]) => m));
   const priveMerken = [...bezitB.merken.keys()].filter(m => !gedeeldeMerken.has(m));
   const priveIds = vanB.filter(id => !GEDEELD_BEDOELD.has(bezitB.bronnen.get(id)));
-  const gedeeldeFamilies = [...GEDEELD_BEDOELD.keys()].map(p => p.split('/').slice(0, 3).join('/'));
+  const gedeeldeFamilies = [...GEDEELD_BEDOELD].flatMap(([pad, regel]) =>
+    [familieVan(pad)].concat((regel && regel.toont) || []));
   const inGedeeldeFamilie = (pad) => gedeeldeFamilies.some(f => pad.startsWith(f + '/') || pad === f);
   const merkersVanB = new Set(priveIds.concat(codeB ? [codeB] : []).concat(priveMerken));
+  if (onbewaakt.length) console.log('  ' + K.geel + onbewaakt.length + ' aanmaakroute(s) leveren iets op dat geen enkele leesroute toont' + K.reset
+    + K.grijs + ': ' + onbewaakt.slice(0, 8).join(', ') + (onbewaakt.length > 8 ? ' ...' : '') + K.reset);
   console.log('  ' + K.grijs + 'waarvan ' + (vanB.length - priveIds.length) +
     ' uit routes die met opzet delen; die tellen niet voor de inhoud, wel voor de vernieling' + K.reset);
 
@@ -444,9 +547,10 @@ async function main() {
   /* Een SCHRIJFlek geeft {ok:true} terug en verraadt zich niet in de inhoud. De
      enige eerlijke controle is achteraf, en alleen op wat B VOORAF wel kon
      vinden -- dat is de nulmeting hierboven. */
+  const opnameNa = await momentopname('achteraf');
   const kwijt = [];
   for (const id of vindbaarVooraf) {
-    const gevonden = await kanVinden(B, id);
+    const gevonden = opnameNa.includes(id);
     if (!gevonden) {
       kwijt.push(id);
       gaten.push({ soort: 'weg', route: bezitB.bronnen.get(id) || '?', marker: id,
@@ -469,17 +573,22 @@ async function main() {
     return gezien ? 0 : 1;
   }
 
-  const uitslag = { gaten: gaten.length, proeven };
+  /* Wat er is NAGEKEKEN: elk endpoint dat A antwoordde, elke vraag met een teken
+     van B, en elk stuk dat tegen vernieling bewaakt wordt. */
+  const gecontroleerd = passief + actief + vindbaarVooraf.length;
+  const uitslag = { gaten: gaten.length, gecontroleerd };
   try {
     fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
       uitleg: 'De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ' +
         'ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); ' +
         'daalt dat, dan is er minder beproefd en niet minder mis.',
       gedraaid: new Date().toISOString(),
-      meters: { [METER]: gaten.length, [METER_N]: proeven },
+      meters: { [METER]: gaten.length, [METER_N]: gecontroleerd },
+      verzoeken: proeven,
       bezitStukken: vanB.length, aanmaakGeprobeerd: aanmaak.length,
       passiefBeantwoord: passief, actieveVragen: actief,
-      vindbaarVooraf: vindbaarVooraf.length, kwijtNaAfloop: kwijt.length, sessieHersteldA: herstelA, gaten
+      vindbaarVooraf: vindbaarVooraf.length, onbewaakteAanmaakroutes: onbewaakt, kwijtNaAfloop: kwijt.length,
+      sessieHersteldA: herstelA, sessieHersteldB: herstelB, gaten
     }, null, 2) + '\n');
   } catch (e) { console.error('  kon GLUURRONDE.json niet schrijven: ' + e.message); }
 
@@ -494,7 +603,8 @@ async function main() {
     return 1;
   }
   console.log('\n  ' + K.groen + 'A kwam nergens bij de spullen van B.' + K.reset +
-    K.grijs + ' (' + proeven + ' vragen; de dekking hangt aan de ' + vanB.length + ' stukken die B kon aanleggen)' + K.reset + '\n');
+    K.grijs + ' (' + gecontroleerd + ' dingen nagekeken in ' + proeven + ' verzoeken; de dekking hangt aan de '
+    + vanB.length + ' stukken die B kon aanleggen)' + K.reset + '\n');
 
   let norm = null;
   try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
@@ -502,7 +612,7 @@ async function main() {
     if (VASTLEGGEN) {
       const p = norm.meters[METER], v = norm.meters[METER_N];
       if (p === undefined || uitslag.gaten <= p) norm.meters[METER] = uitslag.gaten;
-      if (v === undefined || uitslag.proeven >= v) norm.meters[METER_N] = uitslag.proeven;
+      if (v === undefined || uitslag.gecontroleerd >= v) norm.meters[METER_N] = uitslag.gecontroleerd;
       fs.writeFileSync(path.join(WORTEL, 'NORM.json'), JSON.stringify(norm, null, 2) + '\n');
       console.log('  ' + K.groen + METER + ' vastgelegd op ' + norm.meters[METER] + ', ' + METER_N + ' op ' + norm.meters[METER_N] + '.' + K.reset + '\n');
     } else {

@@ -414,6 +414,26 @@ gevonden en gerepareerd. Hij kwam terug omdat de LES niet meeverhuisde, alleen
 de reparatie. Vandaar dat de kanarie nu op de plek zit waar de vraag gesteld
 wordt (`vraagA`) en niet in een losse controle ernaast: er is geen weg omheen.
 
+Twee dingen leerde datzelfde instrument nog, allebei over METEN en niet over de
+code. Toen de vernielingscontrole breder werd gemaakt -- van de eigen familie naar
+een opname over alles -- vond hij VEERTIEN van B's stukken waar de smalle
+zoektocht er vijftien vond. Een bredere zoektocht die minder vindt, vernietigt
+onderweg: tussen die duizenden aanroepen zitten wis- en archiveerroutes die met
+een leeg lijf gewoon hun werk doen. En de versie daarna liep tegen de
+snelheidsrem: de eerste opname gaf 299 keer 2xx, de tweede nog 36, met 2700 keer
+401 -- waarna de controle veertien lekken meldde die geen van alle bestonden.
+**Een meting die de rem uitlokt, meet de rem.** Beide keren zag de uitslag er
+geloofwaardig uit; beide keren was het getal verzonnen door het instrument zelf.
+
+En daaruit volgde nog een correctie, op een meter die ik twee dagen eerder zelf
+had gezet. `gluurProeven` telde VERZOEKEN. De herbouw controleerde meer en vroeg
+minder (9349 in plaats van 9540), en de ratel las die winst als achteruitgang.
+Een meter die geklets beloont, duwt de volgende verbetering de verkeerde kant op;
+hij is vervangen door `gluurGecontroleerd`, dat telt wat er is NAGEKEKEN. Die
+vervanging is langs de vervalregel gegaan als een structurele verlaging met een
+waarheen -- het mechanisme uit de vorige ronde liep daarmee voor het eerst zijn
+eigen pad.
+
 En de dekking van diezelfde ronde kwam er niet met meer handwerk maar met
 BETER LUISTEREN. Van de 73 aanmaakroutes lukten er 20; de andere 53 zeiden bijna
 allemaal met zoveel woorden wat ze misten -- "een clip duurt 1 tot 60 seconden",

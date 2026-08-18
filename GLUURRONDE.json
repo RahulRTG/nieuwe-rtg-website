@@ -1,16 +1,29 @@
 {
   "uitleg": "De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); daalt dat, dan is er minder beproefd en niet minder mis.",
-  "gedraaid": "2026-08-18T13:20:00.076Z",
+  "gedraaid": "2026-08-18T14:01:43.901Z",
   "meters": {
     "gluurGaten": 0,
-    "gluurProeven": 9540
+    "gluurGecontroleerd": 2410
   },
-  "bezitStukken": 26,
+  "verzoeken": 9349,
+  "bezitStukken": 27,
   "aanmaakGeprobeerd": 73,
   "passiefBeantwoord": 488,
-  "actieveVragen": 1899,
+  "actieveVragen": 1907,
   "vindbaarVooraf": 15,
+  "onbewaakteAanmaakroutes": [
+    "/api/concern/nieuw",
+    "/api/les/maak",
+    "/api/muziek/maak",
+    "/api/rtf/baby/entry-maak",
+    "/api/rtf/kantoorpakket/maak",
+    "/api/rtf/leren/project-maak",
+    "/api/rtf/samen/maak",
+    "/api/rtf/tiener/toets-maak",
+    "/api/samen/maak"
+  ],
   "kwijtNaAfloop": 0,
   "sessieHersteldA": 2,
+  "sessieHersteldB": 0,
   "gaten": []
 }

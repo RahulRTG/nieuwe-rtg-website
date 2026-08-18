@@ -40,9 +40,17 @@
     "rolscheidingGaten": 0,
     "rolscheidingGemeten": 1444,
     "gluurGaten": 0,
-    "gluurProeven": 9540
+    "gluurGecontroleerd": 2410
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "gluurProeven vervangen door gluurGecontroleerd",
+      "soort": "structureel",
+      "waarheen": "gluurGecontroleerd in NORM.json, gemeten door scripts/gluurronde.js: passief + actief + bewaakte stukken",
+      "reden": "gluurProeven telde VERZOEKEN. Toen de vernielingscontrole werd herbouwd -- van per stuk een familie aflopen naar een momentopname over 796 leesroutes -- controleerde de ronde meer en vroeg hij minder: 9349 in plaats van 9540. De ratel las die winst als achteruitgang en zakte. Een meter die geklets beloont, duwt de volgende verbetering de verkeerde kant op, dus is hij vervangen door een die telt wat er is NAGEKEKEN: elk endpoint dat A antwoordde, elke vraag met een identificator van B, en elk stuk dat tegen vernieling bewaakt wordt. Dat getal stijgt met de dekking en beweegt niet mee met de zuinigheid van de verzoeken.",
+      "eerlijkheidshalve": "Dit is een verlaging van het GETAL (9540 -> 2410) en geen verlaging van de lat: de twee meten iets anders. Wat wel eerlijk moet: het aantal bewaakte stukken bleef 15 van de 27. De opname is breder geworden (796 routes in plaats van de eigen familie), maar de twaalf stukken zonder enige leesroute blijven onbewaakt -- die staan als 4.16 in de takenlijst."
+    },
     {
       "datum": "2026-08-17",
       "meter": "browserpoortToetsen 200 -> 189",

@@ -46,7 +46,7 @@ const REGISTER = {
   'WETTEN.json': { meter: ['wettenOnbewezen'] },
   'LADDER.json': { meter: ['ladderRaak', 'ladderNietGeprobeerd'] },
   'ROLRONDE.json': { meter: ['rolscheidingGaten', 'rolscheidingGemeten'] },
-  'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurProeven'] },
+  'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
      bestand en niet in NORM.json -- dat is geen tekortkoming maar een keuze:

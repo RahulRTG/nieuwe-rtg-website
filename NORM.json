@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
-    "keuringOmvang": 158,
+    "keuringOmvang": 159,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,16 +21,22 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5927,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1405,
+    "kernBreedte": 1417,
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 154,
+    "toetsenNietGemeten": 161,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "keuringOmvang 158 -> 159, kernBreedte 1405 -> 1417, toetsenNietGemeten 154 -> 161 (VERHOOGD, op de basislijn van main)",
+      "reden": "Deze tak zet twee nieuwe kernmodules neer met een deur erachter: kern/reisaanbod.js (de enige schrijver van db.data.partnerTrips, die tot nu toe niemand had) en kern/instelling.js (de weg waarlangs een echte gemeente, luchthaven of vervoerder binnenkomt, die alleen uit de demo-seed kwam). Daar horen routes bij, en daarmee groeit kernBreedte met twaalf eigenschappen. keuringOmvang komt er een hoger uit doordat het opknippen van kernlaag2 (die over de 10 kB ging) een bestand in de band vlak onder de grens zet -- de keerzijde van een overtreding oplossen. toetsenNietGemeten stijgt met zeven: zeven nieuwe toetsbestanden waar de mutatiemotor nog niet langs is geweest; die motor draait uren en is hier niet gedraaid.",
+      "eerlijkheidshalve": "Bij het samengaan met main botste dit met de bijstelling die main zelf had gedaan (keuringOmvang 155 -> 158, kernBreedte 1396 -> 1405, toetsenNietGemeten 150 -> 154, met hun eigen verantwoording eronder). Ik heb DIE versie genomen als basis en mijn getallen er opnieuw bovenop gezet, in plaats van mijn conflictzijde eroverheen te duwen -- anders was hun verantwoording stil verdwenen. De deltas hierboven zijn dus die van deze tak alleen. Wat ik NIET bijstel is inlineStijlAttributen: die stond ook rood en is GEREPAREERD door drie vormen die als style-attribuut op tientallen plekken stonden naar klassen te halen (.cols.na, .panel > .sub, .uitgifte). En over toetsenNietGemeten: de motor is er niet langs geweest, maar de acht nieuwe grenzen in deze tak zijn met de hand gemuteerd en alle acht zagen we de juiste toets zakken; die meter meet de dekking van het INSTRUMENT, niet van de code."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 155 -> 158; kernBreedte 1396 -> 1405; kernGedeeld 188 -> 191; toetsenNietGemeten 150 -> 154 (de persoonseis, gemeten NA het samengaan met main)",

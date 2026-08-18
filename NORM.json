@@ -461,13 +461,14 @@
     }
   ],
   "prestatie": {
-    "p99Ms": 144,
-    "doorvoerPerSec": 395,
-    "eventLoopP99Ms": 64.8,
+    "p99Ms": 233,
+    "doorvoerPerSec": 336,
+    "eventLoopP99Ms": 97.9,
     "herstelSeconden": 1,
-    "verhalenSlaagPctStorm": 76.4,
+    "verhalenSlaagPctStorm": 100,
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-05T14:32:44.570Z"
+  "prestatieGemeten": "2026-08-05T14:32:44.570Z",
+  "prestatieKalibratie": 13.3
 }

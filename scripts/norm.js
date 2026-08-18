@@ -649,7 +649,8 @@ function leesPrestatie(bestand) {
   /* Een GEZAKTE ronde levert geen grondwaarde. De cijfers van een run die zijn
      eigen drempels niet haalde zijn geen norm om aan vast te houden. */
   if (c.oordeel !== 'PASS') return { reden: 'de laatste beproeving is GEZAKT (' + c.gezakteDrempels + ' drempel(s)); die cijfers zijn geen lat' };
-  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid };
+  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid,
+    kalibratie: c.machine && c.machine.kalibratieBasisMs || null };
 }
 
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
@@ -715,6 +716,29 @@ function main() {
     console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze ronde draaide op ' + pres.bron
       + ', de lat staat op ' + norm.prestatieBron + '.');
     console.log('  \x1b[2mEen p99 van een andere machine of modus is geen betere of slechtere p99, maar een andere.\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && pres.kalibratie &&
+      (pres.kalibratie / norm.prestatieKalibratie > 1.4 || norm.prestatieKalibratie / pres.kalibratie > 1.4)) {
+    /* DEZELFDE VORM IS NOG NIET DEZELFDE MACHINE. Twee cloudcontainers met
+       "4k/17g/linux/sqlite" bleken op ander silicium te draaien: de een
+       haalde p99 144, de ander consistent 233 -- en de kalibratie (dezelfde
+       vaste spin-werklast, in rust) verschilde navenant. Latenties vergelijken
+       tussen die twee is dezelfde fout als darwin met linux vergelijken,
+       alleen onzichtbaarder. De vorm-sleutel hierboven vangt dat niet; deze
+       gemeten snelheid wel. Factor 1,4 en niet strakker: de kalibratie zelf
+       heeft ruis (gemeten ruisfactor ~1,1-1,2 op een rustige machine). */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: zelfde vorm (' + pres.bron + '), andere snelheid -- ' +
+      'kalibratie nu ' + pres.kalibratie + ' ms, bij de lat ' + norm.prestatieKalibratie + ' ms.');
+    console.log('  \x1b[2mEen p99 van trager silicium is geen slechtere p99, maar een andere. De lat verzet\x1b[0m');
+    console.log('  \x1b[2malleen wie op vergelijkbare snelheid meet, of met de hand (met reden, in de historie).\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && !pres.kalibratie) {
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze BEPROEVING.json draagt geen kalibratie; draai npm run beproeving opnieuw.');
+  } else if (heeftGrond && pres.kalibratie && !norm.prestatieKalibratie) {
+    /* De lat komt uit een tijd dat de snelheid niet werd meegemeten. Tegen
+       zo'n lat is elke vergelijking een gok -- misschien zelfde silicium,
+       misschien niet, en dat verschil is precies wat hier fout ging. */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: de lat draagt geen kalibratie (hij is gezet voordat de snelheid werd meegemeten).');
+    console.log('  \x1b[2mZet de lat met de hand op de cijfers van een ronde MET kalibratie (met reden, in de historie);\x1b[0m');
+    console.log('  \x1b[2mvanaf dan vergelijkt hij alleen nog metingen van vergelijkbaar silicium.\x1b[0m');
   } else {
     for (const m of PRESTATIEMETERS) {
       const v = pres.cijfers[m.sleutel];
@@ -781,6 +805,7 @@ function main() {
       for (const b of presBeter) uit.prestatie[b.m.sleutel] = b.nu;
       for (const n of presNieuw) uit.prestatie[n.m.sleutel] = n.nu;
       uit.prestatieBron = pres.bron;
+      if (pres.kalibratie) uit.prestatieKalibratie = pres.kalibratie;
       uit.prestatieGemeten = pres.gedraaid;
     }
     fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');

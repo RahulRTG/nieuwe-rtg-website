@@ -172,12 +172,22 @@ const POSTEN = [
   { id: 'wegwerpserver-kopieen', soort: 'meetwerk',
     wat: 'scripts met een eigen kopie van "start een wegwerpserver"',
     uit: () => {
+      /* HET KENMERK IS DE SPAWN, NIET HET PAD. De eerste teller zocht op
+         "'server', 'server.js'" en telde daarmee twee in-procesladers mee
+         (grensmeld laadt de servermodule in een -e script, kernbron require't
+         hem om de moduleboom te traceren -- geen van beide is een wegwerpserver)
+         EN miste drie echte kopieen die 'server/server.js' als EEN string
+         spawnen (beproeving, tot-crash, hersteltijd). Een schuldpost die zowel
+         te veel als te weinig telt, stuurt twee kanten op verkeerd -- dezelfde
+         fout als auth-onbeslist, dezelfde dag gevonden. Het echte kenmerk:
+         een spawn-aanroep met server.js erin, over regelgrenzen heen. */
       let n = 0;
       try {
         for (const f of fs.readdirSync(path.join(WORTEL, 'scripts'))) {
           if (!f.endsWith('.js')) continue;
           const t = fs.readFileSync(path.join(WORTEL, 'scripts', f), 'utf8');
-          if (/spawn\([^)]*server\.js|'server', 'server\.js'/.test(t) && !t.includes('lib/wegwerpserver')) n++;
+          if (t.includes('lib/wegwerpserver')) continue;
+          if (/spawn(?:Sync)?\(process\.execPath[\s\S]{0,200}?server\.js/.test(t)) n++;
         }
       } catch (e) { return null; }
       return n;

@@ -148,8 +148,11 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   const { publiekeConfig, config, normaliseerVelden, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars } = require('./onboarding/beheer')(ctx);
   // de lid-acties (status, intake, paspoort, RTG Pay-poort, tekenen)
   const { status, klaar, payGate, slaOp, bewaarPaspoort, teken } = require('./onboarding/lid')(ctx);
+  // het inrichten: in één keer invullen wat de gegevenspoort anders per keer vraagt
+  const { inrichtStatus, inrichtOp } = require('./onboarding/inrichten')(ctx);
 
   return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
+    inrichtStatus, inrichtOp,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }
 

@@ -1350,9 +1350,40 @@ var RTG_BOUW = '5134029c';
       if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
   }
+  /* Het inrichten: ná het tekenen biedt Rahul één keer aan in te vullen wat de
+     gegevenspoort anders per keer komt vragen. Een aanbod, geen poort -- waarom
+     en waar het landt staat in server/kern/onboarding/inrichten.js. */
+  let onbInr = [], onbInrHuidig = null;
+  async function onbInrichtenAanbod(){
+    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbKlaar(); }
+    if (!st || st.klaar || !(st.open || []).length) return onbKlaar();
+    onbInr = st.open.slice(); onbStap = 'inrichten-aanbod';
+    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
+    onbZeg(T('onb.inr.aanbod','Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Zal ik ze nu in één keer doorlopen?'));
+    onbActies([{ txt: T('onb.inr.ja','Ja, nu meteen'), prim: true, doe: onbInrVolgende },
+      { txt: T('onb.inr.later','Liever later'), doe: onbKlaar }]);
+  }
+  function onbInrVolgende(){
+    if (!onbInr.length) return onbKlaar();
+    onbInrHuidig = onbInr.shift(); onbStap = 'inrichten';
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = onbInputType(onbInrHuidig.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    // het waarom staat erbij: nooit een veld zonder de handeling die erom vraagt
+    onbZeg(onbInrHuidig.vraag + ' ' + (onbInrHuidig.waarom || ''));
+    onbActies([{ txt: T('onb.inr.sla','Sla dit over'), doe: onbInrVolgende }]);
+    if (inp) inp.focus();
+  }
+  async function onbInrOpslaan(t){
+    const velden = {}; velden[onbInrHuidig.id] = t;
+    onbBezig = true;
+    try { await API.call('/onboarding/inricht', { velden }); } catch(e){}
+    onbBezig = false; onbInrVolgende();
+  }
+
   function onbKlaar(){
     const g = onbEl('onbGate'); if (g) g.hidden = true;
-    onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null;
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
     naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
@@ -1373,13 +1404,16 @@ var RTG_BOUW = '5134029c';
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
       } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    } else if (onbStap === 'inrichten'){
+      if (!tekst || !onbInrHuidig) return;
+      return onbInrOpslaan(tekst);
     } else if (onbStap === 'teken'){
       if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
       onbBezig = true;
       try {
         const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
         onbBezig = false; onbSt = r;
-        if (r && r.klaar) return onbKlaar();
+        if (r && r.klaar) return onbInrichtenAanbod();
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
@@ -1420,6 +1454,12 @@ var RTG_BOUW = '5134029c';
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
+  /* Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart.
+     Geknipt toen deel 08 met het inrichten (de onboarding-stap erboven) over de
+     10 KB-lat ging, en langs de enige naad die er zat: hierboven is het gesprek
+     bij de voordeur, hieronder De Salon. Let op de STAART: renderSnapsStories
+     loopt door in deel 09, precies zoals hij dat in 08 deed -- die grens is
+     alleen van bestand veranderd, niet van plek. */
   function snapOverlay(){
     let ov = document.getElementById('snapOv'); if (ov) return ov;
     ov = document.createElement('div'); ov.id='snapOv';

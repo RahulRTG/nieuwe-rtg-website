@@ -188,3 +188,33 @@ test('6. zonder onderdelen geen uitnodiging, en het kantoor houdt zijn eigen lij
   assert.equal((await post('/api/office/reisbureau/klaarzetten', { onderdelen: [] }, klant)).status, 401);
   assert.equal((await post('/api/reis/uitnodiging/eisop', { code: CODE }, null)).status, 401);
 });
+
+test('7. het kantoor trekt een klaargezette reis in, en de link is daarna dood', async () => {
+  /* De dekkingspoort van de CI vond dit endpoint als het enige dat de hele
+     suite nooit aanraakte -- het intrekken was alleen langs de LEDENroute
+     getoetst (toets 5), nooit langs de kantoorbalie. Dit is de kantoorkant:
+     een klaargezette reis waarvan de klant afziet, moet de medewerker kunnen
+     intrekken voordat de link ergens blijft slingeren. */
+  const zet = await post('/api/office/reisbureau/klaarzetten', {
+    onderdelen: [{ soort: 'verblijf', titel: 'Casa Ibiza', bestemming: 'Ibiza', van: dag(50), tot: dag(53) }]
+  }, kantoor);
+  assert.equal(zet.status, 200);
+  const code = zet.body.link.split('code=')[1];
+  const id = zet.body.uitnodiging.id;
+
+  // zonder kantoorinlog is er niets in te trekken -- ook niet door een lid
+  assert.equal((await post('/api/office/reisbureau/uitnodiging-weg', { id }, klant)).status, 401);
+
+  const weg = await post('/api/office/reisbureau/uitnodiging-weg', { id }, kantoor);
+  assert.equal(weg.status, 200);
+  const beeld = await post('/api/reis/uitnodiging/open', { code }, null);
+  assert.equal(beeld.body.uitnodiging.open, false, 'de link is dood');
+  assert.match(beeld.body.uitnodiging.reden, /ingetrokken/i);
+  assert.equal((await post('/api/reis/uitnodiging/eisop', { code }, genoot)).status, 409,
+    'en opeisen kan niet meer');
+  // een verzonnen id trekt niets in, en zegt dat eerlijk
+  assert.equal((await post('/api/office/reisbureau/uitnodiging-weg', { id: 'U-bestaatniet' }, kantoor)).status, 404);
+  // en de ingetrokken reis staat in de kantoorlijst als ingetrokken
+  const lijst = await post('/api/office/reisbureau/uitnodigingen', {}, kantoor);
+  assert.equal(lijst.body.uitnodigingen.find(x => x.id === id).ingetrokken, true);
+});

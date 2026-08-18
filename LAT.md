@@ -382,6 +382,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
 | dertien treden van kleuter tot aanvaller tegen een ECHTE server | `scripts/ladder.js` + `LADDER.json` + `ci.yml` |
+| welke rol waar binnenkomt, gevraagd aan de server en niet aan de bron | `scripts/rolronde.js` + `ROLRONDE.json` + `ci.yml` |
 | geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
@@ -399,6 +400,23 @@ openbare routes stonden niet in zijn publieke lijst, een 503 uit de schakelkast
 telde als serverfout, en de begane grond toetste op seed-gegevens die
 weggedreven waren (KIKUNOI staat allang niet meer in de seed). Achttien keer
 RAAK, elke ronde, geen van alle een bevinding.
+
+Dezelfde week kwam de tweede helft van die les uit een andere hoek.
+`test/auth-rol.test.js` opende met "Uitputtende auth-scoping-test. Niet een
+steekproef en geen mooipraterij" -- en herkende een leden-endpoint aan het
+eerste woord na het pad. Staat de grendel in de BODY van de handler
+(`const g = werkPoort(req, res); if (!g) return;`), dan valt de route buiten de
+uitdrukking en dus stilzwijgend buiten de toets: 511 van de 1885 registraties,
+waarvan zeventig echte leden-endpoints die nooit op rolscheiding zijn beproefd.
+
+Geen van die zeventig bleek lek -- `scripts/rolronde.js` vraagt het nu aan de
+server in plaats van aan de bron en vindt 1444 leden-endpoints met nul gaten.
+Maar de belofte was onwaar, en dat is het punt: **een toets die zegt dat hij
+alles ziet en 5% mist, is gevaarlijker dan een toets die zegt dat hij een
+steekproef is.** De eerste laat je stoppen met zoeken. Beide meters van die
+ronde staan er daarom naast elkaar: `rolscheidingGaten` (nul, mag niet omhoog)
+en `rolscheidingGemeten` (1444, mag niet omlaag) -- want nul gaten is triviaal
+te halen door minder te onderzoeken.
 
 **Een proef die per definitie rood staat, kan nergens aan hangen.** Dat is de
 stille manier waarop een handhaver uit deze tabel verdwijnt: niet doordat iemand

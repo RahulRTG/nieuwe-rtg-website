@@ -32,10 +32,8 @@
    Env: LADDER_SEED (deterministische rommel), LADDER_PORT.
    ============================================================================ */
 'use strict';
-const { spawn } = require('child_process');
 const http = require('http');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -133,40 +131,15 @@ function werkbank(vraag, rollen, kiezer) {
 }
 
 /* ---------- server starten (tenzij --basis) ---------- */
-function bootEigen() {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ladder-'));
-  const child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
-    /* RTG_DEMO=1 IS HIER GEEN VERSOEPELING MAAR DEKKING.
-
-       Zonder die vlag start de ladder een installatie zonder demo-zaak en zonder
-       betaalrail, en dan kan een flink deel van de proef niets: de begane grond
-       kan niet bestellen en geen geld sturen, de vervalser en de gluurder komen
-       drie keer niet aan een zaaktoken, en de INSIDER -- de trede die vraagt of
-       een geldig token werkt waar het niet hoort -- probeerde helemaal niets.
-       Een trede die niets probeert bewijst niets, en dat stond er ook: "LEEG".
-
-       Wat de vlag NIET doet is een deur openzetten. Hij geeft een demo-persona
-       een sessie en zet een demo-betaalrail aan; elke poort die deze ladder
-       beproeft (auth, rolscheiding, horizontale scheiding, tokenvervalsing)
-       blijft precies zoals hij is. De sessie is juist het gereedschap waarmee
-       de insider zijn werk kan doen.
-
-       Het draait op een EIGEN server met een wegwerpdatamap en NODE_ENV=test.
-       Voor productie geldt onverkort dat RTG_DEMO uit hoort te staan; daar gaat
-       scripts/golive.js over. */
-      cwd: WORTEL, env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', ANTHROPIC_API_KEY: '', RTG_DEMO: '1' },
-    stdio: ['ignore', 'ignore', 'ignore']
-  });
-  return { child, base: 'http://127.0.0.1:' + PORT, TMP };
-}
-async function wachtGezond(vraag, pogingen) {
-  for (let i = 0; i < (pogingen || 200); i++) {
-    const r = await vraag('GET', '/api/ready', null, null, { timeout: 3000 }).catch(() => ({ status: 0 }));
-    if (r.status === 200) return true;
-    await new Promise(r => setTimeout(r, 250));
-  }
-  return false;
-}
+/* De startregels wonen in scripts/lib/proefserver.js, want scripts/rolronde.js
+   heeft precies hetzelfde nodig. Twee kopieen lopen uiteen -- en dan draait de
+   ene proef tegen een installatie met een demo-zaak en de andere niet, waarna
+   hun uitslagen niet meer vergelijkbaar zijn zonder dat iemand weet waarom
+   (LAT.md regel 4). Daar staat ook waarom RTG_DEMO=1 geen versoepeling is maar
+   dekking. */
+const proefserver = require('./lib/proefserver');
+const bootEigen = () => proefserver.start({ poort: PORT, merk: 'ladder' });
+const wachtGezond = (vraag, pogingen) => proefserver.wachtGezond(vraag, pogingen);
 
 /* ---------- de rollen die de treden nodig hebben ---------- */
 async function haalRollen(vraag) {

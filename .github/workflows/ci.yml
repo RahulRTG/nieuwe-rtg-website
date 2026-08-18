@@ -226,6 +226,37 @@ jobs:
           path: LADDER.json
           if-no-files-found: warn
 
+  rolronde:
+    # DE ROLSCHEIDING, gevraagd aan een echte server in plaats van aan de bron.
+    # test/auth-rol.test.js beloofde "ELK leden-endpoint" en herkende er 1374;
+    # een grendel die in de BODY van de handler staat viel buiten zijn
+    # uitdrukking. Deze ronde klopt met drie rollen (anoniem, lid, leverancier,
+    # kantoor) op elke route en vindt er 1444 -- zeventig meer, en die zeventig
+    # waren nog nooit op rolscheiding beproefd.
+    #
+    # Eigen baan om dezelfde reden als de ladder: minuten die de kritieke lijn
+    # niet verlengen. Hij zakt op een gat EN op minder beproeven dan de norm --
+    # nul gaten is anders te halen door minder te onderzoeken.
+    name: De rolronde (welke rol komt waar binnen)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Elke rol op elke route
+        run: node scripts/rolronde.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: rolronde-uitslag
+          path: ROLRONDE.json
+          if-no-files-found: warn
+
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest

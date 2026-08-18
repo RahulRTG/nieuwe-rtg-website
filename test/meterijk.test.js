@@ -744,6 +744,38 @@ const IJKINGEN = {
      proberen -- en precies dat was hier gebeurd: de insider-trede voerde NUL
      proeven uit en meldde keurig geen enkele bevinding. Deze meter maakt van
      "minder proberen" een verslechtering. */
+  /* DE TWEE METERS VAN DE ROLRONDE. Zelfde vorm en zelfde reden als bij de
+     ladder hieronder: de ronde duurt minuten met een echte server, dus de ijking
+     voedt niet de RONDE maar het OORDEEL een bekend-foute uitslag.
+
+     rolscheidingGemeten is de minst vanzelfsprekende en de belangrijkste. Nul
+     gaten is triviaal te halen door minder te onderzoeken, en precies dat was
+     hier aan de hand: test/auth-rol.test.js beloofde "ELK leden-endpoint" en
+     herkende er 1374 van de 1444, omdat een grendel in de body van de handler
+     buiten zijn uitdrukking viel. Deze meter maakt van "minder beproeven" een
+     verslechtering. */
+  rolscheidingGaten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      assert.equal(rol.beoordeel({ gaten: 0, gemeten: 1444 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = rol.beoordeel({ gaten: 2, gemeten: 1444 }, norm);
+      assert.equal(stuk.zakt, true, 'twee gaten tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /2 gat\(en\)/);
+      return 1;
+    }
+  },
+  rolscheidingGemeten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      const blind = rol.beoordeel({ gaten: 0, gemeten: 900 }, norm);
+      assert.equal(blind.zakt, true,
+        'nul gaten over 900 endpoints terwijl er 1444 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder beproeven is geen betere uitslag/);
+      return 1;
+    }
+  },
   ladderRaak: {
     proef: () => {
       const ladder = require('../scripts/ladder.js');

@@ -489,9 +489,25 @@ const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
   koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
   maakSessies({ db, save, crypto });
 
-/* Inlogpogingen afremmen: per bron en doel hooguit tien mislukkingen,
-   daarna vijf minuten wachten. Geldt voor wachtwoorden en toegangscodes. */
-const loginFails = new Map(); // bucket -> { n, until }
+/* Inlogpogingen afremmen: per emmer hooguit tien mislukkingen (of de grens die
+   de aanroeper meegeeft), daarna vijf minuten wachten. Geldt voor wachtwoorden
+   en toegangscodes.
+
+   WAT EEN EMMER IS, BEPAALT WAT DE REM KAN. Een emmer op IP+account remt tien
+   gokken van EEN bron op EEN account -- en niets anders. Veertig bronnen op
+   hetzelfde account zijn veertig verse emmers, dus een verspreide aanval loopt
+   er ongehinderd langs. Daarom hangt de inlog nu ook een emmer op de bron
+   alleen en een op het doel alleen (routes/auth/inlog.js), net zoals de
+   passkey-kant dat al deed. Gemeten voor de reparatie: 40 gokken op een account
+   vanaf 40 adressen leverden nul remmen op.
+
+   DE GRENS IS PER AANROEP INSTELBAAR omdat de emmers niet dezelfde schade
+   aanrichten als ze onterecht dichtgaan. Een emmer op IP+account raakt alleen
+   de aanvaller; een emmer op de bron alleen kan een heel kantoor achter een
+   NAT-adres treffen, en een emmer op het doel alleen kan een vreemde gebruiken
+   om iemands account dicht te houden. Die twee staan dus ruimer, en het slot
+   duurt bewust maar vijf minuten. */
+const loginFails = new Map(); // bucket -> { n, until, laatst }
 function tooManyTries(res, bucket) {
   const f = loginFails.get(bucket);
   if (f && f.until > Date.now()) {
@@ -500,10 +516,18 @@ function tooManyTries(res, bucket) {
   }
   return false;
 }
-function noteFailedTry(bucket) {
+function noteFailedTry(bucket, limiet) {
+  const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
-  if (f.n >= 10) {
+  /* WANNEER DEZE TELLER MOCHT VERVALLEN WAS EEN GAT. De opruimlus gooide elke
+     vijf minuten alles weg wat niets tegenhield -- ook een emmer die nog aan
+     het tellen was. Daarmee was de regel in de praktijk "negen mislukkingen per
+     opruimronde", en wie zijn gokken doseerde kwam nooit aan de grens. Sinds
+     hier een tijdstempel bij staat, ruimt de lus alleen op wat ook echt stil
+     is (zie opzet/start.js). */
+  f.laatst = Date.now();
+  if (f.n >= grens) {
     f.until = Date.now() + 5 * 60000; f.n = 0;
     // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
     if (beveilig) beveilig.meld('brute-force', 'kritiek',

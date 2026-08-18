@@ -29,7 +29,7 @@
     const rij = v =>
       '<div class="vrow" data-sleutel="'+escHtml(v.sleutel)+'" data-wat="'+escHtml(v.wat)+'">' +
         '<div class="vi"><div class="nm">'+escHtml(vakLabel(v.wat)) +
-          ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.wie || '-')+'</span></div>' +
+          ' <span class="bij">· '+escHtml(v.wie || '-')+'</span></div>' +
           '<div class="sub" data-nr>' +
             (v.tot ? T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot) : T('bo.vak.geendatum','geen einddatum')) +
             (v.toelichting ? ' · '+escHtml(v.toelichting) : '') + '</div></div>' +
@@ -45,10 +45,10 @@
       /* Wat er BINNENKORT afloopt hoort op hetzelfde bord: zonder die blik
          merkt een zaak het verlopen pas op de ochtend dat er iemand niet meer
          naar binnen kan. */
-      (verlopend.length ? '<div class="sub" style="margin:0.8rem 0 0.3rem;color:var(--soft);">' +
+      (verlopend.length ? '<div class="sub vkop">' +
         T('bo.vak.verlopend','Loopt binnen 60 dagen af') + '</div>' + verlopend.map(v =>
         '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(vakLabel(v.wat)) +
-          ' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.wie || '-')+'</span></div>' +
+          ' <span class="bij">· '+escHtml(v.wie || '-')+'</span></div>' +
           '<div class="sub">'+T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot || '')+'</div></div>' +
         '<button class="vbtn no" data-intrek data-sleutel="'+escHtml(v.sleutel)+'" data-wat="'+escHtml(v.wat)+'">' +
           T('bo.vak.intrek','Intrekken')+'</button></div>').join('') : '');
@@ -83,7 +83,7 @@
     catch(e){ alert(e.message); return; }
     const sub = row.querySelector('[data-nr]');
     if (sub) sub.innerHTML = '<b>'+escHtml(r.nummer || T('bo.vak.geennr','zonder nummer'))+'</b> · ' + sub.innerHTML +
-      '<div style="color:var(--soft);margin-top:0.2rem;">'+escHtml(r.grens || '')+'</div>';
+      '<div class="vgrens">'+escHtml(r.grens || '')+'</div>';
     const knop = row.querySelector('[data-nummer]'); if (knop) knop.remove();
   }
 

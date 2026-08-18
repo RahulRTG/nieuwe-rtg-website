@@ -14,6 +14,11 @@ module.exports = (ctx) => {
     noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, isBaas, kern } = ctx;
 
+  /* Eenmalig, niet per verzoek: de emmernaam van een doel wordt gehasht zodat
+     een e-mailadres nooit in het geheugen van de rem of in een
+     beveiligingsmelding belandt. Zelfde vorm als routes/auth/webauthn.js. */
+  const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
+
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');
   if (hasCred(req.body)) {
@@ -59,14 +64,49 @@ app.post('/api/logout', auth, (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   const login = req.body.login || req.body.email || req.body.username;
-  const bucket = 'auth:' + req.ip + ':' + String(login || '').toLowerCase().slice(0, 60);
-  if (tooManyTries(res, bucket)) return;
+  const sleutel = String(login || '').toLowerCase().trim();
+  /* DRIE REMMEN, WANT EEN EMMER OP IP+ACCOUNT REMT MAAR EEN SOORT AANVAL.
+
+     Hier stond alleen de eerste. Die stopt tien gokken van EEN adres op EEN
+     account, en dat is precies wat een aanvaller met meer dan een adres
+     omzeilt: veertig adressen op hetzelfde account zijn veertig verse emmers.
+     Gemeten op de stand van hiervoor: veertig gokken, nul remmen, en het echte
+     wachtwoord werkte daarna nog gewoon.
+
+     De passkey-kant (routes/auth/webauthn.js) deed dit al goed met een bron- en
+     een doelemmer; de wachtwoordkant liep achter. Nu dezelfde vorm, inclusief
+     het hashen van het doel: zo belandt een e-mailadres nooit in het geheugen
+     van de rem of in een beveiligingsmelding -- dat is dezelfde regel als de
+     codenamen elders in dit huis.
+
+     De grenzen lopen uiteen naar de schade die een onterecht slot aanricht.
+     IP+account raakt alleen de aanvaller (10). De bron alleen kan een kantoor
+     achter een NAT-adres treffen, dus die staat ruim (50).
+
+     EN HET DOEL KRIJGT GEEN SLOT MAAR EEN VERTRAGING. Een slot op het account
+     zou een vreemde de macht geven om een lid uit zijn eigen account te houden:
+     vijfentwintig gokken verbranden en de eigenaar staat buiten. Gemeten toen
+     die emmer nog een slot was: na de aanval gaf het JUISTE wachtwoord een 429.
+     Dat is de aanval helpen in plaats van hem stoppen.
+
+     Dus kost elke MISLUKTE poging op een aangevallen account twee seconden, en
+     verandert er voor de eigenaar niets: wie het wachtwoord weet, komt zonder
+     vertraging binnen. Voor de aanvaller zakt het tempo naar een gok per twee
+     seconden per account, boven op de tien per adres en de vijftig per bron. */
+  const bucket = 'auth:' + req.ip + ':' + sleutel.slice(0, 60);
+  const bronBucket = 'auth:bron:' + req.ip;
+  const doelBucket = 'auth:doel:' + vingerafdruk('account:' + sleutel);
+  if (tooManyTries(res, bucket) || tooManyTries(res, bronBucket)) return;
   const user = accounts.findByLogin(login);
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
     noteFailedTry(bucket);
+    noteFailedTry(bronBucket, 50);
+    noteFailedTry(doelBucket, 25);
+    const doel = loginFails.get(doelBucket);
+    if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, 2000));
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
-  loginFails.delete(bucket);
+  loginFails.delete(bucket); loginFails.delete(bronBucket); loginFails.delete(doelBucket);
   /* Uit dienst gemeld door de organisatie (SCIM) = ook met het juiste wachtwoord
      niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
      deze regel zou iemand een token krijgen dat meteen daarna nergens voor

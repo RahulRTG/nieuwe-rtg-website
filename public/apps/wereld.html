@@ -44,7 +44,11 @@
   .kop h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
     font-size:1.5rem;margin:0 0 0.15rem;letter-spacing:0.01em;}
   .kop .wie{font-size:0.74rem;color:var(--rtg-soft);margin:0 0 0.85rem;}
-  .kop .wie b{color:var(--rtg-acc);font-weight:600;}
+  /* De pasnaam stond hier in het accent (--rtg-acc, de dagkleur). Op deze
+     donkere grond haalt dat 3,78:1 bij 11,8px -- te weinig, want AA vraagt 4,5
+     onder 24px. De kleurregel in CLAUDE.md: het accent is voor GROTE tekst, en
+     kleine tekst op zwart hoort wit te zijn. Het vet blijft de nadruk dragen. */
+  .kop .wie b{color:var(--rtg-txt);font-weight:600;}
 
   /* DE WERELDSCHAKELAAR. Een rij, horizontaal scrollend op een telefoon.
      Een wereld die dicht is verdwijnt niet: hij staat er, gedimd, met een slotje.
@@ -57,8 +61,13 @@
     border-radius:999px;padding:0.42rem 0.95rem;color:var(--rtg-muted);
     font:inherit;font-size:0.76rem;font-weight:600;cursor:pointer;
     white-space:nowrap;transition:background .18s,color .18s,border-color .18s;}
+  /* De gekozen wereld: bijna-zwart OP het accent haalde 3,78:1, en dat is de
+     omgekeerde vorm van dezelfde fout. --rtg-acc-inkt is precies hiervoor
+     gemaakt: hij volgt de dagkleur mee (shared/dagkleur.css rekent per tint uit
+     of er zwarte of witte inkt op past) en valt zonder dagkleur terug op wit,
+     dat op de bordeaux 5,17:1 haalt. */
   .werelden button[aria-current="true"]{background:var(--rtg-acc);
-    border-color:var(--rtg-acc);color:#0C0C0B;}
+    border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);}
   .werelden button[disabled]{opacity:0.42;cursor:not-allowed;}
   .werelden button[disabled]::after{content:' ·';}
 

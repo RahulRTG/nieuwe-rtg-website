@@ -9,7 +9,7 @@ module.exports = (kern) => {
     theaterKanaalMaak, theaterOfficeLijst, theaterOfficeBeslis, theaterVideoMaak,
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
-    theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal,
+    theaterThuisAanwezig, theaterSignaal, theaterOndertitels, theaterZaakMaak, theaterZaakZaal,
     theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand,
     theaterHuisstijl } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -43,6 +43,13 @@ module.exports = (kern) => {
   app.post('/api/theater/upload/:id', uploadRem, auth, express.raw({ type: () => true, limit: '420mb' }), (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, theaterVideoUpload(req.session.key, String(req.params.id || ''), req.body));
+  });
+  /* De ondertitels van een video. Zelfde deur als video/maak: een lid met een
+     sessie, geen gast. Wie er werkelijk aan mag komen (de maker) beslist de
+     kern -- dat is een eigendomsvraag en geen routevraag. */
+  app.post('/api/theater/ondertitels', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterOndertitels(req.session.key, String((req.body || {}).id || ''), (req.body || {}).regels));
   });
   app.post('/api/theater/verwijder', auth, (req, res) => {
     if (geenGast(req, res)) return;

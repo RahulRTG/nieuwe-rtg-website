@@ -18,7 +18,7 @@
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
   main{padding:1.1rem;max-width:860px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:1rem;}
-  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;}
+  .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
   .veld{width:100%;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1.1rem;font:600 .9rem Inter,sans-serif;cursor:pointer;}
@@ -57,7 +57,7 @@
     <div class="kaart">
       <div class="lbl">Onderwerp van de les</div>
       <input class="veld" id="mOnderwerp" maxlength="120" placeholder="Bijv. de tafels van 7, de Romeinen, veilig internet…">
-      <div class="lbl">Niveau</div>
+      <label class="lbl" for="mNiveau">Niveau</label>
       <select class="veld" id="mNiveau">
         <option value="mini">Kleuters</option><option value="kind" selected>Basisschool</option>
         <option value="tiener">Middelbare school</option><option value="jong">MBO/HBO/universiteit</option><option value="volw">Volwassenen</option>

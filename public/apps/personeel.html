@@ -86,7 +86,11 @@
   .gbtn .ic .rtg-glyf{width:1.5rem;height:1.5rem;color:var(--burgundy-on-dark,#C23A5E);}
   .gbtn b{display:block;font-size:0.92rem;font-weight:600;}
   .gbtn span{font-size:0.72rem;color:var(--soft);}
-  .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:0;}
+  /* padding in plaats van 0: de terugknop in de kantoorpoort mat 49x16 en dat is
+     onder de 24 van WCAG 2.5.8. Vier schermen komen hier binnen (backoffice,
+     kantoorpda, magnaat-kantoor en het Foundation OS sturen allemaal door naar
+     /apps/personeel.html?kantoor=1), dus die vier zijn hiermee ook geholpen. */
+  .gback{align-self:flex-start;background:none;border:none;color:var(--muted);font-size:0.82rem;margin-bottom:1rem;padding:4px 0;min-height:24px;}
   .pinrow{margin-top:1.4rem;display:flex;gap:0.6rem;}
   /* min-width:0 is hier geen detail. Zonder die regel krimpt een invoerveld nooit
      onder zijn eigen min-content, en met letter-spacing 0.4em is dat breder dan

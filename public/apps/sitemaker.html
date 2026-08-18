@@ -33,7 +33,8 @@
   .knop.online{background:var(--green);border-color:var(--green);color:#fff;}
   .knop.aan{border-color:var(--gold);color:var(--gold);}
   .swatches{display:flex;gap:.35rem;align-items:center;}
-  .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
+  /* 1.35rem is 21,6px en dus onder de 24 van WCAG 2.5.8; 1.5rem is precies 24 */
+  .swatch{width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
   .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}

@@ -43,7 +43,11 @@
     s.id = 'fxStijl';
     s.textContent = '.fx-kaart.fx-dicht > *:not(.fx-kop){display:none !important;}' +
       '.fx-kaart.fx-dicht{padding-bottom:0.55rem;}' +
-      '.fx-kop{cursor:pointer;user-select:none;}' +
+      /* min-height en niet padding: een kaartkop is een aanklikbaar vlak (WCAG
+         2.5.8 vraagt 24x24) en de meeste zijn dat allang. Een min-height raakt
+         alleen de koppen die te klein zijn -- padding zou elke kaart in dit huis
+         verschuiven om er vier te repareren. */
+      '.fx-kop{cursor:pointer;user-select:none;min-height:24px;}' +
       '.fx-kop:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px;}' +
       '.fx-pijl{float:right;margin-left:0.5rem;opacity:0.55;font-size:0.8em;transition:transform 0.15s;}' +
       '.fx-dicht .fx-pijl{transform:rotate(-90deg);}' +

@@ -80,6 +80,14 @@
   .vrow .vi{flex:1;min-width:0;}
   .vrow .vi .nm{font-weight:600;font-size:0.9rem;}
   .vrow .vi .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;overflow:hidden;text-overflow:ellipsis;}
+  /* De drie vormen die de vakbewijzenstapel nodig heeft. Ze stonden als
+     style="..." in het opbouwende script; dat houdt style-src-attr in de CSP
+     open en telt in de norm-meter inlineStijlAttributen. Hier zijn het klassen,
+     net als bij de rest van dit scherm. */
+  .vrow .vi .nm .bij{color:var(--soft);font-weight:400;font-size:0.72rem;}
+  .vkop{margin:0.8rem 0 0.3rem;color:var(--soft);}
+  .vgrens{color:var(--soft);margin-top:0.2rem;}
+  .uitleg{font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;}
   .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
   .vbtn.doc{color:var(--muted);}
   .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
@@ -202,7 +210,7 @@
       </div>
       <div class="panel">
         <h2 data-i18n="panel.vakbewijs">Vakbewijzen</h2>
-        <p style="font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;" data-i18n="bo.vakuitleg">De stukken die bij een beroep horen: een VOG voor de kinderopvang, een BIG-registratie voor wie voorschrijft, een legitimatiebewijs voor een bewaker. Jij legt vast dat je het stuk hebt gezien, met je naam erbij. RTG is geen inspectie en beoordeelt de inhoud niet.</p>
+        <p class="uitleg" data-i18n="bo.vakuitleg">De stukken die bij een beroep horen: een VOG voor de kinderopvang, een BIG-registratie voor wie voorschrijft, een legitimatiebewijs voor een bewaker. Jij legt vast dat je het stuk hebt gezien, met je naam erbij. RTG is geen inspectie en beoordeelt de inhoud niet.</p>
         <div class="rows" id="vakbewijzen"></div>
       </div>
       <div class="panel">

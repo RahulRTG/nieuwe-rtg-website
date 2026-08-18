@@ -62,7 +62,19 @@ const api = (pad, body) => fetch('/api/' + pad, {
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 function toast(t){ const m = $('#toast'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
 
-const STAND = { rustig: 'var(--green)', normaal: '#F4F1EC', druk: 'var(--burgundy)', stil: 'var(--soft)' };
+/* DE KLEUR VAN EEN STAND, en waarom 'druk' hier niet het bordeaux is.
+   Deze waarde staat in Bodoni op 1,15rem (18,4px) op de kaart (#1B1817). Het
+   bordeaux #C23A5E haalt daar 3,41:1, en 18,4px niet-vet valt onder de grens van
+   WCAG AA: pas vanaf 24px (of 18,66px vet) mag 3,0. --rtg-rood is de rode van
+   het huis en haalt op dezelfde grond 6,02:1, dus de betekenis blijft in de
+   kleur zitten zonder dat de kijker moet raden.
+
+   DEZE STOND IN A11Y-INGELOGD.JSON EN IK HAD HEM TEN ONRECHTE AFGEVINKT: hij
+   rendeert alleen als een domein ECHT druk is, dus tijdens mijn meetronde stond
+   hij er niet en leek stad.html schoon. De volle scan ving hem alsnog. Dat is
+   precies waarom de scan over de ingelogde staat gaat en niet over een
+   steekproef. */
+const STAND = { rustig: 'var(--green)', normaal: '#F4F1EC', druk: 'var(--rtg-rood)', stil: 'var(--soft)' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 let B = null;

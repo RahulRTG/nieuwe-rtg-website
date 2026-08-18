@@ -32,7 +32,7 @@
 const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
-module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi, keyVanCodenaam, lidstandVan }) => {
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -64,7 +64,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
      wie bezit is een juridisch feit, geen operationeel. Hij staat hier en niet
      in ./lagen.js omdat hij de samengevoegde capslijst van ./beeld.js leest, en
      die wordt hierboven pas gemaakt. */
-  const bst = require('./bestuur')({ save, schoon, ondernemingCaps });
+  const bst = require('./bestuur')({ save, schoon, ondernemingCaps, keyVanCodenaam, lidstandVan });
 
   /* De vier handelingen die het object zelf veranderen staan in
      ./levensloop.js -- dit bestand ging over de 10 kB van het modulebeleid, en

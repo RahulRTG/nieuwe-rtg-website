@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1012 bestanden en 6716 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1012 bestanden en 6725 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1012 |
-| losse beweringen (`test(...)`) | 6716 |
+| losse beweringen (`test(...)`) | 6725 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 839 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-888 bestanden, 6503 beweringen.
+888 bestanden, 6512 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -495,7 +495,7 @@ toets omvalt.
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
 | `onderneming-belasting.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
-| `onderneming-bestuur.test.js` | 19 | gezakt op `===->!==#0` | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
+| `onderneming-bestuur.test.js` | 28 | gezakt op `===->!==#0` | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
 | `onderneming-capaciteit.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de capaciteit -- kan er nog iets bij. Vier beweringen: 1. |
 | `onderneming-contracten.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
 | `onderneming-crediteuren.test.js` | 11 | gezakt op `===->!==#0` | Ronde: de crediteuren -- wat er nog uit moet, en wanneer. Vier beweringen: 1. |

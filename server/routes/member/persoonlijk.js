@@ -1,7 +1,9 @@
 /* Persoonlijke ledenroutes: zorg, locatie, Rahul en Shared Assets.
    De logica woont in de kernmodules. */
+const { maakLiveTwin } = require('../../ai-live-twin');
+
 module.exports = (kern) => {
-  const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus, assetsOverzicht, assetDocument, assetKoop, assetHerroep, assetWachtlijstZet, assetMijn, assetGebruik, assetUitstap } = kern;
+  const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus } = kern;
   const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
   const aiStatus = () => require('../../ai').beschikbaarheid(kern.anthropic);
 
@@ -70,16 +72,22 @@ app.post('/api/fluister', auth, async (req, res) => {
     if (lus && lus.tekst) {
       onthoudGesprek(req, lus.tekst);
       const stand = aiStatus();
-      return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+      const antwoord = { antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
         goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
         goedkeuringWereld: 'member',
-        aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas });
+        aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas };
+      antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
+        actor: req.session.tier || 'member', stand, gedaan: antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
+      return res.json(antwoord);
     }
   }
   onthoudGesprek(req, r && r.antwoord);
   const stand = aiStatus();
-  res.json(Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
-    verwerking: stand.verwerking, kompas: stand.kompas }));
+  const antwoord = Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
+    verwerking: stand.verwerking, kompas: stand.kompas });
+  antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
+    actor: req.session.tier || 'member', stand, gedaan: !!antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
+  res.json(antwoord);
 });
 /* De uitwisseling in het doorlopende gesprek zetten, zodat de chat in de app en
    de balk in het OS EEN draadje zijn en je geschiedenis niet half is. Alleen
@@ -133,43 +141,7 @@ app.post('/api/spar/status', auth, (req, res) => {
   res.json(r);
 });
 
-/* ---- Toren 3: RTG Shared Assets (kern/assets.js) ----
-   Altijd 300 tickets per object; een ticket is 24 uur per jaar, tien jaar
-   lang. Access loopt af, Asset heeft restwaarde en stapt uit via een Tik. */
-app.post('/api/assets', auth, (req, res) => res.json(assetsOverzicht(req.session.key)));
-// het essentiele-informatiedocument: lezen voordat er iets wordt afgerekend
-app.post('/api/asset/document', auth, (req, res) => {
-  const r = assetDocument(req.body.assetId);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/asset/koop', auth, (req, res) => {
-  const r = assetKoop(req.session, liveCodename(req.session), req.body.assetId, req.body.smaak, req.body.aantal, req.body.akkoord === true);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-// veertien dagen bedenktijd: volledige terugbetaling, voor beide smaken
-app.post('/api/asset/herroep', auth, async (req, res) => {
-  const r = await assetHerroep(req.session, liveCodename(req.session), req.body.ticketId);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/asset/wachtlijst', auth, (req, res) => {
-  const r = assetWachtlijstZet(req.session, liveCodename(req.session), req.body.assetId);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/asset/mijn', auth, (req, res) => res.json(assetMijn(req.session.key)));
-app.post('/api/asset/gebruik', auth, (req, res) => {
-  const r = assetGebruik(req.session, req.body.assetId, req.body.datum);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/asset/uitstap', auth, async (req, res) => {
-  const r = await assetUitstap(req.session, liveCodename(req.session), req.body.ticketId);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
+require('./persoonlijk-assets')(kern);
 
 // Toren 4, RTG Care (zorg & welzijn) staat apart, in ./persoonlijk-care.js
 require('./persoonlijk-care')(kern);

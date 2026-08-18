@@ -146,10 +146,17 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       });
     } catch (e) {}
     // De backoffice mag voor de KYC-controle de echte naam/e-mail uit de kluis zien.
-    return rij.map(u => ({
-      id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
-      tier: u.tier, doc: u.id_doc, at: u.created_at
-    }));
+    /* De OPGEGEVEN geboortedatum gaat mee, zodat de keurder hem naast het
+       document kan leggen. Hij is namelijk zelf ingetypt bij de aanmelding en
+       tot nu toe werd hij bij de goedkeuring nooit tegen het paspoort
+       gehouden -- zie routes/office/verificaties.js. */
+    return rij.map(u => {
+      let md = {};
+      try { md = accounts.getMemberState(u.id) || {}; } catch (e) { md = {}; }
+      return { id: u.id, name: accounts.realNameOf(u), email: accounts.emailOf(u), codename: u.codename,
+        tier: u.tier, doc: u.id_doc, at: u.created_at,
+        geborenOpgegeven: md.geboren || null, geborenBron: md.geborenBron || 'opgegeven' };
+    });
   }
 
   return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };

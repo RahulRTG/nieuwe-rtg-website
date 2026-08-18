@@ -34,7 +34,7 @@ const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCA
 /* Een lid echt door de kantoorkeuring halen, zodat het op A4 komt. Dat kan
    alleen langs de echte weg -- bewijs insturen, kantoor keurt goed -- want het
    niveau wordt nergens gezet maar overal afgeleid. */
-async function keurGoed(token, codenaam) {
+async function keurGoed(token, codenaam, documentDatum) {
   const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   await api('/api/verify/upload', { image: PNG }, token);
   await api('/api/verify/selfie', { image: PNG }, token);
@@ -42,8 +42,9 @@ async function keurGoed(token, codenaam) {
   const mij = (pend.body.pending || []).find(x => x.codename === codenaam);
   assert.ok(mij, 'het lid staat in de keuringsrij');
   const r = await api('/api/office/verify', { userId: mij.id, decision: 'approve',
-    faceMatch: true, nationaliteit: 'Nederlandse' }, office);
-  assert.equal(r.status, 200, 'het kantoor keurt goed');
+    faceMatch: true, nationaliteit: 'Nederlandse', geboortedatum: documentDatum }, office);
+  assert.equal(r.status, 200, 'het kantoor keurt goed: ' + JSON.stringify(r.body).slice(0, 140));
+  return { office, userId: mij.id };
 }
 
 /* Een passkey aan een account hangen, met de echte ceremonie. De teller loopt
@@ -393,4 +394,69 @@ test('19. bij een machtiging telt het niveau van wie gedeeld WORDT', async () =>
     attributen: ['codenaam'], minBetrouwbaarheid: 'A3' });
   const k2 = await api('/api/rtgid/koppel', { code: s2.body.code }, d.token);
   assert.equal((await bevestigMet(pkD, d.token, k2.body.koppelId)).status, 200);
+});
+
+/* ---- waar de leeftijd op rust ---- */
+
+test('20. een leeftijdsclaim zegt of hij op het document rust of op de invoer', async () => {
+  /* DIT WAS EEN GAT, en een stil gat. Een lid typt zijn geboortedatum zelf bij
+     de aanmelding (routes/auth/account.js zegt daar met zoveel woorden "het
+     paspoort komt pas later"), en bij de goedkeuring werden nationaliteit,
+     geslacht en de gezichtscontrole wel van het document overgenomen -- de
+     geboortedatum niet. Elke 18plus die dit huis aan een dienst gaf, rustte dus
+     op een zelf ingetypte datum, ook bij een volledig goedgekeurd paspoort.
+     Een slijterij kon dat niet zien. Nu wel. */
+  const e = await lid('1990-01-01');
+  const pkE = await passkeyVoor(e.token, 'Telefoon van E');
+
+  const voor = await inlog('Slijterij De Kurk', ['18plus'], e.token, undefined, pkE);
+  const wieVoor = await api('/api/rtgid/wie', { idToken: voor.idToken });
+  assert.equal(wieVoor.body.attributen['18plus'], true);
+  assert.equal(wieVoor.body.attributen.leeftijdBron, 'opgegeven',
+    'zonder keuring rust de claim op wat het lid zelf opgaf');
+
+  // het kantoor keurt goed EN neemt de datum van het document over
+  await keurGoed(e.token, e.codenaam, '1990-01-01');
+  const na = await inlog('Slijterij De Kurk', ['18plus'], e.token, undefined, pkE);
+  const wieNa = await api('/api/rtgid/wie', { idToken: na.idToken });
+  assert.equal(wieNa.body.attributen.leeftijdBron, 'paspoort', 'daarna rust hij op het document');
+  assert.equal(wieNa.body.attributen.betrouwbaarheid.id, 'A4');
+  assert.ok(!JSON.stringify(wieNa.body).includes('1990-01-01'), 'en de datum zelf blijft in de kluis');
+});
+
+test('21. de keurder corrigeert een datum die niet klopt met het document', async () => {
+  /* De hele reden dat dit veld er is: het lid gaf iets anders op dan er op het
+     paspoort staat. Het document wint. */
+  const f = await lid('2009-06-01');            // opgegeven: net geen 18
+  const pkF = await passkeyVoor(f.token, 'Telefoon van F');
+  const voor = await inlog('Slijterij De Kurk', ['18plus'], f.token, undefined, pkF);
+  assert.equal((await api('/api/rtgid/wie', { idToken: voor.idToken })).body.attributen['18plus'], false);
+
+  await keurGoed(f.token, f.codenaam, '1989-06-01');   // op het document: ruim 18
+  const na = await inlog('Slijterij De Kurk', ['18plus'], f.token, undefined, pkF);
+  const wie = await api('/api/rtgid/wie', { idToken: na.idToken });
+  assert.equal(wie.body.attributen['18plus'], true, 'de datum van het document telt');
+  assert.equal(wie.body.attributen.leeftijdBron, 'paspoort');
+});
+
+test('22. een onleesbare datum wordt geweigerd, niet half opgeslagen', async () => {
+  /* Een datum die er niet uitziet als een datum is erger dan geen datum: die
+     krijgt straks het stempel 'paspoort' en ziet er dus uit als bewijs. */
+  const g = await lid('1992-02-02');
+  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  await api('/api/verify/upload', { image: PNG }, g.token);
+  await api('/api/verify/selfie', { image: PNG }, g.token);
+  const pend = await api('/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === g.codenaam);
+  assert.ok(mij, 'staat in de rij');
+  assert.equal(mij.geborenOpgegeven, '1992-02-02', 'de keurder ziet wat het lid opgaf');
+  assert.equal(mij.geborenBron, 'opgegeven', 'en dat het nog niet van een document komt');
+
+  for (const rommel of ['1 juni 1990', '0000-00-00', '3025-01-01', '1700-01-01']) {
+    const r = await api('/api/office/verify', { userId: mij.id, decision: 'approve',
+      faceMatch: true, geboortedatum: rommel }, office);
+    assert.equal(r.status, 400, rommel + ' hoort geweigerd te worden');
+  }
+  // en zonder datum mag de keuring gewoon door: de bron blijft dan eerlijk 'opgegeven'
+  assert.equal((await api('/api/office/verify', { userId: mij.id, decision: 'approve', faceMatch: true }, office)).status, 200);
 });

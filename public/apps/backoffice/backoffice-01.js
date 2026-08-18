@@ -90,6 +90,12 @@
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
         '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
+        /* De geboortedatum van het DOCUMENT. Voorgevuld met wat het lid zelf
+           opgaf, zodat de keurder vergelijkt in plaats van overtypt; wijkt hij
+           af, dan wint het document. Zonder dit veld rustte elke leeftijdsclaim
+           in het huis op een zelf ingetypte datum. */
+        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;">'+T('bo.dob','Geb. op document')+
+          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" style="font:inherit;font-size:0.72rem;"></label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
         /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
@@ -104,7 +110,8 @@
         $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
         $('#docScrim').classList.add('open');
       });
-      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve',
+        row.querySelector('[data-face]').checked, row.querySelector('[data-geb]').value));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
       row.querySelector('[data-bewaar]').addEventListener('click', () => bewaarVerzoek(id));
     });
@@ -119,7 +126,8 @@
     try { await call('/office/bewaarverzoek', { userId, reden: reden.trim() }); alert(T('bo.keep.ok','Vastgelegd. Het dossier blijft tot een jaar na het einde van het lidmaatschap; daarna wist de bewaarveger het alsnog.')); }
     catch(e){ alert(e.message); }
   }
-  async function decide(userId, decision, faceMatch){
-    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
+  async function decide(userId, decision, faceMatch, geboortedatum){
+    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch,
+      geboortedatum: geboortedatum || undefined }); } catch(e){ alert(e.message); return; }
     loadVerify();
   }

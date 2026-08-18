@@ -945,15 +945,23 @@ function geenGast(req, res) {
   if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
 }
-/* Is de identiteit RTG-geverifieerd? Een GRATIS account mag pas reserveren
-   (en telt pas als volwassene) nadat RTG het paspoort echt gecontroleerd
-   heeft; tot die tijd geldt de standaard "onder de 18". De betaalde passen
-   lopen door de ballotage (aanmelden met paspoort) en houden hun bestaande
-   rechten; een anonieme demo-gast zonder account telt nooit als bekend. */
+/* Is de identiteit RTG-GEVERIFIEERD? Een lid telt pas als volwassene -- en mag
+   pas alcohol bestellen -- nadat RTG het identiteitsbewijs echt heeft gezien;
+   tot die tijd geldt de standaard "onder de 18".
+
+   HIER STOND EEN AANNAME IN PLAATS VAN EEN CONTROLE. De regel luidde: "pas-leden:
+   met paspoort geballoteerd", en gaf `true` voor IEDEREEN die geen gast was.
+   Dat is hoe het bedoeld is -- een betaalde pas loopt door de ballotage -- maar
+   het werd nergens nagegaan. Een lid dat zich zojuist had aangemeld en nog in de
+   keuringsrij stond, gold dus al als geverifieerd, met een geboortedatum die hij
+   bij dat aanmelden zelf had ingetypt. De foutmelding aan de bar zei intussen
+   "je leeftijd is via je paspoort geverifieerd" (kern/lidacties/bestellen.js).
+
+   Nu wordt het gevraagd in plaats van aangenomen, voor iedereen langs dezelfde
+   weg. Een anonieme demo-gast zonder account telt nooit als bekend. */
 function idGeverifieerd(sess) {
   if (!sess) return false;
-  if (sess.tier !== 'guest') return true; // pas-leden: met paspoort geballoteerd
-  if (!sess.account) return false;        // anonieme demo-gast
+  if (!sess.account) return false;        // gast of demo-persona: geen dossier
   const u = accounts.getUserById(sess.account.id);
   return !!u && u.verified === 'verified';
 }

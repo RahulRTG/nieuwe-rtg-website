@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spellen-'));
@@ -58,6 +58,13 @@ async function tweeVrienden() {
   const t = Date.now() + '' + (teller++);
   const a = await json(await raw('/auth/register', { name: 'Speler A' + t, email: 'a' + t + '@v.test', phone: '0611' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }));
   const b = await json(await raw('/auth/register', { name: 'Speler B' + t, email: 'b' + t + '@v.test', phone: '0622' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1992-02-02', tier: 'rtg' }));
+  /* Allebei door de keuring: de 18+-poort kijkt sinds deze ronde echt naar het
+     identiteitsbewijs (server/kern/volwassen.js), en niet meer alleen naar een
+     zelf ingetypt jaartal. Zonder deze stap zijn dit twee spelers die alles
+     mogen SPELEN maar van wie niets wordt bewaard -- en dan toetst de helft van
+     dit bestand een andere situatie dan hij denkt. */
+  await keurLidGoed(BASE, a.token, a.state.user.codename);
+  await keurLidGoed(BASE, b.token, b.state.user.codename);
   await raw('/member/connections', {}, a.token); await raw('/member/connections', {}, b.token);
   // op de volledige codenaam zoeken: exact raak, ook als de gids vol zit met
   // eerdere testspelers die hetzelfde eerste woord delen (CI-flake)
@@ -241,7 +248,7 @@ test('uitslagen: onder de 18+-grens bestaat er geen historie', async () => {
   const r = await json(await raw('/member/spel/uitslagen', {}, jong.token));
   assert.deepEqual(r.uitslagen, []);
   assert.equal(r.progressie, false);
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 });
 
 test('woordduel: het woordenboek keurt; een echt NL-woord over het midden scoort', async () => {
@@ -657,6 +664,11 @@ test('Magnaat is een gedeelde educatieve simulatie: ook RTF mag een potje starte
 test('arcade: onder de 18+-grens bestaat er geen score en geen ranglijst', async () => {
   const t = Date.now() + '' + (teller++);
   const jong = await json(await raw('/auth/register', { name: 'Jong A' + t, email: 'ja' + t + '@v.test', phone: '0678' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+  /* WEL door de keuring, met de datum van zijn document. Anders valt dit lid af
+     omdat RTG hem niet kent, en niet omdat hij vijftien is -- en dan toetst dit
+     de keuringseis nog eens in plaats van de leeftijdsgrens. Dat bleek bij het
+     muteren: de leeftijdsgrens weghalen liet geen enkele toets zakken. */
+  await keurLidGoed(BASE, jong.token, jong.state.user.codename, '2010-01-01');
 
   // spelen mag: geen 403, want het spel is niet verboden
   const post = await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 4200 }, jong.token);
@@ -664,7 +676,11 @@ test('arcade: onder de 18+-grens bestaat er geen score en geen ranglijst', async
   const r = await json(post);
   assert.equal(r.bewaard, false, 'maar de score wordt niet bewaard');
   assert.equal(r.beste, undefined, 'en er komt geen highscore terug');
-  assert.ok(/geverifieerde volwassen leeftijd/.test(r.reden || ''), 'de reden staat erbij');
+  /* De reden zegt sinds deze ronde ook wat eraan te doen is: de poort kijkt nu
+     echt naar de keuring, dus kan iemand er buiten vallen die dat gisteren nog
+     niet deed, en een grens zonder deur ernaast leest als een storing. */
+  assert.match(r.reden || '', /identiteitsbewijs/, 'de reden staat erbij');
+  assert.match(r.reden || '', /verifieren in de app/, 'met wat eraan te doen is');
 
   // het bord bestaat niet, en is niet "leeg": de client hoort de sectie te verbergen
   const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, jong.token));
@@ -724,4 +740,32 @@ test('opgeven: de ander wint het potje', async () => {
   const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
   assert.equal(st.potje.status, 'klaar');
   assert.equal(st.potje.winnaar, b.cn, 'wie overblijft wint');
+});
+
+test('achttien zijn is niet genoeg: RTG moet het bewijs hebben gezien', async () => {
+  /* HIER ZAT HET GAT. De 18+-poort keek alleen naar de leeftijd, en die komt
+     uit een geboortedatum die het lid bij de AANMELDING zelf intypt -- het
+     paspoort komt pas later. Wie zich ouder maakte, kwam er dus gewoon door,
+     en CLAUDE.md beloofde intussen "paspoort-geboortedatum gecontroleerd".
+
+     Dit lid is ruim volwassen op papier en NIET gekeurd. Zonder deze toets
+     merkt niemand het als de keuringseis er ooit weer uit valt. */
+  const t = Date.now() + '' + (teller++);
+  const ongekeurd = await json(await raw('/auth/register', { name: 'Papier ' + t,
+    email: 'pa' + t + '@v.test', phone: '0688' + String(t).slice(-6),
+    password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg' }));
+
+  const post = await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 9999 }, ongekeurd.token);
+  assert.equal(post.status, 200, 'spelen mag: het spel is niet verboden');
+  const r = await json(post);
+  assert.equal(r.bewaard, false, 'maar er wordt niets bewaard');
+  assert.match(r.reden || '', /identiteitsbewijs/, 'en de reden noemt het bewijs, niet de leeftijd');
+
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, ongekeurd.token));
+  assert.equal(bord.ranglijst, false, 'geen ranglijst zonder keuring');
+
+  // en na de keuring mag het wel -- anders zou "alles weigeren" ook slagen
+  await keurLidGoed(BASE, ongekeurd.token, ongekeurd.state.user.codename);
+  const na = await json(await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 9999 }, ongekeurd.token));
+  assert.equal(na.bewaard, true, 'gekeurd en volwassen: nu telt het wel');
 });

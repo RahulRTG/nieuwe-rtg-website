@@ -117,7 +117,7 @@ test('onder de grens is er geen historie om te lezen', () => {
   const r = u.spelUitslagen('kind1');
   assert.deepEqual(r.uitslagen, []);
   assert.equal(r.progressie, false);
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 });
 
 test('je ziet alleen je eigen partijen', () => {

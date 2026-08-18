@@ -106,7 +106,7 @@ module.exports = (ctx) => {
   function spelUitslagen(mij, hoeveel) {
     if (!progressieMag(mij)) {
       return { status: 200, uitslagen: [], progressie: false,
-        reden: 'Uitslagen worden bewaard voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.' };
+        reden: 'Uitslagen worden bewaard voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.' };
     }
     const n = Math.max(1, Math.min(100, Number(hoeveel) || 25));
     const mijne = U().filter(r => r.spelers.some(s => s.key === mij));
@@ -136,7 +136,7 @@ module.exports = (ctx) => {
   function spelStand(mij) {
     if (!progressieMag(mij)) {
       return { status: 200, stand: [], totaal: null, progressie: false,
-        reden: 'Een stand bestaat voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.' };
+        reden: 'Een stand bestaat voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.' };
     }
     const per = new Map();
     let g = 0, w = 0, q = 0;

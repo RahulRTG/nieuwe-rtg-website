@@ -173,7 +173,7 @@ test('de progressiegrens hangt aan de echte leeftijdspoort in grens.js', () => {
     const onder = kind[vorm]('iemand');
     const boven = volw[vorm]('iemand');
     assert.equal(onder.progressie, false, vorm + ': onder de grens wordt er niets bewaard');
-    assert.match(onder.reden, /geverifieerde volwassen leeftijd/,
+    assert.match(onder.reden, /identiteitsbewijs heeft gezien/,
       vorm + ': en er staat waarom, in plaats van een lege lijst zonder uitleg');
     assert.equal(boven.progressie, true, vorm + ': boven de grens wel');
   }

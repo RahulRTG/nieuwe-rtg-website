@@ -30,32 +30,6 @@
   var zetten = function (k, v) { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
   var stemAan = lezen(STEM, true);
 
-  var css = '.hv-balk{position:fixed;left:0;right:0;bottom:0;z-index:38;display:flex;gap:.5rem;align-items:center;' +
-    'padding:.55rem .7rem calc(.55rem + env(safe-area-inset-bottom,0px));background:rgba(12,12,11,.94);' +
-    'border-top:1px solid var(--gold,#857007);font-family:Inter,system-ui,sans-serif;backdrop-filter:blur(6px);}' +
-    '.hv-balk form{display:flex;gap:.5rem;flex:1;align-items:center;margin:0;}' +
-    '.hv-balk input{flex:1;min-width:0;background:#0C0C0B;border:1px solid #333;border-radius:10px;color:#eee;' +
-    'font:inherit;font-size:.88rem;padding:.5rem .7rem;}' +
-    '.hv-balk input:focus-visible,.hv-k:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +
-    /* De knoppen moeten op een telefoon van 390px naast het veld passen; met
-       drie woorden erin liep de rij het beeld uit. Vandaar een pijl voor sturen
-       (zoals in de metgezel) en korte woorden voor de twee schakelaars. */
-    '.hv-k{background:transparent;border:1px solid #444;border-radius:10px;color:#eee;font:inherit;font-size:.78rem;' +
-    'padding:.45rem .5rem;cursor:pointer;white-space:nowrap;flex:0 0 auto;}' +
-    '.hv-go{font-size:1rem;line-height:1;padding:.4rem .6rem;}' +
-    '.hv-k[aria-pressed="true"]{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}' +
-    '.hv-k.hv-hoort{background:#9E1C40;color:#fff;border-color:#9E1C40;}' +
-    /* Weggelegd tot je hem oproept. Deze strook stond op ELK scherm onderaan,
-       altijd, en was daarmee de grootste vaste knoppenrij van het huis --
-       terwijl hij hetzelfde doet als Rahul: zeggen of typen wat er moet
-       gebeuren. Je haalt hem nu van de onderrand omhoog (shared/randen.js),
-       net als het bedieningspaneel van de bovenrand. Escape legt hem weg.
-       Zolang hij weg is neemt hij ook geen ruimte meer in (hv-ruimte). */
-    '.hv-balk.hv-weg,.hv-werk.hv-weg,.hv-chat.hv-weg{display:none;}' +
-    'body.hv-ruimte{padding-bottom:3.6rem;}' +
-    'body.hv-opgeruimd{padding-bottom:0;}' +
-    '@media (prefers-reduced-motion: reduce){.hv-balk{backdrop-filter:none;}}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   var balk = document.createElement('div');
   balk.className = 'hv-balk hv-weg';

@@ -599,25 +599,25 @@
     {
       "id": "wereld-geen-twee-beginschermen",
       "soort": "wereld",
-      "wet": "Er zijn geen twee beginschermen: de wereldstand en het rooster delen dezelfde lijst werelden, dezelfde klok en dezelfde manier om een app te openen.",
+      "wet": "Er is één beginscherm, en dat is de werktafel van RTG Command; geen tweede scherm mag ernaast blijven bestaan om hetzelfde te doen.",
       "bron": {
         "bestand": "WERELD.md",
-        "anker": "Er zijn geen twee beginschermen."
+        "anker": "Er is één beginscherm, en dat is de werktafel van RTG Command."
       },
       "handhaver": [
-        "test/wereld.e2e.js",
-        "public/apps/app-main/app-main-24a2.js"
+        "test/appmenu.e2e.js",
+        "public/shared/command.css"
       ],
       "sabotage": {
-        "wat": "geef de wereldstand een eigen tweede lijst werelden naast die van het rooster",
-        "bestand": "public/apps/app-main/app-main-24a2.js",
-        "zoek": "const MAPPEN = [",
-        "zet": "const MAPPEN_WERELD = [];\n  const MAPPEN = [",
+        "wat": "laat het springboard weer onder de werktafel doorkomen als tweede beginscherm",
+        "bestand": "public/shared/command.css",
+        "zoek": "body.rtg-command > #shell #app:not(.os-open) > .topbar,\nbody.rtg-command > #shell #app:not(.os-open) > #content{display:none!important;}",
+        "zet": "body.rtg-command > #shell #app:not(.os-open) > .topbar{display:none!important;}",
         "wachters": [
-          "e2e:test/wereld.e2e.js"
+          "e2e:test/appmenu.e2e.js"
         ]
       },
-      "kanttekening": "De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan."
+      "kanttekening": "De wet is meeverhuisd met wat hij bewaakt. Hij ging over de wereldstand en het rooster -- twee standen van het klokscherm, dat er sinds 17 augustus 2026 niet meer is. De belofte eronder is dezelfde gebleven en staat nu op de werktafel. De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan."
     },
     {
       "id": "techniek-geen-productie-zonder-grootboek",

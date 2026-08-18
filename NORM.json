@@ -20,7 +20,7 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5878,
-    "browserpoortToetsen": 200,
+    "browserpoortToetsen": 189,
     "kernBreedte": 1395,
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
@@ -31,6 +31,12 @@
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-17",
+      "meter": "browserpoortToetsen 200 -> 189",
+      "reden": "De klok is van het beginscherm af en het springboard is als scherm verdwenen (WERELD.md); de werktafel van RTG Command is nu de enige landing. Daarmee verdwijnt test/wereld.e2e.js, en dat bestand droeg elf schermtoetsen achter de browserpoort. Die elf zijn niet verloren gegaan aan slordigheid maar aan hun onderwerp: ze maten de wereldstand, het rooster en de klok van een scherm dat er niet meer is. Wat van hun beloftes OVERBLEEF is meeverhuisd en niet weggegooid -- de drie werelden, hun beeldmerken en het feit dat elke wereld ook echt zijn huis opent, staan nu in test/appmenu.e2e.js op de bank, mét de omgekeerde meting erbij dat het springboard NIET terugkomt; en de vierkantheid van het klokvak (de schaduw die anders een ei wordt) is verhuisd naar de inlogpoort in test/apps-ui.e2e.js, want daar hangt het horloge nog. Ik verlaag deze meter dus met de hand in plaats van elf toetsen te verzinnen voor schermen die niet bestaan.",
+      "eerlijkheidshalve": "189 is een echte verlaging en geen boekhouding: er staan elf schermtoetsen minder achter de browserpoort dan gisteren. e2eBestanden blijft op 124 omdat er in dezelfde ronde een bestand bijkwam waar er een afging. De rest van de meters staat ongewijzigd; ik heb --vastleggen niet gebruikt, want dat tilt ook meters op die deze ronde niemand heeft aangeraakt."
+    },
     {
       "datum": "2026-08-16",
       "meter": "kernBreedte 1394 -> 1395; kernGedeeld 187 -> 188; testbestanden 858 -> 862; toetsenNietGemeten 180 -> 150; toetsenOngevoeligPct 2.5 -> 2.4",

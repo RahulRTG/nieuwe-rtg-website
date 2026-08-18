@@ -54,10 +54,16 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
     }, reg.token);
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-klok');
-    await page.waitForSelector('#app', { state: 'visible', timeout: 5000 });
-    await page.waitForSelector('.view[data-view="zorg"].active', { timeout: 5000 });
+    /* HIER STOND EEN KLIK OP .cmd-klok. Die knop vouwde de werktafel op en gaf
+       de schil terug; hij bestaat niet meer, want het scherm waar hij heen
+       vouwde bestaat niet meer (WERELD.md).
+
+       Nodig is hij ook niet: rtg_actieve_tab hierboven zegt "zorg", app-main
+       herstelt die plek bij het opstarten (app-main-12a.js: openTab(beginTab))
+       en openTab zet de schil zelf in appmodus. Dat is precies de weg die een
+       lid loopt dat de app hervat waar hij was. */
+    await page.waitForSelector('.view[data-view="zorg"].active', { timeout: 15000 });
+    await page.waitForSelector('#app.os-open', { timeout: 10000 });
 
     await page.waitForFunction(() => {
       const e = document.getElementById('verzorgingAanbod');

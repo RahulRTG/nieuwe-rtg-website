@@ -124,3 +124,25 @@ test('5. blokkeren en melden: Salon-niveau opvolging bij de backoffice', async (
   const gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
   assert.equal((await api('/api/vonk/selectie', {}, gast)).status, 403, 'de gratis app heeft geen Vonk');
 });
+
+test('een profiel zegt hoe zeker RTG weet dat dit deze mens is', async () => {
+  /* DE BELOFTE STOND ER AL EN BEREIKTE DE ANDER NOOIT. Wie de poort niet haalt,
+     krijgt te horen: "Activeer eerst uw RTG-geverifieerde paspoort (KYC); zo
+     weet iedereen op Vonk dat de ander echt is." Dat is een belofte aan de
+     ANDER -- en op een kaartje stond een codenaam, een leeftijd en een stad,
+     precies zoals op elk ander datingprofiel ter wereld.
+
+     De poort garandeert al minstens A3, dus dit is geen zeef maar een
+     onderscheid: A4 betekent dat RTG de selfie naast het document heeft gelegd.
+     Dat is wat je wilt weten voordat je met een vreemde afspreekt. */
+  const sel = await api('/api/vonk/selectie', {}, A.token);
+  assert.equal(sel.status, 200);
+  assert.ok(sel.body.profiel.betrouwbaarheid, 'uw eigen kaart draagt het');
+  assert.equal(sel.body.profiel.betrouwbaarheid.id, 'A4',
+    'gekeurd met gezichtscontrole: het paspoort hoort aantoonbaar bij deze persoon');
+  assert.ok(sel.body.profiel.betrouwbaarheid.naam, 'met een naam die een mens leest');
+  for (const m of sel.body.mensen) {
+    assert.ok(m.betrouwbaarheid && m.betrouwbaarheid.id,
+      'en elk kaartje in de selectie ook: ' + JSON.stringify(m).slice(0, 120));
+  }
+});

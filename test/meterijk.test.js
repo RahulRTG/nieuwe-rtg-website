@@ -746,14 +746,32 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
+  /* EEN HERIJKING BIJ EEN MISSER, en waarom dat geen wegmoffelen is. In de
+     volle CI-suite draaien honderden toetsen naast deze; de nulmeting
+     ('voor') is dan een momentopname van een boom die onder je voeten kan
+     bewegen. Een proef die tegen die verschoven nulmeting 0 meet, zegt
+     niets over de meter -- alleen over de gelijktijdigheid. Bij een misser
+     meten we daarom EERST een verse nul en proberen we een keer opnieuw:
+     een echte regressie (de meter ziet de geplante fout niet) zakt ook
+     tegen de verse nul; een verbouwing ernaast niet. En als het dan nog
+     mis is, noemt de melding ALLE gezakte meters met hun verschillen --
+     de vorige vorm stopte bij de eerste en de CI-samenvatting herhaalt
+     alleen de toetsnaam, waardoor het echte detail onvindbaar bleef. */
+  const missers = [];
   for (const sleutel of geijkt) {
     meld('start ' + sleutel);
-    const verschil = IJKINGEN[sleutel].proef(voor);
+    let verschil = IJKINGEN[sleutel].proef(voor);
+    if (!(verschil > 0)) {
+      const versNul = norm.meet();
+      verschil = IJKINGEN[sleutel].proef(versNul);
+      meld('herijking ' + sleutel + ' tegen een verse nulmeting: verschil ' + verschil);
+    }
     meld('klaar ' + sleutel + ': verschil ' + verschil);
-    assert.ok(verschil > 0,
-      'meter "' + sleutel + '" zag de bekend-foute invoer NIET (verschil ' + verschil + '). ' +
-      'Een meter die niet uitslaat op iets wat fout is, meet niets.');
+    if (!(verschil > 0)) missers.push(sleutel + ' (verschil ' + verschil + ')');
   }
+  assert.deepEqual(missers, [],
+    'meters die de bekend-foute invoer NIET zagen, ook niet tegen een verse nulmeting: ' +
+    missers.join(', ') + '. Een meter die niet uitslaat op iets wat fout is, meet niets.');
 });
 
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {

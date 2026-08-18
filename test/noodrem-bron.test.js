@@ -1,9 +1,12 @@
 /* EEN AANVALLER MAG HET HELE HUIS NIET KUNNEN SLUITEN.
 
-   server/beveiliging.js draagt een automatische noodrem: vanaf drie
-   aanvalsbronnen binnen tien minuten gaat de registratie-zekering eruit, vanaf
-   zes de ONDERHOUDS-zekering -- en dan geeft elke /api/-route 503 "De app is in
-   onderhoud", voor iedereen.
+   server/beveiliging.js draagt een automatische noodrem, en die is een LADDER:
+   elke bron met een brute-force-alarm gaat individueel in quarantaine, vanaf
+   drie bronnen gaat de registratie-zekering eruit, en vanaf zes de INLOGPAUZE --
+   de in- en uitschrijfpaden dicht, wie al is ingelogd merkt niets. De
+   onderhouds-zekering (hele app op 503) springt met opzet nooit meer vanzelf:
+   een verdediging die van een brute force een totale uitval maakt, is een
+   DoS-versterker. Zie de kop van noodrem() in server/beveiliging.js.
 
    DE VRAAG IS WAT EEN "BRON" IS. De noodrem telde verschillende BUCKETS, en een
    bucket is (server/routes/auth/inlog.js):
@@ -34,8 +37,8 @@
         pogingen op dezelfde naam volgt 429;
      2. EEN bron die zes namen probeert sluit het huis NIET; een gewone
         gebruiker komt daarna nog gewoon binnen;
-     3. en de noodrem is niet uitgezet: ZES verschillende bronnen sluiten het
-        huis wel degelijk.
+     3. en de noodrem is niet uitgezet: ZES verschillende bronnen zetten de
+        inlogpauze er wel degelijk uit -- terwijl de app zelf open blijft.
 
    Punt 3 is wat deze toets eerlijk houdt. Zonder die bewering zou "het huis
    gaat niet dicht" ook groen zijn als de noodrem helemaal niet meer werkt, en
@@ -130,7 +133,7 @@ test('2. EEN bron met zes namen sluit het huis niet', async () => {
   } finally { srv.op(); }
 });
 
-test('3. maar ZES bronnen sluiten het huis wel degelijk', async () => {
+test('3. maar ZES bronnen zetten de inlogpauze er wel degelijk uit', async () => {
   const srv = await versServer();
   try {
     /* Zes verschillende adressen, elk op zijn eigen naam. Dit is wel het beeld
@@ -138,7 +141,19 @@ test('3. maar ZES bronnen sluiten het huis wel degelijk', async () => {
     for (let i = 1; i <= 6; i++) {
       await raadDoor(srv.base, 'doel' + i + '@x.test', '203.0.113.' + i);
     }
-    assert.equal(await huisOpen(srv.base), false,
-      'zes verschillende bronnen horen de onderhouds-zekering er wel uit te halen');
+    /* DE INLOG DICHT, en dat is de trede die hier hoort te vallen. Een 503 op
+       /api/auth/login vanaf een adres dat zelf niets fout deed, is de pauze en
+       niet de snelheidsrem -- die remt per emmer en dit adres heeft geen emmer. */
+    const vreemde = await post(srv.base, '/api/auth/login',
+      { login: 'iemand.anders@x.test', password: 'wat dan ook' }, { 'X-Forwarded-For': '198.51.100.77' });
+    assert.equal(vreemde.status, 503,
+      'zes verschillende bronnen horen de inlogpauze eruit te halen (kreeg ' + vreemde.status + ')');
+
+    /* EN DE APP BLIJFT OPEN. Dit is de helft die de ladder toevoegt en die de
+       oude stand juist verloor: wie al is ingelogd hoort niets te merken van een
+       aanval op de inlog. Zonder deze bewering zou een terugval naar "hele app
+       in onderhoud" hier stil groen blijven. */
+    assert.equal(await huisOpen(srv.base), true,
+      'de app zelf hoort open te blijven: de schade-scope is de aanvals-scope');
   } finally { srv.op(); }
 });

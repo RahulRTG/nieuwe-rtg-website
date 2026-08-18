@@ -92,12 +92,27 @@ test('een verspreide aanval op een account wordt vertraagd, en nooit met een slo
   });
 });
 
-test('de rem per adres blijft staan: tien gokken van een bron, daarna 429', async () => {
+/* WAT ER NA TIEN GOKKEN GEBEURT, en waarom hier twee codes mogen staan.
+
+   Deze toets eiste een 429 van de snelheidsrem. Sinds de noodrem-ladder en de
+   bron-maatstaf in dezelfde stand samenkomen, komt er eerst iets ANDERS: trede 1
+   van de ladder zet de bron zelf in de zelf-dovende quarantaine van De Wacht, en
+   die antwoordt met 403. Dat is geen regressie maar precies wat beide kanten
+   apart bedoelden en geen van beide alleen kon: de ladder wilde "een adres
+   isoleren, geen etiket", en pas sinds de melding het aanvallende ADRES draagt
+   (in plaats van de emmer, waar de inlognaam in zit) is er een adres om te
+   isoleren.
+
+   De bewering blijft dus wat hij was -- wie blijft gokken wordt gestopt -- maar
+   hij noemt beide manieren waarop dat mag gebeuren. Haalt iemand allebei de
+   remmen weg, dan blijven de statussen 401 en zakt hij alsnog. */
+test('de rem per adres blijft staan: tien gokken van een bron, daarna dicht', async () => {
   await metAccount(async ({ poging }) => {
     const statussen = [];
     for (let i = 0; i < 12; i++) statussen.push((await poging('203.0.113.9', 'fout' + i)).status);
-    assert.ok(statussen.includes(429),
-      'een bron die op een account blijft gokken hoort na tien pogingen een slot te krijgen (' + statussen.join(',') + ')');
+    assert.ok(statussen.some(s => s === 429 || s === 403),
+      'een bron die op een account blijft gokken hoort na tien pogingen te worden gestopt -- '
+      + '429 van de snelheidsrem of 403 van de quarantaine (' + statussen.join(',') + ')');
     assert.equal(statussen.slice(0, 10).every(s => s === 401), true,
       'en de eerste tien pogingen komen gewoon met 401 terug, zodat een typefout geen slot oplevert');
   });

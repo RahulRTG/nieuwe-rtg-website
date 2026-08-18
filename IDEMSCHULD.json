@@ -1,9 +1,9 @@
 {
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",
  "gemeten": {
-  "schrijfroutes": 3650,
-  "verklaard": 20,
-  "schuld": 3630,
+  "schrijfroutes": 3652,
+  "verklaard": 23,
+  "schuld": 3629,
   "weesverklaringen": 0
  },
  "weesverklaringen": [],
@@ -1409,7 +1409,6 @@
   "POST /api/office/geld/korting",
   "POST /api/office/geld/pasprijs",
   "POST /api/office/ghost",
-  "POST /api/office/handelingen",
   "POST /api/office/hardware",
   "POST /api/office/hardware/concept",
   "POST /api/office/hardware/kritiek",

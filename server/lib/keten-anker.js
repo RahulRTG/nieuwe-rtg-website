@@ -95,13 +95,14 @@ const CONTROL = {
      journalen om te ankeren (inzage, inlog, handelingen, onderzoekslab en de
      boardroom-journalen samen). Een noemer die niet meegroeit, maakt van een gat
      stilletjes een percentage. */
-  grens: 'DE DIENST DRAAIT, HET ANKER STAAT NERGENS BUITEN. server/lib/ankerdienst.js ' +
+  grens: 'DE DIENST DRAAIT, MAAR DE CONTROL IS NIET IN BEDRIJF: het anker staat nergens '  +
+    'buiten. server/lib/ankerdienst.js ' +
     'verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt ' +
     'teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl ' +
     'de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het ' +
     'blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming ' +
     'is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker ' +
-    'maar een tweede regel om te wijzigen. De dienst toont daarom "niet in bedrijf" tot er een ' +
+    'maar een tweede regel om te wijzigen. De dienst meldt daarom NIET IN BEDRIJF tot er een ' +
     'blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.',
   inBedrijf: false
 };

@@ -34,6 +34,11 @@
        rest van de body meelift (een tijdstempel van de client, een teller) en
        twee verzoeken toch dezelfde handeling zijn.
 
+     { leest: true }
+       Een POST die niets verandert. Herhalen is per definitie veilig en er valt
+       niets te dedupliceren; de poort doet hier niets. Apart van "geen
+       verklaring", want dat is een gat en dit is een besluit.
+
      { nietIdempotent: true, waarom: '...' }
        Een herhaling is een ECHTE tweede handeling. De worp, de teller, het
        trekken van een kaart. `waarom` is verplicht: zonder reden is dit veld
@@ -64,40 +69,71 @@
 const VENSTER_MS = 5000;
 
 const SLEUTELS = {
-  // ---- oprichten en aanmaken: dubbeltik maakt er nooit twee ----
-  'POST /api/concern/nieuw': { zelfdeVerzoek: true },
-  'POST /api/concern/entiteit/nieuw': { zelfdeVerzoek: true },
-  'POST /api/concern/opname/maak': { zelfdeVerzoek: true },
-  'POST /api/genootschap/richt-op': { zelfdeVerzoek: true },
-  'POST /api/gewoonten/maak': { zelfdeVerzoek: true },
-  'POST /api/meet/maak': { zelfdeVerzoek: true },
-  'POST /api/mall/lijst/nieuw': { zelfdeVerzoek: true },
-  'POST /api/mediaos/lijst/maak': { zelfdeVerzoek: true },
-  'POST /api/muziek/maak': { zelfdeVerzoek: true },
-  'POST /api/member/leren/project-maak': { zelfdeVerzoek: true },
-  'POST /api/office/ideeen/maak': { zelfdeVerzoek: true },
-  'POST /api/office/hardware/maak': { zelfdeVerzoek: true },
-  'POST /api/office/atelier/maak': { zelfdeVerzoek: true },
-  'POST /api/office/architect/maak': { zelfdeVerzoek: true },
-  'POST /api/office/kantoorpakket/maak': { zelfdeVerzoek: true },
+  /* ---- geverifieerd: de body draagt de identiteit van wat er gemaakt wordt ----
 
-  /* De agenda draagt een datum en een tijd, en die maken de afspraak. Een
-     tweede "Lunch" op dezelfde dag om dezelfde tijd is een dubbeltik; een
-     tweede op een ander tijdstip is een echte tweede afspraak. */
-  'POST /api/agenda/toevoegen': { zelfdeVerzoek: true },
+     Van elk van deze routes is de handler nagelezen: er staat een veld in de
+     body dat bepaalt WAT er ontstaat (een naam, een titel, een datum). Twee
+     woordelijk gelijke verzoeken binnen vijf seconden zijn dan een dubbeltik en
+     geen tweede bedoeling. */
+  'POST /api/concern/nieuw': { zelfdeVerzoek: true },              // naam
+  'POST /api/concern/entiteit/nieuw': { zelfdeVerzoek: true },     // naam + rechtsvorm
+  'POST /api/gewoonten/maak': { zelfdeVerzoek: true },             // naam
+  'POST /api/genootschap/richt-op': { zelfdeVerzoek: true },       // naam + soort
+  'POST /api/agenda/toevoegen': { zelfdeVerzoek: true },           // titel + datum + tijd
+  'POST /api/gemeente/meld': { zelfdeVerzoek: true },              // de melding zelf
+  'POST /api/member/leren/project-maak': { zelfdeVerzoek: true },  // titel
+  'POST /api/mall/lijst/nieuw': { zelfdeVerzoek: true },           // naam, verplicht (kern/mall/lijsten.js)
+  'POST /api/mediaos/lijst/maak': { zelfdeVerzoek: true },         // naam, verplicht (kern/mediaos/lijsten.js)
+  'POST /api/office/architect/maak': { zelfdeVerzoek: true },      // naam, verplicht (kern/architect/index.js)
+  'POST /api/office/atelier/maak': { zelfdeVerzoek: true },        // naam, verplicht (kern/atelier/index.js)
+  'POST /api/office/hardware/maak': { zelfdeVerzoek: true },       // naam, verplicht (kern/hardwarelab/index.js)
+  'POST /api/office/ideeen/maak': { zelfdeVerzoek: true },         // titel, verplicht (kern/ideeen.js)
 
-  /* Een melding aan de gemeente: twee keer dezelfde melding binnen vijf
-     seconden is een dubbeltik, en een dubbele melding kost een ambtenaar tijd. */
-  'POST /api/gemeente/meld': { zelfdeVerzoek: true },
+  /* ---- bewust NIET idempotent, met de reden erbij ----
 
-  // ---- bewust NIET idempotent, met de reden erbij ----
+     /api/muziek/maak stond hier eerst als "zelfde verzoek is een herhaling", en
+     dat was fout. Hij maakt uit een LEGE body elke keer een nieuw stuk; twee
+     oproepen zijn twee stukken. test/mediaos.test.js ving het meteen.
+
+     Dat is precies de fout waar de kop van dit bestand voor waarschuwt, en ik
+     liep er zelf in: de verklaring was op de NAAM van de route gebaseerd ("maak"
+     klinkt als aanmaken met inhoud) en niet op de handler. Een verklaring die je
+     niet hebt nagelezen, is een gok met een net gezicht. */
+  'POST /api/muziek/maak': { nietIdempotent: true,
+    waarom: 'maakt uit een lege body elke keer een NIEUW stuk; twee oproepen zijn twee stukken, ' +
+      'en een laag die de tweede opslikt laat werk verdwijnen zonder dat iemand het merkt' },
   'POST /api/command/sonde/draai': { nietIdempotent: true,
     waarom: 'een sonde draaien is een MEETHANDELING: twee keer draaien hoort twee metingen op te leveren, ' +
       'anders meet de tweede ronde de eerste' },
   'POST /api/command/puls': { nietIdempotent: true,
     waarom: 'de puls is een momentopname; twee keer vragen hoort twee momenten te geven' },
   'POST /api/live/start': { nietIdempotent: true,
-    waarom: 'een tweede start is een nieuwe uitzending, niet dezelfde nog eens' }
+    waarom: 'een tweede start is een nieuwe uitzending, niet dezelfde nog eens' },
+
+  /* Dezelfde toets als hierboven, andere uitkomst: bij deze vier staat er GEEN
+     verplicht veld in de body dat bepaalt wat er ontstaat. Wie zonder inhoud
+     een tweede maakt, krijgt met recht een tweede -- en een laag die dat
+     opslikt, laat werk verdwijnen. */
+  'POST /api/office/kantoorpakket/maak': { nietIdempotent: true,
+    waarom: 'de titel is optioneel en valt terug op "Nieuw document"; twee lege oproepen zijn ' +
+      'twee verse documenten, niet dezelfde nog eens (kern/office/docs.js)' },
+  'POST /api/meet/maak': { nietIdempotent: true,
+    waarom: 'zonder agendaId ontstaat er elke keer een verse kamer met een eigen toegangscode; ' +
+      'MET agendaId dedupliceert de route zelf al (kern/meet.js geeft dan bestond:true terug), ' +
+      'dus er valt hier niets te winnen en wel iets te verliezen' },
+  'POST /api/concern/opname/maak': { nietIdempotent: true,
+    waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
+      'twee momenten op te leveren, anders is de tweede opname stil de eerste' },
+
+  /* ---- routes die niets veranderen ----
+
+     Een POST die alleen leest. Herhalen is per definitie veilig, en er valt
+     niets te dedupliceren: de poort doet hier dan ook niets. Ze staan hier
+     omdat "geen verklaring" en "verklaard als leesroute" twee verschillende
+     dingen zijn, en de schuldteller dat verschil hoort te zien. */
+  'POST /api/office/anker': { leest: true },
+  'POST /api/office/anker/reken': { leest: true },
+  'POST /api/office/handelingen': { leest: true }
 };
 
 function sleutelVoor(methode, pad) {
@@ -111,7 +147,7 @@ for (const [sleutel, v] of Object.entries(SLEUTELS)) {
     throw new Error('idemsleutels: "' + sleutel + '" is nietIdempotent zonder waarom');
   if (v.velden && (!Array.isArray(v.velden) || !v.velden.length))
     throw new Error('idemsleutels: "' + sleutel + '" heeft een lege veldenlijst');
-  if (!v.nietIdempotent && !v.zelfdeVerzoek && !v.velden)
+  if (!v.nietIdempotent && !v.zelfdeVerzoek && !v.velden && !v.leest)
     throw new Error('idemsleutels: "' + sleutel + '" verklaart niets');
 }
 

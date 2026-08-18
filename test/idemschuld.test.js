@@ -60,9 +60,14 @@ test('de teller draait echt, en zakt als er een verklaring wegvalt', () => {
     'verklaard + schuld hoort precies het aantal schrijfroutes te zijn');
 });
 
-test('elke verklaring is een van de drie vormen, en nietIdempotent draagt een reden', () => {
+test('elke verklaring is een van de vier vormen, en nietIdempotent draagt een reden', () => {
+  /* VIER en niet drie: naast zelfdeVerzoek, velden en nietIdempotent bestaat
+     `leest` -- een POST die niets verandert. Die vorm is er later bij gekomen
+     en deze toets telde hem niet mee, waardoor een correcte verklaring op
+     "verklaart niets" zakte. De lijst hoort hier op EEN plek te staan en mee
+     te groeien met server/lib/idemsleutels.js. */
   for (const [sleutel, v] of Object.entries(SLEUTELS)) {
-    const vormen = [v.zelfdeVerzoek, v.velden, v.nietIdempotent].filter(Boolean).length;
+    const vormen = [v.zelfdeVerzoek, v.velden, v.nietIdempotent, v.leest].filter(Boolean).length;
     assert.equal(vormen, 1, sleutel + ' hoort precies een vorm te verklaren');
     if (v.nietIdempotent) {
       assert.ok(v.waarom && v.waarom.length > 20,

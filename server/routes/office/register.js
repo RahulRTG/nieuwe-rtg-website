@@ -76,7 +76,16 @@ module.exports = (octx) => {
     return uit;
   };
 
-  const registerBestaat = (naam) => { try { return fs.existsSync(path.join(WORTEL, naam)); } catch (e) { return false; } };
+  /* Niet OF het register er ligt, maar of het nog bij DEZE code hoort. Zie
+     scripts/versheid.js: een verouderd register ziet er identiek uit aan een
+     verse, en dat is precies waarom dit veld bestaat. */
+  const versheidMeter = require('../../../scripts/versheid');
+  const { versheid, nuCommit } = require('../../../scripts/lib/stempel');
+  const versheidVan = (naam) => {
+    const s = versheidMeter.stempelVan(naam);
+    if (s === undefined) return null;                 // het bestand is er niet
+    return versheid(s, nuCommit());
+  };
 
   let cache = null;
   function bouwRegister() {
@@ -96,7 +105,7 @@ module.exports = (octx) => {
       sam.functieRecords(functies.FUNCTIES, perDing, standVan),
       sam.bedieningRecords(perDing),
       schermRecordsVeilig(),
-      sam.controlRecords(controls(), registerBestaat)
+      sam.controlRecords(controls(), versheidVan)
     );
 
     const reg = { dingen: alle, onbenoemd, herkomst: m.herkomst, routes: m.routes };
@@ -144,7 +153,7 @@ module.exports = (octx) => {
        kunnen komen. Gezakt, zonder routes, ongemeten, nooit geopend, of een
        register dat ontbreekt -- dat is het werk. */
     if (alleenAandacht) rijen = rijen.filter(d =>
-      ['gezakt', 'zonder routes', 'ongemeten', 'nooit geopend', 'register ontbreekt'].includes(d.status.staat) ||
+      ['gezakt', 'zonder routes', 'ongemeten', 'nooit geopend', 'register ontbreekt', 'verouderd bewijs'].includes(d.status.staat) ||
       d.schakel.stand === 'storing' || d.onbeschreven);
     if (zoek) rijen = rijen.filter(d =>
       (d.naam + ' ' + d.id + ' ' + d.doet).toLowerCase().includes(zoek));

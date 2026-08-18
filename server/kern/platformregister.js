@@ -104,7 +104,8 @@ const UITLEG = {
   'alleen geveegd': 'alleen een veegtoets kwam langs. Die bewijst dat de pagina laadt, niet dat hij werkt.',
   'alleen opgehaald': 'de pagina is wel opgehaald maar nergens naartoe genavigeerd; een cache die hem ophaalt is geen toets die hem aflegt.',
   'nooit geopend': 'geen enkele toets heeft dit scherm geopend.',
-  'levert bewijs': 'het instrument draait en zijn register ligt er.',
+  'levert bewijs': 'het instrument draait en zijn register hoort bij deze commit.',
+  'verouderd bewijs': 'het register ligt er, maar is gemeten op andere code. Getallen uit een ander tijdperk lezen als getallen van nu.',
   'register ontbreekt': 'het instrument bestaat, maar zijn register is er niet; er is dus niets gemeten.',
   'geen register': 'deze control houdt geen eigen register bij en leunt op een ander instrument.'
 };

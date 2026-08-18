@@ -150,11 +150,18 @@ function schermRecords(schermen, gids, waarneming) {
    Ze dragen hun eigen beschrijving al (het CONTROL-object bij elk instrument).
    Hun status is of hun register er LIGT: een control met een instrument maar
    zonder register heeft niets gemeten, hoe goed het instrument ook is. */
-function controlRecords(controls, registerBestaat) {
+function controlRecords(controls, versheidVan) {
   return controls.map(c => {
     const reg = (c.dekking && c.dekking.register) || null;
+    /* BESTAAN IS NIET GENOEG. Hier stond `registerBestaat(reg)`: ligt het bestand
+       er, dan heette de control "levert bewijs". Maar een register van drie
+       maanden geleden ligt er ook, en die zag er precies zo geruststellend uit --
+       dat is de fout waar scripts/versheid.js voor is gemaakt. Een control met
+       een verouderd register levert geen bewijs over DEZE code. */
+    const v = reg ? versheidVan(reg) : null;
     const staat = !reg ? 'geen register'
-      : registerBestaat(reg) ? 'levert bewijs' : 'register ontbreekt';
+      : !v ? 'register ontbreekt'
+        : v.vers ? 'levert bewijs' : 'verouderd bewijs';
     return {
       soort: 'control',
       id: c.control,
@@ -163,7 +170,10 @@ function controlRecords(controls, registerBestaat) {
       groep: c.eigenaar || 'Techniek',
       schakel: { schakelbaar: false, stand: 'altijd aan',
         reden: 'een beheersmaatregel die je kunt uitzetten is geen beheersmaatregel' },
-      status: { staat, pct: null, routes: 0, cellen: 0, bewezen: 0, ongemeten: 0, gezakt: 0 },
+      status: { staat, pct: null, routes: 0, cellen: 0, bewezen: 0, ongemeten: 0, gezakt: 0,
+        /* De reden waarom het bewijs verouderd is, hoort mee: "verouderd" zonder
+           waarom leidt tot een tweede onderzoek. */
+        reden: v ? v.reden : null },
       /* De GRENS is het eerlijkste veld van een control: wat hij NIET aantoont.
          Zonder dat leest elke control als een dekkende garantie. */
       grens: c.grens || '',

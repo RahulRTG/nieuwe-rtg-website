@@ -9,13 +9,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
+   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
+   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
+const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
 const JPEG = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==', 'base64');

@@ -131,6 +131,13 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      hele database, maar een tak die nooit is aangemaakt kan hij niet vinden.
      Wat er in staat is precies wat art. 17 bedoelt -- de weetjes die het lid
      zelf deelde en de laatste beurten van het gesprek. */
+  /* Een VAKBEWIJS, en dat is hier geen decor. Deze rij draagt een eigen
+     sleutelvorm (lid:<accountId>) in plaats van user-<accountId>, en de bezem
+     onderaan zoekt op die laatste -- hij kan hem dus NIET zien. Zonder deze
+     regel plus de gerichte bewering verderop, zou een vergeten lid zijn
+     vakbewijzen gewoon achterlaten zonder dat iets klaagde. */
+  await post('/api/vakbewijs/zet', { wat: 'vog', nummer: 'VOG-VERGEET-1', tot: '2030-01-01' }, token);
+
   await post('/api/fluister', { q: 'plan mijn dag' }, token);
   await post('/api/fluister', { q: 'onthoud dat ik graag bij het raam zit' }, token);
 
@@ -300,6 +307,27 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
    verwijderde verwijzing met een blijvend bestand is geen vergetelheid maar een
    wees die wij nog gewoon kunnen openen -- en bij de kluis gaat dat over
    paspoortscans, contracten en medische brieven. */
+test('de vakbewijzen gaan mee, ook al ziet de bezem ze niet', async () => {
+  /* GERICHT en niet via de bezem hierboven: die zoekt op de sleutel (user-<id>),
+     de codenaam en de naam, en een vakbewijsrij draagt geen van drieen -- hij
+     staat op lid:<accountId>. Precies daarom hoort deze bewering hier apart, en
+     precies daarom is het gat er ooit ingeslopen. */
+  const bestand = path.join(TMP, 'db.json');
+  const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));
+  const rijen = data.vakbewijzen || [];
+  /* Alleen over HAAR. Het demopersoneel heeft zijn eigen vakbewijzen en die
+     horen te blijven staan -- een bewering die alles wegveegt zou hier groen
+     worden om de verkeerde reden. */
+  const haar = 'lid:' + String(sleutel).replace('user-', '');
+  assert.ok(rijen.length > 0, 'er staan wel vakbewijzen van anderen; anders bewijst het volgende niets');
+  assert.equal(rijen.some(v => v && v.sleutel === haar), false,
+    'er staat geen vakbewijs meer van haar (' + haar + '): ' + JSON.stringify(rijen).slice(0, 200));
+  /* En het nummer al helemaal niet: dat woonde in het ledendossier en dat gaat
+     met het account mee. */
+  assert.equal(JSON.stringify(data).includes('VOG-VERGEET-1'), false,
+    'en het documentnummer staat nergens meer');
+});
+
 test('en de bezem over de schijf: geen weesbestanden van dit lid', async () => {
   await wacht(600);
   assert.ok(bestandenVanWilma.length >= 5, 'de vorige test heeft bestanden vastgelegd om op te controleren');

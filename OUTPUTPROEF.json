@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-18T19:13:54.261Z",
-  "commit": "6598a6c",
+  "op": "2026-08-18T19:41:46.590Z",
+  "commit": "c7fa38b",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 347,
-  "onbeslist": 3817,
-  "blind": 23,
+  "bewezen": 356,
+  "onbeslist": 3807,
+  "blind": 24,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -17754,26 +17754,28 @@
    "reden": "er is over DEZE route gelogen en genreplan.test.js zakte daarop"
   },
   "POST /api/supplier/puls/plan/klaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "genreplan.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en genreplan.test.js zakte daarop"
   },
   "POST /api/supplier/opvang/nanny": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "genreplan.test.js",
-    "verzorging.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/supplier/puls/blik": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "genreplan.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en genreplan.test.js zakte daarop"
+  },
+  "POST /api/supplier/puls/blik": {
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "genreplan.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en genreplan.test.js zakte daarop"
   },
   "POST /api/supplier/puls": {
    "staat": "bewezen",
@@ -17919,22 +17921,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 27); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/foundation/gezin/ochtend/stap": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "gezin-weghalen.test.js",
-    "gezinleven.test.js",
     "ochtend.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ochtend.test.js zakte daarop"
   },
   "GET /api/foundation/gezin/:code/ochtend": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "gezin-weghalen.test.js",
-    "gezinleven.test.js",
     "ochtend.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ochtend.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/foundation/gezin/wissen/intrekken": {
    "staat": "onbeslist",
@@ -18059,12 +18059,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 14); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/foundation/gezin/ochtend/vink": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "gezinleven.test.js",
     "ochtend.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ochtend.test.js zakte daarop"
   },
   "POST /api/foundation/gezin/verjaardag/wens/claim": {
    "staat": "onbeslist",
@@ -18933,36 +18933,36 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/ideeen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "ideeen.test.js",
-    "office-tweede-helft.test.js",
-    "redactie.test.js"
+    "ideeen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ideeen.test.js zakte daarop"
   },
   "POST /api/office/ideeen/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "ideeen.test.js",
-    "office-tweede-helft.test.js",
-    "redactie.test.js"
+    "ideeen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ideeen.test.js zakte daarop"
   },
   "POST /api/office/ideeen/reactie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "ideeen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ideeen.test.js zakte daarop"
   },
   "POST /api/office/ideeen/uitwerken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "ideeen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 7); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en ideeen.test.js zakte daarop"
   },
   "POST /api/office/ideeen/spinoff": {
    "staat": "onbeslist",
@@ -34181,6 +34181,56 @@
    "toets": "genreplan.test.js",
    "merkt": true,
    "op": "2026-08-18T19:13:54.112Z"
+  },
+  "POST /api/supplier/opvang/nanny": {
+   "toets": "genreplan.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:23.433Z"
+  },
+  "POST /api/supplier/puls/blik": {
+   "toets": "genreplan.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:23.507Z"
+  },
+  "POST /api/supplier/puls/plan/klaar": {
+   "toets": "genreplan.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:23.599Z"
+  },
+  "GET /api/foundation/gezin/:code/ochtend": {
+   "toets": "ochtend.test.js",
+   "merkt": false,
+   "op": "2026-08-18T19:41:34.850Z"
+  },
+  "POST /api/office/ideeen": {
+   "toets": "ideeen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:34.873Z"
+  },
+  "POST /api/foundation/gezin/ochtend/stap": {
+   "toets": "ochtend.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:35.054Z"
+  },
+  "POST /api/foundation/gezin/ochtend/vink": {
+   "toets": "ochtend.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:45.903Z"
+  },
+  "POST /api/office/ideeen/maak": {
+   "toets": "ideeen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:45.909Z"
+  },
+  "POST /api/office/ideeen/uitwerken": {
+   "toets": "ideeen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:46.046Z"
+  },
+  "POST /api/office/ideeen/reactie": {
+   "toets": "ideeen.test.js",
+   "merkt": true,
+   "op": "2026-08-18T19:41:46.435Z"
   }
  },
  "basislijn": {
@@ -34271,6 +34321,7 @@
   "fases.test.js": "groen",
   "dealkans.test.js": "groen",
   "collegachat.test.js": "groen",
-  "genreplan.test.js": "groen"
+  "genreplan.test.js": "groen",
+  "ochtend.test.js": "groen"
  }
 }

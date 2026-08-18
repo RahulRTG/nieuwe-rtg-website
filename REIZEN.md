@@ -304,6 +304,35 @@ regels al; Het Huis levert de standen al). Nog geen invoer, nog geen bewaking.
 verschillende domeinen één reis ziet met één naam, en elk onderdeel nog steeds
 naar zijn eigen app wijst.
 
+**Waar fase 1 staat: af** (18 augustus 2026). `kern/reizen.js` (de verdeling) en
+`kern/reizen-vorm.js` (wat een Reis is als hij af is), `/api/reis/reizen`, en het
+register van `/apps/reizen.html` staat per reis in plaats van als één rij. De
+laag leest uitsluitend `reiswereld.komend()` en schrijft niets.
+
+De verdeling gaat in twee ronden, en dat is geen elegantie maar een reparatie:
+één ronde op datum liet elk geplaatst onderdeel het venster oprekken, waardoor
+een vlucht op de 34e twee losse Dubai-reizen (t/m de 33e en vanaf de 35e) aan
+elkaar **lijmde**. Nu vormen eerst de onderdelen mét een eigen venster het
+geraamte; daarna worden de losse punten tegen die vastgezette vensters gelegd.
+Past een punt bij twee reizen, dan wordt het losgelegd met de reden erbij in
+plaats van in de eerste de beste geduwd — par. 4.1 in de praktijk.
+
+Twee dingen die bij het bouwen boven water kwamen en die er los van staan:
+
+- **een verblijf had helemaal geen plaats.** De reiswereld las `v.plaats`, en dat
+  veld bestaat niet op een verblijfsrecord — de stad staat bij de zaak. Alle
+  hotelovernachtingen stonden dus zonder bestemming in RTG Reizen, en De Reis kon
+  ze bij geen enkele reis plaatsen. Opgelost in het domein dat het weet
+  (`verblijf/gast.js` projecteert de stad van de zaak), niet in de laag erboven.
+- **de stand telde regels en noemde ze reizen.** Een vlucht, een hotel en een
+  aanvraag naar Dubai lazen als "3 reizen gepland". Nu er reizen zijn, telt hij
+  reizen.
+
+Wat deze fase met opzet **niet** doet: een terugvlucht herkennen. Het
+vluchtdomein kent geen vertrekpunt (er zijn alleen boekingen op een vertrek vanaf
+de eigen luchthaven), dus zou dat raden zijn. Zodra er retourvluchten bestaan,
+heeft een onderdeel een **richting** nodig.
+
 ### Fase 2 -- De Invoerbalie
 
 Eén ingang voor documenten en beelden, eerst voor het kantoor, daarna voor het

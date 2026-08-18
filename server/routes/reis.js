@@ -17,4 +17,9 @@ module.exports = (kern) => {
      elkaar. Alleen lezen -- boeken, wijzigen en annuleren blijft in de
      gespecialiseerde app, en deze route heeft er geen tegenhanger voor. */
   app.post('/api/reis/wereld', auth, (req, res) => res.json(kern.reiswereld.komend(req.session.key)));
+
+  /* DE REIS: dezelfde regels, maar gegroepeerd tot reizen (REIZEN.md fase 1).
+     Ook alleen lezen, en om dezelfde reden: hier ontstaat geen boeking. Wat
+     niet te plaatsen was komt mee terug in `los`, met de reden. */
+  app.post('/api/reis/reizen', auth, (req, res) => res.json(kern.reizen.mijn(req.session.key)));
 };

@@ -139,13 +139,19 @@
      is de normale gang van zaken; dat als alarm tonen is loos alarm, en loos
      alarm leert mensen de stand te negeren op de dag dat hij wel klopt. Het
      staat er dus als cijfer, en het kleurt het woord niet. */
-  function tekenStand(d) {
+  function tekenStand(d, aantalReizen) {
     const t = d.telling || {};
+    /* HET EERSTE CIJFER TELT REIZEN EN GEEN REGELS. Hier stond `t.komend`, en
+       dat is het aantal ONDERDELEN: een vlucht, een hotel en een aanvraag naar
+       Dubai lazen als "3 reizen gepland" terwijl het er één is. Sinds De Reis
+       bestaat (kern/reizen.js) is dat gewoon te tellen, en dan hoort het label
+       ook te kloppen. */
+    const n = aantalReizen == null ? (t.komend || 0) : aantalReizen;
     RTGCanvas.stand('#stand', {
       app: 'RTG Reizen',
       stand: d.stand,
       cijfers: [
-        [t.komend || 0, t.komend === 1 ? 'reis gepland' : 'reizen gepland'],
+        [n, n === 1 ? 'reis gepland' : 'reizen gepland'],
         [t.aandacht || 0, 'vraagt actie'],
         [t.wachtend || 0, 'wacht op bevestiging']
       ]
@@ -225,15 +231,53 @@
     })));
   }
 
-  function teken(d) {
-    tekenStand(d);
+  /* Het venster van een reis in mensentaal: 12-19 okt, 30 sep - 3 okt, of een
+     enkele dag. Geen jaartal zolang alles binnen hetzelfde venster valt -- dat
+     is ruis in een regel die over volgende maand gaat. */
+  function vensterTekst(v) {
+    const a = dagdeel(v.van), b = dagdeel(v.tot);
+    if (v.van === v.tot) return a.nr + ' ' + a.mnd;
+    return a.mnd === b.mnd ? a.nr + '-' + b.nr + ' ' + b.mnd
+      : a.nr + ' ' + a.mnd + ' - ' + b.nr + ' ' + b.mnd;
+  }
 
-    const alles = d.komend || [];
+  /* De kop van een reis. `grond` staat er alleen bij als er iets uit te leggen
+     valt -- bij één onderdeel is dat een zin over niets, en dan is het ruis
+     (ONTWERP.md: uitzonderingsgestuurd). */
+  function reisKop(r) {
+    const n = r.telling.onderdelen;
+    return '<div class="regkop"><h2>' + esc(r.bestemming) + ' &middot; ' + esc(vensterTekst(r.venster)) + '</h2>' +
+      '<span class="tel">' + n + (n === 1 ? ' onderdeel' : ' onderdelen') + '</span></div>' +
+      (n > 1 ? '<p class="stil">' + esc(r.grond) + '</p>' : '');
+  }
+
+  function teken(d) {
+    const reizen = d.reizen || [];
+    const losseDelen = (d.los || []).map(x => x.onderdeel);
+    const alles = reizen.reduce((a, r) => a.concat(r.onderdelen), []).concat(losseDelen);
+
+    tekenStand(d, reizen.length);
     tekenVandaag(alles);
+
     // wat op de tijdlijn staat, staat niet nog eens in het register
-    const r = alles.filter(x => !opDeKlok(x));
-    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' reis' : ' reizen') : '';
-    $('#komend').innerHTML = r.length ? r.map(reisRegel).join('')
+    const blokken = [];
+    for (const r of reizen) {
+      const rij = r.onderdelen.filter(x => !opDeKlok(x));
+      if (rij.length) blokken.push(reisKop(r) + rij.map(reisRegel).join(''));
+    }
+    /* WAT RTG NIET KON PLAATSEN, en met opzet niet weggelaten. Een onderdeel
+       stil in de eerst passende reis duwen zou er beter uitzien en zou liegen;
+       het hier apart zetten is het eerlijke alternatief (kern/reizen.js). */
+    const losRest = losseDelen.filter(x => !opDeKlok(x));
+    if (losRest.length) blokken.push(
+      '<div class="regkop"><h2>Nog niet bij een reis geplaatst</h2>' +
+      '<span class="tel">' + losRest.length + '</span></div>' +
+      '<p class="stil">Van deze onderdelen weet RTG niet zeker bij welke reis ze horen. ' +
+      'Ze staan daarom apart, en niet bij de verkeerde.</p>' +
+      losRest.map(reisRegel).join(''));
+
+    $('#tel').textContent = reizen.length ? reizen.length + (reizen.length === 1 ? ' reis' : ' reizen') : '';
+    $('#komend').innerHTML = blokken.length ? blokken.join('')
       /* Twee soorten leeg, en ze betekenen niet hetzelfde: vertrekt alles wat
          er is vandaag, dan is "er staat niets gepland" onwaar -- het staat drie
          centimeter hoger. */
@@ -294,7 +338,11 @@
        aan de hand', en dat is de enige uitkomst die hij nooit mag suggereren. */
     tekenStand({});
     try {
-      const res = await fetch('/api/reis/wereld', {
+      /* DE REIS en niet het losse register (REIZEN.md fase 1): dit scherm
+         toont reizen, en de stand en telling van de wereld reizen mee in
+         hetzelfde antwoord -- een tweede aanroep zou dezelfde domeinen nog een
+         keer laten lezen voor dezelfde vraag. */
+      const res = await fetch('/api/reis/reizen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
         body: '{}'

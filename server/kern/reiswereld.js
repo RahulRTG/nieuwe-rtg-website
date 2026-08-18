@@ -73,6 +73,12 @@ module.exports.maakReiswereld = ({ kern }) => {
     const b = betekenis(st);
     return {
       soort, titel: o.titel || '', bestemming: o.bestemming || '',
+      /* WAAR HET VANDAAN KOMT (REIZEN.md par. 2.2). De bron weet dit en de
+         lagen erboven niet, dus wordt het hier meegegeven en nergens geraden:
+         een verblijf staat bij een partner, een reis en een vlucht zijn van
+         RTG zelf. Wat het WOORD mag zijn, bewaakt kern/reizen.js -- een regel
+         zonder geldige herkomst wordt daar niet geplaatst maar losgelegd. */
+      herkomst: o.herkomst || '',
       van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
       /* HET UUR, en alleen waar het domein er een kent. Een vlucht vertrekt om
          17:30 en een charter ook; een verblijf en een reis van het reisbureau
@@ -104,14 +110,16 @@ module.exports.maakReiswereld = ({ kern }) => {
       .filter(v => v.status !== 'geannuleerd')
       .map(v => regel('verblijf', {
         titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
-        status: v.status, kenmerk: v.id, app: 'Verblijven', link: '/apps/hotels.html'
+        status: v.status, kenmerk: v.id, herkomst: 'partner',
+        app: 'Verblijven', link: '/apps/hotels.html'
       })), uit, stil);
 
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
       .filter(a => a.status !== 'geannuleerd')
       .map(a => regel('reis', {
         titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
-        status: a.status, kenmerk: a.ref, app: 'Reisbureau', link: '/apps/reisbureau.html'
+        status: a.status, kenmerk: a.ref, herkomst: 'rtg',
+        app: 'Reisbureau', link: '/apps/reisbureau.html'
       })), uit, stil);
 
     bron('vluchten', () => {
@@ -119,12 +127,12 @@ module.exports.maakReiswereld = ({ kern }) => {
       const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
         titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
         van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
-        status: x.status, kenmerk: x.code,
+        status: x.status, kenmerk: x.code, herkomst: 'rtg',
         app: 'Vluchten', link: '/apps/vluchten.html'
       }));
       const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
         titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
-        status: x.status, kenmerk: x.code, app: 'Hangar', link: '/apps/hangar.html'
+        status: x.status, kenmerk: x.code, herkomst: 'rtg', app: 'Hangar', link: '/apps/hangar.html'
       }));
       return b.concat(c);
     }, uit, stil);

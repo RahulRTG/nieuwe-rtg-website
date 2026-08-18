@@ -1757,6 +1757,31 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
     ['/api/auth/register', 'registreren kan alleen zonder account'],
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+    /* DE INLOGDEUR ZELF, en waarom hij hier hoort te staan in plaats van op de
+       heuristiek te leunen.
+
+       Hij stond nooit op deze lijst en werd toch goedgekeurd, want de regel
+       telt "geeft ergens binnen achthonderd tekens een 401 of 403 terug" ook als
+       poort. Dat klopte toevallig: de 401 stond net binnen dat venster. Toen de
+       inlog er drie remmen, een beveiligingsregel en een hash-opwaardering bij
+       kreeg, schoof diezelfde 401 erbuiten -- en meldde de poort een gat waar
+       niets was veranderd aan wie er binnenkomt.
+
+       Een groen dat aan tekstafstand hangt is geen groen (dezelfde les die
+       hierboven bij het venster staat). Daarom staat hij nu bij naam. De REDEN
+       is bovendien dezelfde als bij register en forgot hierboven: dit IS de
+       deur, er kan per definitie nog geen sessie zijn, en een poort die een
+       sessie eist zou inloggen onmogelijk maken.
+
+       Wat hem beschermt staat er wel: drie remmen (per adres+account, per
+       adres, per doelwit), een vertraging bij een belaagd account, en een regel
+       in het beveiligingsjournaal bij elke mislukte poging. */
+    ['/api/auth/login', 'dit IS de deur: wie inlogt heeft nog geen sessie. Beschermd met drie remmen (adres+account, adres, doelwit), een vertraging bij een belaagd account en een regel in het beveiligingsjournaal'],
+    /* Dezelfde deur, andere sleutel. /api/webauthn/opties staat hierboven al op
+       de lijst met "het bewijs volgt bij /login" -- dit is dat /login. Het
+       bewijs zit in het verzoek: een handtekening over de uitdaging die de
+       server zelf net heeft uitgegeven, en die maar een keer geldig is. */
+    ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en

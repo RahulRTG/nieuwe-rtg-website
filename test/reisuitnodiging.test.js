@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, kantoor, klant, genoot;
@@ -34,6 +34,17 @@ const nieuwLid = async (naam) => {
   const u = naam + Date.now().toString().slice(-6);
   const r = await post('/api/auth/register', { name: naam, email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').slice(-8),
     password: 'geheim123', geboortedatum: '1990-01-01' });
+  /* DOOR DE KEURING, want aanmelden alleen is geen geverifieerde identiteit meer.
+     idGeverifieerd() (server/server.js) nam aan dat elke pas-houder geballoteerd
+     was; sinds die aanname is vervangen door een vraag aan de keuring, valt een
+     vers aangemeld lid op /uitnodiging/eisop af op de IDENTITEITSCONTROLE in
+     plaats van erdoorheen te komen. Toets 4 zou dan groen zijn op de verkeerde
+     grond -- of, zoals hier, rood terwijl er niets stuk is.
+
+     keurLidGoed() loopt de echte weg (bewijs insturen, kantoor keurt goed) en
+     staat in ./helper.js, zodat deze stappen op een plek staan; vijf andere
+     toetsbestanden gebruiken hem al. */
+  if (r.body.token) await keurLidGoed(base, r.body.token, r.body.state.user.codename, '1990-01-01');
   return r.body.token;
 };
 

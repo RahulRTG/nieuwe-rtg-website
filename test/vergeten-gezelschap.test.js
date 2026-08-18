@@ -30,7 +30,25 @@ const MAG_BLIJVEN = new Map([
   ['inzagelog', 'auditlog: geen naam, alleen een account-id dat nergens meer op slaat (AVG art. 17 lid 3)'],
   ['giftcards', 'de kaart vertegenwoordigt geld van de zaak; de koper is eruit gehaald'],
   ['supplierNotifications', 'de administratie van de zaak; de codenaam is vervangen door (verwijderd)'],
-  ['lidmaatschapBetalingen', 'fiscale bewaarplicht van 7 jaar (AVG art. 17 lid 3 sub b); staat met grond en al in server/bewaartermijnen.js']
+  ['lidmaatschapBetalingen', 'fiscale bewaarplicht van 7 jaar (AVG art. 17 lid 3 sub b); staat met grond en al in server/bewaartermijnen.js'],
+
+  /* HET HANDELINGSSPOOR, en met opzet NIET blanco vrijgesteld.
+
+     Waarom het mag blijven: het is dezelfde afweging als bij het inzagejournaal
+     hierboven. Een auditspoor dat verdwijnt zodra de betrokkene erom vraagt, is
+     geen auditspoor meer -- en juist daarom staan er codenamen in en geen
+     namen. Na wissing wijst `user-42` naar een account dat niet meer bestaat.
+     De grond staat in server/bewaarbeleid.js (tak 'handelingLog', grond
+     'audit') en het doel in VERWERKINGSREGISTER.md.
+
+     Waarom het toch niet blanco is: een tak die je helemaal overslaat, ziet
+     nooit meer iets. Zet iemand hier later een naam, een e-mailadres of een
+     codenaam in -- bijvoorbeeld door de body alsnog mee te loggen -- dan zwijgt
+     een blanco uitzondering daarover. `alleen: ['sleutel']` laat precies het ene
+     door dat hier hoort te staan en houdt de rest tegen. */
+  ['handelingLog', { alleen: ['sleutel'],
+    waarom: 'auditspoor: alleen de pseudonieme sleutel, die na wissing nergens meer op slaat ' +
+      '(AVG art. 17 lid 3; bewaartermijn in server/bewaarbeleid.js, tak handelingLog)' }]
 ]);
 
 /* Elke uitzondering hierboven moet ook ECHT ergens vastgelegd zijn. Een tak die
@@ -45,6 +63,15 @@ test('wat mag blijven staan, staat ook in het bewaarbeleid', () => {
   assert.ok(regel, 'en hij staat in server/bewaartermijnen.js, niet alleen hier');
   assert.equal(regel.grond, 'wettelijk', 'met de juiste grond');
   assert.ok(regel.dagen > 6 * 365, 'en een termijn die bij de fiscale bewaarplicht past');
+
+  /* Hetzelfde voor het handelingsspoor. Dat het mag blijven staan is hierboven
+     een regel in een Map; dat het ook echt een TERMIJN heeft, is wat voorkomt
+     dat "auditspoor" een woord wordt waarmee je iets voor altijd bewaart. */
+  const audit = BELEID.find(r => r.tak === 'handelingLog');
+  assert.ok(audit, 'het handelingsspoor staat in het bewaarbeleid, niet alleen in deze test');
+  assert.equal(audit.grond, 'audit');
+  assert.ok(audit.dagen > 0 && audit.dagen <= 2 * 365,
+    'met een eindige termijn -- een auditspoor zonder einde is een permanent dossier');
 });
 
 test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () => {
@@ -103,13 +130,17 @@ test('vergetelheid werkt voor elke pas, niet alleen voor een RTG-lid', async () 
 
       const raak = [];
       for (const [tak, waarde] of Object.entries(data)) {
-        if (MAG_BLIJVEN.has(tak)) continue;
+        const vrij = MAG_BLIJVEN.get(tak);
+        if (typeof vrij === 'string') continue;          // blanco vrijgesteld
         const tekst = JSON.stringify(waarde == null ? null : waarde);
         if (!tekst) continue;
-        const wat = [];
+        let wat = [];
         if (lid.key && tekst.includes('"' + lid.key + '"')) wat.push('sleutel');
         if (lid.codenaam && tekst.includes(lid.codenaam)) wat.push('codenaam');
         if (tekst.includes(lid.naam) || tekst.includes(lid.email)) wat.push('NAAM/E-MAIL');
+        /* Gedeeltelijk vrijgesteld: alleen wat er met reden hoort te staan valt
+           weg, al het andere blijft een fout. */
+        if (vrij && Array.isArray(vrij.alleen)) wat = wat.filter(w => !vrij.alleen.includes(w));
         if (wat.length) raak.push(tak + ' (' + wat.join(' + ') + ')');
       }
       assert.deepEqual(raak, [],

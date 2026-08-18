@@ -129,6 +129,30 @@ die zeven jaar moet blijven.
 | **Gegevens** | IP-adressen, tijdstippen, account-id's, reden van inzage. **Geen namen** -- het inzagejournaal bewaart bewust geen namen, anders was het een tweede onversleutelde kopie van de kluis |
 | **Bewaartermijn** | Beveiligingslogboek 1 jaar, inzagejournaal 2 jaar |
 
+### 9. Handelingsspoor (wie deed wat)
+
+> **Besluit van de eigenaar, 18 augustus 2026: deze verwerking mag bestaan, in
+> de vorm die hieronder staat.** Daarmee is de bouw niet langer geblokkeerd.
+>
+> Wat dat besluit NIET vervangt: een grondslag is een juridisch oordeel, en de
+> twee vetgedrukte plekken hieronder (het bredere bereik dan punt 8, en wat er
+> bij vergetelheid gebeurt) horen vóór livegang door een advocaat te worden
+> getoetst -- samen met de rest van punt 7 in `LAUNCH.md`. Dat is advies en geen
+> blokkade; het staat hier zodat het niet in een gesprek blijft hangen.
+
+| | |
+|---|---|
+| **Doel** | Kunnen navertellen wat er is gebeurd: bij een incident, bij een klacht, en bij de vraag van een betrokkene "wat is er onder mijn account gedaan" |
+| **Grondslag** | Gerechtvaardigd belang: beveiliging en verantwoording (art. 6 lid 1 f) -- dezelfde als punt 8, maar **breder van bereik**, en dat verschil hoort een jurist te wegen |
+| **Gegevens** | Tijdstip, de **pseudonieme sleutel** (`user-42`), methode, pad, statuscode, en een **hash van de aanvraag**. Geen namen, geen e-mailadressen, en **nooit de inhoud van de aanvraag zelf** -- een auditlog dat de inhoud bewaart is een tweede onversleutelde kopie van alles wat er ooit is ingevuld, op een plek die juist lang bewaard blijft |
+| **Wat het WEL zegt** | Dát er iets is gedaan, door welke sleutel, wanneer, en of twee handelingen hetzelfde verzoek waren |
+| **Wat het NIET zegt** | Wat erin stond. De hash is onomkeerbaar |
+| **Ontvangers** | RTG-backoffice. De betrokkene ziet zijn **eigen** regels in de AVG-export |
+| **Bewaartermijn** | 1 jaar, gelijk aan het beveiligingslogboek. Vastgelegd in `server/bewaarbeleid.js` (tak `handelingLog`), zodat de bewaarwacht hem telt -- een termijn die alleen hier staat, bestaat op papier en nergens anders |
+| **Bij vergetelheid** | Het spoor blijft, de sleutel blijft. Dat is een keuze: een auditspoor dat verdwijnt zodra de betrokkene erom vraagt is geen auditspoor meer. Ná wissing verwijst de sleutel naar een account dat niet meer bestaat en is de kluis leeg, dus de regel is dan onherleidbaar. **Laat juist deze afweging toetsen** -- het is de spanning tussen art. 17 (vergetelheid) en het gerechtvaardigd belang hierboven |
+| **Beveiliging** | Elke regel draagt de hash van zijn voorganger (`server/lib/keten.js`), dus wijzigen of verwijderen midden in het spoor breekt aantoonbaar. Wat dat niet tegenhoudt: het wegknippen van de nieuwste regels -- daarvoor is een extern anker nodig, en dat is nog niet in bedrijf |
+
+
 ---
 
 ## Verwerkers (art. 28) -- met wie moet een overeenkomst

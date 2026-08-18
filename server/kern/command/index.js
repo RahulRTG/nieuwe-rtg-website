@@ -67,7 +67,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      de naad lag er al, want dit zijn allemaal dingen die de ruggengraat
      GEBRUIKEN en die de ruggengraat zelf niet nodig heeft. */
   const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern });
-  const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
+  const { mdm, landpakket, apipoort, overname, zandbak, canary, uitrolregie, stadstart } = lagen;
 
   /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
      SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
@@ -152,7 +152,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, uitrolregie, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

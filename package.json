@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Rahul Travel Group, website, ledenportaal en backend",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node scripts/start.js",
     "telefoon": "RTG_LOKAAL_TLS=1 node server/trio.js",
@@ -121,7 +124,10 @@
     "sentinel:audit:verify": "node scripts/sentinel-beheer.js verify-audit",
     "sentinel:audit:recover": "node scripts/sentinel-beheer.js recover-audit",
     "start:rust": "node scripts/start-met-motor.js",
-    "prestaties": "node --experimental-sqlite scripts/prestaties.js"
+    "prestaties": "node --experimental-sqlite scripts/prestaties.js",
+    "idemschuld": "node scripts/idemschuld.js",
+    "idemschuld:vast": "node scripts/idemschuld.js --vastleggen",
+    "handelingproef": "node --experimental-sqlite scripts/handelingproef-route.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

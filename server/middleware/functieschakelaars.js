@@ -76,9 +76,17 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
       const f = functies.functieVoorPad(p);
       if (f && f.vermogen) {
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-        let gebruiker = null, tier = null;
+        let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        if (tok && !gebruiker) { try { const ses = sessionFor(tok); if (ses && ses.tier) tier = ses.tier; } catch (e) {} }
+        /* DE SESSIE ZELF WORDT BEWAARD EN NIET ALLEEN ZIJN TIER, want een
+           leverancierssessie draagt een ROL en geen tier. Toen deze laag ging
+           zwijgen tegen een onbekende beller, viel de ingelogde zaakmanager
+           daaronder: `tier` bleef null, dus hij gold als niemand en kreeg bij
+           een dichte partnerrail alleen de neutrale zin. Zwijgen tegen een
+           vreemde is de bedoeling; zwijgen tegen wie er wel degelijk hoort te
+           zijn is een verslechtering, en test/bank.test.js zag dat -- alleen
+           niet meteen, want de volledige toetsronde was toen niet gedraaid. */
+        if (tok && !gebruiker) { try { sessie = sessionFor(tok) || null; if (sessie && sessie.tier) tier = sessie.tier; } catch (e) {} }
         const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
           (tier ? functies.tierNaarDoelgroep(tier) : null);
         const raakt = doel && Array.isArray(f.doelgroepen) && f.doelgroepen.includes(doel);
@@ -100,7 +108,7 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
                voor /api/supplier, /api/staff, /api/office en /api/foundation gold
                dat niet. Zie schakelaar-antwoord.js. Blokkeren blijft blokkeren;
                alleen de uitleg gaat eraf. */
-            return res.status(503).json(antwoord.bevoegdheid(bekendeBeller(gebruiker, tier), f, oordeel));
+            return res.status(503).json(antwoord.bevoegdheid(bekendeBeller(gebruiker, tier || sessie), f, oordeel));
           }
         }
       }

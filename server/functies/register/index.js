@@ -37,6 +37,40 @@ const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));
     ' -- zet ze in CATEGORIEEN (functies/register/doelgroepen.js), anders vallen die functies van het bord');
 }
 
+/* FAIL-FAST OP EEN PAD DAT TWEE KEER WORDT GECLAIMD.
+
+   functieVoorPad() kiest de LANGSTE prefix en breekt een gelijkspel met de
+   volgorde: `len > besteLen` is strikt, dus bij twee even lange claims wint wie
+   er het eerst staat. De tweede staat dan wel op het schakelbord en schakelt
+   niets.
+
+   Dat was geen theorie. Vier paren claimden hetzelfde pad -- tg-werving naast
+   werving, en ov-arrival, ov-instant-reality en ov-rtgone naast arrival,
+   instantreality en rtgone. Samen 23 routes achter een knop die loog: wie
+   'Invisible Arrival' uitzette zag hem uitgaan terwijl alle vier de routes
+   bleven draaien. Een schakelaar die niet schakelt is erger dan een ontbrekende
+   schakelaar, want hij wekt vertrouwen.
+
+   Hier fail-fast en niet in de keuring: de keuring draait als iemand hem start,
+   dit draait bij elke serverstart. Een bord met een dode knop hoort niet op te
+   komen. */
+{
+  const perPad = new Map();
+  for (const f of FUNCTIES) {
+    for (const p of (f.paden || [])) {
+      const bij = perPad.get(p) || [];
+      bij.push(f.id);
+      perPad.set(p, bij);
+    }
+  }
+  const dubbel = [...perPad].filter(([, ids]) => ids.length > 1);
+  if (dubbel.length) {
+    throw new Error('functie-catalogus: pad(en) door meer dan een functie geclaimd: ' +
+      dubbel.map(([p, ids]) => p + ' <- ' + ids.join(' + ')).join('; ') +
+      ' -- de eerste wint en de rest schakelt niets. Geef ze een eigen pad of haal de dubbel weg.');
+  }
+}
+
 // fail-fast: een dubbele id zou stil de laatste laten winnen in OP_ID en de
 // schakelkast op de verkeerde functie laten werken; dat is eerder misgegaan
 if (Object.keys(OP_ID).length !== FUNCTIES.length) {

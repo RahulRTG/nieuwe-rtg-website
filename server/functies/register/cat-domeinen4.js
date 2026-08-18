@@ -68,12 +68,18 @@ module.exports = [
     uitleg: 'Het bijlesgesprek met de begeleider.', paden: ['/api/bijles'] },
   { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },
-  { id: 'ov-arrival', categorie: 'Diensten (leden)', naam: 'Invisible Arrival', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.', paden: ['/api/arrival'] },
-  { id: 'ov-instant-reality', categorie: 'Diensten (leden)', naam: 'Instant Reality', standaard: true, doelgroepen: ['business'],
-    uitleg: 'De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.', paden: ['/api/instant-reality'] },
-  { id: 'ov-rtgone', categorie: 'Werk (zaken en personeel)', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
-    uitleg: 'Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.', paden: ['/api/rtgone'] },
+  /* HIER STONDEN 'ov-arrival', 'ov-instant-reality' en 'ov-rtgone'. Alle drie
+     claimden een pad dat 'arrival', 'instantreality' en 'rtgone' (cat-apps) al
+     claimen, en die staan eerder in de catalogus. Bij een even lange prefix wint
+     de eerste, dus deze drie stonden wel op het bord en schakelden samen 21
+     routes niet -- veertien daarvan van RTG One. Iemand die 'Invisible Arrival'
+     uitzette, zag hem uitgaan en hij bleef gewoon draaien.
+
+     Weggehaald in plaats van hernoemd: het ID van de WERKENDE schakelaar moet
+     blijven staan, anders raakt de bewaarde stand in db.data.functies zijn
+     eigenaar kwijt. De categorieen hier ('Diensten (leden)', 'Werk') houden na
+     dit weghalen 22 en 10 functies over, dus er verdwijnt geen groep van het
+     bord. Zie de fail-fast in ./index.js. */
   { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] },
   /* De buitenpoort van RTG Mail. Deze hoort NAAR ZIJN AARD in de kast: hij is

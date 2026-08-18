@@ -80,6 +80,13 @@ Afspraken die de lus in bedwang houden:
 - **`herstel.yml` kan alleen issues schrijven.** Niet pushen, niet mergen,
   niet terugrollen, geen workflows starten. Wat de lus mag, staat in de
   `permissions:` van het bestand zelf — dat is de handhaving, geen belofte.
+- **Eén uitzondering op "mergen is mensenwerk", en hij is gesloten.**
+  `automerge.yml` merget uitsluitend Dependabot-PR's die vier sloten halen:
+  de echte bot als auteur, alleen manifest-bestanden, álle checks groen, en
+  een toegestane klasse (npm alleen patch; Actions-pins binnen dezelfde
+  major; docker patch of digest). Alles daarbuiten — élke andere PR, élke
+  minor of major — blijft bij een mens. De eigenaar heeft hier uitdrukkelijk
+  om gevraagd, na de afweging eerst te hebben afgewezen.
 
 ## De triage: waar terugrollen wél en níét helpt
 

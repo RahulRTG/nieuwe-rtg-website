@@ -237,6 +237,10 @@
       "consentVan",
       "status"
     ],
+    "inzagekaart": [
+      "inzagekaartVan",
+      "status"
+    ],
     "dagcoach": [
       "dagVoor"
     ],

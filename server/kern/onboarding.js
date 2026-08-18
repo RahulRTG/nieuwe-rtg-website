@@ -29,19 +29,7 @@ const ALLE_WIE = ['guest', 'rtg', 'lifestyle', 'business', 'rtf'];
 const PAS_WIE = ['rtg', 'lifestyle', 'business'];
 const VELD_TYPES = ['text', 'email', 'tel', 'date', 'land', 'nummer', 'kyc'];
 
-const DEFAULT_CONTRACT = `RTG-lidmaatschaps- en reisovereenkomst
-
-1. Wie u bent. U verklaart dat de gegevens die u opgeeft (naam, e-mailadres, telefoon, adres en, indien gevraagd, uw paspoort- of identiteitsgegevens) juist zijn en van uzelf. RTG mag deze verifieren.
-
-2. De pas is voor reizen. Uw RTG-pas is persoonlijk en bedoeld om via RTG te reizen en van de aangesloten partners gebruik te maken. U geeft uw pas of codenaam niet aan een ander.
-
-3. Privacy (AVG). RTG verwerkt uw gegevens, inclusief paspoortgegevens, alleen om uw lidmaatschap, reizen en veiligheid mogelijk te maken. U kunt uw gegevens inzien, corrigeren en laten verwijderen. Zie de privacyverklaring.
-
-4. Gedrag. U gebruikt het platform eerlijk en respectvol. Misbruik, fraude of het lastigvallen van anderen kan leiden tot schorsing.
-
-5. Rol van RTG. RTG is bemiddelaar tussen u en de partners; overeenkomsten over reizen en diensten komen tot stand met de betreffende partner. Betalingen lopen via de app.
-
-6. Akkoord. Door te tekenen gaat u akkoord met deze overeenkomst, de algemene voorwaarden en de privacyverklaring.`;
+const DEFAULT_CONTRACT = require('./onboarding/contract');
 
 function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   function nu() { return new Date().toISOString(); }
@@ -150,9 +138,11 @@ function maakOnboarding({ db, save, crypto, accounts, anthropic, schoon }) {
   const { status, klaar, payGate, slaOp, bewaarPaspoort, teken } = require('./onboarding/lid')(ctx);
   // het inrichten: in één keer invullen wat de gegevenspoort anders per keer vraagt
   const { inrichtStatus, inrichtOp } = require('./onboarding/inrichten')(ctx);
+  // meebouwen: het eerste Salon-bericht en het eigen bedrijf, met toestemming
+  const { meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken } = require('./onboarding/meebouwen')(ctx);
 
   return { store, standaardScope, status, klaar, payGate, slaOp, bewaarPaspoort, teken, config, zetConfig, aiPasAan, cannedVoorstel, ondertekenaars,
-    inrichtStatus, inrichtOp,
+    inrichtStatus, inrichtOp, meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken,
     ALLE_WIE, PAS_WIE, VELD_TYPES };
 }
 

@@ -100,6 +100,13 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
      poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
      data. Zie kern/onderneming/ontwerper.js. */
   anthropic, magAi }));
+/* De onboarding kan nu pas weten hoe De Salon en de bedrijvenkant heten: ze
+   worden later gebouwd dan zij. Hier gaan de haken erin, zodat het meebouwen
+   (het eerste Salon-bericht en het eigen bedrijf) echt ergens op uitkomt.
+   Bewust ZONDER `if`: raakt deze bedrading zoek, dan hoort dat bij het opstarten
+   om te vallen en niet stil een onboarding op te leveren die niets doet. */
+kern.onboarding.zetHaken({ salon: kern.salon, ondernemingNieuw: kern.ondernemingNieuw,
+  ondernemingVanEigenaar: kern.ondernemingVanEigenaar });
 /* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
    Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
    in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een

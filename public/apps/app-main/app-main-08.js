@@ -69,16 +69,16 @@
      en waar het landt staat in server/kern/onboarding/inrichten.js. */
   let onbInr = [], onbInrHuidig = null;
   async function onbInrichtenAanbod(){
-    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbKlaar(); }
-    if (!st || st.klaar || !(st.open || []).length) return onbKlaar();
+    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbMeebouwen(); }
+    if (!st || st.klaar || !(st.open || []).length) return onbMeebouwen();
     onbInr = st.open.slice(); onbStap = 'inrichten-aanbod';
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
     onbZeg(T('onb.inr.aanbod','Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Zal ik ze nu in één keer doorlopen?'));
     onbActies([{ txt: T('onb.inr.ja','Ja, nu meteen'), prim: true, doe: onbInrVolgende },
-      { txt: T('onb.inr.later','Liever later'), doe: onbKlaar }]);
+      { txt: T('onb.inr.later','Liever later'), doe: onbMeebouwen }]);
   }
   function onbInrVolgende(){
-    if (!onbInr.length) return onbKlaar();
+    if (!onbInr.length) return onbMeebouwen();
     onbInrHuidig = onbInr.shift(); onbStap = 'inrichten';
     const inp = onbEl('onbIn'), rij = onbEl('onbRij');
     if (rij) rij.style.display = '';
@@ -97,7 +97,7 @@
 
   function onbKlaar(){
     const g = onbEl('onbGate'); if (g) g.hidden = true;
-    onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null;
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null; onbMb = []; onbMbHuidig = null;
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
     naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
@@ -121,6 +121,9 @@
     } else if (onbStap === 'inrichten'){
       if (!tekst || !onbInrHuidig) return;
       return onbInrOpslaan(tekst);
+    } else if (onbStap === 'meebouw'){
+      if (!tekst || !onbMbHuidig) return;
+      return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
       if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
       onbBezig = true;

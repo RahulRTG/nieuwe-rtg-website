@@ -381,6 +381,12 @@ const EIGEN_MODULE = new Map([
   ['txindex.test.js', ['server/db/tx/index.js']],
   ['txgeld.test.js', ['server/db/tx/index.js', 'server/db/tx/collecties.js']],
   ['merge3.property.test.js', ['server/db/merge.js']],
+  /* Zelfde soort misgreep: server/db/gidsen.js is een samenvoeglaag van
+     zevenendertig regels die twee registers tot een API smeedt. Wat deze toets
+     bewaakt -- de synchrone omgekeerde cache (ledenRev) die een net actief lid
+     meteen op codenaam vindbaar maakt, ook voordat de INSERT geland is -- woont
+     in ./ledengids.js. */
+  ['ledengids-race.test.js', ['server/db/ledengids.js']],
   /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
      is sinds de samenvoeging een schil van dertig regels: twee paden, twee
      namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet

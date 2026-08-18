@@ -2342,12 +2342,11 @@
     },
     "ledengids-race.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/gidsen.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/ledengids.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "ledenladder.test.js": {
       "soort": "server",

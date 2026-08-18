@@ -414,6 +414,18 @@ gevonden en gerepareerd. Hij kwam terug omdat de LES niet meeverhuisde, alleen
 de reparatie. Vandaar dat de kanarie nu op de plek zit waar de vraag gesteld
 wordt (`vraagA`) en niet in een losse controle ernaast: er is geen weg omheen.
 
+En de dekking van diezelfde ronde kwam er niet met meer handwerk maar met
+BETER LUISTEREN. Van de 73 aanmaakroutes lukten er 20; de andere 53 zeiden bijna
+allemaal met zoveel woorden wat ze misten -- "een clip duurt 1 tot 60 seconden",
+"welk vak is het?", "minstens twee vraag-antwoordparen", "wat is de kaart- of
+ticketcode?". Die meldingen zijn de invoer voor de volgende poging, en elf
+andere routes zeiden "Log opnieuw in bij je gezin", wat geen ontbrekend RECHT
+bleek maar een andere SLEUTELVORM (gezinscode in het lijf, profieltoken in de
+header of in body.token, afhankelijk van de route). Twaalf van de 73 waren
+bovendien helemaal geen leden-routes. Een foutmelding die zegt wat er ontbreekt,
+is een handleiding; wie hem als muur leest, bouwt een proef die minder ziet dan
+hij kan.
+
 En daaronder ligt de reden dat die ronde nu ook een ZELFPROEF heeft. Drie
 pogingen om zijn scherpste controle -- ziet hij dat A iets van B heeft
 weggegooid? -- met een opzettelijk gat te beproeven sloegen alle drie af, en

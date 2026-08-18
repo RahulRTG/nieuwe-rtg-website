@@ -102,7 +102,19 @@ const KYC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJA
 const MERK_BASIS = 'ZZGLUUR';
 const maakLijf = (merk) => ({ titel: merk, naam: merk, title: merk, name: merk, tekst: merk + ' tekst', text: merk,
   omschrijving: merk, soort: 'lijst', type: 'lijst', items: [{ t: merk }], datum: '2026-09-01', date: '2026-09-01',
-  inhoud: merk, waarde: merk, label: merk, kleur: '#7F1634', aan: true, bedrag: 100, centen: 100 });
+  inhoud: merk, waarde: merk, label: merk, kleur: '#7F1634', aan: true, bedrag: 100, centen: 100,
+  /* De velden hieronder komen niet uit de duim maar uit de FOUTMELDINGEN van de
+     routes die afvielen: "een clip duurt 1 tot 60 seconden", "waarom wilt u
+     dit?", "een scene heeft minstens een apparaatstand nodig", "geef eerst een
+     onderwerp", "minstens twee vraag-antwoordparen", "welk vak is het?", "wat is
+     de kaart- of ticketcode?". Elke route die zegt wat hij mist, krijgt het. */
+  seconden: 5, duur: 5, lengte: 5, reden: merk + ' reden', waarom: merk + ' waarom',
+  onderwerp: merk, vak: 'rekenen', standen: [{ apparaat: merk, stand: 'aan' }],
+  paren: [{ vraag: merk, antwoord: merk }, { vraag: merk + '2', antwoord: merk + '2' }],
+  vragen: [{ vraag: merk, antwoord: merk }, { vraag: merk + '2', antwoord: merk + '2' }],
+  kaarten: [{ vraag: merk, antwoord: merk }, { vraag: merk + '2', antwoord: merk + '2' }],
+  personen: [merk], betrokkenen: [merk], vrienden: [merk],
+  ticketcode: merk, kaartcode: merk, barcode: merk });
 
 /* De veldnamen waaronder een identificator meegestuurd wordt. Breed, want een
    endpoint dat er een niet leest, negeert hem gewoon. */
@@ -262,12 +274,36 @@ async function main() {
      route (het Lab-fonds) het merk van B overal publiek maken, en dan is geen
      enkel stuk inhoud van B meer herkenbaar. Per route uitsluiten kan alleen als
      elk merk bij precies een route hoort. */
-  const legAan = async (tok, merkBasis) => {
+  /* ---- DE GEZINSKANT HEEFT EEN EIGEN SLEUTELVORM ----
+
+     Elf aanmaakroutes onder /api/rtf/* gaven "Log opnieuw in bij je gezin", en
+     dat bleek geen ontbrekend recht maar een andere VORM. Een gezinsroute wil
+     drie dingen tegelijk: de gezinscode in het lijf (gezinVan leest
+     req.body.code), en het profieltoken -- maar de ene route leest dat uit de
+     HEADER (tokenUit pakt de header voor het lijf) en de andere rechtstreeks uit
+     req.body.token. Wie er maar een van de drie meestuurt, komt er niet in, en
+     dat leek dan op een gesloten deur terwijl het een verkeerde sleutelbaard was.
+
+     Beide leden krijgen daarom een eigen gezin. Dat is ook horizontaal winst: A
+     probeert straks de identificatoren van B op gezinsroutes met ZIJN gezin, en
+     dat is precies de vraag of gezinnen van elkaar gescheiden zijn. */
+  const gezinPad = (pad) => /^\/api\/(rtf|school)\//.test(pad);
+  const maakGezin = async (tok, merk) => {
+    const r = await vraag('POST', '/api/foundation/gezin/maak', tok,
+      { gezinsnaam: 'Gluur ' + merk, naam: 'Ouder', pin: '4321' });
+    try { const j = JSON.parse(r.tekst); return j.token ? { token: j.token, code: j.code } : null; }
+    catch (e) { return null; }
+  };
+
+  const legAan = async (tok, merkBasis, gezin) => {
     const ids = new Set(); const bronnen = new Map(); const merken = new Map();
     for (let i = 0; i < aanmaak.length; i++) {
       const r = aanmaak[i];
       const merk = merkBasis + String(i).padStart(3, '0');
-      const res = await vraag('POST', r.pad, tok, maakLijf(merk));
+      const lijf = maakLijf(merk);
+      let sleutel = tok;
+      if (gezin && gezinPad(r.pad)) { lijf.token = gezin.token; lijf.code = gezin.code; sleutel = gezin.token; }
+      const res = await vraag('POST', r.pad, sleutel, lijf);
       if (res.status < 200 || res.status >= 300) continue;
       merken.set(merk, r.pad);
       for (const id of idsUit(res.tekst)) { ids.add(id); if (!bronnen.has(id)) bronnen.set(id, r.pad); }
@@ -276,7 +312,8 @@ async function main() {
   };
   const merkA = MERK_BASIS + 'A' + crypto.randomBytes(4).toString('hex').toUpperCase();
   const merkB = MERK_BASIS + 'B' + crypto.randomBytes(4).toString('hex').toUpperCase();
-  const bezitA = await legAan(A, merkA), bezitB = await legAan(B, merkB);
+  const gezinA = await maakGezin(A, merkA), gezinB = await maakGezin(B, merkB);
+  const bezitA = await legAan(A, merkA, gezinA), bezitB = await legAan(B, merkB, gezinB);
   /* Wat bij B verschijnt EN bij A: dat is geen bezit maar een catalogus. En het
      merk zelf telt niet als id -- dat is de echo van wat we zelf instuurden. */
   const vanB = [...bezitB.ids].filter(id => !bezitA.ids.has(id) && !id.toUpperCase().startsWith(MERK_BASIS));
@@ -359,7 +396,8 @@ async function main() {
   let passief = 0;
   for (const r of routes) {
     const pad = r.pad.replace(/:[A-Za-z_]+/g, 'x1');
-    const res = await vraagA(r.methode, pad, {});
+    const eigenGezin = gezinA && gezinPad(r.pad) ? { token: gezinA.token, code: gezinA.code } : {};
+    const res = await vraagA(r.methode, pad, eigenGezin, gezinA && gezinPad(r.pad) ? gezinA.token : null);
     if (res.status < 200 || res.status >= 300) continue;
     passief++;
     const gezien = inGedeeldeFamilie(r.pad) ? null : zietB(res.tekst, null);
@@ -385,7 +423,13 @@ async function main() {
          handvol tweede parameters die in dit huis het vaakst voorkomen. */
       const lijf = Object.assign(maakLijf(MERK_BASIS + 'PROBE'), { index: 0, af: true, aan: true, codenaam: codeA });
       for (const veld of IDVELDEN) lijf[veld] = id;
-      const res = await vraagA(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), lijf);
+      /* Op een gezinsroute gaat A's EIGEN gezin mee -- anders komt hij niet eens
+         door de deur en zegt de proef niets over de scheiding erachter. De code
+         van zijn eigen gezin overschrijft het geinjecteerde id met opzet: de
+         vraag is of hij met zijn sleutel bij de spullen van B komt. */
+      let sleutelA = null;
+      if (gezinA && gezinPad(r.pad)) { lijf.token = gezinA.token; lijf.code = gezinA.code; sleutelA = gezinA.token; }
+      const res = await vraagA(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), lijf, sleutelA);
       actief++;
       if (res.status < 200 || res.status >= 300) continue;
       const gezien = inGedeeldeFamilie(r.pad) ? null : zietB(res.tekst, id);

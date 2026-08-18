@@ -766,9 +766,9 @@ const IJKINGEN = {
   gluurGaten: {
     proef: () => {
       const g = require('../scripts/gluurronde.js');
-      const norm = { gluurGaten: 0, gluurProeven: 7908 };
-      assert.equal(g.beoordeel({ gaten: 0, proeven: 7908 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
-      const stuk = g.beoordeel({ gaten: 1, proeven: 7908 }, norm);
+      const norm = { gluurGaten: 0, gluurProeven: 9540 };
+      assert.equal(g.beoordeel({ gaten: 0, proeven: 9540 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = g.beoordeel({ gaten: 1, proeven: 9540 }, norm);
       assert.equal(stuk.zakt, true, 'een lek tegen een norm van nul hoort te zakken');
       assert.match(stuk.redenen[0], /1 lek/);
       return 1;
@@ -777,9 +777,9 @@ const IJKINGEN = {
   gluurProeven: {
     proef: () => {
       const g = require('../scripts/gluurronde.js');
-      const blind = g.beoordeel({ gaten: 0, proeven: 400 }, { gluurGaten: 0, gluurProeven: 7908 });
+      const blind = g.beoordeel({ gaten: 0, proeven: 400 }, { gluurGaten: 0, gluurProeven: 9540 });
       assert.equal(blind.zakt, true,
-        'nul lekken over 400 vragen terwijl er 7908 waren, is geen schone ronde maar een blinde');
+        'nul lekken over 400 vragen terwijl er 9540 waren, is geen schone ronde maar een blinde');
       assert.match(blind.redenen[0], /Minder beproeven is geen betere uitslag/);
       return 1;
     }

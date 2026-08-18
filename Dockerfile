@@ -22,8 +22,12 @@ FROM postgres:18-alpine AS backup-runtime
 RUN apk add --no-cache openssl
 
 # RTG / RTFoundation productie-image.
-# Node 22 (nodig voor en de ingebouwde test-runner).
-FROM node:22-slim
+# Node 26: dezelfde major als CI draait, zodat de GELEVERDE runtime ook de
+# beproefde is. node:sqlite laadt hier zonder vlag (dat is zo sinds 22.13,
+# vandaar dat --experimental-sqlite uit de hele boom is); de ondergrens staat
+# in package.json (engines) en wordt afgedwongen in server/server.js, vóór
+# het eerste require.
+FROM node:26-slim
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.

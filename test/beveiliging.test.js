@@ -149,8 +149,9 @@ test('noodrem: EEN aanvaller met zes deuren telt als EEN bron', () => {
   for (const naam of ['aap', 'noot', 'mies', 'wim', 'zus', 'jet']) {
     bev.meld('brute-force', 'kritiek', 'x', { bron: 'auth:10.0.0.9:' + naam, aanvaller: '10.0.0.9' });
   }
-  assert.notEqual(zekering(db, 'onderhoud').aan, false, 'een enkele aanvaller sluit het huis niet');
+  assert.notEqual(zekering(db, 'inlogpauze').aan, false, 'een enkele aanvaller sluit de inlog niet');
   assert.notEqual(zekering(db, 'registratie').aan, false, 'en zet de registratie ook niet dicht');
+  assert.notEqual(zekering(db, 'onderhoud').aan, false, 'en de app al helemaal niet');
 
   /* TEGENPROEF in hetzelfde huis: zes ECHTE aanvallers, met dezelfde zes
      buckets, doen het wel. Zonder deze helft zou "er springt niets" ook waar
@@ -158,7 +159,9 @@ test('noodrem: EEN aanvaller met zes deuren telt als EEN bron', () => {
   for (let i = 1; i <= 6; i++) {
     bev.meld('brute-force', 'kritiek', 'x', { bron: 'auth:203.0.113.' + i + ':aap', aanvaller: '203.0.113.' + i });
   }
-  assert.equal(zekering(db, 'onderhoud').aan, false, 'zes verdeelde bronnen horen de app wel op slot te zetten');
+  assert.equal(zekering(db, 'inlogpauze').aan, false, 'zes verdeelde bronnen horen de inlog wel te pauzeren');
+  assert.notEqual(zekering(db, 'onderhoud').aan, false,
+    'maar ook dan blijft de app open: de onderhoudsstand is van de eigenaar (zie de ladder)');
 });
 
 test('noodrem: zonder aanvaller valt hij terug op de oude, schrikachtige maat', () => {
@@ -168,7 +171,7 @@ test('noodrem: zonder aanvaller valt hij terug op de oude, schrikachtige maat', 
      server/server.js zegt er hoorbaar bij dat het gebeurde. */
   const { db, bev } = opzet();
   for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'deur' + i });
-  assert.equal(zekering(db, 'onderhoud').aan, false, 'zonder bron telt elke deur nog als aparte bron');
+  assert.equal(zekering(db, 'inlogpauze').aan, false, 'zonder bron telt elke deur nog als aparte bron');
 });
 
 test('noodrem: uitgezet door de eigenaar -> er springt niets', () => {

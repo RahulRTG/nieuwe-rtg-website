@@ -293,6 +293,12 @@
         <span class="stil" id="kKantineStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
     </div>
+    <!-- de reisbalie: alleen in de kamer 'reisbureau' -->
+    <div class="kaart" id="kReisbureau" hidden>
+      <h4 style="margin:0 0 .4rem;">Aanvragen bevestigen</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
+      <div id="kReisOpen"><div class="leeg">Laden...</div></div>
+    </div>
     <div class="kaart" id="kZelfzorg" hidden>
       <h4 style="margin:0 0 .4rem;">De zelfzorg van het platform</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
@@ -1157,6 +1163,9 @@ async function openKamer(id){
   // de identiteitskluis alleen voor kamers die klanten bij naam moeten kennen
   $('#kKluis').hidden = !d.naamInzage;
   $('#kKluisUit').textContent = '';
+  // de reisbalie: hier wordt een aanvraag pas een toezegging
+  $('#kReisbureau').hidden = (id !== 'reisbureau');
+  if (id === 'reisbureau') laadReisbalie();
   // de kantine mag de kaart van vandaag zetten
   $('#kKantine').hidden = (id !== 'kantine');
   if (id === 'kantine') api('kantine/menu').then(r => {
@@ -1173,6 +1182,41 @@ async function openKamer(id){
   // en elke afdeling heeft haar eigen huis
   $('#kHotel').hidden = false;
   laadAfdHotel(id, d.naam);
+}
+
+/* DE REISBALIE. De aanvragen staan op codenaam; de echte naam haalt u zo nodig
+   uit de identiteitskluis hierboven, en die opvraging komt in het auditlog.
+   Bevestigen en afwijzen lopen allebei over /api/office/reisbureau/besluit --
+   een knop die alleen maar 'bevestigd' meestuurt zou een typefout in een
+   toezegging veranderen, dus de stand staat op de knop en de server keurt hem. */
+async function laadReisbalie(){
+  const el = $('#kReisOpen');
+  el.innerHTML = '<div class="leeg">Laden...</div>';
+  let d; try { d = await api('reisbureau'); } catch(e){ el.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
+  if (!open.length){ el.innerHTML = '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>'; return; }
+  el.innerHTML = open.map(a =>
+    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+      '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
+      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
+        esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
+        ' · '+esc(a.codename||'lid')+(a.prijs ? ' · \u20ac '+esc(String(a.prijs.totaal)) : '')+
+        (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>'+
+      '<div class="taakrij">'+
+        '<input class="veld" style="flex:1;" maxlength="300" data-bericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
+        '<button class="knop" type="button" data-besluit="bevestigd" data-ref="'+esc(a.ref)+'">Bevestig</button>'+
+        '<button class="knop stil" type="button" data-besluit="afgewezen" data-ref="'+esc(a.ref)+'">Wijs af</button>'+
+      '</div>'+
+    '</div>').join('');
+  el.querySelectorAll('button[data-besluit]').forEach(b => b.addEventListener('click', async () => {
+    const veld = el.querySelector('input[data-bericht="'+b.dataset.ref+'"]');
+    b.disabled = true;
+    try {
+      await api('reisbureau/besluit', { ref: b.dataset.ref, besluit: b.dataset.besluit, bericht: veld ? veld.value : '' });
+      meld(b.dataset.besluit === 'bevestigd' ? 'Bevestigd. Het lid ziet het meteen staan.' : 'Afgewezen, met uw reden erbij.');
+      openKamer('reisbureau');
+    } catch(e){ b.disabled = false; meld(e.message); }
+  }));
 }
 
 function geld(centen){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format((Number(centen)||0)/100); }

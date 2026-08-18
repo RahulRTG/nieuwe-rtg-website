@@ -54,6 +54,22 @@ module.exports = (kern) => {
 
   // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
   app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+  /* Het besluit van de reisadviseur: hier wordt "aangevraagd" pas iets anders.
+     WIE beslist komt uit de sessie en niet uit de body -- precies de reden die
+     hierboven bij de identiteitskluis staat: een spoor dat de aanvrager zelf
+     invult is geen spoor. Anoniem binnengekomen op de gedeelde kantoorcode? Dan
+     staat dat er ook zo bij, in plaats van een verzonnen adviseursnaam.
+     Het besluit gaat ook het kantoor-auditlog in: een reis bevestigen is een
+     toezegging aan een lid, en die hoort navraagbaar te zijn. */
+  app.post('/api/office/reisbureau/besluit', officeAuth, async (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    const stand = String(req.body.besluit || '');
+    try {
+      const r = await kern.reisbureau.besluit(req.body.ref, stand, wie, req.body.bericht);
+      if (r.ok) afdelingen.audit(wie, 'Reisbureau: aanvraag ' + r.aanvraag.ref + ' ' + r.aanvraag.status + ' (' + r.aanvraag.titel + ')');
+      stuur(res, r);
+    } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
      WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
      de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van

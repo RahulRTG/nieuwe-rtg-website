@@ -3,7 +3,9 @@
    maar tegen de nettoprijs zonder opslag), en vragen een reis aan. De aanvraag
    landt bij een RTG-reisadviseur, die de datum bevestigt en de losse onderdelen
    (verblijf, transfers, tafels) regelt. Nooit de belofte dat iets al geboekt is:
-   een aanvraag heet "aangevraagd" tot een mens hem bevestigt.
+   een aanvraag heet "aangevraagd" tot een mens hem bevestigt. Die mens zit in de
+   kamer Reisbureau van het RTG-kantoor en drukt op `besluit` (onderaan); zonder
+   die kamer was dit een belofte zonder iemand die hem kon waarmaken.
 
    Geen echte lucht-/hotelmerken als bevestigde partners. Prijzen in euro.
    Volgt het vaste kern-patroon maakReisbureau(state). */
@@ -29,6 +31,11 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
 
   const reizen = () => reisAanbod(db);
+  /* Het lokale reisadvies woont apart (./reisbureau-advies.js): het is de enige
+     laag hier die niets met de aanvraag doet -- hij LEEST alleen de catalogus en
+     rangschikt hem. Het draait op dezelfde `reizen()`, zodat er geen tweede
+     projectie van de prijs ontstaat (LAT-regel 4). */
+  const { advies } = require('./reisbureau-advies')({ reizen });
 
   function overzicht() {
     const lijst = reizen();
@@ -67,8 +74,17 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     return { ok: true, aanvraag: entry, visumtaak: taak };
   }
 
+  /* WAT HET LID VAN EEN BESLUIT ZIET: de stand, wanneer het genomen is en het
+     bericht van de adviseur -- niet WIE er in het kantoor op de knop drukte.
+     Die naam is een interne sleutel (`user-3`, of "backoffice (gedeelde code)")
+     en hoort in het kantoor te blijven; het lid heeft aan een mens met een
+     bericht genoeg. Het besluit zelf staat wel op de aanvraag, want het kantoor
+     leest dezelfde rij. */
   function mijn(key) {
-    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50);
+    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50)
+      .map(a => a.besluit
+        ? Object.assign({}, a, { besluit: { at: a.besluit.at, bericht: a.besluit.bericht } })
+        : a);
   }
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
@@ -85,50 +101,52 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     return { ok: true, aanvraag: a };
   }
 
-  /* Lokaal reisadvies: het lid vertelt in vrije tekst wat het zoekt. Een
-     uitlegbare score wijst de best passende reis uit de bestaande catalogus
-     aan en toont de woorden waarop de overeenkomst berust. */
-  function regelRangschik(wens) {
-    const lijst = reizen();
-    if (!lijst.length) return null;
-    const w = String(wens || '').toLowerCase();
-    const woorden = [...new Set(w.split(/[^a-z0-9à-ÿ]+/).filter(x => x.length > 2))];
-    const stop = new Set(['een', 'het', 'die', 'dat', 'met', 'voor', 'naar', 'van', 'zoek', 'willen', 'graag', 'reis']);
-    const intenties = [
-      ['rust', ['rust', 'stilte', 'rustig', 'natuur', 'wandelen', 'bergen']],
-      ['zon', ['zon', 'strand', 'zee', 'warm', 'zwemmen', 'kust']],
-      ['cultuur', ['cultuur', 'kunst', 'museum', 'historie', 'stad', 'architectuur']],
-      ['culinair', ['culinair', 'eten', 'restaurant', 'wijn', 'keuken', 'proeven']],
-      ['avontuur', ['avontuur', 'actief', 'hiken', 'surfen', 'safari', 'duiken']]
-    ];
-    const uitgebreid = new Set(woorden.filter(x => !stop.has(x)));
-    for (const [, groep] of intenties) if (groep.some(x => uitgebreid.has(x))) for (const x of groep) uitgebreid.add(x);
-    let beste = lijst[0], score = -1, treffers = [];
-    for (const r of lijst) {
-      const hooi = ((r.bestemming || '') + ' ' + (r.titel || '') + ' ' + (r.omschrijving || '') + ' ' + (r.inbegrepen || []).join(' ')).toLowerCase();
-      const raak = [...uitgebreid].filter(woord => hooi.includes(woord));
-      const s = raak.length;
-      if (s > score) { score = s; beste = r; treffers = raak; }
-    }
-    return { reis: beste, score, treffers: treffers.slice(0, 4) };
-  }
-  async function advies(wens) {
-    const lijst = reizen();
-    if (!lijst.length) return { status: 404, error: 'Er staan nu geen reizen klaar.' };
-    const val = regelRangschik(wens);
-    const reden = val.treffers.length
-      ? 'Deze reis sluit aan op ' + val.treffers.join(', ') + '.'
-      : 'Er is geen sterke inhoudelijke match; dit is het eerste beschikbare voorstel om mee te vergelijken.';
-    return { ok: true, reis: val.reis, reden, bron: 'regel', ai: false,
-      onderbouwing: { score: val.score, treffers: val.treffers } };
-  }
-
   // het reisbureau-kantoor: de openstaande aanvragen (codenamen, nooit echte namen)
   function aanvragen() {
     return { ok: true, aanvragen: (db.data.reisAanvragen || []).slice(0, 200) };
   }
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen } };
+  /* HET BESLUIT VAN DE REISADVISEUR -- de stap die hier tot vandaag ontbrak.
+     Bovenaan dit bestand staat: een aanvraag heet "aangevraagd" tot een mens
+     hem bevestigt. Dat was een belofte zonder mens: `boek` zette de stand op
+     "aangevraagd", `annuleer` kon hem namens het lid op "geannuleerd" zetten,
+     en verder kon niemand er iets aan doen. De rest van het platform rekende er
+     wel al op -- de reisagenda laat alleen "aangevraagd" en "bevestigd" op de
+     dagen zien (kern/ervaring/leden/spaarpot.js) en de reiswereld heeft voor
+     "bevestigd" en "afgewezen" allang een teken en een signaal klaarliggen
+     (kern/reiswereld.js). Vandaar deze twee woorden en geen eigen vocabulaire:
+     de betekenis van een stand woont daar, niet hier (LAT-regel 4).
+
+     WIE beslist komt van de aanroeper uit de SESSIE en niet uit het verzoek;
+     zie de kop van routes/kantoren/index.js bij de identiteitskluis. Een naam
+     die de aanvrager zelf invult is geen naam.
+
+     Afwijzen kan alleen met een reden. Een lid dat "afgewezen" leest zonder te
+     weten waarom, belt -- en dan is de balie alsnog aan zet, maar nu met een
+     boos lid. Bevestigen mag zonder bericht: de bevestiging IS het bericht. */
+  async function besluit(ref, stand, door, bericht) {
+    if (stand !== 'bevestigd' && stand !== 'afgewezen')
+      return { status: 400, error: 'Een reisaanvraag wordt bevestigd of afgewezen; een andere uitkomst kent het reisbureau niet.' };
+    const wie = String(door || '').replace(/[<>]/g, '').trim().slice(0, 60);
+    if (!wie) return { status: 400, error: 'Een besluit zonder naam eronder is geen besluit.' };
+    const a = (db.data.reisAanvragen || []).find(x => x.ref === String(ref || '').trim());
+    if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
+    if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
+    const tekst = String(bericht || '').replace(/[<>]/g, '').trim().slice(0, 300);
+    if (stand === 'afgewezen' && !tekst)
+      return { status: 400, error: 'Afwijzen kan alleen met een reden voor het lid.' };
+    a.status = stand;
+    a.besluit = { door: wie, at: nu(), bericht: tekst || null };
+    save();
+    /* Een afgewezen reis gaat niet door, dus de visumtaak eromheen ook niet --
+       dezelfde redenering als bij een ingetrokken aanvraag: een taak voor een
+       reis die niet doorgaat is ruis in de agenda. Bij een bevestiging blijft
+       de taak juist staan; die wordt vanaf nu pas echt urgent. */
+    if (stand === 'afgewezen') { const vt = visum(); if (vt) await vt.bijAnnulering(a.customerKey, a.ref); }
+    return { ok: true, aanvraag: a };
+  }
+
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, besluit } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

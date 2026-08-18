@@ -144,14 +144,25 @@ async function laad(){
   $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
   laadMijn();
 }
+/* MIJN AANVRAGEN -- en met opzet niet alleen de open aanvragen. Zolang alleen
+   "aangevraagd" hier stond, verdween een reis uit beeld op het moment dat de
+   reisadviseur hem bevestigde: precies het bericht waar je op wacht, en juist
+   dat viel weg. Nu blijft elke aanvraag staan met zijn stand erbij, en het
+   bericht van de adviseur eronder. Annuleren kan alleen zolang er nog geen
+   besluit ligt; daarna gaat het via de adviseur, want er is dan iets geregeld. */
 async function laadMijn(){
   let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){ return; }
-  const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
-  if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
+  const rijen = (d.aanvragen||[]).slice(0, 8);
+  if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
+  const kleur = { bevestigd: 'var(--green)', afgewezen: 'var(--burgundy)' };
   $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn aanvragen</h2>'+
-    open.map(a => '<div class="reis" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
-      '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+a.personen+' pers · aangevraagd</span></div>'+
-      '<button class="knop" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Annuleer</button>'+
+    rijen.map(a => '<div class="reis" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;gap:1rem;">'+
+      '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+a.personen+' pers · <span style="color:'+(kleur[a.status]||'var(--soft)')+';">'+esc(a.status)+'</span></span>'+
+      (a.besluit && a.besluit.bericht ? '<span class="tag" style="display:block;margin-top:.3rem;">'+esc(a.besluit.bericht)+'</span>' : '')+
+      (a.status === 'aangevraagd' ? '<span class="tag" style="display:block;margin-top:.3rem;">Een RTG-reisadviseur bevestigt de datum en stelt de reis samen.</span>' : '')+'</div>'+
+      (a.status === 'aangevraagd'
+        ? '<button class="knop" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Annuleer</button>'
+        : '')+
     '</div>').join('');
   $('#mijnWrap').querySelectorAll('button[data-ref]').forEach(b => b.addEventListener('click', async () => {
     try { await api('/api/reisbureau/annuleer', { ref: b.dataset.ref }); meld('Aanvraag ingetrokken.'); laadMijn(); } catch(e){ meld(e.message); }

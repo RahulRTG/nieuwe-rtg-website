@@ -784,6 +784,22 @@ const IJKINGEN = {
       return 1;
     }
   },
+  gluurOnbewaakt: {
+    proef: () => {
+      /* Een aanmaakroute waarvan het resultaat nergens te lezen is, is geen lek
+         maar een blinde vlek: een schrijflek erop blijft onzichtbaar. De meter
+         hoort dus uit te slaan op een ONVERKLAARDE blinde vlek, en niet op een
+         ronde die er geen heeft. */
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurGecontroleerd: 2417, gluurOnbewaakt: 0 };
+      assert.equal(g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 0 }, norm).zakt, false,
+        'een ronde zonder onverklaarde blinde vlek hoort niet te zakken');
+      const blind = g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 1 }, norm);
+      assert.equal(blind.zakt, true, 'een nieuwe aanmaakroute zonder lezer en zonder reden hoort te zakken');
+      assert.match(blind.redenen[0], /zonder lezer en zonder reden/);
+      return 1;
+    }
+  },
   rolscheidingGaten: {
     proef: () => {
       const rol = require('../scripts/rolronde.js');

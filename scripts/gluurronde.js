@@ -99,6 +99,14 @@ const RICHTING = 'omlaag';           // een plafond: meer lekken is slechter
    niet mee met hoe zuinig de ronde zijn verzoeken doet. */
 const METER_N = 'gluurGecontroleerd';
 const RICHTING_N = 'omhoog';         // een vloer: minder nakijken is slechter
+/* `gluurOnbewaakt` telt de aanmaakroutes waarvan het resultaat door geen enkele
+   leesroute wordt getoond en waarvoor ook geen reden is opgeschreven. Zo'n route
+   is geen lek maar een BLINDE VLEK: wat B nooit kan opvragen, kan hij ook niet
+   missen, dus een schrijflek erop blijft onzichtbaar. Nul, en wie een nieuwe
+   aanmaakroute zonder lezer bouwt, geeft hem er een of schrijft in
+   ONGELEZEN_BEDOELD op waarom die er niet is. */
+const METER_O = 'gluurOnbewaakt';
+const RICHTING_O = 'omlaag';         // een plafond: meer blinde vlekken is slechter
 const UITSLAGBESTAND = path.join(WORTEL, 'GLUURRONDE.json');
 
 const NIET_KLOPPEN = /\/api\/(sse|stream|live-)|\/sse|\/stream|\/api\/test\/|\/api\/cluster\//;
@@ -131,7 +139,7 @@ const maakLijf = (merk) => ({ titel: merk, naam: merk, title: merk, name: merk, 
 
 /* De veldnamen waaronder een identificator meegestuurd wordt. Breed, want een
    endpoint dat er een niet leest, negeert hem gewoon. */
-const IDVELDEN = ['id', 'ref', 'code', 'sleutel', 'key', 'nummer', 'uuid'];
+const IDVELDEN = ['id', 'ref', 'code', 'sleutel', 'key', 'nummer', 'uuid', 'kamercode'];
 
 /* WAT EEN LID AANLEGT IS NIET ALTIJD PRIVE, en dat is geen uitzondering maar
    een soort. Deze ronde vond bij de eerste echte draai een "lek" op
@@ -179,6 +187,28 @@ const GEDEELD_BEDOELD = new Map([
    spullen van die route -- maar deelnemers die elkaar zien is precies wat een
    samen-sessie IS. Wie de code deelt, deelt het gezelschap. De inhoudscontrole
    slaat dus /api/samen/* over, en de vernielingscontrole niet. */
+
+/* AANMAAKROUTES WAARVAN HET RESULTAAT BEWUST NERGENS TE LEZEN IS.
+
+   De ronde kijkt of B zijn eigen spullen terugvindt; wat hij nooit kan opvragen,
+   kan hij ook niet missen, en een schrijflek daarop blijft dus onzichtbaar
+   (TAKEN.md 4.16). Bij de eerste meting bleven negen aanmaakroutes over waarvan
+   geen enkele leesroute het resultaat toonde. ACHT daarvan bleken wél een lezer
+   te hebben -- die werd alleen niet bereikt, omdat de opname elke route met een
+   leeg lijf aanriep terwijl een gezinsroute een gezinsreferentie wil en een
+   detailroute het identificator zelf. Dat is hieronder gerepareerd.
+
+   Wat overblijft staat hier MET REDEN, net als bij GEDEELD_BEDOELD. Een nieuwe
+   aanmaakroute zonder lezer die hier niet in staat, laat de meter
+   `gluurOnbewaakt` stijgen en zakt de ronde. Dat is de goede kant om fout te
+   staan: luid, en niet als stille regel in een filter. */
+const ONGELEZEN_BEDOELD = new Map([
+  ['/api/concern/nieuw', 'een concerngroep is een indeling, geen ding: hij wordt zichtbaar via ' +
+    '/api/concern/boom zodra er een entiteit in hangt, en een lege groep staat op geen enkele lijst. ' +
+    'De ronde hangt er niets in, dus zij ziet hem niet. Nagelopen op 18 augustus 2026, en het is bij ' +
+    'die controle wel wat anders opgeleverd: het HANGEN zelf keek niet of de groep van de aanvrager ' +
+    'was (gerepareerd in server/kern/concern/graaf.js, toets in test/concern.test.js).']
+]);
 
 /* ---------------------------------------------------------------- het vragen */
 const agent = new http.Agent({ keepAlive: true, maxSockets: 32 });
@@ -235,6 +265,10 @@ function beoordeel(uitslag, normMeters) {
   if (vloer !== undefined && uitslag.gecontroleerd < vloer)
     redenen.push('De gluurronde keek ' + uitslag.gecontroleerd + ' dingen na tegen een norm van ' + vloer +
       '. Minder nakijken is geen betere uitslag.');
+  const blind = normMeters ? normMeters[METER_O] : undefined;
+  if (blind !== undefined && uitslag.onbewaakt > blind)
+    redenen.push('De gluurronde vond ' + uitslag.onbewaakt + ' aanmaakroute(s) zonder lezer en zonder reden, ' +
+      'tegen een norm van ' + blind + '. Geef de route een leesroute, of zet in ONGELEZEN_BEDOELD waarom die er niet is.');
   return { zakt: redenen.length > 0, redenen };
 }
 
@@ -342,8 +376,22 @@ async function main() {
     catch (e) { return null; }
   };
 
+  /* WAT DE AANMAAKROUTE TERUGGAF, WORDT BEWAARD -- want de lezer wil het vaak
+     terug. /api/les/leraar geeft de les alleen aan wie zowel de klascode als de
+     leraarssleutel meestuurt, en die twee staan naast elkaar in het antwoord op
+     /api/les/maak. Alleen het identificator meesturen is dan te weinig, en de
+     les leek daardoor onleesbaar terwijl haar lezer er gewoon is. De vlakke
+     tekstvelden zijn genoeg: geneste objecten zijn de inhoud, niet de sleutel. */
+  const vlakkeVelden = (tekst) => {
+    let j = null; try { j = JSON.parse(tekst); } catch (e) { return {}; }
+    if (!j || typeof j !== 'object') return {};
+    const uit = {};
+    for (const [k, v] of Object.entries(j)) if (typeof v === 'string' && v.length <= 128) uit[k] = v;
+    return uit;
+  };
   const legAan = async (tok, merkBasis, gezin) => {
     const ids = new Set(); const bronnen = new Map(); const merken = new Map();
+    const stukken = new Map(); const antwoorden = new Map();
     for (let i = 0; i < aanmaak.length; i++) {
       const r = aanmaak[i];
       const merk = merkBasis + String(i).padStart(3, '0');
@@ -353,9 +401,15 @@ async function main() {
       const res = await vraag('POST', r.pad, sleutel, lijf);
       if (res.status < 200 || res.status >= 300) continue;
       merken.set(merk, r.pad);
-      for (const id of idsUit(res.tekst)) { ids.add(id); if (!bronnen.has(id)) bronnen.set(id, r.pad); }
+      antwoorden.set(r.pad, vlakkeVelden(res.tekst));
+      for (const id of idsUit(res.tekst)) {
+        ids.add(id);
+        if (!bronnen.has(id)) bronnen.set(id, r.pad);
+        if (!stukken.has(r.pad)) stukken.set(r.pad, []);
+        stukken.get(r.pad).push(id);
+      }
     }
-    return { ids, bronnen, merken };
+    return { ids, bronnen, merken, stukken, antwoorden };
   };
   const merkA = MERK_BASIS + 'A' + crypto.randomBytes(4).toString('hex').toUpperCase();
   const merkB = MERK_BASIS + 'B' + crypto.randomBytes(4).toString('hex').toUpperCase();
@@ -418,10 +472,19 @@ async function main() {
   const families = new Set([...bezitB.bronnen.values()].map(familieVan));
   const leesRoutes = routes.filter(r => !r.pad.startsWith('/api/auth/') && !MUTEERT.test(r.pad)
     && (LEZER.test(r.pad) || [...families].some(f => r.pad === f || r.pad.startsWith(f + '/'))));
+  /* EN DE OPNAME NEEMT DE GEZINSREFERENTIE MEE. Een lege body op /api/rtf/* is
+     geen vraag maar een dichte deur: gezinVan leest de gezinscode uit het lijf.
+     Vier van de negen "onbewaakte" aanmaakroutes hadden hun lezer gewoon naast
+     zich staan (/api/rtf/baby/boek, /api/rtf/kantoorpakket/mijn,
+     /api/rtf/tiener/toetsen, /api/rtf/leren/projecten) -- de opname klopte
+     alleen zonder sleutel aan. Dat is dezelfde les als bij het AANLEGGEN, waar
+     de gezinsvorm al werd meegestuurd; hij was hier niet meeverhuisd. */
+  const gezinLijf = (pad, extra) => Object.assign({}, extra,
+    gezinB && gezinPad(pad) ? { token: gezinB.token, code: gezinB.code } : {});
   const momentopname = async (merk) => {
     const uit = []; const status = new Map();
     for (const r of leesRoutes) {
-      const res = await vraagB(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), {});
+      const res = await vraagB(r.methode, r.pad.replace(/:[A-Za-z_]+/g, 'x1'), gezinLijf(r.pad));
       status.set(res.status, (status.get(res.status) || 0) + 1);
       if (res.status >= 200 && res.status < 300) uit.push(res.tekst);
     }
@@ -431,14 +494,70 @@ async function main() {
   };
   const opnameVooraf = await momentopname('vooraf');
   console.log('  ' + K.grijs + leesRoutes.length + ' leesachtige routes in de momentopname (van ' + routes.length + ')' + K.reset);
-  const vindbaarVooraf = vanB.filter(id => opnameVooraf.includes(id));
+
+  /* ---------- de gerichte tweede blik ----------
+     Een opname met een leeg lijf vindt alleen wat op een LIJST staat. Een stuk
+     dat je bij naam moet opvragen -- /api/rtf/leren/project-staat,
+     /api/rtf/samen/staat, /api/samen/staat -- valt er dus buiten, en viel
+     daarmee ook buiten de bewaking. Voor precies die stukken wordt hier nog
+     eenmaal gericht gevraagd: in de BUURT van de aanmaakroute (het pad zonder
+     zijn laatste segment, dus /api/rtf/leren voor project-maak), met het
+     identificator onder elke gangbare veldnaam, met de vlakke velden uit het
+     aanmaakantwoord, en met de gezinsreferentie waar die hoort.
+
+     Echte lezers eerst, en dat is geen kosmetiek: /api/samen/muziek antwoordt
+     ook met de kamercode, maar dat is een zetroute. Wie de eerste de beste
+     treffer onthoudt, onthoudt straks een muterende route als "de plek waar B
+     zijn spullen terugvindt", en de controle achteraf schrijft dan waar zij
+     hoort te lezen.
+
+     De vondst wordt onthouden, want de controle achteraf hoeft dan maar EEN
+     vraag te stellen in plaats van de buurt opnieuw af te lopen. Een ronde die
+     de snelheidsrem uitlokt meet de rem, en niet de scheiding. */
+  const buurtVan = (pad) => String(pad || '').replace(/\/[^/]+$/, '');
+  const gerichtePlek = new Map();
+  const gerichtVragen = async (id, plek) => {
+    const bron = bezitB.bronnen.get(id);
+    const lijf = Object.assign({}, bezitB.antwoorden.get(bron) || {});
+    for (const veld of IDVELDEN) lijf[veld] = id;
+    const res = await vraagB(plek.methode, plek.pad, gezinLijf(plek.pad, lijf));
+    return res.status >= 200 && res.status < 300 && res.tekst.includes(id);
+  };
+  const zoekGericht = async (id) => {
+    const buurt = buurtVan(bezitB.bronnen.get(id));
+    if (!buurt) return false;
+    const buren = routes.filter(r => !MUTEERT.test(r.pad) && r.pad.startsWith(buurt + '/'))
+      .sort((a, b) => (LEZER.test(b.pad) ? 1 : 0) - (LEZER.test(a.pad) ? 1 : 0));
+    for (const plek of buren) {
+      if (await gerichtVragen(id, plek)) { gerichtePlek.set(id, plek); return true; }
+    }
+    return false;
+  };
+  const uitOpname = vanB.filter(id => opnameVooraf.includes(id));
+  const gerichtGevonden = [];
+  for (const id of vanB) {
+    if (uitOpname.includes(id)) continue;
+    if (await zoekGericht(id)) gerichtGevonden.push(id);
+  }
+  const vindbaarVooraf = uitOpname.concat(gerichtGevonden);
+  if (gerichtGevonden.length) console.log('  ' + K.grijs + 'gericht nagevraagd: ' + gerichtGevonden.length +
+    ' stuk(ken) die niet op een lijst staan maar wel bij naam op te vragen zijn' + K.reset);
   /* WAT NIET BEWAAKT WORDT, MET NAAM. Een getal ("15 van de 27") laat zich
      lezen als een detail; de lijst laat zien welke aanmaakroutes iets opleveren
      dat daarna door geen enkele leesroute meer wordt getoond. Dat is geen lek --
      maar wat B nooit kan opvragen, kan hij ook niet missen, en een schrijflek
      daarop blijft dus onzichtbaar. Het hoort zichtbaar te zijn, niet weggeteld. */
-  const onbewaakt = vanB.filter(id => !vindbaarVooraf.includes(id))
-    .map(id => bezitB.bronnen.get(id)).filter((v, i, a) => a.indexOf(v) === i);
+  /* PER ROUTE EN NIET PER IDENTIFICATOR, want een antwoord draagt er vaak meer
+     dan een. /api/muziek/maak geeft een track met vier kanalen terug, elk met
+     een eigen id; /api/muziek/mijn toont de track en van de kanalen alleen het
+     aantal. Op identificatorniveau heet dat vier onbewaakte stukken, terwijl
+     wat de route OPLEVERT gewoon op een lijst staat. De vraag is of het
+     resultaat van de route ergens te zien is, en het antwoord is ja zodra een
+     van zijn identificatoren wordt getoond. */
+  const onbewaakt = [...bezitB.stukken.keys()]
+    .filter(pad => (bezitB.stukken.get(pad) || []).some(id => vanB.includes(id)))
+    .filter(pad => !(bezitB.stukken.get(pad) || []).some(id => vindbaarVooraf.includes(id)));
+  const onbewaaktOnverklaard = onbewaakt.filter(pad => !ONGELEZEN_BEDOELD.has(pad));
   console.log('  ' + K.grijs + 'nulmeting: B vindt ' + vindbaarVooraf.length + ' van zijn ' + vanB.length +
     ' stukken zelf terug' + (herstelB ? '; de sessie van B is ' + herstelB + ' keer hersteld' : '') + K.reset);
 
@@ -467,7 +586,12 @@ async function main() {
       if (!weghaler) continue;
       const lijf = {}; for (const veld of IDVELDEN) lijf[veld] = id;
       const res = await vraagB(weghaler.methode, weghaler.pad, lijf);
-      if (res.status >= 200 && res.status < 300 && !(await momentopname('zelfproef')).includes(id)) { zelfproefId = id; break; }
+      if (res.status < 200 || res.status >= 300) continue;
+      /* Op dezelfde plek terugkijken als waar het stuk gevonden is -- een stuk
+         dat alleen bij naam op te vragen was, staat ook nu niet op een lijst. */
+      const plek = gerichtePlek.get(id);
+      const weg = plek ? !(await gerichtVragen(id, plek)) : !(await momentopname('zelfproef')).includes(id);
+      if (weg) { zelfproefId = id; break; }
     }
     console.log('  ' + (zelfproefId
       ? K.geel + 'ZELFPROEF: B heeft ' + zelfproefId + ' zelf weggegooid; de controle hoort hem als kwijt te melden' + K.reset
@@ -485,8 +609,12 @@ async function main() {
     [familieVan(pad)].concat((regel && regel.toont) || []));
   const inGedeeldeFamilie = (pad) => gedeeldeFamilies.some(f => pad.startsWith(f + '/') || pad === f);
   const merkersVanB = new Set(priveIds.concat(codeB ? [codeB] : []).concat(priveMerken));
-  if (onbewaakt.length) console.log('  ' + K.geel + onbewaakt.length + ' aanmaakroute(s) leveren iets op dat geen enkele leesroute toont' + K.reset
-    + K.grijs + ': ' + onbewaakt.slice(0, 8).join(', ') + (onbewaakt.length > 8 ? ' ...' : '') + K.reset);
+  for (const pad of onbewaakt.filter(p => ONGELEZEN_BEDOELD.has(p)))
+    console.log('  ' + K.grijs + 'geen lezer, met reden: ' + pad + ' -- ' +
+      String(ONGELEZEN_BEDOELD.get(pad)).split('.')[0] + '.' + K.reset);
+  if (onbewaaktOnverklaard.length) console.log('  ' + K.geel + onbewaaktOnverklaard.length +
+    ' aanmaakroute(s) leveren iets op dat geen enkele leesroute toont, zonder opgegeven reden' + K.reset
+    + K.grijs + ': ' + onbewaaktOnverklaard.slice(0, 8).join(', ') + (onbewaaktOnverklaard.length > 8 ? ' ...' : '') + K.reset);
   console.log('  ' + K.grijs + 'waarvan ' + (vanB.length - priveIds.length) +
     ' uit routes die met opzet delen; die tellen niet voor de inhoud, wel voor de vernieling' + K.reset);
 
@@ -550,7 +678,12 @@ async function main() {
   const opnameNa = await momentopname('achteraf');
   const kwijt = [];
   for (const id of vindbaarVooraf) {
-    const gevonden = opnameNa.includes(id);
+    /* Wie vooraf alleen bij naam te vinden was, wordt achteraf ook bij naam
+       gevraagd -- en op DEZELFDE plek. Anders heet elk stuk dat niet op een
+       lijst staat na afloop kwijt, en meldt deze ronde vernieling waar alleen
+       verkeerd gekeken is. */
+    const plek = gerichtePlek.get(id);
+    const gevonden = plek ? await gerichtVragen(id, plek) : opnameNa.includes(id);
     if (!gevonden) {
       kwijt.push(id);
       gaten.push({ soort: 'weg', route: bezitB.bronnen.get(id) || '?', marker: id,
@@ -576,18 +709,20 @@ async function main() {
   /* Wat er is NAGEKEKEN: elk endpoint dat A antwoordde, elke vraag met een teken
      van B, en elk stuk dat tegen vernieling bewaakt wordt. */
   const gecontroleerd = passief + actief + vindbaarVooraf.length;
-  const uitslag = { gaten: gaten.length, gecontroleerd };
+  const uitslag = { gaten: gaten.length, gecontroleerd, onbewaakt: onbewaaktOnverklaard.length };
   try {
     fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
       uitleg: 'De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ' +
         'ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); ' +
         'daalt dat, dan is er minder beproefd en niet minder mis.',
       gedraaid: new Date().toISOString(),
-      meters: { [METER]: gaten.length, [METER_N]: gecontroleerd },
+      meters: { [METER]: gaten.length, [METER_N]: gecontroleerd, [METER_O]: onbewaaktOnverklaard.length },
       verzoeken: proeven,
       bezitStukken: vanB.length, aanmaakGeprobeerd: aanmaak.length,
       passiefBeantwoord: passief, actieveVragen: actief,
-      vindbaarVooraf: vindbaarVooraf.length, onbewaakteAanmaakroutes: onbewaakt, kwijtNaAfloop: kwijt.length,
+      vindbaarVooraf: vindbaarVooraf.length, onbewaakteAanmaakroutes: onbewaakt,
+      onbewaaktMetReden: onbewaakt.filter(pad => ONGELEZEN_BEDOELD.has(pad)),
+      onbewaaktZonderReden: onbewaaktOnverklaard, kwijtNaAfloop: kwijt.length,
       sessieHersteldA: herstelA, sessieHersteldB: herstelB, gaten
     }, null, 2) + '\n');
   } catch (e) { console.error('  kon GLUURRONDE.json niet schrijven: ' + e.message); }
@@ -610,11 +745,13 @@ async function main() {
   try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
   if (norm && norm.meters && !BASIS_EXTERN) {
     if (VASTLEGGEN) {
-      const p = norm.meters[METER], v = norm.meters[METER_N];
+      const p = norm.meters[METER], v = norm.meters[METER_N], b = norm.meters[METER_O];
       if (p === undefined || uitslag.gaten <= p) norm.meters[METER] = uitslag.gaten;
       if (v === undefined || uitslag.gecontroleerd >= v) norm.meters[METER_N] = uitslag.gecontroleerd;
+      if (b === undefined || uitslag.onbewaakt <= b) norm.meters[METER_O] = uitslag.onbewaakt;
       fs.writeFileSync(path.join(WORTEL, 'NORM.json'), JSON.stringify(norm, null, 2) + '\n');
-      console.log('  ' + K.groen + METER + ' vastgelegd op ' + norm.meters[METER] + ', ' + METER_N + ' op ' + norm.meters[METER_N] + '.' + K.reset + '\n');
+      console.log('  ' + K.groen + METER + ' vastgelegd op ' + norm.meters[METER] + ', ' + METER_N + ' op ' +
+        norm.meters[METER_N] + ', ' + METER_O + ' op ' + norm.meters[METER_O] + '.' + K.reset + '\n');
     } else {
       const oordeel = beoordeel(uitslag, norm.meters);
       if (oordeel.zakt) { for (const r of oordeel.redenen) console.error('  ' + K.rood + r + K.reset); console.error(''); return 1; }
@@ -624,4 +761,4 @@ async function main() {
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { beoordeel, METER, METER_N };
+module.exports = { beoordeel, METER, METER_N, METER_O };

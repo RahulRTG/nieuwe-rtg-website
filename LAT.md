@@ -227,6 +227,21 @@ de cijfers van een GEZAKTE ronde als grondwaarde, en vergelijkt niet tussen
 machines of opslagstanden -- 144 ms op vier kernen is geen betere 144 ms dan op
 zestien, het is een andere.
 
+*En de achtste, van 18 augustus 2026: een meter die met een leeg lijf aanklopt,
+meet een dichte deur.* De gluurronde meldde negen aanmaakroutes "waarvan geen
+enkele leesroute het resultaat toont". Acht van die negen hadden hun lezer
+gewoon naast zich staan. De ronde vroeg ze alleen verkeerd: op `/api/rtf/*` wil
+een route de gezinsreferentie in het lijf, en een detailroute wil het
+identificator -- een leeg lijf levert daar een 403 of een 404 op, en dat las de
+meter als "die functie bestaat niet". Het bijzondere is dat het instrument die
+sleutelvorm al kende: bij het AANLEGGEN stuurde het hem netjes mee. De les was
+niet meeverhuisd naar het TERUGZOEKEN, precies zoals de uitlogkanarie eerder
+niet meeverhuisde van de rolronde naar de gluurronde. De vorm om op te letten:
+een meter die een ONTBREKEN telt, moet kunnen aantonen dat hij het bestaande
+wél ziet -- anders telt hij zijn eigen onvermogen. Wat er daarna wel echt uit
+kwam, was een lek: `/api/concern/entiteit/groep` controleerde de eigenaar van
+de entiteit maar niet die van de groep.
+
 **Handhaver:** sinds deze ronde machinaal, en niet meer alleen als voornemen.
 `test/meterijk.test.js` houdt een registratie waarin ELKE meter staat: met een
 proef die hem op een bekend-foute invoer laat uitslaan, of met een opgeschreven

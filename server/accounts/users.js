@@ -129,6 +129,31 @@ function setPasswordSync(userId, password) {
   return getUserById(userId);
 }
 
+/* DE HASH OPWAARDEREN ZONDER IEMAND UIT TE LOGGEN.
+
+   Dit lijkt op setPassword en is er met opzet NIET hetzelfde aan. setPassword
+   zet ook `sessies_vanaf`, en dat hoort daar: wie zijn wachtwoord wijzigt gooit
+   elke lopende sessie eruit, want dat was meestal de hele reden.
+
+   Hier is het wachtwoord juist ONVERANDERD -- alleen de kosten waarmee het
+   gehasht is gaan omhoog (zie de scrypt-uitleg in ./kluis.js). Zou deze functie
+   sessies_vanaf zetten, dan werd elk lid met een oude hash bij zijn volgende
+   inlog meteen weer overal uitgelogd, en zou een stille verbetering voelen als
+   een storing. Ook reset_hash blijft ongemoeid: een lopend herstelverzoek gaat
+   dit niet aan.
+
+   De aanroeper heeft de klaartekst alleen op het moment van een GESLAAGDE
+   inlog. Dat is het enige moment waarop opwaarderen kan, en daarom staat de
+   aanroep daar en nergens anders. */
+async function vernieuwWachtwoordHash(userId, password) {
+  const u = getUserById(userId);
+  if (!u || !kluis.moetVernieuwen(u.password_hash)) return false;
+  S.zin('UPDATE users SET password_hash = ? WHERE id = ?')
+    .run(await kluis.hashPassword(password), userId);
+  mirror.markUser(userId);
+  return true;
+}
+
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
 const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 
@@ -165,6 +190,6 @@ module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

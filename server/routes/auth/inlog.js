@@ -67,6 +67,16 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);
+  /* DE HASH STIL OPWAARDEREN. Het wachtwoord klopt, dus we hebben de klaartekst
+     precies een keer in handen -- het enige moment waarop een hash met oude
+     scrypt-kosten naar de huidige kan (zie server/accounts/kluis.js). De inlog
+     hangt er niet van af: lukt het niet, dan loggen we dat en gaan we door, want
+     een lid buitensluiten omdat een VERBETERING mislukte is de verkeerde kant om
+     te falen. Stil overslaan mag het niet (LAT.md regel 5). */
+  if (typeof accounts.vernieuwWachtwoordHash === 'function') {
+    try { await accounts.vernieuwWachtwoordHash(user.id, req.body.password); }
+    catch (e) { try { require('../../log').log.warn('hash opwaarderen mislukte voor gebruiker ' + user.id + ': ' + e.message); } catch (x) {} }
+  }
   /* Uit dienst gemeld door de organisatie (SCIM) = ook met het juiste wachtwoord
      niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
      deze regel zou iemand een token krijgen dat meteen daarna nergens voor

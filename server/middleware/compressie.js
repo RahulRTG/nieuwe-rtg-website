@@ -70,11 +70,50 @@ function jsonGzip() {
       let s;
       try { s = JSON.stringify(data); } catch (e) { return gewoonJson(data); }
       if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Content-Encoding', br ? 'br' : 'gzip');
-      res.setHeader('Vary', 'Accept-Encoding');
-      return res.send(br ? zlib.brotliCompressSync(Buffer.from(s), BR_ANTWOORD)
-                         : zlib.gzipSync(Buffer.from(s), { level: 6 }));
+      /* ASYNCHROON, EN DAT IS HIER GEEN SMAAKKWESTIE.
+
+         Dit stond op brotliCompressSync/gzipSync. Comprimeren is puur rekenwerk,
+         en de synchrone vorm doet dat OP DE EVENT-LOOP: zolang zlib bezig is
+         staat de hele server stil -- ook voor verzoeken die niets met dit
+         antwoord te maken hebben. Gemeten op een echt API-antwoord:
+
+           164 kB   gzip-6  0,8 ms   brotli-4  0,7 ms
+           827 kB   gzip-6  4,2 ms   brotli-4  2,9 ms
+          3320 kB   gzip-6 16,3 ms   brotli-4 17,1 ms
+
+         Dat lijkt weinig tot je het maal de doorvoer doet: bij 300 verzoeken
+         per seconde van 164 kB is dat een kwart seconde per seconde die niemand
+         anders kan gebruiken, en het slaat neer op de p99 van ELK verzoek --
+         ook op de kleine, die zelf niet eens gecomprimeerd worden.
+
+         De asynchrone vorm rekent in de libuv-threadpool, naast de loop, en
+         levert byte-voor-byte dezelfde uitvoer (nagemeten met Buffer.equals op
+         beide vormen). De statische laag hieronder blijft wel synchroon: die
+         comprimeert een bestand EEN keer en bewaart het resultaat, dus daar is
+         geen herhaald werk om weg te halen.
+
+         De koppen worden nu pas gezet als de compressie GELUKT is. Dat is de
+         volgorde die de asynchrone vorm afdwingt: zou Content-Encoding er al
+         staan en de compressie daarna falen, dan beloofde het antwoord een
+         verpakking die er niet is. */
+      const bron = Buffer.from(s);
+      const klaar = (err, uit) => {
+        if (res.headersSent) return;
+        if (err || !uit) {
+          /* Niets slaat stil over (LAT.md regel 5): onverpakt bezorgen is de
+             juiste uitwijk, maar hij hoort geteld te worden. De synchrone vorm
+             zou hier gegooid hebben en dus zichtbaar zijn geweest. */
+          try { require('../log').log.warn('compressie mislukt (' + (err && err.message) + '); onverpakt bezorgd.'); } catch (e) {}
+          return gewoonJson(data);
+        }
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Content-Encoding', br ? 'br' : 'gzip');
+        res.setHeader('Vary', 'Accept-Encoding');
+        res.send(uit);
+      };
+      if (br) zlib.brotliCompress(bron, BR_ANTWOORD, klaar);
+      else zlib.gzip(bron, { level: 6 }, klaar);
+      return res;
     };
     next();
   };

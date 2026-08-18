@@ -64,12 +64,17 @@ test('een lid ziet zijn eigen handelingen in de AVG-export, en de ketenstand erb
   }
 });
 
+/* Tellen op het DOELPAD en niet op het totaal. Het lezen van het spoor is zelf
+   een POST die 200 geeft, dus die komt er ook in -- en dat is met opzet: wie het
+   auditlog leest, hoort in het auditlog te staan. Een toets die op het totaal
+   telt, meet daardoor zijn eigen leesoproepen mee. */
 test('een geweigerde handeling laat geen spoor na', async () => {
-  const voor = (await api('/api/office/handelingen', { max: 500 }, office)).body.totaal;
+  const tel = async () => ((await api('/api/office/handelingen', { max: 500 }, office)).body.regels || [])
+    .filter(r => r.pad === '/api/concern/nieuw').length;
+  const voor = await tel();
   const weg = await api('/api/concern/nieuw', {}, lid);          // zonder naam: 400
   assert.ok(weg.status >= 400, 'deze hoort te weigeren, kreeg ' + weg.status);
-  const na = (await api('/api/office/handelingen', { max: 500 }, office)).body.totaal;
-  assert.equal(na, voor, 'een mislukte handeling verandert niets en hoort er dus niet in');
+  assert.equal(await tel(), voor, 'een mislukte handeling verandert niets en hoort er dus niet in');
 });
 
 test('de bewaartermijn staat in het beleid, niet alleen in een document', () => {
@@ -78,4 +83,37 @@ test('de bewaartermijn staat in het beleid, niet alleen in een document', () => 
   assert.ok(tak, 'zonder regel in het bewaarbeleid telt de bewaarwacht deze tak nooit');
   assert.equal(tak.grond, 'audit');
   assert.ok(tak.dagen >= 300 && tak.dagen <= 400, 'ongeveer een jaar, net als het beveiligingslogboek');
+});
+
+/* DE FOUT DIE DE METER VOND, ALS TOETS.
+
+   Het spoor hing eerst aan res.json. server/middleware/compressie.js
+   comprimeert elk antwoord boven ongeveer een kilobyte en stuurt dat met
+   res.send -- volledig langs res.json heen. Elke geslaagde schrijfactie met een
+   GROOT antwoord liet daardoor niets na, en juist de zwaarste handelingen
+   hebben de grootste antwoorden.
+
+   scripts/handelingproef-route.js vond het: /api/assets en
+   /api/avond/voorkeuren gaven 200 en stonden niet in het spoor. Sindsdien hangt
+   het spoor aan 'finish', dat vuurt hoe het antwoord ook verstuurd is.
+
+   Deze toets vraagt expliciet om compressie, want zonder die header stuurt de
+   laag niets langs res.json heen en zou de fout onzichtbaar blijven. */
+test('een GROOT antwoord laat ook een spoor na -- de compressielaag mag er niet langs', async () => {
+  {
+    const tok = lid;
+
+    const r = await fetch(base + '/api/assets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok,
+        'Accept-Encoding': 'gzip, br' },
+      body: '{}'
+    });
+    assert.ok(r.status >= 200 && r.status < 300, 'de oproep slaagt');
+
+    const uit = await api('/api/office/handelingen', { max: 200 }, tok);
+    const raak = (uit.body.regels || []).find(x => x.pad === '/api/assets');
+    assert.ok(raak, 'een geslaagde schrijfactie met een groot, gecomprimeerd antwoord hoort ook in het spoor');
+    assert.ok(raak.hash, 'en geketend te zijn');
+  }
 });

@@ -34,7 +34,11 @@ function nepRes() {
   res.statusCode = 200;
   res.verzonden = null;
   res.status = (c) => { res.statusCode = c; return res; };
-  res.json = (l) => { res.verzonden = l; return res; };
+  /* 'finish' hoort erbij, want daar hangt het spoor aan -- en NIET aan res.json.
+     Zie de kop van server/lib/handelingsspoor.js: de compressielaag stuurt grote
+     antwoorden met res.send, volledig langs res.json heen. Een nagebootst
+     antwoord dat alleen res.json kent, zou die hele fout onzichtbaar maken. */
+  res.json = (l) => { res.verzonden = l; res.emit('finish'); return res; };
   return res;
 }
 function doe(spoor, req, route) {

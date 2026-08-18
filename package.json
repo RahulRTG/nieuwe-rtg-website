@@ -126,7 +126,8 @@
     "start:rust": "node scripts/start-met-motor.js",
     "prestaties": "node --experimental-sqlite scripts/prestaties.js",
     "idemschuld": "node scripts/idemschuld.js",
-    "idemschuld:vast": "node scripts/idemschuld.js --vastleggen"
+    "idemschuld:vast": "node scripts/idemschuld.js --vastleggen",
+    "handelingproef": "node --experimental-sqlite scripts/handelingproef-route.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

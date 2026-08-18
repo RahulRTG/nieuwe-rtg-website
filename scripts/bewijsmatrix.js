@@ -84,6 +84,7 @@ const JSONUIT = argv.includes('--json');
 const inWortel = (naam) => { const p = path.join(WORTEL, naam); return fs.existsSync(p) ? p : ''; };
 const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13) || inWortel('POORTWACHT.json');
 const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) || inWortel('ROLPROEF.json');
+const HANDELINGPROEF = (argv.find(a => a.startsWith('--handelingproef=')) || '').slice(17) || inWortel('HANDELINGPROEF.json');
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
@@ -116,8 +117,11 @@ const SCHAKELS = [
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
-  { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: null, nodig: 'de VOORZIENING is er inmiddels wel: server/lib/handelingsspoor.js legt elke geslaagde schrijfactie geketend vast (wie, wanneer, pad, hash van de aanvraag) en hangt in de lijfpoort, dus elke schrijfroute laat een spoor na. Wat nog ontbreekt is de METER: een route-loop zoals scripts/rolproef-route.js die per route vaststelt dat er ook echt een regel verscheen, en die uitslag als HANDELINGPROEF.json wegschrijft. Tot die er is blijft deze kolom leeg -- een voorziening die bestaat is geen cel die gemeten is' },
+    { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
+    bron: 'scripts/handelingproef-route.js (klopt aan met de JUISTE rol en kijkt of er een geketende regel verscheen)',
+    nodig: 'de voorziening is server/lib/handelingsspoor.js; wat deze kolom NIET zegt is dat het spoor ' +
+      'volledig is -- hij kijkt of er een regel verscheen, niet of alles wat erin staat klopt. En het ' +
+      'wegknippen van de NIEUWSTE regels valt hier niet op; daarvoor is het anker nodig' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -201,6 +205,20 @@ function rolproefUitslag() {
   if (!ROLPROEF) return null;
   try {
     const j = JSON.parse(fs.readFileSync(ROLPROEF, 'utf8'));
+    if (!Array.isArray(j.perRoute)) return null;
+    const kaart = new Map();
+    for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    return kaart;
+  } catch (e) { return null; }
+}
+
+/* De handelingproef per route: liet een geslaagde oproep een geketende regel na
+   in het handelingsspoor? Zelfde vorm als de rolproef -- een route die er niet
+   in staat is niet beproefd, en dat is ongemeten en geen groen. */
+function handelingproefUitslag() {
+  if (!HANDELINGPROEF) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(HANDELINGPROEF, 'utf8'));
     if (!Array.isArray(j.perRoute)) return null;
     const kaart = new Map();
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
@@ -292,6 +310,7 @@ function bouw(invoer) {
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
+  const handeling = inv.handeling !== undefined ? inv.handeling : handelingproefUitslag();
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -360,6 +379,21 @@ function bouw(invoer) {
             ...(s.id === 'SIDE_EFFECT' ? { collecties: st.collecties } : {}) };
         } else if (st) {
           cellen[s.id] = { staat: 'ongemeten', bron: 'staatproef', reden: st.reden };
+        } else {
+          cellen[s.id] = { staat: 'ongemeten' };
+        }
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        const beproefd = handeling && handeling.get(sleutel);
+        /* 'ongemeten' in de proef betekent: de oproep gaf geen 2xx, dus er is
+           niets gebeurd en er HOORT geen regel te zijn. Dat is geen bewijs en
+           ook geen bevinding -- het is niet gemeten. */
+        if (beproefd && beproefd.audit === 'bewezen') {
+          cellen[s.id] = { staat: 'bewezen', bron: 'handelingproef' };
+        } else if (beproefd && beproefd.audit === 'gezakt') {
+          cellen[s.id] = { staat: 'gezakt', bron: 'handelingproef', reden: beproefd.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }

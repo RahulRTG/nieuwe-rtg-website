@@ -137,25 +137,37 @@ function maakHandelingsspoor({ db, save, nu, max }) {
     };
   }
 
-  /* De middleware. Hij hangt in de lijfpoort en wikkelt res.json, zodat hij de
-     statuscode en de sessie ziet zoals de route ze achterlaat -- req.session
-     wordt door de auth-poortwachter gezet en bestaat op dat moment pas. */
+  /* De middleware, en hij hangt aan 'finish' EN NIET AAN res.json.
+
+     Dat verschil is met een meter gevonden en het was een stil gat. De eerste
+     opzet wikkelde res.json, want daar komt een API-antwoord uit. Maar
+     server/middleware/compressie.js comprimeert elk antwoord boven ongeveer een
+     kilobyte en stuurt dat met res.send -- volledig LANGS res.json heen. Elke
+     geslaagde schrijfactie met een groot antwoord liet daardoor niets na, en
+     precies de zwaarste handelingen hebben de grootste antwoorden.
+
+     scripts/handelingproef-route.js vond het: /api/assets en
+     /api/avond/voorkeuren gaven 200 en stonden niet in het spoor. Een auditlog
+     dat zwijgt over wat er wél gebeurde is erger dan geen auditlog, want hij
+     wekt vertrouwen.
+
+     'finish' vuurt ongeacht hoe het antwoord is verstuurd -- json, send, end of
+     een gecomprimeerde stroom. Bijkomend voordeel: het loggen gebeurt NA het
+     antwoord, dus een journaalstoring kan de gebruiker niets meer kosten.
+
+     'close' zonder 'finish' betekent een afgebroken verbinding: er is niets
+     afgemaakt, en dan hoort er ook niets in het spoor. */
   function middleware(req, res, next) {
     if (!SCHRIJFT.has(req.method)) return next();
-    const echteJson = res.json.bind(res);
-    let genoteerd = false;
-    res.json = (lijf) => {
+    res.on('finish', () => {
       const status = res.statusCode || 200;
-      if (!genoteerd && status >= 200 && status < 300) {
-        genoteerd = true;
-        try {
-          noteer({ wie: wieVan(req), methode: req.method,
-            pad: String(req.path || req.url || ''), status, afdruk: afdrukVan(req.body) });
-          save();
-        } catch (e) { /* een journaalstoring mag een handeling niet tegenhouden */ }
-      }
-      return echteJson(lijf);
-    };
+      if (!(status >= 200 && status < 300)) return;
+      try {
+        noteer({ wie: wieVan(req), methode: req.method,
+          pad: String(req.path || req.url || ''), status, afdruk: afdrukVan(req.body) });
+        save();
+      } catch (e) { /* een journaalstoring mag een handeling niet tegenhouden */ }
+    });
     next();
   }
 

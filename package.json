@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Rahul Travel Group, website, ledenportaal en backend",
+  "engines": {
+    "node": ">=22 <25"
+  },
   "scripts": {
     "start": "node scripts/start.js",
     "telefoon": "RTG_LOKAAL_TLS=1 node server/trio.js",
@@ -80,6 +83,10 @@
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",
+    "grondwacht": "node scripts/grondwacht.js",
+    "wetwacht": "node scripts/wetwacht.js",
+    "wetwacht:vast": "node scripts/wetwacht.js --vastleggen",
+    "triage": "node scripts/triage.js",
     "chaos": "node scripts/chaos.js",
     "grenzen": "node scripts/grenzen.js",
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",

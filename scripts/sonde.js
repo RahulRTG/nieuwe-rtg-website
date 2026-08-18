@@ -31,6 +31,10 @@ const BASIS = (args.find(a => /^https?:\/\//.test(a)) || 'http://127.0.0.1:3000'
 const MELDEN = args.includes('--melden');
 const TOKEN = (args.find(a => a.startsWith('--token=')) || '').slice(8) || process.env.RTG_METRICS_TOKEN || '';
 const NAAR = (args.find(a => a.startsWith('--naar=')) || '').slice(7) || BASIS;
+/* --json=pad: de monsters ook als bestand afgeven, zodat scripts/triage.js er
+   een duiding op kan doen (welke laag is stuk, helpt terugrollen). De tekst
+   hierboven blijft de uitvoer voor mensen; dit is de uitvoer voor de triage. */
+const JSON_UIT = (args.find(a => a.startsWith('--json=')) || '').slice(7);
 
 const norm = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'SLO.json'), 'utf8'));
 const REIZEN = Array.isArray(norm.reizen) ? norm.reizen : [];
@@ -77,6 +81,8 @@ async function loop(reis) {
       String(m.status).padStart(4) + '  ' + String(m.ms).padStart(5) + ' ms' +
       (m.reden ? '  ' + m.reden : (m.traag ? '  trager dan de afgesproken ' + reis.maxMs + ' ms' : '')));
   }
+
+  if (JSON_UIT) fs.writeFileSync(JSON_UIT, JSON.stringify({ basis: BASIS, monsters }, null, 2) + '\n');
 
   const mislukt = monsters.filter(m => !m.gelukt).length;
   console.log('\n' + (monsters.length - mislukt) + ' van ' + monsters.length + ' reizen gelukt.');

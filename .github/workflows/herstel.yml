@@ -1,0 +1,105 @@
+### HET HERSTEL -- wat er gebeurt nadat iets rood werd.
+#
+# Alle bewaking in dit huis (ci.yml, de ronde, de wacht, de live-sonde)
+# produceert rode lichten. Tot deze workflow bestond wachtte elk rood licht
+# op een mens die hem toevallig zag, het log opende, de oorzaak zocht en de
+# reparatie begon. Dat wachten en zoeken IS de onderhoudspost -- niet het
+# repareren zelf.
+#
+# Deze workflow doet het eerste, mechanische deel van dat werk: hij ziet de
+# rode run, raapt de context bij elkaar (welke workflow, welke tak, welke
+# commit, het log-adres) en zet die als issue klaar met het label `herstel`.
+# In dat issue staat een @claude-oproep: de Claude-app op deze repo pakt het
+# op, diagnosticeert, schrijft de fix en opent een PR. HET MERGEN BLIJFT
+# MENSENWERK -- dat is de afgesproken grens, en hij is bewust: elke poort in
+# dit huis blijft een echte poort zolang er een mens tussen fix en main staat.
+#
+#   rood licht -> dit issue (automatisch) -> fix-PR (Claude) -> merge (mens)
+#
+# Reageert de app niet op de bot-mention (apps mogen bot-berichten negeren),
+# dan is het issue zelf nog steeds de halve reparatie: alle context staat er
+# al in, en een mens hoeft alleen nog '@claude' te typen.
+#
+# Wat hier bewust NIET gebeurt: pushen, mergen, terugrollen of een workflow
+# opnieuw starten. Dit bestand heeft schrijfrecht op issues en verder nergens
+# op, en dat hoort zo te blijven.
+
+name: Het herstel
+
+on:
+  workflow_run:
+    workflows: ["CI", "De ronde (wekelijks)", "De wacht", "Publieke live-sonde"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  aanmelden:
+    name: Rood licht wordt fix-issue
+    # Alleen echte mislukkingen; een geannuleerde run is geen storing. En
+    # alleen de hoofdlijn of een schema -- een rode feature-tak is werk in
+    # uitvoering, geen onderhoudsincident.
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      (github.event.workflow_run.head_branch == github.event.repository.default_branch ||
+       github.event.workflow_run.event == 'schedule')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Issue openen of aanvullen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WF_NAAM: ${{ github.event.workflow_run.name }}
+          WF_URL: ${{ github.event.workflow_run.html_url }}
+          WF_TAK: ${{ github.event.workflow_run.head_branch }}
+          WF_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -eu
+          TITEL="herstel: ${WF_NAAM} is rood"
+
+          # Het label aanleggen als het er nog niet is; bestaat het al, dan is
+          # dit een no-op. Zonder label geen bundeling en geen filter.
+          gh label create herstel --repo "$REPO" \
+            --description "Automatisch geopend door herstel.yml bij een rode workflow" \
+            --color B60205 2>/dev/null || true
+
+          # Eén issue per workflow, niet één per run: een workflow die vijf
+          # nachten faalt is één storing met vijf metingen, geen vijf storingen.
+          BESTAAND=$(gh issue list --repo "$REPO" --state open --label herstel \
+            --search "\"$TITEL\" in:title" --json number --jq '.[0].number // empty')
+
+          BODY=$(cat <<EINDE
+          De workflow **${WF_NAAM}** is rood.
+
+          | | |
+          |---|---|
+          | Run | ${WF_URL} |
+          | Tak | \`${WF_TAK}\` |
+          | Commit | \`${WF_SHA}\` |
+
+          @claude Diagnosticeer deze rode run en repareer de OORZAAK, niet het symptoom (LAT.md regel 1). Lees eerst het log van de run hierboven. Regels van het huis: geen toets uitzetten of afzwakken om groen te worden; elke bewering natrekken met een mutatie; bij een zakkende wacht (wacht.yml) eerst GRONDWACHT.json of WETWACHT.json uit de artefacten lezen -- daar staat de bevinding al geduid. Draai voor het openen van de PR de volledige poort (npm run check en npm test). Open de fix als PR; er wordt hier niet direct op de hoofdlijn gedrukt.
+          EINDE
+          )
+
+          if [ -n "$BESTAAND" ]; then
+            # De tijdrem. De live-sonde draait elke vijf minuten; zonder rem
+            # krijgt een nachtstoring 288 "opnieuw rood"-reacties en leest
+            # niemand het issue meer. Een herhaling telt daarom pas na zes
+            # uur stilte -- het issue blijft intussen gewoon open en rood.
+            LAATSTE=$(gh issue view "$BESTAAND" --repo "$REPO" \
+              --json comments --jq '.comments | if length == 0 then "" else .[-1].createdAt end')
+            NU=$(date -u +%s)
+            DAN=$([ -n "$LAATSTE" ] && date -u -d "$LAATSTE" +%s || echo 0)
+            if [ $((NU - DAN)) -ge 21600 ]; then
+              gh issue comment "$BESTAAND" --repo "$REPO" --body "Opnieuw rood: ${WF_URL} (commit \`${WF_SHA}\`)."
+              echo "Aangevuld: issue #$BESTAAND"
+            else
+              echo "Issue #$BESTAAND is al aangemeld; binnen de tijdrem, geen nieuwe reactie."
+            fi
+          else
+            gh issue create --repo "$REPO" --title "$TITEL" --label herstel --body "$BODY"
+            echo "Geopend: $TITEL"
+          fi

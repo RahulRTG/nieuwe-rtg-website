@@ -36,8 +36,51 @@ test.after(() => {
 test('1. de fases staan op het bord, met naam en omvang', async () => {
   const b = await api('/api/office/boardroom', {}, office);
   const ids = (b.body.fases || []).map(f => f.id);
-  assert.deepEqual(ids, ['fundament', 'stad', 'alles'], 'drie stapelende fases');
-  assert.ok(b.body.fases[0].aantalAan < b.body.fases[1].aantalAan, 'de stad is ruimer dan het fundament');
+  assert.deepEqual(ids, ['start', 'fundament', 'stad', 'alles'], 'vier stapelende fases');
+  const [start, fundament, stad] = b.body.fases;
+  assert.ok(start.aantalAan < stad.aantalAan, 'de smalle snee is smaller dan de stad');
+  assert.ok(fundament.aantalAan < stad.aantalAan, 'de stad is ruimer dan het fundament');
+});
+
+/* FASE 0 -- DE SMALLE SNEE, als doorloop en niet als opsomming.
+
+   Een fase die alleen op zijn eigen lijst wordt nagekeken, bewijst dat de lijst
+   klopt met zichzelf. Deze toets loopt daarom de weg af die een echt lid loopt:
+   binnenkomen, jezelf zien, De Salon lezen, je aanmelden, je gegevens kunnen
+   opvragen. En hij kijkt of wat NIET in de snee zit ook echt dicht zit -- want
+   zonder die tegenproef zou hij ook groen blijven op een fase die alles opent.
+
+   De kop van server/functies/register/index.js waarschuwt hiervoor met een echt
+   voorval: een fase-lijst en een catalogus die allebei klopten en samen niet
+   deugden, waardoor een lid ineens niet meer kon betalen. Dat vind je alleen zo. */
+test('1b. fase 0: de snee werkt echt, en de rest zit dicht', async () => {
+  const zet = await api('/api/office/boardroom/fase', { fase: 'start' }, office);
+  assert.equal(zet.status, 200);
+  assert.ok(zet.body.uit > zet.body.aan * 3, 'verreweg het meeste hoort dicht te zijn');
+
+  // BINNEN: de weg van een lid
+  assert.equal((await api('/api/ik', {}, lid)).status, 200, 'een lid ziet zichzelf');
+  assert.equal((await api('/api/member/apps', {}, lid)).status, 200, 'de leden-app draait');
+  assert.equal((await api('/api/salon/promo', {}, lid)).status, 200, 'De Salon is open');
+  assert.equal((await api('/api/gegevens/nodig', {}, lid)).status, 200,
+    'de gegevenspoort MOET open zijn: een livegang zonder AVG-rechten is niet smal maar onrechtmatig');
+  assert.equal((await api('/api/aanmelding/aanvraag',
+    { pas: 'lifestyle', naam: 'Proef', contact: 'proef@x.nl' }, lid)).status, 200, 'aanmelden kan');
+
+  // en opnieuw inloggen blijft kunnen -- anders sluit de fase de deur achter zich
+  assert.ok((await api('/api/auth/login',
+    { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token, 'inloggen blijft werken');
+
+  // DICHT: de tegenproef
+  assert.equal((await api('/api/pay/overzicht', {}, lid)).status, 503, 'betalen zit dicht in de snee');
+  assert.equal((await api('/api/theater/zaal', {}, lid)).status, 503, 'de eigen apps ook');
+  assert.equal((await api('/api/member/dm/lijst', {}, lid)).status, 503,
+    'DM staat bewust uit: moderatie begin je niet in dezelfde week als je inlog');
+
+  // DE BACKOFFICE BLIJFT OPEN, anders zet deze fase de aanmelding open en het
+  // besluit erover dicht -- en een Lifestyle-pas wordt door een MENS toegekend.
+  assert.equal((await api('/api/aanmelding/lijst', {}, office)).status, 200,
+    'het kantoor kan de aanvragen nog zien en beslissen');
 });
 
 test('2. fase 1 (de wig): bestellen en betalen open, de rest dicht', async () => {

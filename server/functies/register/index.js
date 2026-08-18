@@ -82,6 +82,54 @@ for (const k of KOPPELS) if (!OP_ID[k.a] || !OP_ID[k.b])
    en in de wig kon een lid ineens niet meer betalen. De catalogus klopte, de
    fase-lijst klopte, en samen deugden ze niet. Wie hier een regel opknipt, zet
    de nieuwe id's erbij in elke fase waar de oude in stond. */
+/* FASE 0 -- DE SMALLE SNEE, en waarom die vóór het fundament staat.
+
+   Het fundament hierboven is al een wig: één stad, één sector diep, met
+   partners die bestellen en betalen aan. Dat is voor een EERSTE livegang nog
+   steeds veel oppervlak. Deze fase is smaller en beantwoordt één vraag: wat kan
+   er open zonder dat er iets openstaat waarvan we niet weten hoe het zich houdt?
+
+   Wat erin zit: binnenkomen (inloggen, account, pincode, zegels), je gegevens
+   kunnen ophalen en laten wissen, je aanmelden voor een pas, de leden-app zelf
+   met de laag die hem draaiende houdt (staat, live-verbinding, meldingen, taal,
+   gids, Rahul, waarderen), en De Salon.
+
+   DRIE DINGEN DIE ER MET OPZET IN ZITTEN EN MAKKELIJK VERGETEN WORDEN:
+
+   - tg-gegevens. Een livegang waarin een lid zijn gegevens niet kan ophalen of
+     laten wissen is niet smal maar onrechtmatig. De AVG-rechten horen bij de
+     eerste snee, niet bij een latere fase.
+   - kern-taal. Zonder de vertaallaag is de app alleen Nederlands. Dat is geen
+     kleinere scope maar een kapotte scope voor ieder ander lid.
+   - supplier-salon. De ledenfeed en de partner-marketing staan in KOPPELS als
+     twee kanten van dezelfde Salon, en schakelFase() volgt koppels NIET. Een
+     fase die alleen de ene helft noemt, zet de kast dus bewust in een stand die
+     de catalogus zelf tegenspreekt. Hij staat hier aan en is stil zolang
+     'supplier' dicht is: zonder partner-inlog komt er niemand bij.
+
+   WAT ER MET OPZET NIET IN ZIT: bestellen, betalen, de partner- en
+   personeelskant, de RTFoundation, de spellen, de eigen apps en de directe
+   berichten tussen leden. Dat laatste is geen technisch oordeel maar een
+   bewuste: DM's brengen moderatie en misbruikafhandeling mee, en die laat je
+   niet in dezelfde week beginnen als je inlog.
+
+   DE BACKOFFICE BLIJFT OPEN, in elke fase: schakelFase() slaat de interne
+   functies over. Dat is hier geen bijzaak maar voorwaarde -- een aanmelding
+   voor een Lifestyle- of Business-pas wordt door een MENS goedgekeurd, en dat
+   gebeurt in de backoffice. Zonder die uitzondering zou deze fase de aanmelding
+   wel openzetten en het besluit erover dichtzetten. */
+const FASE_START = [
+  // binnenkomen en je gegevens beheren
+  'tg-inlog', 'tg-account', 'tg-pin', 'tg-zegel', 'tg-gegevens', 'tg-aanmeld',
+  // wie ben je echt: de identiteitslaag waar ook de 18+-grens op leunt
+  'verificatie', 'paspoort', 'webauthn',
+  // de leden-app en de laag die hem draaiende houdt
+  'member', 'kern-state', 'kern-live', 'kern-meldingen', 'kern-taal', 'kern-gids',
+  'kern-rahul', 'kern-waardering',
+  // De Salon, met de partnerhelft die er in KOPPELS aan vastzit
+  'salon', 'supplier-salon'
+];
+
 const FASE_FUNDAMENT = [
   // de wig: een stad, een sector diep - leden bestellen en betalen bij
   // partners, de zaak draait op kassa en personeel, identiteit is op orde
@@ -99,6 +147,8 @@ const FASE_STAD = [...FASE_FUNDAMENT,
   'foundation', 'foundation-school', 'werk-rtf', 'rtf-contacten'
 ];
 const FASES = [
+  { id: 'start', naam: 'Fase 0 · De smalle snee', aan: FASE_START,
+    uitleg: 'De kleinste stand die een echte livegang aankan: binnenkomen, je gegevens beheren, je aanmelden voor een pas, de leden-app en De Salon. Bestellen, betalen, partners, personeel en de RTFoundation blijven dicht. De backoffice blijft open, want een pasbesluit wordt door een mens genomen.' },
   { id: 'fundament', naam: 'Fase 1 · Het fundament (de wig)', aan: FASE_FUNDAMENT,
     uitleg: 'Eén stad, één sector diep: leden bestellen en betalen bij partners, de zaak draait op kassa, Salon en personeel, en de identiteitslaag staat. Al het andere blijft dicht tot u verder draait.' },
   { id: 'stad', naam: 'Fase 2 · De stad', aan: FASE_STAD,

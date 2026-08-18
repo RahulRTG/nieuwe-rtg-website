@@ -16,6 +16,52 @@ lijst van wat er nog moet gebeuren om echt online te gaan, in volgorde.
 > terwijl de app zijn eigen certificaten regelt. Wie deze lijst volgde, bouwde
 > de verkeerde opstelling.
 
+## De scope van de eerste livegang
+
+Alles is gebouwd. Lanceren is daarom geen bouwvraag maar een **scopevraag**, en
+die staat als voorinstelling in de kast: één klik in de boardroom zet het hele
+platform in de stand van een fase.
+
+| fase | wat er open is |
+|---|---|
+| **Fase 0 · De smalle snee** | Binnenkomen, je gegevens beheren, je aanmelden voor een pas, de leden-app en De Salon. 19 van de 189 functies. |
+| Fase 1 · Het fundament (de wig) | Daarbovenop: bestellen en betalen bij partners, kassa, personeel, identiteit. |
+| Fase 2 · De stad | Tickets, vervoer, kamers, events, de sociale laag, de eerste eigen apps, de RTFoundation. |
+| Fase 3 · Alles open | De volledige catalogus. |
+
+**Ga live op fase 0.** Niet omdat de rest niet werkt — de suite is groen — maar
+omdat je bij de eerste echte leden niet wilt ontdekken hoe 189 functies zich
+onder echt verkeer houden. Elke fase is één klik verder, en één klik terug.
+
+Wat fase 0 open zet, met de reden waar die niet vanzelf spreekt:
+
+- **binnenkomen**: inloggen, account, pincode, zegels
+- **je gegevens**: ophalen en laten wissen. Dit hoort in de eerste snee en niet
+  in een latere fase — een livegang waarin een lid zijn AVG-rechten niet kan
+  uitoefenen is niet smal maar onrechtmatig
+- **aanmelden voor een pas**, en de identiteitslaag eronder (verificatie,
+  paspoort, passkeys) waar ook de 18+-grens op leunt
+- **de leden-app** met de laag die hem draaiende houdt: staat, live-verbinding,
+  meldingen, **taal** (zonder de vertaallaag is de app alleen Nederlands, en dat
+  is geen kleinere scope maar een kapotte scope), gids, Rahul, waarderen
+- **De Salon**, met de partnerhelft die er in de catalogus aan vastzit
+
+Bewust dicht in fase 0: bestellen, betalen, de partner- en personeelskant, de
+RTFoundation, de spellen, de eigen apps, en de **directe berichten tussen
+leden** — dat laatste is geen technisch oordeel maar een bewuste keuze: DM's
+brengen moderatie en misbruikafhandeling mee, en die begin je niet in dezelfde
+week als je inlog.
+
+**De backoffice blijft in elke fase open.** Dat is geen uitzondering maar
+voorwaarde: een Lifestyle- of Business-pas wordt door een mens toegekend, en dat
+gebeurt in de backoffice. Zonder die uitzondering zou fase 0 de aanmelding
+openzetten en het besluit erover dichtzetten.
+
+De fases staan in `server/functies/register/index.js`; `test/fases.test.js`
+loopt fase 0 af als een echt lid en controleert ook dat de rest werkelijk dicht
+zit. Zet hem met de knop in de boardroom, of via
+`POST /api/office/boardroom/fase {"fase":"start"}`.
+
 ## Al geregeld (zit in de code)
 
 - [x] Alle apps en flows: leden, partners per genre, personeel, backoffice

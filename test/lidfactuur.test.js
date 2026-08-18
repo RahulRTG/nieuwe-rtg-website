@@ -28,7 +28,7 @@
    Draai los: node --experimental-sqlite --test test/lidfactuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidfac-')); }
@@ -39,11 +39,14 @@ async function api(base, pad, body, token) {
 }
 async function registreer(base, naam) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', {
+  const r = (await api(base, '/api/auth/register', {
     name: naam || 'Factuur Lid', email: u + '@x.nl',
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  })).body.token;
+  })).body;
+  // achteraf betalen geldt alleen voor een geverifieerde volwassene
+  await keurLidGoed(base, r.token, r.state.user.codename, '1990-01-01');
+  return r.token;
 }
 // de manager van een zaak, want de kassa en de boekhouding zijn managementwerk
 async function managerVan(base, code) {

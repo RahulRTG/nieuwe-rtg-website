@@ -4121,7 +4121,7 @@
     "rahul-hart.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
-      "reden": "de passies en het datahuis-verhaal zijn LETTERLIJKE TEKST in server/kern/rahul-hart.js, en geen operator raakt een stringliteraal. Met de hand nagetrokken: horloges -> uurwerken in het hart laat hem zakken"
+      "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
       "soort": "puur",
@@ -4415,7 +4415,7 @@
     "rtfcampus.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
-      "reden": "leest public/apps/foundation/campus.html als tekst en eist de catalogus-fetch en de ene schil; een operator muteert servermodules, niet de pagina. Met de hand nagetrokken: het catalogus-pad in campus.html verbouwen laat hem zakken"
+      "reden": "leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)"
     },
     "rtfcoderem.test.js": {
       "soort": "server",
@@ -6561,6 +6561,117 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "bank-eigendom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bank/eigendom.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "demokosten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "geld-rollen-buiten-bank.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "server/routes/member/rechterhand.js",
+      "operator": "true->false#0",
+      "geprobeerd": 1
+    },
+    "geld-rollen-gezin.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinshulp.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 5
+    },
+    "geld-rollen-school.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/school/financien.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 11
+    },
+    "geld-rollen-werkruimte.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "geld-rollen-zaken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/horeca/betalen.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "geld-rollen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "keuringsindex.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/keuring.js",
+      "operator": "return-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 7
+    },
+    "motorverbinding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/motorverbinding.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "motorzekering.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/motorzekering.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "noodrem-bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/beveiliging.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "perimeter-risico.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "wachtwoordkosten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     }
   }
 }

@@ -178,9 +178,11 @@
       "duurMs": 234
     },
     "concern-juridisch-gegeven-heeft-een-bron": {
-      "stand": "mensenwerk",
-      "afdruk": "fa5e55aeeb2b66a6",
-      "reden": "CONCERN.md noemt vier bronsoorten en eist ze per gegeven. In de code bestaat de bronsoort wel op sommige plekken, maar er is geen enkele poort die een juridisch gegeven ZONDER bron weigert -- niet in de opslag en niet op de route. De wet is dus opgeschreven en niet gehandhaafd. Dat is precies wat dit register zichtbaar hoort te maken."
+      "stand": "raak",
+      "afdruk": "080b150fd18731ea",
+      "reden": "een juridisch gegeven zonder bron bestaat niet",
+      "wachter": "test:test/concern.test.js",
+      "duurMs": 226
     },
     "concern-werknemer-koopt-geen-pas": {
       "stand": "raak",

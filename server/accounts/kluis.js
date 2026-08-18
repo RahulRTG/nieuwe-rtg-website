@@ -65,34 +65,15 @@ function phoneHash(phone) {
   return n ? crypto.createHmac('sha256', S.VAULT).update(n).digest('hex') : null;
 }
 
-/* ---------- wachtwoorden (scrypt + salt, tijd-veilige vergelijking) ----------
-   scrypt is bewust zwaar (dat is de bescherming), maar de synchrone variant
-   blokkeert de HELE server tijdens het rekenen: bij 100 gelijktijdige logins
-   stond alles seconden stil. De asynchrone variant rekent in de threadpool
-   naast de server, zodat andere verzoeken gewoon doorlopen. De Sync-varianten
-   blijven bestaan voor het opstarten (seed) en tests: eenmalig blokkeren voor
-   'listen' is prima en houdt de boot deterministisch. */
-const scryptAsync = (pw, salt, len) => new Promise((resolve, reject) =>
-  crypto.scrypt(pw, salt, len, (err, key) => err ? reject(err) : resolve(key)));
+/* ---------- wachtwoorden ----------
+   Staan in ./wachtwoord.js: scrypt, het hashformaat met zijn kosten, en het
+   migratiepad voor een hash uit de oude wereld. Ze reizen hieronder gewoon mee
+   naar buiten, zodat aanroepers niets van de knip merken -- zelfde vorm als
+   ./users.js met ./tokens.js. */
+const wachtwoord = require('./wachtwoord');
+const { scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen,
+  SCRYPT_N, SCRYPT_R, SCRYPT_P } = wachtwoord;
 
-function hashPasswordSync(pw) {
-  const salt = crypto.randomBytes(16);
-  const hash = crypto.scryptSync(String(pw), salt, 64);
-  return salt.toString('hex') + ':' + hash.toString('hex');
-}
-async function hashPassword(pw) {
-  const salt = crypto.randomBytes(16);
-  const hash = await scryptAsync(String(pw), salt, 64);
-  return salt.toString('hex') + ':' + hash.toString('hex');
-}
-async function verifyPassword(pw, stored) {
-  const parts = String(stored || '').split(':');
-  if (parts.length !== 2) return false;
-  const salt = Buffer.from(parts[0], 'hex');
-  const expected = Buffer.from(parts[1], 'hex');
-  const actual = await scryptAsync(String(pw), salt, 64);
-  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
-}
 
 function makeCodename() {
   return CODENAMES[crypto.randomInt(CODENAMES.length)] + ' ' + crypto.randomBytes(2).toString('hex').toUpperCase();
@@ -103,5 +84,6 @@ function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).
 
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
-  scryptAsync, hashPasswordSync, hashPassword, verifyPassword, makeCodename, sign
+  scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen, makeCodename, sign,
+  SCRYPT_N, SCRYPT_R, SCRYPT_P
 };

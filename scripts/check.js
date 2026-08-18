@@ -3387,5 +3387,72 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   }
 }
 
+
+console.log('\n50) een geheim wordt tijd-veilig vergeleken, en een credential komt uit crypto');
+{
+  /* TWEE FOUTEN DIE HIER ECHT ZIJN GEMAAKT, EN DIE ALLEBEI EEN TWEEDE WAARHEID
+     WAREN IN PLAATS VAN EEN ONTBREKENDE.
+
+     A) De eenmalige manager-PIN van een nieuwe zaak kwam uit
+        `Math.floor(1000 + Math.random() * 9000)`. Math.random is geen
+        cryptografische bron: uit een handvol uitkomsten is de staat van de
+        generator af te leiden en daarmee de VOLGENDE pin. Er bestond al een
+        huisfunctie (accounts.makePin -> crypto.randomInt); deze plek had er
+        stil een tweede naast gezet.
+
+     B) verifyToken vergeleek de HMAC van het SESSIETOKEN met `!==`. Een gewone
+        stringvergelijking stopt bij het eerste verschillende teken, dus de tijd
+        verraadt hoeveel tekens er klopten. Exact deze redenering stond al
+        uitgeschreven bij de clustersleutel in server.js -- en uitgerekend de
+        deur waar ELK verzoek langskomt stond nog op de kale vergelijking.
+
+     Waarom dit een keuring is en geen toets: geen van beide is met een
+     gedragstoets eerlijk te betrappen. Een timingverschil van microseconden is
+     op een testmachine niet betrouwbaar te meten, en een PIN uit Math.random
+     ziet er precies zo uit als een goede. Ze zijn alleen in de BRON te zien, en
+     dus hoort de bewaker daar te staan (LAT.md regel 2: beide zijn met een
+     mutatie nagetrokken -- de fout teruggezet, deze regel werd rood, en toen
+     pas terug). */
+  const stripRegels = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+
+  /* A) Math.random op een regel die een geheim maakt.
+     Bewust NAUW: 'code' en 'id' staan er niet bij. Een leverancierscode of een
+     gespreks-id is geen credential, en een regel die ook die aanwijst wordt
+     binnen een week weggeklikt -- dat is precies hoe scripts/samenhang.js zijn
+     eerste maatstaf verloor (849 valse gevallen). Liever een smalle regel die
+     altijd klopt dan een brede die niemand meer gelooft. */
+  const CREDENTIAL = /\b(pin|pincode|otp|token|secret|geheim|sleutel|wachtwoord|password|salt|nonce|apikey|herstelcode|verificatiecode|resetcode)\b/i;
+  /* B) een handtekening die met == of != wordt vergeleken. `handtekening(` staat
+     er NIET in: dat is Nederlands proza ("er ontbreken 2 handtekening(en)") en
+     geen cryptografie. Alleen echte crypto-aanroepen tellen. */
+  const HANDTEKENING = /\b(kluis\.sign|\bsign)\s*\(|createHmac\s*\(|\.digest\s*\(/;
+  const VERGELIJK = /[!=]==?/;
+  const VEILIG = /veiligGelijk|timingSafeEqual/;
+  const VENSTER = 2;   // regels boven en onder waarin de veilige vergelijker mag staan
+
+  let losA = 0, losB = 0, gekeurd = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const regels = stripRegels(fs.readFileSync(f, 'utf8')).split('\n');
+    regels.forEach((r, i) => {
+      if (/Math\.random\s*\(/.test(r) && CREDENTIAL.test(r)) {
+        losA++;
+        fout(rel + ':' + (i + 1) + ' maakt een geheim met Math.random() -- gebruik crypto' +
+          ' (crypto.randomInt/randomBytes, of de bestaande accounts.makePin)');
+      }
+      if (!HANDTEKENING.test(r) || !VERGELIJK.test(r)) return;
+      gekeurd++;
+      if (VEILIG.test(regels.slice(Math.max(0, i - VENSTER), i + VENSTER + 1).join('\n'))) return;
+      losB++;
+      fout(rel + ':' + (i + 1) + ' vergelijkt een handtekening met == of != -- dat stopt bij het' +
+        ' eerste verschillende teken en lekt daarmee hoeveel er klopte; gebruik veiligGelijk()');
+    });
+  });
+  if (!losA && !losB) ok('geen enkel geheim uit Math.random(), en alle ' + gekeurd +
+    ' handtekeningvergelijkingen gaan tijd-veilig');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

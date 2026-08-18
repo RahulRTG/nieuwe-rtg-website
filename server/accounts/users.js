@@ -129,6 +129,26 @@ function setPasswordSync(userId, password) {
   return getUserById(userId);
 }
 
+/* DE HASH OPWAARDEREN ZONDER IEMAND UIT TE LOGGEN.
+
+   Lijkt op setPassword en mist met opzet een ding: `sessies_vanaf`. Daar hoort
+   dat wel -- wie zijn wachtwoord WIJZIGT gooit elke sessie eruit. Hier is het
+   wachtwoord onveranderd en gaan alleen de scrypt-kosten omhoog (zie
+   ./wachtwoord.js); zou dit sessies_vanaf zetten, dan vloog elk lid met een
+   oude hash er bij zijn volgende inlog overal uit en voelde een stille
+   verbetering als een storing. reset_hash blijft er om dezelfde reden af.
+
+   De klaartekst is er alleen bij een GESLAAGDE inlog; daarom staat de aanroep
+   daar en nergens anders. */
+async function vernieuwWachtwoordHash(userId, password) {
+  const u = getUserById(userId);
+  if (!u || !kluis.moetVernieuwen(u.password_hash)) return false;
+  S.zin('UPDATE users SET password_hash = ? WHERE id = ?')
+    .run(await kluis.hashPassword(password), userId);
+  mirror.markUser(userId);
+  return true;
+}
+
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
 const { realNameOf, emailOf, phoneOf } = gebonden; // lezen zit bij de binding
 
@@ -165,6 +185,6 @@ module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

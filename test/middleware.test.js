@@ -142,6 +142,20 @@ test('5. de compressielaag laat kleine antwoorden met rust', async () => {
     const res = nepRes();
     await draai(jsonGzip(), req, res);
     res.json(data);
+    /* WACHTEN, WANT COMPRIMEREN GEBEURT NIET MEER OP DE EVENT-LOOP.
+
+       Hier stond `res.json(data)` en meteen daarna de kop uitlezen. Dat kon
+       zolang de laag brotliCompressSync/gzipSync gebruikte: die zette de kop
+       nog binnen dezelfde tik. Sinds de compressie in de threadpool draait
+       (zie server/middleware/compressie.js) is het antwoord een tik later
+       klaar, en las deze toets de kop voordat hij bestond -- 'geen' in plaats
+       van 'gzip'.
+
+       res.wacht is de belofte die nepRes aflost zodra send/end/json het
+       antwoord afsluit, en die gaat af in ALLE takken: ook bij een klein
+       antwoord en bij een client die niets vraagt. Dit is dus geen soepeler
+       toets maar dezelfde toets op het juiste moment. */
+    await res.wacht;
     return res.kop['content-encoding'] || 'geen';
   };
   assert.equal(await proef(klein, 'gzip'), 'geen', 'onder een kilobyte kost gzip meer dan het oplevert');
@@ -164,6 +178,7 @@ test('5b. brotli levert echt kleinere bytes, en alleen aan wie erom vraagt', asy
     const res = nepRes();
     await draai(jsonGzip(), req, res);
     res.json(groot);
+    await res.wacht;   // zie toets 5: de compressie draait in de threadpool
     return { kop: res.kop['content-encoding'], bytes: Buffer.from(res.body) };
   };
   const g = await meet('gzip'), b = await meet('br');

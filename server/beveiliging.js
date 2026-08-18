@@ -106,15 +106,48 @@ module.exports = (ctx) => {
           uitschrijfpaden dicht, dooft na tien minuten. Wie al is ingelogd
           merkt niets: de schade-scope is de aanvals-scope.
      De onderhouds-zekering springt nooit meer automatisch; die is van de
-     eigenaar. */
+     eigenaar.
+
+     WAT ER GETELD WORDT ZIJN AANVALLERS EN GEEN DEUREN. Hier stond de meldingssleutel
+     venster een brute-force-alarm gaven. Vanaf drie gaat de registratie-
+     zekering eruit (geen nieuwe accounts), vanaf zes de onderhouds-zekering
+     (hele app op slot, alleen de eigenaar erin).
+
+     AANVALLERS, EN NIET DEUREN -- dat was de fout. Hier stond `.map(m => m.sleutel)`,
+     en die sleutel is `brute-force|<bucket>`. Een bucket is fijnmazig met opzet:
+     'auth:<ip>:<inlognaam>' (server/server.js). De inlognaam hoort daarin voor de
+     snelheidsrem, want anders zet iemand het account van een ander op slot door
+     het fout te raden -- maar hij hoort NIET in de telling van deze noodrem.
+
+     Wat er daardoor gebeurde: een script vanaf EEN adres dat zes gebruikersnamen
+     probeert leverde zes "bronnen" op, en het hele platform ging in onderhoud.
+     Dat is credential stuffing, de meest gewone aanval die er is, en het
+     antwoord erop was een zelf toegebrachte storing voor alle echte gebruikers.
+     De aanvaller had geen enkel account nodig, alleen zes namen. Hetzelfde gold
+     voor de tien route-families met hun eigen prefix ('sup:', 'join:', 'tech:'):
+     een aanvaller die langs zes deuren liep telde als zes aanvallers.
+
+     De maat is nu `meta.aanvaller` -- het adres dat klopte. Ontbreekt die (een
+     aanroep die hem vergat), dan valt hij terug op de sleutel: dat is de oude,
+     te schrikachtige stand, en server.js zegt het er hoorbaar bij.
+
+     GEVONDEN MET EEN METING en niet met nadenken: de A/B van npm run beproeving
+     liet rondes zien met 87.963 keer 503 en een server die na de storm helemaal
+     niet meer openging, afgewisseld met rondes die schoon waren -- op dezelfde
+     code. Het was een race om deze drempel. test/noodrem-bron.test.js legt hem
+     vast zonder storm. */
   function noodrem() {
     if (!autoStaat().aan) return;
     const nu = Date.now();
-    /* De ECHTE bron (meta.bron), niet de meldingssleutel 'type|bron': de
-       quarantaine van trede 1 moet een adres isoleren, geen etiket. */
+    /* Het ADRES DAT KLOPT (meta.aanvaller), niet de deur waarop geklopt werd
+       (meta.bron is de bucket, met de inlognaam erin) en niet de meldings-
+       sleutel: de quarantaine van trede 1 moet een adres isoleren en geen
+       etiket, en de telling eronder moet aanvallers tellen en geen deuren.
+       meta.bron blijft de terugval voor een melding die nog geen aanvaller
+       meegaf; server.js meldt zo'n aanroep hoorbaar. */
     const bronnen = new Set(lijst()
       .filter(m => m.type === 'brute-force' && (nu - m.atMs) < NOODREM_VENSTER_MS)
-      .map(m => (m.meta && m.meta.bron) || '').filter(Boolean));
+      .map(m => (m.meta && (m.meta.aanvaller || m.meta.bron)) || '').filter(Boolean));
     if (isoleerBron) {
       for (const bron of bronnen) { try { isoleerBron(bron, 'noodrem: brute force'); } catch (e) {} }
     }

@@ -133,6 +133,7 @@ module.exports = {
   init, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
+  moetVernieuwen: kluis.moetVernieuwen,
   ...users,
   ...staff
 };

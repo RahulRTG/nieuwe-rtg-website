@@ -1,4 +1,5 @@
-/* RTG Bank, deel "incasso": terugkerende betalingen en machtigingen (incasso). Een
+
+const { magBij } = require('./eigendom');/* RTG Bank, deel "incasso": terugkerende betalingen en machtigingen (incasso). Een
    lid zet een vaste overboeking klaar (huur, sparen, een abonnement) die per week of
    maand automatisch loopt; de incassoronde voert alles uit wat aan de beurt is. Net
    als de renteronde: idempotent op de klok (een uitvoering zet de volgende datum
@@ -15,7 +16,7 @@ module.exports = (ctx) => {
 
   function zet({ vanIban, naarIban, centen, interval, oms, codenaam }) {
     const m = rekMeta(vanIban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De bronrekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (!rekMeta(naarIban)) return { status: 404, error: 'De tegenrekening bestaat niet.' };
     if (!INTERVAL[interval]) return { status: 400, error: 'Kies per week of per maand.' };
     const c = Math.round(Number(centen));
@@ -33,7 +34,7 @@ module.exports = (ctx) => {
   }
   function stop({ id, codenaam }) {
     const t = reeks().find(x => x.id === id);
-    if (!t || (codenaam && t.codenaam !== String(codenaam).trim())) return { status: 404, error: 'Deze vaste betaling bestaat niet.' };
+    if (!magBij(t, codenaam)) return { status: 404, error: 'Deze vaste betaling bestaat niet.' };
     t.actief = false;
     save();
     return { ok: true, id, actief: false };

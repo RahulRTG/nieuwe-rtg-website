@@ -137,6 +137,40 @@ test('noodrem trede 1: elke brute-force-bron gaat de quarantaine in via de haak'
   assert.ok(geisoleerd.every(g => /noodrem/.test(g.reden)));
 });
 
+test('noodrem: EEN aanvaller met zes deuren telt als EEN bron', () => {
+  /* Dit was de fout die het hele platform kon sluiten. De noodrem telde de
+     BUCKET van de snelheidsrem, en die is fijnmazig met opzet:
+     'auth:<ip>:<inlognaam>'. Een script vanaf een adres dat zes namen probeert
+     -- credential stuffing -- leverde daarmee zes "bronnen" op.
+
+     Zes meldingen, zes verschillende buckets, EEN aanvaller. Er hoort niets te
+     springen: niet de onderhoudsstand en ook niet de registratie. */
+  const { db, bev } = opzet();
+  for (const naam of ['aap', 'noot', 'mies', 'wim', 'zus', 'jet']) {
+    bev.meld('brute-force', 'kritiek', 'x', { bron: 'auth:10.0.0.9:' + naam, aanvaller: '10.0.0.9' });
+  }
+  assert.notEqual(zekering(db, 'onderhoud').aan, false, 'een enkele aanvaller sluit het huis niet');
+  assert.notEqual(zekering(db, 'registratie').aan, false, 'en zet de registratie ook niet dicht');
+
+  /* TEGENPROEF in hetzelfde huis: zes ECHTE aanvallers, met dezelfde zes
+     buckets, doen het wel. Zonder deze helft zou "er springt niets" ook waar
+     zijn als de noodrem helemaal stuk is. */
+  for (let i = 1; i <= 6; i++) {
+    bev.meld('brute-force', 'kritiek', 'x', { bron: 'auth:203.0.113.' + i + ':aap', aanvaller: '203.0.113.' + i });
+  }
+  assert.equal(zekering(db, 'onderhoud').aan, false, 'zes verdeelde bronnen horen de app wel op slot te zetten');
+});
+
+test('noodrem: zonder aanvaller valt hij terug op de oude, schrikachtige maat', () => {
+  /* Een aanroep die de bron vergeet mag niet STIL minder gaan tellen -- dan zou
+     een vergeten regel de noodrem uitschakelen zonder dat iemand het merkt.
+     Hij valt dus terug op de sleutel: te schrikachtig, maar nooit blind.
+     server/server.js zegt er hoorbaar bij dat het gebeurde. */
+  const { db, bev } = opzet();
+  for (let i = 1; i <= 6; i++) bev.meld('brute-force', 'kritiek', 'x', { bron: 'deur' + i });
+  assert.equal(zekering(db, 'onderhoud').aan, false, 'zonder bron telt elke deur nog als aparte bron');
+});
+
 test('noodrem: uitgezet door de eigenaar -> er springt niets', () => {
   const { db, bev } = opzet();
   bev.zetAuto(false);

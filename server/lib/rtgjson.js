@@ -136,79 +136,54 @@ function parse(tekst, opties) {
   return uit;
 }
 
-/* ---------- stringify ---------- */
-/* Dezelfde escapes als de ingebouwde: ", \\\\, \\b \\t \\n \\f \\r, overige
-   stuurtekens en losse surrogaten als \\uXXXX; complete surrogaatparen blijven
-   rauw. Het ESCAPEN blijft bewust handwerk (geen regex-vervanging): geen
-   escaping-lagen over elkaar. Of er ge-escaped moet worden beslist de voorwacht
-   hieronder. */
-const KORT = { 8: '\\b', 9: '\\t', 10: '\\n', 12: '\\f', 13: '\\r', 34: '\\"', 92: '\\\\' };
+/* ---------- stringify ----------
 
-/* DE VOORWACHT. Verreweg de meeste tekst die hier langskomt heeft geen enkel
-   bijzonder teken: sleutelnamen, codenamen, tijdstempels, gewone zinnen. De
-   handmatige lus hierboven liep daar toch teken voor teken doorheen, in JS.
+   HIER STOND EEN EIGEN SERIALISEERDER, EN DIE IS WEGGEHAALD. Dat verdient
+   uitleg, want de kop van dit bestand zegt dat deze motor bewust in eigen huis
+   is gecodeerd.
 
-   Deze test doet dezelfde vraag in een keer in de regex-motor, en beslist alleen
-   OF er ge-escaped moet worden -- het escapen zelf blijft handwerk, want daar
-   zat de reden voor de handmatige scan (geen escaping-lagen over elkaar). De
-   uitvoer verandert dus niet; alleen de weg ernaartoe is korter.
+   Het verschil zit in wat de twee helften OPLEVEREN. De parser hieronder doet
+   iets wat de ingebouwde niet doet: hij weert de sleutel `__proto__` al tijdens
+   het bouwen (prototype-vergiftiging kan niet eens ontstaan) en hij kapt een
+   nestings-bom af op diepte. Dat is echte winst op de HTTP-grens, en die blijft
+   dus volledig van ons.
 
-   Gemeten op een mengsel van echte sleutels en waarden: 1470 ms -> 395 ms voor
-   3,6 miljoen aanroepen, en byte-voor-byte dezelfde uitvoer (getoetst over alle
-   tekens 0x00-0x20FF en alle surrogaten, zie test/rtgjson.test.js). Op het warme
-   pad (POST /api/state, 8 lezers, 40,8 s, boot erbuiten): stringify van 12,0%
-   naar 6,9% zelf-tijd, strEsc van 5,3% naar 2,8%, doorvoer 1432 -> 1638 req/s.
+   De stringifier had zo'n verschil niet, en kon het ook niet hebben. Zijn
+   opdracht stond letterlijk in zijn eigen kop: "byte-voor-byte hetzelfde
+   resultaat als de ingebouwde JSON.stringify". Een functie die per definitie
+   hetzelfde MOET opleveren als de ingebouwde, kan alleen nog verschillen in
+   prijs -- en dat deed hij:
 
-   Compleet surrogaatpaar valt hier ook binnen en gaat dus naar de trage weg. Dat
-   mag: die laat het paar rauw staan, precies zoals de ingebouwde. Ruimer dan
-   nodig is hier veilig, smaller dan nodig zou een stil verschil geven. */
-const BIJZONDER = /[\x00-\x1f"\\\ud800-\udfff]/;
+     53,5 MB datastore serialiseren   eigen 1602 ms   ingebouwd 226 ms   (7,1x)
+     13,3 MB datastore serialiseren   eigen  342 ms   ingebouwd  57 ms   (6,0x)
 
-function strEsc(str) {
-  if (!BIJZONDER.test(str)) return '"' + str + '"';
-  let uit = '';
-  let start = 0;
-  for (let k = 0; k < str.length; k++) {
-    const c = str.charCodeAt(k);
-    let esc = null;
-    if (c === 34 || c === 92 || c < 0x20) esc = KORT[c] || ('\\u' + c.toString(16).padStart(4, '0'));
-    else if (c >= 0xd800 && c <= 0xdfff) {
-      if (c <= 0xdbff && k + 1 < str.length) {
-        const v = str.charCodeAt(k + 1);
-        if (v >= 0xdc00 && v <= 0xdfff) { k++; continue; } // compleet paar: rauw laten
-      }
-      esc = '\\u' + c.toString(16).padStart(4, '0'); // los surrogaat
-    }
-    if (esc !== null) { uit += str.slice(start, k) + esc; start = k + 1; }
-  }
-  if (start === 0) return '"' + str + '"';
-  return '"' + uit + str.slice(start) + '"';
-}
+   Dat is geen implementatiedetail: het is de blokkade van de event-loop bij elke
+   snapshot (BEPROEVING.json mat eventLoopMaxMs 2968) en het is tijd op ELK
+   antwoord dat via res.json de deur uit gaat. De vorige ronde optimalisatie
+   (de escape-voorwacht, 3,7x op strEsc) haalde precies daarom niet genoeg: een
+   handgeschreven serialiseerder in JS verslaat de C++-implementatie in V8 niet.
+
+   EN DIT KOST GEEN ENKELE DEPENDENCY. `JSON` is onderdeel van de taal, net als
+   `Math` en `Array`, en staat in dezelfde categorie als de node-ingebouwden die
+   dit huis overal gebruikt (node:http, node:crypto, node:sqlite). De belofte
+   "nul dependencies" gaat over npm-pakketten en die staat nog precies overeind:
+   package.json heeft nog altijd geen enkele runtime-afhankelijkheid.
+
+   WAT DE TOETSEN NU MOETEN DOEN. test/rtgjson.test.js bewees de gelijkheid met
+   `assert.equal(rtgjson.stringify(x), JSON.stringify(x))`. Na deze wijziging is
+   dat een toets die niet meer kan zakken (LAT.md regel 9), dus die beweringen
+   zijn vervangen door gouden verwachtingen en door eigenschappen die wel bijten:
+   de uitvoer bevat geen rauw stuurteken, losse surrogaten staan als \uXXXX, en
+   alles komt via ONZE eigen parser identiek terug. */
 function stringify(waarde) {
-  const t = typeof waarde;
-  if (t === 'string') return strEsc(waarde);
-  if (t === 'number') return Number.isFinite(waarde) ? String(waarde) : 'null';
-  if (t === 'boolean') return waarde ? 'true' : 'false';
-  if (t === 'bigint') throw fout('BigInt hoort niet in JSON');
-  if (waarde === null) return 'null';
-  if (t !== 'object') return undefined; // function/symbol/undefined
-  if (typeof waarde.toJSON === 'function') return stringify(waarde.toJSON());
-  if (Array.isArray(waarde)) {
-    let uit = '[';
-    for (let k = 0; k < waarde.length; k++) {
-      if (k) uit += ',';
-      const el = stringify(waarde[k]);
-      uit += el === undefined ? 'null' : el;
-    }
-    return uit + ']';
+  try {
+    return JSON.stringify(waarde);
+  } catch (e) {
+    /* Een BigInt gaf hier altijd een nette rtgjson-fout (met .rtgjson = true),
+       en de body-parser vertaalt die naar een 400. De ingebouwde gooit een
+       kale TypeError; die vertalen we terug, zodat aanroepers niets merken. */
+    if (e instanceof TypeError && /BigInt/i.test(e.message || '')) throw fout('BigInt hoort niet in JSON');
+    throw e;
   }
-  let uit = '';
-  for (const sleutel of Object.keys(waarde)) {
-    const el = stringify(waarde[sleutel]);
-    if (el === undefined) continue; // net als de ingebouwde: overslaan
-    uit += (uit ? ',' : '') + strEsc(sleutel) + ':' + el;
-  }
-  return '{' + uit + '}';
 }
-
 module.exports = { parse, stringify, MAX_DIEPTE };

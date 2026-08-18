@@ -77,7 +77,7 @@ function maakKantoorgesprek({ OFFICE_CODE, veiligGelijk, totpOk, crypto, remembe
 
     const mis = () => {
       gesprekken.delete(id);
-      noteFailedTry('office:' + ip);
+      noteFailedTry('office:' + ip, ip);
       logInlog('office', false, null, req);
       // bewust hetzelfde antwoord voor de code en de tweede factor
       return { status: 401, error: 'Dat klopt niet. Begin gerust opnieuw.' };

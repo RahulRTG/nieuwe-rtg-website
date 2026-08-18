@@ -17,28 +17,14 @@
    server tijdens een echte testronde zelf schrijft. Dit is de indicatie. */
 'use strict';
 
+const { maakDekkingsIndex } = require('./dekkingsindex');
+
 /* Geeft een functie terug die zegt of een route in de meegegeven testtekst
    voorkomt. De tekst gaat er ONTDAAN VAN COMMENTAAR in -- dat is geen detail
    maar de reparatie waardoor het cijfer niet meer met een zoek-en-vervang op te
    poetsen is. De aanroeper doet dat, want die weet welke bestanden het zijn. */
 function maakZoeker(testTekst) {
-  const tekst = String(testTekst);
-  return function gedekt(route) {
-    if (tekst.includes(route)) return true;
-    /* Ook de vorm MET leidende slash maar ZONDER /api-prefix. Dat is hoe een
-       test hem schrijft als haar helper de prefix zelf plakt:
-       `l.call('/member/boardroom/zetveel')`. Die endpoints werden geteld als
-       ongedekt terwijl de test ze wel degelijk aanroept -- de teller keek naar
-       de verkeerde vorm. Een indicatie die de goede gevallen mist, stuurt je
-       naar werk dat al gedaan is. */
-    const staart = route.startsWith('/api/') ? route.slice(5) : route.replace(/^\//, '');
-    for (const vorm of [staart, '/' + staart]) {
-      if (tekst.includes("'" + vorm + "'") ||
-          tekst.includes('"' + vorm + '"') ||
-          tekst.includes('`' + vorm + '`')) return true;
-    }
-    return false;
-  };
+  return maakDekkingsIndex(testTekst);
 }
 
 module.exports = { maakZoeker };

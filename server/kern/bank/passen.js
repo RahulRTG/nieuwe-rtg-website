@@ -1,4 +1,5 @@
-/* RTG Bank, deel "passen": betaalpassen en creditcards op een rekening. Een pas is
+
+const { magBij } = require('./eigendom');/* RTG Bank, deel "passen": betaalpassen en creditcards op een rekening. Een pas is
    een instrument OP een rekening: uitgeven, bevriezen, een daglimiet, en betalen
    (dat boekt van de gekoppelde rekening naar extern:kaartbetaling en respecteert de
    bodem van de rekening, dus ook de rood-staan-ruimte bij een creditcard). Het volle
@@ -23,11 +24,10 @@ module.exports = (ctx) => {
   const masker = pan => '•••• •••• •••• ' + pan.slice(-4);
   const publiek = p => ({ id: p.id, iban: p.iban, soort: p.soort, soortLabel: SOORTEN[p.soort], naam: p.naam,
     nummer: p.masker, laatste4: p.laatste4, bevroren: !!p.bevroren, dagLimietCenten: p.dagLimietCenten, geopend: p.geopend });
-  const eigen = (p, codenaam) => p && (!codenaam || p.codenaam === String(codenaam).trim());
 
   function uitgeven({ iban, soort = 'debit', naam, codenaam }) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Kies een betaalpas of creditcard.' };
     if (Object.values(passen()).filter(p => p.codenaam === m.codenaam).length >= 20) return { status: 429, error: 'Het maximaal aantal passen is bereikt.' };
     const pan = genPan();
@@ -45,7 +45,7 @@ module.exports = (ctx) => {
   }
   function bevries(id, aan, codenaam) {
     const p = passen()[id];
-    if (!eigen(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
+    if (!magBij(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     p.bevroren = aan === true;
     save();
     seintje(p.codenaam);
@@ -53,7 +53,7 @@ module.exports = (ctx) => {
   }
   function limiet(id, euro, codenaam) {
     const p = passen()[id];
-    if (!eigen(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
+    if (!magBij(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     const centen = Math.round(Number(euro) * 100);
     if (!Number.isFinite(centen) || centen < 0 || centen > 5000000) return { status: 400, error: 'Kies een daglimiet tot 50.000 euro.' };
     p.dagLimietCenten = centen;
@@ -62,7 +62,7 @@ module.exports = (ctx) => {
   }
   function sluit(id, codenaam) {
     const p = passen()[id];
-    if (!eigen(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
+    if (!magBij(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     delete passen()[id];
     save();
     seintje(p.codenaam);
@@ -73,7 +73,7 @@ module.exports = (ctx) => {
      van de rekening -- inclusief rood staan -- geldt gewoon). */
   async function betaal({ id, centen, oms, codenaam }) {
     const p = passen()[id];
-    if (!eigen(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
+    if (!magBij(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     if (p.bevroren) return { status: 423, error: 'Deze pas is bevroren.' };
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < 1) return { status: 400, error: 'Dat bedrag kan niet.' };

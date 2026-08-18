@@ -25,6 +25,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
 const { maakZoeker } = require('./lib/routedekking');
+const { maakDekkingsIndex, DEKKING_KAP } = require('./lib/dekkingsindex');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -140,7 +141,12 @@ function dekking() {
      scripts/lib/routedekking.js, want scripts/deltapoort.js stelt dezelfde
      vraag over de routes die NIEUW zijn in een wijziging. Twee kopieen van
      deze regels lopen uiteen -- ze zijn hier al drie keer bijgesteld -- en dan
-     meet de poort iets anders dan de ratel die hij moet dienen (regel 4). */
+     meet de poort iets anders dan de ratel die hij moet dienen (regel 4).
+
+     De SNELHEID komt uit scripts/lib/dekkingsindex.js: die zoeker liep zeven
+     keer per route over tientallen megabytes testtekst, en dat was 64% van de
+     hele keuring. routedekking.js draagt nog steeds de regel, maar rekent hem
+     via dat register uit -- een plek voor de regel, en toch de snelle weg. */
   const gedekt = maakZoeker(testTekst);
   const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
@@ -508,4 +514,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur };
+module.exports = { keur, maakDekkingsIndex, DEKKING_KAP };

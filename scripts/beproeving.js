@@ -478,25 +478,39 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  // 2. De AI beweegt GEEN geld zonder menselijke goedkeuring. Het contract is
-  //    sinds de stuurgoedkeuring een eenmalig SERVERVOORSTEL: /doe geeft 428
-  //    met een goedkeuring.id, en alleen /doe/bevestig met precies dat id
-  //    voert uit. Deze toets liep achter op dat contract -- hij stuurde
-  //    bevestigd:true in de aanroep zelf, en dat is nu juist het gedrag dat
-  //    NIET meer mag werken: een model dat zichzelf bevestigt. De lat hier is
-  //    dus drievoudig: zonder akkoord 428, zelf-akkoord blijft 428, en het
-  //    echte akkoord is eenmalig (een herhaling is 404).
+  /* 2. De AI beweegt GEEN geld zonder menselijke goedkeuring.
+
+     Het contract is sinds de stuurgoedkeuring een eenmalig SERVERVOORSTEL:
+     /doe geeft 428 met een goedkeuring.id, en alleen /doe/bevestig met precies
+     dat id voert uit (server/routes/stuur.js, server/kern/stuur/bevestiging.js).
+
+     DEZE PROEF WAS OOIT VERLOPEN en zakte daardoor op iets goeds: hij stuurde
+     `bevestigd: true` mee in de body van /doe en verwachtte dat de 428 dan weg
+     was. Zo werkte het ooit. Een vlaggetje in de body doet nu niets meer -- en
+     dat hoort ook zo: een client die zijn eigen bevestiging mag zetten is geen
+     bevestiging.
+
+     De lat is daarom viervoudig: zonder akkoord 428 met een voorstel erbij, een
+     zelf gezet akkoord blijft 428, een verzonnen id komt er niet door, en het
+     echte akkoord werkt precies EEN keer (de herhaling is 404). */
   {
-    const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const zelf = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const geld = { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } };
+    const zonder = await post('/api/member/doe', geld, lid);
+    const zelf = await post('/api/member/doe', Object.assign({ bevestigd: true }, geld), lid);
     const id = zonder.data && zonder.data.goedkeuring && zonder.data.goedkeuring.id;
+    const verzonnen = await post('/api/member/doe/bevestig', { goedkeuringId: 'bestaat-niet', akkoord: true }, lid);
     const met = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
     const nogEens = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
     const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && !!id
       && zelf.status === 428
+      && !(verzonnen.status >= 200 && verzonnen.status < 300)
       && met.status !== 428 && met.status !== 0
       && nogEens.status === 404;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + ', zelfbevestigd=' + zelf.status + ', echt akkoord=' + met.status + ', herhaald akkoord=' + (nogEens.status || '-') });
+    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok,
+      detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') +
+        ', zelfbevestigd=' + zelf.status + ', voorstel=' + (id ? 'ja' : 'GEEN') +
+        ', verzonnen-id=' + verzonnen.status + ', echt akkoord=' + met.status +
+        ', herhaald akkoord=' + (nogEens.status || '-') });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
@@ -960,7 +974,22 @@ async function misbruikBeproeving(tok) {
     { m: 'POST', p: '/api/pay/overzicht', rol: 'member' }, { m: 'POST', p: '/api/office/state', rol: 'office' },
     { m: 'POST', p: '/api/supplier/backoffice', rol: 'supplier' }
   ];
-  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (st.status >= 500) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } await new Promise(res => setTimeout(res, 1 + rint(4))); } }
+  /* DEZELFDE REGEL ALS DE GAUNTLET, EN DAT WAS HIER NIET ZO.
+
+     Hier stond `st.status >= 500`, en 503 is >= 500. De kop van dit bestand
+     belooft nadrukkelijk het tegendeel -- "nul onverwachte 5xx (503 feature-uit
+     en 429 tellen niet mee)" -- en de gauntlet hierboven houdt zich daar netjes
+     aan met een eigen tak per code. Deze lus telde ze wel mee, in dezelfde
+     buckets.s5xx.
+
+     Wat dat kostte: een ronde waarin De Wacht de app in onderhoud zette meldde
+     87.963 "onverwachte serverfouten" die allemaal 503 waren. Het cijfer wees
+     naar een kapotte server terwijl het een dichte deur was, en de echte
+     bevinding -- de app gaat in onderhoud en komt niet terug -- stond een regel
+     lager veel zachter opgeschreven. Een meter die zijn eigen regel niet volgt
+     wijst de verkeerde kant op precies wanneer het spannend is (LAT-regel 10). */
+  const echteServerfout = (s) => s >= 500 && s !== 503;
+  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (echteServerfout(st.status)) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } else if (st.status === 503) buckets.r503++; await new Promise(res => setTimeout(res, 1 + rint(4))); } }
   async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
   async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
   const lekMin = LEK_MS / 60000;

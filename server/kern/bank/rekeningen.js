@@ -1,4 +1,5 @@
-/* RTG Bank, deel "rekeningen": het openen, tonen, bevriezen en sluiten van
+
+const { magBij } = require('./eigendom');/* RTG Bank, deel "rekeningen": het openen, tonen, bevriezen en sluiten van
    rekeningen, en de IBAN-uitgifte. Een IBAN is een echt geldig NL-nummer (mod-97),
    met RTG's eigen bankcode -- zo voelt de eigen bank meteen echt en kunnen externe
    systemen (SEPA) er straks mee overweg. Rekening-identiteit hangt aan de codenaam;
@@ -72,14 +73,14 @@ module.exports = (ctx) => {
   }
   function detail(iban, codenaam) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     return { ok: true, rekening: publiek(m) };
   }
 
   // een rekening bevriezen/ontdooien (lid zelf bij verlies, of het kantoor)
   function bevries(iban, aan, codenaam) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     m.bevroren = aan === true;
     save();
     seintje(m.codenaam);
@@ -99,7 +100,7 @@ module.exports = (ctx) => {
   // een lege rekening sluiten; met saldo kan het niet (eerst leegmaken)
   function sluit(iban, codenaam) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     if (saldoVan(iban) !== 0) return { status: 409, error: 'Maak de rekening eerst leeg voordat je hem sluit.' };
     delete rekeningen()[iban];
     save();

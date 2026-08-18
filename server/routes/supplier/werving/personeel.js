@@ -92,21 +92,21 @@ app.post('/api/supplier/staff/join', async (req, res) => {
      personeelslogin op een gedeeld apparaat, dus kiest iemand er zelf geen, dan
      maken we er een en hoeft hij er nooit aan te denken. */
   const gekozen = String(req.body.pin || '').trim();
-  if (!bedrijf || !kassacode) { noteFailedTry(bucket); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
+  if (!bedrijf || !kassacode) { noteFailedTry(bucket, req.ip); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
   if (gekozen && !/^\d{4}$/.test(gekozen)) return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
   const pin = gekozen || accounts.makePin();
   // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Meld u aan met uw eigen RTG-account.' });
   }
   // 2) het bedrijf moet bestaan en de kassacode moet erbij horen (eenmalig)
   const s = findSupplierByName(bedrijf);
-  if (!s) { noteFailedTry(bucket); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
+  if (!s) { noteFailedTry(bucket, req.ip); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
   const lijst = invitesVan(s.code);
   const inv = lijst.find(i => i.kassacode === kassacode && !i.used && i.expires > Date.now());
-  if (!inv) { noteFailedTry(bucket); return res.status(403).json({ error: 'Deze kassacode klopt niet, is al gebruikt of verlopen. Vraag uw werkgever om een nieuwe uitnodiging.' }); }
+  if (!inv) { noteFailedTry(bucket, req.ip); return res.status(403).json({ error: 'Deze kassacode klopt niet, is al gebruikt of verlopen. Vraag uw werkgever om een nieuwe uitnodiging.' }); }
   // 3) niet dubbel aanmelden bij hetzelfde bedrijf
   if (accounts.staffByMember(s.code, lid.id)) {
     inv.used = true; save();

@@ -26,7 +26,7 @@ app.post('/api/login', (req, res) => {
     const bucket = 'demo:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       logInlog('lid', false, req.body.username, req);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     }
@@ -99,14 +99,24 @@ app.post('/api/auth/login', async (req, res) => {
   if (tooManyTries(res, bucket) || tooManyTries(res, bronBucket)) return;
   const user = accounts.findByLogin(login);
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
-    noteFailedTry(bucket);
-    noteFailedTry(bronBucket, 50);
-    noteFailedTry(doelBucket, 25);
+    noteFailedTry(bucket, req.ip);
+    noteFailedTry(bronBucket, req.ip, 50);
+    noteFailedTry(doelBucket, req.ip, 25);
     const doel = loginFails.get(doelBucket);
     if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, 2000));
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket); loginFails.delete(bronBucket); loginFails.delete(doelBucket);
+  /* DE HASH STIL OPWAARDEREN. Het wachtwoord klopt, dus we hebben de klaartekst
+     precies een keer in handen -- het enige moment waarop een hash met oude
+     scrypt-kosten naar de huidige kan (zie server/accounts/kluis.js). De inlog
+     hangt er niet van af: lukt het niet, dan loggen we dat en gaan we door, want
+     een lid buitensluiten omdat een VERBETERING mislukte is de verkeerde kant om
+     te falen. Stil overslaan mag het niet (LAT.md regel 5). */
+  if (typeof accounts.vernieuwWachtwoordHash === 'function') {
+    try { await accounts.vernieuwWachtwoordHash(user.id, req.body.password); }
+    catch (e) { try { require('../../log').log.warn('hash opwaarderen mislukte voor gebruiker ' + user.id + ': ' + e.message); } catch (x) {} }
+  }
   /* Uit dienst gemeld door de organisatie (SCIM) = ook met het juiste wachtwoord
      niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
      deze regel zou iemand een token krijgen dat meteen daarna nergens voor

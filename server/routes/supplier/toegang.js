@@ -52,7 +52,7 @@ app.post('/api/supplier/login', async (req, res) => {
     const bucket = 'sup:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     }
     loginFails.delete(bucket);

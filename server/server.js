@@ -324,7 +324,12 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      /* createStaffDemo en niet createStaffSync: dit zijn 183 rijen met een
+         pincode die twee regels hierboven te lezen is. Op volle scrypt-kosten
+         duurde deze lus alleen al twintig seconden voor 'listen' -- zie
+         server/accounts/wachtwoord.js bij hashDemoSync voor het waarom en de
+         drie grendels eromheen. */
+      people.forEach(([name, role, func], i) => accounts.createStaffDemo({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
@@ -512,7 +517,30 @@ function tooManyTries(res, bucket) {
   }
   return false;
 }
-function noteFailedTry(bucket, limiet) {
+/* DE BUCKET IS DE DEUR, DE BRON IS DE AANVALLER -- EN DAT ZIJN TWEE DINGEN.
+
+   `bucket` is waar geteld wordt voor de snelheidsrem, en die is met opzet fijn:
+   'auth:<ip>:<inlognaam>'. De inlognaam hoort daarin, want anders kan iemand
+   het account van een ander op slot zetten door het tien keer fout te raden.
+
+   `bron` is WIE er klopt. Die gaat apart mee naar het beveiligingsjournaal,
+   want de noodrem daar stelt een andere vraag: hoeveel AANVALLERS zijn er?
+   Telde je daar buckets, dan is een script vanaf een adres dat zes namen
+   probeert -- credential stuffing, de meest gewone aanval die er is -- goed
+   voor zes "bronnen", en ging het hele platform in onderhoud. Zonder ook maar
+   een account te raken. Zie server/beveiliging.js bij noodrem() en
+   test/noodrem-bron.test.js.
+
+   Wie geen bron meegeeft valt terug op de bucket. Dat is de oude, te
+   schrikachtige stand -- veilig maar luidruchtig -- en hij zegt het er ook bij,
+   zodat een vergeten aanroep opvalt in plaats van stil de noodrem te voeden.
+
+   De GRENS staat los van allebei: de deur van een lid gaat na tien pogingen
+   dicht, maar een emmer die een heel adres of een heel doelwit telt heeft er
+   meer nodig voor hij iemand onterecht buitensluit. Wie niets meegeeft krijgt
+   tien. */
+let bronLoosGemeld = false;
+function noteFailedTry(bucket, bron, limiet) {
   const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
@@ -525,10 +553,15 @@ function noteFailedTry(bucket, limiet) {
   f.laatst = Date.now();
   if (f.n >= grens) {
     f.until = Date.now() + 5 * 60000; f.n = 0;
+    if (!bron && !bronLoosGemeld) {
+      bronLoosGemeld = true;
+      try { require('./log').log.warn('noteFailedTry zonder bron (' + String(bucket).split(':')[0] +
+        '): de noodrem telt deze deur als aparte aanvaller. Geef req.ip mee.'); } catch (e) {}
+    }
     // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
     if (beveilig) beveilig.meld('brute-force', 'kritiek',
       'Te veel mislukte inlogpogingen (' + String(bucket).split(':')[0] + '). De inlog is tijdelijk op slot gezet; mogelijk een brute-force-aanval.',
-      { bron: bucket });
+      { bron: bucket, aanvaller: String(bron || bucket) });
   }
   loginFails.set(bucket, f);
 }

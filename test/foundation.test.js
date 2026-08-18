@@ -23,7 +23,20 @@ function api(pad, body) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
+  /* RTG_GEZIN_REM_UIT: dit bestand maakt zeventien gezinnen achter elkaar vanaf
+     hetzelfde adres, en /gezin/maak staat een quotum van acht per half uur toe
+     ('hooguit 8 nieuwe gezinnen per adres per half uur', server/foundation/
+     gezin.js). Dat quotum is geen storing maar een misbruikgrens: een echt
+     huishouden maakt geen negen gezinnen in dertig minuten.
+
+     Die rem stond vroeger uit zodra NODE_ENV=test, dus voor ELKE toets en ook
+     voor de rem op het RADEN van een gezinscode -- die daardoor nergens bewezen
+     werd (server/foundation/rem.js legt uit waarom dat erger is dan het klinkt).
+     Nu staat hij standaard aan en zet een toets hem uitdrukkelijk uit als hij
+     hem in de weg zit. Dit is zo'n toets, en dit is de reden. */
+  ({ child, base: BASE } = await startServer({
+    env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_GEZIN_REM_UIT: '1' },
+    wachtPad: '/api/foundation/health' }));
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

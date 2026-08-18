@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1022 bestanden en 6733 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1023 bestanden en 6737 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1022 |
-| losse beweringen (`test(...)`) | 6733 |
+| toetsbestanden | 1023 |
+| losse beweringen (`test(...)`) | 6737 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 857 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 51 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
-| niets van beide | 95 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-898 bestanden, 6520 beweringen.
+899 bestanden, 6524 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -249,6 +249,7 @@ toets omvalt.
 | `geheugen.test.js` | 9 | gezakt op `===->!==` | Test voor de GEHEUGEN-motor (server/db/geheugen.js): de volledig in-memory runtime-engine met versleutelde, incrementele, brok-per-collectie-opslag. Toetst het beloofde: correctheid (round-trip), privacy (niets... |
 | `geld-conservatie-last.test.js` | 1 | gezakt op `liegpoort /api/` | Geld-conservatie onder GELIJKTIJDIGE, ECHTE schrijfpaden. De beproeving zaait haar activiteit rechtstreeks in de opslag (snel, maar het toetst geen functionele juistheid van de echte betaalroute). |
 | `geld-rollen-buiten-bank.test.js` | 4 | gezakt op `true->false#0` | DE ROLLENVRAAG BUITEN DE BANK. test/geld-rollen.test.js bewijst dat lid B niet bij de bankrekening van lid A komt. |
+| `geld-rollen-gezin.test.js` | 4 | -- | KOMT GEZIN B BIJ HET DOSSIER VAN GEZIN A? De zesde en laatste rollenvraag, en de zwaarste. |
 | `geld-rollen-school.test.js` | 4 | gezakt op `return-weg#0` | KOMT SCHOOL B BIJ DE ADMINISTRATIE VAN SCHOOL A? De vierde rollenvraag. |
 | `geld-rollen-werkruimte.test.js` | 4 | gezakt op `===->!==#0` | KOMT WERKRUIMTE B BIJ DE LICENTIEKOSTEN VAN WERKRUIMTE A? De vijfde rollenvraag, en de laatste van de vier vormen die dit huis kent. |
 | `geld-rollen-zaken.test.js` | 3 | gezakt op `!==->===#0` | KOMT ZAAK B BIJ DE OMZET VAN ZAAK A? De derde rollenvraag. |

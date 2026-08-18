@@ -446,6 +446,11 @@ const EIGEN_MODULE = new Map([
      toets 2 zakken (een aanvaller sluit het huis weer), en de drempel
      onbereikbaar hoog zetten laat toets 3 zakken (dan is de noodrem weg). */
   ['noodrem-bron.test.js', ['server/beveiliging.js', 'server/server.js']],
+  /* De zesde rollenvraag. De grendel is profielVan() -- een token wordt BINNEN
+     het gezin gezocht -- en de rem tegen het raden van een gezinscode staat in
+     foundation/basis.js. Met de hand nagemeten en raak: profielVan over alle
+     gezinnen heen laten zoeken laat toets 2 zakken. */
+  ['geld-rollen-gezin.test.js', ['server/foundation/gezinshulp.js', 'server/foundation/basis.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van

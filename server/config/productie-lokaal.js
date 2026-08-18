@@ -6,6 +6,12 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   if (env.RTG_DEMO === '1')
     fouten.push('RTG_DEMO=1 in productie: de demo-inlog zou openstaan. Zet hem uit.');
 
+  /* De rem op het raden van een gezinscode. Toetsen mogen hem uitzetten (ze
+     delen een adres en zouden elkaar anders remmen); een echte server nooit.
+     Achter een gezinscode liggen kinderprofielen met locatie en gezondheid. */
+  if (env.RTG_GEZIN_REM_UIT === '1')
+    fouten.push('RTG_GEZIN_REM_UIT=1 in productie: het raden van gezinscodes zou onbeperkt zijn. Zet hem uit.');
+
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')
       fouten.push(naam + '=1 is uitsluitend lokaal: een contract-sandbox mag productie nooit als een echte integratie laten starten.');

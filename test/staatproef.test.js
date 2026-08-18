@@ -105,7 +105,7 @@ test('drie vingerafdrukken rond twee oproepen, en de ruis wordt toegepast', asyn
     vingerafdruk: async () => ({ nr: ++beurt }),
     verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]); return d('doorgeefjournaal', 'agenda'); },
     ruis: new Set(['doorgeefjournaal']),
-    routes: [{ method: 'POST', pad: '/api/x', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/x', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
   assert.equal(beurt, 3, 'drie vingerafdrukken bij de eerste route');
@@ -125,7 +125,7 @@ test('de laatste afdruk van een route is de eerste van de volgende', async () =>
     post: async () => ({ status: 200 }),
     vingerafdruk: async () => ({ nr: ++beurt }),
     verschilVan: async () => d('agenda'),
-    routes: [1, 2, 3].map(i => ({ method: 'POST', pad: '/api/r' + i, rol: 'member' })),
+    routes: [1, 2, 3].map(i => ({ methode: 'POST', pad: '/api/r' + i, rol: 'member' })),
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
   assert.equal(beurt, 7, 'drie routes: 3 + 2 + 2, niet 9');
@@ -139,7 +139,7 @@ test('bewoog er bij GEEN ENKELE route iets, dan meldt de ronde zichzelf blind', 
     post: async () => ({ status: 200 }),
     vingerafdruk: async () => ({}),
     verschilVan: async () => niets,
-    routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }, { method: 'POST', pad: '/api/b', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }, { methode: 'POST', pad: '/api/b', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
   assert.ok(uit.meterStuk);
@@ -151,7 +151,7 @@ test('een vingerafdruk die niet terugkomt is een kapotte MEETOPSTELLING, geen be
     post: async () => ({ status: 200 }),
     vingerafdruk: async () => null,
     verschilVan: async () => niets,
-    routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
   assert.match(uit.perRoute['POST /api/a'].reden, /vingerafdruk kwam niet terug/);

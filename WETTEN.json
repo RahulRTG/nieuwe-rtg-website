@@ -531,12 +531,12 @@
         "server/kern/concern/tijd.js"
       ],
       "sabotage": {
-        "wat": "laat de tijdmachine een gegeven ZONDER bron alsnog door, met bron null -- precies de stille vorm die ./bron.js kwam voorkomen",
+        "wat": "laat de tijdmachine een gegeven ZONDER bron alsnog vastleggen, met bron null -- precies de stille vorm die ./bron.js kwam voorkomen",
         "bestand": "server/kern/concern/tijd.js",
-        "zoek": "if (b.error) return { status: 400, error: b.error, uitleg: b.uitleg };",
-        "zet": "if (b.error) b.bron = null;",
+        "zoek": "const b = maakBron(o.bronSoort, o.bronDetail, o.wie);\n    if (b.error) return { status: 400, error: b.error, uitleg: b.uitleg };",
+        "zet": "const b = maakBron(o.bronSoort, o.bronDetail, o.wie);\n    if (b.error) b.bron = null;",
         "wachters": [
-          "test/concern.test.js"
+          "test:test/concern.test.js"
         ]
       }
     },

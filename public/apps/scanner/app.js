@@ -21,30 +21,9 @@
     clearTimeout(meldT); meldT = setTimeout(function () { m.classList.remove('zie'); }, 3200);
   };
 
-  /* DE MAP SCANS WORDT BIJ HET OPENEN GEZOCHT, EN DAT DUURT TWEE VERZOEKEN.
-     Wie sneller klikt dan die twee, bewaarde tot nu toe met `map: null`: het
-     bestand landde dan naast de map terwijl de melding wel "bewaard in je
-     kluis (map Scans)" zei. Niemand die het merkte -- de melding kwam, de
-     upload lukte, alleen de map klopte niet. Een belofte in tekst is een
-     belofte in code, dus wachten de bewaarknoppen nu op DEZE belofte in plaats
-     van op een variabele die er misschien al staat.
-
-     Bij een mislukking vervalt de belofte weer. Anders zou een hapering bij
-     het openen het bewaren voorgoed op null vastzetten, en dat is precies de
-     stille fout die we hier weghalen. */
-  var mapId = null, mapBelofte = null;
-  function zoekMap() {
-    if (!mapBelofte) mapBelofte = api('/api/bestanden/mijn').then(function (r) {
-      if (r.body.error) throw new Error(r.body.error);
-      var m = (r.body.mappen || []).find(function (x) { return x.naam === 'Scans'; });
-      if (m) { mapId = m.id; return mapId; }
-      return api('/api/bestanden/map', { naam: 'Scans' }).then(function (n) {
-        if (n.body.error) throw new Error(n.body.error);
-        mapId = n.body.id; return mapId;
-      });
-    }).catch(function (e) { mapBelofte = null; throw e; });
-    return mapBelofte;
-  }
+  /* De map Scans: opzoeken gaat via shared/kluismap.js, en daar staat ook
+     waarom dat een belofte is en geen variabele -- deze app was de aanleiding. */
+  function zoekMap() { return RTGKluisMap.zoek(api, 'Scans'); }
 
   /* ---- pagina's: elk een JPEG op het toestel tot je bewaart ---- */
   var paginas = [];   // { b64, w, h }

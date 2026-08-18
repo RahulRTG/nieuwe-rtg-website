@@ -81,3 +81,97 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* OPNEMEN EN BEWAREN, EN DE WEDLOOP DAAROMHEEN.
+
+   De toets hierboven zet de memo via de kluis-API klaar; het echte bewaarpad
+   (opnemen -> stoppen -> upload) liep daardoor nooit door een toets heen. Dat
+   was precies de plek waar het misging: apps/memo/app.js zoekt de map Memo's op
+   in twee verzoeken en bewaarde ondertussen met `map: null`. De memo landde dan
+   naast de map, terwijl er "Memo bewaard in je kluis" stond -- en omdat de lijst
+   op diezelfde map filtert, zag je hem ook niet meer terug.
+
+   De microfoon valt buiten headless bereik, maar het bewaarpad niet: RTGMedia en
+   MediaRecorder zijn hier vervangen door een dubbelganger die precies doet wat
+   de app van ze verwacht. Wat er daarna gebeurt is de echte code.
+
+   De vertraging op het opzoeken van de map maakt van de wedloop een zekerheid,
+   zoals ook in test/scanner.e2e.js. Zonder de wachtende zoekMap() zakt hij. */
+test('Memo: opnemen en stoppen bewaart in de map Memo\'s, ook als het opzoeken traag is',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-memo-opname-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, ANTHROPIC_API_KEY: '' } });
+  let browser;
+  try {
+    const u = Date.now().toString().slice(-8);
+    const reg = await fetch(base + '/api/auth/register', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Opnamelid', email: 'mo' + u + '@x.nl', phone: '06' + u,
+        password: 'geheim123', geboortedatum: '1992-04-04', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
+    assert.ok(reg.token, 'het opnamelid is aangemeld');
+    const api = (pad, body) => fetch(base + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+      body: JSON.stringify(body || {}) }).then(r => r.json());
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    /* De map wordt traag opgezocht, en de dubbelganger van de recorder is klaar
+       voordat dat rond is -- de wedloop die op een drukke telefoon vanzelf
+       ontstaat, hier met de klok vastgezet. */
+    await page.addInitScript(() => {
+      const echt = window.fetch;
+      window.fetch = function (p, o) {
+        if (String(p).includes('/api/bestanden/mijn'))
+          return new Promise(r => setTimeout(() => r(echt(p, o)), 1200));
+        return echt(p, o);
+      };
+    });
+    await page.goto(base + '/apps/memo.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(t => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, reg.token);
+    await page.goto(base + '/apps/memo.html', { waitUntil: 'domcontentloaded' });
+
+    await page.evaluate(() => {
+      const spoor = { stop() {} };
+      window.RTGMedia = window.RTGMedia || {};
+      window.RTGMedia.microfoon = () => Promise.resolve({ getTracks: () => [spoor] });
+      window.MediaRecorder = function () {
+        this.mimeType = 'audio/webm';
+        this.start = function () {};
+        this.stop = function () {
+          if (this.ondataavailable) this.ondataavailable({ data: new Blob(['geluid'], { type: 'audio/webm' }) });
+          if (this.onstop) this.onstop();
+        };
+      };
+    });
+
+    /* opnemen en meteen stoppen: dat is sneller dan het opzoeken van de map */
+    await page.evaluate(() => { document.querySelector('#opneem').click(); });
+    await page.waitForFunction(() => /Stop en bewaar/.test(document.querySelector('#opneem').textContent),
+      null, { timeout: 8000 });
+    await page.evaluate(() => { document.querySelector('#opneem').click(); });
+    await page.waitForFunction(() => /bewaard in je kluis/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 20000 });
+
+    const kluis = await api('/api/bestanden/mijn', {});
+    const map = (kluis.mappen || []).find(m => m.naam === "Memo's");
+    const memo = (kluis.items || []).find(x => /^memo-.*\.webm$/.test(x.naam));
+    assert.ok(map, 'de map Memo\'s bestaat');
+    assert.ok(memo, 'er staat een memo in de kluis');
+    assert.equal(memo.map, map.id, 'en hij staat IN de map Memo\'s, niet ernaast');
+
+    /* en de lijst laat hem ook zien -- die filtert op dezelfde map */
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .memo').length === 1,
+      null, { timeout: 20000 });
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
+  } finally {
+    if (browser) try { await browser.close(); } catch (e) {}
+    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

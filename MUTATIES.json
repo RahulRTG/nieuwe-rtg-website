@@ -3107,20 +3107,19 @@
     },
     "motorverbinding.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "server/kern/pay/motorklant.js",
-        "server/kern/bank/motorklant.js"
-      ],
-      "posities": 1
+      "staat": "gezakt",
+      "module": "server/kern/motorverbinding.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "motorzekering.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "server/kern/pay/motorklant.js"
-      ],
-      "posities": 1
+      "staat": "gezakt",
+      "module": "server/kern/motorzekering.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "mrz.test.js": {
       "soort": "puur",
@@ -3859,6 +3858,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "perimeter-risico.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "persistentiestand.test.js": {

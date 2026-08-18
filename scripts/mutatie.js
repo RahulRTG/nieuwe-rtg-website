@@ -359,6 +359,21 @@ const EIGEN_MODULE = new Map([
   ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
   /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
   ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
+     is sinds de samenvoeging een schil van dertig regels: twee paden, twee
+     namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet
+     omdat de toetsen niets vastleggen, maar omdat het gedrag een laag dieper
+     woont. Dat is precies waar dit register voor is.
+
+     Nagemeten met de hand, en alle tien raak: bij motorzekering.test.js slaan de
+     verwisselde storingsdrempel (elke niet-2xx als storing), een zekering die
+     nooit opent, een half-open die de hele wachtrij doorlaat, een ontbrekend dak
+     op de antwoordgrootte en een ontbrekende gelijktijdigheidsgrens allemaal
+     aan; bij motorverbinding.test.js de verwisselde grootboekpaden, het niet
+     afronden van centen, een weigering die als geslaagd telt, en het weghalen
+     van de fail-closed op een ontbrekende URL. */
+  ['motorzekering.test.js', ['server/kern/motorzekering.js']],
+  ['motorverbinding.test.js', ['server/kern/motorverbinding.js', 'server/kern/motorzekering.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van

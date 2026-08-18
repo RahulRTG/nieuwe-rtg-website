@@ -193,6 +193,21 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "ankerdienst-echt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "ankerdienst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "anthropic.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -635,6 +650,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "boardlog-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "boardroom-poort.test.js": {
       "soort": "server",
@@ -1752,6 +1775,21 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "handelingsspoor-echt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "handelingsspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/handelingsspoor.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "handelsketen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1960,11 +1998,34 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "idem-poort-echt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "idem-poort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem-poort.js",
+      "operator": "true->false#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/idemproef.js",
       "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idemschuld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idemsleutels.js",
+      "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 1
     },
@@ -4857,6 +4918,13 @@
       "geprobeerd": 7,
       "posities": 8
     },
+    "securitylog-keten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "selfhost.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5725,6 +5793,21 @@
       "module": "scripts/uitrol.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "uitrolregie-echt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "uitrolregie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/uitrolregie.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
       "geprobeerd": 1
     },
     "upload-poort.test.js": {

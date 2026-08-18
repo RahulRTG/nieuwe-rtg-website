@@ -85,28 +85,14 @@
 'use strict';
 
 const crypto = require('crypto');
-const klok = require('./klok');
 const { sleutelVoor, VENSTER_MS } = require('./idemsleutels');
+/* De bewaarkast staat apart: dat is een gegevensstructuur (ring, vervaltijd,
+   wat er wel en niet in mag) zonder een enkel begrip uit het web erin. Wat
+   HIER staat is het http-deel: welke sleutel geldt, wie de afzender is, en wat
+   er met een herhaling gebeurt. Zie de kop van ./idem-kast.js. */
+const { maakKast, afdrukVan, MAX, TTL_MS } = require('./idem-kast');
 
-const MAX = 20000;              // ring: zoveel sleutels houden we vast
-const TTL_MS = 24 * 60 * 60 * 1000; // een dag, zoals de gangbare betaalrails
 const MAX_SLEUTEL = 200;        // langer is geen sleutel maar een payload
-
-/* De velden die NIET meetellen in de afdruk van het verzoek. Zelfde gedachte
-   als in lib/idem.js: de sleutel zelf is geen inhoud, en vrije tekst is geen
-   ander verzoek. */
-const BUITEN_AFDRUK = new Set(['idem', 'idempotentieSleutel', 'notitie', 'omschrijving', 'oms', 'toelichting']);
-
-function afdrukVan(body) {
-  if (!body || typeof body !== 'object') return '';
-  const uit = {};
-  for (const k of Object.keys(body).sort()) {
-    if (BUITEN_AFDRUK.has(k)) continue;
-    uit[k] = body[k];
-  }
-  try { return crypto.createHash('sha256').update(JSON.stringify(uit)).digest('hex'); }
-  catch (e) { return ''; } // niet-serialiseerbaar (cyclisch): dan geen binding, geen 409
-}
 
 /* Wie stuurt dit? De poort hoeft niet te weten WIE het is, alleen dat twee
    verschillende mensen nooit dezelfde opslagsleutel delen. Een hash over het
@@ -158,33 +144,15 @@ function verklaardeSleutel(req) {
 /* De poort zelf. `nu` is injecteerbaar zodat de verlooptoets niet hoeft te
    wachten; standaard is het de huisklok en niet Date.now(). */
 function maakIdemPoort(opties) {
-  const nu = (opties && opties.nu) || klok.nu;
-  const max = (opties && opties.max) || MAX;
   const ttl = (opties && opties.ttl) || TTL_MS;
+  const kast = maakKast(opties);
 
-  const bewaard = new Map();  // opslagsleutel -> { status, lijf, afdruk, tot }
   const inVlucht = new Map(); // opslagsleutel -> { afdruk, belofte, klaar }
-
-  function opruimen() {
-    const t = nu();
-    for (const [k, v] of bewaard) if (v.tot <= t) bewaard.delete(k);
-    // de ring: Map bewaart invoegvolgorde, dus de oudste staat vooraan
-    while (bewaard.size > max) bewaard.delete(bewaard.keys().next().value);
-  }
 
   function opslagsleutel(req, sleutel) {
     return crypto.createHash('sha256')
       .update(wieVan(req) + '\u0000' + req.method + '\u0000' + (req.path || req.url || '') + '\u0000' + sleutel)
       .digest('hex');
-  }
-
-  /* Mag dit antwoord bewaard worden? Regel 1 uit de kop, en de enige plek waar
-     hij staat. `ok:false` in een 200 is hier een MISLUKKING -- dat is de vorm
-     die de kern gebruikt voor "het ging niet door, probeer opnieuw". */
-  function magBewaren(status, lijf) {
-    if (!(status >= 200 && status < 300)) return false;
-    if (lijf && typeof lijf === 'object' && lijf.ok === false) return false;
-    return true;
   }
 
   function middleware(req, res, next) {
@@ -199,9 +167,8 @@ function maakIdemPoort(opties) {
 
     const id = opslagsleutel(req, sleutel);
     const afdruk = afdrukVan(req.body);
-    opruimen();
 
-    const eerder = bewaard.get(id);
+    const eerder = kast.haal(id);
     if (eerder) {
       if (afdruk && eerder.afdruk && eerder.afdruk !== afdruk)
         return res.status(409).json({ error: 'Deze idem-sleutel is al gebruikt voor een ander verzoek.' });
@@ -232,17 +199,11 @@ function maakIdemPoort(opties) {
 
     res.json = (lijf) => {
       const status = res.statusCode || 200;
-      if (magBewaren(status, lijf)) {
-        bewaard.set(id, { status, lijf, afdruk, tot: nu() + vensterMs });
-        /* Snoeien hoort NA het opslaan en niet alleen aan het begin van het
-           volgende verzoek: anders staat de ring tussen twee verzoeken door
-           altijd één over zijn grens, en bij een stille server blijft hij daar
-           staan. Zo gevonden, door de toets op de omvang. */
-        opruimen();
-        rond({ status, lijf });
-      } else {
-        rond(null); // mislukt: niets bewaren, een volgende poging mag het echt opnieuw doen
-      }
+      /* De kast beslist zelf of dit bewaard mag worden (alleen een geslaagd
+         antwoord) en snoeit meteen daarna. Levert hij false, dan is er niets
+         onthouden en mag een volgende poging het werk echt opnieuw doen. */
+      if (kast.zet(id, { status, lijf, afdruk }, vensterMs)) rond({ status, lijf });
+      else rond(null);
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken
@@ -260,7 +221,7 @@ function maakIdemPoort(opties) {
       : lijf;
   }
 
-  middleware.omvang = () => bewaard.size;
+  middleware.omvang = () => kast.omvang();
   return middleware;
 }
 

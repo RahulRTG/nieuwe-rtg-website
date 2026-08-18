@@ -431,9 +431,13 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
        hoort geknipt te worden, niet vrijgesteld.
 
-         server/lib/idem-poort.js          12,6 KB / 5,1 KB code
-           naad: de bewaarkast (de ring, het venster, het opruimen) los van de
-           poort zelf. De kast is een gegevensstructuur zonder http erin.
+         server/lib/idem-poort.js          11,3 KB / 4,1 KB code
+           de bewaarkast IS eruit (./idem-kast.js, 4,3 KB): de ring, het venster
+           en de regel dat alleen een geslaagd antwoord erin mag, staan nu los
+           en zonder een enkel begrip uit het web erin. Wat hier over is, is het
+           http-deel -- en dat ligt nog boven de maat. De volgende naad is de
+           SLEUTELBEPALING (welke sleutel geldt, en van wie) los van wat de
+           poort met een herhaling doet.
 
          server/kern/command/uitrolregie.js  12,7 KB / 7,6 KB code
            naad: het METEN (5xx over al het verkeer sinds de sport) los van het

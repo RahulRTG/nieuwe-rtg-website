@@ -8,33 +8,33 @@
     "endpointsZonderTest": 1192,
     "dekkingPct": 76,
     "keuringStuk": 0,
-    "keuringScheef": 23,
+    "keuringScheef": 41,
     "dependencies": 0,
     "testbestanden": 899,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 129,
-    "keuringOmvang": 159,
-    "keuringDubbeling": 117,
+    "keuringOmvang": 320,
+    "keuringDubbeling": 311,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
-    "keuringTeGroot": 21,
-    "inlineStijlAttributen": 5994,
+    "keuringTeGroot": 37,
+    "inlineStijlAttributen": 5999,
     "browserpoortToetsen": 195,
-    "kernBreedte": 1417,
-    "kernGedeeld": 191,
+    "kernBreedte": 1435,
+    "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 162,
+    "toetsenNietGemeten": 170,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "ratelTanden": 43,
-    "metingenZonderRatel": 6,
+    "metingenZonderRatel": 9,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
@@ -44,6 +44,85 @@
     "gluurOnbewaakt": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 159,
+      "vervalt": "2026-11-02",
+      "meter": "keuringOmvang 159 -> 320 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. De band vlak onder de 10 kB-grens is vol gelopen: negen takken die elk netjes onder de grens knipten, zetten samen 161 bestanden extra in de waarschuwingsband. Dit hangt een op een aan keuringTeGroot en keuringDubbeling hierboven: wie die schulden aflost (knippen op naden, namen samenvoegen) trekt deze band leeg of juist voller, dus hij deelt de ruime einddatum van de dubbeling. Verrekenen met keuringTeGroot mag uitdrukkelijk niet (zie scripts/norm.js)."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "waarheen": "dezelfde plek als kernBreedte hieronder: GRENZEN.json, waar de gedeelde namen per domein zijn begrensd",
+      "meter": "kernGedeeld 191 -> 194 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Drie kernnamen worden nu door meer dan een domein gevraagd -- de persoonseis-poort en het lidstand-koppelpunt zijn er met opzet EEN plek voor drie vragers, precies de ruil die LAT-regel 4 voorschrijft. Een kopie per domein zou deze meter sparen en de regel dupliceren."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 6,
+      "vervalt": "2026-10-01",
+      "meter": "metingenZonderRatel 6 -> 9 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Drie meetbestanden erbij (uit de onderhouds- en ratel-takken zelf) waar nog geen ratel aan hangt. Aflossen is er een ratel bij zetten per bestand, niet een regel erbij schrijven -- zie de kop van scripts/lib/metingen.js."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 18,
+      "vervalt": "2026-10-01",
+      "meter": "keuringScheef 18 -> 41 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Scheve bevindingen zijn reparatiewerk en geen functieprijs: ze horen terug naar de oude stand. De vindplaatsen staan in de keuring zelf (npm run keuring)."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "keuringTeGroot",
+      "van": 16,
+      "vervalt": "2026-10-01",
+      "meter": "keuringTeGroot 16 -> 37 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Eenentwintig modules extra echt over de 10 kB-grens. Het knipwerk hoort per naad te gebeuren; de twintig zwaarste staan al met pad en reden in de uitzonderingen hieronder, met dezelfde soort vervaldatum."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 115,
+      "vervalt": "2026-11-02",
+      "meter": "keuringDubbeling 115 -> 311 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Negen takken brachten elk hun eigen woordenschat mee en die overlapt: 196 functienamen extra die in meer dan twee kernmodules staan. Dit is de duurste schuld van de ronde en krijgt daarom de ruimste einddatum; hij wordt afgelost door hernoemen of samenvoegen per naam, niet door de meter te verzetten."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 155,
+      "vervalt": "2026-10-01",
+      "meter": "toetsenNietGemeten 155 -> 170 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Vijftien toetsbestanden extra waar de mutatiemotor nog niet langs is geweest; die motor draait uren en is in deze ronde niet gedraaid. Aflossen is een volle ronde npm run mutatie."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "schuld",
+      "sleutel": "inlineStijlAttributen",
+      "van": 5927,
+      "vervalt": "2026-10-01",
+      "meter": "inlineStijlAttributen 5927 -> 5999 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Tweeenzeventig style-attributen erbij, vrijwel allemaal in de tien schermen die ook bij de deltapoort-uitzonderingen staan. Aflossen = klassen, zoals de vorige twee rondes deden."
+    },
+    {
+      "datum": "2026-08-19",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "waarheen": "GRENZEN.json (de domeinen social, reizen en onderneming dragen de nieuwe namen) en de notities van 2026-08-18 hieronder, die de groei per tak verantwoorden",
+      "meter": "kernBreedte 1413 -> 1435 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De samenvoegronde (PR #83): negen PR-takken bijeen. Elke tak bleef binnen zijn eigen lat; de verzameling niet, want deze meter telt over het geheel. Dit is als enige van de zes geen reparatieschuld maar functieprijs: de contactpin (+8, begrensd onder social), de reisbalie en de instellingsweg (+12) en de persoonseis droegen elk hun eigen verantwoording in de notities van 18 augustus. De belofte \"de kern blijft smal\" is niet losgelaten maar per naam ondergebracht in GRENZEN.json, waar geen ander domein erbij kan."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",
@@ -592,5 +671,127 @@
     "inlineStijlAttributen": "2026-08-18",
     "ratelTanden": "2026-08-18",
     "metingenZonderRatel": "2026-08-18"
-  }
+  },
+  "uitzonderingen": [
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/app-main/app-main-08b.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 5 stijlattributen in de reisbureau-schermen (PR #75/#78)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/backoffice/backoffice-01.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 2 attributen erbij in de kantoorschermen (PR #81)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/backoffice/backoffice-03.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 1 attribuut erbij (PR #81)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/backoffice/backoffice-03c.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw kantoordeel met 2 attributen (PR #81)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/kantoren.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 30 attributen erbij op het kantorenscherm (PR #75/#80)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/overheid.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 2 attributen erbij (PR #81)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/reisbureau.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 3 attributen erbij op het reisbureauscherm (PR #75)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/reisuitnodiging.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw scherm met 12 attributen (PR #75)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/reizen.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 22 attributen op het vernieuwde reizenscherm (PR #75)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/rtgid.html",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; 3 attributen erbij (PR #70)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/bewaarbeleid.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; het handelingsspoor-bewaarbeleid (PR #70) duwt hem net over de grens; de naad is de takkenlijst apart",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/db/ledengids.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de contactpin-velden (PR #77, al op main) plus de consent-kant (PR #81); stond al met reden in de NOG-lijst van check.js",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/functies/register/index.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; het functieregister verdubbelt door de persoonseis (PR #74); de naad is de eisenkant los van het register",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/appgids-data/deel1.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; gids-ingangen van de nieuwe schermen; de geplande verhuizing naar deel1b staat al in check.js aangetekend",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/command/uitrolregie.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw uit PR #74 (13 kB); de naad is de canary-kant los van de uitrolstappen",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/pay/index.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de idem-poort-aansluiting (PR #70)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/lib/idem-poort.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; nieuw uit PR #70 (11,3 kB); de naad is de afdruk-kant (BUITEN_AFDRUK) los van het venster",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/lib/keten.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; groei door de handelingssporen (PR #70/#74)",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/kernlaag4b.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; draagt sinds de ronde ook de reisuitnodiging en het lidstand-koppelpunt; de 10 kB-knip naar 4c bestaat al en de volgende kamer kan erheen",
+      "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/server.js",
+      "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; de monoliet groeit met elke tak mee; het afbouwplan staat in TAKEN.md en elke nieuwe kamer hoort in kern/ of routes/ te landen, niet hier",
+      "vervalt": "2026-09-15"
+    }
+  ]
 }

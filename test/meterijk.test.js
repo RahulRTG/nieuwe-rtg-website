@@ -266,7 +266,13 @@ const IJKINGEN = {
         /* De lexfout telt mee als ongedekt, en dat hoort ook geijkt: een bestand
            dat de tweede mening niet kan lezen is geen bestand zonder bevindingen,
            het is een bestand waar niet naar gekeken is (LAT.md regel 10). */
-        fs.writeFileSync(path.join(dir, 'server', 'stuk.js'), 'const = = = ;\n');
+        /* EEN LEXFOUT IS IETS ANDERS DAN EEN PARSEFOUT, en hier stond eerst het
+           verkeerde: `const = = = ;`. Dat is onzin voor een parser, maar een
+           LEXER tokeniseert het probleemloos -- `const`, drie gelijktekens, een
+           puntkomma, allemaal geldige tokens. Deze ijking zakte daarop, en dat
+           is precies waarvoor hij bestaat: hij mat niet wat hij beweerde te
+           meten. Een niet-afgesloten string breekt de lexer wel echt. */
+        fs.writeFileSync(path.join(dir, 'server', 'stuk.js'), "const a = 'nooit gesloten\n");
         const metStuk = meetBlind({ wortel: dir, mappen: ['server'] });
         assert.equal(metStuk.lexfout, 1, 'onleesbare bron telt als lexfout');
         assert.equal(metStuk.ongedekt, 1, 'en een lexfout telt mee in de meter, niet als stille nul');

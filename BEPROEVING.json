@@ -1,5 +1,5 @@
 {
-  "gedraaid": "2026-08-18T15:31:53.161Z",
+  "gedraaid": "2026-08-18T16:29:24.361Z",
   "modus": "postgres",
   "machine": {
     "kernen": 4,
@@ -8,26 +8,26 @@
     "node": "v22.22.2"
   },
   "oordeel": "GEZAKT",
-  "gezakteDrempels": 2,
+  "gezakteDrempels": 1,
   "meters": {
     "p50Ms": 34,
     "p95Ms": 233,
     "p99Ms": 377,
-    "maxMs": 5246,
-    "doorvoerPerSec": 519,
-    "stormDuurSec": 1207.5,
+    "maxMs": 3503,
+    "doorvoerPerSec": 536,
+    "stormDuurSec": 1209.9,
     "serverfouten5xx": 0,
     "serverfouten5xxPaden": [],
-    "eventLoopP99Ms": 321.1,
-    "eventLoopMaxMs": 3787.9,
-    "cpuGemiddeldPct": 111.6,
-    "cpuPiekPct": 147.6,
-    "ramPiekMB": 1269,
+    "eventLoopP99Ms": 350.4,
+    "eventLoopMaxMs": 3475.5,
+    "cpuGemiddeldPct": 112.5,
+    "cpuPiekPct": 159.3,
+    "ramPiekMB": 1475,
     "geheugenHellingMBPerMin": 0,
-    "herstelSeconden": null,
-    "verhalenSlaagPctStorm": 72.4,
+    "herstelSeconden": 3,
+    "verhalenSlaagPctStorm": 72.8,
     "verhalenGefaaldStorm": 0,
     "endpointsOnbereikt": 0,
-    "endpointsBestookt": 3426
+    "endpointsBestookt": 3427
   }
 }

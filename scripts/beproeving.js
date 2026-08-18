@@ -705,6 +705,16 @@ async function misbruikBeproeving(tok) {
     await post('/api/auth/register', { name: 'Omstander Proef', email, password: ww, geboortedatum: '1990-01-01' });
     const inlog = await post('/api/auth/login', { login: email, password: ww, pasApp: 'rtg' });
     const tok = (inlog.data && inlog.data.token) || null;
+    /* En zijn paspoort erbij: RTG Pay eist eenmalig KYC van een echt gratis
+       account (payGate accepteert 'pending'), en zonder die stap kan de
+       vingerafdruk-ijking van E3 zijn kalibratie-oplading niet doen -- dan
+       heet de meter blind terwijl alleen de meetgebruiker nog geen paspoort
+       had laten zien. Een pixel is genoeg: de poort toetst de indiening,
+       niet de foto. */
+    if (tok) {
+      const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+      await post('/api/verify/upload', { image: pixel }, tok);
+    }
     return { member: tok ? [tok] : [], supplier: [], office: [] };
   })();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');

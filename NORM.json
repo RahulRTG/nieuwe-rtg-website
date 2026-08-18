@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
-    "keuringOmvang": 156,
+    "keuringOmvang": 159,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5927,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1404,
-    "kernGedeeld": 188,
+    "kernBreedte": 1413,
+    "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 150,
+    "toetsenNietGemeten": 155,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1
@@ -33,9 +33,14 @@
   "notities": [
     {
       "datum": "2026-08-18",
-      "meter": "kernBreedte 1396 -> 1404 en keuringOmvang 155 -> 156 (VERHOOGD voor de contactpin)",
-      "reden": "De acht zijn geen erosie maar precies de acht kernnamen die deze functie toevoegt en die de routes ook echt aanraken: pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind, liveMaak, liveKijk en liveVerbind. Ze staan alle acht in GRENZEN.json bij het domein social, dus ze zijn benoemd en afgebakend en niet zomaar aan de kern geplakt. Een functie toevoegen zonder dat deze meter beweegt kan alleen door de kern te omzeilen, en dat is de duurdere fout. keuringOmvang gaat met een omhoog voor public/apps/app-main/app-main-09a.js (9769 bytes): het pin-paneel zit onder de lat maar in de band eronder. Opknippen zou hier een derde deel opleveren dat alleen het tonen van een QR draagt, en dat is een naad die niet bestaat -- het paneel is een ding.",
-      "eerlijkheidshalve": "Drie andere meters die deze tak eerst wel liet zakken, zijn NIET hier weggeschreven maar gerepareerd. endpointsZonderTest stond op 1204 tegen een norm van 1192: alle twaalf pin-loketten worden nu met hun volledige pad aangeroepen in test/contactpin.test.js, en die toetsen vonden meteen een echte fout (de gezinsroute las de gescande code als sessietoken, omdat allebei `token` heetten). inlineStijlAttributen stond op 5944 tegen 5927 en staat weer op 5927: de trefferregel stond aan beide kanten in twee kopieen met de opmaak in style-attributen, en dat is nu een gedeelde bouwer met klassen. toetsenNietGemeten stond op 151 tegen 150 en staat weer op 150 doordat de mutatiemotor over contactpin.test.js is gedraaid -- uitslag gezakt, en scherp gezakt, dus hij zakt op de inhoud en niet alleen op de inlog."
+      "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",
+      "reden": "De contactpin (kern/sociaal/pin*.js). Drie meters gaan omhoog en dat is hier de prijs van een functie erbij, geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nkernBreedte +8: precies de acht namen die de pinlaag aan de kern toevoegt (pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind, liveMaak, liveKijk, liveVerbind). Alle acht staan in GRENZEN.json onder \"social\", dus geen enkel ander domein kan erbij. Minder kan niet zonder de functie te halveren.\n\nkeuringOmvang +1: een bestand erbij dat vlak onder de 10 kB zit. De pinlaag is juist WEL opgeknipt langs zijn onderwerpen (bezit, hint, deur, levende code), en daardoor zit er een net onder de grens in plaats van een net erboven.\n\ntoetsenNietGemeten +1: test/contactpin.e2e.js. Die is niet te repareren en dat is structureel: scripts/mutatie.js leest alleen *.test.js (regel 688), dus een schermtoets komt nooit in het register -- 113 van de 126 e2e-bestanden staan er om exact dezelfde reden niet in. Elke nieuwe schermtoets kost dus +1 op deze meter. De drie .test.js-bestanden zijn wel gemeten en staan alle drie op \"gezakt\", oftewel bewezen gevoelig.\n\nEERLIJKHEIDSHALVE, wat hier NIET is verhoogd: endpointsZonderTest en inlineStijlAttributen stonden allebei ook boven de norm en zijn GEREPAREERD in plaats van opgerekt -- routetoetsen voor elk pinloket (dat legde meteen een echte fout bloot: de gezinsroute las een gescande code als sessietoken, want beide heetten \"token\"), en de inline stijlen zijn klassen geworden. En er is bewust geen --vastleggen gedraaid: dat zou ook winst wegschrijven die van het samengaan met main komt en niet van dit werk."
+    },
+    {
+      "datum": "2026-08-18",
+      "meter": "keuringOmvang 155 -> 158; kernBreedte 1396 -> 1405; kernGedeeld 188 -> 191; toetsenNietGemeten 150 -> 154 (de persoonseis, gemeten NA het samengaan met main)",
+      "reden": "De persoonseis: acht genres hielden de ZAAK tegen tot een medewerker een vergunning had gezien, en daarna kwam iedereen die zaak binnen met dezelfde vier cijfers. Deze tak sluit dat gat met een register (kern/persoonseis.js en kern/persoonseis-lijst.js), een vakbewijs (kern/vakbewijs.js met -nummer, -aftekenen en -verhuis) en een handhavingspunt in supplierAuth.\n\nDat verklaart de twee kern-meters: negen extra kern-eigenschappen die routes aanraken, waarvan drie door meer dan een domein. De poort hangt met opzet op EEN plek en wordt door de leden-, kantoor- en zaakkant alledrie gevraagd; een kopie per domein zou de teller sparen en de regel dupliceren, en dat is precies de ruil die LAT-regel 4 verbiedt.\n\nkeuringOmvang gaat met drie omhoog: server/kern/vakbewijs.js (10234 bytes), server/kern/socialegraaf/lijn.js en server/opzet/kernlaag3.js zitten vlak onder de 10 kB-grens. Die eerste is al op zijn naden gesplitst -- het nummer, het aftekenen en de eenmalige verhuizing staan in eigen bestanden. Nog een keer knippen zou een knip om een getal zijn en niet om een naad. Wel eerlijk vermeld: 10234 is zes bytes onder de grens, dus wie hem als volgende aanraakt loopt er tegenaan; de volgende echte naad daar is de vraagkant (vakbewijsHeeft en vakbewijzenVerlopend) los van de schrijfkant.\n\ntoetsenNietGemeten stijgt met vier: deze tak voegt vier toetsbestanden toe (persoonseis, vakbewijs-routes, vakbewijs-kluis, gezakte-toetsen) waar de mutatiemotor nog niet langs is geweest. De beweringen erin zijn wel met de hand gemuteerd -- dat staat per bestand aan het slot -- maar de motor kent ze nog niet, en die telt hier.",
+      "eerlijkheidshalve": "Deze getallen zijn opnieuw gemeten NA de samenvoeging met main, niet overgenomen van voor die samenvoeging. Main verzette zelf de basislijn (kernBreedte 1395 -> 1396 door theaterOndertitels, keuringOmvang terug naar 155, inlineStijlAttributen naar de eerlijke 5927 na de reparatie van scripts/lib/bron.js). Mijn eigen norm-notitie van eerder vandaag stond op de oude basislijn en is vervallen; dit is de enige die telt.\n\nDrie meters die ook rood stonden zijn NIET opgehoogd maar hersteld. endpointsZonderTest en keuringDekkingAdvies kwamen van precies een endpoint, /api/aanmelding/bewijs/herkeuring: puur getoetst op de kernfunctie, over de route door niemand. Daar staat nu een toets op (test/vakbewijs-routes.test.js, toets 10), die ook vastlegt dat de lijst van het kantoor is en dat de gedeelde kantoorcode niet aftekent. En inlineStijlAttributen kwam op 5932 door vijf style=\"...\"-attributen in de vakbewijzenstapel van de backoffice; dat zijn nu vier klassen in het stijlblok van backoffice.html, en de meter staat weer op 5927. Precies wat main een dag eerder met het ondertitelvel deed.\n\nWat ik NIET heb gedaan is --vastleggen over alles heen draaien. Vier meters staan beter dan hun norm (testbestanden 895, browserpoortToetsen 193, e2eBestanden 125 en de dekking); die winst is deels van main en deels van deze tak, en hem nu op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
     },
     {
       "datum": "2026-08-18",

@@ -9,12 +9,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null; // de eigen driver kent geen aparte contexten; dan slaan we over
-}
+/* Eén browserkeuze: ./browser.js -- maar hier ZONDER de eigen driver. Die kent
+   geen aparte contexten met eigen permissies, en dat heeft deze toets nodig;
+   dan is overslaan eerlijker dan draaien op iets dat de vraag niet kent. */
+const { laadBrowser: kiesBrowser } = require('./browser');
+const laadBrowser = () => kiesBrowser({ eigenDriver: false });
 const pw = laadBrowser();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },

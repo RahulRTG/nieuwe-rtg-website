@@ -31,7 +31,14 @@ const REGELS = [
   [/office\/(?:mob)|\/mob\b|\/ride\b|\/transfer\b|\/voertuig|\/dispatch/, 'klantenservice', 'Klantenservice'],
   [/office\/(?:ondernemersregie|trust)|leverancier-aanvragen|\/aanmelding/, 'balie', 'De Ledenbalie'],
   [/office\/(?:school|schools)|\/les\b|\/bijles|\/vak\b|\/bieb|\/rtgschool|\/lesmaker|\/labpas|\/livinglab/, 'onderzoek', 'Onderzoek & data'],
-  [/office\/(?:bewaarverzoek|uitgifte|verifications)|\/onboarding|\/zegel|\/codewoord/, 'juridisch', 'Juridisch'],
+  /* Het vakbewijs en de persoonseis liggen bij Juridisch, en met opzet in
+     dezelfde regel als `verifications`: het is dezelfde handeling, een stap
+     verder. Een mens van RTG ziet een stuk (VOG, BIG-registratie,
+     legitimatiebewijs) en tekent af dat hij het heeft gezien -- zonder de
+     inhoud te beoordelen, want RTG is geen inspectie. Bij HR zou het niet
+     kloppen: dit is geen personeelsbeheer maar een controle die juist NIET bij
+     de werkgever hoort te liggen. */
+  [/office\/(?:bewaarverzoek|uitgifte|verifications|vakbewijs)|\/vakbewijs|\/persoonseis|\/onboarding|\/zegel|\/codewoord/, 'juridisch', 'Juridisch'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],

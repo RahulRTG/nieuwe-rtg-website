@@ -111,7 +111,7 @@ test('vandaag en morgen bij naam, de rest van de week bij weekdag', () => {
 
 /* Een vaste week, doorgerekend vanaf een maandag, zodat de vakindeling zelf
    getoetst is en niet alleen de labels. */
-test('de vakken lopen van vandaag via volgende week naar deze maand en later', () => {
+test('de vakken lopen van vandaag via volgende week en deze maand naar een maandnaam', () => {
   const MAANDAG = '2026-08-10'; // een maandag
   const v = (d) => L.vakVan(d, MAANDAG).sleutel;
   assert.equal(v('2026-08-10'), 'vandaag');
@@ -121,8 +121,56 @@ test('de vakken lopen van vandaag via volgende week naar deze maand en later', (
   assert.equal(v('2026-08-17'), 'volgendeweek');
   assert.equal(v('2026-08-23'), 'volgendeweek');
   assert.equal(v('2026-08-28'), 'dezemaand');
-  assert.equal(v('2026-09-05'), 'later');
+  assert.equal(v('2026-09-05'), 'maand:2026-09', 'binnen de horizon, maar niet meer deze maand');
+  assert.equal(L.vakVan('2026-09-05', MAANDAG).label, 'September', 'en dan heet het vak naar zijn maand');
+  assert.equal(v('2026-09-20'), 'later', 'voorbij de horizon van vijf weken');
   assert.equal(L.vakVan('2026-08-09', MAANDAG), null, 'gisteren is geen vak');
+});
+
+/* DE EIGENSCHAP WAAR DE HELE VAKINDELING OP STAAT, en die ontbrak.
+
+   De ladder eindigde op "deze maand", en die krimpt naar nul aan het eind van
+   een maand. Daardoor hing de zichtbare horizon van de lijn af van de DATUM
+   waarop je hem opende: op de derde zag je veertien dagen vooruit, op de
+   vijfentwintigste niet meer. Dezelfde afstand, een ander antwoord, om een
+   reden die niets met het leven van het lid te maken heeft.
+
+   Deze toets pint de eigenschap zelf vast in plaats van losse gevallen: voor
+   ELKE dag van een maand geldt dat wat binnen de horizon ligt in een vak
+   belandt, en wat erbuiten ligt niet. Zo kan geen enkele nieuwe grens er stil
+   een gat in maken.
+
+   DE MUTATIE: zet de maand-tak terug naar `datum.slice(0,7) === nu.slice(0,7)`
+   zonder horizon. Dan zakt hij op de eerste dag waarop veertien dagen vooruit
+   over een maandgrens springt. */
+test('dezelfde afstand geeft dezelfde zichtbaarheid, waar je ook in de maand staat', () => {
+  const dagenVooruit = 14;
+  const gemist = [];
+  for (let d = 1; d <= 31; d++) {
+    const nu = '2026-08-' + String(d).padStart(2, '0');
+    const datum = new Date(new Date(nu + 'T12:00:00Z').getTime() + dagenVooruit * 864e5)
+      .toISOString().slice(0, 10);
+    const vak = L.vakVan(datum, nu);
+    if (!vak || vak.sleutel === 'later') gemist.push(nu + ' -> ' + datum + ' (' + (vak && vak.sleutel) + ')');
+  }
+  assert.deepEqual(gemist, [],
+    'veertien dagen vooruit hoort op elke dag van de maand een vak te krijgen');
+});
+
+/* En de tegenkant, want anders bewijst het bovenstaande alleen dat er altijd
+   een vak is: voorbij de horizon hoort er GEEN vak te zijn, ook weer op elke
+   dag van de maand. Zonder deze helft zou "alles altijd tonen" ook groen zijn,
+   en dan is de oneindige staart terug die de kop van lijn.js verbiedt. */
+test('voorbij de horizon telt het mee en krijgt het geen vak, ook op elke dag', () => {
+  const teVer = [];
+  for (let d = 1; d <= 31; d++) {
+    const nu = '2026-08-' + String(d).padStart(2, '0');
+    const datum = new Date(new Date(nu + 'T12:00:00Z').getTime() + 60 * 864e5)
+      .toISOString().slice(0, 10);
+    const vak = L.vakVan(datum, nu);
+    if (vak && vak.sleutel !== 'later') teVer.push(nu + ' -> ' + datum + ' (' + vak.sleutel + ')');
+  }
+  assert.deepEqual(teVer, [], 'zestig dagen vooruit hoort een telling te blijven');
 });
 
 /* GEEN LEGE VAKKEN. Een week zonder afspraken is geen gat om op te vullen --

@@ -68,6 +68,25 @@ module.exports = ({ db, lidBoardLogWis }) => {
        staan na "verwijder mijn gegevens", dan houden we een spoor van iemand die
        er niet meer is. */
     if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
+
+    /* DE VAKBEWIJZEN, en die stonden hier niet -- met een reden die het waard is
+       op te schrijven, want hij geldt voor alles wat er nog bij komt.
+
+       Zij zijn geen tak op de sleutel maar een LIJST met een eigen sleutelvorm:
+       `lid:<accountId>` in plaats van `user-<accountId>`. Daardoor zag de bezem
+       van test/vergeten.test.js ze niet: die zoekt op de sleutel, de codenaam en
+       de naam, en `lid:5` bevat `user-5` niet. Het stuk zelf (het nummer) gaat
+       wel mee, want dat woont in het ledendossier en dat verdwijnt met het
+       account -- maar de RIJ bleef staan: "dit account had een VOG, gezien en
+       afgetekend op die datum", bij een account dat niet meer bestaat.
+
+       Wie hier een lade bijzet met een eigen sleutelvorm, moet dus ook nagaan of
+       de bezem hem kan zien. */
+    const m = /^user-(\d+)$/.exec(String(key || ''));
+    if (m && Array.isArray(db.data.vakbewijzen)) {
+      const mijn = 'lid:' + Number(m[1]);
+      db.data.vakbewijzen = db.data.vakbewijzen.filter(v => v && v.sleutel !== mijn);
+    }
   }
 
   return { wisEigen, EIGEN_TAKKEN };

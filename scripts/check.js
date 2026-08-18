@@ -2018,7 +2018,9 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
-      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/lib/dubbeltik.js|const kop = req.get('authorization') || '';",
+      'de dubbeltik VERSLEUTELT de kop tot een hash en kijkt er nooit in. Hij beslist niets over toegang -- de hash bepaalt alleen in welke la het bewaarde antwoord komt, zodat twee bellers met dezelfde idem-sleutel nooit elkaars antwoord krijgen. Een verzonnen kop levert dus hooguit een eigen lege la op; of het verzoek mag, beslist de echte auth verderop in de keten.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -3419,6 +3421,60 @@ console.log('\n50) de release-workflow publiceert niets zonder stuklijst en herk
     else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
       (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
   }
+}
+
+
+/* ============================================================================
+   51) DE DUBBELTIK STAAT NA ELKE ANDERE RES.JSON-WIKKEL
+
+   DEZE REGEL KOMT UIT EEN FOUT DIE DERTIEN GROENE TOETSEN NIET ZAGEN. De
+   dubbeltik (server/lib/dubbeltik.js) hing res.json om zich een antwoord te
+   herinneren. jsonGzip() doet dat OOK, en stuurt een antwoord boven de kilobyte
+   via res.send in plaats van via res.json. Stond de dubbeltik daarvoor, dan zag
+   hij grote antwoorden nooit -- en liet hij de herhaling het werk gewoon opnieuw
+   doen. Negentien routes in de idemproef, allemaal met een groot antwoord, en
+   nergens een foutmelding: kleine antwoorden gingen goed, en curl vraagt
+   standaard geen compressie.
+
+   Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
+   dubbeltik hoort dus de BUITENSTE wikkel te zijn. test/dubbeltikgzip.test.js
+   bewijst dat die samenstelling werkt; deze regel bewaakt dat de PRODUCTIECODE
+   die volgorde ook echt aanhoudt -- een toets die zijn eigen volgorde opschrijft
+   zegt niets over wat er in server/ gebeurt. */
+console.log('\n51) de dubbeltik staat na elke andere res.json-wikkel');
+{
+  const wikkelaars = [];
+  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    /* Elke plek die res.json vervangt is een wikkel. De dubbeltik zelf hoort
+       er ook bij: die moet als laatste komen. */
+    if (/\bres\.json\s*=/.test(bron)) wikkelaars.push(rel);
+  });
+  const poortwachters = path.join(ROOT, 'server/opzet/poortwachters.js');
+  const bron = fs.existsSync(poortwachters) ? zonderCommentaar(fs.readFileSync(poortwachters, 'utf8')) : '';
+  const gzip = bron.indexOf('app.use(jsonGzip())');
+  const dub = bron.indexOf('app.use(dubbeltik.middleware())');
+  const klachten = [];
+  if (dub < 0) klachten.push('de dubbeltik wordt in poortwachters.js niet meer gemount; dan is geen enkele route tegen een herhaling beschermd');
+  else if (gzip < 0) klachten.push('jsonGzip() staat niet meer in poortwachters.js -- controleer of de dubbeltik nog de buitenste wikkel is');
+  else if (dub < gzip) klachten.push('de dubbeltik staat VOOR jsonGzip(); grote antwoorden gaan dan buiten hem om (zie test/dubbeltikgzip.test.js)');
+  /* En een NIEUWE wikkel is geen fout, maar wel iets waar iemand naar hoort te
+     kijken: hij kan de dubbeltik opnieuw onzichtbaar maken. De lijst staat hier
+     bij naam, dus hij groeit niet stil. */
+  const BEKEND = {
+    'server/middleware/compressie.js': 'jsonGzip -- staat VOOR de dubbeltik, precies daarom bestaat deze regel',
+    'server/opzet/lijfpoort.js': 'het zaakdoos-journaal; staat voor de dubbeltik en verandert het antwoord niet',
+    'server/opzet/liegpoort.js': 'meetgereedschap, draait alleen met RTG_LIEG en nooit in een echte rit',
+    'server/lib/dubbeltik.js': 'de dubbeltik zelf',
+    'server/lib/cache.js': 'antwoordcache; alleen op leesroutes (GET), en een cachetreffer doet per definitie geen werk',
+    'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik'
+  };
+  const nieuw = wikkelaars.filter(w => !BEKEND[w]);
+  if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +
+    ' -- staat de dubbeltik daar nog achter? Zet hem op de lijst in check.js regel 51 zodra dat is nagekeken');
+  if (klachten.length) klachten.forEach(fout);
+  else ok(wikkelaars.length + ' plekken vervangen res.json, en de dubbeltik komt na jsonGzip()');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

@@ -354,6 +354,16 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
 - **Betaal-naad** — `server/betaal.js`: idempotente betalingen (geen
   dubbele afschrijving bij herhaling) en webhook-verificatie met handtekening.
   Zonder Stripe-key draait de demo-provider.
+- **Dubbeltik** — `server/lib/dubbeltik.js` staat vóór alle routers: een
+  schrijfverzoek met een idem-sleutel (`idem` in het lijf of de kop
+  `Idempotency-Key`) wordt één keer uitgevoerd; de herhaling krijgt het bewaarde
+  antwoord met `herhaald: true`. Gemeten met `npm run idemproef`: van 15
+  beschermde en 100 onbeschermde routes naar **855 beschermd en 0 onbeschermd**.
+  Drie grenzen staan in de kop van dat bestand en horen erbij: hij doet niets
+  zonder sleutel (twee keer hetzelfde toevoegen zonder sleutel MAG twee items
+  zijn), hij leeft in het geheugen van één proces (voor geld blijft
+  `server/lib/idem.js` staan, mét duurzame commit), en een ander lijf onder
+  dezelfde sleutel wordt doorgelaten in plaats van geweigerd.
 - **Security** — https-redirect + HSTS, strikte CSP (met per-antwoord nonce voor
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).

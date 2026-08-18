@@ -2,7 +2,7 @@
    vrijgave voor vroege check-in (de overschot-techniek voor het hotel):
    alleen een schone kamer kan vrij, en elke andere status haalt de
    vrijgave vanzelf weg.
-   Draai: node --experimental-sqlite --test test/housekeeping.test.js */
+   Draai: node --test test/housekeeping.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -3,7 +3,7 @@
    uit (typologie, constructie, materialen, gedempt palet, voorzieningen,
    verhaal), levert een bouwstaat en de blik van de chef-architect, en per
    project een portfolio.
-   Draai los: node --experimental-sqlite --test test/architect.test.js */
+   Draai los: node --test test/architect.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

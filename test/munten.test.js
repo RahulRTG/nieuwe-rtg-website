@@ -140,7 +140,7 @@ test('e2e: rechtstreeks een partner betalen met munten crediteert de leverancier
    Deze test draait op de kern-module zelf: hij zet een ontvangst neer die
    gisteren al verlopen was en kijkt wat er gebeurt.
 
-   Draai los: node --experimental-sqlite --test test/munten.test.js */
+   Draai los: node --test test/munten.test.js */
 test('een verlopen munt-ontvangst valt niet meer terug op de oude koers', () => {
   const db = { data: { muntOntvangsten: [] } };
   const { maakMunten } = require('../server/kern/munten');

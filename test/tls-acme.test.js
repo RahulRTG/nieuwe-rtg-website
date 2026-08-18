@@ -4,7 +4,7 @@
    -- net als de echte CA -- de keyAuthorization uit dezelfde challenge-winkel te
    lezen die de client publiceert. Komt de flow tot een geldig certificaat, dan
    klopt onze account-, order-, challenge- en finalize-afhandeling. Draai los:
-   node --experimental-sqlite --test test/tls-acme.test.js */
+   node --test test/tls-acme.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

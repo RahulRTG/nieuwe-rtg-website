@@ -3,7 +3,7 @@
    (starten, vinken, eigen stap, dubbel starten geweigerd), groeigesprekken
    en certificaten, en de privacygrens: een medewerker ziet alleen het
    eigen dossier en komt niet in het manager-overzicht.
-   Draai los: node --experimental-sqlite --test test/hrplus.test.js */
+   Draai los: node --test test/hrplus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

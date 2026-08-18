@@ -7,7 +7,7 @@
    telt allergenen per tafel op voor de keuken en zet ze per stoel klaar
    voor de bediening; de checklijst is alleen zichtbaar voor wie hem deelt,
    iedereen vinkt zelf af en bij elk vinkje staat wie het deed.
-   Draai los: node --experimental-sqlite --test test/werkvloer.test.js */
+   Draai los: node --test test/werkvloer.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

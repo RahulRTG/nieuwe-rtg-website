@@ -24,7 +24,7 @@
    En de derde: een bon van de buren is geen bon van jou. Dat is hier de
    scheiding tussen zaken.
 
-   Draai los: node --experimental-sqlite --test test/vloerwerk.test.js
+   Draai los: node --test test/vloerwerk.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

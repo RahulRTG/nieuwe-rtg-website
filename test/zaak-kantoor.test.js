@@ -26,7 +26,7 @@
    foto-index van photo/remove en pand/foto: JavaScript geeft een bruikbaar
    antwoord op iets wat geen invoer is.
 
-   Draai los: node --experimental-sqlite --test test/zaak-kantoor.test.js
+   Draai los: node --test test/zaak-kantoor.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -1,7 +1,7 @@
 /* De wauw-laag (kern/wauw.js): de dag-stemming (vaste 9+-lijst) en de
    verjaardagsglans die overal naast de codenaam meereizen (Pulse, Berichten),
    het Moment van de week in de Pulse-feed en De Terugblik op je sociale week.
-   Draai los: node --experimental-sqlite --test test/wauw.test.js */
+   Draai los: node --test test/wauw.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -4,7 +4,7 @@
    fooi over het geheel. Getoetst: /api/rekening telt de open bonnen op, en
    /api/rekening/betaal zet ze allemaal op betaald met de fooi op de rekening.
    Aan-de-balie-bonnen tellen niet mee (die gaan langs de kassa).
-   Draai los: node --experimental-sqlite --test test/rekening.test.js */
+   Draai los: node --test test/rekening.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

@@ -18,7 +18,7 @@
       Hij staat hier omdat een route die nergens wordt aangeraakt, groen blijft
       bij elke fout die erin komt.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-afmaak.test.js
+   Draai los: node --test test/rtfos-afmaak.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -1,7 +1,7 @@
 /* De toegangseis voor nieuwe partners: alleen een bedrijf waar minstens een
    persoon een Business Pass heeft, kan een bedrijfscode krijgen. Zonder pass
    geen aanvraag; en het kantoor keurt alleen aanvragen met pass-bewijs goed.
-   Draai: node --experimental-sqlite --test test/partnerpas.test.js */
+   Draai: node --test test/partnerpas.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

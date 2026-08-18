@@ -21,7 +21,7 @@
       het is een lijst van plekken waar de scheiding niet uit de code af te
       lezen valt, en die lijst hoort leeg te zijn.
 
-   Draai los: node --experimental-sqlite --test test/scheiding.test.js */
+   Draai los: node --test test/scheiding.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

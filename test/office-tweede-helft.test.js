@@ -20,7 +20,7 @@
       dood te lopen op de basename-filter, niet op geluk.
 
    Draai los:
-   node --experimental-sqlite --test test/office-tweede-helft.test.js */
+   node --test test/office-tweede-helft.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

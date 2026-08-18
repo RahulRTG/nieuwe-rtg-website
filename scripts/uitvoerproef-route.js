@@ -24,8 +24,8 @@
    is de hele meting waardeloos. Er is dus een controle op vlak voor de ronde
    begint.
 
-   Draai:  node --experimental-sqlite scripts/uitvoerproef-route.js
-           node --experimental-sqlite scripts/uitvoerproef-route.js --max=500
+   Draai:  node scripts/uitvoerproef-route.js
+           node scripts/uitvoerproef-route.js --max=500
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -73,7 +73,7 @@ async function wacht(basis, ms) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitvoerproef-'));
   const basis = 'http://127.0.0.1:' + poort;
 
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
       RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }

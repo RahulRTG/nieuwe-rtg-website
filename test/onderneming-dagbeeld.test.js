@@ -10,7 +10,7 @@
    2. DE ACTIES STAAN OP GEWICHT. Wat het plan breekt gaat voorop, daarna wat
       er ontbreekt, daarna wat er kan.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-dagbeeld.test.js */
+   Draai los: node --test test/onderneming-dagbeeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

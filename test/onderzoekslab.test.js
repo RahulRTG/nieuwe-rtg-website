@@ -2,7 +2,7 @@
    (idee > onderzoek > prototype > proef > uitrol), de menselijke veiligheids-
    en ethiektoets als poort naar de proef, de harde weigering van schadelijke
    richtingen en een kennisbank die nooit iets vergeet. Draai los:
-   node --experimental-sqlite --test test/onderzoekslab.test.js */
+   node --test test/onderzoekslab.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

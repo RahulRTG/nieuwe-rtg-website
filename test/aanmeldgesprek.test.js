@@ -12,7 +12,7 @@
    werkgever-herkenning; dat Business-interesse genoteerd maar NOOIT beloofd wordt;
    het uitleg-pad; en het inlogpad via de sleutelwoorden (drie van vier woorden in
    een gesprek, het wachtwoord gaat nooit door het gesprek).
-   Draai los: node --experimental-sqlite --test test/aanmeldgesprek.test.js */
+   Draai los: node --test test/aanmeldgesprek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

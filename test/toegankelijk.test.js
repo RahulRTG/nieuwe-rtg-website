@@ -3,7 +3,7 @@
    onbekende waarde valt terug op normaal in plaats van stil te blijven hangen,
    een veld dat je niet meestuurt blijft ongemoeid, en zonder eigen account is
    er niets in te stellen.
-   Draai los: node --experimental-sqlite --test test/toegankelijk.test.js */
+   Draai los: node --test test/toegankelijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

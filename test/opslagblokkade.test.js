@@ -23,7 +23,7 @@
    iemand dat besloot, maar omdat dat bestand er nog ligt. Dat hoort de start te
    blokkeren, en die tak ligt hier vast.
 
-   Draai los: node --experimental-sqlite --test test/opslagblokkade.test.js
+   Draai los: node --test test/opslagblokkade.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

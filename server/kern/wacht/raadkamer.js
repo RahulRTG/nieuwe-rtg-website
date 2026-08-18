@@ -44,6 +44,7 @@ module.exports = (kamer) => {
       z.aan = !!actie.aan;
       z.reden = actie.aan ? null : 'via raadkamer';
       z.sindsGesprongen = actie.aan ? null : Date.now();
+      z.tot = null;   // de raadkamer besluit; een besluit is niet tijdgebonden
       save();
       return { ok: true, uitleg: 'Zekering "' + actie.id + '" ' + (actie.aan ? 'er weer in' : 'eruit') + '.' };
     }

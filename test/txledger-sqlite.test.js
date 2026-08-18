@@ -10,7 +10,7 @@
    zonder database: venster in het RAM, de rest als geindexeerde rij, verlies-vrij
    vegen, historie voorbij het venster, en statuswissels die doorstromen. Plus de
    claim die de reden van dit werk is: de kv-blob groeit niet meer mee.
-   Draai los: node --experimental-sqlite --test test/txledger-sqlite.test.js */
+   Draai los: node --test test/txledger-sqlite.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
@@ -19,7 +19,7 @@ const { execFileSync } = require('child_process');
 // Eigen proces: de opslagmodules houden hun verbinding en het grootboek in
 // modulescope, en dit is de enige toets die dat globale grootboek aanzet.
 function rit(env) {
-  const uit = execFileSync(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'txledger-sqlite-rit.js')],
+  const uit = execFileSync(process.execPath, [path.join(__dirname, 'txledger-sqlite-rit.js')],
     { env: { ...process.env, ...env }, encoding: 'utf8', timeout: 120000 });
   return JSON.parse(uit.trim().split('\n').pop());
 }

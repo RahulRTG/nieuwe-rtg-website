@@ -1,7 +1,7 @@
 /* RTG Gereedschap: de rekenmotor (puur, geen eval) en de klok-kern
    (wekkers en timers op de server; de veegfunctie wordt hier direct
    aangeroepen, dus de test wacht nergens op).
-   Draai los: node --experimental-sqlite --test test/gereedschap.test.js */
+   Draai los: node --test test/gereedschap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

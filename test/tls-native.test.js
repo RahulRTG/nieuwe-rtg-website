@@ -2,7 +2,7 @@
    HTTP/1.1 over TLS serveren, ALPN naar h2 aanbieden, zelf een self-signed cert
    maken en cachen, en het certificaat LIVE omwisselen (setSecureContext) zonder
    herstart -- de haak waar de ACME-vernieuwing op leunt. Volledig offline. Draai:
-   node --experimental-sqlite --test test/tls-native.test.js */
+   node --test test/tls-native.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const https = require('https');

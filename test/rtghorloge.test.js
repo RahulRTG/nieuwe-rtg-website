@@ -2,7 +2,7 @@
    het plaatsen op een klok-hoek, het achthoekige cassement en de uur-hoeken --
    draait ook in Node en is hier los getoetst. Het tekenen (SVG + WebGL) leeft in
    de browser.
-   Draai los: node --experimental-sqlite --test test/rtghorloge.test.js */
+   Draai los: node --test test/rtghorloge.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const H = require('../public/shared/rtghorloge');

@@ -13,7 +13,7 @@
    5. Een juridische bewaring wint altijd van de bewaartermijn.
    6. Wat vernietigd is, laat het FEIT achter: aantal, tijdvak, wie en waarom --
       en de inhoud niet, want dat zou de vernietiging ongedaan maken.
-   Draai: node --experimental-sqlite --test test/rtmail-bestuur.test.js */
+   Draai: node --test test/rtmail-bestuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

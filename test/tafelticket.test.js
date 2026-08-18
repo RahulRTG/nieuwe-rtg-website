@@ -4,7 +4,7 @@
    zegel wordt geweigerd, een gewijzigde rekening (extra ronde) wordt geweigerd,
    en na afrekenen staat er niets meer open (geen dubbel afrekenen). Bonnen van
    een andere tafel of andere zaak komen er nooit in.
-   Draai los: node --experimental-sqlite --test test/tafelticket.test.js */
+   Draai los: node --test test/tafelticket.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

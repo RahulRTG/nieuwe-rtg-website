@@ -3,7 +3,7 @@
    bij de doos landen. Plus de 9+-veiligheidsronde: het auditlog (wie deed
    wat), de sleutelwacht met lockout na brute force, en de extra
    security-headers. Draai los:
-   node --experimental-sqlite --test test/wereld.test.js */
+   node --test test/wereld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

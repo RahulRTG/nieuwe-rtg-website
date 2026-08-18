@@ -2,7 +2,7 @@
    vertelt, leert van je schermgebruik (alleen tellers), is volledig
    transparant ("wat weet je over mij") en wisbaar. Voor leden en voor het
    personeel, elk met een eigen, gescheiden geheugen. Draai los:
-   node --experimental-sqlite --test test/fluister.test.js */
+   node --test test/fluister.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

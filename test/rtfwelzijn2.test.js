@@ -2,7 +2,7 @@
    Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop
    werkt dus altijd), een onbekende soort valt veilig terug, en de
    veiligheidslijnen staan in de teksten zelf (Kindertelefoon, huisarts).
-   Draai los: node --experimental-sqlite --test test/rtfwelzijn2.test.js */
+   Draai los: node --test test/rtfwelzijn2.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -25,7 +25,7 @@
    3. Ontbreekt de meter, dan komt er NULL terug en geen nul. Nul is een
       meetwaarde; "ik weet het niet" is dat niet.
 
-   Draai los: node --experimental-sqlite --test test/eventloop.test.js
+   Draai los: node --test test/eventloop.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

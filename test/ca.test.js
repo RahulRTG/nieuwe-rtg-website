@@ -2,7 +2,7 @@
    server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden
    (niet via rejectUnauthorized:false), mTLS-clientauthenticatie, en intrekking via
    een door de CA ondertekende CRL. Alles offline. Draai los:
-   node --experimental-sqlite --test test/ca.test.js */
+   node --test test/ca.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

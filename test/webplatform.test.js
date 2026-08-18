@@ -21,7 +21,7 @@
    - ZOEKEN VINDT SITES EN BEDRIJVEN, maar lekt niets: alleen wat toch al
      publiek is (naam, stad, type) en alleen online sites.
 
-   Draai los: node --experimental-sqlite --test test/webplatform.test.js
+   Draai los: node --test test/webplatform.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

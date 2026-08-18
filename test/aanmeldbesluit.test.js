@@ -20,7 +20,7 @@
    constructie niet zien. Dit bestand gaat over de ROUTE, met een echte server en
    echte inloggen, want daar zat hij.
 
-   Draai los: node --experimental-sqlite --test test/aanmeldbesluit.test.js
+   Draai los: node --test test/aanmeldbesluit.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

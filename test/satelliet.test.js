@@ -5,7 +5,7 @@
       dan het oplevert);
    3. gzip op de app-pagina's zelf (de CSP-nonce-handler);
    4. dat de gedeelde verbindingslaag met de satellietmodus geserveerd wordt.
-   Draai los: node --experimental-sqlite --test test/satelliet.test.js */
+   Draai los: node --test test/satelliet.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

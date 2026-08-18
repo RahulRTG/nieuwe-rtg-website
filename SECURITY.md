@@ -75,6 +75,23 @@ De beveiliging wordt in de CI en de testsuite continu bewaakt:
 Zet daarnaast in de repo-instellingen GitHub's eigen **Secret scanning** en
 **Push protection** aan; die vullen de bovenstaande lagen aan.
 
+### De noodrem-ladder bij brute force
+
+Bij brute-force-alarmen escaleert de afweer in drie treden, elk tijdgebonden
+en met melding aan de eigenaar (`server/beveiliging.js`):
+
+1. **Lokaal eerst**: elke bron gaat individueel in de zelf-dovende quarantaine
+   van De Wacht.
+2. **Vanaf drie bronnen**: nieuwe registraties dicht; dooft vanzelf na een uur.
+3. **Vanaf zes bronnen**: de *inlogpauze* — alleen de in- en uitschrijfpaden
+   dicht, tien minuten; wie al is ingelogd merkt niets.
+
+De volledige onderhoudsstand springt **nooit** automatisch: die knop is van de
+eigenaar. De eerdere noodrem deed dat wel en werkte daarmee als DoS-versterker
+(zes gespoofte bronnen = totale uitval tot een mens langskwam); de
+mega-beproeving legde dat bloot en `test/beveiliging.test.js` legt het huidige
+gedrag vast, mutatieproef inbegrepen.
+
 ### De identiteitskluis is aan zijn rij gebonden
 
 Persoonsgegevens (naam, e-mail, telefoon en het ledendossier) staan versleuteld in

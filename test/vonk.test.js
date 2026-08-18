@@ -3,7 +3,7 @@
    wensen past, wederzijdse like = match + chatlijn + automatisch een tafel
    rond het geografische midden, EUR 10 p.p. vooraf (EUR 5 RTG, EUR 5 zaak),
    en blokkeren + melden met backoffice-opvolging. Draai los:
-   node --experimental-sqlite --test test/vonk.test.js */
+   node --test test/vonk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

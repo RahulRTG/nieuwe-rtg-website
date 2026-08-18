@@ -1,0 +1,109 @@
+### AUTO-MERGE VOOR DE GESLOTEN LIJST -- het saaiste werk zonder handen.
+#
+# De herstellus (herstel.yml) houdt de afspraak "fix-PR, mens merget" voor
+# alles wat een oordeel vraagt. Maar een deel van de wekelijkse stroom vraagt
+# geen oordeel: een Dependabot-patch op de ene devDependency, een Actions-pin
+# die naar een nieuwere SHA schuift, een basis-image-patch. Die PR's zijn
+# mechanisch controleerbaar, en de controle STAAT er al -- de volledige CI.
+# Dit bestand merget ze zodra alles groen is. De eigenaar heeft hier
+# uitdrukkelijk om gevraagd, na de afweging eerst te hebben afgewezen.
+#
+# DE GESLOTEN LIJST, en waarom hij zo klein is:
+#
+#   npm             alleen PATCH (a.b.C): gedragswijzigingen horen bij minor/
+#                   major en die verdienen ogen. Dit huis heeft nul runtime-
+#                   dependencies, dus in de praktijk gaat dit over Playwright.
+#   github-actions  patch en minor: een Actions-pin is een SHA-verschuiving
+#                   binnen een major; ci-keten.js dwingt af dat het een echte
+#                   SHA blijft. Een MAJOR bump verandert het contract: mens.
+#   docker          alleen PATCH of digest: een nieuw basis-image binnen
+#                   dezelfde lijn.
+#
+# DE SLOTEN (allemaal hard, allemaal in dit bestand):
+#   1. Alleen PR's van dependabot[bot] zelf -- niet van iemand die zich zo
+#      noemt in een branchnaam.
+#   2. Alleen bestanden die bij het manifest horen (package.json, lockfile,
+#      workflows, Dockerfile). Een dependency-PR die OOK broncode raakt is
+#      per definitie geen dependency-PR meer: mens.
+#   3. Alle checks op de head-SHA geslaagd -- geen failure, niets dat nog
+#      loopt.
+#   4. De klasse-toets hierboven, gelezen uit de PR-titel die Dependabot
+#      zelf schrijft (deps/ci/container + from/to-versies).
+#
+# Wat hier bewust NIET in zit: een algemene "merge bij groen"-regel. Elke
+# andere PR blijft mensenwerk, ook die van de herstellus zelf.
+
+name: Auto-merge (gesloten lijst)
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    name: Dependabot-PR mergen als alles groen is
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sloten controleren en mergen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAK: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -eu
+
+          PR=$(gh pr list --repo "$REPO" --head "$TAK" --state open \
+            --json number,author,title --jq '.[0]')
+          [ -n "$PR" ] || { echo "Geen open PR voor $TAK; niets te doen."; exit 0; }
+          NUMMER=$(echo "$PR" | jq -r '.number')
+          AUTEUR=$(echo "$PR" | jq -r '.author.login')
+          TITEL=$(echo "$PR" | jq -r '.title')
+
+          # Slot 1: de echte bot, niet een naamgenoot.
+          if [ "$AUTEUR" != "dependabot" ] && [ "$AUTEUR" != "app/dependabot" ]; then
+            echo "Auteur is '$AUTEUR', geen dependabot; mens beslist."; exit 0
+          fi
+
+          # Slot 2: alleen manifest-bestanden.
+          FOUT=$(gh pr view "$NUMMER" --repo "$REPO" --json files \
+            --jq '.files[].path' | grep -Ev '^(package\.json|package-lock\.json|\.github/workflows/[^/]+\.ya?ml|Dockerfile|docker-compose[^/]*\.ya?ml)$' || true)
+          if [ -n "$FOUT" ]; then
+            echo "PR raakt bestanden buiten het manifest; mens beslist:"; echo "$FOUT"; exit 0
+          fi
+
+          # Slot 3: ALLE checks op deze SHA afgerond en goed (de CI-run zelf
+          # is al groen, maar CodeQL en de rest draaien apart).
+          OPEN=$(gh api "repos/$REPO/commits/$SHA/check-runs" \
+            --jq '[.check_runs[] | select(.conclusion != "success" and .conclusion != "neutral" and .conclusion != "skipped")] | length')
+          if [ "$OPEN" != "0" ]; then
+            echo "$OPEN check(s) op $SHA niet (of niet goed) afgerond; mens beslist."; exit 0
+          fi
+
+          # Slot 4: de klasse. Dependabot-titels dragen from/to; wij rekenen.
+          KLASSE=$(node -e '
+            const t = process.argv[1] || "";
+            const m = /from ([0-9]+)\.([0-9]+)\.([0-9]+)[^ ]* to ([0-9]+)\.([0-9]+)\.([0-9]+)/.exec(t);
+            const soort = /^ci[(:]|github.actions/i.test(t) ? "actions" : /^container[(:]/i.test(t) ? "docker" : "npm";
+            if (!m) { console.log(/digest|sha/i.test(t) && soort !== "npm" ? "ok:digest" : "mens:onleesbaar"); process.exit(0); }
+            const [ , A, B, , a, b ] = m;
+            const major = A !== a, minor = B !== b;
+            if (soort === "actions") console.log(major ? "mens:major" : "ok:actions");
+            else console.log(major || minor ? "mens:" + (major ? "major" : "minor") : "ok:patch");
+          ' "$TITEL")
+          case "$KLASSE" in
+            ok:*) echo "Klasse toegestaan ($KLASSE): $TITEL" ;;
+            *)    echo "Klasse vraagt een mens ($KLASSE): $TITEL"; exit 0 ;;
+          esac
+
+          gh pr merge "$NUMMER" --repo "$REPO" --squash --delete-branch
+          echo "Gemerged: #$NUMMER ($TITEL)"

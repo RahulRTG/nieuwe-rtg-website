@@ -1,5 +1,5 @@
 /* NEGENTIEN ZAKELIJKE INGANGEN DIE DOOR GEEN ENKELE TOETS WERDEN AANGEROEPEN.
-   Draai los: node --experimental-sqlite --test test/supplier-comm-mob-payroll.test.js
+   Draai los: node --test test/supplier-comm-mob-payroll.test.js
 
    Ze staan in vier bestanden, ze zitten alle vier in de zaak-app, en de suite
    kwam er nooit langs:

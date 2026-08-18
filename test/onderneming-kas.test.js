@@ -13,7 +13,7 @@
    4. EEN OUD SALDO IS GEEN SALDO. Wie er drie maanden geleden een intypte,
       hoort dat te horen voordat hij erop stuurt.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-kas.test.js */
+   Draai los: node --test test/onderneming-kas.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

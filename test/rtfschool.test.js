@@ -1,7 +1,7 @@
 /* De School-Bibliotheek (10.000 school-apps per leeftijdsgroep, altijd
    gratis, met de leeftijdspoort) en Samen voor de gezinsapps (kindveilig:
    alleen gezin en bevestigde vrienden). Draai los:
-   node --experimental-sqlite --test test/rtfschool.test.js */
+   node --test test/rtfschool.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

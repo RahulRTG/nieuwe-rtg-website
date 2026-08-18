@@ -2,7 +2,7 @@
    draait een villa op verblijven met datums, een receptiebord, de
    check-in/check-out-keten en slimme deuren. Deze test bewaakt dat het
    villa-genre (demo Casa Lunara) diezelfde keten doorloopt.
-   Draai los: node --experimental-sqlite --test test/villa.test.js */
+   Draai los: node --test test/villa.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

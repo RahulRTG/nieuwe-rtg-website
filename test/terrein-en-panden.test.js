@@ -20,7 +20,7 @@
      de manager; water geven en voeren doet wie er 's ochtends staat. Dat
      onderscheid loopt door de hele boerderij en wordt hier afgerekend.
 
-   Draai los: node --experimental-sqlite --test test/terrein-en-panden.test.js
+   Draai los: node --test test/terrein-en-panden.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -2,7 +2,7 @@
    zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per
    genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de
    zaak houdt het volle bedrag, dus de nettoprijzen-belofte blijft staan).
-   Draai los: node --experimental-sqlite --test test/geldregie.test.js */
+   Draai los: node --test test/geldregie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

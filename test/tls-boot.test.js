@@ -69,7 +69,7 @@ function boot(port, dataDir, tls) {
     NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: ''
   });
   if (tls) env.RTG_TLS = '1'; else delete env.RTG_TLS;
-  const kind = cp.spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'],
+  const kind = cp.spawn(process.execPath, ['server/server.js'],
     { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   const uitInfo = { log: '', fataal: false };
   const vang = d => { uitInfo.log += d; if (/uncaughtException|"fataal":true/.test(String(d))) uitInfo.fataal = true; };

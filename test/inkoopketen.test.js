@@ -23,7 +23,7 @@
      -- niet met wat de AI voorstelde. Het verschil staat in toets 4.
    - EEN BESTELLING VAN DE BUREN BESTAAT HIER NIET.
 
-   Draai los: node --experimental-sqlite --test test/inkoopketen.test.js
+   Draai los: node --test test/inkoopketen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

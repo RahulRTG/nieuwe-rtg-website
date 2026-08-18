@@ -18,7 +18,7 @@
    Dat is geen smaak maar `CLAUDE.md`: een dagstreak straft je voor de dag dat
    je niet meedoet, en dat is precies de ratel die hier niet hoort.
 
-   Draai los: node --experimental-sqlite --test test/speldag.test.js */
+   Draai los: node --test test/speldag.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

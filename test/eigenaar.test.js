@@ -1,7 +1,7 @@
 /* De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn
    eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen
    personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven ook voor de
-   eigenaar dicht. Draai: node --experimental-sqlite --test test/eigenaar.test.js */
+   eigenaar dicht. Draai: node --test test/eigenaar.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

@@ -26,7 +26,7 @@ module.exports = function poortwachters(deps) {
   const { app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION,
     opslagKlaar, sseToOffice, sessionFor, findSupplier, sendPushToUser, eigenWeb } = deps;
 
-  const { remOpDeDeur, opslagPoort, hoofdzekering } = require('../middleware/remmen');
+  const { remOpDeDeur, opslagPoort, hoofdzekering, inlogpauzePoort } = require('../middleware/remmen');
   const { schakelaars } = require('../middleware/functieschakelaars');
   const { jsonGzip, statischGzip } = require('../middleware/compressie');
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
@@ -39,6 +39,8 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1');
   app.use(opslagPoort(opslagKlaar));
   app.use(hoofdzekering({ db, accounts, eigenaar }));
+  // de kleine degraded mode van de noodrem-ladder: alleen de inlogpaden
+  app.use(inlogpauzePoort({ db }));
   // sessionFor en findSupplier staan in server.js; ze worden pas bij een echt
   // verzoek geraadpleegd, dus geven we ze lui door in plaats van hier hun
   // waarde te lezen (die er op dit punt nog niet is).

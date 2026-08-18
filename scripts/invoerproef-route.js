@@ -15,9 +15,9 @@
    komen. Op een wegwerpmap is dat precies goed; op een gedeelde installatie zou
    het onvergeeflijk zijn.
 
-   Draai:  node --experimental-sqlite scripts/invoerproef-route.js
-           node --experimental-sqlite scripts/invoerproef-route.js --max=2000
-           node --experimental-sqlite scripts/invoerproef-route.js --seed=99
+   Draai:  node scripts/invoerproef-route.js
+           node scripts/invoerproef-route.js --max=2000
+           node scripts/invoerproef-route.js --seed=99
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -69,7 +69,7 @@ async function wacht(basis, ms) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-invoerproef-'));
   const basis = 'http://127.0.0.1:' + poort;
 
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna rommel krijgen zijn
        de echte, met hun echte validatie ervoor. Zelfde afweging als in de

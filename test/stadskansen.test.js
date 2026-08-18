@@ -25,7 +25,7 @@
    de helft van de dwarsstraat, en dat is precies het kruispunt met de laan.
    Ze bonden daardoor aan de verkeerde straat en heetten "Marinastraat kolk"
    terwijl hun adres de Marinalaan was.
-   Draai los: node --experimental-sqlite --test test/stadskansen.test.js */
+   Draai los: node --test test/stadskansen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

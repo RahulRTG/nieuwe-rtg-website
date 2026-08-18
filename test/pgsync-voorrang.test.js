@@ -19,7 +19,7 @@
    Postgres nodig, want wat hier bewezen wordt is de BESLISSING om te schrijven,
    niet het schrijven zelf.
 
-   Draai los: node --experimental-sqlite --test test/pgsync-voorrang.test.js
+   Draai los: node --test test/pgsync-voorrang.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

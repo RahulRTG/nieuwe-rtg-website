@@ -41,6 +41,10 @@ const beveilig = require('../beveiliging')({
    ~10 s een momentopname voor de grafiek. `wacht` is hierboven al gedeclareerd
    (het schild raadpleegt hem voor de quarantaine). */
 const wacht = require('../kern/wacht')({ db, save, beveilig, lees: schild.signalen });
+/* Trede 1 van de noodrem-ladder (beveiliging.js): elke brute-force-bron gaat
+   individueel in de zelf-dovende quarantaine van De Wacht, voordat er ook
+   maar een zekering aan te pas komt. */
+beveilig.zetIsoleer((bron, reden) => wacht.isoleer(bron, reden));
 const atelierweb = require('../kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('../kern/naamlaag')({ db, save, schoon });

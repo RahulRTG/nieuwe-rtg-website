@@ -2,7 +2,7 @@
    vloot (server/vloot.js) achter de poortwachter. Een bug in een route raakt
    alleen die ene aanvraag; een crash van een groep raakt alleen dat domein en
    wordt automatisch hersteld, terwijl de andere apps gewoon doordraaien.
-   Draai los: node --experimental-sqlite --test test/vloot.test.js */
+   Draai los: node --test test/vloot.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

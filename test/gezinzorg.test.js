@@ -29,7 +29,7 @@
    zonder toets trekt iemand het ooit gelijk in de veronderstelling dat het een
    inconsistentie is.
 
-   Draai los: node --experimental-sqlite --test test/gezinzorg.test.js
+   Draai los: node --test test/gezinzorg.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

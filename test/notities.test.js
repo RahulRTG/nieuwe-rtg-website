@@ -1,6 +1,6 @@
 /* Notities & Taken: het bord, samen werken op codenaam, en de herinnering
    die een gekoppelde agenda-afspraak wordt (een wekkerlaag, niet drie).
-   Draai los: node --experimental-sqlite --test test/notities.test.js */
+   Draai los: node --test test/notities.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

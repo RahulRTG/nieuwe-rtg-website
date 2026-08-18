@@ -3,7 +3,7 @@
    (archief/venster/pg-sync) en schrijven BUITEN de helpers om (zelfherstel).
    Dit test de db.js-laag rechtstreeks, zonder server: de index werkt in alle
    opslagmodi en dit is de gedeelde kern ervan.
-   Draai: node --experimental-sqlite --test test/txindex.test.js */
+   Draai: node --test test/txindex.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -11,8 +11,12 @@ const os = require('os');
 const path = require('path');
 
 process.env.RTG_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-txidx-'));
-const { db, orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
-  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe } = require('../server/db');
+const { db } = require('../server/db');
+/* De functies rechtstreeks uit server/db/tx: de module waarvan dit bestand
+   het gedrag vastlegt. Via de gevel laden liet de mutatiemotor de
+   her-exports muteren in plaats van de logica ('overleefd' zonder reden). */
+const { orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
+  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe } = require('../server/db/tx');
 
 const ZAKEN = ['KIKUNOI', 'PONTO', 'HOSHI'];
 function maakOrder(i) {

@@ -2,7 +2,7 @@
    goedkeuring door de gemachtigde (pas dan een echte bestelling bij de
    groothandel), automatisch een voorstel na de MEP-voorspelling, en het
    AI-weekrooster dat na vaststelling het echte rooster stuurt.
-   Draai: node --experimental-sqlite --test test/agent.test.js */
+   Draai: node --test test/agent.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -3,7 +3,7 @@
    Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in het
    gesprek de gedachte parkeert, en de kern-eenheid rustMoment/sweepVoor: wel
    aankaarten bij rust, niet als je onderweg bent of nog iets in je agenda hebt.
-   Draai los: node --experimental-sqlite --test test/sparren.test.js */
+   Draai los: node --test test/sparren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

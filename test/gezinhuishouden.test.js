@@ -24,7 +24,7 @@
       weghalen. Iemands droom afvinken die hij zelf nog niet af vindt, is precies
       het soort kleinigheid dat een gedeeld bord onveilig maakt.
 
-   Draai los: node --experimental-sqlite --test test/gezinhuishouden.test.js
+   Draai los: node --test test/gezinhuishouden.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

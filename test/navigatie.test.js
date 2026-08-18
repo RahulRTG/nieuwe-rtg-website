@@ -2,7 +2,7 @@
    Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling:
    het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per vervoerwijze, en
    de koppeling aan leveranciers/OV/loketten/tank/laad + Flits. Geen externe kaart.
-   Draai los: node --experimental-sqlite --test test/navigatie.test.js */
+   Draai los: node --test test/navigatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { haversine } = require('../server/lib/geo');

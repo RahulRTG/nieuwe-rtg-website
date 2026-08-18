@@ -6,7 +6,7 @@
    mag nooit bij een kind terechtkomen, en Rahul mag nooit iemands geloof
    raden.
 
-   Draai los: node --experimental-sqlite --test test/rahul-mens.test.js */
+   Draai los: node --test test/rahul-mens.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

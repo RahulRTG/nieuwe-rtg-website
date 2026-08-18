@@ -2,7 +2,7 @@
    afvink-per-dag, medische afspraken (aankomend), de groeicurve, en de
    allergiekaart die uit het zorgprofiel (oppasinfo) komt. Medische vrije tekst
    ligt versleuteld op schijf. Dicht voor gasten.
-   Draai los: node --experimental-sqlite --test test/gezondheid.test.js */
+   Draai los: node --test test/gezondheid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

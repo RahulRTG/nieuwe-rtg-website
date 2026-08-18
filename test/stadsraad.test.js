@@ -3,7 +3,7 @@
    daar SAMEN met RTG-personeel beslist over de lab-uitslagen. Grenzen: de
    partner ziet alleen rtf/samen-uitslagen (RTG-bedrijfswerk blijft dicht) en
    een besluit valt pas als beide kanten gestemd hebben.
-   Draai los: node --experimental-sqlite --test test/stadsraad.test.js */
+   Draai los: node --test test/stadsraad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

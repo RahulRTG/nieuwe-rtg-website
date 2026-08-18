@@ -17,7 +17,7 @@
    5. DE KETEN LOOPT DOOR TOT DE KLANT EN ZIJN WERK -- gemeten, niet geraden.
    6. WAT DIT HUIS NIET WEET, STAAT ERBIJ: kans, kosten en onderaannemers.
 
-   Draai los: node --experimental-sqlite --test test/werktoen.test.js */
+   Draai los: node --test test/werktoen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

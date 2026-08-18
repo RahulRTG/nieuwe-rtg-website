@@ -2,7 +2,7 @@
    helikoptervlucht aan bij Ibiza Sky Charter, betaalt vooraf, en de zaak
    (Operations + piloot) wijst piloot en toestel toe en rijdt de ritketen af.
    18+ zoals de privejet. Verloopt via dezelfde ritlaag als taxi's en jets.
-   Draai: node --experimental-sqlite --test test/helikopter.test.js */
+   Draai: node --test test/helikopter.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

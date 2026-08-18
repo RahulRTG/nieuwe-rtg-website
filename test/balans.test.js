@@ -1,6 +1,6 @@
 /* RTG Balans: Rahul kijkt naar agenda, rooster en eetpatroon en adviseert
    ook eens niks: rust, hobby's, ontprikkelen; eerlijk en zonder dwang.
-   Draai los: node --experimental-sqlite --test test/balans.test.js */
+   Draai los: node --test test/balans.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

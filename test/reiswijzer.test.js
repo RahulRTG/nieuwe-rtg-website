@@ -2,7 +2,7 @@
    rijrichting, alarmnummer, water, fooi, let-op), automatisch bijgehouden
    door de Regelwacht en automatisch uitgereikt zodra iemand ergens naartoe
    gaat (reisbureau-aanvraag en partnerboeking).
-   Draai los: node --experimental-sqlite --test test/reiswijzer.test.js */
+   Draai los: node --test test/reiswijzer.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

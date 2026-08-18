@@ -122,7 +122,7 @@ async function beheer(sql) {
       continue;
     }
     const t0 = Date.now();
-    const r = spawnSync(process.execPath, ['--experimental-sqlite', '--test', bestand], {
+    const r = spawnSync(process.execPath, ['--test', bestand], {
       cwd: WORTEL, stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, DATABASE_URL: metDb(BRON, naam), PG_URL: '' }
     });

@@ -1,6 +1,6 @@
 /* De bank-laag: tijd-veilige vergelijkingen, de TOTP-tweede factor op de
    backoffice en het inlog-auditlog.
-   Draai: node --experimental-sqlite --test test/bankbeveiliging.test.js */
+   Draai: node --test test/bankbeveiliging.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

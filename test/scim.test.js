@@ -5,7 +5,7 @@
    sleutel ligt bij de klant. De meeste tests hieronder gaan dus over de GRENS:
    wat mag de sleutel van organisatie A NIET doen bij organisatie B.
 
-   Draai los: node --experimental-sqlite --test test/scim.test.js
+   Draai los: node --test test/scim.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

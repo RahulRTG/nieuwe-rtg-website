@@ -29,7 +29,7 @@
    betekenen. Zonder die spoeling zou deze toets groen blijven op een lek dat
    simpelweg nog onderweg was.
 
-   Draai los: node --experimental-sqlite --test test/fout-client.test.js
+   Draai los: node --test test/fout-client.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

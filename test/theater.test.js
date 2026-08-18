@@ -2,7 +2,7 @@
    na menselijke goedkeuring; de bytes blijven exact het origineel (geen
    hercompressie) en komen met range-streaming terug; reacties op codenaam;
    melden landt bij kantoor. Draai los:
-   node --experimental-sqlite --test test/theater.test.js */
+   node --test test/theater.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

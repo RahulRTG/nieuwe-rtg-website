@@ -13,7 +13,7 @@
    systematisch niet. Omdat hier geen persoon in staat, mag hij alles tellen --
    de privacyregel maakt de cijfers hier beter en niet slechter.
 
-   Draai los: node --experimental-sqlite --test test/speltelling.test.js */
+   Draai los: node --test test/speltelling.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

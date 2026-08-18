@@ -1,7 +1,7 @@
 /* RTG Pulse (kern/pulse.js): het 9+-microblog op codenaam. Posten met de
    9+-poort, volgen, de chronologische feed, reacties, melden (3x = verborgen)
    en de 9+-poort op De Salon en de vriendenchat. Draai los:
-   node --experimental-sqlite --test test/pulse.test.js */
+   node --test test/pulse.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

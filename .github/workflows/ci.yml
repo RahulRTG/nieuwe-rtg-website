@@ -150,7 +150,7 @@ jobs:
       # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
       # De vloer staat in NORM.json (dekkingWaargenomenPct).
       - name: Waargenomen endpoint-dekking (uit het routejournaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)

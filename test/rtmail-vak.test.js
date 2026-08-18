@@ -15,7 +15,7 @@
    3. Een gesprek toont alleen wat je zelf mag zien, en ZEGT hoeveel er buiten
       beeld blijft. Verzwijgen dat er meer is, misleidt net zo goed als het
       tonen ervan.
-   Draai: node --experimental-sqlite --test test/rtmail-vak.test.js */
+   Draai: node --test test/rtmail-vak.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

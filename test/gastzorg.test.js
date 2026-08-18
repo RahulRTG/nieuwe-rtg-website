@@ -1,7 +1,7 @@
 /* De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met
    bestellingen en verblijven, en de live locatie is alleen zichtbaar voor
    zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt.
-   Draai los: node --experimental-sqlite --test test/gastzorg.test.js */
+   Draai los: node --test test/gastzorg.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

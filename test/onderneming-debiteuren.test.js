@@ -13,7 +13,7 @@
    4. WAT NOG LOOPT IS GEEN ACTIE. Alleen vervallen posten komen op het
       dagbeeld; een lopende factuur is de normale gang van zaken.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-debiteuren.test.js */
+   Draai los: node --test test/onderneming-debiteuren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

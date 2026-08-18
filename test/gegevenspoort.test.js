@@ -8,7 +8,7 @@
    En het omgekeerde wordt net zo hard afgerekend: er wordt NIETS gevraagd wat de
    handeling niet nodig heeft. Een bestelling ter plekke vraagt geen adres.
 
-   Draai los: node --experimental-sqlite --test test/gegevenspoort.test.js */
+   Draai los: node --test test/gegevenspoort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

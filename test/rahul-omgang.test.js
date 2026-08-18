@@ -8,7 +8,7 @@
 
    De tekstinhoud per stand en per fase staat in test/rahul-mens.test.js; hier
    gaat het om de bedrading. Draai los:
-   node --experimental-sqlite --test test/rahul-omgang.test.js */
+   node --test test/rahul-omgang.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const rahul = require('../server/kern/rahul');

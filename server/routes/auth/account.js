@@ -6,11 +6,9 @@ module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern } = actx;
 app.post('/api/auth/register', async (req, res) => {
-  // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
-  // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
-  // technische pagina.
+  // Registratie-zekering (een noodrem-trede dooft vanzelf; zie techniek.js).
   const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
-  if (zReg && zReg.aan === false) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
+  if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
   // schoon(): de echte naam wordt o.a. in de backoffice (KYC) getoond; geen opmaak.
   const name = schoon(req.body.name, 80);
   const email = String(req.body.email || '').trim().toLowerCase();

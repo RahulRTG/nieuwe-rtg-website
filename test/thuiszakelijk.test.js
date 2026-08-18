@@ -5,7 +5,7 @@
    kostenplaats belooft nooit dat er betaald is, het commerciele bord telt
    omzet, btw, commissie en netto uitbetaling, en de Mall toont de
    verdieping RTG Thuis met een verwijzing naar de app zelf.
-   Draai los: node --experimental-sqlite --test test/thuiszakelijk.test.js */
+   Draai los: node --test test/thuiszakelijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

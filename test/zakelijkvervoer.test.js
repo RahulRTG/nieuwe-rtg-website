@@ -1,6 +1,6 @@
 /* De zakelijke laag van het Mobility OS: wie er op rekening van een bedrijf
    mag rijden, binnen welke grenzen, en wie daar ja tegen zegt. Draai los:
-   node --experimental-sqlite --test test/zakelijkvervoer.test.js
+   node --test test/zakelijkvervoer.test.js
 
    Wat deze toetsen bewaken, en waarom juist dat:
 

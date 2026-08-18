@@ -4,7 +4,7 @@
    hem op en past hem toe); niet-actieve talen vallen veilig terug. Zonder
    AI-sleutel vangt het woordenboek het op (Spaans als demo); met sleutel
    vertaalt Claude elke taal volledig. Draai los:
-   node --experimental-sqlite --test test/talen114.test.js */
+   node --test test/talen114.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

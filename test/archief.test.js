@@ -2,7 +2,7 @@
    naar append-only maandbestanden. De levende kast blijft klein, maar niets
    raakt zoek: de backoffice-totalen tellen het archief mee en de boekhoud-
    export leest het gewoon terug. Open of recente tickets blijven levend.
-   Draai: node --experimental-sqlite --test test/archief.test.js */
+   Draai: node --test test/archief.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -27,7 +27,7 @@ const ORDER = (ref, at, status) => ({
 });
 
 function boot() {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  child = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     // deze test seedt en leest het rauwe db.json en test dus bewust de JSON-opslag
     env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, RTG_STORE: 'json', NODE_ENV: 'test', RTG_DEMO: '1', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
     stdio: ['ignore', 'ignore', 'inherit']

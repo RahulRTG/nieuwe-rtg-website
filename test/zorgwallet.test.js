@@ -5,7 +5,7 @@
    en de wallet zelf: klantenkaarten, tickets, sleutels en feestmunten
    met een saldo dat nooit onder nul komt. Plus de poorten: gasten en
    anoniemen niet, en zonder polis-cap geen zorgtak.
-   Draai los: node --experimental-sqlite --test test/zorgwallet.test.js */
+   Draai los: node --test test/zorgwallet.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -6,7 +6,7 @@
    Verder dat het echt leest uit de lagen die er al waren: een doel dat je in
    Doelen zet en een afspraak die je bij de salon maakt, staan hier zonder dat
    Life er iets van heeft vastgelegd.
-   Draai los: node --experimental-sqlite --test test/life.test.js */
+   Draai los: node --test test/life.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

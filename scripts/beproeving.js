@@ -54,7 +54,7 @@
                    lukt er tijdens de storm ook echt minstens een -- anders is
                    "nul gefaald" vanzelf waar zodra De Wacht alles afwijst.
 
-   Draai (standaard, overal):   node --experimental-sqlite scripts/beproeving.js
+   Draai (standaard, overal):   node scripts/beproeving.js
    Draai (mega, 100M Postgres):  DATABASE_URL=postgres://... \
                                 node --max-old-space-size=8192 scripts/beproeving.js
    Knoppen (env): MEGA_LEDEN, MEGA_CHUNK, SOAK_MIN, STORM_WERKERS, MEGA_SEED,
@@ -275,7 +275,7 @@ function boot() {
       ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
       NODE_OPTIONS: '--max-old-space-size=8192' };
     if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
+    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), 'server/server.js'],
       { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
     child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
     (async () => {
@@ -478,13 +478,25 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
-  //    geeft 428 (bevestigNodig). Mét bevestiging is dat 428 in elk geval weg.
+  // 2. De AI beweegt GEEN geld zonder menselijke goedkeuring. Het contract is
+  //    sinds de stuurgoedkeuring een eenmalig SERVERVOORSTEL: /doe geeft 428
+  //    met een goedkeuring.id, en alleen /doe/bevestig met precies dat id
+  //    voert uit. Deze toets liep achter op dat contract -- hij stuurde
+  //    bevestigd:true in de aanroep zelf, en dat is nu juist het gedrag dat
+  //    NIET meer mag werken: een model dat zichzelf bevestigt. De lat hier is
+  //    dus drievoudig: zonder akkoord 428, zelf-akkoord blijft 428, en het
+  //    echte akkoord is eenmalig (een herhaling is 404).
   {
     const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
+    const zelf = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const id = zonder.data && zonder.data.goedkeuring && zonder.data.goedkeuring.id;
+    const met = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const nogEens = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && !!id
+      && zelf.status === 428
+      && met.status !== 428 && met.status !== 0
+      && nogEens.status === 404;
+    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + ', zelfbevestigd=' + zelf.status + ', echt akkoord=' + met.status + ', herhaald akkoord=' + (nogEens.status || '-') });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
@@ -678,6 +690,33 @@ async function misbruikBeproeving(tok) {
   }
 
   // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
+  /* DE OMSTANDER. Voor de storm losgaat wordt een EIGEN lid geregistreerd dat
+     er niet aan meedoet. Niet alleen een apart token: een apart ACCOUNT --
+     want de demo-logins delen hun sessie, en de storm raakt /api/logout, dus
+     elk demo-token (ook een 'bewaard' exemplaar) is na de storm dood. Dat was
+     de les van de vorige ronde: de bewaarde demo-sessie mat alsnog 401 x60.
+     De noodrem-ladder zet na de storm bovendien de inlogpaden tien minuten
+     dicht (by design), dus vers inloggen kan dan ook niet. De belofte van de
+     ladder is dat een BESTAANDE sessie niets merkt; deze omstander is die
+     sessie, en E2/E3 vallen op hem terug als vers inloggen niet kan. */
+  const sessieVanVoorDeStorm = await (async () => {
+    const email = 'omstander-' + Math.random().toString(36).slice(2, 10) + '@proef.rtg';
+    const ww = 'Omstander!7-proef';
+    await post('/api/auth/register', { name: 'Omstander Proef', email, password: ww, geboortedatum: '1990-01-01' });
+    const inlog = await post('/api/auth/login', { login: email, password: ww, pasApp: 'rtg' });
+    const tok = (inlog.data && inlog.data.token) || null;
+    /* En zijn paspoort erbij: RTG Pay eist eenmalig KYC van een echt gratis
+       account (payGate accepteert 'pending'), en zonder die stap kan de
+       vingerafdruk-ijking van E3 zijn kalibratie-oplading niet doen -- dan
+       heet de meter blind terwijl alleen de meetgebruiker nog geen paspoort
+       had laten zien. Een pixel is genoeg: de poort toetst de indiening,
+       niet de foto. */
+    if (tok) {
+      const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+      await post('/api/verify/upload', { image: pixel }, tok);
+    }
+    return { member: tok ? [tok] : [], supplier: [], office: [] };
+  })();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];
@@ -852,6 +891,17 @@ async function misbruikBeproeving(tok) {
      altijd 401 opleveren en nooit iets over herstel zeggen. */
   const versTok = await tokens();
   if (versTok.member && versTok.member.length) tokVoor.member = versTok.member;
+  /* Kon een rol niet vers inloggen (de inlogpauze van de noodrem-ladder doet
+     precies dat), dan meet de rest van deze fase met de sessie van voor de
+     storm -- de gebruiker die volgens de ladder niets hoort te merken. */
+  let viaBewaardeSessie = false;
+  for (const rol of ['member', 'supplier', 'office']) {
+    if ((!versTok[rol] || !versTok[rol].length) && sessieVanVoorDeStorm[rol] && sessieVanVoorDeStorm[rol].length) {
+      tokVoor[rol] = sessieVanVoorDeStorm[rol];
+      viaBewaardeSessie = true;
+    }
+  }
+  if (viaBewaardeSessie) rij('  meetsessie', 'vers inloggen kon niet (inlogpauze); gemeten met de sessie van voor de storm -- de ladderbelofte zelf');
   const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
   async function gewoneAanroep() {
     const st = await verzoek('POST', '/api/state', gewoonToken(), {});

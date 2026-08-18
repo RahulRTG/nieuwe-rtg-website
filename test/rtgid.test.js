@@ -2,7 +2,7 @@
    koppelflow (code, bevestigen, weigeren, eenmalig token), de selectieve
    gegevensdeling (18plus zonder geboortedatum, alleen wat gevraagd is),
    het inzagelog met intrekken, machtigingen (mantelzorg) en de poorten.
-   Draai los: node --experimental-sqlite --test test/rtgid.test.js */
+   Draai los: node --test test/rtgid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -23,7 +23,7 @@
 
    Zonder de mutaties waren die vier gewoon als geslaagde toetsen blijven staan.
 
-   Draai los: node --experimental-sqlite --test test/stadsbestuur.test.js */
+   Draai los: node --test test/stadsbestuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

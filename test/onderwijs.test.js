@@ -1,7 +1,7 @@
 /* RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven
    lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de
    eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier).
-   Draai los: node --experimental-sqlite --test test/onderwijs.test.js */
+   Draai los: node --test test/onderwijs.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

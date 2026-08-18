@@ -3,7 +3,7 @@
    het vaste dagritme, de eigen rittenhistorie en het deterministische
    weerbeeld) en levert per waarschuwing een concreet vlootadvies plus een
    simulatie zonder/met advies. Draai los:
-   node --experimental-sqlite --test test/ghost.test.js */
+   node --test test/ghost.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

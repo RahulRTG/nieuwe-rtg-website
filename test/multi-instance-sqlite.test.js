@@ -5,7 +5,7 @@
    contract waar failover en horizontaal schalen op rusten: een sessie en een
    betaling gemaakt op instance 1 worden consistent zichtbaar op instance 2, zonder
    dat er geld ontstaat of verdwijnt. Draai los:
-   node --experimental-sqlite --test test/multi-instance-sqlite.test.js */
+   node --test test/multi-instance-sqlite.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

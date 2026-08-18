@@ -113,9 +113,34 @@ function standaardZekeringen() {
   return {
     onderhoud:   { naam: 'Onderhoudsstand', code: 'FUSE-MAINT', aan: true, poort: true, uitleg: 'Springt hij (stroom eraf), dan is de hele app in onderhoud: alleen de eigenaar komt er nog in.' },
     registratie: { naam: 'Nieuwe registraties', code: 'FUSE-REG', aan: true, poort: true, uitleg: 'Eraf = geen nieuwe accounts (bijv. bij misbruik).' },
+    /* De kleine degraded mode van de noodrem-ladder: alleen de inlog- en
+       registratiepaden dicht, ingelogde leden merken niets. Bestaat omdat de
+       oude noodrem bij een brede brute force de ONDERHOUDS-zekering trok --
+       de hele app op slot, permanent tot de eigenaar langskwam. Zes gespoofte
+       bronnen op de inlog waren zo genoeg voor totale uitval: een verdediging
+       die als DoS-versterker werkte. */
+    inlogpauze: { naam: 'Inlogpauze', code: 'FUSE-LOGIN', aan: true, poort: true, uitleg: 'Eraf = in- en uitschrijfpaden tijdelijk dicht (brede brute force); wie al is ingelogd merkt niets.' },
     betalingen:  { naam: 'Betaalverkeer', code: 'FUSE-PAY', aan: true, poort: true, uitleg: 'Eraf = betalingen tijdelijk geblokkeerd.' },
     ai:          { naam: 'AI-antwoorden', code: 'FUSE-AI', aan: true, poort: true, uitleg: 'Eraf = de persoonlijke AI staat uit.' }
   };
 }
 
-module.exports = { CHECKS, draaiChecks, standaardZekeringen };
+/* Is deze zekering gesprongen? EN de plek waar een tijdgebonden (automatische)
+   zekering vanzelf dooft. flood.js formuleerde het huisprincipe al voor de
+   lastafworp: een reflex die blijft hangen is geen bescherming. Een zekering
+   die de noodrem trok draagt daarom een 'tot'; is die verstreken, dan gaat de
+   stroom er hier weer op -- bij de eerstvolgende lezing, zonder dat er een
+   mens of een timer aan te pas komt. Een HANDMATIG getrokken zekering heeft
+   geen 'tot' en blijft eruit tot de eigenaar hem reset; dat verschil is de
+   hele afspraak. De heling wordt niet apart weggeschreven: elke lezing heelt
+   opnieuw, en de eerstvolgende gewone save neemt hem mee. */
+function zekeringGesprongen(z) {
+  if (!z || z.aan !== false) return false;
+  if (z.tot && z.tot <= Date.now()) {
+    z.aan = true; z.reden = null; z.sindsGesprongen = null; z.tot = null;
+    return false;
+  }
+  return true;
+}
+
+module.exports = { CHECKS, draaiChecks, standaardZekeringen, zekeringGesprongen };

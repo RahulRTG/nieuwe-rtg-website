@@ -1,5 +1,5 @@
 /* Het trainingsschema (kern/trainingsschema.js).
-   Draai los: node --experimental-sqlite --test test/trainingsschema.test.js Dezelfde vorm als het medicatieschema, en om
+   Draai los: node --test test/trainingsschema.test.js Dezelfde vorm als het medicatieschema, en om
    dezelfde reden: RTG schrijft geen trainingsschema voor.
 
    Wat hier wordt vastgezet:

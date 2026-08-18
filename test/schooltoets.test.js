@@ -3,7 +3,7 @@
    geen goed/fout-verklikker halverwege), een MO geeft de leraar de vragen
    met antwoorden, en het cijfervoorstel is een advies dat de leraar met een
    tik in het bestaande cijferboek zet.
-   Draai los: node --experimental-sqlite --test test/schooltoets.test.js */
+   Draai los: node --test test/schooltoets.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

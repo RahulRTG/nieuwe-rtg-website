@@ -94,7 +94,7 @@ Magnaat Boardroom bij `capabilityGraph.motor`. Zet bij twijfel direct
 
 ```bash
 npm ci --omit=dev
-NODE_ENV=production RTG_ENC_KEY=... node --experimental-sqlite server/server.js
+NODE_ENV=production RTG_ENC_KEY=... node server/server.js
 ```
 
 De server **weigert te starten** als productie onveilig is ingesteld (demo aan,
@@ -245,7 +245,7 @@ je iets aan de opslag verandert.
 #### Hoe lang duurt het? (gemeten, niet aangenomen)
 
 `scripts/hersteltijd.js` doet dezelfde ronde maar met een stopwatch, op een
-database van een opgegeven omvang. Draai: `node --experimental-sqlite
+database van een opgegeven omvang. Draai: `node
 scripts/hersteltijd.js 250000`.
 
 Gemeten op **2 augustus 2026**, op de ontwikkelmachine:
@@ -479,7 +479,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer
 - [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). Overdragen kan later op de technische pagina onder "Eigenaarschap"
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
-- [ ] Versleuteling in rust bewezen op de echte machine: `node --experimental-sqlite --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
+- [ ] Versleuteling in rust bewezen op de echte machine: `node --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
 - [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
 - [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend

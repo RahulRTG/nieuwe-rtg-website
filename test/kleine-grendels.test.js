@@ -5,7 +5,7 @@
    eigen testbestand rechtvaardigen, maar samen wel. Ze delen een vorm: geen
    ontbrekende controle, maar een controle die op het VERKEERDE ding kijkt.
 
-   Draai los: node --experimental-sqlite --test test/kleine-grendels.test.js
+   Draai los: node --test test/kleine-grendels.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

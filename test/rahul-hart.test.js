@@ -2,7 +2,7 @@
    gangen met wijnarrangement, 70's en Frenna) en het datahuis-verhaal (RTG
    verwerkt alles zelf, met de kluis en de hashes) staan in het GEDEELDE
    karakter, dus elke assistent draagt ze. Draai los:
-   node --experimental-sqlite --test test/rahul-hart.test.js */
+   node --test test/rahul-hart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { RAHUL_BASIS } = require('../server/kern/rahul');

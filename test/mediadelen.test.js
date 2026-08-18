@@ -12,7 +12,7 @@
        gesprek geen manier wordt om te toetsen welke id's bestaan;
      - en een bericht zonder tekst maar met een stuk is een geldig bericht.
 
-   Draai los: node --experimental-sqlite --test test/mediadelen.test.js */
+   Draai los: node --test test/mediadelen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -4,7 +4,7 @@
    bronlabel), de premium-functies gratis (inzichten, vaste-lasten-radar,
    wisselgeld sparen met auto-spaarrekening) en de zakelijke rekening die er
    voor de Business Pass en voor elke zaak automatisch bij komt.
-   Draai los: node --experimental-sqlite --test test/bankhart.test.js */
+   Draai los: node --test test/bankhart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

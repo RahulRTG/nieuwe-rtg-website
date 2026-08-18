@@ -16,7 +16,7 @@
    Op een geleende laptop of een gedeelde computer is dat precies het moment
    waarop iemand denkt veilig te zijn. Daarom staat deze test er.
 
-   Draai los: node --experimental-sqlite --test test/uitloggen.test.js */
+   Draai los: node --test test/uitloggen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

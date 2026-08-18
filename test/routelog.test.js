@@ -30,7 +30,7 @@
         /apps/foundation/rust.html 45 "geopende" schermen op, want de service
         worker daar haalt zijn hele schil op.
 
-   Draai los: node --experimental-sqlite --test test/routelog.test.js
+   Draai los: node --test test/routelog.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

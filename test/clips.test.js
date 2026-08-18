@@ -1,7 +1,7 @@
 /* RTG Clips: korte verticale video's die alleen op het toestel van de maker
    staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en
    relayeert signalen; de feed is een eindige dagselectie zonder oneindige
-   scroll. Draai los: node --experimental-sqlite --test test/clips.test.js */
+   scroll. Draai los: node --test test/clips.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

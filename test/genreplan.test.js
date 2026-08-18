@@ -18,7 +18,7 @@
    De proefaanroep staat er nog, maar als BEWERING: is de motor niet aangesloten,
    dan zakt deze toets en gaat de rest gewoon door met falen.
 
-   Draai los: node --experimental-sqlite --test test/genreplan.test.js */
+   Draai los: node --test test/genreplan.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

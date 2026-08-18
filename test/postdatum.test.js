@@ -16,7 +16,7 @@
      de zaak        dezelfde drie routes op het postvak van een RTG-kantoor,
                     en alleen voor de manager
 
-   Draai: node --experimental-sqlite --test test/postdatum.test.js */
+   Draai: node --test test/postdatum.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -18,7 +18,7 @@
    hoeveel minuten je op sociale media zat -- de meting waar dit beleid tegen
    beschermt.
 
-   Draai los: node --experimental-sqlite --test test/werkbeleid-dienst.test.js
+   Draai los: node --test test/werkbeleid-dienst.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -21,7 +21,7 @@
       tafel; bij de economie niet, en de kijker- en schermweergave horen dus
       niet iemands kas te tonen.
 
-   Draai los: node --experimental-sqlite --test test/spelmagnaat.test.js */
+   Draai los: node --test test/spelmagnaat.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

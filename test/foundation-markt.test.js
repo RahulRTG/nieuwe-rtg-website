@@ -19,7 +19,7 @@
      beschermende handeling, geen handelsdaad, en die hoort niet achter een
      volwassene te zitten.
 
-   Draai los: node --experimental-sqlite --test test/foundation-markt.test.js
+   Draai los: node --test test/foundation-markt.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -2,7 +2,7 @@
    Maandgroepen en de terugblik (zelfde maand, eerdere jaren), het gedeelde
    favorieten-hartje, en de eerlijke dagklem: een oude foto mag op zijn
    echte dag het boekje in, nooit op een dag die nog moet komen.
-   Draai los: node --experimental-sqlite --test test/rtfalbum.test.js */
+   Draai los: node --test test/rtfalbum.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

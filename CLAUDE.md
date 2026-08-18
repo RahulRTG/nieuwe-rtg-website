@@ -75,6 +75,13 @@ voorgekookt werkblad) vóór je er iets bij zet.
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
+**`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
+zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus
+die van elk rood licht een fix-issue met diagnose maakt. De twee vaste grenzen
+daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
+Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
+juridische oordeel blijft bij een mens.
+
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
 
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.

@@ -3,7 +3,7 @@
    Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt
    hem tegen de SERVER-kopie. Lopen ze uiteen, dan faalt dit hier, in plaats
    van als raadselachtige fout midden in een potje.
-   Draai los: node --experimental-sqlite --test test/spelregels-drift.test.js */
+   Draai los: node --test test/spelregels-drift.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -2,7 +2,7 @@
    expediteurs (demo TerraMar Cargo). Bewaakt de etappeketen met de juiste
    documenten, de douane-stap bij een grensoverschrijding, het publieke
    volgen zonder klantgegevens en de cap-poort.
-   Draai los: node --experimental-sqlite --test test/vracht.test.js */
+   Draai los: node --test test/vracht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

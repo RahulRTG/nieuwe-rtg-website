@@ -2,7 +2,7 @@
    met de invulling van de stichting, plus de Clubs & steden-afdeling: clubs
    per stad, programma's, RTF-team, afspraken en een gedeeld samenwerkingslog;
    de club zelf kijkt via de clubcode en ziet alleen het eigen dossier. Draai los:
-   node --experimental-sqlite --test test/rtfkantoor.test.js */
+   node --test test/rtfkantoor.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

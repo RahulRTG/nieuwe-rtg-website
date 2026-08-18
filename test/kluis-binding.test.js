@@ -10,7 +10,7 @@
    Deze tests vallen die verplaatsing echt aan, met rauwe SQL, en toetsen daarnaast
    dat een BESTAANDE installatie leesbaar blijft en netjes migreert.
 
-   Draai los: node --experimental-sqlite --test test/kluis-binding.test.js */
+   Draai los: node --test test/kluis-binding.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

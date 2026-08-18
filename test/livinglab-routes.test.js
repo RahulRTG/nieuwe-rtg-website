@@ -24,7 +24,7 @@
    - het bestuurlijke deel niet strippen in bewoner/labs
      -> "de bewoner ziet de binnenkant niet" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/livinglab-routes.test.js
+   Draai los: node --test test/livinglab-routes.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

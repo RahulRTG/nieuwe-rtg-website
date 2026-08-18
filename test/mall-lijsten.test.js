@@ -4,7 +4,7 @@
    verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand
    aanbiedt, kun je vragen.
 
-   Draai los: node --experimental-sqlite --test test/mall-lijsten.test.js */
+   Draai los: node --test test/mall-lijsten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

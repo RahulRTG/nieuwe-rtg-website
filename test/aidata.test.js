@@ -3,7 +3,7 @@
    eigen model te trainen. Getest: het bord telt, de export is geldig JSONL met
    een meta-kop, echte gesprekken komen erin mee, en de export bevat NOOIT echte
    namen (privacy by design: alles op codenaam; de kluis blijft dicht).
-   Draai los: node --experimental-sqlite --test test/aidata.test.js */
+   Draai los: node --test test/aidata.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

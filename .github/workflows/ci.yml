@@ -1,8 +1,25 @@
 name: CI
 
 on:
+  # ALLEEN DE HOOFDLIJN, en dat is een reparatie en geen bezuiniging.
+  #
+  # Hier stond 'claude/**' bij. Een push naar zo'n branch draaide dan de hele
+  # keten EN de pull_request-trigger deed dat ook, op dezelfde commit, tegelijk.
+  # De concurrency-groep hieronder kon dat niet zien: bij een pull_request is
+  # de sleutel het PR-nummer en bij een push de ref, dus twee groepen die
+  # elkaar nooit annuleren.
+  #
+  # Wat dat kostte was niet alleen tijd. Twee volledige schermrondes (elk bijna
+  # een uur, elk met een eigen Chromium, Postgres en Redis) vochten om dezelfde
+  # runners, en de traagste van de twee liep tegen zijn timeout van 90 minuten
+  # aan -- drie keer op rij, telkens de PR-run, telkens op een commit waarvan
+  # de push-run in 45 minuten groen was. Een rood vinkje om drukte in plaats
+  # van om code, en elke keer een herstart met de hand.
+  #
+  # Een branch zonder PR krijgt hierdoor geen keuring meer. Dat is de prijs, en
+  # hij is klein: mergen kan alleen via een PR, en dan draait pull_request.
   push:
-    branches: [ main, master, 'claude/**' ]
+    branches: [ main, master ]
   pull_request:
 
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
@@ -155,7 +172,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Blokkeer nieuwe high/critical kwetsbaarheden
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
 

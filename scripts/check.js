@@ -3258,6 +3258,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
+    ['public/apps/app-main/app-main-09a.js#scPinCam', ['werktuig', 'de sociale balk leest een contactpin of een levende code van het scherm van een ander; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
@@ -3269,6 +3270,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
     ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
+    ['public/apps/foundation/vrienden.html#pinCam', ['werktuig', 'dezelfde pinlezer aan de gezinskant: beeld als invoer om een code te lezen, zonder geluid']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],

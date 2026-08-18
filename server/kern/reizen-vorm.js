@@ -14,15 +14,18 @@
 const { RANG } = require('./wereldkern');
 
 /* De herkomst van een onderdeel: waar het systeem het vandaan heeft. Zes
-   waarden (REIZEN.md par. 2.2); vandaag zijn er twee bereikbaar -- `rtg` en
-   `partner` -- en de andere vier komen met de Invoerbalie en de partnerkant.
-   Ze staan er nu al in omdat dit het woordenboek is en niet de voorraad.
+   waarden (REIZEN.md par. 2.2), plus een zevende die er met de reisuitnodiging
+   bij kwam: `gedeeld` -- een reisgenoot heeft dit met u gedeeld. Dat is een
+   echte, eigen bron en geen variant van `handmatig`: u heeft dat hotel niet
+   geboekt en dat document niet, en dat verschil hoort te blijven staan.
+   `extern` is nog niet bereikbaar; dat komt met de partnerkant. Ze staan er nu
+   al in omdat dit het woordenboek is en niet de voorraad.
 
    Een onderdeel ZONDER geldige herkomst wordt niet geplaatst. Dat is geen
    pietluttigheid: op herkomst hangt straks wat er met een onderdeel mag
    gebeuren -- een ingelezen hotelbevestiging is geen verkochte boeking. Een
    onbekende waarde stil als `rtg` behandelen zou dat verschil weggummen. */
-const HERKOMSTEN = ['rtg', 'partner', 'extern', 'document', 'beeld', 'handmatig'];
+const HERKOMSTEN = ['rtg', 'partner', 'extern', 'document', 'beeld', 'handmatig', 'gedeeld'];
 
 /* Bestemmingen vergelijken. "Ibiza (uit Geneve)" en "Ibiza" zijn dezelfde
    plaats; "Dubai" en "Dubai Marina" ook. "Rome" en "Romeinse Riviera" NIET --

@@ -17,7 +17,7 @@
       kluis (RTG Bestanden) en niet naar een tweede, verborgen opslag: daar staat
       al een quotum op, een virusscan, een prullenbak en een verwijderknop. Het
       onderdeel draagt alleen een VERWIJZING. Zo is invoeren geen val -- u kunt
-      uw eigen bewijsstuk zien en weggooien (REIZEN.md par. 4.8).
+      uw eigen bewijsstuk zien en weggooien (REIZEN.md par. 4.9).
    2. WAT ER GELEZEN IS, STAAT ERBIJ. Elk veld draagt waarde, hoe, zekerheid en
       waaruit. Die extractie wordt hier bewaard en komt NIET van de aanvrager:
       de client stuurt geen zekerheden mee, want een bewijsstuk dat de aanvrager
@@ -98,6 +98,17 @@ module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) 
         : 'Wij konden er niets uit lezen. Het bestand is bewaard als bewijsstuk; vul de gegevens zelf in.' };
   }
 
+  /* VOORLEZEN ZONDER IETS TE BEWAREN. Het kantoor zet een reis klaar voor
+     iemand die nog geen lid is; er is dus geen kluis om een origineel in te
+     leggen en geen account om een voorstel aan te hangen. Deze weg leest alleen
+     -- er blijft niets achter over een mens die nog geen klant is (zie de kop
+     van kern/reisuitnodiging.js). */
+  const leesVoor = (tekst) => {
+    const r = lezer.lees(String(tekst || '').slice(0, 20000), { plaatsVind });
+    return r ? { ok: true, gelezen: r, drempel: lezer.DREMPEL }
+      : { status: 400, error: 'Hier valt niets uit te lezen. Vul de gegevens met de hand in.' };
+  };
+
   /* ---- 2. bevestigen: pas hier ontstaat een onderdeel ---- */
   function bevestig(key, id, correcties) {
     const b = bak();
@@ -146,26 +157,12 @@ module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) 
     return { ok: true, onderdeel: item };
   }
 
-  const mijn = (key) => (bak().items || []).filter(x => x.key === key).slice(0, 100);
+  /* De onderdelen zelf -- opvragen, weghalen, doorgeven aan de reiswereld en
+     overnemen uit een uitnodiging -- staan in ./invoer-onderdelen.js. Deze
+     module is de BALIE (lezen en bevestigen); dat is een andere vraag dan wat er
+     met de onderdelen daarna gebeurt. Ze delen dezelfde bak, en die wordt
+     doorgegeven in plaats van overgetikt. */
+  const { mijn, weg, mijnRegels, neemOver } = require('./invoer-onderdelen')({ bak, save, crypto, nu, schoon });
 
-  /* Weghalen mag altijd: wie zijn reis hier onderbrengt, moet hem er ook weer
-     uit kunnen halen. Het bewijsstuk zelf blijft in de eigen kluis staan -- dat
-     is van het lid en niet van deze module om weg te gooien. */
-  function weg(key, id) {
-    const b = bak();
-    const i = b.items.findIndex(x => x.id === String(id || '') && x.key === key);
-    if (i < 0) return { status: 404, error: 'Dit onderdeel staat niet bij u.' };
-    const [uit] = b.items.splice(i, 1);
-    save();
-    return { ok: true, weg: uit.id, bewijsBlijft: !!(uit.bewijs && uit.bewijs.bestandId) };
-  }
-
-  /* De regels voor de reiswereld. Dezelfde vorm als elk ander reisdomein: deze
-     laag levert rijen, de wereld maakt er regels van en De Reis groepeert ze. */
-  const mijnRegels = (key) => mijn(key).map(x => ({
-    titel: x.titel, bestemming: x.bestemming, van: x.van, tot: x.tot,
-    status: x.status, kenmerk: x.kenmerk, soort: x.soort, herkomst: x.herkomst
-  }));
-
-  return { invoer: { lees, bevestig, mijn, weg, mijnRegels, SOORTEN } };
+  return { invoer: { lees, leesVoor, bevestig, mijn, weg, mijnRegels, neemOver, SOORTEN } };
 };

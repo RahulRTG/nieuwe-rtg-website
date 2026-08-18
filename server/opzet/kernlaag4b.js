@@ -4,6 +4,7 @@
      bankregie
      bank
      reis
+     invoerbalie + reisuitnodiging
      fiscaal/regelwacht
      fiscaal/btwaangifte
      thuis
@@ -53,6 +54,14 @@ Object.assign(kern, require('../kern/reis')({ LANDEN }));
    krijgt geen eigen opslag). */
 Object.assign(kern, require('../kern/invoer').maakInvoer({
   db, save, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
+/* DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis plus een
+   link. Het kantoor zet een reis klaar voor iemand die nog geen lid is, en een
+   lid nodigt zijn reisgenoot uit. Krijgt de Invoerbalie mee (daar landen de
+   overgenomen onderdelen; een tweede plek zou een tweede antwoord geven op
+   "waar staat mijn reis") en de bestaande identiteitscontrole -- er komt geen
+   eigen manier bij om vast te stellen wie iemand is. */
+Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
+  db, save, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd

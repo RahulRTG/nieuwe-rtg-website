@@ -270,13 +270,20 @@
      (ONTWERP.md: uitzonderingsgestuurd). */
   function reisKop(r) {
     const n = r.telling.onderdelen;
+    /* NODIG EEN REISGENOOT UIT. De knop staat bij de reis en niet ergens in een
+       menu: je nodigt iemand uit VOOR IETS. Wat er gedeeld wordt zijn de regels
+       van deze reis -- geen bewijsstukken, geen kenmerk van uw kluis. */
     return '<div class="regkop"><h2>' + esc(r.bestemming) + ' &middot; ' + esc(vensterTekst(r.venster)) + '</h2>' +
-      '<span class="tel">' + n + (n === 1 ? ' onderdeel' : ' onderdelen') + '</span></div>' +
-      (n > 1 ? '<p class="stil">' + esc(r.grond) + '</p>' : '');
+      '<span class="tel">' + n + (n === 1 ? ' onderdeel' : ' onderdelen') + '</span>' +
+      '<button class="rtg-knop" type="button" data-nodig="' + esc(r.id) + '" style="margin-left:.6rem;">Nodig een reisgenoot uit</button>' +
+      '</div>' +
+      (n > 1 ? '<p class="stil">' + esc(r.grond) + '</p>' : '') +
+      '<div class="stil" data-uitnodiging="' + esc(r.id) + '"></div>';
   }
 
+  let REIZEN = [];
   function teken(d) {
-    const reizen = d.reizen || [];
+    const reizen = REIZEN = d.reizen || [];
     const losseDelen = (d.los || []).map(x => x.onderdeel);
     const alles = reizen.reduce((a, r) => a.concat(r.onderdelen), []).concat(losseDelen);
 
@@ -310,6 +317,7 @@
         : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
           'verschijnt het hier vanzelf.</p>');
 
+    $('#komend').querySelectorAll('[data-nodig]').forEach(b => b.addEventListener('click', () => nodigUit(b)));
     $('#komend').querySelectorAll('.rtg-ref').forEach(b => b.addEventListener('click', async (e) => {
       e.preventDefault(); e.stopPropagation();
       try { await navigator.clipboard.writeText(b.dataset.ref); const t = b.textContent;
@@ -381,6 +389,33 @@
     }
   }
   laad();
+
+  /* Een reisgenoot uitnodigen: de regels van deze reis gaan mee, en verder
+     niets. De link is een sleutel -- hij staat er daarom uitgeschreven bij, met
+     een knop om hem te kopieren, en het scherm zegt erbij dat de ontvanger zich
+     eerst legitimeert. Versturen doet u zelf; RTG mailt hier niemand. */
+  async function nodigUit(knop) {
+    const reis = REIZEN.find(x => x.id === knop.dataset.nodig);
+    const vak = $('#komend').querySelector('[data-uitnodiging="' + knop.dataset.nodig + '"]');
+    if (!reis || !vak) return;
+    knop.disabled = true;
+    vak.textContent = 'Klaarzetten...';
+    try {
+      const d = await api('uitnodiging/nodig-uit', { onderdelen: reis.onderdelen.map((o) => ({
+        soort: o.soort, titel: o.titel, bestemming: o.bestemming, van: o.van, tot: o.tot, kenmerk: o.kenmerk
+      })) });
+      const link = location.origin + d.link;
+      vak.innerHTML = '<span>Stuur deze link naar uw reisgenoot. Hij ziet alleen waar en wanneer; ' +
+        'de reis komt pas bij hem te staan nadat hij zich heeft gelegitimeerd.</span>' +
+        '<span style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap;">' +
+        '<input class="rtg-veld" readonly value="' + esc(link) + '" style="flex:1 1 18rem;font-size:.8rem;">' +
+        '<button class="rtg-knop" type="button" id="kopie-' + esc(reis.id) + '">Kopieer</button></span>';
+      const kb = vak.querySelector('button');
+      kb.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(link); kb.textContent = 'gekopieerd'; } catch (err) {}
+      });
+    } catch (e) { vak.textContent = e.message; knop.disabled = false; }
+  }
 
   /* ---------- DE INVOERBALIE ----------
 

@@ -122,7 +122,11 @@ activiteit, tafel, evenement, spoor, huurauto, verzekering.
 **Herkomst** (wat het systeem weet): `rtg` (zelf verkocht), `partner`
 (partnerinventaris), `extern` (extern distributiekanaal), `document`
 (ingelezen PDF/e-mail), `beeld` (ingelezen schermafdruk/foto), `handmatig`
-(door mens ingevoerd).
+(door mens ingevoerd) en `gedeeld` (een reisgenoot heeft dit met u gedeeld).
+
+Die laatste is geen variant van `handmatig`: wie een reis van zijn reisgenoot
+overneemt, heeft dat hotel niet geboekt en dat document niet. Voor hem is de
+bron een ander mens, en dat hoort te blijven staan.
 
 De voorkant kiest op **soort**, en ziet er dus overal hetzelfde uit. Elke regel
 die met geld, wijzigen, garanderen of bewaken te maken heeft, kijkt naar
@@ -253,7 +257,29 @@ De reisdocumentenmap valt daaronder, niet ernaast. Klantgegevens draaien ook
 hier op codenamen; de echte naam komt uit de kluis, per keer, met een reden, en
 in het journaal.
 
-### 4.8 De reiziger mag stoppen zonder alles kwijt te raken
+### 4.8 Een link is een sleutel, en een klaargezette reis is geen dossier
+
+Het reisbureau kan een reis klaarzetten voor iemand die nog geen lid is, en een
+lid kan zijn reisgenoot uitnodigen. Beide lopen over één link. Vier dingen
+liggen daarbij vast:
+
+- **Er wordt geen profiel aangemaakt van iemand die geen lid is.** Een
+  klaargezette reis bevat de reis en niet de persoon: geen naam, geen
+  e-mailadres, geen telefoonnummer, en geen bestanden. De medewerker stuurt de
+  link zelf. Wordt hij niet opgeëist, dan verloopt hij en is er niets bewaard
+  dat over een mens gaat (LIFE.md par. 4.7).
+- **De link laat zien dat het over jou gaat, en verder niets**: bestemming,
+  periode, hoeveel onderdelen en van welke soort. Geen titels, geen kenmerken,
+  geen datums per onderdeel. Wie de link doorstuurt, lekt geen boekingsnummers.
+- **Het slot is de entropie, niet de rem.** De code is 128 bits; de rem op de
+  publieke route houdt ruis tegen en is uitdrukkelijk geen slot (LAT-regel 7).
+- **Een link geeft nooit een pas.** Opeisen levert de gewone weg naar een RTG
+  Pass, met de ballotage die daarbij hoort; Lifestyle en Business blijven
+  menselijke goedkeuring. En een reisgenoot komt in de gegevens van een ánder,
+  dus die wordt met de bestaande identiteitscontrole gecontroleerd — er komt
+  geen tweede manier bij om vast te stellen wie iemand is.
+
+### 4.9 De reiziger mag stoppen zonder alles kwijt te raken
 
 Wie zijn reis bij RTG onderbrengt terwijl hij hem elders kocht, moet hem er ook
 weer uit kunnen halen: de originelen zijn van hem. Invoeren is geen val.
@@ -370,7 +396,7 @@ boekingsnummer, en die gok zou een verkeerd kenmerk in een reisdossier zetten.
 
 1. het origineel gaat naar de **eigen kluis** van het lid (RTG Bestanden, met
    quotum, virusscan en verwijderknop) en niet naar een tweede opslag; haalt hij
-   het onderdeel weg, dan blijft het bewijsstuk van hem (par. 4.8);
+   het onderdeel weg, dan blijft het bewijsstuk van hem (par. 4.9);
 2. de zekerheden komen van de lezer en **nooit van de aanvrager**; een mens mag
    corrigeren, en dan staat er `door u ingevuld` bij dat veld — met de lezing
    ernaast bewaard, niet eroverheen;
@@ -378,6 +404,17 @@ boekingsnummer, en die gok zou een verkeerd kenmerk in een reisdossier zetten.
    bevestigt hier niets, het document zegt het, en van wie dat document is staat
    in de herkomst (par. 4.3). Bleef er een veld onder de drempel, dan is de stand
    `tecontroleren` en vraagt de reis er aandacht voor.
+
+**De keten die daarop volgt: klaarzetten, een link, een nieuw lid, een
+reisgenoot.** `kern/reisuitnodiging.js` + `/apps/reisuitnodiging.html` (de enige
+pagina van dit huis die opent voor iemand zonder account). Het reisbureau leest
+de bevestigingen van een klant voor, zet de reis klaar en krijgt een link; wie
+die opent kan lid worden en de reis overnemen; en hij kan daarna zijn reisgenoot
+uitnodigen — die eerst langs de identiteitscontrole gaat, want hij komt in de
+reisgegevens van een ander. De regels staan in par. 4.8.
+
+Overgenomen onderdelen landen bij de Invoerbalie en niet in een eigen bak van de
+uitnodigingen: anders geeft "waar staat mijn reis" twee antwoorden.
 
 **Twee dingen anders dan hierboven gepland, allebei met reden.** De balie is
 eerst voor het **lid** gebouwd en niet voor het kantoor: die weg heeft geen

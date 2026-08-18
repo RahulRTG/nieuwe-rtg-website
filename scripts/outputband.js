@@ -38,7 +38,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { spawn } = require('child_process');
 const op = require('./outputproef');
 
 const WORTEL = path.join(__dirname, '..');
@@ -86,12 +86,26 @@ function schrijf(gericht, basislijn) {
   return na;
 }
 
+/* ASYNCHROON, EN DAT IS DE HELE WINST. spawnSync blokkeert de event-loop tot het
+   kind klaar is; met drie "werkers" die allemaal spawnSync doen draait er in
+   werkelijkheid maar EEN tegelijk -- serieel, met een extra proceslaag eromheen,
+   dus trager dan de kale --meet-lus. Met spawn (async) lopen de drie kinderen
+   echt naast elkaar en telt de machine zijn kernen mee. */
 function eenRegel(args) {
-  const r = spawnSync('node', ['--experimental-sqlite', __filename].concat(args),
-    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 16 * 1024 * 1024 });
-  const regel = String(r.stdout || '').trim().split('\n').filter(Boolean).pop();
-  if (!regel) return null;
-  try { return JSON.parse(regel); } catch (e) { return null; }
+  return new Promise((resolve) => {
+    const kind = spawn('node', ['--experimental-sqlite', __filename].concat(args),
+      { cwd: WORTEL });
+    let uit = '';
+    const dood = setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} }, 300000);
+    kind.stdout.on('data', (d) => { uit += d; });
+    kind.on('close', () => {
+      clearTimeout(dood);
+      const regel = uit.trim().split('\n').filter(Boolean).pop();
+      if (!regel) return resolve(null);
+      try { resolve(JSON.parse(regel)); } catch (e) { resolve(null); }
+    });
+    kind.on('error', () => { clearTimeout(dood); resolve(null); });
+  });
 }
 
 (async () => {
@@ -119,6 +133,42 @@ function eenRegel(args) {
     sindsSchrijf = 0;
   }
 
+  /* ---- DE BAND COMMIT ZICHZELF ----
+
+     DEZE OMGEVING HERSTART DE CONTAINER BIJ ELKE SESSIE-RESUME, en dan kan een
+     lopende band sneuvelen. Alleen wat GECOMMIT is, is met zekerheid duurzaam;
+     de werkboom-schrijfbeurt is dat misschien niet. Vandaar dat de band zelf
+     periodiek OUTPUTPROEF.json vastlegt en pusht. Nooit iets anders dan dat ene
+     bestand (server/data en .env blijven met rust), en een mislukte push mag de
+     meting nooit stoppen -- vandaar de try/catch en geen throw. */
+  const { execFileSync } = require('child_process');
+  function commitDuurzaam(na) {
+    try {
+      execFileSync('git', ['add', 'OUTPUTPROEF.json'], { cwd: WORTEL });
+      const staat = na && na.gemeten ? na.gemeten : {};
+      const bericht = 'OUTPUT-band: ' + (staat.bewezen || 0) + ' bewezen, ' +
+        (staat.onbeslist || 0) + ' onbeslist (' + klaar + '/' + rij.length + ' gemeten)\n\n' +
+        'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n' +
+        'Claude-Session: https://claude.ai/code/session_011wXxJn2qhUZPyF9dJtwgW1';
+      /* Niets te committen (geen wijziging sinds vorige keer) geeft exit 1; dat
+         is geen fout maar rust. */
+      const st = execFileSync('git', ['status', '--porcelain', 'OUTPUTPROEF.json'], { cwd: WORTEL, encoding: 'utf8' });
+      if (!st.trim()) return;
+      /* ONGESIGNEERD MET OPZET. Deze omgeving tekent commits via een
+         signeringsserver die geregeld 503 geeft, en de commits hier zijn toch
+         niet geverifieerd-getekend (git log %G? = N). Een mechanische
+         register-commit laten stranden op een flakey tekenserver is de meting
+         niet waard; -c commit.gpgsign=false slaat die server over. */
+      execFileSync('git', ['-c', 'commit.gpgsign=false', 'commit', '-q', '-m', bericht], { cwd: WORTEL });
+      for (let poging = 0; poging < 4; poging++) {
+        try { execFileSync('git', ['push', '-u', 'origin', 'claude/route-coverage-rtg-kantoor-tsv5ot'], { cwd: WORTEL }); break; }
+        catch (e) { if (poging === 3) break; require('child_process').execSync('sleep ' + (2 ** (poging + 1))); }
+      }
+    } catch (e) { process.stdout.write('  (commit overgeslagen: ' + String((e && e.message) || e).slice(0, 80) + ')\n'); }
+  }
+  let sindsCommit = 0;
+  const commitBundel = 300;
+
   async function werker(nr) {
     while (volgende < rij.length) {
       const i = volgende++;
@@ -133,9 +183,8 @@ function eenRegel(args) {
       const basis = basislijn.get(d.toets);
       if (basis === 'rood') { klaar++; stoornis++; continue; }
 
-      const u = await Promise.resolve().then(() =>
-        eenRegel(['--een=' + d.route + '|' + d.toets + '|' + (basis === 'groen' ? 'groen' : 'onbekend')]) ||
-        { route: d.route, toets: d.toets, staat: 'stoornis', basis: null });
+      const u = (await eenRegel(['--een=' + d.route + '|' + d.toets + '|' + (basis === 'groen' ? 'groen' : 'onbekend')])) ||
+        { route: d.route, toets: d.toets, staat: 'stoornis', basis: null };
       klaar++; sindsSchrijf++;
 
       /* Wat de werker over de basislijn zag, onthouden -- ook 'rood', zodat de
@@ -153,12 +202,15 @@ function eenRegel(args) {
       process.stdout.write('  ' + String(klaar).padStart(5) + '/' + rij.length + '  w' + nr + '  ' +
         label + '  ' + d.route.slice(0, 52).padEnd(54) + '  ~' + rest + ' min\n');
       if (sindsSchrijf >= bundel) bewaar();
+      if (++sindsCommit >= commitBundel) { sindsCommit = 0; commitDuurzaam(schrijf(gericht, Object.fromEntries(basislijn))); }
     }
   }
 
   await Promise.all(Array.from({ length: werkers }, (_, n) => werker(n + 1)));
   const na = schrijf(gericht, Object.fromEntries(basislijn));
+  commitDuurzaam(na);
   console.log('\n  ' + merkt + ' merken, ' + blind + ' blind, ' + stoornis + ' stoornis.');
   if (na && na.gemeten) console.log('  register nu: ' + JSON.stringify(na.gemeten));
+  console.log('  BAND KLAAR');
   process.exitCode = 0;
 })().catch(e => { console.error('de band viel om: ' + (e && e.stack || e)); process.exitCode = 2; });

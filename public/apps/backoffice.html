@@ -85,6 +85,11 @@
   .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .vbtn.no{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .vbtn:hover{background:rgba(255,255,255,0.05);}
+  /* invoer in een paneel: hetzelfde ritme als de rijen erboven, veel lucht */
+  .invoerrij{display:grid;gap:0.5rem;padding:1rem 1.25rem 1.25rem;border-top:1px solid var(--line);}
+  .invoerrij input,.invoerrij select{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;color:var(--txt);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;}
+  .invoerrij input:focus,.invoerrij select:focus{border-color:var(--gold);}
+  .invoerrij button{justify-self:start;margin-top:0.2rem;}
   .doc-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out;}
   .doc-scrim.open{display:flex;}
   .doc-scrim img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
@@ -251,12 +256,57 @@
     <!-- De catalogus-wensen uit de onboarding: leden die bij het aanmelden
          zeiden dat ze een bedrijf hebben en het in de RTG-catalogus willen. Op
          codenaam. Een besluit hier maakt GEEN zaak -- dat blijft de
-         partner-aanvraag hierboven, met Business Pass-bewijs. -->
+         partner-aanvraag hierboven, met ledenbewijs. -->
     <div class="cols" style="margin-top:1.5rem;">
       <div class="panel">
         <h2 data-i18n="panel.cw">Bedrijven uit de onboarding</h2>
-        <p class="sub" style="margin:0 1.25rem;" data-i18n="cw.uitleg">Leden die bij het aanmelden een bedrijf opgaven en vroegen of het in de catalogus mag. Een partnerplek loopt via een aanvraag met Business Pass; hier houdt u bij wie er contact mee had.</p>
+        <p class="sub" style="margin:0 1.25rem;" data-i18n="cw.uitleg">Leden die bij het aanmelden een bedrijf opgaven en vroegen of het in de catalogus mag. Een partnerplek loopt via een aanvraag als lid; de pas erbij zegt wie het is, niet of het mag. Hier houdt u bij wie er contact mee had.</p>
         <div class="rows" id="cwList"></div>
+      </div>
+    </div>
+    <!-- DE REISBALIE. Het reisbureau LAS db.data.partnerTrips en niemand
+         schreef daarin: de seed was de enige bron en die begint zonder
+         RTG_DEMO leeg. Een echte installatie had dus nul reizen en elke
+         aanvraag gaf 404. Hier ontstaat het aanbod, en hiernaast handelt de
+         reisadviseur de aanvragen af. -->
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.ra">Reisaanbod</h2>
+        <p class="sub" style="margin:0 1.25rem;" data-i18n="ra.uitleg">De samengestelde reizen van RTG. Leden zien de nettoprijs, zonder opslag. Staat hier niets, dan is het reisbureau leeg en valt er niets aan te vragen.</p>
+        <div class="rows" id="raList"></div>
+        <div class="invoerrij">
+          <input id="raTitel" placeholder="Titel, bv. Lissabon, lang weekend" data-i18n-ph="ra.ph.titel" autocomplete="off">
+          <input id="raBestemming" placeholder="Bestemming" data-i18n-ph="ra.ph.best" autocomplete="off">
+          <input id="raNetto" placeholder="Nettoprijs p.p. in euro" data-i18n-ph="ra.ph.netto" inputmode="decimal" autocomplete="off">
+          <input id="raDates" placeholder="Wanneer, bv. 4 dagen · doorlopend" data-i18n-ph="ra.ph.dates" autocomplete="off">
+          <input id="raDesc" placeholder="Korte omschrijving" data-i18n-ph="ra.ph.desc" autocomplete="off">
+          <input id="raIncl" placeholder="Inbegrepen, gescheiden door een puntkomma" data-i18n-ph="ra.ph.incl" autocomplete="off">
+          <button class="vbtn ok" id="raZet" data-i18n="ra.zet">Reis in het aanbod zetten</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2 data-i18n="panel.rb">Reisaanvragen</h2>
+        <p class="sub" style="margin:0 1.25rem;" data-i18n="rb.uitleg">Leden die een reis aanvroegen. Bevestigen zet hem in hun dossier op bevestigd; afwijzen haalt hem eruit. Er wordt niets geboekt en niets betaald.</p>
+        <div class="rows" id="rbList"></div>
+      </div>
+    </div>
+    <!-- DE INSTELLINGEN. Gemeente, luchthaven, vervoerder en de andere interne
+         genres komen niet via het partnerformulier binnen (het register zegt
+         dat ze bij de wereld zelf horen) -- en kwamen daardoor alleen uit de
+         demo. Dit is hun deur, en hij zit bij de boardroom. -->
+    <div class="cols" style="margin-top:1.5rem;">
+      <div class="panel">
+        <h2 data-i18n="panel.inst">Instellingen aansluiten</h2>
+        <p class="sub" style="margin:0 1.25rem;" data-i18n="inst.uitleg">Een gemeente, luchthaven, vervoerder of dienst hoort bij de wereld zelf en vraagt zichzelf niet aan via het partnerformulier. Aansluiten maakt een bedrijfscode en een beheer-inlog; de instelling begint offline.</p>
+        <div id="instResult" style="display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;"></div>
+        <div class="rows" id="instList"></div>
+        <div class="invoerrij">
+          <select id="instGenre"></select>
+          <input id="instNaam" placeholder="Naam, bv. Gemeente Proefdorp" data-i18n-ph="inst.ph.naam" autocomplete="off">
+          <input id="instPlaats" placeholder="Plaats" data-i18n-ph="inst.ph.plaats" autocomplete="off">
+          <input id="instBeheerder" placeholder="Op wiens naam komt de beheer-inlog" data-i18n-ph="inst.ph.beheerder" autocomplete="off">
+          <button class="vbtn ok" id="instZet" data-i18n="inst.zet">Aansluiten</button>
+        </div>
       </div>
     </div>
     <div class="cols" style="margin-top:1.5rem;">

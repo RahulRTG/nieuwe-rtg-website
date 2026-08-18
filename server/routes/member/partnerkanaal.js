@@ -107,6 +107,20 @@ module.exports = (kern) => {
     const phone = String(b.phone || '').trim().slice(0, 30);
     const note = schoon(b.note, 500);
     if (!db.data.supplierTypes[type]) return res.status(400).json({ error: 'Kies een geldig type bedrijf.' });
+    /* EN DE GENREPOORT, want die gold hier niet. Deze route keek alleen OF een
+       genre bestond; het register zegt van acht genres dat een partner ze niet
+       aanvraagt ('intern': gemeente, luchthaven, ov, rijk, politie, brandweer,
+       ambulance, marechaussee) en van andere dat ze alleen op uitnodiging
+       opengaan. Iemand kon zich dus via dit formulier als gemeente aanmelden,
+       terwijl het register iets anders beweerde -- dezelfde waarheid op twee
+       plekken (LAT-regel 4), met een belofte in tekst die niet werd gehandhaafd
+       (regel 6). De aanmeldingsstroom en de onderneming-intake vroegen deze
+       poort al; nu deze deur ook. De uitleg komt uit het register zelf, zodat
+       er geen tweede formulering ontstaat.
+
+       Interne genres komen binnen langs de boardroom (kern/instelling.js). */
+    const poort = require('../../seed/genres').genreToegang(type);
+    if (!poort.ok) return res.status(403).json({ error: poort.uitleg });
     if (!company || !city || !contactName) return res.status(400).json({ error: 'Vul de bedrijfsnaam, plaats en contactpersoon in.' });
     // juridisch vereist: uitdrukkelijk akkoord met de partnervoorwaarden,
     // inclusief de verwerkersafspraken en het verplichte Salon-account

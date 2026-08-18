@@ -211,6 +211,13 @@
        kluis en hoort niet in een lijst. */
     renderCatalogusWensen();
 
+    /* De reisbalie en de instellingen. Ook eigen routes: het aanbod en de
+       instellingen staan niet in de kantoorstaat, want ze horen bij een andere
+       kamer (routes/kantoren/reizen.js en routes/office/instellingen.js). */
+    renderReisaanbod();
+    renderReisaanvragen();
+    renderInstellingen();
+
     // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
     // nadat RTG hem hier goedkeurt
     const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));

@@ -3566,6 +3566,52 @@ Wat stand 2 *niet* kan oplossen staat hardop in de kop van `server/smtp-direct.j
 
 Zie **LAUNCH.md** voor de volledige livegang-checklist (hosting, domein, betalingen, sleutels).
 
+## Het reisaanbod & de instellingsweg
+
+Twee bakken werden wel gelezen maar door niets geschreven, en dat viel pas op
+toen de demo-inhoud eruit ging (`RTG_DEMO`). Op een echte installatie stond
+daardoor iets stil.
+
+**Het reisaanbod.** `db.data.partnerTrips` had geen enkele schrijver: de seed was
+de enige bron. Zonder demo toonde het reisbureau nul reizen, gaf `reisbureau.boek()`
+op elke aanvraag een 404, en kreeg het reisdossier van een lid dus nooit iets te
+schrijven -- de kern van een reismembership. `server/kern/reisaanbod.js` is nu de
+**enige** schrijver, met de balie in `routes/kantoren/reizen.js`
+(`/api/office/reisaanbod{,/zet,/weg}`, achter de kantoorinlog, naast de bestaande
+aanvraag-routes die daar nu ook wonen). De veldnamen liggen vast omdat drie
+lezers ze delen (`reisAanbod()`, `publicTrip()` en de Mall-vindlaag): een reis die
+hier anders heet, bestaat in het ene scherm en is leeg in het andere.
+
+Twee regels die het aanbod eerlijk houden: een reis met een **open aanvraag**
+verdwijnt niet (409 -- die aanvraag staat in het dossier van een lid en moet eerst
+af), en een **ontbrekende prijs is geen nul**. Dat laatste was een echte fout:
+`Number(null)` is 0, dus een reis zonder prijsveld kwam er als gratis in te staan,
+zonder melding. Een uitdrukkelijke 0 mag wel; dat is een keuze die iemand maakt.
+
+**De instellingsweg.** Acht genres staan in het register op `status: 'intern'` --
+ov, luchthaven, gemeente, rijk, politie, brandweer, ambulance, marechaussee -- met
+als uitleg "hoort bij de wereld zelf en wordt niet door een partner aangevraagd".
+Dat is juist, maar er was ook geen *andere* weg: die instellingen kwamen alleen uit
+de demo-seed. Vier werelden stonden op een echte installatie dus permanent leeg,
+met een eerlijke lege stand en geen deur ernaast. `server/kern/instelling.js` is die
+deur, achter **boardroomAuth** (aansluiten maakt een bedrijfscode en een
+beheer-inlog -- hetzelfde gewicht als een partnerbesluit). De keuzelijst komt uit
+het register zelf, en een aangesloten instelling krijgt géén `geseed`-merkteken,
+anders ruimt de eerstvolgende start hem op.
+
+Daarbij hoorde een tweede reparatie: `POST /api/partner/apply` controleerde alleen
+óf een genre bestond, niet de **genrepoort**. `genreToegang()` werd al gehandhaafd
+in de aanmeldingsstroom en de onderneming-intake, maar niet daar -- dus 'intern' en
+'op uitnodiging' stonden via dat formulier gewoon open, terwijl het register iets
+anders beweerde. Nu leest die route dezelfde poort, met de uitleg uit het register.
+
+Beide schermen staan in de backoffice (`#raList`, `#rbList`, `#instList`). Getoetst
+in `test/reisaanbod.test.js` (de hele keten zonder `RTG_DEMO`: leeg → samengesteld →
+aangevraagd → bevestigd in het dossier) en `test/instellingsweg.test.js`. Vier
+mutaties gedaan, alle vier zagen we de juiste toets zakken: de prijscontrole
+weghalen, de open-aanvraag-grendel weghalen, elk genre als instelling toestaan, en
+de genrepoort op het partnerformulier negeren.
+
 ## Live updates & push-notificaties
 
 Website-portaal en app delen dezelfde backend en werken **live bij zonder herladen**, via Server-Sent Events (`GET /api/stream`). Betaal je in de app, dan daalt het openstaande bedrag in een geopend website-portaal meteen; reageert iemand op je post, dan verschijnt de reactie live in beide.

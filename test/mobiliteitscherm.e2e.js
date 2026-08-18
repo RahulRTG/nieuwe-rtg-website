@@ -96,11 +96,9 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
     assert.ok(opties.some(o => /restaurant|hotel|koffie|bar/i.test(o)),
       'de bestemmingslijst bevat onze eigen zaken, kreeg: ' + opties.slice(0, 5).join(' | '));
 
-    /* Via de ZOEKBALK een bestemming ver weg kiezen. Dat is ook de echte weg:
-       de eerste pagina van de lijst staat vol met wat vlakbij is, en juist wat
-       je zoekt staat er dan niet in. Zonder zoeken pakte deze toets de zaak op
-       nul meter afstand en kreeg hij terecht "vertrek en bestemming liggen op
-       dezelfde plek". */
+    /* Via de ZOEKBALK een bestemming ver weg vinden. Dat is de echte weg: de
+       eerste pagina van de lijst staat vol met wat vlakbij is, en juist wat je
+       zoekt staat er dan niet in. */
     await page.fill('#velZoek', 'Santa Eularia');
     await page.waitForFunction(() => {
       const els = [...document.querySelectorAll('#velNaar option')];
@@ -110,6 +108,44 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
       (els.find(e => /Santa Eularia/i.test(e.textContent)) || {}).value || '');
     assert.ok(doel, 'zoeken vindt de bestemming');
     await page.selectOption('#velNaar', doel);
+
+    /* EERST HET EERLIJKE GEVAL: plannen VANAF "Huidige locatie" terwijl deze
+       browser geen locatie geeft. Dit scherm had een vast punt op Ibiza als
+       "startpunt tot de gps spreekt", en daarmee plande hij een reis vanaf een
+       eiland waar je niet bent. Dat punt is weg (zie de kop bij `hier` in
+       ov.html), dus hier hoort nu een reden te staan in plaats van een reis. */
+    await page.click('#velPlan');
+    await page.waitForFunction(() => {
+      const m = document.querySelector('#melding');
+      return m && m.classList.contains('zien') && m.textContent.trim().length > 5;
+    }, null, { timeout: 20000 });
+    const reden = (await page.textContent('#melding')) || '';
+    assert.match(reden, /locatie|plek|waar/i,
+      'zonder locatie zegt het scherm waarom het niet kan: ' + reden.slice(0, 120));
+    const geenOpties = await page.$$eval('#opties .kaart', els => els.length);
+    assert.equal(geenOpties, 0, 'en er staat geen verzonnen reis op het scherm');
+
+    /* EN DAN DE ECHTE WEG die daarvoor in de plaats komt: de reiziger kiest
+       zelf een vertrekpunt. Die keuzelijst staat er al -- hij wordt met dezelfde
+       plekken gevuld als de bestemmingslijst -- en dat is meteen eerlijker: de
+       reiziger zegt waar hij opgehaald wil worden in plaats van dat het scherm
+       het voor hem verzint.
+
+       Eerst het zoekveld leegmaken, want zoeken vult BEIDE lijsten en dat ene
+       zoekresultaat kan niet tegelijk vertrek en bestemming zijn. Leeg levert
+       de gewone lijst met plekken terug, en daar kiezen we er twee uit. */
+    await page.fill('#velZoek', '');
+    await page.waitForFunction(() => {
+      const els = [...document.querySelectorAll('#velVan option')];
+      return els.filter(e => e.value && e.value !== 'hier').length >= 2;
+    }, null, { timeout: 20000 });
+    const paar = await page.$$eval('#velVan option', els => {
+      const echt = els.filter(e => e.value && e.value !== 'hier').map(e => e.value);
+      return echt.length >= 2 ? [echt[0], echt[1]] : [];
+    });
+    assert.equal(paar.length, 2, 'er staan twee echte plekken om uit te kiezen');
+    await page.selectOption('#velVan', paar[0]);
+    await page.selectOption('#velNaar', paar[1]);
     await page.click('#velPlan');
 
     /* De bewering die telt: er verschijnen OPTIES met cijfers, niet een enkele

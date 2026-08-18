@@ -44,6 +44,7 @@ const REGISTER = {
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
   'WETTEN.json': { meter: ['wettenOnbewezen'] },
+  'LADDER.json': { meter: ['ladderRaak', 'ladderNietGeprobeerd'] },
 
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
      bestand en niet in NORM.json -- dat is geen tekortkoming maar een keuze:

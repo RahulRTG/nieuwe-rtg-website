@@ -41,6 +41,34 @@ const crypto = require('crypto');
 
 const WORTEL = path.join(__dirname, '..');
 const { TREDEN, maakKiezer } = require('./ladder/trappen');
+
+/* ---- DE RATEL OP DEZE PROEF ----
+
+   Deze ladder was de meest complete aanvalsproef van het huis (3878 aanvallen
+   over dertien treden) en hing aan NIETS: niet aan ci.yml, niet aan de
+   weekronde, en niet aan een meter. Hij draaide als iemand eraan dacht.
+
+   Dat was geen slordigheid maar een gevolg: hij kon niet groen worden. Twaalf
+   bewust-openbare routes stonden niet in de publieke lijst, een 503 uit de
+   schakelkast telde als serverfout, en de begane grond toetste op seed-gegevens
+   die weggedreven waren. Een proef die per definitie rood staat, kan nergens
+   aan hangen. Nu hij eerlijk groen is, hoort hij aan een ratel.
+
+   TWEE GETALLEN, want een ervan alleen liegt. `ladderRaak` telt de bevindingen.
+   `ladderNietGeprobeerd` telt de proeven die hun voorwaarde niet rond kregen --
+   en dat getal moet erbij, want raak op nul is triviaal te halen door niets meer
+   te proberen. Precies dat was hier gebeurd: de insider-trede probeerde NUL
+   dingen en meldde keurig geen enkele bevinding.
+
+   Wat deze twee NIET meten: of de treden de juiste dingen proberen. Dat blijft
+   mensenwerk en staat in de kop van dit bestand ("een schone uitkomst betekent:
+   niets van wat WIJ konden bedenken kwam erdoor"). */
+const METER = 'ladderRaak';
+const RICHTING = 'omlaag';           // een plafond: meer bevindingen is slechter
+const METER_N = 'ladderNietGeprobeerd';
+const RICHTING_N = 'omlaag';         // een plafond: minder proberen is slechter
+const UITSLAGBESTAND = path.join(WORTEL, 'LADDER.json');
+const VASTLEGGEN = process.argv.includes('--vastleggen');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m', vet: '\x1b[1m' };
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
@@ -108,7 +136,25 @@ function werkbank(vraag, rollen, kiezer) {
 function bootEigen() {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ladder-'));
   const child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
-    cwd: WORTEL, env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', ANTHROPIC_API_KEY: '' },
+    /* RTG_DEMO=1 IS HIER GEEN VERSOEPELING MAAR DEKKING.
+
+       Zonder die vlag start de ladder een installatie zonder demo-zaak en zonder
+       betaalrail, en dan kan een flink deel van de proef niets: de begane grond
+       kan niet bestellen en geen geld sturen, de vervalser en de gluurder komen
+       drie keer niet aan een zaaktoken, en de INSIDER -- de trede die vraagt of
+       een geldig token werkt waar het niet hoort -- probeerde helemaal niets.
+       Een trede die niets probeert bewijst niets, en dat stond er ook: "LEEG".
+
+       Wat de vlag NIET doet is een deur openzetten. Hij geeft een demo-persona
+       een sessie en zet een demo-betaalrail aan; elke poort die deze ladder
+       beproeft (auth, rolscheiding, horizontale scheiding, tokenvervalsing)
+       blijft precies zoals hij is. De sessie is juist het gereedschap waarmee
+       de insider zijn werk kan doen.
+
+       Het draait op een EIGEN server met een wegwerpdatamap en NODE_ENV=test.
+       Voor productie geldt onverkort dat RTG_DEMO uit hoort te staan; daar gaat
+       scripts/golive.js over. */
+      cwd: WORTEL, env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', ANTHROPIC_API_KEY: '', RTG_DEMO: '1' },
     stdio: ['ignore', 'ignore', 'ignore']
   });
   return { child, base: 'http://127.0.0.1:' + PORT, TMP };
@@ -158,6 +204,34 @@ async function haalRollen(vraag) {
 }
 
 /* ---------- de loop ---------- */
+/* HET OORDEEL APART, ZODAT HET TE IJKEN IS.
+
+   De twee meters hierboven hangen aan een ronde van vier minuten met een echte
+   server. Die is in een toets niet na te spelen, en dat was bijna de reden om
+   hier "geen proef, wel een reden" op te schrijven -- precies de uitweg die
+   `metersOngeijkt` telt en die op nul staat.
+
+   Maar de vraag van een ijking is niet "kun je deze ronde namaken", het is
+   "SLAAT DEZE METER UIT ALS ZIJN INVOER FOUT IS". Dezelfde redenering staat bij
+   de zes prestatiemeters in test/meterijk.test.js, en om dezelfde reden staat
+   het oordeel hier los: een toets kan er een bekend-foute uitslag in stoppen.
+
+   WAT DIT NIET BEWIJST, en dat hoort erbij: dat het TELLEN klopt. `raak` is een
+   som over wat de treden zelf melden, en of een trede het juiste probeert blijft
+   mensenwerk -- zie de kop van dit bestand. Deze functie bewaakt de tand, niet
+   het oog. */
+function beoordeel(uitslag, normMeters) {
+  const redenen = [];
+  const plafond = normMeters ? normMeters[METER] : undefined;
+  const plafondN = normMeters ? normMeters[METER_N] : undefined;
+  if (plafond !== undefined && uitslag.raak > plafond)
+    redenen.push('De ladder gaf ' + uitslag.raak + ' bevinding(en) tegen een norm van ' + plafond + '.');
+  if (plafondN !== undefined && uitslag.niet > plafondN)
+    redenen.push('De ladder kon ' + uitslag.niet + ' proef/proeven niet uitvoeren tegen een norm van ' + plafondN +
+      '. Minder proberen is geen betere uitslag.');
+  return { zakt: redenen.length > 0, redenen };
+}
+
 async function main() {
   let srv = null, base = BASIS_EXTERN;
   const host = () => new URL(base).hostname, poort = () => Number(new URL(base).port || 80);
@@ -218,8 +292,47 @@ async function main() {
   console.log('  ' + K.grijs + 'Een schone uitkomst betekent: niets van wat WIJ konden bedenken kwam erdoor. Niet: veilig.' + K.reset + '\n');
 
   if (srv) { try { srv.child.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(srv.TMP, { recursive: true, force: true }); } catch (e) {} }
+
+  /* De uitslag op schijf, zodat er iets te ratelen valt. De bevindingen gaan
+     mee met naam: een getal zonder de lijst erbij stuurt niemand ergens heen. */
+  try {
+    fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
+      uitleg: 'De ladder: elke trede van kleuter tot aanvaller tegen een echte server. ' +
+        'raak MAG ALLEEN DALEN en nietGeprobeerd ook -- zie scripts/ladder.js. ' +
+        'Een schone uitkomst betekent: niets van wat wij konden bedenken kwam erdoor. Niet: veilig.',
+      gedraaid: new Date().toISOString(), treden: treden.length,
+      meters: { [METER]: raak, [METER_N]: niet },
+      afgeslagen: af, gelukt,
+      bevindingen: rapport.flatMap(r => r.raak.map(x => ({ trede: r.trede, wat: x.wat, hoe: x.hoe || null }))),
+      nietGeprobeerd: rapport.flatMap(r => [...new Set(r.niet)].map(n => ({ trede: r.trede, reden: n })))
+    }, null, 2) + '\n');
+  } catch (e) { console.error('  kon LADDER.json niet schrijven: ' + e.message); }
+
+  /* DE RATEL. Losse treden draaien (--trede) meet maar een deel, dus dan is er
+     niets te vergelijken -- anders zou een enkele trede de lat van de hele
+     ladder verzetten. Dat is dezelfde val als een prestatiecijfer van een andere
+     machine. */
+  const heleRonde = !ALLEEN.length;
+  let norm = null;
+  try { norm = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NORM.json'), 'utf8')); } catch (e) {}
+  if (heleRonde && norm && norm.meters) {
+    if (VASTLEGGEN) {
+      const p = norm.meters[METER], pN = norm.meters[METER_N];
+      if (p === undefined || raak <= p) norm.meters[METER] = raak;
+      if (pN === undefined || niet <= pN) norm.meters[METER_N] = niet;
+      fs.writeFileSync(path.join(WORTEL, 'NORM.json'), JSON.stringify(norm, null, 2) + '\n');
+      console.log('  ' + K.groen + METER + ' vastgelegd op ' + norm.meters[METER] + ', ' + METER_N + ' op ' + norm.meters[METER_N] + '.' + K.reset + '\n');
+    } else {
+      const oordeel = beoordeel({ raak, niet }, norm.meters);
+      if (oordeel.zakt) {
+        for (const r of oordeel.redenen) console.error('  ' + K.rood + r + K.reset);
+        console.error('');
+        return 1;
+      }
+    }
+  }
   return raak ? 1 : 0;
 }
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
-module.exports = { TREDEN };
+module.exports = { TREDEN, beoordeel, METER, METER_N };

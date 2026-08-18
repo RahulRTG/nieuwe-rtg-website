@@ -731,6 +731,41 @@ const IJKINGEN = {
      geen enkel register voorkomt: dat is per definitie een gat, en de meter
      hoort het te zien op het moment dat het ontstaat -- niet pas als iemand er
      over een half jaar overheen struikelt. */
+  /* DE TWEE METERS VAN DE LADDER.
+
+     Ze komen uit een ronde van vier minuten tegen een echte server, en die is
+     hier niet na te spelen. Dezelfde situatie als bij de zes prestatiemeters
+     hieronder, en dezelfde oplossing: niet het CIJFER namaken maar de meter een
+     bekend-foute uitslag voeren en kijken of hij uitslaat. scripts/ladder.js
+     zet zijn oordeel daarom apart in beoordeel().
+
+     ladderNietGeprobeerd is de belangrijkste van de twee en de minst
+     vanzelfsprekende. Nul bevindingen is triviaal te halen door niets meer te
+     proberen -- en precies dat was hier gebeurd: de insider-trede voerde NUL
+     proeven uit en meldde keurig geen enkele bevinding. Deze meter maakt van
+     "minder proberen" een verslechtering. */
+  ladderRaak: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      assert.equal(ladder.beoordeel({ raak: 0, niet: 1 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = ladder.beoordeel({ raak: 3, niet: 1 }, norm);
+      assert.equal(stuk.zakt, true, 'drie bevindingen tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /3 bevinding/);
+      return 1;
+    }
+  },
+  ladderNietGeprobeerd: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      const stil = ladder.beoordeel({ raak: 0, niet: 9 }, norm);
+      assert.equal(stil.zakt, true,
+        'nul bevindingen bij negen overgeslagen proeven is geen schone ronde maar een blinde');
+      assert.match(stil.redenen[0], /Minder proberen is geen betere uitslag/);
+      return 1;
+    }
+  },
   metingenZonderRatel: {
     proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
       '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',

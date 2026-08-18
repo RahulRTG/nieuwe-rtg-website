@@ -30,18 +30,13 @@ function natieNaarLand(nat) {
   return null;
 }
 
-const ZIN = {
-  globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-  pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-  land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-  plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
-  persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.',
-  /* De canary is geen storing en geen straf: de functie wordt uitgerold en is
-     nog niet aan iedereen toe. Dat hoort er ook zo te staan -- "uitgeschakeld
-     door de beheerder" zou een supportvraag opleveren die nergens over gaat. */
-  canary: 'Deze functie wordt stap voor stap uitgerold en staat nog niet voor iedereen open.'
-};
+/* De ZINNEN en de twee 503-antwoorden wonen in schakelaar-antwoord.js. Dat is
+   geen opsplitsing om de opsplitsing: dit bestand kwam met de uitleg erbij over
+   de omvanggrens van 10 kB, en de deltapoort hield dat tegen. Wat eruit is
+   gegaan hoort ook bij elkaar -- het is de vraag WAT een beller te horen krijgt,
+   los van de vraag OF hij erdoor mag. */
+const antwoord = require('./schakelaar-antwoord');
+const { ZIN, bekendeBeller } = antwoord;
 
 function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan }) {
   return (req, res, next) => {
@@ -99,11 +94,13 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
             if (land) oordeel = bevoegd.mag(f.vermogen, { land });
           }
           if (!oordeel.mag) {
-            return res.status(503).json({
-              error: oordeel.uitleg, functie: f.id, naam: f.naam,
-              reden: 'bevoegdheid', vermogen: oordeel.vermogen, bevoegdheidReden: oordeel.reden,
-              nodig: oordeel.nodig || undefined
-            });
+            /* Aan een vreemde vertellen we niet welke vergunning ontbreekt. De
+               alinea hierboven belooft te zwijgen tegen wie "niemand is", maar
+               doelgroepVanVerzoek() leidt de doelgroep ook uit het PAD af, dus
+               voor /api/supplier, /api/staff, /api/office en /api/foundation gold
+               dat niet. Zie schakelaar-antwoord.js. Blokkeren blijft blokkeren;
+               alleen de uitleg gaat eraf. */
+            return res.status(503).json(antwoord.bevoegdheid(bekendeBeller(gebruiker, tier), f, oordeel));
           }
         }
       }
@@ -133,8 +130,9 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
     try { if (tok) user = accounts.verifyToken(tok); } catch (e) {}
     // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
     // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
+    let sessie = null;
     if (tok && !user) {
-      try { const s = sessionFor(tok); if (s && s.tier) sessieTier = s.tier; } catch (e) {}
+      try { sessie = sessionFor(tok) || null; if (sessie && sessie.tier) sessieTier = sessie.tier; } catch (e) {}
     }
     const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
       (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
@@ -167,10 +165,10 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
 
     const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, plaats, persoon, genre: zaakGenre });
     if (dicht) {
-      return res.status(503).json({
-        error: ZIN[dicht.reden] || ZIN.globaal,
-        functie: dicht.id, naam: dicht.naam, reden: dicht.reden, doelgroep: doelgroep || undefined
-      });
+      /* Deze as legt zich WEL uit aan een beller zonder inlog, en dat is een
+         besluit dat twee bestaande toetsen vastleggen (boardroom.test.js en
+         techniek-functies.test.js, allebei met "ook zonder inlog" erbij). Zie de
+         kop van schakelaar-antwoord.js voor wat daar tegenover staat. */      return res.status(503).json(antwoord.dicht(bekendeBeller(user, sessie), dicht, doelgroep));
     }
     next();
   };

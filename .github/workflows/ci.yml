@@ -189,6 +189,43 @@ jobs:
         with:
           fail-on-severity: high
 
+  ladder:
+    # DE LADDER, de meest complete aanvalsproef van dit huis: dertien treden van
+    # een kleuter die op alles ramt tot een aanvaller die weet wat hij doet,
+    # tegen een ECHTE server, met 3878 pogingen.
+    #
+    # Hij hing tot 18 augustus 2026 aan NIETS -- niet aan deze pijplijn, niet aan
+    # de weekronde, niet aan een meter -- en draaide dus alleen als iemand eraan
+    # dacht. Dat was geen slordigheid maar een gevolg: hij kon niet groen worden.
+    # Twaalf bewust-openbare routes stonden niet in zijn publieke lijst, een 503
+    # uit de schakelkast telde als serverfout, en de begane grond toetste op
+    # seed-gegevens die weggedreven waren. Een proef die per definitie rood staat
+    # kan nergens aan hangen.
+    #
+    # EIGEN BAAN, dus hij draait naast de tests in plaats van erachteraan: vier
+    # minuten die de kritieke lijn niet verlengen. Hij zakt op een bevinding EN
+    # op minder proberen dan de norm (ladderRaak en ladderNietGeprobeerd in
+    # NORM.json) -- nul bevindingen is anders te halen door niets meer te doen.
+    name: De ladder (aanvalsproef tegen een echte server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Van kleuter tot aanvaller
+        run: node scripts/ladder.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ladder-uitslag
+          path: LADDER.json
+          if-no-files-found: warn
+
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest

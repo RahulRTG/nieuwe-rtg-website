@@ -4718,6 +4718,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "schakelaar-zwijgt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "schakelkast-dekking.test.js": {
       "soort": "server",
       "staat": "gezakt",

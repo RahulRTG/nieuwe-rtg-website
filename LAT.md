@@ -381,6 +381,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
+| dertien treden van kleuter tot aanvaller tegen een ECHTE server | `scripts/ladder.js` + `LADDER.json` + `ci.yml` |
+| geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
@@ -389,6 +391,24 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.
+
+De ladder stond hier tot 18 augustus 2026 niet in, en dat was geen vergeetachtigheid
+maar een gevolg. Hij was de meest complete aanvalsproef van dit huis -- 3878
+pogingen over dertien treden -- en hij kon niet groen worden: twaalf bewust
+openbare routes stonden niet in zijn publieke lijst, een 503 uit de schakelkast
+telde als serverfout, en de begane grond toetste op seed-gegevens die
+weggedreven waren (KIKUNOI staat allang niet meer in de seed). Achttien keer
+RAAK, elke ronde, geen van alle een bevinding.
+
+**Een proef die per definitie rood staat, kan nergens aan hangen.** Dat is de
+stille manier waarop een handhaver uit deze tabel verdwijnt: niet doordat iemand
+hem weghaalt, maar doordat hij zo veel ruis geeft dat niemand hem meer in een
+poort durft te zetten. En dan valt de negentiende melding -- de echte -- niemand
+meer op. De reparatie was dus niet de meldingen dempen maar ze waar maken; pas
+daarna kon hij aan `ci.yml` en aan twee ratels. `ladderNietGeprobeerd` staat er
+naast `ladderRaak` omdat nul bevindingen anders te halen is door niets meer te
+proberen -- precies wat er gebeurde met de insider-trede, die nul proeven deed
+en keurig geen enkele bevinding meldde.
 
 En sinds `scripts/samenhang.js` is die lijst niet langer alleen een belofte in
 tekst (regel 6). Die census draait de vraag om: niet "zakt er iets" maar "kijkt

@@ -329,26 +329,41 @@ test('9. de boardroom deelt zijn eigen sleutels uit', async () => {
     'een lid komt niet eens door de kantoordeur');
 });
 
-test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass is de voorwaarde', async () => {
+test('10. een partneraanvraag beslissen: de Boardroom beslist, en een pas is de voorwaarde', async () => {
   // de uitgiftelijst van het kantoor (contracten) hoort er gewoon te staan
   const uit = await ko('uitgifte', {});
   assert.equal(uit.status, 200);
 
-  /* De aanvraagpoort leest het pas-bewijs met resolveSession(): die kent zowel
+  /* De aanvraagpoort leest het ledenbewijs met resolveSession(): die kent zowel
      een demosessie als een ECHT ledenaccount. Dat laatste is de weg die een
      klant in de praktijk loopt, en die weg toetsen we hier van begin tot eind:
-     registreren -> aanvraag afgewezen (nog geen pas) -> menselijk besluit tilt
-     het account naar Business -> opnieuw inloggen -> aanvraag lukt. */
+     de gratis gast komt er niet in, een gewone RTG Pass wel, en een account dat
+     later naar Business gaat blijft die weg gewoon lopen.
+
+     DE EIS IS EEN PAS, NIET DE BUSINESS PASS. Hier stond het omgekeerde: alleen
+     Business mocht aanvragen. Een pas is een lidmaatschapsniveau en geen
+     vergunning om te ondernemen; wie met een RTG Pass een zaak runt, is niet
+     minder ondernemer. Wat blijft staan is dat er een LID achter de aanvraag
+     hoort, want er gaat een bedrijfscode en een beheer-inlog de deur uit. */
   const t = Date.now().toString().slice(-7);
+  const gast = await post('/api/auth/register', { name: 'Gratis Gast', email: 'gg' + t + '@rtg.test',
+    password: 'Wachtwoord123', geboortedatum: '1988-03-11', tier: 'guest' });
+  assert.equal(gast.status, 200);
+  const zonderPas = await post('/api/partner/apply', { company: 'Zonder Pas BV', type: 'restaurant',
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'zp' + t + '@rtg.test', akkoord: true }, gast.body.token);
+  assert.equal(zonderPas.status, 403, 'zonder pas komt de aanvraag er niet in');
+  assert.doesNotMatch(zonderPas.body.error, /alleen (een|de) Business Pass/i);
+
   const gewoon = await post('/api/auth/register', { name: 'Partner Aanvrager', email: 'pa' + t + '@rtg.test',
     phone: '+31612340003', password: 'Wachtwoord123', geboortedatum: '1988-03-11' });
   assert.equal(gewoon.status, 200);
-  const zonderPas = await post('/api/partner/apply', { company: 'Zonder Pas BV', type: 'restaurant',
-    city: 'Rotterdam', contactName: 'A. Vragende', email: 'zp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
-  assert.equal(zonderPas.status, 403, 'zonder Business Pass komt de aanvraag er niet in');
-  assert.match(zonderPas.body.error, /Business Pass/);
+  assert.equal(gewoon.body.state.user.tier, 'rtg', 'zelf aanmelden levert een RTG Pass');
+  const metRtg = await post('/api/partner/apply', { company: 'Gewone Pas BV', type: 'restaurant',
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'gp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
+  assert.equal(metRtg.status, 200, 'een gewone RTG Pass mag een partnerplek aanvragen: '
+    + JSON.stringify(metRtg.body).slice(0, 160));
 
-  // het menselijke besluit: pas hierna bestaat de Business Pass
+  // en een menselijk besluit naar Business verandert daar niets aan
   await elevateTier(base, gewoon.body.token, 'business', kantoor);
   const zakelijk = await post('/api/auth/login', { login: 'pa' + t + '@rtg.test',
     password: 'Wachtwoord123', pasApp: 'business' });
@@ -390,7 +405,7 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
 });
 
 /* Deze test toetste eerst de demoweg (/api/login), want de echte weg WERKTE
-   NIET: /api/partner/apply las het pas-bewijs met sessionFor(), en die kent
-   alleen de demosessies. Een echte Business Pass-houder kwam er dus nooit door.
+   NIET: /api/partner/apply las het ledenbewijs met sessionFor(), en die kent
+   alleen de demosessies. Een echte pashouder kwam er dus nooit door.
    Dat is nu gerepareerd (resolveSession, zie routes/member/partnerkanaal.js) en
    de test loopt de echte weg. Blijft deze test groen, dan blijft die weg open. */

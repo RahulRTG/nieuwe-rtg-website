@@ -23,10 +23,15 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
+  /* HET DOSSIER VAN HET LID (kern/lid/reisdossier.js). Een aanvraag hoort niet
+     alleen bij het reisbureau te liggen maar ook bij het lid te staan -- als
+     AANVRAAG, want dat is wat het is. Zonder accounts (losse module-test) blijft
+     het dossier weg en verandert er niets aan het reisbureau zelf. */
+  const dossier = accounts ? require('./lid/reisdossier').maakReisdossier({ accounts }).reisdossier : null;
 
   const reizen = () => reisAanbod(db);
 
@@ -64,6 +69,10 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     // is de bestemming visumplichtig, dan staat de aanvraag-taak meteen klaar
     const vt = visum();
     const taak = vt ? (await vt.bijBoeking(sess.key, { ref: entry.ref, bestemming: trip.dest, vertrek })).taak : null;
+    /* En de reis komt in het dossier van het lid te staan. Dit is de plek waar
+       een reisdossier ONTSTAAT: hiervoor kwam de enige reis die een lid ooit
+       had uit de demo-seed (zie kern/lid/reisdossier.js). */
+    if (dossier) dossier.zetAanvraag(sess.key, { ...entry, dates: trip.dates || null });
     return { ok: true, aanvraag: entry, visumtaak: taak };
   }
 
@@ -78,6 +87,8 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     a.status = 'geannuleerd';
     save();
+    // uit het dossier van het lid: een reis die niet doorgaat hoort niet in zijn tijdlijn
+    if (dossier) dossier.weghalen(key, a.ref);
     // de visumtaak van deze reis gaat mee weg; een taak voor een reis die
     // niet doorgaat is ruis in de agenda
     const vt = visum();
@@ -128,7 +139,44 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     return { ok: true, aanvragen: (db.data.reisAanvragen || []).slice(0, 200) };
   }
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen } };
+  /* DE REISADVISEUR BESLIST, EN DAT IS EEN MENS.
+
+     De aanvraag stond op 'aangevraagd' en er was geen enkele weg naar een
+     andere stand: het reisbureau kon reizen aannemen maar nooit bevestigen of
+     afwijzen. Daarmee kon een reis nooit rond komen, en het dossier van het lid
+     kon dus ook nooit meer worden dan een aanvraag. Deze twee sluiten die lus,
+     op het kantoor (officeAuth) en dus achter een mens -- de merkregel is dat
+     de AI hier niets beslist.
+
+     Bevestigen zet dezelfde regel in het dossier van het lid op bevestigd;
+     afwijzen haalt hem eruit. Er wordt niets geboekt en niets betaald: dat
+     loopt langs de facturen, zoals overal in dit huis. */
+  function bevestig(ref, door) {
+    const a = (db.data.reisAanvragen || []).find(x => x.ref === String(ref || ''));
+    if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
+    if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
+    a.status = 'bevestigd';
+    a.besluit = { door: String(door || 'reisadviseur').slice(0, 60), at: nu() };
+    save();
+    if (dossier) dossier.bevestig(a.customerKey, a.ref);
+    return { ok: true, aanvraag: a };
+  }
+
+  async function wijsAf(ref, door, reden) {
+    const a = (db.data.reisAanvragen || []).find(x => x.ref === String(ref || ''));
+    if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
+    if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
+    a.status = 'afgewezen';
+    a.besluit = { door: String(door || 'reisadviseur').slice(0, 60), at: nu(),
+      reden: String(reden || '').replace(/[<>]/g, '').trim().slice(0, 300) || null };
+    save();
+    if (dossier) dossier.weghalen(a.customerKey, a.ref);
+    const vt = visum();
+    if (vt) await vt.bijAnnulering(a.customerKey, a.ref);
+    return { ok: true, aanvraag: a };
+  }
+
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, bevestig, wijsAf } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

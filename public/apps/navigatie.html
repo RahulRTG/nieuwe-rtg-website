@@ -174,7 +174,12 @@
   const zeg = t => { const m = $('#toast'); m.textContent = t; m.classList.add('zien'); clearTimeout(toastT); toastT = setTimeout(() => m.classList.remove('zien'), 3000); };
 
   const LAND = 'ES';
-  let hier = { lat: 38.9089, lng: 1.4330 };     // demo-startpunt tot de gps spreekt
+  /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
+     de gps spreekt", en de opmerking hieronder zegt het zelf al: voor navigatie
+     IS je positie de hele functie. De kaart bouwde zich dus rond een eiland
+     waar je niet bent, met routes en flitspalen die niets met jou te maken
+     hadden. Zonder plek bouwen we niets en zegt de poort waarom. */
+  let hier = null;
   let kaartData = null, modus = 'auto', route = null, naar = null;
   const actief = { leverancier: true, ov: true, laad: true, tank: false, civic: false, flits: true };
   /* Meenemen (shared/uitvoer.js): staat er een route, dan is dat wat je mee
@@ -474,12 +479,15 @@
      if stil weg en gebeurde er precies niets -- dezelfde stilte als het defect
      dat we repareren, alleen een laag hoger. Uitgeprobeerd in een echte
      browser: zonder dit verschijnt de vraag niet, ermee wel. */
-  let stopVolgen = null;
+  let stopVolgen = null, opPlek = null;
   document.addEventListener('DOMContentLoaded', () => {
     if (!window.RTGPlek || !window.isSecureContext) return;
     stopVolgen = RTGPlek.volg(plek => {
+      const eerste = !hier;
       hier = { lat: plek.lat, lng: plek.lng };
       if (kaartData) bouwPinnen();
+      // de eerste fix is het startsein: hiervoor viel er niets te bouwen
+      if (eerste && opPlek) { const f = opPlek; opPlek = null; f(); }
     }, { waarom: 'Om je de weg te wijzen moet ik weten waar je bent. Je locatie blijft op je toestel; RTG bewaart hem niet.' });
     // het toestel blijft niet peilen als niemand kijkt
     window.addEventListener('pagehide', () => { if (stopVolgen) stopVolgen(); });
@@ -489,6 +497,20 @@
   window.addEventListener('resize', grootte);
   (async () => {
     if (!token) { $('#poort').classList.add('zien'); return; }
+    /* Wachten op de eerste plek in plaats van er een te verzinnen. Komt hij
+       niet -- geen toestemming, geen gps -- dan zegt de poort waarom er niets
+       staat, en dat is eerlijker dan een kaart van ergens anders. */
+    if (!hier) {
+      const gekregen = await new Promise(klaar => {
+        opPlek = () => klaar(true);
+        setTimeout(() => { if (opPlek) { opPlek = null; klaar(false); } }, 12000);
+      });
+      if (!gekregen) {
+        $('#poortReden').textContent = 'Navigatie werkt op je locatie: zonder die plek is er geen kaart om te tonen. Zet je locatie aan in het bedieningspaneel en open hem opnieuw.';
+        $('#poort').classList.add('zien');
+        return;
+      }
+    }
     const r = await api('kaart', { lat: hier.lat, lng: hier.lng });
     if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.'; $('#poort').classList.add('zien'); return; }
     kaartData = r.body; ref = kaartData.ref; cosRef = Math.cos(ref.lat * Math.PI / 180);

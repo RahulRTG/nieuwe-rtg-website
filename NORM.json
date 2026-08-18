@@ -21,11 +21,11 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5927,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1413,
+    "kernBreedte": 1417,
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 155,
+    "toetsenNietGemeten": 161,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1
@@ -35,6 +35,12 @@
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",
       "reden": "De contactpin (kern/sociaal/pin*.js). Drie meters gaan omhoog en dat is hier de prijs van een functie erbij, geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nkernBreedte +8: precies de acht namen die de pinlaag aan de kern toevoegt (pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind, liveMaak, liveKijk, liveVerbind). Alle acht staan in GRENZEN.json onder \"social\", dus geen enkel ander domein kan erbij. Minder kan niet zonder de functie te halveren.\n\nkeuringOmvang +1: een bestand erbij dat vlak onder de 10 kB zit. De pinlaag is juist WEL opgeknipt langs zijn onderwerpen (bezit, hint, deur, levende code), en daardoor zit er een net onder de grens in plaats van een net erboven.\n\ntoetsenNietGemeten +1: test/contactpin.e2e.js. Die is niet te repareren en dat is structureel: scripts/mutatie.js leest alleen *.test.js (regel 688), dus een schermtoets komt nooit in het register -- 113 van de 126 e2e-bestanden staan er om exact dezelfde reden niet in. Elke nieuwe schermtoets kost dus +1 op deze meter. De drie .test.js-bestanden zijn wel gemeten en staan alle drie op \"gezakt\", oftewel bewezen gevoelig.\n\nEERLIJKHEIDSHALVE, wat hier NIET is verhoogd: endpointsZonderTest en inlineStijlAttributen stonden allebei ook boven de norm en zijn GEREPAREERD in plaats van opgerekt -- routetoetsen voor elk pinloket (dat legde meteen een echte fout bloot: de gezinsroute las een gescande code als sessietoken, want beide heetten \"token\"), en de inline stijlen zijn klassen geworden. En er is bewust geen --vastleggen gedraaid: dat zou ook winst wegschrijven die van het samengaan met main komt en niet van dit werk."
+    },
+    {
+      "datum": "2026-08-18",
+      "meter": "keuringOmvang 158 -> 159, kernBreedte 1405 -> 1417, toetsenNietGemeten 154 -> 161 (VERHOOGD, op de basislijn van main)",
+      "reden": "Deze tak zet twee nieuwe kernmodules neer met een deur erachter: kern/reisaanbod.js (de enige schrijver van db.data.partnerTrips, die tot nu toe niemand had) en kern/instelling.js (de weg waarlangs een echte gemeente, luchthaven of vervoerder binnenkomt, die alleen uit de demo-seed kwam). Daar horen routes bij, en daarmee groeit kernBreedte met twaalf eigenschappen. keuringOmvang komt er een hoger uit doordat het opknippen van kernlaag2 (die over de 10 kB ging) een bestand in de band vlak onder de grens zet -- de keerzijde van een overtreding oplossen. toetsenNietGemeten stijgt met zeven: zeven nieuwe toetsbestanden waar de mutatiemotor nog niet langs is geweest; die motor draait uren en is hier niet gedraaid.",
+      "eerlijkheidshalve": "Bij het samengaan met main botste dit met de bijstelling die main zelf had gedaan (keuringOmvang 155 -> 158, kernBreedte 1396 -> 1405, toetsenNietGemeten 150 -> 154, met hun eigen verantwoording eronder). Ik heb DIE versie genomen als basis en mijn getallen er opnieuw bovenop gezet, in plaats van mijn conflictzijde eroverheen te duwen -- anders was hun verantwoording stil verdwenen. De deltas hierboven zijn dus die van deze tak alleen. Wat ik NIET bijstel is inlineStijlAttributen: die stond ook rood en is GEREPAREERD door drie vormen die als style-attribuut op tientallen plekken stonden naar klassen te halen (.cols.na, .panel > .sub, .uitgifte). En over toetsenNietGemeten: de motor is er niet langs geweest, maar de acht nieuwe grenzen in deze tak zijn met de hand gemuteerd en alle acht zagen we de juiste toets zakken; die meter meet de dekking van het INSTRUMENT, niet van de code."
     },
     {
       "datum": "2026-08-18",

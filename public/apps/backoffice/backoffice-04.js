@@ -92,5 +92,11 @@
     } catch (e) {}
   });
 
+  /* De knoppen van de reisbalie en de instellingen: één keer ophangen, niet bij
+     elke render. Anders krijgt dezelfde knop bij elke verversing een extra
+     luisteraar en zet één klik straks drie reizen neer. */
+  reisaanbodKnop();
+  instellingKnop();
+
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
 })();

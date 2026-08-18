@@ -64,9 +64,40 @@
       if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
   }
+  /* Het inrichten: ná het tekenen biedt Rahul één keer aan in te vullen wat de
+     gegevenspoort anders per keer komt vragen. Een aanbod, geen poort -- waarom
+     en waar het landt staat in server/kern/onboarding/inrichten.js. */
+  let onbInr = [], onbInrHuidig = null;
+  async function onbInrichtenAanbod(){
+    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbMeebouwen(); }
+    if (!st || st.klaar || !(st.open || []).length) return onbMeebouwen();
+    onbInr = st.open.slice(); onbStap = 'inrichten-aanbod';
+    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
+    onbZeg(T('onb.inr.aanbod','Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Zal ik ze nu in één keer doorlopen?'));
+    onbActies([{ txt: T('onb.inr.ja','Ja, nu meteen'), prim: true, doe: onbInrVolgende },
+      { txt: T('onb.inr.later','Liever later'), doe: onbMeebouwen }]);
+  }
+  function onbInrVolgende(){
+    if (!onbInr.length) return onbMeebouwen();
+    onbInrHuidig = onbInr.shift(); onbStap = 'inrichten';
+    const inp = onbEl('onbIn'), rij = onbEl('onbRij');
+    if (rij) rij.style.display = '';
+    if (inp){ inp.type = onbInputType(onbInrHuidig.type); inp.value = ''; inp.placeholder = T('onb.typ','Typ je antwoord'); }
+    // het waarom staat erbij: nooit een veld zonder de handeling die erom vraagt
+    onbZeg(onbInrHuidig.vraag + ' ' + (onbInrHuidig.waarom || ''));
+    onbActies([{ txt: T('onb.inr.sla','Sla dit over'), doe: onbInrVolgende }]);
+    if (inp) inp.focus();
+  }
+  async function onbInrOpslaan(t){
+    const velden = {}; velden[onbInrHuidig.id] = t;
+    onbBezig = true;
+    try { await API.call('/onboarding/inricht', { velden }); } catch(e){}
+    onbBezig = false; onbInrVolgende();
+  }
+
   function onbKlaar(){
     const g = onbEl('onbGate'); if (g) g.hidden = true;
-    onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
+    onbStap = null; onbGeopend = false; onbSt = null; onbRij = []; onbInr = []; onbInrHuidig = null; onbMb = []; onbMbHuidig = null;
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
     naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
@@ -87,13 +118,19 @@
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
       } catch(e){ onbBezig = false; if (fout) fout.textContent = (e && e.message) || T('onb.mis','Dat lukte niet, probeer het nog eens.'); }
+    } else if (onbStap === 'inrichten'){
+      if (!tekst || !onbInrHuidig) return;
+      return onbInrOpslaan(tekst);
+    } else if (onbStap === 'meebouw'){
+      if (!tekst || !onbMbHuidig) return;
+      return onbMbOpslaan(tekst);
     } else if (onbStap === 'teken'){
       if (tekst.length < 2){ if (fout) fout.textContent = T('onb.naamkort','Typ je volledige naam om te tekenen.'); return; }
       onbBezig = true;
       try {
         const r = await API.call('/onboarding/teken', { naam: tekst, akkoord: true });
         onbBezig = false; onbSt = r;
-        if (r && r.klaar) return onbKlaar();
+        if (r && r.klaar) return onbInrichtenAanbod();
         onbRij = onbOpenVelden();
         onbStap = onbRij.length ? 'veld' : 'teken';
         onbVolgende();
@@ -134,24 +171,3 @@
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();
 
-  function snapOverlay(){
-    let ov = document.getElementById('snapOv'); if (ov) return ov;
-    ov = document.createElement('div'); ov.id='snapOv';
-    ov.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;';
-    ov.innerHTML='<button id="snapOvX" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:#fff;font-size:1.6rem;">✕</button>'+
-      '<div id="snapOvVan" style="color:#fff;font-size:.85rem;margin-bottom:.6rem;"></div>'+
-      '<img id="snapOvImg" alt="" style="max-width:100%;max-height:72vh;border-radius:12px;">'+
-      '<div id="snapOvTxt" style="color:#fff;margin-top:.7rem;text-align:center;"></div>'+
-      '<div id="snapOvNote" style="color:#999;font-size:.72rem;margin-top:.7rem;"></div>';
-    document.body.appendChild(ov);
-    ov.querySelector('#snapOvX').addEventListener('click', ()=>{ ov.style.display='none'; ov.querySelector('#snapOvImg').src=''; loadSocial(); });
-    return ov;
-  }
-  async function renderSnapsStories(){
-    const el = $('#homeContacts'); if (!el || !socialOK) return;
-    // verhalen-strip + inkomende snaps bovenaan de contactenkaart
-    let stories = [], snaps = [];
-    try { stories = (await API.call('/member/stories')).stories || []; } catch(e){}
-    try { snaps = (await API.call('/member/snaps')).snaps || []; } catch(e){}
-    let box = el.querySelector('#snapStrip');
-    if (!box){ box = document.createElement('div'); box.id='snapStrip'; el.insertBefore(box, el.firstChild.nextSibling); }

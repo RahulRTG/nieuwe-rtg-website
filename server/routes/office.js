@@ -16,6 +16,8 @@ module.exports = (kern) => {
   const octx = { kern, officeQueryMag };
   require('./office/veiligheid')(octx);
   require('./office/partners')(octx);
+  require('./office/ondernemers')(octx);   // de ondernemerskant: regie, rechtsvormwacht, catalogus-wensen
+  require('./office/instellingen')(octx);  // gemeente, luchthaven, OV en de andere interne genres aansluiten
   require('./office/toegang')(octx);
   require('./office/werk')(octx);
   require('./office/bewaarverzoek')(octx);

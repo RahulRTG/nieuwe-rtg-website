@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0c0c0b">
-  <meta name="description" content="Vraag met uw RTG Business Pass een gecontroleerde partnerwerkplek aan.">
+  <meta name="description" content="Vraag als RTG-lid een gecontroleerde partnerwerkplek aan.">
   <title>Partner worden · RTG</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/fonts/fonts.css">
@@ -24,7 +24,7 @@
   <main>
     <div class="eyebrow">Een gecontroleerde bedrijfswerkplek</div>
     <h1>Uw bedrijf werkt straks vanuit dezelfde RTG-software.</h1>
-    <p class="lead">Vraag met uw Business Pass een partnerplek aan. Na menselijke beoordeling krijgt uw bedrijf een eigen werkruimte, eerste manager, teamomgeving en ondernemer-poort. De zaak verschijnt pas voor leden nadat de inrichting compleet is.</p>
+    <p class="lead">Vraag als lid een partnerplek aan, met uw RTG-, Lifestyle- of Business Pass. Na menselijke beoordeling krijgt uw bedrijf een eigen werkruimte, eerste manager, teamomgeving en ondernemer-poort. De zaak verschijnt pas voor leden nadat de inrichting compleet is.</p>
     <div class="layout">
       <section class="card" aria-labelledby="formTitel">
         <h2 id="formTitel">Partneraanvraag</h2>
@@ -40,20 +40,20 @@
             <label class="bot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
             <label class="check wide"><input name="akkoord" type="checkbox" required><span>Ik ben bevoegd deze aanvraag te doen en ga akkoord met de partnervoorwaarden en verwerkersafspraken. Ik begrijp dat RTG de aanvraag persoonlijk beoordeelt.</span></label>
           </div>
-          <div class="actions"><button id="verstuur" type="submit">Aanvraag versturen</button><a class="button secondary" href="/apps/app.html?pas=business">Open Business Pass</a></div>
+          <div class="actions"><button id="verstuur" type="submit">Aanvraag versturen</button><a class="button secondary" href="/apps/app.html">Open uw pas</a></div>
           <div class="msg" id="melding" role="status" aria-live="polite"></div>
         </form>
       </section>
       <aside class="card">
         <h2>Zo werkt het</h2>
         <div class="steps">
-          <div class="step"><div class="nr">1</div><div><b>Business Pass</b><span>Uw actieve persoonlijke Business Pass bewijst wie de aanvraag doet.</span></div></div>
+          <div class="step"><div class="nr">1</div><div><b>Uw pas</b><span>Uw actieve persoonlijke pas bewijst wie de aanvraag doet. Welke pas dat is maakt niet uit; een pas hebben wel.</span></div></div>
           <div class="step"><div class="nr">2</div><div><b>Menselijke beoordeling</b><span>RTG controleert het bedrijf, de contactpersoon en de samenwerking.</span></div></div>
           <div class="step"><div class="nr">3</div><div><b>Persoonlijke manager</b><span>Na goedkeuring wordt uw account automatisch aan de eerste managerrol gekoppeld.</span></div></div>
           <div class="step"><div class="nr">4</div><div><b>Veilig online</b><span>Vul de Salon-pagina en rond de kassa- en werkintro af voordat de zaak zichtbaar wordt.</span></div></div>
           <div class="step"><div class="nr">5</div><div><b>Speelbaar in Magnaat</b><span>Bouw daarna in de Partnerstudio een digitale tweeling. RTG publiceert alleen een bewezen trainingsversie, zonder echt geld of klantdata.</span></div></div>
         </div>
-        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead" style="font-size:.76rem">Log in met uw Business Pass om statussen te zien.</p></div></div>
+        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead" style="font-size:.76rem">Log in met uw pas om statussen te zien.</p></div></div>
       </aside>
     </div>
   </main>
@@ -85,7 +85,7 @@
     };
     form.addEventListener('submit', async event => {
       event.preventDefault();
-      if (!token) { toon('Open eerst de Business Pass en log in. Kom daarna terug naar dit formulier.', 'bad'); return; }
+      if (!token) { toon('Open eerst uw pas en log in. Kom daarna terug naar dit formulier.', 'bad'); return; }
       if (!form.reportValidity()) return;
       knop.disabled = true;
       const data = Object.fromEntries(new FormData(form).entries());

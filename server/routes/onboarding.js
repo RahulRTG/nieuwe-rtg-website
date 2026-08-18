@@ -21,6 +21,35 @@ module.exports = (kern) => {
   app.post('/api/onboarding/opslaan', express.json({ limit: '256kb' }), auth, (req, res) => {
     res.json(onboarding.slaOp('rtg', req.session, req.body.velden || {}));
   });
+  /* HET INRICHTEN: in één keer invullen wat de gegevenspoort anders per keer
+     komt vragen (kern/onboarding/inrichten.js). Vrijwillig -- wie het overslaat
+     merkt er niets van en krijgt de vraag later alsnog, op het moment zelf. */
+  app.post('/api/onboarding/inrichten', auth, (req, res) => {
+    res.json(onboarding.inrichtStatus(req.session));
+  });
+  app.post('/api/onboarding/inricht', express.json({ limit: '32kb' }), auth, (req, res) => {
+    const r = onboarding.inrichtOp(req.session, (req.body || {}).velden || {});
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+  /* MEEBOUWEN: het eerste Salon-bericht en het eigen bedrijf, elk met een
+     toestemming die ergens op slaat (kern/onboarding/meebouwen.js). Vrijwillig,
+     net als het inrichten -- overslaan kost niets. */
+  app.post('/api/onboarding/meebouwen', auth, (req, res) => {
+    res.json(onboarding.meebouwStatus(req.session));
+  });
+  app.post('/api/onboarding/salonpost', express.json({ limit: '10mb' }), auth, async (req, res) => {
+    try {
+      const r = await onboarding.meebouwSalon(req.session, req.body || {});
+      if (r.error) return res.status(r.status || 400).json({ error: r.error });
+      res.json(r);
+    } catch (e) { console.error('[onboarding]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/onboarding/bedrijf', express.json({ limit: '32kb' }), auth, (req, res) => {
+    const r = onboarding.meebouwBedrijf(req.session, req.body || {});
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
   // De vervaldatum uit de MRZ-scan bewaren, zodat Rahul een half jaar vooraf seint.
   app.post('/api/onboarding/paspoort', express.json({ limit: '16kb' }), auth, (req, res) => {
     res.json(onboarding.bewaarPaspoort(req.session, req.body || {}));

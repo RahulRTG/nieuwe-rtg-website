@@ -21,9 +21,20 @@ function salonPromoFotos(db, max) {
     gezien.add(u);
     uit.push({ src: u, naam: String(naam || 'De Salon').slice(0, 60) });
   };
-  // 1) echt uitgelicht of partner-Salonbeeld, met naamsvermelding ("Uit De Salon · naam")
+  /* 1) echt uitgelicht of partner-Salonbeeld, met naamsvermelding
+        ("Uit De Salon · naam").
+
+     EN VAN EEN LID ALLEEN MET ZIJN TOESTEMMING. Dit is de enige plek in het huis
+     waar het bericht van een lid BUITEN De Salon terechtkomt: als beeld op de
+     site en in de campagne, met zijn naam eronder. Dat mag niet stilzwijgend --
+     wie iets voor zijn vrienden plaatst, geeft daarmee geen campagnebeeld weg.
+     `promoMag` staat op de post en wordt gezet bij het plaatsen (kern/salon:
+     plaats), standaard uit. Een partner is een ander geval: die publiceert
+     commercieel, dat IS zijn Salon-pagina, en voor hem verandert er niets. */
   for (const p of posts) {
-    if (p && p.photo && (p.featured || p.partner)) voegToe(p.photo, p.author);
+    if (!p || !p.photo) continue;
+    const magVanLid = p.partner ? true : p.promoMag === true;
+    if ((p.featured || p.partner) && magVanLid) voegToe(p.photo, p.author);
     if (uit.length >= grens) break;
   }
   // 2) het eigen RTG-campagnebeeld als vaste huisbron

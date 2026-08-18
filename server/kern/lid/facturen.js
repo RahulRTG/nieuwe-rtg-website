@@ -22,6 +22,26 @@ const { maandCentenUit } = require('../pasprijs');
 
 const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
 
+/* WELKE MAAND ER OP DE BIJDRAGEFACTUUR STAAT.
+
+   Hier stond letterlijk ' · juli 2026' -- de maand van de demo-seed, geplakt op
+   de factuur van iedereen, voor altijd. Een lid dat zich in maart aanmeldde las
+   dus "Maandbijdrage RTG Pass · juli 2026". De factuur draagt zijn eigen maand
+   nu mee (eersteBijdrageFactuur hieronder, veld `maand`, vorm JJJJ-MM); staat
+   die er niet op (oude of geseede facturen), dan blijft de maand weg in plaats
+   van dat we er een verzinnen. */
+const MAAND_NL = ['januari', 'februari', 'maart', 'april', 'mei', 'juni',
+  'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+const MAAND_EN = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+function maandNaam(maand, lang) {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(maand || ''));
+  if (!m) return '';
+  const i = Number(m[2]) - 1;
+  if (i < 0 || i > 11) return '';
+  return (lang === 'en' ? MAAND_EN : MAAND_NL)[i] + ' ' + m[1];
+}
+
 /* `deps` komt binnen en niet `deps.geldPasprijzen`: die tabel wordt door
    server.js later ingevuld dan deze fabriek draait, dus we lezen hem pas op het
    moment dat er echt een factuur wordt gemaakt. */
@@ -35,7 +55,7 @@ function maakFacturen({ i18n, deps }) {
           ...inv,
           desc: (lang === 'en' ? 'Monthly contribution ' : 'Maandbijdrage ') + PASNAAM[tier] +
                 (bijdrageCenten == null ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
-                (lang === 'en' ? ' · July 2026' : ' · juli 2026'),
+                (maandNaam(inv.maand, lang) ? ' · ' + maandNaam(inv.maand, lang) : ''),
           // alleen invullen als er echt een prijs IS; anders het bedrag laten staan
           ...(bijdrageCenten == null ? {} : { netto: 0, bijdrage: Math.round(bijdrageCenten * 1.21) / 100 })
         };
@@ -51,6 +71,47 @@ function maakFacturen({ i18n, deps }) {
     });
   }
 
+  /* DE EERSTE MAANDBIJDRAGE VAN EEN NIEUW LID MET EEN PAS.
+
+     Dat een nieuw lid iets te betalen had, kwam tot nu toe uit de DEMO-seed:
+     memberTemplate kopieerde "Maandbijdrage lidmaatschap juli 2026" (nummer
+     RTG-2026-0207) naar elk vers account. De datum klopte niet, het nummer was
+     van iemand anders, en het bedrag stond in de seed.
+
+     De verplichting zelf is wel echt -- bij een pas hoort een bijdrage -- dus
+     die blijft, maar als een factuur VAN DIT LID: een eigen nummer, de maand
+     waarin hij lid werd, en de prijs uit dezelfde bron als hierboven. De gratis
+     gast-laag heeft geen pas en dus geen bijdrage: die krijgt niets. */
+  // de maandbijdrage inclusief btw, in euro's; null (op maat) wordt 0
+  function centenNaarBijdrage(tier) {
+    const centen = maandCentenUit(deps.geldPasprijzen, tier);
+    return centen == null ? 0 : Math.round(centen * 1.21) / 100;
+  }
+
+  function eersteBijdrageFactuur(tier, userId, opDatum) {
+    if (!['rtg', 'lifestyle', 'business'].includes(tier)) return null;
+    const d = opDatum ? new Date(opDatum) : new Date();
+    if (isNaN(d.getTime())) return null;
+    const m2 = String(d.getMonth() + 1).padStart(2, '0');
+    const verval = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    return {
+      id: 'RTG-' + d.getFullYear() + '-' + m2 + '-' + String(userId || 0).padStart(4, '0'),
+      desc: 'Maandbijdrage lidmaatschap',
+      maand: d.getFullYear() + '-' + m2,
+      /* HET BEDRAG STAAT ER OOK ECHT OP.
+
+         ./lid/facturen.js vult de prijs bij het TONEN in (uit de boardroom), en
+         daarmee zou het scherm kloppen terwijl de opgeslagen factuur op nul
+         stond -- en de betaalwegen lezen de opgeslagen factuur. Betalen zou dan
+         afketsen op "op deze factuur staat niets meer open". Dus: bij het maken
+         dezelfde bron (kern/pasprijs.js) en dezelfde btw-rekensom. Is er geen
+         prijs (Business is op maat), dan blijft het bedrag 0 en spreekt RTG het
+         met het lid af -- er wordt hier niets verzonnen. */
+      netto: 0, bijdrage: centenNaarBijdrage(tier), status: 'open',
+      date: 'Vervalt 1 ' + MAAND_NL[verval.getMonth()] + ' ' + verval.getFullYear()
+    };
+  }
+
   // De reis, met de losse programmaonderdelen vertaald. Geen reis: geen veld.
   function reisVoor(md, lang) {
     if (!md.trip) return null;
@@ -63,7 +124,7 @@ function maakFacturen({ i18n, deps }) {
     };
   }
 
-  return { facturenVoor, reisVoor };
+  return { facturenVoor, reisVoor, eersteBijdrageFactuur };
 }
 
 module.exports = maakFacturen;

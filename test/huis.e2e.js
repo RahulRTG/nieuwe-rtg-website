@@ -27,9 +27,16 @@ test('Het Huis: het reisdossier staat op blad 02, met elke stand als woord',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const t = Date.now();
-    const reg = await api(base, '/api/auth/register', { name: 'Huis E2E', email: 'he' + t + '@e.test',
-      phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1986-06-06', tier: 'rtg' });
+    /* EEN SESSIE MET EEN REIS EROP, EN DAT IS DE DEMO-SESSIE.
+
+       Hier stond een verse registratie, en die had een volle reis naar Ibiza --
+       maar alleen doordat elk nieuw account de demo-reis uit de seed erfde. Dat
+       is rechtgezet (server/kern/lid.js): wie zich echt aanmeldt begint leeg.
+       Dit blad toetst hoe het dossier een reis TOONT, dus draait het nu op de
+       demo-sessie, die de demo-reis wel heeft. Dat een vers account juist een
+       leeg dossier krijgt, staat in test/huis.test.js. */
+    const reg = await api(base, '/api/login', { tier: 'rtg' });
+    assert.ok(reg.token, 'de demo-sessie staat open');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();

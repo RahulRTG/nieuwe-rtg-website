@@ -52,7 +52,13 @@
           (jaren.length > 1 ? '<span style="width:1px;height:1rem;background:var(--line);margin:0 0.2rem;"></span>' + chip(payFilterJaar === 'alle', 'alle', 'jaar', T('fin.f.jaren','Alle jaren')) + jaren.map(j => chip(payFilterJaar === j, j, 'jaar', j)).join('') : '') +
         '</div>'
       : '';
-    $('#payList').innerHTML = finKaart + filterBar + (zichtbaar.length ? '' : '<div style="color:var(--soft);font-size:0.8rem;padding:0.5rem 0;">' + T('fin.f.leeg','Geen facturen in deze selectie.') + '</div>') + zichtbaar.map(inv => {
+    /* Nog nooit een factuur gehad is iets anders dan "niets in deze selectie".
+       Een nieuw account begint leeg, dus dit is wat een nieuw lid hier leest:
+       niet dat het filter niets vond, maar wat er komt te staan en waarom. */
+    const leegTekst = invoices.length
+      ? T('fin.f.leeg','Geen facturen in deze selectie.')
+      : T('fin.f.nognooit','Hier komen uw facturen te staan: wat RTG voor u regelt, wat u bij partners besteedt en uw maandbijdrage. Btw en afboekcode staan er meteen bij, zodat het zo de boekhouding in kan. Van elke bijdrage gaat 30% naar de RTFoundation.');
+    $('#payList').innerHTML = finKaart + filterBar + (zichtbaar.length ? '' : '<div style="color:var(--soft);font-size:0.8rem;padding:0.5rem 0;line-height:1.6;">' + leegTekst + '</div>') + zichtbaar.map(inv => {
       const total = inv.netto + inv.bijdrage;
       return '<div class="rowitem">' +
         '<div class="t"><b>' + inv.desc + '</b><span>' + inv.id + ' · ' + inv.date + '</span></div>' +

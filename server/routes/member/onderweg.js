@@ -4,7 +4,7 @@
 const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
-    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor } = kern;
+    liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, ledenInhoudVan } = kern;
   // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
   const liveSaveAt = new Map();
 
@@ -16,7 +16,10 @@ module.exports = (kern) => {
     const mode = ['walking', 'driving', 'flying'].includes(req.body.mode) ? req.body.mode : 'driving';
     // Startpositie: meegegeven, anders het hotel op de bestemming, anders vlakbij de bestemming.
     let start = coordPaar(req.body.lat, req.body.lng);
-    if (!start) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === db.data.trip.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
+    // het hotel op de bestemming van de EIGEN reis (stond op db.data.trip: de
+    // demo-bestemming, en dat viel om zodra een lid geen demo-reis meer erft)
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
+    if (!start && eigenReis) { const hotel = db.data.suppliers.find(s => s.type === 'hotel' && s.city === eigenReis.dest); if (hotel && hotel.loc) start = { lat: hotel.loc.lat, lng: hotel.loc.lng }; }
     if (!start && dest && dest.loc) start = { lat: dest.loc.lat + 0.012, lng: dest.loc.lng - 0.014 };
     db.data.live[key] = {
       key, tier: req.session.tier, codename: liveCodename(req.session),

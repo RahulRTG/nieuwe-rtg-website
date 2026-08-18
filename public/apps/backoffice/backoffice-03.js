@@ -205,6 +205,19 @@
       try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
     }));
 
+    /* De catalogus-wensen uit de onboarding. Eigen route en niet uit de
+       kantoorstaat: hij hoort bij de ondernemerskant en die staat apart
+       (routes/office/ondernemers.js). Op CODENAAM -- de echte naam ligt in de
+       kluis en hoort niet in een lijst. */
+    renderCatalogusWensen();
+
+    /* De reisbalie en de instellingen. Ook eigen routes: het aanbod en de
+       instellingen staan niet in de kantoorstaat, want ze horen bij een andere
+       kamer (routes/kantoren/reizen.js en routes/office/instellingen.js). */
+    renderReisaanbod();
+    renderReisaanvragen();
+    renderInstellingen();
+
     // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
     // nadat RTG hem hier goedkeurt
     const scholen = (state.pendingSchools || []).filter(x => past(x.naam, x.code, x.plaats));
@@ -222,3 +235,44 @@
     }));
   }
 
+
+  /* De wensen om in de catalogus te komen. Een besluit maakt hier GEEN zaak: dat
+     blijft de partner-aanvraag, met ledenbewijs. Wat hier gebeurt is bijhouden
+     dat er iemand naar gekeken heeft, en wie. De pas staat erbij omdat je wilt
+     weten met wie je spreekt -- niet als drempel: elk lid met een pas mag een
+     bedrijf aanmelden. */
+  async function renderCatalogusWensen(){
+    const el = $('#cwList'); if (!el) return;
+    let d = null; try { d = await call('/office/catalogus-wensen'); } catch(e){ return; }
+    const rij = (d && d.wensen) || [];
+    el.innerHTML = rij.length ? rij.map(function(w){
+      const st = w.besluit === 'opgepakt' ? T('bo.cw.ok','opgepakt')
+        : w.besluit === 'afgewezen' ? T('bo.cw.no','afgewezen') : null;
+      const passen = { rtg: T('bo.cw.rtg','RTG Pass'), lifestyle: T('bo.cw.ls','Lifestyle Pass'), business: T('bo.cw.bp','Business Pass') };
+      const pas = passen[w.pas]
+        ? '<span class="pill klaar">'+passen[w.pas]+'</span>'
+        : '<span class="pill">'+T('bo.cw.geenpas','pas onbekend')+'</span>';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(w.naam)+' '+pas+'</div>'+
+        '<div class="sub">'+escHtml(w.eigenaar||'')+' · '+timeAgo(w.gevraagd)+
+          (w.door?' · '+T('bo.cw.door','door')+' '+escHtml(w.door):'')+
+          (w.notitie?'<br>"'+escHtml(w.notitie.slice(0,120))+'"':'')+'</div></div>'+
+        (st ? '<span class="pill '+(w.besluit==='opgepakt'?'klaar':'bereiding')+'">'+st+'</span>'
+            : '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-cwok="'+escHtml(w.id)+'">'+T('bo.cw.pak','Opgepakt')+'</button><button class="vbtn" data-cwno="'+escHtml(w.id)+'">'+T('bo.cw.wijs','Afwijzen')+'</button></div>')+
+        '</div></div>';
+    }).join('') : '<div class="empty">'+T('bo.nocw','Nog geen bedrijven uit de onboarding. Leden geven bij het aanmelden op of ze er een hebben.')+'</div>';
+    document.querySelectorAll('[data-cwok]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        try { await call('/office/catalogus-wens/besluit', { id: b.dataset.cwok, besluit: 'opgepakt' }); renderCatalogusWensen(); }
+        catch(e){ alert(e.message); }
+      });
+    });
+    document.querySelectorAll('[data-cwno]').forEach(function(b){
+      b.addEventListener('click', async function(){
+        // afwijzen vraagt een reden: een deur die dichtgaat krijgt een grond
+        const reden = prompt(T('bo.cw.reden','Waarom wijst u deze wens af?'));
+        if (!reden) return;
+        try { await call('/office/catalogus-wens/besluit', { id: b.dataset.cwno, besluit: 'afgewezen', notitie: reden }); renderCatalogusWensen(); }
+        catch(e){ alert(e.message); }
+      });
+    });
+  }

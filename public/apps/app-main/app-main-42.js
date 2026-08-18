@@ -44,19 +44,50 @@
 
     // Deze twee kaarten met Util.el: tekst structureel veilig, data-goto blijft
     // (de globale [data-goto]-binding onderaan pakt de knoppen op).
-    Util.vervang($('#homeTrip'),
-      E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
-      E('div', { class: 'big' }, trip.dest),
-      E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
-      E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →'));
+    /* GEEN REIS IS EEN UITNODIGING, GEEN LEEG VAK.
+
+       Een nieuw account begint leeg (server/kern/lid.js), dus dit is het eerste
+       dat een echt nieuw lid hier ziet. Vroeger stond er de reis van de demo --
+       Ibiza, een villa in Cala Jondal -- en dat leek een boeking op zijn naam.
+       Nu staat er wat dit vak IS en wat het lid moet doen om het te vullen. */
+    Util.vervang($('#homeTrip'), trip
+      ? [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+         E('div', { class: 'big' }, trip.dest),
+         E('div', { class: 'meta' }, trip.dates + ' · ' + T('app.in', 'over') + ' ' + trip.days + ' ' + T('app.days', 'dagen')),
+         E('button', { class: 'go', dataset: { goto: 'reizen' } }, (stem('Bekijk je reis', 'Naar je reizen', 'Bekijk uw reis') || T('app.viewtrip', 'Bekijk uw reis')) + ' →')]
+      : [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
+         E('div', { class: 'big' }, T('app.notrip', 'Nog niets gepland')),
+         E('div', { class: 'meta' }, stem(
+             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.',
+             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier: eerst als aanvraag, bevestigd zodra een reisadviseur hem rond heeft.',
+             'Vraagt u een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.')
+           || T('app.notrip.sub', 'Request a trip at the travel desk. From that moment it stands here: as a request first, and confirmed once a travel adviser has it settled.')),
+         E('button', { class: 'go js-naarreisbureau' },
+           (stem('Naar het reisbureau', 'Naar het reisbureau', 'Naar het reisbureau')
+             || T('app.notrip.go', 'To the travel desk')) + ' →')]);
+    /* De knop wijst naar de plek waar een reis ECHT ontstaat: het reisbureau
+       (/apps/reisbureau.html). Daar vraag je een reis aan, en vanaf dat moment
+       staat hij in je dossier -- als aanvraag, tot een reisadviseur hem
+       bevestigt (server/kern/lid/reisdossier.js). Het is een eigen app en geen
+       tabblad hier, dus geen data-goto maar een gewone navigatie. */
+    const naarRb = $('#homeTrip .js-naarreisbureau');
+    if (naarRb) naarRb.addEventListener('click', () => {
+      location.href = '/apps/reisbureau.html' + (vastePas ? '?pas=' + encodeURIComponent(vastePas) : '');
+    });
     Util.vervang($('#homePay'), open.length
       ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
          E('div', { class: 'big accent' }, eur(openSum)),
          E('div', { class: 'meta' }, open.length + ' ' + (open.length === 1 ? T('app.payment', 'betaling') : T('app.payments', 'betalingen')) + ' · ' + T('app.onetapfid', 'één tik met Face ID')),
          E('button', { class: 'go', dataset: { goto: 'betalen' } }, T('app.paynow', 'Nu betalen') + ' →')]
-      : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
-         E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
-         E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]);
+      : invoices.length
+        ? [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+           E('div', { class: 'big', style: { color: 'var(--green)' } }, T('app.allsettled', 'Alles voldaan')),
+           E('div', { class: 'meta' }, T('app.nothingopen', 'Er staat niets open.'))]
+        // nog nooit een factuur: zeg wat hier komt te staan in plaats van
+        // "alles voldaan" over een lijst die niet bestaat
+        : [E('div', { class: 'label' }, T('app.payments.cap', 'Betalingen')),
+           E('div', { class: 'big' }, T('app.nobills', 'Nog geen rekeningen')),
+           E('div', { class: 'meta' }, T('app.nobills.sub', 'Wat RTG voor u regelt en wat u bij partners besteedt, komt hier te staan, met btw en afboekcode erbij.'))]);
     $('#homeSalon').innerHTML =
       '<div class="label">'+T('app.thesalon','De Salon')+'</div>' +
       '<div class="big gold">' + nfmt(creatorLikes) + '</div>' +

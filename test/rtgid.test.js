@@ -178,7 +178,8 @@ test('6. de poorten: vals token, onbekende koppel, gast en anoniem', async () =>
   assert.equal((await api('/api/rtgid/status', { koppelId: 'bestaatniet' })).status, 404);
   assert.equal((await api('/api/rtgid/inzage', {})).status, 401, 'de app-kant vraagt een leden-inlog');
   const gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
-  assert.equal((await api('/api/rtgid/inzage', {}, gast)).status, 403, 'gasten hebben geen iD');
+  assert.equal((await api('/api/rtgid/inzage', {}, gast)).status, 403,
+    'een ANONIEME demo-gast heeft geen dossier en dus geen iD');
   assert.equal((await api('/api/rtgid/start', {})).status, 400, 'zonder dienstnaam geen koppel');
 });
 
@@ -263,17 +264,20 @@ test('11. wie nog geen passkey heeft, ziet dat en kan er een maken', async () =>
   assert.equal((await bevestigMet(pkC, c.token, k2.body.koppelId)).status, 200, 'bevestigen kan nu wel');
 });
 
-test('12. een demo-persona kan niet bevestigen, en hoort waarom', async () => {
-  /* Dit is wat de harde eis kost. Een persona heeft geen eigen account en kan
-     dus geen passkey maken; die krijgt geen vage weigering maar de reden. */
+test('12. een demo-persona heeft geen dossier, en hoort waarom', async () => {
+  /* Dit is wat de poort kost, en het is de bedoelde prijs. Een persona is een
+     demo-inlog zonder dossier: geen account, geen paspoort, geen passkey. Sinds
+     de poort op het DOSSIER kijkt in plaats van op de pas, valt hij aan de deur
+     af in plaats van bij het bevestigen -- dat is dezelfde uitkomst, een stap
+     eerder, en met dezelfde reden. Een gratis account komt er wel in (toets 27);
+     dat is precies het onderscheid dat deze poort hoort te maken. */
   const persona = (await api('/api/login', { tier: 'rtg', pasApp: 'rtg' })).body.token;
-  const s = await api('/api/rtgid/start', { dienst: 'MijnOverheid', attributen: ['codenaam'] });
-  const k = await api('/api/rtgid/koppel', { code: s.body.code }, persona);
-  assert.equal(k.status, 200, 'opzoeken mag: hij mag zien wie er aanklopt');
-  assert.equal(k.body.eigenAccount, false, 'maar het scherm weet dat hier geen sleutel te maken valt');
-  const b = await api('/api/rtgid/bevestig', { koppelId: k.body.koppelId }, persona);
-  assert.equal(b.status, 403);
-  assert.match(b.body.error, /eigen RTG-account/i, 'met de reden erbij');
+  const k = await api('/api/rtgid/koppel', { code: 'ID-XXXXX' }, persona);
+  assert.equal(k.status, 403);
+  assert.match(k.body.error, /eigen RTG-account/i, 'met de reden erbij');
+  assert.match(k.body.error, /gratis account is genoeg/i,
+    'en met wat er WEL genoeg is: een pas kopen hoort er niet bij');
+  assert.equal((await api('/api/rtgid/inzage', {}, persona)).status, 403);
 });
 
 test('13. weigeren vraagt geen passkey: er wordt niets gedeeld', async () => {
@@ -566,4 +570,39 @@ test('26. twee machtigingen aan dezelfde persoon voor DEZELFDE dienst', async ()
   // en de nieuwe intrekken sluit hem wel
   assert.equal((await api('/api/rtgid/machtig/intrek', { id: tweede.body.machtiging.id }, lidA)).status, 200);
   assert.equal((await api('/api/rtgid/wie', { idToken: opNieuwe.idToken })).status, 403);
+});
+
+test('27. een gratis account heeft wel een iD -- een pas kopen hoort er niet bij', async () => {
+  /* CONCERN.md noemt deze mens bij naam: "een werknemer koopt nooit een pas om
+     te mogen werken... met de gratis RTG Pass of een gratis werkidentiteit."
+     De poort keek naar de TIER, en zo kreeg precies degene die zich moest
+     identificeren om te MOGEN werken te horen dat RTG iD voor leden is.
+
+     De echte grens is het DOSSIER, niet de pas: dit account heeft een eigen
+     inlog, kan een passkey dragen en kan gekeurd worden. Een anonieme demo-gast
+     heeft dat allemaal niet, en blijft buiten (zie toets 6). */
+  const u = (Date.now() + 900).toString().slice(-8);
+  const reg = await api('/api/auth/register', { name: 'Werker', email: 'wk' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-08-08',
+    tier: 'guest', pasApp: 'rtg' });
+  const gratis = reg.body.token;
+  assert.ok(gratis, 'een gratis account is aan te maken: ' + JSON.stringify(reg.body).slice(0, 160));
+  const st = await api('/api/state', {}, gratis);
+  assert.equal(st.body.state.user.tier, 'guest', 'en het is echt de gratis laag');
+
+  // de app-kant staat open
+  const inz = await api('/api/rtgid/inzage', {}, gratis);
+  assert.equal(inz.status, 200, 'het inzagelog is er: ' + JSON.stringify(inz.body).slice(0, 140));
+
+  // en hij kan de hele weg lopen: passkey maken, code opzoeken, bevestigen
+  const pkG = await passkeyVoor(gratis, 'Telefoon van de werker');
+  const s = await api('/api/rtgid/start', { dienst: 'Werkgever B.V.', attributen: ['codenaam'] });
+  const k = await api('/api/rtgid/koppel', { code: s.body.code }, gratis);
+  assert.equal(k.status, 200);
+  assert.equal(k.body.eigenAccount, true, 'het scherm weet dat hier een sleutel te maken valt');
+  assert.equal((await bevestigMet(pkG, gratis, k.body.koppelId)).status, 200,
+    'en bevestigen lukt: een pas is geen voorwaarde om je te kunnen identificeren');
+  const wie = await api('/api/rtgid/wie', { idToken: (await api('/api/rtgid/status', { koppelId: s.body.koppelId })).body.idToken });
+  assert.equal(wie.status, 200);
+  assert.equal(wie.body.attributen.betrouwbaarheid.id, 'A1', 'ongekeurd, en dat staat er eerlijk bij');
 });

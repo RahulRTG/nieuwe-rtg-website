@@ -12,8 +12,24 @@
 module.exports = (kern) => {
   const { app, auth, rtgid, appUrl, webauthnStapOpOpties } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; r.error ? res.status(status || 400).json({ error: r.error }) : res.status(200).json(rest); };
-  const geenGast = (req, res, next) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'RTG iD is voor leden.' });
+  /* WIE HIER BINNEN MAG: iedereen met een EIGEN account, en niet iedereen met
+     een betaalde pas.
+
+     Hier stond `tier === 'guest'`, en dat sloot de gratis accounts buiten -- de
+     mensen die een echt account hebben, een paspoort kunnen laten keuren en een
+     passkey kunnen dragen, maar geen pas hebben gekocht. Precies de groep die
+     CONCERN.md bij naam noemt: "een werknemer koopt nooit een pas om te mogen
+     werken... met de gratis RTG Pass of een gratis werkidentiteit". Wie zich
+     moest identificeren om te MOGEN werken, kreeg te horen dat RTG iD voor
+     leden is.
+
+     De echte grens is niet de pas maar het DOSSIER: een anonieme demo-gast
+     (sleutel `guest-xxxx`, geen account) heeft niets om mee te bewijzen, en
+     kern/rtgid-bevestigen.js weigert die al op eigen kracht. Deze poort zegt nu
+     hetzelfde als die laag, in plaats van iets strengers. */
+  const eigenAccount = (req, res, next) => {
+    if (!req.session.account) return res.status(403).json({
+      error: 'RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen.' });
     next();
   };
   // In productie komt de WebAuthn-grens uit APP_URL, nooit uit een door de
@@ -27,7 +43,7 @@ module.exports = (kern) => {
   app.post('/api/rtgid/wie', (req, res) => stuur(res, rtgid.wie(req.body.idToken)));
 
   // de app-kant (het lid zelf)
-  const lid = [auth, geenGast];
+  const lid = [auth, eigenAccount];
   app.post('/api/rtgid/koppel', ...lid, (req, res) => stuur(res, rtgid.koppelZoek(req.session.key, req.body.code)));
   /* De ceremonie voor DEZE koppel. Het account komt uit de sessie en niet uit
      de body: wie een ceremonie aanvraagt, krijgt er een voor zichzelf. */

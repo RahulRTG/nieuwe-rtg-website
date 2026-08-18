@@ -42,7 +42,14 @@
     if (!socialOK){ el.innerHTML = ''; return; }
     let html = '';
     for (const r of (social.requests || [])){
-      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + T('sal.wilverbinden','wil verbinden') + '</span>' +
+      /* WAARLANGS dit verzoek binnenkwam, en dat is meer dan een detail: staat
+         er "via je pin" bij iemand die je niet verwacht, dan gaat de pin die je
+         ooit ergens neerzette nog rond -- en dan is dit het moment om hem te
+         vernieuwen. Zonder dat verschil merk je dat nooit. */
+      const langs = r.via === 'pin' ? T('sal.viapin','via je pin')
+                  : r.via === 'code' ? T('sal.viacode','via je live code')
+                  : T('sal.wilverbinden','wil verbinden');
+      html += '<div class="sc-req"><b>' + escT(r.codename) + '</b><span style="color:var(--soft);font-size:0.7rem;">' + langs + '</span>' +
         '<button class="ja" data-scja="' + escT(r.key) + '">' + T('sal.accepteer','Accepteer') + '</button>' +
         '<button data-scnee="' + escT(r.key) + '">✕</button></div>';
     }

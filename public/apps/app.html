@@ -829,6 +829,11 @@
   /* En ze gaan ook echt weg als ze dicht staan: een eigen `display` wint van de
      `[hidden]`-regel van de browser -- dezelfde val als bij .os-nu hieronder. */
   #scPinQrBeeld[hidden],#scPinCam[hidden]{display:none;}
+  .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
+  .sc-pin-noot{margin-top:0.55rem;font-size:0.7rem;line-height:1.45;color:var(--soft);}
+  .sc-pin-noot[hidden]{display:none;}
+  #scPinLiveDoek{margin-top:0.7rem;}
+  #scPinLiveDoek[hidden]{display:none;}
   .sc-pin .sc-zoek input{letter-spacing:0.1em;text-transform:uppercase;}
   .sc-pin .sc-zoek button.grijs{background:var(--card);border:1px solid var(--line);color:var(--txt);}
 
@@ -2284,6 +2289,8 @@
 <script src="/shared/scanner.js"></script>
 <script src="/shared/scanknop.js"></script>
 <script src="/shared/rtgcode.js"></script>
+<!-- de levende, ondertekende code (o.a. de contactcode die na een minuut vervalt) -->
+<script src="/shared/dyncode.js"></script>
 <script src="/shared/speler.js"></script>
 <script src="/shared/geluid.js"></script>
 <script src="/shared/glyf.js"></script>

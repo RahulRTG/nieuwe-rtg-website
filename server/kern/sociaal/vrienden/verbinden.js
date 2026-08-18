@@ -52,8 +52,16 @@ async function socialZoek(mij, q) {
 }
 /* vriendschapsverzoek van 'mij' naar 'naar'. doorOuder=true betekent: een
    ouder/verzorger doet dit namens zijn beschermde kind (via ouderVerbind); dan
-   geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven. */
-async function socialVerbind(mij, naar, doorOuder) {
+   geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven.
+
+   'via' zegt langs WELKE weg dit verzoek binnenkwam: 'pin' (iemand typte of
+   scande de vaste contactpin), 'code' (een levende code die de ontvanger op dat
+   moment ophield) of niets (het gewone zoeken op codenaam). Dat is geen
+   boekhouding maar een signaal aan de ONTVANGER: staat er "via je pin" bij een
+   verzoek van iemand die je niet verwacht, dan weet je dat de pin die je ooit
+   ergens neerzette nog rondgaat -- en dat is precies het moment om hem te
+   vernieuwen. Zonder dat verschil merk je dat nooit. */
+async function socialVerbind(mij, naar, doorOuder, via) {
   if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
   /* De wachtende bestaanscheck: dit 404-besluit mag niet op een koude cache
      rusten (in Postgres-stand kreeg een net gevonden codenaam hier onder last
@@ -74,7 +82,8 @@ async function socialVerbind(mij, naar, doorOuder) {
   // is de ANDER ook een beschermd kind (kan alleen via doorOuder), dan moet
   // diens eigen ouder nog akkoord geven
   if (isBeschermdHandle(naar)) voogdWacht.push(naar);
-  c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht };
+  c = { a: mij, b: naar, requestedBy: mij, status: 'pending', at: new Date().toISOString(), voogdWacht,
+    via: via === 'pin' || via === 'code' ? via : null };
   db.data.connections.push(c); save();
   sseToCustomer(naar, 'social', { kind: 'request', from: codenaamVan(mij) });
   return { status: 200, ok: true, st: voogdWacht.length ? 'wacht-op-ouder' : 'aangevraagd' };

@@ -229,6 +229,39 @@ er achter de pin zit; pas `/pin/connect` stuurt het verzoek. Een gescande QR die
 meteen een verzoek de deur uit doet, is een verzoek dat niemand bewust deed --
 LIFE.md: samenstellen en klaarzetten, bevestigen doet de mens.
 
+**Twee remmen, want de eerste alleen is te weinig.** De ene telt per *vrager*
+(dertig pogingen per uur). Die remt de ongeduldige, maar wie de pin van niemand
+in het bijzonder zoekt, koopt gewoon een tweede account -- exact de fout die
+`server/pinslot.js` beschrijft. Bij een contactpin is er geen doel om de teller
+aan te hangen (de aanvaller noemt er juist geen), dus hangt de tweede aan de
+**deur**: een huisbreed budget aan *missers* per minuut, gedeeld door elke ingang
+die een pin opzoekt. Alleen missers tellen, en dat maakt hem bruikbaar: wie een
+pin overtypt die hij net kreeg, mist vrijwel nooit; wie raadt, mist bijna altijd.
+De prijs staat erbij in `kern/sociaal/pin-deur.js` -- een huisbrede teller is ook
+een huisbrede knop.
+
+**De levende code: de QR die verloopt.** Een vaste pin is voor eeuwig, en dat is
+precies het probleem dat de BlackBerry-pin altijd heeft gehad. Voor het geval
+waarin een pin het vaakst wordt afgegeven -- twee mensen tegenover elkaar --
+is een blijvend adres helemaal niet nodig. `/pin/live` levert een verse,
+ondertekende code die na een minuut niets meer is, **je pin niet draagt en je
+sleutel ook niet** (er zit een willekeurige verwijzing in die alleen deze server
+kan omzetten), en die maar één keer opgaat. Ondertekend door `kern/dyncode.js`,
+dus zelf een geldige code maken kan niet. Wie de QR fotografeert houdt een string
+over die naar niets meer wijst.
+
+**De pin uitzetten.** Vernieuwen helpt tegen een pin die is rondgegaan; `/pin/uit`
+is het andere verzoek -- ik wil helemaal niet zo gevonden worden. Uit betekent:
+dezelfde stilte als een pin die niet bestaat. De *levende* code blijft dan wel
+werken, en dat is geen gat maar het onderscheid waar de schakelaar over gaat: een
+pin die je hebt afgegeven werkt passief door, ook als je niet meer weet aan wie;
+een code die je op dit moment ophoudt is een handeling.
+
+**En je merkt dat je pin rondgaat.** Een verzoek draagt zijn herkomst mee: "via
+je pin", "via je live code", of niets (het gewone zoeken op codenaam). Zonder dat
+verschil merk je nooit dat de pin die je ooit in een groepsapp zette nog steeds
+gebruikt wordt -- en dat is precies het moment om hem te vernieuwen.
+
 De QR draagt precies dezelfde pin (`rtg:pin:<pin>`, zie
 `public/shared/rtgcode.js`) en wordt getekend met de eigen QR-codec in
 `public/shared/qr.js`; scannen gebeurt op het toestel zelf
@@ -244,11 +277,22 @@ krijgt de pin van zijn kind wél te zien (in `/api/rtf/social/connections`) en
 kan er via `/oudervoeg` een vriend mee toevoegen -- waarna de ouder van het
 andere kind nog steeds akkoord moet geven.
 
-Bewezen door `test/contactpin.test.js` (twaalf toetsen: vorm, uniekheid, de
-voorleeslezing van O/I/L/U, het intrekken van een oude pin, de drie gelijke
-antwoorden, de rem, en de ouderkant) en `test/contactpin.e2e.js` (het scherm in
-een echte browser: de pin staat er, de QR wordt echt getekend, en zoeken
-verstuurt niets). Zes mutaties uit LAT.md-regel 2, alle zes raak.
+**En de opzoeking is geen doorloop meer.** De index van pin naar lid is met opzet
+geen tweede waarheid maar een *hint*: elke treffer wordt tegen de echte rij
+nagekeken voordat hij telt, en de index wordt opnieuw opgebouwd zodra de
+opslaglaag `db.data` vervangt of het aantal rijen verandert. Dat is niet
+theoretisch -- `kern/vergeten/eigen.js` wist een lid rechtstreeks uit die tak, en
+een index die zichzelf gelooft wijst dat lid daarna nog gewoon aan.
+
+Bewezen door `test/contactpin.test.js` (drieëntwintig toetsen: vorm, uniekheid,
+de voorleeslezing van O/I/L/U, het intrekken van een oude pin, de vier gelijke
+antwoorden, beide remmen, de index tegen een wissing en tegen een vervangen
+`db.data`, de levende code die geen blijvend gegeven draagt en maar één keer
+opgaat, en de ouderkant) en `test/contactpin.e2e.js` (het scherm in een echte
+browser). Mutaties uit LAT.md-regel 2 per verbetering, en twee toetsen zijn
+onderweg herschreven omdat ze **niet konden zakken** -- de botsingscontrole in
+`verzinPin` treedt op bij 1 op 1,1 biljoen, dus die botsing wordt nu met een
+gestuurde toevalsbron afgedwongen.
 
 ### Muisvrij: alles met de mond of met typen
 
@@ -838,6 +882,10 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/member/pin/nieuw` | Een nieuwe pin; de oude wijst daarna niemand meer aan |
 | `POST /api/member/pin/zoek` `{pin}` | Wie zit er achter deze pin? (kijken, nog niets versturen) |
 | `POST /api/member/pin/connect` `{pin}` | En dan pas: het vriendschapsverzoek versturen |
+| `POST /api/member/pin/uit` `{uit}` | De vaste pin uit- of weer aanzetten |
+| `POST /api/member/pin/live` | Een levende code: ondertekend, één minuut houdbaar, eenmalig |
+| `POST /api/member/pin/live/kijk` `{token}` | Wie zit er achter deze gescande code? (code gaat nog niet op) |
+| `POST /api/member/pin/live/verbind` `{token}` | Versturen; nu is de code op |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
 | `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`) |

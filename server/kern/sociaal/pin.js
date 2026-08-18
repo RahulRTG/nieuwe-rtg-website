@@ -24,16 +24,17 @@
    contactpin, daar heet dat algemene pin.
    ------------------------------------------------------------------------
 
-   Wat er WEL geheim aan is, is dat een pin niet af te lopen mag zijn. Acht
-   tekens uit Crockford base32 zijn 32^8 = 1,1 biljoen mogelijkheden, en elke
-   poging kost een tik uit dezelfde snelheidsteller die de rest van de sociale
-   laag remt (sociaalRate). Wie raadt, komt in een mensenleven niet in de
-   buurt van een tweede lid.
-
    Crockford base32 en niet gewoon hex: een pin wordt VOORGELEZEN. Daar zitten
    0/O en 1/I/L in elkaars vaarwater, dus die staan niet in het alfabet en
    worden bij het invoeren stil omgezet naar wat de spreker bedoelde. Dat is
-   een bestaand, opgeschreven schema; er is hier niets eigens aan verzonnen. */
+   een bestaand, opgeschreven schema; er is hier niets eigens aan verzonnen.
+   Waarom acht van die tekens genoeg zijn tegen raden, staat bij de remmen die
+   dat waarmaken: ./pin-deur.js.
+
+   DRIE BESTANDEN, DRIE ONDERWERPEN. Hier woont het BEZIT: het alfabet, het
+   verzinnen, de eigen pin, vernieuwen en de aan/uit-schakelaar, plus de index
+   die daarbij hoort. Het OPZOEKEN staat in ./pin-deur.js (de twee remmen en de
+   gelijke antwoorden), en de LEVENDE code in ./pin-live.js. */
 module.exports = (ctx) => {
 const { db, save, crypto, codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd,
   sociaalRate, statusVan, connectieTussen, socialVerbind } = ctx;
@@ -64,18 +65,26 @@ function normaliseer(ruw) {
 // zoals het lid hem ziet: twee groepjes van vier, want acht op een rij overtypt niemand
 const toonbaar = pin => (pin ? pin.slice(0, 4) + '-' + pin.slice(4) : null);
 
-/* Van pin naar handle. Een doorloop en geen index, en dat is een keuze: een
-   index naast db.data is een tweede waarheid die stil uit de pas kan lopen
-   zodra de opslaglaag db.data vervangt (bij een externe wijziging gebeurt dat
-   echt). connectieTussen doet het in ../sociaal.js om dezelfde reden met een
-   doorloop. Het aantal aanroepen is bovendien geremd (zie pinZoek), dus deze
-   lus loopt hooguit tientallen keren per uur per lid. */
-function handleVanPin(pin) {
-  const r = rij();
-  for (const handle of Object.keys(r)) if (r[handle] && r[handle].pin === pin) return handle;
-  return null;
-}
+/* De hint van pin naar lid staat in ./pin-index.js -- een eigen bestand, want
+   de uitleg waarom een index hier GEEN tweede waarheid is, is langer dan de
+   code zelf. Hij krijgt de rij-lezer mee en raakt db nooit aan. */
+const { zoekRuw, indexZet } = require('./pin-index')(rij);
 
+/* Twee opzoekingen en niet een, en dat verschil is een bug die anders pas over
+   maanden opvalt. `zoekRuw` zegt of een pin BEZET is -- daar controleert
+   verzinPin op, en die moet ook een UITGEZETTE pin zien: anders krijgt een nieuw
+   lid de pin die iemand tijdelijk had uitgezet, en zijn er twee zodra die ander
+   hem weer aanzet. `handleVanPin` zegt of een pin iemand AANWIJST, en daar telt
+   de schakelaar wel. */
+const pinBezet = pin => !!zoekRuw(pin);
+function handleVanPin(pin) {
+  const handle = zoekRuw(pin);
+  if (!handle) return null;
+  return rij()[handle].uit ? null : handle;
+}
+// de opgeslagen pin, zonder er een te maken: op een LEESpad hoort niets te
+// ontstaan (pinVan maakt er wel een aan, en schrijft dus ook)
+const pinHuidig = handle => { const e = rij()[handle]; return e && e.pin ? e.pin : null; };
 function verzinPin() {
   /* Botsingen zijn met 1,1 biljoen mogelijkheden zeldzaam, maar "zeldzaam"
      is geen "nooit": twee leden met dezelfde pin zou betekenen dat een
@@ -85,7 +94,7 @@ function verzinPin() {
     const bytes = crypto.randomBytes(LENGTE);
     let pin = '';
     for (let i = 0; i < LENGTE; i++) pin += ALFABET[bytes[i] % 32];
-    if (!handleVanPin(pin)) return pin;
+    if (!pinBezet(pin)) return pin;
   }
   throw new Error('contactpin: geen vrije pin gevonden na 50 pogingen');
 }
@@ -97,11 +106,12 @@ function pinVan(handle) {
   const r = rij();
   if (!r[handle] || !r[handle].pin) {
     r[handle] = { pin: verzinPin(), at: new Date().toISOString() };
+    indexZet(handle, null, r[handle].pin);
     save();
   }
   return r[handle].pin;
 }
-const pinKaart = handle => { const p = pinVan(handle); return { pin: p, toon: toonbaar(p) }; };
+const pinKaart = handle => { const p = pinVan(handle); return { pin: p, toon: toonbaar(p), uit: !!(rij()[handle] || {}).uit }; };
 
 /* Een nieuwe pin. Dit is het intrekken van een adres: wie de oude heeft
    (op een oude foto van de QR, in een oude groepsapp) kan er niets meer mee.
@@ -110,57 +120,34 @@ function pinVernieuw(handle) {
   if (!handle) return { status: 400, error: 'Onbekend lid.' };
   if (!sociaalRate(handle, 'pinnieuw', 10, UUR))
     return { status: 429, error: 'Je hebt net al een nieuwe pin gemaakt. Probeer het over een uur opnieuw.' };
-  rij()[handle] = { pin: verzinPin(), at: new Date().toISOString() };
+  const r = rij(), oud = r[handle] ? r[handle].pin : null;
+  // de stand van de schakelaar blijft staan: wie zijn pin uit had, wil na een
+  // verse pin niet ineens weer vindbaar zijn
+  r[handle] = { pin: verzinPin(), at: new Date().toISOString(), uit: !!(r[handle] && r[handle].uit) };
+  indexZet(handle, oud, r[handle].pin);
   save();
   return { status: 200, ...pinKaart(handle) };
 }
 
-/* Opzoeken wie er achter een pin zit -- zonder iets te doen. Dat is met opzet
-   een aparte stap: het scherm toont eerst "dit is Gouden Ibis", en de MENS
-   drukt daarna pas op verzoek sturen (LIFE.md: samenstellen en klaarzetten,
-   bevestigen doet de mens). Een gescande QR die meteen een verzoek verstuurt,
-   is een verzoek dat iemand nooit bewust deed.
+/* De pin uitzetten. Vernieuwen helpt tegen een pin die is rondgegaan, maar niet
+   tegen "ik wil helemaal niet op deze manier gevonden worden" -- en dat is een
+   ander verzoek. Uit betekent: de vaste pin wijst niemand meer aan, met precies
+   hetzelfde antwoord als een pin die niet bestaat (zie ./pin-deur.js).
 
-   Drie uitkomsten geven met opzet HETZELFDE antwoord: de pin bestaat niet, de
-   pin hoort bij een beschermd profiel (15 of jonger) en de pin hoort bij
-   iemand die jou blokkeerde. Anders is het verschil in de foutmelding precies
-   het gaatje waardoor je alsnog kunt vaststellen dat een kind bestaat. */
-function pinZoek(mij, ruw) {
-  const pin = normaliseer(ruw);
-  if (!pin) return { status: 400, error: 'Een pin bestaat uit acht tekens, bijvoorbeeld 7K2M-9XPQ.' };
-  if (!sociaalRate(mij, 'pinzoek', 30, UUR))
-    return { status: 429, error: 'Te veel pins geprobeerd. Probeer het over een uur opnieuw.' };
-  const eigen = rij()[mij];
-  if (eigen && eigen.pin === pin) return { status: 400, error: 'Dat is je eigen pin.' };
-  const doel = handleVanPin(pin);
-  if (!doel || isBeschermdHandle(doel) || isGeblokkeerd(mij, doel))
-    return { status: 404, error: 'Deze pin kennen we niet.' };
-  return { status: 200, key: doel, codename: codenaamVan(doel), tier: soortVan(doel),
-    st: statusVan(mij, connectieTussen(mij, doel)) };
+   DE LEVENDE CODE BLIJFT WEL WERKEN, en dat is geen gat maar het onderscheid
+   waar deze schakelaar over gaat: een pin die je hebt afgegeven werkt PASSIEF
+   door, ook als je allang niet meer weet aan wie. Een code die je op dit moment
+   ophoudt is een HANDELING, met een mens die hem bewust laat zien en een venster
+   van een halve minuut. Wie de eerste dichtdoet, wil zelden de tweede kwijt --
+   en het scherm zegt dat er ook bij. */
+function pinUit(handle, uit) {
+  if (!handle) return { status: 400, error: 'Onbekend lid.' };
+  pinVan(handle);                      // zorgt dat er een rij is om te schakelen
+  rij()[handle].uit = !!uit;
+  save();
+  return { status: 200, ...pinKaart(handle) };
 }
 
-/* Verbinden op pin. Doet zelf geen enkele controle over: hij zoekt de handle
-   op en laat socialVerbind de rest doen. Dat is de bedoeling -- daar wonen de
-   blokkade, de ouder-goedkeuring en de snelheidsrem, en een tweede kopie
-   ervan hier zou de dag na de eerste wijziging al uit de pas lopen. */
-async function pinVerbind(mij, ruw) {
-  const gevonden = pinZoek(mij, ruw);
-  if (gevonden.error) return gevonden;
-  const r = await socialVerbind(mij, gevonden.key);
-  return r.error ? r : { ...r, key: gevonden.key, codename: gevonden.codename };
-}
-
-/* De rauwe oplossing, voor de ouderkant (zie ouderVerbind in
-   ./vrienden/verbinden.js). Die MAG een beschermd profiel raken -- twee
-   ouders wisselen de pin van hun kinderen uit, precies zoals ze nu de
-   codenaam overtypen -- en de ouder van het andere kind moet daarna alsnog
-   akkoord geven (voogdWacht). Geen eigen rem hier: de aanroeper zet hem, want
-   die weet op wiens naam er geteld moet worden. */
-function pinNaarHandle(ruw) {
-  const pin = normaliseer(ruw);
-  return pin ? handleVanPin(pin) : null;
-}
-
-return { pinVan, pinKaart, pinVernieuw, pinZoek, pinVerbind, pinNaarHandle,
+return { pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig,
   pinNormaliseer: normaliseer, pinToonbaar: toonbaar };
 };

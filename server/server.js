@@ -864,7 +864,10 @@ function eisAccount(req, res) {
    alleen nodig op het moment dat er echt een bericht langskomt, en tegen die
    tijd staat hij er. Een vaste verwijzing zou hier voor altijd undefined zijn. */
 const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media,
-  commDm: () => kern && kern.commDm });
+  commDm: () => kern && kern.commDm,
+  // de ondertekenaar van de levende contactcode, om dezelfde reden opgehaald in
+  // plaats van vastgehouden: kern/dyncode.js wordt pas in kernlaag1 gezet
+  dyncodeGeef: () => kern && kern.dyncode });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
 const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });

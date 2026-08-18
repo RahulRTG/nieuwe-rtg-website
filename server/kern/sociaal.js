@@ -4,7 +4,7 @@
    te lezen en te testen is. Krijgt de gedeelde kern-onderdelen mee en praat
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
-  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media, commDm } = core;
+  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media, commDm, dyncodeGeef } = core;
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -67,23 +67,33 @@ function sociaalRate(mij, actie, max, perMs) {
 /* De vriendenlaag en de snaps/verhalen-laag draaien als submodules op een
    gedeelde context, een keer opgebouwd bij het opstarten; de vriendenlaag
    levert zijnVrienden aan de snapslaag via die context. */
-const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm,
+const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm, dyncodeGeef,
   dmSleutel, connectieTussen, isRtf, codeExists, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate };
 const deelVrienden = require('./sociaal/vrienden')(ctx);
 Object.assign(ctx, deelVrienden);
 const deelSnaps = require('./sociaal/snaps')(ctx);
 Object.assign(ctx, deelSnaps);
-/* De contactpin (./sociaal/pin.js): de eigen code waarmee twee mensen elkaar
-   toevoegen zonder te zoeken. Staat NA de vriendenlaag omdat hij op
-   socialVerbind en statusVan leunt -- alle controles blijven daar, deze laag
-   zoekt alleen de handle op. */
+/* De contactpin in drie lagen, in deze volgorde en niet anders: het BEZIT
+   (pin.js) weet van niemand af, de DEUR (pin-deur.js) leunt op dat bezit en op
+   socialVerbind, en de LEVENDE code (pin-live.js) leunt op de deur voor het ene
+   ding dat ze delen: wat je van een gevonden mens te zien krijgt. Alle
+   controles blijven bij socialVerbind; deze lagen zoeken alleen de handle op.
+   Alle drie staan NA de vriendenlaag, want die levert statusVan en
+   socialVerbind aan. */
 const deelPin = require('./sociaal/pin')(ctx);
 Object.assign(ctx, deelPin);
+const deelPinDeur = require('./sociaal/pin-deur')(ctx);
+Object.assign(ctx, deelPinDeur);
+const deelPinLive = require('./sociaal/pin-live')(ctx);
+Object.assign(ctx, deelPinLive);
 const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur } = deelVrienden;
 const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht } = deelSnaps;
-const { pinVan, pinKaart, pinVernieuw, pinZoek, pinVerbind, pinNaarHandle, pinNormaliseer, pinToonbaar } = deelPin;
+const { pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar } = deelPin;
+const { pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT } = deelPinDeur;
+const { liveMaak, liveKijk, liveVerbind, liveOpen } = deelPinLive;
 
   return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht,
-    pinVan, pinKaart, pinVernieuw, pinZoek, pinVerbind, pinNaarHandle, pinNormaliseer, pinToonbaar };
+    pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar,
+    pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT, liveMaak, liveKijk, liveVerbind, liveOpen };
 };

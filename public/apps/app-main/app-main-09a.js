@@ -22,8 +22,13 @@
           '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
           '<button id="scPinQr">' + T('pin.qr','Toon QR') + '</button>' +
           '<button id="scPinNieuw">' + T('pin.nieuw','Nieuwe pin') + '</button>' +
+          '<button id="scPinLive">' + T('pin.live','Live code') + '</button>' +
+          '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
         '</div>' +
         '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
+        '<div id="scPinLiveDoek" hidden></div>' +
+        '<div id="scPinUitNoot" class="sc-pin-noot"' + (mijnPin && mijnPin.uit ? '' : ' hidden') + '>' +
+          T('pin.uitnoot','Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel: die houd je bewust op.') + '</div>' +
       '</div>' +
       '<div class="sc-zoek open">' +
         '<input id="scPinIn" maxlength="12" autocapitalize="characters" spellcheck="false" placeholder="' + T('pin.ph','Pin van de ander, bijv. 7K2M-9XPQ') + '">' +
@@ -35,6 +40,8 @@
     $('#scPinKopie').addEventListener('click', pinKopieer);
     $('#scPinQr').addEventListener('click', pinQrWissel);
     $('#scPinNieuw').addEventListener('click', pinNieuw);
+    $('#scPinLive').addEventListener('click', pinLiveWissel);
+    $('#scPinUit').addEventListener('click', pinUitWissel);
     $('#scPinGo').addEventListener('click', () => pinOpzoeken($('#scPinIn').value));
     $('#scPinScan').addEventListener('click', pinScanWissel);
     $('#scPinIn').addEventListener('keydown', e => { if (e.key === 'Enter') pinOpzoeken($('#scPinIn').value); });
@@ -43,12 +50,21 @@
 
   async function pinHalen(){
     try { mijnPin = await API.call('/member/pin', {}); } catch(e){ return; }
-    const c = $('#scPinCode'); if (c) c.textContent = mijnPin.toon;
+    pinStandTonen();
+  }
+  // een uitgezette pin blijft leesbaar (het is je pin, je mag hem zien) maar
+  // draagt zichtbaar dat hij niemand aanwijst
+  function pinStandTonen(){
+    const c = $('#scPinCode'); if (!c || !mijnPin) return;
+    c.textContent = mijnPin.toon;
+    c.classList.toggle('uit', !!mijnPin.uit);
+    const u = $('#scPinUit'); if (u) u.textContent = mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten');
+    const n = $('#scPinUitNoot'); if (n) n.hidden = !mijnPin.uit;
   }
   async function pinNieuw(){
     if (!confirm(T('pin.nieuwvraag','Een nieuwe pin maken? Wie je oude pin nog heeft, kan je daarmee niet meer toevoegen. Je huidige vrienden merken er niets van.'))) return;
     try { mijnPin = await API.call('/member/pin/nieuw', {}); } catch(e){ toast(e.message); return; }
-    $('#scPinCode').textContent = mijnPin.toon;
+    pinStandTonen();
     const b = $('#scPinQrBeeld'); if (b && !b.hidden) pinQrTeken();
     toast(T('pin.nieuwok','Je hebt een nieuwe pin.'));
   }
@@ -92,6 +108,10 @@
     cam.hidden = false;
     pinScanner = new RTGScanner.Scanner({ video: cam, onCode: c => {
       const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort: 'tekst', tekst: c.tekst };
+      /* Twee soorten, want er zijn er twee: de vaste pin staat leesbaar in de
+         code (rtg:pin:...), de levende is een ondertekend token (RTG1....) dat
+         alleen de server kan duiden. Voor wie scant is dat hetzelfde gebaar. */
+      if (g.soort === 'rtg1') { pinScanUit(); pinLiveKijken(g.token); return; }
       if (g.soort !== 'pin') { toast(T('pin.geenpin','Dit is geen RTG-pin.')); return; }
       pinScanUit();
       $('#scPinIn').value = g.pin;
@@ -101,6 +121,9 @@
     $('#scPinScan').textContent = T('pin.scanstop','Stop');
   }
   function pinScanUit(){
+    // ook de levende code stopt hier: hij ververst zichzelf elke minuut, en dat
+    // hoort niet door te lopen in een la die dicht is of een balk die weg is
+    pinLiveUit();
     if (pinScanner) { try { pinScanner.stop(); } catch(e){} pinScanner = null; }
     const cam = $('#scPinCam'); if (cam) cam.hidden = true;
     const knop = $('#scPinScan'); if (knop) knop.textContent = T('pin.scan','Scan');

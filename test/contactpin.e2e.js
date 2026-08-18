@@ -12,7 +12,9 @@
    2. de QR wordt echt getekend, met onze eigen codec -- geen vreemde server,
       geen leeg beeld;
    3. de pin van een ander invullen laat eerst zien WIE het is en verstuurt
-      niets; pas de tweede knop stuurt het verzoek.
+      niets; pas de tweede knop stuurt het verzoek;
+   4. de LEVENDE code wordt echt getekend en komt van de server, en de
+      aan/uit-schakelaar maakt de vaste pin ook werkelijk onvindbaar.
 
    Scannen met de camera staat er niet bij: die kan deze omgeving niet leveren.
    De weg van de gescande tekst naar de pin ligt vast in test/rtgcode.test.js.
@@ -156,6 +158,44 @@ test('een pin invullen laat eerst zien wie het is; pas de tweede knop verstuurt'
       (document.getElementById('scPinRes') || {}).textContent || ''), null, { timeout: 30000 });
     const na = await api(base, '/api/member/connections', {}, B.token);
     assert.equal((na.requests || []).length, 1, 'en nu pas staat het verzoek er');
+    await page.close();
+  });
+});
+
+test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvindbaar',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  await metTweeLeden(async ({ base, ctx, A, B }) => {
+    const page = await salonPaneel(ctx, base);
+    await page.waitForFunction(() => /-/.test((document.getElementById('scPinCode') || {}).textContent || ''),
+      null, { timeout: 30000 });
+
+    // 1. de levende code: een echt getekende QR, met de aftelring eronder
+    await page.click('#scPinLive');
+    await page.waitForSelector('#scPinLiveDoek canvas', { timeout: 30000 });
+    const live = await page.evaluate(() => {
+      const cs = document.querySelectorAll('#scPinLiveDoek canvas');
+      return { aantal: cs.length, breed: cs[0] ? cs[0].width : 0 };
+    });
+    assert.equal(live.aantal, 2, 'de code en de aftelring staan er allebei');
+    assert.ok(live.breed > 40, 'de code is echt getekend (' + live.breed + 'px)');
+
+    /* 2. de schakelaar. Het scherm bevestigt met een confirm(); dat is hier de
+          mens die ja zegt. Daarna hoort de vaste pin voor een ANDER lid
+          onvindbaar te zijn -- en dat vragen we aan de server, niet aan het
+          scherm, want het scherm kan van alles beweren. */
+    const pin = (await api(base, '/api/member/pin', {}, A.token)).toon;
+    assert.equal((await api(base, '/api/member/pin/zoek', { pin }, B.token)).codename !== undefined, true,
+      'vooraf is hij gewoon te vinden');
+    page.on('dialog', d => d.accept());
+    await page.click('#scPinUit');
+    await page.waitForFunction(() => {
+      const n = document.getElementById('scPinUitNoot');
+      return n && !n.hidden;
+    }, null, { timeout: 30000 });
+    const na = await fetch(base + '/api/member/pin/zoek', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + B.token },
+      body: JSON.stringify({ pin }) });
+    assert.equal(na.status, 404, 'met de pin uit is hij onvindbaar, en met dezelfde stilte');
     await page.close();
   });
 });

@@ -30,7 +30,10 @@
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
   /* een eigen display wint van de [hidden]-regel van de browser */
-  #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden]{display:none;}
+  #pinUitNoot{margin-top:.55rem;font-size:.75rem;line-height:1.45;color:var(--zacht);}
+  #pinLiveDoek{margin-top:.6rem;}
+  .pincode.uit{opacity:.45;text-decoration:line-through;}
+  #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
   .stories{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;}
   .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
   .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
@@ -115,8 +118,12 @@
       <button class="knop grijs mini" id="pinKopie">Kopieer</button>
       <button class="knop grijs mini" id="pinQrKnop">Toon QR</button>
       <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
+      <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
+      <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
     </div>
     <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
+    <div id="pinLiveDoek" hidden></div>
+    <div id="pinUitNoot" hidden>Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel, want die houd je bewust op.</div>
   </div>
 
   <div class="deel">Verhalen</div>
@@ -246,6 +253,7 @@
 <script src="/shared/qrscan.js" defer></script>
 <script src="/shared/scanner.js" defer></script>
 <script src="/shared/rtgcode.js" defer></script>
+<script src="/shared/dyncode.js" defer></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -338,7 +346,11 @@ async function laad(){
   $('#verzoekenBlok').hidden = !reqs.length;
   vervang($('#verzoeken'), reqs.map(r=> E('div',{class:'rij'},
     E('span',{class:'av'}, initcn(r.codename)),
-    E('div',{class:'nm'}, r.codename, E('small', null, 'wil je vriend zijn')),
+    /* WAARLANGS het verzoek binnenkwam. Staat er "via je pin" bij iemand die je
+       niet verwacht, dan gaat de pin die je ooit ergens neerzette nog rond --
+       en dan is dit het moment om hem te vernieuwen. */
+    E('div',{class:'nm'}, r.codename, E('small', null,
+      r.via==='pin' ? 'via je pin' : r.via==='code' ? 'via je live code' : 'wil je vriend zijn')),
     E('button',{class:'knop mini', onclick:async()=>{ try{ await soc('/respond',{key:r.key,action:'accept'}); laad(); }catch(e){ alert(e.message); } }}, 'Accepteer'),
     E('button',{class:'knop grijs mini', onclick:async()=>{ try{ await soc('/respond',{key:r.key,action:'decline'}); laad(); }catch(e){ alert(e.message); } }}, '✕')
   )));
@@ -451,14 +463,72 @@ async function kindContacten(kindHandle, cn){
    met opzet uit elkaar: eerst zien WIE het is, dan pas een knop. Een gescande
    code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
 let mijnPin = null, pinScanner = null;
+let pinLive = null;
 async function pinHalen(){
   try{ mijnPin = await soc('/pin'); }catch(e){ return; }
+  pinStandTonen();
+}
+// een uitgezette pin blijft leesbaar (het is je pin) maar draagt zichtbaar dat
+// hij niemand meer aanwijst
+function pinStandTonen(){
+  if (!mijnPin) return;
   $('#pinCode').textContent = mijnPin.toon;
+  $('#pinCode').classList.toggle('uit', !!mijnPin.uit);
+  $('#pinUitKnop').textContent = mijnPin.uit ? 'Pin aanzetten' : 'Pin uitzetten';
+  $('#pinUitNoot').hidden = !mijnPin.uit;
+}
+/* De levende code: een verse, ondertekende QR die na een minuut niets meer is
+   en je vaste pin niet draagt. Dezelfde toner als de RTG-code (/shared/dyncode.js),
+   alleen bij een andere deur -- daar bepaalt de server wat erin komt. */
+function pinLiveWissel(){
+  if (pinLive) { pinLiveUit(); return; }
+  if (!window.RTGDyn || !window.RTGQRteken){ alert('De QR-code kan hier niet getekend worden.'); return; }
+  $('#pinQrBeeld').hidden = true;          // twee codes naast elkaar verwart alleen maar
+  $('#pinLiveDoek').hidden = false;
+  // het gezin-token gaat hier in het LIJF mee en niet in een kop: dat is hoe
+  // /api/rtf/social/* zich laat herkennen (zie soc() hierboven)
+  pinLive = RTGDyn.plaats($('#pinLiveDoek'), { pad: '/api/rtf/social/pin/live',
+    lijf: { code: s.code, token: s.token }, ttlMs: 60000, schaal: 6 });
+  $('#pinLiveKnop').textContent = 'Verberg live code';
+}
+function pinLiveUit(){
+  if (pinLive){ try{ pinLive.stop(); }catch(e){} pinLive = null; }
+  $('#pinLiveDoek').hidden = true; $('#pinLiveDoek').innerHTML = '';
+  $('#pinLiveKnop').textContent = 'Live code';
+}
+/* Een gescande levende code: eerst zien wie het is, dan pas een knop -- en de
+   code gaat pas op bij het verbinden. De sleutel komt niet mee terug; de code
+   zelf is het bewijs. */
+async function pinLiveKijken(token){
+  let d;
+  try{ d = await soc('/pin/live/kijk', { token }); }
+  catch(e){ $('#pinRes').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const knop = d.status==='verbonden' ? '<span style="color:var(--groen,#7ecb8f);font-size:.78rem;">✓ vriend</span>'
+    : d.status==='aangevraagd' ? '<span style="color:var(--zacht);font-size:.78rem;">aangevraagd</span>'
+    : d.status==='geen' ? '<button class="knop mini" data-pinlv="1">Verzoek</button>'
+    : '<span style="color:var(--zacht);font-size:.78rem;">'+esc(d.status)+'</span>';
+  $('#pinRes').innerHTML = '<div class="rij"><span class="av">'+initcn(d.codename)+'</span><div class="nm">'+esc(d.codename)+
+    '<small>'+(d.tier==='rtf'?'RTFoundation':'RTG')+' · live code</small></div>'+knop+'</div>';
+  const b = $('#pinRes').querySelector('[data-pinlv]');
+  if (b) b.addEventListener('click', async()=>{
+    try{ const r = await soc('/pin/live/verbind', { token }); alert(r.status==='wacht-op-ouder'?'Verzoek verstuurd. Een ouder moet het nog goedkeuren.':'Verzoek verstuurd.'); }
+    catch(e){ alert(e.message); return; }
+    laad();
+  });
+}
+/* De pin uitzetten. Vernieuwen helpt tegen een pin die is rondgegaan; dit is het
+   andere verzoek. Wat er dan nog wel werkt staat er meteen bij. */
+async function pinUitWissel(){
+  if (!mijnPin) return;
+  const uit = !mijnPin.uit;
+  if (uit && !confirm('Je vaste pin uitzetten? Niemand kan je er dan nog mee toevoegen. Je vrienden merken er niets van, en een live code werkt gewoon.')) return;
+  try{ mijnPin = await soc('/pin/uit', { uit }); }catch(e){ alert(e.message); return; }
+  pinStandTonen();
 }
 async function pinNieuw(){
   if (!confirm('Een nieuwe pin maken? Wie je oude pin nog heeft, kan je daarmee niet meer toevoegen. Je huidige vrienden merken er niets van.')) return;
   try{ mijnPin = await soc('/pin/nieuw'); }catch(e){ alert(e.message); return; }
-  $('#pinCode').textContent = mijnPin.toon;
+  pinStandTonen();
   if (!$('#pinQrBeeld').hidden) pinQrTeken();
 }
 function pinKopieer(){
@@ -485,6 +555,9 @@ function pinScanWissel(){
   $('#pinCam').hidden = false;
   pinScanner = new RTGScanner.Scanner({ video: $('#pinCam'), onCode: c=>{
     const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort:'tekst' };
+    // twee soorten: de vaste pin staat leesbaar in de code, de levende is een
+    // ondertekend token dat alleen de server kan duiden. Zelfde gebaar.
+    if (g.soort === 'rtg1'){ pinScanUit(); pinLiveKijken(g.token); return; }
     if (g.soort !== 'pin') return;
     pinScanUit();
     $('#pinIn').value = g.pin;
@@ -545,6 +618,8 @@ $('#pinScanBtn').addEventListener('click', pinScanWissel);
 $('#pinKopie').addEventListener('click', pinKopieer);
 $('#pinQrKnop').addEventListener('click', pinQrWissel);
 $('#pinNieuwKnop').addEventListener('click', pinNieuw);
+$('#pinLiveKnop').addEventListener('click', pinLiveWissel);
+$('#pinUitKnop').addEventListener('click', pinUitWissel);
 
 // ---- chat ----
 let chatMet=null, chatCn='';

@@ -5,8 +5,7 @@ module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
-          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding,
-          pinKaart, pinVernieuw, pinZoek, pinVerbind } = kern;
+          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */
@@ -37,37 +36,6 @@ app.post('/api/rtf/social/connect', async (req, res) => {
   const r = await socialVerbind(s.handle, String(req.body.key || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
-});
-/* De contactpin (kern/sociaal/pin.js): dezelfde code als aan de RTG-kant, zodat
-   een gezinslid en een RTG-lid elkaar met een pin toevoegen zonder eerst een
-   codenaam te hoeven zoeken. Voor een beschermd profiel (15 of jonger) staat
-   ook dit loket dicht -- daar loopt alles via de ouder, en die krijgt de pin
-   van zijn kind mee in /connections. */
-app.post('/api/rtf/social/pin', (req, res) => {
-  const s = rtfSociaal(req, res); if (!s) return;
-  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  res.json(pinKaart(s.handle));
-});
-app.post('/api/rtf/social/pin/nieuw', (req, res) => {
-  const s = rtfSociaal(req, res); if (!s) return;
-  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  const r = pinVernieuw(s.handle);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ pin: r.pin, toon: r.toon });
-});
-app.post('/api/rtf/social/pin/zoek', (req, res) => {
-  const s = rtfSociaal(req, res); if (!s) return;
-  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  const r = pinZoek(s.handle, req.body.pin);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ key: r.key, codename: r.codename, tier: r.tier, status: r.st });
-});
-app.post('/api/rtf/social/pin/connect', async (req, res) => {
-  const s = rtfSociaal(req, res); if (!s) return;
-  if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  const r = await pinVerbind(s.handle, req.body.pin);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
 });
 // Een ouder/beheerder voegt een contact toe voor een beschermd kind van zijn gezin
 // (op contactpin of exacte codenaam). De andere kant moet daarna nog gewoon zelf accepteren.

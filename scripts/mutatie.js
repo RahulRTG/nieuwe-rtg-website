@@ -562,7 +562,40 @@ const GEEN_BRONMUTATIE = new Map([
      Alle drie met de hand nagetrokken op hun eigen foutklasse, alle drie raak. */
   ['loghygiene.test.js', 'beweert AFWEZIGHEID (geen querystring, geen stack, geen persoonsgegeven in het log) en een leeg antwoord bevestigt dat juist; bovendien roept hij de middleware rechtstreeks aan, buiten de poort om. Met de hand raak: req.path vervangen door req.originalUrl in server/log.js zet de querystring met token en e-mailadres in de log en laat toets 1 zakken. Hij heeft ook de positieve tegenhanger, dus hij kan niet leeg slagen: "het pad staat er wel in"'],
   ['strenge-poort.test.js', 'toetst de POORT zelf (test/helper.js), niet een endpoint -- de liegpoort zit een laag lager dan zijn onderwerp. Met de hand raak: de FATAAL-regex onherkenbaar maken laat beide toetsen zakken, want dan telt een crash niet meer mee'],
-  ['genretoegang.test.js', 'beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken']
+  ['genretoegang.test.js', 'beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken'],
+  /* eventloop ijkt zichzelf beter dan deze motor kan, en dat is precies wat
+     LAT.md regel 10 van een meter vraagt: hij BLOKKEERT echt 200 ms en eist dat
+     de meter dat ziet, met een ondergrens (>=150) en een bovengrens (<1000), en
+     met de eis dat de MEDIAAN juist niet meebeweegt -- anders zou een meter die
+     alles op de max plakt er ook doorheen komen. Nagetrokken: lusVertraging()
+     alles op nul laten melden laat drie van de vier toetsen zakken.
+     Dit is bovendien het instrument waarmee de prestatiewinst van deze hele
+     ronde is beoordeeld; dat het niet stilletjes nul kan melden is dus geen
+     detail maar de bodem onder dat bewijs. */
+  ['eventloop.test.js', 'ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken'],
+  /* scriptbundel bouwt zijn foutisolatie op als STRING (try/catch per bestand,
+     met de bestandsnaam in de melding) en voert die in de toets echt uit. Een
+     bronoperator raakt een stringliteraal niet; de betekenisvolle mutatie is de
+     omwikkeling weghalen. Nagetrokken en raak: dan sleept een gooiend script
+     het volgende wel mee en zakt de kernbelofte. */
+  ['scriptbundel.test.js', 'de foutisolatie is een stringliteraal (try/catch per bestand) die de toets echt uitvoert; geen bronoperator raakt dat. Met de hand raak: de omwikkeling weghalen laat toets 1 zakken, en dat is de enige reden dat samenvoegen daar mag'],
+  /* wereldtaal toetst DATA: dertig kernwoorden in elke registertaal, compact
+     opgeslagen als |-gescheiden regels in wereld1..wereld8. De motor muteert
+     wereld.js -- de uitpakker -- waar niets te halen valt. De betekenisvolle
+     mutatie is een woord uit een taalregel halen, en daar bestaat geen operator
+     voor. Nagetrokken en raak: een regel van veertien woorden naar dertien
+     brengen laat toets 1 zakken op "het kernwoord ontbreekt". */
+  ['wereldtaal.test.js', 'toetst dertig kernwoorden per taal, opgeslagen als |-gescheiden regels in wereld1..8; de motor muteert de uitpakker en niet de data. Met de hand raak: een woord uit een taalregel halen laat toets 1 zakken'],
+  /* i18n-auto is een PAGINASCAN over public/: hij leest ieder blijvend appscherm
+     en eist dat het de gedeelde taalrail laadt. Zijn onderwerp is dus welke
+     bestanden wat bevatten, niet wat een module rekent -- dezelfde klasse als
+     consent-dekking hierboven. */
+  ['i18n-auto.test.js', 'een paginascan over public/: leest ieder blijvend appscherm en eist dat het de taalrail laadt. Zijn onderwerp is de inhoud van bestanden, niet rekenend gedrag van een module'],
+  /* genreregister is dezelfde soort census, nu over de genre-definities: niemand
+     definieert een genre buiten het register, elk genre heeft een bestaande
+     sector. Een liegpoort die antwoorden leegmaakt raakt een registervergelijking
+     niet. */
+  ['genreregister.test.js', 'een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

@@ -1275,13 +1275,8 @@
     },
     "eventloop.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/meting.js",
-        "server/meting-lus.js"
-      ],
-      "geprobeerd": 5,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken"
     },
     "excursie.test.js": {
       "soort": "server",
@@ -1600,9 +1595,9 @@
       "scherp": "gezakt"
     },
     "genreregister.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet"
     },
     "genretoegang.test.js": {
       "soort": "puur",
@@ -1936,12 +1931,8 @@
     },
     "i18n-auto.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/lib/ui-bronnen.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een paginascan over public/: leest ieder blijvend appscherm en eist dat het de taalrail laadt. Zijn onderwerp is de inhoud van bestanden, niet rekenend gedrag van een module"
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -4853,12 +4844,8 @@
     },
     "scriptbundel.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/middleware/scriptbundel.js"
-      ],
-      "geprobeerd": 7,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de foutisolatie is een stringliteraal (try/catch per bestand) die de toets echt uitvoert; geen bronoperator raakt dat. Met de hand raak: de omwikkeling weghalen laat toets 1 zakken, en dat is de enige reden dat samenvoegen daar mag"
     },
     "selfhost.test.js": {
       "soort": "puur",
@@ -6133,14 +6120,8 @@
     },
     "wereldtaal.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/talen.js",
-        "server/translate/woordenboek/wereld.js",
-        "server/translate.js"
-      ],
-      "geprobeerd": 10,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "toetst dertig kernwoorden per taal, opgeslagen als |-gescheiden regels in wereld1..8; de motor muteert de uitpakker en niet de data. Met de hand raak: een woord uit een taalregel halen laat toets 1 zakken"
     },
     "wereldvermogens.test.js": {
       "soort": "server",

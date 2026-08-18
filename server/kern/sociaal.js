@@ -74,8 +74,16 @@ const deelVrienden = require('./sociaal/vrienden')(ctx);
 Object.assign(ctx, deelVrienden);
 const deelSnaps = require('./sociaal/snaps')(ctx);
 Object.assign(ctx, deelSnaps);
+/* De contactpin (./sociaal/pin.js): de eigen code waarmee twee mensen elkaar
+   toevoegen zonder te zoeken. Staat NA de vriendenlaag omdat hij op
+   socialVerbind en statusVan leunt -- alle controles blijven daar, deze laag
+   zoekt alleen de handle op. */
+const deelPin = require('./sociaal/pin')(ctx);
+Object.assign(ctx, deelPin);
 const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur } = deelVrienden;
 const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht } = deelSnaps;
+const { pinVan, pinKaart, pinVernieuw, pinZoek, pinVerbind, pinNaarHandle, pinNormaliseer, pinToonbaar } = deelPin;
 
-  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht };
+  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht,
+    pinVan, pinKaart, pinVernieuw, pinZoek, pinVerbind, pinNaarHandle, pinNormaliseer, pinToonbaar };
 };

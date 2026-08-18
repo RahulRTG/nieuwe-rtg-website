@@ -203,6 +203,53 @@ AI-sleutel werkt de feed precies zoals hij is. Getest in
 `test/salon-curatie.test.js`, inclusief een ronde tegen een nagemaakte
 provider.
 
+### Elkaar toevoegen met een pin (en een QR)
+
+Zoeken op codenaam werkt, maar het vraagt dat je iets van de ander *al* weet.
+De **contactpin** draait dat om, zoals de BlackBerry-pin dat deed: acht tekens
+die op je eigen scherm staan, en pas als jij ze afgeeft -- voorgelezen, gedeeld
+of als QR voorgehouden -- kan iemand er iets mee. Er valt niet mee te bladeren.
+
+Twee dingen maken hem anders dan een naam:
+
+- **Hij is een adres, geen geheim.** Dat is het verschil met de *andere* pin in
+  dit huis (`server/kern/algpin.js`), die apps op het toestel opent: die staat
+  met scrypt gehasht in de kluis en komt nooit in een antwoord terug. De
+  contactpin staat leesbaar in de database en gaat leesbaar over de lijn --
+  precies zoals een telefoonnummer op een kaartje. Wie de twee door elkaar
+  haalt, bouwt of een adres dat niemand kan voorlezen, of een geheim dat op
+  ieders scherm staat.
+- **Hij is niet af te lopen.** Acht tekens uit Crockford base32 (geen I, L, O of
+  U, want een pin wordt voorgelezen) geven 32⁸ ≈ 1,1 biljoen mogelijkheden, en
+  elke poging kost een tik uit dezelfde snelheidsteller die de rest van de
+  sociale laag remt: dertig per uur per lid.
+
+**Kijken en versturen staan met opzet uit elkaar.** `/pin/zoek` zegt alleen wie
+er achter de pin zit; pas `/pin/connect` stuurt het verzoek. Een gescande QR die
+meteen een verzoek de deur uit doet, is een verzoek dat niemand bewust deed --
+LIFE.md: samenstellen en klaarzetten, bevestigen doet de mens.
+
+De QR draagt precies dezelfde pin (`rtg:pin:<pin>`, zie
+`public/shared/rtgcode.js`) en wordt getekend met de eigen QR-codec in
+`public/shared/qr.js`; scannen gebeurt op het toestel zelf
+(`public/shared/scanner.js`), er gaat geen beeld de deur uit. Geen extern
+pakket, geen vreemde server -- de CSP laat dat ook niet toe.
+
+**De kinderbescherming blijft onaangeroerd.** Een beschermd profiel (15 of
+jonger) is via zijn pin net zo onvindbaar als via zijn codenaam: een pin die
+niet bestaat, een pin van een beschermd kind en een pin van iemand die jou
+blokkeerde geven alle drie *hetzelfde* antwoord, want juist het verschil in de
+melding zou de manier zijn om vast te stellen dat een kind bestaat. De ouder
+krijgt de pin van zijn kind wél te zien (in `/api/rtf/social/connections`) en
+kan er via `/oudervoeg` een vriend mee toevoegen -- waarna de ouder van het
+andere kind nog steeds akkoord moet geven.
+
+Bewezen door `test/contactpin.test.js` (twaalf toetsen: vorm, uniekheid, de
+voorleeslezing van O/I/L/U, het intrekken van een oude pin, de drie gelijke
+antwoorden, de rem, en de ouderkant) en `test/contactpin.e2e.js` (het scherm in
+een echte browser: de pin staat er, de QR wordt echt getekend, en zoeken
+verstuurt niets). Zes mutaties uit LAT.md-regel 2, alle zes raak.
+
 ### Muisvrij: alles met de mond of met typen
 
 Op elke app-pagina staat onderaan één balk met daarboven het gesprek
@@ -787,6 +834,10 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/like` `{postId, liked}` | Like/unlike (mag iedereen, ook gasten) |
 | `POST /api/comment` `{postId, text}` | Reageren, rechten per pas, server-side afgedwongen |
 | `POST /api/dm` `{postId, text}` | Privébericht, zelfde rechten als reageren |
+| `POST /api/member/pin` | Je eigen contactpin (wordt bij de eerste vraag gemaakt) |
+| `POST /api/member/pin/nieuw` | Een nieuwe pin; de oude wijst daarna niemand meer aan |
+| `POST /api/member/pin/zoek` `{pin}` | Wie zit er achter deze pin? (kijken, nog niets versturen) |
+| `POST /api/member/pin/connect` `{pin}` | En dan pas: het vriendschapsverzoek versturen |
 | `POST /api/ai` `{messages}` | Persoonlijke AI (Claude indien key aanwezig, anders demo) |
 | `POST /api/logout` | Sessie beëindigen |
 | `POST /api/partner` `{code}` | Partnercode valideren (demo-codes: `NOVA`, `ATLAS`) |

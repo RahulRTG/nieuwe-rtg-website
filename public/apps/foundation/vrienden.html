@@ -22,6 +22,15 @@
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
   .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
   .mijncn b{color:var(--goud);}
+  /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
+     adres -- zie server/kern/sociaal/pin.js. */
+  .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
+  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
+  .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
+  #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
+  #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
+  /* een eigen display wint van de [hidden]-regel van de browser */
+  #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden]{display:none;}
   .stories{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;}
   .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
   .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
@@ -96,8 +105,19 @@
 <header id="balk"></header>
 <main class="wrap" id="hoofd" tabindex="-1">
   <h1>Contacten</h1>
-  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam.</div>
+  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam, of voeg hem toe met zijn pin: overtypen of de QR scannen.</div>
   <div class="mijncn" id="mijncn"></div>
+  <!-- je eigen pin: voorlezen, kopieren of voorhouden. Staat niet bij een
+       beschermd profiel (15 of jonger): daar voegt de ouder toe. -->
+  <div class="mijncn" id="mijnpin" hidden>
+    <div class="pinrij"><span style="color:var(--zacht);font-size:.8rem;">Jouw pin</span><b class="pincode" id="pinCode">····-····</b></div>
+    <div class="pinakt">
+      <button class="knop grijs mini" id="pinKopie">Kopieer</button>
+      <button class="knop grijs mini" id="pinQrKnop">Toon QR</button>
+      <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
+    </div>
+    <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
+  </div>
 
   <div class="deel">Verhalen</div>
   <div id="opdrachtKaart"></div>
@@ -111,6 +131,14 @@
       <button class="knop" id="zoekBtn">Zoek</button>
     </div>
     <div class="lijst" id="zoekRes"></div>
+    <div class="sec">…of op pin</div>
+    <div class="zoekrij">
+      <input class="veld" id="pinIn" placeholder="Pin van de ander (bijv. 7K2M-9XPQ)" maxlength="12" autocapitalize="characters" spellcheck="false">
+      <button class="knop" id="pinZoekBtn">Zoek</button>
+      <button class="knop grijs" id="pinScanBtn">Scan</button>
+    </div>
+    <video id="pinCam" playsinline muted hidden></video>
+    <div class="lijst" id="pinRes"></div>
   </div>
   <!-- beschermd profiel (15 of jonger): zoeken staat dicht, de ouder voegt toe -->
   <div id="beschermdBlok" hidden>
@@ -211,6 +239,13 @@
 <script src="/apps/translate.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
+<!-- de eigen QR-laag: codec, tekenaar, beeld-decoder, camera en het vaste
+     scan-formaat. Alles in eigen huis (de CSP laat geen vreemde server toe). -->
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<script src="/shared/qrscan.js" defer></script>
+<script src="/shared/scanner.js" defer></script>
+<script src="/shared/rtgcode.js" defer></script>
 <script>
 const $ = s => document.querySelector(s);
 if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
@@ -279,6 +314,10 @@ async function laad(){
   // beschermd (15 of jonger): geen zoekveld; de ouder/verzorger voegt vrienden toe
   $('#zoekBlok').hidden = mij.beschermd;
   $('#beschermdBlok').hidden = !mij.beschermd;
+  // de eigen pin alleen waar er iets mee te doen valt: een beschermd profiel
+  // verbindt hoe dan ook via zijn ouder, en die krijgt de pin in de kinderlijst
+  $('#mijnpin').hidden = mij.beschermd;
+  if (!mij.beschermd && !mijnPin) pinHalen();
   $('#mijncn').innerHTML = 'Jouw codenaam: <b>'+esc(d.codename)+'</b><br><span style="color:var(--zacht);font-size:.8rem;">'+
     (mij.beschermd ? 'Je ouder kan deze codenaam aan een ander gezin geven.' : 'Geef deze aan iemand die jou wil toevoegen.')+'</span>';
   // vrienden (opgebouwd met de veilige component-bouwer i.p.v. HTML-strings)
@@ -340,7 +379,8 @@ function renderMeekijk(kinderen){
   $('#meekijkBlok').hidden = !(mij.beheerder && kinderen.length);
   if (!(mij.beheerder && kinderen.length)) return;
   $('#meekijk').innerHTML = kinderen.map(k=>
-    '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+'<small>jij voegt vrienden toe en kijkt mee</small></div>'+
+    '<div class="rij"><span class="av">'+initcn(k.codenaam)+'</span><div class="nm">'+esc(k.codenaam)+
+      '<small>jij voegt vrienden toe en kijkt mee'+(k.toon ? ' · pin '+esc(k.toon) : '')+'</small></div>'+
     '<button class="knop mini" data-voeg="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Vriend</button>'+
     '<button class="knop grijs mini" data-kijk="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Bekijk</button>'+
     '<button class="knop grijs mini" data-board="'+esc(k.handle)+'" data-cn="'+esc(k.codenaam)+'">Boardroom</button></div>'
@@ -383,7 +423,7 @@ async function kindBoard(kindHandle, cn){
 // Een ouder voegt een vriend toe voor zijn kind: op exacte codenaam. De andere
 // kant moet daarna nog zelf accepteren (of diens ouder, als die ook een kind is).
 async function ouderVoegt(kindHandle, cn){
-  const codenaam = prompt('Welke codenaam wil je als vriend toevoegen voor '+cn+'?\n\nTyp de volledige codenaam over (bijv. "Gouden Vos AB12").','');
+  const codenaam = prompt('Welke pin of codenaam wil je als vriend toevoegen voor '+cn+'?\n\nDe pin van het andere kind (bijv. "7K2M-9XPQ") is het kortst; anders de volledige codenaam (bijv. "Gouden Vos AB12").','');
   if (!codenaam || !codenaam.trim()) return;
   try{
     const r = await soc('/oudervoeg', { kindHandle, codenaam: codenaam.trim() });
@@ -404,6 +444,84 @@ async function kindContacten(kindHandle, cn){
   try{ await soc('/kind/verwijder', { kindHandle, anderKey: lijst[idx].key }); alert('Contact verwijderd.'); }catch(e){ alert(e.message); }
 }
 
+/* ---- de contactpin: je eigen code, en die van een ander ----
+
+   Dezelfde pin als aan de RTG-kant (server/kern/sociaal/pin.js); een gezinslid
+   en een RTG-lid voegen elkaar er dus gewoon mee toe. Zoeken en versturen staan
+   met opzet uit elkaar: eerst zien WIE het is, dan pas een knop. Een gescande
+   code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
+let mijnPin = null, pinScanner = null;
+async function pinHalen(){
+  try{ mijnPin = await soc('/pin'); }catch(e){ return; }
+  $('#pinCode').textContent = mijnPin.toon;
+}
+async function pinNieuw(){
+  if (!confirm('Een nieuwe pin maken? Wie je oude pin nog heeft, kan je daarmee niet meer toevoegen. Je huidige vrienden merken er niets van.')) return;
+  try{ mijnPin = await soc('/pin/nieuw'); }catch(e){ alert(e.message); return; }
+  $('#pinCode').textContent = mijnPin.toon;
+  if (!$('#pinQrBeeld').hidden) pinQrTeken();
+}
+function pinKopieer(){
+  if (!mijnPin) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(mijnPin.toon).catch(()=>{});
+  else alert('Je pin is ' + mijnPin.toon + '.');
+}
+function pinQrWissel(){
+  const b = $('#pinQrBeeld');
+  if (!b.hidden){ b.hidden = true; return; }
+  if (pinQrTeken()) b.hidden = false;
+}
+function pinQrTeken(){
+  if (!mijnPin || !window.RTGQRteken || !window.RTGCode){ alert('De QR-code kan hier niet getekend worden.'); return false; }
+  try{ $('#pinQrBeeld').src = RTGQRteken.dataURLRTG(RTGCode.bouwPin(mijnPin.pin), { schaal: 5 }); }
+  catch(e){ alert('De QR-code kan hier niet getekend worden.'); return false; }
+  return true;
+}
+/* Scannen gebeurt op het toestel zelf: elk frame wordt lokaal ontleed
+   (/shared/scanner.js), er gaat geen beeld de deur uit. */
+function pinScanWissel(){
+  if (pinScanner){ pinScanUit(); return; }
+  if (!window.RTGScanner){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
+  $('#pinCam').hidden = false;
+  pinScanner = new RTGScanner.Scanner({ video: $('#pinCam'), onCode: c=>{
+    const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort:'tekst' };
+    if (g.soort !== 'pin') return;
+    pinScanUit();
+    $('#pinIn').value = g.pin;
+    pinOpzoeken(g.pin);
+  } });
+  pinScanner.start().catch(()=>{ alert('Geen toegang tot de camera.'); pinScanUit(); });
+  $('#pinScanBtn').textContent = 'Stop';
+}
+function pinScanUit(){
+  if (pinScanner){ try{ pinScanner.stop(); }catch(e){} pinScanner = null; }
+  $('#pinCam').hidden = true;
+  $('#pinScanBtn').textContent = 'Scan';
+}
+// stap 1: wie is dit?
+async function pinOpzoeken(ruw){
+  const pin = String(ruw||'').trim(); if (!pin) return;
+  let d;
+  try{ d = await soc('/pin/zoek', { pin }); }
+  catch(e){ $('#pinRes').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const knop = d.status==='verbonden' ? '<span style="color:var(--groen,#7ecb8f);font-size:.78rem;">✓ vriend</span>'
+    : d.status==='aangevraagd' ? '<span style="color:var(--zacht);font-size:.78rem;">aangevraagd</span>'
+    : d.status==='wacht-op-ouder' ? '<span style="color:var(--zacht);font-size:.78rem;">wacht op ouder</span>'
+    : d.status==='wacht-op-u' ? '<button class="knop mini" data-pinja="'+esc(d.key)+'">Accepteer</button>'
+    : '<button class="knop mini" data-pinvz="'+esc(pin)+'">Verzoek</button>';
+  $('#pinRes').innerHTML = '<div class="rij"><span class="av">'+initcn(d.codename)+'</span><div class="nm">'+esc(d.codename)+
+    '<small>'+(d.tier==='rtf'?'RTFoundation':'RTG')+'</small></div>'+knop+'</div>';
+  const vz = $('#pinRes').querySelector('[data-pinvz]');
+  // stap 2: en nu pas versturen -- omdat een mens erop drukte
+  if (vz) vz.addEventListener('click', async()=>{
+    try{ const r = await soc('/pin/connect', { pin: vz.dataset.pinvz }); alert(r.status==='wacht-op-ouder'?'Verzoek verstuurd. Een ouder moet het nog goedkeuren.':'Verzoek verstuurd.'); }
+    catch(e){ alert(e.message); return; }
+    pinOpzoeken(vz.dataset.pinvz); laad();
+  });
+  const ja = $('#pinRes').querySelector('[data-pinja]');
+  if (ja) ja.addEventListener('click', async()=>{ try{ await soc('/respond',{key:ja.dataset.pinja,action:'accept'}); pinOpzoeken(pin); laad(); }catch(e){ alert(e.message); } });
+}
+
 // ---- zoeken ----
 async function zoek(){
   const q = $('#zoek').value.trim(); if(q.length<2){ return; }
@@ -421,6 +539,12 @@ async function zoek(){
 }
 $('#zoekBtn').addEventListener('click', zoek);
 $('#zoek').addEventListener('keydown', e=>{ if(e.key==='Enter') zoek(); });
+$('#pinZoekBtn').addEventListener('click', ()=> pinOpzoeken($('#pinIn').value));
+$('#pinIn').addEventListener('keydown', e=>{ if(e.key==='Enter') pinOpzoeken($('#pinIn').value); });
+$('#pinScanBtn').addEventListener('click', pinScanWissel);
+$('#pinKopie').addEventListener('click', pinKopieer);
+$('#pinQrKnop').addEventListener('click', pinQrWissel);
+$('#pinNieuwKnop').addEventListener('click', pinNieuw);
 
 // ---- chat ----
 let chatMet=null, chatCn='';

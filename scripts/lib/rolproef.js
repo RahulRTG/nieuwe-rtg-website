@@ -186,7 +186,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
   const voor = await vingerafdruk(post, vastVoor());
   let gedaan = 0;
   for (const r of routes) {
-    if (r.method === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
+    if (r.methode === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
     if (r.rol === 'open' || !r.rol) continue;         // publiek: geen rol om te kruisen
     if (r.schakel) continue;                          // de schakelkast zou de hele proef vergiftigen
     for (const rol of rollen) {
@@ -207,8 +207,8 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
          tweede uitvoer naast zet -- en dat is precies wat de bewijsmatrix wil --
          bouwt dan onvermijdelijk een tweede waarheid die er langzaam naast gaat
          lopen. Dezelfde les als bij de poortwacht. */
-      const sleutel = r.method + ' ' + r.pad;
-      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.method, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
+      const sleutel = r.methode + ' ' + r.pad;
+      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
       bij.geprobeerd.push(rol);
       if (oordeel.tweexx) {
         bij.acl = 'OPEN';

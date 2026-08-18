@@ -51,7 +51,8 @@ const REGISTERS = [
   ['MUTATIES.json', 'npm run mutatie', 'welke toetsen kunnen zakken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --experimental-sqlite --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
-  ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat']
+  ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
+  ['WAAROM.json', 'node --experimental-sqlite scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

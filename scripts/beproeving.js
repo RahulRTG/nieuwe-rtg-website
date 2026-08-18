@@ -554,7 +554,7 @@ if (require.main !== module) { module.exports = {}; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
-  const dekking = new Map(routes.map(r => [r.method + ' ' + r.pad, 0]));
+  const dekking = new Map(routes.map(r => [r.methode + ' ' + r.pad, 0]));
   rij('endpoints uit de bron', nl(routes.length));
   if (MODE === 'postgres') rij('psql', PSQL);
   await poortVrij(); // nooit per ongeluk een oude, achtergebleven server toetsen
@@ -714,14 +714,14 @@ if (require.main !== module) { module.exports = {}; return; }
     const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
     // de platformbrede schakelkast krijgt een benigne body: fuzzen mag, maar niet
     // de hele kast uitzetten en zo elke andere endpoint-meting vergiftigen.
-    const body = r.method === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
-    const st = await verzoek(r.method, r.pad, tk, body);
+    const body = r.methode === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
+    const st = await verzoek(r.methode, r.pad, tk, body);
     totaal++; noteerLat(st.ms);
     const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 };
     pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
     const pr = rolTel(kruis ? r.rol + ' (verkeerde rol)' : r.rol); pr.n++;
     pr.codes.set(st.status, (pr.codes.get(st.status) || 0) + 1);
-    if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
+    if (rol === r.rol) dekking.set(r.methode + ' ' + r.pad, (dekking.get(r.methode + ' ' + r.pad) || 0) + 1);
     const s = st.status;
     if (s === 0) { buckets.stuk++; pe.stuk++; pr.stuk++; }
     else if (s === 503) { buckets.r503++; pe.r503++; pr.r503++; }
@@ -734,7 +734,7 @@ if (require.main !== module) { module.exports = {}; return; }
          en verversen we niets -- dan zouden we de rol-scheiding wegpoetsen. */
       if (s === 401 && !kruis && rol !== 'open') versNu(rol);
     }
-    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
+    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.methode + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
     await new Promise(res => setTimeout(res, 1 + rint(4)));
   }
   async function werker(ix) {

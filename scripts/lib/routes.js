@@ -224,7 +224,13 @@ function verdeelOpRol(routes, beschikbareRollen) {
   for (const r of routes) {
     const rol = rolVan(r.bewakers);
     if (rol && (!beschikbaar || beschikbaar.has(rol))) {
-      metRol.push({ method: r.methode, pad: r.pad, rol });
+      /* `methode` EN NIET `method`. Hier stond de enige plek in dit huis waar een
+         route halverwege de pijplijn van veldnaam wisselde: alleRoutes() geeft
+         `methode`, verdeelOpRol() gaf `method`, en vijf instrumenten vertaalden
+         hem bij het wegschrijven weer terug. Een nieuw instrument dat r.methode
+         las kreeg `undefined` in zijn register, en dat viel pas op omdat de
+         sleutels "undefined /api/bank/advies" gingen heten (LAT.md regel 4). */
+      metRol.push({ methode: r.methode, pad: r.pad, rol });
       continue;
     }
     if (rol) {

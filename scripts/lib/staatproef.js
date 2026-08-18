@@ -165,7 +165,7 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
        stuk en niet de route. Dat verschil hoort in het register te staan. */
     if (!f0 || !f1 || !f2) {
       vorige = null;
-      perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
+      perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
         state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'ongemeten', idempotentie: 'ongemeten',
         reden: 'de vingerafdruk kwam niet terug' };
       tel.ongemeten++;
@@ -174,7 +174,7 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
 
     const o = weegStaat({ a, b, d01: zonderRuis(await verschilVan(f0, f1), ruis),
       d12: zonderRuis(await verschilVan(f1, f2), ruis) });
-    perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
+    perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
       statussen: [a.status, b.status], ...o };
 
     if (o.state === 'bewezen') tel.state++;

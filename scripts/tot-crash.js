@@ -259,8 +259,8 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
         // juiste rol + soms bewust de verkeerde rol (rol-scheiding onder druk)
         const rolPool = rng() < 0.75 ? T[rt.rol] : rkeuze([T.member, T.supplier, T.office, T.open]);
         const tk = rkeuze(rolPool.length ? rolPool : T.open);
-        const b = rt.schakel ? { aan: true } : (rt.method === 'GET' ? null : body(0, r));
-        const st = await verzoek(rt.method, rt.pad, tk, b);
+        const b = rt.schakel ? { aan: true } : (rt.methode === 'GET' ? null : body(0, r));
+        const st = await verzoek(rt.methode, rt.pad, tk, b);
         req++;
         // 503 = De Wacht die onder de flood bewust load afwerpt ("kom zo terug") --
         // dat is JUIST gedrag (zelfbescherming), geen bug. Alleen 500/502/504 zijn

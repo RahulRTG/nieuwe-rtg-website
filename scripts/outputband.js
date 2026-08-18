@@ -67,7 +67,7 @@ if (eenArg) {
 /* ---- DE COORDINATOR ---- */
 if (require.main !== module) { module.exports = {}; return; }
 
-const werkers = Math.max(1, Number((argv.find(a => a.startsWith('--werkers=')) || '').slice(10)) || 3);
+const werkers = Math.max(1, Number((argv.find(a => a.startsWith('--werkers=')) || '').slice(10)) || 4);
 const max = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
 
 function leesRegister() {
@@ -126,7 +126,13 @@ function eenRegel(args) {
   let volgende = 0, klaar = 0, merkt = 0, blind = 0, stoornis = 0;
   const begin = Date.now();
   let sindsSchrijf = 0;
-  const bundel = 10;
+  /* ELKE VIJF ROUTES WEGSCHRIJVEN. De container van deze omgeving herstart bij
+     elke sessie-resume, en dan sneuvelt de band midden in de rij. De WERKBOOM
+     overleeft dat wel (gemeten: het register stond op 161 terwijl de laatste
+     commit 103 droeg), dus de schrijfbeurt is de echte reddingslijn en niet de
+     commit. Bij vijf routes kost een herstart hooguit een minuut meetwerk; het
+     herrekenen van het register is goedkoop genoeg om dat te dragen. */
+  const bundel = 5;
 
   function bewaar() {
     schrijf(gericht, Object.fromEntries(basislijn));

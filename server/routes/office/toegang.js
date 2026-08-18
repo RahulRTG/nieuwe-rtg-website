@@ -3,7 +3,8 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
-          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten } = kern;
+          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
+          handelingsspoor } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
@@ -37,6 +38,20 @@ app.post('/api/office/login', (req, res) => {
    de regels van vóór deze voorziening. */
 app.post('/api/office/securitylog', officeAuth, (req, res) => {
   res.json({ log: (db.data.securityLog || []).slice(0, 200), keten: securityLogKeten() });
+});
+
+/* Het handelingsspoor: wie deed wat, over het hele platform. Alleen voor het
+   kantoor -- dit is het spoor van alle leden samen, en dat is geen scherm voor
+   een lid. Zijn EIGEN handelingen kan hij wel opvragen; die route staat bij de
+   AVG-rechten in routes/member/privacy.js, want daar hoort ze thuis.
+
+   Het veld "over" filtert op sleutel. De ketenstand gaat over het HELE spoor en
+   niet over de selectie: een filter mag nooit bepalen of het bewijs klopt. */
+app.post('/api/office/handelingen', officeAuth, (req, res) => {
+  res.json(Object.assign({ ok: true }, handelingsspoor.lijst({
+    over: req.body && req.body.over ? String(req.body.over).slice(0, 60) : null,
+    max: req.body && req.body.max
+  })));
 });
 
 app.post('/api/office/timeline', officeAuth, (req, res) => {

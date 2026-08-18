@@ -68,6 +68,17 @@ module.exports = function lijfpoort(deps) {
      verhouding tot de duurzame geldlaag staan in ../lib/idem-poort.js. */
   app.use(require('../lib/idem-poort')());
 
+  /* 3c. Het handelingsspoor: elke GESLAAGDE schrijfactie laat een geketende
+     regel na -- wie, wanneer, welk pad, en een hash van de body. Nooit de body
+     zelf; waarom dat de dragende keuze is, staat in ../lib/handelingsspoor.js.
+
+     Hij staat NA de idem-poort, zodat een herhaling die daar wordt beantwoord
+     niet nog een keer in het spoor belandt: dat was immers geen tweede
+     handeling. En hij wikkelt res.json, want req.session bestaat pas nadat de
+     auth-poortwachter hem heeft gezet -- bij het binnenkomen weten we nog niet
+     wie er belt. */
+  app.use(require('../lib/handelingsspoor')({ db, save }).middleware);
+
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
      journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
      Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */

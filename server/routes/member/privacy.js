@@ -7,7 +7,7 @@ const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
-  const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast } = kern;
+  const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast, handelingsspoor } = kern;
   const { lidBoard, lidBoardLog, lidBoardLogKeten } = kern.lidboard;
   const { wisLid } = maakVergeten(kern);
 
@@ -50,6 +50,13 @@ module.exports = (kern) => {
          een AVG-inzage terechtkomt zonder de mogelijkheid om na te rekenen of
          er aan gesleuteld is, vraagt van de betrokkene dat hij ons gelooft. */
       boardroomLogboekKeten: typeof lidBoardLogKeten === 'function' ? lidBoardLogKeten(key) : null,
+      /* WAT ER ONDER UW SLEUTEL IS GEDAAN. Het handelingsspoor legt elke
+         geslaagde schrijfactie vast; hier krijgt de betrokkene de regels die
+         onder ZIJN sleutel staan, en niet die van een ander. Het spoor
+         bewaart de body niet, alleen een hash -- dus dit zegt WAT er is
+         gedaan en niet wat erin stond. */
+      handelingen: typeof handelingsspoor === 'object' && handelingsspoor
+        ? handelingsspoor.lijst({ over: key, max: 500 }) : null,
       // wie er in uw identiteitsdossier heeft gekeken, en waarom
       inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
     });

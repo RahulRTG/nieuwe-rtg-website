@@ -580,6 +580,17 @@ function logInlog(kanaal, ok, wie, req) {
 /* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()
    voor het inzagejournaal geeft. Het kantoor toont hem naast het log, zodat
    "klopt dit spoor nog" een antwoord heeft in plaats van een aanname. */
+/* HET HANDELINGSSPOOR, als EEN instantie.
+
+   De lijfpoort maakt er zelf ook een aan om de middleware te hangen. Dat mag,
+   want het spoor houdt geen staat in het geheugen -- alles staat in
+   db.data.handelingLog en de keten wordt per regel uitgerekend. Twee instanties
+   schrijven dus in hetzelfde journaal en zien elkaars regels. Wat NIET mag is
+   twee verschillende opslagplekken, en die zijn er niet.
+
+   Deze instantie bestaat voor het LEZEN: het kantoor vraagt het hele spoor op,
+   een lid alleen zijn eigen regels. Zie ../lib/handelingsspoor.js. */
+const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
 function securityLogKeten() {
   const lijst = (db.data && db.data.securityLog) || [];
   return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
@@ -1976,7 +1987,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
-  securityLogKeten,
+  securityLogKeten, handelingsspoor,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,

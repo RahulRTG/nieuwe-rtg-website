@@ -117,7 +117,7 @@ const SCHAKELS = [
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
+    bron: null, nodig: 'de VOORZIENING is er inmiddels wel: server/lib/handelingsspoor.js legt elke geslaagde schrijfactie geketend vast (wie, wanneer, pad, hash van de aanvraag) en hangt in de lijfpoort, dus elke schrijfroute laat een spoor na. Wat nog ontbreekt is de METER: een route-loop zoals scripts/rolproef-route.js die per route vaststelt dat er ook echt een regel verscheen, en die uitslag als HANDELINGPROEF.json wegschrijft. Tot die er is blijft deze kolom leeg -- een voorziening die bestaat is geen cel die gemeten is' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },

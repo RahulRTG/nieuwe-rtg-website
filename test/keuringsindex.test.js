@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { maakDekkingsIndex, DEKKING_KAP } = require('../scripts/keuring.js');
+const { maakDekkingsIndex, DEKKING_KAP } = require('../scripts/lib/dekkingsindex');
 
 const WORTEL = path.join(__dirname, '..');
 

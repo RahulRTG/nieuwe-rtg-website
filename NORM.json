@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-18",
   "meters": {
-    "endpointsZonderTest": 995,
+    "endpointsZonderTest": 992,
     "dekkingPct": 76,
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 889,
+    "testbestanden": 899,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
@@ -25,12 +25,17 @@
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 149,
-    "toetsenOngevoeligPct": 2.4,
+    "toetsenNietGemeten": 162,
+    "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "endpointsZonderTest 995 -> 992; testbestanden 889 -> 899; toetsenOngevoeligPct 2,4 -> 0; toetsenNietGemeten 149 -> 162 (OMHOOG, met de hand verlaagd)",
+      "reden": "Drie meters gingen de goede kant op en een de verkeerde, en die vierde is een gevolg van de derde. Dat staat hier met naam en toenaam, want een ratel die omhoog gaat hoort niet met een handgebaar te worden weggewuifd.\n\nWAT ER GEBEURDE. De eenentwintig mutatie-overlevers zijn op nul gebracht (toetsenOngevoeligPct 2,4 -> 0). Negen daarvan waren geen zwakke toetsen maar een verkeerd gerichte motor: hij muteerde een orkestrator terwijl het gedrag een laag dieper woont. Die staan nu in EIGEN_MODULE en zakken netjes. De overige dertien KAN de motor niet beoordelen -- een toets die de bron zelf muteert, een toets die zijn eigen module niet requiret -- en die staan nu in GEEN_BRONMUTATIE met een geschreven reden en een met de hand nagetrokken foutklasse.\n\nDAAR ZIT DE KOPPELING. Precies die dertien telden voorheen als GEMETEN met de uitkomst \"overleefd\". Dat was de leugen: de motor had er geen oordeel over, en \"overleefd\" las als \"de toets legt niets vast\". Ze zijn nu niet-te-meten, en dus telt toetsenNietGemeten er dertien bij op. Nagerekend tegen commit 700276d, en het is exact een-op-een: bundeldelen, consent-dekking, eventloop, genreregister, genretoegang, i18n-auto, loghygiene, rahul-hart, rtfcampus, scriptbundel, strenge-poort, wereldtaal, wiring-contract. 149 + 13 = 162.\n\nEr is dus geen toets slechter geworden en geen meting verloren gegaan; dezelfde dertien bestanden worden eerlijker geteld. Wie de oude 149 wil terugverdienen, doet dat door e2e-bestanden te laten meten (111 van de 162 zijn schermtoetsen die de motor nooit heeft aangeraakt) -- niet door deze dertien weer als \"gemeten\" te laten gelden.\n\nDe andere drie: tien nieuwe toetsbestanden (rollenvragen voor school, werkruimte, zaak en gezin, de demoseed-kosten, de dekkingsindex en de noodrem), en drie endpoints minder zonder toets."
+    },
     {
       "datum": "2026-08-18",
       "meter": "endpointsZonderTest 1192 -> 995; dekkingPct 71 -> 76; testbestanden 862 -> 889; keuringDubbeling 115 -> 113; keuringDekkingAdvies 56 -> 50; toetsenNietGemeten 150 -> 149; inlineStijlAttributen 5878 -> 5863",

@@ -340,6 +340,14 @@
       "gezakt": 13,
       "scherp": "gezakt"
     },
+    "bank-eigendom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bank/eigendom.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "bank.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1524,6 +1532,14 @@
       "operator": "true->false#0",
       "geprobeerd": 1
     },
+    "geld-rollen-gezin.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinshulp.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 5
+    },
     "geld-rollen-school.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1547,6 +1563,13 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 7
+    },
+    "geld-rollen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "geldbeleid.test.js": {
       "soort": "server",
@@ -2202,6 +2225,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "keuringsindex.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/keuring.js",
+      "operator": "return-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "kijken.test.js": {
       "soort": "puur",

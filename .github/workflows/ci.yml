@@ -44,7 +44,13 @@ jobs:
           --health-cmd "redis-cli ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
     steps:
+      # fetch-depth: 0 is GEEN gemak maar de invoer van de deltapoort hieronder.
+      # Die poort vergelijkt deze wijziging met het punt waar de tak van de
+      # hoofdlijn afweek; in een ondiepe kloon bestaat dat punt niet, en dan
+      # zakt hij met exitcode 2 in plaats van stil groen te melden.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
@@ -52,6 +58,30 @@ jobs:
       - run: npm ci
       - name: Codeafspraken (check.js)
         run: npm run check
+      # DE DELTAPOORT. De norm hieronder is een som over de hele codebase, en een
+      # som verrekent: vijf inline stijlattributen erbij in het ene bestand en zes
+      # eruit in het andere is een DALING, dus de ratel juicht terwijl het nieuwe
+      # bestand zijn vijf houdt. Deze stap weigert die verrekening en keurt per
+      # bestand: een nieuw bestand staat op de norm, een aangeraakt bestand zakt
+      # er niet onder. Hij draait vroeg omdat hij seconden kost en een fout hier
+      # niets met de rest van de baan te maken heeft.
+      #
+      # RTG_BASIS staat alleen bij een pull request gevuld; dan is het
+      # exacte punt bekend waar de tak vandaan komt. Bij een push naar een tak is
+      # de variabele leeg en zoekt de poort het aftakpunt zelf.
+      - name: De deltapoort (nieuw werk staat op de norm)
+        run: node scripts/deltapoort.js --toon
+        env:
+          RTG_BASIS: ${{ github.event.pull_request.base.sha }}
+      # HET VERVAL. De ratel bewaakt de code; dit bewaakt de ratel. NORM.json kan
+      # alleen met de hand losser worden gezet, en dat mag -- een poort zonder
+      # uitweg wordt uitgezet -- maar niet in stilte en niet voor altijd. Deze
+      # stap zakt op een verlaging zonder notitie, op een notitie zonder soort,
+      # en op een schuld die over zijn vervaldatum is. Zie scripts/normverval.js.
+      - name: Het verval (een verlaging heeft een reden en een einde)
+        run: node scripts/normverval.js
+        env:
+          RTG_BASIS: ${{ github.event.pull_request.base.sha }}
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
       - name: CI-keten gebruikt alleen exact vastgezette Actions

@@ -45,9 +45,11 @@ const { execFileSync, spawnSync } = require('child_process');
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const METER = 'dekkingWaargenomenPct';
+const RICHTING = 'omhoog';           // een vloer: minder waargenomen dekking is slechter
 // een AANTAL en geen percentage: staat hij op 0, dan valt een nieuw endpoint
 // zonder toets niet meer weg in een afronding (zie de kop)
 const METER_N = 'endpointsNooitAangeraakt';
+const RICHTING_N = 'omlaag';         // een plafond: meer nooit-aangeraakte endpoints is slechter
 const jsonUit = process.argv.includes('--json');
 const vastleggen = process.argv.includes('--vastleggen');
 const leesIdx = process.argv.indexOf('--lees');

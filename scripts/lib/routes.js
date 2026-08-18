@@ -40,6 +40,34 @@ const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]
 const BEWAKERS = ['auth', 'supplierAuth', 'officeAuth', 'staffAuth', 'techAuth', 'scimAuth',
   'kantoorAuth', 'eisAccount', 'lid', 'managerOnly', 'adminOnly', 'rem('];
 
+/* DE REGISTRATIES IN EEN ENKEL BESTAND, uit zijn brontekst.
+
+   Apart van alleRoutes() omdat scripts/deltapoort.js een bestand moet lezen dat
+   NIET op de schijf staat: de vorige versie ervan, uit `git show`. Wie alleen
+   over de werkmap kan scannen, kan geen verschil zien tussen wat er stond en
+   wat er nu staat -- en dat verschil is precies wat een poort op nieuw werk
+   nodig heeft. Dezelfde uitdrukking, dezelfde velden, een andere invoer. */
+function routesInBron(tekst, bestandNaam) {
+  const uit = [];
+  let m;
+  ROUTE_RE.lastIndex = 0;
+  while ((m = ROUTE_RE.exec(tekst))) {
+    const pad = m[4];
+    if (!pad.startsWith('/')) continue;
+    const staart = m[5] || '';
+    uit.push({
+      methode: m[2].toUpperCase(),
+      pad,
+      viaRouter: m[1] === 'router',
+      bestand: bestandNaam || '?',
+      regel: tekst.slice(0, m.index).split('\n').length,
+      bewakers: BEWAKERS.filter(b => staart.includes(b)),
+      rauw: staart.trim().slice(0, 160)
+    });
+  }
+  return uit;
+}
+
 function alleRoutes() {
   const uit = [];
   const gezien = new Set();
@@ -83,4 +111,4 @@ const SCHAKELPADEN = [
 ];
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
-module.exports = { alleRoutes, WORTEL, loopMap, BEWAKERS, SCHAKELPADEN, isSchakel };
+module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, BEWAKERS, SCHAKELPADEN, isSchakel };

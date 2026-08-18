@@ -287,6 +287,21 @@ Bindend. Nieuw werk voldoet aan alle elf, en waar een machine kan handhaven
 handhaaft hij. Wie een regel toevoegt aan `check.js` beproeft hem met een mutatie
 voordat hij hem inlevert (regel 2 geldt ook voor regels).
 
+**Sinds 18 augustus 2026 handhaaft een machine dit ook echt: `scripts/deltapoort.js`.**
+Die zin hierboven was tot dan een voornemen, en wel een van de gevaarlijkste
+soort -- hij klonk als een regel. Wat eronder zat: elke meter in `NORM.json` is
+een SOM over de hele codebase, en een som verrekent. Vijf inline stijlattributen
+erbij in het ene bestand en zes eruit in het andere is een daling; de ratel
+juicht, en het nieuwe bestand houdt zijn vijf. Zo blijft nieuw werk precies zo
+slecht als oud werk mag zijn, terwijl elke meter de goede kant op wijst.
+
+De deltapoort weigert die verrekening en hanteert twee latten. Een NIEUW bestand
+staat op de norm -- nul inline stijlattributen, onder de omvanggrens, geen
+zelfpoortende toets, elk endpoint met een toets. Een AANGERAAKT bestand mag niet
+zakken: de erfenis hoef je niet op te ruimen om iets te mogen wijzigen, maar je
+mag hem niet vergroten. Daarmee kan het geheel alleen nog dalen, en dat is het
+verschil tussen "niet slechter worden" en "beter worden".
+
 ### Het heden
 
 De bekende defecten gaan naar nul. "Foutloos" is bij 1145 bestanden niet te
@@ -306,6 +321,36 @@ terugwerkende kracht herschreven. Wat wel geldt:
    wil verlagen doet dat met de hand in `NORM.json`, met een reden erbij, zodat
    het een besluit is en geen erosie.
 
+   Ook in die zin zaten twee gaten, en `scripts/normverval.js` sluit ze sinds
+   18 augustus 2026. Het eerste: de reden was een GEWOONTE en geen eis. Er
+   staan 62 notities in `NORM.json` -- een ongewoon nauwkeurig register -- maar
+   niets hield tegen dat de 63e er niet kwam. Wie een getal verlaagt en verder
+   niets doet, komt gewoon door de poort: `norm.js` vergelijkt de meting met de
+   norm en heeft geen idee dat de norm zelf net is opgeschoven. De ratel
+   bewaakte de code, en niemand bewaakte de ratel.
+
+   Het tweede: een reden had geen EINDE. Een verlaging blijft staan tot iemand
+   er toevallig over struikelt, en een excuus dat nooit verloopt is na een half
+   jaar geen uitzondering meer maar een tweede norm die nergens staat
+   opgeschreven. Vandaar twee soorten, en het verschil is echt. *Structureel*:
+   het gemetene veranderde van vorm (elf schermtoetsen verdwenen omdat de
+   schermen verdwenen). Daar valt niets terug te halen, dus geen vervaldatum --
+   wel de eis te zeggen WAARHEEN de belofte ging. *Schuld*: we konden het even
+   niet. Dat mag, met een datum erbij; daarna zakt de ronde tot de meter terug
+   is. Zo wordt een schuld geind in plaats van vergeten.
+
+4. **De ratel mag niet krimpen, en stilstand is zichtbaar.** Een ratel kan
+   alleen tegenhouden wat hij meet, dus dekt hij over de tijd een steeds kleiner
+   deel van een steeds grotere codebase. `ratelTanden` telt daarom hoeveel
+   meters er geratelde zijn en mag alleen omhoog; `metingenZonderRatel` telt de
+   meetbestanden in de wortel waar niets achter staat (zes van de eenentwintig)
+   en mag alleen omlaag. En omdat een ratel over STILSTAND niets zegt --
+   negentien van de drieentwintig meters stonden bij de laatste ronde op
+   "gelijk", en dat mag eeuwig zo blijven -- toont `npm run norm` sinds
+   dezelfde dag de veer: welke meter staat het langst stil terwijl er nog werk
+   aan is. Die zakt met opzet niet. Een poort op stilstand koopt cosmetische
+   winst, en dat heeft dit huis bij de dekkingsteller al een keer geleerd.
+
 Dat is geen enterprise-grade verleden. Het is een verleden dat elke week een
 stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
@@ -317,6 +362,10 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 |---|---|
 | 36 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
+| nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
+| een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |
+| de ratel zelf mag niet krimpen, en wat nergens aan hangt is geteld | `ratelTanden` + `metingenZonderRatel` + `scripts/lib/metingen.js` |
+| welke meter het langst stilstaat terwijl er werk aan is (wijst, zakt niet) | de veer in `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
 | geen geslaagde toets met een serverfout eronder | `test/helper.js` (strenge poort) |

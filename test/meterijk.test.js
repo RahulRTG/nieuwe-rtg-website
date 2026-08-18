@@ -705,7 +705,37 @@ const IJKINGEN = {
   eventLoopP99Ms: { proef: () => prestatieIjking('eventLoopP99Ms') },
   herstelSeconden: { proef: () => prestatieIjking('herstelSeconden') },
   verhalenSlaagPctStorm: { proef: () => prestatieIjking('verhalenSlaagPctStorm') },
-  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') }
+  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') },
+
+  /* DE TWEE METERS DIE OVER DE RATEL ZELF GAAN.
+
+     Ze bewaken niet de code maar de dekking van de ratel, en juist daarom
+     moeten ze zelf een proef hebben: een meter over meters die niet uitslaat,
+     zou de indruk wekken dat de ratel meegroeit terwijl hij stilstaat. Dat is
+     erger dan geen meter, want het is een geruststelling.
+
+     `ratelTanden` telt de geratelde sleutels. De bekend-foute invoer is een
+     script dat een NIEUWE meter declareert: dan hoort de telling mee te
+     bewegen. Dat het langs een tijdelijk BESTAND in scripts/ gaat en niet langs
+     een verzonnen lijst, is met opzet -- zo loopt de hele weg (de map lezen, de
+     METER-constante herkennen, ontdubbelen, tellen) nog steeds door de meter,
+     precies zoals bij de mutatiemeters hierboven. */
+  ratelTanden: {
+    proef: (voor) => metTijdelijkBestand('scripts/zz-ijk-tijdelijk.js',
+      "'use strict';\nconst METER = 'zzIjkTand';\nmodule.exports = { METER };\n",
+      () => norm.meet().ratelTanden - voor.ratelTanden)
+  },
+
+  /* `metingenZonderRatel` telt de meetbestanden in de wortel waar geen ratel
+     achter staat. De bekend-foute invoer is dus een nieuw meetbestand dat in
+     geen enkel register voorkomt: dat is per definitie een gat, en de meter
+     hoort het te zien op het moment dat het ontstaat -- niet pas als iemand er
+     over een half jaar overheen struikelt. */
+  metingenZonderRatel: {
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
+      '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
+      () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+  }
 };
 
 /* De proef achter alle zes. Ze verschillen alleen in hun sleutel, dus staat de
@@ -759,6 +789,7 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
+    'scripts/zz-ijk-tijdelijk.js', 'zz-ijk-tijdelijk.json',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
     'server/kern/zz-ijk-tijdelijk-c.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');

@@ -1088,6 +1088,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "deltapoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/deltapoort.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "demostand.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3196,6 +3204,14 @@
       "operator": "return-weg#1",
       "gezakt": 1,
       "geprobeerd": 10
+    },
+    "normverval.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/normverval.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "notities.test.js": {
       "soort": "server",
@@ -5790,6 +5806,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "veer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "false->true#0",
+      "gezakt": 7,
+      "geprobeerd": 2
     },
     "veiligadres.test.js": {
       "soort": "puur",

@@ -173,4 +173,26 @@ test('geen scherm liegt als de backend leeg antwoordt',
   assert.deepEqual(opgelost, [],
     'dit staat als schuld opgeschreven maar gebeurt niet meer -- haal het uit ' +
     'SCHERMLEUGEN.json, anders beschermt de ratel een gat dat dicht is');
+
+  /* ---- HET STEMPEL: WANNEER IS DIT GEMETEN, EN TEGEN WELKE CODE ----
+
+     SCHERMLEUGEN.json was het laatste register zonder stempel, en dat is geen
+     detail: een verouderd register ziet er identiek uit aan een verse, en
+     getallen worden geloofd (scripts/versheid.js). Hier is het bovendien
+     lastiger dan elders, want dit register wordt niet door een script gevuld
+     maar door DEZE toets -- en een toets die bij elke run een gevolgde bestand
+     herschrijft, maakt van `npm test` een vieze werkboom.
+
+     Vandaar RTG_VASTLEGGEN. De e2e-ronde (npm run e2e) zet hem, want dat IS de
+     meetronde; wie dit bestand los draait om iets na te kijken, laat de boom
+     met rust. Zonder de vlag verandert er niets -- ook niet als de meting
+     precies hetzelfde uitvalt. */
+  if (process.env.RTG_VASTLEGGEN === '1') {
+    const { stempel } = require('../scripts/lib/stempel');
+    const bij = Object.assign({}, schuld, { stempel: stempel(),
+      gemeten: { schermen: SCHERMEN.length,
+        metKlacht: Object.keys(gevonden).length,
+        klachten: Object.values(gevonden).reduce((a, v) => a + v.length, 0) } });
+    fs.writeFileSync(SCHULD, JSON.stringify(bij, null, 2) + '\n');
+  }
 });

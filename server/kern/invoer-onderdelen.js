@@ -29,9 +29,14 @@ module.exports = ({ bak, save, crypto, nu, schoon }) => {
 
   /* De regels voor de reiswereld. Dezelfde vorm als elk ander reisdomein: deze
      laag levert rijen, de wereld maakt er regels van en De Reis groepeert ze. */
+  /* Het kenmerk: het boekingsnummer als dat er is, anders het eigen id. Een
+     onderdeel ZONDER kenmerk is nergens aan vast te knopen -- de visumtaak
+     hangt aan 'reis:<kenmerk>', en de oplosser vond bij een ingevoerd hotel
+     zonder boekingsnummer letterlijk niets om een taak aan te hangen. Het
+     eigen id is een echte referentie: hij wijst dit onderdeel aan. */
   const mijnRegels = (key) => mijn(key).map(x => ({
     titel: x.titel, bestemming: x.bestemming, van: x.van, tot: x.tot,
-    status: x.status, kenmerk: x.kenmerk, soort: x.soort, herkomst: x.herkomst
+    status: x.status, kenmerk: x.kenmerk || x.id, soort: x.soort, herkomst: x.herkomst
   }));
 
   /* OVERNEMEN UIT EEN UITNODIGING. Er komt hier geen bewijsstuk mee en geen

@@ -424,11 +424,13 @@
     for (const r of (d.reizen || [])) {
       if (!r.signalen.length) continue;
       blokken.push('<div class="rtg-rij" style="flex-direction:column;align-items:stretch;gap:.3rem;">' +
-        '<span class="rtg-naam">' + esc(r.bestemming) + '</span>' +
+        '<span class="rtg-naam" style="display:flex;align-items:center;gap:.6rem;">' + esc(r.bestemming) +
+          '<button class="rtg-knop" type="button" data-los="' + esc(r.id) + '" style="margin-left:auto;">Los het op</button></span>' +
         r.signalen.map((s) => '<span class="rtg-sub" style="color:' +
           (s.ernst === 'incident' ? 'var(--rtg-acc)' : 'var(--rtg-txt)') + ';">' +
           TEKEN[s.ernst] + ' ' + esc(s.tekst) + '</span>' +
           '<span class="rtg-sub">Bron: ' + esc(s.bron) + ' &middot; ' + esc(s.grond) + '</span>').join('') +
+        '<span data-losuit="' + esc(r.id) + '"></span>' +
         '</div>');
     }
     if ((d.stil || []).length) blokken.push('<p class="stil">Let op: de bron' +
@@ -443,8 +445,50 @@
     el.innerHTML = rust + blokken.join('') +
       '<p class="stil" style="margin-top:.7rem;">' + esc(d.uitleg || '') + '</p>' +
       '<div style="margin-top:.4rem;line-height:1.7;">' + bronnen + '</div>';
+    el.querySelectorAll('[data-los]').forEach((b) => b.addEventListener('click', () => losOp(b)));
   }
   laadWacht();
+
+  /* DE OPLOSSER (REIZEN.md fase 5). De knop haalt voorstellen op en voert
+     NIETS uit; alleen een taak-voorstel heeft een eigen knop, en die zet na
+     een klik een taak in de eigen agenda. Alternatieven zijn verwijzingen
+     naar het domein -- boeken en betalen gebeurt daar. De grens komt uit het
+     antwoord van de server mee en staat erbij. */
+  async function losOp(knop) {
+    const vak = $('#wacht').querySelector('[data-losuit="' + knop.dataset.los + '"]');
+    if (!vak) return;
+    knop.disabled = true;
+    vak.innerHTML = '<span class="rtg-sub">Kijken wat er kan...</span>';
+    let d;
+    try {
+      d = await fetch('/api/reis/los', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: JSON.stringify({ reisId: knop.dataset.los })
+      }).then(async (r) => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
+    } catch (e) { vak.innerHTML = '<span class="rtg-sub">' + esc(e.message) + '</span>'; knop.disabled = false; return; }
+    vak.innerHTML = d.blokken.map((b) => b.voorstellen.map((v) => {
+      if (v.soort === 'taak') return '<span class="rtg-sub" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">' +
+        '<button class="rtg-knop" type="button" data-doe="' + esc(v.id) + '" data-reis="' + esc(knop.dataset.los) + '">' + esc(v.tekst) + '</button>' +
+        '<span>' + esc(v.uitleg || '') + '</span></span>';
+      if (v.soort === 'alternatief') return '<span class="rtg-sub">&rarr; <a href="' + esc(v.link) + '">' + esc(v.tekst) + '</a>' +
+        (v.kosten ? ' &middot; \u20ac ' + esc(String(v.kosten.bedrag)) + ' p.p.' : '') + ' &middot; ' + esc(v.uitleg || '') + '</span>';
+      if (v.soort === 'nakijken') return '<span class="rtg-sub">&rarr; <a href="' + esc(v.link) + '">' + esc(v.tekst) + '</a></span>';
+      return '<span class="rtg-sub">' + esc(v.tekst) + '</span>';
+    }).join('')).join('') +
+    '<span class="rtg-sub" style="color:var(--rtg-soft);">' + esc(d.grens || '') + '</span>';
+    vak.querySelectorAll('[data-doe]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r = await fetch('/api/reis/los/doe', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+          body: JSON.stringify({ reisId: b.dataset.reis, voorstel: b.dataset.doe })
+        }).then(async (x) => { const j = await x.json().catch(() => ({})); if (!x.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
+        b.outerHTML = '<span class="rtg-sub">' + (r.al ? 'Deze taak stond al in uw agenda.' : 'De taak staat in uw agenda.') +
+          ' <a href="' + esc(r.link) + '">Naar de agenda</a></span>';
+        laadWacht();
+      } catch (e) { b.disabled = false; b.textContent = e.message; }
+    }));
+  }
 
   /* Een reisgenoot uitnodigen: de regels van deze reis gaan mee, en verder
      niets. De link is een sleutel -- hij staat er daarom uitgeschreven bij, met

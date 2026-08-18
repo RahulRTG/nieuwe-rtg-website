@@ -31,6 +31,20 @@ module.exports = (kern) => {
     r.ok ? res.json(r) : res.status(r.status || 503).json(r);
   });
 
+  /* DE OPLOSSER (REIZEN.md fase 5). `los` leest en stelt voor; `doe` voert
+     uitsluitend een TAAK-voorstel uit, en zoekt dat voorstel server-side
+     opnieuw op -- wat de client stuurt is een verwijzing, nooit inhoud. */
+  app.post('/api/reis/los', auth, (req, res) => {
+    const r = kern.reisoplosser.los(req.session.key, (req.body || {}).reisId);
+    r.ok ? res.json(r) : res.status(r.status || 503).json(r);
+  });
+  app.post('/api/reis/los/doe', auth, async (req, res) => {
+    try {
+      const r = await kern.reisoplosser.doe(req.session.key, (req.body || {}).reisId, (req.body || {}).voorstel);
+      r.ok ? res.json(r) : res.status(r.status || 503).json(r);
+    } catch (e) { console.error('[reisoplosser]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   /* DE INVOERBALIE (REIZEN.md fase 2). Twee stappen, en dat is de kern van het
      ontwerp: LEZEN maakt een voorstel, BEVESTIGEN maakt er pas een onderdeel
      van. Een extractie die zichzelf in uw reisplan zet, zet daar vroeg of laat

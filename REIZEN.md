@@ -518,6 +518,42 @@ Dynamische samenstelling en de knop "los het op": alternatieven zoeken, gevolgen
 doorrekenen, klaarzetten. Uitvoeren blijft bij het domein; bevestigen bij de
 mens, binnen de drempels uit 4.5.
 
+**Waar fase 5 staat: "Los het op" is af; samenstellen niet** (18 augustus 2026).
+`kern/reisoplosser.js`, `/api/reis/los` + `/api/reis/los/doe`, en de knop bij
+elke reis met signalen in De Reiswacht.
+
+De knop volgt de drempels van par. 4.5 letterlijk, en dat is de architectuur:
+
+- **Lezen mag altijd.** Alternatieven komen uit de eigen catalogus (bij een
+  afgewezen reisaanvraag: eerst dezelfde bestemming) en van het eigen
+  vluchtbord (bij een vertraagde vlucht: zonder de vertraagde zelf en zonder de
+  geannuleerde). Elk alternatief is een **verwijzing** met de prijs van nu erbij
+  — "beschikbaar volgens het bord van dit moment" is het maximum; nergens staat
+  "geboekt" of "gereserveerd", en `doe` weigert een alternatief uit te voeren
+  (409, met de verwijzing naar het domein).
+- **De enige uitvoerbare actie is een taak in de eigen agenda** — na een klik
+  van de mens, idempotent (twee keer drukken zet geen tweede taak), en een taak
+  kost geen geld en bereikt geen tweede persoon. De visumvraag wordt zo met één
+  klik een echte visumtaak; een verlopend document wordt "verleng X vóór
+  vertrek".
+- **Het voorstel-id is een verwijzing, geen inhoud.** `doe` herberekent de
+  voorstellen server-side en zoekt het id daarin op; wat de client stuurt
+  bepaalt nooit wat er in de agenda belandt — hetzelfde principe als bij de
+  Invoerbalie.
+- **En de eerlijkste uitkomst bestaat ook:** op een aanvraag die bij de zaak
+  ligt valt niets te doen — *"iets afwachten is geen taak"* (de regel van Het
+  Huis), gezegd in plaats van een nepknop.
+
+De keten sluit aantoonbaar: wacht → "los het op" → taak → en de wacht toont
+daarna de open taak in plaats van de vraag. Een reparatie die de keten-toets
+blootlegde: een ingevoerd onderdeel zonder boekingsnummer had geen kenmerk, dus
+niets om een visumtaak aan te hangen — het draagt nu zijn eigen id als kenmerk.
+
+**Wat "samenstellen" (dynamische pakketten uit meerdere domeinen tegelijk) nog
+niet is:** dat vraagt prijslogica over domeinen heen en hoort pas nadat de
+partnerkant moderatie heeft. Het staat hier zodat niemand het voor vergeten
+aanziet.
+
 ---
 
 ## 8. Wat V1 minimaal moet zijn om "RTG" te mogen heten

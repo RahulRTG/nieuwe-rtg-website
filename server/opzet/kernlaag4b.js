@@ -93,6 +93,11 @@ Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.ag
    niet zijn. Leest laat uit de kern, want hij hangt aan De Reis (kernlaag3w),
    Entourage (kernlaag4) en de agenda. */
 Object.assign(kern, require('../kern/reiswacht').maakReiswacht({ kern }));
+/* DE OPLOSSER (kern/reisoplosser.js): de knop "Los het op" -- REIZEN.md fase 5.
+   Leest de wacht en de domeinen, zet hoogstens een taak in de eigen agenda
+   (na een klik van de mens, idempotent); boeken en betalen blijft bij het
+   domein. Zelfde late lezing als de wacht, om dezelfde reden. */
+Object.assign(kern, require('../kern/reisoplosser').maakReisoplosser({ kern }));
 Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft

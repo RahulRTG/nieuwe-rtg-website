@@ -30,6 +30,7 @@
     if (window.RTGStudioMotor) window.RTGStudioMotor.stop();
     var f = $('#film');
     f.pause(); f.removeAttribute('src'); f.load(); f.classList.remove('zien');
+    if (window.RTGOndertitelband) RTGOndertitelband.weg(document.getElementById('filmvlak'));
     var cv = $('#clipvlak'), cf = $('#clipfilm');
     cf.pause(); cf.removeAttribute('src'); cf.load();
     var ond = cv.querySelector('.ondert'); if (ond) ond.remove();
@@ -55,6 +56,10 @@
       var f = $('#film');
       f.src = s.spelen.bron + '?token=' + encodeURIComponent(TOKEN);
       f.classList.add('zien');
+      /* Dezelfde band als in het Theater en bij een clip: shared/ondertitelband.js.
+         Het gaat hier om hetzelfde bestand als in het Theater, dus een kijker die
+         daar ondertitels ziet hoort ze hier ook te zien. */
+      if (window.RTGOndertitelband) RTGOndertitelband.zet(document.getElementById('filmvlak'), f, s.ondertitels || []);
       f.play().catch(function () {});
       $('#spTitel').textContent = s.titel;
       $('#spSub').textContent = s.maker.codenaam + ' · origineel beeld uit het Theater';

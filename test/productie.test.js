@@ -62,6 +62,30 @@ test('config: herstel-SMS moet echt bestaan of bewust fail-closed staan', () => 
   assert.ok(!bewust.fouten.some(f => /SMS-provider/.test(f)), 'de bewuste fail-closed stand is toegestaan');
 });
 
+/* De backoffice is de meest bevoorrechte deur van het huis: auditlog, tijdlijn
+   met codenamen, export. Zonder tweede factor staat die achter alleen de
+   statische OFFICE_CODE, en de officedeur telt mislukkingen per IP -- dus is
+   verspreid raden er ook niet door gestopt. Dit was een waarschuwing, en een
+   waarschuwing bij elke start leert iedereen wegkijken. */
+test('config: productie start niet zonder tweede factor op de backoffice', () => {
+  const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
+    RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SMTP_URL: 'smtp://x',
+    RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_DEMO_BEWUST: '1' };
+  const zonder = config.valideer(basis);
+  assert.ok(zonder.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)),
+    'zonder tweede factor hoort productie te weigeren, niet te waarschuwen');
+  assert.ok(!zonder.waarschuwingen.some(f => /OFFICE_TOTP_SECRET/.test(f)),
+    'en het hoort geen waarschuwing meer te zijn, anders staat dezelfde eis op twee sterktes');
+
+  /* Een geheim dat te kort is om een tweede factor te zijn is geen tweede
+     factor. Anders haalt "OFFICE_TOTP_SECRET=x" de eis met een letter. */
+  const kort = config.valideer({ ...basis, OFFICE_TOTP_SECRET: 'JBSWY3DP' });
+  assert.ok(kort.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)), 'acht tekens is geen tweede factor');
+
+  const goed = config.valideer({ ...basis, OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP' });
+  assert.ok(!goed.fouten.some(f => /OFFICE_TOTP_SECRET/.test(f)), 'een bruikbaar base32-geheim is genoeg');
+});
+
 test('config: een ongebruikte SMTP_HOST doet zich niet voor als werkende mailroute', () => {
   const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',

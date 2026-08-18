@@ -35,8 +35,11 @@
    daarvoor staat in de muziekmodule, niet hier: wie eigenaar is, weet de
    eigenaar-module. */
 
-const CUES_MAX = 200;        // ondertitelregels per clip
-const CUE_TEKST = 120;       // tekens per regel; langer leest niemand in beeld
+/* Wat een geldige ondertitelregel is, staat in kern/ondertitels.js -- niet hier.
+   Het Theater heeft sinds vandaag hetzelfde spoor, en twee kopieen van die
+   twintig regels validatie lopen binnen een jaar uiteen (LAT.md regel 4). De
+   grenzen (200 regels, 120 tekens) staan daar, met de reden erbij. */
+const { schoonCues } = require('./ondertitels');
 const GELUID = ['eigen', 'stil', 'stem', 'muziek'];
 
 module.exports = ({ db, save, schoon, clipMet, eigenTrack }) => {
@@ -69,16 +72,8 @@ module.exports = ({ db, save, schoon, clipMet, eigenTrack }) => {
      want de maker weet zelf het beste hoe zijn zinnen lopen. */
   function ondertitels(key, cid, regels) {
     const { c, fout } = mijn(key, cid); if (fout) return fout;
-    if (!Array.isArray(regels)) return { status: 400, error: 'Geef de ondertitels als lijst.' };
-    const uit = [];
-    for (const r of regels.slice(0, CUES_MAX)) {
-      const tekst = schoon((r && r.tekst) || '', CUE_TEKST);
-      const van = getal(r && r.van), tot = getal(r && r.tot);
-      if (!tekst || van == null || tot == null) continue;
-      if (van < 0 || tot > c.duurS || tot <= van) continue;
-      uit.push({ van: Math.round(van * 10) / 10, tot: Math.round(tot * 10) / 10, tekst });
-    }
-    uit.sort((a, b) => a.van - b.van);
+    const uit = schoonCues(regels, c.duurS);
+    if (!uit) return { status: 400, error: 'Geef de ondertitels als lijst.' };
     c.ondertitels = uit;
     save();
     return { status: 200, ok: true, regels: uit.length, ondertitels: uit };
@@ -121,5 +116,6 @@ module.exports = ({ db, save, schoon, clipMet, eigenTrack }) => {
   }
 
   return { clipsKnip: knip, clipsOndertitels: ondertitels, clipsGeluid: geluid,
-    clipsStudioBeeld: studioBeeld, CLIPS_GELUID: GELUID, CLIPS_CUES_MAX: CUES_MAX };
+    clipsStudioBeeld: studioBeeld, CLIPS_GELUID: GELUID,
+    CLIPS_CUES_MAX: require('./ondertitels').CUES_MAX };
 };

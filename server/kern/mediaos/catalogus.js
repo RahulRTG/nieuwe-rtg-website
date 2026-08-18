@@ -84,6 +84,12 @@ function maakCatalogus({ bronnen }) {
         : { soort: 'stream', bron: '/api/theater/kijk/' + v.id },
       cijfers: { reacties: v.reacties || 0 },
       omschrijving: v.omschrijving || '',
+      /* De ondertitels reizen mee, net als bij een clip hieronder: het is tekst,
+         dus klein, en de speler moet ze hebben voordat het beeld begint. Zonder
+         dit veld speelt de Media OS dezelfde video als het Theater maar zonder
+         band -- twee schermen, een bestand, twee ervaringen. */
+      ondertitels: Array.isArray(v.ondertitels) ? v.ondertitels : [],
+      ondertiteld: !!v.ondertiteld,
       mijn: !!mijn, volgIk: !!abonnee
     };
   }

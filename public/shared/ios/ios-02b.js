@@ -102,7 +102,54 @@
     setTimeout(function () { location.href = THUIS; }, 200);
   }
 
+  /* DE PIL BRENGT ZIJN EIGEN MAAT MEE, want niet elk scherm laadt ios.css.
+
+     Gemeten over 259 schermen: 202 laden ios.js EN ios.css, 22 laden alleen de
+     JS. Op die 22 kreeg de home-indicator dus geen enkele stijl -- een lege knop
+     krimpt dan tot zijn inhoud, en dat is precies wat de raakvlakmeting liet
+     zien: 4x4 op comm.html, 16x6 op geld.html. Onzichtbaar, onraakbaar, en toch
+     in de tabvolgorde met de naam "Omhoog vegen brengt je naar de homescreen".
+     Dat is de slechtst denkbare combinatie: een toetsenbordgebruiker landt op
+     iets dat hij niet ziet en niemand anders kan aanwijzen.
+
+     Deze regels staan daarom in de component zelf en niet in het blad. Ze zijn
+     met opzet mager (alleen maat en plaats, geen kleur): waar ios.css er wel is,
+     staat die later in de head en wint hij. Zelfde patroon als de ondertitelband
+     in shared/ondertitelband.js. */
+  function pilStijlEenmalig() {
+    if (document.getElementById('rtg-ios-thuis-basis')) return;
+    var st = document.createElement('style');
+    st.id = 'rtg-ios-thuis-basis';
+    st.textContent = '.ios-thuis{position:fixed;left:50%;transform:translateX(-50%);' +
+      'bottom:calc(env(safe-area-inset-bottom,0px) + 6px);z-index:60;' +
+      'width:150px;min-width:24px;height:24px;min-height:24px;' +
+      'background:none;border:0;padding:0;cursor:pointer;display:flex;' +
+      'align-items:center;justify-content:center;touch-action:none;}' +
+      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:2.5px;' +
+      'background:rgba(244,241,236,.55);}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  /* DEZELFDE LES ALS BIJ DE PIL, EEN LAAG HOGER. ios.js bouwt de navigatiebalk
+     op elk scherm dat hem laadt, maar tweeentwintig schermen laden ios.js ZONDER
+     ios.css. Daar valt de maat weg die ios.css aan de acties rechtsboven geeft
+     (17px tekst met 0.3rem padding, ruim boven de 24), en dan meet een actie 15
+     tot 22 pixels: te klein om te raken (WCAG 2.5.8).
+
+     Dus brengt de component ook hier zijn eigen ondergrens mee. Alleen min-*:
+     waar ios.css er wel is, verandert er niets -- die zet de padding met
+     !important en komt ruim boven deze grens uit. */
+  function navStijlEenmalig() {
+    if (document.getElementById('rtg-ios-acties-basis')) return;
+    var st = document.createElement('style');
+    st.id = 'rtg-ios-acties-basis';
+    st.textContent = '.ios-nav-acties > *{min-width:24px;min-height:24px;box-sizing:border-box;' +
+      'display:inline-flex;align-items:center;justify-content:center;}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+
   function homeIndicator() {
+    pilStijlEenmalig();
     var pil = el('button', 'ios-thuis');
     pil.type = 'button';
     pil.setAttribute('aria-label', 'Omhoog vegen brengt je naar de homescreen');

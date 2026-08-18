@@ -87,6 +87,8 @@ voorgekookt werkblad) vóór je er iets bij zet.
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
+**`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
@@ -116,7 +118,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 --grey-soft:#8A8680       /* onderschriften/meta */
 ```
 
-**Regel: bordeaux is een accent, nooit een tekstkleur op zwarte achtergrond** (te weinig contrast). Op zwart: wit of `--burgundy-on-dark`.
+**Regel: bordeaux is een accent, nooit een tekstkleur op zwarte achtergrond** (te weinig contrast). Op zwart: wit of `--burgundy-on-dark` — maar `--burgundy-on-dark` is zelf óók een accent en haalt op `--black` **3,78:1**: genoeg voor grote tekst (WCAG AA vraagt 3,0 vanaf 24px, of 18,66px vet), te weinig voor lopende tekst en kleine labels (4,5). Voor kleine tekst op zwart is het dus **wit**. Gemeten op 17 augustus 2026, toen de a11y-scan over alle 258 schermen ging; `--grey-soft` haalt daar 5,41 en is wel goed, `--grey` haalt 2,22 en hoort niet op zwart.
 
 ### Typografie
 - **Bodoni Moda** voor koppen/display

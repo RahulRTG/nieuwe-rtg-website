@@ -94,7 +94,10 @@
   .tref .band{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
   .tref .soort{color:var(--gold);}
   .tref .wie{border:1px solid var(--line);border-radius:999px;padding:.1rem .45rem;color:var(--soft);}
-  .tref .wie.part{border-color:var(--burgundy);color:var(--burgundy);}
+  /* De partnermerker: de RAND blijft bordeaux, want dat is waar het accent voor
+     is. De TEKST erin was ook bordeaux (#C23A5E) en haalde op deze grond 3,58:1
+     bij 9,9px. Wit maakt het label leesbaar en de rand doet het merkwerk. */
+  .tref .wie.part{border-color:var(--burgundy);color:#FFFFFF;}
   .tref h3{font-size:1.02rem;margin-top:.15rem;}
   .tref .oms{font-size:.82rem;color:var(--muted);line-height:1.5;}
   .tref .waar{font-size:.74rem;color:var(--soft);}

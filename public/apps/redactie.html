@@ -109,6 +109,9 @@
   .beeldgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
   .inlog{max-width:460px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .inlog a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .inlog a{color:var(--gold);}
   .hint{color:var(--soft);font-size:.82rem;line-height:1.6;}
   @media(max-width:560px){ .kpis{grid-template-columns:1fr 1fr;} }

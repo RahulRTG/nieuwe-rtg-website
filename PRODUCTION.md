@@ -499,7 +499,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
 - [ ] GitHub repository variable `RTG_LIVE_URL` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen
-- [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; de keuring waarschuwt zolang hij ontbreekt)
+- [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; **de keuring blokkeert de productiestart zolang hij ontbreekt**, en een geheim onder de 16 base32-tekens telt niet als tweede factor). Zonder deze factor staat de backoffice — auditlog, tijdlijn met codenamen, export — achter alleen de statische `OFFICE_CODE`, en de officedeur remt per IP, dus verspreid raden komt daar langs. Dit was een waarschuwing; `scripts/docker/controle.js` eiste het al hard voor livegang, en die twee zeggen nu hetzelfde
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
 - [ ] Schone start bevestigd: in productie zonder `RTG_DEMO` zijn er geen demozaken, geen demopersoneel en geen voorbeeldposts; ook een database die als demo begon wordt bij de start opgeschoond (test/livegang.test.js)

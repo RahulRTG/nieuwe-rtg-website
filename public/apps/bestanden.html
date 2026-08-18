@@ -43,7 +43,8 @@
 
   /* het pad en de mappen */
   #pad{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
-  #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;}
+  /* min-height erbij: .15rem boven en onder bracht de knop net niet op 24 (WCAG 2.5.8) */
+  #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;min-height:24px;}
   #pad button:hover{color:var(--gold);}
   #pad .hier{color:var(--txt);font-weight:600;}
   .mapkaart{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);border:1px solid var(--line);

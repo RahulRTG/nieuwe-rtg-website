@@ -164,10 +164,20 @@
 }
 
 /* ------------------------------------------------- de home-indicator */
+/* DE HOOGTE IS 24 EN NIET 22, en dat is geen smaak. WCAG 2.5.8 (AA sinds 2.2)
+   vraagt een raakvlak van minstens 24x24 CSS-pixels. Deze pil is de weg terug
+   naar huis op ELK scherm van dit huis -- gemeten stond hij op 150x22, en op de
+   schermen die hem in een kleiner kader tekenen zelfs op 16x6 en 4x4. Voor
+   iemand met een beverige hand of een grote vinger is dat het verschil tussen
+   "terug" en "ergens anders op geduwd".
+
+   Het BEELD verandert niet: de streep zelf is en blijft 134x5, de maat van iOS.
+   Alleen het raakvlak eromheen is nu groot genoeg om te raken. Dat is precies
+   wat 2.5.8 bedoelt -- het gaat over het doel, niet over de tekening. */
 .ios-thuis{
   position:fixed; left:50%; transform:translateX(-50%);
   bottom:calc(var(--ios-onder) + 6px);
-  z-index:60; width:150px; height:22px;
+  z-index:60; width:150px; min-width:24px; height:24px; min-height:24px;
   background:none; border:none; padding:0; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   touch-action:none;

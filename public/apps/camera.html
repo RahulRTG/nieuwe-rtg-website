@@ -211,7 +211,10 @@
   </div>
 </section>
 
-<script src="/shared/spraak.js" defer></script>
+<!-- ZONDER defer: het inline script hieronder draait tijdens het parsen en
+     doet `if (window.Spraak)`. Met defer draait spraak.js pas NA het parsen,
+     dus die voorwaarde was altijd onwaar en de microfoon nooit gekoppeld. -->
+<script src="/shared/spraak.js"></script>
 <script>
 /* ============================ de Studio-motor ============================
    Professionele nabewerking, volledig op het toestel (de foto verlaat de

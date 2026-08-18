@@ -9,9 +9,10 @@
    waarmaakt (LAT-regel 6). Dit bestand is die lezer.
 
    WAT HET NADRUKKELIJK NIET DOET: een zaak maken. Een partnerplek komt er langs
-   de bestaande weg, met een Business Pass-bewijs en een besluit van de boardroom
-   (routes/office/partners.js). Zou dit besluit dat ook kunnen, dan waren er twee
-   deuren naar dezelfde catalogus en zou de ene de eis van de andere overslaan.
+   de bestaande weg, met een ledenbewijs bij de aanvraag en een besluit van de
+   boardroom (routes/office/partners.js). Zou dit besluit dat ook kunnen, dan
+   waren er twee deuren naar dezelfde catalogus en sloeg de ene de eis van de
+   andere over.
    Hier wordt alleen bijgehouden of er iemand naar gekeken heeft, wie dat was en
    wat eruit kwam -- meer belooft de onboarding ook niet.
 
@@ -20,9 +21,12 @@
    codenamen en de echte naam ligt in de gescheiden kluis. Het kantoor ziet dus
    wie het is zoals de rest van het huis dat ziet.
 
-   DE BUSINESS PASS STAAT ERBIJ, want dat is de eerste vraag die de beoordelaar
-   toch stelt: zonder die pas kan er geen partnerplek komen en is het gesprek een
-   ander gesprek. Beter erbij dan erachteraan. */
+   DE PAS STAAT ERBIJ ALS INLICHTING, NIET ALS DREMPEL. Elk lid met een pas mag
+   een bedrijf aanmelden -- een RTG Pass net zo goed als een Business Pass. Een
+   pas is een lidmaatschapsniveau en geen vergunning om te ondernemen; wie hier
+   weer een eis van maakt, bouwt de grens terug die routes/member/partnerkanaal.js
+   nu juist heeft opgeruimd. Hij staat erbij omdat de beoordelaar wil weten met
+   wie hij spreekt, en verder niet. */
 'use strict';
 
 const BESLUITEN = ['opgepakt', 'afgewezen'];
@@ -43,9 +47,8 @@ module.exports = ({ bak, save, nu, scho, codenaamVan, tierVan }) => {
         naam: o.naam,
         // codenaam, nooit de echte naam: die ligt in de kluis en hoort niet in een lijst
         eigenaar: codenaamVan ? codenaamVan(o.eigenaar) : o.eigenaar,
+        // inlichting, geen drempel: elk lid met een pas mag een bedrijf aanmelden
         pas: tier || null,
-        // zonder Business Pass kan er geen partnerplek komen; dat is geen detail
-        businessPass: tier === 'business',
         rechtsvorm: (o.rechtsvorm || null),
         gevraagd: w.at || null,
         besluit: w.besluit || null,

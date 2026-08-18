@@ -117,13 +117,23 @@ test('een bedrijf komt op naam van het lid, en niets wordt geregeld genoemd', as
     const mijn = (await P('/api/onderneming/mijn', {}, lid)).body.ondernemingen || [];
     assert.ok(mijn.some(o => o.naam === 'Bakkerij Olivier'), 'het staat op zijn naam');
 
-    /* NOOIT "GEREGELD". Een partnerplek vraagt een Business Pass en een mens die
-       beslist; het antwoord hoort dat te zeggen in plaats van het te suggereren. */
+    /* NOOIT "GEREGELD". Een partnerplek vraagt een mens die beslist; het
+       antwoord hoort dat te zeggen in plaats van het te suggereren. */
     const v = String(r.body.vervolg || '');
     assert.ok(v.length > 20, 'er staat een vervolg bij: ' + v);
     assert.doesNotMatch(v, /\b(geregeld|geplaatst|staat in de catalogus|goedgekeurd)\b/i,
       'het belooft niets: ' + v);
-    assert.match(v, /mens beslist|Business Pass/i, 'en zegt waar het echt ligt: ' + v);
+    assert.match(v, /mens beslist/i, 'en zegt waar het echt ligt: ' + v);
+
+    /* EN GEEN PASDREMPEL MEER. Dit lid heeft een gewone RTG Pass; als het
+       antwoord of de vraag een Business Pass als voorwaarde noemt, staat de
+       oude regel er nog in woorden terwijl de code hem heeft losgelaten. */
+    assert.doesNotMatch(v, /Business Pass (is )?nodig|zonder Business Pass/i,
+      'geen pasdrempel in het vervolg: ' + v);
+    const bedrijfsvraag = ((await P('/api/onboarding/meebouwen', {}, lid)).body.open || [])
+      .find(o => o.id === 'bedrijf');
+    if (bedrijfsvraag) assert.doesNotMatch(String(bedrijfsvraag.toestemming || ''),
+      /Business Pass (is )?nodig|zonder Business Pass/i, 'en ook niet in de vraag');
 
     // zonder naam gebeurt er niets, en dat is een nette fout
     const leeg = await P('/api/onboarding/bedrijf', { naam: '' }, lid);

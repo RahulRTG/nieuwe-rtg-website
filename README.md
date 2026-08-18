@@ -3531,6 +3531,29 @@ Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adre
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
+**Een pas, niet DE Business Pass.** `POST /api/partner/apply` eiste een actieve
+**Business Pass**. Dat stelde twee dingen gelijk die niets met elkaar te maken
+hebben: een pas is een lidmaatschapsniveau, geen vergunning om te ondernemen.
+Wie met een gewone RTG Pass een zaak runt was niet minder ondernemer -- hij kon
+alleen zijn bedrijf niet aanmelden. Dezelfde vorm van grens die `CONCERN.md` aan
+de werknemerskant al verbiedt: niemand koopt hier een pas om te mogen werken.
+
+Wat blijft staan is dat er een **lid** achter de aanvraag hoort, want er gaat een
+bedrijfscode en een beheer-inlog de deur uit; de gratis gast-laag valt er dus
+buiten. Die lijst staat op één plek (`server/kern/paseis.js`) en wordt door
+allebei de deuren gelezen: het formulier *Partner worden* en het vinkje in de
+onboarding (`kern/onboarding/meebouwen.js`). Het kantoor keurt alleen goed met
+ledenbewijs op de aanvraag en leest daarbij zowel het nieuwe veld `pas` als het
+oude `businessPass`, zodat aanvragen van vóór deze wijziging behandelbaar
+blijven. Op het kantoorscherm is de pas een **inlichting**, geen drempel: je ziet
+met wie je spreekt, en verder niets.
+
+Getoetst in `test/partnerpas.test.js` (zonder pas geen aanvraag; een gewone RTG
+Pass levert een bedrijfscode op), `test/office-tweede-helft.test.js` (de echte
+accountweg, van registreren tot bedrijfscode) en `test/catalogus-wensen.test.js`
+(de pas wordt echt opgezocht -- een Business-lid leest als `business` -- en de
+gratis laag krijgt geen catalogus-wens, wel zijn eigen bedrijf).
+
 E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af, en de verzendlaag is helemaal van onszelf -- er zit geen pakket meer onder. `server/mail.js` kent drie standen, in deze volgorde:
 
 1. **`SMTP_URL`** (+ optioneel `MAIL_FROM`): afleveren bij een ingehuurde smarthost via de eigen SMTP-client `server/smtp.js` (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA, MIME met base64 en dot-stuffing; credentials gaan nooit over een onversleutelde verbinding).

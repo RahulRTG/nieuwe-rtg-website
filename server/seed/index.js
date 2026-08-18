@@ -3,7 +3,7 @@
 
    ZONDER RTG_DEMO start het platform schoon: geen demozaken, geen voorbeeld-
    posts in De Salon en geen fictieve reizen op de boekpagina.
-   Echte partners komen binnen via de partneraanvraag (met Business Pass),
+   Echte partners komen binnen via de partneraanvraag (als lid, met een pas),
    echte leden via hun eigen account. De demo-inhoud blijft volledig
    beschikbaar voor lokaal en demogebruik.
 

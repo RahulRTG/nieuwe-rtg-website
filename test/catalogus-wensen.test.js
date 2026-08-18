@@ -13,8 +13,11 @@
    2. op CODENAAM -- de echte naam ligt in de gescheiden kluis en hoort niet in
       een lijst, ook niet achter de kantoorpoort;
    3. het besluit maakt GEEN zaak. Een partnerplek loopt langs de bestaande weg,
-      met Business Pass-bewijs en een besluit van de boardroom. Twee deuren naar
-      dezelfde catalogus zou betekenen dat de ene de eis van de andere overslaat.
+      met ledenbewijs en een besluit van de boardroom. Twee deuren naar dezelfde
+      catalogus zou betekenen dat de ene de eis van de andere overslaat;
+   4. en die eis is een PAS, niet DE Business Pass. Elk lid met een pas mag een
+      bedrijf aanmelden, de gratis laag niet -- één lijst voor beide deuren
+      (server/kern/paseis.js).
    Draai: npm test -- --bestanden=catalogus-wensen */
 'use strict';
 const test = require('node:test');
@@ -22,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 
 const CODE = 'RTG-CW-TEST';
 
@@ -35,13 +38,16 @@ function post(base) {
 }
 
 let teller = 0;
-async function versLid(P, naam) {
+const mailBijToken = new Map();
+const leesMail = (token) => mailBijToken.get(token);
+async function versLid(P, naam, tier) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
-  const r = await P('/api/auth/register', {
-    name: naam, email: naam.toLowerCase() + u + '@x.nl',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
-  });
+  const email = naam.toLowerCase() + u + '@x.nl';
+  const r = await P('/api/auth/register', Object.assign({
+    name: naam, email, password: 'geheim123', geboortedatum: '1990-01-01'
+  }, tier === 'guest' ? { tier: 'guest' } : { tier: 'rtg', pasApp: 'rtg' }));
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  mailBijToken.set(r.body.token, email);
   return r.body.token;
 }
 
@@ -67,8 +73,11 @@ test('een wens uit de onboarding komt op het kantoor, op codenaam, en een mens b
     const w = na.wensen[0];
     assert.equal(w.naam, 'Atelier Pieternel');
     assert.ok(w.gevraagd, 'met een tijdstip erbij');
-    assert.equal(w.businessPass, false,
-      'en de eerste vraag staat erbij: zonder Business Pass geen partnerplek');
+    /* De pas staat erbij als inlichting, niet als drempel: dit lid heeft een
+       gewone RTG Pass en zijn wens hoort gewoon op de lijst te staan. Een veld
+       dat "geen Business Pass" roept, is de oude regel die terugkomt. */
+    assert.equal(w.pas, 'rtg', 'de pas staat erbij zoals hij is: ' + w.pas);
+    assert.ok(!('businessPass' in w), 'en niet als drempelvlag: ' + JSON.stringify(w));
 
     /* 2. OP CODENAAM. Klantdata draait in dit huis op codenamen; achter de
        kantoorpoort zitten is geen reden om daar een echte naam neer te zetten. */
@@ -78,9 +87,9 @@ test('een wens uit de onboarding komt op het kantoor, op codenaam, en een mens b
       'en niet de rauwe sleutel maar een codenaam: ' + w.eigenaar);
     assert.ok(w.eigenaar && w.eigenaar.length > 2, 'er staat wel iemand bij: ' + w.eigenaar);
 
-    /* 3. HET BESLUIT MAAKT GEEN ZAAK. Dat blijft de partnerweg, met Business
-       Pass-bewijs. Zou dit besluit het ook kunnen, dan sloeg de ene deur de eis
-       van de andere over. */
+    /* 3. HET BESLUIT MAAKT GEEN ZAAK. Dat blijft de partnerweg, met ledenbewijs.
+       Zou dit besluit het ook kunnen, dan sloeg de ene deur de eis van de andere
+       over. */
     const zakenVoor = ((await P('/api/suppliers', {}, lid)).body.suppliers || []).length;
     const besluit = await P('/api/office/catalogus-wens/besluit',
       { id: w.id, besluit: 'opgepakt' }, kantoor);
@@ -146,5 +155,52 @@ test('zonder vinkje komt het bedrijf niet op de kantoorlijst', async () => {
     // maar het bedrijf is er wel, van hem
     const mijn = (await P('/api/onderneming/mijn', {}, lid)).body.ondernemingen || [];
     assert.ok(mijn.some(o => o.naam === 'Rosalie Studio'), 'het bedrijf staat wel op zijn naam');
+  } finally { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
+});
+
+/* De pas erbij: wie het is, niet of het mag. Aparte toets omdat hij twee extra
+   leden aanmaakt en de tellingen van de eerste toets dan niet meer kloppen. */
+test('de pas van de aanvrager staat erbij, en de gratis laag meldt niets aan', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cw4-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
+  try {
+    const P = post(srv.base);
+    const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
+
+    // een gewone RTG Pass komt gewoon op de lijst: de eis is een pas, niet DE pas
+    const gewoon = await versLid(P, 'Renske');
+    await P('/api/onboarding/bedrijf', { naam: 'Renske Repareert', catalogus: true }, gewoon);
+    const rw = ((await P('/api/office/catalogus-wensen', {}, kantoor)).body.wensen || [])
+      .find(x => x.naam === 'Renske Repareert');
+    assert.ok(rw, 'de wens van een RTG-lid staat op het kantoor');
+    assert.equal(rw.pas, 'rtg', 'met zijn pas erbij: ' + rw.pas);
+    assert.ok(!('businessPass' in rw), 'en niet als drempelvlag: ' + JSON.stringify(rw));
+
+    /* EN DE PAS IS ECHT OPGEZOCHT, niet de terugvalwaarde. De opzoeker geeft
+       'rtg' terug als hij het lid niet kent, dus een veld dat altijd 'rtg' zegt
+       ziet er hierboven precies hetzelfde uit. Een lid dat ECHT naar Business is
+       getild moet dus 'business' opleveren. */
+    const bazin = await versLid(P, 'Berber');
+    await elevateTier(srv.base, bazin, 'business', kantoor);
+    const bzk = (await P('/api/auth/login', { login: leesMail(bazin), password: 'geheim123', pasApp: 'business' })).body;
+    assert.equal(bzk.state.user.tier, 'business', 'Berber heeft nu echt een Business Pass');
+    await P('/api/onboarding/bedrijf', { naam: 'Berber Beheer', catalogus: true }, bzk.token);
+    const bw = ((await P('/api/office/catalogus-wensen', {}, kantoor)).body.wensen || [])
+      .find(x => x.naam === 'Berber Beheer');
+    assert.ok(bw, 'de wens van Berber staat er ook');
+    assert.equal(bw.pas, 'business', 'en zijn pas wordt echt opgezocht: ' + bw.pas);
+
+    /* DE GRATIS LAAG MELDT GEEN BEDRIJF AAN. Dat is de enige grens die overblijft
+       nu de Business Pass-eis weg is: er hoort een LID achter een aanvraag. Zijn
+       eigen bedrijf op eigen naam zetten mag wel -- dat verlaat het huis niet. */
+    const gast = await versLid(P, 'Gratisje', 'guest');
+    const gastR = await P('/api/onboarding/bedrijf', { naam: 'Klus Gratisje', catalogus: true }, gast);
+    assert.equal(gastR.status, 200, 'zijn eigen bedrijf mag hij wel aanmaken');
+    assert.equal(gastR.body.catalogusWens, false, 'maar de wens wordt niet vastgelegd');
+    assert.ok(((await P('/api/onderneming/mijn', {}, gast)).body.ondernemingen || [])
+      .some(o => o.naam === 'Klus Gratisje'), 'en zijn bedrijf staat gewoon op zijn naam');
+    assert.ok(!((await P('/api/office/catalogus-wensen', {}, kantoor)).body.wensen || [])
+      .some(x => x.naam === 'Klus Gratisje'), 'hij komt niet op de kantoorlijst');
+
   } finally { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });

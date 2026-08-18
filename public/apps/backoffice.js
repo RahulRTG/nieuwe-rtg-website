@@ -466,8 +466,10 @@
 
 
   /* De wensen om in de catalogus te komen. Een besluit maakt hier GEEN zaak: dat
-     blijft de partner-aanvraag, met Business Pass-bewijs. Wat hier gebeurt is
-     bijhouden dat er iemand naar gekeken heeft, en wie. */
+     blijft de partner-aanvraag, met ledenbewijs. Wat hier gebeurt is bijhouden
+     dat er iemand naar gekeken heeft, en wie. De pas staat erbij omdat je wilt
+     weten met wie je spreekt -- niet als drempel: elk lid met een pas mag een
+     bedrijf aanmelden. */
   async function renderCatalogusWensen(){
     const el = $('#cwList'); if (!el) return;
     let d = null; try { d = await call('/office/catalogus-wensen'); } catch(e){ return; }
@@ -475,9 +477,10 @@
     el.innerHTML = rij.length ? rij.map(function(w){
       const st = w.besluit === 'opgepakt' ? T('bo.cw.ok','opgepakt')
         : w.besluit === 'afgewezen' ? T('bo.cw.no','afgewezen') : null;
-      const pas = w.businessPass
-        ? '<span class="pill klaar">'+T('bo.cw.bp','Business Pass')+'</span>'
-        : '<span class="pill bereiding">'+T('bo.cw.geenbp','geen Business Pass')+'</span>';
+      const passen = { rtg: T('bo.cw.rtg','RTG Pass'), lifestyle: T('bo.cw.ls','Lifestyle Pass'), business: T('bo.cw.bp','Business Pass') };
+      const pas = passen[w.pas]
+        ? '<span class="pill klaar">'+passen[w.pas]+'</span>'
+        : '<span class="pill">'+T('bo.cw.geenpas','pas onbekend')+'</span>';
       return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(w.naam)+' '+pas+'</div>'+
         '<div class="sub">'+escHtml(w.eigenaar||'')+' · '+timeAgo(w.gevraagd)+
           (w.door?' · '+T('bo.cw.door','door')+' '+escHtml(w.door):'')+

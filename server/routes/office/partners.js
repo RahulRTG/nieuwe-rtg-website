@@ -12,10 +12,13 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
   if (req.body.action === 'goedkeuren') {
-    // de toegangseis geldt ook hier: geen Business Pass-bewijs bij de
-    // aanvraag, dan gaat er geen bedrijfscode de deur uit
-    if (!a.businessPass || !a.businessPass.key)
-      return res.status(409).json({ error: 'Deze aanvraag heeft geen Business Pass-bewijs; zonder Business Pass geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen met een actieve Business Pass.' });
+    // de toegangseis geldt ook hier: een partnerplek vraag je aan ALS LID, met
+    // welke pas dan ook. Zonder ledenbewijs bij de aanvraag gaat er geen
+    // bedrijfscode de deur uit. `businessPass` staat er nog voor aanvragen van
+    // voor die regel wijzigde -- ook dat is een ledenbewijs.
+    const bewijs = a.pas || a.businessPass;
+    if (!bewijs || !bewijs.key)
+      return res.status(409).json({ error: 'Deze aanvraag heeft geen ledenbewijs; zonder pas geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen terwijl hij is ingelogd met zijn pas.' });
     const code = makeSupplierCode(a.company);
     // Een nieuw goedgekeurde partner start OFFLINE: eerst door de ondernemer-
     // poort (Salon-pagina vullen + de rondleidingen), dan pas online en

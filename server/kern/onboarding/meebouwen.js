@@ -18,14 +18,17 @@
      dat. Uit staat uit: wie iets voor zijn kring plaatst, geeft daarmee geen
      campagnebeeld weg.
    - een bedrijf kan in de RTG-catalogus komen. Het vinkje legt die WENS vast,
-     meer niet: er wordt niets geplaatst en niets beloofd. Een partnerplek is er
-     alleen voor bedrijven met een Business Pass en een mens beslist erover
-     (routes/member/partnerkanaal.js, en het kantoor keurt). Rahul zegt dat er
-     dus ook eerlijk bij in plaats van "geregeld".
+     meer niet: er wordt niets geplaatst en niets beloofd. Elk lid met een pas
+     mag een bedrijf aanmelden -- daar is geen Business Pass voor nodig, en die
+     eis staat op één plek (../paseis, dezelfde die het formulier Partner worden
+     leest) -- maar een mens beslist erover. Rahul zegt dat er dus ook eerlijk
+     bij in plaats van "geregeld".
 
    BEIDE ZIJN VRIJWILLIG. Wie ze overslaat merkt er niets van; er is geen poort,
    geen herinnering en geen tweede vraag. */
 'use strict';
+
+const { heeftPas, PAS_FOUT } = require('../paseis');
 
 module.exports = (ctx) => {
   const { db, save, schoon } = ctx;
@@ -61,10 +64,16 @@ module.exports = (ctx) => {
       toestemming: 'Mag RTG dit bericht ook uitlichten? Dan kan het als beeld op de site en in de campagne komen, altijd met je naam erbij. Zeg je nee, dan blijft het in De Salon.',
       standaard: false
     });
+    /* De gratis gast krijgt het vinkje niet TE ZIEN in plaats van het te zien en
+       er een weigering op te krijgen. De vraag zelf blijft staan: je bedrijf op
+       je eigen naam zetten mag iedereen met een account. */
     if (!heeftZaak) open.push({
       id: 'bedrijf',
       vraag: 'Heb je een bedrijf? Dan kan het hier zijn eigen plek krijgen.',
-      toestemming: 'Zal ik het aanmelden voor de RTG-catalogus? Ik leg de wens vast; RTG kijkt ernaar en een mens beslist. Voor een partnerplek is een Business Pass nodig, dus het staat er niet vanzelf.',
+      toestemming: heeftPas(sess.tier)
+        ? 'Zal ik het aanmelden voor de RTG-catalogus? Ik leg de wens vast; RTG kijkt ernaar en een mens beslist, dus het staat er niet vanzelf. Welke pas je hebt maakt niet uit: elk lid kan een bedrijf aanmelden.'
+        : 'Aanmelden voor de RTG-catalogus doe je met een pas; met het gratis account kan dat niet. Je bedrijf op je eigen naam zetten kan wel.',
+      catalogusMag: heeftPas(sess.tier),
       standaard: false
     });
     return { ok: true, klaar: open.length === 0, open };
@@ -97,18 +106,25 @@ module.exports = (ctx) => {
     if (typeof maak !== 'function') return { status: 503, error: 'De bedrijvenkant is nu niet bereikbaar.' };
     const r = maak(key, { naam });
     if (r.error) return r;
-    if ((invoer || {}).catalogus === true) {
+    /* DEZELFDE EIS ALS BIJ HET FORMULIER PARTNER WORDEN, uit dezelfde lijst
+       (../paseis). De wens is de eerste stap naar een partnerplek, dus wie daar
+       een pas voor nodig heeft, heeft hem hier ook nodig. De onderneming zelf
+       blijft staan: die is van het lid en verlaat het huis niet. */
+    const wens = (invoer || {}).catalogus === true && heeftPas(sess && sess.tier);
+    if (wens) {
       const o = ((ondernemingenVan && ondernemingenVan(key)) || []).find(x => x.naam === naam);
       if (o) {
         o.catalogusWens = { at: new Date().toISOString() };
         save();
       }
     }
-    return { ok: true, onderneming: r.onderneming,
+    return { ok: true, onderneming: r.onderneming, catalogusWens: wens,
       // wat er NU echt gebeurt, in plaats van "geregeld"
-      vervolg: (invoer || {}).catalogus === true
-        ? 'Je bedrijf staat op je naam en de wens voor de catalogus is vastgelegd. RTG kijkt ernaar; een mens beslist, en voor een partnerplek is een Business Pass nodig.'
-        : 'Je bedrijf staat op je naam. Wil je het later in de catalogus, dan zeg je het en leg ik die wens vast.' };
+      vervolg: wens
+        ? 'Je bedrijf staat op je naam en de wens voor de catalogus is vastgelegd. RTG kijkt ernaar en een mens beslist; er staat verder niets vast.'
+        : (invoer || {}).catalogus === true
+          ? 'Je bedrijf staat op je naam. ' + PAS_FOUT
+          : 'Je bedrijf staat op je naam. Wil je het later in de catalogus, dan zeg je het en leg ik die wens vast.' };
   }
 
   return { meebouwStatus, meebouwSalon, meebouwBedrijf, zetHaken };

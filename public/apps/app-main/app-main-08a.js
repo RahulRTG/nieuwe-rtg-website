@@ -22,8 +22,15 @@
     onbMbKnoppen();
     if (inp) inp.focus();
   }
-  // het vinkje als knop: uit is uit, en je ziet wat aan staat
+  /* Het vinkje als knop: uit is uit, en je ziet wat aan staat. Kan het gegeven
+     niet -- de gratis laag mag geen bedrijf aanmelden voor de catalogus -- dan
+     is er geen schakelaar maar een zin: een vinkje dat niets doet is erger dan
+     geen vinkje. De server zegt dat met catalogusMag. */
   function onbMbKnoppen(){
+    if (onbMbHuidig.catalogusMag === false){
+      onbZeg(onbMbHuidig.vraag + ' ' + onbMbHuidig.toestemming);
+      return onbActies([{ txt: T('onb.mb.sla','Sla dit over'), doe: onbMbVolgende }]);
+    }
     onbActies([
       { txt: (onbMbJa ? '\u2713 ' : '') + onbMbHuidig.toestemming, doe: function(){ onbMbJa = !onbMbJa; onbMbKnoppen(); } },
       { txt: T('onb.mb.sla','Sla dit over'), doe: onbMbVolgende }

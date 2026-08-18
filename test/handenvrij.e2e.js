@@ -59,11 +59,10 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     }));
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
-    // De nieuwe landing is de Command-werktafel. Voor de OS-balk en zijn
-    // muisvrije bediening kiest de gebruiker eerst het zichtbare Beginscherm.
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-klok');
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
+    /* De landing is de Command-werktafel, en de balk van Rahul hangt aan <body>
+       en niet aan een scherm -- hij werkt daar dus gewoon. Hier stonden twee
+       stappen naar het springboard eronder; dat scherm is weg (WERELD.md) en
+       ze waren ook nooit nodig voor wat deze toets meet. */
 
     /* 1. de balk hangt klaar (via metgezel -> handenvrij -> handenvrij-balk),
        maar staat niet uit zichzelf op het scherm: sinds "Losse knoppen weg"
@@ -165,9 +164,6 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     // met de mond aan: eerst een bevestiging, en pas daarna gaat het uit
     await page.evaluate(() => { sessionStorage.setItem('rtg_handenvrij_geldmond', '1'); });
     await page.reload({ waitUntil: 'load' });
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-klok');
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
     // na het herladen hangt de balk weer weg; roep Rahul opnieuw
     await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 15000 });
     await page.evaluate(() => window.RTGRahul.open());

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1014 bestanden en 6715 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1013 bestanden en 6701 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1014 |
-| losse beweringen (`test(...)`) | 6715 |
+| toetsbestanden | 1013 |
+| losse beweringen (`test(...)`) | 6701 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 839 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 23 |
+| alleen in de kop *genoemd*, nog niet gemeten | 22 |
 | niets van beide | 93 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -928,7 +928,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-126 bestanden, 229 beweringen.
+125 bestanden, 215 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1046,7 +1046,6 @@ toets omvalt.
 | `voeding-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/voeding.html. Dit scherm belooft vooral iets NIET, en dat is precies wat op het scherm zelf nagekeken hoort te worden: een motor die niets telt naast een scherm dat er alsnog een cijfer of een... |
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `vooruitscherm.e2e.js` | 1 | -- | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
-| `wereld.e2e.js` | 14 | genoemd | DE LEVENDE WERELD: het beginscherm als kring om de klok (shared/wereld.js). WAAROM DEZE TOETS BESTAAT. |
 | `wereldbreedte.e2e.js` | 1 | genoemd | ELKE WERELD PAST OP EEN TELEFOON. Vier van de twaalf werelden liepen op 390px rechts buiten beeld: Partner Network 558, Private Office 557, Living OS 532, Instant Reality 459. |
 | `wereldlaag.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |
 | `werkblad.e2e.js` | 1 | -- | RTG Kantoren en de middenconsole in een echte browser. Twee dingen die alleen daar te zien zijn: 1. |

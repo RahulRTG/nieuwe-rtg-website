@@ -6,7 +6,7 @@
    browser. Draai: node --experimental-sqlite --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
@@ -45,10 +45,17 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 60000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 10000 });
-    await page.click('#rtgCommand .cmd-klok');
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN LID DAT DOET.
+
+       Hier stonden twee stappen: eerst de knop in de bank naar het springboard,
+       daarna de knop in de statusbalk daar. Dat springboard is als scherm weg
+       (WERELD.md) en het paneel hangt nu aan de voet van de bank -- dezelfde
+       deur die een lid ziet, één stap in plaats van twee.
+
+       Via openBank() en niet via .cmd-lade: deze pagina draait op de
+       standaardbreedte van Playwright, en daar is de bank een vaste rail
+       zonder greep. Zie test/helper.js. */
+    await bankDeur(page, 'Bedieningspaneel');
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     await page.waitForSelector('#osCcZegel', { state: 'visible', timeout: 8000 });
     await page.click('#osCcZegel');

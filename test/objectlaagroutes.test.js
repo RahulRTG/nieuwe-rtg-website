@@ -24,24 +24,40 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
-/* VEERTIEN DAGEN, en dat getal staat er weer omdat het PRODUCT is veranderd.
+/* VEERTIEN DAGEN, EN DAT IS NA EEN SAMENVOEGING EEN BEWUSTE KEUZE.
 
-   Deze toets stond even op drie dagen. Reden: de momentlijn eindigde op "deze
-   maand", en die krimpt naar nul aan het eind van een maand -- veertien dagen
-   vooruit sprong dan over de maandgrens, viel in de telling `later` en stond
-   dus niet op de lijn. De toets was daarmee afhankelijk van de kalenderdag
-   waarop je hem draaide, en dat is een tijdbom.
+   Deze plek heeft twee sessies tegelijk beziggehouden, met dezelfde aanleiding
+   en twee verschillende antwoorden -- en dat is het opschrijven waard.
 
-   De toets terugbuigen was toen het eerlijke antwoord op een rode suite, maar
-   niet het goede antwoord op de vraag eronder: waarom zou een afspraak over
-   twee weken onzichtbaar zijn? Dat is nu opgelost waar het hoorde, in
-   kern/socialegraaf/lijn.js: de lijn heeft een uitgesproken horizon van vijf
-   weken en noemt de maanden daarbinnen bij naam. Veertien dagen valt daar
-   altijd binnen, op elke dag van de maand.
+   DE AANLEIDING. De lijn-toets hieronder eiste dat een bijeenkomst veertien
+   dagen vooruit in een vak met een naam belandt. Dat klopte op ongeveer twee
+   van de drie dagen: de momentlijn eindigde bij de KALENDERMAAND, dus zodra
+   vandaag + 14 over een maandgrens viel, belandde de bijeenkomst in `later` --
+   een telling, geen vak. Op 17 augustus groen, op 18 augustus rood, zonder dat
+   er een regel was veranderd. Doorgerekend over 400 dagen: op 182 ervan mis.
 
-   Dat het hier weer veertien is, is dus geen terugdraaiing maar de bewering die
-   de wijziging draagt. */
+   OP MAIN is de toets verlegd naar drie dagen (commit 50f4144), met het
+   argument dat de vakindeling een besluit is dat elders deterministisch wordt
+   getoetst. Dat was juist voor het product zoals het toen was.
+
+   OP DEZE TAK is het product veranderd, en dat was een uitdrukkelijke opdracht:
+   de lijn heeft nu een uitgesproken horizon van vijf weken en noemt de maanden
+   daarbinnen bij naam (kern/socialegraaf/lijn.js). De reden dat veertien dagen
+   soms onzichtbaar was, bestaat dus niet meer -- die zichtbaarheid hing af van
+   waar de maandgrens toevallig lag, en dat viel aan een lid niet uit te leggen.
+
+   WAT ER NU STAAT. Eén constante en geen twee. Veertien dagen is sinds die
+   wijziging net zo deterministisch als drie, en het is de betere bewering:
+   het is precies de afstand die eerst wegviel. De tweede constante (OPDELIJN)
+   is daarmee vervallen -- zij bestond om een productfout te ontwijken die er
+   niet meer is, en twee datums voor dezelfde vraag lopen uiteen (LAT-regel 4).
+
+   De vakindeling zelf blijft waar zij hoort te zakken: test/socialelijn.test.js
+   rekent hem door vanaf een vaste maandag, en toetst sinds deze wijziging de
+   EIGENSCHAP -- dezelfde afstand geeft dezelfde zichtbaarheid, op elke dag van
+   de maand. */
 const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };

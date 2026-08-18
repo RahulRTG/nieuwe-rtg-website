@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="5141b00d">
+<meta name="rtg-bouw" content="5134029c">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -32,10 +32,6 @@
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
-<!-- de levende wereld: de kring om de klok, de bezel, het Command Wheel en de
-     levende grond. Hier tussen de andere bladen om dezelfde reden als media.css
-     hierboven: een blad erbij mag geen tweede stijlbundel opleveren. -->
-<link rel="stylesheet" href="/shared/wereld.css">
 <style>
   :root{
     --bg:var(--rtg-bg);
@@ -1125,12 +1121,20 @@
     #content.os-veeg-weg{transition:transform var(--rtg-tempo) var(--rtg-ease-uit),opacity var(--rtg-tempo) var(--rtg-ease-uit);transform:scale(0.85) translateY(-10vh);opacity:0;}
   }
 
-  /* ================= HET BEGINSCHERM: VIER LAGEN =================
+  /* ================= DE SCHIL: DRIE LAGEN =================
 
-     Van boven naar beneden: de mappen, de klok, de functies, de balk van
-     Rahul. Eén scherm, nooit scrollen, geen tweede blad. De klok krijgt de
-     ruimte die overblijft (flex:1) en blijft daarmee altijd het midden --
-     op een telefoon net zo goed als op de tablet. */
+     Van boven naar beneden: de mappen, de functies, de balk van Rahul. Eén
+     scherm, nooit scrollen, geen tweede blad.
+
+     DE KLOK STOND HIER TUSSEN, en dat was vier lagen. Zij was de kop van dit
+     scherm en pakte met flex:1 alle ruimte die de andere lagen overlieten. Het
+     beginscherm is de werktafel van RTG Command geworden (shared/command.js) en
+     de klok is met hem meegegaan; de werelden die op haar bezel hingen staan nu
+     bovenaan de bank. Wat overblijft is deze schil, die je nog ziet zolang de
+     overeenkomst niet getekend is -- daar ligt #onbGate overheen en mag de
+     werktafel er niet zijn. De overgebleven ruimte gaat sindsdien naar de leegte
+     tussen de mappen en de functies (margin-top:auto hieronder), zodat de balk
+     van Rahul aan de onderrand blijft waar je duim hem zoekt. */
   #content.os-thuis{padding:0;overflow:hidden;display:flex;flex-direction:column;}
   .view[data-view="home"].active{display:flex;flex-direction:column;flex:1;min-height:0;}
   /* ============ HET RTG-BEWEGINGSSYSTEEM ============
@@ -1165,7 +1169,7 @@
   .os-thuisscherm > *{width:100%;max-width:var(--os-kolom);margin-inline:auto;}
 
   /* de passregel: welke pas, en sinds wanneer. Eén dunne regel, en de enige
-     tekst boven de mappen -- de klok is de kop van dit scherm.
+     tekst boven de mappen.
      (.os-groet stond hier, voor de begroeting die van dit scherm af is; een
      klasse zonder element is de soort rommel waar niemand meer aan durft te
      komen omdat je niet weet of hij nog ergens vandaan komt.) */
@@ -1177,10 +1181,10 @@
 
   /* 1. de hoofdwerelden, bovenaan -- één gecentreerde rij van drie.
 
-        De voordeur toont RTG, RTG Kantoor en RTFoundation als één rustige
-        vorm. De tegels houden de compacte rastermaat; ze worden niet uitgerekt
-        om de beschikbare breedte te vullen, want dan verdringen ze de klok en
-        voelt drie als een leeg raster in plaats van een bewuste keuze. */
+        RTG, RTG Kantoor en RTFoundation als één rustige vorm. De tegels houden
+        de compacte rastermaat; ze worden niet uitgerekt om de beschikbare
+        breedte te vullen, want dan voelt drie als een leeg raster in plaats van
+        een bewuste keuze. */
   .os-mappen{
     display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
     margin-top:calc(var(--e) * 0.9);flex-shrink:0;
@@ -1190,50 +1194,21 @@
     width:calc((100% - var(--e) * 2.25) / 4);
   }
 
-  /* 2. de ronde klok, in het midden. Dit vak pakt alle ruimte die de andere
-        lagen overlaten en centreert de klok daarin -- dus staat er evenveel
-        lucht boven als onder, en dat is precies wat een horloge nodig heeft
-        om een horloge te blijven en geen tegel te worden.
+  /* 2. de functies, onder de lucht.
 
-        HIER HEEFT EEN BOVENGRENS OP GESTAAN, en die is er weer af. Bedoeling
-        was de klok omhoog te halen; gevolg was dat alle overtollige ruimte
-        naar het einde van de kolom zakte, de balk van Rahul los van de
-        onderrand kwam te hangen en er een gat van 155 punten onder het scherm
-        stond. De balk hoort aan de onderrand -- daar zoekt je duim hem -- en
-        de klok hoort lucht om zich heen. Allebei krijg je terug door dit vak
-        gewoon zijn werk te laten doen.
+        Hier stond .os-klokvak: het vak met de ronde klok, dat met flex:1 alle
+        overgebleven ruimte pakte en de klok erin centreerde. De klok is weg (zie
+        de kop van dit blok), en zonder vervanging zou de hele kolom naar boven
+        klappen en de balk van Rahul los van de onderrand komen te hangen -- een
+        fout die hier eerder is gemaakt met een bovengrens op datzelfde vak.
 
-        Wil je de laag ERBOVEN of ERONDER verschuiven, doe dat dan met een
-        marge op die laag zelf (zie .os-aibalk): dit vak krimpt dan mee en de
-        onderrand blijft waar hij staat. */
-  .os-klokvak{
-    flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
-    padding:calc(var(--e) * 0.5) 0;
-  }
-  .os-klokvak .os-home-klok.rtg-ring{
-    width:auto;height:100%;aspect-ratio:1;
-    /* zo groot als de overgebleven ruimte toelaat, maar nooit breder dan de
-       kolom: op een telefoon vult hij het midden, op de tablet blijft hij een
-       horloge en wordt hij geen schotel.
-
-       De twee grenzen moeten DEZELFDE zijn, en dat is geen schoonheidsfoutje.
-       Met height:100% en aspect-ratio:1 rekent de browser de breedte uit de
-       hoogte; knijpt max-width die breedte daarna af, dan blijft de hoogte
-       gewoon staan en is het vak niet langer vierkant (gemeten op een telefoon:
-       228 breed, 384 hoog). De wijzerplaat zelf blijft rond, want de SVG houdt
-       zijn verhouding -- maar de schaduw in .rtg-ring::before krijgt
-       border-radius:50% op dat uitgerekte vak en werd zo een ellips van 384
-       hoog: het donkere ei rond de klok, dat niemand aan de schaduwkleur kon
-       wijten. Dezelfde bovengrens op de hoogte houdt het vak vierkant, en de
-       schaduw dus rond om de kast. */
-    max-width:min(100%, calc(var(--e) * 19));
-    max-height:min(100%, calc(var(--e) * 19));
-  }
-
-  /* 3. de functies, onder de klok */
-  .os-functies{margin-top:0;flex-shrink:0;}
+        margin-top:auto zet die ruimte nu op deze laag: mappen bovenaan,
+        functies en de balk van Rahul aan de onderrand, lucht ertussen. Wil je
+        een laag verschuiven, doe dat met een marge op die laag zelf; de leegte
+        krimpt dan mee en de onderrand blijft waar hij staat. */
+  .os-functies{margin-top:auto;flex-shrink:0;}
   /* bellen, berichten en videobellen zijn het telefoongedeelte: iets warmer
-     dan de rest, zodat de rij onder de klok als één ding leest */
+     dan de rest, zodat de rij als één ding leest */
   .os-functies .os-app[data-sleutel="os:bellen"] .os-tegel,
   .os-functies .os-app[data-sleutel="os:videobellen"] .os-tegel,
   .os-functies .os-app[data-sleutel="link:berichten"] .os-tegel{
@@ -1243,10 +1218,10 @@
     background:linear-gradient(160deg,#8A6D14,#5C4A0E);
   }
 
-  /* 4. het gesprek met Rahul, boven zijn balk
+  /* 3. het gesprek met Rahul, boven zijn balk
      De draad groeit vanaf de balk omhoog en neemt hoogstens een derde van het
-     scherm; wat erboven staat (de klok) krimpt mee, want die heeft flex:1. Zo
-     blijft het beginscherm een beginscherm en wordt het geen chat-app. */
+     scherm; de lucht erboven krimpt mee. Zo blijft dit een schil en wordt het
+     geen chat-app. */
   .os-aidraad{
     flex-shrink:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
     max-height:34%;margin-top:calc(var(--e) * 0.9);
@@ -1346,8 +1321,10 @@
   .os-scrim{
     position:absolute;inset:0;z-index:50;display:none;
     align-items:flex-start;justify-content:center;
-    background:rgba(0,0,0,0.45);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    /* Onyx en geen neutraal zwart: de was eronder hoort van hetzelfde materiaal
+       te zijn als het paneel erop. */
+    background:rgba(5,5,5,0.58);
+    backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
   }
   .os-scrim.open{display:flex;}
   .os-map-paneel{
@@ -1454,53 +1431,101 @@
     color:var(--soft);font-size:0.8rem;text-align:center;line-height:1.5;
   }
 
+  /* HET BEDIENINGSPANEEL IS VAN ONYXGLAS MET EEN GOUDEN HAARLIJN.
+
+     Het was gebouwd uit --card en --card2, en die twee zijn geen materiaal maar
+     een MENGSEL: shared/levendekleur.js mengt er de levende dagkleur doorheen,
+     en die is overdag blauw. Gevolg: een paneel met een paarse zweem, naast een
+     werktafel van onyx en goud. Precies waar MATERIAAL.md voor waarschuwt --
+     wie een kleur kiest in plaats van een materiaal, drijft weg zonder dat
+     iemand het merkt.
+
+     Dit paneel hangt sinds het springboard verdween BOVEN de werktafel, dus is
+     het van hetzelfde gemaakt als de console daar (shared/command.css): onyxglas,
+     een haarlijn van champagnegoud, licht dat langs de bovenrand invalt. Een
+     materiaal, en overal hetzelfde.
+
+     Goud is hier gereserveerd voor "geselecteerd" (ONTWERP.md par. 4) en groen
+     voor "staat aan" -- niet voor versiering. */
   .os-cc{
     margin-top:calc(env(safe-area-inset-top, 0px) + 3.6rem);
     width:min(340px, 90%);
-    background:color-mix(in srgb, var(--card) 72%, transparent);
-    border:1px solid var(--line);border-radius:18px;
-    padding:1rem;box-shadow:0 24px 60px rgba(0,0,0,0.5);
-    display:flex;flex-direction:column;gap:0.85rem;
+    background:linear-gradient(158deg, rgba(28,25,24,0.86), rgba(5,5,5,0.80));
+    backdrop-filter:blur(30px) saturate(1.08);
+    -webkit-backdrop-filter:blur(30px) saturate(1.08);
+    border:1px solid color-mix(in srgb, var(--gold-tekst,#C0A544) 24%, rgba(255,255,255,0.1));
+    border-radius:22px;
+    padding:1.05rem;
+    box-shadow:0 1px 0 rgba(255,255,255,0.16) inset,
+               0 -1px 0 rgba(192,165,68,0.09) inset,
+               0 22px 56px rgba(0,0,0,0.5);
+    display:flex;flex-direction:column;gap:1rem;
+    color:var(--rtg-txt,#F4F0E9);
   }
   /* -------- Now Playing: je muziek bedienen vanaf de ROS -------- */
   .os-nu{display:flex;align-items:center;gap:0.6rem;
-    background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:0.55rem 0.65rem;}
+    background:rgba(255,255,255,0.035);border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    border-radius:16px;padding:0.55rem 0.65rem;}
+  /* EN HIJ GAAT OOK ECHT WEG ALS ER NIETS SPEELT.
+
+     app-main-31.js zet `hidden` op deze kaart zodra er geen titel is -- maar
+     `display:flex` op een klasse wint van de `[hidden]`-regel van de browser,
+     dus stond er bovenaan het bedieningspaneel altijd een lege bak met een
+     noot, een leeg tekstvak en drie knoppen die nergens over gingen. Het viel
+     niet op zolang het paneel zelf al een verzameling doosjes was; met een
+     rustig vlak eromheen is het het eerste wat je ziet. */
+  .os-nu[hidden]{display:none;}
   .os-nu-open{display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;padding:0;color:var(--txt);}
-  .os-nu-hoes{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 30%, var(--card)), var(--card));font-size:1.25rem;color:var(--gold);}
+  .os-nu-hoes{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(140deg, rgba(192,165,68,0.20), rgba(255,255,255,0.03));
+    font-size:1.25rem;color:var(--gold-tekst,#C0A544);}
   .os-nu-hoes svg{display:block;}
   .os-nu-tekst{display:flex;flex-direction:column;min-width:0;}
   .os-nu-tekst b{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .os-nu-tekst small{font-size:0.66rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .os-nu-tekst small{font-size:0.66rem;color:var(--rtg-soft,rgba(244,240,233,0.56));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .os-nu-knoppen{display:flex;align-items:center;gap:0.15rem;flex-shrink:0;}
-  .os-nu-knoppen button{background:none;border:none;color:var(--txt);font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
-  .os-nu-knoppen button:hover{color:var(--gold);}
+  .os-nu-knoppen button{background:none;border:none;color:var(--rtg-muted,rgba(244,240,233,0.72));font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
+  .os-nu-knoppen button:hover{color:var(--gold-tekst,#C0A544);background:rgba(255,255,255,0.04);}
   #osNuSpeel{font-size:1.3rem;}
 
-  .os-cc-rij{display:flex;flex-direction:column;gap:0.45rem;}
-  .os-cc-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
+  .os-cc-rij{display:flex;flex-direction:column;gap:0.5rem;}
+  /* Hetzelfde kopje als in de bank van de werktafel (.cmd-kop in command.css):
+     zelfde gewicht, zelfde spatiëring, zelfde toon. Twee bijna-gelijke kopjes
+     naast elkaar lezen als twee systemen. */
+  .os-cc-label{font:600 0.56rem/1 var(--rtg-interface,'Inter',system-ui,sans-serif);
+    letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-soft,rgba(244,240,233,0.56));}
   .os-cc-knoppen{display:flex;gap:0.4rem;}
   .os-cc-knoppen button{
-    flex:1;padding:0.55rem 0;border-radius:10px;border:1px solid var(--line);
-    background:var(--card2);color:var(--txt);font-size:0.72rem;
-    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
+    flex:1;padding:0.6rem 0;border-radius:999px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    background:transparent;color:var(--rtg-muted,rgba(244,240,233,0.72));
+    font:500 0.72rem/1 var(--rtg-interface,'Inter',system-ui,sans-serif);
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
   }
-  .os-cc-knoppen button.actief{border-color:var(--gold);color:var(--gold);}
+  .os-cc-knoppen button:hover{color:var(--rtg-txt,#F4F0E9);background:rgba(255,255,255,0.04);}
+  .os-cc-knoppen button.actief{
+    border-color:color-mix(in srgb, var(--gold-tekst,#C0A544) 42%, transparent);
+    background:rgba(192,165,68,0.14);color:var(--gold-tekst,#C0A544);}
   .os-cc-thema button{display:flex;align-items:center;justify-content:center;gap:0.4rem;}
   .os-thema-stip{width:0.85rem;height:0.85rem;border-radius:50%;flex:0 0 auto;
     box-shadow:0 0 0 1px var(--line) inset;}
   .os-cc-thema button.actief .os-thema-stip{box-shadow:0 0 0 1.5px var(--gold) inset;}
-  #osCcHelder{width:100%;accent-color:var(--gold);}
-  .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
+  /* Beide schuiven dragen dezelfde accentkleur. De tweede stond op de
+     browserstandaard -- systeemblauw -- en dat is hier geen ingetogen keuze maar
+     een kleur van buiten: Royal is het enige koele materiaal en gaat niet over
+     helderheid of beweging (MATERIAAL.md). */
+  #osCcHelder,#osCcBeweging{width:100%;accent-color:var(--gold-tekst,#C0A544);}
+  .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.45rem;}
   .os-cc-tegels button{
-    display:flex;flex-direction:column;align-items:center;gap:0.3rem;
-    padding:0.65rem 0;border-radius:12px;border:1px solid var(--line);
-    background:var(--card2);color:var(--txt);font-size:0.6rem;
-    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease);
+    display:flex;flex-direction:column;align-items:center;gap:0.35rem;
+    padding:0.7rem 0.2rem;border-radius:14px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    background:rgba(255,255,255,0.035);color:var(--rtg-muted,rgba(244,240,233,0.72));
+    font:500 0.6rem/1.25 var(--rtg-interface,'Inter',system-ui,sans-serif);text-align:center;
+    transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
   }
+  .os-cc-tegels button:hover{color:var(--rtg-txt,#F4F0E9);background:rgba(255,255,255,0.06);}
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
   .os-cc-tegels button b svg{display:block;}
-  .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
+  .os-cc-tegels button.aan{border-color:color-mix(in srgb, var(--green) 45%, transparent);color:var(--green);}
   /* het aantal ongelezen meldingen op de tegel: hetzelfde stipje als de bel-badge
      had, want hij vertelt hetzelfde */
   .os-cc-tegels button{position:relative;}
@@ -1582,6 +1607,7 @@
 <script src="/shared/command/console.js" defer></script>
 <script src="/shared/command/verdeler.js" defer></script>
 <script src="/shared/command/bank.js" defer></script>
+<script src="/shared/command/praat.js" defer></script>
 <script src="/shared/command/inlogpoort.js" defer></script>
 <script src="/shared/command/werktafel.js" defer></script>
 <script src="/shared/command.js" defer></script>
@@ -1737,11 +1763,16 @@
 
           <nav class="os-grid os-mappen" id="osMappen" aria-label="Mappen met apps"></nav>
 
-          <!-- De RTG-klok is de enige tijd in het OS: hetzelfde horloge als op
-               het inlogscherm, hier groot in het midden van het beginscherm. -->
-          <div class="os-klokvak">
-            <div class="os-home-klok" id="homeKlok" data-rtg-klok="ring" aria-label="RTG-horloge"></div>
-          </div>
+          <!-- HIER STOND DE RTG-KLOK, groot in het midden.
+
+               Zij was de kern van het beginscherm: de werelden hingen als merken
+               op haar bezel en je draaide eraan om te reizen. Het beginscherm is
+               de werktafel van RTG Command geworden, en een klok die het midden
+               is van een scherm dat niemand meer als eerste ziet, is geen kern
+               meer maar een widget. De werelden staan nu bovenaan de bank van de
+               werktafel (shared/command/bank.js), de tijd staat waar hij op een
+               telefoon hoort, en het horloge zelf blijft op het inlogscherm --
+               daar is het nog steeds het eerste wat je ziet. -->
 
           <nav class="os-grid os-functies" id="osFuncties" aria-label="Functies"></nav>
 
@@ -1983,17 +2014,14 @@
           </div>
           <small class="os-aiwet">De achtergrond ‘Beeld’ is een AI-gegenereerd campagnebeeld zonder echte personen.</small>
         </div>
-        <!-- Het beginscherm: de levende wereld (de kring om de klok) of het
-             vertrouwde rooster met tegels. Dit is EEN schakelaar en geen tweede
-             beginscherm: beide standen tonen dezelfde klok, dezelfde werelden
-             en dezelfde balk van Rahul (zie shared/wereld.js). -->
-        <div class="os-cc-rij" id="osCcWereldRij">
-          <span class="os-cc-label" data-i18n="os.cc.wereld">Beginscherm</span>
-          <div class="os-cc-knoppen" id="osCcWereld">
-            <button type="button" data-wereld="aan" data-i18n="os.cc.wereld.kring">Wereld</button>
-            <button type="button" data-wereld="uit" data-i18n="os.cc.wereld.raster">Rooster</button>
-          </div>
-        </div>
+        <!-- HIER STOND DE SCHAKELAAR WERELD/ROOSTER.
+
+             Twee standen van hetzelfde beginscherm: de kring om de klok, of het
+             rooster met tegels. Het beginscherm is de werktafel van RTG Command
+             geworden en de klok is met de kring meegegaan, dus schakelt deze
+             knop tussen twee dingen die er geen van beide meer zijn. Er is nu
+             één beginscherm en dat is precies de belofte die WERELD.md al deed
+             -- alleen is het een ander scherm geworden. -->
         <div class="os-cc-tegels">
           <button id="osCcScan"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M4 12h16"/></svg></b><span data-i18n="os.cc.scan">Scannen</span></button>
           <button id="osCcZegel"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></b><span data-i18n="os.cc.zegel">Mijn Zegel</span></button>
@@ -2260,12 +2288,6 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<!-- De levende wereld: het beginscherm als kring om de klok. Moet VOOR
-     app-main.js staan en zonder defer, want app-main reikt hem de werelden aan
-     (app-main-26c.js) op het moment dat het zelf draait. De zware hoofdbundel
-     zelf mag wel uitgesteld: dan downloadt hij naast het HTML-parsen en draait
-     hij vóór DOMContentLoaded, nadat de volledige shell bestaat. -->
-<script src="/shared/wereld.js"></script>
 <script src="/apps/magnaat-sandbox.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>

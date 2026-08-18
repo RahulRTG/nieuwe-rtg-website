@@ -27,7 +27,10 @@ function wereldMet(over) {
     reisbureau: { mijn: () => [] },
     lucht: { mijn: () => ({ boekingen: [], charters: [] }) },
     // de vierde bron: de Invoerbalie (kern/invoer.js), sinds REIZEN.md fase 2
-    invoer: { mijnRegels: () => [] }
+    invoer: { mijnRegels: () => [] },
+    // de vijfde: activiteiten (tickets/diensten), sinds fase 4 -- leest db + de zaak
+    db: { boekingenVanKlant: () => [], data: { boekingen: [] } },
+    findSupplier: () => null
   }, over || {});
   return maakReiswereld({ kern }).reiswereld;
 }

@@ -43,6 +43,45 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
       return b.concat(c);
     }, uit, stil);
 
+  /* DE ACTIVITEITEN: tickets en dienstboekingen bij partners (excursies,
+     tours, musea, afspraken met een datum). Ze stonden al in de Mall-
+     bestellingen en de reisagenda, maar NIET in de reiswereld -- een gekochte
+     excursie in Ibiza hoorde dus niet bij de reis naar Ibiza. Sinds fase 4
+     van REIZEN.md wel.
+
+     Alleen wat betaald of bevestigd is: een boeking in 'wacht-op-betaling'
+     vervalt na een half uur vanzelf (lidacties.js geeft er 410 op) en zou hier
+     eeuwig als spook blijven staan. De statusfilter staat NAAST paid en dat is
+     verdedigingsdiepte, geen dubbeling: de lid-annulering zet paid op false
+     (dus die dekt paid al), maar een annuleringsweg die paid laat staan --
+     een zaak die afzegt zonder terug te betalen -- mag hier nooit als reis
+     verschijnen. De mutatie die de statusfilter weghaalde sloeg af op de
+     bestaande toetsen, precies omdat de demoroutes altijd terugbetalen; dat
+     is opgeschreven in plaats van de filter geschrapt (LAT-regel 2). De BESTEMMING komt uit de zaak zelf --
+     dezelfde reparatie als bij de verblijven: een boeking draagt de zaak, de
+     zaak draagt de stad, en die projectie hoort bij het lezen en op een plek.
+
+     En de wachttekst: een betaald ticket heet 'aangevraagd', maar er wacht
+     geen reisadviseur -- de ZAAK bevestigt. Vandaar de eigen wacht-override;
+     het woordenboek houdt zijn betekenis, de bron kent zijn wachter. */
+  bron('activiteiten', () => {
+    const rij = kern.db.boekingenVanKlant ? kern.db.boekingenVanKlant(key)
+      : (kern.db.data.boekingen || []).filter(b => (b.customerKey || b.customerTier) === key);
+    return rij
+      .filter(b => b.datum && b.paid && !['geannuleerd', 'geweigerd', 'terugbetaald'].includes(b.status))
+      .map(b => {
+        const zaak = kern.findSupplier(b.supplierCode);
+        return regel(b.kind === 'ticket' ? 'activiteit' : 'afspraak', {
+          titel: (b.service && b.service.name) || b.supplierName,
+          bestemming: (zaak && zaak.city) || '',
+          van: b.datum, tijd: b.tijd || null, personen: b.personen,
+          status: b.status, wacht: b.status === 'aangevraagd' ? 'de zaak' : null,
+          kenmerk: b.ref, herkomst: 'partner',
+          app: b.kind === 'ticket' ? 'Tickets' : 'Diensten', link: '/apps/portaal.html'
+        });
+      });
+  }, uit, stil);
+
   /* DE INVOERBALIE: wat het lid zelf invoerde uit een eigen document, foto of
      e-mail (kern/invoer.js). Een domein als elk ander -- het bezit zijn eigen
      rijen -- met dit verschil: de herkomst komt hier PER RIJ mee en staat niet

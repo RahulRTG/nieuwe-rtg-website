@@ -478,6 +478,40 @@ afwikkeling.
 *Klaar als:* een kleine ondernemer op zijn telefoon een tijdslot kan sluiten en
 dat binnen een seconde in de reis van een lid klopt.
 
+**Waar fase 4 staat: verder dan gedacht, en de rest is af** (18 augustus 2026).
+Bij het nameten bleek de schrijfkant grotendeels te bestaan: een zaak met de
+`tickets`-capability beheert al activiteiten met prijs, capaciteit en
+tijdsloten (`routes/supplier/tickets.js`), leden kopen en betalen via de
+bestaande boekingstroom, dyncode en de betaalopdracht staan klaar. Wat er echt
+ontbrak waren twee dingen, en die zijn gebouwd:
+
+1. **Een gekochte excursie hoorde niet bij de reis.** Tickets stonden in de
+   Mall-bestellingen en de reisagenda, maar niet in de reiswereld — een
+   snorkeltocht in Ibiza stond los van de reis naar Ibiza. Nu is
+   `activiteiten` de vijfde bron: bestemming uit de zaak (dezelfde reparatie
+   als bij de verblijven), de tijd van het slot, herkomst `partner`. Alleen
+   wat betaald is — `wacht-op-betaling` vervalt na een half uur vanzelf en zou
+   als spook blijven staan. En de wachttekst is van de bron: op een betaald
+   ticket wacht **de zaak**, geen reisadviseur; het woordenboek houdt het
+   signaal, de bron kent zijn wachter.
+2. **De sluitdag** (`kern/activiteitendicht.js`): de manager sluit een dag
+   (voor één activiteit of de hele zaak, met een reden die de gast leest —
+   "gesloten" is iets anders dan "vol"), kopen weigert per direct, en het
+   aanbod toont de dag vooraf als dicht. Sluiten raakt bestaande boekingen
+   **niet**: die stil annuleren zou geld afpakken zonder dat iemand erop
+   drukte. Het antwoord telt ze en zegt dat daar werk ligt.
+
+Eén mutatie sloeg af en dat staat opgeschreven in plaats van weggewerkt: de
+statusfilter naast `paid` in de bron is verdedigingsdiepte tegen een
+annuleringsweg die `paid` laat staan; de bestaande routes betalen altijd terug,
+dus geen enkele toets kan hem vandaag laten bijten.
+
+**Wat er van fase 4 nog open staat:** moderatie vóór publicatie van
+partnerproducten (nieuwe activiteiten gaan nu live zoals al het zaakaanbod — of
+dat een aparte keuring verdient is een besluit over het hele aanbodmodel, niet
+alleen over reizen), en het partner-dashboard uit de opdracht (omzet,
+settlement, analytics) — de cijfers bestaan per zaak al in de leverancier-app.
+
 ### Fase 5 -- Samenstellen
 
 Dynamische samenstelling en de knop "los het op": alternatieven zoeken, gevolgen

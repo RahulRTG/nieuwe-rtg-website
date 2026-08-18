@@ -40,7 +40,9 @@ function reizenMet(over) {
     mijnVerblijven: () => [],
     reisbureau: { mijn: () => [] },
     lucht: { mijn: () => ({ boekingen: [], charters: [] }) },
-    invoer: { mijnRegels: () => [] }
+    invoer: { mijnRegels: () => [] },
+    db: { boekingenVanKlant: () => [], data: { boekingen: [] } },
+    findSupplier: () => null
   }, over || {});
   Object.assign(kern, maakReiswereld({ kern }));
   return maakReizen({ kern }).reizen;

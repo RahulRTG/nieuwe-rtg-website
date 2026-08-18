@@ -96,7 +96,11 @@ module.exports.maakReiswereld = ({ kern }) => {
          en de rest hoort in het register. Hier een 00:00 verzinnen zou een
          hotelovernachting bovenaan uw dag zetten (CANVAS.md). */
       tijd: o.tijd || null,
-      sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
+      /* De wachttekst: het WOORDENBOEK zegt wat een status betekent, maar WIE
+         er wacht verschilt per bron -- op een reisbureau-aanvraag wacht een
+         reisadviseur, op een betaald ticket de zaak. De bron mag dat
+         preciseren; het signaal en het teken blijven van het woordenboek. */
+      sig: b.sig || '', teken: b.teken || '', wacht: o.wacht || b.wacht || '',
       /* Alleen meesturen wat het domein ECHT weet. Een verblijf kent geen
          reizigersaantal en een vlucht kent een stoel en geen gezelschap; daar
          een 1 neerzetten zou een getal verzinnen dat er nooit stond. Het scherm
@@ -155,7 +159,7 @@ module.exports.maakReiswereld = ({ kern }) => {
          Het scherm zegt dit hardop, want een lege reiswereld die eigenlijk een
          storing is, laat iemand een vlucht missen. */
       stil,
-      bronnen: ['verblijven', 'reisbureau', 'vluchten', 'ingevoerd']
+      bronnen: ['verblijven', 'reisbureau', 'vluchten', 'activiteiten', 'ingevoerd']
     };
   }
 

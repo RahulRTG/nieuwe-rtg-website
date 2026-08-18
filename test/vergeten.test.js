@@ -255,8 +255,27 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
   /* De server heeft zijn eigen kopie in het geheugen; we lezen wat er op schijf
      staat, want dat is wat na een herstart terugkomt en wat in een backup
      belandt. Dat is de eerlijke maat voor "weg". */
-  await wacht(600);
+  /* WACHTEN OP DE SCHRIJFACTIE, NIET OP DE KLOK.
+
+     Hier stond `await wacht(600)`: zeshonderd milliseconde hopen dat de server
+     zijn geheugen naar schijf had weggeschreven. Op een lege machine klopt dat;
+     op een volle CI-runner niet, en dan zakte deze toets op DRUKTE terwijl de
+     bezem gewoon zijn werk deed. Dat is geen bevinding maar ruis, en het is
+     precies het soort rood dat mensen leren wegklikken.
+
+     Nu kijkt hij tot de sleutel er ECHT niet meer staat, met een ruime grens.
+     Dat maakt de bewering hieronder niet vanzelfsprekend: gebeurt de bezem
+     niet, dan loopt deze lus zijn grens vol en zakt de toets alsnog -- op
+     dezelfde regel en met dezelfde melding als eerst. Wat verdwijnt is alleen
+     de gok over hoe snel een schijf is. */
   const bestand = path.join(TMP, 'db.json');
+  const grens = Date.now() + 20000;
+  while (Date.now() < grens) {
+    try {
+      if (fs.existsSync(bestand) && !fs.readFileSync(bestand, 'utf8').includes(sleutel)) break;
+    } catch (e) { /* halverwege een schrijfactie gelezen: zo weer opnieuw */ }
+    await wacht(100);
+  }
   assert.ok(fs.existsSync(bestand), 'er staat een databasebestand: ' + bestand);
   const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));
 

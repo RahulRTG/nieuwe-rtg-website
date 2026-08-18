@@ -15,8 +15,21 @@
    vorm van een toestemming (een rij met een `key` en een `status: 'actief'`) en
    eist dat elke module die hem heeft, hier staat of daar een reden krijgt. Een
    nieuwe laag zakt dus met naam en toenaam. Wat die scan NIET vindt is een
-   andere vorm -- RTG iD gebruikt een `ingetrokken`-vlag en staat hier omdat een
-   mens hem erin zette. Het gat is kleiner, niet weg, en het scherm zegt dat.
+   andere vorm -- RTG iD gebruikt een `ingetrokken`-vlag en de paspoortlaag een
+   `status: 'goedgekeurd'`; die twee staan hier omdat een mens ze erin zette.
+   Het gat is kleiner, niet weg, en het scherm zegt dat.
+
+   IDENTITEIT KOMT UIT VIER LAGEN, en dat is de reden dat hier lang maar een van
+   de vier stond. RTG iD (kern/rtgid.js) deelt attributen met een dienst, de
+   paspoortlaag (kern/paspoort.js) opent het identiteitsbewijs zelf, het Zegel
+   (public/shared/zegelcheck.js) bewijst een feit aan de balie, en payroll
+   (kern/payroll/identiteit.js) laat een werkgever opvragen wat de
+   loonadministratie eist. Alleen de eerste twee zetten iets OPEN dat blijft
+   staan tot iemand het sluit; die horen op dit scherm. De andere twee zijn
+   eenmalig: daar valt niets in te trekken, want er staat niets open. Ze horen
+   bij de andere vraag -- "wie heeft er in mijn gegevens gekeken" -- en dat is
+   een journaal (server/inzagelog.js), geen toestemming. Ze staan daarom
+   hieronder bij het niet-gedekte, met die reden erbij.
 
    Wat een toets wel bewaakt: dat voor elke gedekte laag de intrekknop echt
    intrekt (heen en terug), en dat het register en wat het scherm toont niet
@@ -28,6 +41,7 @@
 const LAGEN = [
   { id: 'care-intake', naam: 'Medische context bij een zorgaanbieder', richting: 'ziet', gedekt: true },
   { id: 'care-vastlegging', naam: 'Zorgaanbieders die iets in uw dossier mogen vastleggen', richting: 'schrijft', gedekt: true },
+  { id: 'paspoort-inzage', naam: 'Partners die uw identiteitsbewijs mogen inzien', richting: 'ziet', gedekt: true },
   { id: 'rtgid-sessie', naam: 'Diensten die met RTG iD uw gegevens ophalen', richting: 'ziet', gedekt: true },
   { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true },
   { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
@@ -51,11 +65,26 @@ const NIET_GEDEKT = [
     reden: 'Daar valt niets te delen: die notities verlaten uw account niet, en er is geen knop die dat wel zou doen.' },
   { naam: 'Uw gedachtenboek',
     reden: 'Daar leest niemand in mee, ook geen model: er bestaat geen route die die tekst ergens anders heen stuurt, dus er valt niets in te trekken.' },
+  { naam: 'Een ID-/leeftijdscheck met het Zegel',
+    reden: 'Dat toont u zelf: de zaak scant uw Zegel en leert alleen het bewezen feit (18-plus, welke pas), nooit uw naam. Er blijft niets openstaan, dus er valt ook niets in te trekken.' },
+  { naam: 'Wat uw werkgever voor de loonadministratie opvraagt',
+    reden: 'Dat is een wettelijke plicht en geen toestemming die u geeft. U krijgt van elke opvraging bericht, en ze staat met reden in het inzagejournaal.' },
   { naam: 'Wat een zaak van een boeking weet',
     reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
 ];
 
 const dagVan = d => (d ? String(d).slice(0, 10) : null);
+/* Een dag is genoeg voor een toestemming die weken loopt. De paspoort-inzage
+   duurt tien minuten, en "Tot 2026-08-18" leest daar als "de hele dag nog". */
+const stipVan = d => (d ? String(d).slice(0, 10) + ' ' + String(d).slice(11, 16) : null);
+
+/* Wat een partner in zo'n venster te zien krijgt, in de woorden van het lid.
+   Niveau 'bevestiging' staat er niet bij: dat vraagt geen goedkeuring en legt
+   dus nooit een lopende toestemming vast (kern/paspoort/verzoeken.js). */
+const NIVEAU_TEKST = {
+  idkaart: 'Uw ID-kaart: pasfoto, naam, nationaliteit en geboortedatum',
+  paspoort: 'De volledige paspoortscan'
+};
 
 module.exports = ({ kern }) => {
   /* Elke laag apart, en een laag die het niet doet wordt gemeld en niet stil
@@ -83,6 +112,29 @@ module.exports = ({ kern }) => {
       uit.push({ laag: 'care-vastlegging', id: v.id, wie: v.aanbiederNaam,
         wat: 'Mag metingen in uw dossier vastleggen (bij een afspraak)',
         tot: null, richting: 'schrijft', intrekbaar: true });
+    }
+
+    /* De paspoortlaag beheert haar eigen toestemming: keurt een lid een verzoek
+       goed, dan krijgt de partner een VENSTER waarin hij de ID-kaart of de scan
+       mag openen. Dat staat open tot het vervalt of tot het lid het sluit, dus
+       het hoort hier -- ook al vindt de dekkingstoets het niet.
+
+       HET VENSTER WORDT HIER ZELF NAGEREKEND, en dat is geen dubbel werk.
+       `mijnVerzoeken` schoont niet op; dat doet alleen de partnerkant
+       (`vervalOpschonen` in partnerVerzoeken). Een verlopen goedkeuring staat
+       dus nog met status 'goedgekeurd' in de lijst. Zou dit scherm die
+       overnemen, dan meldt het een inzage die allang dicht is -- precies de
+       schijnzekerheid waar dit bestand bovenaan voor waarschuwt. Vervallen is
+       hier dus WEG, niet grijs. */
+    const pas = pak('Paspoort', kern.paspoortMijn && (() => kern.paspoortMijn(key)));
+    const nuMs = Date.now();
+    for (const v of pas || []) {
+      if (v.status !== 'goedgekeurd') continue;
+      if (v.vervalt && Date.parse(v.vervalt) < nuMs) continue;
+      uit.push({ laag: 'paspoort-inzage', id: v.id, wie: v.supplierName || v.supplierCode,
+        wat: (NIVEAU_TEKST[v.niveau] || 'gegevens uit uw identiteitsbewijs') +
+          (v.incident ? ' (vrijgegeven door RTG na een incident)' : ''),
+        tot: stipVan(v.vervalt), richting: 'ziet', intrekbaar: true });
     }
 
     const id = pak('RTG iD', kern.rtgid && kern.rtgid.inzage && (() => kern.rtgid.inzage(key)));
@@ -146,6 +198,7 @@ module.exports = ({ kern }) => {
 
     if (laag === 'care-intake') return kern.careIntakeStop(key, id);
     if (laag === 'care-vastlegging') return kern.vastleggingStop(key, id);
+    if (laag === 'paspoort-inzage') return kern.paspoortTrekIn(key, id);
     if (laag === 'rtgid-sessie') return kern.rtgid.intrek(key, id);
     if (laag === 'rtgid-machtiging') return kern.rtgid.machtigIntrek(key, id);
     if (laag === 'locatie') return kern.locStopKlant(key, id);

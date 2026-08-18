@@ -26,6 +26,7 @@
    Opslag in db.data.rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
 const { idVanKey } = require('../lib/lidsleutel');
+const { NIVEAUS, niveauVan, voldoet, bestaat } = require('./betrouwbaarheid');
 
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
@@ -55,6 +56,15 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
   }
   const codenaamUit = key => ((typeof gidsHaal === 'function' ? gidsHaal(key) : null) || {}).codename || 'lid';
 
+  /* Het betrouwbaarheidsniveau van dit lid. Er wordt niets nieuws gevraagd of
+     bewaard: kern/betrouwbaarheid.js geeft alleen een naam aan de stand die het
+     ledendossier al draagt. */
+  function niveauVoor(key) {
+    const u = accountVanKey(key);
+    const md = u ? (accounts.getMemberState(u.id) || {}) : {};
+    return niveauVan({ account: u, verified: u && u.verified, faceMatch: md.faceMatch });
+  }
+
   /* Selectieve deling: alleen de gevraagde attributen worden berekend en
      geleverd; 18plus is een afgeleid bewijs zonder de geboortedatum. */
   function attributenVoor(key, gevraagd) {
@@ -62,7 +72,8 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     const md = u ? (accounts.getMemberState(u.id) || {}) : {};
     const geboren = md.geboren || null;
     const lft = geboren && typeof leeftijdVan === 'function' ? leeftijdVan(geboren) : null;
-    const uit = { geverifieerd: !!(u && u.verified === 'verified') };
+    const uit = { geverifieerd: !!(u && u.verified === 'verified'),
+      betrouwbaarheid: niveauVan({ account: u, verified: u && u.verified, faceMatch: md.faceMatch }) };
     for (const a of gevraagd) {
       if (a === 'codenaam') uit.codenaam = codenaamUit(key);
       else if (a === '18plus') uit['18plus'] = lft != null ? lft >= 18 : null;
@@ -80,10 +91,17 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     if (!dienst) return { status: 400, error: 'Welke dienst vraagt de inlog?' };
     const gevraagd = (Array.isArray(b.attributen) ? b.attributen : []).filter(a => ATTRIBUTEN.includes(a));
     if (!gevraagd.length) gevraagd.push('codenaam');
+    /* Een dienst mag een betrouwbaarheidsniveau eisen: niet alleen "is dit lid
+       18+", maar "en hoe hard weet u dat". Een eis die niet bestaat wordt hier
+       geweigerd en niet stil genegeerd -- anders is een typefout in de eis
+       precies zo goed als geen eis, en faalt de strengste vraag het stilst. */
+    const eis = b.minBetrouwbaarheid ? String(b.minBetrouwbaarheid) : null;
+    if (eis && !bestaat(eis)) return { status: 400, error: 'Onbekend betrouwbaarheidsniveau: ' + eis + '.' };
     const k = { id: 'k' + crypto.randomBytes(6).toString('hex'), code: codeMaak(), dienst,
-      attributen: gevraagd, status: 'wacht', gemaakt: iso(), verloopt: nu() + KOPPEL_TTL_MS };
+      attributen: gevraagd, eis, status: 'wacht', gemaakt: iso(), verloopt: nu() + KOPPEL_TTL_MS };
     s.koppels.unshift(k); cap(s.koppels, MAX_KOPPELS); save();
-    return { status: 200, koppelId: k.id, code: k.code, dienst, attributen: gevraagd, verloopt: iso(k.verloopt) };
+    return { status: 200, koppelId: k.id, code: k.code, dienst, attributen: gevraagd,
+      minBetrouwbaarheid: eis, verloopt: iso(k.verloopt) };
   }
   function statusVan(koppelId) {
     const s = S();
@@ -118,8 +136,13 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
        een scherm dat dat pas bij de knop ontdekt, laat iemand tegen een dichte
        deur lopen zonder te zeggen welke sleutel eraan hoort. */
     const u = accountVanKey(key);
+    /* De eis en of dit lid hem haalt, gaan allebei mee. Alleen de eis tonen zou
+       het lid laten uitzoeken waar hij staat; alleen "kan niet" tonen laat hem
+       raden waarom. */
+    const mijn = niveauVoor(key);
     return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen,
-      passkeys: typeof passkeysVan === 'function' ? passkeysVan(u) : 0, eigenAccount: !!u };
+      passkeys: typeof passkeysVan === 'function' ? passkeysVan(u) : 0, eigenAccount: !!u,
+      minBetrouwbaarheid: k.eis || null, betrouwbaarheid: mijn, haaltEis: voldoet(mijn, k.eis) };
   }
   /* Bevestigen vraagt ALTIJD een passkey, en die eis staat HIER en niet in de
      route.
@@ -155,6 +178,18 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
        machtiging tekent de gemachtigde met zijn eigen sleutel. Anders zou een
        machtiging betekenen dat iemand met de biometrie van een ander bevestigt,
        en dat kan niet bestaan. */
+    /* Het niveau van wie er GEDEELD wordt, niet van wie er staat: bij een
+       machtiging vraagt de dienst zekerheid over de persoon wiens identiteit
+       hij krijgt. En deze controle staat VOOR de passkey, want om iemands
+       gezicht vragen voor een bevestiging die toch afvalt, is onbeleefd. */
+    if (k.eis) {
+      const n = niveauVoor(voorKey);
+      if (!voldoet(n, k.eis)) {
+        const eisNaam = (NIVEAUS.find(x => x.id === k.eis) || {}).naam || k.eis;
+        return { status: 403, error: k.dienst + ' vraagt betrouwbaarheidsniveau ' + k.eis + ' (' + eisNaam +
+          ')' + (namens ? ' voor de persoon namens wie u inlogt' : '') + '; u staat op ' + n.id + ' (' + n.naam + ').' };
+      }
+    }
     const ik = accountVanKey(key);
     if (!ik) return { status: 403, error: 'Bevestigen met RTG iD vraagt een passkey, en die hoort bij een eigen RTG-account. Een demo-persona of gast heeft er geen.' };
     if (typeof stapOp !== 'function') return { status: 500, error: 'De passkey-controle is niet aangesloten; bevestigen kan nu niet.' };

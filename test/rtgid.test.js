@@ -29,6 +29,23 @@ async function lid(geboortedatum) {
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }
 
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+
+/* Een lid echt door de kantoorkeuring halen, zodat het op A4 komt. Dat kan
+   alleen langs de echte weg -- bewijs insturen, kantoor keurt goed -- want het
+   niveau wordt nergens gezet maar overal afgeleid. */
+async function keurGoed(token, codenaam) {
+  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  await api('/api/verify/upload', { image: PNG }, token);
+  await api('/api/verify/selfie', { image: PNG }, token);
+  const pend = await api('/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === codenaam);
+  assert.ok(mij, 'het lid staat in de keuringsrij');
+  const r = await api('/api/office/verify', { userId: mij.id, decision: 'approve',
+    faceMatch: true, nationaliteit: 'Nederlandse' }, office);
+  assert.equal(r.status, 200, 'het kantoor keurt goed');
+}
+
 /* Een passkey aan een account hangen, met de echte ceremonie. De teller loopt
    per sleutel op: de server weigert een assertie waarvan de teller niet is
    gestegen (dat is de kloondetectie), dus een vaste teller zou de tweede inlog
@@ -293,4 +310,87 @@ test('14. een ceremonie van iemand anders is niet over te nemen', async () => {
   assert.match(gekaapt.body.error, /ander account/i);
   assert.equal((await api('/api/rtgid/status', { koppelId: s.body.koppelId })).body.stand, 'wacht',
     'en de inlog staat nog gewoon te wachten');
+});
+
+/* ---- het betrouwbaarheidsniveau: niet alleen het feit, ook hoe hard ---- */
+
+test('15. een dienst krijgt te horen hoe hard het feit is dat hij krijgt', async () => {
+  /* Tot nu toe kreeg een dienst "18plus: true" en moest hij maar aannemen
+     waar dat op rustte. Het niveau reist nu mee. Onze proefleden zijn
+     geregistreerd maar niet door het kantoor gekeurd, dus ze staan op A1. */
+  const { idToken } = await inlog('Slijterij De Kurk', ['18plus'], lidA);
+  const wie = await api('/api/rtgid/wie', { idToken });
+  assert.equal(wie.status, 200);
+  assert.equal(wie.body.attributen.betrouwbaarheid.id, 'A1');
+  assert.ok(wie.body.attributen.betrouwbaarheid.naam, 'met een naam die een mens leest');
+  assert.ok(!JSON.stringify(wie.body).includes('geboortedatum'), 'en nog steeds nooit de geboortedatum');
+});
+
+test('16. een dienst mag een niveau eisen; wie het niet haalt, bevestigt niet', async () => {
+  const s = await api('/api/rtgid/start', { dienst: 'Notaris Van Dam',
+    attributen: ['naam'], minBetrouwbaarheid: 'A4' });
+  assert.equal(s.status, 200);
+  assert.equal(s.body.minBetrouwbaarheid, 'A4', 'de eis staat op de koppel');
+
+  const k = await api('/api/rtgid/koppel', { code: s.body.code }, lidA);
+  assert.equal(k.body.minBetrouwbaarheid, 'A4', 'het lid ziet WAT er gevraagd wordt');
+  assert.equal(k.body.betrouwbaarheid.id, 'A1', 'en waar hij zelf staat');
+  assert.equal(k.body.haaltEis, false, 'en dat hij het niet haalt, voor hij op de knop drukt');
+
+  const b = await bevestigMet(pkA, lidA, k.body.koppelId);
+  assert.equal(b.status, 403);
+  assert.match(b.body.error, /A4/, 'de weigering noemt de eis');
+  assert.match(b.body.error, /A1/, 'en waar het lid staat');
+  const st = await api('/api/rtgid/status', { koppelId: s.body.koppelId });
+  assert.equal(st.body.stand, 'wacht', 'er is niets gedeeld');
+});
+
+test('17. een eis die dit lid wel haalt, laat gewoon door', async () => {
+  const s = await api('/api/rtgid/start', { dienst: 'Bibliotheek',
+    attributen: ['codenaam'], minBetrouwbaarheid: 'A1' });
+  const k = await api('/api/rtgid/koppel', { code: s.body.code }, lidA);
+  assert.equal(k.body.haaltEis, true);
+  assert.equal((await bevestigMet(pkA, lidA, k.body.koppelId)).status, 200);
+});
+
+test('18. een onbekende eis wordt geweigerd en niet stil genegeerd', async () => {
+  /* Zou 'A9' worden genegeerd, dan is een typefout in de strengste eis van het
+     huis precies zo goed als geen eis -- en dat faalt volkomen geruisloos. */
+  const fout = await api('/api/rtgid/start', { dienst: 'Slordige Dienst',
+    attributen: ['codenaam'], minBetrouwbaarheid: 'A9' });
+  assert.equal(fout.status, 400);
+  assert.match(fout.body.error, /Onbekend betrouwbaarheidsniveau/i);
+});
+
+test('19. bij een machtiging telt het niveau van wie gedeeld WORDT', async () => {
+  /* De dienst krijgt de identiteit van A, dus wil hij zekerheid over A -- ook
+     als een ander de knop indrukt. Daarom staat de gemachtigde hier BEWUST
+     hoger dan de principaal: D is door het kantoor gekeurd (A4), A niet (A1).
+     Zou het niveau van de INDRUKKER tellen, dan zou een zwaar geverifieerde
+     gemachtigde de eis omzeilen voor iemand die hem niet haalt -- en dat is
+     precies de fout die geen enkele toets zou opmerken als D en A allebei op
+     hetzelfde niveau stonden. */
+  const d = await lid('1988-07-07');
+  await keurGoed(d.token, d.codenaam);
+  const pkD = await passkeyVoor(d.token, 'Telefoon van D');
+
+  const eigenD = await api('/api/rtgid/start', { dienst: 'IJk', attributen: ['codenaam'] });
+  const kD = await api('/api/rtgid/koppel', { code: eigenD.body.code }, d.token);
+  assert.equal(kD.body.betrouwbaarheid.id, 'A4', 'D staat na de keuring op het hoogste niveau');
+
+  const m = await api('/api/rtgid/machtig', { codenaam: d.codenaam, dienst: 'Notariskantoor', dagen: 5 }, lidA);
+  assert.equal(m.status, 200);
+  const s = await api('/api/rtgid/start', { dienst: 'Notariskantoor',
+    attributen: ['codenaam'], minBetrouwbaarheid: 'A3' });
+  const k = await api('/api/rtgid/koppel', { code: s.body.code }, d.token);
+  const b = await bevestigMet(pkD, d.token, k.body.koppelId, m.body.machtiging.id);
+  assert.equal(b.status, 403, 'A haalt A3 niet, dus D kan het namens hem ook niet -- ook al haalt D het zelf ruim');
+  assert.match(b.body.error, /namens wie u inlogt/i, 'en het zegt dat het over de ander gaat');
+  assert.match(b.body.error, /A1/, 'met het niveau van A, niet dat van D');
+
+  // en zonder machtiging deelt D zijn EIGEN identiteit, en dan haalt hij hem wel
+  const s2 = await api('/api/rtgid/start', { dienst: 'Notariskantoor',
+    attributen: ['codenaam'], minBetrouwbaarheid: 'A3' });
+  const k2 = await api('/api/rtgid/koppel', { code: s2.body.code }, d.token);
+  assert.equal((await bevestigMet(pkD, d.token, k2.body.koppelId)).status, 200);
 });

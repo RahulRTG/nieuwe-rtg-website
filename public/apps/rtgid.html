@@ -69,6 +69,7 @@
       <b class="groot" id="kDienst"></b>
       <div id="kAttr" style="margin:0.4rem 0;"></div>
       <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
+      <p class="stil" id="kNiveau" style="margin:0.4rem 0;"></p>
       <p class="stil" id="kSleutel" style="margin:0.4rem 0;"></p>
       <div class="rij" style="margin-top:0.4rem;">
         <button class="knop vol" id="kBevestig" type="button">Bevestig met passkey</button>
@@ -171,9 +172,22 @@
   function toonSleutelstand() {
     const heeft = koppel && koppel.passkeys > 0;
     const eigen = koppel && koppel.eigenAccount;
-    $('#kMaak').style.display = (!heeft && eigen) ? '' : 'none';
-    $('#kBevestig').disabled = !heeft;
-    $('#kSleutel').textContent = heeft
+    /* Twee onafhankelijke redenen waarom bevestigen niet kan: geen passkey, of
+       een betrouwbaarheidsniveau dat de dienst niet genoeg vindt. Ze staan als
+       twee regels en niet als een: de eerste lost het lid hier op, de tweede
+       niet -- daar moet RTG eerst zijn paspoort keuren. */
+    const eis = koppel && koppel.minBetrouwbaarheid;
+    const haalt = !eis || (koppel && koppel.haaltEis);
+    $('#kNiveau').textContent = !eis
+      ? (koppel && koppel.betrouwbaarheid ? 'Uw niveau: ' + koppel.betrouwbaarheid.id + ' \u00b7 ' + koppel.betrouwbaarheid.naam + '.' : '')
+      : haalt
+        ? 'Deze dienst vraagt niveau ' + eis + '; u staat op ' + koppel.betrouwbaarheid.id + ' (' + koppel.betrouwbaarheid.naam + ').'
+        : 'Deze dienst vraagt niveau ' + eis + ' en u staat op ' + koppel.betrouwbaarheid.id + ' (' + koppel.betrouwbaarheid.naam +
+          '). Laat eerst uw identiteitsbewijs door RTG controleren; dit lost u hier niet op.';
+    $('#kMaak').style.display = (!heeft && eigen && haalt) ? '' : 'none';
+    $('#kBevestig').disabled = !heeft || !haalt;
+    $('#kSleutel').textContent = !haalt ? ''
+      : heeft
       ? 'Bevestigen vraagt uw passkey op dit toestel.'
       : eigen
         ? 'Bevestigen vraagt een passkey en aan dit account hangt er nog geen. Maak er hier een aan; dat duurt een tel.'

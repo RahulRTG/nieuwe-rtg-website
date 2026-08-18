@@ -103,8 +103,13 @@ module.exports = (ctx) => {
     if (k.status !== 'wacht') return { status: 409, error: 'Deze inlog is inmiddels afgehandeld.' };
     if (nu() > k.verloopt) { k.status = 'verlopen'; save(); return { status: 410, error: 'De code is tijdens het bevestigen verlopen; laat de dienst een nieuwe tonen.' }; }
     const raw = crypto.randomBytes(24).toString('hex');
+    /* De sessie draagt de MACHTIGING waarop hij draait, niet alleen de codenaam
+       van wie er tekende. Zonder dat is bij het intrekken niet te zien welke
+       lopende sessie erbij hoort, en dan gaan ze allemaal dicht -- ook die van
+       een andere gemachtigde bij een andere dienst. */
     const sess = { tokenHash: hash(raw), dienst: k.dienst, memberKey: voorKey, attributen: k.attributen,
-      namens, gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
+      namens, machtigingId: machtigingId ? String(machtigingId) : null,
+      gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
     s.sessies.unshift(sess); cap(s.sessies, MAX_SESSIES);
     k.status = 'bevestigd'; k.tokenEenmalig = raw;
     const log = logVan(voorKey);

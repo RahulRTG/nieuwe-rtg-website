@@ -490,3 +490,80 @@ test('23. een dienst die uw gegevens blijft ophalen, staat in het log', async ()
   await api('/api/rtgid/intrek', { dienst: 'Gemeente Ibiza' }, lidA);
   assert.equal((await api('/api/rtgid/wie', { idToken })).status, 403);
 });
+
+test('24. een machtiging intrekken raakt alleen DIE machtiging', async () => {
+  /* DIT WAS EEN FOUT, EN GEEN STRENGHEID. Intrekken sloot elke namens-sessie
+     van de principaal: `x.memberKey === m.vanKey && x.namens`. Wie zijn
+     accountant de toegang tot de belastingdienst ontnam, gooide daarmee de
+     lopende sessie van zijn mantelzorger bij de gemeente eruit -- een
+     verkeerde deur, en eentje die je pas merkt op het moment dat je hem het
+     hardst niet wilt.
+
+     A machtigt twee mensen voor twee diensten. Allebei loggen ze namens A in.
+     Dan trekt A er EEN in. */
+  const c = await lid('1987-07-07');
+  const pkC = await passkeyVoor(c.token, 'Telefoon van C');
+
+  const mB = await api('/api/rtgid/machtig', { codenaam: codeB, dienst: 'Belastingdienst', dagen: 30 }, lidA);
+  const mC = await api('/api/rtgid/machtig', { codenaam: c.codenaam, dienst: 'Gemeente Ibiza', dagen: 30 }, lidA);
+  assert.equal(mB.status, 200); assert.equal(mC.status, 200);
+
+  const viaB = await inlog('Belastingdienst', ['codenaam'], lidB, mB.body.machtiging.id, pkB);
+  const viaC = await inlog('Gemeente Ibiza', ['codenaam'], c.token, mC.body.machtiging.id, pkC);
+  assert.equal((await api('/api/rtgid/wie', { idToken: viaB.idToken })).status, 200);
+  assert.equal((await api('/api/rtgid/wie', { idToken: viaC.idToken })).status, 200);
+
+  // A trekt alleen de machtiging van B in
+  assert.equal((await api('/api/rtgid/machtig/intrek', { id: mB.body.machtiging.id }, lidA)).status, 200);
+  assert.equal((await api('/api/rtgid/wie', { idToken: viaB.idToken })).status, 403,
+    'de sessie van B gaat dicht');
+  assert.equal((await api('/api/rtgid/wie', { idToken: viaC.idToken })).status, 200,
+    'en die van C blijft gewoon open -- dat is een andere machtiging bij een andere dienst');
+
+  // en de machtiging van C staat er ook nog
+  const inz = await api('/api/rtgid/inzage', {}, lidA);
+  assert.ok(inz.body.machtigingen.some(x => x.id === mC.body.machtiging.id), 'de andere machtiging leeft');
+  assert.ok(!inz.body.machtigingen.some(x => x.id === mB.body.machtiging.id), 'de ingetrokkene niet');
+});
+
+test('25. twee machtigingen aan DEZELFDE persoon blijven uit elkaar', async () => {
+  /* De scherpste vorm ervan: dezelfde gemachtigde, twee diensten. Op de
+     codenaam alleen zijn die twee niet te onderscheiden -- daarom draagt een
+     sessie de machtiging zelf en niet alleen de naam van wie er tekende. */
+  const m1 = await api('/api/rtgid/machtig', { codenaam: codeB, dienst: 'Waterschap', dagen: 30 }, lidA);
+  const m2 = await api('/api/rtgid/machtig', { codenaam: codeB, dienst: 'Provincie', dagen: 30 }, lidA);
+  const s1 = await inlog('Waterschap', ['codenaam'], lidB, m1.body.machtiging.id, pkB);
+  const s2 = await inlog('Provincie', ['codenaam'], lidB, m2.body.machtiging.id, pkB);
+
+  await api('/api/rtgid/machtig/intrek', { id: m1.body.machtiging.id }, lidA);
+  assert.equal((await api('/api/rtgid/wie', { idToken: s1.idToken })).status, 403, 'het waterschap is eruit');
+  assert.equal((await api('/api/rtgid/wie', { idToken: s2.idToken })).status, 200,
+    'de provincie niet: zelfde gemachtigde, andere machtiging');
+});
+
+test('26. twee machtigingen aan dezelfde persoon voor DEZELFDE dienst', async () => {
+  /* HIER VERDIENT `machtigingId` ZIJN PLEK, en dat bleek pas bij het muteren:
+     zonder dat veld werkt de terugval op codenaam-plus-dienst, en die haalt
+     toets 24 en 25 gewoon. Twee machtigingen aan dezelfde persoon voor
+     dezelfde dienst zijn zo echter niet uit elkaar te houden -- en dat geval
+     bestaat: wie een aflopende machtiging vervangt door een verse, heeft er
+     even twee.
+
+     Trek de oude in, en de sessie op de NIEUWE hoort te blijven staan. */
+  const eerste = await api('/api/rtgid/machtig', { codenaam: codeB, dienst: 'Kadaster', dagen: 1 }, lidA);
+  const tweede = await api('/api/rtgid/machtig', { codenaam: codeB, dienst: 'Kadaster', dagen: 90 }, lidA);
+  assert.equal(eerste.status, 200); assert.equal(tweede.status, 200);
+  assert.notEqual(eerste.body.machtiging.id, tweede.body.machtiging.id);
+
+  const opNieuwe = await inlog('Kadaster', ['codenaam'], lidB, tweede.body.machtiging.id, pkB);
+  assert.equal((await api('/api/rtgid/wie', { idToken: opNieuwe.idToken })).status, 200);
+
+  // de oude, aflopende machtiging gaat eruit
+  assert.equal((await api('/api/rtgid/machtig/intrek', { id: eerste.body.machtiging.id }, lidA)).status, 200);
+  assert.equal((await api('/api/rtgid/wie', { idToken: opNieuwe.idToken })).status, 200,
+    'de sessie draait op de NIEUWE machtiging en blijft dus staan');
+
+  // en de nieuwe intrekken sluit hem wel
+  assert.equal((await api('/api/rtgid/machtig/intrek', { id: tweede.body.machtiging.id }, lidA)).status, 200);
+  assert.equal((await api('/api/rtgid/wie', { idToken: opNieuwe.idToken })).status, 403);
+});

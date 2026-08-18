@@ -6,7 +6,7 @@ module.exports = (kern) => {
   const { DEMO, DEMO_SUPPLIER, accounts, app, checkCred, crypto, findSupplier, hasCred, logActivity,
           loginFails, managerOnly, noteFailedTry, pinSlot, rememberSession, sseToSupplier, supplierAuth,
           supplierState, tooManyTries, zaakBoard, zaakZet, logInlog, werkvensterVan, zetWerkvenster,
-          magWerken, werkAdvies } = kern;
+          magWerken, werkAdvies, persoonsPoort } = kern;
 
 
 app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
@@ -67,6 +67,18 @@ app.post('/api/supplier/login', async (req, res) => {
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
   if (s.partnerStatus === 'geschorst' || s.partnerStatus === 'beeindigd')
     return res.status(403).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
+  /* De persoonseis van het genre, met DEZELFDE functie die supplierAuth
+     gebruikt. Hem hier herhalen in eigen woorden zou de tweede plek zijn die
+     dit besluit neemt, en die twee lopen uiteen. Wat dit toevoegt is alleen het
+     moment: nu hoort iemand het aan de deur in plaats van bij zijn eerste
+     handeling, met een sessie op zak die nergens meer komt. */
+  const eisenaar = { name: actor.name, role: actor.role, staffId: actor.staffId, manager: actor.manager,
+    lid: staff && staff.member_id != null ? Number(staff.member_id) : null };
+  const pp = persoonsPoort(s, eisenaar);
+  if (!pp.ok) {
+    logInlog('zaak', false, s.code + ' · ' + actor.name + ' (persoonseis)', req);
+    return res.status(403).json({ error: pp.error, persoonseis: pp.missend || null });
+  }
   const token = crypto.randomBytes(24).toString('hex');
     rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
       staffRole: actor.role, manager: actor.manager,

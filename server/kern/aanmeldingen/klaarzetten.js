@@ -58,5 +58,10 @@ module.exports = ({ A, bedrijfMod }) => {
     return Object.assign({ ok: true }, bedrijfMod.bewijsStand(a));
   }
 
-  return { provisioneerId, bewijsIndienId, bewijsTekenId, bewijsStandId };
+  /* De herkeuringslijst: welke afgetekende stukken zijn verlopen of lopen bijna
+     af. Hij hoort hier bij de andere bewijs-ingangen, en niet in ./bewijs.js:
+     die module redeneert PER aanmelding en dit is de vraag over de hele stapel. */
+  function bewijsHerkeuring(dagen) { return bedrijfMod.bewijsHerkeuring(A(), dagen); }
+
+  return { provisioneerId, bewijsIndienId, bewijsTekenId, bewijsStandId, bewijsHerkeuring };
 };

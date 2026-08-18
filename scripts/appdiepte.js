@@ -50,12 +50,11 @@ const WORTEL = path.join(__dirname, '..');
 const jsonUit = process.argv.includes('--json');
 const mdUit = process.argv.includes('--md');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
+/* Eén browserkeuze, gedeeld met de schermtoetsen (test/browser.js). ZONDER de
+   eigen driver: deze meter drijft op Playwright-eigenschappen die de eigen
+   driver niet kent, en dan is niets meten eerlijker dan half meten. */
+const { laadBrowser: kiesBrowser } = require('../test/browser');
+const laadBrowser = () => kiesBrowser({ eigenDriver: false });
 
 /* WAT DIT CIJFER WEL EN NIET IS. Het telt wat een app doet bij het OPENEN, en
    dat is met opzet: dat is de enige stand die je van alle eenentachtig apps op

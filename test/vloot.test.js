@@ -30,6 +30,21 @@ async function wachtTot(fn, ms = 20000) {
   return false;
 }
 
+/* HOE LANG EEN SERVERPROCES MAG DOEN OVER OPKOMEN.
+
+   Deze toets start er VIER tegelijk: de poortwachter en drie groepen, elk een
+   volledige RTG-server. Daar stond dertig seconden voor, en op een CI-runner met
+   dekkingsmeting erbij is dat te krap: op 18 augustus 2026 zakte de before-hook
+   op 29,99 s, zonder een enkele foutregel van de vloot. Geen crash dus, alleen
+   een klok die eerder klaar was dan vier opstarten.
+
+   Het staat hier als naam en niet als getal per regel, want elders in dit
+   bestand wordt op hetzelfde gewacht (een groep die na een crash vanzelf
+   terugkomt). Twee getallen voor dezelfde vraag lopen uiteen (LAT-regel 4).
+   Een poll kost niets; een vloot die er echt niet komt zakt straks net zo
+   hard, alleen later. */
+const OPKOMST = 120000;
+
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
     env: {
@@ -39,14 +54,23 @@ test.before(async () => {
     },
     stdio: ['ignore', 'ignore', 'inherit']
   });
-  // alle drie de groepen en de gateway moeten opkomen
+  /* Alle drie de groepen en de gateway moeten opkomen -- en als er een NIET
+     komt, hoort de melding te zeggen welke. "de vloot komt op" was met vier
+     processen precies zoveel waard als geen melding: je weet dat er iets stil
+     bleef en niet wat. */
+  const stand = { leden: 'nooit geantwoord', kantoor: 'nooit geantwoord', rtf: 'nooit geantwoord' };
+  const probeer = async (naam, doe) => {
+    try { const r = await doe(); stand[naam] = r.status; return r.ok; }
+    catch (e) { stand[naam] = String(e.code || e.message || e).slice(0, 60); return false; }
+  };
   const klaar = await wachtTot(async () => {
-    const a = await fetch(BASE + '/api/health');                    // via gateway -> groep leden
-    const b = await post('/api/office/login', { code: 'RTG-OFFICE' }); // via gateway -> groep kantoor
-    const c = await fetch(BASE + '/api/foundation/health');        // via gateway -> groep rtf
-    return a.ok && b.ok && c.ok;
-  }, 30000);
-  assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op');
+    const a = await probeer('leden', () => fetch(BASE + '/api/health'));
+    const b = await probeer('kantoor', () => post('/api/office/login', { code: 'RTG-OFFICE' }));
+    const c = await probeer('rtf', () => fetch(BASE + '/api/foundation/health'));
+    return a && b && c;
+  }, OPKOMST);
+  assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op binnen ' +
+    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand));
 });
 test.after(() => {
   if (vloot) try { vloot.kill('SIGTERM'); } catch (e) {}
@@ -77,7 +101,8 @@ test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door'
   assert.equal((await fetch(BASE + '/api/foundation/health')).status, 200, 'de foundation draait door');
 
   // de vloot herstart de groep vanzelf; daarna doet kantoor het weer
+  /* Ook dit is een server die opkomt, dus dezelfde grens als hierboven. */
   const terug = await wachtTot(async () =>
-    (await post('/api/office/login', { code: 'RTG-OFFICE' })).status === 200, 25000);
+    (await post('/api/office/login', { code: 'RTG-OFFICE' })).status === 200, OPKOMST);
   assert.ok(terug, 'de kantoor-groep is automatisch herstart en werkt weer');
 });

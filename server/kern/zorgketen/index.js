@@ -21,8 +21,18 @@ const AGENDAS = ['specialist', 'beautymedical'];
 const TRIAGE = ['rood', 'oranje', 'geel', 'groen', 'blauw'];
 const SPREEKKAMERS = ['ziekenhuis', 'huisarts', 'specialist', 'beautymedical'];
 
-module.exports = ({ db, save, crypto, findSupplier }) => {
+module.exports = ({ db, save, crypto, findSupplier, persoonseis }) => {
   const nu = () => Date.now();
+  /* De persoonseis van de handeling. Laat gebonden en met een EIGEN weigering
+     als de laag ontbreekt: een zorgketen zonder persoonscontrole hoort dicht te
+     staan, niet open. Stil doorlaten zou precies de fout herhalen die deze
+     module had -- toetsen op het genre en niemand die de mens bekijkt. */
+  function persoonMag(code, handeling, actor) {
+    const genre = (findSupplier(code) || {}).type || null;
+    if (!persoonseis) return { ok: false, missend: null,
+      error: 'De persoonscontrole is niet beschikbaar; deze handeling gaat dan niet door.' };
+    return persoonseis.magHandeling(genre, handeling, persoonseis.persoonVanActor(actor));
+  }
   const schoon = (v, max) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max || 200);
   function bak() {
     if (!db.data.hulp) db.data.hulp = {};
@@ -66,7 +76,7 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, crypto, findSupplier, nu, schoon, bak, soortVan, sehRij, afspraakRij, receptieRij,
-    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, SPREEKKAMERS };
+    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, SPREEKKAMERS, persoonMag };
   const api = { ZORG_TYPES, TRIAGE, zorgOverzicht };
   Object.assign(api, require('./keten')(ctx), require('./balie')(ctx));
   return { zorgketen: api };

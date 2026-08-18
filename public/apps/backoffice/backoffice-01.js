@@ -54,6 +54,7 @@
     laadTimeline();
     loadAanmeldingen();
     loadVerify();
+    loadVakbewijzen();
     loadConcierge();
     loadIncidenten();
     loadSalonNaleving();

@@ -3,24 +3,14 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { UPLOAD_DIR, accounts, app, broadcastSync, conciergeInbox, db, eigenaar, fs, notify,
+  const { UPLOAD_DIR, accounts, app, broadcastSync, conciergeInbox, db, fs, notify,
           notifySupplier, officeAuth, officeState, path, talen, trChat, save, sseToOffice, sseToSupplier,
           paspoortIncidenten, paspoortBeoordeel } = kern;
 
-/* Wie kijkt hier in de identiteitskluis? De backoffice-code is gedeeld, dus
-   een office-sessie alleen zegt "iemand van kantoor" en niet meer -- eerlijker
-   is dat dan een verzonnen naam. Komt de eigenaar met zijn eigen accountlogin
-   binnen (officeAuth zet dan req.eigenaar), dan weten we het wel precies, en
-   dan hoort dat ook in het inzagejournaal te staan. */
-function wieKijkt(req) {
-  const h = req.get('authorization') || '';
-  const tok = h.startsWith('Bearer ') ? h.slice(7) : null;
-  try {
-    const u = tok && accounts.verifyToken(tok);
-    if (u && req.eigenaar) return { id: u.id, naam: 'eigenaar' };
-  } catch (e) {}
-  return { naam: 'backoffice (gedeelde code)' };
-}
+/* Wie kijkt hier in de identiteitskluis? Eén antwoord voor het hele huis, en
+   het staat in ./wiekijkt.js -- ook routes/vakbewijs.js stelt die vraag nu, en
+   dat domein kan niet bij deze closure. */
+const wieKijkt = require('./wiekijkt')(accounts);
 
 /* De verificatie-routes wonen in ./verificaties.js (afgesplitst voor de 10 KB
    van keuringsregel 13); wieKijkt gaat mee, want een tweede kopie van "wie

@@ -24,7 +24,7 @@
    Toeschrijving blijft persoonlijk: de sessie draagt de naam van het
    personeelslid en lidKey, dus elke handeling staat nog steeds op een mens. */
 
-function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberSession, logInlog, logActivity, supplierState }) {
+function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberSession, logInlog, logActivity, supplierState, persoonsPoort }) {
   /* Alle werkplekken van dit lid, met per plek of hij nu open is. Open plekken
      krijgen meteen een sessie-token; dichte plekken de reden.
 
@@ -53,10 +53,31 @@ function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberS
         }
       }
 
-      // exact dezelfde sessie als de losse personeelslogin zou geven
+      /* De persoonseis van het genre. Dezelfde functie als bij de losse
+         personeelslogin en bij supplierAuth; dit is alleen het moment waarop je
+         het hoort. Zonder deze regel kreeg deze weg een token dat bij de eerste
+         handeling alsnog stukloopt, en dat is de vorm waarvan mensen denken dat
+         de app kapot is in plaats van dat er een stuk ontbreekt. */
+      if (persoonsPoort) {
+        const pp = persoonsPoort(s, { manager: actor.manager, lid: st.member_id != null ? Number(st.member_id) : lidId });
+        if (!pp.ok) {
+          plek.open = false;
+          plek.reden = pp.error;
+          plek.persoonseis = pp.missend || null;
+          uit.push(plek);
+          continue;                            // geen stuk = geen token
+        }
+      }
+
+      /* exact dezelfde sessie als de losse personeelslogin zou geven -- en dus
+         MET `lid`. Dat ontbrak hier, en pas toen de persoonseis erop ging
+         steunen viel het op: deze weg gaf een sessie waarin het lidnummer niet
+         zat, terwijl de inlogger juist met zijn RTG-account binnenkwam. Alles
+         wat op `actor.lid` steunt keek daardoor langs deze twee ingangen heen. */
       const token = crypto.randomBytes(24).toString('hex');
       rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
-        staffRole: actor.role, manager: actor.manager, lidKey: key });
+        staffRole: actor.role, manager: actor.manager, lidKey: key,
+        lid: st.member_id != null ? Number(st.member_id) : lidId });
       plek.token = token;
       try { logInlog('zaak', true, s.code + ' · ' + actor.name + ' (met het RTG-account)', req); } catch (e) {}
       try { logActivity(s.code, actor, actor.name + ' kwam binnen met het RTG-account'); } catch (e) {}

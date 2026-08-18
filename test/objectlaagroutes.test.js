@@ -24,7 +24,24 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
-const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+/* DRIE DAGEN, EN DAT GETAL IS EEN BESLUIT.
+
+   Hier stond veertien, en daarmee was deze toets een tijdbom die op sommige
+   kalenderdagen afging. kern/socialegraaf/lijn.js toont alleen GEVULDE vakken
+   tot en met "deze maand"; wat in het vak `later` valt wordt geteld en niet
+   getoond. Veertien dagen vooruit springt over een maandgrens zodra je na
+   ongeveer de zestiende van de maand draait -- dan belandt de bijeenkomst in
+   `later` en staat hij dus niet op de lijn, terwijl de toets dat wel eist.
+
+   Op 18 augustus 2026 gebeurde dat: +14 = 1 september, vak `later`, toets rood
+   -- en dat gold ook op de basis van deze tak, dus het is geen regressie maar
+   een toets die zijn eigen aanname niet waarmaakte.
+
+   Drie dagen valt ALTIJD in een getoond vak: n <= rest + 7 is waar voor elke
+   dag van de week, want rest is minstens nul. Daarmee toetst deze toets weer
+   wat hij bedoelt -- dat een echte bijeenkomst de lijn haalt -- in plaats van
+   ook nog waar we in de maand staan. */
+const STRAKS = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -123,7 +140,7 @@ test('een echte bijeenkomst belandt op de lijn, in een vak met een naam', async 
   const d = await json(r);
   const alle = (d.vakken || []).flatMap(v => v.regels.map(x => x.titel));
   assert.ok(alle.includes('Proefborrel'),
-    'de bijeenkomst van over twee weken hoort op de lijn te staan');
+    'de bijeenkomst van over drie dagen hoort op de lijn te staan');
 
   for (const v of d.vakken) {
     assert.ok(v.label, 'elk vak draagt een naam');

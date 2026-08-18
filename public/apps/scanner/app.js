@@ -21,14 +21,29 @@
     clearTimeout(meldT); meldT = setTimeout(function () { m.classList.remove('zie'); }, 3200);
   };
 
-  var mapId = null;
+  /* DE MAP SCANS WORDT BIJ HET OPENEN GEZOCHT, EN DAT DUURT TWEE VERZOEKEN.
+     Wie sneller klikt dan die twee, bewaarde tot nu toe met `map: null`: het
+     bestand landde dan naast de map terwijl de melding wel "bewaard in je
+     kluis (map Scans)" zei. Niemand die het merkte -- de melding kwam, de
+     upload lukte, alleen de map klopte niet. Een belofte in tekst is een
+     belofte in code, dus wachten de bewaarknoppen nu op DEZE belofte in plaats
+     van op een variabele die er misschien al staat.
+
+     Bij een mislukking vervalt de belofte weer. Anders zou een hapering bij
+     het openen het bewaren voorgoed op null vastzetten, en dat is precies de
+     stille fout die we hier weghalen. */
+  var mapId = null, mapBelofte = null;
   function zoekMap() {
-    return api('/api/bestanden/mijn').then(function (r) {
+    if (!mapBelofte) mapBelofte = api('/api/bestanden/mijn').then(function (r) {
       if (r.body.error) throw new Error(r.body.error);
       var m = (r.body.mappen || []).find(function (x) { return x.naam === 'Scans'; });
-      if (m) { mapId = m.id; return; }
-      return api('/api/bestanden/map', { naam: 'Scans' }).then(function (n) { mapId = n.body.id; });
-    });
+      if (m) { mapId = m.id; return mapId; }
+      return api('/api/bestanden/map', { naam: 'Scans' }).then(function (n) {
+        if (n.body.error) throw new Error(n.body.error);
+        mapId = n.body.id; return mapId;
+      });
+    }).catch(function (e) { mapBelofte = null; throw e; });
+    return mapBelofte;
   }
 
   /* ---- pagina's: elk een JPEG op het toestel tot je bewaart ---- */
@@ -100,33 +115,45 @@
     var d = new Date();
     return d.toISOString().slice(0, 10) + '-' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0');
   }
+  /* De PDF wordt op het toestel gebouwd VOOR we op de map wachten: mislukt dat,
+     dan hoort de mens dat meteen en niet pas na een rondje naar de server. */
   $('#bewaarPdf').addEventListener('click', function () {
     if (!paginas.length) return;
-    try {
-      var b64 = RTGPdf.maak(paginas);
-      api('/api/bestanden/upload', { naam: 'scan-' + stempel() + '.pdf', map: mapId,
+    var aantal = paginas.length, b64;
+    try { b64 = RTGPdf.maak(paginas); } catch (e) { return meld(e.message); }
+    zoekMap().then(function (map) {
+      return api('/api/bestanden/upload', { naam: 'scan-' + stempel() + '.pdf', map: map,
         dataUrl: 'data:application/pdf;base64,' + b64 }).then(function (r) {
         if (r.body.error) return meld(r.body.error);
-        meld('PDF met ' + paginas.length + ' pagina\'s bewaard in je kluis (map Scans).');
+        meld('PDF met ' + aantal + ' pagina\'s bewaard in je kluis (map Scans).');
         paginas = []; teken();
       });
-    } catch (e) { meld(e.message); }
+    }).catch(function (e) { meld(e.message); });
   });
   $('#bewaarFotos').addEventListener('click', function () {
     if (!paginas.length) return;
-    var basis = 'scan-' + stempel(), klaar = 0, fouten = 0;
-    paginas.forEach(function (p, i) {
-      api('/api/bestanden/upload', { naam: basis + '-' + (i + 1) + '.jpg', map: mapId,
-        dataUrl: 'data:image/jpeg;base64,' + p.b64 }).then(function (r) {
-        if (r.body.error) fouten++;
-        if (++klaar === paginas.length) {
-          meld(fouten ? 'Bewaard, maar ' + fouten + ' pagina(\'s) lukten niet.' : klaar + ' foto\'s bewaard in je kluis (map Scans).');
-          if (!fouten) { paginas = []; teken(); }
-        }
+    /* Tellen tegen een MOMENTOPNAME. `paginas` kan tijdens het uploaden nog
+       veranderen, en dan valt de laatste melding nooit of te vroeg. */
+    var basis = 'scan-' + stempel(), lijst = paginas.slice();
+    zoekMap().then(function (map) {
+      var klaar = 0, fouten = 0;
+      lijst.forEach(function (p, i) {
+        api('/api/bestanden/upload', { naam: basis + '-' + (i + 1) + '.jpg', map: map,
+          dataUrl: 'data:image/jpeg;base64,' + p.b64 }).then(function (r) {
+          if (r.body.error) fouten++;
+          if (++klaar === lijst.length) {
+            meld(fouten ? 'Bewaard, maar ' + fouten + ' pagina(\'s) lukten niet.' : klaar + ' foto\'s bewaard in je kluis (map Scans).');
+            if (!fouten) { paginas = []; teken(); }
+          }
+        });
       });
-    });
+    }).catch(function (e) { meld(e.message); });
   });
 
   if (!token) { meld('Log eerst in op de leden-app.'); return; }
-  zoekMap().then(teken).catch(function (e) { meld(e.message); });
+  /* Het scherm komt op zonder op de kluis te wachten; de map wordt intussen
+     gezocht. Wie klikt voordat dat rond is, wacht in zoekMap() en niet op een
+     lege variabele. */
+  teken();
+  zoekMap().catch(function (e) { meld(e.message); });
 })();

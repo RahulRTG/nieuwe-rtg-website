@@ -201,13 +201,39 @@ function redenZonderRol(r) {
 /* Splitst een routelijst in wat beproefbaar is en wat niet, met de redenen
    geteld. De proeven printen dat en zetten het in hun uitslagbestand; zo staat er
    naast "2934 beproefd" altijd "en 937 niet, en hierom". */
-function verdeelOpRol(routes) {
+function verdeelOpRol(routes, beschikbareRollen) {
   const metRol = [];
   const zonderRol = [];
   const redenen = new Map();
+  /* WELKE ROLLEN HEEFT DIT INSTRUMENT WERKELIJK EEN TOKEN VOOR?
+
+     Zonder deze grens ging het mis, en stil. Sinds de bewakerskaart ook
+     EIGENROLLEN kent (boardroom, techniek, scim, werkplekbaas) kwamen 123 routes
+     als "met rol" uit deze functie -- terwijl de proeven alleen een token hebben
+     voor member, office en supplier. tokenVoor('boardroom') gaf undefined, de
+     route werd zonder token aangeroepen, kreeg 401, en dat telde als "geweigerd
+     en er bleef niets staan": ROLLBACK bewezen. Natuurlijk bleef er niets staan
+     -- er was geen sleutel. Een meting zonder invoer die toch een cijfer geeft
+     (LAT.md regel 3).
+
+     Wie geen lijst meegeeft krijgt het oude gedrag, want twee van de vier
+     proeven kruisen rollen en hebben deze grens niet nodig: daar is een rol
+     waarvoor je GEEN token hebt geen probleem maar juist het geval dat je wilt
+     beproeven. */
+  const beschikbaar = Array.isArray(beschikbareRollen) ? new Set(beschikbareRollen) : null;
   for (const r of routes) {
     const rol = rolVan(r.bewakers);
-    if (rol) { metRol.push({ method: r.methode, pad: r.pad, rol }); continue; }
+    if (rol && (!beschikbaar || beschikbaar.has(rol))) {
+      metRol.push({ method: r.methode, pad: r.pad, rol });
+      continue;
+    }
+    if (rol) {
+      const reden = 'rol "' + rol + '", maar dit instrument heeft daar geen token voor; ' +
+        'zonder sleutel aankloppen meet niets over deze route';
+      zonderRol.push({ methode: r.methode, pad: r.pad, reden });
+      redenen.set(reden, (redenen.get(reden) || 0) + 1);
+      continue;
+    }
     const reden = redenZonderRol(r);
     zonderRol.push({ methode: r.methode, pad: r.pad, reden });
     redenen.set(reden, (redenen.get(reden) || 0) + 1);

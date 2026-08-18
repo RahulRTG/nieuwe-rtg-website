@@ -137,7 +137,13 @@ if (require.main !== module) { module.exports = {}; return; }
   /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
      honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
      komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
-  const verdeling = verdeelOpRol(kandidaten);
+  /* ALLEEN ROLLEN WAARVOOR DIT INSTRUMENT EEN TOKEN HEEFT. Sinds de
+     bewakerskaart ook eigenrollen kent (boardroom, techniek, scim,
+     werkplekbaas) kwamen 123 routes hier binnen als "met rol" terwijl er
+     geen sleutel voor bestaat: de invoerproef stuurt rommel MET de juiste rol; zonder token voor die rol
+     meet hij de voordeur en niet de invoercontrole.
+     Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
+  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
   const routes = verdeling.metRol;
 
   console.log('\n=== DE INVOER-ROBUUSTHEID PER ROUTE ===\n');

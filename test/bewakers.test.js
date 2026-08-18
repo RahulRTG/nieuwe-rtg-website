@@ -137,6 +137,38 @@ test('onbekend blijft onbekend, en dat is geen lege bewakerslijst', () => {
   assert.match(leeg.reden, /geen bewakerslaag/);
 });
 
+test('een rol zonder token is geen beproefde rol', () => {
+  /* DE KEERZIJDE VAN DE EIGENROLLEN, en die kostte bijna een stille meting.
+
+     Door boardroom, techniek, scim en werkplekbaas als eigenrol te herkennen
+     kwamen 123 routes als "met rol" uit verdeelOpRol(). Maar de proeven hebben
+     alleen een token voor member, office en supplier. tokenVoor('boardroom')
+     gaf undefined, de route werd ZONDER sleutel aangeroepen, kreeg 401, en dat
+     telde als "geweigerd en er bleef niets staan": ROLLBACK bewezen. Natuurlijk
+     bleef er niets staan -- er was geen sleutel. Een meter zonder invoer die toch
+     een cijfer geeft (LAT.md regel 3).
+
+     verdeelOpRol() neemt daarom een lijst beschikbare rollen. Wie er geen
+     meegeeft krijgt het oude gedrag: de rolproef KRUIST rollen, en daar is een
+     rol zonder token juist het geval dat je wilt beproeven. */
+  const { alleRoutes, verdeelOpRol } = require('../scripts/lib/routes.js');
+  const kandidaten = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET');
+
+  const ruim = verdeelOpRol(kandidaten);
+  const krap = verdeelOpRol(kandidaten, ['member', 'office', 'supplier']);
+  assert.ok(krap.metRol.length < ruim.metRol.length,
+    'met een rollenlijst horen de eigenrol-routes eruit te vallen; nu ' +
+    krap.metRol.length + ' tegen ' + ruim.metRol.length);
+
+  for (const r of krap.metRol) {
+    assert.ok(['member', 'office', 'supplier'].includes(r.rol),
+      r.pad + ' krijgt rol "' + r.rol + '" terwijl daar geen token voor is');
+  }
+  const uitleg = krap.redenen.find(x => /geen token/.test(x.reden));
+  assert.ok(uitleg && uitleg.aantal > 0,
+    'de uitgevallen routes horen MET REDEN terug te komen, niet stil te verdwijnen');
+});
+
 test('de reclassificatie levert echte meting op, en dat is te tellen', () => {
   /* De 338 routes met een "onbekende rol" splitsen in vier groepen die om vier
      verschillende reparaties vragen. Deze toets houdt vast dat de KRUISBARE

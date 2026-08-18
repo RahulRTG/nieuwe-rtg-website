@@ -52,6 +52,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const rd = require('../server/kern/routedekking');
 const sporen = require('../server/kern/auditsporen');
+const fs = require('fs');
+const path = require('path');
 
 test('1. TOETS- en AUDIT-regels tellen niet mee als aangeraakte routes', () => {
   const journaal = [
@@ -175,6 +177,45 @@ test('5. een verse gerichte ronde telt METEEN mee, niet pas de volgende batch', 
   const blind = oordeel(perRoute, perToets, gevoelig, new Set(),
     { 'POST /api/vers': { toets: 'breed.test.js', merkt: false, op: 'nu' } });
   assert.equal(blind.perRoute['POST /api/vers'].staat, 'blind');
+});
+
+test('6. de basislijn vervangt de controlerun zonder het oordeel te verzwakken', () => {
+  /* DE SNELHEIDSWINST MAG HET BEWIJS NIET UITHOLLEN. De controlerun draaide per
+     MERKT een tweede keer om te zien of de toets ook zonder leugen zakte -- voor
+     de 194 routes van auth-rol.test.js was dat 194 keer dezelfde vraag. De
+     basislijn stelt hem een keer. Deze toets houdt vast dat het ONDERSCHEID
+     overeind blijft:
+
+       toets groen in de basislijn + zakt onder leugen  -> merkt (toe te rekenen)
+       toets NIET in de basislijn (was al rood)         -> stoornis, geen lie-run
+       toets groen + groen onder leugen                 -> blind
+
+     meetEen draait hier echt, tegen twee kleine wegwerptoetsen in de test/-map:
+     een die altijd groen is en een die altijd rood is. Dat is de enige manier om
+     te bewijzen dat de basislijn-tak doet wat de controlerun deed (LAT.md regel
+     2 en 10). */
+  const o = require('../scripts/outputproef');
+  const groenBestand = path.join(__dirname, 'zz-basis-groen.test.js');
+  const roodBestand = path.join(__dirname, 'zz-basis-rood.test.js');
+  fs.writeFileSync(groenBestand,
+    "const{test}=require('node:test');test('ok',()=>{});\n");
+  fs.writeFileSync(roodBestand,
+    "const{test}=require('node:test');const a=require('node:assert');test('rood',()=>{a.fail('altijd');});\n");
+  try {
+    /* Een toets die al rood is in de basislijn: stoornis, en zonder ook maar
+       een lie-run (die zou zinloos zijn). */
+    const rood = o.meetEen('POST /api/iets', 'zz-basis-rood.test.js', { basisGroen: new Set() });
+    assert.equal(rood.staat, 'stoornis');
+
+    /* Een groene toets die niets over de route beweert: liegen over een pad dat
+       hij niet raakt laat hem groen -> blind. */
+    const blind = o.meetEen('POST /api/bestaat-niet-in-deze-toets', 'zz-basis-groen.test.js',
+      { basisGroen: new Set(['zz-basis-groen.test.js']) });
+    assert.equal(blind.staat, 'blind');
+  } finally {
+    fs.unlinkSync(groenBestand);
+    fs.unlinkSync(roodBestand);
+  }
 });
 
 test('4. een ontbrekend journaal geeft een REDEN en geen nullen', () => {

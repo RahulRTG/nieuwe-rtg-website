@@ -235,31 +235,28 @@ function meet(versGericht) {
    uitspraak "geen enkele toets die deze route raakt kijkt naar zijn inhoud" te
    sterk -- er is er EEN geprobeerd. Daarom heet dat hier `blind` met de naam van
    de toets erbij, en niet "bewezen dat niemand kijkt". */
-function gerichteRonde(aantal) {
-  const { draaiToets, DEUREN } = require('./mutatie');
-  /* DE DEUREN BLIJVEN OPEN, en dat is geen detail maar het verschil tussen een
-     meting en een artefact. Mijn eerste drie gerichte metingen waren /api/login,
-     /api/office/login en /api/supplier/login -- alle drie "MERKT". Natuurlijk:
-     liegen over de inlog breekt elke toets die moet inloggen, en dat zegt niets
-     over de vraag of iemand naar de INHOUD van die route kijkt.
-     scripts/mutatie.js maakt dat onderscheid al in zijn scherpe ronde
-     (RTG_LIEG_NIET=DEUREN); hier geldt hetzelfde. Een deur zelf valt daarmee
-     buiten deze meting, en dat staat in de uitslag. */
+/* ---- WELKE ROUTES KUNNEN NOG GERICHT GEMETEN WORDEN ----
+
+   Losgetrokken uit gerichteRonde(), zodat de parallelle band (scripts/
+   outputband.js) dezelfde selectie gebruikt als de seriele ronde. Een tweede
+   kopie van "welke route is de moeite waard" zou binnen een week uiteenlopen
+   (LAT.md regel 4).
+
+   `al` mag worden meegegeven, want de band weet welke routes al bezig zijn en
+   die horen niet nog een keer te worden uitgedeeld. */
+function kiesKandidaten(al) {
+  const { DEUREN } = require('./mutatie');
   const deuren = DEUREN.split(',');
   const isDeur = (pad) => deuren.some(d => pad === d || pad.startsWith(d));
   const k = koppeling(JOURNAAL);
   const g = gevoeligheid();
-  if (!k || !g) { console.error('  geen journaal of geen MUTATIES.json'); return null; }
+  if (!k || !g) return null;
   const infra = infrastructuur(k.perToets);
-  const al = eerderGemeten();
+  const gedaan = al || eerderGemeten();
 
-  /* Alleen routes waar iets te meten valt: er moet een INHOUDGEVOELIGE toets op
-     zitten. Zit die er niet, dan is er geen toets die ooit iets zou merken. */
   const kandidaten = [];
   for (const [route, toetsen] of k.perRoute) {
-    if (al[route] || infra.has(route)) continue;
-    /* Een deur meten door over de deur te liegen, meet de deur niet maar de
-       inlog van elke toets die erlangs moet. */
+    if (gedaan[route] || infra.has(route)) continue;
     if (isDeur(route.slice(route.indexOf(' ') + 1))) continue;
     const gevoelig = [...toetsen].filter(t => g.gevoelig.has(t));
     if (!gevoelig.length) continue;
@@ -270,45 +267,85 @@ function gerichteRonde(aantal) {
     kandidaten.push({ route, toets: smalste.t, breedte: smalste.n });
   }
   kandidaten.sort((a, b) => a.breedte - b.breedte);
+  return kandidaten;
+}
 
+/* ---- EEN ROUTE METEN, MET DE CONTROLERUN ----
+
+   Liegt over EEN route en kijkt of de smalste toets erop het merkt. Zakt hij,
+   dan draait dezelfde toets nog een keer ZONDER leugen: alleen als hij dan groen
+   is bewijst de zakking iets over de inhoud (zie de controlerun-uitleg hieronder).
+   Geeft { staat: 'merkt' | 'blind' | 'stoornis' } terug. Een pure meting: geen
+   register, geen schijf -- de aanroeper (seriele ronde of parallelle band) legt
+   vast. */
+function meetEen(route, toets, opties) {
+  const { draaiToets, DEUREN } = require('./mutatie');
+  const o = opties || {};
+  /* DE BASISLIJN, EEN KEER GEMETEN IN PLAATS VAN PER ROUTE. De controlerun
+     hieronder vraagt "is deze toets groen ZONDER leugen". Voor de honderden
+     routes die dezelfde toets delen (auth-rol.test.js raakt er 194) is dat
+     honderden keren dezelfde vraag. Wie een `basisGroen` meegeeft -- een Set of
+     Map van toetsen die in een eerste ronde groen bleken -- slaat de controlerun
+     over: staat de toets erin, dan is een zakking onder de leugen toe te
+     rekenen; staat hij er NIET in (hij was al rood), dan is het stoornis en valt
+     er niets aan de leugen toe te schrijven. Zo blijft het onderscheid uit de
+     controlerun overeind, maar zonder hem duizenden keren te herhalen. */
+  const kentBasis = o.basisGroen !== undefined && o.basisGroen !== null;
+  const heeft = (t) => o.basisGroen instanceof Set ? o.basisGroen.has(t)
+    : o.basisGroen instanceof Map ? o.basisGroen.get(t) : !!(o.basisGroen && o.basisGroen[t]);
+  if (kentBasis && !heeft(toets)) return { staat: 'stoornis' };   // was al rood in de basislijn
+
+  const pad = route.slice(route.indexOf(' ') + 1);
+  const r = draaiToets(path.join(WORTEL, 'test', toets),
+    { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
+  if ((r.gezakt || 0) === 0) return { staat: 'blind' };
+  if (kentBasis) return { staat: 'merkt' };   // basislijn zei groen, leugen maakt rood: toe te rekenen
+
+  /* DE CONTROLERUN (zonder basislijn). Een toets die onder de leugen zakt, kan
+     ook zakken door iets anders -- een trage machine, een poortbotsing, een toets
+     die net vandaag stuk is. Dat als MERKT tellen maakt een valse bewezen-cel in
+     de matrix, precies het bewijs dat niemand ooit nakijkt (LAT.md regel 10).
+     Alleen als dezelfde toets ZONDER leugen groen is, bewijst de zakking iets
+     over de inhoud. */
+  const controle = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
+  return { staat: (controle.gezakt || 0) > 0 ? 'stoornis' : 'merkt' };
+}
+
+/* Draait EEN toets zonder leugen en zegt of hij groen was. De basislijn van de
+   band leunt hierop; het is dezelfde draaiToets die de controlerun gebruikt. */
+function basislijnVan(toets) {
+  const { draaiToets } = require('./mutatie');
+  const r = draaiToets(path.join(WORTEL, 'test', toets), {}, 240000);
+  return { toets, groen: (r.gezakt || 0) === 0, gedraaid: r.gedraaid !== undefined ? r.gedraaid : null };
+}
+
+function gerichteRonde(aantal) {
+  const kandidaten = kiesKandidaten();
+  if (!kandidaten) { console.error('  geen journaal of geen MUTATIES.json'); return null; }
   const doen = kandidaten.slice(0, Math.max(1, aantal));
   console.log('\n  gericht meten: ' + doen.length + ' routes van de ' + kandidaten.length + ' die nog kunnen\n');
-  const gericht = Object.assign({}, al);
+  const gericht = Object.assign({}, eerderGemeten());
   let merkt = 0, blind = 0, stoornis = 0;
   for (let i = 0; i < doen.length; i++) {
     const d = doen[i];
-    const pad = d.route.slice(d.route.indexOf(' ') + 1);
-    const r = draaiToets(path.join(WORTEL, 'test', d.toets),
-      { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
-    const zakte = (r.gezakt || 0) > 0;
-    /* DE CONTROLERUN. Een toets die onder de leugen zakt, kan ook zakken door
-       iets anders -- een trage machine, een poortbotsing, een toets die net
-       vandaag stuk is. Dat telde hier als MERKT, en een vals MERKT wordt een
-       valse bewezen-cel in de matrix: precies het soort bewijs dat niemand ooit
-       nakijkt (LAT.md regel 10). Alleen als dezelfde toets ZONDER leugen groen
-       is, bewijst de zakking iets over de inhoud van deze route. Faalt hij ook
-       zonder leugen, dan heet het STOORNIS en wordt er niets vastgelegd -- een
-       latere batch probeert het opnieuw. De controle draait alleen bij een
-       zakking; een groene toets heeft niets te controleren. */
-    let uitslag;
-    if (!zakte) { uitslag = 'blind '; blind++; }
-    else {
-      const controle = draaiToets(path.join(WORTEL, 'test', d.toets), {}, 240000);
-      if ((controle.gezakt || 0) > 0) { uitslag = 'STOORNIS'; stoornis++; }
-      else { uitslag = 'MERKT '; merkt++; }
+    const u = meetEen(d.route, d.toets);
+    if (u.staat === 'merkt') merkt++;
+    else if (u.staat === 'blind') blind++;
+    else stoornis++;
+    if (u.staat !== 'stoornis') {
+      gericht[d.route] = { toets: d.toets, merkt: u.staat === 'merkt', op: new Date().toISOString() };
     }
-    if (uitslag !== 'STOORNIS') {
-      gericht[d.route] = { toets: d.toets, merkt: uitslag === 'MERKT ', op: new Date().toISOString() };
-    }
+    const label = u.staat === 'merkt' ? 'MERKT ' : u.staat === 'blind' ? 'blind ' : 'STOORNIS';
     process.stdout.write('  ' + String(i + 1).padStart(4) + '/' + doen.length + '  ' +
-      uitslag + ' ' + d.route.slice(0, 58).padEnd(60) + d.toets + '\n');
+      label + ' ' + d.route.slice(0, 58).padEnd(60) + d.toets + '\n');
   }
   console.log('\n  gemeten: ' + merkt + ' merken de leugen, ' + blind + ' niet' +
     (stoornis ? ', ' + stoornis + ' stoornis (toets faalt ook zonder leugen; niet vastgelegd)' : '') + '.');
   return gericht;
 }
 
-module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, gerichteRonde };
+module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten,
+  gerichteRonde, kiesKandidaten, meetEen, basislijnVan };
 
 if (require.main !== module) return;
 

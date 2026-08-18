@@ -591,6 +591,17 @@ function logInlog(kanaal, ok, wie, req) {
    Deze instantie bestaat voor het LEZEN: het kantoor vraagt het hele spoor op,
    een lid alleen zijn eigen regels. Zie ../lib/handelingsspoor.js. */
 const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
+
+/* DE ANKERDIENST: het ene getal dat naar buiten moet.
+
+   De keten ziet gesleutel MIDDEN in een spoor. Kopafknipping ziet hij niet --
+   wie de nieuwste regels weggooit houdt een kloppende keten over. Daarvoor moet
+   er een blok naar een GESCHEIDEN plek, en dat besluit is van een mens.
+
+   Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
+   dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
+   software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
 function securityLogKeten() {
   const lijst = (db.data && db.data.securityLog) || [];
   return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
@@ -1987,7 +1998,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
-  securityLogKeten, handelingsspoor,
+  securityLogKeten, handelingsspoor, ankerdienst,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,

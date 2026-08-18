@@ -88,12 +88,21 @@ const CONTROL = {
   control: 'AUDIT-KETEN-VERANKERD',
   wat: 'het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker',
   eigenaar: 'Security',
-  bewijs: ['test/keten.test.js'],
-  bewijsstuk: 'inzagelog.anker() -- de momentopname die weggezet moet worden',
-  dekking: { beproefd: 0, totaal: 4, eenheid: 'auditjournalen met een extern anker' },
-  grens: 'ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en ' +
-    'een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens ' +
-    'een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.',
+  bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js'],
+  bewijsstuk: 'POST /api/office/anker -- het blok met de kop van elk journaal, plus de tegenproef',
+  dekking: { beproefd: 0, totaal: 5, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
+  /* De noemer is 5 en niet 4: sinds het handelingsspoor erbij kwam zijn er vijf
+     journalen om te ankeren (inzage, inlog, handelingen, onderzoekslab en de
+     boardroom-journalen samen). Een noemer die niet meegroeit, maakt van een gat
+     stilletjes een percentage. */
+  grens: 'DE DIENST DRAAIT, HET ANKER STAAT NERGENS BUITEN. server/lib/ankerdienst.js ' +
+    'verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt ' +
+    'teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl ' +
+    'de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het ' +
+    'blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming ' +
+    'is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker ' +
+    'maar een tweede regel om te wijzigen. De dienst toont daarom "niet in bedrijf" tot er een ' +
+    'blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.',
   inBedrijf: false
 };
 

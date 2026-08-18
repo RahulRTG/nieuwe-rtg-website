@@ -184,9 +184,9 @@ const CONTROL = {
   eigenaar: 'Security',
   bewijs: ['test/keten.test.js', 'test/securitylog-keten.test.js', 'test/boardlog-keten.test.js'],
   bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)',
-  /* ALLE VIER. Het inzagejournaal was de eerste; daarna zijn securityLog (het
-     inlog-auditlog), livingLab.audit en het boardroom-journaal van het lid eraan
-     gehangen. De noemer hoort in beeld te blijven staan, ook nu hij vol is:
+  /* ALLE VIJF. Het inzagejournaal was de eerste; daarna zijn securityLog (het
+     inlog-auditlog), livingLab.audit, het boardroom-journaal van het lid en het
+     handelingsspoor (server/lib/handelingsspoor.js) eraan gehangen. De noemer hoort in beeld te blijven staan, ook nu hij vol is:
      komt er een vijfde journaal bij, dan hoort dit getal te zakken en niet stil
      te blijven staan.
 
@@ -197,7 +197,7 @@ const CONTROL = {
      auditspoor is dicht". De meeste schrijfroutes laten helemaal GEEN spoor na;
      die staan niet in deze noemer omdat er niets te ketenen valt. Zie de
      AUDIT-kolom in BEWIJSMATRIX.json, die daarom nog op nul staat. */
-  dekking: { beproefd: 4, totaal: 4, eenheid: 'auditjournalen aan de keten' },
+  dekking: { beproefd: 5, totaal: 5, eenheid: 'auditjournalen aan de keten' },
   grens: 'ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de ' +
     'NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen ' +
     'van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD ' +

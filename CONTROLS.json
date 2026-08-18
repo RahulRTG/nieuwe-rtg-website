@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:47:53.455Z",
+        "at": "2026-08-18T09:57:20.342Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -56,8 +56,8 @@
       ],
       "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)",
       "dekking": {
-        "beproefd": 4,
-        "totaal": 4,
+        "beproefd": 5,
+        "totaal": 5,
         "eenheid": "auditjournalen aan de keten",
         "tellers": {},
         "pct": 100
@@ -65,9 +65,9 @@
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 45,
+        "beweringen": 46,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:17.316Z",
+        "at": "2026-08-18T09:57:53.619Z",
         "bestanden": [
           "test/keten.test.js",
           "test/securitylog-keten.test.js",
@@ -81,25 +81,29 @@
       "wat": "het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker",
       "eigenaar": "Security",
       "bewijs": [
-        "test/keten.test.js"
+        "test/keten.test.js",
+        "test/ankerdienst.test.js",
+        "test/ankerdienst-echt.test.js"
       ],
-      "bewijsstuk": "inzagelog.anker() -- de momentopname die weggezet moet worden",
+      "bewijsstuk": "POST /api/office/anker -- het blok met de kop van elk journaal, plus de tegenproef",
       "dekking": {
         "beproefd": 0,
-        "totaal": 4,
-        "eenheid": "auditjournalen met een extern anker",
+        "totaal": 5,
+        "eenheid": "auditjournalen met een anker dat BUITEN staat",
         "tellers": {},
         "pct": 0
       },
-      "grens": "ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.",
+      "grens": "DE DIENST DRAAIT, HET ANKER STAAT NERGENS BUITEN. server/lib/ankerdienst.js verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker maar een tweede regel om te wijzigen. De dienst toont daarom \"niet in bedrijf\" tot er een blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.",
       "inBedrijf": false,
       "laatstGroen": {
         "staat": "NIET IN BEDRIJF",
-        "beweringen": 30,
+        "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:17.518Z",
+        "at": "2026-08-18T09:58:05.035Z",
         "bestanden": [
-          "test/keten.test.js"
+          "test/keten.test.js",
+          "test/ankerdienst.test.js",
+          "test/ankerdienst-echt.test.js"
         ],
         "mechanismeBewezen": true,
         "reden": "ontworpen en bewezen, maar niet in gebruik -- zie grens"
@@ -133,7 +137,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:18.744Z",
+        "at": "2026-08-18T09:58:05.999Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -169,7 +173,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:19.003Z",
+        "at": "2026-08-18T09:58:06.267Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -198,7 +202,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:21.017Z",
+        "at": "2026-08-18T09:58:08.129Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -228,7 +232,7 @@
       "laatstGroen": {
         "staat": "niet gemeten",
         "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-17T21:48:33.186Z",
+        "at": "2026-08-18T09:58:20.387Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -245,8 +249,8 @@
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
       "dekking": {
-        "beproefd": 2937,
-        "totaal": 2937,
+        "beproefd": 3081,
+        "totaal": 3081,
         "eenheid": "schrijfroutes met een rol",
         "tellers": {
           "doorbraken": 0,
@@ -261,7 +265,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:33.457Z",
+        "at": "2026-08-18T09:58:20.614Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -277,15 +281,15 @@
       ],
       "bewijsstuk": "INVOERPROEF.json -- per route hoeveel rommel erheen ging en wat eruit kwam",
       "dekking": {
-        "beproefd": 2510,
-        "totaal": 2936,
+        "beproefd": 2634,
+        "totaal": 3080,
         "eenheid": "routes waar rommel voorbij de poort kwam",
         "tellers": {
           "breuken": 0,
           "sporen": 0,
-          "achterEenPoort": 426,
+          "achterEenPoort": 446,
           "blindeRondes": 0,
-          "tokensHernieuwd": 13
+          "tokensHernieuwd": 12
         },
         "pct": 85.5
       },
@@ -294,7 +298,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:33.639Z",
+        "at": "2026-08-18T09:58:20.883Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -326,7 +330,7 @@
         "staat": "GROEN",
         "beweringen": 12,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:33.860Z",
+        "at": "2026-08-18T09:58:21.095Z",
         "bestanden": [
           "test/idemproef.test.js"
         ]
@@ -343,26 +347,26 @@
       ],
       "bewijsstuk": "STAATPROEF.json -- per route welke collecties bewogen, en wat de herhaling deed",
       "dekking": {
-        "beproefd": 2338,
-        "totaal": 2936,
+        "beproefd": 2491,
+        "totaal": 3080,
         "eenheid": "routes waar de toestand is gemeten",
         "tellers": {
-          "state": 224,
-          "sideEffect": 224,
-          "rollback": 2107,
-          "rollbackGezakt": 7,
-          "idemBewezen": 124,
-          "idemGezakt": 100,
+          "state": 266,
+          "sideEffect": 266,
+          "rollback": 2217,
+          "rollbackGezakt": 8,
+          "idemBewezen": 174,
+          "idemGezakt": 92,
           "blindeRondes": 0
         },
-        "pct": 79.6
+        "pct": 80.9
       },
       "grens": "ziet de DATABASE en niets daarbuiten: een mail, een push of een betaling bij een derde valt er niet onder, dus SIDE_EFFECT betekent hier \"buiten de eigen collectie\" en niet \"buiten het huis\". Ziet ook geen wijziging die zichzelf binnen één verzoek opheft. Een route waar de eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 27,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:34.360Z",
+        "at": "2026-08-18T09:58:21.474Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -379,21 +383,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 15044,
-        "totaal": 43857,
+        "beproefd": 16475,
+        "totaal": 46068,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 28431,
-          "gezakt": 122
+          "ongemeten": 29205,
+          "gezakt": 116
         },
-        "pct": 34.3
+        "pct": 35.8
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 17,
         "overgeslagen": 0,
-        "at": "2026-08-17T21:48:34.901Z",
+        "at": "2026-08-18T09:58:22.000Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

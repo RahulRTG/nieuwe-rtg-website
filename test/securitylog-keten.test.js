@@ -146,3 +146,47 @@ test('regels van vóór de keten blijven staan en worden niet veroordeeld', () =
   assert.equal(oordeel.zonderKeten, 2, 'de oude regels worden geteld');
   assert.equal(journaal[0].at, 'nu', 'de nieuwe regel staat vooraan');
 });
+
+/* DE ECHTE ACCOUNTINLOG HOORT ER OOK IN, en dat ontbrak.
+
+   De demo-inlog, de partner-inlog, SSO en de kantoordeur schreven allemaal een
+   regel in het beveiligingslogboek. Juist /api/auth/login -- de weg waarlangs
+   echte leden binnenkomen -- niet. Een brute-force tegen echte accounts was
+   daardoor onzichtbaar in het ene log dat daarvoor bestaat.
+
+   Gevonden doordat een andere toets (test/ankerdienst-echt.test.js) een leeg
+   inlog-auditlog aantrof terwijl er net was ingelogd.
+
+   Let op wat er NIET in staat: het ingetypte e-mailadres. Dat is
+   persoonsgegeven van iemand die hier misschien niet eens klant is, en het
+   verwerkingsregister zegt bij punt 8 met zoveel woorden "geen namen". Het IP
+   staat er al bij, en dat is wat een reeks mislukte pogingen zichtbaar maakt. */
+test('een echte accountinlog komt in het beveiligingslogboek, gelukt en mislukt', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
+  try {
+    const goed = await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
+    assert.ok(goed.body && goed.body.token, 'ingelogd');
+    await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'FOUT-WACHTWOORD', pasApp: 'business' });
+    await api(base, '/api/auth/login', { login: 'bestaatniet@nergens.nl', password: 'x', pasApp: 'business' });
+
+    const log = await fetch(base + '/api/office/securitylog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + goed.body.token },
+      body: '{}'
+    }).then(r => r.json());
+
+    const leden = (log.log || []).filter(r => r.kanaal === 'lid');
+    assert.ok(leden.length >= 3, 'drie pogingen op de echte inlog horen erin te staan, kreeg ' + leden.length);
+    assert.ok(leden.some(r => r.ok === true), 'de geslaagde');
+    assert.ok(leden.some(r => r.ok === false), 'en de mislukte');
+    assert.equal(log.keten.ok, true, 'geketend');
+
+    const alles = JSON.stringify(leden);
+    assert.ok(!alles.includes('roellie.i@gmail.com'),
+      'het e-mailadres hoort NIET in het beveiligingslogboek -- het register zegt "geen namen"');
+    assert.ok(!alles.includes('bestaatniet@nergens.nl'),
+      'ook niet van iemand die hier geen account heeft');
+    assert.ok(leden.some(r => String(r.wie).startsWith('user-')), 'wel het account-id');
+  } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
+});

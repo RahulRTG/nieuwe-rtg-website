@@ -1,4 +1,10 @@
 {
+  "stempel": {
+    "op": "2026-08-18T09:08:42.089Z",
+    "commit": "5b13f2b",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",

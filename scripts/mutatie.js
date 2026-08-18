@@ -712,7 +712,14 @@ if (require.main === module) {
     const op = {};
     for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
     fs.mkdirSync(path.dirname(doel), { recursive: true });
-    fs.writeFileSync(doel, JSON.stringify({ stempel: stempel(), toetsen: op }, null, 2) + '\n');
+    fs.writeFileSync(doel, JSON.stringify({ stempel: stempel(),
+      uitleg: 'Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de ' +
+        'module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren ' +
+        'bleven open, dus hij zakte op de INHOUD en niet op de inlog.',
+      grens: 'een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de ' +
+        'verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de ' +
+        'operatoren zijn mechanisch en er zijn fouten die ze niet maken.',
+      toetsen: op }, null, 2) + '\n');
   };
   const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo

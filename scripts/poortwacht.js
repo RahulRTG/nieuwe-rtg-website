@@ -230,7 +230,19 @@ ronde().then(() => {
         'vanaf een intern adres; een lokale ronde meldt hem daarom als open zonder dat er ' +
         'iets mis is. Vergelijk alleen rondes met dezelfde vlaggen.'
     });
-    console.log(JSON.stringify(perRouteUit ? { gemeten, ...uit, perRoute } : { gemeten, ...uit }, null, 1));
+    /* UITLEG EN GRENS HOREN IN DE UITSLAG, niet alleen in dit bestand. Een
+       register dat zichzelf niet uitlegt, wordt gelezen als een dekkende
+       garantie; scripts/meetkeuring.js handhaaft dat. */
+    const kop = {
+      uitleg: 'Per route: gaat hij open voor een verzoek ZONDER token. dicht = 401 of 403, ' +
+        'publiek = met opzet open (zie PUBLIEK in dit script), stil = iets anders dan 2xx ' +
+        'waaruit niets valt af te leiden.',
+      grens: 'klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de validatie of ' +
+        'een opzoeking eerder aan de beurt was dan de autorisatie, en zegt NIETS over een slot -- ' +
+        'die heten daarom stil en niet dicht. Zegt ook niets over wie er met een GELDIG token ' +
+        'binnenkomt; dat is de rolproef.'
+    };
+    console.log(JSON.stringify(perRouteUit ? { ...kop, gemeten, ...uit, perRoute } : { ...kop, gemeten, ...uit }, null, 1));
     /* process.exitCode EN NIET process.exit(), en dat verschil is hier 146 KB
        waard. Naar een BESTAND schrijft node synchroon, dus `> POORTWACHT.json`
        ging altijd goed. Naar een PIPE schrijft hij asynchroon, en process.exit()

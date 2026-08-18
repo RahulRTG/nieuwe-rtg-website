@@ -98,7 +98,30 @@ function gevoeligheid() {
 
    Nu neemt hij zijn vier ingangen als argument en is hij zonder schijf, zonder
    server en zonder journaal te beproeven. */
-function oordeel(perRoute, perToets, gevoelig, blind) {
+/* ---- WELKE ROUTES ZIJN INFRASTRUCTUUR ----
+
+   De toerekening vroeg eerst: raakt deze gevoelige toets GEEN ANDERE route? Dat
+   leverde NUL bewezen routes op, en dat was geen strengheid maar een regel die
+   niet kan vuren: elke toets raakt ook de gezondheidscontrole en de inlog. Een
+   regel die nooit `bewezen` kan opleveren meet niets (LAT.md regel 9).
+
+   Wat infrastructuur is, wordt GEMETEN en niet opgesomd: een route die door meer
+   dan de helft van alle toetsbestanden wordt geraakt, is niet waar een van die
+   toetsen over gaat. Gemeten op deze suite zijn dat er drie -- /api/health
+   (540/540), /api/ready (504/540) en /api/auth/register (301/540).
+
+   De drempel is bewust niet afgesteld op de uitkomst: bij 50%, 30% en 20% komt
+   er 7, 7 en 8 uit. Een cijfer dat nauwelijks van de grens afhangt is een cijfer
+   over de suite en niet over de grens. */
+function infrastructuur(perToets, deel) {
+  const tel = new Map();
+  for (const s of perToets.values()) for (const r of s) tel.set(r, (tel.get(r) || 0) + 1);
+  const grens = perToets.size * (deel || 0.5);
+  return new Set([...tel].filter(([, c]) => c > grens).map(([r]) => r));
+}
+
+function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
+  const infra = infrastructuur(perToets);
   const perRouteUit = {};
   const telling = { bewezen: 0, onbeslist: 0, blind: 0, ongemeten: 0 };
   for (const [route, toetsen] of perRoute) {
@@ -117,13 +140,31 @@ function oordeel(perRoute, perToets, gevoelig, blind) {
        raakt, kan op de inhoud van een van die tien zijn gezakt. Alleen als hij
        er precies EEN raakt, valt de gevoeligheid aan deze route toe te
        schrijven. */
-    const alleen = gevoelige.filter(t => (perToets.get(t) || new Set()).size === 1);
+    /* Een gerichte meting (--meet) slaat alles over: daar is over DEZE route
+       gelogen en gekeken of een toets het merkte. Dat is direct bewijs en geen
+       toerekening. */
+    const direct = gemeten && gemeten[route];
+    if (direct) {
+      perRouteUit[route] = direct.merkt
+        ? { staat: 'bewezen', bron: 'outputproef (gericht)', toetsen: [direct.toets],
+            reden: 'er is over DEZE route gelogen en ' + direct.toets + ' zakte daarop' }
+        : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
+            reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
+              'geen enkele toets kijkt naar deze inhoud' };
+      telling[perRouteUit[route].staat]++;
+      continue;
+    }
+    const alleen = gevoelige.filter(t => {
+      const eigen = [...(perToets.get(t) || [])].filter(x => !infra.has(x));
+      return eigen.length === 1;
+    });
     if (alleen.length) {
       perRouteUit[route] = { staat: 'bewezen', bron: 'outputproef', toetsen: alleen.slice(0, 6),
         reden: 'deze toets(en) zakken als het antwoord leeg wordt, en raken geen andere route' };
       telling.bewezen++;
     } else {
-      const kleinste = Math.min(...gevoelige.map(t => (perToets.get(t) || new Set()).size));
+      const kleinste = Math.min(...gevoelige.map(t =>
+        [...(perToets.get(t) || [])].filter(x => !infra.has(x)).length));
       perRouteUit[route] = { staat: 'onbeslist', toetsen: gevoelige.slice(0, 6),
         reden: 'inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer ' +
           '(de smalste: ' + kleinste + '); de gevoeligheid is niet aan deze route toe te schrijven' };
@@ -131,6 +172,16 @@ function oordeel(perRoute, perToets, gevoelig, blind) {
     }
   }
   return { telling, perRoute: perRouteUit };
+}
+
+/* De gerichte metingen uit een eerdere ronde. Ze STAPELEN: elke ronde meet er
+   een paar honderd bij, en wat al gemeten is hoeft niet opnieuw. Zonder dit is
+   gericht meten zinloos werk -- de volgende ronde gooit het weg. */
+function eerderGemeten() {
+  try {
+    const j = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
+    return j.gericht || {};
+  } catch (e) { return {}; }
 }
 
 function meet() {
@@ -143,7 +194,7 @@ function meet() {
       'sinds de OUTPUT-as bestaat; een journaal van voor die tijd kan deze vraag niet beantwoorden.' };
   }
 
-  const o = oordeel(k.perRoute, k.perToets, g.gevoelig, g.blind);
+  const o = oordeel(k.perRoute, k.perToets, g.gevoelig, g.blind, eerderGemeten());
   const perRoute = o.perRoute;
   const telling = o.telling;
 
@@ -156,9 +207,97 @@ function meet() {
     gemeten: telling, routes: Object.keys(perRoute).length, perRoute };
 }
 
-module.exports = { meet, oordeel, koppeling, gevoeligheid };
+/* ---- GERICHT METEN: LIEG OVER EEN ROUTE EN KIJK WIE HET MERKT ----
+
+   De toerekening hierboven is een AFLEIDING: een gevoelige toets die maar een
+   route raakt, zakt waarschijnlijk op die route. Dat levert er tien op, en voor
+   de andere 4170 valt niets af te leiden.
+
+   Dit is de directe meting, en hij kan pas sinds het journaal TOETS-regels
+   draagt: zet de liegpoort op EEN route en draai alleen de toetsen die hem
+   raken. Zakt er een, dan kijkt die toets aantoonbaar naar de inhoud van DEZE
+   route -- geen afleiding meer, maar een waarneming.
+
+   WAAROM DIT NIET IN EEN KEER KAN. Per route een toetsbestand draaien kost
+   seconden tot een minuut; 4170 routes is dagen. Daarom stapelt hij: elke ronde
+   meet er een paar honderd bij en bewaart de uitslag in `gericht`. Wat al
+   gemeten is, wordt niet opnieuw gedaan. Zo groeit deze as met het werk mee in
+   plaats van te wachten op een ronde die niemand ooit start.
+
+   DE KEUZE VAN DE TOETS is de smalste die de route raakt: die gaat er het meest
+   waarschijnlijk over, en hij is het snelst. Blijft hij groen, dan is de
+   uitspraak "geen enkele toets die deze route raakt kijkt naar zijn inhoud" te
+   sterk -- er is er EEN geprobeerd. Daarom heet dat hier `blind` met de naam van
+   de toets erbij, en niet "bewezen dat niemand kijkt". */
+function gerichteRonde(aantal) {
+  const { draaiToets, DEUREN } = require('./mutatie');
+  /* DE DEUREN BLIJVEN OPEN, en dat is geen detail maar het verschil tussen een
+     meting en een artefact. Mijn eerste drie gerichte metingen waren /api/login,
+     /api/office/login en /api/supplier/login -- alle drie "MERKT". Natuurlijk:
+     liegen over de inlog breekt elke toets die moet inloggen, en dat zegt niets
+     over de vraag of iemand naar de INHOUD van die route kijkt.
+     scripts/mutatie.js maakt dat onderscheid al in zijn scherpe ronde
+     (RTG_LIEG_NIET=DEUREN); hier geldt hetzelfde. Een deur zelf valt daarmee
+     buiten deze meting, en dat staat in de uitslag. */
+  const deuren = DEUREN.split(',');
+  const isDeur = (pad) => deuren.some(d => pad === d || pad.startsWith(d));
+  const k = koppeling(JOURNAAL);
+  const g = gevoeligheid();
+  if (!k || !g) { console.error('  geen journaal of geen MUTATIES.json'); return null; }
+  const infra = infrastructuur(k.perToets);
+  const al = eerderGemeten();
+
+  /* Alleen routes waar iets te meten valt: er moet een INHOUDGEVOELIGE toets op
+     zitten. Zit die er niet, dan is er geen toets die ooit iets zou merken. */
+  const kandidaten = [];
+  for (const [route, toetsen] of k.perRoute) {
+    if (al[route] || infra.has(route)) continue;
+    /* Een deur meten door over de deur te liegen, meet de deur niet maar de
+       inlog van elke toets die erlangs moet. */
+    if (isDeur(route.slice(route.indexOf(' ') + 1))) continue;
+    const gevoelig = [...toetsen].filter(t => g.gevoelig.has(t));
+    if (!gevoelig.length) continue;
+    const smalste = gevoelig
+      .map(t => ({ t, n: [...(k.perToets.get(t) || [])].filter(x => !infra.has(x)).length }))
+      .sort((a, b) => a.n - b.n)[0];
+    if (smalste.n === 1) continue;          // die is al via toerekening bewezen
+    kandidaten.push({ route, toets: smalste.t, breedte: smalste.n });
+  }
+  kandidaten.sort((a, b) => a.breedte - b.breedte);
+
+  const doen = kandidaten.slice(0, Math.max(1, aantal));
+  console.log('\n  gericht meten: ' + doen.length + ' routes van de ' + kandidaten.length + ' die nog kunnen\n');
+  const gericht = Object.assign({}, al);
+  let merkt = 0, blind = 0;
+  for (let i = 0; i < doen.length; i++) {
+    const d = doen[i];
+    const pad = d.route.slice(d.route.indexOf(' ') + 1);
+    const r = draaiToets(path.join(WORTEL, 'test', d.toets),
+      { RTG_LIEG: pad, RTG_LIEG_NIET: DEUREN }, 240000);
+    const zakte = (r.gezakt || 0) > 0;
+    gericht[d.route] = { toets: d.toets, merkt: zakte, op: new Date().toISOString() };
+    if (zakte) merkt++; else blind++;
+    process.stdout.write('  ' + String(i + 1).padStart(4) + '/' + doen.length + '  ' +
+      (zakte ? 'MERKT ' : 'blind ') + d.route.slice(0, 58).padEnd(60) + d.toets + '\n');
+  }
+  console.log('\n  gemeten: ' + merkt + ' merken de leugen, ' + blind + ' niet.');
+  return gericht;
+}
+
+module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, gerichteRonde };
 
 if (require.main !== module) return;
+
+const MEET = Number((argv.find(a => a.startsWith('--meet=')) || '').slice(7)) || 0;
+if (MEET) {
+  const gericht = gerichteRonde(MEET);
+  if (!gericht) { process.exitCode = 2; return; }
+  const na = meet();
+  if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(Object.assign(na, { gericht }), null, 1) + '\n');
+  console.log('  weggeschreven in OUTPUTPROEF.json\n');
+  process.exitCode = 0;
+  return;
+}
 
 const uit = meet();
 if (uit.fout) { console.error('\n  ' + uit.fout + '\n'); process.exitCode = 2; return; }

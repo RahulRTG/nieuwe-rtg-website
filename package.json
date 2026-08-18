@@ -127,7 +127,6 @@
     "versheid": "node scripts/versheid.js"
   },
   "devDependencies": {
-    "playwright": "^1.62.1",
-    "zz-ijk-dev": "^1.0.0"
+    "playwright": "^1.62.1"
   }
 }

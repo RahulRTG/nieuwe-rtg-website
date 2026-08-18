@@ -84,14 +84,20 @@ const POSTEN = [
     sluit: 'niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de ' +
       'AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag.' },
 
-  { id: 'output-niet-toerekenbaar', soort: 'grens',
+  /* STOND HIER ALS 'grens', EN DAT KLOPT NIET MEER. Zolang de liegpoort alleen
+     per toetsbestand kon, viel er over deze routes niets af te leiden en was dat
+     de rand van de methode. Sinds scripts/outputproef.js --meet bestaat, is het
+     gewoon traag werk: lieg over EEN route, draai de toetsen die hem raken, en
+     kijk wie het merkt. Een post die meetbaar is geworden hoort niet als grens
+     te blijven staan -- dan verbergt het woord "grens" achterstand. */
+  { id: 'output-niet-toerekenbaar', soort: 'meetwerk',
     wat: 'routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer',
     uit: (r) => (r.output && r.output.gemeten || {}).onbeslist,
     waarom: 'een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van ' +
       'een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.',
-    sluit: 'de liegpoort per ROUTE in plaats van per toetsbestand. Dat betekent per route een ' +
-      'suite-run, en dat is bij 4185 routes geen instrument maar een rekencentrum. Smallere ' +
-      'toetsen sluiten hem vanzelf, beetje bij beetje.' },
+    sluit: 'node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen ' +
+      'de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd ' +
+      'per ronde, dus dit sluit met werk en niet met een doorbraak.' },
 
   { id: 'audit-wisselend', soort: 'meetwerk',
     wat: 'routes die soms wel en soms geen spoor nalaten',

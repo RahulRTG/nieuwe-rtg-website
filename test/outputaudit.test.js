@@ -77,11 +77,18 @@ test('2. OUTPUT: gevoeligheid telt alleen als ze toe te rekenen is', () => {
      bleef de suite groen terwijl ik de toerekening weghaalde. Nu gaat hij door
      oordeel() heen: dezelfde functie die de echte ronde gebruikt. */
   const { oordeel } = require('../scripts/outputproef');
+  /* DE FIXTURE MOET GROOT GENOEG ZIJN OM DE INFRASTRUCTUURREGEL TE OVERLEVEN.
+     Die regel noemt een route infrastructuur als MEER DAN DE HELFT van alle
+     toetsbestanden hem raakt. Met drie bestanden in de fixture haalde een route
+     die er twee raakt die drempel al, viel hij als infrastructuur weg, en zakte
+     deze toets op iets wat in de echte suite (540 bestanden) niet gebeurt. Acht
+     vulbestanden zetten de drempel op een realistische hoogte. */
   const perToets = new Map([
     ['smal.test.js', new Set(['POST /api/een'])],
     ['breed.test.js', new Set(['POST /api/een', 'POST /api/twee', 'POST /api/drie'])],
     ['blind.test.js', new Set(['POST /api/drie'])]
   ]);
+  for (let i = 0; i < 8; i++) perToets.set('vul' + i + '.test.js', new Set(['GET /api/health']));
   const perRoute = new Map([
     ['POST /api/een', new Set(['smal.test.js', 'breed.test.js'])],
     ['POST /api/twee', new Set(['breed.test.js'])],
@@ -97,7 +104,15 @@ test('2. OUTPUT: gevoeligheid telt alleen als ze toe te rekenen is', () => {
   assert.match(uit.perRoute['POST /api/twee'].reden, /niet aan deze route toe te schrijven/);
   assert.equal(uit.perRoute['POST /api/drie'].staat, 'blind',
     'alleen een toets die niets van de inhoud merkt');
-  assert.deepEqual(uit.telling, { bewezen: 1, onbeslist: 1, blind: 1, ongemeten: 0 });
+
+  /* En een GERICHTE meting slaat de toerekening over: daar is over die ene route
+     gelogen en gekeken wie het merkte. Dat is waarneming en geen afleiding. */
+  const gericht = oordeel(perRoute, perToets, new Set(['breed.test.js']), new Set(),
+    { 'POST /api/twee': { toets: 'breed.test.js', merkt: true } });
+  assert.equal(gericht.perRoute['POST /api/twee'].staat, 'bewezen');
+  assert.match(gericht.perRoute['POST /api/twee'].reden, /over DEZE route gelogen/);
+
+    assert.deepEqual(uit.telling, { bewezen: 1, onbeslist: 1, blind: 1, ongemeten: 0 });
 });
 
 test('3. AUDIT: de sporenlijst is benoemd, en groei is de enige maat', () => {

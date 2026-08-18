@@ -816,7 +816,13 @@ if (require.main === module) {
 }
 
 module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
-  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
+  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
+  /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in
+     plaats van namaken. Hij weet dingen die je niet twee keer wilt leren: de
+     reporter moet op TAP staan (anders leest niemand de uitslag op Node 24), en
+     een time-out krijgt SIGKILL en geen SIGTERM (anders blijven er wezen achter
+     die poorten vasthouden en latere metingen vervuilen). */
+  draaiToets,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

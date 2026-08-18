@@ -1,14 +1,14 @@
 {
  "stempel": {
-  "op": "2026-08-18T08:03:16.745Z",
-  "commit": "6ddc96d",
+  "op": "2026-08-18T08:51:19.210Z",
+  "commit": "ec84cf7",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "telling": {
   "posten": 9,
-  "meetwerk": 20,
+  "meetwerk": 4282,
   "instrument": 406,
   "grens": 586
  },
@@ -47,17 +47,17 @@
   },
   {
    "id": "output-niet-toerekenbaar",
-   "soort": "grens",
+   "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": null,
+   "aantal": 4170,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
-   "sluit": "de liegpoort per ROUTE in plaats van per toetsbestand. Dat betekent per route een suite-run, en dat is bij 4185 routes geen instrument maar een rekencentrum. Smallere toetsen sluiten hem vanzelf, beetje bij beetje."
+   "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
   {
    "id": "audit-wisselend",
    "soort": "meetwerk",
    "wat": "routes die soms wel en soms geen spoor nalaten",
-   "aantal": null,
+   "aantal": 92,
    "waarom": "het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is \"laat een spoor na\" geen eigenschap van de route.",
    "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap."
   },

@@ -24,7 +24,27 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
-const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+/* ZEVEN DAGEN EN NIET VEERTIEN, EN DAT IS GEEN SMAAK.
+
+   Hier stond +14, en die toets ging op 18 augustus 2026 vanzelf stuk zonder dat
+   iemand iets had aangeraakt -- ook op main. De momentlijn zet alles wat verder
+   weg ligt dan deze maand in `later`, en `later` is met opzet een TELLING en
+   geen vak (zie de laatste bewering van de lijn-toets hieronder). Veertien dagen
+   valt dus de ene helft van de maand wel in een vak ("Deze maand") en de andere
+   helft niet. Op 17 augustus was +14 nog 31 augustus en stond hij in een vak; op
+   18 augustus werd het 1 september en was hij alleen nog een getal.
+
+   Zeven dagen valt ALTIJD in een vak, en dat is te rekenen en niet te hopen: de
+   lijn zet iets in "Volgende week" als het verder weg is dan de rest van deze
+   week (0 tot 6 dagen) maar binnen die rest plus zeven. Zeven is altijd groter
+   dan die rest en altijd kleiner dan of gelijk aan rest+7 -- op elke dag van de
+   week, in elke maand.
+
+   Wat NIET verandert: dat "Deze maand" en "Later" langs een maandgrens springen
+   is een eigenschap van kalendervakken en geen fout, dus daar blijf ik af. Een
+   toets hoort alleen niet van de kalender af te hangen als hij daar niet over
+   gaat -- deze gaat over de keten van domein tot route. */
+const STRAKS = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };

@@ -33,9 +33,17 @@
 
 module.exports = function opslagStart(deps) {
   const { log, accounts, initRealtime, startGedeeld, startSqliteSync, startPostgres,
-    DEMO, zetEigenaarsAccount } = deps;
+    DEMO, zetEigenaarsAccount, demoPapieren } = deps;
 
   initRealtime();
+  /* De papieren van het demopersoneel, en NA initRealtime() met opzet: de
+     hulpdienst- en zorgzaken (CONSULTA, FARMACIA, GUARDIA...) worden pas daar
+     gezaaid. Ervoor aanroepen deed niets en gaf ook geen fout -- de lijst zaken
+     was simpelweg nog leeg, en dat is precies het soort stilte waar LAT-regel 5
+     over gaat. Zie kern/staffseed-papieren.js voor wat er gezaaid wordt. */
+  if (DEMO && demoPapieren) {
+    try { demoPapieren(); } catch (e) { log.warn('[demo] papieren zaaien mislukt', { fout: e.message }); }
+  }
   // Gedeelde data via Redis aanzetten (JSON-opslag, lees-replica's).
   startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));
   // Kruisproces-synchronisatie voor de SQLite-opslag (echt losse schrijvende servers).

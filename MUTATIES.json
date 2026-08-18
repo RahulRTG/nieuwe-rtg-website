@@ -690,6 +690,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "bron.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "btw-aangifte.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2013,6 +2021,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "inlogrem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "overleefd"
+    },
     "instant-reality.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3306,6 +3321,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "onderhoud.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/onderhoud.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3509,6 +3532,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "ondertitels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ondertitels.js",
+      "operator": "<=-><#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "onderwijs.test.js": {
       "soort": "server",
@@ -4060,6 +4091,14 @@
       "operator": ">=->>#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "raakvlak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/raakvlakkeuring.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "rahul-eerlijk.test.js": {
       "soort": "puur",
@@ -5748,6 +5787,14 @@
       "module": "scripts/uitrol.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "uitvoerproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/uitvoerproef.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "upload-poort.test.js": {

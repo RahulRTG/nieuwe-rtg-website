@@ -26,6 +26,12 @@ function opvangen(API, T){
   scrim.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
   var doos = document.createElement('div');
   doos.setAttribute('role','dialog');
+  /* aria-modal hoort erbij en stond er niet. Dit scherm LIGT modaal -- een
+     scrim over de hele pagina op z-index 9990 -- maar zei dat alleen visueel.
+     Een schermlezer las dus gewoon de pagina eronder door, en de gedeelde laag
+     (shared/basis: een venster sluit de rest af) zag hem niet en sloot hem
+     daarom zelf af als "buiten het venster". Wat modaal is, zegt dat. */
+  doos.setAttribute('aria-modal','true');
   doos.setAttribute('aria-label', T('pinh.kop','Nieuwe algemene pin'));
   doos.style.cssText = 'width:min(22rem,100%);background:var(--paneel,#151312);border:1px solid var(--line);border-radius:14px;padding:1.2rem;color:var(--txt,#F7F5F1);font-family:Inter,system-ui,sans-serif;';
   var kop = document.createElement('div');

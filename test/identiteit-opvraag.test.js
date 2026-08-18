@@ -19,6 +19,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakIdentiteit } = require('../server/kern/payroll/identiteit');
+/* HET ECHTE INZAGEJOURNAAL en niet een dubbel. Hier stond `{ noteer: (r) =>
+   journaal.push(r) }`, en dat slikte elk object -- ook een met sleutels die het
+   echte inzagelog niet leest. Dat is precies wat er gebeurde: de aanroep zette
+   `accountId` in plaats van `over`, dus voorBetrokkene() (dat op overId filtert)
+   vond niets en een medewerker zag zijn eigen werkgever niet staan. Een dubbel
+   dat ruimer is dan het echte ding meet niets (LAT-regel 9). */
+const inzagelog = require('../server/inzagelog');
 
 function opzet(over) {
   const db = { data: {} };
@@ -31,13 +38,16 @@ function opzet(over) {
     getUserById: (id) => users[id] || null,
     getMemberState: (id) => state[id] || null
   };
+  inzagelog.zet(db, () => {});
   const ident = maakIdentiteit(Object.assign({
     accounts, db, save: () => {}, nu: () => '2026-08-06T12:00:00.000Z',
-    inzagelog: { noteer: (r) => journaal.push(r) },
+    inzagelog,
     notify: (key, m) => berichten.push({ key, m }),
     logActivity: () => {}
   }, over || {}));
-  return { ident, db, berichten, journaal };
+  /* `journaal` is nu wat er ECHT in de database staat, niet wat er is
+     doorgegeven. Het verschil daartussen was de bug. */
+  return { ident, db, berichten, journaal, regels: () => (db.data.inzageLog || []) };
 }
 
 const sam = { id: 1, name: 'Sam', supplier_code: 'ESVEDRA', member_id: 7 };
@@ -78,11 +88,19 @@ test('gegevens opvragen levert het nodige, niet het document', () => {
   assert.equal(r.kopie, undefined, 'en geen scan');
   assert.ok(!JSON.stringify(r).includes('NL9938214821'), 'het volledige documentnummer gaat niet mee');
 
-  assert.equal(journaal.length, 1, 'het staat in het inzagejournaal');
-  assert.equal(journaal[0].accountId, 7);
-  assert.equal(journaal[0].wat, 'identiteit:gegevens');
-  assert.ok(journaal[0].waarom.length >= 10, 'met de reden erbij');
-  assert.ok(!JSON.stringify(journaal[0]).includes('Sam'), 'maar zonder de naam: dat zou een tweede kluis zijn');
+  const regels = inzagelog.lijst({ max: 50 });
+  assert.equal(regels.length, 1, 'het staat in het inzagejournaal');
+  assert.equal(regels[0].overId, '7', 'OVER wie het gaat, want daar filtert voorBetrokkene() op');
+  assert.ok(/identiteit:gegevens/.test(regels[0].bron), 'met de bron erbij: ' + regels[0].bron);
+  assert.ok(regels[0].door && regels[0].door !== 'onbekend', 'en WIE er keek: ' + regels[0].door);
+  assert.ok(regels[0].waarom.length >= 10, 'met de reden erbij');
+  assert.ok(!JSON.stringify(regels[0]).includes('Sam'), 'maar zonder de naam van de medewerker: dat zou een tweede kluis zijn');
+
+  /* DE BEWERING WAAR HET OM DRAAIT: de medewerker kan het zelf terugvinden.
+     Dat is de hele reden dat het journaal bestaat, en juist dat werkte niet. */
+  const zijnEigen = inzagelog.voorBetrokkene(7);
+  assert.equal(zijnEigen.length, 1, 'de medewerker ziet deze inzage in zijn eigen dossier');
+  assert.ok(/loonadministratie/.test(zijnEigen[0].waarom), 'met de reden die de werkgever opgaf');
 
   assert.equal(berichten.length, 1, 'en de medewerker krijgt bericht');
   assert.equal(berichten[0].key, 'user-7');

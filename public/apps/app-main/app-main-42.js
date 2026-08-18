@@ -20,6 +20,7 @@
 
   function renderHome(){
     renderVerifyBanner();
+    laadVakbewijs();
     laadPaspoortInbox();
     // gratis gebruiker (zonder pas): beperkte, veilige startpagina
     if (user.tier === 'guest'){ renderHomeGuest(); return; }

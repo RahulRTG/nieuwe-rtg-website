@@ -10,46 +10,56 @@
 
    Zij staan hier los omdat ./scope.js ze LEEST maar niet bezit: een
    kwalificatie is geen recht en geen rol, en zij hoort dus ook niet in het
-   bestand te wonen dat over rollen gaat. */
+   bestand te wonen dat over rollen gaat.
+
+   DE OPSLAG IS SINDS DE PERSOONSEIS NIET MEER VAN DIT BESTAND. Toen het
+   leverancierskanaal dezelfde vraag kreeg -- wat kan deze mens aantoonbaar, en
+   tot wanneer -- stonden er bijna twee stores naast elkaar met hetzelfde
+   antwoord. Die zouden uiteenlopen op precies het punt dat ertoe doet: het
+   moment waarop iets vervalt (LAT-regel 4). Dus draagt kern/vakbewijs.js nu de
+   rij, en blijft hier alleen wat de concernkant EIGEN is: de vorm van de vraag
+   (`persoon`, niet `sleutel`) en het antwoord dat ./scope.js verwacht.
+
+   WAT DAARBIJ NIET IS VERANDERD, EN MET OPZET NIET. De concernkant kent geen
+   aftekening door RTG. Een werkgever legt hier iets vast over zijn eigen
+   mensen, en dat is zijn zaak -- RTG is daar geen keurmeester. Een supplier-
+   poort die wel een aftekening eist, gaat daarom nooit per ongeluk op een
+   concernrij steunen: die vraagt met `aftekening: true`. */
 'use strict';
 
 module.exports = (ctx) => {
   const { db, save, schoon, tijdVandaag } = ctx;
 
-  /* ---- kwalificaties ----
-     Wat iemand aantoonbaar kan of mag. Geen rol en geen recht: een filter dat
-     ERVOOR hangt. Verloopt hij, dan valt het bijbehorende werk weg en blijft de
-     rol staan -- dat is het verschil tussen "u bent geen chauffeur meer" en "uw
-     rijbewijs is verlopen", en die twee vragen om een ander gesprek. */
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!Array.isArray(db.data.concern.kwalificaties)) db.data.concern.kwalificaties = [];
-    return db.data.concern.kwalificaties;
-  }
+  /* De store, met de concern-sleutelvorm eromheen. De helpers hieronder zijn
+     dun met opzet: hoe langer deze laag, hoe groter de kans dat er alsnog een
+     tweede regel over geldigheid ontstaat. */
+  const store = require('../vakbewijs')({ db, save, schoon, tijdVandaag });
+  const { sleutelConcern } = store;
 
   function kwalificatieZet(body) {
     const b = body || {};
     const persoon = schoon(b.persoon, 80);
     const wat = schoon(b.wat, 80);
     if (!persoon || !wat) return { status: 400, error: 'Wie heeft welke kwalificatie?' };
-    const tot = b.tot && /^\d{4}-\d{2}-\d{2}$/.test(b.tot) ? b.tot : null;
-    const bestaand = bak().find(k => k.persoon === persoon && k.wat === wat);
-    const k = bestaand || { persoon, wat };
-    k.van = b.van && /^\d{4}-\d{2}-\d{2}$/.test(b.van) ? b.van : tijdVandaag();
-    k.tot = tot;
-    k.nummer = schoon(b.nummer, 60) || null;
-    k.opent = Array.isArray(b.opent) ? b.opent.slice(0, 12).map(x => schoon(x, 60)).filter(Boolean) : (k.opent || []);
-    if (!bestaand) bak().push(k);
-    save();
-    return { ok: true, kwalificatie: k };
+    const r = store.vakbewijsZet(sleutelConcern(persoon), b);
+    if (r.error) return r;
+    return { ok: true, kwalificatie: naarKwalificatie(r.vakbewijs, persoon) };
   }
 
-  const kwalificatiesVan = (persoon) => {
-    const d = tijdVandaag();
-    return bak().filter(k => k.persoon === persoon)
-      .map(k => Object.assign({}, k, { geldig: !(k.van && k.van > d) && !(k.tot && k.tot < d) }));
-  };
+  const kwalificatiesVan = (persoon) =>
+    store.vakbewijzenVan(sleutelConcern(persoon)).map(v => naarKwalificatie(v, persoon));
 
+  /* Terug naar de vorm die ./scope.js en routes/concern/mensen.js kennen. De
+     velden die de concernkant nooit had (aftekening, intrekking) gaan hier niet
+     mee: ze zouden een betekenis suggereren die deze wereld niet kent. */
+  function naarKwalificatie(v, persoon) {
+    /* Het nummer komt apart op, want ../vakbewijs.js houdt hem sinds de
+       kluis-verhuizing uit de leesbare vorm van een rij. Voor een concernrij
+       verandert er niets: die heeft geen RTG-account om een dossier aan te
+       hangen, dus vakbewijsNummer() leest hem gewoon uit de rij zelf. */
+    return { persoon, wat: v.wat, nummer: store.vakbewijsNummer(sleutelConcern(persoon), v.wat) || null,
+      van: v.van || null, tot: v.tot || null, opent: v.opent || [], geldig: v.geldig };
+  }
 
   return { kwalificatieZet, kwalificatiesVan };
 };

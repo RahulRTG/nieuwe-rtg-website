@@ -58,7 +58,12 @@ const REGISTER = {
   'POORTWACHT.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'ROLPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'STAATPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
+  'UITVOERPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'KLOK.json': { eigenRatel: 'scripts/klok.js' },
+  /* De a11y-grens draagt zijn eigen nul: scripts/a11y.js LEEST de grens hieruit
+     en zakt erop (exit 1), en scripts/raakvlakkeuring.js hangt zijn getal aan
+     hetzelfde register. Twee metingen, een ratel. */
+  'A11Y-INGELOGD.json': { eigenRatel: 'scripts/a11y.js' },
   'SABOTAGE.json': { eigenRatel: 'scripts/wetten.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een

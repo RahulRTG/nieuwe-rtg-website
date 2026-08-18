@@ -4,6 +4,8 @@
    thuis-video blijft op het apparaat van de maker; wij kennen alleen titel en omvang
    en geven het WebRTC-signaal door. Plus verwijderen en de stream-verwijzing voor de
    kijk-route. Krijgt de gedeelde ctx van kern/theater/index.js. */
+const { schoonCues } = require('../ondertitels');
+
 module.exports = (ctx) => {
   // nieuwWerk: de haak van de Media OS (laat gebonden en optioneel)
   const nieuwWerk = ctx.nieuwWerk;
@@ -112,5 +114,30 @@ module.exports = (ctx) => {
     return { status: 200, ok: true };
   }
 
-  return { videoMaak, videoUpload, verwijder, streamVan, thuisAanwezig, signaal };
+  /* ---- de ondertitels ----
+
+     TAKEN.md 4.21 noemde dit met zoveel woorden als NIET gebouwd: "ondertiteling
+     of doorzoekbare spraak" ontbrak in de Media for Business-kant. check.js
+     regel 49 telde de bioscoop van het Theater en de filmspeler van de Media OS
+     daarom als 'onbedekt' -- opgenomen inhoud waar wel een ondertitelspoor bij
+     hoort en waar het model geen veld voor had.
+
+     Wat een geldige regel is, staat NIET hier maar in kern/ondertitels.js, samen
+     met de clip-kant. Wat hier wel staat is wie eraan mag komen: de maker van de
+     video, net als bij verwijderen. Een kanaal van een zaak verandert daar niets
+     aan -- wie de video plaatste, schrijft de ondertitels.
+
+     Een lege lijst is een geldig antwoord en wist het spoor: een maker die zijn
+     ondertitels terugtrekt hoort dat te kunnen zonder de video weg te gooien. */
+  function ondertitels(key, vid, regels) {
+    const v = videoMet(vid); if (!v || v.key !== key) return { status: 404, error: 'Video niet gevonden.' };
+    const uit = schoonCues(regels, v.duurS);
+    if (!uit) return { status: 400, error: 'Geef de ondertitels als lijst.' };
+    v.ondertitels = uit;
+    save();
+    return { status: 200, ok: true, regels: uit.length, ondertitels: uit };
+  }
+
+  return { videoMaak, videoUpload, verwijder, streamVan, thuisAanwezig, signaal,
+    videoOndertitels: ondertitels };
 };

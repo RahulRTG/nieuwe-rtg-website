@@ -39,6 +39,9 @@
   #opneem{font-size:.95rem;padding:.7rem 1.4rem;}
   #duur{font-family:'Bodoni Moda',serif;font-size:2rem;font-variant-numeric:tabular-nums;margin:.4rem 0;}
   #luisterWrap{margin-top:.6rem;font-size:.82rem;color:var(--muted);}
+  /* een vakje van 13x13 is te klein om te raken (WCAG 2.5.8); het label doet al
+     mee als klikvlak, maar het vakje zelf hoort ook te raken te zijn */
+  #luister{width:24px;height:24px;vertical-align:-.4rem;margin-right:.2rem;}
   #luisterWrap.uit{opacity:.5;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
   .memo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.55rem;}
@@ -78,6 +81,7 @@
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/kluismap.js"></script>
 <script src="/apps/memo/app.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

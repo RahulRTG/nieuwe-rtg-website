@@ -5,7 +5,9 @@
    rust is een uitkomst en geen leegte.
 
    Registreert GEEN stand en bindt geen knoppen; dat doet deel 3. De splitsing
-   bestaat om de 10 KB-maat te halen (scripts/check.js regel 13). */
+   bestaat om de 10 KB-maat te halen (scripts/check.js regel 13). De STIJL van dit
+   paneel staat sinds die maat weer knelde in deel 1a (overzicht-a.js) en komt
+   hier binnen als Deel.ovcss. */
 (function (w, d) {
   'use strict';
   var $ = function (s) { return d.querySelector(s); };
@@ -23,42 +25,6 @@
 
   /* Alles gescopet op #ovWrap zodat een andere stand hier nooit iets van
      erft; de kaart, knop en lbl komen uit geld.html zelf. */
-  var OVCSS =
-    '#ovWrap .ov-start{margin:.4rem 0 1.1rem;}' +
-    '#ovWrap .ov-groet{font-size:clamp(1.7rem,6vw,2.3rem);margin:0;}' +
-    '#ovWrap .ov-staat{margin:.35rem 0 0;font-size:1rem;color:var(--rtg-soft);}' +
-    '#ovWrap .ov-staat[data-aandacht]{color:var(--rtg-sig-aandacht);}' +
-    '#ovWrap .ov-stil{margin:.5rem 0 0;font-size:.8rem;color:var(--rtg-sig-aandacht);}' +
-    '#ovWrap .ov-cijfers{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));' +
-      'gap:1rem;align-items:end;margin:1.2rem 0 .9rem;}' +
-    '#ovWrap .ov-lbl{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;' +
-      'color:var(--rtg-soft);margin-bottom:.3rem;}' +
-    '#ovWrap .ov-getal{font-size:1.12rem;font-weight:500;}' +
-    '#ovWrap .ov-rust{font-size:.92rem;line-height:1.6;color:var(--rtg-soft);max-width:38rem;margin:.2rem 0 1.1rem;}' +
-    '#ovWrap .ov-vooruit{display:flex;gap:1.6rem;flex-wrap:wrap;margin:0 0 1.2rem;}' +
-    '#ovWrap .ov-vsom{display:block;font-size:1rem;font-weight:500;}' +
-    '#ovWrap .ov-vwoord{display:block;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;' +
-      'color:var(--rtg-soft);margin-top:.15rem;}' +
-    '#ovWrap .ov-kaart{padding-left:1.15rem;}' +
-    '#ovWrap .ov-rij{display:flex;align-items:center;justify-content:space-between;gap:.8rem;}' +
-    '#ovWrap .ov-som{font-weight:600;}' +
-    '#ovWrap .ov-titel{margin:.45rem 0 .2rem;font-size:.98rem;font-weight:600;}' +
-    '#ovWrap .ov-uitleg{margin:0 0 .6rem;font-size:.86rem;line-height:1.55;color:var(--rtg-soft);}' +
-    '#ovWrap .ov-waarom{background:none;border:0;padding:0;cursor:pointer;font:inherit;' +
-      'font-size:.74rem;font-weight:600;color:var(--rtg-goud);}' +
-    /* Het beleid-paneel (deel 3) hangt buiten #ovWrap en heeft daarom eigen
-       scoping; het staat hier omdat een stand EEN stijlblad hoort te hebben
-       en niet twee die elkaar in de head verdringen. */
-    '#paneel .ov-vraagrij{display:flex;gap:.6rem}#paneel .ov-vraagrij input{flex:1;min-width:0}' +
-    '#paneel #ovBeleidKnop{margin:1.4rem 0 .6rem}' +
-    '#paneel .ov-regel{display:flex;align-items:center;justify-content:space-between;' +
-      'padding:.45rem 0;border-top:1px solid var(--rtg-line)}' +
-    '#paneel .ov-doe{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 1rem}' +
-    '#paneel .ov-doe input,#paneel .ov-doe select{flex:1;min-width:7rem}' +
-    '#ovWrap .ov-standen{display:flex;flex-wrap:wrap;gap:.1rem 1rem;margin-top:1.8rem;' +
-      'padding-top:.75rem;border-top:1px solid var(--rtg-line);}' +
-    '#ovWrap .ov-standen a{font-size:.74rem;color:var(--rtg-soft);text-decoration:none;}' +
-    '#ovWrap .ov-standen a:hover,#ovWrap .ov-standen a:focus-visible{color:var(--rtg-txt);}';
 
   /* Via createElement en NIET als <style> in de html-string: de voordeur
      stempelt alleen createElement-elementen met de CSP-nonce; een blok uit
@@ -66,9 +32,19 @@
      ongestyled de lucht in). Id-wacht: teken() draait bij elke standwissel. */
   function stijl() {
     if (d.getElementById('ovStijl')) return;
+    var css = (w.RTGGeldDeel || {}).ovcss;
+    /* GEEN STILLE TERUGVAL OP EEN LEGE STRING, en dat is geen theorie: hier stond
+       `|| ''` en deel 1a was nog niet in geld.html gezet. Het paneel tekende
+       ongestyled door en niemand merkte het -- behalve de raakvlakronde, die de
+       navigatielinks als te kleine knoppen meldde. Een symptoom dat op een heel
+       ander probleem wees. Een ontbrekend deel hoort te schreeuwen. */
+    if (!css) {
+      if (w.console && w.console.error) w.console.error('geld/overzicht: deel 1a (overzicht-a.js) is niet geladen -- dit paneel blijft ongestyled');
+      return;
+    }
     var st = d.createElement('style');
     st.id = 'ovStijl';
-    st.textContent = OVCSS;
+    st.textContent = css;
     d.head.appendChild(st);
   }
 

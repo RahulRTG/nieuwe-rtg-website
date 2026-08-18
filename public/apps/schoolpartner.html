@@ -30,6 +30,9 @@
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .stil > a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
     font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}

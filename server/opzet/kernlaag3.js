@@ -35,7 +35,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
+  const { DATA_DIR, accounts, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
 
 /* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
    vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
@@ -92,7 +92,17 @@ Object.assign(kern, require('../kern/hulpdienst')({ db, save, crypto, anthropic,
 /* De zorgketen (kern/zorgketen.js): recepten naar de apotheek, de eerste
    hulp met triagekleuren, verwijzingen en de agenda's van de specialist en
    beauty medical. */
-Object.assign(kern, require('../kern/zorgketen')({ db, save, crypto, findSupplier }));
+/* Het vakbewijs en de persoonseis (kern/vakbewijs.js, kern/persoonseis.js): de
+   mensenkant van wat de aanmeldingen al voor de ZAAK doen. Ze staan hier vlak
+   VOOR hun eerste lezer -- de zorgketen hieronder toetste het genre van de zaak
+   en niet de mens die voorschreef. De identiteitsstand komt laat gebonden uit
+   payrollOS: de enige lezer van `verified` in dit huis. */
+Object.assign(kern, require('../kern/vakbewijs')({ db, save, schoon, accounts }));
+Object.assign(kern, { persoonseis: require('../kern/persoonseis')({
+  vakbewijsHeeft: kern.vakbewijsHeeft, sleutelLid: kern.sleutelLid,
+  identiteitVan: (p) => kern.payrollOS.identiteit.stand(p.lid) }) });
+Object.assign(kern, require('../kern/zorgketen')({ db, save, crypto, findSupplier,
+  persoonseis: kern.persoonseis }));
 /* De ketenchat (kern/ketenchat.js): korpsen verbinden eenmalig, delen een
    ketenkanaal en maken besloten deelgroepen waar de meldkamer meekijkt. */
 Object.assign(kern, require('../kern/ketenchat')({ db, save, crypto, findSupplier }));

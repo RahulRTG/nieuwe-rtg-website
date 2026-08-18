@@ -71,4 +71,10 @@ module.exports = (kern) => {
     aanmeldingen.bewijsStandId(String((req.body || {}).id || ''))));
   app.post('/api/aanmelding/bewijs/teken', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.bewijsTekenId(String((req.body || {}).id || ''), wie(req))));
+  /* De herkeuring: welke afgetekende stukken zijn verlopen of lopen binnenkort
+     af. Zonder deze lijst is de houdbaarheidsdatum een veld dat niemand ooit
+     leest, en dan is "voor eeuwig gezien" alleen verplaatst in plaats van
+     opgelost (LAT-regel 6). */
+  app.post('/api/aanmelding/bewijs/herkeuring', officeAuth, (req, res) => veilig(res, () =>
+    ({ ok: true, herkeuring: aanmeldingen.bewijsHerkeuring(Number((req.body || {}).dagen) || 60) })));
 };

@@ -22,7 +22,7 @@
    komt geen foutmelding, geen rood scherm, niets -- alleen een verjaardag
    zonder verrassing.
 
-   Draai los: node --experimental-sqlite --test test/gezinleven.test.js
+   Draai los: node --test test/gezinleven.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

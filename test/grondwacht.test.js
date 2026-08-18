@@ -351,3 +351,25 @@ test('wetwacht: het echte register laadt en elk raakt-doel bestaat', () => {
     }
   }
 });
+
+/* De slotcode: het cijfer waar de CI en de herstellus op afgaan. De eerste
+   versie gaf 0 bij een ontbrekend nulpunt -- een maandronde die niets mat en
+   toch slaagde. Deze toetsen leggen vast dat dat nooit terugkomt. */
+test('wetwacht slotcode: geen nulpunt is KON NIET METEN (2), geen stil groen', () => {
+  assert.equal(wetwacht.slotcode([{ code: 'NOG_GEEN_AFDRUK', ernst: 'zacht' }]), 2);
+});
+
+test('wetwacht slotcode: bij --vastleggen is het nulpunt net gezet, dan wel 0', () => {
+  assert.equal(wetwacht.slotcode([{ code: 'NOG_GEEN_AFDRUK', ernst: 'zacht' }], true), 0);
+});
+
+test('wetwacht slotcode: onbereikbaar blijft 2, ook onder --vastleggen', () => {
+  assert.equal(wetwacht.slotcode([{ code: 'BRON_ONBEREIKBAAR', ernst: 'onmeetbaar' }], true), 2,
+    'vastleggen legt vast wat gemeten is; wat niet gemeten is blijft niet gemeten');
+});
+
+test('wetwacht slotcode: gewijzigd is 1, afgehandeld met vastleggen is 0, niets is 0', () => {
+  assert.equal(wetwacht.slotcode([{ code: 'BRON_GEWIJZIGD', ernst: 'melden' }]), 1);
+  assert.equal(wetwacht.slotcode([{ code: 'BRON_GEWIJZIGD', ernst: 'melden' }], true), 0);
+  assert.equal(wetwacht.slotcode([]), 0);
+});

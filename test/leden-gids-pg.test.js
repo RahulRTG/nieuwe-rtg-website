@@ -6,7 +6,7 @@
    Draait alleen als DATABASE_URL is gezet (zoals test/pg.test.js); anders
    overgeslagen. Draai:
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtg \
-     node --experimental-sqlite --test test/leden-gids-pg.test.js */
+     node --test test/leden-gids-pg.test.js */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel

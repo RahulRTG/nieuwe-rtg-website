@@ -4,7 +4,7 @@
    reistoestemming vraagt zet een afvinkbare taak in de persoonlijke agenda
    (kern/visumtaak.js, /api/agenda/mijn-lijst). Annuleren ruimt beide op:
    de projectie filtert zichzelf, de taak gaat weg op zijn bron.
-   Draai los: node --experimental-sqlite --test test/reisagenda.test.js */
+   Draai los: node --test test/reisagenda.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

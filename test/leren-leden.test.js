@@ -22,7 +22,7 @@
    project voor hem niet (404 op alles). Zodra hij ja zegt, mag hij meedoen --
    maar nog steeds niet alles: opruimen blijft van wie het startte.
 
-   Draai los: node --experimental-sqlite --test test/leren-leden.test.js
+   Draai los: node --test test/leren-leden.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

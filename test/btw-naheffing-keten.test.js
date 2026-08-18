@@ -14,7 +14,7 @@
    btw-fraude pleegt. Dus gaat het hier zoals een beheerder het zou doen: de
    server draait, boekt een factuur, gaat UIT, de datum wordt in de opslag
    (db.json) gezet, en de server komt terug. De motor blijft ongemoeid.
-   Draai: node --experimental-sqlite --test test/btw-naheffing-keten.test.js */
+   Draai: node --test test/btw-naheffing-keten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

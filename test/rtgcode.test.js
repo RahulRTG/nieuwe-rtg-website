@@ -2,7 +2,7 @@
    We toetsen dat bouwen + lezen elkaars omgekeerde zijn, dat tafelnamen met
    dubbele punt en spatie heel terugkomen, en dat vreemde tekst netjes als
    'tekst' geldt (zodat een Zegel-token niet als code wordt aangezien).
-   Draai los: node --experimental-sqlite --test test/rtgcode.test.js */
+   Draai los: node --test test/rtgcode.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const C = require('../public/shared/rtgcode');

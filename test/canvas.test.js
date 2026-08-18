@@ -18,7 +18,7 @@
    De serverkant van de stand (welk niveau bij welke meting hoort) staat in
    test/wereldkern.test.js. Dit gaat over de schermen en over shared/canvas.js.
 
-   Draai los: node --experimental-sqlite --test test/canvas.test.js */
+   Draai los: node --test test/canvas.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

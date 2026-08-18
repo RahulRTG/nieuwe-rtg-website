@@ -16,7 +16,7 @@
      pas op hun ingangsdatum;
    - onder het minimumloon is een WAARSCHUWING, geen stille correctie.
 
-   Draai los: node --experimental-sqlite --test test/payroll-motor.test.js */
+   Draai los: node --test test/payroll-motor.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

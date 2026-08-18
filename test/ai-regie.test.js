@@ -2,7 +2,7 @@
    AAN (nooit vervangen: de vaste kern staat in de code en wordt door
    test/rahul-eerlijk.test.js bewaakt). De aanvulling komt live mee in elke
    assistent via de RAHUL_LEAD-getter en in de leden-AI via de prompt.
-   Draai los: node --experimental-sqlite --test test/ai-regie.test.js */
+   Draai los: node --test test/ai-regie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

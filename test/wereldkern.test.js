@@ -12,7 +12,7 @@
    'open'; die gelijktrekken zou van vier werelden een grijze middelmaat
    maken.
 
-   Draai los: node --experimental-sqlite --test test/wereldkern.test.js */
+   Draai los: node --test test/wereldkern.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

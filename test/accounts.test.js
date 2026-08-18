@@ -3,7 +3,7 @@
    testrunner (node --test) en een tijdelijke datamap via RTG_DATA_DIR, zodat de
    echte data nooit wordt aangeraakt.
 
-   Draai los: node --experimental-sqlite --test test/accounts.test.js */
+   Draai los: node --test test/accounts.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

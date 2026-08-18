@@ -2,7 +2,7 @@
    Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen,
    accepteren, dobbelen, zetten), schaken (legale en onwettige zetten),
    woordduel (eerste woord over het midden, scoren) en het Sneek-scorebord.
-   Draai los: node --experimental-sqlite --test test/spellen.test.js */
+   Draai los: node --test test/spellen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

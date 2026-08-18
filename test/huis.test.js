@@ -2,7 +2,7 @@
    kern/huis.js -- wat niet bevestigd is staat er ook zo bij, wat aan jou ligt
    is streng gescheiden van wat je alleen kunt afwachten, en het dossier is mee
    te nemen als platte tekst.
-   Draai: node --experimental-sqlite --test test/huis.test.js */
+   Draai: node --test test/huis.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

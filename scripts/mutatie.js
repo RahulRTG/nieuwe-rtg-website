@@ -298,7 +298,7 @@ function draaiToets(bestand, env, wacht, forceer) {
      meer -- elke toets heette "geen toetsen gedraaid", ook een suite die
      aantoonbaar draaide en zakte. Een meter die op een standaardinstelling
      leunt, meet de standaardinstelling (LAT regel 10). */
-  const vlaggen = ['--experimental-sqlite', '--test', '--test-reporter=tap'];
+  const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
   const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,

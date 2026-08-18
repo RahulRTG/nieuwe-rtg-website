@@ -2,7 +2,7 @@
    keten, zonder surveillance. De ene knop is van het kind; toestemming
    bepaalt wie meeleest (vertrouwelijk = alleen de mentor); en aankomende
    toetsen reizen mee naar het gezinsoverzicht.
-   Draai los: node --experimental-sqlite --test test/schoolhulplijn.test.js */
+   Draai los: node --test test/schoolhulplijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

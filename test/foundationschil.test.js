@@ -14,7 +14,7 @@
         de HELE schil niet gevuld -- een dode verwijzing kost dus niet een
         pagina maar alle pagina's).
 
-   Draai los: node --experimental-sqlite --test test/foundationschil.test.js */
+   Draai los: node --test test/foundationschil.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

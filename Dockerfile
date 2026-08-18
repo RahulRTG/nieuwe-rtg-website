@@ -22,7 +22,7 @@ FROM postgres:16-alpine AS backup-runtime
 RUN apk add --no-cache openssl
 
 # RTG / RTFoundation productie-image.
-# Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
+# Node 22 (nodig voor en de ingebouwde test-runner).
 FROM node:22-slim
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
@@ -70,5 +70,5 @@ EXPOSE 3000 3100
 HEALTHCHECK --interval=30s --timeout=4s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-# server.js herstart zichzelf met --experimental-sqlite; direct starten kan ook.
-CMD ["node", "--experimental-sqlite", "server/server.js"]
+# node:sqlite laadt sinds Node 22.13 zonder vlag; server.js start direct.
+CMD ["node", "server/server.js"]

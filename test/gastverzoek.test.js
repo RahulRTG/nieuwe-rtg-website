@@ -18,7 +18,7 @@
    5. HET IS JOUW TAFEL OF HET IS NIETS. Zonder tafelsleutel geen verzoek, en
       andermans verzoek is niet in te trekken.
 
-   Draai los: node --experimental-sqlite --test test/gastverzoek.test.js */
+   Draai los: node --test test/gastverzoek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

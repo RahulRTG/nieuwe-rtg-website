@@ -8,7 +8,7 @@
    niets bewaard. Zo raakt een volwassene zijn historie niet kwijt zodra hij met
    een tiener speelt, en bouwt het systeem toch geen profiel van die tiener op.
 
-   Draai los: node --experimental-sqlite --test test/speluitslagen.test.js */
+   Draai los: node --test test/speluitslagen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

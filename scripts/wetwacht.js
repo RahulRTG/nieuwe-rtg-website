@@ -134,6 +134,26 @@ function leesRegister(pad = REGISTER) {
   }
 }
 
+/* De slotcode, als pure functie zodat een toets hem echt kan laten omvallen.
+
+   2 -- KON NIET METEN. Niet alleen een onbereikbare bron: ook een bron ZONDER
+        nulpunt telt zo, want zonder afdruk is er niets om mee te vergelijken
+        en detecteert deze wacht per definitie niets (LAT.md regel 3). De
+        eerste versie gaf daar 0 op, en dat was precies het stille groen dat
+        dit huis afwijst: een maandronde die niets meet en toch slaagt. Rood
+        hier is de bedoeling -- herstel.yml maakt er een issue van, en de
+        fix-PR die daaruit komt IS het nulpunt.
+   1 -- een bron is echt veranderd; een mens moet kijken.
+   0 -- gemeten en niets veranderd. --vastleggen dempt 1 (de nieuwe afdruk
+        vastleggen is de afhandeling), maar dempt 2 alleen voor het
+        nulpuntgeval: wat onbereikbaar was, is en blijft niet gemeten. */
+function slotcode(bevindingen, vastleggen = false) {
+  if (bevindingen.some(b => b.ernst === 'onmeetbaar')) return 2;
+  if (bevindingen.some(b => b.code === 'NOG_GEEN_AFDRUK') && !vastleggen) return 2;
+  if (bevindingen.some(b => b.code === 'BRON_GEWIJZIGD') && !vastleggen) return 1;
+  return 0;
+}
+
 function toon(bevindingen) {
   if (!bevindingen.length) return 'DE WETWACHT\n\n  Geen van de bronnen is veranderd.';
   const r = ['DE WETWACHT', ''];
@@ -167,13 +187,11 @@ if (require.main === module) {
       console.log('\nDe afdrukken zijn vastgelegd. Wat onbereikbaar was is NIET vastgelegd.');
     }
 
-    const onmeetbaar = bevindingen.some(b => b.ernst === 'onmeetbaar');
-    const gewijzigd = bevindingen.some(b => b.code === 'BRON_GEWIJZIGD');
-    process.exit(onmeetbaar ? 2 : (gewijzigd && !vastleggen ? 1 : 0));
+    process.exit(slotcode(bevindingen, vastleggen));
   })().catch(e => {
     console.error('DE WETWACHT KON NIET METEN: ' + e.message);
     process.exit(2);
   });
 }
 
-module.exports = { normaliseer, afdruk, vergelijk, meet, leesRegister, toon };
+module.exports = { normaliseer, afdruk, vergelijk, meet, leesRegister, toon, slotcode };

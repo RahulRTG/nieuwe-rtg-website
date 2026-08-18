@@ -5,7 +5,7 @@
    zelf en derden zien het etiket NOOIT, en een etiket kan alleen voor een
    echte connectie. (2) elke zaak heeft een dorp: het retail-genre krijgt
    de winkelvloer-indeling, het restaurant houdt zijn eigen dorp.
-   Draai los: node --experimental-sqlite --test test/naamlaag.test.js */
+   Draai los: node --test test/naamlaag.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

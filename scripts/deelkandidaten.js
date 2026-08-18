@@ -34,8 +34,8 @@
 
    DRAAIEN
 
-     node --experimental-sqlite scripts/deelkandidaten.js
-     node --experimental-sqlite scripts/deelkandidaten.js --json
+     node scripts/deelkandidaten.js
+     node scripts/deelkandidaten.js --json
    ========================================================================== */
 'use strict';
 const fs = require('fs');

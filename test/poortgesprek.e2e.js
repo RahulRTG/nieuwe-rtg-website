@@ -10,7 +10,7 @@
    Het loopt via de echte api-helper van foodcourt.html, dus de bedrading van de
    pagina wordt meegetoetst en niet alleen de module.
 
-   Draai los: node --experimental-sqlite --test test/poortgesprek.e2e.js */
+   Draai los: node --test test/poortgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten } = require('./helper');

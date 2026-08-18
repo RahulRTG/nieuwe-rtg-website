@@ -2,7 +2,7 @@
    als echt onderdeel in de winkel gezet (App Store of Bibliotheek). De overlay
    leeft in db.data.appbiebExtra en verschijnt bij de leden in de App-Bibliotheek;
    intrekken haalt het er weer uit. Alles omkeerbaar.
-   Draai los: node --experimental-sqlite --test test/werkplaats-uitgifte.test.js */
+   Draai los: node --test test/werkplaats-uitgifte.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

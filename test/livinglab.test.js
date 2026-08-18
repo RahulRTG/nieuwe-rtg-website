@@ -1,7 +1,7 @@
 /* Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de
    bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de
    pijplijn naar echte verandering. Draai los:
-   node --experimental-sqlite --test test/livinglab.test.js
+   node --test test/livinglab.test.js
 
    Wat deze toetsen bewaken is niet "werkt de knop" maar "houdt de belofte". Elke
    test hieronder hoort te ZAKKEN als de bijbehorende poort wegvalt; waar dat

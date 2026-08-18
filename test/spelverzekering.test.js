@@ -21,7 +21,7 @@
       gaat -- anders raakt hij kwaliteit en reputatie niet.
    8. EEN MEDESPELER ZIET JE POLISSEN NIET.
 
-   Draai los: node --experimental-sqlite --test test/spelverzekering.test.js */
+   Draai los: node --test test/spelverzekering.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

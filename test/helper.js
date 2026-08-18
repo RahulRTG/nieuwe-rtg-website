@@ -138,7 +138,7 @@ async function startEens(opts) {
      die ook. */
   const eigenMap = (opts.env && ('RTG_DATA_DIR' in opts.env)) || process.env.RTG_DATA_DIR
     ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toets-'));
-  const child = spawn(process.execPath, ['--experimental-sqlite', script], {
+  const child = spawn(process.execPath, [script], {
     /* RTG_TOETS: welke toets deze server start. De server schrijft dat mee in
        het schermjournaal, zodat scripts/schermen.js een VEEGTOETS (een die
        honderd schermen even aantikt) kan onderscheiden van een toets die de

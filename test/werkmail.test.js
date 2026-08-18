@@ -3,7 +3,7 @@
    terugschrijft, werkgeversbeheer (aanmaken en afpakken), de buitenpost
    (extern versturen via de outbox) en de buitenpoort die ALLES van buiten
    in de onbetrouwde baan aflevert: links op slot, bijlagen bestaan niet.
-   Draai los: node --experimental-sqlite --test test/werkmail.test.js */
+   Draai los: node --test test/werkmail.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

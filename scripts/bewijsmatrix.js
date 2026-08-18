@@ -54,10 +54,10 @@
      valse zekerheid die hij moest wegnemen. Zie ONGEMETEN_PLAN hieronder voor
      wat elke lege kolom nodig heeft.
 
-   Draai:  node --experimental-sqlite scripts/bewijsmatrix.js
-           node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen
-           node --experimental-sqlite scripts/bewijsmatrix.js --json
-           node --experimental-sqlite scripts/bewijsmatrix.js --poortwacht=uit.json
+   Draai:  node scripts/bewijsmatrix.js
+           node scripts/bewijsmatrix.js --vastleggen
+           node scripts/bewijsmatrix.js --json
+           node scripts/bewijsmatrix.js --poortwacht=uit.json
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -145,7 +145,7 @@ const LEESMETHODEN = new Set(['GET', 'HEAD']);
 function routetabel() {
   try {
     const rauw = execFileSync(process.execPath,
-      ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+      [path.join(__dirname, 'routekaart.js'), '--json'],
       { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 180000 });
     const kaart = JSON.parse(rauw);
     const uit = [];
@@ -589,7 +589,7 @@ if (matrix.telling.ongemeten > oud.telling.ongemeten || waarAchteruit.length) {
   console.log('\n  Meet ze, of leg de verslechtering met de hand vast in BEWIJSMATRIX.json');
   console.log('  met een reden. Ontbreekt er een meetronde, geef hem dan mee:');
   console.log('    node scripts/poortwacht.js --json --per-route > pw.json');
-  console.log('    node --experimental-sqlite scripts/bewijsmatrix.js --poortwacht=pw.json');
+  console.log('    node scripts/bewijsmatrix.js --poortwacht=pw.json');
   process.exit(1);
 }
 if (matrix.telling.ongemeten < oud.telling.ongemeten) {

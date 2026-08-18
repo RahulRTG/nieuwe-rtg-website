@@ -6,7 +6,7 @@
    de app het uitvoeren van tekst als code (terecht) blokkeren. Elke formule
    gaf daardoor #FOUT op het scherm terwijl alles hier groen stond. De motor
    rekent nu zelf; deze test bewaakt dat er nooit meer een eval in sluipt.
-   Draai los: node --experimental-sqlite --test test/office-blad.test.js */
+   Draai los: node --test test/office-blad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

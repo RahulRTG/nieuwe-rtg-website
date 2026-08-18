@@ -6,7 +6,7 @@
    document zet het aantoonbaar terug naar concept.
 
    Draai los:
-   node --experimental-sqlite --test test/office-enterprise.test.js */
+   node --test test/office-enterprise.test.js */
 'use strict';
 
 const test = require('node:test');

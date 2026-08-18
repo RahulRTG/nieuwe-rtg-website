@@ -2,7 +2,7 @@
    check-in/check-out-keten. De logies gaan bij check-in automatisch als
    kamerlast op de rekening; de kassa-check-out int alles in een keer en pas
    daarna sluit het verblijf. Draai los:
-   node --experimental-sqlite --test test/verblijf.test.js */
+   node --test test/verblijf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

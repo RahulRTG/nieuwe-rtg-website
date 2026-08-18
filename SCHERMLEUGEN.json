@@ -1,6 +1,6 @@
 {
   "uitleg": "Schermen die iets tonen wat de backend niet heeft gezegd, gemeten met de liegpoort aan (RTG_LIEG=/api/, de deuren gespaard). MAG ALLEEN KRIMPEN -- zie test/liegend-scherm.e2e.js. LEEG betekent: geen enkel gemeten scherm liegt.",
-  "hoe": "node --experimental-sqlite --test test/liegend-scherm.e2e.js",
+  "hoe": "node --test test/liegend-scherm.e2e.js",
   "gemeten": {
     "schermen": 6,
     "metKlacht": 0,

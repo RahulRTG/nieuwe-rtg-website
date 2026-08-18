@@ -13,7 +13,7 @@
    4. netjes afsluiten kijkt alles na en vouwt de WAL dicht;
    5. onder de grens verandert er niets aan het oude gedrag.
    Draai los:
-   node --experimental-sqlite --test test/opslag-voorcheck.test.js */
+   node --test test/opslag-voorcheck.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

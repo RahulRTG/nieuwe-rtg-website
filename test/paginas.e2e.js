@@ -45,7 +45,7 @@
    hij vroeg of laat op de klok in plaats van op de code -- en dat is precies
    het soort toets dat mensen uitzetten.
 
-   Draai los: node --experimental-sqlite --test test/paginas.e2e.js
+   Draai los: node --test test/paginas.e2e.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -13,7 +13,7 @@
    kluis-functies kijkt had allebei gemist, want de crypto zelf was in orde --
    hij werd op die plekken alleen niet gebruikt.
 
-   Draai los: node --experimental-sqlite --test test/rust.test.js */
+   Draai los: node --test test/rust.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

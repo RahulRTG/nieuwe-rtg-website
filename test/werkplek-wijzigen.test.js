@@ -14,7 +14,7 @@
    de mand vallen.
 
    Draai los:
-   node --experimental-sqlite --test test/werkplek-wijzigen.test.js */
+   node --test test/werkplek-wijzigen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

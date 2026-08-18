@@ -17,7 +17,7 @@ Voor de kaart van de code: `ARCHITECTUUR.md`. Voor wat de toetsen bewijzen:
 
 ## 1. Installeren en starten
 
-**Vereisten:** Node 22 of hoger (de app draait op `--experimental-sqlite`, dat is
+**Vereisten:** Node 22.13 of hoger (de app draait op de ingebouwde `node:sqlite`, die is
 Node's eigen SQLite -- er zit geen enkele externe dependency in dit project).
 
 ```bash
@@ -97,7 +97,7 @@ controleren.
 
 ```bash
 npm test -- test/herstelproef.test.js                    # doet de ronde echt
-node --experimental-sqlite scripts/hersteltijd.js 250000  # met een stopwatch
+node scripts/hersteltijd.js 250000  # met een stopwatch
 ```
 
 Gemeten RTO, RPO, en de twee dingen die die cijfers níet zeggen: `PRODUCTION.md`

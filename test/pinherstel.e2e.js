@@ -24,7 +24,7 @@
 
    Draait alleen waar een Chromium staat; anders overgeslagen.
    Draai: npm run e2e  --  of los:
-   RTG_CHROMIUM=... node --experimental-sqlite --test test/pinherstel.e2e.js */
+   RTG_CHROMIUM=... node --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, bankDeur } = require('./helper');

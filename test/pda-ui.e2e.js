@@ -4,7 +4,7 @@
    API te halen en in localStorage te zetten; de PDA herstelt dan de sessie zelf.
    Draait alleen waar Playwright beschikbaar is (net als de a11y-keuring); anders
    wordt de test netjes overgeslagen.
-   Draai: npm run e2e  (of node --experimental-sqlite --test test/pda-ui.e2e.js) */
+   Draai: npm run e2e  (of node --test test/pda-ui.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten } = require('./helper');

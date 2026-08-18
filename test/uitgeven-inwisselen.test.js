@@ -18,7 +18,7 @@
      te bestaan. De kassa van het restaurant kent de cadeaukaart van het hotel
      niet, en andersom.
 
-   Draai los: node --experimental-sqlite --test test/uitgeven-inwisselen.test.js
+   Draai los: node --test test/uitgeven-inwisselen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

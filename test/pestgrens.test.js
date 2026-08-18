@@ -2,7 +2,7 @@
    slotantwoord (waarin hij zegt dat hij hier zelf geen behoefte aan had) en
    24 uur weg; na die 24 uur opent alleen een oprecht excuus de deur, en
    weigeren betekent opnieuw 24 uur stilte. Draai los:
-   node --experimental-sqlite --test test/pestgrens.test.js */
+   node --test test/pestgrens.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

@@ -24,7 +24,7 @@
       "iedereen ziet alles" niet meer waar -- de waarschuwing stond al in de
       descriptor voordat deze laag bestond.
 
-   Draai los: node --experimental-sqlite --test test/spelhandel.test.js */
+   Draai los: node --test test/spelhandel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

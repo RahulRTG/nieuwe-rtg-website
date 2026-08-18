@@ -20,10 +20,10 @@
 
    DRAAIEN
 
-     node --experimental-sqlite scripts/dekking.js              (draait de suite zelf)
-     node --experimental-sqlite scripts/dekking.js --lees <bestand>
-     node --experimental-sqlite scripts/dekking.js --json
-     node --experimental-sqlite scripts/dekking.js --vastleggen
+     node scripts/dekking.js              (draait de suite zelf)
+     node scripts/dekking.js --lees <bestand>
+     node scripts/dekking.js --json
+     node scripts/dekking.js --vastleggen
 
    In CI draait de suite toch al: die stap krijgt RTG_ROUTELOG mee en deze stap
    leest het journaal met --lees. Dat kost dus niets extra's.
@@ -58,7 +58,7 @@ const leesIdx = process.argv.indexOf('--lees');
 function draaiSuite(journaal) {
   const bestanden = fs.readdirSync(path.join(WORTEL, 'test'))
     .filter(f => f.endsWith('.test.js')).sort().map(f => 'test/' + f);
-  const r = spawnSync(process.execPath, ['--experimental-sqlite', '--test', ...bestanden], {
+  const r = spawnSync(process.execPath, ['--test', ...bestanden], {
     cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'],
     env: { ...process.env, RTG_ROUTELOG: journaal },
     maxBuffer: 256 * 1024 * 1024, timeout: 3600000
@@ -70,7 +70,7 @@ function draaiSuite(journaal) {
 
 function routekaart() {
   const uit = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+    [path.join(__dirname, 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 });
   return (JSON.parse(uit).routes || []).map(r => r.pad).filter(p => p && p.startsWith('/api/'));
 }

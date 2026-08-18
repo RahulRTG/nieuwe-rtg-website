@@ -17,7 +17,7 @@
    hoort er vanzelf bovenop te komen -- zonder herstart.
 
    Draai:  DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
-           node --experimental-sqlite --test test/pg-wachten.test.js
+           node --test test/pg-wachten.test.js
    ========================================================================== */
 /* LET OP -- deze toets maakt en dropt een EIGEN database (naam met achtervoegsel
    -wacht) en raakt de database uit DATABASE_URL alleen om die aan te maken. */

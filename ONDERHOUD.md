@@ -100,9 +100,13 @@ kijken kost minder dan een gemiste wijziging. Na beoordeling:
 `npm run wetwacht:vast` legt de nieuwe vingerafdruk vast.
 
 Let op: de afdrukken in `WETBRONNEN.json` zijn bij aanleg **nog niet gezet**
-(vanuit de bouwomgeving waren de EUR-Lex-bronnen niet bereikbaar). De eerste
-maandronde meldt daarom `NOG_GEEN_AFDRUK`; één keer `npm run wetwacht:vast`
-draaien op een machine die erbij kan zet het nulpunt.
+(vanuit de bouwomgeving waren de EUR-Lex-bronnen niet bereikbaar). Dat lost de
+lus zelf op: een ontbrekend nulpunt is KON NIET METEN (exitcode 2), dus de
+eerste maandronde -- of een handmatige "Run workflow" op `wacht.yml` -- wordt
+rood, `herstel.yml` opent het issue, en de fix-PR die daaruit komt is één
+draai van `npm run wetwacht:vast` op een runner die de bronnen wél kan
+bereiken. Sneller kan ook: zelf `npm run wetwacht:vast` draaien en de
+bijgewerkte `WETBRONNEN.json` committen.
 
 ## Wat dit huis nog steeds zelf draagt
 

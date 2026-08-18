@@ -3,7 +3,7 @@
    kunnen zelf plaatsen, de muur van 60 posts is weg en vervangen door echte
    paginering, er zijn profielen en draadjes, en de AI stelt voor zonder ooit
    zelf te plaatsen.
-   Draai los: node --experimental-sqlite --test test/salon-app.test.js */
+   Draai los: node --test test/salon-app.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

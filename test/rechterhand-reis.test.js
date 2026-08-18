@@ -26,7 +26,7 @@
    weet wiens paspoort niet meer geldig is, de cercle weet waar hij in Milaan
    terechtkan en de hangar weet waar zijn toestel staat.
 
-   Draai los: node --experimental-sqlite --test test/rechterhand-reis.test.js
+   Draai los: node --test test/rechterhand-reis.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

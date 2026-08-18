@@ -7,7 +7,7 @@
       te horen HOE er geteld is (LAT.md regel 3).
    3. DE NOODKAART LEEST DE LIJST, hij kopieert hem niet -- net als bij het
       zorgprofiel.
-   Draai los: node --experimental-sqlite --test test/medicatie.test.js */
+   Draai los: node --test test/medicatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

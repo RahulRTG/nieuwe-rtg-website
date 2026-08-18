@@ -11,7 +11,7 @@
       gewone aanmelding; wie dat pad afsnijdt, bouwt precies de deur waar geen
       mens meer voor staat.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-oprichting.test.js */
+   Draai los: node --test test/onderneming-oprichting.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

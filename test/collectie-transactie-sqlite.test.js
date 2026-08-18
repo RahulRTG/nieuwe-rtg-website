@@ -18,7 +18,7 @@ function laatsteJson(tekst) {
 }
 function draai(code, env) {
   return new Promise((resolve, reject) => {
-    const kind = spawn(process.execPath, ['--experimental-sqlite', '-e', code], { cwd: ROOT, env });
+    const kind = spawn(process.execPath, ['-e', code], { cwd: ROOT, env });
     let uit = '', fout = '';
     kind.stdout.on('data', b => { uit += b; });
     kind.stderr.on('data', b => { fout += b; });
@@ -32,7 +32,7 @@ test('SQLite-collectieslot accepteert één revisie en rolt een mislukte mutatie
   const env = basisEnv(map);
   const laad = "const d=require('./server/db');d.load();";
   try {
-    const init = spawnSync(process.execPath, ['--experimental-sqlite', '-e', laad +
+    const init = spawnSync(process.execPath, ['-e', laad +
       "console.log(JSON.stringify(d.bewerkCollectie('slotproef',s=>{s.revisie=0;return {ok:true}})))"],
     { cwd: ROOT, env, encoding: 'utf8' });
     assert.equal(init.status, 0, init.stderr);

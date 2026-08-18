@@ -2,7 +2,7 @@
    Toetst de vier beloftes van kern/rtmail-team.js: het adres volgt de oprichter,
    een team kaapt nooit een bestaand postvak, toewijzen voorkomt dubbel werk, en
    wie namens het team schrijft staat er altijd bij.
-   Draai: node --experimental-sqlite --test test/rtmail-team.test.js */
+   Draai: node --test test/rtmail-team.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

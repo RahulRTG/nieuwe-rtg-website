@@ -2,7 +2,7 @@
    het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte
    RTG-server in een tijdelijke datamap.
 
-   Draai los: node --experimental-sqlite --test test/foundation.test.js */
+   Draai los: node --test test/foundation.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

@@ -14,7 +14,7 @@
       dat staat er, want een scherm dat nuance suggereert geeft schijnzekerheid.
    5. HIER STAAN GEEN NAMEN.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-toegang.test.js */
+   Draai los: node --test test/onderneming-toegang.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

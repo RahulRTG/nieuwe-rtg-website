@@ -25,7 +25,7 @@
      stand durven aanzetten; zonder die baan is dit gewoon een vliegtuigstand
      met een mooiere naam.
 
-   Draai los: node --experimental-sqlite --test test/veiligheid-kring-rust.test.js
+   Draai los: node --test test/veiligheid-kring-rust.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

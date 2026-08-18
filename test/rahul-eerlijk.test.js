@@ -3,7 +3,7 @@
    karakter (RAHUL_LEAD), de leden-AI met het volledige verhaal, en de
    tool-lus van het AI-stuur. Valt de regel ergens weg, dan breekt deze
    test voordat het de assistenten bereikt. Draai los:
-   node --experimental-sqlite --test test/rahul-eerlijk.test.js */
+   node --test test/rahul-eerlijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

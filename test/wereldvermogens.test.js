@@ -8,7 +8,7 @@
    ertussen veranderd. Een zoekmachine die matcht op een veld dat hij daarna
    niet toont, is een lek met een nette voorkant.
 
-   Draai los: node --experimental-sqlite --test test/wereldvermogens.test.js */
+   Draai los: node --test test/wereldvermogens.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

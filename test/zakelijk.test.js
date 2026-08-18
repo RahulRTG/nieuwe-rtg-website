@@ -1,7 +1,7 @@
 /* Integratietests voor RTG Zakelijk (de LinkedIn-laag van de Business Pass):
    profiel (opt-in), gids, professioneel verbinden via de bestaande
    vriendengraaf, de zakelijke feed en aanbevelingen. Draait tegen een echte
-   server. Draai los: node --experimental-sqlite --test test/zakelijk.test.js */
+   server. Draai los: node --test test/zakelijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

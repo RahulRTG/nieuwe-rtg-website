@@ -13,7 +13,7 @@
       toekomst gaat niet weg; een tijdstip in het verleden wordt geweigerd in
       plaats van stil te mislukken.
    4. Een alias mag nooit het postvak van een ander opvangen.
-   Draai: node --experimental-sqlite --test test/rtmail-schrijf.test.js */
+   Draai: node --test test/rtmail-schrijf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

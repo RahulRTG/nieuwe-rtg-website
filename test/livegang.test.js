@@ -2,7 +2,7 @@
    - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts
    - de demo-inlog is dicht (leden en zaken)
    - de rate-limiter staat aan
-   Draai: node --experimental-sqlite --test test/livegang.test.js */
+   Draai: node --test test/livegang.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

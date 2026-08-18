@@ -20,7 +20,7 @@
    route /api/office/weefsel/project/maak gaf `besluitId` niet door, waardoor
    het mandaat onmogelijk te halen was. De poort stond dicht voor iedereen,
    ook voor wie het besluit gewoon had.
-   Draai los: node --experimental-sqlite --test test/stadsbesluit.test.js */
+   Draai los: node --test test/stadsbesluit.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -1,7 +1,7 @@
 /* Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo),
    het overhoorduel via de vriendenlaag (zonder automatische vriendschap),
    samen-projecten met taken/notities/AI-plan, en schrijven met buddy-feedback.
-   Draai los: node --experimental-sqlite --test test/leren.test.js */
+   Draai los: node --test test/leren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

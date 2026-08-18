@@ -54,7 +54,7 @@
                    lukt er tijdens de storm ook echt minstens een -- anders is
                    "nul gefaald" vanzelf waar zodra De Wacht alles afwijst.
 
-   Draai (standaard, overal):   node --experimental-sqlite scripts/beproeving.js
+   Draai (standaard, overal):   node scripts/beproeving.js
    Draai (mega, 100M Postgres):  DATABASE_URL=postgres://... \
                                 node --max-old-space-size=8192 scripts/beproeving.js
    Knoppen (env): MEGA_LEDEN, MEGA_CHUNK, SOAK_MIN, STORM_WERKERS, MEGA_SEED,
@@ -275,7 +275,7 @@ function boot() {
       ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
       NODE_OPTIONS: '--max-old-space-size=8192' };
     if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
+    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), 'server/server.js'],
       { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
     child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
     (async () => {

@@ -114,7 +114,7 @@ jobs:
       # Deze poort is wel hard: dekking is machine-onafhankelijk. De vloer staat
       # in NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt).
       - name: Waargenomen endpoint-dekking (uit het journaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       # De census: welke handhaver bewaakt welke categorie. Hij zakt als een
       # categorie zonder bewaker komt te staan.
       - name: De samenhang (wie bewaakt wat)
@@ -128,7 +128,7 @@ jobs:
       # wettenOnbewezen). Hij zakt wel als een RECEPT nergens meer naar wijst.
       - name: De sabotage (zet elke handhaver echt uit)
         if: always()
-        run: node --experimental-sqlite scripts/sabotage.js
+        run: node scripts/sabotage.js
       - name: Wat we weten, en wat niet
         if: always()
         run: npm run zekerheid || true

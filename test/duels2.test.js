@@ -2,7 +2,7 @@
    (vijf reeksen, 4 tot en met 8 lang, foutloos natikken) en het
    Rangschikduel van De Societeit (vier dingen in de enige juiste volgorde;
    de waarheid blijft in de bank). Overal alleen codenamen.
-   Draai los: node --experimental-sqlite --test test/duels2.test.js */
+   Draai los: node --test test/duels2.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

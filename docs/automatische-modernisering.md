@@ -12,7 +12,7 @@ samengevoegd.
    een *pull request* op. Samenvoegen naar de hoofdtak gebeurt uitsluitend nadat
    de eigenaar (Rahul Imran Ismail, `RTG_OWNER_EMAIL`) de PR heeft goedgekeurd.
 2. **Alles moet groen zijn.** Een voorstel wordt alleen ingediend als de volledige
-   testsuite (`node --experimental-sqlite --test --test-concurrency=1 test/*.test.js`)
+   testsuite (`node --test --test-concurrency=1 test/*.test.js`)
    en de huisstijlcheck (`node scripts/check.js`) slagen.
 3. **Kleine, omkeerbare stappen.** Liever meerdere kleine, goed uitgelegde PR's dan
    een grote, ondoorzichtige. Elke PR beschrijft precies wat er verandert en waarom.

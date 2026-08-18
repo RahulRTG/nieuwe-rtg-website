@@ -24,7 +24,7 @@
    - de toelichting-grendel uit routes/staff/inzetbaarheid.js gehaald
      -> "de verzuimlaag vraagt niet wat iemand heeft" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/payroll-routes.test.js
+   Draai los: node --test test/payroll-routes.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');

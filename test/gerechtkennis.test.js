@@ -1,7 +1,7 @@
 /* Het gerechtenmenu op het keukenscherm: recept, bereidingswijze, allergenen
    met vervangers en een dranksuggestie per gerecht, plus de 86-melding
    (uitverkocht) die het bestellen per direct blokkeert.
-   Draai: node --experimental-sqlite --test test/gerechtkennis.test.js */
+   Draai: node --test test/gerechtkennis.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

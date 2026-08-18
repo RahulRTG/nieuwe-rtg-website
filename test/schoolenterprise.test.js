@@ -10,7 +10,7 @@
    - een volle opleiding levert een wachtlijst met een plek, geen stille
      plaatsing;
    - uitschrijven haalt de leerling uit de klas maar WIST het dossier niet.
-   Draai los: node --experimental-sqlite --test test/schoolenterprise.test.js */
+   Draai los: node --test test/schoolenterprise.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -6,7 +6,7 @@
    echte tokens mee. Geen netwerk nodig: de discovery en de sleutelbos worden
    als functie ingespoten, precies zoals de productiecode dat toelaat.
 
-   Draai los: node --experimental-sqlite --test test/sso.test.js
+   Draai los: node --test test/sso.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

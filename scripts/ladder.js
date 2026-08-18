@@ -107,7 +107,7 @@ function werkbank(vraag, rollen, kiezer) {
 /* ---------- server starten (tenzij --basis) ---------- */
 function bootEigen() {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ladder-'));
-  const child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
+  const child = spawn(process.execPath, ['server/server.js'], {
     cwd: WORTEL, env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', ANTHROPIC_API_KEY: '' },
     stdio: ['ignore', 'ignore', 'ignore']
   });

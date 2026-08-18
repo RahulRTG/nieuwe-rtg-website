@@ -23,7 +23,7 @@
    controle eromheen is dan ook dubbel: je moet beheerder zijn EN het moet je
    eigen kind zijn.
 
-   Draai los: node --experimental-sqlite --test test/laatste-negen.test.js
+   Draai los: node --test test/laatste-negen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

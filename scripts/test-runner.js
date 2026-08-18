@@ -52,7 +52,7 @@ const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1
 
 function draai(namen, parallel) {
   if (!namen.length) return 0;
-  const args = ['--experimental-sqlite', '--test', '--test-concurrency=' + parallel];
+  const args = ['--test', '--test-concurrency=' + parallel];
   if (reporter) args.push('--test-reporter=' + reporter);
   args.push(...namen.map(n => path.join('test', n)));
   const r = spawnSync(process.execPath, args, {

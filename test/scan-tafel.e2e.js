@@ -3,7 +3,7 @@
    een tafel-QR-payload in (headless heeft geen camera). De app hoort dan het menu
    van die zaak te openen met de tafel voorgekozen: precies de "scan en bestel"-
    belofte. Draait alleen waar een browser beschikbaar is; anders overgeslagen.
-   Draai: node --experimental-sqlite --test test/scan-tafel.e2e.js */
+   Draai: node --test test/scan-tafel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten } = require('./helper');

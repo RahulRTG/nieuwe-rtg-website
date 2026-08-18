@@ -24,8 +24,8 @@
    en de zevenstappenlat eronder. Een verraad dat de lat niet haalt, telt niet
    mee als bewijs; wat eraan ontbreekt staat erbij.
 
-   Draai:  node --experimental-sqlite scripts/ketenronde.js
-           node --experimental-sqlite scripts/ketenronde.js --seed=819226199
+   Draai:  node scripts/ketenronde.js
+           node scripts/ketenronde.js --seed=819226199
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -50,7 +50,7 @@ function vrijePoort() {
 async function start(datamap, extra) {
   const poort = await vrijePoort();
   const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
       STUN_UIT: '1', RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });

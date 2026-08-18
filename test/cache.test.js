@@ -1,7 +1,7 @@
 /* De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting,
    treffer/misser-telling, en de response-cache-middleware die een publiek JSON-
    antwoord memoiseert (miss -> hit) en een niet-200 juist NIET bewaart.
-   Draai los: node --experimental-sqlite --test test/cache.test.js */
+   Draai los: node --test test/cache.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { Cache, memo, antwoordCache } = require('../server/lib/cache');

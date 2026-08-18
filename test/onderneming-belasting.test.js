@@ -14,7 +14,7 @@
    4. DE AANNAMES STAAN IN HET ANTWOORD, en waar wij iets niet weten kiezen we
       de kant die de reservering HOGER maakt.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-belasting.test.js */
+   Draai los: node --test test/onderneming-belasting.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

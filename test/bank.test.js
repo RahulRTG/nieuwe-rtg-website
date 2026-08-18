@@ -5,7 +5,7 @@
    het opschalen; de nood-fallback (noodstop en automatisch); sparen met rente; de
    wallet-brug; passen, krediet, incasso, zakelijk en de AI-bankier; en de
    sluitcontrole die na alles nog klopt.
-   Draai los: node --experimental-sqlite --test test/bank.test.js */
+   Draai los: node --test test/bank.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -2,7 +2,7 @@
    mode en alles wat je aan het lijf draagt, met een AI die het concept
    uittekent (silhouet, materialen, gedempt palet, verhaal), een tech pack
    levert en de blik van de creatief directeur geeft.
-   Draai los: node --experimental-sqlite --test test/atelier.test.js */
+   Draai los: node --test test/atelier.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

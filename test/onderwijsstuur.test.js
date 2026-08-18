@@ -3,7 +3,7 @@
    "Schrijf me in op groep 3", "overhoor me", "vraag bijles" -- alles loopt
    als interne aanroep met de eigen inlog van het lid, dus de AI kan nooit
    meer dan de persoon zelf. Draai los:
-   node --experimental-sqlite --test test/onderwijsstuur.test.js */
+   node --test test/onderwijsstuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

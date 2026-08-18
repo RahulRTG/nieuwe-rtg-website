@@ -1,7 +1,7 @@
 /* RTG Boeken: de huisbibliotheek, de leesvoortgang die met je account
    meereist (en alleen die plek -- geen leesstatistieken), en de dichte
    poort zonder token.
-   Draai los: node --experimental-sqlite --test test/boeken.test.js */
+   Draai los: node --test test/boeken.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

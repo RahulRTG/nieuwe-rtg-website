@@ -46,7 +46,7 @@
    kantoorsessie halen en daarna van het landelijke bestuur een zetel krijgen.
    Dat is de weg die in productie ook gelopen wordt.
 
-   Draai los: node --experimental-sqlite --test test/rtfos.test.js
+   Draai los: node --test test/rtfos.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

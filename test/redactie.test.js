@@ -4,7 +4,7 @@
    een kant op draait (met drukproef), de nieuwstips-wand uit het hele platform,
    de Nieuws-app die alleen gepubliceerd werk toont (met Rahul als nieuwslezer)
    en de spin-off vanuit de Ideeenkamer naar de schrijftafel.
-   Draai los: node --experimental-sqlite --test test/redactie.test.js */
+   Draai los: node --test test/redactie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

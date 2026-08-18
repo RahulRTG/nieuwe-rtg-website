@@ -16,7 +16,7 @@
        kaartje) staat bij de eigenaar als kaart en bij de ander als verdwenen;
      - delen terugdraaien sluit de deur echt.
 
-   Draai los: node --experimental-sqlite --test test/medialijstdelen.test.js */
+   Draai los: node --test test/medialijstdelen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

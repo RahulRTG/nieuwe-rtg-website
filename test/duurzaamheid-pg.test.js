@@ -42,7 +42,7 @@
    verkeerd kenmerk werkt hij te goed (dan negeert hij ook een ander).
 
    Draai:  DATABASE_URL=postgresql://rtg@127.0.0.1:5433/rtgtest \
-           node --experimental-sqlite --test test/duurzaamheid-pg.test.js
+           node --test test/duurzaamheid-pg.test.js
    ========================================================================== */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF (zie leden-gids-pg). */
 const test = require('node:test');

@@ -16,7 +16,7 @@
    En als eerste, want zonder die regel is de hele verhuizing onveilig: NIEMAND
    WINT OF VERLIEST TOEGANG. Wat achter de 18+-deur stond, staat daar nog.
 
-   Draai los: node --experimental-sqlite --test test/podiumzones.test.js */
+   Draai los: node --test test/podiumzones.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

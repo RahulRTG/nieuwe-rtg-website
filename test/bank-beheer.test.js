@@ -16,7 +16,7 @@
    de fout die je bij een bank niet mag maken, en hij is met een IBAN uit een
    ander verzoek zo geprobeerd.
 
-   Draai los: node --experimental-sqlite --test test/bank-beheer.test.js
+   Draai los: node --test test/bank-beheer.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

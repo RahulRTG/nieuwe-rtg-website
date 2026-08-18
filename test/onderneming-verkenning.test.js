@@ -11,7 +11,7 @@
       kostprijs blokkerend is, en dat het plan pas met een uitdrukkelijke keuze
       alsnog vastgelegd kan worden.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-verkenning.test.js */
+   Draai los: node --test test/onderneming-verkenning.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

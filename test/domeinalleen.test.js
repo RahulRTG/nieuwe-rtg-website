@@ -102,7 +102,7 @@ function boot(port, dataDir, domeinen) {
     NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: '', RTG_STIL: '1'
   });
   if (domeinen) env.RTG_DOMAINS = domeinen; else delete env.RTG_DOMAINS;
-  const kind = cp.spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'],
+  const kind = cp.spawn(process.execPath, ['server/server.js'],
     { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   const uitInfo = { log: '', fataal: false };
   const vang = d => { uitInfo.log += d; if (/uncaughtException|"fataal":true|is not a function/.test(String(d))) uitInfo.fataal = true; };

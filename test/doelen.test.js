@@ -4,7 +4,7 @@
 
    Verder: geen meting is niet nul (LAT regel 3), een doel van een ander lid
    bestaat niet voor jou, en een meting draagt haar herkomst.
-   Draai los: node --experimental-sqlite --test test/doelen.test.js */
+   Draai los: node --test test/doelen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

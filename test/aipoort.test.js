@@ -21,7 +21,7 @@
    repareren. De beslissing is daarom uit de route gehaald; hier wordt hij
    rechtstreeks beproefd, met een nagemaakte resolveSession.
 
-   Draai los: node --experimental-sqlite --test test/aipoort.test.js
+   Draai los: node --test test/aipoort.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

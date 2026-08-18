@@ -1,5 +1,5 @@
 /* De belastingtool van elke zaak + meerdere groothandels per zaak.
-   Draai: node --experimental-sqlite --test test/belasting-groothandels.test.js */
+   Draai: node --test test/belasting-groothandels.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

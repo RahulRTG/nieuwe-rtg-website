@@ -12,7 +12,7 @@
 #  2. launchd geeft een daemon een kale PATH (/usr/bin:/bin:/usr/sbin:/sbin).
 #     Node uit Homebrew (/opt/homebrew/bin op Apple Silicon) zit daar niet in,
 #     dus die zoeken we hier zelf op.
-#  3. Node 22 of hoger is nodig (de server draait op --experimental-sqlite).
+#  3. Node 22.13 of hoger is nodig (de server gebruikt de ingebouwde node:sqlite).
 #     Beter hier meteen een duidelijke regel in het logboek dan een cryptische
 #     crash-lus.
 #
@@ -95,7 +95,7 @@ fi
 
 major="$("$NODE" -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)"
 if [ "$major" -lt 22 ]; then
-  stuk "node $("$NODE" -v) is te oud; de server heeft 22 of hoger nodig (--experimental-sqlite)."
+  stuk "node $("$NODE" -v) is te oud; de server heeft 22.13 of hoger nodig (ingebouwde node:sqlite)."
 fi
 
 cd "$REPO"

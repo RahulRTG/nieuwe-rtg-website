@@ -3,7 +3,7 @@
    camera-onafhankelijke kern: de grijswaarde-omzetting die elk frame ondergaat
    en de eigen-QR-terugval. We bouwen een RGBA-frame zoals een <canvas> dat geeft,
    halen het door grijs() + leesGrijs() en verwachten de tekst terug.
-   Draai los: node --experimental-sqlite --test test/scanner.test.js */
+   Draai los: node --test test/scanner.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const QR = require('../public/shared/qr');

@@ -14,7 +14,7 @@
    4. De klok op een gedeeld postvak stopt bij een MENS. Een afwezigheids- of
       systeembericht zet hem niet stil -- dezelfde regel als bij de tickets.
    5. Een interne notitie draagt altijd wie hem schreef.
-   Draai: node --experimental-sqlite --test test/rtmail-werk.test.js */
+   Draai: node --test test/rtmail-werk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

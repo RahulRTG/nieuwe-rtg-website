@@ -2,7 +2,7 @@
    leden tonen interesse (bezichtiging) en doen een bod, de makelaar bevestigt
    met keyless toegang die alleen binnen het venster werkt, en behandelt het
    bod. Een niet-uitgenodigd lid ziet het gerichte aanbod niet.
-   Draai: node --experimental-sqlite --test test/vastgoed.test.js */
+   Draai: node --test test/vastgoed.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

@@ -3,7 +3,7 @@
    met een tik betaalt waarbij de wallet zelf bijlaadt, de kassacode bij de
    partner, en uitbetalen. De sluitcontrole bewaakt dat de som van alle saldi
    altijd exact nul is. Draai los:
-   node --experimental-sqlite --test test/pay.test.js */
+   node --test test/pay.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

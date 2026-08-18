@@ -13,7 +13,7 @@
    En twee deuren horen er met REDEN buiten: /api/toestemming (een knop die je
    intrekscherm dichtzet hoort niet te bestaan) en /api/toestel/meting (die komt
    op een toestelsleutel binnen, niet op een ledensessie).
-   Draai los: node --experimental-sqlite --test test/life-schakelbaar.test.js */
+   Draai los: node --test test/life-schakelbaar.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

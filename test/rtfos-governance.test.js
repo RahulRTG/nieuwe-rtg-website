@@ -23,7 +23,7 @@
 
    MUTATIES (LAT.md regel 2): zie het einde van dit bestand en het commitbericht.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-governance.test.js
+   Draai los: node --test test/rtfos-governance.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

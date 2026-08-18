@@ -6,7 +6,7 @@
    achter de verkeerde poort hangt. Dan hoort de bouw te breken, met dit
    bestand als reden.
 
-   Draai los: node --experimental-sqlite --test test/eu-naleving.test.js */
+   Draai los: node --test test/eu-naleving.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

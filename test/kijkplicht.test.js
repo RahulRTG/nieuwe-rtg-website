@@ -19,7 +19,7 @@
      - de medewerker ziet dezelfde lijst als zijn werkgever;
      - wie bij een ANDERE zaak werkt, ziet niets van deze lijst.
 
-   Draai los: node --experimental-sqlite --test test/kijkplicht.test.js */
+   Draai los: node --test test/kijkplicht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

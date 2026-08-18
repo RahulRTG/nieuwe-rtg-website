@@ -1,7 +1,7 @@
 /* RTG Synergie: zaken maken samen deals en pakketten. Pas als elke
    deelnemer heeft getekend staat het pakket live; RTG Pay splitst elke
    aankoop exact volgens de afgesproken aandelen (de som moet kloppen).
-   Draai los: node --experimental-sqlite --test test/synergie.test.js */
+   Draai los: node --test test/synergie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

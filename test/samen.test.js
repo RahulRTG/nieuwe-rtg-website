@@ -1,7 +1,7 @@
 /* Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op
    codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers
    verlopen vanzelf. Draai los:
-   node --experimental-sqlite --test test/samen.test.js */
+   node --test test/samen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

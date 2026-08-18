@@ -26,7 +26,7 @@
    ouder beheert de kaart van een kind, een kind beheert alleen die van
    zichzelf. Toets 4 rekent het af.
 
-   Draai los: node --experimental-sqlite --test test/gezin-weghalen.test.js
+   Draai los: node --test test/gezin-weghalen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

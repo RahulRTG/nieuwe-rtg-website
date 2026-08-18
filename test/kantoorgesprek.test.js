@@ -7,7 +7,7 @@
    het precies zo streng is als het formulier: dezelfde teller, dezelfde bucket,
    en een fout antwoord dat niet verklapt welke helft fout was.
 
-   Draai los: node --experimental-sqlite --test test/kantoorgesprek.test.js */
+   Draai los: node --test test/kantoorgesprek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

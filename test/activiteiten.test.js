@@ -2,7 +2,7 @@
    en capaciteit, betalen vooraf, en de entree-check aan de deur op naam van
    het personeelslid (security/gids/balie). Vol is vol, en een ticket kan
    maar een keer naar binnen.
-   Draai: node --experimental-sqlite --test test/activiteiten.test.js */
+   Draai: node --test test/activiteiten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

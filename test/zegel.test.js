@@ -2,7 +2,7 @@
    Getoetst: selectieve onthulling (ruwe persoonsgegevens komen er nooit in),
    offline verificatie met alleen de publieke sleutel, afwijzing van geknoei en
    van een verlopen zegel, en onkoppelbare paarsgewijze pseudoniemen.
-   Draai los: node --experimental-sqlite --test test/zegel.test.js */
+   Draai los: node --test test/zegel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

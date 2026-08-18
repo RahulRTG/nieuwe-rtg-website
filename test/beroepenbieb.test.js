@@ -1,6 +1,6 @@
 /* De Beroepen-Bibliotheek van de RTFoundation: twee werelden van elk precies
    een miljoen gratis leer-apps (technisch/agrarisch + bedrijfsleven).
-   Draai los: node --experimental-sqlite --test test/beroepenbieb.test.js */
+   Draai los: node --test test/beroepenbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

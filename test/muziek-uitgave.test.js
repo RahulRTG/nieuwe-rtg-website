@@ -5,7 +5,7 @@
    kantoor kan hem toekennen -- dezelfde regel als bij de Lifestyle- en
    Business Pass. En: de makers staan allemaal in de aftiteling, ook als er
    daarna iemand uit het stuk gehaald wordt.
-   Draai: node --experimental-sqlite --test test/muziek-uitgave.test.js */
+   Draai: node --test test/muziek-uitgave.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

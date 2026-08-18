@@ -12,7 +12,7 @@
    3. Parkeren mag ("weet ik nu niet") maar telt gewoon als open.
    4. Alleen de eigenaar. Hier staan privénummers en het KvK-nummer.
 
-   Draai los: node --experimental-sqlite --test test/papieren.test.js */
+   Draai los: node --test test/papieren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

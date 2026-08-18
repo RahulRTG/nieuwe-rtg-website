@@ -5,7 +5,7 @@
 
    Met een verzetbare klok, want alles hier gaat over een AFGESLOTEN tijdvak:
    over een lopend kwartaal valt niets na te heffen omdat er nog niets te laat
-   is. Draai: node --experimental-sqlite --test test/btw-naheffing.test.js */
+   is. Draai: node --test test/btw-naheffing.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

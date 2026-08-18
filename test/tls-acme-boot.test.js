@@ -4,7 +4,7 @@
    nep-CA valideert de HTTP-01-challenge via dezelfde winkel die de boot-lijm
    intern maakt, precies zoals Let's Encrypt de .well-known-URL zou ophalen.
    Volledig offline. Draai los:
-   node --experimental-sqlite --test test/tls-acme-boot.test.js */
+   node --test test/tls-acme-boot.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

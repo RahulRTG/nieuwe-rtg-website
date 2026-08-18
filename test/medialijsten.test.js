@@ -12,7 +12,7 @@
      - een lijst is van u alleen: een ander komt er niet in, ook niet met het id;
      - de volgorde is echt van u (verplaatsen), en verplaatsen voegt niets toe.
 
-   Draai los: node --experimental-sqlite --test test/medialijsten.test.js */
+   Draai los: node --test test/medialijsten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

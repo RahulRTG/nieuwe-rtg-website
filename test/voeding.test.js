@@ -8,7 +8,7 @@
       eigen allergenen bevat -- dat zou een controle beweren die er niet is.
    3. HET IS EEN PLAN EN GEEN DAGBOEK. Wat voorbij is, wordt opgeruimd; anders
       wordt het stilletjes toch een registratie van wat u at.
-   Draai los: node --experimental-sqlite --test test/voeding.test.js */
+   Draai los: node --test test/voeding.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

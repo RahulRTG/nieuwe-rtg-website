@@ -13,7 +13,7 @@
    - een openstaande hoge bevinding houdt de run tegen;
    - verklaren kan, wegklikken zonder reden niet.
 
-   Draai los: node --experimental-sqlite --test test/payroll-uren-controles.test.js */
+   Draai los: node --test test/payroll-uren-controles.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -24,7 +24,7 @@
      4. DE METER BEWEEGT. `wettenOnbewezen` moet omhoog gaan zodra een wet zijn
         bewijs verliest. Een teller die altijd hetzelfde zegt, telt niets.
 
-   Draai los: node --experimental-sqlite --test test/wetten.test.js */
+   Draai los: node --test test/wetten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

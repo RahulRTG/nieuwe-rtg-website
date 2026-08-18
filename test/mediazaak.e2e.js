@@ -11,7 +11,7 @@
    En de andere kant: een lid dat NERGENS werkt hoort dit blok helemaal niet te
    zien. Een tab die altijd nee zegt is geen tab.
 
-   Draai: npm run e2e (of los: node --experimental-sqlite --test test/mediazaak.e2e.js) */
+   Draai: npm run e2e (of los: node --test test/mediazaak.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -4,7 +4,7 @@
    is als alle taken klaar zijn, de agenda per adviseur zonder dubbele
    afspraken, de dossierketen, en de harde verzekeringsregel: er wordt
    hier nooit een polis afgesloten, en advies komt altijd van een mens.
-   Draai los: node --experimental-sqlite --test test/planners.test.js */
+   Draai los: node --test test/planners.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

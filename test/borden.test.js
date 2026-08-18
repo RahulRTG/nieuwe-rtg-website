@@ -2,7 +2,7 @@
    kiest per bord de collega's (leeg = hele team), en alleen bord-leden zien
    een besloten bord. Business Pass-leden hebben dezelfde motor voor eigen
    projecten; andere passen niet.
-   Draai: node --experimental-sqlite --test test/borden.test.js */
+   Draai: node --test test/borden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

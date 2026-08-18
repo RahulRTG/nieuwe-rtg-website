@@ -3,7 +3,7 @@
    leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,
    gigastrings, prototype-vergiftiging, diep geneste JSON, onzin-getallen)
    ketst overal netjes af zonder de data of het proces te raken.
-   Draai los: node --experimental-sqlite --test test/streng-poorten.test.js */
+   Draai los: node --test test/streng-poorten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

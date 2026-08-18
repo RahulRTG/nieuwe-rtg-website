@@ -3,7 +3,7 @@
    (archief/venster/pg-sync) en schrijven BUITEN de helpers om (zelfherstel).
    Dit test de db.js-laag rechtstreeks, zonder server: de index werkt in alle
    opslagmodi en dit is de gedeelde kern ervan.
-   Draai: node --experimental-sqlite --test test/txindex.test.js */
+   Draai: node --test test/txindex.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

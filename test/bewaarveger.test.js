@@ -2,7 +2,7 @@
    (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een
    mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt.
 
-   Draai los: node --experimental-sqlite --test test/bewaarveger.test.js */
+   Draai los: node --test test/bewaarveger.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakBewaarveger } = require('../server/bewaarveger');

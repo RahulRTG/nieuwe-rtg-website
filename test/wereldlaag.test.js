@@ -13,7 +13,7 @@
    getoetst tegen de ECHTE route en niet tegen een kopie van de lijst, want een
    toets tegen een kopie slaagt altijd.
 
-   Draai los: node --experimental-sqlite --test test/wereldlaag.test.js */
+   Draai los: node --test test/wereldlaag.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

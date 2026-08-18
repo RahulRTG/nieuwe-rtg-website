@@ -3,7 +3,7 @@
    2) In de PDA ziet elk teamlid tips voor de eigen functie plus een tip van de
       dag; een manager kan eigen huistips toevoegen en verwijderen; de coach
       geeft altijd een antwoord (met terugval op de bibliotheek).
-   Draai: node --experimental-sqlite --test test/training.test.js */
+   Draai: node --test test/training.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

@@ -13,7 +13,7 @@
    productie. De weigering met de gedeelde code staat als eigen bewering in
    test/aanmeldbesluit.test.js.
 
-   Draai los: node --experimental-sqlite --test test/pas-escalatie.test.js */
+   Draai los: node --test test/pas-escalatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

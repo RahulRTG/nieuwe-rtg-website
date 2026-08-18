@@ -4,7 +4,7 @@
    met vol-is-vol, de uitlaatronde-limiet, de trimtafel, de ophaalregel
    (alleen de aangemelde ouder), de nanny-keten waarin een mens bevestigt,
    en de cap-poorten.
-   Draai los: node --experimental-sqlite --test test/verzorging.test.js */
+   Draai los: node --test test/verzorging.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

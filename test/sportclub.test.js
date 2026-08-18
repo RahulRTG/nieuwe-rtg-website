@@ -4,7 +4,7 @@
    telt echte uitslagen, het veldbeheer geeft signalen, een trainingskamp
    bevestigt een MENS bij RTG, sponsors kiest de club zelf, en de financien
    tellen ook de kantine (kassa) mee. Draai los:
-   node --experimental-sqlite --test test/sportclub.test.js */
+   node --test test/sportclub.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

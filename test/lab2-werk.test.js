@@ -3,7 +3,7 @@
    hun rollen, de werkplaats (taken, agenda, documenten, logboek, besluitenlog),
    de vragen uit de buurt aan de kantoorkant, en de weg van uitgang naar pijplijn
    en vervolgonderzoek. Draai los:
-   node --experimental-sqlite --test test/lab2-werk.test.js
+   node --test test/lab2-werk.test.js
 
    WAAROM DIT BESTAND BESTAAT. test/livinglab.test.js loopt de onderzoekscyclus
    af en test/lab2-bewoner.test.js de bewonerskant. Daartussen viel een strook

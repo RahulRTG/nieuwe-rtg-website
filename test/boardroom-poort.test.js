@@ -3,7 +3,7 @@
    de eigenaar komt binnen met zijn eigen account (direct, of als kantoor-rol
    via het ene account) en geeft of neemt toegang op codenaam. De rest van het
    kantoor blijft gewoon op de office-inlog werken. Draai los:
-   node --experimental-sqlite --test test/boardroom-poort.test.js */
+   node --test test/boardroom-poort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -26,7 +26,7 @@
    verkeer horen te zijn. De toets legt hieronder alleen vast WAT het nu doet,
    met een naam die dat eerlijk zegt -- veranderen is een besluit voor RTG.
 
-   Draai los: node --experimental-sqlite --test test/genootschap-beheer.test.js
+   Draai los: node --test test/genootschap-beheer.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

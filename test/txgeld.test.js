@@ -32,7 +32,7 @@
    De grenzen staan hier laag (TX_*_CAP) -- zelfde gedrag als op 200.000, alleen
    beproefbaar. Eigen bestand, want die variabelen worden bij het laden gelezen.
 
-   Draai los: node --experimental-sqlite --test test/txgeld.test.js
+   Draai los: node --test test/txgeld.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -25,7 +25,7 @@
      de RPO tot 24 uur. Het staat hier omdat het de vraag is die er meteen na
      de RTO komt, en omdat het antwoord onaangenaam is.
 
-   Draai: node --experimental-sqlite scripts/hersteltijd.js [aantal-leden]
+   Draai: node scripts/hersteltijd.js [aantal-leden]
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -120,7 +120,7 @@ async function main() {
   t = process.hrtime.bigint();
   const poort = 4700 + Math.floor(Math.random() * 200);
   const srv = require('child_process').spawn(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'server/server.js')],
+    [path.join(WORTEL, 'server/server.js')],
     { env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: doel, SMTP_URL: '' }, stdio: 'ignore' });
 
   let op = false;

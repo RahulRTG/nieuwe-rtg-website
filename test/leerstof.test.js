@@ -2,7 +2,7 @@
    met een les, de oefensessie is server-authoritatief (antwoorden staan
    nooit in de vraag), een behaald doel komt in het leerpaspoort, en er
    zijn bewust geen scores, reeksen of ranglijsten buiten de sessie.
-   Draai los: node --experimental-sqlite --test test/leerstof.test.js */
+   Draai los: node --test test/leerstof.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

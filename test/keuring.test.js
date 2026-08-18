@@ -76,7 +76,7 @@ test('en die uitzondering is geen blinddoek: echt losgekoppelde code wordt nog g
   fs.writeFileSync(pad, '/* tijdelijk proefbestand van test/keuring.test.js */\nmodule.exports = () => ({});\n');
   try {
     const uit = require('child_process').execFileSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'keuring.js'), '--json'],
+      [path.join(WORTEL, 'scripts', 'keuring.js'), '--json'],
       { cwd: WORTEL, maxBuffer: 1e9, encoding: 'utf8' });
     const dood = JSON.parse(uit).bevindingen.filter(b => b.groep === 'dode code').map(b => b.waar);
     assert.ok(dood.some(p => p.includes('zz-keuringproef-dood')),

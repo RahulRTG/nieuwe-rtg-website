@@ -19,7 +19,7 @@
    een nieuwe meter niet ongemerkt ongeijkt meeliften, en wordt het gat
    kleiner in plaats van vergeten.
 
-   Draai los: node --experimental-sqlite --test test/meterijk.test.js */
+   Draai los: node --test test/meterijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -111,7 +111,7 @@ function journaalMetGat(weglaten) {
   const os = require('os');
   const { execFileSync, spawnSync } = require('child_process');
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 }));
   const routes = (kaart.routes || []).filter(r => r && r.pad && r.pad.startsWith('/api/'));
   assert.ok(routes.length > 100, 'de routekaart geeft routes (' + routes.length + ')');
@@ -123,7 +123,7 @@ function journaalMetGat(weglaten) {
     const regels = routes.slice(0, routes.length - n).map(r => (r.methode || 'POST').toUpperCase() + ' ' + r.pad);
     fs.writeFileSync(bestand, regels.join('\n') + '\n');
     const r = spawnSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
+      [path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
       { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 });
     let d = null;
     try { d = JSON.parse(r.stdout); } catch (e) { d = null; }

@@ -24,7 +24,7 @@
    bij de basis van het toestel hoort (je wallet met je ledenpas) kan een
    werkgever helemaal niet raken.
 
-   Draai los: node --experimental-sqlite --test test/zaak-en-mensen.test.js
+   Draai los: node --test test/zaak-en-mensen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

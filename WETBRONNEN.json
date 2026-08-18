@@ -5,7 +5,14 @@
       "code": "avg",
       "naam": "AVG / GDPR (2016/679), geconsolideerde tekst",
       "bron": "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:02016R0679-20160504",
-      "raakt": ["DPIA.md", "VERWERKINGSREGISTER.md", "VERWERKERS.md", "DATALEK.md", "server/bewaarbeleid.js", "server/inzagelog.js"],
+      "raakt": [
+        "DPIA.md",
+        "VERWERKINGSREGISTER.md",
+        "VERWERKERS.md",
+        "DATALEK.md",
+        "server/bewaarbeleid.js",
+        "server/inzagelog.js"
+      ],
       "afdruk": null,
       "gezienOp": null
     },
@@ -13,7 +20,12 @@
       "code": "ai-verordening",
       "naam": "AI-verordening (2024/1689), geconsolideerde tekst",
       "bron": "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:02024R1689-20240712",
-      "raakt": ["EU.md", "TOEZICHT.md", "server/kern/aipoort.js", "server/local-ai.js"],
+      "raakt": [
+        "EU.md",
+        "TOEZICHT.md",
+        "server/kern/aipoort.js",
+        "server/local-ai.js"
+      ],
       "afdruk": null,
       "gezienOp": null
     },
@@ -21,7 +33,11 @@
       "code": "nis2",
       "naam": "NIS2-richtlijn (2022/2555)",
       "bron": "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32022L2555",
-      "raakt": ["EU.md", "SECURITY.md", "RUNBOOK.md"],
+      "raakt": [
+        "EU.md",
+        "SECURITY.md",
+        "RUNBOOK.md"
+      ],
       "afdruk": null,
       "gezienOp": null
     },
@@ -29,7 +45,12 @@
       "code": "dora",
       "naam": "DORA (2022/2554)",
       "bron": "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32022R2554",
-      "raakt": ["EU.md", "GELD.md", "GELDLAT.md", "RUNBOOK.md"],
+      "raakt": [
+        "EU.md",
+        "GELD.md",
+        "GELDLAT.md",
+        "RUNBOOK.md"
+      ],
       "afdruk": null,
       "gezienOp": null
     },
@@ -37,7 +58,10 @@
       "code": "ap-nieuws",
       "naam": "Autoriteit Persoonsgegevens — actualiteiten",
       "bron": "https://www.autoriteitpersoonsgegevens.nl/actueel",
-      "raakt": ["DPIA.md", "DATALEK.md"],
+      "raakt": [
+        "DPIA.md",
+        "DATALEK.md"
+      ],
       "afdruk": null,
       "gezienOp": null
     }

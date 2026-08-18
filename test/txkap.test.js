@@ -24,7 +24,7 @@
    alleen beproefbaar. Eigen bestand, want die omgevingsvariabele wordt bij het
    laden gelezen en zou de vergelijkingen in txindex.test.js uithollen.
 
-   Draai los: node --experimental-sqlite --test test/txkap.test.js
+   Draai los: node --test test/txkap.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

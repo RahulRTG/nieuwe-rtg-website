@@ -21,7 +21,7 @@
    sessie genomen; wat hier staat is het meetpunt dat ervoor nodig is, mét het
    bewijs dat het meetpunt werkt.
 
-   Draai los: node --experimental-sqlite --test test/persistentiestand.test.js */
+   Draai los: node --test test/persistentiestand.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -30,7 +30,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
-const inProces = (env, code) => execFileSync(process.execPath, ['--experimental-sqlite', '-e', code],
+const inProces = (env, code) => execFileSync(process.execPath, ['-e', code],
   { encoding: 'utf8', env: { ...process.env, ...env }, cwd: WORTEL }).trim().split('\n').pop();
 const verseMap = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pstand-'));
 

@@ -16,7 +16,7 @@
    En daarnaast: een town hall neemt geen geld aan, en staat in geen enkele
    gedeelde lijst.
 
-   Draai los: node --experimental-sqlite --test test/podiumzaak.test.js */
+   Draai los: node --test test/podiumzaak.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

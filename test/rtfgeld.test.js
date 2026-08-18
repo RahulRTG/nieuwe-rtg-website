@@ -1,7 +1,7 @@
 /* RTF-golf 4: de geldschool -- klusjes (sterren), weekgeld en het
    zakgeldpotje als een geheel. Ouder beslist, kind ziet alles terug,
    de eer (ranglijst) blijft staan na verzilveren.
-   Draai los: node --experimental-sqlite --test test/rtfgeld.test.js */
+   Draai los: node --test test/rtfgeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

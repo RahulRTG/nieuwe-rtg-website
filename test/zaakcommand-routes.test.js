@@ -20,7 +20,7 @@
    - het zaakvak vervangen door db.data in kern/zaakcommand
      -> "het journaal van deze zaak is van deze zaak" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/zaakcommand-routes.test.js
+   Draai los: node --test test/zaakcommand-routes.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

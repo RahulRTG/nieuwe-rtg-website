@@ -24,8 +24,8 @@
    de duurzaamheid komt of van de machine die toevallig druk was; loopt de
    controle even hard mee omhoog, dan meet je ruis.
 
-   Draai:  node --experimental-sqlite scripts/duurzaamheidskosten.js
-           node --experimental-sqlite scripts/duurzaamheidskosten.js --n=400
+   Draai:  node scripts/duurzaamheidskosten.js
+           node scripts/duurzaamheidskosten.js --n=400
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -66,7 +66,7 @@ async function start(extra) {
   const poort = await vrijePoort();
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kosten-'));
   const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
       STUN_UIT: '1', RTG_DEMO: '1', ...extra }

@@ -21,7 +21,7 @@
    ingelogd (met een staffId) heeft een naam om aan de andere kant te
    herkennen; een zaakbrede inlog zou anders in iemand anders' rooster landen.
 
-   Draai los: node --experimental-sqlite --test test/wisselen-en-historie.test.js
+   Draai los: node --test test/wisselen-en-historie.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

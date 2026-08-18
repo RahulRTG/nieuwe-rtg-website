@@ -1,6 +1,6 @@
 /* Beeld "Uit De Salon" als bron in de website-makers, en foto-upload met
    virusscan in de Atelier-studio (pariteit met de leden-Website-maker).
-   Draai los: node --experimental-sqlite --test test/salonbron-fotobank.test.js */
+   Draai los: node --test test/salonbron-fotobank.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -1078,6 +1078,13 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "demokosten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "demostand.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1506,6 +1513,32 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "geld-rollen-buiten-bank.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 4,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "server/routes/member/rechterhand.js",
+      "operator": "true->false#0",
+      "geprobeerd": 1
+    },
+    "geld-rollen-school.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/school/financien.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 11
+    },
+    "geld-rollen-zaken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/horeca/betalen.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "geldbeleid.test.js": {
       "soort": "server",

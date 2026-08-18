@@ -414,6 +414,30 @@ const EIGEN_MODULE = new Map([
      van de fail-closed op een ontbrekende URL. */
   ['motorzekering.test.js', ['server/kern/motorzekering.js']],
   ['motorverbinding.test.js', ['server/kern/motorverbinding.js', 'server/kern/motorzekering.js']],
+  /* DE ROLLENVRAAG, vier bestanden. Deze toetsen zijn servertoetsen -- ze zetten
+     twee echte partijen op en laten de een bij de ander proberen -- en de
+     liegpoort kan er dus niets over zeggen. De module waar hun bewering woont is
+     per bestand een andere:
+
+       geld-rollen-school.test.js  de schoolpoort (het token wordt tegen de
+                                   GEVONDEN school gehouden, niet andersom) en de
+                                   twee financiele lagen die alles door g.sch
+                                   opzoeken;
+       geld-rollen-zaken.test.js   de horeca-rekening, waar de zaak uit de sessie
+                                   komt (H(req.supplier.code)) en het rekening-id
+                                   uit de body;
+       geld-rollen-buiten-bank.test.js  de rechterhand, waar de scope req.session.key
+                                   is en het meegestuurde id BINNEN dat dossier
+                                   wordt gezocht.
+
+     Met de hand nagemeten, alle drie raak: `if (beheer)` in plaats van
+     `if (beheer && sch.token === beheer)` laat school B met de code van A binnen
+     (toets 2 zakt); de factuur- en leerlingopzoeking over ALLE scholen heen laat
+     B op de factuur van A boeken en die op 'voldaan' zetten (toets 3 zakt); en
+     rekVan over alle zaken heen laat zaak B bij de omzet van A (toets 2 zakt). */
+  ['geld-rollen-school.test.js', ['server/school/rollen.js', 'server/school/financien.js', 'server/school/financien-beheer.js']],
+  ['geld-rollen-zaken.test.js', ['server/routes/supplier/horeca/rekening.js', 'server/routes/supplier/horeca/betalen.js']],
+  ['geld-rollen-buiten-bank.test.js', ['server/routes/member/rechterhand.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van

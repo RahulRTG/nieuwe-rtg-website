@@ -1,4 +1,10 @@
 {
+  "stempel": {
+    "op": "2026-08-18T07:17:59.979Z",
+    "commit": "4ad6a5a",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -2981,6 +2987,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "meetketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "memo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4751,6 +4765,14 @@
       "operator": "<=-><#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "schakelaarsdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/toegang.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "schakelkast-dekking.test.js": {
       "soort": "server",

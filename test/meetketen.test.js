@@ -76,6 +76,23 @@ test('2. onbekend is geen schoon: een register zonder stempel heet verouderd', (
   assert.equal(goed.vers, true);
 });
 
+test('2b. vers gaat over veranderde CODE, niet over een veranderde commit', () => {
+  /* Zonder dit onderscheid is `vers` onbereikbaar: je meet, je COMMIT de verse
+     registers, HEAD verspringt, en de meter verklaart zijn eigen meting van een
+     minuut oud verouderd. Een meter die nooit groen kan worden meet niets
+     (LAT.md regel 9). Wat telt is of er sinds de meting code is gewijzigd -- een
+     commit die alleen registers of documentatie aanraakt, maakt niets ongeldig. */
+  const head = spawnSync('git', ['rev-parse', '--short', 'HEAD'],
+    { cwd: WORTEL, encoding: 'utf8' }).stdout.trim();
+  const opHead = versheid({ op: 'x', commit: head, boomVuil: false }, head);
+  assert.equal(opHead.vers, true, 'op de huidige commit is een meting vers');
+
+  const weg = versheid({ op: 'x', commit: 'deadbee', boomVuil: false }, head);
+  assert.equal(weg.vers, false, 'een commit die niet meer bestaat is niet vers');
+  assert.match(weg.reden, /bestaat/,
+    'een mislukte vergelijking mag nooit als "geen wijzigingen" lezen');
+});
+
 test('3. de versheidsmeter kent elk meetregister en zegt hoe je het herstelt', () => {
   const uit = versheidMeter.meet();
   assert.ok(uit.rijen.length >= 10, 'de meetregisters staan erin (' + uit.rijen.length + ')');

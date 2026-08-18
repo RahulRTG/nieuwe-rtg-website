@@ -6,11 +6,11 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 16551,
+    "bewezen": 16546,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 29074,
-    "gezakt": 138
+    "ongemeten": 29078,
+    "gezakt": 139
   },
   "perSchakel": {
     "AUTH": {
@@ -21,17 +21,17 @@
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3377,
+      "bewezen": 3379,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 808,
+      "ongemeten": 806,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 2808,
+      "bewezen": 2804,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1377,
+      "ongemeten": 1381,
       "gezakt": 0
     },
     "OUTPUT": {
@@ -42,17 +42,17 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 255,
+      "bewezen": 254,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3862,
+      "ongemeten": 3863,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 255,
+      "bewezen": 254,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3862,
+      "ongemeten": 3863,
       "gezakt": 0
     },
     "AUDIT": {
@@ -63,10 +63,10 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 141,
+      "bewezen": 139,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3846,
+      "ongemeten": 3848,
       "gezakt": 130
     },
     "FAILURE": {
@@ -77,17 +77,17 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2451,
+      "bewezen": 2450,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 1658,
-      "gezakt": 8
+      "gezakt": 9
     },
     "PRIVACY": {
-      "bewezen": 3377,
+      "bewezen": 3379,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 808,
+      "ongemeten": 806,
       "gezakt": 0
     }
   },

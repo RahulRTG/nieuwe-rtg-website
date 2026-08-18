@@ -66,10 +66,35 @@ function versheid(gemeten, huidigeCommit) {
   if (gemeten.boomVuil) return { vers: false, reden: 'gemeten met ongecommit werk in de boom (commit ' + gemeten.commit + '); niet reproduceerbaar' };
   const nu = huidigeCommit || git(['rev-parse', '--short', 'HEAD']);
   if (!nu) return { vers: false, reden: 'de huidige commit is niet vast te stellen' };
-  if (gemeten.commit !== nu) {
-    return { vers: false, reden: 'gemeten op ' + gemeten.commit + ', de code staat op ' + nu };
+  if (gemeten.commit === nu) return { vers: true, reden: 'gemeten op de huidige commit (' + nu + ')' };
+
+  /* NIET "ANDERE COMMIT" MAAR "ANDERE CODE", en dat verschil is het verschil
+     tussen een bruikbare meter en een die altijd rood staat.
+
+     De eerste versie vergeleek de commit van de meting met HEAD. Dat klinkt
+     streng en het is onwerkbaar: zodra je de verse registers COMMIT, verspringt
+     HEAD en verklaart de meter zijn eigen meting van een minuut oud verouderd.
+     Vers was daarmee onbereikbaar -- een meter die nooit groen kan worden, meet
+     niets (LAT.md regel 9).
+
+     Wat telt is of er sinds de meting CODE is veranderd. Een commit die alleen
+     registers, documentatie of een tekstbestand aanraakt, maakt een meting niet
+     ongeldig. Een commit in server/, scripts/ of public/ wel. */
+  const gewijzigd = git(['diff', '--name-only', gemeten.commit + '..' + nu, '--',
+    'server', 'scripts', 'public']);
+  if (gewijzigd === '') {
+    /* Lege uitvoer betekent OOK "de vergelijking mislukte" (onbekende commit na
+       een rebase, of geen git). Daarom apart nagaan of de commit bestaat: een
+       mislukte vergelijking als "geen wijzigingen" lezen zou een meting van een
+       verdwenen commit vers noemen. */
+    const bestaat = git(['cat-file', '-e', gemeten.commit + '^{commit}']) === '' &&
+      git(['rev-parse', '--quiet', '--verify', gemeten.commit + '^{commit}']) !== '';
+    if (!bestaat) return { vers: false, reden: 'gemeten op commit ' + gemeten.commit + ', die hier niet meer bestaat' };
+    return { vers: true, reden: 'gemeten op ' + gemeten.commit + '; sindsdien is er geen code gewijzigd' };
   }
-  return { vers: true, reden: 'gemeten op de huidige commit (' + nu + ')' };
+  const n = gewijzigd.split('\n').filter(Boolean).length;
+  return { vers: false, reden: 'gemeten op ' + gemeten.commit + ', sindsdien zijn ' + n +
+    ' codebestand(en) gewijzigd' };
 }
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;

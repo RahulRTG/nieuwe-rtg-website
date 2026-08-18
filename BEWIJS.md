@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1020 bestanden en 6741 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1020 bestanden en 6742 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,12 +13,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1020 |
-| losse beweringen (`test(...)`) | 6741 |
+| losse beweringen (`test(...)`) | 6742 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 845 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 847 |
 | **overleefd**: geen mutatie kreeg hem rood | 22 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 21 |
+| alleen in de kop *genoemd*, nog niet gemeten | 19 |
 | niets van beide | 94 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-894 bestanden, 6513 beweringen.
+894 bestanden, 6514 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -446,7 +446,7 @@ toets omvalt.
 | `mediazaak.test.js` | 6 | gezakt op `liegpoort /api/` | MEDIA FOR BUSINESS -- de interne mediawereld van een organisatie. Het Podium had de LIVE-kant al (zone 'zaak': een town hall die alleen het eigen personeel ziet). |
 | `medicatie.test.js` | 11 | gezakt op `liegpoort /api/` | Het medicatieschema (kern/medicatie.js). De belofte is niet "RTG helpt met uw medicijnen" maar iets veel kleiners, en juist dat kleine wordt hier vastgezet: 1. |
 | `meet.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Meet: kamers op codenaam, de toegangsregels (open op code, besloten via de agenda-afspraak), het doorgeefluik voor WebRTC-seinen en de idempotente koppeling met RTG Agenda. |
-| `meetketen.test.js` | 5 | genoemd | DE MEETKETEN: STEMPEL, VERSHEID EN DE WACHT VOOR HET REGISTER. Drie dingen die deze sessie echt zijn misgegaan en die hier vastliggen: 1. |
+| `meetketen.test.js` | 6 | gezakt op `===->!==#0` | DE MEETKETEN: STEMPEL, VERSHEID EN DE WACHT VOOR HET REGISTER. Drie dingen die deze sessie echt zijn misgegaan en die hier vastliggen: 1. |
 | `memo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload, lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst. |
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
@@ -690,7 +690,7 @@ toets omvalt.
 | `saveduurzaam.test.js` | 11 | geen module gevonden | saveDuurzaam() -- de zware primitive, en de poort die hem schaars houdt. WAT HIER OP HET SPEL STAAT, en het is niet de techniek. |
 | `scanner.test.js` | 4 | gezakt op `>=->>#0` | RTG Scanner (public/shared/scanner.js): de camera-bediening. De camera zelf (getUserMedia, BarcodeDetector) bestaat niet in Node, dus we toetsen de pure, camera-onafhankelijke kern: de grijswaarde-omzetting die elk... |
 | `scannerpdf.test.js` | 3 | gezakt op `<=-><#0` | RTG Scanner: de eigen PDF-bouwer (public/apps/scanner/pdfje.js) is puur en draait ook in Node -- dus toetsen we hem zonder browser: een geldige PDF-structuur, een beeld per pagina, en een kloppende xref-verwijzing. |
-| `schakelaarsdekking.test.js` | 4 | genoemd | ELKE SCHAKELAAR SCHAKELT IETS, EN ELKE ROUTE WEET OF HIJ AAN STAAT. DE VRAAG DIE HIERONDER LIGT: welke routes bestaan wel maar zijn niet actief? |
+| `schakelaarsdekking.test.js` | 4 | gezakt op `===->!==#0` | ELKE SCHAKELAAR SCHAKELT IETS, EN ELKE ROUTE WEET OF HIJ AAN STAAT. DE VRAAG DIE HIERONDER LIGT: welke routes bestaan wel maar zijn niet actief? |
 | `schakelkast-dekking.test.js` | 6 | gezakt op `liegpoort /api/` | STAAT ELKE FUNCTIE VAN HET PLATFORM IN DE BOARDROOM? De schakelkast is niet zo compleet als haar knoppen, maar zo compleet als haar CATALOGUS. |
 | `scheiding.test.js` | 5 | gezakt op `liegpoort /api/` | SCHEIDING -- kan sessie A bij de gegevens van B? Dit is de test die hoort bij de meest voorkomende beveiligingsfout in een API met veel routes: authenticatie zonder autorisatie. |
 | `schermleugen.test.js` | 17 | gezakt op `&&->||#0` | DE DETECTOREN ACHTER DE LIEGENDE-BACKEND-SCHERMTOETS (scripts/lib/schermleugen.js). WAAROM DIT BESTAND BESTAAT, en het is geen formaliteit. |

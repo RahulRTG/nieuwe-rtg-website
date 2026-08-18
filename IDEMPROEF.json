@@ -1,4 +1,10 @@
 {
+ "stempel": {
+  "op": "2026-08-18T06:59:11.491Z",
+  "commit": "6426ea1",
+  "boomVuil": true,
+  "node": "v22.22.2"
+ },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "nietBeproefbaar": 737,
  "redenenNietBeproefbaar": [
@@ -43,14 +49,14 @@
    "aantal": 1
   }
  ],
- "routesGevonden": 4101,
+ "routesGevonden": 4103,
  "gemeten": {
-  "routesMetRol": 3364,
-  "beoordeeld": 120,
+  "routesMetRol": 3366,
+  "beoordeeld": 119,
   "beschermd": 14,
-  "onbeschermd": 106,
-  "ongemeten": 3244,
-  "oproepen": 10116,
+  "onbeschermd": 105,
+  "ongemeten": 3247,
+  "oproepen": 10122,
   "tokensHernieuwd": 24,
   "blindeRondes": 0,
   "begrenzing": 8000
@@ -17530,6 +17536,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/platformregister",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/podium",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -17855,6 +17873,18 @@
   {
    "methode": "POST",
    "pad": "/api/office/routedekking",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedossier",
    "rol": "office",
    "idempotentie": "ongemeten",
    "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
@@ -18192,8 +18222,8 @@
    "methode": "POST",
    "pad": "/api/office/stats",
    "rol": "office",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,

@@ -25,8 +25,8 @@ op telefoonformaat (390x844).
 
 Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het
-raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd, na het
-uitlopen van de animaties). `check.js` regel 49 doet het ondertitelregister.
+raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd; wie iets
+vindt, meet nog een keer). `check.js` regel 49 doet het ondertitelregister.
 
 ## De instellingen die een lid zelf zet
 

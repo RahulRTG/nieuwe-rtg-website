@@ -81,7 +81,7 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 | # | Wat | Waarom |
 |---|---|---|
 | 2.1 | `ERR_WEBHOOK_URL` zetten en beproeven | Nu is er geen EXTERNE alarmering: een storing zie je alleen als je zelf kijkt, en niet als de doos plat ligt |
-| 2.2 | `OFFICE_TOTP_SECRET` zetten | De backoffice heeft nu geen tweede factor, terwijl daar de pasbesluiten vallen |
+| ~~2.2~~ | ~~`OFFICE_TOTP_SECRET` zetten~~ **Deze regel klopte niet meer en stond hier te verouderen.** Het geheim is geen aanbeveling maar een BLOKKADE: `server/config/productie.js` weigert de productiestart zonder een base32-geheim van minstens 16 tekens, en `scripts/docker/controle.js` eist hem ook. Wat er nog wel te doen is, is het zetten -- maar dat merk je vanzelf, want de server start anders niet. Nagemeten op 18 augustus 2026 | Een aanbeveling die in werkelijkheid een blokkade is, leert de lezer dat deze lijst niet klopt |
 | 2.3 | `DATABASE_URL` (PostgreSQL) | Op SQLite kan er maar een instance zijn; het transactiegrootboek draait alleen in de sqlite- en postgres-stand |
 | 2.4 | `REDIS_URL` | Realtime werkt nu alleen binnen een proces |
 | 2.5 | Mail aanzetten: `SMTP_URL` (smarthost) **of** `MAIL_DIRECT=1` (eigen bezorging, zie `npm run eigenpost`) | Herstel-links en bevestigingen worden nu niet echt verstuurd. De verzendlaag is er wel helemaal -- eigen SMTP-client, eigen MX-bezorging, eigen DKIM -- maar zonder een van beide standen gaat alles naar de outbox. Voor de directe stand moeten drie dingen BUITEN de code kloppen: open poort 25 uit, kloppende PTR, en de DNS-records uit `npm run eigenpost` |
@@ -98,6 +98,8 @@ Geen blokkade, wel een risico dat je bewust moet nemen.
 | 3.2 | Rand-DDoS: DNS achter Cloudflare of gelijkwaardig met proxy aan; de app-WAF is de tweede linie |
 | 3.3 | **Een onafhankelijke pentest.** Eigen toetsen vervangen geen vreemde ogen, en dit huis toetst zichzelf streng genoeg om dat te weten |
 | 3.4 | Herstelproef draaien op de echte machine: `npm test -- test/herstelproef.test.js` zet een backup echt terug |
+| 3.5 | **Een releasesleutel maken en vastleggen.** `npm run imageherkomst:sleutel` geeft een Ed25519-paar: de private helft in het repository-secret `RTG_RELEASE_SIGN_KEY`, de publieke helft als `deploy/release-sleutel.pub` in een commit. Zolang dat niet is gebeurd maakt de release wel een stuklijst en een herkomstdocument, maar kan niemand ze verifieren -- en zegt de workflow dat hardop |
+| 3.6 | **Sigstore/cosign, als een inkoper daarom vraagt.** De herkomstlaag hier is een eigen Ed25519-handtekening: geen transparantielogboek, geen keyless-OIDC, geen derde die meekijkt. Dat is bewust (een cosign-binary in het releasepad is precies de afhankelijkheid die een stuklijst moet blootleggen), maar het is geen antwoord op een inkoopeis die letterlijk "cosign verify" zegt. Dit is dus een KEUZE die openstaat en geen vergeten werk |
 
 ## 4. Bekende defecten en open eindjes
 

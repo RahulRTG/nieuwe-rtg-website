@@ -131,6 +131,8 @@ Voor een datalek is er een eigen draaiboek met de 72-uursklok: `DATALEK.md`.
 | welke endpoints raakt niemand aan? | `npm run dekking` |
 | toegankelijkheid | `npm run a11y` |
 | klopt het gebouwde releasepakket nog byte voor byte? | `npm run release:controle` |
+| draait hier het image dat wij gebouwd hebben? | `npm run imageherkomst:controle -- --draait=<digest>` (zonder `--draait` toets je alleen de handtekening) |
+| wat zit er in dat image? | `.release/sbom.json` uit de release-run, of `npm run sbom -- --image=<verwijzing>` |
 | meten vanaf een andere machine | `node scripts/sonde.js https://jouwdomein --melden --token=...` |
 
 Na een wijziging aan de code horen `ARCHITECTUUR.md` en `BEWIJS.md` mee te

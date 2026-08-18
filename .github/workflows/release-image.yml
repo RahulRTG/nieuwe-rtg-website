@@ -48,3 +48,52 @@ jobs:
           docker build --pull --tag "$RTG_RELEASE_IMAGE" .
           docker push "$RTG_RELEASE_IMAGE"
           echo "Gepubliceerd: $RTG_RELEASE_IMAGE"
+
+      # ------------------------------------------------------------------
+      # DE HERKOMST. Hierboven staat WAT er gepubliceerd is; hieronder komt
+      # het antwoord op "waar komt dat vandaan en wat zit erin". Zonder deze
+      # stappen is de enige stuklijst van dit image de bronhash in
+      # release-bewijs.json, en die zegt niets over de ruim honderd
+      # deb-pakketten die uit node:22-slim meekomen. Zie scripts/imageherkomst.js
+      # voor waarom dit geen syft/cosign is.
+      # ------------------------------------------------------------------
+      - name: Het releasebewijs UIT het image halen (niet uit de werkboom)
+        run: |
+          mkdir -p .release
+          docker run --rm --entrypoint cat "$RTG_RELEASE_IMAGE" /app/release-bewijs.json > .release/release-bewijs.json
+          node -e "const b=require('./.release/release-bewijs.json');console.log('bron in image:',b.bestandAantal,'bestanden, SHA-256',b.inhoudSha256)"
+
+      - name: Stuklijst (SBOM) uit het gepubliceerde image
+        run: node scripts/imageherkomst.js --sbom --image="$RTG_RELEASE_IMAGE" --uit=.release/sbom.json --eis-image
+
+      - name: Herkomst binden aan het digest en tekenen
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: |
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_RELEASE_IMAGE" | cut -d@ -f2)"
+          test -n "$digest" || { echo "Geen RepoDigest: er is niets om aan te binden."; exit 1; }
+          node scripts/imageherkomst.js --binden --image="$RTG_RELEASE_IMAGE" --digest="$digest" \
+            --sbom=.release/sbom.json --uit=.release/herkomst.json
+
+      # Wie een publieke sleutel heeft vastgelegd, krijgt hier een harde
+      # controle op zijn eigen publicatie. Zolang die er niet is, mag deze
+      # stap niet stilzwijgend groen geven: dan staat er een luide
+      # waarschuwing in plaats van een vinkje.
+      - name: Controleer de eigen publicatie
+        if: hashFiles('deploy/release-sleutel.pub') != ''
+        run: node scripts/imageherkomst.js --controle --herkomst=.release/herkomst.json --sbom=.release/sbom.json
+
+      - name: Zeg het hardop als de release ongetekend is
+        if: hashFiles('deploy/release-sleutel.pub') == ''
+        run: |
+          echo "::warning title=Ongetekende release::deploy/release-sleutel.pub ontbreekt. De stuklijst en het herkomstdocument zijn gemaakt, maar niemand kan ze verifieren. Maak een sleutelpaar met 'npm run imageherkomst:sleutel', zet de private helft in het repository-secret RTG_RELEASE_SIGN_KEY en commit de publieke helft."
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: herkomst
+          path: |
+            .release/sbom.json
+            .release/herkomst.json
+            .release/release-bewijs.json
+          if-no-files-found: error
+          retention-days: 90

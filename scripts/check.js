@@ -3358,5 +3358,68 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   }
 }
 
+
+/* ============================================================================
+   50) DE RELEASE-WORKFLOW PUBLICEERT NIETS ZONDER STUKLIJST EN HERKOMST
+
+   WAT HIER ACHTER ZIT. Het releasebewijs (scripts/release-bewijs.js) hasht elke
+   bron in dit huis, en dat bewijs zit ook in het image. Maar een image is meer
+   dan deze repository: uit node:22-slim komen ruim honderd deb-pakketten mee die
+   wij niet schrijven en niet kiezen. Op de vraag "zit die kwetsbaarheid in wat
+   jullie draaien?" gaf een bronhash geen antwoord, en die vraag komt bij elke
+   doorlichting langs. scripts/imageherkomst.js maakt daarom een stuklijst UIT het
+   gepubliceerde image en bindt die met een handtekening aan het image-digest.
+
+   WAAROM DAT HIER EEN POORT NODIG HEEFT. Die stappen staan in een
+   workflow-bestand, en workflow-bestanden zijn de makkelijkste plek om iets uit
+   te zetten: een stap uitcommentarieren is een regel, en de publicatie gaat
+   daarna gewoon door. Groen, sneller, en niemand die het ziet -- tot een
+   inkoper om de stuklijst vraagt. Deze regel maakt van dat weglaten een rood
+   vinkje.
+
+   DE VOLGORDE DOET ERTOE, en dat is geen vormkwestie. Een stuklijst die VOOR de
+   publicatie wordt gemaakt beschrijft een image dat misschien niet is wat er
+   uiteindelijk gepusht is. Daarom eist deze regel dat --sbom NA de push staat.
+
+   WAT HIJ NIET KAN. Of de handtekening ooit gezet is, weet dit bestand niet:
+   dat hangt aan een secret in GitHub. Wel kan hij eisen dat de publieke sleutel,
+   als hij er staat, een echte Ed25519-sleutel is -- een verminkte plak tekst in
+   deploy/release-sleutel.pub zou anders pas opvallen op het moment dat iemand
+   een release probeert te verifieren. */
+console.log('\n50) de release-workflow publiceert niets zonder stuklijst en herkomst');
+{
+  const wfPad = path.join(ROOT, '.github/workflows/release-image.yml');
+  if (!fs.existsSync(wfPad)) fout('.github/workflows/release-image.yml bestaat niet meer');
+  else if (!fs.existsSync(path.join(ROOT, 'scripts/imageherkomst.js'))) fout('scripts/imageherkomst.js is weg, terwijl de workflow hem aanroept');
+  else {
+    const wf = fs.readFileSync(wfPad, 'utf8');
+    const na = (naald) => wf.indexOf(naald);
+    const push = na('docker push');
+    const sbom = na('imageherkomst.js --sbom');
+    const binden = na('imageherkomst.js --binden');
+    const controle = na('imageherkomst.js --controle');
+    const klachten = [];
+    if (push < 0) klachten.push('de workflow pusht geen image meer -- dan klopt deze regel niet meer bij wat hij bewaakt');
+    if (sbom < 0) klachten.push('er wordt geen stuklijst meer gemaakt (imageherkomst.js --sbom ontbreekt)');
+    else if (push >= 0 && sbom < push) klachten.push('de stuklijst wordt VOOR de push gemaakt; dan beschrijft hij niet wat er gepubliceerd is');
+    if (binden < 0) klachten.push('het image-digest wordt nergens aan de stuklijst gebonden (imageherkomst.js --binden ontbreekt)');
+    else if (sbom >= 0 && binden < sbom) klachten.push('er wordt gebonden voordat de stuklijst bestaat');
+    if (controle < 0) klachten.push('de workflow controleert zijn eigen publicatie niet (imageherkomst.js --controle ontbreekt)');
+    if (!/upload-artifact/.test(wf) || !/sbom\.json/.test(wf)) klachten.push('de stuklijst wordt niet bewaard: zonder upload blijft er na de run niets van over');
+    /* Een sleutel die er WEL staat maar geen sleutel is, is erger dan geen
+       sleutel: hij ziet eruit als een vertrouwensanker. */
+    const pubPad = path.join(ROOT, 'deploy/release-sleutel.pub');
+    if (fs.existsSync(pubPad)) {
+      try {
+        const sleutel = require('crypto').createPublicKey(fs.readFileSync(pubPad, 'utf8'));
+        if (sleutel.asymmetricKeyType !== 'ed25519') klachten.push('deploy/release-sleutel.pub is geen Ed25519-sleutel maar ' + sleutel.asymmetricKeyType);
+      } catch (e) { klachten.push('deploy/release-sleutel.pub is geen leesbare publieke sleutel: ' + e.message); }
+    }
+    if (klachten.length) klachten.forEach(fout);
+    else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
+      (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

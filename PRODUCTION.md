@@ -371,6 +371,21 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   piekcapaciteit per instance schaalt met de kernen van de machine;
   meer draden dan kernen levert niets op. Meer capaciteit = zwaardere
   machine of meer instances (vloot/trio).
+- **Herkomst van het image** — de release-workflow maakt na de push een
+  stuklijst (SBOM, CycloneDX 1.5) UIT het gepubliceerde image en bindt die met
+  een Ed25519-handtekening aan het image-digest, het releasebewijs en de commit
+  (`scripts/imageherkomst.js`). Waarom dat nodig was naast `release-bewijs.json`:
+  dat bewijs hasht de BRON van dit huis, maar een image is meer dan deze
+  repository -- uit `node:22-slim` komen ruim honderd deb-pakketten mee die wij
+  niet schrijven. Op "zit die kwetsbaarheid in wat jullie draaien?" gaf een
+  bronhash geen antwoord. Controleren op de machine:
+  `npm run imageherkomst:controle -- --draait=<digest van wat er draait>`; zonder
+  dat laatste toets je alleen de handtekening en niet wat er staat te draaien.
+  **Twee eerlijke grenzen.** (1) Dit is geen Sigstore: geen transparantielogboek,
+  geen keyless-OIDC, geen derde die meekijkt -- wie sigstore-verificatie eist
+  krijgt dat hier niet (`TAKEN.md` 3.5). (2) Zolang `deploy/release-sleutel.pub`
+  niet bestaat, worden stuklijst en herkomstdocument wel gemaakt maar is er
+  niets te verifieren; de workflow zegt dat dan hardop als waarschuwing.
 - **Graceful shutdown** — `SIGTERM`/`SIGINT` schrijven data weg en sluiten netjes.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).

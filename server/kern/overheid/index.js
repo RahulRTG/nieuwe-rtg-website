@@ -53,7 +53,7 @@ const WATERMELD = { verontreiniging: 'Verontreiniging/lozing', wateroverlast: 'W
 const WATER_STATUS = ['nieuw', 'in behandeling', 'opgelost', 'afgewezen'];
 
 function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
-  bankLive, bankBoek, bankSaldo }) {
+  bankLive, bankBoek, bankSaldo, lidstandVan }) {
   const nu = () => new Date().toISOString();
   const jaar = () => new Date().getFullYear();
   const id = () => crypto.randomBytes(4).toString('hex');
@@ -127,6 +127,10 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
        eerder stilletjes verdwenen, en dan is de hele betaalweg dood zonder dat
        iets klaagt. */
     bankLive, bankBoek, bankSaldo,
+    /* De ledenstand (trede, leeftijd, herkomst van die leeftijd) voor de
+       stempoort in ./bestuur.js. Komt van buiten binnen omdat deze laag de
+       kluis niet kent en ook niet hoort te kennen. */
+    lidstandVan,
     IB, TOESLAGEN, UITKERINGEN, RECHTSVORMEN, SUBSIDIES, WATERHEFFINGEN, WATERMELD, WATER_STATUS
   };
 

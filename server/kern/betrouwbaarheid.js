@@ -72,4 +72,35 @@ function voldoet(niveau, minimum) {
 
 const bestaat = id => OP_ID.has(String(id));
 
-module.exports = { NIVEAUS, niveauVan, voldoet, bestaat };
+/* WAAR EEN GEBOORTEDATUM VANDAAN KOMT. Een lid typt hem zelf bij de aanmelding;
+   pas als de keurder hem van het document overneemt, staat er 'paspoort'
+   (routes/office/verificaties.js). Dat onderscheid staat hier omdat er inmiddels
+   twee lagen op afgaan -- wat RTG iD aan een dienst vertelt, en wie er mag
+   stemmen -- en twee kopieen van dezelfde vergelijking lopen uiteen zodra er een
+   derde bron bij komt. */
+const bronVan = md => ((md || {}).geborenBron === 'paspoort' ? 'paspoort' : 'opgegeven');
+
+/* De STAND van een ledensleutel: trede, leeftijd en waar die leeftijd op rust.
+
+   Dit is de vorm die een poort nodig heeft. Een niveau alleen is niet genoeg
+   voor een vraag als "mag deze mens stemmen": daar telt ook hoe oud iemand is
+   en of dat uit een document komt. Alle drie in een antwoord, uit een lezing
+   van de kluis, zodat een poort ze niet elk apart hoeft op te halen en ze niet
+   uit elkaar kunnen lopen. */
+function maakLidstand({ accounts, leeftijdVan, idVanKey }) {
+  return function lidstandVan(key) {
+    const id = idVanKey(key);
+    let u = null;
+    try { u = id == null ? null : accounts.getUserById(id); } catch (e) { u = null; }
+    let md = {};
+    try { md = u ? (accounts.getMemberState(u.id) || {}) : {}; } catch (e) { md = {}; }
+    return {
+      account: !!u,
+      niveau: niveauVan({ account: u, verified: u && u.verified, faceMatch: md.faceMatch }),
+      leeftijd: md.geboren ? leeftijdVan(md.geboren) : null,
+      leeftijdBron: bronVan(md)
+    };
+  };
+}
+
+module.exports = { NIVEAUS, niveauVan, voldoet, bestaat, bronVan, maakLidstand };

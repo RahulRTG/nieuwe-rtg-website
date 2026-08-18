@@ -28,7 +28,7 @@
 
 'use strict';
 
-const { niveauVan } = require('./betrouwbaarheid');
+const { niveauVan, bronVan } = require('./betrouwbaarheid');
 
 module.exports = (ctx) => {
   const { accounts, accountVanKey, codenaamUit, leeftijdVan } = ctx;
@@ -55,7 +55,7 @@ module.exports = (ctx) => {
     /* De herkomst reist alleen mee als er ook echt iets over leeftijd wordt
        gedeeld; anders krijgt een dienst die om een codenaam vraagt een veld
        over de leeftijd terug dat hij niet heeft gevraagd. */
-    const leeftijdBron = md.geborenBron === 'paspoort' ? 'paspoort' : 'opgegeven';
+    const leeftijdBron = bronVan(md);
     for (const a of gevraagd) {
       if (a === 'codenaam') uit.codenaam = codenaamUit(key);
       else if (a === '18plus') { uit['18plus'] = lft != null ? lft >= 18 : null; uit.leeftijdBron = leeftijdBron; }

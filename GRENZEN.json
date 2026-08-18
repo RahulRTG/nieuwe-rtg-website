@@ -475,6 +475,7 @@
       "geldPasprijzen",
       "hardware",
       "ideeen",
+      "invoer",
       "magnaatLeren",
       "mail",
       "mall",
@@ -485,6 +486,7 @@
       "redactie",
       "reisaanbod",
       "reisbureau",
+      "reisuitnodiging",
       "stad",
       "studio",
       "stuur",
@@ -1302,9 +1304,16 @@
       "werkvormen"
     ],
     "reis": [
+      "invoer",
+      "liveCodename",
+      "mijnReizen",
       "reisLanden",
+      "reisoplosser",
+      "reisuitnodiging",
+      "reiswacht",
       "reiswereld",
-      "reiswijzer"
+      "reiswijzer",
+      "tooManyTries"
     ],
     "rtfbieb": [
       "bibliothecaris",

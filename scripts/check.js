@@ -1841,6 +1841,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
     ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
     ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
+    /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
+       dat is de hele opzet van de reisuitnodiging. Het slot is de code zelf
+       (128 bits uit crypto.randomBytes); wat er zonder opeisen te zien is,
+       is bewust mager (bestemming, periode, hoeveel onderdelen) zodat een
+       doorgestuurde link geen boekingsnummers lekt. Opeisen kan alleen mét
+       sessie. Zie de kop van server/kern/reisuitnodiging.js. */
+    ['/api/reis/uitnodiging/open', 'een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)'],
     ['/api/talen', 'de talenlijst voedt de kiezer op het inlogscherm'],
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],

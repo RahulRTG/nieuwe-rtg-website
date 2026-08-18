@@ -82,6 +82,40 @@
   </div>
   <div id="komend"><p class="stil">Laden...</p></div>
 
+  <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
+       aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
+       gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
+       niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
+       en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
+  <div class="regkop"><h2>De reiswacht</h2></div>
+  <div id="wacht"><p class="stil">Laden...</p></div>
+
+  <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
+       anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
+       LEEST en zet klaar, de mens BEVESTIGT. Wat er gelezen is staat er met
+       zoveel woorden bij -- waaruit, en hoe zeker -- want een extractie die
+       zichzelf in een reisplan zet, zet daar vroeg of laat een verkeerde datum
+       in. -->
+  <div class="regkop"><h2>Zelf iets toevoegen</h2><span class="tel" id="invTel"></span></div>
+  <div class="rtg-groep" id="invoer">
+    <p class="rtg-uitleg">Ergens anders geboekt? Plak de bevestiging of kies het bestand. RTG leest eruit
+      wat het zeker weet, bewaart het origineel in uw eigen kluis, en zet het pas bij uw reizen
+      nadat u het heeft nagekeken.</p>
+    <label class="rtg-label" for="invTekst">De tekst van uw bevestiging, of de strook van een boardingpass</label>
+    <textarea class="rtg-veld" id="invTekst" rows="3" maxlength="20000"
+      placeholder="Plak hier de e-mail, de voucher of de M1-strook van uw instapkaart"></textarea>
+    <div class="rtg-acties" style="margin-top:.7rem;align-items:center;">
+      <input type="file" id="invBestand" hidden accept=".txt,.pdf,image/*,text/plain,application/pdf">
+      <button class="rtg-knop" id="invKies" type="button">Kies een bestand</button>
+      <span class="rtg-sub" id="invBestandNaam"></span>
+      <button class="rtg-knop vol" id="invLees" type="button">Lees voor</button>
+    </div>
+    <div id="invUit" aria-live="polite"></div>
+    <div id="invMijn"></div>
+    <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
+      <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
+  </div>
+
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
 </main>
@@ -139,13 +173,19 @@
      is de normale gang van zaken; dat als alarm tonen is loos alarm, en loos
      alarm leert mensen de stand te negeren op de dag dat hij wel klopt. Het
      staat er dus als cijfer, en het kleurt het woord niet. */
-  function tekenStand(d) {
+  function tekenStand(d, aantalReizen) {
     const t = d.telling || {};
+    /* HET EERSTE CIJFER TELT REIZEN EN GEEN REGELS. Hier stond `t.komend`, en
+       dat is het aantal ONDERDELEN: een vlucht, een hotel en een aanvraag naar
+       Dubai lazen als "3 reizen gepland" terwijl het er één is. Sinds De Reis
+       bestaat (kern/reizen.js) is dat gewoon te tellen, en dan hoort het label
+       ook te kloppen. */
+    const n = aantalReizen == null ? (t.komend || 0) : aantalReizen;
     RTGCanvas.stand('#stand', {
       app: 'RTG Reizen',
       stand: d.stand,
       cijfers: [
-        [t.komend || 0, t.komend === 1 ? 'reis gepland' : 'reizen gepland'],
+        [n, n === 1 ? 'reis gepland' : 'reizen gepland'],
         [t.aandacht || 0, 'vraagt actie'],
         [t.wachtend || 0, 'wacht op bevestiging']
       ]
@@ -225,15 +265,60 @@
     })));
   }
 
-  function teken(d) {
-    tekenStand(d);
+  /* Het venster van een reis in mensentaal: 12-19 okt, 30 sep - 3 okt, of een
+     enkele dag. Geen jaartal zolang alles binnen hetzelfde venster valt -- dat
+     is ruis in een regel die over volgende maand gaat. */
+  function vensterTekst(v) {
+    const a = dagdeel(v.van), b = dagdeel(v.tot);
+    if (v.van === v.tot) return a.nr + ' ' + a.mnd;
+    return a.mnd === b.mnd ? a.nr + '-' + b.nr + ' ' + b.mnd
+      : a.nr + ' ' + a.mnd + ' - ' + b.nr + ' ' + b.mnd;
+  }
 
-    const alles = d.komend || [];
+  /* De kop van een reis. `grond` staat er alleen bij als er iets uit te leggen
+     valt -- bij één onderdeel is dat een zin over niets, en dan is het ruis
+     (ONTWERP.md: uitzonderingsgestuurd). */
+  function reisKop(r) {
+    const n = r.telling.onderdelen;
+    /* NODIG EEN REISGENOOT UIT. De knop staat bij de reis en niet ergens in een
+       menu: je nodigt iemand uit VOOR IETS. Wat er gedeeld wordt zijn de regels
+       van deze reis -- geen bewijsstukken, geen kenmerk van uw kluis. */
+    return '<div class="regkop"><h2>' + esc(r.bestemming) + ' &middot; ' + esc(vensterTekst(r.venster)) + '</h2>' +
+      '<span class="tel">' + n + (n === 1 ? ' onderdeel' : ' onderdelen') + '</span>' +
+      '<button class="rtg-knop" type="button" data-nodig="' + esc(r.id) + '" style="margin-left:.6rem;">Nodig een reisgenoot uit</button>' +
+      '</div>' +
+      (n > 1 ? '<p class="stil">' + esc(r.grond) + '</p>' : '') +
+      '<div class="stil" data-uitnodiging="' + esc(r.id) + '"></div>';
+  }
+
+  let REIZEN = [];
+  function teken(d) {
+    const reizen = REIZEN = d.reizen || [];
+    const losseDelen = (d.los || []).map(x => x.onderdeel);
+    const alles = reizen.reduce((a, r) => a.concat(r.onderdelen), []).concat(losseDelen);
+
+    tekenStand(d, reizen.length);
     tekenVandaag(alles);
+
     // wat op de tijdlijn staat, staat niet nog eens in het register
-    const r = alles.filter(x => !opDeKlok(x));
-    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' reis' : ' reizen') : '';
-    $('#komend').innerHTML = r.length ? r.map(reisRegel).join('')
+    const blokken = [];
+    for (const r of reizen) {
+      const rij = r.onderdelen.filter(x => !opDeKlok(x));
+      if (rij.length) blokken.push(reisKop(r) + rij.map(reisRegel).join(''));
+    }
+    /* WAT RTG NIET KON PLAATSEN, en met opzet niet weggelaten. Een onderdeel
+       stil in de eerst passende reis duwen zou er beter uitzien en zou liegen;
+       het hier apart zetten is het eerlijke alternatief (kern/reizen.js). */
+    const losRest = losseDelen.filter(x => !opDeKlok(x));
+    if (losRest.length) blokken.push(
+      '<div class="regkop"><h2>Nog niet bij een reis geplaatst</h2>' +
+      '<span class="tel">' + losRest.length + '</span></div>' +
+      '<p class="stil">Van deze onderdelen weet RTG niet zeker bij welke reis ze horen. ' +
+      'Ze staan daarom apart, en niet bij de verkeerde.</p>' +
+      losRest.map(reisRegel).join(''));
+
+    $('#tel').textContent = reizen.length ? reizen.length + (reizen.length === 1 ? ' reis' : ' reizen') : '';
+    $('#komend').innerHTML = blokken.length ? blokken.join('')
       /* Twee soorten leeg, en ze betekenen niet hetzelfde: vertrekt alles wat
          er is vandaag, dan is "er staat niets gepland" onwaar -- het staat drie
          centimeter hoger. */
@@ -242,6 +327,7 @@
         : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
           'verschijnt het hier vanzelf.</p>');
 
+    $('#komend').querySelectorAll('[data-nodig]').forEach(b => b.addEventListener('click', () => nodigUit(b)));
     $('#komend').querySelectorAll('.rtg-ref').forEach(b => b.addEventListener('click', async (e) => {
       e.preventDefault(); e.stopPropagation();
       try { await navigator.clipboard.writeText(b.dataset.ref); const t = b.textContent;
@@ -288,13 +374,17 @@
     });
   })();
 
-  (async function laad() {
+  async function laad() {
     /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
        onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets
        aan de hand', en dat is de enige uitkomst die hij nooit mag suggereren. */
     tekenStand({});
     try {
-      const res = await fetch('/api/reis/wereld', {
+      /* DE REIS en niet het losse register (REIZEN.md fase 1): dit scherm
+         toont reizen, en de stand en telling van de wereld reizen mee in
+         hetzelfde antwoord -- een tweede aanroep zou dezelfde domeinen nog een
+         keer laten lezen voor dezelfde vraag. */
+      const res = await fetch('/api/reis/reizen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
         body: '{}'
@@ -307,7 +397,252 @@
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
       $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
     }
-  })();
+  }
+  laad();
+
+  /* DE REISWACHT. Drie stukken, in deze volgorde: de signalen (alleen die),
+     de rustzin als er niets is, en ALTIJD de bronnenregel eronder -- ook de
+     bronnen die stilvielen of niet bestaan. Die volgorde is het ontwerp: wie
+     "alles rustig" leest, hoort in dezelfde oogopslag te zien met hoeveel ogen
+     er gekeken is. */
+  async function laadWacht() {
+    const el = $('#wacht');
+    let d;
+    try {
+      const res = await fetch('/api/reis/wacht', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'De reiswacht gaf geen antwoord.');
+    } catch (e) {
+      /* De wacht die stuk is, is STUK -- geen leeg vak dat als rust leest. */
+      el.innerHTML = '<p class="stil">' + esc(e.message) + ' Dit betekent niet dat er niets speelt.</p>';
+      return;
+    }
+    const TEKEN = { incident: '!', aandacht: '\u25B3' };
+    const blokken = [];
+    for (const r of (d.reizen || [])) {
+      if (!r.signalen.length) continue;
+      blokken.push('<div class="rtg-rij" style="flex-direction:column;align-items:stretch;gap:.3rem;">' +
+        '<span class="rtg-naam" style="display:flex;align-items:center;gap:.6rem;">' + esc(r.bestemming) +
+          '<button class="rtg-knop" type="button" data-los="' + esc(r.id) + '" style="margin-left:auto;">Los het op</button></span>' +
+        r.signalen.map((s) => '<span class="rtg-sub" style="color:' +
+          (s.ernst === 'incident' ? 'var(--rtg-acc)' : 'var(--rtg-txt)') + ';">' +
+          TEKEN[s.ernst] + ' ' + esc(s.tekst) + '</span>' +
+          '<span class="rtg-sub">Bron: ' + esc(s.bron) + ' &middot; ' + esc(s.grond) + '</span>').join('') +
+        '<span data-losuit="' + esc(r.id) + '"></span>' +
+        '</div>');
+    }
+    if ((d.stil || []).length) blokken.push('<p class="stil">Let op: de bron' +
+      (d.stil.length === 1 ? '' : 'nen') + ' ' + d.stil.map(esc).join(', ') +
+      ' deed' + (d.stil.length === 1 ? '' : 'en') + ' niet mee. Dit beeld is onvolledig.</p>');
+    const rust = blokken.length ? '' :
+      '<p class="stil">Er speelt op dit moment niets rond uw reizen.</p>';
+    const bronnen = (d.bronnen || []).map((b) =>
+      '<span class="rtg-sub"' + (b.stand !== 'gemeten' ? ' style="color:var(--rtg-soft);"' : '') + '>' +
+      (b.stand === 'gemeten' ? '\u25CF' : b.stand === 'stil' ? '\u25CB' : '\u2014') + ' ' +
+      esc(b.naam) + (b.stand === 'gemeten' ? '' : ': ' + esc(b.uitleg)) + '</span>').join('<br>');
+    el.innerHTML = rust + blokken.join('') +
+      '<p class="stil" style="margin-top:.7rem;">' + esc(d.uitleg || '') + '</p>' +
+      '<div style="margin-top:.4rem;line-height:1.7;">' + bronnen + '</div>';
+    el.querySelectorAll('[data-los]').forEach((b) => b.addEventListener('click', () => losOp(b)));
+  }
+  laadWacht();
+
+  /* DE OPLOSSER (REIZEN.md fase 5). De knop haalt voorstellen op en voert
+     NIETS uit; alleen een taak-voorstel heeft een eigen knop, en die zet na
+     een klik een taak in de eigen agenda. Alternatieven zijn verwijzingen
+     naar het domein -- boeken en betalen gebeurt daar. De grens komt uit het
+     antwoord van de server mee en staat erbij. */
+  async function losOp(knop) {
+    const vak = $('#wacht').querySelector('[data-losuit="' + knop.dataset.los + '"]');
+    if (!vak) return;
+    knop.disabled = true;
+    vak.innerHTML = '<span class="rtg-sub">Kijken wat er kan...</span>';
+    let d;
+    try {
+      d = await fetch('/api/reis/los', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: JSON.stringify({ reisId: knop.dataset.los })
+      }).then(async (r) => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
+    } catch (e) { vak.innerHTML = '<span class="rtg-sub">' + esc(e.message) + '</span>'; knop.disabled = false; return; }
+    vak.innerHTML = d.blokken.map((b) => b.voorstellen.map((v) => {
+      if (v.soort === 'taak') return '<span class="rtg-sub" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">' +
+        '<button class="rtg-knop" type="button" data-doe="' + esc(v.id) + '" data-reis="' + esc(knop.dataset.los) + '">' + esc(v.tekst) + '</button>' +
+        '<span>' + esc(v.uitleg || '') + '</span></span>';
+      if (v.soort === 'alternatief') return '<span class="rtg-sub">&rarr; <a href="' + esc(v.link) + '">' + esc(v.tekst) + '</a>' +
+        (v.kosten ? ' &middot; \u20ac ' + esc(String(v.kosten.bedrag)) + ' p.p.' : '') + ' &middot; ' + esc(v.uitleg || '') + '</span>';
+      if (v.soort === 'nakijken') return '<span class="rtg-sub">&rarr; <a href="' + esc(v.link) + '">' + esc(v.tekst) + '</a></span>';
+      return '<span class="rtg-sub">' + esc(v.tekst) + '</span>';
+    }).join('')).join('') +
+    '<span class="rtg-sub" style="color:var(--rtg-soft);">' + esc(d.grens || '') + '</span>';
+    vak.querySelectorAll('[data-doe]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r = await fetch('/api/reis/los/doe', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+          body: JSON.stringify({ reisId: b.dataset.reis, voorstel: b.dataset.doe })
+        }).then(async (x) => { const j = await x.json().catch(() => ({})); if (!x.ok) throw new Error(j.error || 'Er ging iets mis.'); return j; });
+        b.outerHTML = '<span class="rtg-sub">' + (r.al ? 'Deze taak stond al in uw agenda.' : 'De taak staat in uw agenda.') +
+          ' <a href="' + esc(r.link) + '">Naar de agenda</a></span>';
+        laadWacht();
+      } catch (e) { b.disabled = false; b.textContent = e.message; }
+    }));
+  }
+
+  /* Een reisgenoot uitnodigen: de regels van deze reis gaan mee, en verder
+     niets. De link is een sleutel -- hij staat er daarom uitgeschreven bij, met
+     een knop om hem te kopieren, en het scherm zegt erbij dat de ontvanger zich
+     eerst legitimeert. Versturen doet u zelf; RTG mailt hier niemand. */
+  async function nodigUit(knop) {
+    const reis = REIZEN.find(x => x.id === knop.dataset.nodig);
+    const vak = $('#komend').querySelector('[data-uitnodiging="' + knop.dataset.nodig + '"]');
+    if (!reis || !vak) return;
+    knop.disabled = true;
+    vak.textContent = 'Klaarzetten...';
+    try {
+      const d = await api('uitnodiging/nodig-uit', { onderdelen: reis.onderdelen.map((o) => ({
+        soort: o.soort, titel: o.titel, bestemming: o.bestemming, van: o.van, tot: o.tot, kenmerk: o.kenmerk
+      })) });
+      const link = location.origin + d.link;
+      vak.innerHTML = '<span>Stuur deze link naar uw reisgenoot. Hij ziet alleen waar en wanneer; ' +
+        'de reis komt pas bij hem te staan nadat hij zich heeft gelegitimeerd.</span>' +
+        '<span style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem;flex-wrap:wrap;">' +
+        '<input class="rtg-veld" readonly value="' + esc(link) + '" style="flex:1 1 18rem;font-size:.8rem;">' +
+        '<button class="rtg-knop" type="button" id="kopie-' + esc(reis.id) + '">Kopieer</button></span>';
+      const kb = vak.querySelector('button');
+      kb.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(link); kb.textContent = 'gekopieerd'; } catch (err) {}
+      });
+    } catch (e) { vak.textContent = e.message; knop.disabled = false; }
+  }
+
+  /* ---------- DE INVOERBALIE ----------
+
+     Twee knoppen, en het verschil ertussen is het hele ontwerp: "Lees voor"
+     maakt een VOORSTEL en verandert niets aan uw reizen; pas "Voeg toe" maakt
+     er een onderdeel van. Wat de lezer eruit haalde staat er per veld bij --
+     waaruit, en hoe zeker -- en wat onder de drempel bleef staat als na te
+     kijken gemarkeerd in plaats van als gegeven gepresenteerd.
+
+     De zekerheden komen van de server en gaan er nooit heen: dit scherm stuurt
+     alleen wat een mens intikt. */
+  const api = (pad, body) => fetch('/api/reis/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+    body: JSON.stringify(body || {})
+  }).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+  const VELDNAAM = { soort: 'Soort', titel: 'Naam', bestemming: 'Bestemming', van_datum: 'Van',
+    tot_datum: 'Tot', kenmerk: 'Kenmerk', vlucht: 'Vlucht', van: 'Vertrek vanaf', naar: 'Aankomst op',
+    reiziger: 'Reiziger', stoel: 'Stoel' };
+  let BESTAND = null, VOORSTEL = null, DREMPEL = 0.85;
+
+  $('#invKies').addEventListener('click', () => $('#invBestand').click());
+  $('#invBestand').addEventListener('change', () => {
+    const f = $('#invBestand').files[0];
+    if (!f) { BESTAND = null; $('#invBestandNaam').textContent = ''; return; }
+    const lezer = new FileReader();
+    lezer.onload = () => { BESTAND = { naam: f.name, dataUrl: String(lezer.result) };
+      $('#invBestandNaam').textContent = f.name; };
+    lezer.onerror = () => { BESTAND = null; $('#invBestandNaam').textContent = 'Dat bestand kon niet gelezen worden.'; };
+    lezer.readAsDataURL(f);
+  });
+
+  $('#invLees').addEventListener('click', async () => {
+    const knop = $('#invLees');
+    knop.disabled = true;
+    $('#invUit').innerHTML = '<p class="stil">Lezen...</p>';
+    try {
+      const d = await api('invoer/lees', Object.assign({ tekst: $('#invTekst').value }, BESTAND || {}));
+      VOORSTEL = d.voorstel; DREMPEL = d.drempel || DREMPEL;
+      tekenVoorstel(d);
+    } catch (e) { $('#invUit').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+    knop.disabled = false;
+  });
+
+  /* Het voorstel: eerst WAT ER GELEZEN IS met de onderbouwing, daarna pas de
+     velden om aan te vullen. Die volgorde is met opzet -- wie eerst een
+     ingevuld formulier ziet, leest de herkomst niet meer. */
+  function tekenVoorstel(d) {
+    const v = d.voorstel, velden = v.velden || {};
+    const namen = Object.keys(velden);
+    const gelezen = namen.length ? namen.map((n) => {
+      const f = velden[n];
+      const onzeker = f.zekerheid < DREMPEL;
+      return '<div class="rtg-rij"><span class="rtg-tekst">' +
+        '<span class="rtg-naam">' + esc(VELDNAAM[n] || n) + ': ' + esc(String(f.waarde)) +
+        (onzeker ? ' <span style="color:var(--rtg-acc);">&middot; na te kijken</span>' : '') + '</span>' +
+        '<span class="rtg-sub">' + esc(f.uitleg) + '</span></span></div>';
+    }).join('') : '<p class="rtg-leeg">Wij konden er niets uit lezen. Het origineel is bewaard; vul de gegevens zelf in.</p>';
+
+    const w = (n) => (velden[n] || {}).waarde || '';
+    const soorten = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'tafel', 'evenement', 'spoor'];
+    $('#invUit').innerHTML =
+      '<h2 style="margin-top:1rem;">Wat wij eruit lezen</h2>' +
+      '<p class="rtg-uitleg">' + esc(d.opmerking || '') + '</p>' + gelezen +
+      '<h2 style="margin-top:1rem;">Nakijken en aanvullen</h2>' +
+      '<div class="rtg-rij" style="gap:.6rem;flex-wrap:wrap;">' +
+        veldje('bTitel', 'Naam', w('titel') || w('vlucht') || w('kenmerk')) +
+        '<span style="flex:1 1 8rem;"><label class="rtg-label" for="bSoort">Soort</label>' +
+        '<select class="rtg-veld" id="bSoort">' + soorten.map((x) =>
+          '<option value="' + x + '"' + (w('soort') === x ? ' selected' : '') + '>' + x + '</option>').join('') +
+        '</select></span>' +
+        veldje('bBestemming', 'Bestemming', w('bestemming')) +
+        veldje('bVan', 'Van (jjjj-mm-dd)', w('van_datum')) +
+        veldje('bTot', 'Tot (leeg mag)', w('tot_datum')) +
+      '</div>' +
+      '<div class="rtg-acties" style="margin-top:.8rem;">' +
+        '<button class="rtg-knop vol" id="invVoegToe" type="button">Voeg toe aan mijn reizen</button>' +
+        '<span class="rtg-sub">Pas hierna staat het bij uw reizen.</span>' +
+      '</div>';
+    $('#invVoegToe').addEventListener('click', voegToe);
+  }
+  function veldje(id, label, waarde) {
+    return '<span style="flex:1 1 9rem;"><label class="rtg-label" for="' + id + '">' + esc(label) + '</label>' +
+      '<input class="rtg-veld" id="' + id + '" value="' + esc(waarde || '') + '" maxlength="120"></span>';
+  }
+
+  async function voegToe() {
+    if (!VOORSTEL) return;
+    const knop = $('#invVoegToe');
+    knop.disabled = true;
+    try {
+      await api('invoer/bevestig', { id: VOORSTEL.id, velden: {
+        titel: $('#bTitel').value, soort: $('#bSoort').value, bestemming: $('#bBestemming').value,
+        van_datum: $('#bVan').value, tot_datum: $('#bTot').value
+      } });
+      VOORSTEL = null; BESTAND = null;
+      $('#invTekst').value = ''; $('#invBestandNaam').textContent = '';
+      $('#invBestand').value = '';
+      $('#invUit').innerHTML = '<p class="stil">Toegevoegd. Het staat nu bij uw reizen hierboven.</p>';
+      laad(); laadMijnInvoer(); laadWacht();
+    } catch (e) { $('#invUit').innerHTML += '<p class="stil">' + esc(e.message) + '</p>'; knop.disabled = false; }
+  }
+
+  /* Wat u zelf invoerde, met een knop om het weer weg te halen. Die knop hoort
+     erbij: wie zijn reis hier onderbrengt, moet hem er ook uit kunnen halen --
+     het bewijsstuk blijft daarbij gewoon in zijn eigen kluis staan. */
+  async function laadMijnInvoer() {
+    let d; try { d = await api('invoer/mijn'); } catch (e) { return; }
+    const rij = d.onderdelen || [];
+    $('#invTel').textContent = rij.length ? rij.length + (rij.length === 1 ? ' toegevoegd' : ' toegevoegd') : '';
+    $('#invMijn').innerHTML = !rij.length ? '' :
+      '<h2 style="margin-top:1rem;">Door u toegevoegd</h2>' + rij.map((x) =>
+        '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(x.titel) +
+          (x.bestemming ? ' &middot; ' + esc(x.bestemming) : '') + '</span>' +
+          '<span class="rtg-sub">' + esc(x.van) + (x.tot ? ' t/m ' + esc(x.tot) : '') +
+          ' &middot; ' + esc(x.status === 'tecontroleren' ? 'nog na te kijken' : 'ingelezen') +
+          ' &middot; uit ' + esc(x.herkomst) + '</span></span>' +
+          '<button class="rtg-knop" type="button" data-weg="' + esc(x.id) + '">Weghalen</button></div>').join('');
+    $('#invMijn').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('invoer/weg', { id: b.dataset.weg }); laad(); laadMijnInvoer(); laadWacht(); }
+      catch (e) { b.disabled = false; }
+    }));
+  }
+  laadMijnInvoer();
 })();
 </script>
 <script src="/shared/deelmenu.js" defer></script>

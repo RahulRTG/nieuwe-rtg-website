@@ -52,10 +52,9 @@ module.exports = (kern) => {
     catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
-  /* De reisbalie -- het aanbod samenstellen en de aanvragen van leden
-     afhandelen -- staat in ./reizen.js. Die twee stonden los: de aanvragen
-     hier, het aanbod nergens (er was geen schrijver voor db.data.partnerTrips).
-     Nu ze allebei bestaan horen ze in één kamer. */
+  // het reisbureau (aanvragen, het besluit, en de klaargezette reizen): ./reisbureau.js
+  require('./reisbureau')({ app, officeAuth, veilig, stuur, afdelingen, kern });
+
   /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
      WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
      de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van

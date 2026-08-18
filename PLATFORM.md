@@ -117,8 +117,12 @@ kiest dat werkwoord bewust en schrijft het op voordat hij begint.
 
 De diepte-documenten per wereld: **GELD.md** (financieel besturingssysteem,
 fase 1 af), **LEVEN.md** (RTFoundation als Life OS, de grenzen van een
-platform dat bij de geboorte begint) en **LIFE.md** (RTG Sociaal als Life OS:
-het leven tússen mensen, met het levensmoment als ingang in plaats van de app).
+platform dat bij de geboorte begint), **LIFE.md** (RTG Sociaal als Life OS:
+het leven tússen mensen, met het levensmoment als ingang in plaats van de app)
+en **REIZEN.md** (RTG Reizen als Travel OS: ook de reis beheren die RTG niet
+verkocht heeft, met soort en herkomst als twee verschillende dingen). Het
+werkwoord van die vierde: **vóór zijn** -- opmerken en klaarzetten voordat de
+reiziger het merkt, en uitvoeren alleen waar het domein dat al mocht.
 
 **Een open beslissing over deze kaart.** De eigenaar heeft op 11 augustus 2026
 een tweede indeling in acht genoemd — Life, Business, Money, Mobility,

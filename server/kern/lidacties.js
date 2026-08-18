@@ -38,6 +38,12 @@ function koopTicketVoor(session, body) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < new Date().toISOString().slice(0, 10))
     return { status: 400, error: 'Kies een datum vanaf vandaag.' };
   if (!(act.tijden || []).includes(tijd)) return { status: 400, error: 'Kies een tijdslot van deze activiteit.' };
+  /* De sluitdag van de zaak (kern/activiteitendicht.js): een gesloten dag is
+     niet vol maar DICHT, en dat verschil hoort de gast te lezen -- "vol" nodigt
+     uit tot een ander slot op dezelfde dag, "gesloten" niet. */
+  const dicht = require('./activiteitendicht').dichtOp(s, datum, act.id);
+  if (dicht) return { status: 409, error: s.name + ' is op ' + datum + ' gesloten' +
+    (dicht.reden ? ' (' + dicht.reden + ')' : '') + '. Kies een andere dag.' };
   const personen = Math.min(10, Math.max(1, parseInt(body.personen, 10) || 1));
   const bezet = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
   if (bezet + personen > act.capaciteit)

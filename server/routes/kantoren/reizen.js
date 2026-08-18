@@ -26,19 +26,8 @@ module.exports = (ctx) => {
   app.post('/api/office/reisaanbod/weg', officeAuth, (req, res) =>
     veilig(res, () => kern.reisaanbod.reisAanbodWeg(String((req.body || {}).id || ''), wie(req))));
 
-  /* ---- de aanvragen: het besluit van de reisadviseur ----
-     Dat besluit ontbrak ooit: een aanvraag kon binnenkomen maar nooit ergens
-     anders terechtkomen, dus een reis kwam nooit rond en het dossier van het
-     lid bleef leeg. Bevestigen zet de reis in dat dossier op bevestigd,
-     afwijzen haalt hem eruit (kern/lid/reisdossier.js). */
-  app.post('/api/office/reisbureau', officeAuth, (req, res) =>
-    veilig(res, () => kern.reisbureau.aanvragen()));
-  app.post('/api/office/reisbureau/bevestig', officeAuth, (req, res) =>
-    veilig(res, () => kern.reisbureau.bevestig(String((req.body || {}).ref || ''), (req.body || {}).door)));
-  app.post('/api/office/reisbureau/afwijzen', officeAuth, async (req, res) => {
-    try {
-      const r = await kern.reisbureau.wijsAf(String((req.body || {}).ref || ''), (req.body || {}).door, (req.body || {}).reden);
-      r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-    } catch (e) { console.error('[reisbureau]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-  });
+  /* Het BESLUIT over een aanvraag staat niet hier maar in ./reisbureau.js,
+     samen met de klaargezette reizen. Reden: daar komt WIE besliste uit de
+     sessie in plaats van uit de body, en dat is het verschil tussen een spoor
+     en een ingevuld veld. Deze kamer gaat over het aanbod. */
 };

@@ -293,6 +293,42 @@
         <span class="stil" id="kKantineStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
     </div>
+    <!-- de reisbalie: alleen in de kamer 'reisbureau' -->
+    <div class="kaart" id="kReisbureau" hidden>
+      <h4 style="margin:0 0 .4rem;">Aanvragen bevestigen</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
+      <div id="kReisOpen"><div class="leeg">Laden...</div></div>
+
+      <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">
+        Plak de bevestigingen van de klant, zet de onderdelen erbij en u krijgt een link. Wie die link opent
+        kan lid worden en de reis overnemen. Er wordt hierbij <b>niets over de klant bewaard</b> -- geen naam,
+        geen e-mailadres, geen telefoonnummer, en geen bestanden. U stuurt de link zelf.</p>
+      <textarea id="kKlaarTekst" rows="3" maxlength="20000" placeholder="Plak hier een bevestiging, voucher of boardingpass-strook"
+        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <button class="knop stil" id="kKlaarLees" type="button">Lees voor</button>
+        <span class="stil" id="kKlaarGelezen" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+      <div class="taakrij" style="margin-top:.5rem;flex-wrap:wrap;">
+        <input class="veld" id="kKlaarTitel" style="flex:2 1 10rem;" placeholder="Naam (bijv. Casa Ibiza)" maxlength="120">
+        <select class="veld" id="kKlaarSoort" style="flex:1 1 7rem;">
+          <option>verblijf</option><option>vlucht</option><option>vervoer</option><option>transfer</option>
+          <option>activiteit</option><option>tafel</option><option>evenement</option><option>spoor</option>
+        </select>
+        <input class="veld" id="kKlaarPlaats" style="flex:1 1 7rem;" placeholder="Bestemming" maxlength="80">
+        <input class="veld" id="kKlaarVan" style="flex:1 1 7rem;" placeholder="van (jjjj-mm-dd)" maxlength="10">
+        <input class="veld" id="kKlaarTot" style="flex:1 1 7rem;" placeholder="tot (mag leeg)" maxlength="10">
+        <button class="knop stil" id="kKlaarErbij" type="button">Zet erbij</button>
+      </div>
+      <div id="kKlaarLijst" style="margin-top:.5rem;"></div>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <button class="knop" id="kKlaarZet" type="button">Zet de reis klaar</button>
+      </div>
+      <div id="kKlaarUit" style="margin-top:.5rem;" aria-live="polite"></div>
+      <h4 style="margin:1.2rem 0 .4rem;">Klaargezette reizen</h4>
+      <div id="kKlaarStaat"><div class="leeg">Laden...</div></div>
+    </div>
     <div class="kaart" id="kZelfzorg" hidden>
       <h4 style="margin:0 0 .4rem;">De zelfzorg van het platform</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
@@ -1157,6 +1193,16 @@ async function openKamer(id){
   // de identiteitskluis alleen voor kamers die klanten bij naam moeten kennen
   $('#kKluis').hidden = !d.naamInzage;
   $('#kKluisUit').textContent = '';
+  // de reisbalie: hier wordt een aanvraag pas een toezegging
+  $('#kReisbureau').hidden = (id !== 'reisbureau');
+  if (id === 'reisbureau') {
+    laadReisbalie();
+    /* De knoppen een KEER bedraden. Twee keer dezelfde luisteraar erop zetten
+       levert twee klaargezette reizen per klik op -- en die tweede staat dan
+       met een geldige link in de wereld zonder dat iemand hem bedoeld heeft. */
+    if (!KLAAR_BEDRAAD) { KLAAR_BEDRAAD = true; bedraadKlaarzetten(); }
+    tekenKlaarLijst(); laadKlaargezet();
+  }
   // de kantine mag de kaart van vandaag zetten
   $('#kKantine').hidden = (id !== 'kantine');
   if (id === 'kantine') api('kantine/menu').then(r => {
@@ -1173,6 +1219,128 @@ async function openKamer(id){
   // en elke afdeling heeft haar eigen huis
   $('#kHotel').hidden = false;
   laadAfdHotel(id, d.naam);
+}
+
+/* DE REISBALIE. De aanvragen staan op codenaam; de echte naam haalt u zo nodig
+   uit de identiteitskluis hierboven, en die opvraging komt in het auditlog.
+   Bevestigen en afwijzen lopen allebei over /api/office/reisbureau/besluit --
+   een knop die alleen maar 'bevestigd' meestuurt zou een typefout in een
+   toezegging veranderen, dus de stand staat op de knop en de server keurt hem. */
+async function laadReisbalie(){
+  const el = $('#kReisOpen');
+  el.innerHTML = '<div class="leeg">Laden...</div>';
+  let d; try { d = await api('reisbureau'); } catch(e){ el.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
+  if (!open.length){ el.innerHTML = '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>'; return; }
+  el.innerHTML = open.map(a =>
+    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+      '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
+      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
+        esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
+        ' · '+esc(a.codename||'lid')+(a.prijs ? ' · \u20ac '+esc(String(a.prijs.totaal)) : '')+
+        (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>'+
+      '<div class="taakrij">'+
+        '<input class="veld" style="flex:1;" maxlength="300" data-bericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
+        '<button class="knop" type="button" data-besluit="bevestigd" data-ref="'+esc(a.ref)+'">Bevestig</button>'+
+        '<button class="knop stil" type="button" data-besluit="afgewezen" data-ref="'+esc(a.ref)+'">Wijs af</button>'+
+      '</div>'+
+    '</div>').join('');
+  el.querySelectorAll('button[data-besluit]').forEach(b => b.addEventListener('click', async () => {
+    const veld = el.querySelector('input[data-bericht="'+b.dataset.ref+'"]');
+    b.disabled = true;
+    try {
+      await api('reisbureau/besluit', { ref: b.dataset.ref, besluit: b.dataset.besluit, bericht: veld ? veld.value : '' });
+      meld(b.dataset.besluit === 'bevestigd' ? 'Bevestigd. Het lid ziet het meteen staan.' : 'Afgewezen, met uw reden erbij.');
+      openKamer('reisbureau');
+    } catch(e){ b.disabled = false; meld(e.message); }
+  }));
+}
+
+/* EEN REIS KLAARZETTEN VOOR EEN KLANT DIE NOG GEEN LID IS.
+
+   De onderdelen worden hier opgebouwd en pas bij "Zet de reis klaar" verstuurd.
+   Er gaat NIETS over de klant mee: dit scherm vraagt niet naar een naam, een
+   e-mailadres of een telefoonnummer, en het stuurt ook niets. De medewerker
+   krijgt een link en verstuurt die zelf -- wat er niet gevraagd wordt, kan ook
+   niet bewaard worden (kern/reisuitnodiging.js). */
+let KLAAR = [], KLAAR_BEDRAAD = false;
+function tekenKlaarLijst(){
+  $('#kKlaarLijst').innerHTML = KLAAR.length
+    ? '<ul>' + KLAAR.map((o, i) => '<li>' + esc(o.soort) + ': ' + esc(o.titel) +
+        (o.bestemming ? ' (' + esc(o.bestemming) + ')' : '') + ' &middot; ' + esc(o.van) +
+        (o.tot ? ' t/m ' + esc(o.tot) : '') +
+        ' <button class="knop stil" type="button" data-af="' + i + '" style="padding:.15rem .5rem;">weg</button></li>').join('') + '</ul>'
+    : '<div class="leeg">Nog geen onderdelen.</div>';
+  $('#kKlaarLijst').querySelectorAll('[data-af]').forEach(b => b.addEventListener('click', () => {
+    KLAAR.splice(Number(b.dataset.af), 1); tekenKlaarLijst();
+  }));
+}
+async function laadKlaargezet(){
+  try {
+    const d = await api('reisbureau/uitnodigingen');
+    const rij = (d.uitnodigingen || []).filter(x => x.soort === 'klaargezet');
+    $('#kKlaarStaat').innerHTML = rij.length ? rij.map(x =>
+      '<div class="lijst" style="border-top:1px solid var(--line);padding:.5rem 0;">' +
+        '<div style="font-size:.86rem;">' + esc(x.bestemming || 'zonder bestemming') + ' &middot; ' +
+          esc(x.venster.van) + ' t/m ' + esc(x.venster.tot) + ' &middot; ' + x.aantal + ' onderdelen</div>' +
+        '<div class="stil" style="font-size:.76rem;color:var(--soft);">' +
+          (x.opgeeist ? 'overgenomen door de klant' : x.ingetrokken ? 'ingetrokken' : 'geldig tot ' + esc(x.geldigTot)) + '</div>' +
+        (x.opgeeist || x.ingetrokken ? '' :
+          '<div class="taakrij" style="margin-top:.3rem;">' +
+          '<input class="veld" readonly style="flex:1;font-size:.76rem;" value="' + esc(location.origin + x.link) + '">' +
+          '<button class="knop stil" type="button" data-kopie="' + esc(location.origin + x.link) + '">Kopieer</button>' +
+          '<button class="knop stil" type="button" data-introk="' + esc(x.id) + '">Trek in</button></div>') +
+      '</div>').join('') : '<div class="leeg">Er staat niets klaar.</div>';
+    $('#kKlaarStaat').querySelectorAll('[data-kopie]').forEach(b => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.kopie); meld('Link gekopieerd.'); } catch (e) {}
+    }));
+    $('#kKlaarStaat').querySelectorAll('[data-introk]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('reisbureau/uitnodiging-weg', { id: b.dataset.introk }); laadKlaargezet(); }
+      catch (e) { meld(e.message); b.disabled = false; }
+    }));
+  } catch (e) { $('#kKlaarStaat').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+}
+function bedraadKlaarzetten(){
+  $('#kKlaarLees').addEventListener('click', async () => {
+    $('#kKlaarGelezen').textContent = 'Lezen...';
+    try {
+      const d = await api('reisbureau/lees', { tekst: $('#kKlaarTekst').value });
+      const v = d.gelezen.velden || {};
+      const w = (n) => (v[n] || {}).waarde || '';
+      if (w('titel') || w('vlucht') || w('kenmerk')) $('#kKlaarTitel').value = w('titel') || w('vlucht') || w('kenmerk');
+      if (w('soort')) $('#kKlaarSoort').value = w('soort');
+      if (w('bestemming')) $('#kKlaarPlaats').value = w('bestemming');
+      if (w('van_datum')) $('#kKlaarVan').value = w('van_datum');
+      if (w('tot_datum')) $('#kKlaarTot').value = w('tot_datum');
+      const onzeker = d.gelezen.onzeker || [];
+      $('#kKlaarGelezen').textContent = 'Gelezen uit ' + (d.gelezen.hoe === 'bcbp' ? 'de boardingpass-strook' : 'de tekst') +
+        (onzeker.length ? ' -- kijk na: ' + onzeker.join(', ') : ' -- alles eenduidig');
+    } catch (e) { $('#kKlaarGelezen').textContent = e.message; }
+  });
+  $('#kKlaarErbij').addEventListener('click', () => {
+    const o = { soort: $('#kKlaarSoort').value, titel: $('#kKlaarTitel').value.trim(),
+      bestemming: $('#kKlaarPlaats').value.trim(), van: $('#kKlaarVan').value.trim(), tot: $('#kKlaarTot').value.trim() };
+    if (!o.titel || !/^\d{4}-\d{2}-\d{2}$/.test(o.van)) { meld('Een onderdeel heeft een naam en een datum nodig.'); return; }
+    KLAAR.push(o); tekenKlaarLijst();
+    $('#kKlaarTekst').value = ''; $('#kKlaarTitel').value = ''; $('#kKlaarVan').value = ''; $('#kKlaarTot').value = '';
+    $('#kKlaarGelezen').textContent = '';
+  });
+  $('#kKlaarZet').addEventListener('click', async () => {
+    if (!KLAAR.length) { meld('Zet eerst een onderdeel erbij.'); return; }
+    try {
+      const d = await api('reisbureau/klaarzetten', { onderdelen: KLAAR });
+      const link = location.origin + d.link;
+      KLAAR = []; tekenKlaarLijst();
+      $('#kKlaarUit').innerHTML = '<div class="stil" style="font-size:.8rem;">De reis staat klaar. Stuur deze link naar de klant:</div>' +
+        '<div class="taakrij" style="margin-top:.3rem;"><input class="veld" readonly style="flex:1;font-size:.78rem;" value="' + esc(link) + '">' +
+        '<button class="knop stil" type="button" id="kKlaarKopie">Kopieer</button></div>';
+      $('#kKlaarKopie').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(link); meld('Link gekopieerd.'); } catch (e) {}
+      });
+      laadKlaargezet();
+    } catch (e) { meld(e.message); }
+  });
 }
 
 function geld(centen){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format((Number(centen)||0)/100); }

@@ -3356,6 +3356,48 @@ eerste aanroep een 500 omdat het domein `reis` `kern.reiswereld` niet in
 `GRENZEN.json` had staan. Dat is geen hindernis maar de bedoeling — een domein
 dat verder reikt dan het opschrijft, hoort te stuiten.
 
+### De reisbalie: het kantoor achter het reisbureau
+
+Het RTG-reisbureau (`server/kern/reisbureau.js` + `/apps/reisbureau.html`) verkocht
+al: leden bladeren door de samengestelde reizen tegen de nettoprijs en vragen er
+een aan. Boven in die module stond de belofte dat een aanvraag *"aangevraagd"
+heet tot een mens hem bevestigt* — en die mens bestond niet. `boek()` zette de
+stand op `aangevraagd`, het lid kon hem zelf intrekken, en verder kon niemand er
+iets aan doen. De rest van het huis rekende er ondertussen wél op: de reisagenda
+toont alleen `aangevraagd` en `bevestigd` (`kern/ervaring/leden/spaarpot.js`) en
+de reiswereld heeft voor `bevestigd` en `afgewezen` allang een teken en een
+signaal klaarliggen (`kern/reiswereld.js`). Er was een openstaand endpoint
+(`/api/office/reisbureau`), maar geen kamer, geen scherm en geen knop.
+
+Die kamer is er nu: **Reisbureau**, de zesentwintigste kamer van het RTG-kantoor
+(`kern/afdelingen/register2/reisbalie.js`, zichtbaar op `/apps/kantoren.html?kamer=reisbureau`).
+Ze telt wat er open staat en wat er langer dan twee dagen ligt, en de balie
+eronder bevestigt of wijst af via `/api/office/reisbureau/besluit`.
+
+Vier dingen die daarbij vastliggen:
+
+1. **Wie beslist komt uit de sessie, niet uit het verzoek.** Dezelfde reden als
+   bij de identiteitskluis: een naam die de aanvrager zelf invult is geen naam.
+   Wie op de gedeelde kantoorcode binnenkwam, staat er ook zo bij.
+2. **Afwijzen kan alleen met een reden**, want die reden leest het lid.
+   Bevestigen mag zonder bericht: de bevestiging *is* het bericht.
+3. **Het lid ziet het besluit, niet de medewerker.** `mijn()` geeft de stand, het
+   tijdstip en het bericht terug — de interne sleutel van wie besloot blijft in
+   het kantoor.
+4. **Een besluit valt maar één keer**, en het gaat het kantoor-auditlog in: een
+   toezegging aan een lid hoort navraagbaar te zijn.
+
+Aan de ledenkant blijft een aanvraag nu ook in beeld ná het besluit. Zolang
+`/apps/reisbureau.html` alleen open aanvragen toonde, verdween een reis uit
+"Mijn aanvragen" op het moment dat de adviseur hem bevestigde — precies het
+bericht waar je op wacht.
+
+Getoetst met `test/reisbureau.test.js` (toets 7 t/m 9: de balie is dicht zonder
+kantoor-inlog, het besluit landt bij het lid zonder de medewerker mee te sturen,
+een tweede besluit ketst af en afwijzen zonder reden verandert niets) en
+`test/reisbalie.e2e.js` (het scherm liegt niet: de knop raakt alleen zijn eigen
+aanvraag, en een geweigerde afwijzing laat de regel gewoon staan).
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails. Alles wat het huis ECHT verlaat krijgt naast de boeking een **betaalopdracht** (`kern/betaalopdracht/`, voor de bank bedraad in `kern/bank/uitgang.js`): die wordt vastgelegd voordat de rail wordt gebeld, wordt bij een mislukking opnieuw ingediend met dezelfde idempotentiesleutel, en boekt het geld terug als de rail hem blijft weigeren. Het openstaande bedrag staat als **reconciliatie** naast de sluitcontrole in `/api/office/bank/gezond` (`railOpenCenten`) -- twee verschillende metingen, want een grootboek kan perfect sluiten terwijl er geen euro is aangekomen. De provider-webhook sluit een opdracht ook echt af: `payout.paid` zet hem op AFGEWIKKELD, `payout.failed`/`payout.canceled` boeken het geld terug -- de mislukte payout is daar het belangrijke geval, want dan staat het geld van de klant af zonder aan te komen. Alle drie de uitgangen delen die rij -- de bank-SEPA, de partneruitbetaling van RTG Pay en de 30%-afdracht van het fonds -- zodat `railOpenCenten` het getal van het hele huis is en niet van een van de drie. De teruggang blijft per rail, want elk boekt in zijn eigen grootboek terug; een soort zonder geregistreerde teruggang wordt geweigerd in plaats van geraden.

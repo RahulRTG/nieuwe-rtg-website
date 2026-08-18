@@ -690,6 +690,13 @@ async function misbruikBeproeving(tok) {
   }
 
   // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
+  /* DE SESSIE DIE BLEEF. Voor de storm losgaat een set tokens munten die er
+     NIET aan meedoet: de storm logt zijn eigen tokens uit (via /api/logout) en
+     de noodrem-ladder zet daarna de inlogpaden tien minuten dicht -- opnieuw
+     inloggen is dan by design onmogelijk. De belofte van die ladder is juist
+     dat een BESTAANDE sessie niets merkt; deze tokens zijn die bestaande
+     sessie, en E2/E3 vallen erop terug als vers inloggen niet kan. */
+  const sessieVanVoorDeStorm = await tokens();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];
@@ -864,6 +871,17 @@ async function misbruikBeproeving(tok) {
      altijd 401 opleveren en nooit iets over herstel zeggen. */
   const versTok = await tokens();
   if (versTok.member && versTok.member.length) tokVoor.member = versTok.member;
+  /* Kon een rol niet vers inloggen (de inlogpauze van de noodrem-ladder doet
+     precies dat), dan meet de rest van deze fase met de sessie van voor de
+     storm -- de gebruiker die volgens de ladder niets hoort te merken. */
+  let viaBewaardeSessie = false;
+  for (const rol of ['member', 'supplier', 'office']) {
+    if ((!versTok[rol] || !versTok[rol].length) && sessieVanVoorDeStorm[rol] && sessieVanVoorDeStorm[rol].length) {
+      tokVoor[rol] = sessieVanVoorDeStorm[rol];
+      viaBewaardeSessie = true;
+    }
+  }
+  if (viaBewaardeSessie) rij('  meetsessie', 'vers inloggen kon niet (inlogpauze); gemeten met de sessie van voor de storm -- de ladderbelofte zelf');
   const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
   async function gewoneAanroep() {
     const st = await verzoek('POST', '/api/state', gewoonToken(), {});

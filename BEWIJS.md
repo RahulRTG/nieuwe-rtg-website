@@ -15,8 +15,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1016 |
 | losse beweringen (`test(...)`) | 6710 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 848 |
-| **overleefd**: geen mutatie kreeg hem rood | 14 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 851 |
+| **overleefd**: geen mutatie kreeg hem rood | 11 |
 | niet te meten (al rood, geen module gevonden, ...) | 40 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
 | niets van beide | 95 |
@@ -161,7 +161,7 @@ toets omvalt.
 | `collegachat.test.js` | 2 | gezakt op `liegpoort /api/` | De interne lijn tussen collega's: het directe chatbericht (1-op-1, met ongelezen-tellers) en de interne call (signalering; alleen ingeklokte collega's zijn belbaar). Draai los: node --experimental-sqlite --test... |
 | `comm-actor.test.js` | 12 | gezakt op `false->true#0` | Het actormodel van de communicatiekern (server/kern/comm/wie.js). WAAROM DIT DE TOETS IS DIE VOOR DE CODE UIT GING. |
 | `comm-collega.test.js` | 8 | gezakt op `===->!==#0` | De verhuizing van de collegaberichten naar de communicatiekern (server/kern/comm/collega.js). DE TWEEDE VOORRAAD DIE OVERGAAT, en de eerste die dat kan doordat een deelnemer niet meer per se een lid is... |
-| `comm-deelnemer.test.js` | 10 | overleefd | Wat een deelnemer met een gesprek doet nadat het bericht er staat (server/kern/comm/deelnemer.js). DIT WAS EEN GAT, en het viel pas op toen de kern werd opgeknipt. |
+| `comm-deelnemer.test.js` | 10 | gezakt op `===->!==#0` | Wat een deelnemer met een gesprek doet nadat het bericht er staat (server/kern/comm/deelnemer.js). DIT WAS EEN GAT, en het viel pas op toen de kern werd opgeknipt. |
 | `comm-dm.test.js` | 6 | gezakt op `===->!==#0` | De verhuizing van de priveberichten naar de communicatiekern (server/kern/comm/dm.js). WAAROM DIT EEN EIGEN TOETS HEEFT. |
 | `comm-gast.test.js` | 12 | gezakt op `===->!==#0` | De verhuizing van het gastcontact naar de communicatiekern (server/kern/comm/gast.js). DE DERDE VOORRAAD, en de eerste waarin een LID en een ZAAK in hetzelfde gesprek zitten. |
 | `comm-vergeten.test.js` | 6 | gezakt op `===->!==#0` | Het wisrecht op de gesprekken van de communicatiekern (server/kern/vergeten/gesprekken.js). WAAROM DEZE TOETS ER IS, en waarom hij er niet was. |
@@ -172,7 +172,7 @@ toets omvalt.
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
 | `commandlagen.test.js` | 10 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
-| `concern.test.js` | 14 | overleefd | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
+| `concern.test.js` | 14 | gezakt op `===->!==#0` | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
 | `consent-dekking.test.js` | 3 | geen bronmutatie mogelijk | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
 | `consent.test.js` | 6 | gezakt op `liegpoort /api/` | Het Consent Center (kern/consent.js). De belofte van dit scherm is "wie raakt mijn gegevens aan, en hier zet u het stop", en die belofte heeft twee helften die allebei kunnen breken: 1. |
 | `contact.test.js` | 6 | gezakt op `liegpoort /api/` | Nooit meer vreemden: zodra een lid echt in contact komt met een partner (hier: een bezorgaanvraag) opent er automatisch een open chatlijn. Beide kanten zien die lijn, de partner mag vooraf de Salon van het lid... |
@@ -777,7 +777,7 @@ toets omvalt.
 | `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
 | `stijlbundel.test.js` | 11 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | gezakt op `liegpoort /api/` | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |
-| `stillepost.test.js` | 2 | overleefd | Post die nergens heen kan, moet je kunnen zien. WAT ER MIS WAS. |
+| `stillepost.test.js` | 2 | gezakt op `&&->||#6` | Post die nergens heen kan, moet je kunnen zien. WAT ER MIS WAS. |
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |
 | `strenge-poort.test.js` | 2 | overleefd | De strenge poort bewaakt de hele suite: een geslaagde test mag de server nooit een uncaughtException of unhandledRejection laten loggen. Deze test bewaakt de BEWAKER zelf: dat de detectie klopt (crashes wel,... |
 | `stripe-eigen.test.js` | 4 | gezakt op `===->!==#0` | De eigen Stripe-client (server/stripe.js) i.p.v. het pakket 'stripe'. |

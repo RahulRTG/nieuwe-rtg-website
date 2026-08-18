@@ -905,12 +905,11 @@
     },
     "comm-deelnemer.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/comm/index.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/comm/deelnemer.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 2
     },
     "comm-dm.test.js": {
       "soort": "puur",
@@ -987,12 +986,11 @@
     },
     "concern.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/concern/index.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/concern/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 14,
+      "geprobeerd": 1
     },
     "consent-dekking.test.js": {
       "soort": "puur",
@@ -5396,12 +5394,11 @@
     },
     "stillepost.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/mail.js"
-      ],
-      "geprobeerd": 6,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/mail.js",
+      "operator": "&&->||#6",
+      "gezakt": 1,
+      "geprobeerd": 16
     },
     "streng-poorten.test.js": {
       "soort": "server",

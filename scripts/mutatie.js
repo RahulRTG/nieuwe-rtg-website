@@ -387,6 +387,18 @@ const EIGEN_MODULE = new Map([
      meteen op codenaam vindbaar maakt, ook voordat de INSERT geland is -- woont
      in ./ledengids.js. */
   ['ledengids-race.test.js', ['server/db/ledengids.js']],
+  /* Zelfde vorm nog eens: server/kern/concern/index.js is de orkestrator van
+     negentien bestanden en 2522 regels. De drie beweringen van concern.test.js
+     wonen elders -- de bronplicht bij een juridisch gegeven in ./bron.js, de
+     tijdmachine (een feit wordt nooit overschreven) in ./tijd.js, en de
+     bestuurderswissel in ./verandering.js en ./entiteit.js. */
+  ['concern.test.js', ['server/kern/concern/bron.js', 'server/kern/concern/tijd.js',
+    'server/kern/concern/verandering.js', 'server/kern/concern/entiteit.js']],
+  /* En nog eens: server/kern/comm/index.js voegt negentien bestanden samen.
+     comm-deelnemer.test.js gaat over het correctievenster, over wie er aan een
+     bericht mag komen en over intrekken -- dat woont in ./deelnemer.js en
+     ./bericht.js. */
+  ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/bericht.js']],
   /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
      is sinds de samenvoeging een schil van dertig regels: twee paden, twee
      namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet

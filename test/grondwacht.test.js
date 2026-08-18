@@ -388,3 +388,24 @@ test('triage: een verlopend certificaat is TLS, ook als de reizen nog slagen', (
   assert.equal(u.laag, 'tls', 'vooraankondiging hoort bij de TLS-laag, niet bij een route');
   assert.equal(u.terugrollen, false, 'een oude versie draagt hetzelfde certificaat');
 });
+
+/* De scanner die de opmaak eruit haalt is lineair en met de hand geschreven;
+   dan horen de randen er expliciet in. De laatste toets is de reden dat hij
+   bestaat: een sluittag met attributen (</script foo="bar">) glipte door het
+   oude regex-patroon heen, en zoiets is precies waar half werkende filtering
+   en een instabiele vingerafdruk beginnen. */
+test('wetwacht: de scanner haalt script, style, commentaar en tags weg', () => {
+  assert.equal(wetwacht.zonderOpmaak('<p>a</p><script>x=1</script>b<style>.c{}</style><!-- weg -->d').replace(/\s+/g, ' ').trim(), 'a b d');
+});
+
+test('wetwacht: hoofdletters en attributen in de tag maken niet uit', () => {
+  assert.equal(wetwacht.zonderOpmaak('<SCRIPT type="text/javascript">gevaar()</SCRIPT>tekst').trim(), 'tekst');
+});
+
+test('wetwacht: een nooit gesloten script eet niet de hele wereld maar stopt netjes', () => {
+  assert.equal(wetwacht.zonderOpmaak('voor<script>open blijft open').trim(), 'voor');
+});
+
+test('wetwacht: een sluittag met attributen sluit ook', () => {
+  assert.equal(wetwacht.zonderOpmaak('<script>x</script data-a="b">na').trim(), 'na');
+});

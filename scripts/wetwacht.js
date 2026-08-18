@@ -45,13 +45,54 @@ const REGISTER = path.join(WORTEL, 'WETBRONNEN.json');
 
 /* Alles eruit wat verandert zonder dat de wet verandert. Zonder deze stap
    slaat de wacht elke week uit op een sessie-id of een datum in de voettekst,
-   en een wacht die altijd piept wordt uitgezet. */
+   en een wacht die altijd piept wordt uitgezet.
+
+   De opmaak gaat er met een LINEAIRE scanner uit, niet met regex. De eerste
+   versie deed dit met /<script[\s\S]*?<\/script>/-achtige patronen over de
+   rauwe, van buiten opgehaalde HTML; CodeQL merkte dat terecht aan -- zulke
+   paar-patronen op andermans invoer zijn de klassieke weg naar polynomiale
+   looptijd en half werkende filtering. Een scanner die elk teken één keer
+   ziet heeft geen van beide problemen, en de bedoeling hier is toch geen
+   sanitatie maar een stabiele vingerafdruk. De kleine patronen verderop
+   (entiteiten, datums, hexsleutels) draaien op de al ontdane tekst en zijn
+   allemaal lineair. */
+function zonderOpmaak(html) {
+  const t = String(html);
+  const kleiner = t.toLowerCase();
+  let uit = '';
+  let i = 0;
+  while (i < t.length) {
+    if (t[i] !== '<') { uit += t[i]; i++; continue; }
+    // commentaar: <!-- ... -->
+    if (kleiner.startsWith('<!--', i)) {
+      const eind = kleiner.indexOf('-->', i + 4);
+      i = eind < 0 ? t.length : eind + 3;
+      uit += ' ';
+      continue;
+    }
+    // script/style: de hele inhoud overslaan tot en met de sluittag
+    let overgeslagen = false;
+    for (const tag of ['script', 'style']) {
+      if (kleiner.startsWith('<' + tag, i)) {
+        const sluit = kleiner.indexOf('</' + tag, i);
+        const eind = sluit < 0 ? -1 : kleiner.indexOf('>', sluit);
+        i = eind < 0 ? t.length : eind + 1;
+        uit += ' ';
+        overgeslagen = true;
+        break;
+      }
+    }
+    if (overgeslagen) continue;
+    // een gewone tag: tot de eerstvolgende >
+    const eind = kleiner.indexOf('>', i);
+    i = eind < 0 ? t.length : eind + 1;
+    uit += ' ';
+  }
+  return uit;
+}
+
 function normaliseer(html) {
-  return String(html)
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
+  return zonderOpmaak(html)
     .replace(/&[a-z]+;|&#\d+;/gi, ' ')
     .replace(/\d{1,2}[-/]\d{1,2}[-/]\d{4}/g, ' ')            // datums in de opmaak
     .replace(/\b[0-9a-f]{16,}\b/gi, ' ')                      // sessie- en cache-sleutels
@@ -194,4 +235,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { normaliseer, afdruk, vergelijk, meet, leesRegister, toon, slotcode };
+module.exports = { normaliseer, zonderOpmaak, afdruk, vergelijk, meet, leesRegister, toon, slotcode };

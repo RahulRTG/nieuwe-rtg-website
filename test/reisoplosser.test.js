@@ -41,8 +41,8 @@ function oplosserMet({ signalen, onderdelen, catalogus, bord, agendaRij }) {
     signalen: signalen || [], gereed: !(signalen || []).length };
   const kern = {
     reiswacht: { wacht: () => ({ ok: true, reizen: [reis], stil: [] }) },
-    reizen: { mijn: () => ({ ok: true, reizen: [{ id: 'R-x', bestemming: 'Dubai',
-      venster: reis.venster, onderdelen: onderdelen || [] }], los: [] }) },
+    mijnReizen: () => ({ ok: true, reizen: [{ id: 'R-x', bestemming: 'Dubai',
+      venster: reis.venster, onderdelen: onderdelen || [] }], los: [] }),
     reisbureau: { reizen: () => catalogus || [] },
     lucht: { bord: () => ({ vluchten: bord || [] }) },
     agenda: { lijst: () => rij, voegToe: async (eig, t) => { rij.push({ ...t, id: 't' + rij.length }); return { ok: true, item: rij[rij.length - 1] }; } },

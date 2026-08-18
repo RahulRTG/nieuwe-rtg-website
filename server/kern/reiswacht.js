@@ -104,7 +104,7 @@ module.exports.maakReiswacht = ({ kern }) => {
     const bronnen = [];
 
     const w = meet('reizen', 'uw reizen, uit de reisdomeinen zelf',
-      () => kern.reizen.mijn(key), bronnen);
+      () => kern.mijnReizen(key), bronnen);
     if (!w) {
       /* Zonder De Reis is er niets om tegenaan te leggen. Dan is de wacht niet
          "rustig" maar STUK, en dat is de enige eerlijke uitkomst hier. */

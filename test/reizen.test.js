@@ -45,7 +45,7 @@ function reizenMet(over) {
     findSupplier: () => null
   }, over || {});
   Object.assign(kern, maakReiswereld({ kern }));
-  return maakReizen({ kern }).reizen;
+  return { mijn: maakReizen({ kern }).mijnReizen };
 }
 const verblijf = (o) => ({ id: o.id, roomName: o.titel, plaats: o.plaats, aankomst: o.van, vertrek: o.tot, status: o.status || 'bevestigd' });
 const aanvraag = (o) => ({ ref: o.ref, titel: o.titel, bestemming: o.plaats, vertrek: o.van, personen: o.personen, status: o.status || 'aangevraagd' });
@@ -174,7 +174,7 @@ test('8. zonder datum, zonder bestemming of zonder geldige herkomst: los, met de
     { soort: 'reis', titel: 'vreemde herkomst', bestemming: 'Dubai', van: dag(3), herkomst: 'gevonden-op-straat', kenmerk: 'C' },
     { soort: 'reis', titel: 'herkomst ontbreekt', bestemming: 'Dubai', van: dag(3), herkomst: '', kenmerk: 'D' }
   ] }) } };
-  const r = maakReizen({ kern: stub }).reizen.mijn('k');
+  const r = maakReizen({ kern: stub }).mijnReizen('k');
   klopt(r, 4);
   assert.equal(r.reizen.length, 0, 'niets hiervan hoort in een reis terecht te komen');
   const reden = Object.fromEntries(r.los.map(x => [x.onderdeel.kenmerk, x.reden]));

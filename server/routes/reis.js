@@ -21,7 +21,7 @@ module.exports = (kern) => {
   /* DE REIS: dezelfde regels, maar gegroepeerd tot reizen (REIZEN.md fase 1).
      Ook alleen lezen, en om dezelfde reden: hier ontstaat geen boeking. Wat
      niet te plaatsen was komt mee terug in `los`, met de reden. */
-  app.post('/api/reis/reizen', auth, (req, res) => res.json(kern.reizen.mijn(req.session.key)));
+  app.post('/api/reis/reizen', auth, (req, res) => res.json(kern.mijnReizen(req.session.key)));
 
   /* DE REISWACHT (REIZEN.md fase 3): de signalen rond de komende reizen, met
      per bron of hij gemeten is, stilviel of simpelweg niet bestaat. Alleen

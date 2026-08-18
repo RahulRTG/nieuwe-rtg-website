@@ -6,6 +6,16 @@
    "welke regels heb ik" maar "hoe staat mijn reis naar Dubai ervoor". Deze laag
    groepeert die regels tot Reizen.
 
+   DE KERN-NAAM IS `mijnReizen`, en dat is een reparatie met een les. Deze
+   module heette in de kern eerst `reizen` -- maar die naam BESTOND al: het
+   reisboek van de Rechterhand exporteert een functie `reizen(key)` naar
+   dezelfde kern (rechterhand/reisboek.js), en de latere kernlaag overschreef
+   hem stil. Drie toetsen ver weg van hier (het reisboek gaf 500) vingen het;
+   niets dichterbij deed dat, want een Object.assign op de kern klaagt niet
+   over een bestaande sleutel. Wie een kern-naam kiest: grep eerst of hij al
+   bestaat. `mijnReizen` volgt de vorm van `mijnVerblijven` -- een functie van
+   key naar de eigen rijen.
+
    WAT DIT NIET IS, en niet mag worden (REIZEN.md par. 2.1 en 4.1): een tweede
    boekingsadministratie. DE REIS BEZIT GEEN BOEKING; hij bezit een verwijzing,
    een voornemen en een bewijs. Er wordt hier niets geschreven, niets bewaard en
@@ -165,5 +175,5 @@ module.exports.maakReizen = ({ kern }) => {
     };
   }
 
-  return { reizen: { mijn, HERKOMSTEN } };
+  return { mijnReizen: mijn };
 };

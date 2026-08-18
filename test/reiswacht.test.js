@@ -38,7 +38,7 @@ function wachtMet(over) {
     onderdelen: [{ soort: 'verblijf', titel: 'Suite', status: 'bevestigd', sig: 'gezond', kenmerk: 'V1', app: 'Verblijven' }],
     telling: { onderdelen: 1 } };
   const kern = Object.assign({
-    reizen: { mijn: () => ({ ok: true, reizen: [reis], los: [], stil: [] }) },
+    mijnReizen: () => ({ ok: true, reizen: [reis], los: [], stil: [] }),
     entourage: () => ({ attenties: [] }),
     agenda: { lijst: () => [] },
     reiswijzer: () => ({ ok: true, naam: 'Verenigde Arabische Emiraten', visum: { soort: 'vrij', label: 'Visumvrij' } })
@@ -80,7 +80,7 @@ test('3. een stilgevallen bron meldt zich met naam, en de rest rekent door', () 
 });
 
 test('4. valt De Reis zelf om, dan is de wacht stuk en niet rustig', () => {
-  const r = wachtMet({ reizen: { mijn: () => { throw new Error('weg'); } } }).wacht('k');
+  const r = wachtMet({ mijnReizen: () => { throw new Error('weg'); } }).wacht('k');
   assert.equal(r.ok, false);
   assert.equal(r.status, 503);
   assert.equal(bron(r, 'reizen').stand, 'stil');
@@ -135,7 +135,7 @@ test('7. een open taak wordt een incident als het vertrek dichtbij komt', () => 
   const reisDichtbij = { id: 'R-i', bestemming: 'India', venster: { van: dag(7), tot: dag(12) },
     onderdelen: [{ soort: 'reis', titel: 'Rondreis', status: 'bevestigd', sig: 'gezond', kenmerk: 'R7', app: 'Reisbureau' }] };
   const r = wachtMet({
-    reizen: { mijn: () => ({ ok: true, reizen: [reisDichtbij], los: [], stil: [] }) },
+    mijnReizen: () => ({ ok: true, reizen: [reisDichtbij], los: [], stil: [] }),
     reiswijzer: visumplichtig,
     agenda: { lijst: () => [{ titel: 'Visum aanvragen voor India', gedaan: false, bron: 'reis:R7' }] }
   }).wacht('k');
@@ -149,7 +149,7 @@ test('8. een onderdeel dat aandacht vraagt komt als signaal mee, met zijn domein
       { soort: 'reis', titel: 'Woestijn', status: 'afgewezen', sig: 'incident', kenmerk: 'R1', app: 'Reisbureau' },
       { soort: 'verblijf', titel: 'Suite', status: 'bevestigd', sig: 'gezond', kenmerk: 'V1', app: 'Verblijven' }
     ] };
-  const r = wachtMet({ reizen: { mijn: () => ({ ok: true, reizen: [reis], los: [], stil: [] }) } }).wacht('k');
+  const r = wachtMet({ mijnReizen: () => ({ ok: true, reizen: [reis], los: [], stil: [] }) }).wacht('k');
   const s = r.reizen[0].signalen;
   assert.equal(s.length, 2, 'het gezonde onderdeel doet niet mee');
   assert.deepEqual(s.map(x => x.bron).sort(), ['Reisbureau', 'Vluchten'], 'de bron is het domein zelf');
@@ -157,7 +157,7 @@ test('8. een onderdeel dat aandacht vraagt komt als signaal mee, met zijn domein
 });
 
 test('9. de stille bronnen van de reiswereld reizen door tot in de wacht', () => {
-  const r = wachtMet({ reizen: { mijn: () => ({ ok: true, reizen: [], los: [], stil: ['vluchten'] }) } }).wacht('k');
+  const r = wachtMet({ mijnReizen: () => ({ ok: true, reizen: [], los: [], stil: ['vluchten'] }) }).wacht('k');
   assert.deepEqual(r.stil, ['vluchten'], 'een onvolledig beeld blijft onvolledig heten');
 });
 

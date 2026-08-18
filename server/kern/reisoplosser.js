@@ -132,7 +132,7 @@ module.exports.maakReisoplosser = ({ kern }) => {
     const reisW = (w.reizen || []).find(r => r.id === String(reisId || ''));
     if (!reisW) return { status: 404, error: 'Deze reis staat niet (meer) onder de wacht.' };
     // de onderdelen komen uit De Reis zelf; de wacht draagt ze niet
-    const vol = (kern.reizen.mijn(key).reizen || []).find(r => r.id === reisW.id) || reisW;
+    const vol = (kern.mijnReizen(key).reizen || []).find(r => r.id === reisW.id) || reisW;
     const blokken = reisW.signalen.map(sig => ({ signaal: sig, voorstellen: voorstellenVoor(vol, sig) }));
     return { ok: true, reis: { id: reisW.id, bestemming: reisW.bestemming, venster: reisW.venster },
       gereed: !blokken.length, blokken, grens: GRENS,

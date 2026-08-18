@@ -42,11 +42,40 @@
   const dagen = (v) => v.van === v.tot ? v.van : v.van + ' t/m ' + v.tot;
   const soortenZin = (s) => Object.entries(s || {}).map(([k, n]) => n + ' ' + k + (n === 1 ? '' : 'en')).join(', ');
 
-  if (!code) { $('#vak').innerHTML = '<p class="rtg-sub">Deze link is niet compleet. Vraag om een nieuwe.</p>'; return; }
+  /* ZONDER CODE is dit de beheerkant: een ingelogd lid ziet hier zijn eigen
+     verstuurde uitnodigingen en kan ze intrekken. Zonder sessie én zonder code
+     valt er niets te tonen -- dan is de link gewoon niet compleet. */
+  if (!code) { token() ? mijnUitnodigingen() : ($('#vak').innerHTML =
+    '<p class="rtg-sub">Deze link is niet compleet. Vraag om een nieuwe.</p>'); return; }
 
   api('reis/uitnodiging/open', { code }).then((d) => teken(d.uitnodiging)).catch((e) => {
     $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>';
   });
+
+  async function mijnUitnodigingen() {
+    let d;
+    try { d = await api('reis/uitnodiging/mijn', {}, token()); }
+    catch (e) { $('#vak').innerHTML = '<p class="rtg-sub">' + esc(e.message) + '</p>'; return; }
+    const rij = d.uitnodigingen || [];
+    $('#vak').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-weight:500;font-size:1.4rem;margin:.6rem 0 .3rem;">Uw uitnodigingen</h2>' +
+      (rij.length ? rij.map((u) =>
+        '<div class="rtg-rij"><span class="rtg-tekst"><span class="rtg-naam">' + esc(u.bestemming || 'reis') +
+          ' &middot; ' + esc(dagen(u.venster)) + '</span>' +
+          '<span class="rtg-sub">' + (u.opgeeist ? 'overgenomen' : u.ingetrokken ? 'ingetrokken' : 'geldig tot ' + esc(u.geldigTot)) + '</span></span>' +
+          (u.opgeeist || u.ingetrokken ? '' :
+            '<button class="rtg-knop" type="button" data-kopie="' + esc(location.origin + u.link) + '">Kopieer link</button>' +
+            '<button class="rtg-knop" type="button" data-weg="' + esc(u.id) + '">Trek in</button>') +
+        '</div>').join('')
+      : '<p class="rtg-sub">U heeft nog geen uitnodigingen verstuurd. Dat doet u bij een reis in <a href="/apps/reizen.html">RTG Reizen</a>.</p>');
+    $('#vak').querySelectorAll('[data-kopie]').forEach((b) => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.kopie); b.textContent = 'gekopieerd'; } catch (e) {}
+    }));
+    $('#vak').querySelectorAll('[data-weg]').forEach((b) => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('reis/uitnodiging/weg', { id: b.dataset.weg }, token()); mijnUitnodigingen(); }
+      catch (e) { b.disabled = false; b.textContent = e.message; }
+    }));
+  }
 
   function teken(u) {
     const kop = '<h2 style="font-family:\'Bodoni Moda\',serif;font-weight:500;font-size:1.5rem;margin:.6rem 0 .2rem;">' +

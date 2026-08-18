@@ -117,6 +117,11 @@ const OPERATOREN = [
   { naam: '<=-><', zoek: /<=/, zet: '<' },
   { naam: '&&->||', zoek: /&&/, zet: '||' },
   { naam: '+->-', zoek: /(\w) \+ (\w)/, zet: '$1 - $2' },
+  /* De spiegel van +->-. Zonder hem was elke bewering over een AFTREK
+     onraakbaar: de resolutie-correctie in server/meting-lus.js (n/1e6 - 10)
+     kon niet omgedraaid worden, en test/eventloop.test.js heette 'overleefd'
+     terwijl zijn kernassertie die aftrek juist vastspijkert. */
+  { naam: '-->+', zoek: /(\w) - (\w)/, zet: '$1 + $2' },
   { naam: 'return-weg', zoek: /\breturn ([a-zA-Z_$][\w$.]*);/, zet: 'return undefined;' }
 ];
 
@@ -365,6 +370,25 @@ const EIGEN_MODULE = new Map([
      de poortwachter (trio.js). web/index.js staat vooraan omdat die de zwaarste
      bewering draagt -- praat hij echt https. */
   ['tls-boot.test.js', ['server/web/index.js', 'server/opzet/luister.js', 'server/trio.js']],
+  /* DE GEVEL-OVERLEVERS. Deze toetsen laden een index.js die alleen delen aan
+     elkaar knoopt of her-exporteert; de logica die ze vastleggen woont in de
+     delen ernaast, en die zag de motor dus nooit. Per toets staat hier de
+     module die hij echt op de proef stelt, in de volgorde van de zwaarste
+     bewering -- en elke regel is daarna door de motor BEVESTIGD (gezakt), naar
+     de afspraak hierboven: een geraden module geeft de toets de schuld van de
+     lijst. */
+  ['concern.test.js', ['server/kern/concern/tijd.js', 'server/kern/concern/graaf.js', 'server/kern/concern/scope.js', 'server/kern/concern/readiness.js', 'server/kern/concern/uitnodiging.js', 'server/kern/concern/index.js']],
+  ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/index.js']],
+  ['scriptbundel.test.js', ['server/middleware/scriptbundel-rij.js', 'server/middleware/scriptbundel.js']],
+  /* Vier servertoetsen die de liegpoort overleefden omdat hun bewering niet
+     over API-antwoorden gaat: het genre-register en de toegangsstand (een
+     waarheid in seed/kern), de loghygiene (wat er in het LOG staat) en de
+     strenge poort (de bewaker in test/helper.js zelf). Een eigen module wint
+     van de liegpoort -- zie de kop van isServerToets. */
+  ['genreregister.test.js', ['server/seed/genres.js']],
+  ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
+  ['loghygiene.test.js', ['server/log.js', 'server/routelog.js']],
+  ['ledengids-race.test.js', ['server/db/ledengids.js', 'server/db/gidsen.js']],
   /* SCHERMTOETSEN, en dat is nieuw. De motor haalde altijd alleen *.test.js op,
      dus de 85 *.e2e.js-bestanden waren structureel onmeetbaar -- en dat maakte
      toetsenNietGemeten een meter die het SCHRIJVEN van een schermtoets bestrafte.
@@ -451,6 +475,14 @@ const GEEN_BRONMUTATIE = new Map([
   ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
   ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
   ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],
+  ['wiring-contract.test.js', 'overleefde 22 mutaties in server/accounts/*, en terecht: dit is een STATISCH contract -- elke accounts.<methode>() in de serverbron moet ook echt geexporteerd worden. Een gedragsoperator verandert wat code doet, niet welke namen er bestaan. De foutklasse die hij wel bewaakt is met de hand nagetrokken en tweemaal raak: renameUser uit de export halen laat toets 2 zakken, en een aanroep van een niet-bestaande accounts.bestaatNietProef() laat toets 1 zakken'],
+  ['strenge-poort.test.js', 'overleefde 31 mutaties in test/helper.js, en terecht: de detectie van de strenge poort is een REGEX-LITERAL (FATAAL), en geen operator raakt patroontekst. Met de hand nagetrokken: uncaughtException in het patroon verbouwen laat de detectietoets zakken'],
+  ['consent-dekking.test.js', 'overleefde 28 mutaties in server/kern/consent.js, en terecht: hij SCANT de kern-bron op de toestemmingsvorm (key + status actief) en eist elke vindplaats in het register. Een gedragsoperator verandert wat code doet, niet welke vorm er in de bron staat. Met de hand nagetrokken: een nepmodule met de vorm neerzetten laat hem zakken'],
+  ['rahul-hart.test.js', 'de passies en het datahuis-verhaal zijn LETTERLIJKE TEKST in server/kern/rahul-hart.js, en geen operator raakt een stringliteraal. Met de hand nagetrokken: horloges -> uurwerken in het hart laat hem zakken'],
+  ['wereldtaal.test.js', 'de kernwoordenboeken zijn DATA (|-gescheiden regels in woordenboek/wereld1..8.js); een gedragsoperator raakt geen datastring. Met de hand nagetrokken: een leeg woord in de en-regel van wereld1.js laat toets 1 zakken'],
+  ['bundeldelen.test.js', 'vergelijkt de bundel met de aaneenschakeling van zijn delen -- puur structuur. Met de hand nagetrokken: een regel rechtstreeks in public/apps/boardroom.js (zonder de delen) laat hem zakken'],
+  ['rtfcampus.test.js', 'leest public/apps/foundation/campus.html als tekst en eist de catalogus-fetch en de ene schil; een operator muteert servermodules, niet de pagina. Met de hand nagetrokken: het catalogus-pad in campus.html verbouwen laat hem zakken'],
+  ['i18n-auto.test.js', 'de paginascan en de taalrail-eis zijn structuur (welke pagina laadt welk blad); de DOM-dubbel toetst de browserlaag die geen servermodule is. Met de hand nagetrokken: shared/i18n.js hernoemen in basis-01.js laat hem zakken'],
   ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module']
 ]);
 
@@ -753,9 +785,15 @@ if (require.main === module) {
        nodig heeft; anders kost de eerste ronde al uren. */
     const overlevers = puur.filter(n => uitslag[n] && uitslag[n].staat === 'overleefd');
     if (overlevers.length) {
-      console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, acht plekken per operator ---');
+      /* ALLE plekken, niet acht. De acht was een tijdsbesparing, en hij
+         produceerde valse beschuldigingen: in server/db/ledengids.js woont de
+         geteste logica voorbij de achtste ===, dus de motor stopte met meten
+         precies voordat hij raak kon schieten -- en noteerde 'overleefd' alsof
+         de TOETS niets vastlegde. Een pure toets kost seconden; de eerlijke
+         meting is er dus gewoon te betalen. */
+      console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, elke plek per operator ---');
       for (const naam of overlevers) {
-        const r = proefPuur(naam, 8);
+        const r = proefPuur(naam, 1000);
         uitslag[naam] = r;
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +

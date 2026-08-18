@@ -750,12 +750,8 @@
     },
     "bundeldelen.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bundel.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "vergelijkt de bundel met de aaneenschakeling van zijn delen -- puur structuur. Met de hand nagetrokken: een regel rechtstreeks in public/apps/boardroom.js (zonder de delen) laat hem zakken"
     },
     "bureau.test.js": {
       "soort": "server",
@@ -905,12 +901,11 @@
     },
     "comm-deelnemer.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/comm/index.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/comm/deelnemer.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 2
     },
     "comm-dm.test.js": {
       "soort": "puur",
@@ -987,21 +982,16 @@
     },
     "concern.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/concern/index.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/concern/tijd.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "consent-dekking.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/consent.js"
-      ],
-      "geprobeerd": 19,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 28 mutaties in server/kern/consent.js, en terecht: hij SCANT de kern-bron op de toestemmingsvorm (key + status actief) en eist elke vindplaats in het register. Een gedragsoperator verandert wat code doet, niet welke vorm er in de bron staat. Met de hand nagetrokken: een nepmodule met de vorm neerzetten laat hem zakken"
     },
     "consent.test.js": {
       "soort": "server",
@@ -1285,13 +1275,11 @@
     },
     "eventloop.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/meting.js",
-        "server/meting-lus.js"
-      ],
-      "geprobeerd": 5,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/meting-lus.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "excursie.test.js": {
       "soort": "server",
@@ -1610,14 +1598,20 @@
       "scherp": "gezakt"
     },
     "genreregister.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/seed/genres.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "genretoegang.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/bedrijf.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "gerechtkennis.test.js": {
       "soort": "server",
@@ -1946,12 +1940,8 @@
     },
     "i18n-auto.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/lib/ui-bronnen.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de paginascan en de taalrail-eis zijn structuur (welke pagina laadt welk blad); de DOM-dubbel toetst de browserlaag die geen servermodule is. Met de hand nagetrokken: shared/i18n.js hernoemen in basis-01.js laat hem zakken"
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -2346,12 +2336,11 @@
     },
     "ledengids-race.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/gidsen.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/ledengids.js",
+      "operator": "return-weg#8",
+      "gezakt": 1,
+      "geprobeerd": 18
     },
     "ledenladder.test.js": {
       "soort": "server",
@@ -2531,9 +2520,12 @@
       "scherp": "gezakt"
     },
     "loghygiene.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/log.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "lokaal-eerst.test.js": {
       "soort": "puur",
@@ -2980,12 +2972,11 @@
     },
     "merge3.property.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/merge.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "meterijk.test.js": {
       "soort": "puur",
@@ -4055,12 +4046,8 @@
     },
     "rahul-hart.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rahul.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de passies en het datahuis-verhaal zijn LETTERLIJKE TEKST in server/kern/rahul-hart.js, en geen operator raakt een stringliteraal. Met de hand nagetrokken: horloges -> uurwerken in het hart laat hem zakken"
     },
     "rahul-mens.test.js": {
       "soort": "puur",
@@ -4353,12 +4340,8 @@
     },
     "rtfcampus.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rtfbieb.js"
-      ],
-      "geprobeerd": 3,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest public/apps/foundation/campus.html als tekst en eist de catalogus-fetch en de ene schil; een operator muteert servermodules, niet de pagina. Met de hand nagetrokken: het catalogus-pad in campus.html verbouwen laat hem zakken"
     },
     "rtfcoderem.test.js": {
       "soort": "server",
@@ -4850,12 +4833,11 @@
     },
     "scriptbundel.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/middleware/scriptbundel.js"
-      ],
-      "geprobeerd": 7,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/middleware/scriptbundel-rij.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "selfhost.test.js": {
       "soort": "puur",
@@ -5383,12 +5365,11 @@
     },
     "stillepost.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/mail.js"
-      ],
-      "geprobeerd": 6,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/mail.js",
+      "operator": "&&->||#6",
+      "gezakt": 1,
+      "geprobeerd": 16
     },
     "streng-poorten.test.js": {
       "soort": "server",
@@ -5398,9 +5379,9 @@
       "scherp": "gezakt"
     },
     "strenge-poort.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 31 mutaties in test/helper.js, en terecht: de detectie van de strenge poort is een REGEX-LITERAL (FATAAL), en geen operator raakt patroontekst. Met de hand nagetrokken: uncaughtException in het patroon verbouwen laat de detectietoets zakken"
     },
     "stripe-eigen.test.js": {
       "soort": "puur",
@@ -5659,31 +5640,27 @@
     },
     "txgeld.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js",
-        "server/db/tx/collecties.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 7
     },
     "txindex.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 11
     },
     "txkap.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 28,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 7
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",
@@ -6127,14 +6104,8 @@
     },
     "wereldtaal.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/talen.js",
-        "server/translate/woordenboek/wereld.js",
-        "server/translate.js"
-      ],
-      "geprobeerd": 10,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de kernwoordenboeken zijn DATA (|-gescheiden regels in woordenboek/wereld1..8.js); een gedragsoperator raakt geen datastring. Met de hand nagetrokken: een leeg woord in de en-regel van wereld1.js laat toets 1 zakken"
     },
     "wereldvermogens.test.js": {
       "soort": "server",
@@ -6291,12 +6262,8 @@
     },
     "wiring-contract.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/accounts/index.js"
-      ],
-      "geprobeerd": 8,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 22 mutaties in server/accounts/*, en terecht: dit is een STATISCH contract -- elke accounts.<methode>() in de serverbron moet ook echt geexporteerd worden. Een gedragsoperator verandert wat code doet, niet welke namen er bestaan. De foutklasse die hij wel bewaakt is met de hand nagetrokken en tweemaal raak: renameUser uit de export halen laat toets 2 zakken, en een aanroep van een niet-bestaande accounts.bestaatNietProef() laat toets 1 zakken"
     },
     "wisselen-en-historie.test.js": {
       "soort": "server",

@@ -87,6 +87,10 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
       // draagt deze video bij een INTERNE bibliotheek? (leeg = openbaar)
       zaakCode: k && k.zaakCode ? k.zaakCode : null,
       bewaring: v.bewaring || 'rtg', online: thuis ? thuisOnline(v) : true,
+      /* Mee met de kaart, net als bij een clip: tekst is klein en de speler moet
+         ze hebben voordat het beeld begint (kern/ondertitels.js). */
+      ondertitels: Array.isArray(v.ondertitels) ? v.ondertitels : [],
+      ondertiteld: !!(v.ondertitels && v.ondertitels.length),
       codenaam: codenaamVan(v.key), reacties: (db.data.theaterReacties[v.id] || []).length, at: v.at };
   }
   function eigenBeeld(k) {
@@ -152,6 +156,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     theaterVerwijder: v.verwijder, theaterStreamVan: v.streamVan, theaterZaal: z.zaal,
     theaterAbonneer: z.abonneer, theaterReactie: z.reactie, theaterReacties: z.reacties, theaterMeld: z.meld,
     theaterThuisAanwezig: v.thuisAanwezig, theaterSignaal: v.signaal,
+    theaterOndertitels: v.videoOndertitels,
     // Media for Business, opgenomen kant (./zaak.js)
     theaterZaakMaak: zaak.zaakKanaalMaak, theaterZaakZaal: zaak.zaakZaal,
     theaterZaakVideos: zaak.zaakVideosVoor,

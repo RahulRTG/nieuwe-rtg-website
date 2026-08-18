@@ -108,7 +108,18 @@ function keur(env, fouten, waarschuwingen) {
        doet (bestaat dat account al?) valt hier ook niet te beantwoorden: deze
        functie kent alleen de omgeving, niet de database. Die controle staat nu in
        server.js, na load(), waar hij het antwoord echt weet. */
-    if (!env.OFFICE_TOTP_SECRET) waarschuwingen.push('OFFICE_TOTP_SECRET niet gezet: de backoffice heeft geen tweede factor (2FA). Sterk aangeraden: zet een base32-geheim en koppel een authenticator-app.');
+    /* DIT WAS EEN WAARSCHUWING, EN DAT PASTE NIET BIJ WAT ERACHTER LIGT.
+       Zonder dit geheim staat de backoffice -- auditlog, tijdlijn met codenamen,
+       export -- achter alleen de statische OFFICE_CODE, en die deur remt per IP,
+       dus verspreid raden komt erlangs. De tweede factor is daar de enige echte
+       rem op. Een waarschuwing bij elke start leert iedereen wegkijken, en
+       scripts/docker/controle.js eiste dit al hard voor livegang: nu zeggen die
+       twee hetzelfde. Bewust GEEN uitweg-vlag -- dat is dezelfde deur met een
+       stap ervoor. De volledige redenering staat in PRODUCTION.md. */
+    if (!env.OFFICE_TOTP_SECRET)
+      fouten.push('OFFICE_TOTP_SECRET ontbreekt: dan staat de backoffice (auditlog, tijdlijn met codenamen, export) achter alleen de statische OFFICE_CODE. Zet een base32-geheim en koppel een authenticator-app.');
+    else if (String(env.OFFICE_TOTP_SECRET).toUpperCase().replace(/[^A-Z2-7]/g, '').length < 16)
+      fouten.push('OFFICE_TOTP_SECRET is te kort om een tweede factor te zijn: na het weglaten van niet-base32-tekens blijven er minder dan 16 over. Maak er een van 32 tekens (A-Z en 2-7).');
     /* AI is een versneller, geen afhankelijkheid. Zonder provider start RTG in
        de ingebouwde werkmodus: schermen, regels, controles en handmatige routes
        blijven beschikbaar en de UI meldt eerlijk dat vrije AI niet actief is.

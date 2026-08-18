@@ -111,6 +111,48 @@ test('4. abonneren, reageren op codenaam en melden bij kantoor', async () => {
   assert.ok((kantoor.body.meldingen || []).some(m => /Verkeerd label/.test(m.reden)));
 });
 
+/* DE ONDERTITELS, EN WAAROM DEZE TOETS DE HELE WEG AFLEGT.
+
+   Het model had er geen veld voor -- TAKEN.md 4.21 noemde ondertiteling met
+   zoveel woorden als niet gebouwd, en check.js regel 49 telde de bioscoop van
+   het Theater daarom als 'onbedekt'. Een veld toevoegen is makkelijk; de vraag
+   is of een KIJKER ze krijgt. Deze toets loopt daarom van schrijven naar lezen:
+   de maker zet ze, een vreemde mag dat niet, en de zaal van de kijker draagt ze.
+
+   De grenzen zelf (te lang, buiten de duur, verkeerde volgorde) worden hier ook
+   aangetikt, maar ze WONEN in kern/ondertitels.js, samen met de clip-kant --
+   test/ondertitels.test.js toetst die regels los. */
+test('4b. ondertitels: de maker schrijft ze, de kijker krijgt ze mee', async () => {
+  const vreemd = await api('/api/theater/ondertitels',
+    { id: videoId, regels: [{ van: 0, tot: 1, tekst: 'niet van mij' }] }, kijker);
+  assert.equal(vreemd.status, 404, 'een vreemde schrijft geen ondertitels bij andermans video');
+
+  const zet = await api('/api/theater/ondertitels', { id: videoId, regels: [
+    { van: 4, tot: 6, tekst: 'later gezegd' },
+    { van: 1, tot: 3, tekst: 'eerst gezegd' },
+    { van: 2, tot: 1, tekst: 'eind voor begin' },          // vervalt
+    { van: 0, tot: 99999, tekst: 'buiten de video' }       // vervalt
+  ] }, maker);
+  assert.equal(zet.status, 200);
+  assert.deepEqual(zet.body.ondertitels.map(c => c.tekst), ['eerst gezegd', 'later gezegd'],
+    'de onmogelijke regels vervallen en de rest staat op tijd gesorteerd');
+
+  /* De kijker is in toets 4 geabonneerd, dus staat deze video in
+     `abonnementen` en niet meer in `nieuw` -- daarom beide lijsten. */
+  const inZaal = (body) => [].concat(body.abonnementen || [], body.nieuw || []).find(x => x.id === videoId);
+  const kaart = inZaal((await api('/api/theater/zaal', {}, kijker)).body);
+  assert.ok(kaart, 'de video staat in de zaal van de kijker');
+  assert.equal(kaart.ondertiteld, true, 'de kaart zegt dat hij te volgen is zonder geluid');
+  assert.deepEqual(kaart.ondertitels.map(c => c.tekst), ['eerst gezegd', 'later gezegd'],
+    'en de regels reizen mee, zodat de speler ze heeft voordat het beeld begint');
+
+  const leeg = await api('/api/theater/ondertitels', { id: videoId, regels: [] }, maker);
+  assert.equal(leeg.body.regels, 0, 'een maker mag zijn ondertitels ook weer intrekken');
+  assert.equal(inZaal((await api('/api/theater/zaal', {}, kijker)).body).ondertiteld, false);
+  // en terugzetten, zodat de volgende toets een normale video treft
+  await api('/api/theater/ondertitels', { id: videoId, regels: [{ van: 1, tot: 3, tekst: 'eerst gezegd' }] }, maker);
+});
+
 test('5. verwijderen haalt ook de bytes weg (maker zelf of kantoor)', async () => {
   const vreemd = await api('/api/theater/verwijder', { id: videoId }, kijker);
   assert.equal(vreemd.status, 403, 'een kijker verwijdert andermans werk niet');

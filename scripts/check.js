@@ -3162,5 +3162,199 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
   }
 }
 
+/* ============================================================================
+   49) ELK MEDIA-ELEMENT DRAAGT EEN BESLUIT OVER ONDERTITELING, MET EEN REDEN
+
+   WAAROM DIT GEEN "ELKE <video> EEN <track>"-POORT IS. Die poort is in vijf
+   minuten geschreven en zou hier meteen twintig keer onterecht afgaan. Van de
+   negenentwintig media-elementen in dit huis is de meerderheid geen INHOUD maar
+   een INSTRUMENT: de camera die een paspoort leest, de QR-scanner van de
+   RTG-code, het oog dat een werkvloer schouwt, het onzichtbare element dat een
+   affiche uit het eerste frame haalt, en je eigen beeld in de hoek van een
+   gesprek. Daar valt niets te ondertitelen -- er is geen geluid en er wordt niets
+   gezegd. Een poort die daar toch een <track> eist levert twintig loze alarmen
+   op, en na drie loze alarmen zet iemand de poort uit. Dat is exact het patroon
+   van de vals-alarmronde in scripts/lib/rolproef.js.
+
+   DUS EEN REGISTER, ZOALS PUBLIEK IN REGEL 28. Elk element staat hieronder bij
+   naam, met een soort en een reden. Komt er een element bij, dan zakt deze regel
+   tot iemand het besluit opschrijft. Dat is het doel: niet dat er overal
+   ondertitels zijn, maar dat over elk element iemand heeft nagedacht, en dat je
+   kunt nalezen wie en waarom.
+
+   HET REGISTER LIEGT DE GATEN NIET WEG. Acht van de negenentwintig staan als
+   OPEN, en dat is de eerlijke stand en geen slordigheid:
+
+     live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
+                         Wat een dove deelnemer hier nodig heeft is live tekst
+                         (spraak-naar-tekst tijdens het gesprek), en die bestaat
+                         in dit huis niet. WCAG 1.2.2 gaat hier niet over; 1.2.4
+                         wel, en die is niet gehaald.
+     live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
+                         naar het kantoor.
+     opgenomen (0)       Dit waren er drie. Het Theater en de filmspeler van de
+                         Media OS hadden geen veld voor ondertitels in het model;
+                         dat veld is er nu (kern/ondertitels.js, dezelfde bron als
+                         de clip-kant), met een route, een vel waar de maker ze
+                         intypt en een gedeelde band die ze toont. De derde, een
+                         spraakbericht in de teamchat, bleek dood hout: het veld
+                         `m.audio` wordt nergens geschreven. Weggehaald.
+
+   WAT HIJ MACHINAAL NAKIJKT, want een register met alleen woorden erin is een
+   document en geen poort:
+
+     stil    Een spiegel of werktuig MOET stil staan: `muted` in de tag, of
+             `muted = true` in de regels eronder. Zonder die eis schuift zo'n
+             element ongemerkt van "geen geluid" naar "geluid dat niemand
+             ondertitelt", en dan klopt de reden hier niet meer. Dit is de tand
+             met de meeste bijt: hij gaat af op een wijziging van EEN attribuut.
+     anker   Wie "dit is geregeld" zegt, noemt WAAR: een bestand en een naam die
+             daar moet staan. Haalt iemand de ondertitelband uit de clipdeler,
+             dan zakt deze regel -- ook al is aan het scherm zelf niets veranderd.
+     ratel   Het aantal open punten mag alleen omlaag. Wie een twaalfde open
+             element toevoegt, lost eerst een ander op of verhoogt OPEN_MAX met
+             opzet en met een reden.
+
+   DE SLEUTEL IS bestand#id. Elementen zonder id krijgen een rangnummer in dat
+   bestand (#1, #2), en elementen die in JS worden gemaakt een #js1, #js2. Zo'n
+   rangnummer schuift als iemand er een element boven zet, en dan meldt deze regel
+   een onbekend element plus een spookregel. Dat is geen ruis maar het gewenste
+   gedrag: er is iets bijgekomen en er is nog geen besluit over.
+
+   WAT HIJ NIET ZIET, en dat hoort erbij te staan: een element waarvan de
+   tagnaam uit een variabele komt (createElement(soort)). Die vorm komt hier
+   vandaag niet voor; komt hij er ooit, dan glipt hij langs deze regel. De drie
+   vormen die hij WEL ziet zijn de tag in markup of in een string, een
+   createElement met een letterlijke naam, en new Audio().
+
+   GEBUNDELDE BESTANDEN DOEN NIET MEE (public/apps/personeel.js en broers): de
+   bron staat in de losse delen ernaast, en anders staat elk element hier twee
+   keer -- dezelfde afspraak als regel 13 en 19. */
+console.log('\n49) elk media-element draagt een besluit over ondertiteling');
+{
+  /* De soorten. `open` betekent: hier hoort iets en het is er niet. `stil` en
+     `anker` zijn de twee dingen die machinaal na te kijken zijn. */
+  const SOORTEN = {
+    spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
+    werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
+    ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
+    gesprek:     { open: true },                // live, tweerichting
+    uitzending:  { open: true },                // live, eenrichting
+    onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
+  };
+  /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, toen 9 nadat het
+     Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
+     clip-kant), en nu 8 van 29 -- het spraakbericht in de teamchat bleek DOOD
+     HOUT. De speler stond in personeel-23.js achter `m.audio`, en niets in dit
+     huis schrijft dat veld ooit: /api/supplier/team/message neemt alleen `text`
+     aan, en geen enkele aanroeper stuurt iets anders. Het was dus geen
+     ondertitelgat maar een knop voor een functie die niet bestaat, en die is
+     weggehaald in plaats van beschreven. Mag alleen omlaag. */
+  const OPEN_MAX = 8;
+  /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
+     Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
+     shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
+     oude anker (toonOndertitels in clipdeler-01.js) viel weg en twee elementen
+     zakten. Dat is precies waar een anker voor is. */
+  const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
+  const REGISTER = new Map([
+    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
+    ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
+    ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
+    ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
+    ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
+    ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
+    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
+    ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
+    ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
+    ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
+    ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
+    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
+    ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
+    ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
+    ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
+    ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
+    ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
+    ['public/apps/theater.html#vVoorbeeld', ['spiegel', 'de voorvertoning van je eigen upload, stil, voordat je hem publiceert']],
+    ['public/apps/theater.html#js1', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
+    ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
+    ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
+    ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks']],
+    ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij']]
+  ]);
+
+  const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
+  const gevonden = new Map();
+  loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (bundelPaden.has(rel)) return;
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    let m, n = 0, jsN = 0;
+    const tag = /<(video|audio)(\s[^>]*)?>/gi;
+    while ((m = tag.exec(bron))) {
+      n++;
+      const id = (String(m[2] || '').match(/\bid=["']?([A-Za-z0-9_-]+)/) || [])[1];
+      gevonden.set(rel + '#' + (id || n), { stil: /\bmuted\b/.test(m[0]) });
+    }
+    /* In JS gemaakte elementen. `muted` staat daar niet in de tag maar in de
+       regels eronder, dus kijken we in een venster van 300 tekens erna. */
+    const inJs = /(?:createElement\(\s*["'](video|audio)["']\s*\)|new\s+Audio\s*\()/g;
+    while ((m = inJs.exec(bron))) {
+      jsN++;
+      const venster = bron.slice(m.index, m.index + 300);
+      gevonden.set(rel + '#js' + jsN, { stil: /\bmuted\b/.test(venster) });
+    }
+  });
+
+  const klachten = [];
+  for (const [sleutel, el] of gevonden) {
+    const post = REGISTER.get(sleutel);
+    if (!post) {
+      klachten.push(sleutel + ' is een media-element zonder besluit -- zet hem in REGISTER met een soort en een reden (check.js regel 49)');
+      continue;
+    }
+    const soort = SOORTEN[post[0]];
+    if (!soort) { klachten.push(sleutel + ' staat als soort "' + post[0] + '", en die soort bestaat niet'); continue; }
+    if (!post[1] || post[1].length < 25) klachten.push(sleutel + ' heeft geen reden die iets zegt');
+    if (soort.stil && !el.stil) {
+      klachten.push(sleutel + ' staat als ' + post[0] + ' (stil) maar is niet meer muted -- of er komt geluid uit, of de reden klopt niet meer');
+    }
+    if (soort.anker) {
+      const [bestand, naam] = post[2] || [];
+      if (!bestand || !naam) klachten.push(sleutel + ' staat als ondertiteld maar noemt niet waar dat geregeld is');
+      else if (!fs.existsSync(path.join(ROOT, bestand))) klachten.push(sleutel + ': het anker ' + bestand + ' bestaat niet meer');
+      else if (!fs.readFileSync(path.join(ROOT, bestand), 'utf8').includes(naam)) {
+        klachten.push(sleutel + ': ' + bestand + ' draagt "' + naam + '" niet meer -- de weg naar tekst is eruit gehaald');
+      }
+    }
+  }
+  /* Een register dat namen bevat die niet meer bestaan, groeit stil vol en leest
+     als dekking die er niet is -- dezelfde controle als bij regel 28 en 47. */
+  for (const sleutel of REGISTER.keys()) {
+    if (!gevonden.has(sleutel)) klachten.push('check.js regel 49: ' + sleutel + ' staat in het register maar bestaat niet (meer) als media-element');
+  }
+
+  const open = [...gevonden.keys()].filter(k => REGISTER.has(k) && (SOORTEN[REGISTER.get(k)[0]] || {}).open);
+  if (open.length > OPEN_MAX) {
+    klachten.push(open.length + ' open media-elementen terwijl OPEN_MAX op ' + OPEN_MAX + ' staat: ' + open.join(', '));
+  }
+
+  if (klachten.length) klachten.forEach(fout);
+  else {
+    const per = {};
+    for (const k of gevonden.keys()) { const s = REGISTER.get(k)[0]; per[s] = (per[s] || 0) + 1; }
+    const noem = (lijst) => lijst.filter(s => per[s]).map(s => per[s] + ' ' + s).join(', ');
+    ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
+      (gevonden.size - open.length) + ' geregeld (' + noem(['spiegel', 'werktuig', 'ondertiteld']) + '), ' +
+      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX);
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -1,11 +1,12 @@
 {
   "stempel": {
-    "op": "2026-08-18T07:36:20.312Z",
-    "commit": "65b7a77",
+    "op": "2026-08-18T11:44:05.051Z",
+    "commit": "8c84e00",
     "boomVuil": true,
     "node": "v22.22.2"
   },
   "uitleg": "Sabotage op echte businessketens, acht velden per scenario. Een verraad telt pas als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst gemeten, invariant beoordeeld, rollback beoordeeld.",
+  "grens": "Alleen de ketens in scripts/lib/ketens; een businessproces dat daar niet in staat is niet gesaboteerd. Per scenario EEN seed (819226199), dus dit is geen uitputtende zoektocht naar verraad maar een herhaalbare steekproef. \"rollbackBewezen\" zegt dat de terugdraai is WAARGENOMEN, niet dat elke gedeeltelijke schrijfactie in het huis terugdraait.",
   "seed": "819226199",
   "gemeten": {
     "ketens": 3,

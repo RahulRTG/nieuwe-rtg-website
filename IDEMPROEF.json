@@ -1,12 +1,12 @@
 {
  "stempel": {
-  "op": "2026-08-18T07:24:00.185Z",
-  "commit": "65b7a77",
+  "op": "2026-08-18T11:43:42.914Z",
+  "commit": "8c84e00",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
- "nietBeproefbaar": 737,
+ "nietBeproefbaar": 848,
  "redenenNietBeproefbaar": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
@@ -15,6 +15,14 @@
   {
    "reden": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
    "aantal": 62
+  },
+  {
+   "reden": "rol \"boardroom\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 55
+  },
+  {
+   "reden": "rol \"techniek\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 52
   },
   {
    "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
@@ -41,8 +49,16 @@
    "aantal": 16
   },
   {
+   "reden": "rol \"werkplekbaas\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 3
+  },
+  {
    "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 2
+  },
+  {
+   "reden": "rol \"scim\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 1
   },
   {
    "reden": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker",
@@ -51,15 +67,15 @@
  ],
  "routesGevonden": 4103,
  "gemeten": {
-  "routesMetRol": 3366,
+  "routesMetRol": 3255,
   "beoordeeld": 119,
   "beschermd": 14,
   "onbeschermd": 105,
-  "ongemeten": 3247,
-  "oproepen": 10122,
+  "ongemeten": 3136,
+  "oproepen": 9789,
   "tokensHernieuwd": 24,
   "blindeRondes": 0,
-  "begrenzing": 8000
+  "begrenzing": 0
  },
  "perRoute": [
   {
@@ -1452,198 +1468,6 @@
     200,
     200,
     200
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/ai",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/betalingen/keuze",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/betalingen/proef",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/betalingen/stap",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/betalingen/status",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/onboarding",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/onboarding/ai",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/persoon",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/reset",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/status",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/storing",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/taal",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/talen",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/toepassen",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/wachter",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/boardroom/zet",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -14584,18 +14408,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/aidata/export",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/architect",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -15016,30 +14828,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/balie/zetel",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/balie/zetels",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/balie/zoek",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -15076,30 +14864,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/bank/autoriseer/annuleer",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/bank/autoriseer/bevestig",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/bank/bevoegdheid",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -15108,18 +14872,6 @@
     200,
     200,
     200
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/bank/draai",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -15220,18 +14972,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/bank/modus",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/bank/nood",
    "rol": "office",
    "idempotentie": "onbeschermd",
@@ -15276,18 +15016,6 @@
     200,
     200,
     200
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/bank/operationeel",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -15412,18 +15140,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/bank/vergunning",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/betalingen/status",
    "rol": "office",
    "idempotentie": "onbeschermd",
@@ -15444,162 +15160,6 @@
     403,
     403,
     403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/ai",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/genre",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/magnaat/besluit",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/magnaat/leren",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/rahul",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/rahul/zet",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/schakel",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/schakel-fijn",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/toegang",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/toegang/geef",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/toegang/weg",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/boardroom/verbeter",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -16048,30 +15608,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/journaal",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/journaal/beeld",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/kachat",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -16396,150 +15932,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/ledenregister",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/beslis",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/gaten/plan",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/overzicht",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/taak/maak",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/taak/zet",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/zelftest",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/controle/zet",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/partner/beslis",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/partners",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/scan",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/magnaat/status",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/mail/opnieuw",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -16656,18 +16048,6 @@
     200,
     200,
     200
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/mall/zet",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -17080,18 +16460,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/paniek/besluit",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/paniek/stel",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -17100,78 +16468,6 @@
     404,
     404,
     404
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren/antwoord",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren/document",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/papieren/documenten",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/partner/decide",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/partner/status",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -17956,30 +17252,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/salon/belang",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/salon/belang/beoordeel",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/school/decide",
    "rol": "office",
    "idempotentie": "ongemeten",
@@ -18336,102 +17608,6 @@
     404,
     404,
     404
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties/besluit",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties/noodstop",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties/schakel",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties/test",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/integraties/verantwoordelijke",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/techniek/lastafworp",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -19560,18 +18736,6 @@
     200,
     200,
     200
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/wereld/actie",
-   "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -25716,18 +24880,6 @@
     404,
     404,
     404
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/scim/v2/Users",
-   "rol": "scim",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
    ]
   },
   {
@@ -37648,438 +36800,6 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/techniek/ai",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/alarm/proef",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/archief",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/keuze",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/proef",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/betalingen/stap",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/beveiliging/afhandelen",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/beveiliging/auto",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/bewaren/veeg",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/controle/incident",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/controle/integriteit",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/eigenaar",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/fouten/wis",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/functie",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/functie/ai",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/functie/besluit",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/moderniseer",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren/antwoord",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren/document",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/papieren/documenten",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/spelcijfers",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/sso",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/sso/proef",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/sso/schakel",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/sso/scimsleutel",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/toegang",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/vingerafdruk",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/vingerafdruk/verschil",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/analyseer",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/av-test",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/beslis",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/lastafworp",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/opruimen",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/wacht/quarantaine",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/techniek/zekering",
-   "rol": "techniek",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/theater/abonneer",
    "rol": "member",
    "idempotentie": "ongemeten",
@@ -40002,42 +38722,6 @@
    "methode": "POST",
    "pad": "/api/wereld/zoek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang",
-   "rol": "werkplekbaas",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang-geef",
-   "rol": "werkplekbaas",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/werkplek/toegang-weg",
-   "rol": "werkplekbaas",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [

@@ -159,9 +159,18 @@ const REGELS = [
          `if (require.main !== module) return;`. Een keuring die onterecht
          aanslaat wordt binnen een week genegeerd, en dan handhaaft hij niets
          meer -- dat is duurder dan de regel waard is. */
-      return /require\.main\s*(===|!==)\s*module/.test(code)
-        ? { ok: true }
-        : { ok: false, reden: 'schrijft een register maar heeft geen require.main-wacht' };
+      if (/require\.main\s*(===|!==)\s*module/.test(code)) return { ok: true };
+      /* EEN TOETS ALS INSTRUMENT KENT GEEN require.main-WACHT. SCHERMLEUGEN.json
+         wordt gevuld door test/liegend-scherm.e2e.js, en een toetsbestand draait
+         per definitie onder de testrunner -- require.main wijst daar nooit naar
+         het bestand zelf, dus die wacht zou de schrijfactie PERMANENT uitzetten.
+         De wacht die daar past is een expliciete meetvlag: de schrijfactie staat
+         achter RTG_VASTLEGGEN, en alleen de meetronde (npm run e2e) zet die.
+         Zonder deze tak wees deze regel zijn eigen reparatie af. */
+      if (i.script.startsWith('test/') && /RTG_VASTLEGGEN/.test(code)) return { ok: true };
+      return { ok: false, reden: i.script.startsWith('test/')
+        ? 'een toets die een register schrijft hoort dat achter een meetvlag (RTG_VASTLEGGEN) te doen'
+        : 'schrijft een register maar heeft geen require.main-wacht' };
     }
   },
   {

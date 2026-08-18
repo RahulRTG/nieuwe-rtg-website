@@ -59,8 +59,13 @@ const keuring = require('../scripts/meetkeuring');
    Alleen ECHTE overtredingen, dus niet de registers die achterlopen op een
    instrument dat de regel inmiddels wel draagt: die verdwijnen vanzelf bij de
    volgende ronde en zouden deze ratel laten meebewegen met wanneer er toevallig
-   is gemeten. Wat hier telt, is code die de regel niet kent. */
-const OPEN_MAX = 1;
+   is gemeten. Wat hier telt, is code die de regel niet kent.
+
+   NUL, en dat is de stand die deze keuring drie dagen na zijn geboorte haalde:
+   acht bij het schrijven, drie valse alarmen gerepareerd, vier echte fouten
+   gedicht, en de laatste (SCHERMLEUGEN zonder stempel) sloot met de
+   RTG_VASTLEGGEN-vlag. Elke nieuwe overtreding is vanaf hier een regressie. */
+const OPEN_MAX = 0;
 
 test('1. elke regel komt uit een echte fout en is na te trekken', () => {
   assert.ok(keuring.REGELS.length >= 4, 'er zijn regels');

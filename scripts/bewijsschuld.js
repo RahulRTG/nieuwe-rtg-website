@@ -47,15 +47,24 @@ const lees = (naam) => { try { return JSON.parse(fs.readFileSync(path.join(WORTE
    een schuldenlijst met overgeschreven cijfers loopt binnen een maand uit de
    pas met wat er werkelijk is (LAT.md regel 4). */
 const POSTEN = [
-  { id: 'auth-onbeslist', soort: 'instrument',
+  /* STOND HIER ALS 'instrument', EN HET GEREEDSCHAP IS ER NU. De reparatie stond
+     er letterlijk bij ("een sonde die een PLAUSIBEL lichaam stuurt"), en sinds
+     scripts/poortwacht.js een tweede keer klopt -- zelfde plausibele lijf als de
+     rolproef, nog steeds zonder token -- is dat gebouwd. Wat er overblijft is
+     geen ontbrekend gereedschap maar een ronde. Een post die meetbaar is
+     geworden hoort niet als `instrument` te blijven staan; dan verbergt dat
+     woord achterstand, precies zoals `grens` dat deed bij
+     output-niet-toerekenbaar. */
+  { id: 'auth-onbeslist', soort: 'meetwerk',
     wat: 'routes waarvan de poortwacht niet kan zeggen of ze een slot hebben',
     uit: (r) => (r.poortwacht || {}).stil,
-    waarom: 'de sonde klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de ' +
+    waarom: 'de eerste klop gaat met een LEEG lichaam. Een 400 of 404 betekent dan dat de ' +
       'validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets ' +
-      'over een slot. Een tweede klop met een onzin-token gaf op alle veertien gemeten routes ' +
-      'exact dezelfde status.',
-    sluit: 'een sonde die een PLAUSIBEL lichaam stuurt. Die moet tegen een eigen wegwerpserver ' +
-      'draaien, want plausibele lichamen naar schrijfroutes sturen kan muteren.' },
+      'over een slot. Wat na de TWEEDE klop nog stil is, gaf ook op een plausibel lijf geen ' +
+      '401, geen 403 en geen 2xx -- daar is met deze sonde niets meer uit te halen.',
+    sluit: 'npm run meetronde -- --alleen=poortwacht. Wie daarna nog stil staat, vraagt om een ' +
+      'derde vraag: niet "gaat deze deur open" maar "waarom kom ik er niet eens bij" -- en dat ' +
+      'is scripts/waarom.js.' },
 
   { id: 'capability-in-handler', soort: 'grens',
     wat: 'routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)',
@@ -117,6 +126,25 @@ const POSTEN = [
     sluit: 'per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst ' +
       'en de enige die naar een mogelijk defect wijst.' },
 
+  /* NIEUW, EN HET IS GEEN NIEUWE SCHULD MAAR OUDE SCHULD MET EEN NAAM. 3112
+     routes stonden als "ongemeten" in de staatproef zonder dat iemand kon zeggen
+     WAT eraan ontbrak. scripts/waarom.js deelt ze in naar de ontbrekende
+     voorwaarde; deze post telt de grootste groep, en die vraagt om ketens van
+     twee stappen (eerst aanmaken, dan bedienen). */
+  { id: 'object-vooraf', soort: 'instrument',
+    wat: 'routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt',
+    uit: (r) => {
+      const s = ((r.waarom || {}).soorten || []).find(x => x.id === 'object-ontbreekt');
+      return s ? s.aantal : null;
+    },
+    waarom: 'de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt ' +
+      'het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft ' +
+      'nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle ' +
+      '166 hetzelfde zeggen.',
+    sluit: 'per domein een keten van twee stappen, zoals scripts/lib/ketens die al kent: maak ' +
+      'het object met de rol die het mag, bedien het daarna. Dat is per domein werk en geen ' +
+      'generieke truc -- een id raden uit een ander domein levert dezelfde 404 op.' },
+
   { id: 'proefruis', soort: 'meetwerk',
     wat: 'de vier proeven meten op dezelfde code niet twee keer hetzelfde',
     uit: () => 1,
@@ -159,7 +187,7 @@ function meet() {
   const r = {
     poortwacht: lees('POORTWACHT.json'), rolproef: lees('ROLPROEF.json'),
     staatproef: lees('STAATPROEF.json'), output: lees('OUTPUTPROEF.json'),
-    audit: lees('AUDITPROEF.json')
+    audit: lees('AUDITPROEF.json'), waarom: lees('WAAROM.json')
   };
   const posten = POSTEN.map(p => {
     let aantal = null;
@@ -173,6 +201,10 @@ function meet() {
     uitleg: 'Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie ' +
       'test/bewijsschuld.test.js. Een post van soort "grens" sluit nooit; die telt niet als ' +
       'achterstand maar als de rand van de methode.',
+    grens: 'Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft ' +
+      'bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een ' +
+      'schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus ' +
+      'zo vers als de laatste ronde; zie scripts/versheid.js.',
     telling: { posten: posten.length, meetwerk: som('meetwerk'),
       instrument: som('instrument'), grens: som('grens') },
     posten };

@@ -690,13 +690,23 @@ async function misbruikBeproeving(tok) {
   }
 
   // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
-  /* DE SESSIE DIE BLEEF. Voor de storm losgaat een set tokens munten die er
-     NIET aan meedoet: de storm logt zijn eigen tokens uit (via /api/logout) en
-     de noodrem-ladder zet daarna de inlogpaden tien minuten dicht -- opnieuw
-     inloggen is dan by design onmogelijk. De belofte van die ladder is juist
-     dat een BESTAANDE sessie niets merkt; deze tokens zijn die bestaande
-     sessie, en E2/E3 vallen erop terug als vers inloggen niet kan. */
-  const sessieVanVoorDeStorm = await tokens();
+  /* DE OMSTANDER. Voor de storm losgaat wordt een EIGEN lid geregistreerd dat
+     er niet aan meedoet. Niet alleen een apart token: een apart ACCOUNT --
+     want de demo-logins delen hun sessie, en de storm raakt /api/logout, dus
+     elk demo-token (ook een 'bewaard' exemplaar) is na de storm dood. Dat was
+     de les van de vorige ronde: de bewaarde demo-sessie mat alsnog 401 x60.
+     De noodrem-ladder zet na de storm bovendien de inlogpaden tien minuten
+     dicht (by design), dus vers inloggen kan dan ook niet. De belofte van de
+     ladder is dat een BESTAANDE sessie niets merkt; deze omstander is die
+     sessie, en E2/E3 vallen op hem terug als vers inloggen niet kan. */
+  const sessieVanVoorDeStorm = await (async () => {
+    const email = 'omstander-' + Math.random().toString(36).slice(2, 10) + '@proef.rtg';
+    const ww = 'Omstander!7-proef';
+    await post('/api/auth/register', { name: 'Omstander Proef', email, password: ww, geboortedatum: '1990-01-01' });
+    const inlog = await post('/api/auth/login', { login: email, password: ww, pasApp: 'rtg' });
+    const tok = (inlog.data && inlog.data.token) || null;
+    return { member: tok ? [tok] : [], supplier: [], office: [] };
+  })();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];

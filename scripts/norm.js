@@ -515,6 +515,15 @@ function meet(bronnen) {
       if (!m) { nietGemeten++; continue; }
       if (m.staat === 'overleefd') overleefd++;
       else if (m.staat === 'gezakt') gezakt++;
+      /* 'geen bronmutatie mogelijk' is GEEN niet-gemeten: de motor is er wel
+         degelijk langs geweest en het oordeel staat gedocumenteerd in
+         GEEN_BRONMUTATIE, elk met zijn foutklasse met de hand nagetrokken.
+         Toen deze staat hier nog als niet-gemeten telde, werd de meter rood
+         van precies het eerlijke werk -- dertien overlevers herklasseren
+         duwde hem van 150 naar 158, terwijl er alleen MEER bekend was
+         geworden. Een meter die eerlijkheid bestraft, leert iedereen om
+         vaag te blijven (zelfde les als bij toetsenOngevoeligPct hierboven). */
+      else if (m.staat === 'geen bronmutatie mogelijk') { /* gekend, eigen categorie */ }
       else nietGemeten++;      // 'al rood', 'geen module gevonden', 'slaat zichzelf over', ...
     }
     const gemeten = overleefd + gezakt;

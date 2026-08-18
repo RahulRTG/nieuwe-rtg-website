@@ -1732,6 +1732,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "grondwacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/grondwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "groothandel.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2700,7 +2708,11 @@
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
-      "staat": "geen toetsen gedraaid"
+      "staat": "gezakt",
+      "module": "server/kern/magnaatwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 12,
+      "geprobeerd": 4
     },
     "mail-eigen.test.js": {
       "soort": "puur",

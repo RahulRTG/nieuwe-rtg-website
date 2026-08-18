@@ -1,0 +1,18 @@
+{
+  "uitleg": "De ladder: elke trede van kleuter tot aanvaller tegen een echte server. raak MAG ALLEEN DALEN en nietGeprobeerd ook -- zie scripts/ladder.js. Een schone uitkomst betekent: niets van wat wij konden bedenken kwam erdoor. Niet: veilig.",
+  "gedraaid": "2026-08-18T17:45:42.655Z",
+  "treden": 13,
+  "meters": {
+    "ladderRaak": 0,
+    "ladderNietGeprobeerd": 1
+  },
+  "afgeslagen": 3887,
+  "gelukt": 8,
+  "bevindingen": [],
+  "nietGeprobeerd": [
+    {
+      "trede": "gast",
+      "reden": "geen zaak met een kaart om bij te bestellen"
+    }
+  ]
+}

@@ -38,6 +38,53 @@ const ROMMEL = ['', ' ', null, undefined, 0, -1, [], {}, true, EMOJI, GIGA,
   '../../etc/passwd', '<script>alert(1)</script>', "' OR 1=1 --",
   '${jndi:ldap://x/y}', '\u0000', '{{7*7}}', 'NaN', 'Infinity', '-0'];
 
+/* ---- DE VOORWAARDEN VAN DE BEGANE GROND ----
+
+   Deze twee helpers bestaan omdat de ladder op 18 augustus 2026 vier keer RAAK
+   meldde die geen van vieren een bevinding was. De treden hieronder toetsten op
+   VASTE aannames over de seed, en die zijn weggedreven:
+
+     - "Bestellen bij het geseede restaurant. m1 staat vast op de kaart van
+       KIKUNOI in de seed" -- KIKUNOI staat NIET in de seed. Alleen AYAKA,
+       ESVEDRA, KAITO en SAKURA staan er; KIKUNOI komt uit DEMO_SUPPLIER, en die
+       zet de ladder niet. Elke ronde meldde dus "een gewone bestelling werd
+       geweigerd -- 404 Leverancier niet gevonden".
+     - Het geldpad gaf 502 met "Geen betaalprovider actief. Stel een provider in
+       of zet de demo-betaalstand bewust aan." Dat is geen kapot geldpad maar een
+       rail die in deze omgeving uit staat -- een ENKELE overboeking geeft exact
+       dezelfde fout.
+
+   Waarom dat erger is dan een verkeerd getal: de trede "de haastige klant" is
+   geschreven om de 100M-dubbelboeking te vangen, en meldde RAAK om een reden die
+   daar niets mee te maken had. Zo'n melding blijft staan, went, en dan valt de
+   echte er niet meer tussen op. Erger nog: zolang deze ladder per definitie rood
+   staat, kan hij nergens aan hangen -- en dat is precies waarom hij nergens aan
+   hing.
+
+   De reparatie is NIET om de melding te dempen. Het is om de voorwaarde te
+   MOETEN vaststellen: bestaat er een partner om bij te bestellen, en staat de
+   geldrail aan? Zo niet, dan is de uitkomst NIET GEPROBEERD -- de derde stand
+   die deze ladder juist met opzet heeft, en die zichtbaar blijft. Werkt de
+   voorwaarde wel, dan is een fout erna weer een echte bevinding. */
+
+async function eersteZaak(w) {
+  const r = await w.vraag('POST', '/api/suppliers', w.lid, {});
+  const lijst = (r.status === 200 && Array.isArray(r.data.suppliers)) ? r.data.suppliers : [];
+  return lijst.find(z => z && z.code) || null;
+}
+
+/* Staat de geldrail aan? Een oplaadpoging is het goedkoopste eerlijke antwoord:
+   lukt die niet met een 5xx, dan is er geen betaalprovider en zegt elke
+   geldproef erna niets over de code. We geven de REDEN terug en niet alleen
+   true/false, want "niet geprobeerd" zonder reden is net zo stil als groen. */
+async function geldRail(w) {
+  const r = await w.vraag('POST', '/api/pay/oplaad', w.lid, { centen: 50000, idem: 'rail-' + w.uniek() });
+  if (r.status === 200) return { aan: true };
+  const zin = (r.data && r.data.error) || ('status ' + r.status);
+  return { aan: false, reden: 'de geldrail staat in deze omgeving uit: ' + String(zin).slice(0, 90) };
+}
+
+
 /* Een deterministische keuze uit een lijst: dezelfde run geeft dezelfde
    volgorde, zodat een gevonden fout na te spelen is. */
 function maakKiezer(zaad) {
@@ -75,17 +122,32 @@ const TREDEN = [
       if (beurs.status === 200 && beurs.data.codenaam) w.gelukt();
       else w.raak('een lid kon zijn portemonnee niet openen', '/api/pay/overzicht gaf ' + beurs.status);
 
-      // de partners in de stad bekijken
-      const stad = await w.vraag('POST', '/api/suppliers', w.lid, { city: 'Ibiza' });
-      if (stad.status === 200 && Array.isArray(stad.data.suppliers) && stad.data.suppliers.length) w.gelukt();
-      else w.raak('een lid zag geen enkele partner in de stad', '/api/suppliers gaf ' + stad.status + ', ' + ((stad.data.suppliers || []).length) + ' partners');
+      /* De partners in de stad. De stad komt uit de LIJST en staat hier niet
+         meer hard: 'Ibiza' gaf op een verse installatie nul partners terwijl er
+         wel degelijk partners waren, en dan meet deze proef de seed en niet de
+         route. Is er in het geheel geen partner, dan valt er niets te bekijken
+         en is dat de uitkomst -- geen bevinding. */
+      const zaak = await eersteZaak(w);
+      if (!zaak) w.nietGeprobeerd('deze installatie heeft geen enkele partner om te bekijken');
+      else {
+        const stad = await w.vraag('POST', '/api/suppliers', w.lid, { city: zaak.city });
+        if (stad.status === 200 && Array.isArray(stad.data.suppliers) && stad.data.suppliers.length) w.gelukt();
+        else w.raak('een lid zag geen enkele partner in een stad waar er wel een is',
+          '/api/suppliers gaf voor ' + zaak.city + ': ' + stad.status + ', ' + ((stad.data.suppliers || []).length) + ' partners');
+      }
 
-      /* Bestellen bij het geseede restaurant. m1 (Gazpacho) staat vast op de
-         kaart van KIKUNOI in de seed, dus dit is een echte bestelling zonder
-         eerst iets te hoeven klaarzetten. Het lid heeft een telefoonnummer
-         (bij registratie), dus de gegevenspoort laat de bestelling door. */
-      const best = await w.vraag('POST', '/api/order', w.lid, { supplierCode: 'KIKUNOI', items: [{ id: 'm1', qty: 1 }] });
-      if (best.status === 200 && best.data.order && best.data.order.ref) {
+      /* Bestellen bij een zaak die er ECHT is, met een gerecht van zijn eigen
+         kaart. Hier stond KIKUNOI met m1 hard ingevuld, "want dat staat vast in
+         de seed" -- en dat was al een tijd niet meer waar. Nu komt zowel de zaak
+         als het gerecht uit de server zelf; is er geen kaart, dan is er niets te
+         bestellen en is dat de uitkomst. */
+      const kaart = zaak ? await w.vraag('POST', '/api/supplier/menu', w.lid, { code: zaak.code }) : { status: 0, data: {} };
+      const gerecht = ((kaart.data && (kaart.data.menu || kaart.data.items)) || (zaak && zaak.menu) || [])[0];
+      const best = (zaak && gerecht)
+        ? await w.vraag('POST', '/api/order', w.lid, { supplierCode: zaak.code, items: [{ id: gerecht.id, qty: 1 }] })
+        : null;
+      if (!best) w.nietGeprobeerd('geen zaak met een kaart om bij te bestellen');
+      else if (best.status === 200 && best.data.order && best.data.order.ref) {
         w.gelukt();
         const ref = best.data.order.ref;
         if (best.data.order.status === 'wacht-op-betaling') {
@@ -96,8 +158,9 @@ const TREDEN = [
       } else w.raak('een gewone bestelling werd geweigerd', '/api/order gaf ' + best.status + ' -- ' + JSON.stringify(best.data).slice(0, 120));
 
       // geld sturen naar een ander lid (het normale, geslaagde pad)
-      if (w.lid2Codenaam) {
-        await w.vraag('POST', '/api/pay/oplaad', w.lid, { centen: 20000, idem: 'gast-vul-' + w.uniek() });
+      const rail = w.lid2Codenaam ? await geldRail(w) : { aan: false, reden: 'geen tweede lid om geld naartoe te sturen' };
+      if (w.lid2Codenaam && !rail.aan) w.nietGeprobeerd(rail.reden);
+      else if (w.lid2Codenaam) {
         const bVoor = (await w.vraag('POST', '/api/pay/overzicht', w.lid2, {})).data.saldo;
         const stuur = await w.vraag('POST', '/api/pay/stuur', w.lid, { aan: w.lid2Codenaam, centen: 2500, oms: 'lunch', idem: 'gast-' + w.uniek() });
         const bNa = (await w.vraag('POST', '/api/pay/overzicht', w.lid2, {})).data.saldo;
@@ -176,9 +239,9 @@ const TREDEN = [
          slechte probe. Sturen tussen leden leunt alleen op metIdem; dat is
          precies de laag waar de 100M-bug zat, en die deze trede hoort te
          bewaken. */
-      if (!w.lid2Codenaam) { w.nietGeprobeerd('geen tweede lid om naartoe te sturen'); }
+      const rail = w.lid2Codenaam ? await geldRail(w) : { aan: false, reden: 'geen tweede lid om naartoe te sturen' };
+      if (!rail.aan) { w.nietGeprobeerd(rail.reden); }
       else {
-        await w.vraag('POST', '/api/pay/oplaad', w.lid, { centen: 50000, idem: 'haastig-vul-' + w.uniek() });
         const bVoor = (await w.vraag('POST', '/api/pay/overzicht', w.lid2, {})).data.saldo;
         const idem = 'haastig-' + w.uniek();
         const [x, y] = await Promise.all([

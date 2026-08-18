@@ -1,5 +1,9 @@
 {
-  "vastgelegd": "2026-08-17",
+  "vastgelegd": "2026-08-18",
+  "vervalregel": {
+    "vanaf": "2026-08-19",
+    "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). De 64 notities van voor deze datum zijn het register zoals het is geschreven en worden niet met terugwerkende kracht ingedeeld -- scripts/normverval.js keurt alleen wat vanaf hier bij komt. Zonder die grens zou de regel over de eigen historie struikelen en binnen een dag zijn uitgezet. DE GRENS STOND EERST OP 18 AUGUSTUS EN IS EEN DAG OPGESCHOVEN, en dat is geen verzachting maar dezelfde redenering nog een keer: main schreef diezelfde dag twee notities op een eigen tak, waar deze regel niet bestond. CI ving dat op bij het samengaan. Allebei dragen ze een uitgebreide reden; wat ze missen is het veld dat er toen nog niet was. Ze alsnog indelen zou betekenen dat ik een andere schrijver een soort in de mond leg -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Vanaf 19 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
+  },
   "meters": {
     "endpointsZonderTest": 1192,
     "dekkingPct": 71,
@@ -28,7 +32,16 @@
     "toetsenNietGemeten": 161,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
-    "devPakketten": 1
+    "devPakketten": 1,
+    "ratelTanden": 43,
+    "metingenZonderRatel": 6,
+    "ladderRaak": 0,
+    "ladderNietGeprobeerd": 1,
+    "rolscheidingGaten": 0,
+    "rolscheidingGemeten": 1444,
+    "gluurGaten": 0,
+    "gluurGecontroleerd": 2417,
+    "gluurOnbewaakt": 0
   },
   "notities": [
     {
@@ -41,6 +54,14 @@
       "meter": "keuringOmvang 158 -> 159, kernBreedte 1405 -> 1417, toetsenNietGemeten 154 -> 161 (VERHOOGD, op de basislijn van main)",
       "reden": "Deze tak zet twee nieuwe kernmodules neer met een deur erachter: kern/reisaanbod.js (de enige schrijver van db.data.partnerTrips, die tot nu toe niemand had) en kern/instelling.js (de weg waarlangs een echte gemeente, luchthaven of vervoerder binnenkomt, die alleen uit de demo-seed kwam). Daar horen routes bij, en daarmee groeit kernBreedte met twaalf eigenschappen. keuringOmvang komt er een hoger uit doordat het opknippen van kernlaag2 (die over de 10 kB ging) een bestand in de band vlak onder de grens zet -- de keerzijde van een overtreding oplossen. toetsenNietGemeten stijgt met zeven: zeven nieuwe toetsbestanden waar de mutatiemotor nog niet langs is geweest; die motor draait uren en is hier niet gedraaid.",
       "eerlijkheidshalve": "Bij het samengaan met main botste dit met de bijstelling die main zelf had gedaan (keuringOmvang 155 -> 158, kernBreedte 1396 -> 1405, toetsenNietGemeten 150 -> 154, met hun eigen verantwoording eronder). Ik heb DIE versie genomen als basis en mijn getallen er opnieuw bovenop gezet, in plaats van mijn conflictzijde eroverheen te duwen -- anders was hun verantwoording stil verdwenen. De deltas hierboven zijn dus die van deze tak alleen. Wat ik NIET bijstel is inlineStijlAttributen: die stond ook rood en is GEREPAREERD door drie vormen die als style-attribuut op tientallen plekken stonden naar klassen te halen (.cols.na, .panel > .sub, .uitgifte). En over toetsenNietGemeten: de motor is er niet langs geweest, maar de acht nieuwe grenzen in deze tak zijn met de hand gemuteerd en alle acht zagen we de juiste toets zakken; die meter meet de dekking van het INSTRUMENT, niet van de code."
+    },
+    {
+      "datum": "2026-08-18",
+      "meter": "gluurProeven vervangen door gluurGecontroleerd",
+      "soort": "structureel",
+      "waarheen": "gluurGecontroleerd in NORM.json, gemeten door scripts/gluurronde.js: passief + actief + bewaakte stukken",
+      "reden": "gluurProeven telde VERZOEKEN. Toen de vernielingscontrole werd herbouwd -- van per stuk een familie aflopen naar een momentopname over 796 leesroutes -- controleerde de ronde meer en vroeg hij minder: 9349 in plaats van 9540. De ratel las die winst als achteruitgang en zakte. Een meter die geklets beloont, duwt de volgende verbetering de verkeerde kant op, dus is hij vervangen door een die telt wat er is NAGEKEKEN: elk endpoint dat A antwoordde, elke vraag met een identificator van B, en elk stuk dat tegen vernieling bewaakt wordt. Dat getal stijgt met de dekking en beweegt niet mee met de zuinigheid van de verzoeken.",
+      "eerlijkheidshalve": "Dit is een verlaging van het GETAL (9540 -> 2410) en geen verlaging van de lat: de twee meten iets anders. Wat wel eerlijk moet: het aantal bewaakte stukken bleef 15 van de 27. De opname is breder geworden (796 routes in plaats van de eigen familie), maar de twaalf stukken zonder enige leesroute blijven onbewaakt -- die staan als 4.16 in de takenlijst."
     },
     {
       "datum": "2026-08-18",
@@ -456,5 +477,13 @@
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-05T14:32:44.570Z"
+  "prestatieGemeten": "2026-08-05T14:32:44.570Z",
+  "sinds": {
+    "keuringOmvang": "2026-08-18",
+    "testbestanden": "2026-08-18",
+    "toetsenNietGemeten": "2026-08-18",
+    "inlineStijlAttributen": "2026-08-18",
+    "ratelTanden": "2026-08-18",
+    "metingenZonderRatel": "2026-08-18"
+  }
 }

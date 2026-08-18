@@ -705,7 +705,150 @@ const IJKINGEN = {
   eventLoopP99Ms: { proef: () => prestatieIjking('eventLoopP99Ms') },
   herstelSeconden: { proef: () => prestatieIjking('herstelSeconden') },
   verhalenSlaagPctStorm: { proef: () => prestatieIjking('verhalenSlaagPctStorm') },
-  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') }
+  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') },
+
+  /* DE TWEE METERS DIE OVER DE RATEL ZELF GAAN.
+
+     Ze bewaken niet de code maar de dekking van de ratel, en juist daarom
+     moeten ze zelf een proef hebben: een meter over meters die niet uitslaat,
+     zou de indruk wekken dat de ratel meegroeit terwijl hij stilstaat. Dat is
+     erger dan geen meter, want het is een geruststelling.
+
+     `ratelTanden` telt de geratelde sleutels. De bekend-foute invoer is een
+     script dat een NIEUWE meter declareert: dan hoort de telling mee te
+     bewegen. Dat het langs een tijdelijk BESTAND in scripts/ gaat en niet langs
+     een verzonnen lijst, is met opzet -- zo loopt de hele weg (de map lezen, de
+     METER-constante herkennen, ontdubbelen, tellen) nog steeds door de meter,
+     precies zoals bij de mutatiemeters hierboven. */
+  ratelTanden: {
+    proef: (voor) => metTijdelijkBestand('scripts/zz-ijk-tijdelijk.js',
+      "'use strict';\nconst METER = 'zzIjkTand';\nmodule.exports = { METER };\n",
+      () => norm.meet().ratelTanden - voor.ratelTanden)
+  },
+
+  /* `metingenZonderRatel` telt de meetbestanden in de wortel waar geen ratel
+     achter staat. De bekend-foute invoer is dus een nieuw meetbestand dat in
+     geen enkel register voorkomt: dat is per definitie een gat, en de meter
+     hoort het te zien op het moment dat het ontstaat -- niet pas als iemand er
+     over een half jaar overheen struikelt. */
+  /* DE TWEE METERS VAN DE LADDER.
+
+     Ze komen uit een ronde van vier minuten tegen een echte server, en die is
+     hier niet na te spelen. Dezelfde situatie als bij de zes prestatiemeters
+     hieronder, en dezelfde oplossing: niet het CIJFER namaken maar de meter een
+     bekend-foute uitslag voeren en kijken of hij uitslaat. scripts/ladder.js
+     zet zijn oordeel daarom apart in beoordeel().
+
+     ladderNietGeprobeerd is de belangrijkste van de twee en de minst
+     vanzelfsprekende. Nul bevindingen is triviaal te halen door niets meer te
+     proberen -- en precies dat was hier gebeurd: de insider-trede voerde NUL
+     proeven uit en meldde keurig geen enkele bevinding. Deze meter maakt van
+     "minder proberen" een verslechtering. */
+  /* DE TWEE METERS VAN DE ROLRONDE. Zelfde vorm en zelfde reden als bij de
+     ladder hieronder: de ronde duurt minuten met een echte server, dus de ijking
+     voedt niet de RONDE maar het OORDEEL een bekend-foute uitslag.
+
+     rolscheidingGemeten is de minst vanzelfsprekende en de belangrijkste. Nul
+     gaten is triviaal te halen door minder te onderzoeken, en precies dat was
+     hier aan de hand: test/auth-rol.test.js beloofde "ELK leden-endpoint" en
+     herkende er 1374 van de 1444, omdat een grendel in de body van de handler
+     buiten zijn uitdrukking viel. Deze meter maakt van "minder beproeven" een
+     verslechtering. */
+  /* DE TWEE METERS VAN DE GLUURRONDE (de horizontale scheiding). Zelfde vorm
+     als bij de ladder en de rolronde: het OORDEEL krijgt een bekend-foute
+     uitslag, want de ronde zelf duurt minuten met twee echte leden.
+
+     De ronde heeft daarnaast een eigen zelfproef (GLUUR_ZELFPROEF=1) die zijn
+     vernielingscontrole aantoonbaar laat uitslaan; die draait in CI. Dat is er
+     omdat drie pogingen om die controle met een opzettelijk gat te beproeven
+     afsloegen op de OPSLAGVORM (bundelde notities), en een ijking die van de
+     opslagvorm afhangt is geen ijking. */
+  gluurGaten: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurGecontroleerd: 2410 };
+      assert.equal(g.beoordeel({ gaten: 0, gecontroleerd: 2410 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = g.beoordeel({ gaten: 1, gecontroleerd: 2410 }, norm);
+      assert.equal(stuk.zakt, true, 'een lek tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /1 lek/);
+      return 1;
+    }
+  },
+  gluurGecontroleerd: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const blind = g.beoordeel({ gaten: 0, gecontroleerd: 400 }, { gluurGaten: 0, gluurGecontroleerd: 2410 });
+      assert.equal(blind.zakt, true,
+        'nul lekken over 400 nagekeken dingen terwijl het er 2410 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder nakijken is geen betere uitslag/);
+      return 1;
+    }
+  },
+  gluurOnbewaakt: {
+    proef: () => {
+      /* Een aanmaakroute waarvan het resultaat nergens te lezen is, is geen lek
+         maar een blinde vlek: een schrijflek erop blijft onzichtbaar. De meter
+         hoort dus uit te slaan op een ONVERKLAARDE blinde vlek, en niet op een
+         ronde die er geen heeft. */
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurGecontroleerd: 2417, gluurOnbewaakt: 0 };
+      assert.equal(g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 0 }, norm).zakt, false,
+        'een ronde zonder onverklaarde blinde vlek hoort niet te zakken');
+      const blind = g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 1 }, norm);
+      assert.equal(blind.zakt, true, 'een nieuwe aanmaakroute zonder lezer en zonder reden hoort te zakken');
+      assert.match(blind.redenen[0], /zonder lezer en zonder reden/);
+      return 1;
+    }
+  },
+  rolscheidingGaten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      assert.equal(rol.beoordeel({ gaten: 0, gemeten: 1444 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = rol.beoordeel({ gaten: 2, gemeten: 1444 }, norm);
+      assert.equal(stuk.zakt, true, 'twee gaten tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /2 gat\(en\)/);
+      return 1;
+    }
+  },
+  rolscheidingGemeten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      const blind = rol.beoordeel({ gaten: 0, gemeten: 900 }, norm);
+      assert.equal(blind.zakt, true,
+        'nul gaten over 900 endpoints terwijl er 1444 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder beproeven is geen betere uitslag/);
+      return 1;
+    }
+  },
+  ladderRaak: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      assert.equal(ladder.beoordeel({ raak: 0, niet: 1 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = ladder.beoordeel({ raak: 3, niet: 1 }, norm);
+      assert.equal(stuk.zakt, true, 'drie bevindingen tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /3 bevinding/);
+      return 1;
+    }
+  },
+  ladderNietGeprobeerd: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      const stil = ladder.beoordeel({ raak: 0, niet: 9 }, norm);
+      assert.equal(stil.zakt, true,
+        'nul bevindingen bij negen overgeslagen proeven is geen schone ronde maar een blinde');
+      assert.match(stil.redenen[0], /Minder proberen is geen betere uitslag/);
+      return 1;
+    }
+  },
+  metingenZonderRatel: {
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
+      '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
+      () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+  }
 };
 
 /* De proef achter alle zes. Ze verschillen alleen in hun sleutel, dus staat de
@@ -759,6 +902,7 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
+    'scripts/zz-ijk-tijdelijk.js', 'zz-ijk-tijdelijk.json',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
     'server/kern/zz-ijk-tijdelijk-c.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');

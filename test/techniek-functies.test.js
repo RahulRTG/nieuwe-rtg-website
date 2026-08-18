@@ -61,7 +61,22 @@ test('schakelen maakt een aanvraag; pas na accepteren gaat de functie echt om', 
   assert.equal(b.status, 'akkoord');
   const r = await post('/api/foundation/school/school/maak', { naam: 'Nu dicht' });
   assert.equal(r.status, 503);
-  assert.equal((await r.json()).functie, 'foundation-school');
+  /* WELKE functie er dicht ging, staat er alleen voor een beller die zich heeft
+     bekendgemaakt. Hier werd dat op een anonieme aanroep nagekeken; sinds 18
+     augustus 2026 krijgt die alleen de neutrale zin, want de catalogus van
+     functies is geen publieke informatie (besluit, zie de kop van
+     server/middleware/schakelaar-antwoord.js). Deze route heeft zelf geen deur,
+     dus dit is precies het geval dat die keuze kost: een school aanmelden kan
+     iedereen, en wie het probeert leest nu "tijdelijk uitgeschakeld" zonder de
+     naam erbij. Beide kanten staan hier, zodat een omkering van dat besluit
+     hier zakt en niet stilletjes doorgaat. */
+  const anoniem = await r.json();
+  assert.equal(anoniem.error, 'Deze functie is tijdelijk uitgeschakeld door de beheerder.');
+  assert.equal('functie' in anoniem, false, 'een vreemde hoort de naam van de functie niet te krijgen');
+  const bekend = await post('/api/foundation/school/school/maak', { naam: 'Nu dicht' }, techToken);
+  assert.equal(bekend.status, 503);
+  assert.equal((await bekend.json()).functie, 'foundation-school',
+    'wie zich bekend heeft gemaakt leest wel WELKE functie uitstaat');
 
   // dezelfde aanvraag kan geen tweede keer behandeld worden
   assert.equal((await post('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId }, techToken)).status, 409);

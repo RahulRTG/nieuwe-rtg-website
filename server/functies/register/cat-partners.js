@@ -64,7 +64,7 @@ module.exports = [
     uitleg: 'Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.',
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',
       '/api/command/recht', '/api/command/rechten', '/api/command/mandaat',
-      '/api/command/canary', '/api/command/zandbak', '/api/command/mdm',
+      '/api/command/canary', '/api/command/uitrol', '/api/command/zandbak', '/api/command/mdm',
       '/api/command/overname', '/api/command/apipoort', '/api/command/land', '/api/command/stad'] },
 
   // ---- RTFoundation ----

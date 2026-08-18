@@ -24,7 +24,24 @@ const { startServer } = require('./helper');
 
 let BASE, child, lidToken, tweedeToken, tweedeCodenaam, groepId, bijeenkomstId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
-const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+
+/* DE KLOK STAAT VAST, EN DAT IS EEN REPARATIE.
+
+   Hiervoor rekende deze toets met de ECHTE dag en zette hij een bijeenkomst
+   veertien dagen vooruit. Die valt in de eerste helft van een maand in het vak
+   "deze maand" (een vak met regels) en in de tweede helft in "later" -- en
+   "later" is in socialegraaf/lijn.js bewust een TELLING en geen lijst, want een
+   lijn hoort geen oneindige staart te hebben.
+
+   Gevolg: deze toets was groen op 5 augustus en rood op 18 augustus, zonder dat
+   er een regel code veranderde. Hij mat de kalender in plaats van de software.
+
+   RTG_KLOK zet de dag vast op een woensdag in de eerste helft van de maand, dus
+   +14 blijft binnen dezelfde maand en landt in een vak dat regels toont. De
+   klok weigert zichzelf in productie (zie server/lib/klok.js), dus dit kan
+   alleen hier iets verschuiven. */
+const KLOK = '2026-08-05T09:00:00Z';
+const STRAKS = new Date(Date.parse(KLOK) + 14 * 864e5).toISOString().slice(0, 10);
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -34,7 +51,7 @@ async function api(pad, body, token) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_KLOK: KLOK } }));
   const een = await json(await api('/api/auth/register', { name: 'Object Lid', email: 'obj1@x.nl',
     phone: '0612345601', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }));
   lidToken = een.token;

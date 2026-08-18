@@ -77,6 +77,22 @@ function luisterOpFouten(child) {
   });
 }
 
+/* HOE DRUK STAAT DEZE MACHINE, als vermenigvuldiger voor geduld.
+
+   Dit stond als twee regels middenin startEens(), en daardoor had
+   test/domeinalleen.test.js -- dat zijn eigen server start en dus zijn eigen
+   wachtlus heeft -- een harde 25 seconden die nooit meeschaalde. Die toets zakte
+   daarop in een volle testronde en slaagde er los naast, wat precies het beeld
+   geeft waar de kop hierboven voor waarschuwt: "server werd niet gezond" terwijl
+   er niets stuk was.
+
+   Eén plek dus, en geen derde kopie (LAT.md regel 4). */
+function drukte() {
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  return { kernen, druk, extra: Math.min(5, Math.max(1, Math.ceil(1 + druk))) };
+}
+
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   // Standaard wachten op /api/ready, niet alleen /api/health: sinds de
@@ -100,8 +116,8 @@ async function startEens(opts) {
      lang is er gewacht, en hoe zwaar stond de machine. Een levend kind plus een
      hoge belasting is drukte; een gestopt kind is een echt defect. Dat verschil
      hoort in de melding te staan en niet in het hoofd van wie hem leest. */
+  const { druk, extra: _extra } = drukte();
   const kernen = Math.max(1, os.cpus().length);
-  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
   /* De eerste versie van deze schaling deed Math.round(druk), en dat was te
      grof: bij een genormaliseerde belasting van 0,7 tot 0,9 -- een machine die
      bijna vol staat -- rondde dat af op 1 en bleef het geduld op 25 seconden.
@@ -109,7 +125,7 @@ async function startEens(opts) {
      server die opstart doet echt werk (SQLite, seed, sleutels), dus "bijna vol"
      is al genoeg om hem over de grens te duwen. Vandaar 1 + druk: elke bezette
      kern telt meteen mee in plaats van pas bij een hele. */
-  const extra = Math.min(5, Math.max(1, Math.ceil(1 + druk)));
+  const extra = _extra;
   const pogingen = opts.pogingen || 250 * extra;
   const gestart = Date.now();
   const port = await vrijePoort();
@@ -457,7 +473,7 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, drukte,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

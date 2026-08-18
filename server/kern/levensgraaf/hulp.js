@@ -15,7 +15,27 @@
 // de trap; drie is het dak (gezondheid, nalatenschap)
 const OPEN = 0, PERSOONLIJK = 1, VERTROUWELIJK = 2, BESLOTEN = 3;
 
-const vandaag = () => new Date().toISOString().slice(0, 10);
+/* DE DAG VAN VANDAAG, OP DE HUISKLOK EN NIET OP DIE VAN HET SYSTEEM.
+
+   Hier stond `new Date()`. Dat leest altijd de echte dag, en daardoor was een
+   hele klasse toetsen niet te schrijven: alles wat deze helper gebruikt --
+   de levensgraaf, de sociale graaf, de Control Tower, de momentlijn -- rekende
+   op een dag waar niets aan te draaien viel.
+
+   Dat is een keer duur geweest. test/objectlaagroutes.test.js zette een
+   bijeenkomst VEERTIEN DAGEN vooruit en verwachtte hem op de momentlijn. Dat
+   klopt in de eerste helft van een maand (dan valt +14 in "deze maand", een vak
+   met regels) en niet in de tweede (dan valt hij in "later", en dat is bewust
+   een TELLING en geen lijst -- zie socialegraaf/lijn.js). Dezelfde toets was in
+   augustus dus groen op de 5e en rood op de 18e, zonder dat er een regel code
+   veranderde. Zo'n toets meet de kalender en niet de software.
+
+   Via server/lib/klok.js is de dag nu te verzetten met RTG_KLOK, precies waar
+   die module voor bestaat. Zonder RTG_KLOK is dit exact hetzelfde als voorheen:
+   dezelfde waarde, geen omweg. En in productie weigert de klok zich te laten
+   verzetten, dus dit kan daar niets verschuiven. */
+const { datum: klokDatum } = require('../../lib/klok');
+const vandaag = () => klokDatum().toISOString().slice(0, 10);
 /* EEN VORMCONTROLE IS GEEN CONTROLE (regel 8 van de lat). Dit stond hier als
    alleen de regex, en daar komt '2027-13-45' vrolijk doorheen: vier cijfers,
    streepje, twee, streepje, twee. Maand dertien en dag vijfenveertig bestaan

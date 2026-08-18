@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1022 bestanden en 6744 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1022 bestanden en 6745 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1022 |
-| losse beweringen (`test(...)`) | 6744 |
+| losse beweringen (`test(...)`) | 6745 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 845 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-898 bestanden, 6531 beweringen.
+898 bestanden, 6532 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -618,7 +618,7 @@ toets omvalt.
 | `redactie.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Redactie: het persbureau (krant, magazine en drukkerij) plus de eigen Nieuws-app voor de leden. Getest: de statusketen van een artikel (publiceren is een mensbesluit; daarna is het stuk onwijzigbaar), de... |
 | `redis.test.js` | 3 | gezakt op `===->!==#0` | Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We starten een ECHTE redis-server op een vrije poort en toetsen: set/get, publish/subscribe, en kruisvalidatie met de nog geïnstalleerde... |
 | `regie.test.js` | 7 | gezakt op `liegpoort /api/` | De app-regie van de boardroom: RTG bepaalt welke apps voor wie beschikbaar zijn. Elke eigen app staat als functie op het schakelbord (per pas of doelgroep te sluiten), de grote hendel zet alles bij iedereen aan of... |
-| `reisaanbod.test.js` | 2 | -- | HET REISAANBOD: van een leeg reisbureau naar een reis in het dossier. DE KETEN DIE HIER GEMETEN WORDT was tot nu toe doorgeknipt. |
+| `reisaanbod.test.js` | 3 | -- | HET REISAANBOD: van een leeg reisbureau naar een reis in het dossier. DE KETEN DIE HIER GEMETEN WORDT was tot nu toe doorgeknipt. |
 | `reisagenda.test.js` | 7 | gezakt op `liegpoort /api/` | De reis staat in je agenda: een vlucht, een verblijf of een reisaanvraag verschijnt vanzelf in het programma van het lid (/api/agenda/mijn, de berekende reisagenda), en een bestemming die vooraf een visum of... |
 | `reisbieb.test.js` | 6 | gezakt op `liegpoort /api/` | De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen redactie. Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. |
 | `reisbureau.test.js` | 6 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |

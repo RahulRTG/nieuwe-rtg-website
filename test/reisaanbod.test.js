@@ -191,3 +191,55 @@ test('het aanbod is kantoorwerk, en de invoer wordt nagerekend', async () => {
     assert.equal((await P('/api/office/reisaanbod/weg', { id: 'bestaatniet' }, kantoor)).status, 404);
   } finally { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });
+
+/* AFWIJZEN, en wat dat met het dossier van het lid doet.
+
+   Deze weg had geen enkele toets, en dat viel pas op toen de poort
+   endpointsNooitAangeraakt hem aanwees: /api/office/reisbureau/afwijzen werd in
+   de hele suite geen enkele keer aangeroepen. Ik had hem zelf gebouwd en alleen
+   het bevestigen gemeten -- precies de helft die goed nieuws is.
+
+   Wat hier telt is niet de 200 maar het GEVOLG: een afgewezen reis hoort uit de
+   tijdlijn van het lid te verdwijnen. Blijft hij staan, dan leest het huis als
+   een reis die doorgaat terwijl er nee is gezegd. */
+test('een afgewezen aanvraag verdwijnt uit het dossier van het lid', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ra3-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE, RTG_DEMO: '' } });
+  try {
+    const P = post(srv.base);
+    const lid = await versLid(P, 'Zeger');
+    const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
+    const id = (await P('/api/office/reisaanbod/zet', REIS, kantoor)).body.reis.id;
+
+    const aangevraagd = await P('/api/reisbureau/boek', { tripId: id, personen: 1 }, lid);
+    assert.equal(aangevraagd.status, 200, JSON.stringify(aangevraagd.body).slice(0, 200));
+    const ref = aangevraagd.body.aanvraag.ref;
+    assert.ok((await P('/api/state', {}, lid)).body.state.trip, 'de reis staat in zijn dossier');
+
+    // de reisadviseur wijst af, met een reden die het lid kan lezen
+    const afgewezen = await P('/api/office/reisbureau/afwijzen',
+      { ref, door: 'Reisbalie', reden: 'Die week is het appartement al vergeven.' }, kantoor);
+    assert.equal(afgewezen.status, 200, JSON.stringify(afgewezen.body).slice(0, 200));
+    assert.equal(afgewezen.body.aanvraag.status, 'afgewezen');
+    assert.match(afgewezen.body.aanvraag.besluit.reden, /appartement/, 'met de reden erbij');
+    assert.ok(afgewezen.body.aanvraag.besluit.door, 'en met wie het deed');
+
+    // en dat is de bewering die telt
+    assert.equal((await P('/api/state', {}, lid)).body.state.trip, undefined,
+      'de afgewezen reis staat niet meer in zijn dossier');
+
+    // het lid ziet de afwijzing wel terug bij zijn eigen aanvragen
+    const mijn = (await P('/api/reisbureau/mijn', {}, lid)).body;
+    const eigen = (mijn.aanvragen || mijn || []).find(a => a && a.ref === ref);
+    assert.ok(eigen, 'de aanvraag staat er nog: ' + JSON.stringify(mijn).slice(0, 200));
+    assert.equal(eigen.status, 'afgewezen', 'met de stand erbij, niet stilletjes weg');
+
+    // twee keer beslissen over dezelfde aanvraag kan niet
+    assert.equal((await P('/api/office/reisbureau/afwijzen', { ref, reden: 'nogmaals' }, kantoor)).status, 409);
+    assert.equal((await P('/api/office/reisbureau/bevestig', { ref }, kantoor)).status, 409,
+      'ook niet alsnog bevestigen');
+
+    // en zonder kantoorinlog beslist niemand iets
+    assert.equal((await P('/api/office/reisbureau/afwijzen', { ref: 'RTG-R-XXXXXX' })).status, 401);
+  } finally { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
+});

@@ -829,6 +829,12 @@
   /* En ze gaan ook echt weg als ze dicht staan: een eigen `display` wint van de
      `[hidden]`-regel van de browser -- dezelfde val als bij .os-nu hieronder. */
   #scPinQrBeeld[hidden],#scPinCam[hidden]{display:none;}
+  /* De statusregel van een treffer, als klassen in plaats van style-attributen:
+     die laatste houden style-src-attr in de CSP open (zie de norm). */
+  .sc-st{font-size:0.72rem;color:var(--soft);}
+  .sc-st.ok{color:var(--green,#2E7D4F);}
+  .sc-st.wacht{color:var(--gold);}
+  .sc-av.klein{width:34px;height:34px;font-size:0.7rem;}
   .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
   .sc-pin-noot{margin-top:0.55rem;font-size:0.7rem;line-height:1.45;color:var(--soft);}
   .sc-pin-noot[hidden]{display:none;}

@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 124,
-    "keuringOmvang": 155,
+    "keuringOmvang": 156,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5927,
     "browserpoortToetsen": 189,
-    "kernBreedte": 1396,
+    "kernBreedte": 1404,
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -31,6 +31,12 @@
     "devPakketten": 1
   },
   "notities": [
+    {
+      "datum": "2026-08-18",
+      "meter": "kernBreedte 1396 -> 1404 en keuringOmvang 155 -> 156 (VERHOOGD voor de contactpin)",
+      "reden": "De acht zijn geen erosie maar precies de acht kernnamen die deze functie toevoegt en die de routes ook echt aanraken: pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind, liveMaak, liveKijk en liveVerbind. Ze staan alle acht in GRENZEN.json bij het domein social, dus ze zijn benoemd en afgebakend en niet zomaar aan de kern geplakt. Een functie toevoegen zonder dat deze meter beweegt kan alleen door de kern te omzeilen, en dat is de duurdere fout. keuringOmvang gaat met een omhoog voor public/apps/app-main/app-main-09a.js (9769 bytes): het pin-paneel zit onder de lat maar in de band eronder. Opknippen zou hier een derde deel opleveren dat alleen het tonen van een QR draagt, en dat is een naad die niet bestaat -- het paneel is een ding.",
+      "eerlijkheidshalve": "Drie andere meters die deze tak eerst wel liet zakken, zijn NIET hier weggeschreven maar gerepareerd. endpointsZonderTest stond op 1204 tegen een norm van 1192: alle twaalf pin-loketten worden nu met hun volledige pad aangeroepen in test/contactpin.test.js, en die toetsen vonden meteen een echte fout (de gezinsroute las de gescande code als sessietoken, omdat allebei `token` heetten). inlineStijlAttributen stond op 5944 tegen 5927 en staat weer op 5927: de trefferregel stond aan beide kanten in twee kopieen met de opmaak in style-attributen, en dat is nu een gedeelde bouwer met klassen. toetsenNietGemeten stond op 151 tegen 150 en staat weer op 150 doordat de mutatiemotor over contactpin.test.js is gedraaid -- uitslag gezakt, en scherp gezakt, dus hij zakt op de inhoud en niet alleen op de inlog."
+    },
     {
       "datum": "2026-08-18",
       "meter": "browserpoortToetsen 203 -> 189 en e2eBestanden 125 -> 124 (VERLAAGD bij het samengaan met main)",

@@ -31,6 +31,9 @@
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
   /* een eigen display wint van de [hidden]-regel van de browser */
   #pinUitNoot{margin-top:.55rem;font-size:.75rem;line-height:1.45;color:var(--zacht);}
+  .pinlabel{color:var(--zacht);font-size:.8rem;}
+  .pinst{font-size:.78rem;color:var(--zacht);}
+  .pinst.ok{color:var(--groen,#7ecb8f);}
   #pinLiveDoek{margin-top:.6rem;}
   .pincode.uit{opacity:.45;text-decoration:line-through;}
   #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
@@ -113,7 +116,7 @@
   <!-- je eigen pin: voorlezen, kopieren of voorhouden. Staat niet bij een
        beschermd profiel (15 of jonger): daar voegt de ouder toe. -->
   <div class="mijncn" id="mijnpin" hidden>
-    <div class="pinrij"><span style="color:var(--zacht);font-size:.8rem;">Jouw pin</span><b class="pincode" id="pinCode">····-····</b></div>
+    <div class="pinrij"><span class="pinlabel">Jouw pin</span><b class="pincode" id="pinCode">····-····</b></div>
     <div class="pinakt">
       <button class="knop grijs mini" id="pinKopie">Kopieer</button>
       <button class="knop grijs mini" id="pinQrKnop">Toon QR</button>
@@ -464,6 +467,20 @@ async function kindContacten(kindHandle, cn){
    code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
 let mijnPin = null, pinScanner = null;
 let pinLive = null;
+/* De trefferregel voor allebei de pin-wegen. Stond twee keer -- de vaste pin en
+   de levende code bouwden dezelfde rij met dezelfde statussen -- en dat is hoe
+   ze een half jaar later verschillend gaan praten. De opmaak zit in klassen
+   (.pinst) in plaats van in style-attributen; die houden style-src-attr in de
+   CSP open, en de norm telt ze. */
+function pinRegel(d, verzoekKnop, bron){
+  const staat = d.status==='verbonden' ? '<span class="pinst ok">✓ vriend</span>'
+    : d.status==='aangevraagd' ? '<span class="pinst">aangevraagd</span>'
+    : d.status==='wacht-op-ouder' ? '<span class="pinst">wacht op ouder</span>'
+    : d.status==='wacht-op-u' ? '<button class="knop mini" data-pinja="'+esc(d.key||'')+'">Accepteer</button>'
+    : verzoekKnop;
+  return '<div class="rij"><span class="av">'+initcn(d.codename)+'</span><div class="nm">'+esc(d.codename)+
+    '<small>'+(d.tier==='rtf'?'RTFoundation':'RTG')+(bron?' · '+bron:'')+'</small></div>'+staat+'</div>';
+}
 async function pinHalen(){
   try{ mijnPin = await soc('/pin'); }catch(e){ return; }
   pinStandTonen();
@@ -501,17 +518,12 @@ function pinLiveUit(){
    zelf is het bewijs. */
 async function pinLiveKijken(token){
   let d;
-  try{ d = await soc('/pin/live/kijk', { token }); }
+  try{ d = await soc('/pin/live/kijk', { livecode: token }); }
   catch(e){ $('#pinRes').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const knop = d.status==='verbonden' ? '<span style="color:var(--groen,#7ecb8f);font-size:.78rem;">✓ vriend</span>'
-    : d.status==='aangevraagd' ? '<span style="color:var(--zacht);font-size:.78rem;">aangevraagd</span>'
-    : d.status==='geen' ? '<button class="knop mini" data-pinlv="1">Verzoek</button>'
-    : '<span style="color:var(--zacht);font-size:.78rem;">'+esc(d.status)+'</span>';
-  $('#pinRes').innerHTML = '<div class="rij"><span class="av">'+initcn(d.codename)+'</span><div class="nm">'+esc(d.codename)+
-    '<small>'+(d.tier==='rtf'?'RTFoundation':'RTG')+' · live code</small></div>'+knop+'</div>';
+  $('#pinRes').innerHTML = pinRegel(d, '<button class="knop mini" data-pinlv="1">Verzoek</button>', 'live code');
   const b = $('#pinRes').querySelector('[data-pinlv]');
   if (b) b.addEventListener('click', async()=>{
-    try{ const r = await soc('/pin/live/verbind', { token }); alert(r.status==='wacht-op-ouder'?'Verzoek verstuurd. Een ouder moet het nog goedkeuren.':'Verzoek verstuurd.'); }
+    try{ const r = await soc('/pin/live/verbind', { livecode: token }); alert(r.status==='wacht-op-ouder'?'Verzoek verstuurd. Een ouder moet het nog goedkeuren.':'Verzoek verstuurd.'); }
     catch(e){ alert(e.message); return; }
     laad();
   });
@@ -577,13 +589,7 @@ async function pinOpzoeken(ruw){
   let d;
   try{ d = await soc('/pin/zoek', { pin }); }
   catch(e){ $('#pinRes').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const knop = d.status==='verbonden' ? '<span style="color:var(--groen,#7ecb8f);font-size:.78rem;">✓ vriend</span>'
-    : d.status==='aangevraagd' ? '<span style="color:var(--zacht);font-size:.78rem;">aangevraagd</span>'
-    : d.status==='wacht-op-ouder' ? '<span style="color:var(--zacht);font-size:.78rem;">wacht op ouder</span>'
-    : d.status==='wacht-op-u' ? '<button class="knop mini" data-pinja="'+esc(d.key)+'">Accepteer</button>'
-    : '<button class="knop mini" data-pinvz="'+esc(pin)+'">Verzoek</button>';
-  $('#pinRes').innerHTML = '<div class="rij"><span class="av">'+initcn(d.codename)+'</span><div class="nm">'+esc(d.codename)+
-    '<small>'+(d.tier==='rtf'?'RTFoundation':'RTG')+'</small></div>'+knop+'</div>';
+  $('#pinRes').innerHTML = pinRegel(d, '<button class="knop mini" data-pinvz="'+esc(pin)+'">Verzoek</button>');
   const vz = $('#pinRes').querySelector('[data-pinvz]');
   // stap 2: en nu pas versturen -- omdat een mens erop drukte
   if (vz) vz.addEventListener('click', async()=>{

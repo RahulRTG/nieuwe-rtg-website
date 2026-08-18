@@ -70,7 +70,12 @@ app.post('/api/rtf/social/pin/connect', gezinsPoort, nietBeschermd, async (req, 
 /* De levende code: een verse, ondertekende QR die na een minuut niets meer is
    en de vaste pin niet draagt (kern/sociaal/pin-live.js). Juist hier nuttig --
    twee gezinnen die elkaar op een verjaardag treffen houden een telefoon op in
-   plaats van een codenaam te spellen. */
+   plaats van een codenaam te spellen.
+
+   De gescande code heet in het lijf `livecode` en niet `token`: dat laatste is
+   hier al bezet door de profielsessie (zie gezinsPoort hierboven). Met dezelfde
+   naam overschreef de code de sessie, en antwoordde dit loket "log opnieuw in
+   bij je gezin" op een code die niets mankeerde. */
 app.post('/api/rtf/social/pin/live', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
   const r = liveMaak(s.handle);
@@ -79,13 +84,13 @@ app.post('/api/rtf/social/pin/live', gezinsPoort, nietBeschermd, (req, res) => {
 });
 app.post('/api/rtf/social/pin/live/kijk', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
-  const r = liveKijk(s.handle, req.body.token);
+  const r = liveKijk(s.handle, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ codename: r.codename, tier: r.tier, status: r.st });
 });
 app.post('/api/rtf/social/pin/live/verbind', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = await liveVerbind(s.handle, req.body.token);
+  const r = await liveVerbind(s.handle, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st, codename: r.codename });
 });

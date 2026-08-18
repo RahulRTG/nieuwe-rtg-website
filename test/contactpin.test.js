@@ -376,6 +376,41 @@ test('een onzinnige pin komt niet als 404 maar als "dat is geen pin" terug', asy
   assert.match((await json(r)).error, /acht tekens/i);
 });
 
+/* ---------- 2b. de loketten zelf, elk met zijn volledige pad ----------
+
+   De kern is hierboven uitgebreid getoetst, maar een route is meer dan de kern
+   die hij aanroept: hij heeft een poort, een veldnaam in het lijf en een vorm
+   die hij teruggeeft. Een tikfout in `req.body.token` valt in geen enkele
+   kerntoets op. Deze toetsen raken elk loket een keer echt aan -- ook omdat een
+   endpoint dat in geen enkele toets voorkomt in NORM.json als ongedekt telt,
+   en dat is precies wat het dan ook is. */
+test('de schakelaar en de levende code werken over hun eigen routes', async () => {
+  const gerda = await lid('Gerda Pin');
+  const hans = await lid('Hans Pin');
+  const pin = (await json(await api('/api/member/pin', {}, gerda.token))).toon;
+
+  // uitzetten -> onvindbaar; weer aan -> gewoon te vinden
+  assert.equal((await json(await api('/api/member/pin/uit', { uit: true }, gerda.token))).uit, true);
+  assert.equal((await api('/api/member/pin/zoek', { pin }, hans.token)).status, 404);
+  assert.equal((await json(await api('/api/member/pin/uit', { uit: false }, gerda.token))).uit, false);
+  assert.equal((await json(await api('/api/member/pin/zoek', { pin }, hans.token))).codename, gerda.codenaam);
+
+  // de levende code: maken, bekijken, en pas daarna verbinden
+  const live = await json(await api('/api/member/pin/live', {}, gerda.token));
+  assert.match(live.token, /^RTG1\./);
+  assert.ok(!live.token.includes(pin.replace('-', '')), 'de code draagt de vaste pin niet');
+  const kijk = await json(await api('/api/member/pin/live/kijk', { livecode: live.token }, hans.token));
+  assert.equal(kijk.codename, gerda.codenaam);
+  assert.equal((await json(await api('/api/member/connections', {}, gerda.token))).requests.length, 0,
+    'kijken langs de live-route stuurt ook niets');
+  assert.equal((await json(await api('/api/member/pin/live/verbind', { livecode: live.token }, hans.token))).status, 'aangevraagd');
+  const bij = await json(await api('/api/member/connections', {}, gerda.token));
+  assert.equal(bij.requests.length, 1);
+  assert.equal(bij.requests[0].via, 'code', 'de ontvanger ziet langs welke weg dit kwam');
+  // en de code is op
+  assert.equal((await api('/api/member/pin/live/kijk', { livecode: live.token }, hans.token)).status, 404);
+});
+
 /* ---------- 3. de ouderkant: een kind heeft geen eigen loket ----------
    Een beschermd profiel (15 of jonger) verbindt nooit zelf. De pin verandert
    daar niets aan -- hij is er voor de OUDER, die hem uitwisselt met de ouder
@@ -422,4 +457,51 @@ test('een ouder voegt een vriend toe voor zijn kind op diens pin', async () => {
   // en een pin die niemand aanwijst, blijft ook hier een nette weigering
   const mis = await soc('/oudervoeg', { code: fam.g.code, token: fam.g.token, kindHandle: kind.handle, pin: '00000000' });
   assert.equal(mis.status, 404);
+});
+
+test('de gezinskant heeft dezelfde loketten, met dezelfde poort ervoor', async () => {
+  const fam = await gezinMetKind('Pinstad');
+  const ouder = { code: fam.g.code, token: fam.g.token };
+  const kind = { code: fam.g.code, token: fam.kidToken };
+  const rtf = (pad, lijf) => fetch(BASE + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf) });
+
+  // de ouder mag overal bij
+  const mijn = await json(await rtf('/api/rtf/social/pin', ouder));
+  assert.match(mijn.toon, /^[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$/);
+  assert.notEqual((await json(await rtf('/api/rtf/social/pin/nieuw', ouder))).pin, mijn.pin);
+  assert.equal((await json(await rtf('/api/rtf/social/pin/uit', { ...ouder, uit: true }))).uit, true);
+  assert.equal((await json(await rtf('/api/rtf/social/pin/uit', { ...ouder, uit: false }))).uit, false);
+
+  // en verbindt met een RTG-lid op diens pin
+  const ilse = await lid('Ilse Pin');
+  const haarPin = (await json(await api('/api/member/pin', {}, ilse.token))).toon;
+  assert.equal((await json(await rtf('/api/rtf/social/pin/zoek', { ...ouder, pin: haarPin }))).codename, ilse.codenaam);
+  assert.equal((await json(await rtf('/api/rtf/social/pin/connect', { ...ouder, pin: haarPin }))).status, 'aangevraagd');
+
+  // de levende code, dezelfde drie stappen
+  const live = await json(await rtf('/api/rtf/social/pin/live', ouder));
+  assert.match(live.token, /^RTG1\./);
+  const jaap = await lid('Jaap Pin');
+  assert.equal((await json(await api('/api/member/pin/live/kijk', { livecode: live.token }, jaap.token))).tier, 'rtf',
+    'een RTG-lid leest de code van een gezinslid: de twee werelden delen deze weg');
+  /* En de gezinskant leest er zelf ook een -- met de code in `livecode` en niet
+     in `token`, want dat laatste is hier het profieltoken. Precies die botsing
+     stond er eerst, en dan zegt het loket "log opnieuw in bij je gezin" op een
+     code die niets mankeert. */
+  const vanJaap = (await json(await api('/api/member/pin/live', {}, jaap.token))).token;
+  const eigen = await json(await rtf('/api/rtf/social/pin/live/kijk', { ...ouder, livecode: vanJaap }));
+  assert.equal(eigen.error, undefined, 'de gezinskant leest de code van een RTG-lid');
+  assert.equal(eigen.codename, jaap.codenaam);
+
+  /* EN DE POORT. Voor een beschermd kind staat elk van deze loketten dicht --
+     met dezelfde zin, want een kind hoort te lezen dat zijn ouder dit doet en
+     niet acht verschillende weigeringen. */
+  for (const pad of ['/api/rtf/social/pin', '/api/rtf/social/pin/nieuw', '/api/rtf/social/pin/uit',
+                     '/api/rtf/social/pin/zoek', '/api/rtf/social/pin/connect', '/api/rtf/social/pin/live',
+                     '/api/rtf/social/pin/live/kijk', '/api/rtf/social/pin/live/verbind']) {
+    const r = await rtf(pad, kind);
+    assert.equal(r.status, 403, pad + ' hoort dicht te staan voor een beschermd kind');
+    assert.match((await json(r)).error, /ouder of verzorger/i, pad + ' zegt het met dezelfde woorden');
+  }
 });

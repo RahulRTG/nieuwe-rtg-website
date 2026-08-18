@@ -130,6 +130,22 @@
   }
 
   // stap 1: wie is dit? (nog niets versturen)
+  /* De trefferregel, EEN KEER. Hij stond hier en in ./app-main-09a2.js in twee
+     kopieen die alleen in de knop verschilden -- en dat is precies het soort
+     verdubbeling dat een half jaar later uit elkaar loopt, met een vaste pin
+     die "verbonden" zegt waar de levende code "vriend" zegt. De opmaak zit nu
+     in klassen (zie .sc-st in apps/app.html) in plaats van in style-attributen;
+     die houden style-src-attr in de CSP open. */
+  function pinRegel(codename, status, knopHtml){
+    const staat = status === 'verbonden' ? '<span class="sc-st ok">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
+      : status === 'aangevraagd' ? '<span class="sc-st">' + T('sal.gevraagd','aangevraagd') + '</span>'
+      : status === 'geen' ? knopHtml
+      : '<span class="sc-st wacht">' + T('sal.wachtu','wacht op u') + '</span>';
+    return '<div class="sc-hit"><span class="sc-av klein">' + initCN(codename) + '</span><b>' +
+      escT(codename) + '</b>' + staat + '</div>';
+  }
+  const pinMelding = tekst => '<div class="sc-hit"><span class="sc-st">' + escT(tekst) + '</span></div>';
+
   async function pinOpzoeken(ruw){
     const res = $('#scPinRes'); if (!res) return;
     const pin = String(ruw || '').trim();
@@ -137,14 +153,9 @@
     res.innerHTML = '';
     let d;
     try { d = await API.call('/member/pin/zoek', { pin }); }
-    catch(e){ res.innerHTML = '<div class="sc-hit"><span style="color:var(--soft);font-size:0.78rem;">' + escT(e.message) + '</span></div>'; return; }
-    const knop = d.status === 'geen'
-      ? '<button data-pinvz="' + escT(pin) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>'
-      : d.status === 'verbonden' ? '<span style="color:var(--green,#2E7D4F);font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
-      : d.status === 'aangevraagd' ? '<span style="color:var(--soft);font-size:0.72rem;">' + T('sal.gevraagd','aangevraagd') + '</span>'
-      : '<span style="color:var(--gold);font-size:0.72rem;">' + T('sal.wachtu','wacht op u') + '</span>';
-    res.innerHTML = '<div class="sc-hit"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' +
-      initCN(d.codename) + '</span><b>' + escT(d.codename) + '</b>' + knop + '</div>';
+    catch(e){ res.innerHTML = pinMelding(e.message); return; }
+    res.innerHTML = pinRegel(d.codename, d.status,
+      '<button data-pinvz="' + escT(pin) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>');
     const b = res.querySelector('[data-pinvz]');
     if (b) b.addEventListener('click', () => pinVerbinden(b.dataset.pinvz));
   }

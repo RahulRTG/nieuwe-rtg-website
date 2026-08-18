@@ -68,10 +68,18 @@ app.post('/api/member/pin/live', auth, (req, res) => {
   res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs });
 });
 
-// kijken wie er achter een gescande code zit -- de code gaat hier NIET op
+/* kijken wie er achter een gescande code zit -- de code gaat hier NIET op.
+
+   HET VELD HEET `livecode` EN NIET `token`, en dat is geen smaak. Aan de
+   gezinskant draagt het lijf al een `token`: dat van de profielsessie
+   (rtfSociaal leest req.body.token). Een levende code die daar ook `token`
+   heette, overschreef de sessie -- en dan antwoordt het loket "log opnieuw in
+   bij je gezin" op een volstrekt geldige code. Hier aan de ledenkant zou
+   `token` op zichzelf kunnen, maar twee namen voor hetzelfde ding over twee
+   apps is hoe de volgende die dit leest het weer fout doet. */
 app.post('/api/member/pin/live/kijk', auth, (req, res) => {
   if (geenGast(req, res)) return;
-  const r = liveKijk(req.session.key, req.body.token);
+  const r = liveKijk(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ codename: r.codename, tier: r.tier, status: r.st });
 });
@@ -79,7 +87,7 @@ app.post('/api/member/pin/live/kijk', auth, (req, res) => {
 // en dan pas versturen; nu is de code op
 app.post('/api/member/pin/live/verbind', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = await liveVerbind(req.session.key, req.body.token);
+  const r = await liveVerbind(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st, codename: r.codename });
 });

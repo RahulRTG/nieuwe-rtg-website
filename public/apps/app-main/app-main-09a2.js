@@ -40,22 +40,19 @@
     const res = $('#scPinRes'); if (!res) return;
     res.innerHTML = '';
     let d;
-    try { d = await API.call('/member/pin/live/kijk', { token }); }
-    catch(e){ res.innerHTML = '<div class="sc-hit"><span style="color:var(--soft);font-size:0.78rem;">' + escT(e.message) + '</span></div>'; return; }
-    const knop = d.status === 'geen'
-      ? '<button data-pinlv="1">' + T('sal.verzoek','Verzoek sturen') + '</button>'
-      : d.status === 'verbonden' ? '<span style="color:var(--green,#2E7D4F);font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
-      : d.status === 'aangevraagd' ? '<span style="color:var(--soft);font-size:0.72rem;">' + T('sal.gevraagd','aangevraagd') + '</span>'
-      : '<span style="color:var(--gold);font-size:0.72rem;">' + T('sal.wachtu','wacht op u') + '</span>';
-    res.innerHTML = '<div class="sc-hit"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' +
-      initCN(d.codename) + '</span><b>' + escT(d.codename) + '</b>' + knop + '</div>';
+    try { d = await API.call('/member/pin/live/kijk', { livecode: token }); }
+    catch(e){ res.innerHTML = pinMelding(e.message); return; }
+    // dezelfde regel als bij de vaste pin (pinRegel in ./app-main-09a.js): het
+    // is dezelfde mens en dezelfde stand, alleen langs een andere weg gevonden
+    res.innerHTML = pinRegel(d.codename, d.status,
+      '<button data-pinlv="1">' + T('sal.verzoek','Verzoek sturen') + '</button>');
     const b = res.querySelector('[data-pinlv]');
     if (b) b.addEventListener('click', async () => {
-      try { await API.call('/member/pin/live/verbind', { token }); }
+      try { await API.call('/member/pin/live/verbind', { livecode: token }); }
       catch(e){ toast(e.message); return; }
       toast(T('sal.verzonden','Verzoek verstuurd.'));
       b.replaceWith(Object.assign(document.createElement('span'),
-        { className: '', textContent: '✓ ' + T('sal.gevraagd','aangevraagd'), style: 'color:var(--soft);font-size:0.72rem;' }));
+        { className: 'sc-st', textContent: '✓ ' + T('sal.gevraagd','aangevraagd') }));
     });
   }
 

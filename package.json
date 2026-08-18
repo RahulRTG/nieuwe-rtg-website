@@ -71,6 +71,7 @@
     "icons": "node scripts/icons.js",
     "norm": "node --experimental-sqlite scripts/norm.js",
     "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen",
+    "norm:basis": "node scripts/normbasis.js",
     "dekking": "node --experimental-sqlite scripts/dekking.js",
     "dekking:vast": "node --experimental-sqlite scripts/dekking.js --vastleggen",
     "samenhang": "node --experimental-sqlite scripts/samenhang.js",

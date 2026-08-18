@@ -3211,6 +3211,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "normbasis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/normbasis.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "normprestatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5535,6 +5543,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "takenlijst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/takenlijst.js",
+      "operator": "&&->||#0",
+      "gezakt": 5,
+      "geprobeerd": 2
     },
     "talen.test.js": {
       "soort": "server",

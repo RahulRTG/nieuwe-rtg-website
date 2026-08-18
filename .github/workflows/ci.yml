@@ -144,6 +144,18 @@ jobs:
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
+
+      # EN DE LAT ZELF. NORM.json staat IN de tak, dus een tak kan hem verzetten
+      # en dan meet de stap hierboven de code tegen een lat die in dezelfde
+      # commit is verlaagd. Deze stap legt hem naast die van main: strakker mag
+      # altijd, losser alleen met een reden in `notities` die de meter bij naam
+      # noemt. De fetch is er omdat de checkout ondiep is en origin/main hier
+      # anders niet bestaat -- en dan zakt normbasis.js liever dan dat hij
+      # stilzwijgend slaagt.
+      - name: De basislijn van de norm (verlagen mag, stilletjes niet)
+        run: |
+          git fetch --depth=1 origin main
+          node scripts/normbasis.js --tegen FETCH_HEAD
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de

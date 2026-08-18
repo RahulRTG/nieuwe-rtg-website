@@ -217,7 +217,18 @@ const METERS = [
      Wat NIET meetelt: el.style.kleur = '...' en andere CSSOM-schrijfacties. Die
      gaan buiten de ontleder om en worden door CSP niet gecontroleerd -- ze zijn
      dus geen schuld maar juist de uitweg. */
-  { sleutel: 'inlineStijlAttributen', richting: 'omlaag', wat: 'style="..."-attributen in public/ (houden style-src-attr open)' }
+  { sleutel: 'inlineStijlAttributen', richting: 'omlaag', wat: 'style="..."-attributen in public/ (houden style-src-attr open)' },
+  /* DE METER OP HET MEETGEREEDSCHAP ZELF. scripts/lib/bron.js at op 17 augustus
+     2026 224.031 tekens broncode op zonder dat een enkele teller afweek: 47
+     bestanden waren deels onzichtbaar voor elke keuring die op hem leunt. Die
+     fout is gerepareerd en test/bron.test.js bewaakt de vijf vormen die hem
+     opleverden -- maar dat is een lijst van bekende gevallen. Deze meter kruist
+     de verwijderaar met scripts/ast/lexer.js, een onafhankelijke lexer die de
+     taal wel kent, en telt de .js-bestanden waar code kwijtraakt of waar de
+     kruisproef niets kan zeggen. Zie scripts/lib/bronblind.js voor waarom de
+     voor de hand liggende meters (ratio, tekens, grootste blok) hier niets
+     scheiden, en waar deze proef ophoudt (HTML en CSS). */
+  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -539,6 +550,14 @@ function meet(bronnen) {
   })(PUB);
   const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
 
+  /* De kruisproef op de commentaar-verwijderaar, uit dezelfde bron als de toets
+     die hem bewaakt (regel 4: geen tweede implementatie). Faalt hij, dan zakt de
+     meter in plaats van stil nul te geven -- juist bij een meter die over
+     blindheid gaat is een stille nul de ergste uitkomst. */
+  let bronBlindeBestanden;
+  try { bronBlindeBestanden = require('./lib/bronblind').meetBlind({ wortel: WORTEL }).ongedekt; }
+  catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
   let grenzen;
@@ -605,7 +624,8 @@ function meet(bronnen) {
     toetsenOngevoeligPct: mutaties.ongevoeligPct,
     toetsenNietGemeten: mutaties.nietGemeten,
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
-    inlineStijlAttributen
+    inlineStijlAttributen,
+    bronBlindeBestanden
   };
 }
 

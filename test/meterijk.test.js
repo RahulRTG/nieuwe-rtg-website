@@ -229,6 +229,52 @@ const IJKINGEN = {
     }
   },
 
+  bronBlindeBestanden: {
+    /* DE MUTATIE IS HIER DE HISTORISCHE FOUT ZELF, in het klein nagebouwd.
+
+       Deze meter kruist scripts/lib/bron.js met scripts/ast/lexer.js: elke token
+       die de lexer ziet is code en hoort dus nog in de gestripte uitvoer te
+       staan. De proef zet een bestand neer met de vorm die op 17 augustus 2026
+       224.031 tekens broncode opat -- een MIME-joker in een string, met verderop
+       een gewoon commentaar dat de opener sluit -- en draait er twee
+       verwijderaars overheen: die van vandaag, en die van voor de reparatie.
+
+       Wat dit bewijst is niet dat de teller draait maar dat hij ZIET: dezelfde
+       bron, nul ongedekt met de gerepareerde verwijderaar en een met de kapotte.
+       Zou de kruisproef ooit stomp worden gemaakt, dan zakt deze regel.
+
+       Het gebeurt in een tijdelijke map en niet in de boom zelf: een ijking die
+       een blind bestand in server/ achterlaat, laat elke andere meting van deze
+       ronde meebewegen. */
+    proef: () => {
+      const { meetBlind } = require('../scripts/lib/bronblind');
+      const kapot = (b) => String(b)
+        .replace(/\/\*[\s\S]*?\*\//g, ' ')
+        .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bronblind-'));
+      try {
+        fs.mkdirSync(path.join(dir, 'server'));
+        fs.writeFileSync(path.join(dir, 'server', 'ijk.js'),
+          "const a = 'image/*';\n/* een gewoon commentaar */\nmodule.exports = { a };\n");
+        const schoon = meetBlind({ wortel: dir, mappen: ['server'] });
+        assert.equal(schoon.bestanden, 1, 'de proef heeft echt een bestand gelezen');
+        assert.equal(schoon.ongedekt, 0, 'met de gerepareerde verwijderaar raakt er niets kwijt');
+        const blind = meetBlind({ wortel: dir, mappen: ['server'], strip: kapot });
+        assert.equal(blind.ongedekt, 1, 'met de verwijderaar van voor 17 augustus is dit bestand blind');
+        assert.match(blind.lijst[0].eerste, /image/,
+          'en het eerste dat kwijtraakt is de MIME-joker: precies de vorm van toen');
+        /* De lexfout telt mee als ongedekt, en dat hoort ook geijkt: een bestand
+           dat de tweede mening niet kan lezen is geen bestand zonder bevindingen,
+           het is een bestand waar niet naar gekeken is (LAT.md regel 10). */
+        fs.writeFileSync(path.join(dir, 'server', 'stuk.js'), 'const = = = ;\n');
+        const metStuk = meetBlind({ wortel: dir, mappen: ['server'] });
+        assert.equal(metStuk.lexfout, 1, 'onleesbare bron telt als lexfout');
+        assert.equal(metStuk.ongedekt, 1, 'en een lexfout telt mee in de meter, niet als stille nul');
+        return blind.ongedekt - schoon.ongedekt;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
+
   /* DE DRIE GRENSMETERS. Geijkt op een VERZONNEN bron en niet op de repo: de
      teller krijgt een stukje code te lezen dat ik zelf schrijf, dus ik weet het
      antwoord vooraf. Een meter die alleen zijn eigen routemap kan lezen, is niet

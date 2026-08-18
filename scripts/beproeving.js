@@ -478,13 +478,25 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
-  //    geeft 428 (bevestigNodig). Mét bevestiging is dat 428 in elk geval weg.
+  // 2. De AI beweegt GEEN geld zonder menselijke goedkeuring. Het contract is
+  //    sinds de stuurgoedkeuring een eenmalig SERVERVOORSTEL: /doe geeft 428
+  //    met een goedkeuring.id, en alleen /doe/bevestig met precies dat id
+  //    voert uit. Deze toets liep achter op dat contract -- hij stuurde
+  //    bevestigd:true in de aanroep zelf, en dat is nu juist het gedrag dat
+  //    NIET meer mag werken: een model dat zichzelf bevestigt. De lat hier is
+  //    dus drievoudig: zonder akkoord 428, zelf-akkoord blijft 428, en het
+  //    echte akkoord is eenmalig (een herhaling is 404).
   {
     const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
+    const zelf = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const id = zonder.data && zonder.data.goedkeuring && zonder.data.goedkeuring.id;
+    const met = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const nogEens = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && !!id
+      && zelf.status === 428
+      && met.status !== 428 && met.status !== 0
+      && nogEens.status === 404;
+    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + ', zelfbevestigd=' + zelf.status + ', echt akkoord=' + met.status + ', herhaald akkoord=' + (nogEens.status || '-') });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)

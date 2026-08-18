@@ -3,6 +3,8 @@
    winkeloverzicht en de winkel- en klantbeelden (ook door de koerierlaag
    gebruikt). Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/modebezorg.js. */
+const { idVanKey } = require('../../lib/lidsleutel');
+
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, accounts, notify, notifySupplier, sseToCustomer, sseToSupplier, sseToOffice, haversine, etaMinutes, leesUploadDataUrl,
     KETEN, KLAAR, id, nu, pin, schoon, getal, lijst } = ctx;
@@ -35,9 +37,9 @@ module.exports = (ctx) => {
   function magLeveren(s) { return isRetail(s) && instel(s).aan; }
 
   function accountVerified(key) {
-    const mm = /^user-(\d+)$/.exec(String(key || ''));
-    if (!mm) return false;
-    try { const u = accounts.getUserById(Number(mm[1])); return !!(u && u.verified === 'verified'); } catch (e) { return false; }
+    const id = idVanKey(key);
+    if (id == null) return false;
+    try { const u = accounts.getUserById(id); return !!(u && u.verified === 'verified'); } catch (e) { return false; }
   }
 
   /* ---- de klant vraagt een bezorging aan ---- */

@@ -6,6 +6,8 @@
 /* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
    een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
    onszelf ermee, zodat zowel `npm start` als `node server/server.js` werkt. */
+const { idVanKey } = require('./lib/lidsleutel');
+
 if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
   const r = require('child_process').spawnSync(
     process.execPath,
@@ -1884,8 +1886,8 @@ const geloof = require('./kern/geloof')({ accounts });
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
   maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
     stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
-      const m = /^user-(\d+)$/.exec(String(key || ''));
-      return m ? geloof.promptRegel(Number(m[1]), null) : null;
+      const id = idVanKey(key);
+      return id != null ? geloof.promptRegel(id, null) : null;
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.

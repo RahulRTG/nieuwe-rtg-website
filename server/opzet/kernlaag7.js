@@ -16,6 +16,8 @@
      mediaos */
 'use strict';
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 module.exports = (kern, hulp) => {
   const { accounts, archief, bewerkCollectie, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
@@ -87,10 +89,10 @@ require('../kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
    Leeftijd telt nog wel: onder de 18 het kind-hart, en de plagerige stand
    bestaat alleen voor volwassenen. */
 require('../kern/rahul').zetGeslachtBron((key) => {
-  const m = /^user-(\d+)$/.exec(String(key || ''));
-  if (!m) return null;
+  const id = idVanKey(key);
+  if (id == null) return null;
   let md = null;
-  try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return null; }
+  try { md = accounts.getMemberState(id); } catch (e) { return null; }
   if (!md) return null;
   let lft = null;
   if (md.geboren) {

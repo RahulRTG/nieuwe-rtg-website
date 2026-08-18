@@ -20,6 +20,8 @@
 
    Opslag in db.data.rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
 const MAX_LOG = 100, MAX_KOPPELS = 300, MAX_SESSIES = 300;
@@ -42,9 +44,9 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
   function logVan(key) { const s = S(); if (!s.logs[key]) s.logs[key] = []; return s.logs[key]; }
 
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   const codenaamUit = key => ((typeof gidsHaal === 'function' ? gidsHaal(key) : null) || {}).codename || 'lid';
 

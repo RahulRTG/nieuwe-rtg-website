@@ -12,6 +12,8 @@
    maakVonk(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
    poort, het profiel/de wensen en de dagselectie wonen hier; de like/match,
    het betalen, de chat en het blokkeren/melden in ./match. */
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const { coord } = require('../util');
 
 const MIN_LEEFTIJD = 18;
@@ -31,9 +33,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
 
   /* ---- de poort: 18+ met actief geverifieerd paspoort (zelfde lat als Podium) ---- */
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   function mag(key) {
     const u = accountVanKey(key);

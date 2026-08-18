@@ -32,7 +32,13 @@ module.exports = (ctx) => {
         const payStand = (pay && pay.schaduw && pay.schaduw.aan) ? await pay.schaduw.stand() : null;
         const bankStand = (bank && bank.motorStand) ? await bank.motorStand.stand() : null;
         const aan = !!(payStand) || (bank && bank.geldModus === 'motor') || (pay && pay.geldModus === 'motor');
-        motor = { aan, modus: (pay && pay.geldModus) || 'schaduw', pay: payStand, bank: bankStand };
+        /* De zekering erbij: zonder deze regel zie je op het bord alleen dat
+           boekingen falen, en niet dat WIJ zijn gestopt met het proberen. */
+        const zekering = {
+          pay: (pay && pay.motorZekering) ? pay.motorZekering() : null,
+          bank: (bank && bank.motorZekering) ? bank.motorZekering() : null
+        };
+        motor = { aan, modus: (pay && pay.geldModus) || 'schaduw', pay: payStand, bank: bankStand, zekering };
       } catch (e) { motor = { aan: false, fout: 'motor onbereikbaar' }; }
 
       // --- De Wacht: het immuunbord (meters, lastafworp, quarantaine, raadkamer) ---

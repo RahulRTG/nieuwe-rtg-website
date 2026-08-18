@@ -17,18 +17,19 @@
 
 const maakMotorverbinding = require('../motorverbinding');
 
-module.exports = function maakBankMotorklant() {
+module.exports = function maakBankMotorklant(opties) {
   const v = maakMotorverbinding({
     boekPad: '/api/bank/boek',
     saldiPad: '/api/bank/saldi',
     watBoeking: 'de bankboeking',
     watSaldi: 'native banksaldi'
-  });
+  }, opties);
   return {
     aan: v.aan, modus: v.modus, globaleNoodstop: v.globaleNoodstop, url: v.url,
     /* Rauw boeken: de JS-guard is AL gepasseerd voordat dit wordt aangeroepen;
        de motor past de al-genomen beslissing enkel toe. */
     bankBoek: v.boek,
-    bankSaldiSnapshot: v.saldi
+    bankSaldiSnapshot: v.saldi,
+    stand: v.stand
   };
 };

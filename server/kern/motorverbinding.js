@@ -14,25 +14,19 @@
    teruggeeft: dat zijn drie manieren om een boeking anders te laten aflopen
    afhankelijk van welk van twee bijna-identieke bestanden hem toevallig deed.
 
-   DIT IS EEN ZUIVERE VERPLAATSING EN GEEN VERBETERING. Zelfde vlaggen, zelfde
-   time-out, zelfde koppen, zelfde foutteksten, zelfde statuscodes, zelfde
-   fail-closed bij een ontbrekende URL. Wie dit leest en denkt "hier had ook
-   meteen X bij gekund" heeft gelijk -- zie de notitie onderaan -- maar een
-   refactor van een geldpad die tegelijk gedrag verandert is niet meer na te
-   trekken, en dan weet niemand meer of een verschil van de verplaatsing kwam of
-   van de verbetering.
+   Dit bestand gaat over WAT er naar de motor gaat: welke twee paden, welk
+   lichaam, en hoe een antwoord gelezen moet worden. Of er nog iets HEEN mag --
+   de zekering, de gelijktijdigheidsgrens en het dak op de antwoordgrootte --
+   staat in ./motorzekering.js. Twee vragen die los van elkaar fout kunnen gaan.
 
-   WAT ER BEWUST NIET IN ZIT, EN HET IS OPGEMERKT. server/kern/magnaat-motorklant.js
-   praat met dezelfde motor en heeft daar wel een zekering omheen: een
-   foutenteller met afkoelperiode (stop met bellen als de motor stuk is), een
-   grens op het aantal gelijktijdige verzoeken, en een maximum op de grootte van
-   het antwoord. Die drie ontbreken hier -- op het pad waar geld loopt, en dat
-   is het pad waar ze het hardst nodig zijn. Dat is een echte bevinding en geen
-   detail, maar het is een GEDRAGSwijziging op boekingen en hoort dus in een
-   eigen ronde met een eigen bewijs, niet stiekem mee in een samenvoeging. */
+   NOOIT THROWEN OP HET GELDPAD. Elke uitkomst komt terug als {error, status},
+   ook een open zekering. De aanroeper spiegelt alleen na een bevestiging, dus
+   elke fout betekent: er is niets gebeurd. */
 'use strict';
 
-module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, watSaldi, vlagUitleg }) {
+const maakZekering = require('./motorzekering');
+
+module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, watSaldi }, opties = {}) {
   const globaleNoodstop = process.env.RTG_RUST_ALLES_UIT === '1';
   const modus = globaleNoodstop ? 'uit' : String(process.env.RTG_MOTOR_GELD || 'schaduw').toLowerCase();
   const aan = modus === 'motor';
@@ -54,23 +48,7 @@ module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, w
     throw new Error('RTG_MOTOR_GELD=motor maar geen RTG_MOTOR_GELD_URL / RTG_MOTOR_SHADOW gezet.');
   }
 
-  async function post(pad, body) {
-    const af = new AbortController();
-    const t = setTimeout(() => af.abort(), TIMEOUT_MS);
-    try {
-      const r = await fetch(URL + pad, {
-        method: 'POST', headers: koppen(),
-        body: JSON.stringify(body || {}), signal: af.signal,
-      });
-      const j = await r.json().catch(() => ({}));
-      return { http: r.status, body: j };
-    } finally { clearTimeout(t); }
-  }
-
-  const onbereikbaar = (e) => ({
-    error: e.name === 'AbortError' ? 'Motor-time-out.' : ('Motor onbereikbaar: ' + e.message),
-    status: 502
-  });
+  const zekering = maakZekering({ url: URL, koppen, timeoutMs: TIMEOUT_MS }, opties);
 
   return {
     aan, modus, globaleNoodstop, url: URL,
@@ -80,13 +58,13 @@ module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, w
        fout. */
     async boek({ van, naar, centen, soort, oms, ref }) {
       if (!aan) return { error: 'Rust-motor staat uit; JavaScript blijft autoritatief.', status: 503 };
-      try {
-        const { http, body } = await post(boekPad, { van, naar, centen: Math.round(Number(centen)), soort, oms, ref });
-        if (http >= 300 || !body || body.ok !== true || !body.boeking) {
-          return { error: (body && body.error) || ('Motor weigerde ' + watBoeking + '.'), status: http || 502 };
-        }
-        return { ok: true, boeking: body.boeking };
-      } catch (e) { return onbereikbaar(e); }
+      const r = await zekering.verstuur(boekPad, { van, naar, centen: Math.round(Number(centen)), soort, oms, ref });
+      if (r.fout) return r.fout;
+      const { http, body } = r;
+      if (http >= 300 || !body || body.ok !== true || !body.boeking) {
+        return { error: (body && body.error) || ('Motor weigerde ' + watBoeking + '.'), status: http || 502 };
+      }
+      return { ok: true, boeking: body.boeking };
     },
 
     /* De volledige saldi-stand van de motor (autoriteit), voor de herstart-
@@ -94,16 +72,15 @@ module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, w
        de motor. */
     async saldi() {
       if (!aan) return { error: 'Rust-motor staat uit; geen ' + watSaldi + ' opgevraagd.', status: 503 };
-      const af = new AbortController();
-      const t = setTimeout(() => af.abort(), TIMEOUT_MS);
-      try {
-        const r = await fetch(URL + saldiPad, { method: 'POST', headers: koppen(), body: '{}', signal: af.signal });
-        if (r.status >= 300) return { error: 'Motor gaf ' + r.status + ' op ' + saldiPad + ' (staat RTG_MOTOR_SALDI=1 aan?).', status: r.status };
-        const j = await r.json().catch(() => null);
-        if (!j || typeof j !== 'object') return { error: 'Motor gaf geen saldi terug.', status: 502 };
-        return { ok: true, saldi: j };
-      } catch (e) { return onbereikbaar(e); }
-      finally { clearTimeout(t); }
+      const r = await zekering.verstuur(saldiPad, {});
+      if (r.fout) return r.fout;
+      const { http, body } = r;
+      if (http >= 300) return { error: 'Motor gaf ' + http + ' op ' + saldiPad + ' (staat RTG_MOTOR_SALDI=1 aan?).', status: http };
+      if (!body || typeof body !== 'object') return { error: 'Motor gaf geen saldi terug.', status: 502 };
+      return { ok: true, saldi: body };
     },
+
+    /* Voor het techniekbord: de stand van de zekering plus wie hij bewaakt. */
+    stand: () => Object.assign({ aan, modus, globaleNoodstop }, zekering.stand()),
   };
 };

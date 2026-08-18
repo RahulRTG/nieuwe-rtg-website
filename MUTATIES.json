@@ -3105,6 +3105,23 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "motorverbinding.test.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "server/kern/pay/motorklant.js",
+        "server/kern/bank/motorklant.js"
+      ],
+      "posities": 1
+    },
+    "motorzekering.test.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "server/kern/pay/motorklant.js"
+      ],
+      "posities": 1
+    },
     "mrz.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6015,6 +6032,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "wachtwoordkosten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "wauw.test.js": {
       "soort": "server",

@@ -17,18 +17,19 @@
 
 const maakMotorverbinding = require('../motorverbinding');
 
-module.exports = function maakMotorklant() {
+module.exports = function maakMotorklant(opties) {
   const v = maakMotorverbinding({
     boekPad: '/api/pay/boekguard',
     saldiPad: '/api/motor/saldi',
     watBoeking: 'de boeking',
     watSaldi: 'native saldi'
-  });
+  }, opties);
   return {
     aan: v.aan, modus: v.modus, globaleNoodstop: v.globaleNoodstop, url: v.url,
     /* Geguard boeken: de motor neemt de beslissing (bijv. 402 bij onvoldoende
        saldo) en de JS-engine spiegelt pas na zijn bevestiging. */
     boekGuard: v.boek,
-    saldiSnapshot: v.saldi
+    saldiSnapshot: v.saldi,
+    stand: v.stand
   };
 };

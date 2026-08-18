@@ -65,7 +65,11 @@ function nepMotor(antwoord) {
     gezien.push({ url, koppen: opties.headers, body: JSON.parse(opties.body || '{}') });
     const a = typeof antwoord === 'function' ? await antwoord(url) : antwoord;
     if (a instanceof Error) throw a;
-    return { status: a.status, json: async () => a.body };
+    /* text() en een headers.get, want de client leest het antwoord sinds de
+       zekering BEGRENSD uit (server/kern/motorverbinding.js): eerst kijken hoe
+       groot het is, dan pas binnenhalen. Een nepmotor die alleen json() kan,
+       modelleert dat pad niet meer. */
+    return { status: a.status, headers: { get: () => null }, text: async () => JSON.stringify(a.body || {}) };
   };
   return { gezien, herstel: () => { globalThis.fetch = oud; } };
 }

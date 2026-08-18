@@ -180,7 +180,12 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
+  /* De stand van de motor-zekering, voor het techniekbord. Een doorgeslagen
+     zekering hoort ZICHTBAAR te zijn en niet alleen merkbaar (LAT.md regel 5):
+     anders zie je alleen dat boekingen falen en niet dat wij zelf gestopt zijn
+     met het proberen. Zie server/kern/motorzekering.js. */
+  const motorZekering = () => motorklant.stand();
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, motorZekering };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

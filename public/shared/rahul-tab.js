@@ -19,6 +19,8 @@
   document.body.appendChild(page);
   window.__rahulTabDialoog={tab:tab,page:page};
   laadStijl('/shared/rahul-tab/dialog.js');
+  // de inkt van de tab hangt af van de balk waar hij in hangt; zie dat bestand
+  laadStijl('/shared/rahul-tab/inkt.js');
 
 
   var input=page.querySelector('input'),log=page.querySelector('.rtg-command-log'),suggest=page.querySelector('.rtg-command-suggest');

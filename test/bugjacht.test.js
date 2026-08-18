@@ -508,6 +508,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     NODE_ENV: 'production', RTG_DEMO: '',
     // productie weigert te starten zonder deze; dat is bewust en het hoort zo
     RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
+    OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
     // deze proef gaat niet over betalen; zonder deze vlag weigert productie te
     // starten omdat de demo-provider anders elke betaling zelf zou bevestigen

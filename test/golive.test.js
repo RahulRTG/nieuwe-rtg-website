@@ -4,6 +4,9 @@
    geweigerd, en dat de go-live-keuring goed keurt en afkeurt.
    Draai los: node --test test/golive.test.js */
 const test = require('node:test');
+/* De veilige productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur
+   vraagt nu ook de tweede factor. Zelfde idioom als bankbeveiliging.test.js. */
+const { totpCode } = require('../server/kern/totp');
 const assert = require('node:assert/strict');
 const { spawn, spawnSync } = require('node:child_process');
 const fs = require('fs');
@@ -21,7 +24,7 @@ fs.writeFileSync(SENTINEL_TOKEN, 'a'.repeat(64) + '\n', { mode: 0o600 });
 const PROD_ENV = {
   ...process.env, NODE_ENV: 'production', PORT: String(PORT), RTG_DATA_DIR: TMP,
   RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-  RTG_CLUSTER_KEY: 'c'.repeat(32), OFFICE_CODE: 'KEURING-CODE-12', DEMO_PASS: 'x'.repeat(16),
+  RTG_CLUSTER_KEY: 'c'.repeat(32), OFFICE_CODE: 'KEURING-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', DEMO_PASS: 'x'.repeat(16),
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', APP_URL: 'https://rtg.example.com',
   RTG_SENTINEL_TOKEN_FILE: SENTINEL_TOKEN,
   /* De eenmalige sleutel waarmee de eerste eigenaar zijn account claimt. Zonder
@@ -141,7 +144,10 @@ test('de veilige productiestart komt op en gedraagt zich als productie', async (
   assert.equal(tech.eigenaar, true, 'de echte eigenaar heeft de technische pagina');
   // en de backoffice draait op de eigen (niet-demo) code
   assert.equal((await post('/api/office/login', { code: 'RTG-OFFICE' })).status, 401, 'de demo-backofficecode werkt niet');
-  assert.equal((await post('/api/office/login', { code: 'KEURING-CODE-12' })).status, 200, 'de eigen code wel');
+  assert.equal((await post('/api/office/login', { code: 'KEURING-CODE-12' })).status, 401,
+    'de juiste code alleen is niet genoeg meer: de tweede factor is verplicht in productie');
+  assert.equal((await post('/api/office/login', { code: 'KEURING-CODE-12', totp: totpCode('JBSWY3DPEHPK3PXP') })).status, 200,
+    'met code EN tweede factor wel');
 });
 
 test.after(() => {

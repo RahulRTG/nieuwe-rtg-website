@@ -33,6 +33,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--goldlicht);outl
 .rij input{flex:1;min-width:9rem;width:auto;}
 .mini{font-size:.72rem;color:var(--soft);display:flex;align-items:center;gap:.3rem;white-space:nowrap;}
 .mini input{width:auto;}
+/* een aanvinkvakje van 13x13 is te klein om te raken; 24x24 is de ondergrens
+   van WCAG 2.5.8. Het label eromheen klikte al mee, het vakje zelf niet. */
+.mini input[type="checkbox"],.mini input[type="radio"]{width:24px;height:24px;flex:0 0 auto;}
 /* de eerlijke grens: gouden lijn, altijd zichtbaar, nooit weg te klikken */
 .grens{border:1px solid var(--gold);border-radius:12px;padding:.8rem .9rem;margin:1rem 0;
   font-size:.8rem;line-height:1.55;color:var(--soft);background:rgba(133,112,7,.07);}

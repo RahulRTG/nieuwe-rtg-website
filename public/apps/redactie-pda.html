@@ -36,7 +36,10 @@
   .badge.live{color:var(--green);border-color:var(--green);} .badge.concept{color:var(--gold);border-color:var(--gold);}
   .mini{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
-  .inlog{margin:4rem auto;text-align:center;padding:0 1.2rem;} .inlog a{color:var(--gold);}
+  .inlog{margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .inlog a{color:var(--gold);display:inline-block;padding:.25rem 0;min-height:24px;}
   .hint{color:var(--soft);font-size:.8rem;line-height:1.5;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">

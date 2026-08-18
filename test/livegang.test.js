@@ -4,6 +4,9 @@
    - de rate-limiter staat aan
    Draai: node --test test/livegang.test.js */
 const test = require('node:test');
+/* Deze productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur vraagt
+   ook de tweede factor. Idioom uit test/bankbeveiliging.test.js. */
+const { totpCode } = require('../server/kern/totp');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -37,7 +40,7 @@ test.before(async () => {
     NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP,
     SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
-    OFFICE_CODE: 'GEHEIME-CODE-123',
+    OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
     // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.
     RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
@@ -75,7 +78,10 @@ test('productie is op slot: demo-inloggen zijn dicht, de backoffice-code is niet
   assert.equal((await api('/api/supplier/login', { username: 'Rahul', password: 'Imran' })).status, 403);
   // de demo-backoffice-code werkt niet; de echte (uit de omgeving) wel
   assert.equal((await api('/api/office/login', { code: 'RTG-OFFICE' })).status, 401);
-  assert.equal((await api('/api/office/login', { code: 'GEHEIME-CODE-123' })).status, 200);
+  assert.equal((await api('/api/office/login', { code: 'GEHEIME-CODE-123' })).status, 401,
+    'de code alleen is niet genoeg: in productie is de tweede factor verplicht');
+  assert.equal((await api('/api/office/login', { code: 'GEHEIME-CODE-123', totp: totpCode('JBSWY3DPEHPK3PXP') })).status, 200,
+    'met code EN tweede factor komt het kantoor binnen');
 });
 
 test('de rate-limiter staat aan in productie (429 boven de grens)', async () => {

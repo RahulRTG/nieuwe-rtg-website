@@ -40,6 +40,10 @@
   function Scanner(opties) {
     opties = opties || {};
     this.video = opties.video || (typeof document !== 'undefined' ? document.createElement('video') : null);
+    /* Stil, altijd. Dit element bestaat om frames uit te lezen en hangt vaak niet
+       eens in de pagina; als er ooit een stroom met geluid in komt, hoort daar
+       geen onaangekondigd geluid uit te komen. check.js regel 49 rekent hierop. */
+    if (this.video) this.video.muted = true;
     this.onCode = opties.onCode || function () {};
     this.onFout = opties.onFout || function () {};
     // welke codesoorten de native detector mag zoeken (streepjescodes + QR)

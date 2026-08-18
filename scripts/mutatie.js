@@ -488,7 +488,25 @@ const GEEN_BRONMUTATIE = new Map([
   ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
   ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
   ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],
-  ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module']
+  ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module'],
+  /* Twee keer dezelfde les als hierboven, en allebei met de hand nagetrokken.
+
+     rahul-hart: de motor muteerde server/kern/rahul.js, want daar staat de
+     EXPORT van RAHUL_BASIS. De tekst zelf woont in server/kern/rahul-hart.js.
+     Ik heb hem eerst in het verkeerde bestand gemuteerd en kreeg groen -- wat
+     precies laat zien hoe overtuigend een verkeerde toewijzing liegt. In het
+     JUISTE bestand is hij tweemaal raak: 'Frenna' uit de passies halen laat
+     toets 1 zakken, en scrypt -> md5 laat toets 2 zakken (het security-verhaal
+     dat met de code moet kloppen). Wat hij vastlegt is TEKST; geen enkele
+     bronoperator raakt een letterlijke string. */
+  ['rahul-hart.test.js', 'de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken'],
+  /* consent-dekking is een CENSUS over de broncode: hij zoekt modules met de
+     toestemmingsvorm en eist dat elk in het register staat of een reden heeft.
+     Een operator verandert wat code DOET, niet welke bestanden er zijn -- de
+     juiste mutatie is een module toevoegen of uit het register halen. En die
+     ijkt de toets al zelf: zijn derde bewering is "de scan kan een nieuwe laag
+     ook echt vinden", dus hij toont zijn eigen gevoeligheid. */
+  ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

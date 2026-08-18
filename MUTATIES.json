@@ -996,12 +996,8 @@
     },
     "consent-dekking.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/consent.js"
-      ],
-      "geprobeerd": 19,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden"
     },
     "consent.test.js": {
       "soort": "server",
@@ -4077,12 +4073,8 @@
     },
     "rahul-hart.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rahul.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
       "soort": "puur",

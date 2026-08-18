@@ -11,8 +11,20 @@
    (campagne of Salon); we bewaren alleen de verwijzing, geen bestanden. */
 module.exports = ({ db, save, crypto, schoon }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
-  const VERSIES = ['telefoon', 'tablet', 'desktop']; // op welke versies een blok verborgen mag zijn
+  /* De bloktaal wordt NIET hier geschoond maar in ./webmaker-schoon.js.
+
+     Hier stonden een eigen schoonBlok en schoonVolgorde: teken voor teken
+     dezelfde tien takken, dezelfde lengtes, dezelfde verberg- en
+     variantenafhandeling als daar. Dat is precies wat de kop van dat bestand
+     zegt te willen voorkomen -- "elke ingang die iets van buiten aanneemt loopt
+     hier langs, en dat is precies de reden om het op EEN plek te houden". Bij
+     twee kopieen van een schoonmaker komt een aangescherpte grens maar op een
+     van de twee ingangen terecht, en dat merk je niet.
+
+     Het Atelier kent zijn eigen tien blokken en geeft die mee; die lijst kan
+     daar alleen versmallen, nooit verbreden. */
+  const ATELIER_TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
+  const { TYPES, schoonBlok, schoonVolgorde } = require('./webmaker-schoon')({ scho, crypto, types: ATELIER_TYPES });
 
   const FOTO_MAX = 40;        // hoeveel eigen foto's het Atelier in zijn beeldbank houdt
   function store() {
@@ -32,59 +44,6 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, url, fotos: s.fotos.slice() };
   }
   function fotoWeg(url) { const s = store(); s.fotos = s.fotos.filter(u => u !== url); save(); return { ok: true, fotos: s.fotos.slice() }; }
-
-  function schoonBlok(b) {
-    b = b || {};
-    const t = TYPES.includes(b.type) ? b.type : 'tekst';
-    const T = (v, n) => scho(v, n || 400);
-    const o = { id: scho(b.id, 20) || ('b' + crypto.randomBytes(4).toString('hex')), type: t };
-    if (t === 'hero') { o.kop = T(b.kop, 120); o.sub = T(b.sub, 240); o.knop = T(b.knop, 40); }
-    else if (t === 'kop') { o.tekst = T(b.tekst, 160); }
-    else if (t === 'tekst') { o.tekst = T(b.tekst, 4000); }
-    else if (t === 'knop') { o.tekst = T(b.tekst, 40); o.href = T(b.href, 300); }
-    else if (t === 'beeld') { o.src = T(b.src, 400); o.bijschrift = T(b.bijschrift, 160); }
-    else if (t === 'kolommen') { o.lk = T(b.lk, 80); o.lt = T(b.lt, 1500); o.rk = T(b.rk, 80); o.rt = T(b.rt, 1500); }
-    else if (t === 'galerij') { o.beelden = (Array.isArray(b.beelden) ? b.beelden : []).slice(0, 12).map(s => T(s, 400)).filter(Boolean); }
-    else if (t === 'citaat') { o.tekst = T(b.tekst, 600); o.bron = T(b.bron, 80); }
-    else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
-    else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
-    // op welke versies (telefoon/tablet/desktop) dit blok verborgen is
-    if (Array.isArray(b.verberg)) {
-      const v = b.verberg.filter(x => VERSIES.includes(x));
-      if (v.length) o.verberg = [...new Set(v)];
-    }
-    // per-versie eigen tekst (telefoon/tablet): alleen de tekstvelden die dit blok kent
-    if (b.varianten && typeof b.varianten === 'object') {
-      const V = {};
-      ['telefoon', 'tablet'].forEach(ver => {
-        const src = b.varianten[ver];
-        if (src && typeof src === 'object') {
-          const ov = {};
-          Object.keys(o).forEach(k => {
-            if (['id', 'type', 'verberg', 'varianten'].includes(k)) return;
-            if (typeof o[k] === 'string' && typeof src[k] === 'string') ov[k] = T(src[k], 4000);
-          });
-          if (Object.keys(ov).length) V[ver] = ov;
-        }
-      });
-      if (Object.keys(V).length) o.varianten = V;
-    }
-    return o;
-  }
-
-  function schoonVolgorde(d, blokken) {
-    if (!d.volgorde || typeof d.volgorde !== 'object') return undefined;
-    const ids = new Set(blokken.map(b => b.id));
-    const V = {};
-    ['telefoon', 'tablet'].forEach(ver => {
-      const arr = d.volgorde[ver];
-      if (!Array.isArray(arr)) return;
-      const seen = new Set(); const uit = [];
-      arr.forEach(x => { const s = scho(x, 20); if (ids.has(s) && !seen.has(s)) { seen.add(s); uit.push(s); } });
-      if (uit.length) V[ver] = uit;
-    });
-    return Object.keys(V).length ? V : undefined;
-  }
 
   function bewaar(d) {
     d = d || {};

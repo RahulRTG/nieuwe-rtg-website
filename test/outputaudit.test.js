@@ -147,6 +147,36 @@ test('3. AUDIT: de sporenlijst is benoemd, en groei is de enige maat', () => {
   assert.deepEqual(uit.telling, { bewezen: 1, wisselend: 1, 'geen spoor': 1 });
 });
 
+test('5. een verse gerichte ronde telt METEEN mee, niet pas de volgende batch', () => {
+  /* DE EEN-RONDE-ACHTERSTAND, en hij is echt gebeurd: een batch van 20 gerichte
+     metingen (18 MERKT) schreef een register waarin `gericht` merkt zei en
+     `perRoute` onbeslist -- meet() las de gerichte uitslagen van SCHIJF terwijl
+     de verse pas NA meet() in het bestand belandden. Elke batch telde dus een
+     ronde lang niet mee, en de bewijsmatrix erop ook niet. meet(versGericht)
+     laat de aanroeper de verse uitslag meegeven; deze toets houdt vast dat die
+     parameter echt wint van wat er op schijf ligt, via dezelfde pure oordeel()
+     die meet() gebruikt. */
+  const { oordeel } = require('../scripts/outputproef');
+  const perRoute = new Map([['POST /api/vers', new Set(['breed.test.js'])]]);
+  const perToets = new Map([['breed.test.js', new Set(['POST /api/vers', 'POST /api/ander'])]]);
+  const gevoelig = new Set(['breed.test.js']);
+
+  /* Zonder de verse meting: onbeslist (de toets raakt twee routes). */
+  const zonder = oordeel(perRoute, perToets, gevoelig, new Set(), {});
+  assert.equal(zonder.perRoute['POST /api/vers'].staat, 'onbeslist');
+
+  /* Met de verse gerichte meting: direct bewijs, geen toerekening. */
+  const met = oordeel(perRoute, perToets, gevoelig, new Set(),
+    { 'POST /api/vers': { toets: 'breed.test.js', merkt: true, op: 'nu' } });
+  assert.equal(met.perRoute['POST /api/vers'].staat, 'bewezen');
+  assert.match(met.perRoute['POST /api/vers'].reden, /over DEZE route gelogen/);
+
+  /* En een gerichte meting die niets merkte is BLIND, geen bewijs. */
+  const blind = oordeel(perRoute, perToets, gevoelig, new Set(),
+    { 'POST /api/vers': { toets: 'breed.test.js', merkt: false, op: 'nu' } });
+  assert.equal(blind.perRoute['POST /api/vers'].staat, 'blind');
+});
+
 test('4. een ontbrekend journaal geeft een REDEN en geen nullen', () => {
   /* De fout die dit huis al twee keer heeft gemaakt: een meter zonder invoer die
      stil een cijfer toont. Beide proeven horen te zeggen dat ze niets weten. */

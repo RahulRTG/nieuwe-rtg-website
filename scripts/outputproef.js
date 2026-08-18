@@ -184,7 +184,13 @@ function eerderGemeten() {
   } catch (e) { return {}; }
 }
 
-function meet() {
+/* `versGericht` is de uitslag van een gerichte ronde die NOG NIET op schijf
+   staat. Zonder die parameter liep elke batch een ronde achter: meet() las de
+   gerichte metingen van schijf, terwijl de verse pas NA meet() in het bestand
+   belandden. Het register was daardoor intern tegenstrijdig -- `gericht` zei
+   merkt, `perRoute` zei onbeslist -- en de telling (en de bewijsmatrix erop)
+   telde 18 gemeten routes een ronde lang niet mee. */
+function meet(versGericht) {
   const k = koppeling(JOURNAAL);
   if (!k) return { fout: 'geen journaal op ' + JOURNAAL + '; draai de suite met RTG_ROUTELOG' };
   const g = gevoeligheid();
@@ -194,7 +200,7 @@ function meet() {
       'sinds de OUTPUT-as bestaat; een journaal van voor die tijd kan deze vraag niet beantwoorden.' };
   }
 
-  const o = oordeel(k.perRoute, k.perToets, g.gevoelig, g.blind, eerderGemeten());
+  const o = oordeel(k.perRoute, k.perToets, g.gevoelig, g.blind, versGericht || eerderGemeten());
   const perRoute = o.perRoute;
   const telling = o.telling;
 
@@ -292,7 +298,7 @@ const MEET = Number((argv.find(a => a.startsWith('--meet=')) || '').slice(7)) ||
 if (MEET) {
   const gericht = gerichteRonde(MEET);
   if (!gericht) { process.exitCode = 2; return; }
-  const na = meet();
+  const na = meet(gericht);
   if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(Object.assign(na, { gericht }), null, 1) + '\n');
   console.log('  weggeschreven in OUTPUTPROEF.json\n');
   process.exitCode = 0;

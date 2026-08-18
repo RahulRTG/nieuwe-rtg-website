@@ -41,6 +41,10 @@ const path = require('path');
 /* Hetzelfde plausibele lijf als de rolproef; twee versies van "geloofwaardige
    invoer" lopen gegarandeerd uiteen (LAT.md regel 4). */
 const { plausibelLijf } = require('./lib/rolproef');
+/* WAT VOOR SOORT DEUR DIT IS. De routekaart draagt de bewakerslagen al mee; de
+   indeling ervan staat in scripts/lib/bewakers.js en hoort hier niet nog een
+   keer te worden bedacht (LAT.md regel 4). */
+const bewakerskaart = require('./lib/bewakers');
 const { stempel } = require('./lib/stempel');
 
 const args = process.argv.slice(2);
@@ -152,7 +156,7 @@ const PUBLIEK = new Map([
 /* `pasNaLijf`: routes die pas bij de TWEEDE klop lieten zien dat ze een slot
    hebben. Apart geteld, want dat is precies de winst van die tweede klop -- en
    zonder eigen getal is niet te zien of hij nog iets oplevert. */
-const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0, pasNaLijf: 0 };
+const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0, pasNaLijf: 0, stilOmdat: {} };
 /* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
    hetzelfde oordeel dat hierboven wordt opgeteld -- geen tweede waarheid. */
 const perRoute = [];
@@ -248,8 +252,35 @@ async function ronde() {
             ...(u.pasNaLijf ? { viaLijf: true } : {}),
             begin: bron.tekst.replace(/\s+/g, ' ').slice(0, 120) });
         }
+        /* ---- WAAROM BLIJFT DEZE STIL? ----
+
+           DIT VELD KWAM ER NA EEN NEGATIEF RESULTAAT, en dat is de nuttigste
+           soort. De tweede klop met een plausibel lijf bracht op 297 stille
+           routes exact NUL nieuwe sloten aan het licht: 276 bleven 404, 19
+           bleven 400, 2 bleven 503. De sonde was dus niet te zwak -- er valt
+           daar niets aan te kloppen. 179 van die routes hebben helemaal geen
+           bewakerslaag (de controle zit in de handler, achter een
+           capability-token), 78 zijn een objectpoort die eerst een bestaand
+           object wil, 37 hebben alleen een snelheidsrem. Drie blijven er over.
+
+           Zonder dit veld leest "297 stil" als 297 open vragen, terwijl 294
+           ervan al onder een andere post in BEWIJSSCHULD.json staan. Een
+           schuldpost die dezelfde routes een tweede keer telt, maakt de
+           achterstand groter dan hij is. */
+        const bewaking = oordeel === 'stil'
+          ? bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: (r.bewakers && r.bewakers[m]) || [] })
+          : null;
+        if (bewaking) {
+          const k = bewaking.rol ? 'een rol, maar de invoer strandt eerder'
+            : /geen bewakerslaag/.test(bewaking.reden) ? 'capability in de handler'
+              : /objectpoort/.test(bewaking.reden) ? 'objectpoort: eerst een bestaand object'
+                : /geenBewaker/.test(bewaking.reden) ? 'geen autorisatielaag, alleen een rem'
+                  : 'anders';
+          uit.stilOmdat[k] = (uit.stilOmdat[k] || 0) + 1;
+        }
         if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status,
-          ...(tweede ? { statusMetLijf: tweede } : {}), oordeel });
+          ...(tweede ? { statusMetLijf: tweede } : {}), oordeel,
+          ...(bewaking ? { bewaking: bewaking.rol ? 'rol: ' + bewaking.rol : bewaking.reden } : {}) });
       }
     }));
   }
@@ -319,6 +350,9 @@ ronde().then(() => {
   console.log('  netjes geweigerd  : ' + uit.dicht + '  (401/403)');
   console.log('  stil afgeslagen   : ' + uit.stil + '  (400/404/5xx op BEIDE kloppen -- geen gegevens eruit)');
   console.log('  pas na een lijf   : ' + uit.pasNaLijf + '  (leeg verzoek strandde op de validatie; met een plausibel lijf kwam het slot tevoorschijn)');
+  for (const [k, n] of Object.entries(uit.stilOmdat).sort((a, b) => b[1] - a[1])) {
+    console.log('     stil omdat     : ' + String(n).padStart(4) + '  ' + k);
+  }
   console.log('  bewust publiek    : ' + uit.publiek);
   console.log('  onbereikbaar      : ' + uit.fout);
   if (!uit.open.length) {

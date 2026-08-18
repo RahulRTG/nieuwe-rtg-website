@@ -47,24 +47,38 @@ const lees = (naam) => { try { return JSON.parse(fs.readFileSync(path.join(WORTE
    een schuldenlijst met overgeschreven cijfers loopt binnen een maand uit de
    pas met wat er werkelijk is (LAT.md regel 4). */
 const POSTEN = [
-  /* STOND HIER ALS 'instrument', EN HET GEREEDSCHAP IS ER NU. De reparatie stond
-     er letterlijk bij ("een sonde die een PLAUSIBEL lichaam stuurt"), en sinds
-     scripts/poortwacht.js een tweede keer klopt -- zelfde plausibele lijf als de
-     rolproef, nog steeds zonder token -- is dat gebouwd. Wat er overblijft is
-     geen ontbrekend gereedschap maar een ronde. Een post die meetbaar is
-     geworden hoort niet als `instrument` te blijven staan; dan verbergt dat
-     woord achterstand, precies zoals `grens` dat deed bij
-     output-niet-toerekenbaar. */
+  /* DEZE POST TELDE 294 ROUTES DIE HIERONDER AL STONDEN, en dat kwam pas uit
+     door een NEGATIEF RESULTAAT. De reparatie stond er letterlijk bij ("een
+     sonde die een PLAUSIBEL lichaam stuurt"); die is gebouwd (de tweede klop van
+     de poortwacht) en bracht op 297 stille routes exact NUL nieuwe sloten aan
+     het licht -- 276 bleven 404, 19 bleven 400, 2 bleven 503. De sonde was dus
+     niet te zwak: er valt daar niets aan te kloppen. 179 van die routes hebben
+     geen bewakerslaag (staat hieronder als capability-in-handler), 78 zijn een
+     objectpoort (staat hieronder), 37 hebben alleen een snelheidsrem. Drie
+     blijven er echt over.
+
+     Een schuldpost die dezelfde routes een tweede keer telt, maakt de
+     achterstand groter dan hij is -- en een te grote achterstand is net zo
+     onbruikbaar als een te kleine. Daarom telt deze post nu alleen wat GEEN
+     andere post dekt, uit het veld `stilOmdat` dat de poortwacht zelf
+     bijhoudt. */
   { id: 'auth-onbeslist', soort: 'meetwerk',
-    wat: 'routes waarvan de poortwacht niet kan zeggen of ze een slot hebben',
-    uit: (r) => (r.poortwacht || {}).stil,
-    waarom: 'de eerste klop gaat met een LEEG lichaam. Een 400 of 404 betekent dan dat de ' +
-      'validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets ' +
-      'over een slot. Wat na de TWEEDE klop nog stil is, gaf ook op een plausibel lijf geen ' +
-      '401, geen 403 en geen 2xx -- daar is met deze sonde niets meer uit te halen.',
-    sluit: 'npm run meetronde -- --alleen=poortwacht. Wie daarna nog stil staat, vraagt om een ' +
-      'derde vraag: niet "gaat deze deur open" maar "waarom kom ik er niet eens bij" -- en dat ' +
-      'is scripts/waarom.js.' },
+    wat: 'stille routes die onder geen enkele andere post op deze lijst vallen',
+    uit: (r) => {
+      const om = (r.poortwacht || {}).stilOmdat;
+      if (!om) return null;
+      const totaal = Object.values(om).reduce((a, b) => a + b, 0);
+      const elders = (om['capability in de handler'] || 0) +
+        (om['objectpoort: eerst een bestaand object'] || 0) +
+        (om['geen autorisatielaag, alleen een rem'] || 0);
+      return totaal - elders;
+    },
+    waarom: 'de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een ' +
+      'opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. ' +
+      'Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.',
+    sluit: 'per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag ' +
+      'meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort ' +
+      'te zijn als het gereedschap er is.' },
 
   { id: 'capability-in-handler', soort: 'grens',
     wat: 'routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)',
@@ -231,6 +245,36 @@ console.log('  achterstand (meetwerk + instrument): ' + (uit.telling.meetwerk + 
 console.log('  rand van de methode (grens)        : ' + uit.telling.grens + '  -- sluit nooit, en dat is geen falen');
 
 if (VASTLEGGEN) {
+  /* ---- GROEI MAG, MAAR NOOIT ZWIJGEND ----
+
+     De ratel in test/bewijsschuld.test.js weigert een groeiende achterstand, en
+     dat is goed: anders wordt deze lijst een plek om werk op te stapelen. Maar
+     hij MOET soms groeien, en dan om de beste reden die er is -- er is iets in
+     beeld gekomen dat er altijd al was. Toen scripts/waarom.js 1025 routes een
+     naam gaf ("wil een bestaand object"), stonden die daarvoor helemaal niet op
+     deze lijst: ze zaten anoniem in de 3112 "ongemeten" van de staatproef.
+
+     Zo'n sprong met de hand in het bestand plakken laat de reden in een
+     committekst achter, en daar leest niemand hem. Hij hoort in het register,
+     bij het getal dat hij verklaart. --groei="..." schrijft hem erbij; zonder
+     reden weigert dit script te groeien. */
+  const groeiArg = (process.argv.find(a => a.startsWith('--groei=')) || '').slice(8);
+  const oud = (() => { try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; } })();
+  const som = (t) => t.meetwerk + t.instrument;
+  if (oud && som(uit.telling) > som(oud.telling) && !groeiArg) {
+    console.error('\n  Weiger vast te leggen: de achterstand groeit van ' + som(oud.telling) +
+      ' naar ' + som(uit.telling) + ' en er staat geen reden bij.');
+    console.error('  Groeien mag -- meestal omdat er iets in beeld komt dat er al was -- maar');
+    console.error('  dan hoort de reden IN het register: --groei="wat er zichtbaar werd".');
+    process.exitCode = 1;
+    return;
+  }
+  if (oud && groeiArg && som(uit.telling) > som(oud.telling)) {
+    uit.groei = (oud.groei || []).concat([{ op: new Date().toISOString().slice(0, 10),
+      van: som(oud.telling), naar: som(uit.telling), reden: groeiArg }]);
+  } else if (oud && oud.groei) {
+    uit.groei = oud.groei;
+  }
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  vastgelegd in BEWIJSSCHULD.json');
 }

@@ -28,7 +28,7 @@ const schermenMeter = require('../../../scripts/schermen');
 
 const WORTEL = path.join(__dirname, '../../..');
 const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'INVOERPROEF.json',
-  'IDEMPROEF.json', 'STAATPROEF.json', 'KETENS.json', '.routejournaal'];
+  'IDEMPROEF.json', 'STAATPROEF.json', 'KETENS.json', 'WAAROM.json', '.routejournaal'];
 
 /* De instrumenten die een CONTROL-object dragen. Met de hand, want er is geen
    manier om "alles wat een CONTROL exporteert" te vinden zonder de hele boom te
@@ -87,6 +87,13 @@ module.exports = (octx) => {
     return versheid(s, nuCommit());
   };
 
+  const leesWaarom = () => {
+    try {
+      const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'WAAROM.json'), 'utf8'));
+      return j && j.perRoute ? j.perRoute : null;
+    } catch (e) { return null; }
+  };
+
   let cache = null;
   function bouwRegister() {
     const nu = stempel();
@@ -101,9 +108,14 @@ module.exports = (octx) => {
     const staat = (db && db.data && db.data.functies) || {};
     const standVan = (id) => functies.functieStatus(id, staat);
 
+    /* WAT ER ONTBREEKT OM IETS TE KUNNEN BEWIJZEN, uit WAAROM.json. Ligt dat
+       bestand er niet, dan staat er bij geen enkel ding een voorwaarde -- en dat
+       is beter dan een veld dat er altijd is en soms niets betekent. */
+    const waarom = leesWaarom();
+
     const alle = [].concat(
-      sam.functieRecords(functies.FUNCTIES, perDing, standVan),
-      sam.bedieningRecords(perDing),
+      sam.functieRecords(functies.FUNCTIES, perDing, standVan, waarom),
+      sam.bedieningRecords(perDing, waarom),
       schermRecordsVeilig(),
       sam.controlRecords(controls(), versheidVan)
     );

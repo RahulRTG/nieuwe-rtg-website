@@ -256,6 +256,18 @@
         '<div><b>' + st.bewezen + '</b>bewezen</div>' +
         '<div><b>' + st.ongemeten + '</b>ongemeten</div>' +
         '<div><b>' + st.gezakt + '</b>gezakt</div></div>' : ''));
+    /* WAT ER ONTBREEKT OM DIT TE KUNNEN BEWIJZEN. "Ongemeten" is eerlijk en
+       onbruikbaar: het noemt geen voorwaarde, dus er valt geen werk van te
+       maken. Deze regel komt uit WAAROM.json en staat in de woorden van de
+       route zelf. Staat hij er niet, dan is er niets gemeten -- en dan staat er
+       ook niets, want een veld dat er altijd is maar soms niets betekent, wordt
+       gelezen als een meting. */
+    if (x.ontbreekt) {
+      h += veld('Wat er ontbreekt om dit te bewijzen',
+        '<b>' + esc(x.ontbreekt.soort) + '</b> op ' + x.ontbreekt.aantal + ' route' +
+        (x.ontbreekt.aantal === 1 ? '' : 's') + '<br>' +
+        '<span class="lb">' + esc(x.ontbreekt.voorbeeld || '') + '</span>');
+    }
     if (x.grens) h += veld('Wat deze control NIET aantoont', esc(x.grens));
     if (x.bewijsstuk) h += veld('Bewijsstuk', esc(x.bewijsstuk));
     h += veld('Waar', esc((x.waar || []).join(', ') || 'nergens'));

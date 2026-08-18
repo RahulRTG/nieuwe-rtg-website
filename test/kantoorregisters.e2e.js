@@ -33,6 +33,10 @@
         "Leden-app (algemeen) draagt geen status" -- en dat is precies de ene
         ontwerpregel van dit register: elk ding draagt er een.
 
+     ontbrekendeVoorwaarde() altijd null laten geven           -> 1 subtoets
+        Dan staat er bij geen enkel ding meer WAT eraan ontbreekt, en is
+        "ongemeten" weer een getal om je zorgen over te maken.
+
    Draait alleen waar een browser is.
    ========================================================================== */
 const test = require('node:test');
@@ -131,6 +135,52 @@ test('het platformregister zegt van elk ding wat het is, wat het doet, of het aa
       assert.match(lijf, /uitspraak over ons/i,
         'de uitleg bij ongemeten hoort te zeggen dat het over ons meetwerk gaat: ' + lijf.slice(0, 300));
       await page.click('#kSluit');
+    });
+
+    await t.test('waar WAAROM.json iets weet, noemt de kaart de ontbrekende voorwaarde', async () => {
+      /* "ONGEMETEN" IS EERLIJK EN ONBRUIKBAAR zolang er geen voorwaarde bij
+         staat: het noemt niets om aan te werken. Ligt WAAROM.json er niet, dan
+         hoort er ook NIETS te staan -- een veld dat er altijd is maar soms niets
+         betekent, wordt gelezen als een meting (LAT.md regel 12). Deze subtoets
+         controleert precies dat onderscheid, en zegt het als hij niets kan
+         controleren. */
+      const heeftWaarom = fs.existsSync(path.join(__dirname, '..', 'WAAROM.json'));
+      if (!heeftWaarom) {
+        const kaartTekst = await page.evaluate(async () => {
+          const el = document.querySelector('.ding');
+          if (el) el.click();
+          await new Promise(r => setTimeout(r, 300));
+          const t = document.querySelector('#kLijf').innerText;
+          document.querySelector('#kaart').close();
+          return t;
+        });
+        assert.doesNotMatch(kaartTekst, /Wat er ontbreekt om dit te bewijzen/i,
+          'zonder WAAROM.json hoort dit veld er NIET te staan');
+        return t.diagnostic('WAAROM.json ontbreekt; alleen het zwijgen is gecontroleerd');
+      }
+      await page.click('#wis');
+      await page.waitForTimeout(800);
+      let gezien = 0;
+      const n = await page.$$eval('.ding', els => els.length);
+      for (let i = 0; i < Math.min(n, 12) && !gezien; i++) {
+        await page.$$eval('.ding', (els, k) => els[k].click(), i);
+        await page.waitForSelector('#kaart[open]', { timeout: 10000 });
+        const lijf = await page.$eval('#kLijf', el => el.innerText);
+        /* HOOFDLETTERONGEVOELIG, EN DAT IS GEEN SLORDIGHEID. innerText geeft de
+           GERENDERDE tekst, dus een label met text-transform: uppercase komt er
+           in kapitalen uit. De eerste versie zocht letterlijk en vond niets,
+           twaalf kaarten lang -- een toets die zakt op de opmaak in plaats van
+           op de inhoud. */
+        if (/Wat er ontbreekt om dit te bewijzen/i.test(lijf)) {
+          assert.match(lijf, /object-ontbreekt|niet-van-jou|veld-ontbreekt|rol-te-laag|geen-sessie|conflict|dienst-uit|onbekend/,
+            'de voorwaarde hoort een van de bekende soorten te zijn: ' + lijf.slice(0, 300));
+          assert.match(lijf, /op \d+ route/, 'met het aantal routes erbij');
+          gezien++;
+        }
+        await page.click('#kSluit');
+      }
+      assert.ok(gezien, 'geen enkel ding op de eerste pagina noemt een ontbrekende voorwaarde, ' +
+        'terwijl WAAROM.json er wel ligt');
     });
 
     await t.test('een filter verandert de telling, anders suggereert het dat je hebt gekeken', async () => {

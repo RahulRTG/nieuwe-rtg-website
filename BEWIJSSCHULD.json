@@ -1,25 +1,26 @@
 {
  "stempel": {
-  "op": "2026-08-18T08:51:19.210Z",
-  "commit": "ec84cf7",
+  "op": "2026-08-18T10:37:13.231Z",
+  "commit": "507c957",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
+ "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
-  "posten": 9,
-  "meetwerk": 4282,
-  "instrument": 406,
+  "posten": 10,
+  "meetwerk": 4285,
+  "instrument": 1131,
   "grens": 586
  },
  "posten": [
   {
    "id": "auth-onbeslist",
-   "soort": "instrument",
-   "wat": "routes waarvan de poortwacht niet kan zeggen of ze een slot hebben",
-   "aantal": 300,
-   "waarom": "de sonde klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Een tweede klop met een onzin-token gaf op alle veertien gemeten routes exact dezelfde status.",
-   "sluit": "een sonde die een PLAUSIBEL lichaam stuurt. Die moet tegen een eigen wegwerpserver draaien, want plausibele lichamen naar schrijfroutes sturen kan muteren."
+   "soort": "meetwerk",
+   "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
+   "aantal": 3,
+   "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
+   "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
   {
    "id": "capability-in-handler",
@@ -70,6 +71,14 @@
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
   {
+   "id": "object-vooraf",
+   "soort": "instrument",
+   "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
+   "aantal": 1025,
+   "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
+   "sluit": "per domein een keten van twee stappen, zoals scripts/lib/ketens die al kent: maak het object met de rol die het mag, bedien het daarna. Dat is per domein werk en geen generieke truc -- een id raden uit een ander domein levert dezelfde 404 op."
+  },
+  {
    "id": "proefruis",
    "soort": "meetwerk",
    "wat": "de vier proeven meten op dezelfde code niet twee keer hetzelfde",
@@ -84,6 +93,14 @@
    "aantal": 11,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
    "sluit": "ze een voor een omzetten. Bewust niet in een keer: deze tien vullen de registers waar dit huis op leunt, en ze tegelijk verbouwen is precies de verandering die je niet in een keer moet doen."
+  }
+ ],
+ "groei": [
+  {
+   "op": "2026-08-18",
+   "van": 4688,
+   "naar": 5416,
+   "reden": "scripts/waarom.js gaf 1025 routes een naam die daarvoor anoniem in de 3112 ongemeten van de staatproef zaten; en auth-onbeslist telde 294 routes die al onder capability-in-handler en objectpoort stonden, dus die daalde van 300 naar 3"
   }
  ]
 }

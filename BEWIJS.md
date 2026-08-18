@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1014 bestanden en 6697 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1015 bestanden en 6702 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1014 |
-| losse beweringen (`test(...)`) | 6697 |
+| toetsbestanden | 1015 |
+| losse beweringen (`test(...)`) | 6702 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 843 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
-| niets van beide | 93 |
+| niets van beide | 94 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-890 bestanden, 6484 beweringen.
+891 bestanden, 6489 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -85,6 +85,7 @@ toets omvalt.
 | `backupvolledig.test.js` | 3 | geen module gevonden | EEN BACKUP DIE HALF IS, IS GEEN BACKUP. TWEE FOUTEN, allebei stil: 1. |
 | `balans.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Balans: Rahul kijkt naar agenda, rooster en eetpatroon en adviseert ook eens niks: rust, hobby's, ontprikkelen; eerlijk en zonder dwang. |
 | `bank-beheer.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Bank, de tien endpoints die nog nergens werden aangeraakt. bank.test.js dekt de kern (openen, storten, overboeken, de drie-standen-knop). |
+| `bank-eigendom.test.js` | 5 | -- | EEN LEGE AANVRAGER IS GEEN VRIJBRIEF. De bankmodules hielden bezit tegen de aanvrager met deze vorm: if (!m \|\| (codenaam && m.codenaam !== String(codenaam).trim())) ... |
 | `bank.test.js` | 23 | gezakt op `liegpoort /api/` | RTG Bank: de eigen bank op het RTG Pay-grootboek, met de 3-standen knop van de boardroom (partner -> hybride -> eigen). Getest: de leden-bank die pas open gaat als de boardroom hem live zet + akkoord (opt-in) die de... |
 | `bankbeveiliging.test.js` | 3 | gezakt op `liegpoort /api/` | De bank-laag: tijd-veilige vergelijkingen, de TOTP-tweede factor op de backoffice en het inlog-auditlog. |
 | `bankdeuren.test.js` | 6 | gezakt op `liegpoort /api/` | ACHTER WELKE DEUR STAAT RTG BANK? De keuring telde 649 endpoints zonder toets. |

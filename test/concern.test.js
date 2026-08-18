@@ -389,6 +389,28 @@ test('de twee eindervaringen zijn één zin, geen stappenteller', () => {
     'wie nog geen werkplek heeft hoort te lezen dat uitgenodigd worden gratis is');
 });
 
+test('een groep van een ander is geen groep van jou', () => {
+  /* Gevonden door de gluurronde (TAKEN.md 4.17). De route controleert dat de
+     ENTITEIT van de aanvrager is; dat de GROEP dat ook is, stond nergens. Wie
+     een `con_`-id in handen kreeg, hing er zijn eigen entiteit in en las
+     daarna met /api/concern/boom de hele groep van een ander: de namen van
+     die entiteiten, hun vestigingen en de codenaam van de eigenaar. */
+  const K = bouw();
+  const mijn = maakEnt(K, 'Hotel BV');                       // van lid_a
+  const groep = K.concernNieuw('lid_a', { naam: 'Groep van A' }).concern;
+  const vreemd = K.entiteitVind(
+    K.entiteitNieuw('lid_b', { naam: 'BV van B', land: 'NL', rechtsvorm: 'bv' }).entiteit.id);
+
+  assert.equal(K.concernZet(mijn, groep.id).ok, true, 'je eigen groep blijft gewoon werken');
+
+  const stiekem = K.concernZet(vreemd, groep.id);
+  assert.equal(stiekem.ok, undefined, 'een groep van een ander hoort te stuiten');
+  assert.equal(stiekem.status, 404);
+  assert.equal(vreemd.concern, null, 'en de entiteit hoort er niet in te hangen');
+  assert.equal(K.concernBoom(groep.id).knopen.length, 1,
+    'anders staat de vreemde entiteit in de boom en is de boom zelf het lek');
+});
+
 /* ----------------------------------------------------------------------------
    DE MUTATIES DIE ZIJN GEDAAN (LAT-regel 2)
 
@@ -400,4 +422,5 @@ test('de twee eindervaringen zijn één zin, geen stappenteller', () => {
    6. uitnodigingNieuw() meteen employmentNieuw() -> toets 8 zakt
    7. readiness zonder nvt (0% i.p.v. geen cijfer) -> toets 10 zakt
    8. fusieDoe() de begindatum op vandaag zetten  -> toets 11 zakt
+   9. de eigenaarscontrole uit concernZet() halen  -> toets 15 zakt
    -------------------------------------------------------------------------- */

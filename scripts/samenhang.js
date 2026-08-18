@@ -54,6 +54,7 @@ const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const jsonUit = process.argv.includes('--json');
 const METER = 'onbewaakt';
+const RICHTING = 'omlaag';           // een plafond: meer onbewaakts is slechter
 
 function loop(map, filter, uit = []) {
   let namen = [];

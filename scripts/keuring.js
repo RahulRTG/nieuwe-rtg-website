@@ -24,6 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
+const { maakZoeker } = require('./lib/routedekking');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -135,22 +136,12 @@ function dekking() {
      journaal dat de server tijdens de testrun zelf schrijft (server/routelog.js).
      Wat daar in staat is aangeroepen. Deze teller blijft staan omdat hij snel is
      en geen suite hoeft te draaien -- maar hij is de indicatie, niet het bewijs. */
-  function gedekt(route) {
-    if (testTekst.includes(route)) return true;
-    /* Ook de vorm MET leidende slash maar ZONDER /api-prefix. Dat is hoe een
-       test hem schrijft als haar helper de prefix zelf plakt:
-       `l.call('/member/boardroom/zetveel')`. Die endpoints werden geteld als
-       ongedekt terwijl de test ze wel degelijk aanroept -- de teller keek naar
-       de verkeerde vorm. Een indicatie die de goede gevallen mist, stuurt je
-       naar werk dat al gedaan is. */
-    const staart = route.slice(5);          // zonder '/api/'
-    for (const vorm of [staart, '/' + staart]) {
-      if (testTekst.includes("'" + vorm + "'") ||
-          testTekst.includes('"' + vorm + '"') ||
-          testTekst.includes('`' + vorm + '`')) return true;
-    }
-    return false;
-  }
+  /* De vormen waarin een test een route kan noemen staan in
+     scripts/lib/routedekking.js, want scripts/deltapoort.js stelt dezelfde
+     vraag over de routes die NIEUW zijn in een wijziging. Twee kopieen van
+     deze regels lopen uiteen -- ze zijn hier al drie keer bijgesteld -- en dan
+     meet de poort iets anders dan de ratel die hij moet dienen (regel 4). */
+  const gedekt = maakZoeker(testTekst);
   const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
   if (pct < 60) meld('scheef', 'dekking', 'Minder dan zestig procent van de endpoints komt in een test voor (' + pct + '%).',
@@ -453,7 +444,9 @@ function i18n() {
      - bijna     : de waarschuwingsband eronder. Dat is de vroege waarschuwing.
    Ze staan als twee meters in NORM.json, want ze zeggen iets anders en een
    optelling zou de ene achter de andere kunnen verbergen. */
-const GRENS = 10240;
+/* De grens woont in scripts/lib/omvang.js: scripts/deltapoort.js houdt tegen
+   dat er nieuwe overtreders bijkomen en moet daarvoor DEZELFDE grens kennen. */
+const { GRENS } = require('./lib/omvang');
 
 function uitschieters() {
   let bijna = 0, teGroot = 0;

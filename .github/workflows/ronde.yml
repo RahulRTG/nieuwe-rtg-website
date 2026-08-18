@@ -62,6 +62,13 @@ jobs:
       - name: De Beproeving (sqlite-schaal)
         run: npm run beproeving 2>&1 | tee beproeving.log
       # Ook als de stap hierboven zakt willen we de cijfers hebben.
+      # DE TIJD VERSTRIJKT ALLEEN HIER. Een schuld met een vervaldatum wordt in
+      # ci.yml pas opgemerkt als iemand pusht; op een stille week gebeurt dat
+      # niet, en dan verloopt hij ongezien. Deze wekelijkse stap is de enige die
+      # de kalender ziet lopen zonder dat er een mens aan te pas komt.
+      - name: Het verval (verlopen schulden en uitzonderingen)
+        if: always()
+        run: node scripts/normverval.js
       - name: De norm (structureel hard, prestatie alleen gemeten)
         if: always()
         run: npm run norm

@@ -63,6 +63,7 @@ const NORMBESTAND = path.join(WORTEL, 'NORM.json');
    meter onder dezelfde plicht als elke andere -- een meter die zijn eigen naam
    verstopt, ontsnapt aan de enige regel die hem eerlijk houdt. */
 const METER = 'wettenOnbewezen';
+const RICHTING = 'omlaag';           // een plafond: meer onbewezen wetten is slechter
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[90m', vet: '\x1b[1m', uit: '\x1b[0m' };
 
 const argv = process.argv.slice(2);

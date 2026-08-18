@@ -18,7 +18,7 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
    "// require('x') -> 'x'" niet als echte require wordt gelezen. Strings blijven
    staan; voor deze keuringen is dat genoeg. Staat in scripts/lib/bron.js omdat
    scripts/keuring.js hem ook gebruikt. */
-const { zonderCommentaar } = require('./lib/bron');
+const { zonderCommentaar, zonderTekst } = require('./lib/bron');
 
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
@@ -1380,7 +1380,16 @@ console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in d
          regel staan als de skip-beslissing of de constante die hem draagt.
          Alleen "noemt de naam ergens" zou elk bestand met een uitleg in het
          commentaar meetellen. */
-      const poort = zonderCommentaar(bron).split('\n').some(r =>
+      /* TEKENREEKSEN ERUIT, en dat is een reparatie en geen verfijning.
+         test/deltapoort.test.js draagt als bekend-foute invoer de letterlijke
+         tekst `test('a', { skip: !process.env.DATABASE_URL }, f)` -- een string,
+         geen poort. Deze keuring las hem als code en meldde dat bestand als een
+         toets die Postgres nodig heeft en nergens draait. Dat is de vierde keer
+         in dit huis dat een teller tekst voor code aanziet (zie de kop van
+         zonderTekst in scripts/lib/bron.js); vandaar dezelfde functie en niet
+         een uitzondering voor dit ene bestand. Een uitzonderingenlijst zou de
+         volgende keer weer moeten groeien. */
+      const poort = zonderTekst(zonderCommentaar(bron)).split('\n').some(r =>
         POORT.test(r) && /\b(OVERSLAAN|HEEFT_PG|HEEFT_REDIS|skip|BRON|URL)\b/.test(r));
       if (!poort) continue;
       if (MAG_ERBUITEN.has(rel)) continue;

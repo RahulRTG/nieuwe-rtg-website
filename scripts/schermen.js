@@ -80,6 +80,7 @@ const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const JOURNAAL = path.join(WORTEL, '.schermjournaal');
 const METER = 'schermenZonderToets';
+const RICHTING = 'omlaag';           // een plafond: meer schermen zonder toets is slechter
 
 const jsonUit = process.argv.includes('--json');
 const vastleggen = process.argv.includes('--vastleggen');

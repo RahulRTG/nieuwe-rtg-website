@@ -131,11 +131,14 @@ die zeven jaar moet blijven.
 
 ### 9. Handelingsspoor (wie deed wat)
 
-> **Deze regel is door de software voorgesteld en moet door een mens worden
-> vastgesteld voordat u live gaat.** Een grondslag is een juridisch oordeel; wat
-> hieronder staat is de techniek zoals hij gebouwd is, plus de grondslag die het
-> meest voor de hand ligt gezien punt 8. Laat hem toetsen (zie ook `LAUNCH.md`,
-> punt "Juridisch nalopen").
+> **Besluit van de eigenaar, 18 augustus 2026: deze verwerking mag bestaan, in
+> de vorm die hieronder staat.** Daarmee is de bouw niet langer geblokkeerd.
+>
+> Wat dat besluit NIET vervangt: een grondslag is een juridisch oordeel, en de
+> twee vetgedrukte plekken hieronder (het bredere bereik dan punt 8, en wat er
+> bij vergetelheid gebeurt) horen vóór livegang door een advocaat te worden
+> getoetst -- samen met de rest van punt 7 in `LAUNCH.md`. Dat is advies en geen
+> blokkade; het staat hier zodat het niet in een gesprek blijft hangen.
 
 | | |
 |---|---|

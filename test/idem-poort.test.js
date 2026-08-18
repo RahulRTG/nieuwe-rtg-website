@@ -27,7 +27,14 @@ const maakIdemPoort = require('../server/lib/idem-poort');
 
 /* Een verzoek/antwoord-paar dat net genoeg van Express nabootst. Elk verzoek
    krijgt zijn EIGEN body-object, want zo werkt express.json ook. */
-function nepReq({ methode = 'POST', pad = '/api/concern/nieuw', body = {}, auth = 'Bearer lid-a', sleutel = null } = {}) {
+/* HET STANDAARDPAD IS BEWUST ONVERKLAARD.
+
+   Stond hier eerst /api/concern/nieuw, en die staat inmiddels in
+   idemsleutels.js als "zelfde verzoek is een herhaling". Daardoor sloegen drie
+   toetsen die juist het GEDRAG ZONDER SLEUTEL vastleggen om -- ze kregen
+   deduplicatie waar ze er geen verwachtten. Een onverklaard pad houdt die
+   toetsen over hun eigen onderwerp; het verklaarde gedrag staat verderop apart. */
+function nepReq({ methode = 'POST', pad = '/api/proef/onverklaard', body = {}, auth = 'Bearer lid-a', sleutel = null } = {}) {
   const koppen = { authorization: auth };
   if (sleutel) koppen['idempotency-key'] = sleutel;
   return {
@@ -303,4 +310,96 @@ test('de afdruk negeert de sleutelvelden, maar niet de inhoud', () => {
   const c = maakIdemPoort._afdrukVan({ naam: 'ANDERS', idem: 'k1' });
   assert.equal(a, b, 'een ander sleutelveld is geen ander verzoek');
   assert.notEqual(a, c, 'een andere naam is WEL een ander verzoek');
+});
+
+/* ---------------------------------------------------------------------------
+   DE VERKLAARDE SLEUTEL -- het dubbeltikvenster.
+
+   Een route verklaart in server/lib/idemsleutels.js wat "hetzelfde verzoek"
+   voor hem betekent. Daarmee is een dubbeltik afgevangen zonder dat de client
+   iets stuurt en zonder dat de route een regel verandert.
+
+   De laatste toets hieronder is het hele argument waarom dit een VERKLARING is
+   en geen slimmigheid: generiek dedupliceren op inhoud zou een tweede
+   dobbelworp opslikken, en dat valt niemand op.
+   ------------------------------------------------------------------------- */
+
+test('een VERKLAARDE route vangt de dubbeltik zonder dat de client iets stuurt', async () => {
+  const poort = maakIdemPoort();
+  let keer = 0;
+  const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: 'concern-' + keer }); };
+  const lijf = () => ({ naam: 'RTG' });
+
+  const a = await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf() }), route);
+  const b = await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf() }), route);
+
+  assert.equal(keer, 1, 'twee keer hetzelfde concern oprichten is een dubbeltik');
+  assert.equal(b.res.verzonden.id, 'concern-1');
+  assert.equal(b.res.verzonden.herhaald, true);
+  assert.ok(!a.res.verzonden.herhaald);
+});
+
+test('een ANDER verzoek op diezelfde route is gewoon een tweede handeling', async () => {
+  const poort = maakIdemPoort();
+  let keer = 0;
+  const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: keer }); };
+
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: { naam: 'Eerste' } }), route);
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: { naam: 'Tweede' } }), route);
+
+  assert.equal(keer, 2, 'twee verschillende concerns zijn twee concerns');
+});
+
+test('het venster is kort: na afloop is het een echte tweede handeling', async () => {
+  let t = 1000;
+  const poort = maakIdemPoort({ nu: () => t });
+  let keer = 0;
+  const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: keer }); };
+  const lijf = () => ({ naam: 'RTG' });
+
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf() }), route);
+  t += 4000;                       // binnen het dubbeltikvenster
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf() }), route);
+  assert.equal(keer, 1, 'binnen vijf seconden is het een dubbeltik');
+
+  t += 4000;                       // erbuiten
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: lijf() }), route);
+  assert.equal(keer, 2, 'daarna wil iemand er echt een tweede');
+});
+
+test('een header-sleutel houdt zijn LANGE venster, ook op een verklaarde route', async () => {
+  let t = 1000;
+  const poort = maakIdemPoort({ nu: () => t });
+  let keer = 0;
+  const route = (req, res) => { keer++; res.status(200).json({ ok: true, id: keer }); };
+
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+  t += 60 * 60000;                 // een uur later: ver buiten het dubbeltikvenster
+  await doe(poort, nepReq({ pad: '/api/concern/nieuw', body: { naam: 'RTG' }, sleutel: 'k1' }), route);
+
+  assert.equal(keer, 1, 'een bewuste sleutel is een opdracht en geen dubbeltik');
+});
+
+/* HET ARGUMENT WAAROM DIT EEN VERKLARING IS EN GEEN SLIMMIGHEID. */
+test('een route die NIET idempotent is verklaard, wordt met rust gelaten', async () => {
+  const poort = maakIdemPoort();
+  let worpen = 0;
+  const dobbel = (req, res) => { worpen++; res.status(200).json({ ok: true, worp: worpen }); };
+
+  // twee keer {} naar dezelfde route, direct achter elkaar
+  await doe(poort, nepReq({ pad: '/api/command/sonde/draai', body: {} }), dobbel);
+  const b = await doe(poort, nepReq({ pad: '/api/command/sonde/draai', body: {} }), dobbel);
+
+  assert.equal(worpen, 2,
+    'twee keer dezelfde meethandeling zijn TWEE metingen; generiek dedupliceren zou de tweede opslikken');
+  assert.equal(b.res.verzonden.worp, 2);
+});
+
+test('elke nietIdempotent-verklaring draagt een reden', () => {
+  const { SLEUTELS } = require('../server/lib/idemsleutels');
+  for (const [sleutel, v] of Object.entries(SLEUTELS)) {
+    if (!v.nietIdempotent) continue;
+    assert.ok(v.waarom && v.waarom.length > 20,
+      sleutel + ' zegt "niet idempotent" zonder reden -- dan is het een ontsnapping en geen verklaring');
+  }
 });

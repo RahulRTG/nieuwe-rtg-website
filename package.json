@@ -124,7 +124,9 @@
     "sentinel:audit:verify": "node scripts/sentinel-beheer.js verify-audit",
     "sentinel:audit:recover": "node scripts/sentinel-beheer.js recover-audit",
     "start:rust": "node scripts/start-met-motor.js",
-    "prestaties": "node --experimental-sqlite scripts/prestaties.js"
+    "prestaties": "node --experimental-sqlite scripts/prestaties.js",
+    "idemschuld": "node scripts/idemschuld.js",
+    "idemschuld:vast": "node scripts/idemschuld.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

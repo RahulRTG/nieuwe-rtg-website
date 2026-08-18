@@ -41,11 +41,21 @@
    en wordt vandaag door geen enkele route gelezen. Geen header, geen afwijking
    -- dus geen bestaande client of toets merkt hier iets van.
 
-   WAT DAT BETEKENT VOOR DE 94. Die routes worden hier NIET vanzelf beschermd:
-   scripts/lib/idemproef.js stuurt zijn sleutel in de body, en dat blijft het
-   domein van de kern. Deze poort geeft de clients een correcte, standaard manier
-   om een retry veilig te maken; de 94 routes echt idempotent maken blijft werk
-   in de kern, per route, met de duurzame laag van lib/idem.js eronder.
+   DE TWEEDE BRON: DE VERKLAARDE SLEUTEL. Alleen de header bood geen antwoord op
+   de 94 routes die de idemproef vond, want die stuurt zijn sleutel in de body.
+   Daarom kent deze poort er een tweede bron bij: de verklaring die een route in
+   ./idemsleutels.js over ZICHZELF aflegt.
+
+   Staat daar dat een woordelijk gelijk verzoek een herhaling is, dan maakt de
+   poort daar zelf een sleutel van -- de client hoeft niets te sturen, en de
+   route hoeft geen regel te veranderen. Staat er dat de route juist NIET
+   idempotent is (een dobbelworp, een teller), dan doet de poort niets.
+
+   Waarom dat een verklaring is en geen slimmigheid: twee keer `{}` naar een
+   dobbelworp zijn twee legitieme worpen. Een laag die generiek op inhoud
+   dedupliceert, slikt die tweede stil op -- en een verdwenen worp valt niet op,
+   een dubbele boeking wel. Idempotentie is een eigenschap van de HANDELING en
+   valt niet te raden. Zie de kop van ./idemsleutels.js.
 
    DE VERHOUDING TOT server/lib/idem.js. Dat is de GELDLAAG: duurzaam op schijf,
    in een commit met de boeking zelf, en die blijft de baas over geld. Deze poort
@@ -71,35 +81,12 @@
    pad, sleutel) en niet over de sleutel alleen. Zonder die binding kon een
    geraden `idemproef-apiconcernnieuw-1` het antwoord van een ander lid teruggeven.
 
-   EN DIT IS DE REGEL DIE DEZE POORT BIJNA VERKEERD MAAKTE. `idem` in de body is
-   niet van deze laag -- sommige routes gebruiken dat veld ZELF, en geven bij een
-   herhaling met opzet een ANDER antwoord dan de eerste keer:
-
-     /api/pakket/koop     eerste keer {betaald: 25000}, daarna {alBetaald: true}
-     /api/wbw/verreken    eerste keer 200, daarna 409 "er is geen schuld meer"
-
-   Die twee antwoorden zijn geen fout maar de bedoeling: ze vertellen de gebruiker
-   dat het al gebeurd is. Een generieke poort die er het EERSTE antwoord overheen
-   legt, maakt van "al betaald" weer "zojuist betaald" -- en dat is erger dan het
-   probleem dat hij oplost. De volledige suite ving dit met twee toetsen; ze
-   stonden er al, en ze hadden gelijk.
-
-   Daarom stapt deze poort opzij zodra de route het veld zelf aanraakt. Dat is
-   niet aan een lijst op te hangen (die veroudert), dus wordt het WAARGENOMEN:
-   het idem-veld krijgt een getter, en leest de route hem, dan bewaart de poort
-   niets. Bij de volgende oproep valt er dus ook niets te herhalen en handelt de
-   route het af zoals hij altijd deed.
-
-   Die waarneming faalt bewust naar de VEILIGE kant. Ziet hij een leesactie die
-   geen eigenaarschap betekent (`{...req.body}` raakt het veld ook aan), dan doet
-   de poort niets -- precies de oude situatie. Een gemiste leesactie zou wel erg
-   zijn, en die kan niet: elke manier om aan de waarde te komen loopt langs de
-   getter, ook via een kopie of via JSON.stringify.
    ========================================================================== */
 'use strict';
 
 const crypto = require('crypto');
 const klok = require('./klok');
+const { sleutelVoor, VENSTER_MS } = require('./idemsleutels');
 
 const MAX = 20000;              // ring: zoveel sleutels houden we vast
 const TTL_MS = 24 * 60 * 60 * 1000; // een dag, zoals de gangbare betaalrails
@@ -132,7 +119,7 @@ function wieVan(req) {
   return 'anon:' + (req.ip || '');
 }
 
-/* Alleen de header. Zie de kop voor waarom `idem` uit de body hier bewust NIET
+/* De header. Zie de kop voor waarom `idem` uit de body hier bewust NIET
    meetelt: dat veld is van de applicatielaag. */
 function sleutelVan(req) {
   const ruw = (typeof req.get === 'function' && req.get('idempotency-key')) || '';
@@ -140,6 +127,32 @@ function sleutelVan(req) {
   const s = ruw.trim();
   if (!s || s.length > MAX_SLEUTEL) return null;
   return s;
+}
+
+/* DE VERKLAARDE SLEUTEL -- het dubbeltikvenster.
+
+   Naast de header kent deze poort een tweede bron: de verklaring die een route
+   in ./idemsleutels.js over zichzelf aflegt. Staat daar dat een woordelijk
+   gelijk verzoek een herhaling is, dan maakt de poort daar zelf een sleutel van
+   -- zonder dat de client iets hoeft mee te sturen.
+
+   Waarom dat niet generiek voor ALLE routes gebeurt, staat in de kop van
+   idemsleutels.js. Kort: twee keer `{}` naar een dobbelworp zijn twee worpen,
+   en een laag die dat opslikt is erger dan het probleem.
+
+   Het venster is kort (seconden, niet uren): dit is de maat van een dubbeltik,
+   niet van een bewuste tweede handeling. Een expliciete Idempotency-Key houdt
+   zijn eigen, veel langere venster. */
+function verklaardeSleutel(req) {
+  const v = sleutelVoor(req.method, req.path || req.url || '');
+  if (!v || v.nietIdempotent) return null;
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  if (v.velden) {
+    const uit = {};
+    for (const veld of v.velden) uit[veld] = body[veld];
+    return 'verklaard:' + crypto.createHash('sha256').update(JSON.stringify(uit)).digest('hex').slice(0, 32);
+  }
+  return 'verklaard:' + afdrukVan(body);
 }
 
 /* De poort zelf. `nu` is injecteerbaar zodat de verlooptoets niet hoeft te
@@ -176,8 +189,13 @@ function maakIdemPoort(opties) {
 
   function middleware(req, res, next) {
     if (req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') return next();
-    const sleutel = sleutelVan(req);
+    /* Twee bronnen, en de header wint. Stuurt een client een eigen sleutel, dan
+       is dat een bewuste opdracht met een lang venster; de verklaring is de
+       vangnet-vorm met het korte dubbeltikvenster. */
+    const uitKop = sleutelVan(req);
+    const sleutel = uitKop || verklaardeSleutel(req);
     if (!sleutel) return next();
+    const vensterMs = uitKop ? ttl : VENSTER_MS;
 
     const id = opslagsleutel(req, sleutel);
     const afdruk = afdrukVan(req.body);
@@ -215,7 +233,7 @@ function maakIdemPoort(opties) {
     res.json = (lijf) => {
       const status = res.statusCode || 200;
       if (magBewaren(status, lijf)) {
-        bewaard.set(id, { status, lijf, afdruk, tot: nu() + ttl });
+        bewaard.set(id, { status, lijf, afdruk, tot: nu() + vensterMs });
         /* Snoeien hoort NA het opslaan en niet alleen aan het begin van het
            volgende verzoek: anders staat de ring tussen twee verzoeken door
            altijd één over zijn grens, en bij een stille server blijft hij daar

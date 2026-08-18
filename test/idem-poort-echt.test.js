@@ -72,15 +72,26 @@ test('een herhaald verzoek met dezelfde sleutel maakt niet twee concerns', async
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
 });
 
-test('zonder sleutel blijft alles zoals het was', async () => {
+/* Deze toets legde eerst vast dat er ZONDER sleutel niets verandert. Dat is
+   sinds de verklaarde sleutel niet meer waar, en met opzet: /api/concern/nieuw
+   verklaart in server/lib/idemsleutels.js dat een woordelijk gelijk verzoek een
+   herhaling is, juist zodat een dubbeltik geen tweede concern maakt.
+
+   Wat er WEL nog geldt, en wat deze toets nu bewaakt: een route die niets
+   verklaart, blijft volledig ongemoeid. Dat is de grens van deze laag -- hij
+   raakt alleen wat om hem gevraagd heeft. */
+test('een route die niets verklaart, blijft ongemoeid', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const tok = await lidToken(base);
-    const a = await api(base, '/api/concern/nieuw', { naam: 'Zonder sleutel' }, tok);
-    const b = await api(base, '/api/concern/nieuw', { naam: 'Zonder sleutel' }, tok);
-    assert.ok(!a.body || !a.body.herhaald, 'geen sleutel, geen merk');
-    assert.ok(!b.body || !b.body.herhaald, 'geen sleutel, geen herhaling -- gedrag ongewijzigd');
+    const { SLEUTELS } = require('../server/lib/idemsleutels');
+    assert.ok(!SLEUTELS['POST /api/gewoonten/lijst'], 'deze route hoort onverklaard te zijn');
+
+    const a = await api(base, '/api/agenda/lijst', {}, tok);
+    const b = await api(base, '/api/agenda/lijst', {}, tok);
+    assert.ok(!a.body || !a.body.herhaald, 'onverklaard, dus geen merk');
+    assert.ok(!b.body || !b.body.herhaald, 'onverklaard, dus geen herhaling');
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
 });
 
@@ -94,5 +105,40 @@ test('dezelfde sleutel met een ander verzoek geeft 409 en nooit stil het oude an
     const b = await api(base, '/api/concern/nieuw', { naam: 'Heel iets anders' }, tok, 'idemtoets-bots');
     assert.equal(b.status, 409, 'een andere opdracht op dezelfde sleutel botst');
     assert.match(String(b.body.error), /al gebruikt voor een ander verzoek/);
+  } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
+});
+
+/* DE VERKLAARDE SLEUTEL OP EEN ECHTE SERVER.
+
+   Een route die in server/lib/idemsleutels.js verklaart dat een woordelijk
+   gelijk verzoek een herhaling is, hoort de dubbeltik af te vangen ZONDER dat
+   de client iets meestuurt. Dat is het verschil met de header-vorm hierboven,
+   en het is precies wat de idemproef op 94 routes miste.
+
+   Dit hoort op een echte server getoetst te worden en niet alleen los: de
+   verklaring werkt via de lijfpoort, en een verkeerd gemonteerde laag valt in
+   een pure toets nooit op. */
+test('een verklaarde route vangt de dubbeltik op, zonder Idempotency-Key', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const tok = await lidToken(base);
+
+    /* Op IDENTITEIT toetsen en niet op een telling: elk nieuw concern krijgt een
+       eigen id, dus twee gelijke id's betekent letterlijk dat er maar EEN is
+       gemaakt. Een telling zou een lijstroute nodig hebben en daarmee een tweede
+       aanname over de vorm van het antwoord. */
+    const a = await api(base, '/api/concern/nieuw', { naam: 'Dubbeltikconcern' }, tok);
+    const b = await api(base, '/api/concern/nieuw', { naam: 'Dubbeltikconcern' }, tok);
+    assert.ok(a.status >= 200 && a.status < 300, 'de eerste slaagt: ' + JSON.stringify(a.body));
+    assert.ok(a.body.concern && a.body.concern.id, 'de eerste levert een concern op');
+    assert.equal(b.body.herhaald, true, 'de tweede hoort een herhaling te zijn');
+    assert.equal(b.body.concern.id, a.body.concern.id,
+      'hetzelfde concern, dus er is er maar EEN opgericht');
+
+    // een ANDER concern is gewoon een tweede handeling
+    const c = await api(base, '/api/concern/nieuw', { naam: 'Heel iets anders' }, tok);
+    assert.ok(!c.body.herhaald, 'een ander verzoek is geen herhaling');
+    assert.notEqual(c.body.concern.id, a.body.concern.id, 'en levert een eigen concern op');
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }
 });

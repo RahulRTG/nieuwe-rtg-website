@@ -206,7 +206,9 @@ const GEWOGEN = new Map([
   ['public/apps/app-main/app-main-48.js | Uw deel is betaald.',
     'bevestiging na een geslaagde betaling via /splits/betaal'],
   ['server/kern/fluister/acties.js | is betaald;',
-    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen']
+    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen'],
+  ['server/kern/mobiliteit/reis.js | De vervoerbewijzen zijn betaald.',
+    'staat achter nuBetaald > 0: de som van etappes die e.betaald dragen -- een stand melden mag, zie de kop van dit blok']
 ]);
 
 function beloftes() {

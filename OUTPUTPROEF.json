@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-08-18T22:49:59.783Z",
-  "commit": "9616725",
-  "boomVuil": true,
+  "op": "2026-08-18T22:56:16.659Z",
+  "commit": "bc69258",
+  "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 904,
-  "onbeslist": 3237,
-  "blind": 46,
+  "bewezen": 908,
+  "onbeslist": 3232,
+  "blind": 47,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -7866,30 +7866,28 @@
    "reden": "er is over DEZE route gelogen en residentie2.test.js zakte daarop"
   },
   "POST /api/residentie/spel/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "residentie2.test.js",
-    "residentie3.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/residentie/spel/stop": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "auth-rol.test.js",
     "residentie2.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en residentie2.test.js zakte daarop"
+  },
+  "POST /api/residentie/spel/stop": {
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "residentie2.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en residentie2.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/residentie/vraag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "residentie2.test.js",
-    "residentie3.test.js"
+    "residentie2.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en residentie2.test.js zakte daarop"
   },
   "POST /api/residentie/paar/vraag": {
    "staat": "onbeslist",
@@ -7916,22 +7914,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 12); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/residentie/huis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "menselijkverkeer.test.js",
     "residentie2.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en residentie2.test.js zakte daarop"
   },
   "POST /api/residentie/bel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "menselijkverkeer.test.js",
     "residentie2.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en residentie2.test.js zakte daarop"
   },
   "POST /api/residentie/suite": {
    "staat": "onbeslist",
@@ -36972,6 +36968,31 @@
    "toets": "residentie2.test.js",
    "merkt": true,
    "op": "2026-08-18T22:49:59.610Z"
+  },
+  "POST /api/residentie/huis": {
+   "toets": "residentie2.test.js",
+   "merkt": true,
+   "op": "2026-08-18T22:56:01.856Z"
+  },
+  "POST /api/residentie/vraag": {
+   "toets": "residentie2.test.js",
+   "merkt": true,
+   "op": "2026-08-18T22:56:02.111Z"
+  },
+  "POST /api/residentie/spel/zet": {
+   "toets": "residentie2.test.js",
+   "merkt": true,
+   "op": "2026-08-18T22:56:02.129Z"
+  },
+  "POST /api/residentie/spel/stop": {
+   "toets": "residentie2.test.js",
+   "merkt": false,
+   "op": "2026-08-18T22:56:02.205Z"
+  },
+  "POST /api/residentie/bel": {
+   "toets": "residentie2.test.js",
+   "merkt": true,
+   "op": "2026-08-18T22:56:16.330Z"
   }
  },
  "basislijn": {

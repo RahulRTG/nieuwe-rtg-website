@@ -52,8 +52,21 @@ module.exports = (kern) => {
     catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
-  // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
+  /* De openstaande reisaanvragen bij het RTG-reisbureau (codenamen), en het
+     besluit van de reisadviseur. Dat besluit ontbrak: een aanvraag kon binnen-
+     komen maar nooit ergens anders terechtkomen, dus een reis kwam nooit rond en
+     het dossier van het lid bleef leeg. Bevestigen zet de reis in dat dossier op
+     bevestigd, afwijzen haalt hem eruit (kern/lid/reisdossier.js). Achter
+     officeAuth, want over een reis beslist een mens. */
   app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+  app.post('/api/office/reisbureau/bevestig', officeAuth, (req, res) =>
+    veilig(res, () => kern.reisbureau.bevestig(String((req.body || {}).ref || ''), (req.body || {}).door)));
+  app.post('/api/office/reisbureau/afwijzen', officeAuth, async (req, res) => {
+    try {
+      const r = await kern.reisbureau.wijsAf(String((req.body || {}).ref || ''), (req.body || {}).door, (req.body || {}).reden);
+      r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+    } catch (e) { console.error('[reisbureau]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
      WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
      de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van

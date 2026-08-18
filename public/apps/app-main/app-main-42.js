@@ -57,13 +57,22 @@
       : [E('div', { class: 'label' }, T('app.nexttrip', 'Eerstvolgende reis')),
          E('div', { class: 'big' }, T('app.notrip', 'Nog niets gepland')),
          E('div', { class: 'meta' }, stem(
-             'Zeg Rahul waar je heen wilt. Hij zoekt het uit, vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.',
-             'Geef Rahul de bestemming en de data. Hij vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.',
-             'Zegt u Rahul waar het heen mag. Hij zoekt het uit, vraagt aan bij de partners en zet het hier neer: vlucht, verblijf, transfer en tafels op één plek.')
-           || T('app.notrip.sub', 'Tell Rahul where you want to go. He arranges it with our partners and it appears here: flight, stay, transfer and tables in one place.')),
-         E('button', { class: 'go', dataset: { goto: 'ai' } },
-           (stem('Vertel Rahul waar je heen wilt', 'Geef Rahul de bestemming', 'Vertelt u Rahul waar het heen mag')
-             || T('app.notrip.go', 'Tell Rahul where to')) + ' →')]);
+             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.',
+             'Vraag een reis aan bij het reisbureau. Vanaf dat moment staat hij hier: eerst als aanvraag, bevestigd zodra een reisadviseur hem rond heeft.',
+             'Vraagt u een reis aan bij het reisbureau. Vanaf dat moment staat hij hier, eerst als aanvraag, en bevestigd zodra een reisadviseur hem rond heeft.')
+           || T('app.notrip.sub', 'Request a trip at the travel desk. From that moment it stands here: as a request first, and confirmed once a travel adviser has it settled.')),
+         E('button', { class: 'go js-naarreisbureau' },
+           (stem('Naar het reisbureau', 'Naar het reisbureau', 'Naar het reisbureau')
+             || T('app.notrip.go', 'To the travel desk')) + ' →')]);
+    /* De knop wijst naar de plek waar een reis ECHT ontstaat: het reisbureau
+       (/apps/reisbureau.html). Daar vraag je een reis aan, en vanaf dat moment
+       staat hij in je dossier -- als aanvraag, tot een reisadviseur hem
+       bevestigt (server/kern/lid/reisdossier.js). Het is een eigen app en geen
+       tabblad hier, dus geen data-goto maar een gewone navigatie. */
+    const naarRb = $('#homeTrip .js-naarreisbureau');
+    if (naarRb) naarRb.addEventListener('click', () => {
+      location.href = '/apps/reisbureau.html' + (vastePas ? '?pas=' + encodeURIComponent(vastePas) : '');
+    });
     Util.vervang($('#homePay'), open.length
       ? [E('div', { class: 'label' }, T('app.outstanding', 'Openstaand')),
          E('div', { class: 'big accent' }, eur(openSum)),

@@ -133,7 +133,7 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
    bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
    kernlaag7) en optioneel. */
-Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic,
+Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
   visumtaakVan: () => kern.visumtaak }));
 /* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
    op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */

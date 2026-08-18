@@ -32,8 +32,8 @@
           'Alles wat RTG aanvraagt komt hier per dag onder elkaar te staan, met de status erbij.') +
         uitleg('e2', 'Wat nog niet vaststaat',
           'Een aanvraag blijft een aanvraag tot de partner ja zegt. RTG bevestigt niets namens hen.') +
-        uitleg('e3', 'Beginnen doe je bij Rahul',
-          'Zeg waar het heen mag en wanneer. Hij zoekt het uit, legt het voor en zet het hier neer.');
+        uitleg('e3', 'Beginnen doe je bij het reisbureau',
+          'Vraag daar een reis aan; vanaf dat moment staat hij hier, en Rahul denkt mee over de rest.');
       renderAgenda();
       return;
     }

@@ -29,7 +29,7 @@ let teller = 0;
 async function nieuwLid(P, naam) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const r = await P('/api/auth/register', {
-    name: naam, email: naam.toLowerCase() + u + '@x.nl',
+    name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, 'lid ' + naam + ' aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
@@ -102,16 +102,114 @@ test('de lege stand legt uit wat er komt te staan', () => {
   assert.match(thuis, /Util\.vervang\(\$\('#homeTrip'\), trip/,
     'de reistegel op het beginscherm kent het verschil tussen wel en geen reis');
   assert.match(thuis, /app\.notrip/, 'en heeft een eigen tekst voor "nog niets gepland"');
+  assert.match(thuis, /reisbureau\.html/, 'met een knop naar de plek waar een reis ontstaat');
 
   const reizen = lees('app-main-45.js');
   assert.match(reizen, /if \(!trip\)\{/, 'het reisscherm vangt de lege stand af');
-  assert.match(reizen, /app\.trip\.e3/, 'en zegt waar je begint (bij Rahul)');
+  assert.match(reizen, /Beginnen doe je bij het reisbureau/,
+    'en zegt waar je begint: op de plek waar een reis echt ontstaat');
 
   const start = lees('app-main-01.js');
   assert.match(start, /let trip = null;/, 'de app begint zonder reis');
   assert.match(start, /let invoices = \[\];/, 'en zonder facturen');
-  assert.match(start, /const DEMO_DATA = \{/, 'de demo-inhoud bestaat nog, maar apart');
-  const naStart = start.slice(start.indexOf('let user = null;'));
-  assert.doesNotMatch(naStart, /Ibiza/,
-    'na de beginwaarden staat er geen demo-inhoud meer die als eigen gegevens doorgaat');
+  assert.doesNotMatch(start, /Ibiza/,
+    'en draagt geen demo-inhoud meer die als eigen gegevens doorgaat');
+
+  // de demo bestaat nog, maar apart, en wordt alleen in de demostand geladen
+  const demo = lees('app-main-01b.js');
+  assert.match(demo, /const DEMO_DATA = \{/, 'de demo-inhoud staat in zijn eigen deel');
+  assert.match(demo, /Ibiza/, 'en bevat nog gewoon de demo-reis');
+  assert.match(lees('app-main-03.js'), /function laadDemoData\(/,
+    'die alleen in de expliciete demostand geladen wordt');
+});
+
+/* EN DE ANDERE KANT VAN DEZELFDE MEDAILLE: HOE HET DOSSIER ZICH WEL VULT.
+
+   Leeg beginnen mag geen doodlopende weg zijn. Toen de demo-erfenis eruit ging
+   bleek er NIETS in de code te zijn dat ooit een reis naar een lid schreef --
+   md.trip kwam uitsluitend uit de seed. Het lege reisscherm beloofde daarmee
+   iets wat het huis niet waar kon maken.
+
+   Nu ontstaat een dossier waar een reis echt ontstaat: bij het reisbureau. Deze
+   toets loopt de hele lus af -- aanvragen, zien staan als AANVRAAG, een mens
+   laten bevestigen, en dan pas bevestigd zien staan. */
+test('een aangevraagde reis vult het dossier, en pas een mens maakt hem bevestigd', async () => {
+  const CODE = 'RTG-TEST-' + String(Date.now()).slice(-5);
+  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: CODE } });
+  try {
+    const P = post(base);
+    const bij = await nieuwLid(P, 'Fabienne');
+    const staat = async () => (await P('/api/state', {}, bij.token)).body.state;
+
+    assert.equal((await staat()).trip, undefined, 'hij begint zonder reis');
+
+    // het lid kiest een reis uit de catalogus en vraagt hem aan
+    const aanbod = await P('/api/reisbureau', {}, bij.token);
+    assert.equal(aanbod.status, 200, 'het reisbureau opent');
+    const reis = (aanbod.body.reizen || [])[0];
+    assert.ok(reis && reis.id, 'er staat een reis klaar om aan te vragen');
+    const vertrek = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
+    const gevraagd = await P('/api/reisbureau/boek', { tripId: reis.id, personen: 2, vertrek }, bij.token);
+    assert.equal(gevraagd.status, 200, JSON.stringify(gevraagd.body).slice(0, 160));
+    const ref = gevraagd.body.aanvraag.ref;
+
+    /* Nu staat de reis in zijn dossier -- en wel als AANVRAAG. Dat is de regel
+       van Het Huis: wat niet bevestigd is, staat er ook zo bij. */
+    const metReis = await staat();
+    assert.ok(metReis.trip, 'de aangevraagde reis staat in het dossier');
+    assert.equal(metReis.trip.dest, reis.bestemming, 'op de juiste bestemming');
+    const regel = (metReis.trip.items || []).find(i => i.reisRef === ref);
+    assert.ok(regel, 'met een regel voor deze aanvraag: ' + JSON.stringify(metReis.trip.items));
+    assert.equal(regel.status, 'req', 'die als aanvraag genoteerd staat');
+    assert.match(regel.label, /aanvraag/i, 'en dat ook zo noemt: ' + regel.label);
+
+    const dos = await P('/api/member/huis/dossier', {}, bij.token);
+    assert.ok(dos.body.reis, 'het reisdossier van Het Huis vult zich mee');
+    assert.ok(dos.body.afwachten.some(a => a.waar === null),
+      'en zet hem bij wat je alleen kunt afwachten, zonder knop');
+
+    /* Bevestigen doet een MENS, op het kantoor. Zonder die inlog verandert er
+       niets -- de merkregel is dat de AI hier niets beslist. */
+    const zonder = await P('/api/office/reisbureau/bevestig', { ref });
+    assert.equal(zonder.status, 401, 'zonder kantoorinlog bevestigt niemand iets');
+    assert.equal(((await staat()).trip.items.find(i => i.reisRef === ref)).status, 'req',
+      'en de aanvraag staat dus nog gewoon open');
+
+    const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
+    assert.ok(kantoor, 'de kantoorcode werkt');
+    const besluit = await P('/api/office/reisbureau/bevestig', { ref, door: 'reisadviseur' }, kantoor);
+    assert.equal(besluit.status, 200, JSON.stringify(besluit.body).slice(0, 160));
+    assert.equal(besluit.body.aanvraag.status, 'bevestigd');
+
+    const na = await staat();
+    const naRegel = (na.trip.items || []).find(i => i.reisRef === ref);
+    assert.equal(naRegel.status, 'paid', 'nu pas staat de reis op bevestigd');
+    assert.match(naRegel.label, /bevestigd/i, 'en zegt dat ook: ' + naRegel.label);
+
+    // tweemaal bevestigen is geen tweede reis
+    const nogmaals = await P('/api/office/reisbureau/bevestig', { ref }, kantoor);
+    assert.equal(nogmaals.status, 409, 'een tweede besluit kaatst af');
+    assert.equal((await staat()).trip.items.filter(i => i.reisRef === ref).length, 1,
+      'en het dossier houdt één regel voor één reis');
+  } finally { child.kill('SIGKILL'); }
+});
+
+test('een ingetrokken aanvraag verdwijnt weer uit het dossier', async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  try {
+    const P = post(base);
+    const bij = await nieuwLid(P, 'Gijs');
+    const staat = async () => (await P('/api/state', {}, bij.token)).body.state;
+    const reis = ((await P('/api/reisbureau', {}, bij.token)).body.reizen || [])[0];
+    const gevraagd = await P('/api/reisbureau/boek', { tripId: reis.id, personen: 1 }, bij.token);
+    assert.equal(gevraagd.status, 200, JSON.stringify(gevraagd.body).slice(0, 160));
+    assert.ok((await staat()).trip, 'de reis staat in het dossier');
+
+    const weg = await P('/api/reisbureau/annuleer', { ref: gevraagd.body.aanvraag.ref }, bij.token);
+    assert.equal(weg.status, 200, JSON.stringify(weg.body).slice(0, 160));
+    /* Er blijft niets over, dus de reis gaat helemaal weg: een dossier met een
+       lege tijdlijn is geen dossier, en het lege scherm zegt beter wat er is. */
+    assert.equal((await staat()).trip, undefined,
+      'en verdwijnt weer zodra het lid hem intrekt');
+  } finally { child.kill('SIGKILL'); }
 });

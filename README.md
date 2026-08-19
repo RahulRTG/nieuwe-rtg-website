@@ -159,6 +159,14 @@ beeld kunnen elk een apart lokaal model krijgen via `LOCAL_AI_MODEL_KORT`,
 `LOCAL_AI_MODEL_TOOLS` en `LOCAL_AI_MODEL_VISION`. Zonder vision-model wordt
 beeld nooit stil verwijderd of aan een tekstmodel voorgelegd.
 
+Die proef spreekt ELK ingesteld model apart aan, en dat is niet vanzelfsprekend
+geweest: hij stuurde een vraag met `max_tokens: 32`, en `modelVoor()` kiest bij
+<= 200 het KORTE model. Stond `LOCAL_AI_MODEL` verkeerd -- een typefout, een
+model dat de server niet geladen heeft -- dan slaagde de check gewoon, terwijl
+elk normaal verzoek daarna stilletjes naar de betaalde uitwijk viel. Nagemeten
+met een kapot tekstmodel: de oude proef gaf exit 0 en sprak alleen het korte
+model aan; de huidige geeft exit 1 en noemt `tekst=... FOUT`.
+
 Zonder model start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
 controles en regelgestuurde opdrachten blijven werken; alleen vrije
 modelverrijking valt weg. Met `RTG_AI_UIT=1` is ook in productie aantoonbaar

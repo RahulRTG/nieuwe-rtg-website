@@ -407,15 +407,14 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
-       ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
-       (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
-       stuk, er zit een duidelijke naad tussen de diagnose (reden/NAMEN/vraag) en
-       de zichtbare melding. Opknippen is wel echte bedrading: 21 pagina's laden
-       nu een module en een blad, en keuringsregel 38 rekent dat na, dus er komt
-       een tweede script bij dat overal mee moet. Dat doe je een voor een met de
-       toetsen ernaast en niet in de staart van een ronde. */
-    'public/shared/media.js',
+    /* public/shared/media.js STOND HIER en is er weer af, en de reden waarom hij
+       bleef staan bleek geen reden. Er stond: opknippen kost 26 pagina's een
+       TWEEDE script, voor een module wiens hele werk is om te WERKEN als er iets
+       stuk is. Dat klopt voor een gewone snede -- maar niet voor een BUNDEL. Dit
+       huis serveert er al vijftig als een bestand en bewerkt ze als delen
+       (scripts/bundel.js), dus de deur is nu shared/media/media-01.js (de
+       diagnose en de teksten) en -02.js (de melding en de vraag), byte voor byte
+       samen het origineel. Geen pagina verandert. */
     /* server/kern/eenaccount.js en public/apps/app-main/app-main-25.js STONDEN
        HIER en zijn er weer af: de naden die erbij benoemd stonden, zijn geknipt.
        De sleutelbos en het MUNTEN van een sessie staan nu apart
@@ -2509,7 +2508,15 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
     const bronnen = [];
     loop(PUB, /\.(js|html)$/, f => {
       const p = web(f);
-      if (p.startsWith('/dist/') || p === '/shared/media.js') return;
+      /* De deur zelf telt niet als overtreder -- en dat is sinds hij een BUNDEL
+         is niet meer een pad maar twee. shared/media.js ging over de 10 kB en is
+         opgeknipt in shared/media/media-01.js (de diagnose en de teksten) en
+         -02.js (de melding en de vraag). Voor de browser is dat nog steeds EEN
+         bestand; voor deze regel waren het er ineens twee, en die tweede kwam
+         als overtreder binnen omdat de enige echte getUserMedia-aanroep van dit
+         huis daarin staat. Wat de deur is, is de MODULE -- niet het aantal
+         bestanden waarin hij bewaard wordt. */
+      if (p.startsWith('/dist/') || p === '/shared/media.js' || p.startsWith('/shared/media/')) return;
       bronnen.push(f);
     });
 

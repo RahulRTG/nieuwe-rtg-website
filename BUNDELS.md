@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**50 bundels, 396 delen, 0 zonder onderwerp.**
+**51 bundels, 398 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -630,6 +630,15 @@ omlaag.
 |---|---|
 | `levendekleur-01.js` | De levende grond van de hele ROS |
 | `levendekleur-02.js` | toepassen |
+
+## `shared/media.js`
+
+`public/shared/media/` -- 2 delen, 191 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `media-01.js` | DE MEDIAPOORT -- de enige deur naar camera en microfoon |
+| `media-02.js` | DE MELDING, op het moment van gebruik -- geen banner die je een half uur eerder wegklikte |
 
 ## `shared/metgezel.js`
 

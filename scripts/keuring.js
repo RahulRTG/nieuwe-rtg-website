@@ -52,11 +52,24 @@ const publicJs = alle.filter(p => p.includes('/public/') && p.endsWith('.js') &&
 const lees = p => { try { return fs.readFileSync(p, 'utf8'); } catch (e) { return ''; } };
 const kort = p => path.relative(WORTEL, p);
 
-/* Bouwsel is geen bron. public/dist/** is geminificeerd, en public/apps/x.js
-   is de samengeplakte versie van public/apps/x/NN-*.js. Een melding op een
-   bouwsel is dezelfde melding drie keer; we kijken alleen naar de bron. */
-const isBouwsel = p => p.includes('/public/dist/') ||
-  (/\/public\/apps\/[^/]+\.js$/.test(p) && fs.existsSync(p.replace(/\.js$/, '')));
+/* Bouwsel is geen bron. public/dist/** is geminificeerd, en een bundel is de
+   samengeplakte versie van zijn delen. Een melding op een bouwsel is dezelfde
+   melding twee keer; we kijken alleen naar de bron.
+
+   EN DE LIJST KWAM UIT EEN PADPATROON IN PLAATS VAN UIT DE BRON. Hier stond
+   `/public/apps/<naam>.js` plus "bestaat er een map met dezelfde naam". Dat
+   dekte 20 van de 51 bundels. De andere 31 wonen in public/shared/ -- glyf,
+   klok3d, i18n, ios, basis, en sinds vandaag media -- en werden dus GEWOON
+   MEEGETELD naast hun eigen delen: 643 kilobyte tekst die twee keer in elke
+   telling zat. Bij `dubbelingen` is dat het ergste denkbare geval, want een
+   bundel is per definitie honderd procent gelijk aan zijn delen.
+
+   De lijst komt nu uit scripts/bundel.js zelf, want daar staat welke bundels er
+   zijn. Een tweede lijst hier zou uit de pas lopen met de eerste, en dat is
+   precies hoe deze fout is ontstaan (LAT.md regel 4). */
+const BUNDELPADEN = new Set(Object.keys(require('./bundel').bundels)
+  .map(n => path.join(WORTEL, 'public', n)));
+const isBouwsel = p => p.includes('/public/dist/') || BUNDELPADEN.has(p);
 
 /* Alleen wat de gebruiker echt te zien krijgt telt mee: tekst tussen
    aanhalingstekens, op regels die geen commentaar zijn. Een regel die het

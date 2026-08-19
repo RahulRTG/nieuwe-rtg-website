@@ -57,6 +57,8 @@
     window.SPart.toetslijst();
     if (window.SPart.presentie) window.SPart.presentie();
     if (window.SPart.rapport) window.SPart.rapport();
+    if (window.SPart.mijnhr) window.SPart.mijnhr();
+    if (window.SPart.verlof) window.SPart.verlof();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {
@@ -82,51 +84,3 @@
       doelkies();
     });
   }
-  function doelkies() {
-    var v = $('#tGroep').value;
-    var bak = /^\d+$/.test(v)
-      ? (BIEB.groepen || []).find(function (x) { return String(x.groep) === v; })
-      : (BIEB.fasen || []).find(function (x) { return x.fase === v; });
-    $('#tDoelen').innerHTML = ((bak && bak.doelen) || []).map(function (d) {
-      return '<label><input type="checkbox" value="' + esc(d.id) + '"> ' + esc(d.naam) + ' <span class="stil">' + esc(d.vak) + '</span></label>';
-    }).join('');
-  }
-  $('#tGroep').addEventListener('change', doelkies);
-  function gekozen() {
-    return Array.prototype.map.call(document.querySelectorAll('#tDoelen input:checked'), function (i) { return i.value; });
-  }
-  $('#tMaak').addEventListener('click', function () {
-    var doelen = gekozen();
-    if (!doelen.length) return meld('Vink minstens een leerdoel aan.');
-    kl('/school/toets/maak', { soort: $('#tSoort').value, naam: $('#tNaam').value, doelen: doelen })
-      .then(function (r) { meld(r.body.error || 'Toets staat klaar: ' + r.body.toets.vragen + ' vragen.'); werkbank(); });
-  });
-  $('#hwMaak').addEventListener('click', function () {
-    var doelen = gekozen();
-    if (doelen.length !== 1) return meld('Kies precies een leerdoel voor oefen-huiswerk.');
-    kl('/school/huiswerk/maak', { titel: 'Oefenen: ' + doelen[0], vak: doelen[0].split('.')[0], doel: doelen[0] })
-      .then(function (r) { meld(r.body.error || 'Huiswerk staat klaar; het vinkt zichzelf af bij goed oefenen.'); werkbank(); });
-  });
-  $('#lesKnop').addEventListener('click', function () {
-    var stoppen = $('#lesKnop').textContent.indexOf('stoppen') >= 0;
-    kl(stoppen ? '/school/les/stop' : '/school/les/start').then(function (r) {
-      meld(r.body.error || (stoppen ? 'Online les gestopt.' : 'Online les live: ' + r.body.onlineLes.kamercode)); werkbank();
-    });
-  });
-  $('#teamKnop').addEventListener('click', function () { $('#teamBlok').hidden = !$('#teamBlok').hidden; });
-  $('#teamErbij').addEventListener('click', function () {
-    kl('/school/klas/leraar-koppel', { personeelId: $('#teamId').value.trim() })
-      .then(function (r) { meld(r.body.error || 'Collega staat vast op de klas.'); werkbank(); });
-  });
-  $('#overnameStop').addEventListener('click', function () {
-    kl('/school/klas/overname-stop').then(function (r) { meld(r.body.error || 'Overname gestopt.'); werkbank(); });
-  });
-
-  window.SPart = window.SPart || {};
-  window.SPart.kl = kl; window.SPart.sk = sk; window.SPart.esc = esc; window.SPart.meld = meld; window.SPart.werkbank = werkbank;
-  $('#rapMaak').addEventListener('click', function () { if (window.SPart.rapportMaken) window.SPart.rapportMaken(); });
-
-  if (S && S.rol === 'directie') directie();
-  else if (S && S.rol === 'leraar') leraar();
-  else toon('vPoort');
-})();

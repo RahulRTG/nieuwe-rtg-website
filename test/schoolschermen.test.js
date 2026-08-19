@@ -82,39 +82,9 @@ test('schoolsleutels blijven tijdelijk en verlopen na dertig minuten', () => {
    de naam uit de lijst is gehaald -- en dat is precies de bedoeling: de lijst
    hoort korter te worden en mag nooit stilletjes langer worden. */
 const OPEN = [
-  // aanwezigheid: het verzuimbeeld van EEN leerling (de klaslijst en het zetten
-  // hebben sinds deze ronde wel een scherm)
-  'aanwezigheid/leerling',
-  // oudergesprekken: momenten en boeken
-  'afspraak/boek', 'afspraak/momenten',
-  // gebouw en veiligheid: passen en bezoekers
-  'bezoeker/aanmeld', 'bezoeker/uit', 'pas/blokkeer', 'pas/geef', 'pas/passeer',
-  // incidenten (melden, lijst, afhandelen)
-  'incident/handel-af', 'incident/lijst', 'incident/meld',
-  // geld: facturen, budgetten, subsidies, kantine, rapportage
-  'budget/zet', 'factuur/boek', 'factuur/herinner', 'factuur/maak', 'financien/rapport',
-  'kantine/saldo', 'subsidie/zet', 'machtiging/intrek', 'machtiging/lijst', 'machtiging/zet',
-  // personeelszaken
-  'hr/afwezig', 'hr/dossier', 'hr/gesprek', 'hr/gesprek/reactie', 'hr/mijn', 'hr/overzicht',
-  'hr/uren', 'hr/verlof/besluit', 'hr/vervanging', 'hr/zet',
-  // verlof van een leerling
-  'verlof/aanvraag', 'verlof/besluit', 'verlof/lijst', 'verlof/mijn',
-  // omroep: nieuwsbrief, herinneringen, vakgroep
-  'herinnering/verstuur', 'herinneringen', 'nieuwsbrief', 'nieuwsbrief/lijst', 'vakgroep',
-  // organisatie: vestigingen, opleidingen, schooljaarovergang
-  'opleiding/zet', 'vestiging/zet', 'schooljaar/voer-uit', 'schooljaar/voorstel',
-  // in- en uitschrijven van een geplaatste leerling
-  'leerling/overstap', 'leerling/uitschrijf',
-  // klasbeheer dat alleen via de andere kant loopt
-  'klas/leraar-weg', 'klas/overname', 'klas/team', 'klas/vestiging',
-  // oefen-huiswerk maakt de leerling nu in de leerapp, niet in het gezinsscherm
-  'huiswerk/oefen', 'huiswerk/oefen-antwoord',
-  // koppelingen en webhooks: aanzetten en weghalen
-  'koppeling/zet', 'webhook/weg', 'webhook/zet',
-  // toestemming vragen, peiling sluiten, personeelspeiling
-  'toestemming/overzicht', 'toestemming/vraag', 'peiling/antwoord-personeel', 'peiling/sluit',
-  // overig
-  'export', 'mijn-rechten', 'signalen', 'toets/sluit', 'voortgang'
+  // Leeg. Elk endpoint van server/school/*.js is vanuit een scherm te bereiken.
+  // Komt hier ooit weer iets bij, dan hoort er een naam en een reden bij te
+  // staan -- en hoort die reden een tijdelijke te zijn.
 ];
 
 function endpointsVanDeServer() {
@@ -197,4 +167,54 @@ test('de vier schermen van deze ronde bestaan en spreken de juiste endpoints aan
   assert.ok(partner.includes('id="presLijst"') && partner.includes('id="rapLijst"'),
     'de werkbank mist de nieuwe delen');
   assert.match(school, /school-toets\.js/);
+});
+
+test('de tweede ronde schermen draagt de beloftes van zijn serverlaag', () => {
+  const veiligheid = lees('apps', 'schoolpartner', 'veiligheid.js');
+  const hr = lees('apps', 'schoolpartner', 'hr.js');
+  const mijnhr = lees('apps', 'schoolpartner', 'mijnhr.js');
+  const geld = lees('apps', 'schoolpartner', 'geld.js');
+  const organisatie = lees('apps', 'schoolpartner', 'organisatie.js');
+  const omroep = lees('apps', 'schoolpartner', 'omroep.js');
+  const oefenen = lees('apps', 'foundation', 'school-oefenen.js');
+  const toets = lees('apps', 'foundation', 'school-toets.js');
+
+  // veiligheid: wel de huidige stand, nooit een looproute
+  assert.match(veiligheid, /\/school\/pas\/lijst/);
+  assert.match(veiligheid, /HUIDIGE stand/i);
+  assert.match(veiligheid, /esc\(d\.uitleg/, 'het scherm toont de belofte die de server zelf meestuurt');
+  assert.doesNotMatch(veiligheid, /pas\/geschiedenis|pas\/spoor/i);
+
+  // HR: het dossier gaat open met een reden, en er is geen scoreveld
+  assert.match(hr, /\/school\/hr\/dossier/);
+  assert.match(hr, /reden: reden/);
+  assert.doesNotMatch(hr, /beoordelingscijfer|score:/i);
+
+  // de medewerker heeft zijn eigen kant: ziek melden zonder redenveld
+  assert.match(mijnhr, /soort: 'ziek'/);
+  assert.doesNotMatch(mijnhr, /ziekReden|diagnose/i);
+  assert.match(mijnhr, /\/school\/mijn-rechten/);
+
+  // geld: geen enkele knop die een kind ergens van uitsluit
+  assert.match(geld, /\/school\/factuur\/maak/);
+  assert.doesNotMatch(geld, /blokkeer.{0,20}leerling|uitsluit(en)?\(/i);
+
+  // de overgang vraagt het woord OVERGANG, en niet stilletjes op een tik
+  assert.match(organisatie, /bevestig: q\('orBevestig'\)/);
+  assert.match(organisatie, /OVERGANG/);
+
+  // toestemming: geen antwoord is geen toestemming, en dat staat op het scherm
+  assert.match(omroep, /\/school\/toestemming\/vraag/);
+  assert.match(omroep, /Geen antwoord is geen toestemming/i);
+
+  /* Het scherpste onderscheid van deze twee bestanden: oefenen geeft meteen
+     goed of fout, een toets niet. Staan ze ooit in een bestand, dan is dat
+     verschil een vergissing weg. */
+  assert.match(oefenen, /juisteAntwoord/, 'oefenen hoort het juiste antwoord te tonen');
+  assert.doesNotMatch(toets, /juisteAntwoord/, 'een toets kijk je na het inleveren na');
+
+  for (const naam of ['veiligheid', 'hr', 'mijnhr', 'geld', 'organisatie', 'omroep', 'verlof'])
+    assert.ok(partner.includes('/apps/schoolpartner/' + naam + '.js'), 'School Partner laadt ' + naam + '.js niet');
+  for (const naam of ['school-toets.js', 'school-verlof.js', 'school-oefenen.js'])
+    assert.ok(school.includes(naam), 'School laadt ' + naam + ' niet');
 });

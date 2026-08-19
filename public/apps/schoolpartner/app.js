@@ -95,6 +95,11 @@
       if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
       if (window.RTGSchoolDossier) RTGSchoolDossier.bind(api, S, esc, meld);
+      if (window.RTGSchoolVeiligheid) RTGSchoolVeiligheid.bind(api, S, esc, meld);
+      if (window.RTGSchoolHR) RTGSchoolHR.bind(api, S, esc, meld);
+      if (window.RTGSchoolGeld) RTGSchoolGeld.bind(api, S, esc, meld);
+      if (window.RTGSchoolOrganisatie) RTGSchoolOrganisatie.bind(api, S, esc, meld);
+      if (window.RTGSchoolOmroep) RTGSchoolOmroep.bind(api, S, esc, meld);
     });
   }
   /* ---------- leraar ---------- */
@@ -156,6 +161,8 @@
     window.SPart.toetslijst();
     if (window.SPart.presentie) window.SPart.presentie();
     if (window.SPart.rapport) window.SPart.rapport();
+    if (window.SPart.mijnhr) window.SPart.mijnhr();
+    if (window.SPart.verlof) window.SPart.verlof();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {
@@ -212,7 +219,38 @@
       meld(r.body.error || (stoppen ? 'Online les gestopt.' : 'Online les live: ' + r.body.onlineLes.kamercode)); werkbank();
     });
   });
-  $('#teamKnop').addEventListener('click', function () { $('#teamBlok').hidden = !$('#teamBlok').hidden; });
+  $('#teamKnop').addEventListener('click', function () {
+    $('#teamBlok').hidden = !$('#teamBlok').hidden;
+    if (!$('#teamBlok').hidden) teamLijst();
+  });
+  /* Het team van de klas: wie staat er vast op, wie neemt waar. De lijst kwam
+     tot nu toe uit de klasweergave als een zin; nu staat hij hier met de
+     handeling erbij, want "Wim en Sanne" is geen knop om iemand van de klas te
+     halen. Een klas houdt altijd minstens een vaste leraar -- dat weigert de
+     server, en de melding zegt waarom. */
+  function teamLijst() {
+    kl('/school/klas/team').then(function (r) {
+      if (r.body.error) { $('#teamLijst').textContent = r.body.error; return; }
+      $('#teamLijst').innerHTML = (r.body.leraren || []).map(function (x) {
+        return '<div class="item"><span>' + esc(x.naam) + ' <span class="stil">· id ' + esc(x.id) + '</span></span>' +
+          '<button class="knop" data-teamweg="' + esc(x.id) + '">Haal van de klas</button></div>';
+      }).join('') + (r.body.waarnemer
+        ? '<div class="item"><span>' + esc(r.body.waarnemer.naam) + ' <span class="stil">· waarnemer</span></span></div>' : '') +
+        '<p class="stil">Maximaal ' + r.body.max + ' vaste leraren; een klas houdt er altijd minstens een.</p>';
+      Array.prototype.forEach.call(document.querySelectorAll('[data-teamweg]'), function (b) {
+        b.addEventListener('click', function () {
+          kl('/school/klas/leraar-weg', { personeelId: b.dataset.teamweg })
+            .then(function (r2) { meld(r2.body.error || 'Van de klas gehaald.'); teamLijst(); werkbank(); });
+        });
+      });
+    });
+  }
+  $('#overneem').addEventListener('click', function () {
+    var code = $('#overneemCode').value.trim().toUpperCase();
+    if (!code) return meld('Welke klas neemt u waar? Vul de klascode in.');
+    api('/school/klas/overname', { schoolCode: S.code, personeelToken: S.token, klasCode: code })
+      .then(function (r) { meld(r.body.error || ('U staat als waarnemer op ' + code + '.')); });
+  });
   $('#teamErbij').addEventListener('click', function () {
     kl('/school/klas/leraar-koppel', { personeelId: $('#teamId').value.trim() })
       .then(function (r) { meld(r.body.error || 'Collega staat vast op de klas.'); werkbank(); });

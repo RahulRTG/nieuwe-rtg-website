@@ -95,5 +95,10 @@
       if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
       if (window.RTGSchoolDossier) RTGSchoolDossier.bind(api, S, esc, meld);
+      if (window.RTGSchoolVeiligheid) RTGSchoolVeiligheid.bind(api, S, esc, meld);
+      if (window.RTGSchoolHR) RTGSchoolHR.bind(api, S, esc, meld);
+      if (window.RTGSchoolGeld) RTGSchoolGeld.bind(api, S, esc, meld);
+      if (window.RTGSchoolOrganisatie) RTGSchoolOrganisatie.bind(api, S, esc, meld);
+      if (window.RTGSchoolOmroep) RTGSchoolOmroep.bind(api, S, esc, meld);
     });
   }

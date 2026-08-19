@@ -68,6 +68,9 @@ test('het zorgdeel: dicht voor de docent, open met een reden, en de reden staat 
   // de docent ziet de basis, maar het zorgdeel is afgeschermd
   const alsDocent = (await api('/school/dossier', { schoolCode: D.schoolCode, personeelToken: leraar.personeelToken, leerlingId: l.id })).body;
   assert.equal(alsDocent.leerling.naam, 'Noor Bakker');
+  /* De klas-sleutel hoort mee te komen: aanwezigheid, voortgang en rapport
+     verwijzen ernaar, dus zonder hem is het dossier een doodlopende weg. */
+  assert.equal(alsDocent.sleutel, 'L:' + l.id, 'het dossier noemt de klas-sleutel van de leerling');
   assert.equal(alsDocent.zorg, null);
   assert.match(alsDocent.zorgToegang, /afgeschermd/);
 

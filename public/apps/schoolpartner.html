@@ -142,6 +142,11 @@
     <div id="dPlus"></div>
     <div id="dEnterprise"></div>
     <div id="dDossier"></div>
+    <div id="dVeiligheid"></div>
+    <div id="dHR"></div>
+    <div id="dGeld"></div>
+    <div id="dOrganisatie"></div>
+    <div id="dOmroep"></div>
     <div id="dBeheer"></div>
   </div>
 
@@ -176,6 +181,10 @@
             <input class="veld" id="teamId" placeholder="Personeels-id van de collega" aria-label="Personeels-id">
             <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
             <button class="knop" id="overnameStop" type="button">Overname stoppen</button>
+          </div>
+          <div class="rij" style="margin-top:.4rem;">
+            <input class="veld" id="overneemCode" placeholder="Klascode van een collega" aria-label="Klascode om waar te nemen">
+            <button class="knop" id="overneem" type="button">Neem waar</button>
           </div>
         </div>
       </div>
@@ -251,6 +260,31 @@
         <p class="stil">Op naam, nooit op &quot;meeste verzuim eerst&quot;.</p>
         <div id="presBeeld"></div>
       </div>
+      <div class="deel">Verlof en oudergesprek</div>
+      <div class="kaart">
+        <div class="kop">Verlofaanvragen</div>
+        <p class="stil">Een besluit gaat altijd met een reden naar het gezin. Een afwijzing zonder reden is bij leerplicht het begin van een conflict dat niemand wil.</p>
+        <div id="verlofLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Momenten voor het oudergesprek</div>
+        <p class="stil">Zet een avond in een keer klaar; de tijden lopen vanzelf door. Ouders kiezen zelf een moment: wie het eerst komt.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="afspraakDatum" type="date" aria-label="Datum" style="flex:0 1 10rem;">
+          <input class="veld" id="afspraakTijd" type="time" aria-label="Begintijd" style="flex:0 1 8rem;">
+          <input class="veld" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakPlek" maxlength="60" placeholder="Lokaal" aria-label="Plek">
+          <button class="knop p" id="afspraakZet" type="button">Zet klaar</button>
+        </div>
+        <div id="afspraakLijst"></div>
+      </div>
+      <div class="deel">Mijn zaken</div>
+      <div class="kaart">
+        <div class="kop">Mijn personeelsdossier</div>
+        <p class="stil">Dit is jouw eigen dossier: wat hier staat, staat er ook voor HR. Ziek melden vraagt geen reden, uren boek je zelf, en je reactie bij een gesprek blijft staan.</p>
+        <div id="mijnHR"></div>
+      </div>
       <div class="deel">Rapporten</div>
       <div class="kaart">
         <div class="kop">Rapport klaarzetten</div>
@@ -282,6 +316,8 @@
 <script src="/apps/schoolpartner/toetsen.js"></script>
 <script src="/apps/schoolpartner/presentie.js"></script>
 <script src="/apps/schoolpartner/rapport.js"></script>
+<script src="/apps/schoolpartner/mijnhr.js"></script>
+<script src="/apps/schoolpartner/verlof.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
@@ -289,6 +325,11 @@
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
 <script src="/apps/schoolpartner/dossier-zorg.js"></script>
 <script src="/apps/schoolpartner/dossier.js"></script>
+<script src="/apps/schoolpartner/veiligheid.js"></script>
+<script src="/apps/schoolpartner/hr.js"></script>
+<script src="/apps/schoolpartner/geld.js"></script>
+<script src="/apps/schoolpartner/organisatie.js"></script>
+<script src="/apps/schoolpartner/omroep.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>

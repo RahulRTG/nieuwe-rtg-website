@@ -16,8 +16,18 @@ window.SPart.toetslijst = function () {
           return '<div class="item"><span>' + esc(l.naam) + (l.uitslag ? ' <span class="stil">' + l.uitslag.goed + '/' + l.uitslag.totaal + '</span>' : '') + '</span>' + st + '</div>';
         }).join('');
         return '<div style="margin-bottom:.7rem;"><div class="rij"><b>' + esc(t.naam) + '</b><span class="tag">' + esc(t.soort.toUpperCase()) + '</span>' +
+          (t.status === 'open' ? '<button class="knop" data-sluit="' + esc(t.id) + '">Sluit de toets</button>' : '<span class="tag">gesloten</span>') +
           '<span class="stil">' + t.doelen.map(function (d) { return esc(d.naam); }).join(' · ') + '</span></div>' + rijen + '</div>';
       }).join('') || '<p class="stil">Nog geen toetsen. Vink hierboven leerdoelen aan en zet er een klaar.</p>';
+      Array.prototype.forEach.call(document.querySelectorAll('[data-sluit]'), function (b) {
+        b.addEventListener('click', function () {
+          /* Sluiten is definitief voor wie nog niet begonnen is; daarom eerst
+             de vraag, en niet stilletjes op de eerste tik. */
+          if (!window.confirm('De toets sluiten? Wie nog niet begonnen is, kan hem daarna niet meer maken.')) return;
+          kl('/school/toets/sluit', { toetsId: b.dataset.sluit })
+            .then(function (r2) { meld(r2.body.error || 'De toets is gesloten.'); P.toetslijst(); });
+        });
+      });
       Array.prototype.forEach.call(document.querySelectorAll('[data-cijfer]'), function (b) {
         b.addEventListener('click', function () {
           var d = b.dataset.cijfer.split('|');

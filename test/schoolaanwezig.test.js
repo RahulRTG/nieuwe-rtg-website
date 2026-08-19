@@ -156,3 +156,43 @@ test('bezoekers en calamiteit: de melding landt in elke klas en de ontruimingsli
   const af = (await api('/school/calamiteit', Object.assign({ stop: true }, D))).body;
   assert.equal(af.actief, false);
 });
+
+/* De twee lijsten. Ze bestonden niet, en daardoor was een pas die je uitgaf
+   alleen terug te vinden als je zijn id had bewaard -- blokkeren werd dan een
+   kwestie van geluk. De lijst mag alleen de HUIDIGE stand tonen: de belofte
+   van dit hele deel is dat er geen looproute wordt bewaard, en een lijst die
+   stiekem wel een geschiedenis meestuurt breekt die belofte in stilte. */
+test('de paslijst toont de huidige stand en geen enkele looproute', async () => {
+  const pas = (await api('/school/pas/geef', Object.assign({ soort: 'personeel', personeelId: leraar.personeelId }, D))).body.pas;
+  await api('/school/pas/passeer', Object.assign({ pasId: pas.id, ingang: 'hoofdingang' }, D));
+  await api('/school/pas/passeer', Object.assign({ pasId: pas.id, richting: 'uit' }, D));
+  await api('/school/pas/passeer', Object.assign({ pasId: pas.id, ingang: 'zij-ingang' }, D));
+
+  const lijst = (await api('/school/pas/lijst', D)).body;
+  const mijn = lijst.passen.find(p => p.id === pas.id);
+  assert.ok(mijn, 'de uitgegeven pas staat in de lijst');
+  assert.equal(mijn.binnen, true);
+  assert.equal(mijn.ingang, 'zij-ingang', 'alleen de laatste stand, niet de eerste');
+  assert.ok(lijst.passagesVandaag >= 3, 'de dagteller telt passages');
+
+  // geen enkel spoor van eerdere passages: niet als lijst, niet als veld
+  const plat = JSON.stringify(lijst);
+  assert.ok(plat.indexOf('hoofdingang') < 0, 'de vorige ingang hoort overschreven te zijn, niet bewaard');
+  assert.doesNotMatch(plat, /histor|spoor|passages":\s*\[|bewegingen/i);
+
+  // filteren op soort werkt, en een leerlingpas van een niet-ingeschreven kind kan niet
+  assert.equal((await api('/school/pas/lijst', Object.assign({ soort: 'leerling' }, D))).body.passen.length, 0);
+});
+
+test('de bezoekerslijst zet wie binnen is vooraan, en uitgetekend blijft naspeurbaar', async () => {
+  const b = (await api('/school/bezoeker/aanmeld', Object.assign({ naam: 'Loodgieter Yilmaz', organisatie: 'Vakwerk', voor: 'Conciërge' }, D))).body.bezoeker;
+  const binnen = (await api('/school/bezoeker/lijst', D)).body;
+  assert.equal(binnen.binnen, 1);
+  assert.equal(binnen.bezoekers[0].naam, 'Loodgieter Yilmaz');
+
+  await api('/school/bezoeker/uit', Object.assign({ bezoekerId: b.id }, D));
+  const na = (await api('/school/bezoeker/lijst', D)).body;
+  assert.equal(na.binnen, 0);
+  assert.ok(na.bezoekers.some(x => x.id === b.id && x.binnen === false),
+    'wie is uitgetekend blijft in de lijst staan, maar niet als aanwezig');
+});

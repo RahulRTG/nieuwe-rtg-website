@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T17:37:56.452Z",
-  "commit": "c178f6f",
+  "op": "2026-08-19T17:41:32.118Z",
+  "commit": "56d1fd4",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3070,
-  "onbeslist": 969,
+  "bewezen": 3125,
+  "onbeslist": 914,
   "blind": 148,
   "ongemeten": 8
  },
@@ -24742,69 +24742,68 @@
    "reden": "er is over DEZE route gelogen en rtfos-afmaak.test.js zakte daarop"
   },
   "POST /api/rtfos/subsidies": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/subsidie/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/subsidie/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/subsidie/moment": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/voorraad/binnen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/voorraad": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/voorraad/uit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/voorraad/afschrijven": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilliger/maak": {
    "staat": "bewezen",
@@ -24831,28 +24830,28 @@
    "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteiten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/begeleiders": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/open": {
    "staat": "bewezen",
@@ -24863,20 +24862,20 @@
    "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/inschrijven": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/incheck": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering/maak": {
    "staat": "bewezen",
@@ -24911,12 +24910,12 @@
    "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/beleid/maak": {
    "staat": "bewezen",
@@ -24927,12 +24926,12 @@
    "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/beleid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/beleid/bevestig": {
    "staat": "bewezen",
@@ -24943,12 +24942,12 @@
    "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/herkomst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-bestuur.test.js zakte daarop"
   },
   "POST /api/rtfos/herkomst/beoordeel": {
    "staat": "bewezen",
@@ -25254,12 +25253,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 43); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/project/indicator": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-netwerk.test.js",
     "rtfos.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 40); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos.test.js zakte daarop"
   },
   "POST /api/rtfos/blauwdrukken": {
    "staat": "onbeslist",
@@ -25276,13 +25275,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 43); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/projecten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-netwerk.test.js",
-    "rtfos-portalen.test.js",
     "rtfos.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 40); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos.test.js zakte daarop"
   },
   "POST /api/rtfos/inkoop/maak": {
    "staat": "onbeslist",
@@ -26231,263 +26229,300 @@
    "reden": "er is over DEZE route gelogen en rtmail-vak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/vak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/gesprekken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/draad": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/verplaats": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/etiket": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/ster": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/sluimer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/zoek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/hulp": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/antwoord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/concepten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/concept/bewaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/concept/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/concept/verstuur": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/instellingen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/handtekening": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/afwezig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/alias": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/regels": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/regel/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/regel/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/regel/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/imap/sleutels": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/imap/sleutel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/imap/intrekken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/rechten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/delegeer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/delegatie/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/journaal": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/bewaarbeleid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/bewaartermijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/bewaring": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/opruimen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/vernietigingen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/export": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/bijlagen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/bijlage": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtmail-zaak.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 39); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-zaak.test.js zakte daarop"
   },
   "POST /api/office/salon/belang": {
    "staat": "bewezen",
@@ -49643,6 +49678,281 @@
    "toets": "rtf-veilig.test.js",
    "merkt": true,
    "op": "2026-08-19T17:37:56.310Z"
+  },
+  "POST /api/rtfos/subsidie/maak": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:09.070Z"
+  },
+  "POST /api/rtfos/subsidies": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:09.160Z"
+  },
+  "POST /api/rtfos/voorraad/binnen": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:21.585Z"
+  },
+  "POST /api/rtfos/subsidie/status": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:21.668Z"
+  },
+  "POST /api/rtfos/subsidie/moment": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:21.776Z"
+  },
+  "POST /api/rtfos/voorraad": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:21.944Z"
+  },
+  "POST /api/rtfos/voorraad/afschrijven": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:34.286Z"
+  },
+  "POST /api/rtfos/voorraad/uit": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:34.428Z"
+  },
+  "POST /api/rtfos/activiteiten": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:34.520Z"
+  },
+  "POST /api/rtfos/activiteit/begeleiders": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:35.032Z"
+  },
+  "POST /api/rtfos/activiteit/zet": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:47.067Z"
+  },
+  "POST /api/rtfos/activiteit/incheck": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:47.077Z"
+  },
+  "POST /api/rtfos/activiteit/inschrijven": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:47.160Z"
+  },
+  "POST /api/rtfos/vergadering": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:47.972Z"
+  },
+  "POST /api/rtfos/herkomst": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:59.390Z"
+  },
+  "POST /api/rtfos/beleid": {
+   "toets": "rtfos-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:38:59.498Z"
+  },
+  "POST /api/supplier/rtmail/vak": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:11.802Z"
+  },
+  "POST /api/supplier/rtmail/gesprekken": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:13.115Z"
+  },
+  "POST /api/supplier/rtmail/verplaats": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:24.242Z"
+  },
+  "POST /api/supplier/rtmail/etiket": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:24.386Z"
+  },
+  "POST /api/supplier/rtmail/draad": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:25.005Z"
+  },
+  "POST /api/supplier/rtmail/ster": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:25.872Z"
+  },
+  "POST /api/supplier/rtmail/sluimer": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:36.982Z"
+  },
+  "POST /api/supplier/rtmail/zoek": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:37.152Z"
+  },
+  "POST /api/supplier/rtmail/hulp": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:37.738Z"
+  },
+  "POST /api/supplier/rtmail/antwoord": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:38.596Z"
+  },
+  "POST /api/supplier/rtmail/concepten": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:49.428Z"
+  },
+  "POST /api/supplier/rtmail/concept/bewaar": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:49.889Z"
+  },
+  "POST /api/supplier/rtmail/concept/weg": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:50.557Z"
+  },
+  "POST /api/supplier/rtmail/concept/verstuur": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:39:51.253Z"
+  },
+  "POST /api/supplier/rtmail/instellingen": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:02.026Z"
+  },
+  "POST /api/supplier/rtmail/handtekening": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:02.843Z"
+  },
+  "POST /api/supplier/rtmail/afwezig": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:03.023Z"
+  },
+  "POST /api/supplier/rtmail/alias": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:04.320Z"
+  },
+  "POST /api/supplier/rtmail/regels": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:14.672Z"
+  },
+  "POST /api/supplier/rtmail/regel/maak": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:15.273Z"
+  },
+  "POST /api/supplier/rtmail/regel/zet": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:15.888Z"
+  },
+  "POST /api/supplier/rtmail/regel/weg": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:16.630Z"
+  },
+  "POST /api/supplier/rtmail/imap/sleutels": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:27.957Z"
+  },
+  "POST /api/supplier/rtmail/imap/sleutel": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:28.518Z"
+  },
+  "POST /api/supplier/rtmail/imap/intrekken": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:29.247Z"
+  },
+  "POST /api/supplier/rtmail/rechten": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:29.996Z"
+  },
+  "POST /api/supplier/rtmail/delegeer": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:40.614Z"
+  },
+  "POST /api/supplier/rtmail/delegatie/weg": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:41.493Z"
+  },
+  "POST /api/supplier/rtmail/journaal": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:41.938Z"
+  },
+  "POST /api/supplier/rtmail/bewaarbeleid": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:42.664Z"
+  },
+  "POST /api/supplier/rtmail/bewaartermijn": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:53.132Z"
+  },
+  "POST /api/supplier/rtmail/bewaring": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:54.237Z"
+  },
+  "POST /api/supplier/rtmail/opruimen": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:54.843Z"
+  },
+  "POST /api/supplier/rtmail/vernietigingen": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:40:55.507Z"
+  },
+  "POST /api/supplier/rtmail/export": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:41:05.906Z"
+  },
+  "POST /api/supplier/rtmail/bijlagen": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:41:06.888Z"
+  },
+  "POST /api/supplier/rtmail/bijlage": {
+   "toets": "rtmail-zaak.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:41:07.631Z"
+  },
+  "POST /api/rtfos/project/indicator": {
+   "toets": "rtfos.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:41:21.700Z"
+  },
+  "POST /api/rtfos/projecten": {
+   "toets": "rtfos.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:41:32.011Z"
   }
  },
  "basislijn": {
@@ -50075,6 +50385,9 @@
   "rtfos-governance.test.js": "groen",
   "stadsweefsel.test.js": "groen",
   "techniek-sso-scim.test.js": "groen",
-  "rtf-veilig.test.js": "groen"
+  "rtf-veilig.test.js": "groen",
+  "rtfos-bestuur.test.js": "groen",
+  "rtmail-zaak.test.js": "groen",
+  "rtfos.test.js": "groen"
  }
 }

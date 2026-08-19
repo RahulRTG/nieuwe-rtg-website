@@ -65,7 +65,7 @@
     "breed": 0,
     "leeg": 0,
     "balk": 0,
-    "duim": 0,
+    "duim": 12,
     "waar": "de vierde ronde: 390x844, ingelogd, twee keer -- rechtshandig en linkshandig (shared/hand.js)",
     "wat elk getal is": {
       "breed": "schermen die op 390px rechts buiten beeld lopen. Die staan zelf op overflow:hidden, dus er is niet naartoe te scrollen: de rechterkant is gewoon weg",
@@ -91,6 +91,14 @@
       "de tweede leeg-poging keek naar HOOGTE en veroordeelde gast.html -- de QR-landingspagina, die terecht een zin lang is. De derde keek in <main> en meldde er 130, om drie redenen tegelijk: babyboek heeft geen <main>, camera heeft er een met nul hoge kinderen, en de toegangspoort van de stichting is een overlay",
       "de detectie van de hoofdhandeling had een derde regel, 'de enige zichtbare verzendknop'. Die leek redelijk en raadde: op app.html koos hij de verzendknop van het Rahul-veld (24x24) als hoofdhandeling van het BEGINSCHERM, waar de handeling is: kies een wereld, en dat zijn er vier"
     ],
-    "werkvoorraad, en met opzet geen fout": "478 van de 514 metingen vonden geen aangewezen hoofdhandeling: 18 van de 257 schermen declareren er een. Dat is geen gebrek maar een teller (GRAMMATICA.md). Een lijst, een overzicht of een dagbriefing heeft niet een handeling die eruit springt, en 'wijs maar iets aan' als reparatie maakt geen enkel scherm beter -- dat is precies hoe muziek.html de verkeerde knop kreeg."
+    "werkvoorraad, en met opzet geen fout": "478 van de 514 metingen vonden geen aangewezen hoofdhandeling: 18 van de 257 schermen declareren er een. Dat is geen gebrek maar een teller (GRAMMATICA.md). Een lijst, een overzicht of een dagbriefing heeft niet een handeling die eruit springt, en 'wijs maar iets aan' als reparatie maakt geen enkel scherm beter -- dat is precies hoe muziek.html de verkeerde knop kreeg.",
+    "gemeten": "2026-08-19",
+    "waarom duim niet op nul staat": {
+      "stand": "12 metingen over 6 schermen, alle twaalf 'boven de duimlijn'. Maat en ankerzijde staan wel op nul.",
+      "het is een botsing tussen twee huisdocumenten en geen bug": "agenda, notities, galerij en bestanden zetten hun maak-actie (+ Afspraak, + Notitie, + Album, Upload) in de iOS-navbalk bovenaan. Dat is de conventie die shared/ios.css met opzet bouwt. GRAMMATICA.md opent met de tegenovergestelde belofte: 'ik wil iets doen -> mijn duim vindt het onderaan'. Beide staan opgeschreven, en een van de twee moet wijken. Dat is een ontwerpbesluit.",
+      "meet en scanner zijn een ander geval": "daar staat de hoofdhandeling in de gewone stroom, op y 313 en y 233, op een pagina die precies een venster hoog is en dus niet scrolt. Geen conventie in de weg; gewoon een indeling die de knop hoog laat landen.",
+      "waarom scrollen het niet oplost": "een knop in de stroom staat het LAAGST bij scrollpositie nul -- naar beneden scrollen tilt hem verder omhoog. De meting staat op nul, dus zij meet het gunstigste geval. Wie deze zes wil vrijpleiten met 'je kunt toch scrollen', heeft de verkeerde kant op gedacht.",
+      "waarom hij niet op nul is gezet": "dat zou liegen, en waarom hij niet is weggemoffeld met een uitzondering: dan verdwijnt de vraag in plaats van het probleem."
+    }
   }
 }

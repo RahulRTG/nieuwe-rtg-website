@@ -194,6 +194,15 @@ eerste actie de hele lade over, wijkt de rest en licht de snede goud op — éé
 keer, met één korte tik. Een doorveeg die je niet zag aankomen is geen bediening
 maar een ongeluk.
 
+**De eerste actie ligt aan de snede.** De lade gaat vanaf de snede open, dus wat
+daar ligt zie je het eerst — en een volle veeg voert de eerste actie uit. Aan de
+rechterkant klopte dat toevallig; aan de linkerkant niet. Daar hing de knoppenrij
+wel aan de snede maar stond hij in leesvolgorde, dus je zag eerst de LAATSTE
+actie en de eerste pas als de lade helemaal open stond. Gemeten op de post, veeg
+naar rechts, bij 40, 90 en 150 pixels: *Ster* nul van 55 pixels zichtbaar, alle
+drie de keren. Wat je wél zag was het midden van een tweeregelig label — een
+grijze bak. De actie die afgaat, hoort de actie te zijn die je ziet.
+
 **De lade toont alleen wat er heel op past, en hij eindigt zoals de regel
 eindigt.** Twee dingen die je pas ziet als je kijkt, en die er tot 19 augustus
 2026 allebei naast zaten. De lade werd afgeknipt op 72% van de regel terwijl de

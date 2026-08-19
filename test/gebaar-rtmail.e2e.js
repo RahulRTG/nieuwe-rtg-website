@@ -142,6 +142,33 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
       const r = l.getBoundingClientRect();
       return [...l.querySelectorAll('.gb-doe')].every((e) => e.getBoundingClientRect().right <= r.right + 0.6);
     }), 'geen enkele actie mag over de rand van de lade steken; een half woord is geen knop');
+
+    /* DE EERSTE ACTIE LIGT AAN DE SNEDE, en dat is de belangrijkste maat van
+       deze hele lade. De lade gaat vanaf de snede open, dus wat daar ligt zie je
+       het eerst -- en een volle veeg voert de EERSTE actie uit. Lag die aan de
+       andere kant, dan voer je iets uit dat je nog nooit gezien hebt.
+
+       Zo was het: de knoppenrij van de LINKERlade hing wel aan de snede maar
+       stond in leesvolgorde, dus je zag eerst de LAATSTE actie. Gemeten op de
+       post bij 40, 90 en 150 pixels: 'Ster' 0 van 55 pixels zichtbaar, alle drie
+       de keren. Wat je wel zag was het midden van een tweeregelig label -- een
+       grijze bak. Aan de rechterkant klopte het toevallig wel, want daar valt de
+       leesvolgorde samen met de snede. */
+    const aanDeSnede = await page.evaluate(() => {
+      const l = document.querySelector('#main .gb-lade');
+      const lb = l.getBoundingClientRect();
+      const e = l.querySelector('.gb-doe');   // DOM-volgorde is de logische volgorde
+      const eb = e.getBoundingClientRect();
+      const snede = l.dataset.kant === 'links' ? lb.right : lb.left;
+      const rand = l.dataset.kant === 'links' ? eb.right : eb.left;
+      return { naam: e.textContent.trim(), gat: Math.round(Math.abs(rand - snede) * 10) / 10,
+        zichtbaar: Math.round(Math.max(0, Math.min(eb.right, lb.right) - Math.max(eb.left, lb.left))) };
+    });
+    assert.ok(aanDeSnede.gat <= 1.5,
+      'de eerste actie (' + aanDeSnede.naam + ') ligt ' + aanDeSnede.gat + 'px van de snede; ' +
+      'daar hoort hij tegenaan, want dat is wat je als eerste ziet en wat een volle veeg uitvoert');
+    assert.ok(aanDeSnede.zichtbaar > 0,
+      'de eerste actie is helemaal niet zichtbaar; dan veeg je iets door dat je nooit gezien hebt');
     await page.mouse.up();
     await page.keyboard.press('Escape');
 

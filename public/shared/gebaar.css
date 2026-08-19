@@ -96,7 +96,26 @@
    de plank mee naar binnen in plaats van op hun plek te wachten. */
 .gb-binnen{position:absolute;top:0;bottom:0;width:var(--gb-vol,0px);display:flex;}
 .gb-lade[data-kant="rechts"] .gb-binnen{left:0;}
-.gb-lade[data-kant="links"]  .gb-binnen{right:0;}
+/* DE LINKERLADE SPIEGELT, EN DAT WAS HET NIET. De knoppenrij hangt aan de snede
+   en steekt de andere kant uit; bij een lade die vanaf de snede opengaat betekent
+   dat: je ziet eerst wat er het VERST van de snede af staat. Aan de rechterkant
+   is dat de eerste actie -- goed. Aan de linkerkant was het de LAATSTE, en de
+   eerste kwam pas in beeld als de lade helemaal open stond.
+
+   Gemeten op de post, veeg naar rechts: bij 40, 90 en 150 pixels stond 'Ster'
+   op 0 van 55 pixels zichtbaar. Nul. Terwijl een volle veeg juist DIE actie
+   uitvoert. Wat je wel zag was het midden van een tweeregelig label -- oftewel
+   een grijze bak. De actie die afgaat, hoort de actie te zijn die je ziet.
+
+   row-reverse zet de eerste actie tegen de snede aan zonder de VOLGORDE in de
+   DOM te draaien: die blijft de logische volgorde, en daar hangen data-i, de
+   voorleesvolgorde en .gb-eerste aan. De scheidingslijn draait mee -- hij hoort
+   TUSSEN de knoppen te staan en niet op de snede, waar de lade zijn eigen rand
+   al heeft. */
+.gb-lade[data-kant="links"]  .gb-binnen{right:0;flex-direction:row-reverse;}
+.gb-lade[data-kant="links"] .gb-doe{border-inline-start:0;
+  border-inline-end:1px solid rgba(255,255,255,.07);}
+.gb-lade[data-kant="links"] .gb-doe:first-child{border-inline-end:0;}
 
 .gb-doe{
   flex:1 0 auto;min-width:3.4rem;

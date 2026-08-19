@@ -166,7 +166,26 @@
      window.open, en een gedeelde laag die die naam in zijn eigen scope
      wegneemt, zet een val voor de volgende die hier iets bijschrijft. */
   var openLade = null;
-  var netGeveegd = false;
+  /* DE KLIK NA DE VEEG, EN WAAROM DIT GEEN VLAG MET EEN TIMER IS.
+
+     Hier stond `netGeveegd = true` met een setTimeout van 60 ms erachter. Dat
+     leek onschuldig en was het niet, om twee redenen die pas in een echte
+     browser zichtbaar werden:
+
+     1. ZOLANG HIJ AAN STOND SLIKTE DE LAAG ELKE KLIK OP DE PAGINA -- ook een
+        klik op de terugdraai-melding, die nergens in de buurt van de geveegde
+        regel staat. Een laag die een gebaar afhandelt, hoort niets te doen met
+        knoppen die er niets mee te maken hebben.
+     2. EEN TIMER VAN 60 MS IS GEEN 60 MS. Een tabblad dat niet zichtbaar is,
+        krijgt zijn timers vertraagd; gemeten in een schermtoets duurde die 60 ms
+        ruim een seconde, en in dat gat verdween precies de klik die het gebaar
+        moest kunnen terugdraaien. De toets zakte de ene keer wel en de andere
+        keer niet -- het klassieke teken dat er tijd in de logica zit die er
+        niet in hoort.
+
+     Wat er nu staat is EENMALIG en gebonden aan de REGEL: precies de eerstvolgende
+     klik, en alleen als hij op de geveegde regel valt. Geen tijd, geen gok. */
+  var slikRij = null;
 
   function px(el, naam, waarde) { el.style.setProperty(naam, waarde); }
   function tik(patroon) {
@@ -356,8 +375,7 @@
     if (!g) return;
     var h = g; g = null;
     if (!h.vast) return;
-    netGeveegd = true;
-    setTimeout(function () { netGeveegd = false; }, 60);
+    slikRij = h.rij;      // de klik die hier zo achteraan komt is de staart van dit gebaar
     try { h.rij.releasePointerCapture(h.pid); } catch (err) {}
     var lijst = h.acties[h.kant];
     if (h.gereed) {
@@ -403,8 +421,15 @@
       return;
     }
     /* De klik die op een veeg volgt is geen klik maar de staart van het gebaar.
-       Zonder dit slikje opent elke veeg over een regel ook nog de regel zelf. */
-    if (netGeveegd) { e.preventDefault(); e.stopPropagation(); return; }
+       Zonder dit slikje opent elke veeg over een regel ook nog de regel zelf.
+       EENMALIG en op de REGEL: de verwijzing gaat weg bij de eerstvolgende klik,
+       wat er ook gebeurt, en alleen een klik OP die regel wordt geslikt. Zie de
+       toelichting bij slikRij in gebaar-02.js voor wat hier eerst stond. */
+    if (slikRij) {
+      var vanDeVeeg = e.target.closest && e.target.closest('.gb-rij') === slikRij;
+      slikRij = null;
+      if (vanDeVeeg) { e.preventDefault(); e.stopPropagation(); return; }
+    }
     if (openLade && !(e.target.closest && e.target.closest('.gb-rij') === openLade.rij)) sluitAlles();
   }, true);
 
@@ -511,6 +536,11 @@
      openstaat is geen geheugen maar een vergeten venster. */
   addEventListener('scroll', function () { if (openLade) sluitAlles(true); }, { passive: true, capture: true });
 
+/* Vervolg van gebaar-03: VASTHOUDEN, in zijn twee betekenissen. Lang drukken
+   opent de acties als lijst; vasthouden op een borg-actie voert hem uit. Apart
+   bestand omdat de maat het vroeg (check.js regel 13) en omdat het een eigen
+   onderwerp is: alles hierboven gaat over EEN tik of EEN toets, hier gaat het
+   over de tijd die een vinger ergens blijft. */
   /* ------------------------------------------------------- vasthouden --
      Lang drukken opent dezelfde acties als lijst. Niet alleen via contextmenu:
      die gebeurtenis komt op een <a> in iOS Safari niet, en juist daar is bijna
@@ -526,8 +556,7 @@
     langTimer = setTimeout(function () {
       if (g && g.vast) return;                 // dit is een veeg, geen vasthouden
       g = null;
-      netGeveegd = true;                       // de klik erna is de staart hiervan
-      setTimeout(function () { netGeveegd = false; }, 400);
+      slikRij = rij;                           // de klik erna is de staart hiervan
       tik(9);
       opendActielade(rij);
     }, 520);
@@ -857,6 +886,104 @@
     klaar: KLAAR,
     wereldregister: wereldregister,
     sluit: function () { sluitAlles(true); sluitBlad(); }
+  };
+
+/* Slot van de gebarenlaag, deel drie: DE VEEG DIE DE SERVER RAAKT.
+
+   Tot hier deed elke actie iets in de browser -- openen, delen, kopieren. Dit
+   deel is voor de acties die echt iets veranderen aan de andere kant, en dat is
+   een ander soort belofte: als de regel wegschuift, is hij ook echt weg.
+
+   OPTIMISTISCH, MET EEN WEG TERUG (ONTWERP.md par. 6). De regel verdwijnt
+   meteen en de server volgt. Snelheid is wat een veeg beter maakt dan een knop;
+   die weggeven maakt hem zinloos. De prijs is dat er drie dingen geregeld
+   moeten zijn, en ze staan HIER en niet in elk scherm opnieuw:
+
+     1. de regel gaat meteen weg, met een korte inklap zodat de lijst niet
+        springt;
+     2. gaat het mis aan de andere kant, dan komt hij TERUG en zegt waarom --
+        stil falen is hier de ergste uitkomst, want het lid denkt dat het gelukt
+        is en het staat er morgen weer;
+     3. lukt het wel, dan staat de weg terug klaar -- en die roept de omgekeerde
+        route aan, niet een kopie van de administratie.
+
+   WAT DIT NIET DOET: verzinnen dat iets omkeerbaar is. Een actie zonder `terug`
+   krijgt geen terugdraai-knop maar een borg: die gaat alleen op vasthouden.
+   Dat is geen strengheid maar de enige eerlijke uitkomst -- een knop
+   'Terugdraaien' die niets terugdraait is erger dan geen knop. */
+
+  /* De inklap. Hij zet een vaste hoogte voordat hij naar nul gaat, want een
+     element klapt niet in vanaf `auto`. Geeft een functie terug die hem
+     terugzet, en die is het vangnet van punt 2 hierboven. */
+  function verberg(rij) {
+    var h = rij.offsetHeight;
+    var oud = { hoogte: rij.style.height, marge: rij.style.marginTop, over: rij.style.overflow };
+    rij.style.height = h + 'px';
+    rij.style.overflow = 'hidden';
+    /* een frame ertussen, anders ziet de browser alleen de eindstand */
+    requestAnimationFrame(function () {
+      if (!rij.isConnected) return;
+      rij.classList.add('gb-weg');
+      rij.style.height = '0px';
+    });
+    return function terugzetten() {
+      rij.classList.remove('gb-weg');
+      rij.style.height = oud.hoogte; rij.style.marginTop = oud.marge; rij.style.overflow = oud.over;
+    };
+  }
+
+  /* Een actie die de server raakt. doe() en terug() geven een Promise terug;
+     alles daaromheen -- inklappen, terugzetten bij een fout, de melding, de
+     knop Terugdraaien -- doet deze laag. */
+  KLAAR.server = function (o) {
+    if (!o || typeof o.doe !== 'function') return null;
+    return {
+      naam: o.naam, teken: o.teken, sig: o.sig,
+      /* melding MOET mee. Hij stond eerst alleen in de o hierboven, en voerUit()
+         leest hem van de ACTIE -- dus de melding was "Prullenbak" in plaats van
+         "Contract-2026.txt ligt in de prullenbak". Gevonden in een echte
+         browser, niet met lezen: het verschil is een woord op een toast. */
+      melding: o.melding,
+      /* Geen terugweg betekent vasthouden. Zie de kop hierboven. */
+      borg: o.borg || typeof o.terug !== 'function',
+      doe: function (rij) {
+        var terugzetten = verberg(rij);
+        var klaar = function () { if (typeof o.na === 'function') try { o.na(); } catch (e) {} };
+        var gelukt = true;
+        var fouttekst = function (f, sl, nl, en) {
+          return (f && f.message) || T(sl, nl, en);
+        };
+        /* De heenweg wordt VASTGEHOUDEN, en dat is niet netjesheid maar een
+           gemeten fout. De melding met Terugdraaien staat er meteen -- dat is
+           wat optimistisch betekent -- dus een snelle hand drukt hem in terwijl
+           de eerste aanvraag nog onderweg is. Zonder deze ketting racen 'weg' en
+           'herstel' met elkaar, en wie het laatst aankomt wint: het bestand
+           bleef weg terwijl het scherm zei dat het terug was. Betrapt door een
+           toets die de ene keer zakte en de andere keer niet. */
+        var heenweg = Promise.resolve()
+          .then(function () { return o.doe(rij); })
+          .then(klaar, function (fout) {
+            gelukt = false;
+            terugzetten();
+            melding(fouttekst(fout, 'gebaar.mislukt', 'Dat lukte niet; de regel staat er nog.',
+              'That did not work; the row is still there.'), null);
+          });
+        if (typeof o.terug !== 'function') return o.melding || o.naam;
+        return function () {
+          heenweg.then(function () {
+            /* Ging de heenweg mis, dan staat de regel er al weer en valt er
+               niets terug te draaien. Alsnog terug gaan zou een tweede,
+               tegengestelde opdracht sturen voor iets dat nooit gebeurd is. */
+            if (!gelukt) return;
+            return Promise.resolve(o.terug(rij)).then(function () { terugzetten(); klaar(); },
+              function (fout) {
+                melding(fouttekst(fout, 'gebaar.terugmislukt', 'Terugdraaien lukte niet.',
+                  'Undo did not work.'), null);
+              });
+          });
+        };
+      }
+    };
   };
 
   /* De laag laadt zonder haast (shared/basis.js zet hem op async), dus een

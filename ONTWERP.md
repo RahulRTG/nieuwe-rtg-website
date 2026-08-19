@@ -207,10 +207,18 @@ Snelheid is wat een veeg beter maakt dan een knop, en die weggeven maakt hem
 zinloos. De prijs is dat elke server-actie een tegenactie moet hebben — zonder
 weg terug hoort hij niet op een veeg maar op vasthouden.
 
-*Dit is een besluit en nog geen handhaver.* Vandaag raakt geen enkele veeg de
-server (openen, delen, kopiëren), dus er is niets om af te dwingen. Zodra de
-eerste er wel een raakt, hoort hier een toets onder te staan die zakt op een
-actie zonder tegenactie. Het staat er als richting, niet als gedane zaak.
+*Sinds 19 augustus 2026 is dit uitgevoerd en gehandhaafd.* `RTGGebaar.klaar.server()`
+doet het drieluik op één plek: de regel klapt meteen in, de server volgt, en gaat
+het mis dan komt de regel terug mét de reden — stil falen is hier de ergste
+uitkomst, want dan denkt het lid dat het gelukt is en staat het er morgen weer.
+Een actie zónder tegenactie krijgt geen terugdraai-knop maar wordt automatisch
+een `borg`: die gaat alleen op vasthouden. Dat is geen strengheid maar de enige
+eerlijke uitkomst — een knop "Terugdraaien" die niets terugdraait is erger dan
+geen knop.
+
+Het eerste domein is RTG Bestanden: naar links is de prullenbak (`/weg`, terug
+met `/herstel`), naar rechts de ster. In de prullenbak zelf is een tweede `/weg`
+onomkeerbaar, en juist daar valt de borg vanzelf op zijn plek.
 
 *Handhaving:* `test/gebaar.test.js` bewaakt wat je niet ziet (de laag raakt in
 rust alleen aan wat met naam geleend is, de lade draagt geen knop-in-een-link,

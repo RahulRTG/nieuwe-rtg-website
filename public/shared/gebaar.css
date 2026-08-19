@@ -200,6 +200,20 @@
   :where(.rtg-knop,.knop)[aria-disabled="true"]:hover::after{opacity:0;}
 }
 
+/* ------------------------------------------------------- de regel die gaat --
+   Een regel die de server in gaat, klapt in plaats van te verdwijnen: springt
+   de lijst, dan verliest het oog waar het was. De hoogte wordt in JS gezet
+   (een element klapt niet in vanaf `auto`); dit blad doet de rest. */
+.gb-rij.gb-weg{
+  opacity:0;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-width:0;
+  transition:height var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease),
+             opacity var(--rtg-tijd-kort,120ms) ease,
+             padding var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease),
+             margin var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease);
+}
+html.rtg-stil .gb-rij.gb-weg{transition:none;}
+@media (prefers-reduced-motion:reduce){ .gb-rij.gb-weg{transition:none;} }
+
 /* ------------------------------------------------------------ de terugweg -- */
 /* Doorvegen VOERT UIT, dus er hoort een weg terug te zijn. Rustig, onderin, en
    met role=status zodat hij ook wordt voorgelezen. */
@@ -211,7 +225,11 @@
   font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);font-size:.82rem;
   color:var(--op-onyx,#F4F0E9);
 }
-.gb-terug button{
+/* Een bestandsnaam is zo lang als hij is; op telefoonformaat viel de melding
+   daardoor uiteen in vier regels met de knop ernaast. Een pil hoort een pil te
+   blijven: de tekst kapt af, de knop wijkt niet. */
+.gb-terug > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gb-terug button{flex:none;
   background:transparent;border:1px solid var(--rtg-line,rgba(255,255,255,.18));
   border-radius:999px;padding:.3rem .75rem;min-height:24px;cursor:pointer;
   font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;

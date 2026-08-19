@@ -15,7 +15,26 @@
      window.open, en een gedeelde laag die die naam in zijn eigen scope
      wegneemt, zet een val voor de volgende die hier iets bijschrijft. */
   var openLade = null;
-  var netGeveegd = false;
+  /* DE KLIK NA DE VEEG, EN WAAROM DIT GEEN VLAG MET EEN TIMER IS.
+
+     Hier stond `netGeveegd = true` met een setTimeout van 60 ms erachter. Dat
+     leek onschuldig en was het niet, om twee redenen die pas in een echte
+     browser zichtbaar werden:
+
+     1. ZOLANG HIJ AAN STOND SLIKTE DE LAAG ELKE KLIK OP DE PAGINA -- ook een
+        klik op de terugdraai-melding, die nergens in de buurt van de geveegde
+        regel staat. Een laag die een gebaar afhandelt, hoort niets te doen met
+        knoppen die er niets mee te maken hebben.
+     2. EEN TIMER VAN 60 MS IS GEEN 60 MS. Een tabblad dat niet zichtbaar is,
+        krijgt zijn timers vertraagd; gemeten in een schermtoets duurde die 60 ms
+        ruim een seconde, en in dat gat verdween precies de klik die het gebaar
+        moest kunnen terugdraaien. De toets zakte de ene keer wel en de andere
+        keer niet -- het klassieke teken dat er tijd in de logica zit die er
+        niet in hoort.
+
+     Wat er nu staat is EENMALIG en gebonden aan de REGEL: precies de eerstvolgende
+     klik, en alleen als hij op de geveegde regel valt. Geen tijd, geen gok. */
+  var slikRij = null;
 
   function px(el, naam, waarde) { el.style.setProperty(naam, waarde); }
   function tik(patroon) {

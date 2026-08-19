@@ -77,8 +77,7 @@
     if (!g) return;
     var h = g; g = null;
     if (!h.vast) return;
-    netGeveegd = true;
-    setTimeout(function () { netGeveegd = false; }, 60);
+    slikRij = h.rij;      // de klik die hier zo achteraan komt is de staart van dit gebaar
     try { h.rij.releasePointerCapture(h.pid); } catch (err) {}
     var lijst = h.acties[h.kant];
     if (h.gereed) {

@@ -179,14 +179,3 @@
     sluit: function () { sluitAlles(true); sluitBlad(); }
   };
 
-  /* De laag laadt zonder haast (shared/basis.js zet hem op async), dus een
-     scherm dat zijn regels wil ophangen kan er niet vanuit gaan dat hij er al
-     is. Dit sein zegt: nu wel. Wie eerder klaar is dan de laag, luistert;
-     wie later komt, ziet window.RTGGebaar gewoon staan. */
-  try { d.dispatchEvent(new CustomEvent('rtg-gebaar')); } catch (e) {}
-
-  d.addEventListener('pointerdown', opNeer);
-  d.addEventListener('pointermove', opBeweeg);
-  d.addEventListener('pointerup', opLos);
-  d.addEventListener('pointercancel', opLos);
-})();

@@ -257,3 +257,36 @@ test('de drie wereldregisters delen EEN bouwer', () => {
   assert.match(JSKAAL, /function wereldregister\(wortel\)/,
     'de gedeelde bouwer is uit de laag verdwenen');
 });
+
+test('de klik na een veeg wordt eenmalig geslikt, niet op een klok', () => {
+  /* DIT KOMT UIT EEN FOUT DIE TWEE DAGEN LANG ALLEEN AAN EEN WISPELTURIGE TOETS
+     te zien was. De laag onderdrukte de klik die op een veeg volgt met een
+     vlag plus `setTimeout(..., 60)`. Twee dingen daaraan waren mis, en allebei
+     zie je ze niet door te kijken:
+
+       1. zolang die vlag aanstond, slikte de laag ELKE klik op de pagina -- ook
+          de knop Terugdraaien van zijn eigen melding, die nergens in de buurt
+          van de geveegde regel staat;
+       2. 60 ms is geen 60 ms. Een tabblad dat niet zichtbaar is krijgt zijn
+          timers vertraagd; gemeten in een schermtoets duurde dat ruim een
+          seconde, en precies in dat gat viel de klik die het gebaar moest
+          kunnen terugdraaien.
+
+     DE MUTATIE: zet er weer een vlag met een setTimeout neer. De schermtoets
+     zakt dan de ene keer wel en de andere keer niet -- en juist daarom staat de
+     regel hier ook statisch vast: een toets die maar de helft van de keren
+     bijt, is geen poort. */
+  /* Het ANKER is de luisteraar op het document, niet de eerste de beste
+     klik-luisteraar: de eerste in het bestand is de knop van de melding, en die
+     heeft een eigen (terechte) timer. Deze toets zakte daarop, en dat is een
+     nuttige les over ankers -- indexOf pakt wat er het eerst staat, niet wat je
+     bedoelt. */
+  const vang = JSKAAL.slice(JSKAAL.indexOf("d.addEventListener('click', function (e) {"), JSKAAL.indexOf('function interactief'));
+  assert.ok(vang.length > 100, 'de vangfase-luisteraar hoort gevonden te zijn');
+  assert.ok(!/setTimeout/.test(vang),
+    'er zit weer een timer in de klikonderdrukking; die is op een traag of onzichtbaar tabblad niet wat hij zegt');
+  assert.match(vang, /slikRij\s*=\s*null/,
+    'de onderdrukking is niet meer eenmalig -- zonder dat blijft hij klikken slikken die niets met het gebaar te maken hebben');
+  assert.match(vang, /closest\('\.gb-rij'\)\s*===\s*slikRij/,
+    'de onderdrukking kijkt niet meer of de klik OP de geveegde regel valt; dan slikt hij ook knoppen elders op het scherm');
+});

@@ -1550,7 +1550,9 @@ const {
   bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
-  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
+  // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
+  bevKoppelPlaats
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
@@ -2050,7 +2052,7 @@ const kern = {
   bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
-  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand, bevKoppelPlaats,
   // de directe-betaallaag (kern/directpay.js)
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten,

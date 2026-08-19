@@ -52,7 +52,11 @@
       } catch(e){ toast(e.message); }
     }));
     // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd
-    if (window.Geo && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
+    /* `Geo.mag()` erbij: staat de locatieschakelaar uit, dan geeft Geo.positie()
+       meteen null, en zonder deze toets zou de grendel hieronder wel gezet zijn.
+       Wie de schakelaar daarna aanzet, kreeg dan de rest van de sessie nog steeds
+       geen afstanden te zien. Nu grendelen we alleen als we het echt gevraagd hebben. */
+    if (window.Geo && Geo.mag() && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
     renderAfspraken();
   }
 

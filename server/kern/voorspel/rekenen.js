@@ -12,6 +12,18 @@ const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag
 function seintjeVoor(voorLidResultaat) {
   const v = voorLidResultaat && (voorLidResultaat.verwachtingen || [])[0];
   if (!v || v.rijp < 0.6 || v.zekerheid < 0.2) return null;
+  /* EN HIJ ZWIJGT ALS JE AANTOONBAAR ERGENS ANDERS BENT (PLAATS.md fase 3).
+
+     De rangschikking in voorLid laat zo'n verwachting al zakken, maar het
+     seintje is indringender dan een lijst: het fluistert ongevraagd mee. "Rond
+     deze tijd, als u wilt: uw gebruikelijke bezoek aan Brisa" terwijl je dertig
+     kilometer verderop staat, is precies het soort meepraten waardoor iemand
+     het hele systeem niet meer gelooft.
+
+     Alleen bij een BEVESTIGDE "niet nabij". Is er niets gemeten, dan zwijgen we
+     niet: dan weten we het niet, en een lid dat zijn locatie uit laat staan
+     hoort niet stilletjes minder te krijgen. */
+  if (v.nabij && v.nabij.gemeten && !v.nabij.bevestigd) return null;
   return { icoon: '\u{1F52E}', tekst: (v.soort === 'keten' ? 'Uw keten kan klaargezet: ' : 'Rond deze tijd, als u wilt: ') +
     v.wat + ' (' + v.waarom + ')' };
 }

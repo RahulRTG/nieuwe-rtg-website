@@ -18,6 +18,7 @@
      RTGPlek.aan()                      staat de schakelaar aan?
      RTGPlek.vraag({ waarom: '...' })   -> Promise van {lat,lng} of null
      RTGPlek.volg(cb, { waarom })       -> stopfunctie; cb krijgt elke nieuwe plek
+     RTGPlek.zetAan(true|false)         de schakelaar zelf (bedieningspaneel)
 
    De browser vraagt daarna zelf nog een keer toestemming, en dat is juist: onze
    schakelaar gaat over wat RTG doet, die van de browser over wat het toestel
@@ -136,5 +137,27 @@
     };
   }
 
-  window.RTGPlek = { aan: aan, vraag: vraag, volg: volg };
+  /* DE SCHAKELAAR ZELF, VOOR HET BEDIENINGSPANEEL.
+
+     Hierboven staat dat de schakelaar in het bedieningspaneel woont. Dat was
+     niet waar: `rtg_os_gps` werd door zeven plekken GELEZEN en door niemand
+     GEZET -- de tegel bestond niet, en het bestand waar de commentaren naar
+     verwijzen (shared/osmenu.js) evenmin. Wie hem nooit had aangeraakt hield
+     dus een sleutel die er niet is, en dat leest als "uit". Gevolg: de
+     sterrenhemel, het levensteken van RTG Veilig, de ontmoet-lus en drie
+     reis-apps deden stil niets, voor altijd.
+
+     Aanzetten is meer dan een vlaggetje omzetten: we halen meteen een positie
+     op. Anders staat de tegel op "aan" terwijl het toestel nog nooit iets heeft
+     afgegeven, en dat is precies de belofte die dit huis niet wil doen. Weigert
+     de browser, dan zet haal() de schakelaar terug op uit en geeft dit false. */
+  async function zetAan(waarde) {
+    if (!waarde) { zet(false); return false; }
+    zet(true);
+    geweigerd = false;          // een bewuste tik heft het "nu niet" van deze sessie op
+    await haal();
+    return aan();               // haal() kan hem hebben teruggezet
+  }
+
+  window.RTGPlek = { aan: aan, vraag: vraag, volg: volg, zetAan: zetAan };
 })();

@@ -456,9 +456,9 @@
       "bankPartnerRailZet",
       "bankSalarisRekeningen",
       "bankVergunningZet",
+      "betaal",
       "betaalRegie",
       "bevoegd",
-      "betaal",
       "boardroomAuth",
       "boardroomLijst",
       "geldBetaaldienst",
@@ -471,8 +471,8 @@
       "hardware",
       "ideeen",
       "magnaatLeren",
-      "mall",
       "mail",
+      "mall",
       "naam",
       "pay",
       "payrollOS",
@@ -1256,6 +1256,11 @@
     "payroll-os-zaak": [
       "payrollOS"
     ],
+    "plaats": [
+      "plaats",
+      "werkbeleidPauzeStand",
+      "werkgeversVan"
+    ],
     "planners": [
       "advies",
       "polis",
@@ -1545,6 +1550,7 @@
       "oogUitgifteLog",
       "oogVoertuigen",
       "payrollOS",
+      "plaats",
       "publicPartner",
       "stuurLus",
       "trustVan",
@@ -1958,6 +1964,35 @@
       "overheid",
       "uitgifte"
     ],
+    "vakbewijs": [
+      "accounts",
+      "app",
+      "auth",
+      "db",
+      "findSupplier",
+      "logActivity",
+      "notify",
+      "officeAuth",
+      "persoonseis",
+      "sendPushToUser",
+      "sleutelLid",
+      "supplierAuth",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijsZet",
+      "vakbewijzenVan",
+      "vakbewijzenVerlopend"
+    ],
+    "vakbewijs-kantoor": [
+      "persoonseis",
+      "sendPushToUser",
+      "stuur",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijzenVerlopend"
+    ],
     "veiligheid": [
       "alarmAfsluiten",
       "alarmSlaan",
@@ -2138,26 +2173,6 @@
       "status",
       "wallet",
       "zorgpolis"
-    ],
-    "vakbewijs": [
-      "accounts",
-      "app",
-      "auth",
-      "db",
-      "findSupplier",
-      "logActivity",
-      "notify",
-      "officeAuth",
-      "persoonseis",
-      "sendPushToUser",
-      "sleutelLid",
-      "supplierAuth",
-      "vakbewijsIntrek",
-      "vakbewijsNummer",
-      "vakbewijsTeken",
-      "vakbewijsZet",
-      "vakbewijzenVan",
-      "vakbewijzenVerlopend"
     ]
   }
 }

@@ -22,6 +22,7 @@ const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
 const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
 const { herschrijfHtml: stijlafsplitsingHtml } = require('./stijlafsplitsing');
 const { herschrijfHtml: versieadresHtml } = require('./versieadres');
+const { herschrijfHtml: scriptafsplitsingHtml } = require('./scriptafsplitsing');
 const { CSP, magnaatHtml, STIJLSTEMPEL } = require('./csp');
 
 /* Een verzoek intern doorverwijzen naar een ander pad.
@@ -91,6 +92,23 @@ function cspNonce(publicDir, aan) {
       if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       const magnaat = req.query && String(req.query.magnaat || '') === '1' && rel.startsWith('/apps/');
+      /* HET GROTE INLINE <script>-BLOK ALS EERSTE, op de RAUWE bron.
+
+         Dit moet hier staan en nergens anders. De uitleverkant zoekt het blok
+         terug op VOLGNUMMER in het bronbestand, dus de telling hier en daar
+         moeten over dezelfde tekst gaan. magnaatHtml hieronder maskeert een
+         <script>-tag en scriptbundelHtml verderop vervangt een hele RIJ
+         <script>-tags door een; draait deze laag daarna, dan telt hij anders
+         dan de bron en levert de pagina het VERKEERDE blok uit.
+
+         Andersom kan het wel: wat hier een <script src> wordt, was een gewoon
+         (niet-uitgesteld) blok en blijft dat ook -- het breekt een rij
+         uitgestelde scripts precies zoals het inline blok dat deed, dus de
+         lagen hieronder zien hetzelfde. Zie ./scriptafsplitsing.js.
+
+         (De stijlkant heeft dit probleem niet: geen enkele laag hieronder
+         verandert het aantal <style>-blokken, dus die mag later draaien.) */
+      html = scriptafsplitsingHtml(html, rel);
       html = magnaatHtml(html, magnaat);
       /* Een rij opeenvolgende stijlbladen wordt EEN verwijzing. Dit gaat voor de
          stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie

@@ -836,6 +836,62 @@ alleen omlaag; `test/meterijk.test.js` ijkt hem (keuringsregel 35), en
 `test/wetten.test.js` ijkt de motor zelf -- onder andere dat een wachter die al
 rood was nooit als bewijs meetelt.
 
+## Snelheid en kosten: vier lagen, allemaal nagemeten
+
+Vier lagen die de pagina lichter maken en de rekening drukken. Ze staan alle
+vier standaard AAN en zijn los uit te zetten; de cijfers komen uit een echte
+browser over HTTP/2 op 80 ms latentie en 12 Mbit, mediaan van vijf ronden.
+
+| laag | wat | uit met |
+|---|---|---|
+| `middleware/stijlafsplitsing.js` | groot inline `<style>`-blok wordt een eigen blad | `RTG_STIJLAFSPLITSING=0` |
+| `middleware/scriptafsplitsing.js` | groot inline `<script>`-blok wordt een eigen bestand | `RTG_SCRIPTAFSPLITSING=0` |
+| `middleware/versieadres.js` | elke `.js`/`.css`-verwijzing krijgt `?v=`, en mag dan `immutable` | `RTG_VINGERAFDRUK=0` |
+| `middleware/voordeur.js` | paginacompressie asynchroon (libuv-threadpool i.p.v. de event loop) | -- |
+
+Waarom dit ertoe doet: over alle 258 schermen was 74% van de 4,7 MB HTML inline
+CSS en JS. Dat is de ene bron die NOOIT gecachet kan worden -- een pagina draagt
+een eigen nonce, dus elk antwoord is anders. Op `/apps/app.html`:
+
+    rauwe HTML      185.444 -> 51.883 bytes
+    over de lijn     52.636 -> 13.910 bytes gzip (74% minder)
+    CPU per verzoek     7,9 ->    1,05 ms
+    plafond             127 ->     948 pagina's/seconde per proces
+
+En met de versie in het adres hoeft een terugkerende bezoeker niet meer na te
+vragen of zijn scripts nog goed zijn: 908 -> 637 ms en 67 -> 29 verzoeken bij
+de server.
+
+Elke laag laat de pagina exact hetzelfde: de uitgeleverde CSS en JS zijn
+byte-voor-byte de inline blokken, en over 1294 elementen x 25 berekende
+eigenschappen is er geen verschil. Alle 259 schermen zijn met en zonder de
+lagen langsgelopen; geen enkel scherm gedraagt zich anders.
+
+## De modelkraan: een meter en twee kranen (`server/ai-meter.js`)
+
+Honderd aanroepplekken sturen werk naar een extern model. `usage.output_tokens`
+kwam wel binnen maar werd weggegooid: de eerste keer dat je de kosten zag was op
+de factuur. En de rem aan de deur (300 verzoeken per minuut per IP) ziet geen
+verschil tussen een endpoint van een tiende cent en een Opus-aanroep van
+$0,0136 -- een uur volloopen is ongeveer $244.
+
+`server/ai.js` is het enige punt waar elke aanroep langskomt, dus daar wordt
+geteld en daar staan de kranen:
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `RTG_AI_DAGPLAFOND` | dagplafond in dollar; daarboven gaan externe modellen dicht | uit (geen plafond) |
+| `RTG_AI_BEURTEN_PER_MINUUT` | modelaanroepen per aanroeper per minuut; 0 zet de rem uit | 60 |
+| `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
+
+Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
+(`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de
+handmatige werkmodus die dit huis al draagt. De rem telt MODELAANROEPEN en geen
+routes, via dezelfde `AsyncLocalStorage` die `db/index.js` al gebruikt, zodat
+een nieuwe route er automatisch onder valt. De prijzen zijn een tabel met een
+peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
+boekhouding.
+
 ## Datamap instelbaar (RTG_DATA_DIR)
 
 Standaard staan database, sleutels en uploads in `server/data`. Met

@@ -41,6 +41,11 @@
         return '<p class="stil" style="margin:.35rem 0 0;">' + esc((m.at || '').slice(0, 10)) + ' · ' + esc(m.tekst) + '</p>';
       }).join('')) + '</div>';
     h += '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="dpRapport" type="button">Schoolrapport (print)</button></div>';
+    /* De escalatie van No-Lost-Child. Zonder naam en zonder tekst: dat is
+       geen zuinigheid maar de kern -- een vertrouwelijke melding is bedoeld
+       voor als het thuis niet veilig is, en die route mag niet alsnog opengaan
+       omdat er niemand reageerde. Bel de klas; open de melding niet. */
+    h += '<div class="kaart"><div class="kop">Hulpvragen die te lang wachten</div><div id="dpBewaking" class="stil">Laden...</div></div>';
     /* Thuistaal per vak: een schoolbesluit en geen keuze van een leraar. Bij
        een taalvak zet de server "volledig" terug naar wat het vak toelaat en
        zegt dat ook -- daar is de taal zelf wat je meet. */
@@ -66,6 +71,18 @@
     /* Het taalbeleid per vak. Hier en niet bij de leraar, want dit is een
        schoolbesluit -- en de server zet een taalvak terug naar wat het toelaat
        en meldt dat, in plaats van het stil bij te stellen. */
+    api('/school/directie/bewaking', { schoolCode: S.code, beheerToken: S.token }).then(function (r) {
+      var el = w.querySelector('#dpBewaking');
+      if (!el) return;
+      if (r.body.error) { el.textContent = r.body.error; return; }
+      el.innerHTML = (r.body.escalaties || []).length
+        ? r.body.escalaties.map(function (e) {
+            return '<div class="item"><span><b>' + esc(e.klas) + '</b>' + (e.acuut ? ' <span class="tag aan">acuut</span>' : '') +
+              '<br><span class="stil">' + e.urenOpen + ' uur open &middot; ' + esc(e.fase) + ' &middot; ' + esc(e.wacht || '') + '</span>' +
+              '<br>' + esc(e.volgende || '') + '</span></div>';
+          }).join('') + '<p class="stil">' + esc(r.body.uitleg) + '</p>'
+        : '<p class="stil">Er wacht geen hulpvraag te lang.</p>';
+    });
     w.querySelector('#dpTaal').addEventListener('click', function () {
       var vak = (w.querySelector('#dpTaalVak').value || '').trim().toLowerCase();
       var stand = w.querySelector('#dpTaalStand').value;

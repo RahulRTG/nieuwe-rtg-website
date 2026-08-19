@@ -418,3 +418,45 @@ test('de taallaag staat op het scherm: het beleid en de poort met de bon', () =>
   assert.ok(partner.includes('/apps/schoolpartner/taal.js'), 'School Partner laadt taal.js niet');
   assert.ok(partner.includes('id="taalbeleidVorm"') && partner.includes('id="berichtVorm"'));
 });
+
+test('de keten na de hulplijn staat op het scherm, en de escalatie noemt geen kind', () => {
+  const opvolg = codeVan(lees('apps', 'schoolpartner', 'opvolging.js'));
+  const dir = codeVan(lees('apps', 'schoolpartner', 'directie.js'));
+
+  // de mentor ziet de keten en de volgende stap, en zet elke stap zelf
+  assert.match(opvolg, /\/school\/hulplijn\/bewaking/);
+  assert.match(opvolg, /\/school\/hulplijn\/toewijzen/);
+  assert.match(opvolg, /\/school\/hulplijn\/afspraak/);
+  assert.match(opvolg, /\/school\/hulplijn\/afronden/);
+  assert.match(opvolg, /x\.volgende/, 'het scherm toont de volgende stap niet');
+  assert.match(opvolg, /x\.urenOpen/, 'hoe lang iets openstaat hoort erbij');
+  assert.match(opvolg, /afronden doet een mens/i, 'afronden hoort op naam te gaan');
+
+  /* Het scherm beoordeelt niets: er staat nergens hoe erg iets is. De server
+     weegt de tekst niet, en dan hoort het scherm dat ook niet te doen. */
+  assert.doesNotMatch(opvolg, /ernstig|risico|score|prioriteit \d/i, 'er sluipt een oordeel over de melding in');
+
+  // de directie ziet DAT er iets ligt, niet wat of van wie
+  assert.match(dir, /\/school\/directie\/bewaking/);
+  assert.match(dir, /e\.klas/, 'zonder klas kan de directie nergens heen bellen');
+  assert.doesNotMatch(dir, /e\.naam|e\.tekst|e\.sleutel/, 'de escalatie wijst terug naar een kind');
+
+  /* Het kind krijgt de twee keuzes PAS NA de knop: vooraf zou het een
+     formulier zijn, en de drempel hoort zo laag te blijven dat je hem per
+     ongeluk haalt. */
+  const kind = codeVan(lees('apps', 'foundation', 'school-hulplijn.js'));
+  assert.match(kind, /\/school\/hulplijn\/wens/);
+  assert.match(kind, /maakt-niet-uit/, 'beide keuzes horen een "maakt niet uit" te hebben');
+  assert.match(kind, /Hoeft niet/i, 'het scherm hoort te zeggen dat het vrijblijvend is');
+  /* Preciezer dan "staat verderop in het bestand": het FORMULIER dat je ziet
+     voordat je op de knop drukt, draagt de keuzes niet. Ze worden pas getekend
+     in het antwoord op het versturen. */
+  const formulier = kind.slice(kind.indexOf('async function hulplijnBlok'), kind.indexOf('function bindWens'));
+  assert.match(formulier, /data-hulp-tekst/, 'de scan pakt het verkeerde stuk; klopt het patroon nog?');
+  assert.doesNotMatch(formulier, /data-wens/, 'de keuzes staan al in het formulier: dan is het weer een formulier');
+  assert.match(kind, /data-wens-wanneer/, 'de keuzes worden nergens getekend');
+
+  assert.ok(partner.includes('/apps/schoolpartner/opvolging.js'), 'School Partner laadt opvolging.js niet');
+  assert.ok(partner.includes('id="opvolgVorm"'));
+  assert.ok(dir.includes('id="dpBewaking"'), 'de directie-cockpit mist de escalatielijst');
+});

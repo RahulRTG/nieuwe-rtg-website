@@ -58,6 +58,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Attention OS en Teacher Flow | een lijst in drie bakken, les afronden in een handeling, lesgeheugen | `school/aandacht.js`, `school/les.js` |
 | Vervanger en nieuwe docent | briefing zonder zorgdossier, waarneming met einddatum, vijf stappen | `school/instap.js`, `school/waarneming.js` |
 | Taallaag en Family Bridge | vakbeleid met een harde regel, terugvertaling met betekeniscontrole, bon | `kern/taalbeleid.js`, `kern/betekenis.js`, `school/taalpoort.js` |
+| No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -365,6 +366,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een teruggezette keuze wordt gemeld | het antwoord noemt het vak en de reden | **ja**, met mutatie beproefd |
 | Verschoven betekenis houdt een bericht tegen | ontkenning, verplichting, getal en datum geteld | **ja**, met mutatie beproefd |
 | Geen bonnetje, geen bericht | elk verstuurd bericht draagt model, gebruik en naam | **ja** (`test/taallaag.test.js`) |
+| De bewaking weegt de inhoud nooit | zelfde melding met en zonder tekst geeft hetzelfde oordeel | **ja**, met mutatie beproefd |
+| Een onbeantwoorde hulpvraag escaleert | acuut na twee uur, anders na een schooldag | **ja** (`test/opvolging.test.js`) |
+| Een escalatie wijst niet terug naar een kind | vaste lijst velden, los getoetst | **ja**, met mutatie beproefd |
+| Afronden kan niet zonder dat iemand keek | 409 zolang er geen gezien-moment is | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -638,8 +643,11 @@ hoofdstuk van dit document.
 
 ## 12. No-Lost-Child -- het enige proces dat harder is dan de rest
 
+> **Gebouwd op 19 augustus 2026.** De keten, de escalatie naar de directie
+> zonder naam of tekst, en de twee keuzes van het kind na de knop.
+
 De hulplijn bestaat (`school/hulplijn.js`): één knop voor het kind, acuut apart,
-vertrouwelijk apart. Wat ontbreekt is de **bewaking van opvolging**.
+vertrouwelijk apart. Wat ontbrak is de **bewaking van opvolging**.
 
 ```
 HELP_GEVRAAGD -> toegewezen mentor -> gezien binnen X -> afspraak? -> afgerond
@@ -653,6 +661,40 @@ grens erbij, die even hard is als het proces zelf:
 
 De drempel blijft daarbij extreem laag: *"❤️ ik wil iemand spreken"*, zonder
 formulier, met daarna hooguit twee keuzes (wanneer, en van wie).
+
+### Wat er van deze paragraaf staat, en onder welke grenzen
+
+**De bewaking ziet de tekst van de melding niet.** `kern/opvolging.js` krijgt
+vier dingen: of het kind zelf zei dat het niet kan wachten, wanneer het is
+gemeld, en welke stappen er zijn gezet. Meer heeft ze niet nodig om te weten dat
+er niemand heeft gekeken -- en met meer zou ze gaan wegen wat er aan de hand is.
+Dat is geen bescheidenheid maar het verschil tussen bewaken en beoordelen, en
+het is de grens uit deze paragraaf, in code.
+
+**Twee uur en een schooldag.** Acuut betekent dat het kind zelf zei dat het niet
+kan wachten; dan is twee uur de grens. Anders een schooldag. Dat zijn geen
+doelen om te halen maar het punt waarop iemand anders het moet weten. Zodra
+iemand laat weten dát hij gekeken heeft, stopt die klok -- kijken is niet
+hetzelfde als klaar, maar het is wel het enige dat de bewaking bewaakt.
+
+**De escalatie vertelt dát er iets ligt, niet wat of van wie.** Het schoolbeeld
+voor de directie draagt geen naam, geen tekst en geen sleutel: alleen de klas,
+hoe lang het openstaat, en wat er ontbreekt. Dat moet wel -- een vertrouwelijke
+melding is juist bedoeld voor als het thuis niet veilig is, en die route mag
+niet alsnog opengaan omdat er niemand reageerde. *Bel de klas; open de melding
+niet.* De vorm van zo'n escalatie ligt vast als een lijst velden en wordt daarop
+getoetst, want een verse melding escaleert nog niet en dan bewijst een lege
+lijst niets.
+
+**De twee keuzes komen ná de knop.** Vooraf zou het een formulier zijn, en de
+drempel hoort zo laag te blijven dat je hem per ongeluk haalt. Beide keuzes
+hebben "maakt niet uit" en beide zijn een wens en geen opdracht aan de school.
+Een onbekende keuze levert geen foutmelding op maar valt terug op "maakt niet
+uit": een kind dat om hulp vraagt hoort geen formulierfout te krijgen.
+
+**Afronden doet een mens, met zijn naam, en wist niets.** Een melding die
+niemand heeft gezien kan niet afgerond zijn, en afgerond betekent dat de melding
+blijft staan met wie hem afsloot erbij.
 
 ---
 
@@ -723,7 +765,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    de poort naar het gezin met terugvertaling, betekeniscontrole en bon (zie
    §8). De Language Independence Test staat bewust nog open: die vraagt eerst
    om een taalvorm voor de opgavesjablonen.
-8. **No-Lost-Child opvolgbewaking.**
+8. **No-Lost-Child opvolgbewaking.** Gedaan: de keten van gevraagd tot
+   afgerond, de escalatie naar de directie zonder naam of tekst, en de twee
+   keuzes van het kind na de knop (zie §12).
 9. **Assessment Compiler, Fairness Engine, Fingerprint.**
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.
 

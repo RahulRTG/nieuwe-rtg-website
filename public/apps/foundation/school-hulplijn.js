@@ -70,6 +70,23 @@
       lijst + knop);
   }
 
+  /* De twee keuzes opsturen. Mislukt het, dan is dat geen drama: de melding
+     staat er al en de wens was vrijblijvend. */
+  function bindWens() {
+    wortel.querySelectorAll('[data-wens]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        var kc = b.dataset.klas;
+        var uitEl = wortel.querySelector('[data-hulp-uit="' + kc + '"]');
+        try {
+          var r = await gezinApi('/school/hulplijn/wens', { klasCode: kc, id: b.dataset.wens,
+            wanneer: (wortel.querySelector('[data-wens-wanneer="' + kc + '"]') || {}).value,
+            vanWie: (wortel.querySelector('[data-wens-wie="' + kc + '"]') || {}).value });
+          if (uitEl) uitEl.textContent = r.uitleg || 'Genoteerd.';
+        } catch (e) { if (uitEl) uitEl.textContent = 'Genoteerd voor zover het lukte; je melding staat er al.'; }
+      });
+    });
+  }
+
   function bind() {
     wortel.querySelectorAll('[data-doe="hulplijn"]').forEach(function (b) {
       b.addEventListener('click', async function () {
@@ -82,8 +99,25 @@
             vertrouwelijk: !!(wortel.querySelector('[data-hulp-vertrouwelijk="' + kc + '"]') || {}).checked,
             acuut: !!(wortel.querySelector('[data-hulp-acuut="' + kc + '"]') || {}).checked
           });
-          if (uitEl) uitEl.textContent = 'Verstuurd. ' + (r.wieZietDit || '');
-          setTimeout(laad, 1200);
+          /* Pas NA de knop de twee keuzes, en allebei met "maakt niet uit"
+             erbij. Vooraf zou het een formulier zijn, en de drempel hoort zo
+             laag te blijven dat je hem per ongeluk haalt. Het zijn wensen en
+             geen opdrachten aan de school; dat staat er ook. */
+          if (uitEl) uitEl.innerHTML = esc('Verstuurd. ' + (r.wieZietDit || '')) +
+            '<div style="margin-top:.4rem;">Wil je er nog iets bij zeggen? Hoeft niet.' +
+            '<div style="display:flex;gap:.3rem;margin-top:.3rem;flex-wrap:wrap;">' +
+            '<select class="veld" data-wens-wanneer="' + esc(kc) + '" aria-label="Wanneer">' +
+            '<option value="maakt-niet-uit">wanneer het uitkomt</option>' +
+            '<option value="vandaag">liefst vandaag</option>' +
+            '<option value="deze-week">liefst deze week</option></select>' +
+            '<select class="veld" data-wens-wie="' + esc(kc) + '" aria-label="Van wie">' +
+            '<option value="maakt-niet-uit">maakt niet uit met wie</option>' +
+            '<option value="mentor">liefst mijn mentor</option>' +
+            '<option value="iemand-anders">liefst iemand anders</option></select>' +
+            '<button class="knop mini" data-wens="' + esc(r.melding.id) + '" data-klas="' + esc(kc) + '">Oke</button>' +
+            '</div></div>';
+          bindWens();
+          setTimeout(laad, 6000);
         } catch (e) { if (uitEl) uitEl.textContent = e.message; }
       });
     });

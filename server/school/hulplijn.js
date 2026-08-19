@@ -46,9 +46,13 @@ module.exports = (sctx) => {
     const k = klasVan(req, res); if (!k) return;
     const m = lijst(k).find(x => x.id === String(req.body.id || ''));
     if (!m) return res.status(404).json({ error: 'Melding niet gevonden.' });
+    /* Oppakken IS "gezien" in de keten van No-Lost-Child: hier stopt de klok
+       die bewaakt of er uberhaupt iemand heeft gekeken. Het blijft een aparte
+       stap van afronden -- kijken is niet hetzelfde als klaar. */
     m.status = 'opgepakt'; m.notitie = schoon(req.body.notitie, 300) || null; m.opgepaktAt = nu();
+    m.gezienAt = m.gezienAt || m.opgepaktAt;
     save();
-    res.json({ ok: true });
+    res.json({ ok: true, volgende: 'Spreek af wanneer en met wie, of rond het af.' });
   });
 
   /* het gezin: ouders zien de gewone meldingen van hun kinderen mee;

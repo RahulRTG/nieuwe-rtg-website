@@ -90,3 +90,18 @@ test('5. het luik toont ook de interne AI en het aandeel extern', () => {
   assert.equal(uit.aandeelExtern, 10, 'en het aandeel dat naar buiten ging');
   meter.nulstel();
 });
+
+test('6. het luik toont ook hoe de eigen modelserver ervoor staat', () => {
+  /* aandeelExtern zegt DAT de eigen server afhaakt; dit zegt waarom. */
+  meter.nulstel();
+  const app = neppApp();
+  const nepAi = { lokaleStaat: () => ({ bezig: 2, wachtend: 5, gelijktijdig: 2, storingen: 0, onderbroken: false }) };
+  route({ app, techAuth: () => {}, eigenaarAlleen: () => {}, anthropic: nepAi });
+  const uit = roep(app.gemount[0].fn);
+  assert.equal(uit.lokaleServer.wachtend, 5, 'de wachtrij is zichtbaar');
+  assert.equal(uit.lokaleServer.onderbroken, false);
+  // en zonder lokale server hoort er gewoon null te staan, geen verzinsel
+  const app2 = neppApp();
+  route({ app: app2, techAuth: () => {}, eigenaarAlleen: () => {}, anthropic: {} });
+  assert.equal(roep(app2.gemount[0].fn).lokaleServer, null);
+});

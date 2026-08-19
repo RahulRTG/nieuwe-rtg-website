@@ -49,6 +49,14 @@ function maakAI(opts) {
     actief: ketting[0].naam,
     bron: ketting[0].lokaal ? 'lokaal' : 'extern',
     kan(params) { return ketting.some(a => typeof a.kan !== 'function' || a.kan(params)); },
+    /* De staat van de EIGEN modelserver: hoeveel er tegelijk loopt, hoeveel er
+       wacht, en of de onderbreker aanstaat. Zonder dit is een worstelende eigen
+       server onzichtbaar -- je ziet alleen dat het aandeel extern oploopt, maar
+       niet waarom. Zie server/local-ai.js. */
+    lokaleStaat() {
+      const l = ketting.find(a => a.lokaal && typeof a.staat === 'function');
+      return l ? Object.assign({ modellen: l.modellen, verwerking: l.verwerking }, l.staat()) : null;
+    },
     routes(params) { return ketting.filter(a => typeof a.kan !== 'function' || a.kan(params)).map(a => a.naam); },
     messages: {
       async create(params) {
@@ -79,7 +87,9 @@ function maakAI(opts) {
                je wilt zien -- de keten is lokaal-eerst, dus loopt het aandeel
                extern op, dan haakt de eigen modelserver af. Zie ./ai-meter.js. */
             try {
-              if (aanbieder.lokaal) meter.boekLokaal(aanbieder.modellen && aanbieder.modellen.tekst, uit && uit.usage);
+              if (aanbieder.lokaal) meter.boekLokaal(
+                (typeof aanbieder.modelVoor === 'function' ? aanbieder.modelVoor(params) : null)
+                  || (aanbieder.modellen && aanbieder.modellen.tekst), uit && uit.usage);
               else meter.boek(params && params.model, uit && uit.usage);
             } catch (e2) {}
             return uit;

@@ -915,6 +915,42 @@ een nieuwe route er automatisch onder valt. De prijzen zijn een tabel met een
 peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
 boekhouding.
 
+## De eigen modelserver heeft een poort (`server/local-ai.js`)
+
+Een externe aanbieder schaalt mee; een eigen modelserver niet. Die doet er twee,
+misschien vier tegelijk, en daarboven wordt hij niet langzamer maar STUK: alles
+kruipt, alles loopt in de timeout, en de uitwijkketen stuurt vervolgens ALLES
+naar de betaalde aanbieder. Dat is de dure faalstand, en hij is stil -- de
+rekening ziet hem eerder dan een mens, en ondertussen verlaat de inhoud wel het
+huis.
+
+Twee kleppen daartegen, allebei in `local-ai.js` en niet in de HTTP-laag
+eronder (die bedient ook de betaalprovider en weet niets van een GPU):
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `LOCAL_AI_GELIJKTIJDIG` | hoeveel verzoeken tegelijk naar de eigen server | 2 |
+| `LOCAL_AI_WACHT_MS` | hoe lang een verzoek in de wachtrij mag staan voordat de keten uitwijkt | 20000 |
+| `LOCAL_AI_STORINGSGRENS` | storingen op rij voordat de onderbreker aanslaat | 3 |
+| `LOCAL_AI_HERSTEL_MS` | hoe lang lokaal dan wordt overgeslagen, voordat er weer een verzoek langs mag | 30000 |
+
+Waarom de wachtrij een grens heeft: een lid drie minuten naar een leeg scherm
+laten kijken is erger dan de vraag naar buiten sturen. Waar die grens ligt is
+een keuze en geen natuurwet, dus hij staat in de env.
+
+Waarom de onderbreker bestaat: blijft de server *hangen* (niet weigeren, maar
+hangen), dan betaalt elk verzoek eerst de volle timeout voordat de uitwijk
+begint. Na een paar storingen slaat `kan()` over op false en slaat de keten hem
+meteen over. Na het herstelvenster mag er weer een verzoek langs; lukt dat, dan
+gaat de klep dicht en staat de teller weer op nul.
+
+Af te lezen op `GET /api/techniek/ai/kosten` als `lokaleServer`: bezig,
+wachtend, storingen, onderbroken. `aandeelExtern` zegt DAT de eigen server
+afhaakt; dit zegt waarom.
+
+`test/lokale-ai-poort.test.js` toetst dit tegen een echte nagemaakte
+modelserver -- gelijktijdigheid, de wachtgrens, de onderbreker en het herstel.
+
 ## Datamap instelbaar (RTG_DATA_DIR)
 
 Standaard staan database, sleutels en uploads in `server/data`. Met

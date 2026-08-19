@@ -22,7 +22,7 @@
 const meter = require('../../ai-meter');
 
 module.exports = (ctx) => {
-  const { app, techAuth, eigenaarAlleen } = ctx;
+  const { app, techAuth, eigenaarAlleen, anthropic } = ctx;
 
   app.get('/api/techniek/ai/kosten', techAuth, eigenaarAlleen, (req, res) => {
     const stand = meter.stand();
@@ -31,7 +31,10 @@ module.exports = (ctx) => {
       /* De rem staat los van het dagplafond: de een begrenst een aanroeper, de
          ander de dag. Allebei tonen, anders lijkt "geen plafond" op "geen
          bescherming". */
-      beurtenPerMinuut: meter.beurtGrens() || null
+      beurtenPerMinuut: meter.beurtGrens() || null,
+      /* En de eigen modelserver zelf. Het aandeel extern zegt DAT hij afhaakt;
+         dit zegt waarom -- bezet, of overgeslagen na storingen. */
+      lokaleServer: anthropic && typeof anthropic.lokaleStaat === 'function' ? anthropic.lokaleStaat() : null
     });
   });
 };

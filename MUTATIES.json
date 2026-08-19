@@ -924,7 +924,7 @@
       "modules": [
         "server/kern/comm/index.js"
       ],
-      "geprobeerd": 1,
+      "geprobeerd": 5,
       "posities": 8
     },
     "comm-dm.test.js": {
@@ -1002,12 +1002,11 @@
     },
     "concern.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/concern/index.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/kern/concern/index.js",
+      "operator": "getal+1#2",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "consent-dekking.test.js": {
       "soort": "puur",
@@ -1015,7 +1014,7 @@
       "modules": [
         "server/kern/consent.js"
       ],
-      "geprobeerd": 19,
+      "geprobeerd": 23,
       "posities": 8
     },
     "consent.test.js": {
@@ -1320,7 +1319,7 @@
         "server/meting.js",
         "server/meting-lus.js"
       ],
-      "geprobeerd": 5,
+      "geprobeerd": 18,
       "posities": 8
     },
     "excursie.test.js": {
@@ -1994,7 +1993,7 @@
       "modules": [
         "server/lib/ui-bronnen.js"
       ],
-      "geprobeerd": 3,
+      "geprobeerd": 11,
       "posities": 8
     },
     "ideeen.test.js": {
@@ -3034,12 +3033,11 @@
     },
     "merge3.property.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 31,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/merge.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "meterijk.test.js": {
       "soort": "puur",
@@ -4459,7 +4457,7 @@
       "modules": [
         "server/kern/rtfbieb.js"
       ],
-      "geprobeerd": 3,
+      "geprobeerd": 11,
       "posities": 8
     },
     "rtfcoderem.test.js": {
@@ -4956,7 +4954,7 @@
       "modules": [
         "server/middleware/scriptbundel.js"
       ],
-      "geprobeerd": 7,
+      "geprobeerd": 15,
       "posities": 8
     },
     "selfhost.test.js": {
@@ -5771,31 +5769,27 @@
     },
     "txgeld.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js",
-        "server/db/tx/collecties.js"
-      ],
-      "geprobeerd": 31,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "txindex.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 31,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 5
     },
     "txkap.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js"
-      ],
-      "geprobeerd": 31,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",
@@ -6253,7 +6247,7 @@
         "server/translate/woordenboek/wereld.js",
         "server/translate.js"
       ],
-      "geprobeerd": 6,
+      "geprobeerd": 13,
       "posities": 8
     },
     "wereldvermogens.test.js": {
@@ -6415,7 +6409,7 @@
       "modules": [
         "server/accounts/index.js"
       ],
-      "geprobeerd": 8,
+      "geprobeerd": 13,
       "posities": 8
     },
     "wisselen-en-historie.test.js": {

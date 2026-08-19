@@ -82,8 +82,17 @@ function vingerVan(publicDir, rel) {
 }
 
 /* src="/pad.js" en href="/pad.css" krijgen ?v=... Een adres dat al een ? draagt
-   blijft ongemoeid (zie de kop). */
-const VERWIJZING = /\b(src|href)=("|')(\/[^"'?#>]+\.(?:js|css))\2/gi;
+   blijft ongemoeid (zie de kop).
+
+   HET ATTRIBUUT MOET OP WITRUIMTE BEGINNEN, en dat is geen detail. Met `\b`
+   ervoor matchte ook `data-src=` en `xlink:href=` -- een woordgrens valt immers
+   ook na een streepje of dubbele punt. Vandaag staat er in geen enkel scherm
+   zo'n attribuut met een .js of .css erin (nagegaan over alle 258), dus het is
+   nu nog niemands probleem. Maar de dag dat iemand een eigen lazy-loader met
+   data-src schrijft, zou die stilzwijgend een ?v= krijgen van een laag die daar
+   niets mee te maken heeft. In html gaat aan een attribuut altijd witruimte
+   vooraf, dus die eis kost niets en sluit de val. */
+const VERWIJZING = /(\s)(src|href)=("|')(\/[^"'?#>]+\.(?:js|css))\3/gi;
 
 /* BINNEN EEN <script> OF <style> BLIJVEN WE OVERAL VANAF.
 
@@ -107,11 +116,11 @@ const BLOK = /(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\2\s*>)/gi;
 
 function herschrijfHtml(html, publicDir) {
   if (!AAN || !html) return html;
-  const stempelIn = (stuk) => stuk.replace(VERWIJZING, (heel, attr, q, rel) => {
+  const stempelIn = (stuk) => stuk.replace(VERWIJZING, (heel, wit, attr, q, rel) => {
     if (!GOED.test(rel) || rel.indexOf('..') !== -1) return heel;
     const v = vingerVan(publicDir, rel);
     if (!v) return heel;                       // bestaat niet: laat staan
-    return attr + '=' + q + rel + '?v=' + v + q;
+    return wit + attr + '=' + q + rel + '?v=' + v + q;
   });
   const uit = [];
   let laatst = 0, m;

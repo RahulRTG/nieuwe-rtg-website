@@ -141,3 +141,22 @@ test('9. binnen een <script> of <style> blijft alles staan', () => {
   assert.ok(uit.includes('\'<link href="/shared/stijl.css" rel="stylesheet">\''),
     'terwijl dezelfde tekst BINNEN het script onaangeraakt blijft');
 });
+
+test('10. alleen een echt src=/href=-attribuut, niet data-src of xlink:href', () => {
+  /* Met `\b` ervoor matchte ook data-src= en xlink:href-- een woordgrens valt
+     immers ook na een streepje of dubbele punt. Vandaag staat zo'n attribuut
+     met een .js of .css in geen enkel scherm, dus het is nu nog niemands
+     probleem; maar de dag dat iemand een eigen lazy-loader met data-src
+     schrijft, zou die stilzwijgend een ?v= krijgen van een laag die daar niets
+     mee te maken heeft. */
+  const echt = '<script src="/shared/klok.js"></script>';
+  assert.match(M.herschrijfHtml(echt, map), /\?v=/, 'een echt src= krijgt zijn stempel');
+  for (const anders of ['<img data-src="/shared/klok.js">',
+                        '<div xlink:href="/shared/stijl.css">',
+                        '<x mysrc="/shared/klok.js">']) {
+    assert.equal(M.herschrijfHtml(anders, map), anders, anders + ' hoort ongemoeid te blijven');
+  }
+  // en de witruimte ervoor blijft staan zoals hij stond
+  const twee = '<link rel="stylesheet" href="/shared/stijl.css">';
+  assert.match(M.herschrijfHtml(twee, map), /rel="stylesheet" href="\/shared\/stijl\.css\?v=/);
+});

@@ -180,6 +180,39 @@ function startEchteServer() {
      TOEGANKELIJK.md. */
   const EIGEN_SESSIE = { '/apps/foundation/campus.html': RTF_KIND };
 
+  /* EN EEN LES, WANT DAARMEE GAAN DE LAATSTE TWEE DEUREN OPEN.
+
+     /apps/foundation/bord.html en schrift.html hangen achter een TIJDELIJKE
+     SCHOOLPAS (shared/rtg-school-session.js): een klassleutel die alleen in
+     sessionStorage van die tab staat en na dertig minuten vervalt. Ik had die
+     twee opgeschreven als "niet aan te maken zonder een model achter
+     /api/les/maak" -- en dat was verkeerd gemeten. Die route heeft een
+     handmatige werkmodus (CLAUDE.md: zonder model blijven de kernprocessen
+     beschikbaar) en levert gewoon een les met een code.
+
+     Allebei de schermen nemen code en sleutel uit de URL over. Twee schermen
+     die aan hun deur gemeten werden, worden nu aan hun inhoud gemeten. */
+  const les = await fetch(basis + '/api/les/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ onderwerp: 'breuken', groep: 'groep 6', aantal: 3 })
+  }).then(r => r.json()).catch(() => ({}));
+  const mee = (les && les.code) ? await fetch(basis + '/api/les/mee', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: les.code, naam: 'Milan' })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  const EIGEN_PAD = {};
+  if (les && les.code && les.leraarToken) {
+    EIGEN_PAD['/apps/foundation/bord.html'] =
+      '/apps/foundation/bord.html?code=' + les.code + '&t=' + les.leraarToken;
+  }
+  if (les && les.code && mee && mee.deelnemerToken) {
+    EIGEN_PAD['/apps/foundation/schrift.html'] =
+      '/apps/foundation/schrift.html?code=' + les.code + '&t=' + mee.deelnemerToken;
+  }
+  if (Object.keys(EIGEN_PAD).length < 2) {
+    console.error('[a11y] LET OP: geen schoolpas -- bord.html en/of schrift.html worden aan hun deur gemeten.');
+  }
+
   /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
      een CSP met nonce mee en die blokkeert een inline script. In een IIFE, want
      evaluate met een string verwacht een expressie en BRON begint met functies. */
@@ -276,6 +309,24 @@ function startEchteServer() {
   }, { token: lid.token, rtf: RTF_SESSIE });
   await telefoon.addCookies([{ name: 'rtg_hand', value: hand, url: basis }]);
   const tel = await telefoon.newPage();
+  /* DE RONDE DRAAGT NU EEN INKEPING, EN DAT MISTE HIJ VANAF HET BEGIN.
+
+     Een browservenster heeft geen statusbalk en geen thuisstreep, dus
+     env(safe-area-inset-*) is er nul -- en een scherm dat die zone negeert ziet
+     er in de keuring perfect uit. Vijf schermen deden dat en dat kwam boven met
+     een SCHERMAFDRUK VAN EEN ECHT TOESTEL, niet met een meting: de bovenste
+     strook liep onder de klok door en de menuknop lag op de eerste tab.
+
+     59 boven en 34 onder zijn de maten van een iPhone met Dynamic Island. Ze
+     staan hier als getal en niet als toestelnaam: wat we meten is "er is een
+     zone die niet van ons is", niet "dit ene toestel". */
+  try {
+    const cdp = await telefoon.newCDPSession(tel);
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: { top: 59, bottom: 34, left: 0, right: 0 } });
+  } catch (e) {
+    console.error('[a11y] LET OP: deze browser kent Emulation.setSafeAreaInsetsOverride niet -- '
+      + 'de telefoonronde meet ZONDER inkeping en ziet dus geen enkel gebrek in de veilige zone.');
+  }
   console.log(`\n[a11y] ===== ronde TELEFOON, ${hand}handig (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
   for (const pad of PAGINAS) {
     /* Een scherm met een eigen sessie krijgt die na het eerste bezoek en dan een
@@ -283,7 +334,7 @@ function startEchteServer() {
        dus daarmee zou het leerlingprofiel de rest van de ronde meelopen. Zetten
        en terugzetten in localStorage blijft bij dit ene scherm. */
     const eigen = EIGEN_SESSIE[pad];
-    await tel.goto(basis + pad, { waitUntil: 'load' });
+    await tel.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
     if (eigen) {
       try {
         await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, eigen);

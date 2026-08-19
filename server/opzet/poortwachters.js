@@ -32,6 +32,7 @@ module.exports = function poortwachters(deps) {
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
   const { stijlbundel, PAD: stijlbundelPad } = require('../middleware/stijlbundel');
 const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbundel');
+  const { stijlafsplitsing, PAD: stijlafsplitsingPad } = require('../middleware/stijlafsplitsing');
 
   const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
   const functies = require('../functies');
@@ -94,6 +95,9 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   app.get(stijlbundelPad, stijlbundel(PUBLIC_DIR));
   // en de gebundelde scripts, om dezelfde reden en op dezelfde plek
   app.get(scriptbundelPad, scriptbundel(PUBLIC_DIR));
+  /* En het afgesplitste inline <style>-blok, om dezelfde reden en op dezelfde
+     plek. Zie ../middleware/stijlafsplitsing.js. */
+  app.get(stijlafsplitsingPad, stijlafsplitsing(PUBLIC_DIR));
   app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
   /* Zelfde cache-regel als statischGzip (zie compressie.js): script en stijl
      altijd laten navragen (ETag/304), anders serveert een tussenlaag na een

@@ -11,6 +11,11 @@
    live-streams tellen niet mee: dat zijn langlopende verbindingen, geen
    verzoeken. Alleen in productie, of met RTG_RATELIMIT=1. */
 function remOpDeDeur(app, aan) {
+  /* De async-context voor de AI-rem staat BUITEN de aan/uit van de deurrem:
+     hij remt zelf niets, hij noteert alleen wie het verzoek doet, zodat
+     ../ai-meter.js weet wie een modelaanroep op zijn naam krijgt. Zonder deze
+     laag valt die rem terug op "geen context, dus geen rem". */
+  app.use(require('../ai-meter').contextMiddleware());
   if (!aan) return;
   const rem = require('../rem');
   app.use(rem({

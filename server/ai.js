@@ -15,6 +15,7 @@ const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
 const { kompasStatus } = require('./ai-kompas');
+const meter = require('./ai-meter');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -54,12 +55,31 @@ function maakAI(opts) {
         let laatste = null;
         for (const aanbieder of ketting) {
           if (typeof aanbieder.kan === 'function' && !aanbieder.kan(params)) continue;
+          /* De hoofdkraan. Alleen voor aanbieders die geld kosten: een eigen
+             modelserver draait door, en is die er niet dan valt de keten terug
+             op geen-model -- de handmatige werkmodus die dit huis al draagt.
+             Zie ./ai-meter.js voor waarom dit hier staat en niet per route. */
+          if (!aanbieder.lokaal && !meter.magNog()) {
+            laatste = laatste || Object.assign(new Error('Het dagplafond voor externe modellen is bereikt.'), { code: 'AI_DAGPLAFOND' });
+            try { log && log.warn && log.warn('ai-dagplafond', meter.stand()); } catch (e2) {}
+            continue;
+          }
+          /* En de rem per aanroeper. Telt modelaanroepen en geen routes, zodat
+             een nieuwe route er automatisch onder valt; zie ./ai-meter.js. */
+          if (!aanbieder.lokaal && !meter.magNogVoor()) {
+            laatste = laatste || Object.assign(new Error('Te veel modelaanroepen achter elkaar. Probeer het over een minuut opnieuw.'), { code: 'AI_TE_SNEL' });
+            continue;
+          }
           try {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
+            /* Tellen wat het kostte. Alleen extern: lokaal draait op eigen
+               ijzer en hoort de dagstand niet te vullen. */
+            if (!aanbieder.lokaal) { try { meter.boek(params && params.model, uit && uit.usage); } catch (e2) {} }
             return uit;
           } catch (e) {
+            if (!aanbieder.lokaal) { try { meter.boekFout(); } catch (e2) {} }
             laatste = e;
             try { log && log.warn && log.warn('ai-uitwijk', { van: aanbieder.naam, fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
             // door naar de volgende aanbieder

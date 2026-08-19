@@ -56,15 +56,26 @@
    template met een openend /* zonder sluiter erin zou wel degelijk door de
    echte code heen eten. Zeven is daarom een stand, geen doel.
 
-   DE GRENS VAN DEZE PROEF, HARDOP. Sinds 19 augustus dekt hij ook .html, maar
-   alleen via de INLINE SCRIPTBLOKKEN daarvan (zie blindInHtml hieronder). De
-   markup zelf blijft ongedekt: de lexer spreekt JavaScript en geen HTML. Dat is
-   minder erg dan het klinkt, want een openend commentaarteken in een attribuut
-   eet VOORUIT en komt op een pagina die iets doet vroeg of laat een scriptblok
-   tegen -- nagemeten met de kapotte verwijderaar van 17 augustus: acht pagina's
-   raken dan 60.014 tokens kwijt, met kantoren.html als ergste (22.084). Maar een
-   pagina met markup en ZONDER inline script is hier nog steeds onzichtbaar, en
-   CSS-bestanden helemaal.
+   DE GRENS VAN DEZE PROEF, HARDOP. Sinds 19 augustus dekt hij ook .html: de
+   inline scriptblokken via de lexer, en de MARKUP via de eis dat daar helemaal
+   niets verdwijnt -- want buiten een <script> is een blokcommentaar geen
+   commentaar maar tekst die een bezoeker leest. De inhoud van een <style> wordt
+   overgeslagen; daar zijn het wel echte CSS-commentaren.
+
+   Nagemeten met de kapotte verwijderaar van 17 augustus: negen pagina's raken
+   dan 66.532 stukken kwijt, met kantoren.html als ergste (22.117) en app.html op
+   647 markupregels -- precies het geval dat in de kop van ./bron.js staat als
+   "784 regels markup en script".
+
+   WAT ER NOG NIET GEDEKT IS: losse .css-bestanden. En een blindheid die WEL
+   bestaat maar vandaag nergens uitslaat: ./bron.js kent geen HTML, dus een
+   blokcommentaar in markuptekst wordt ook opgegeten (de vorm zelf staat hier
+   niet uitgeschreven: zonder een backslash zou dat voorbeeld deze uitleg
+   afsluiten -- dezelfde streep en dezelfde reden als in de kop van ./bron.js).
+   Geen enkele pagina doet dat
+   nu, dus de meter staat op nul -- maar schrijft iemand zo'n tekst, dan gaat
+   hij boven nul en zakt de ratel. De valstrik staat open en is niet onbewaakt;
+   test/bronblind.test.js legt dat vast.
 
    EEN LEXFOUT TELT MEE ALS BLIND. Een bestand dat de lexer niet kan lezen is
    een bestand waarover deze proef niets zegt, en LAT.md regel 10 is helder over
@@ -118,43 +129,79 @@ function blindIn(bron, strip = zonderCommentaar) {
    Het knippen gebeurt op dezelfde manier als in scripts/check.js regel 12, dat
    elk inline script al ontleedt -- maar dan met de vraag "staat het er na het
    strippen nog", in plaats van "is het geldige JS". */
-const SCRIPT_OPEN = /<script(?![^>]*\bsrc=)[^>]*>/gi;
+const BLOK_OPEN = /<(script|style)\b[^>]*>/gi;
 
-function scriptBlokken(bron) {
-  const uit = [];
+/* De pagina in documentvolgorde uit elkaar: markup, blokinhoud, markup, ...
+   `soort` is null voor markup, 'script' of 'style' voor de inhoud van zo'n blok.
+   Een blok dat niet sluit stopt de verdeling; scripts/check.js regel 12 klaagt
+   daar al over en dit is niet de plek om dat nog eens te doen. */
+function stukken(bron) {
   const laag = bron.toLowerCase();
-  SCRIPT_OPEN.lastIndex = 0;
+  const uit = [];
+  let i = 0;
+  BLOK_OPEN.lastIndex = 0;
   let m;
-  while ((m = SCRIPT_OPEN.exec(bron))) {
-    const start = m.index + m[0].length;
-    const eind = laag.indexOf('</scr' + 'ipt>', start);
-    if (eind < 0) break;                     // een niet-gesloten script: check.js regel 12 klaagt daar al over
-    uit.push(bron.slice(start, eind));
-    SCRIPT_OPEN.lastIndex = eind;
+  while ((m = BLOK_OPEN.exec(bron))) {
+    const na = m.index + m[0].length;
+    const sluit = laag.indexOf('</' + m[1].toLowerCase() + '>', na);
+    if (sluit < 0) break;
+    uit.push({ soort: null, tekst: bron.slice(i, na) });
+    uit.push({ soort: m[1].toLowerCase(), tekst: bron.slice(na, sluit) });
+    i = sluit;
+    BLOK_OPEN.lastIndex = sluit;
   }
+  uit.push({ soort: null, tekst: bron.slice(i) });
   return uit;
 }
 
-/* De hele pagina wordt in EEN keer gestript (zo lezen de keuringen hem ook), en
-   daarna kijken we per scriptblok of zijn tokens er nog staan. */
+/* EEN PAGINA, TWEE SOORTEN BRON, EEN CURSOR.
+
+   In een SCRIPT is elke token van de lexer code, en die hoort na het strippen
+   nog te staan. In de MARKUP is `/* *\/` helemaal geen commentaar -- dat is
+   CSS- en JS-notatie, geen HTML -- dus daar hoort de verwijderaar NIETS weg te
+   halen. Alleen de inhoud van een <style> wordt overgeslagen: daar zijn het
+   wel echte CSS-commentaren, en die mogen weg.
+
+   De cursor loopt door beide heen, in documentvolgorde. Dat toetst niet alleen
+   of iets er nog staat maar ook of het op zijn plek staat: een verwijderaar die
+   bron verplaatst in plaats van weghaalt, komt er zo ook niet doorheen.
+
+   Gemeten met de kapotte verwijderaar van 17 augustus: acht pagina's raken
+   60.014 script-tokens kwijt en zeven pagina's 926 markupregels, met app.html
+   op 647 -- precies het geval dat in de kop van ./bron.js beschreven staat als
+   "784 regels markup en script". */
 function blindInHtml(bron, strip = zonderCommentaar) {
-  const blokken = scriptBlokken(bron);
-  if (!blokken.length) return { lexfout: false, kwijt: 0, eerste: null, blokken: 0 };
+  /* GEEN VROEGE UITSTAP VOOR EEN PAGINA ZONDER SCRIPT. Die stond hier eerst, en
+     dat was precies verkeerd om: juist een pagina met alleen markup heeft geen
+     tweede net. stukken() geeft dan een enkel markupdeel terug en dat hoort
+     gewoon nagelopen te worden. */
+  const delen = stukken(bron);
   const gestript = strip(bron);
   let kwijt = 0, eerste = null, lexfout = false, cursor = 0;
-  for (const blok of blokken) {
-    let tokens;
-    try { tokens = lex(blok); } catch (e) { lexfout = true; continue; }
-    for (const t of tokens) {
-      if (t.type === 'eof') continue;
-      const tekst = blok.slice(t.start, t.end);
-      if (!tekst.trim()) continue;
-      const p = gestript.indexOf(tekst, cursor);
-      if (p < 0) { kwijt++; if (eerste === null) eerste = tekst.slice(0, 80); }
-      else cursor = p + tekst.length;
+  const mis = (tekst) => { kwijt++; if (eerste === null) eerste = tekst.slice(0, 80); };
+
+  for (const deel of delen) {
+    if (deel.soort === 'style') continue;                 // CSS-commentaar mag weg
+    if (deel.soort === 'script') {
+      let tokens;
+      try { tokens = lex(deel.tekst); } catch (e) { lexfout = true; continue; }
+      for (const t of tokens) {
+        if (t.type === 'eof') continue;
+        const tekst = deel.tekst.slice(t.start, t.end);
+        if (!tekst.trim()) continue;
+        const q = gestript.indexOf(tekst, cursor);
+        if (q < 0) mis(tekst); else cursor = q + tekst.length;
+      }
+      continue;
+    }
+    for (const regel of deel.tekst.split('\n')) {
+      const t = regel.trim();
+      if (!t) continue;
+      const q = gestript.indexOf(t, cursor);
+      if (q < 0) mis(t); else cursor = q + t.length;
     }
   }
-  return { lexfout, kwijt, eerste, blokken: blokken.length };
+  return { lexfout, kwijt, eerste };
 }
 
 function bronBestanden(wortel, mappen) {
@@ -219,4 +266,4 @@ function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], s
   return uit;
 }
 
-module.exports = { blindIn, blindInHtml, scriptBlokken, meetBlind, bronBestanden };
+module.exports = { blindIn, blindInHtml, stukken, meetBlind, bronBestanden };

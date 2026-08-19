@@ -698,6 +698,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "bronblind.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bronblind.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "btw-aangifte.test.js": {
       "soort": "server",
       "staat": "gezakt",

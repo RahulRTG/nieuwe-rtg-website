@@ -171,6 +171,7 @@
     if (window.SPart.opvolging) window.SPart.opvolging();
     if (window.SPart.toetskeuring) window.SPart.toetskeuring();
     if (window.SPart.belasting) window.SPart.belasting();
+    if (window.SPart.overdracht) window.SPart.overdracht();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {

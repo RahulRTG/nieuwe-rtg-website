@@ -498,3 +498,31 @@ test('de week van de klas en van de docent is planning, geen meetlat', () => {
   assert.ok(partner.includes('/apps/schoolpartner/belasting.js'), 'School Partner laadt belasting.js niet');
   assert.ok(partner.includes('id="belastingKlas"') && partner.includes('id="belastingMij"'));
 });
+
+test('de overdrachtskaart toont "nooit", de restlijst en wat een standaard niet kan', () => {
+  const code = codeVan(lees('apps', 'schoolpartner', 'overdracht.js'));
+
+  assert.match(code, /\/school\/overdracht\/kaart/);
+  assert.match(code, /\/school\/overdracht\/pakket/);
+  assert.match(code, /\/school\/overdracht\/inlezen/);
+  assert.match(code, /v\.klasse/, 'per gegeven hoort de klasse zichtbaar te zijn');
+  assert.match(code, /v\.waarom/, 'en waarom het wel of niet meegaat');
+  assert.match(code, /'nooit'/, 'wat nooit meegaat hoort er als zodanig uit te springen');
+
+  /* De winst van deze aanpak is de RESTLIJST: een overdracht die alleen toont
+     wat meegaat, laat de ontvangende school denken dat ze alles heeft. */
+  assert.match(code, /d\.weggelaten/, 'het scherm toont niet wat er NIET meegaat');
+  assert.match(code, /r\.body\.geweigerd/, 'en niet wat er van buiten geweigerd is');
+
+  /* En de eerlijkheid van deze paragraaf zit in wat een standaard NIET kan.
+     Staat dat niet op het scherm, dan is het eerlijk in de code en oneerlijk
+     aan tafel -- precies de zin die hierover in SCHOOL.md stond. */
+  assert.match(code, /st\.kanNiet/, 'het scherm verzwijgt wat een standaard niet kan dragen');
+  assert.match(code, /kan niet dragen/i);
+
+  // en er staat geen knop die doet alsof er iets verstuurd wordt
+  assert.doesNotMatch(code, /verstuur|verzend/i, 'er staat een verstuurknop terwijl er geen koppeling is');
+
+  assert.ok(partner.includes('/apps/schoolpartner/overdracht.js'), 'School Partner laadt overdracht.js niet');
+  assert.ok(partner.includes('id="overdrachtKaart"') && partner.includes('id="overdrachtPakket"'));
+});

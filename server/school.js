@@ -120,4 +120,5 @@ module.exports = (ctx) => {
   require('./school/opvolging')(sctx); // No-Lost-Child: de keten na de hulplijn, en de escalatie
   require('./school/toetskeuring')(sctx); // de toets als meetinstrument: keuring vooraf, spiegel achteraf
   require('./school/belasting')(sctx); // de donderdag van de leerling en de week van de docent
+  require('./school/overdracht')(sctx); // Transition Continuity en de adapters: wat gaat mee, en in welke vorm
 };

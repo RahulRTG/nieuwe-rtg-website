@@ -61,6 +61,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
 | Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
 | Belasting | de dag van de leerling over klassen heen, de week van de docent, niets bewaard | `kern/belasting.js`, `school/belasting.js` |
+| Overdracht en adapters | pakket per doel met een restlijst; vertaling naar vier standaarden, met wat ze niet kunnen | `kern/overdracht.js`, `kern/koppelvlak.js`, `school/overdracht.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -379,6 +380,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | De dag van een kind telt over klassen heen | werk uit andere klassen telt mee in het klasbeeld | **ja**, met mutatie beproefd |
 | Van elders komt alleen een aantal | de weekweergave draagt geen vaknaam en geen titel | **ja**, met mutatie beproefd |
 | Het advies gaat over verplaatsen | geen woord over sneller of achterstand | **ja**, met mutatie beproefd |
+| Zorg gaat ook met toestemming niet mee | 'nooit' kent geen vinkje | **ja**, met mutatie beproefd |
+| Een pakket zegt wat er niet in zit | weggelaten-lijst met een reden per gegeven | **ja**, met mutatie beproefd |
+| Ons model groeit niet mee met een koppelvlak | onbekend veld van buiten wordt geweigerd en gemeld | **ja**, met mutatie beproefd |
+| Elke standaard zegt wat hij niet kan | kanNiet-lijst per standaard, ook op het scherm | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -772,12 +777,43 @@ blijft staan met wie hem afsloot erbij.
 - **Universal School Identity.** Eén leerlingidentiteit via RTG iD, en
   interoperabel met de **Entree Federatie** -- geen gesloten eiland ernaast.
 - **Integration Fabric.** Intern het canonieke onderwijsmodel; extern adapters
-  voor Edu-V, Entree, Edu-API, OSO en overheidsdiensten. Vandaag staan die als
-  *labels* in `school/koppelingen.js` en niet als implementatie; dat is eerlijk
-  in de code en oneerlijk in een verkooppraatje.
+  voor Edu-V, Entree, Edu-API, OSO en overheidsdiensten. **Gebouwd op 19
+  augustus 2026** als *vertaling* (`kern/koppelvlak.js`): heen en terug, met per
+  standaard een lijst van wat hij **niet** kan dragen. Er wordt nog niets
+  verstuurd en niets opgehaald -- er staat geen verbinding met Edu-V of Entree,
+  en zolang die er niet is hoort er niet te worden gedaan alsof.
 - **Transition Continuity.** Bij een overstap gaat niet "dossier.zip" mee, maar
   per doel: nodig voor inschrijving / nodig voor onderwijscontinuïteit / alleen
-  met specifieke toestemming / niet overdraagbaar.
+  met specifieke toestemming / niet overdraagbaar. **Gebouwd op 19 augustus
+  2026** (`kern/overdracht.js`).
+
+### Wat er van deze twee staat, en onder welke grenzen
+
+**Het pakket zegt altijd wat er niet in zit.** Een overdracht die alleen toont
+wat meegaat, laat de ontvangende school denken dat ze alles heeft. Elk pakket
+draagt daarom een weggelaten-lijst met de reden per gegeven. Dat is de hele
+winst: niet minder delen om het delen, maar **weten wat je niet hebt**.
+
+**"Nooit" is geen instelling.** Zorg, incidenten, het inzagejournaal en signalen
+staan op nooit, en daar is geen toestemmingsvinkje voor. Niet omdat toestemming
+niets waard is, maar omdat een ouder die onder tijdsdruk een overstap regelt geen
+vrije keuze maakt over het zorgdossier van zijn kind -- en omdat zulke stukken
+horen bij de school die ze heeft opgebouwd, met hun eigen route en hun eigen
+journaal.
+
+**Toestemming is een handeling, geen stand.** Zonder een genoteerde toestemming
+(wie, wanneer, welke velden) gaat een toestemmingsveld niet mee. De afwezigheid
+van een nee is geen ja.
+
+**Wat niet op de kaart staat, gaat niet mee.** Een onbekend gegeven glijdt niet
+stilletjes in een pakket; het valt eruit en wordt gemeld.
+
+**En de volgorde is de grens.** Eerst *wat* er meegaat (`kern/overdracht.js`),
+pas daarna *in welke vorm* (`kern/koppelvlak.js`). Zou de standaard eerst komen,
+dan bepaalt een koppelvlak wat er over een kind gedeeld wordt -- precies wat
+grens 12 verbiedt. In dezelfde geest weigert `naarBinnen` elk veld dat niet op
+onze kaart staat: ons model groeit niet mee met wat een leverancier stuurt, en
+een veld dat er wél bij hoort komt op de kaart en niet in een uitzondering.
 - **Future Passport.** Na twaalf jaar geen cijferexport maar een portfolio met
   kennis, vaardigheden, projecten, talen en verifieerbare credentials -- waarvan
   de leerling binnen de wettelijke grenzen zelf bepaalt wat hij deelt.
@@ -841,6 +877,11 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    vooraf, de spiegel achteraf en de belasting -- de donderdag van de leerling
    over klassen heen, en de week van de docent (zie §10).
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.
+    Gedaan: de vertaling heen en terug met per standaard wat hij niet kan
+    dragen, en de overdracht per doel met een restlijst (zie §13). Wat er nog
+    niet is: een echte verbinding met een van die diensten. Dat is geen
+    vertaalvraag maar een kwestie van sleutels, contracten en een partij aan de
+    andere kant.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een
 toets bewaakt die iemand heeft zien zakken (LAT-regel 2).

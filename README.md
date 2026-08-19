@@ -869,11 +869,28 @@ lagen langsgelopen; geen enkel scherm gedraagt zich anders.
 
 ## De modelkraan: een meter en twee kranen (`server/ai-meter.js`)
 
-Honderd aanroepplekken sturen werk naar een extern model. `usage.output_tokens`
-kwam wel binnen maar werd weggegooid: de eerste keer dat je de kosten zag was op
-de factuur. En de rem aan de deur (300 verzoeken per minuut per IP) ziet geen
-verschil tussen een endpoint van een tiende cent en een Opus-aanroep van
-$0,0136 -- een uur volloopen is ongeveer $244.
+EERST DE STAND VAN ZAKEN, want die is minder alarmerend dan het klinkt:
+`npm run live:init` schrijft `RTG_AI_UIT=1`, dus productie start ZONDER model,
+in de regelgestuurde werkmodus. En zodra er wel AI is, is de keten lokaal-eerst
+(`server/ai.js`): de eigen modelserver (`LOCAL_AI_URL`) staat vooraan, externe
+aanbieders zijn uitwijk voor wat lokaal niet kan of uitvalt. De
+configuratiekeuring (`server/config/productie-ai.js`) weigert zelfs een
+achtergebleven providersleutel naast `RTG_AI_UIT=1`: uit moet aantoonbaar uit
+zijn.
+
+Wat er dus geregeld moest worden, geldt voor het moment dat er externe sleutels
+staan. Dan sturen honderd aanroepplekken werk naar een extern model, en
+`usage.output_tokens` kwam wel binnen maar werd weggegooid: de eerste keer dat
+je de kosten zag, was op de factuur. De rem aan de deur (300 verzoeken per
+minuut per IP) ziet bovendien geen verschil tussen een endpoint van een tiende
+cent en een Opus-aanroep van $0,0136 -- een uur volloopen is ongeveer $244.
+
+EN DE EIGEN AI TELT OOK MEE, in een eigen emmer. Die kost geen geld maar
+CAPACITEIT: eigen ijzer, eigen wachttijd. Er hangt dus geen bedrag aan, wel een
+telling. Daaruit volgt het getal dat je echt wilt zien: **het aandeel dat naar
+buiten ging**. De keten is lokaal-eerst, dus dat hoort laag te zijn. Loopt het
+op, dan is dat geen kostenpost maar een signaal -- de eigen modelserver haakt
+af, en de rekening merkt het eerder dan een mens.
 
 `server/ai.js` is het enige punt waar elke aanroep langskomt, dus daar wordt
 geteld en daar staan de kranen:
@@ -885,8 +902,10 @@ geteld en daar staan de kranen:
 | `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
 
 De stand is af te lezen op `GET /api/techniek/ai/kosten` (techniek-inlog en
-alleen de eigenaar): aanroepen, tokens, kosten en de uitsplitsing per model. Een
-totaalbedrag zegt dat het duur is, de uitsplitsing zegt waardoor.
+alleen de eigenaar): aanroepen, tokens, kosten en de uitsplitsing per model,
+plus de interne emmer (`lokaal`) en `aandeelExtern`. Een totaalbedrag zegt dat
+het duur is, de uitsplitsing zegt waardoor, en het aandeel zegt of de eigen
+modelserver zijn werk nog doet.
 
 Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
 (`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de

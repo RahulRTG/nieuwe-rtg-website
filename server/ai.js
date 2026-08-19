@@ -74,12 +74,17 @@ function maakAI(opts) {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
-            /* Tellen wat het kostte. Alleen extern: lokaal draait op eigen
-               ijzer en hoort de dagstand niet te vullen. */
-            if (!aanbieder.lokaal) { try { meter.boek(params && params.model, uit && uit.usage); } catch (e2) {} }
+            /* Beide tellen, maar in hun eigen emmer: extern kost geld, intern
+               kost capaciteit. De verhouding tussen die twee is het signaal dat
+               je wilt zien -- de keten is lokaal-eerst, dus loopt het aandeel
+               extern op, dan haakt de eigen modelserver af. Zie ./ai-meter.js. */
+            try {
+              if (aanbieder.lokaal) meter.boekLokaal(aanbieder.modellen && aanbieder.modellen.tekst, uit && uit.usage);
+              else meter.boek(params && params.model, uit && uit.usage);
+            } catch (e2) {}
             return uit;
           } catch (e) {
-            if (!aanbieder.lokaal) { try { meter.boekFout(); } catch (e2) {} }
+            try { if (aanbieder.lokaal) meter.boekLokaalFout(); else meter.boekFout(); } catch (e2) {}
             laatste = e;
             try { log && log.warn && log.warn('ai-uitwijk', { van: aanbieder.naam, fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
             // door naar de volgende aanbieder

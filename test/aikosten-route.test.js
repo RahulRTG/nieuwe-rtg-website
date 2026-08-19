@@ -75,3 +75,18 @@ test('4. de rem staat erbij, niet alleen het dagplafond', () => {
   assert.equal(uit.plafondUsd, null, 'geen dagplafond ingesteld');
   assert.equal(uit.beurtenPerMinuut, 60, 'maar de rem staat er wel');
 });
+
+test('5. het luik toont ook de interne AI en het aandeel extern', () => {
+  /* De keten is lokaal-eerst, dus zonder deze velden staat het luik op nul
+     terwijl de eigen modelserver al het werk doet -- en zie je niet dat hij
+     afhaakt en het verkeer naar de betaalde uitwijk glijdt. */
+  meter.nulstel();
+  for (let i = 0; i < 9; i++) meter.boekLokaal('mijn-model', { input_tokens: 100, output_tokens: 50 });
+  meter.boek('claude-sonnet-5', { input_tokens: 100, output_tokens: 50 });
+  const app = neppApp();
+  route({ app, techAuth: () => {}, eigenaarAlleen: () => {} });
+  const uit = roep(app.gemount[0].fn);
+  assert.equal(uit.lokaal.aanroepen, 9, 'de interne aanroepen staan erin');
+  assert.equal(uit.aandeelExtern, 10, 'en het aandeel dat naar buiten ging');
+  meter.nulstel();
+});

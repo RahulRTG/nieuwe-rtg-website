@@ -249,6 +249,21 @@ machinaal wordt nagekeken of waar een fout alleen een matige zin oplevert. Waar
 een regel alleen bestaat doordat het model hem opvolgt -- en zeker waar een kind
 meeleest -- blijft hij staan.
 
+#### En dit gaat alleen over de UITWIJK
+
+De tabel hierboven is een bovengrens en geen verwachting. `npm run live:init`
+schrijft `RTG_AI_UIT=1`: productie start zonder model, in de regelgestuurde
+werkmodus. En zodra er wel AI is, staat de eigen modelserver (`LOCAL_AI_URL`)
+vooraan in de keten -- met vier apart instelbare modellen (tekst, kort, tools,
+beeld), waarbij `max_tokens <= 200` vanzelf het korte model kiest. Externe
+aanbieders komen pas aan de beurt als de lokale laag iets niet kan of uitvalt.
+
+De bedragen hierboven gelden dus voor het deel dat die uitwijk haalt, niet voor
+al het verkeer. Hoe groot dat deel is, staat op `GET /api/techniek/ai/kosten`
+als `aandeelExtern`. Dat getal is belangrijker dan het bedrag: de keten is
+lokaal-eerst, dus het hoort laag te zijn, en loopt het op dan haakt de eigen
+modelserver af -- de rekening merkt dat eerder dan een mens.
+
 ### Samengevat
 
 | Scenario | Infra per maand | AI per maand (indicatie) |

@@ -81,7 +81,22 @@ function kostenVan(model, usage) {
    een kraan en een teller, geen grootboek. Na een herstart begint de dag
    opnieuw -- dat is een bewuste keuze en staat ook zo in de uitleg hieronder,
    zodat niemand denkt dat hier een boekhouding staat. */
-const LEEG = () => ({ dag: '', aanroepen: 0, gefaald: 0, tokensIn: 0, tokensUit: 0, cacheLees: 0, kosten: 0, perModel: {} });
+/* Twee emmers, want het zijn twee verschillende dingen.
+
+   EXTERN kost geld: daar hoort een bedrag bij en een kraan.
+
+   INTERN (LOCAL_AI_URL) kost geen geld maar CAPACITEIT -- je eigen ijzer, je
+   eigen wachttijd. Die telt hier dus wel mee, maar zonder bedrag; een euro
+   naast een lokale aanroep zetten zou een verzinsel zijn.
+
+   En dan is er nog een derde getal dat pas ontstaat doordat er twee emmers
+   zijn, en dat is misschien wel het nuttigste van alle drie: de VERHOUDING.
+   De keten is lokaal-eerst (server/ai.js), dus een externe aanroep gebeurt
+   alleen als de lokale laag iets niet kan of uitvalt. Loopt het aandeel extern
+   op, dan is dat geen kostenpost maar een SIGNAAL: de eigen modelserver haakt
+   af, en de rekening merkt het eerder dan een mens. */
+const LEEG = () => ({ dag: '', aanroepen: 0, gefaald: 0, tokensIn: 0, tokensUit: 0, cacheLees: 0, kosten: 0, perModel: {},
+  lokaal: { aanroepen: 0, gefaald: 0, tokensIn: 0, tokensUit: 0, perModel: {} } });
 let staat = LEEG();
 
 const vandaag = (nu) => new Date(nu || Date.now()).toISOString().slice(0, 10);
@@ -123,6 +138,18 @@ function boek(model, usage, nu) {
 
 function boekFout(nu) { huidig(nu).gefaald += 1; }
 
+/* De interne AI. Zelfde telwerk, geen bedrag. */
+function boekLokaal(model, usage, nu) {
+  const l = huidig(nu).lokaal;
+  const u = usage || {};
+  l.aanroepen += 1;
+  l.tokensIn += (Number(u.input_tokens) || 0) + (Number(u.cache_creation_input_tokens) || 0);
+  l.tokensUit += Number(u.output_tokens) || 0;
+  const m = String(model || 'onbekend');
+  l.perModel[m] = (l.perModel[m] || 0) + 1;
+}
+function boekLokaalFout(nu) { huidig(nu).lokaal.gefaald += 1; }
+
 function stand(nu) {
   const s = huidig(nu);
   const max = plafond();
@@ -141,6 +168,16 @@ function stand(nu) {
     plafondUsd: max || null,
     ruimte: max ? Math.max(0, Math.round((max - s.kosten) * 10000) / 10000) : null,
     dicht: max ? s.kosten >= max : false,
+    /* De interne AI: aantallen en tokens, geen bedrag -- die draait op eigen
+       ijzer. Zie de kop bij LEEG(). */
+    lokaal: { aanroepen: s.lokaal.aanroepen, gefaald: s.lokaal.gefaald,
+      tokensIn: s.lokaal.tokensIn, tokensUit: s.lokaal.tokensUit,
+      perModel: Object.assign({}, s.lokaal.perModel) },
+    /* Het aandeel dat naar buiten ging. De keten is lokaal-eerst, dus dit hoort
+       laag te zijn; loopt het op, dan haakt de eigen modelserver af. null als er
+       nog niets gedraaid heeft, want 0% van niets zegt niets. */
+    aandeelExtern: (s.aanroepen + s.lokaal.aanroepen)
+      ? Math.round(s.aanroepen / (s.aanroepen + s.lokaal.aanroepen) * 100) : null,
     peildatum: PRIJZEN_PEILDATUM,
     /* Zodat een scherm dat dit toont niet suggereert dat het een grootboek is. */
     let: 'schatting op basis van een lokale prijstabel; nulstand bij herstart'
@@ -207,5 +244,5 @@ const opruimer = setInterval(() => {
 }, BEURT_VENSTER);
 if (opruimer.unref) opruimer.unref();
 
-module.exports = { boek, boekFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM,
+module.exports = { boek, boekFout, boekLokaal, boekLokaalFout, magNog, stand, nulstel, kostenVan, plafond, PRIJZEN, PRIJZEN_PEILDATUM,
   magNogVoor, inContext, contextMiddleware, beurtGrens, wie };

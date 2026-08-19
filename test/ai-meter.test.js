@@ -154,3 +154,51 @@ test('11. op nul staat de rem uit', () => {
   for (let i = 0; i < 200; i++) assert.equal(meter.magNogVoor('1.2.3.4'), true);
   schoon();
 });
+
+/* ---- DE INTERNE AI: EIGEN EMMER, GEEN BEDRAG ---- */
+
+test('12. de interne AI telt mee, maar kost geen geld', () => {
+  /* Zonder dit staat de meter op nul terwijl de eigen modelserver al het werk
+     doet -- de keten is lokaal-eerst, dus dat is juist de normale stand. */
+  schoon();
+  meter.boekLokaal('mijn-model', { input_tokens: 5000, output_tokens: 2000 });
+  meter.boekLokaal('mijn-model', { input_tokens: 5000, output_tokens: 2000 });
+  const s = meter.stand();
+  assert.equal(s.lokaal.aanroepen, 2, 'de interne aanroepen zijn geteld');
+  assert.equal(s.lokaal.tokensIn, 10000);
+  assert.equal(s.lokaal.tokensUit, 4000);
+  assert.equal(s.kostenUsd, 0, 'maar er hangt geen bedrag aan eigen ijzer');
+  assert.equal(s.aanroepen, 0, 'en ze vullen de externe emmer niet');
+  assert.equal(s.lokaal.perModel['mijn-model'], 2, 'per lokaal model uitgesplitst');
+});
+
+test('13. de interne AI raakt het dagplafond niet', () => {
+  /* De kraan is voor de rekening. Zou intern meetellen, dan zou een druk eigen
+     model de externe uitwijk dichtzetten -- precies verkeerd om. */
+  schoon();
+  process.env.RTG_AI_DAGPLAFOND = '1';
+  for (let i = 0; i < 100; i++) meter.boekLokaal('mijn-model', { input_tokens: 1e6, output_tokens: 1e6 });
+  assert.equal(meter.magNog(), true, 'honderd interne aanroepen sluiten de kraan niet');
+  assert.equal(meter.stand().dicht, false);
+  schoon();
+});
+
+test('14. het aandeel extern is het signaal dat de eigen server afhaakt', () => {
+  schoon();
+  assert.equal(meter.stand().aandeelExtern, null, 'zonder verkeer zegt een percentage niets');
+  for (let i = 0; i < 9; i++) meter.boekLokaal('mijn-model', {});
+  meter.boek('claude-sonnet-5', {});
+  assert.equal(meter.stand().aandeelExtern, 10, 'een op de tien ging naar buiten');
+  for (let i = 0; i < 90; i++) meter.boek('claude-sonnet-5', {});
+  assert.ok(meter.stand().aandeelExtern > 80, 'valt lokaal weg, dan loopt het aandeel op');
+  schoon();
+});
+
+test('15. een mislukte interne aanroep telt apart', () => {
+  schoon();
+  meter.boekLokaalFout();
+  meter.boekFout();
+  const s = meter.stand();
+  assert.equal(s.lokaal.gefaald, 1);
+  assert.equal(s.gefaald, 1, 'en loopt niet door elkaar');
+});

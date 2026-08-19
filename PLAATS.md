@@ -156,6 +156,53 @@ tot je er bent, kan klaarstaan voordat je er bent. Hier ligt het grootste
 gevoel en het grootste risico, en daarom geldt hier de vierde-laag-regel het
 strengst: klaarzetten, en de mens bevestigt.
 
+### Wat fase 3 opleverde: plaats spreekt alleen over nu
+
+De voorspeller (`kern/voorspel/`) leerde uitsluitend uit het grootboek: hij weet
+*wanneer* en *wat*, nooit *waar*. Daardoor was "je bestelt meestal om 19:00" het
+maximum, terwijl "je bestelt om 19:00 als je thuis bent, en je bent nu onderweg"
+het verschil is tussen een aardige suggestie en iets wat klopt.
+
+**Wat plaats hier niet doet, en niet kan: leren.** De laag houdt geen spoor, dus
+er valt uit plaats geen patroon over tijd af te leiden — en dat is met opzet zo.
+Plaats spreekt alleen over *nu*: ben je op dit moment in de buurt van de zaak
+waar deze gewoonte over gaat. Wie hier ooit een "je gaat woensdags altijd naar
+het noorden" bij wil bouwen, bouwt een locatiegeschiedenis, en die bestaat hier
+niet.
+
+**Drie uitkomsten, en de derde draagt het ontwerp.** Bevestigd nabij gaat naar
+voren; bevestigd niet-nabij zakt naar achteren; *niet gemeten* blijft ongemoeid.
+Zou die derde hetzelfde doen als de tweede, dan wordt elk lid dat zijn locatie
+uit laat staan stilletjes slechter bediend — een boete op een keuze die vrij
+hoort te zijn.
+
+**Er valt niets weg, en het getal verandert niet.** Klaarzetten is het werkwoord:
+een gewoonte verbergen omdat je er nu niet bent, zou een lid zijn eigen gewoonte
+kunnen afnemen. En de zekerheid blijft staan voor een geleerde frequentie —
+nabijheid erbij optellen zou dat getal iets anders laten betekenen dan het zegt.
+Plaats verandert alleen de volgorde, en staat als eigen veld naast de
+verwachting zodat je kunt zien dat het meespeelde.
+
+**Het stille seintje houdt zich in.** De rangschikking laat een verwachting al
+zakken, maar het seintje is indringender: het fluistert ongevraagd mee. "Rond
+deze tijd, als u wilt: uw gebruikelijke bezoek" terwijl je dertig kilometer
+verderop staat, is precies het meepraten waardoor iemand het hele systeem niet
+meer gelooft. Alleen bij een *bevestigde* niet-nabij; bij niets gemeten praat hij
+gewoon mee.
+
+**En het doel is `nadering`, niet `dienst`.** Een waarneming die is gemaakt om je
+aanwezigheid op je werk te bevestigen, mag geen aanbeveling voeden. Dat is grens
+2 hieronder, en het is precies waarvoor een hek zijn doel draagt.
+
+**Een gat dat hier zichtbaar wordt en niet stilletjes gedicht hoort te worden.**
+`kern/stadsweefsel/algoritmeregister.js` is een openbaar register dat per
+rekenregel zegt wat hij doet, welke gegevens hij gebruikt, wat zijn beperking is
+en waar je terecht kunt — maar het gaat uitsluitend over het *weefsel*, en zegt
+dat ook van zichzelf. De voorspeller heeft geen equivalent. Wat hij wel heeft is
+het `waarom` per verwachting, en daar staat plaats nu ook in. Dat is uitleg op
+de plek waar een lid kijkt, maar het is geen register. Of dat register
+huisbreed moet worden, is een eigen beslissing en geen bijvangst van deze fase.
+
 ## 5. De grenzen
 
 Waar een functie hiermee botst, vervalt de functie.
@@ -201,7 +248,7 @@ Waar een functie hiermee botst, vervalt de functie.
 | **2a** | Aanwezigheid, de motor + de eerste klant: `plaatsBijZaak()` met drie uitkomsten, stabiele hek-id's op zaakcode, en de prikklok (`/api/staff/clock`) die de bevestiging vastlegt | **af** |
 | **2b** | Het bronnenregister: een domein levert zijn eigen plaatsen als hek. Twee bronnen bedraad (je werkplekken, de posten van je beveiligingsteam) | **af** |
 | **2c** | De brug: een lopende dienst wordt in de app van het lid aangeboden, en het venster sluit als de dienst voorbij is | **af** |
-| **3** | Plaats als bron voor `kern/voorspel/`, met de regel in het algoritmeregister erbij | open |
+| **3** | Plaats als bron voor `kern/voorspel/`: nabijheid verandert de volgorde en houdt het stille seintje in, en leert nooit iets | **af** |
 | **4** | Nadering: arrival, mall, hoteldorp, avond/plan — klaarzetten vóór aankomst | open |
 
 De volgorde is niet vrij. Fase 2, 3 en 4 bouwen alle drie op fase 1; ze eerder

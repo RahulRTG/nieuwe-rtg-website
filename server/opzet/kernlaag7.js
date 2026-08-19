@@ -57,7 +57,8 @@ Object.assign(kern, require('../kern/vonk').maakVonk({
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en
    zet verwachtingen klaar voor de apps en voor Rahul. */
-Object.assign(kern, require('../kern/voorspel').maakVoorspel({ db, findSupplier }));
+// plaats als bron erbij: zie kern/voorspel/index.js (PLAATS.md fase 3)
+Object.assign(kern, require('../kern/voorspel').maakVoorspel({ db, findSupplier, plaats: kern.plaats }));
 
 /* RTG Synergie (kern/synergie.js): zaken maken samen deals en pakketten;
    pas als elke deelnemer heeft getekend staat het pakket live, en RTG Pay

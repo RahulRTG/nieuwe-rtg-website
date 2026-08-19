@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T13:26:21.496Z",
-  "commit": "c753959",
+  "op": "2026-08-19T13:27:11.446Z",
+  "commit": "e970a76",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2391,
-  "onbeslist": 1679,
+  "bewezen": 2406,
+  "onbeslist": 1664,
   "blind": 117,
   "ongemeten": 8
  },
@@ -10435,13 +10435,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/member/sport/ticket/koop": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "gegevenspoort.test.js",
-    "sportclub.test.js"
+    "gegevenspoort.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gegevenspoort.test.js zakte daarop"
   },
   "POST /api/member/sport/tickets": {
    "staat": "onbeslist",
@@ -14280,102 +14279,116 @@
    "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/zoek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/beleid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/beleid/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/beleid/keur": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/beleid/geschiedenis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/beleid/terug": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/simulatie/beleid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/simulatie/watals": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/journaal": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/journaal/herbeleef": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/object": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/rechten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/recht/geef": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/recht/introk": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "command-routes-bestuur.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 24); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en command-routes-bestuur.test.js zakte daarop"
   },
   "POST /api/command/recht/nood": {
    "staat": "onbeslist",
@@ -45886,6 +45899,81 @@
    "toets": "command-routes-bestuur.test.js",
    "merkt": true,
    "op": "2026-08-19T13:26:21.252Z"
+  },
+  "POST /api/command/zoek": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:23.428Z"
+  },
+  "POST /api/command/beleid": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:29.868Z"
+  },
+  "POST /api/command/beleid/zet": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:35.057Z"
+  },
+  "POST /api/command/beleid/keur": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:35.398Z"
+  },
+  "POST /api/command/beleid/geschiedenis": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:41.612Z"
+  },
+  "POST /api/command/beleid/terug": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:46.792Z"
+  },
+  "POST /api/command/simulatie/beleid": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:46.915Z"
+  },
+  "POST /api/command/simulatie/watals": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:53.526Z"
+  },
+  "POST /api/member/sport/ticket/koop": {
+   "toets": "gegevenspoort.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:55.245Z"
+  },
+  "POST /api/command/journaal": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:58.928Z"
+  },
+  "POST /api/command/journaal/herbeleef": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:26:59.034Z"
+  },
+  "POST /api/command/object": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:27:05.693Z"
+  },
+  "POST /api/command/rechten": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:27:07.498Z"
+  },
+  "POST /api/command/recht/introk": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:27:11.151Z"
+  },
+  "POST /api/command/recht/geef": {
+   "toets": "command-routes-bestuur.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:27:11.329Z"
   }
  },
  "basislijn": {
@@ -46278,6 +46366,7 @@
   "gemeente.test.js": "groen",
   "metier.test.js": "groen",
   "payroll-routes.test.js": "groen",
-  "command-routes-bestuur.test.js": "groen"
+  "command-routes-bestuur.test.js": "groen",
+  "gegevenspoort.test.js": "groen"
  }
 }

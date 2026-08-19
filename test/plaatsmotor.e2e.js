@@ -9,10 +9,15 @@
    ("uw medewerkers verlaten uw toestel niet"), dus die hoort gemeten te worden
    op de plek waar hij waar of onwaar wordt: de netwerklaag.
 
-   De motor wordt hier met een scripttag ingeladen in plaats van dat er een
-   pagina is die hem al draagt. Dat is geen omweg om de toets heen maar de stand
-   van zaken: fase 1 van PLAATS.md levert de laag, fase 2 hangt hem aan de
-   schermen. Zodra dat gebeurd is, hoort deze toets de echte pagina te openen.
+   DE MOTOR KOMT UIT DE PAGINA ZELF, en dat was hier ooit anders. Toen fase 1
+   alleen de laag opleverde, injecteerde deze toets shared/plaats.js met een
+   scripttag, met de aantekening dat hij de echte pagina hoorde te openen zodra
+   fase 2 hem aan de schermen zou hangen. Dat is gebeurd (app.html laadt hem
+   sinds fase 2c), en de injectie is niet alleen overbodig maar ook GEVAARLIJK
+   gebleken: app.html navigeert kort na het laden zelf door (?pas=rtg), en een
+   addScriptTag die daar tussenin valt sterft aan "Execution context was
+   destroyed". Los gedraaid haalde die race het meestal; in de volle e2e-ronde
+   niet. Een toets die soms rood is, leert mensen rood te negeren.
 
    Draai: npm run e2e */
 const test = require('node:test');
@@ -81,10 +86,16 @@ test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over
       if (r.url().includes('/api/plaats/')) verstuurd.push({ url: r.url(), body: r.postData() || '' });
     });
 
-    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => !!window.RTGPlek, null, { timeout: 15000 });
-    await page.addScriptTag({ url: '/shared/plaats.js' });
-    await page.waitForFunction(() => !!window.RTGPlaats, null, { timeout: 10000 });
+    /* Met ?pas=rtg erbij, want app.html zet die parameter er anders zelf op met
+       een navigatie -- en elke evaluate die daar tussenin valt sterft aan
+       "Execution context was destroyed". Dat is geen kapotte pagina maar een
+       toets die op het verkeerde moment kijkt. */
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    /* Wachten op wat de PAGINA levert, en niets injecteren. Dat is meteen de
+       scherpere toets: hij zakt nu ook als iemand de scripttag uit app.html
+       haalt, en dat kon hij hiervoor niet zien. */
+    await page.waitForFunction(() => !!window.RTGPlek && !!window.RTGPlaats,
+      null, { timeout: 20000 });
 
     // een venster openen, want zonder toestemming hoort er niets waargenomen te worden
     const v = await api(base, '/api/plaats/venster', { doel: 'stad', bron: 'schermtoets', minuten: 60 }, reg.token);

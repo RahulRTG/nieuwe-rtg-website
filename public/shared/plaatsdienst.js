@@ -103,8 +103,17 @@
       waarom: 'Om je aanwezigheid tijdens je dienst bij te houden. Je locatie blijft op je toestel; RTG krijgt alleen te horen of je op je werkplek bent.'
     }).then(function (r) { motorLoopt = !!(r && r.ok); });
   }
+  /* STOPPEN DOE JE ALLEEN WAT JE ZELF BENT BEGONNEN.
+
+     Hier stond een onvoorwaardelijke RTGPlaats.stop(). De motor is GEDEELD --
+     shared/plaatsnadering.js gebruikt hem ook, en een volgende laag straks --
+     dus dit zette het werk van een ander stil zodra er hier toevallig geen
+     dienst liep. Op app.html gebeurde dat elke keer: dit bestand kijkt bij het
+     laden of er een dienst is, vindt er geen, en trok de motor onder alles
+     vandaan wat er net was gestart. Een schermtoets ving het; zonder die toets
+     was het een functie die "soms niet werkt". */
   function stopMotor() {
-    if (window.RTGPlaats) { try { window.RTGPlaats.stop(); } catch (e) {} }
+    if (motorLoopt && window.RTGPlaats) { try { window.RTGPlaats.stop(); } catch (e) {} }
     motorLoopt = false;
   }
 
@@ -144,7 +153,12 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', begin);
   else begin();
   // het toestel blijft niet peilen als niemand kijkt
-  window.addEventListener('pagehide', function () { if (timer) clearInterval(timer); stopMotor(); });
+  // bij het verlaten van de pagina mag alles stoppen: daar kijkt niemand meer
+  window.addEventListener('pagehide', function () {
+    if (timer) clearInterval(timer);
+    if (window.RTGPlaats) { try { window.RTGPlaats.stop(); } catch (e) {} }
+    motorLoopt = false;
+  });
 
   window.RTGPlaatsDienst = { ronde: ronde, _bied: bied };
 })();

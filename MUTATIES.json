@@ -1103,6 +1103,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "dekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/dekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "demostand.test.js": {
       "soort": "server",
       "staat": "gezakt",

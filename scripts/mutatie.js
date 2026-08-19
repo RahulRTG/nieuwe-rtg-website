@@ -359,6 +359,10 @@ const EIGEN_MODULE = new Map([
   ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
   /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
   ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* De dekkingsmeter start als KINDPROCES (hij is een CLI, geen module), dus zijn
+     toets noemt hem nergens in een require en de motor meldde "geen module
+     gevonden". Dat is dezelfde grens als bij de schermtoetsen hieronder. */
+  ['dekking.test.js', ['scripts/dekking.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van

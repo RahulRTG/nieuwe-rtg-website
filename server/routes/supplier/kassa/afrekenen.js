@@ -1,14 +1,17 @@
-/* Kassa (deelmodule): het afrekenen: uitchecken (per kamer of tafel, met
-   splitsen) en cadeaukaarten verkopen en innen. Krijgt de gedeelde kern
-   een keer bij het opstarten vanuit routes/supplier/kassa.js. */
+/* Kassa (deelmodule): het afrekenen -- uitchecken per kamer of tafel, met
+   splitsen. Krijgt de gedeelde kern een keer bij het opstarten vanuit
+   routes/supplier/kassa.js.
+
+   DE CADEAUKAARTEN STONDEN HIER OOK, en zijn eruit gehaald: dit bestand zat
+   met 9642 bytes vlak onder de tienkilobyte-grens (npm run keuring, meter
+   keuringOmvang) en het deed twee dingen. Verkopen en innen van kaarten woont
+   nu in ./cadeaukaart.js, naast de regel die ze delen (./kaart.js). */
 module.exports = (kern) => {
-  const { app, crypto, db, facturatie, gcCode, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
+  const { app, crypto, db, facturatie, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
           sseToSupplier, supplierAuth, pay, tafelticket } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
-  // de drie grenzen van een verzilvering staan op EEN plek; zie ./kaart.js
-  const { verzilver: verzilverKaart } = require('./kaart');
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
@@ -132,27 +135,4 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   res.json({ ok: true, sale, table: chk.table, aantalBonnen: chk.bonnen.length, subtotaal: chk.subtotaal, gasten: codenames.length });
 });
 
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
-  const bedrag = Math.round(Number(req.body.bedrag));
-  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
-});
-
-/* De LOSSE inwisseling: saldo van de kaart halen zonder dat er een kassabon
-   bij hoort. De drie grenzen staan in ./kaart.js, want de kassabon die met een
-   kaart betaalt houdt precies dezelfde aan. Zonder `viaBon` is deze
-   verzilvering zelf het omzetmoment in de maandboekhouding. */
-app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
-  const r = verzilverKaart(db, req.supplier.code, req.body.code, req.body.bedrag, req.actor.name, null);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + r.bedrag + ' van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ')');
-  res.json({ ok: true, saldo: r.kaart.saldo, kaart: { code: r.kaart.code, saldo: r.kaart.saldo } });
-});
 };

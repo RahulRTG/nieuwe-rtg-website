@@ -294,7 +294,7 @@ test('twee keer een code vragen laat er een leven, niet twee (kascode en tikcode
    /api/pay/* gaat met opzet om de dubbeltik heen (geld heeft een duurzame,
    strengere laag), maar deze twee verplaatsen geen geld -- ze maken een token
    van vijf minuten. Ze staan daarom bij naam op de uitzonderingslijst in
-   server/opzet/poortwachters.js. Mutatie: die twee namen weghalen laat deze
+   server/opzet/geldwegen.js. Mutatie: `GEEN_GELD` daar leegmaken laat deze
    toets zakken op "de herhaling gaf een nieuwe code". */
 test('een retry met dezelfde sleutel geeft dezelfde code terug, en verdringt de vorige niet', async () => {
   const sleutel = 'kascode-retry-' + Date.now().toString(36);

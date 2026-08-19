@@ -481,17 +481,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        codering, DKIM) staat in mail-opstellen.js, de SMS-kant met de
        sandbox-zekering in mail-lokaal.js, en het vangnet met zijn pad in
        mail-outbox.js. Wat overblijft is de keuze tussen de drie standen. */
-    /* 11,4 en 10,7 KB: allebei stonden ze tientallen bytes onder de grens en
-       gingen ze erover door een gemeten oorzaak uit de beproevingsladder. De
-       crashproef (kill -9 onder schrijflast) vond een dubbele boeking doordat
-       geld en idem-sleutel in twee losse commits landden -- de save-bundel
-       (bijeen) hoort naast de save() die hij bewaakt. En de 1M-ronde vond een
-       404 op een bestaand lid doordat een koude cache als feit werd gelezen --
-       de wachtende lezing hoort naast de lader die hij hergebruikt. De snedes
-       die er wel zijn (bijeen naar een eigen module; het zoek-deel van de
-       ledengids apart) zijn echte bedrading en staan in TAKEN.md. */
-    'server/db/index.js',
-    'server/db/ledengids.js',
+    /* server/db/index.js en server/db/ledengids.js STONDEN HIER en zijn er weer
+       af: de twee snedes die er met naam bij stonden, zijn gemaakt. Het
+       zoek-deel van de ledengids staat in db/ledengids-zoek.js, en db/index.js
+       is langs vier naden geknipt -- ./starten.js, ./bijeen.js (de save-bundel
+       naast de save() die hij bewaakt, precies zoals het hier stond),
+       ./duurzaam.js en ./afsluiten.js. Van 23911 naar 9260 byte. */
     /* server/pg/sync.js STOND HIER en is er weer af: de snede die er met naam
        bij stond -- "schrijfEen + de twee schrijflanen naar een eigen deel" --
        is gemaakt. Het slot, de merge, het versienummer, de NOTIFY en de twee
@@ -3056,12 +3051,13 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
-    ['server/db/index.js', 'hier WOONT de primitive, en bijeen() is de enige indirecte weg erheen'],
+    ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
+    ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
+    ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
-    ['test/duurzaamheidskosten.test.js', 'de toets op het oordeel van die meting'],
     ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
@@ -3070,12 +3066,40 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
-    ['server/kern/bestanden-delen.js', 'delen, versies en de prullenbak zijn dezelfde kluis; een lid ziet niet welke knop beschermd is'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
-     regel alleen zichzelf. */
+     regel alleen zichzelf.
+
+     EN HIJ KIJKT NAAR CODE, NIET NAAR PROZA. Hier stond de rauwe bron, dus een
+     bestand dat saveDuurzaam alleen NOEMT -- in een kop die uitlegt waarom het
+     hier juist niet gebeurt -- kwam als overtreder binnen en moest met een
+     reden op de lijst. Zo'n regel is erger dan geen: hij zet een naam op de
+     lijst van plekken die aan de duurzame commit komen terwijl daar geen enkele
+     aanroep staat, en dan leest de lijst als dekking die er niet is.
+
+     Betrapt bij het knippen van server/db/index.js: drie nieuwe deelbestanden
+     werden gemeld, en een ervan (afsluiten.js) raakt de commit nergens aan --
+     het woord stond in een zin over waar hij NIET hoort. Strings blijven wel
+     staan: server/lib/verraad.js noemt de plek in zijn catalogus als tekst, en
+     dat is een verwijzing die iets doet.
+
+     TWEE REGELS VIELEN DAARMEE VAN DE LIJST, en dat zegt iets over wat deze
+     regel wel en niet ziet. test/duurzaamheidskosten.test.js kwam er alleen op
+     door zijn eigen uitleg; die raakt de commit nergens aan.
+     server/kern/bestanden-delen.js WEL -- maar via een `vastleggen` die
+     server/kern/bestanden.js hem aanreikt, en die naam staat in 111 bestanden
+     van dit huis. Hem aan het bereik toevoegen zou de lijst met honderd namen
+     vullen en daarmee waardeloos maken.
+
+     WAT DEZE REGEL DUS NIET DEKT, en dat hoort hier te staan: een module die de
+     helper KRIJGT AANGEREIKT. Dat is te verdedigen en niet toevallig -- deze
+     regel bewaakt wie BESLUIT om duurzaam te schrijven, en dat besluit valt
+     waar lib/duurzaam wordt gemaakt (bestanden.js, dus op de lijst). Een module
+     die alleen gebruikt wat hij krijgt, kan dat besluit niet nemen. Maar wie
+     vanuit een toegestaan bestand de helper aan een nieuwe module doorgeeft,
+     komt hier ongezien langs. Dat is mensenwerk, geen poort. */
   const BEREIK = /saveDuurzaam|duurzaam\s*:\s*true|lib\/duurzaam/;
   const overtreders = [];
   let gezien = 0;
@@ -3090,7 +3114,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
       if (!naam.endsWith('.js')) continue;
       let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
       if (bron.includes('\u0000')) continue;
-      if (!BEREIK.test(bron)) continue;
+      if (!BEREIK.test(zonderCommentaar(bron))) continue;
       gezien++;
       const rel = path.relative(ROOT, p).replace(/\\/g, '/');
       if (!TOEGESTAAN.has(rel)) overtreders.push(rel);

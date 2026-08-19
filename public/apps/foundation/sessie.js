@@ -163,7 +163,17 @@
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        /* DE ENVELOP STOND ER NIET, EN DAT WAS GEEN MAATPROBLEEM.
+
+           Deze knop had alleen een VERBORGEN telbadge als inhoud, en verder
+           niets: geen glyf, geen icoon. Hij mat dus 6x6 -- twee keer de padding
+           -- en stond onzichtbaar en onraakbaar in de tabvolgorde met de naam
+           "Berichten". Op zesenveertig RTF-schermen tegelijk, en pas te zien
+           sinds de keuring een gezin aanmaakt en die schermen echt opengaan.
+           Precies dezelfde fout als de microfoonknop van muziek.html destijds. */
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten">' +
+        '<span aria-hidden="true">' + String.fromCharCode(0x2709) + '</span>' +
+        '<span class="sb-tel" id="sbTel" hidden>0</span></button>' +
         '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
@@ -213,7 +223,11 @@
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
       '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:4px;}.sb-brand b{color:#F4E9C8;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
-      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
+      /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
+         envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
+         component en niet bij het toeval van zijn inhoud. */
+      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
+        'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
       '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +

@@ -304,7 +304,14 @@ function startEchteServer() {
 
          Alleen bij een gebrek, want dat kost alleen iets op de schermen die iets
          vinden -- en dat zijn er hopelijk nul. */
-      if (m.hoofd && m.gebreken.length) {
+      /* Elke bevinding krijgt een tweede meting, niet alleen een duimgebrek --
+         dat was de eerste versie en die was te smal. /apps/wereld.html meldde
+         zich als LEEG in de volle ronde en niet als hij alleen draait: dat
+         scherm haalt zijn inhoud op en 600ms is onder belasting soms te kort.
+         Een scherm dat ECHT niets toont, meldt zich in de tweede meting gewoon
+         weer -- dat is precies waarom het een tweede meting is en geen
+         uitzondering. */
+      if (m.leeg || m.balkenBuiten.length || m.inhoud > m.venster + 2 || (m.hoofd && m.gebreken.length)) {
         try {
           await tel.waitForFunction(
             () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),

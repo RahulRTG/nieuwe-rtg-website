@@ -87,7 +87,17 @@
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        /* DE ENVELOP STOND ER NIET, EN DAT WAS GEEN MAATPROBLEEM.
+
+           Deze knop had alleen een VERBORGEN telbadge als inhoud, en verder
+           niets: geen glyf, geen icoon. Hij mat dus 6x6 -- twee keer de padding
+           -- en stond onzichtbaar en onraakbaar in de tabvolgorde met de naam
+           "Berichten". Op zesenveertig RTF-schermen tegelijk, en pas te zien
+           sinds de keuring een gezin aanmaakt en die schermen echt opengaan.
+           Precies dezelfde fout als de microfoonknop van muziek.html destijds. */
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten">' +
+        '<span aria-hidden="true">' + String.fromCharCode(0x2709) + '</span>' +
+        '<span class="sb-tel" id="sbTel" hidden>0</span></button>' +
         '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +

@@ -77,6 +77,26 @@ function luisterOpFouten(child) {
   });
 }
 
+/* GEDULD DAT MEESCHAALT MET DE MACHINE.
+
+   Een vaste tijdslimiet in een toets meet twee dingen tegelijk: of de code
+   antwoordt, en of de machine vrij was. Op een lege laptop is dat hetzelfde;
+   op een volle CI-runner niet, en dan is rood geen bevinding maar drukte.
+
+   Dit huis wist dat al voor het opstarten van een server (zie de kop van
+   startEens hieronder, waar dezelfde les twee keer is geleerd). Het gold alleen
+   niet voor de losse deadlines in de toetsen zelf. Vandaar deze ene plek: geef
+   een basis in milliseconden, krijg er de tijd voor terug die bij de huidige
+   belasting hoort. Op een rustige machine verandert er niets.
+
+   Nooit ONBEPERKT: een aanroep die nooit antwoordt hoort een toets te laten
+   zakken en niet te laten hangen. Het plafond is vijf keer de basis. */
+function geduld(basisMs) {
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  return Math.round(basisMs * Math.min(5, Math.max(1, 1 + druk)));
+}
+
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   // Standaard wachten op /api/ready, niet alleen /api/health: sinds de
@@ -457,7 +477,7 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

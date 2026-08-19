@@ -7,6 +7,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const http = require('node:http');
 const Anthropic = require('../server/anthropic');
+const { geduld } = require('./helper');
 
 /* SLUITEN DAT OOK DE OPEN VERBINDINGEN MEENEEMT.
 
@@ -38,11 +39,25 @@ function sluitServer(srv) {
 
    Vijftien seconden is ruim: de nepserver antwoordt in milliseconden, en de
    herprobeer-logica die hier wordt getoetst wacht bewust even. */
+/* DE DEADLINE SCHAALT MEE MET DE MACHINE, en dat is een reparatie.
+
+   Hier stond een harde 15 seconden. Dat is genoeg voor elke aanroep hier --
+   behalve voor "429 wordt herprobeerd", die twee herprobeer-rondes met
+   wachttijd moet halen. Op een volle CI-runner (zestien toetsbestanden naast
+   elkaar plus een browserjob) paste dat er niet altijd meer in, en dan zakte
+   die toets op DRUKTE in plaats van op gedrag. Dat is precies het soort rood
+   dat je leert wegklikken, en daarmee de toets waardeloos maakt.
+
+   geduld() staat in ./helper.js, dezelfde plek waar het opstarten van een
+   server zijn geduld vandaan haalt -- niet een tweede formule ernaast. De
+   grens blijft bestaan: nooit onbeperkt, want een aanroep die niet antwoordt
+   hoort deze toets te laten zakken en niet te laten hangen. */
 function metDeadline(belofte, wat) {
   let t = null;
+  const grens = geduld(15000);
   const klok = new Promise((_, af) => {
-    t = setTimeout(() => af(new Error('geen antwoord binnen 15s: ' + wat +
-      ' -- een aanroep die niet antwoordt hoort deze toets te laten zakken, niet te laten hangen')), 15000);
+    t = setTimeout(() => af(new Error('geen antwoord binnen ' + Math.round(grens / 1000) + 's: ' + wat +
+      ' -- een aanroep die niet antwoordt hoort deze toets te laten zakken, niet te laten hangen')), grens);
   });
   return Promise.race([belofte, klok]).finally(() => clearTimeout(t));
 }

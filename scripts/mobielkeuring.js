@@ -257,7 +257,32 @@ function mobielInPagina(opt) {
   if (hr.width < MAAT || hr.height < MAAT) {
     uit.gebreken.push('maat ' + Math.round(hr.width) + 'x' + Math.round(hr.height) + ', hoort ' + MAAT);
   }
-  if (!inVasteBalk && midY < H * ONDER) {
+  /* EEN KNOP DIE BIJ EEN VELD HOORT, WORDT BEREIKT VANAF DAT VELD.
+
+     /apps/foundation/os-deelnemer.html zet "Bekijken" naast een codeveld op
+     y=300. Die knop naar onderen trekken zou hem losmaken van het veld waar je
+     net in getypt hebt -- en je duim is daar al, dus er is geen greepwissel.
+     Bovendien schuift een openstaand toetsenbord het paar toch omhoog, en dat
+     ziet deze meting op 844px niet.
+
+     De uitzondering is smal met opzet: het veld moet ZICHTBAAR zijn en in
+     dezelfde rij staan. Een verzendknop onderaan een lang formulier waarvan het
+     veld boven de vouw ligt, valt er dus niet onder. */
+  var bijVeld = false;
+  if (hoofd.parentElement) {
+    var buren = hoofd.parentElement.children;
+    for (var bz = 0; bz < buren.length; bz++) {
+      var bn = buren[bz];
+      if (bn === hoofd) continue;
+      if (!/^(input|textarea|select)$/i.test(bn.tagName)) continue;
+      if (!zichtbaar(bn)) continue;
+      var bnr = bn.getBoundingClientRect();
+      if (Math.abs((bnr.top + bnr.height / 2) - midY) < 40) { bijVeld = true; break; }
+    }
+  }
+  uit.hoofd.bijVeld = bijVeld;
+
+  if (!inVasteBalk && !bijVeld && midY < H * ONDER) {
     uit.gebreken.push('staat op y ' + Math.round(midY) + ' van ' + H + ', boven de duimlijn');
   }
   if (hr.width < W * SMAL) {

@@ -323,7 +323,19 @@ body.rtg-stijl [role="button"].hoofd{
      regel maakte de knop kleiner in plaats van bereikbaarder. Een knop in een
      balk houdt zijn eigen maat; die balk regelt zijn breedte zelf. */
   body.rtg-stijl .cmd-balk [data-hoofdactie],
-  body.rtg-stijl .cmd-balk .hoofd{
+  body.rtg-stijl .cmd-balk .hoofd,
+  /* EN NIET ALS HIJ BIJ EEN VELD HOORT. "Bekijken" naast een codeveld,
+     "Zoek" naast een zoekveld: die twee horen op een regel. Volle breedte
+     duwde de knop onder het veld en maakte er twee losse dingen van -- gemeten
+     op de drie RTFoundation-portalen, waar de koppeling zo sneuvelde.
+
+     Die :not([data-inbalk]) hieronder staat er niet voor de sier, en hem
+     weglaten kostte een halve ronde. `:has()` telt voor de zwaarte van zijn
+     ZWAARSTE ARGUMENT, en dat is hier `input` -- een element, geen klasse. De
+     uitzondering woog dus (0,2,2) tegen de (0,3,1) van de regel erboven, en
+     verloor. Met :not() erbij is het (0,3,2) en wint hij. Gemeten in een echte
+     browser op 19 augustus 2026: zonder 374 pixels breed, met 66. */
+  body.rtg-stijl *:has(> input, > textarea, > select) > [data-hoofdactie]:not([data-inbalk]){
     width:auto;max-width:none;flex:0 0 auto;
   }
 
@@ -376,8 +388,14 @@ body.rtg-stijl [role="button"].hoofd{
     border-top:1px solid var(--rtg-line);
   }
   body.rtg-stijl .rtg-duimbalk > *{ flex:1 1 auto; }
-  /* ruimte eronder, anders legt de balk zich over de laatste regel van de lijst */
-  body.rtg-stijl:has(.rtg-duimbalk){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
+  /* Ruimte eronder, anders legt de balk zich over de laatste regel van de lijst.
+
+     De :not([hidden] *) is er sinds /apps/foundation/index.html: dat scherm
+     wisselt van blad met het hidden-attribuut op een <section>, en de duimbalk
+     hangt in het welkomblad. Een balk in een verborgen blad wordt niet getekend,
+     maar :has() ziet hem wel -- zonder deze uitzondering kregen de andere drie
+     bladen van dat scherm 5,5rem lucht onderaan waar niets stond. */
+  body.rtg-stijl:has(.rtg-duimbalk:not([hidden] *)){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
 }
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de

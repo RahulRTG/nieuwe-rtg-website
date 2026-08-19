@@ -555,7 +555,11 @@
     $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
       '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
       '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
-      '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
+      /* De hoofdhandeling van een poortscherm is binnenkomen (GRAMMATICA.md).
+         Deze knop staat op vier schermen tegelijk -- backoffice, kantoorpda,
+         magnaat-kantoor en het Foundation OS -- dus staat de markering hier
+         en niet vier keer los. */
+      '<button id="kaGo" class="hoofd" data-hoofdactie>'+T('pd.ka.binnen','Binnen')+'</button></div>'+
       '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
       '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';

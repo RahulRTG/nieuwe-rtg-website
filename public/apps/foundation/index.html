@@ -139,8 +139,16 @@
   <div class="hero">
     <div class="kick">RTFoundation</div>
     <div class="logo">Alles om <b>vooruit</b> te komen</div>
-    <div class="knoprij">
-      <button class="knop" id="bMaak">Maak een gezin aan</button>
+    <!-- De twee ingangen staan hier als PAAR en niet als een hoofdknop met een
+         losse tweede: "Maak een gezin aan" is de hoofdhandeling (hij draagt
+         .hoofd, de ander .grijs -- het scherm wees hem zelf al aan), maar wie
+         al een gezin heeft moet ernaast kunnen inloggen. Ze verhuizen dus
+         samen. Op telefoonmaat is .rtg-duimbalk een vaste strook onderaan
+         (GRAMMATICA.md: de handeling hoort bij de duim; gemeten stond hij op
+         y 271 van 844, boven de duimlijn); daarboven blijft het de gecentreerde
+         rij in de hero, want .knoprij zet justify-content zelf. -->
+    <div class="knoprij rtg-duimbalk">
+      <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
     </div>
     <!-- MIJN LEVEN HOORT HIER, op het welkomscherm en niet tussen de tegels.

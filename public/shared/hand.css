@@ -53,3 +53,22 @@
    vullen, zodat de eerste handeling het dichtstbij ligt. */
 :root[data-hand="links"] .cmd-actierij { flex-direction: row-reverse; }
 :root[data-hand="links"] .cmd-balkbladen { flex-direction: row-reverse; }
+
+/* ---- een hoofdhandeling naast zijn veld hoort aan de duimzijde -----------
+   "Bekijken" naast een codeveld, "Zoek" naast een zoekveld: die knop staat in
+   elk huis rechts van het veld, en voor een linkshandige is dat precies de
+   verste hoek. Gemeten op 19 augustus 2026: op de vier RTFoundation-portalen
+   stond hij op x 310 van 390 -- in het kwart waar die duim niet komt.
+
+   Zelfde truc als bij de dialoogvoet hierboven: row-reverse, dus het VELD komt
+   eerst in de DOM en de knop erna (een schermlezer hoort ze in de goede
+   volgorde), maar de knop ligt aan de duimkant. Het veld heeft flex:1 en vult
+   de rest, dus de uitlijning van de rij verandert verder niet.
+
+   Bewust zo smal: alleen een rij die een veld EN de aangewezen hoofdhandeling
+   draagt. `.rij` is in dit huis een algemene klasse; die in zijn geheel
+   omklappen zou pillen, labels en meta-regels meespiegelen die niets met de
+   duim te maken hebben. */
+:root[data-hand="links"] *:has(> input, > textarea, > select):has(> [data-hoofdactie]) {
+  flex-direction: row-reverse;
+}

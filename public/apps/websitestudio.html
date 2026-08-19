@@ -160,8 +160,14 @@
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Openen</button>
   <button class="knop" id="exportKnop">Exporteer</button>
-  <button class="knop prim" id="bewaarKnop">Opslaan</button>
 </header>
+<!-- Opslaan stond in de werkbalk hierboven, en die scrolt op een telefoon in
+     zichzelf: gemeten op 19 augustus 2026 lag de knop op x 831 van een venster
+     van 390 -- buiten beeld, achter vier andere knoppen. GRAMMATICA.md zegt
+     "ik wil iets doen -> mijn duim vindt het onderaan", dus hij staat nu in de
+     vaste strook (shared/rtg-ui.css, .rtg-duimbalk). Boven telefoonmaat is dat
+     gewoon een rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop prim hoofd" id="bewaarKnop" data-hoofdactie>Opslaan</button></div>
 <div class="vnoot" id="versienoot" hidden></div>
 <main id="hoofd"><div class="doek" id="doek" data-thema="donker"></div></main>
 

@@ -141,6 +141,7 @@
     </div>
     <div id="dPlus"></div>
     <div id="dEnterprise"></div>
+    <div id="dDossier"></div>
     <div id="dBeheer"></div>
   </div>
 
@@ -239,6 +240,31 @@
         </div>
         <div id="boomLijst"></div>
       </div>
+      <div class="deel">Aanwezigheid</div>
+      <div class="kaart">
+        <div class="kop">Presentie van deze les</div>
+        <p class="stil">Een registratie is een waarneming, geen oordeel. Zet u dezelfde les nog eens, dan vervangt dat de vorige: verzuim uit een typefout is een van de vervelendste fouten die een school kan maken.</p>
+        <div id="presLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Verzuimbeeld van de klas</div>
+        <p class="stil">Op naam, nooit op &quot;meeste verzuim eerst&quot;.</p>
+        <div id="presBeeld"></div>
+      </div>
+      <div class="deel">Rapporten</div>
+      <div class="kaart">
+        <div class="kop">Rapport klaarzetten</div>
+        <p class="stil">De cijfers en de aanwezigheid staan er meteen in. Het blijft een concept tot u het vaststelt; zolang ziet geen enkel gezin het.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="rapPeriode" maxlength="30" placeholder="Periode (bijv. Periode 2)" aria-label="Periode van het rapport">
+          <button class="knop p" id="rapMaak" type="button">Zet het rapport klaar</button>
+        </div>
+        <div id="rapLijst"></div>
+      </div>
+      <div class="kaart" id="rapDetailKaart">
+        <div class="kop">Het rapport</div>
+        <div id="rapDetail"><p class="stil">Open hierboven een rapport om de teksten te schrijven en het vast te stellen.</p></div>
+      </div>
       <div class="deel">Cijferboek</div>
       <div class="kaart">
         <div class="kop">Cijferboek</div>
@@ -254,11 +280,15 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
 <script src="/apps/schoolpartner/toetsen.js"></script>
+<script src="/apps/schoolpartner/presentie.js"></script>
+<script src="/apps/schoolpartner/rapport.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
 <script src="/apps/schoolpartner/enterprise.js"></script>
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
+<script src="/apps/schoolpartner/dossier-zorg.js"></script>
+<script src="/apps/schoolpartner/dossier.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>

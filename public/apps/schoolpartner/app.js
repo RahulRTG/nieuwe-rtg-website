@@ -94,6 +94,7 @@
       });
       if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
+      if (window.RTGSchoolDossier) RTGSchoolDossier.bind(api, S, esc, meld);
     });
   }
   /* ---------- leraar ---------- */
@@ -115,6 +116,13 @@
     });
   }
   function kl(pad, body) { return api(pad, Object.assign({ klasCode: KLAS, personeelToken: S.token }, body || {})); }
+  /* Twee sleutelbossen, want er zijn twee poorten. kl() gaat naar de klaslaag
+     (klascode + token van de leraar); sk() gaat naar de rollenpoort, en die
+     wil de SCHOOLcode erbij -- presentie, rapporten en dossier hangen aan een
+     recht van de school en niet aan het bezit van een klascode. */
+  function sk(pad, body) {
+    return api(pad, Object.assign({ schoolCode: S.code, klasCode: KLAS, personeelToken: S.token }, body || {}));
+  }
 
   function werkbank() {
     kl('/school/klas').then(function (r) {
@@ -146,6 +154,8 @@
       }).join('') || 'Nog geen cijfers.';
     });
     window.SPart.toetslijst();
+    if (window.SPart.presentie) window.SPart.presentie();
+    if (window.SPart.rapport) window.SPart.rapport();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {
@@ -212,7 +222,8 @@
   });
 
   window.SPart = window.SPart || {};
-  window.SPart.kl = kl; window.SPart.esc = esc; window.SPart.meld = meld; window.SPart.werkbank = werkbank;
+  window.SPart.kl = kl; window.SPart.sk = sk; window.SPart.esc = esc; window.SPart.meld = meld; window.SPart.werkbank = werkbank;
+  $('#rapMaak').addEventListener('click', function () { if (window.SPart.rapportMaken) window.SPart.rapportMaken(); });
 
   if (S && S.rol === 'directie') directie();
   else if (S && S.rol === 'leraar') leraar();

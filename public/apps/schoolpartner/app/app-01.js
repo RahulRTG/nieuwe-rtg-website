@@ -94,5 +94,6 @@
       });
       if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
+      if (window.RTGSchoolDossier) RTGSchoolDossier.bind(api, S, esc, meld);
     });
   }

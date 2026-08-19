@@ -67,3 +67,134 @@ test('schoolsleutels blijven tijdelijk en verlopen na dertig minuten', () => {
   for (const pad of ["'/apps/foundation/leerpaspoort.html'", "'/apps/rtgschool/leer.js'", "'/apps/rtgschool/examen.js'", "'/apps/rtgschool/bijles.js'"])
     assert.ok(offline.includes(pad), 'het leerlingpaspoort mist offline onderdeel ' + pad);
 });
+
+/* ---------------------------------------------------------------------------
+   DEKKING: elk school-endpoint heeft een scherm, of staat hieronder met naam.
+
+   Waarom deze toets bestaat. RTG School had 165 endpoints en 84 daarvan waren
+   vanuit een scherm te bereiken; de rest bestond wel, maar niemand kon erbij.
+   Dat is de vervelendste soort onaf: de tests waren groen, de belofte stond in
+   de code, en toch kon een leraar geen presentie zetten en een leerling zijn
+   toets niet maken.
+
+   De lijst OPEN hieronder is dus geen uitzonderingenlijst maar een REGISTER
+   van wat nog geen scherm heeft. Bouwt iemand er een, dan zakt deze toets tot
+   de naam uit de lijst is gehaald -- en dat is precies de bedoeling: de lijst
+   hoort korter te worden en mag nooit stilletjes langer worden. */
+const OPEN = [
+  // aanwezigheid: het verzuimbeeld van EEN leerling (de klaslijst en het zetten
+  // hebben sinds deze ronde wel een scherm)
+  'aanwezigheid/leerling',
+  // oudergesprekken: momenten en boeken
+  'afspraak/boek', 'afspraak/momenten',
+  // gebouw en veiligheid: passen en bezoekers
+  'bezoeker/aanmeld', 'bezoeker/uit', 'pas/blokkeer', 'pas/geef', 'pas/passeer',
+  // incidenten (melden, lijst, afhandelen)
+  'incident/handel-af', 'incident/lijst', 'incident/meld',
+  // geld: facturen, budgetten, subsidies, kantine, rapportage
+  'budget/zet', 'factuur/boek', 'factuur/herinner', 'factuur/maak', 'financien/rapport',
+  'kantine/saldo', 'subsidie/zet', 'machtiging/intrek', 'machtiging/lijst', 'machtiging/zet',
+  // personeelszaken
+  'hr/afwezig', 'hr/dossier', 'hr/gesprek', 'hr/gesprek/reactie', 'hr/mijn', 'hr/overzicht',
+  'hr/uren', 'hr/verlof/besluit', 'hr/vervanging', 'hr/zet',
+  // verlof van een leerling
+  'verlof/aanvraag', 'verlof/besluit', 'verlof/lijst', 'verlof/mijn',
+  // omroep: nieuwsbrief, herinneringen, vakgroep
+  'herinnering/verstuur', 'herinneringen', 'nieuwsbrief', 'nieuwsbrief/lijst', 'vakgroep',
+  // organisatie: vestigingen, opleidingen, schooljaarovergang
+  'opleiding/zet', 'vestiging/zet', 'schooljaar/voer-uit', 'schooljaar/voorstel',
+  // in- en uitschrijven van een geplaatste leerling
+  'leerling/overstap', 'leerling/uitschrijf',
+  // klasbeheer dat alleen via de andere kant loopt
+  'klas/leraar-weg', 'klas/overname', 'klas/team', 'klas/vestiging',
+  // oefen-huiswerk maakt de leerling nu in de leerapp, niet in het gezinsscherm
+  'huiswerk/oefen', 'huiswerk/oefen-antwoord',
+  // koppelingen en webhooks: aanzetten en weghalen
+  'koppeling/zet', 'webhook/weg', 'webhook/zet',
+  // toestemming vragen, peiling sluiten, personeelspeiling
+  'toestemming/overzicht', 'toestemming/vraag', 'peiling/antwoord-personeel', 'peiling/sluit',
+  // overig
+  'export', 'mijn-rechten', 'signalen', 'toets/sluit', 'voortgang'
+];
+
+function endpointsVanDeServer() {
+  const map = path.join(__dirname, '..', 'server', 'school');
+  const uit = new Set();
+  for (const f of fs.readdirSync(map).filter(x => x.endsWith('.js'))) {
+    const bron = fs.readFileSync(path.join(map, f), 'utf8');
+    for (const m of bron.matchAll(/router\.(?:post|get)\('\/school\/([a-z0-9/-]+)'/g)) uit.add(m[1]);
+  }
+  return uit;
+}
+
+function endpointsInDeSchermen() {
+  const uit = new Set();
+  const loop = (map) => {
+    for (const naam of fs.readdirSync(map)) {
+      const p = path.join(map, naam);
+      if (fs.statSync(p).isDirectory()) { loop(p); continue; }
+      if (!/\.(html|js)$/.test(naam)) continue;
+      const bron = fs.readFileSync(p, 'utf8');
+      /* Ook een pad dat als EventSource-URL begint (".../belkanaal?" + vraag)
+         telt als een scherm dat het endpoint gebruikt; vandaar de ? in de sluitklasse. */
+      for (const m of bron.matchAll(/['"](?:\/api\/foundation)?\/school\/([a-z0-9/-]+)['"?]/g)) uit.add(m[1]);
+    }
+  };
+  loop(PUB);
+  return uit;
+}
+
+test('elk school-endpoint heeft een scherm, of staat in het register van openstaande schermen', () => {
+  const server = endpointsVanDeServer();
+  const schermen = endpointsInDeSchermen();
+  const zonderScherm = [...server].filter(e => !schermen.has(e)).sort();
+  const geregistreerd = [...OPEN].sort();
+  assert.deepEqual(zonderScherm, geregistreerd,
+    'De lijst OPEN in deze toets loopt uit de pas met de werkelijkheid.\n' +
+    'Wel op de server, geen scherm, niet in OPEN: ' + zonderScherm.filter(e => !OPEN.includes(e)).join(', ') + '\n' +
+    'In OPEN maar inmiddels wel een scherm (haal ze uit de lijst): ' + OPEN.filter(e => !zonderScherm.includes(e)).join(', '));
+  assert.ok(server.size >= 165, 'de school heeft minder endpoints dan verwacht: ' + server.size);
+});
+
+test('de vier schermen van deze ronde bestaan en spreken de juiste endpoints aan', () => {
+  const presentie = lees('apps', 'schoolpartner', 'presentie.js');
+  const rapport = lees('apps', 'schoolpartner', 'rapport.js');
+  const dossier = lees('apps', 'schoolpartner', 'dossier.js');
+  const zorg = lees('apps', 'schoolpartner', 'dossier-zorg.js');
+  const toets = lees('apps', 'foundation', 'school-toets.js');
+
+  // presentie: zetten EN het beeld, en via de rollenpoort (dus met schoolcode)
+  assert.match(presentie, /\/school\/aanwezigheid\/zet/);
+  assert.match(presentie, /\/school\/aanwezigheid\/klas/);
+  assert.match(partnerApp, /schoolCode: S\.code[\s\S]{0,80}personeelToken/, 'sk() moet de schoolcode meesturen');
+
+  // rapport: vaststellen kan alleen met een vinkje dat een mens zet
+  assert.match(rapport, /\/school\/rapport\/stel-vast/);
+  assert.match(rapport, /gelezen: true/);
+  assert.match(rapport, /rapGelezen[\s\S]{0,200}checked/,
+    'het scherm moet de vaststelling achter een expliciet vinkje houden');
+
+  // zorgdeel: nooit open zonder reden
+  assert.match(zorg, /zorg: true/);
+  assert.match(zorg, /reden: reden/);
+  assert.match(zorg, /journaal/i, 'het scherm hoort te zeggen wat er met de reden gebeurt');
+  assert.match(dossier, /\/school\/dossier\/contact/);
+  assert.match(dossier, /\/school\/document\/voeg/);
+
+  // de toets van de leerling: starten, antwoorden, en GEEN goed/fout per vraag
+  assert.match(toets, /\/school\/toets\/voor-mij/);
+  assert.match(toets, /\/school\/toets\/start/);
+  assert.match(toets, /\/school\/toets\/antwoord/);
+  assert.doesNotMatch(toets, /juisteAntwoord/,
+    'een toets kijk je na het inleveren na, niet halverwege');
+  assert.match(toets, /\/school\/rapport\/mijn/);
+
+  // en ze hangen ook echt in de pagina's
+  assert.match(partner, /schoolpartner\/presentie\.js/);
+  assert.match(partner, /schoolpartner\/rapport\.js/);
+  assert.match(partner, /schoolpartner\/dossier\.js/);
+  assert.ok(partner.includes('id="dDossier"'), 'School Partner mist #dDossier');
+  assert.ok(partner.includes('id="presLijst"') && partner.includes('id="rapLijst"'),
+    'de werkbank mist de nieuwe delen');
+  assert.match(school, /school-toets\.js/);
+});

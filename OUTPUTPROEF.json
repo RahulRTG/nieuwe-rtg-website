@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T18:46:41.739Z",
-  "commit": "2fd6125",
+  "op": "2026-08-19T19:18:50.716Z",
+  "commit": "ab90539",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3249,
-  "onbeslist": 789,
+  "bewezen": 3269,
+  "onbeslist": 769,
   "blind": 149,
   "ongemeten": 8
  },
@@ -6000,148 +6000,148 @@
    "reden": "er is over DEZE route gelogen en redactie.test.js zakte daarop"
   },
   "POST /api/onderneming/bestuur": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/bestuur/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/bestuur/af": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/aandeel/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/aandeel/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/toegang": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/ontwerp": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/ontwerp/opdrachten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/relaties": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/relaties/notitie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/debiteuren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/crediteuren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/contracten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/werkruimte": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/belasting": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/kas": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/kas/saldo": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/capaciteit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "onderneming-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 45); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en onderneming-routes.test.js zakte daarop"
   },
   "POST /api/onderneming/werving": {
    "staat": "onbeslist",
@@ -20449,18 +20449,20 @@
    "reden": "er is over DEZE route gelogen en livinglab.test.js zakte daarop"
   },
   "POST /api/lab2/coach": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "livinglab.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 44); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en livinglab.test.js zakte daarop"
   },
   "POST /api/lab2/coach/methoden": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "livinglab.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 44); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en livinglab.test.js zakte daarop"
   },
   "POST /api/supplier/pos/redeem": {
    "staat": "bewezen",
@@ -50668,6 +50670,106 @@
    "toets": "livinglab.test.js",
    "merkt": true,
    "op": "2026-08-19T18:46:41.649Z"
+  },
+  "POST /api/lab2/coach": {
+   "toets": "livinglab.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:15:24.808Z"
+  },
+  "POST /api/lab2/coach/methoden": {
+   "toets": "livinglab.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:15:25.126Z"
+  },
+  "POST /api/onderneming/bestuur": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:16:25.997Z"
+  },
+  "POST /api/onderneming/bestuur/zet": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:16:26.101Z"
+  },
+  "POST /api/onderneming/aandeel/zet": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:16:38.160Z"
+  },
+  "POST /api/onderneming/bestuur/af": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:16:38.364Z"
+  },
+  "POST /api/onderneming/aandeel/weg": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:01.702Z"
+  },
+  "POST /api/onderneming/toegang": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:01.872Z"
+  },
+  "POST /api/onderneming/ontwerp/opdrachten": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:14.086Z"
+  },
+  "POST /api/onderneming/ontwerp": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:14.235Z"
+  },
+  "POST /api/onderneming/relaties/notitie": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:38.580Z"
+  },
+  "POST /api/onderneming/relaties": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:39.111Z"
+  },
+  "POST /api/onderneming/debiteuren": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:50.400Z"
+  },
+  "POST /api/onderneming/crediteuren": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:17:50.626Z"
+  },
+  "POST /api/onderneming/werkruimte": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:14.195Z"
+  },
+  "POST /api/onderneming/contracten": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:14.505Z"
+  },
+  "POST /api/onderneming/belasting": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:26.033Z"
+  },
+  "POST /api/onderneming/kas": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:26.070Z"
+  },
+  "POST /api/onderneming/kas/saldo": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:49.980Z"
+  },
+  "POST /api/onderneming/capaciteit": {
+   "toets": "onderneming-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T19:18:50.625Z"
   }
  },
  "basislijn": {
@@ -51110,6 +51212,7 @@
   "supplier-comm-mob-payroll.test.js": "groen",
   "rtfos-netwerk.test.js": "groen",
   "stadsbestuur.test.js": "groen",
-  "livinglab.test.js": "groen"
+  "livinglab.test.js": "groen",
+  "onderneming-routes.test.js": "groen"
  }
 }

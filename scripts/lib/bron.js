@@ -57,13 +57,28 @@
    regelcommentaar. Dus loopt hij nu een keer door de tekst, in volgorde, met
    drie standen: code, string, commentaar.
 
-   STRINGS ZIJN PER REGEL BEGRENSD, en dat is een keuze. Deze functie krijgt ook
+   EEN QUOTE IS PER REGEL BEGRENSD, EEN BACKTICK NIET. Deze functie krijgt ook
    HTML te lezen, en daar staat proza in ("pagina's", "'s ochtends"). Een losse
    apostrof mag dan hoogstens de rest van DIE REGEL verstoren en niet de rest van
-   het bestand -- dezelfde soort schade als hierboven, alleen dan omgekeerd. Een
-   meerregelige template literal met `/*` erin wordt daardoor nog steeds als
-   commentaar gelezen; dat is exact het oude gedrag, dus geen enkele keuring
-   wordt hier blinder van.
+   het bestand -- dezelfde soort schade als hierboven, alleen dan omgekeerd.
+
+   Hier stond dat een meerregelige template literal met een openend
+   commentaarteken erin daardoor nog steeds als commentaar werd gelezen, en dat
+   dat "exact het oude gedrag" was zodat geen enkele keuring er blinder van
+   werd. Dat eerste klopte; dat tweede niet. De meter die na 17 augustus is
+   gebouwd (bronBlindeBestanden, zie ./bronblind.js) kruist deze functie met de
+   lexer van de AST-scanner, en wees ZEVEN bestanden aan waar wel degelijk bron
+   verdween -- allemaal CSS in een backtick-string met commentaar erin. Onschuldig
+   in die zeven gevallen, want het IS commentaar, alleen van een andere taal;
+   maar het mechanisme is precies dat van 17 augustus, en een template met een
+   openende opener zonder sluiter erin eet wel door de echte code heen.
+
+   Een backtick loopt daarom nu over regels en een quote niet, en dat is geen
+   uitzondering op de regel hierboven maar de reden erachter, scherper gesteld:
+   de grens per regel bestaat voor de apostrof in PROZA, en een backtick komt in
+   proza niet voor. Nagemeten: de kruisproef gaat van zeven naar nul, geen enkele
+   NORM-meter beweegt de verkeerde kant op, en de vangrail hieronder (nooit meer
+   weghalen dan de oude regex) blijft staan.
 
    GEMETEN, NIET AANGENOMEN: over alle 4333 bestanden ziet deze versie 224.031
    tekens MEER en 0 tekens minder dan de vorige. De richting is dus eenzijdig.
@@ -105,8 +120,23 @@ function zonderCommentaar(bron) {
        vermoedelijk geen string maar een apostrof in proza; dan gaat alleen dit
        teken mee en lezen we verder als code. */
     if (c === '"' || c === "'" || c === '`') {
+      /* EEN BACKTICK MAG WEL OVER REGELS LOPEN, en dat is geen uitzondering op
+         de regel hierboven maar de reden ERACHTER, scherper gesteld. De grens
+         per regel bestaat om de apostrof in proza ("pagina's") hoogstens EEN
+         regel te laten verstoren. Een backtick komt in proza niet voor; hij is
+         in JavaScript altijd een template literal, en die loopt per definitie
+         vaak over regels.
+
+         Dat het oude gedrag hier geen enkele keuring blinder maakte, klopte
+         niet helemaal: zeven bestanden raakten er wel degelijk bron door kwijt
+         (de meter bronBlindeBestanden telde ze). Het gaat om CSS in een
+         backtick-string met commentaar erin -- vandaag onschuldig, want het IS
+         commentaar, alleen van een andere taal. Maar het mechanisme is precies
+         dat van 17 augustus: een template met een openende /* zonder sluiter
+         erin eet wel degelijk door de echte code heen. */
+      const meerRegelig = c === '`';
       let j = i + 1;
-      while (j < n && s[j] !== c && s[j] !== '\n') { if (s[j] === '\\') j++; j++; }
+      while (j < n && s[j] !== c && (meerRegelig || s[j] !== '\n')) { if (s[j] === '\\') j++; j++; }
       if (j < n && s[j] === c) { uit += s.slice(i, j + 1); i = j + 1; continue; }
     }
     uit += c;

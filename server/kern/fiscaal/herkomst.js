@@ -16,10 +16,9 @@
       groen. Dit is wat een controle vraagt en wat een spreadsheet nooit kan.
    3. WAT DE KETEN ZELF TEGENSPREEKT. Een factuurregel draagt het tarief dat de
       facturatiemotor erop zette; de jaargangen weten welke tarieven er in dat
-      land op die dag BESTONDEN. Staat er een percentage op een regel dat op die
-      dag in dat land helemaal niet voorkwam, dan klopt er iets niet -- een
-      regel die voor een tariefwijziging is geboekt en na de ingangsdatum is
-      gedateerd, of een met de hand ingetypt tarief.
+      land op die dag BESTONDEN. Staat er een percentage op een regel dat die dag
+      niet voorkwam, dan klopt er iets niet -- een regel die voor een
+      tariefwijziging is geboekt en erna is gedateerd, of een ingetypt tarief.
 
       LET OP WAT DEZE CONTROLE WEL EN NIET ZEGT. Hij zegt NIET "deze regel had
       het lage tarief moeten hebben": welke categorie een regel had, staat niet
@@ -29,12 +28,13 @@
 
    EEN TELLING, NIET TWEE. De centensom per regel komt uit ./btwtelling.js --
    dezelfde die de aangifte en de inspecteur gebruiken. Deze module telt de
-   posten los op en LEGT DIE SOM DAARNAAST: wijken ze af, dan is dat geen detail
-   maar een bevinding, en hij meldt hem als zodanig. Zo bewijst de verklaring
-   zichzelf tegen het getal dat hij verklaart. */
+   posten los op en legt die som DAARNAAST: wijken ze af, dan is dat geen detail
+   maar een bevinding. Zo bewijst de verklaring zichzelf tegen het getal dat hij
+   verklaart. */
 'use strict';
 
 const { maakBtwTelling, periodeVak } = require('./btwtelling');
+const { zekerheid } = require('./zekerheid');
 
 function maakHerkomst({ db, jaargangen }) {
   const { telFacturen, regelBtwCenten } = maakBtwTelling({ db });
@@ -102,10 +102,11 @@ function maakHerkomst({ db, jaargangen }) {
       regelstand: jaargangen && typeof jaargangen.geschiedenis === 'function'
         ? { bron: 'jaargangen', jaargangen: jaargangen.geschiedenis(land).filter(x => x.geldigVanaf <= vak.tot).map(x => x.id) }
         : { bron: 'lopend', jaargangen: [] },
-      /* EERLIJK OVER DE RAND. Wat nooit een factuur kreeg, staat hier niet in --
-         dezelfde beperking als de aangifte zelf heeft, en die hoort mee te
-         reizen met de verklaring en niet alleen in de documentatie te staan. */
-      let: 'Deze opbouw komt uit het factuurregister. Omzet die nooit een factuur kreeg, zit er niet in.' };
+      /* EERLIJK OVER DE RAND, en niet in eigen woorden: dezelfde klasse als de
+         aangifte die deze opbouw verklaart (./zekerheid.js), inclusief waar hij
+         ophoudt -- omzet zonder factuur. Twee plekken die elk hun eigen
+         voorbehoud verzinnen, zeggen na een tijd iets anders. */
+      zekerheid: zekerheid('btw.aangifte') };
   }
 
   /* ---------- 2. herbouwen ---------- */

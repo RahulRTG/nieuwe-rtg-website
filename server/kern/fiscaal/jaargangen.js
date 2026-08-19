@@ -1,33 +1,29 @@
 /* DE FISCALE JAARGANGEN: welke regels golden er OP DIE DAG.
 
    Dit bestand bestaat omdat de Regelwacht zijn eigen geheugen wegschreef. Hij
-   legde een overlay op de gedeelde LANDEN-tabel en bewaarde die met
-   `Object.assign(eerder, wijz)` -- per veld alleen de LAATSTE waarde. Wat het
-   Nederlandse eten-tarief op 15 maart 2026 was, stond daarna nergens meer. Niet
-   moeilijk te achterhalen: weg.
+   bewaarde zijn overlay met `Object.assign(eerder, wijz)` -- per veld alleen de
+   LAATSTE waarde. Wat het Nederlandse eten-tarief op 15 maart 2026 was, stond
+   daarna nergens meer: niet moeilijk te achterhalen, weg. Daarmee was een hele
+   klasse vragen onbeantwoordbaar, en het zijn precies de vragen die een
+   administratie jaren later krijgt -- herbouw dit bedrag uit de regels die toen
+   golden, wat veranderde er sinds vorig kwartaal, laat de onderneming zien
+   zoals hij op 31 december 2027 stond.
 
-   Daardoor was een hele klasse vragen onbeantwoordbaar, en het zijn precies de
-   vragen die een administratie jaren later krijgt:
+   DE OPLOSSING IS GELEEND EN NIET VERZONNEN: payroll doet dit al met jaargangen
+   (kern/payroll/regelpakket.js) -- een tarief is daar nooit een constante maar
+   een VERSIE met een geldigheidsperiode en een herkomst. Twee regelmotoren in
+   een huis is wat LAT.md regel 4 verbiedt, dus de fiscale kant krijgt hetzelfde
+   model. Het verschil: payroll krijgt hele pakketten binnen, de Regelwacht
+   losse velden, en de basis staat hier in code. Dus:
 
-     herbouw dit btw-bedrag uit de bron en de regels die toen golden
-     wat veranderde er sinds vorig kwartaal, en wat raakte dat
-     laat de onderneming zien zoals hij op 31 december 2027 stond
-
-   DE OPLOSSING IS GELEEND EN NIET VERZONNEN. Payroll loste dit al op met
-   jaargangen (kern/payroll/regelpakket.js): een tarief is daar nooit een
-   constante maar een VERSIE met een geldigheidsperiode en een herkomst, en de
-   loonrun stempelt de versie die hij gebruikte op zichzelf. Twee regelmotoren
-   in een huis is precies wat LAT.md regel 4 verbiedt, dus de fiscale kant
-   krijgt hetzelfde model en geen tweede eigen model.
-
-   HET VERSCHIL, en waarom dit geen kopie is. Payroll krijgt HELE pakketten
-   binnen (een JSON-bestand per land per jaar). De Regelwacht krijgt LOSSE
-   VELDEN binnen -- "NL, eten, 11%" -- en de basis staat in code (./landen.js,
-   het peiljaar) en niet in een bestand. Een volledige momentopname per
-   wijziging zou voor ~200 landen absurd zijn. Dus:
-
-     de basis (peiljaar, uit ./landen.js)  +  de wijzigingen tot een datum
+     de basis (peiljaar) + de wijzigingen tot een datum
      = de tabel zoals hij op die datum was
+
+   EEN STORE PER TABEL. Dit werkt voor de landentabel (btw, lasten, minimumloon)
+   en voor de zzp-tabel (schijven, aftrek, kortingen), en die twee hebben elk
+   een eigen bak in de database, een eigen basis en eigen GENESTE velden. Wat
+   ze delen is het mechaniek, en dat hoort dus een keer te bestaan en niet twee
+   keer -- zie ./regelwacht.js en ./zzpwacht.js voor de twee gebruikers.
 
    Het opbouwen zelf staat in ./jaargangen-tijdlijn.js (puur); hier staat hoe je
    een wijziging bewaart, terugvindt en op de gedeelde tabel zet.
@@ -40,30 +36,33 @@
    tabel zoals hij uit ./landen.js kwam, gemaakt voordat er iets overheen ging.
 
    WAT DIT NIET DOET: iets blokkeren. Een wijziging draagt een `stand`
-   (ongecontroleerd / goedgekeurd), net als een payroll-pakket, maar hij wordt
-   ook ongecontroleerd geprojecteerd -- exact zoals de Regelwacht het vandaag
-   doet. Dat is met opzet: aan die projectie een goedkeuring hangen bevriest bij
-   de eerste de beste storing stilletjes de tarieven van het hele huis, en dat is
-   een eigen besluit met een eigen zichtbare schakelaar. Hier wordt de stand
-   alleen VASTGELEGD, zodat dat besluit later te nemen is zonder archeologie. */
+   (ongecontroleerd / goedgekeurd), maar wordt ook ongecontroleerd geprojecteerd
+   -- zoals de Regelwacht het altijd deed. Aan die projectie een goedkeuring
+   hangen bevriest bij de eerste de beste bronstoring de tarieven van het hele
+   huis; dat is een eigen besluit met een eigen zichtbare schakelaar. De stand
+   wordt hier alleen VASTGELEGD, zodat dat besluit later te nemen is. */
 'use strict';
 
 const { datum: klokDatum } = require('../../lib/klok');
-const { isDatum, diep, voegSamen, lichtUit, opVolgorde, bouwOp } = require('./jaargangen-tijdlijn');
+const { isDatum, diep, opVolgorde, maakTijdlijn } = require('./jaargangen-tijdlijn');
 const { uitTabel } = require('./tarief');
 
-function maakJaargangen({ db, save, LANDEN, peiljaar, nu }) {
+function maakJaargangen({ db, save, LANDEN, tabel, peiljaar, nu, bak: bakNaam, genest }) {
   const tijd = nu || (() => klokDatum().toISOString());
   const vandaag = () => tijd().slice(0, 10);
+  // `LANDEN` is de oorspronkelijke naam en blijft werken; `tabel` zegt wat het is
+  const TABEL = tabel || LANDEN;
+  const SLEUTEL = bakNaam || 'fiscaalJaargangen';
+  const { voegSamen, lichtUit, bouwOp } = maakTijdlijn(genest);
 
   /* DE BASIS. Een diepe kopie van de tabel zoals ./landen.js hem oplevert,
      gemaakt VOOR de eerste projectie. Vanaf hier is LANDEN een levend beeld en
      dit de vaste grond eronder. */
-  const BASIS = diep(LANDEN);
+  const BASIS = diep(TABEL);
 
   function bak() {
-    if (!db.data.fiscaalJaargangen || typeof db.data.fiscaalJaargangen !== 'object') db.data.fiscaalJaargangen = {};
-    return db.data.fiscaalJaargangen;
+    if (!db.data[SLEUTEL] || typeof db.data[SLEUTEL] !== 'object') db.data[SLEUTEL] = {};
+    return db.data[SLEUTEL];
   }
   const lijstVan = (land) => {
     const b = bak();
@@ -100,7 +99,7 @@ function maakJaargangen({ db, save, LANDEN, peiljaar, nu }) {
     const d = isDatum(datum) ? String(datum).slice(0, 10) : vandaag();
     let landen = 0, wachtend = 0;
     for (const l of Object.keys(bak())) {
-      if (!LANDEN[l] || !BASIS[l]) continue;
+      if (!TABEL[l] || !BASIS[l]) continue;
       const lijst = opVolgorde(lijstVan(l));
       const actief = lijst.filter(j => j.geldigVanaf <= d);
       wachtend += lijst.length - actief.length;
@@ -113,8 +112,8 @@ function maakJaargangen({ db, save, LANDEN, peiljaar, nu }) {
          overgeslagen. Dat deed dit blok wel, en dan bleef juist het geval waar
          het om gaat -- de laatste wijziging valt weg -- op de oude stand staan.
          Gevonden door test/fiscaal-jaargangen.test.js, die precies dat doet. */
-      voegSamen(LANDEN[l], diep(BASIS[l]));
-      for (const j of actief) voegSamen(LANDEN[l], j.wijzigingen);
+      voegSamen(TABEL[l], diep(BASIS[l]));
+      for (const j of actief) voegSamen(TABEL[l], j.wijzigingen);
       if (actief.length) landen++;
     }
     return { landen, wachtend, op: d };
@@ -161,8 +160,7 @@ function maakJaargangen({ db, save, LANDEN, peiljaar, nu }) {
     return { ok: true, jaargang: j };
   }
 
-  /* Aanmerken door een mens -- de tweede helft van "welke regel gold er, en wie
-     stond ervoor in". */
+  /* Aanmerken door een mens: de tweede helft van "welke regel gold er". */
   function merkAan(land, id, door) {
     const j = lijstVan(land).find(x => x.id === id);
     if (!j) return { status: 404, error: 'Deze wijziging kennen we niet.' };

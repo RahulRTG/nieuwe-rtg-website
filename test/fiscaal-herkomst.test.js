@@ -62,7 +62,10 @@ test('verklaren vouwt de periode open per tarief en controleert zichzelf', () =>
   // en de opbouw sluit aan op de telling die de aangifte gebruikt
   assert.equal(v.sluitAan, true);
   assert.equal(v.afwijkingCenten, 0);
-  assert.match(v.let, /nooit een factuur kreeg/i, 'de rand reist mee met de verklaring');
+  // de rand reist mee met de verklaring, en in dezelfde klasse als de aangifte
+  assert.equal(v.zekerheid.klasse, 'bepaald', 'een getelde opbouw is vastgesteld, geen schatting');
+  assert.equal(v.zekerheid.term, 'DETERMINISTIC');
+  assert.match(v.zekerheid.mits, /alleen omzet die een factuur kreeg/i, 'inclusief waar hij ophoudt');
 });
 
 test('een percentage dat op die dag niet bestond, wordt gemeld -- en niet meer dan dat', () => {

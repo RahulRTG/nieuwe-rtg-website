@@ -14,6 +14,7 @@ const { zzpBerekening } = require('./zzp');
 // welke categorie en welk percentage bij deze zaak horen -- op EEN plek, want
 // de factuur van de klant vraagt het aan dezelfde routine; zie ./tarief.js
 const tarief = require('./tarief');
+const { zekerheid, zin } = require('./zekerheid');
 
 function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
   /* De regels-op-datum, met terugval op de lopende tabel als de jaargangen er
@@ -112,12 +113,15 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
          welke bron, en welke wijzigingen golden er toen. Zonder die stempel is
          een herbouw van dit bedrag later een gok. */
       regelstand: regelbron.stempel(landCode, peildag),
+      /* Hier stond een vlakke zin ("voorlichting, geen bindend fiscaal advies")
+         die ook onder de getelde btw hing. Nu geklasseerd; zie ./zekerheid.js. */
+      zekerheid: zekerheid('boekhouding.maand'),
       regels: [
         R.aangifte,
         R.extra,
         'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
         'Indicatie minimumuurloon in ' + L.naam + ': € ' + R.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(R.lasten * 100) + '% werkgeverslasten' + (R.vakantiegeld ? ' en ' + Math.round(R.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.',
-        'Dit overzicht is voorlichting (peiljaar ' + FISCAAL_PEILJAAR + '), geen fiscaal advies; de aangifte en afdracht blijven de verantwoordelijkheid van de onderneming.'
+        zin('boekhouding.maand') + ' De aangifte en afdracht blijven de verantwoordelijkheid van de onderneming (peiljaar ' + FISCAAL_PEILJAAR + ').'
       ]
     };
   }
@@ -133,7 +137,7 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       return 'Uw cadeaukaarten zijn meervoudig inwisselbaar: de verkoop (deze maand € ' + fin.giftcards.verkocht + ') is nog geen omzet en kent geen btw. Pas bij inwisseling (deze maand € ' + fin.giftcards.ingewisseld + ') boekt u omzet met btw. Het openstaande saldo van € ' + fin.giftcards.open + ' staat als verplichting op de balans.';
     if (/aangifte|deadline|wanneer|termijn/.test(v))
       return L.aangifte + ' ' + L.extra;
-    return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. Dit is voorlichting, geen bindend fiscaal advies.';
+    return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. ' + zin('boekhouding.advies');
   }
 
   /* Het Z-rapport (dagafsluiting) en de shift-samenvatting draaien als

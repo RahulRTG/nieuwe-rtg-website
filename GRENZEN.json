@@ -99,7 +99,8 @@
       "bank",
       "bankLedenAan",
       "herkomst",
-      "regelwacht"
+      "regelwacht",
+      "zzpwacht"
     ],
     "bedrijf": [
       "agenda",
@@ -1017,7 +1018,8 @@
       "zorgContact",
       "zorgVan",
       "zorgVoor",
-      "zorgZet"
+      "zorgZet",
+      "zzpwacht"
     ],
     "memo": [],
     "meting": [],

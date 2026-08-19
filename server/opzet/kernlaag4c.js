@@ -19,6 +19,12 @@ module.exports = (kern, hulp) => {
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
 Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
 kern.regelwacht.herstelOverlay();
+/* De zzp-wacht (kern/fiscaal/zzpwacht.js): de ondernemersregimes per
+   ingangsdatum, zodat een berekening over een ander jaar met de regels van dat
+   jaar rekent in plaats van met die van nu. Zelfde mechaniek als de Regelwacht,
+   eigen bak en eigen validatie. */
+Object.assign(kern, require('../kern/fiscaal/zzpwacht')({ db, save, peiljaar: FISCAAL_PEILJAAR }));
+kern.zzpwacht.herstel();
 /* De btw-aangifte van een zaak (kern/fiscaal/btwaangifte.js): opmaken uit het
    factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
    model van de loonaangifte, met het factuurregister als enige bron. */

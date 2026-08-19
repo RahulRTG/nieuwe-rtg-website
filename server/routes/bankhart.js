@@ -4,7 +4,7 @@
    de zakelijke rekening van elke zaak (manager) en de Regelwacht-status
    voor het bankkantoor. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, officeAuth, managerOnly, liveCodename, bank, regelwacht, herkomst, logActivity } = kern;
+  const { app, auth, supplierAuth, officeAuth, managerOnly, liveCodename, bank, regelwacht, zzpwacht, herkomst, logActivity } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const gast = (req, res) => { if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Bank is voor leden.' }); return true; } return false; };
   const dicht = (req, res) => { if (!kern.bankLedenAan()) { res.status(403).json({ error: 'De RTG Bank is nog niet live voor leden.' }); return true; } return false; };
@@ -43,6 +43,17 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/office/bank/regels/check', officeAuth, async (req, res) => res.json(await regelwacht.check()));
+
+  /* De zzp-regimes: status en doorvoeren, naast de landentabel hierboven. Een
+     eigen paar routes en geen extra vlag op de bestaande: het zijn andere
+     velden met andere grenzen, en een update die per ongeluk in de verkeerde
+     tabel landt is precies wat je bij tarieven niet wilt. */
+  app.post('/api/office/bank/regels/zzp', officeAuth, (req, res) => res.json(zzpwacht.status()));
+  app.post('/api/office/bank/regels/zzp/update', officeAuth, (req, res) => {
+    const b = req.body || {};
+    res.json(zzpwacht.pasToe({ landen: b.landen || {} }, 'kantoor', b.versie,
+      { geldigVanaf: b.geldigVanaf, rechtsgrond: b.rechtsgrond }));
+  });
 
   /* De geschiedenis van een land: wat veranderde er, wanneer, en wat verving
      het. Dit is de leesbare kant van kern/fiscaal/jaargangen.js -- de status

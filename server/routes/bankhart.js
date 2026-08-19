@@ -4,7 +4,7 @@
    de zakelijke rekening van elke zaak (manager) en de Regelwacht-status
    voor het bankkantoor. Draait op de gedeelde kern. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, officeAuth, managerOnly, liveCodename, bank, regelwacht, logActivity } = kern;
+  const { app, auth, supplierAuth, officeAuth, managerOnly, liveCodename, bank, regelwacht, herkomst, logActivity } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const gast = (req, res) => { if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Bank is voor leden.' }); return true; } return false; };
   const dicht = (req, res) => { if (!kern.bankLedenAan()) { res.status(403).json({ error: 'De RTG Bank is nog niet live voor leden.' }); return true; } return false; };
@@ -43,5 +43,26 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/office/bank/regels/check', officeAuth, async (req, res) => res.json(await regelwacht.check()));
+
+  /* De geschiedenis van een land: wat veranderde er, wanneer, en wat verving
+     het. Dit is de leesbare kant van kern/fiscaal/jaargangen.js -- de status
+     hierboven zegt DAT een land is bijgewerkt, dit zegt wat er is gebeurd. */
+  app.post('/api/office/bank/regels/geschiedenis', officeAuth, (req, res) => {
+    const b = req.body || {};
+    res.json({ land: String(b.land || '').toUpperCase(),
+      wijzigingen: regelwacht.jaargangen.geschiedenis(String(b.land || ''), b.veld ? String(b.veld).slice(0, 40) : null) });
+  });
+
+  /* EN WAT RAAKT DIE WIJZIGING. De vraag die hoort bij het doorvoeren van een
+     regel, en hij hoort daarom hier en niet bij de inspecteur: wie de knop
+     indrukt, hoort te zien wat eronder beweegt. Antwoord komt uit de
+     bewijsketen (kern/fiscaal/herkomst.js), die het factuurregister afloopt. */
+  app.post('/api/office/bank/regels/geraakt', officeAuth, (req, res) => {
+    if (!herkomst) return res.status(503).json({ error: 'De bewijsketen draait niet.' });
+    const b = req.body || {};
+    const r = herkomst.geraakt(String(b.land || ''), String(b.jaargang || ''));
+    if (r && r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
 
 };

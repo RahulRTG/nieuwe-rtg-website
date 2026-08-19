@@ -1041,6 +1041,61 @@ stempel is het herbouwen van een bedrag later een gok.
 `test/fiscaal-terugrekenen.test.js` dekt de vijf beweringen, elk met een mutatie
 zien zakken.
 
+### De bewijsketen (`kern/fiscaal/herkomst.js`)
+
+Een aangifte zegt "€ 4.812 te betalen". Dat getal is te vertrouwen zolang je het
+kunt openvouwen, en dat kon niet: de aangifte droeg de optelling maar niet de
+posten. Deze laag vouwt hem open langs de keten die er echt is — aangifte →
+periode → tarief → factuur → factuurregel → de regel die op de factuurdatum
+gold — en doet drie dingen.
+
+**Verklaren** geeft de opbouw van een periode, per tarief, met de factuurnummers
+eronder. **Herbouwen** rekent een ingediende aangifte opnieuw uit de primaire
+bronnen en vergelijkt cent voor cent; gelijk is groen. Anders dan de controle in
+`dienIn` weigert die niets — weigeren hoort bij het indienen, verantwoorden bij
+het terugkijken, en een controleur die alleen "geweigerd" ziet weet nog steeds
+niet hoeveel het scheelt.
+
+Het derde is het interessantst: **wat de keten zichzelf tegenspreekt.** Een
+factuurregel draagt het tarief dat de facturatiemotor erop zette; de jaargangen
+weten welke tarieven er in dat land op die dag *bestonden*. Staat er een
+percentage op een regel dat op die dag helemaal niet voorkwam, dan klopt er iets
+niet — een regel die vóór een tariefwijziging is geboekt en ná de ingangsdatum is
+gedateerd, of een met de hand ingetypt tarief.
+
+> Let op wat die controle wél en niet zegt. Hij zegt **niet** "deze regel had het
+> lage tarief moeten hebben": welke categorie een regel had staat niet op de
+> regel, en dat verzinnen zou een bewering zijn die wij niet kunnen waarmaken.
+> Hij zegt alleen: dit percentage bestond die dag niet in dit land. Dat is smal,
+> en juist daarom is het waar.
+
+**Eén telling, niet twee.** De centensom per regel komt uit `btwtelling.js` —
+dezelfde die de aangifte en de inspecteur gebruiken. De verklaring telt de posten
+los op en legt die som ernaast: wijken ze af, dan is dat geen detail maar een
+bevinding (`sluitAan: false` met het verschil erbij). Zo bewijst de verklaring
+zichzelf tegen het getal dat ze verklaart.
+
+De omgekeerde weg — **wat raakt deze regelwijziging** — telt de facturen die ná
+de ingangsdatum nog een percentage dragen dat door die wijziging is vervangen,
+per zaak. Wat er geteld wordt is smal en nagaanbaar, en de nuance reist mee: een
+levering van vóór de wijziging mág het oude tarief dragen, dus dit is de lijst om
+na te lopen en geen lijst met fouten.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/verklaar` `{periode}` | De opbouw van een periode per tarief, met de facturen eronder; manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/herbouw` `{id}` | Een eigen aangifte herbouwen uit de bronnen en cent voor cent vergelijken |
+| `POST /api/office/bank/regels/geschiedenis` `{land, veld?}` | Wat er veranderde, wanneer, en wat het verving |
+| `POST /api/office/bank/regels/geraakt` `{land, jaargang}` | Wat die wijziging raakt: facturen, regels en zaken |
+
+De impact-vraag hangt bij het **kantoor** en niet bij de inspecteur: wie de knop
+indrukt hoort te zien wat eronder beweegt.
+
+`test/fiscaal-herkomst.test.js` dekt zeven beweringen — vijf op de motor, elk met
+een mutatie zien zakken, en twee door de API heen op de poorten, want een
+verklaring legt de complete omzet mét factuurnummers open en is daarmee zo
+mogelijk gevoeliger dan de aangifte zelf.
+
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
 Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om

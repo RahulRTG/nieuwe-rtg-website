@@ -23,6 +23,10 @@ kern.regelwacht.herstelOverlay();
    factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
    model van de loonaangifte, met het factuurregister als enige bron. */
 Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db, save, crypto }));
+/* De bewijsketen (kern/fiscaal/herkomst.js): waar komt dit bedrag vandaan, komt
+   het herbouwd op de cent uit, en wat raakt een regelwijziging. Hij hoort NA de
+   Regelwacht, want hij leest de jaargangen die daar ontstaan. */
+Object.assign(kern, require('../kern/fiscaal/herkomst').maakHerkomst({ db, jaargangen: kern.regelwacht.jaargangen }));
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 

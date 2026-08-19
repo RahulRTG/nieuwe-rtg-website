@@ -118,3 +118,26 @@ test('8. heeftVinger herkent alleen een verzoek met ?v=', () => {
   assert.equal(M.heeftVinger({}), false);
   assert.equal(M.heeftVinger(null), false);
 });
+
+test('9. binnen een <script> of <style> blijft alles staan', () => {
+  /* Daar is src="/x.js" geen attribuut maar TEKST. /apps/websitestudio.html
+     bouwt in een inline script de HTML van een website die een lid EXPORTEERT,
+     met daarin letterlijk '<link href="/fonts/fonts.css" rel="stylesheet">'.
+     Zonder deze grens plakte deze laag onze eigen bestandsstempel in elke
+     geexporteerde site, en verklapte hij de wijzigingstijden van onze
+     bestanden aan iedereen die zo'n export opent. */
+  const binnenScript = '<script>var h = \'<link href="/shared/stijl.css" rel="stylesheet">\';</script>';
+  assert.equal(M.herschrijfHtml(binnenScript, map), binnenScript, 'een script blijft heel');
+
+  const binnenStyle = '<style>/* zie href="/shared/stijl.css" */</style>';
+  assert.equal(M.herschrijfHtml(binnenStyle, map), binnenStyle, 'een stijlblok ook');
+
+  // maar ERBUITEN wordt er gewoon gestempeld, ook als er een script naast staat
+  const gemengd = '<link href="/shared/stijl.css" rel="stylesheet">' + binnenScript +
+                  '<script src="/shared/klok.js"></script>';
+  const uit = M.herschrijfHtml(gemengd, map);
+  assert.match(uit, /<link href="\/shared\/stijl\.css\?v=[^"]+"/, 'de echte link krijgt wel een stempel');
+  assert.match(uit, /src="\/shared\/klok\.js\?v=[^"]+"/, 'en het externe script ook');
+  assert.ok(uit.includes('\'<link href="/shared/stijl.css" rel="stylesheet">\''),
+    'terwijl dezelfde tekst BINNEN het script onaangeraakt blijft');
+});

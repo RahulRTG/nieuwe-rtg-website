@@ -85,14 +85,46 @@ function vingerVan(publicDir, rel) {
    blijft ongemoeid (zie de kop). */
 const VERWIJZING = /\b(src|href)=("|')(\/[^"'?#>]+\.(?:js|css))\2/gi;
 
+/* BINNEN EEN <script> OF <style> BLIJVEN WE OVERAL VANAF.
+
+   Daar is `src="/x.js"` geen attribuut maar TEKST, en tekst met dezelfde vorm
+   komt hier echt voor: /apps/websitestudio.html bouwt in een inline script de
+   HTML van een website die een lid EXPORTEERT, en daarin staat letterlijk
+   `'<link href="/fonts/fonts.css" rel="stylesheet">'`. Zonder deze grens
+   plakte deze laag onze eigen bestandsstempel in elke geexporteerde site --
+   onzin op een vreemde server, en het verklapt de wijzigingstijden van onze
+   bestanden aan iedereen die zo'n export opent.
+
+   Daarom: knip de pagina op de script- en stijlblokken, en herschrijf alleen
+   wat ertussen ligt. Dat is ook precies wat we bedoelen -- een verwijzing is
+   een attribuut in de opmaak, nooit iets in de inhoud van een script.
+
+   Let op: alleen de INHOUD blijft met rust. De opentag zelf is gewoon opmaak,
+   en juist daar staat de src= van een extern script die wel gestempeld hoort te
+   worden. Een eerdere versie sloeg het hele element over en liet daarmee elk
+   <script src> ongestempeld -- precies de helft van het werk. */
+const BLOK = /(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\2\s*>)/gi;
+
 function herschrijfHtml(html, publicDir) {
   if (!AAN || !html) return html;
-  return html.replace(VERWIJZING, (heel, attr, q, rel) => {
+  const stempelIn = (stuk) => stuk.replace(VERWIJZING, (heel, attr, q, rel) => {
     if (!GOED.test(rel) || rel.indexOf('..') !== -1) return heel;
     const v = vingerVan(publicDir, rel);
     if (!v) return heel;                       // bestaat niet: laat staan
     return attr + '=' + q + rel + '?v=' + v + q;
   });
+  const uit = [];
+  let laatst = 0, m;
+  BLOK.lastIndex = 0;
+  while ((m = BLOK.exec(html))) {
+    uit.push(stempelIn(html.slice(laatst, m.index)));
+    uit.push(stempelIn(m[1]));                 // de opentag: wel stempelen
+    uit.push(m[3]);                            // de inhoud: onaangeraakt
+    uit.push(m[4]);
+    laatst = m.index + m[0].length;
+  }
+  uit.push(stempelIn(html.slice(laatst)));
+  return uit.join('');
 }
 
 /* Draagt dit verzoek een vingerafdruk? Zo ja, dan mag het antwoord een jaar

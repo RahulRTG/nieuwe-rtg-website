@@ -67,6 +67,9 @@
   /* rustige sectiekop voor de hulp-tools: aanwezig, maar niet pontificaal */
   .sec.stil{color:var(--zacht);font-weight:600;opacity:.85;margin-top:2.4rem;}
   .foot{text-align:center;margin-top:1.4rem;font-size:.8rem;}
+  /* Een link die in zijn eentje een alinea vult is een knop, geen woord in een
+     zin -- dus geen WCAG-uitzondering, en dus 24 hoog. Hij mat er 15. */
+  .foot a{display:inline-flex;align-items:center;justify-content:center;min-height:24px;}
   .foot a{color:var(--zacht);text-decoration:none;}
   /* welkom + profielkiezer */
   .knoprij{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.6rem;}
@@ -129,7 +132,13 @@
   .ronb-contract h2{font-family:var(--serif);font-weight:500;font-size:1.05rem;}
   .ronb-tekst{max-height:14rem;overflow-y:auto;margin-top:.4rem;white-space:pre-wrap;font-size:.82rem;line-height:1.6;color:var(--zacht);}
   .ronb-akk{display:flex;gap:.5rem;align-items:flex-start;margin:.9rem 0 .4rem;font-size:.86rem;}
-  .ronb-akk input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;}
+  /* 1,1rem is 17,6 pixels en WCAG 2.5.8 vraagt 24. Het LABEL klikte al mee, maar
+     wie het vakje zelf aanwijst -- en dat doet een mens met een trillende hand,
+     want dat is het ding dat aan of uit gaat -- mikt op 18x18. Zesde kale
+     aanvinkvakje van dit soort in dit huis; de vorige vijf staan in
+     A11Y-INGELOGD.json. De inkt blijft 1,1rem, alleen het raakvlak groeit. */
+  .ronb-akk input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;
+    min-width:24px;min-height:24px;}
   #rtfOnbFout{color:var(--rood,#E06A80);font-size:.8rem;min-height:1rem;margin:.3rem 0;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

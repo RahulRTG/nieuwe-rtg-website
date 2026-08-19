@@ -157,7 +157,21 @@
 
 <main>
   <div id="fout" hidden></div>
-  <div id="feed"></div>
+  <!-- EEN SCHERM DAT WACHT, HOORT TE ZEGGEN DAT HET WACHT.
+
+       Deze regel stond er niet, en het gevolg was een zwart scherm. De hele
+       inhoud van dit werkvlak hangt aan een verzoek; MISLUKT dat, dan zegt de
+       pagina het netjes (de catch onderaan zet een melding in #fout), maar
+       terwijl het DUURT stond hier niets. In het werkvlak was dan alleen "RTG"
+       te lezen -- drie tekens -- en "Bezig met laden..." stond in de kopbalk,
+       dus buiten het vlak waar een mens kijkt.
+
+       Gemeten op 19 augustus 2026 met een vertraagd verzoek: zonder deze regel
+       drie tekens en de leegte-meting sloeg aan, met deze regel niet. De volle
+       a11y-ronde vond hem twee keer omdat die eerst 510 bureaupagina's laadt en
+       de server dan traag genoeg is; in zijn eentje haalde dit scherm het altijd
+       en leek er niets aan de hand. -->
+  <div id="feed"><p class="leeg">Bezig met laden&#8230;</p></div>
   <div id="profiel" hidden></div>
   <div id="ontdek" hidden>
     <form id="zoekform" autocomplete="off">
@@ -480,6 +494,11 @@
     })
     .catch(function (e) {
       $('#wie').textContent = 'Niet ingelogd';
+      /* De wachtregel weghalen, anders staat er "Bezig met laden..." ONDER een
+         foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat
+         het nog bezig is. De melding is het antwoord; verder hoort dit vlak
+         leeg te zijn. */
+      $('#feed').textContent = '';
       toon(e.message + ' Log opnieuw in via de app.');
     });
 })();

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T08:50:05.704Z",
-  "commit": "c0074ad",
+  "op": "2026-08-19T09:22:45.194Z",
+  "commit": "7842989",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1761,
-  "onbeslist": 2344,
-  "blind": 82,
+  "bewezen": 1770,
+  "onbeslist": 2334,
+  "blind": 83,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -9630,12 +9630,12 @@
    "reden": "er is over DEZE route gelogen en portemonnee.test.js zakte daarop"
   },
   "POST /api/pay/tiks": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "pay.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en pay.test.js zakte daarop"
   },
   "POST /api/pay/kascode": {
    "staat": "bewezen",
@@ -11000,22 +11000,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/veiligheid/codewoord/check": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/veiligheid/codewoord/proef": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid/rust": {
    "staat": "onbeslist",
@@ -11026,22 +11024,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/veiligheid/rust/aan": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid/rust/uit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid/wacht/start": {
    "staat": "bewezen",
@@ -11073,21 +11069,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/veiligheid/wacht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid/kring": {
    "staat": "onbeslist",
@@ -11097,13 +11092,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/veiligheid/kring/toevoegen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "veiligheid-kring-rust.test.js",
     "veiligheid.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en veiligheid.test.js zakte daarop"
   },
   "POST /api/veiligheid/kring/aanpassen": {
    "staat": "onbeslist",
@@ -11557,21 +11551,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 59); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/wereld/profiel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "wereldprofiel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en wereldprofiel.test.js zakte daarop"
   },
   "POST /api/wereld/profiel/zicht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "wereldprofiel.test.js",
-    "wereldvermogens.test.js"
+    "wereldprofiel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 17); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en wereldprofiel.test.js zakte daarop"
   },
   "POST /api/wereld/profiel/van": {
    "staat": "onbeslist",
@@ -41565,6 +41558,56 @@
    "toets": "mailpost-kantoor.test.js",
    "merkt": true,
    "op": "2026-08-19T08:50:05.527Z"
+  },
+  "POST /api/pay/tiks": {
+   "toets": "pay.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:19:17.158Z"
+  },
+  "POST /api/veiligheid/codewoord/check": {
+   "toets": "veiligheid.test.js",
+   "merkt": false,
+   "op": "2026-08-19T09:20:26.217Z"
+  },
+  "POST /api/veiligheid/codewoord/proef": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:21:57.401Z"
+  },
+  "POST /api/veiligheid/rust/aan": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:21:57.767Z"
+  },
+  "POST /api/veiligheid": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:01.013Z"
+  },
+  "POST /api/veiligheid/kring/toevoegen": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:01.358Z"
+  },
+  "POST /api/veiligheid/wacht": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:02.848Z"
+  },
+  "POST /api/veiligheid/rust/uit": {
+   "toets": "veiligheid.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:21.462Z"
+  },
+  "POST /api/wereld/profiel": {
+   "toets": "wereldprofiel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:33.171Z"
+  },
+  "POST /api/wereld/profiel/zicht": {
+   "toets": "wereldprofiel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T09:22:45.095Z"
   }
  },
  "basislijn": {
@@ -41901,6 +41944,8 @@
   "postdatum.test.js": "groen",
   "wereldprofiel.test.js": "groen",
   "lidboard.test.js": "groen",
-  "onboarding.test.js": "groen"
+  "onboarding.test.js": "groen",
+  "pay.test.js": "groen",
+  "veiligheid.test.js": "groen"
  }
 }

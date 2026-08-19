@@ -32,6 +32,7 @@
    op afgaat, en die had zonder toets stil van tekst kunnen veranderen.
    ========================================================================== */
 const { test } = require('node:test');
+const { opstartGeduld } = require('./helper');
 const assert = require('node:assert');
 const cp = require('child_process');
 const http = require('http');
@@ -79,22 +80,36 @@ function boot(port, dataDir, tls) {
 }
 
 /* Wachten op "hij praat", en met de JUISTE module -- anders wacht een https-start
-   het hele tijdvenster af op een http-verzoek dat nooit lukt. */
-async function wachtTotOp(mod, port, uitInfo, tot = 30000) {
-  const eind = Date.now() + tot;
+   het hele tijdvenster af op een http-verzoek dat nooit lukt.
+
+   Het geduld komt uit ./helper.js (`opstartGeduld`) en niet uit een getal hier:
+   dit was de derde kopie van dezelfde regel (LAT.md regel 4), en een vast
+   venster is op een bezette machine te krap zonder dat er iets stuk is. Een
+   GESTOPT kindproces breekt meteen af -- dan valt er niets meer af te wachten. */
+async function wachtTotOp(mod, port, uitInfo, kind, tot) {
+  const geduld = opstartGeduld(30000);
+  const budget = tot || geduld.ms;
+  const gestart = Date.now();
+  const eind = gestart + budget;
   while (Date.now() < eind) {
     if (uitInfo.fataal) throw new Error('server crashte bij opstart:\n' + uitInfo.log.slice(-2000));
+    if (kind && kind.exitCode != null)
+      throw new Error('server stopte tijdens opstarten (exit ' + kind.exitCode + ') na ' +
+        (Date.now() - gestart) + 'ms\n' + uitInfo.log.slice(-2000));
     try { const r = await vraag(mod, port, '/api/health'); if (r.status) return r; } catch (e) { /* nog niet op */ }
     await new Promise(r => setTimeout(r, 300));
   }
-  throw new Error('server werd niet bereikbaar binnen ' + tot + 'ms\n' + uitInfo.log.slice(-2000));
+  throw new Error('server werd niet bereikbaar binnen ' + budget + 'ms (' +
+    (kind && kind.exitCode == null ? 'het kindproces LEEFDE nog' : 'het kindproces was gestopt') +
+    ', belasting ' + geduld.druk.toFixed(2) + ' per kern, geduld x' + geduld.extra + ')\n' +
+    uitInfo.log.slice(-2000));
 }
 
 async function opgestart(dataDir, tls, mod) {
   for (let poging = 0; ; poging++) {
     const port = await vrijePoort();
     const { kind, uitInfo } = boot(port, dataDir, tls);
-    try { await wachtTotOp(mod, port, uitInfo); return { kind, uitInfo, port }; }
+    try { await wachtTotOp(mod, port, uitInfo, kind); return { kind, uitInfo, port }; }
     catch (e) {
       kind.kill('SIGKILL');
       if (poging < 3 && /EADDRINUSE/.test(String(e.message))) continue;
@@ -178,7 +193,7 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
     kind.stdout.on('data', vang);
     kind.stderr.on('data', vang);
 
-    await wachtTotOp(https, port, uitInfo, 60000);
+    await wachtTotOp(https, port, uitInfo, kind, 60000);
     const r = await vraag(https, port, '/api/health');
     assert.equal(r.status, 200, 'de poortwachter gaf ' + r.status + ' over https');
     assert.equal(uitInfo.fataal, false,

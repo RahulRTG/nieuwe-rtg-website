@@ -363,3 +363,27 @@ test('de werkbank draagt een lijst in drie bakken en rondt niets vanzelf af', ()
   assert.ok(partner.includes('/apps/schoolpartner/aandacht.js'), 'School Partner laadt aandacht.js niet');
   assert.ok(partner.includes('id="aandachtVorm"') && partner.includes('id="lesVorm"'));
 });
+
+test('de vervanger en de nieuwe docent hebben een scherm, met de firewall erop', () => {
+  const bron = lees('apps', 'schoolpartner', 'instap.js');
+  const code = codeVan(bron);
+
+  assert.match(code, /\/school\/vervanging\/briefing/);
+  assert.match(code, /\/school\/personeel\/start/);
+
+  /* Het scherm toont met zoveel woorden wat er NIET in staat. Zonder die zin
+     denkt een vervanger dat hij alles ziet, en dus dat er niets speelt -- en
+     dat is precies het moment waarop een kind tussen wal en schip valt. */
+  assert.match(code, /bewust niet in staat/i, 'de briefing zegt niet wat er ontbreekt');
+  assert.match(code, /nietHierin/, 'het scherm toont de uitsluitingslijst van de server niet');
+
+  // en de vervanger krijgt het materiaal met de tweede uitleg erbij
+  assert.match(code, /m\.uitleg/, 'juist een vervanger heeft aan een tweede uitleg wat');
+  assert.match(code, /eerder/, 'wat eerdere lessen opschreven hoort in de briefing');
+
+  // geen voortgangsmeter op een mens
+  assert.doesNotMatch(code, /voortgang|voltooid|van de 5|percentage|balk/i, 'er sluipt een voortgangsmeter op een docent in');
+
+  assert.ok(partner.includes('/apps/schoolpartner/instap.js'), 'School Partner laadt instap.js niet');
+  assert.ok(partner.includes('id="startVorm"') && partner.includes('id="vervangVorm"'));
+});

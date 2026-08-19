@@ -16,6 +16,7 @@ const { duiding, andersUitgelegd } = require('../kern/leerstof-denkfout');
 const { tel } = require('./denkfout');
 
 const MAX_LERAREN = 3;
+const { totWanneer } = require('./waarneming');
 const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 
 module.exports = (sctx) => {
@@ -67,9 +68,14 @@ module.exports = (sctx) => {
     if (!k || k.schoolCode !== sch.code) return res.status(404).json({ error: 'Deze klas hoort niet bij jouw school.' });
     if (p.status !== 'actief') return res.status(403).json({ error: 'Je aanmelding is nog niet goedgekeurd.' });
     if (lerarenVan(k).some(x => x.id === p.id)) return res.status(400).json({ error: 'Je staat al vast op deze klas; overnemen hoeft niet.' });
-    k.waarnemer = { id: p.id, naam: p.naam, at: nu() };
+    /* Een waarneming VERLOOPT. Zonder einddatum is een overname een tweede
+       vaste leraar via de achterdeur: hij begint als "even invallen bij ziekte"
+       en staat er over een half jaar nog. Veertien dagen als de aanvrager
+       niets zegt, negentig als maximum. */
+    k.waarnemer = { id: p.id, naam: p.naam, at: nu(), tot: totWanneer(req.body.dagen, Date.now()) };
     save();
-    res.json({ ok: true, waarnemer: k.waarnemer });
+    res.json({ ok: true, waarnemer: k.waarnemer,
+      uitleg: 'De waarneming loopt tot ' + k.waarnemer.tot.slice(0, 10) + ' en stopt dan vanzelf. Eerder stoppen kan altijd.' });
   });
 
   router.post('/school/klas/overname-stop', (req, res) => {

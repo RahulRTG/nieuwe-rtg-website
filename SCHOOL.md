@@ -56,6 +56,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Misconception Graph | 18 denkpatronen uit het feit van de opgave; klasbeeld zonder wie | `kern/leerstof-denkfout.js`, `school/denkfout.js` |
 | Daily Learning Guarantee | dagplan uit huiswerk, herhalingen en leerlijn; vijf stukken, niets bewaard | `kern/leerstof-dag.js`, `school/dag.js` |
 | Attention OS en Teacher Flow | een lijst in drie bakken, les afronden in een handeling, lesgeheugen | `school/aandacht.js`, `school/les.js` |
+| Vervanger en nieuwe docent | briefing zonder zorgdossier, waarneming met einddatum, vijf stappen | `school/instap.js`, `school/waarneming.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -356,6 +357,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Niemands tempo wordt gemeten | de aandachtslijst schrijft niets weg | **ja** (`test/teacherflow.test.js`) |
 | Een les rondt zichzelf niet af | bevestiging en naam verplicht, anders 400 | **ja**, met mutatie beproefd |
 | Een lesverslag draagt alleen de telling | vaste lijst velden, op de opslag getoetst | **ja**, met mutatie beproefd |
+| Een vervanger ziet geen zorgdossier | de vorm van de briefing ligt vast | **ja**, met mutatie beproefd |
+| Een waarneming verloopt | de klas-poort weigert een verlopen waarnemer | **ja** (`test/instap.test.js`) |
+| Een nieuwe docent krijgt er nooit meer dan vijf | alle standen nagerekend, geen afkapgrens | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -405,9 +409,9 @@ Daaraan vast twee dingen:
 ## 9. Teacher Flow -- bijna geen administratie tijdens een les
 
 > **Gebouwd op 19 augustus 2026.** Het Attention OS (een lijst in drie bakken),
-> de les afronden in een handeling, en het lesgeheugen dat terugkomt bij
-> dezelfde leerstof. Substitute Teacher Mode en New Teacher Autopilot staan er
-> nog niet.
+> de les afronden in een handeling, het lesgeheugen dat terugkomt bij dezelfde
+> leerstof, en de twee mensen die hier voor het eerst staan: de vervanger en de
+> nieuwe docent.
 
 Doelstelling, hard: **een docent voert tijdens een normale les vrijwel niets in.**
 De les opent zichzelf, de klas staat aanwezig, hij tikt alleen de afwijkingen.
@@ -465,6 +469,32 @@ alleen de *telling* mee; er komt geen leerlingsleutel en geen naam in. Wie er
 was, staat in de presentielijst en hoort niet in een verslag dat jaren blijft
 liggen. De vorm van dat verslag staat als lijst velden in de code en wordt op de
 **opslag** getoetst, niet op wat een scherm ervan terugkrijgt.
+
+**De vervanger krijgt de klas en verder niets.** De briefing draagt de klas, de
+namen (zonder naam kun je niemand aanspreken en geen presentie aftekenen), wat
+er vandaag speelt, het materiaal met een tweede uitleg erbij, en wat eerdere
+lessen erover schreven -- juist hij heeft daaraan wat, want hij kent de klas
+niet. Geen zorgdossier, geen incidenten, geen gezinssituatie: grens 4, de Child
+Context Firewall. En de briefing **zegt zelf wat er niet in staat**, want een
+vervanger die denkt dat hij alles ziet, gaat ervan uit dat er niets speelt --
+en dat is precies het moment waarop een kind tussen wal en schip valt. De vorm
+van die briefing ligt vast als een lijst velden en wordt daarop getoetst; er een
+zorgveld bij zetten laat een toets zakken.
+
+**Een waarneming verloopt vanzelf.** Een overname zonder einddatum is een tweede
+vaste leraar via de achterdeur: ze begint als "even invallen bij ziekte" en
+staat er een half jaar later nog. Veertien dagen als de aanvrager niets zegt,
+negentig als maximum, en de klas-poort laat een verlopen waarnemer er niet meer
+in. Die regel staat op één plek (`school/waarneming.js`), want hij wordt op twee
+plaatsen gebruikt en een begrip met twee kopieën loopt uit elkaar.
+
+**Vijf dingen is geen afkapgrens maar een eigenschap.** De nieuwe docent krijgt
+hoogstens vijf stappen omdat er maar vijf dingen tegelijk waar kunnen zijn --
+niet omdat er bij vijf wordt afgekapt. Dat verschil is het hele punt: een
+afkapgrens verbergt dat er een zesde bijkwam, en de toets loopt daarom álle
+standen langs en rekent het maximum na. Wat af is valt weg, en er wordt niets
+opgeslagen: geen voortgangsbalk en geen "3 van de 5 voltooid", want dat zou een
+prestatiemeter op een mens zijn (grens 8).
 
 **Teaching Memory staat vóór het afronden, niet erna.** Wie deze stof gaat
 geven, ziet wat eerdere lessen erover hebben opgeschreven -- wat werkte, waar
@@ -626,8 +656,8 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    huiswerk vooraan, dan wat terugkomt, dan waar je gebleven bent; begrensd op
    vijf en met niets dat over dagen heen telt (zie §5b).
 6. **Teacher Flow en Attention OS.** Gedaan: de lijst in drie bakken, de les
-   afronden in een handeling, en het lesgeheugen (zie §9). Substitute Teacher
-   Mode en New Teacher Autopilot staan nog open.
+   afronden in een handeling, het lesgeheugen, en de instap van de vervanger en
+   de nieuwe docent (zie §9).
 7. **Taallaag en Family Bridge.** Meaning preservation vóór massale uitrol.
 8. **No-Lost-Child opvolgbewaking.**
 9. **Assessment Compiler, Fairness Engine, Fingerprint.**

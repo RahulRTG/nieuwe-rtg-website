@@ -25,7 +25,11 @@
   .nav:hover{border-color:var(--gold);}
   .nav:disabled{opacity:.35;cursor:default;}
   .nav.home{color:var(--gold);}
-  form.balk{flex:1 1 auto;display:flex;align-items:center;gap:.4rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.3rem .5rem .3rem .8rem;}
+  form/* min-width:0, anders zakt dit flexitem nooit onder de breedte van zijn
+   inhoud en duwt het de rij naast zich buiten beeld (op 390px liep dit
+   scherm tot 411px). */
+.balk{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:.4rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.3rem .5rem .3rem .8rem;}
+.balk>*{min-width:0;}
   form.balk:focus-within{border-color:var(--gold);}
   form.balk .slot{color:var(--soft);font-size:.9rem;flex:0 0 auto;}
   form.balk input{flex:1 1 auto;background:transparent;border:0;color:var(--txt);font:inherit;font-size:.9rem;outline:none;}
@@ -38,7 +42,12 @@
   .start .lead{text-align:center;color:var(--muted);max-width:52ch;margin:0 auto 1.6rem;line-height:1.6;}
   .zoekgroot{display:flex;max-width:560px;margin:0 auto 2.2rem;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.4rem .5rem .4rem 1rem;align-items:center;gap:.5rem;}
   .zoekgroot:focus-within{border-color:var(--gold);}
-  .zoekgroot input{flex:1;background:transparent;border:0;color:var(--txt);font:inherit;font-size:1rem;outline:none;}
+  /* min-width:0, en dat is hier het hele verschil. Een flexitem met flex:1
+   houdt min-width:auto, dus dit veld zakt nooit onder de breedte van zijn
+   eigen PLACEHOLDER -- "zoek een site of bedrijf, of typ een adres" -- en
+   duwt de zoekknop buiten beeld. Op 390px liep dit scherm tot 411px, en
+   alleen ingelogd, want dit veld verschijnt pas op het startscherm. */
+.zoekgroot input{flex:1;min-width:0;background:transparent;border:0;color:var(--txt);font:inherit;font-size:1rem;outline:none;}
   .zoekgroot .suf{color:var(--gold);font-weight:600;}
   .zoekgroot button{background:var(--burgundy);border:0;color:#fff;border-radius:999px;padding:.5rem 1.1rem;font:inherit;font-weight:600;cursor:pointer;}
   .rooster{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;}

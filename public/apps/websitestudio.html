@@ -34,7 +34,7 @@
   .swatches{display:flex;gap:.35rem;align-items:center;}
   .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
-  .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;flex-wrap:wrap;min-width:0;}
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
   .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:6px;background:none;padding:0;cursor:pointer;}
   .kleurbalk .knop{padding:.3rem .55rem;font-size:.7rem;}
@@ -52,7 +52,11 @@
   .apparaten button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   /* het doek (de website die je bouwt) -- een container, zodat de blokken
      meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
-  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
+  /* min-width:0 op de flexrij en zijn kind: zonder dat zakt een flexitem
+   nooit onder de breedte van zijn inhoud, en dan steekt het doek er aan de
+   rechterkant uit. Op 390px liep dit scherm 9px buiten beeld. */
+  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;min-width:0;overflow-x:hidden;}
+  main>*{min-width:0;max-width:100%;}
   .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
   .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* thema-tokens op het doek zelf */

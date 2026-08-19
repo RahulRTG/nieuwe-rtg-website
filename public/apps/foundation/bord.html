@@ -16,7 +16,12 @@
 <style>
   body{height:100vh;overflow:hidden;}
   .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
-  .top{grid-column:1/3;display:flex;align-items:center;gap:1rem;}
+  /* min-width:0 en wikkelen: deze rij groeide op 390px door tot 510px in een
+   vak van 368, en body staat op overflow:hidden -- de rechterkant was dus
+   gewoon weg en er was niet naartoe te scrollen. Een flexitem zakt zonder
+   min-width:0 nooit onder zijn inhoud. */
+.top{grid-column:1/3;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;min-width:0;}
+.top>*{min-width:0;}
   .brand{font-family:var(--serif);font-weight:500;font-size:1.1rem;}
   .brand b{color:var(--goud);}
   .code{margin-left:auto;display:flex;align-items:center;gap:.7rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem .8rem;}

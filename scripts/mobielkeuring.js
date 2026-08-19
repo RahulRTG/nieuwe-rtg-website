@@ -74,16 +74,29 @@ function mobielInPagina(opt) {
   /* De DWINGER: het breedste element dat zelf geen te breed kind heeft. Dat is
      wie de pagina openduwt, en die naam maakt een zakkende meting meteen
      bruikbaar in plaats van alleen waar. */
-  var dwinger = null;
+  /* EERSTE VERSIE KEEK ALLEEN NAAR BREEDTE, en liet zes van de elf te brede
+     schermen zonder aanwijzing achter: "411px" en verder niets. Dat komt doordat
+     een element ook buiten beeld kan steken zonder zelf te breed te zijn -- iets
+     op `left: 300px` met een breedte van 200 past prima en duwt de pagina toch
+     open.
+
+     Dus: wie steekt het verst RECHTS uit, en heeft zelf geen kind dat nog
+     verder komt. Dat is de dwinger, en met die naam is een zakkende meting
+     meteen bruikbaar in plaats van alleen waar. */
+  var dwinger = null, verst = W + 2;
   var alles = document.querySelectorAll('body *');
   for (var i = 0; i < alles.length; i++) {
-    var e = alles[i], r = e.getBoundingClientRect();
-    if (r.width <= W + 2) continue;
-    var teBreedKind = false, k = e.children;
-    for (var j = 0; j < k.length; j++) if (k[j].getBoundingClientRect().width > W + 2) { teBreedKind = true; break; }
-    if (teBreedKind) continue;
-    dwinger = merk(e) + ' (' + Math.round(r.width) + 'px)';
-    break;
+    var e = alles[i];
+    if (!zichtbaar(e)) continue;
+    var r = e.getBoundingClientRect();
+    if (r.right <= W + 2) continue;
+    var kindVerder = false, k = e.children;
+    for (var j = 0; j < k.length; j++) if (k[j].getBoundingClientRect().right > r.right - 1) { kindVerder = true; break; }
+    if (kindVerder) continue;
+    if (r.right > verst) {
+      verst = r.right;
+      dwinger = merk(e) + ' (' + Math.round(r.width) + 'px breed, rechterrand op ' + Math.round(r.right) + ')';
+    }
   }
 
   /* ---- 2. LEEG --------------------------------------------------------- */
@@ -162,7 +175,7 @@ function mobielInPagina(opt) {
   }
 
   var uit = {
-    venster: W, hoogte: H, inhoud: inhoud, dwinger: dwinger,
+    venster: W, hoogte: H, inhoud: inhoud, dwinger: inhoud > W + 2 ? dwinger : null,
     hoogsteBlok: Math.round(hoogste), balkenBuiten: balkenBuiten,
     hoofd: null, hoe: hoe || 'geen', gebreken: []
   };

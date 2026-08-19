@@ -219,3 +219,81 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* ---------------------------------------------------------------------------
+   DEZELFDE FOUT IN SPIEGELBEELD: apps/geo.js LAS de schakelaar helemaal niet.
+
+   Zes plekken behandelen `rtg_os_gps` als de waarheid; geo.js (window.Geo)
+   vroeg het toestel rechtstreeks, ongevraagd bij het tekenen van de partner-
+   en vacaturelijst. De tegel kon dus op "uit" staan terwijl er gewoon om je
+   locatie werd gevraagd, en de opgehaalde positie bleef daarna in localStorage
+   staan. Deze toets meet beide kanten: uit is uit (en wist wat er lag), aan is
+   aan.
+   --------------------------------------------------------------------------- */
+
+test('Locatie: geo.js luistert naar dezelfde schakelaar',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    await page.addInitScript(STUB);   // telt elke aanraking, beantwoordt niets
+
+    // app.html laadt /apps/geo.js; de inlogpoort ervoor doet er niet toe
+    const opnieuw = async (stand) => {
+      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+      await page.evaluate((s) => {
+        localStorage.setItem('rtg_os_gps', s);
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+        // een positie die er al lag van vóór het uitzetten
+        localStorage.setItem('rtg_geo', JSON.stringify({ lat: 52.37, lng: 4.9, at: Date.now() }));
+      }, stand);
+      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => !!window.Geo, null, { timeout: 15000 });
+    };
+
+    await opnieuw('0');
+    const uit = await page.evaluate(async () => ({
+      mag: Geo.mag(),
+      laatste: Geo.laatste(),
+      heeft: Geo.heeft(),
+      positie: await Geo.positie(),
+      bewaard: localStorage.getItem('rtg_geo'),
+      aanrakingen: window.__gpsAanrakingen
+    }));
+    assert.equal(uit.mag, false, 'schakelaar op uit, maar Geo.mag() zegt ja');
+    assert.equal(uit.laatste, null, 'schakelaar op uit, maar Geo.laatste() geeft nog een plek');
+    assert.equal(uit.heeft, false, 'schakelaar op uit, maar Geo.heeft() zegt ja');
+    assert.equal(uit.positie, null, 'schakelaar op uit, maar Geo.positie() geeft een plek');
+    assert.equal(uit.bewaard, null, 'schakelaar op uit, maar de bewaarde positie bleef staan');
+    assert.equal(uit.aanrakingen, 0, 'schakelaar op uit, maar geo.js raakte geolocation ' + uit.aanrakingen + ' keer aan');
+
+    /* De bewuste ingang MOET het wel vragen, anders is de knop "dichtstbij
+       eerst" in foundation/werk.html een dode knop -- precies het defect dat
+       deze hele ronde is. Geo.vraag() loopt via shared/plek.js, dus de kaart
+       hoort in beeld te komen; "nu niet" geeft null en raakt niets aan. */
+    const vraag = page.evaluate(() => Geo.vraag('waarom dan'));
+    await page.waitForSelector('.rtgplek', { timeout: 5000 });
+    await page.click('.rtgplek .nee');
+    assert.equal(await vraag, null, 'na "nu niet" hoort Geo.vraag() null te geven');
+    assert.equal(await page.evaluate(() => window.__gpsAanrakingen), 0,
+      'na "nu niet" werd geolocation toch aangeraakt');
+
+    /* En de andere kant, anders bewijst de eerste helft niets: met de
+       schakelaar aan hoort geo.js het toestel wél te vragen. De stub antwoordt
+       nooit, dus niet op de belofte wachten -- alleen op de aanraking. */
+    await opnieuw('1');
+    await page.evaluate(() => { localStorage.removeItem('rtg_geo'); Geo.positie(0); });
+    await page.waitForTimeout(300);
+    const aan = await page.evaluate(() => window.__gpsAanrakingen);
+    assert.ok(aan >= 1, 'schakelaar op aan, maar geo.js raakte geolocation nooit aan');
+
+    assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+  }
+});

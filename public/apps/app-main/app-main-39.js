@@ -63,7 +63,8 @@
       vacs = d.vacatures || []; vacLanden = d.landen || [];
       renderVacatures();
       // locatie ophalen zodat vacatures op afstand komen (eenmalig)
-      if (window.Geo && !Geo.laatste() && !loadVacatures._gps){ loadVacatures._gps = true; Geo.positie().then(p => { if (p) renderVacatures(); }); }
+      // Geo.mag(): zie app-main-21.js -- niet grendelen op een vraag die nooit gesteld is
+      if (window.Geo && Geo.mag() && !Geo.laatste() && !loadVacatures._gps){ loadVacatures._gps = true; Geo.positie().then(p => { if (p) renderVacatures(); }); }
     } catch(e){ $('#homeVacatures').hidden = true; }
   }
   function renderVacatures(){

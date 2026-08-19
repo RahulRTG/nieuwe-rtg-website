@@ -119,4 +119,5 @@ module.exports = (ctx) => {
   require('./school/taalpoort')(sctx); // de taallaag: vakbeleid, en de terugvertaling voor de deur uitgaat
   require('./school/opvolging')(sctx); // No-Lost-Child: de keten na de hulplijn, en de escalatie
   require('./school/toetskeuring')(sctx); // de toets als meetinstrument: keuring vooraf, spiegel achteraf
+  require('./school/belasting')(sctx); // de donderdag van de leerling en de week van de docent
 };

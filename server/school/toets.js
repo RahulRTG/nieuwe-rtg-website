@@ -68,11 +68,15 @@ module.exports = (sctx) => {
     const t = { id: rid(5), soort, naam: schoon(req.body.naam, 80) || (SOORTEN[soort] + ' ' + DOELEN[doelen[0]].naam),
       vak: schoon(req.body.vak, 40) || DOELEN[doelen[0]].vak, doelen, perDoel,
       weging: Math.min(10, Math.max(1, Number(req.body.weging) || (soort === 'examen' ? 3 : soort === 'proefwerk' ? 2 : 1))),
+      /* De dag waarop hij wordt afgenomen. Optioneel, want een SO kan ook
+         "gewoon een keer" zijn -- maar zonder dag telt hij niet mee in de week
+         van de leerling, en juist daar hoort een proefwerk te wegen. */
+      datum: schoon(req.body.datum, 10) || null,
       status: 'open', werk: {}, at: nu() };
     toetsenVan(k).unshift(t); k.toetsen = k.toetsen.slice(0, 200);
     save();
     res.json({ ok: true, toets: { id: t.id, soort: t.soort, naam: t.naam, vak: t.vak, weging: t.weging,
-      doelen: doelen.map(d => ({ id: d, naam: DOELEN[d].naam })), vragen: doelen.length * perDoel } });
+      datum: t.datum, doelen: doelen.map(d => ({ id: d, naam: DOELEN[d].naam })), vragen: doelen.length * perDoel } });
   });
 
   router.post('/school/toets/lijst', (req, res) => {

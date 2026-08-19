@@ -480,3 +480,21 @@ test('de toets krijgt zelf een keuring en een spiegel, zonder leerlingen erin', 
   assert.ok(partner.includes('/apps/schoolpartner/toetskeuring.js'), 'School Partner laadt toetskeuring.js niet');
   assert.ok(partner.includes('id="keurVorm"') && partner.includes('id="spiegelVorm"'));
 });
+
+test('de week van de klas en van de docent is planning, geen meetlat', () => {
+  const code = codeVan(lees('apps', 'schoolpartner', 'belasting.js'));
+
+  assert.match(code, /\/school\/belasting\/klas/);
+  assert.match(code, /\/school\/belasting\/mij/);
+  assert.match(code, /d\.elders/, 'dat er iets uit een andere klas valt, hoort zichtbaar te zijn');
+  assert.match(code, /d\.vol/, 'een volle dag hoort een merkteken te krijgen');
+  assert.match(code, /r\.body\.advies/, 'het advies van de server hoort op het scherm');
+
+  /* Geen meetlat op een mens: geen tempo, geen achterstand, geen percentage
+     weggewerkt. De server stuurt het niet, en dit scherm rekent het niet uit. */
+  assert.doesNotMatch(code, /achterstand|tempo|doorlooptijd|weggewerkt|productiviteit/i,
+    'er sluipt een prestatiemeter in de weekweergave');
+
+  assert.ok(partner.includes('/apps/schoolpartner/belasting.js'), 'School Partner laadt belasting.js niet');
+  assert.ok(partner.includes('id="belastingKlas"') && partner.includes('id="belastingMij"'));
+});

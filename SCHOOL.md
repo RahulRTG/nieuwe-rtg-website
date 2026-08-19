@@ -60,6 +60,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Taallaag en Family Bridge | vakbeleid met een harde regel, terugvertaling met betekeniscontrole, bon | `kern/taalbeleid.js`, `kern/betekenis.js`, `school/taalpoort.js` |
 | No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
 | Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
+| Belasting | de dag van de leerling over klassen heen, de week van de docent, niets bewaard | `kern/belasting.js`, `school/belasting.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -375,6 +376,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Talige zwaarte telt bij een zaakvak, niet bij taal | de knip komt uit het taalbeleid | **ja**, met mutatie beproefd |
 | Onder vijf gemaakte toetsen geen spiegel | hard getal in de toets, niet de constante | **ja**, met mutatie beproefd |
 | De spiegel noemt geen leerling | vaste sleutelverzameling per leerdoel | **ja**, met mutatie beproefd |
+| De dag van een kind telt over klassen heen | werk uit andere klassen telt mee in het klasbeeld | **ja**, met mutatie beproefd |
+| Van elders komt alleen een aantal | de weekweergave draagt geen vaknaam en geen titel | **ja**, met mutatie beproefd |
+| Het advies gaat over verplaatsen | geen woord over sneller of achterstand | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -575,8 +579,8 @@ docent vertrekt: dat is het punt van Institutional Memory.
 ## 10. Toetsen als vak -- Assessment Compiler, Fairness Engine, Fingerprint
 
 > **Gebouwd op 19 augustus 2026.** De keuring vooraf (dekking, vorm, overlap,
-> tijd, taalbelasting) en de spiegel achteraf, met een ondergrens van vijf. De
-> belastingsparagraaf onderaan staat er nog niet.
+> tijd, taalbelasting), de spiegel achteraf met een ondergrens van vijf, en de
+> belasting: de donderdag van de leerling en de week van de docent.
 
 De docent zegt niet "maak dertig vragen" maar *ik wil betrouwbaar meten of 2 havo
 doelen A t/m F beheerst.* Daarop controleert de compiler dekking,
@@ -633,6 +637,26 @@ buiten laten komen.
 donderdag van de leerling. En de docent ziet zijn eigen week: eenennegentig open
 antwoorden naast een rapportdeadline is een planningsfout, geen karakterfout.
 Werkdrukhulp -- **nooit** een prestatiemeter over personeel (§11).
+
+**Over klassen heen, want de donderdag van een kind trekt zich niets aan van
+vakgrenzen.** Zit een leerling ook in een andere klas, dan telt dat werk mee in
+het beeld van deze klas. Wat er van elders **meekomt is een telling en verder
+niets**: geen titel, geen vak, geen leraar. Een docent hoort te zien dát er twee
+dingen elders op die dag vallen; wat een collega precies opgeeft, gaat hem niet
+aan. Een toets telt daarbij alleen mee als er een dag bij staat -- een deadline
+zonder dag is er geen.
+
+**Het advies gaat over verplaatsen en niet over harder werken.** Dat is het
+verschil tussen hulp en een meetlat, en het is de zin die het onderscheid draagt:
+*"Op donderdag komt er veel samen. Verplaatsen scheelt meer dan doorwerken."*
+
+**Er wordt niets bewaard.** `school/belasting.js` schrijft niet; beide beelden
+worden telkens uitgerekend. Er is dus geen geschiedenis van hoe snel iemand zijn
+stapel wegwerkt, en die kan er later ook niet stilletjes bij komen.
+
+**En er gaat niets naar het kind.** Een drukke dag is een signaal aan wie het
+werk zet. Een melding aan een leerling dat het te druk is, verplaatst de last
+naar degene die er niets over te zeggen heeft.
 
 ---
 
@@ -814,8 +838,8 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    afgerond, de escalatie naar de directie zonder naam of tekst, en de twee
    keuzes van het kind na de knop (zie §12).
 9. **Assessment Compiler, Fairness Engine, Fingerprint.** Gedaan: de keuring
-   vooraf en de spiegel achteraf (zie §10). De belastingsparagraaf (de donderdag
-   van de leerling, de week van de docent) staat nog open.
+   vooraf, de spiegel achteraf en de belasting -- de donderdag van de leerling
+   over klassen heen, en de week van de docent (zie §10).
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een

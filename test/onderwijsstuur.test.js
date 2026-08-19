@@ -58,7 +58,11 @@ test('2. een hele oefensessie via het stuur: de antwoorden blijven op de server'
   for (let i = 0; i < 5; i++) uit = (await doe('/api/leerstof/antwoord', { antwoord: 'bewust-fout' })).body.antwoord;
   assert.equal(uit.klaar, true);
   assert.equal(uit.behaald, false);
-  assert.match(uit.advies, /oefening/i, 'een fout is gewoon de volgende stap in de les');
+  /* Het advies wijst sinds de Learning Fabric bij voorkeur naar de voorkennis
+     die nog openstaat, en anders naar een andere uitleg. Wat niet verandert:
+     een fout is de volgende stap in de les en nooit een verwijt. */
+  assert.match(uit.advies, /oefening|open|uitleg/i, 'een fout is gewoon de volgende stap in de les');
+  assert.doesNotMatch(uit.advies, /fout|slecht|jammer|helaas/i, 'en het is geen verwijt');
 });
 
 test('3. bijles en niveau-advies via het stuur, binnen dezelfde remmen', async () => {

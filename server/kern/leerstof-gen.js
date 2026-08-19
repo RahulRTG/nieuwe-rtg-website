@@ -116,6 +116,17 @@ const GEN = {
 };
 function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 
+/* De tweede reeks (delen met rest, afronden, tijdsduur, kalender, schaal,
+   negatieve getallen, kwadraten, schatten, korting, tabellen, meten en breuken
+   vergelijken) woont in ./leerstof-gen-meer.js en komt hier in dezelfde lijst
+   terecht. Een generator hoort maar op EEN plek te bestaan, en de beller mag
+   niet hoeven weten in welk bestand hij staat. */
+const { GEN2, MEERKEUZE2 } = require('./leerstof-gen-meer');
+for (const naam of Object.keys(GEN2)) {
+  if (GEN[naam]) throw new Error('leerstof-gen: de soort "' + naam + '" bestaat twee keer');
+  GEN[naam] = GEN2[naam];
+}
+
 /* Een opgave voor dit leerdoel; onbekende soorten vallen luid om (test bewaakt dekking). */
 function opgave(gen) {
   const maak = GEN[gen.soort];
@@ -135,6 +146,6 @@ function opgave(gen) {
    elders loopt daar stil op achter. `test/leerstof.test.js` legt hem naast wat
    de generatoren werkelijk doen, dus een soort die van vorm verandert zonder
    deze lijst bij te werken zakt. */
-const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm'];
+const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm'].concat(MEERKEUZE2).sort();
 
 module.exports = { opgave, SOORTEN: Object.keys(GEN), MEERKEUZE };

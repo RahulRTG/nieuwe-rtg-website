@@ -44,15 +44,20 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | schermen | leraar, directie, gezin, campus, bibliotheek | `public/apps/schoolpartner*`, `public/apps/foundation/school*` |
 | dekking | **168 van 168** endpoints vanuit een scherm bereikbaar | `test/schoolschermen.test.js` |
 | rollen en rechten | 15 rollen, recht per handeling, inzagejournaal met verplichte reden | `school/rollen.js` |
-| leerstofmotor | **99 leerdoelen**, 26 opgavengeneratoren, referentieniveaus 1F-4F | `kern/leerstof*.js` |
+| leerstofmotor | **114 leerdoelen**, 37 opgavengeneratoren, referentieniveaus 1F-4F | `kern/leerstof*.js` |
+| de Fabric | voorkennisgraaf, meerdere uitlegvormen en een eigen meting per doel, gekeurd bij het opstarten | `kern/leerstof.js` |
+| rekenen po (de proef) | **47 doelen** groep 1-8, 43 met voorkennis, **99 uitlegvarianten**, doorlopend tot in het mbo | `kern/leerstof-data/rekenen-g*.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
 
-En hier is het eerlijke deel: **de motor is er, de brandstof niet.** 99
-leerdoelen voor po t/m wo is een demonstratie, geen curriculum. Voor het hele
-voortgezet, middelbaar en hoger onderwijs samen staan er 167 vaste
-meerkeuzevragen. Een examentraining van tien vragen op hbo-niveau put uit acht.
+En hier is het eerlijke deel: **de motor is er, de brandstof deels.** Rekenen
+po is nu een echte leerlijn -- 47 doelen met hun voorkennis, twee of drie
+uitlegvormen per doel, en een graaf die van "tellen tot 10" doorloopt tot
+"rekenen op de werkvloer" in het mbo. Dat is het bewijs dat de structuur
+draagt, en tegelijk de maat van wat er nog moet: taal, wereldorientatie,
+natuur en het hele voortgezet en vervolgonderwijs staan nog op het oude niveau,
+met voor vo t/m wo samen 167 vaste meerkeuzevragen.
 
 > **De volgorde van dit document is daarom niet "wat bouwen we erbij" maar "wat
 > moet er onder".** Elk hoofdstuk hierna hangt aan hoofdstuk 2. Zonder die laag
@@ -187,7 +192,9 @@ worden -- door de school, door ons, door een toezichthouder.
 
 | Belofte | Meting | Vandaag |
 |---|---|---|
-| Elke leerling kan elke schooldag elk actief vak oefenen | dekkingsmeter: vakken met minstens één oefenbaar leerdoel per fase | **nee** -- 99 leerdoelen totaal |
+| Elke leerling kan elke schooldag elk actief vak oefenen | dekkingsmeter: vakken met minstens één oefenbaar leerdoel per fase | **deels** -- rekenen po wel, de rest nog niet |
+| Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
+| Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
 | Geen zorgtoegang zonder doel en reden | invariant + toets | **ja** (`test/schoolenterprise.test.js`) |
 | Een rapport bereikt het gezin alleen na menselijke vaststelling | invariant + toets | **ja** (`test/schoolbeeld.test.js`) |
@@ -393,9 +400,10 @@ formulier, met daarna hooguit twee keuzes (wanneer, en van wie).
 
 Er is één juiste eerste stap, en het is niet de spannendste.
 
-1. **De Fabric en de brandstof.** Leerdoelstructuur uitbreiden (`vereist`,
-   `uitleg[]`, `meting`, `bewijs[]`) en de bibliotheek vullen tot een echte
-   leerlijn per fase. Zonder dit is de rest een demo.
+1. **De Fabric en de brandstof.** Structuur: gedaan (`vereist`, `uitleg[]`,
+   `meting`, plus de keuring die bij het opstarten gooit). Brandstof: rekenen
+   po gedaan als proef; taal, wereldorientatie, natuur en het hele vo/mbo/hbo/wo
+   staan nog open. Zonder die vulling blijft de rest een demo.
 2. **Proof of Learning.** Bewijs onder elke beheersing, en het scherm dat de
    vraag "waarom denkt RTG dat ik dit kan?" beantwoordt.
 3. **Memory Engine.** Retentiestand per node en de drie herhaalvragen.

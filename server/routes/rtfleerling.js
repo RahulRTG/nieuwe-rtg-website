@@ -52,7 +52,8 @@ module.exports = (kern) => {
   app.post('/api/rtf/leerling/inschrijf', auth, handel((l, b) => faseMag(l, b.fase) ? onderwijs.inschrijf(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/jaar-over', auth, handel((l) => onderwijs.jaarOver(l.sleutel)));
   app.post('/api/rtf/leerling/vakken', auth, handel((l, b) => b.fase && !faseMag(l, b.fase) ? dicht() : leerstof.leerstofVakken(l.sleutel, b)));
-  app.post('/api/rtf/leerling/les', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofLes(b) : dicht()));
+  app.post('/api/rtf/leerling/les', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofLes(l.sleutel, b) : dicht()));
+  app.post('/api/rtf/leerling/pad', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofPad(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/oefen', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofOefenStart(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/antwoord', auth, handel((l, b) => leerstof.leerstofOefenAntwoord(l.sleutel, b)));
   app.post('/api/rtf/leerling/examen', auth, handel((l, b) => faseMag(l, b.fase) && l.rechten.leeftijd >= 12 ? vervolg.examenStart(l.sleutel, b) : dicht()));

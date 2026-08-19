@@ -17,9 +17,16 @@ const { VO2 } = require('./leerstof-data/vo2');
 const { VO3 } = require('./leerstof-data/vo3');
 const { VERVOLG } = require('./leerstof-data/vervolg');
 const { opgave } = require('./leerstof-gen');
+/* De graaf (voorkennis, uitlegvormen, meting, de keuring en het pad naar een
+   doel) woont in ./leerstof-fabric.js. Hier staat de stroom eromheen. */
+const { UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad: fabricPad } = require('./leerstof-fabric');
+// de graaflaag bezit de doelen niet; hier komen ze erbij
+const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
 const OPGAVEN_PER_SESSIE = 5;
 const BEHAALD_BIJ = 4;
+
+
 
 /* alle leerdoelen plat, geindexeerd op id, met vak en groep erbij -- op
    moduleniveau, zodat ook de schooltoetsen (school/toets.js) uit dezelfde
@@ -49,6 +56,8 @@ for (const blok of VO.concat(VO2, VO3, VERVOLG)) {
     }
   }
 }
+
+keurLeerstof(DOELEN);
 
 function maakLeerstof({ db, save, onderwijs }) {
   const nu = () => new Date().toISOString();
@@ -87,22 +96,35 @@ function maakLeerstof({ db, save, onderwijs }) {
     return { ok: true, groep, vakken: Object.entries(perVak).map(([vak, doelen]) => ({ vak, doelen })) };
   }
 
-  function les(d) {
+  function les(key, d) {
     const doel = DOELEN[String(d && d.doel || '')];
     if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
-    return { ok: true, doel: { id: doel.id, naam: doel.naam, vak: doel.vak, groep: doel.groep, les: doel.les, ref: doel.ref || null } };
+    const behaald = key ? ((onderwijs.mijn(key).doelen) || {}) : {};
+    const onder = pad(doel.id, behaald).filter(x => x.id !== doel.id);
+    return { ok: true, doel: { id: doel.id, naam: doel.naam, vak: doel.vak, groep: doel.groep, les: doel.les, ref: doel.ref || null,
+      /* Andere uitleg van HETZELFDE doel. Het leerdoel verandert niet; de weg
+         ernaartoe wel. Wie de eerste uitleg niet snapt, is niet geholpen met
+         diezelfde uitleg nog een keer. */
+      uitleg: (doel.uitleg || []).map(u => ({ soort: u.soort, tekst: u.tekst })),
+      meting: doel.meting || STANDAARD_METING },
+      voorkennis: onder,
+      ontbreekt: onder.filter(x => !x.behaald),
+      /* Zonder voorkennis-informatie zou dit veld liegen; daarom zegt hij het
+         zelf als er niets onder ligt. */
+      let: onder.length ? null : 'Voor dit leerdoel staat (nog) geen voorkennis in de leerlijn.' };
   }
 
   /* ---- oefenen: vijf verse opgaven, een tegelijk, antwoorden op de server ---- */
   function oefenStart(key, d) {
     const doel = DOELEN[String(d && d.doel || '')];
     if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
+    const meting = doel.meting || STANDAARD_METING;
     const vragen = [];
-    for (let i = 0; i < OPGAVEN_PER_SESSIE; i++) vragen.push(opgave(doel.gen));
-    sessies()['lid:' + key] = { doel: doel.id, vragen, ix: 0, goed: 0, at: nu() };
+    for (let i = 0; i < meting.opgaven; i++) vragen.push(opgave(doel.gen));
+    sessies()['lid:' + key] = { doel: doel.id, vragen, ix: 0, goed: 0, drempel: meting.drempel, at: nu() };
     save();
     const v = vragen[0];
-    return { ok: true, doel: doel.id, naam: doel.naam, totaal: OPGAVEN_PER_SESSIE, nr: 1, vraag: v.v, opties: v.opties || null };
+    return { ok: true, doel: doel.id, naam: doel.naam, totaal: meting.opgaven, nr: 1, vraag: v.v, opties: v.opties || null };
   }
 
   function oefenAntwoord(key, d) {
@@ -116,13 +138,24 @@ function maakLeerstof({ db, save, onderwijs }) {
     const klaar = s.ix >= s.vragen.length;
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: s.ix, totaal: s.vragen.length, aantalGoed: s.goed, klaar };
     if (klaar) {
-      uit.behaald = s.goed >= BEHAALD_BIJ;
+      uit.behaald = s.goed >= (s.drempel || BEHAALD_BIJ);
       if (uit.behaald) {
         const b = onderwijs.doelBehaald(key, { doel: s.doel });
         if (b.error) uit.behaald = false; // geen paspoort (bijv. niet ingeschreven): eerlijk melden
         uit.paspoort = b.error || 'bijgeschreven';
       } else {
-        uit.advies = 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
+        /* Niet gehaald is geen aansporing maar een vraag: ligt er iets onder
+           dat nog niet af is? Dan wijst het advies daarheen, en anders naar een
+           andere uitleg van hetzelfde doel. */
+        const behaald = (onderwijs.mijn(key).doelen) || {};
+        const mist = pad(s.doel, behaald).filter(x => x.id !== s.doel && !x.behaald);
+        const doel = DOELEN[s.doel];
+        uit.ontbreekt = mist.slice(0, 3);
+        uit.advies = mist.length
+          ? 'Hieronder staat nog iets open: ' + mist.slice(0, 2).map(x => x.naam).join(' en ') + '. Doe dat eerst; daarna gaat dit vanzelf beter.'
+          : (doel.uitleg || []).length
+            ? 'Lees de uitleg eens op een andere manier; dezelfde stof kan er heel anders uitzien.'
+            : 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
       }
       delete sessies()['lid:' + key];
     } else {
@@ -134,7 +167,17 @@ function maakLeerstof({ db, save, onderwijs }) {
     return uit;
   }
 
-  return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord, DOELEN };
+  return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord,
+    leerstofPad: (key, d) => {
+      const doel = DOELEN[String(d && d.doel || '')];
+      if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
+      const behaald = (onderwijs.mijn(key).doelen) || {};
+      const rij = pad(doel.id, behaald);
+      return { ok: true, doel: doel.id, naam: doel.naam, pad: rij,
+        ontbreekt: rij.filter(x => x.id !== doel.id && !x.behaald),
+        uitleg: 'Dit is de weg naar dit leerdoel: eerst wat eronder ligt, dan het doel zelf.' };
+    },
+    DOELEN };
 }
 
-module.exports = { maakLeerstof, DOELEN, PER_FASE };
+module.exports = { maakLeerstof, DOELEN, PER_FASE, UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad };

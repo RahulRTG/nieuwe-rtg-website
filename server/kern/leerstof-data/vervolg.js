@@ -7,11 +7,23 @@ const WO = ['wo-b', 'wo-m', 'wo-phd'];
 
 module.exports.VERVOLG = [
   { vak: 'rekenen', fasen: MBO, doelen: [
+    /* De voorkennis wijst hier naar de basisschool, en dat is geen slordigheid
+       maar het punt van een graaf: een mbo'er die vastloopt op beroepsrekenen
+       mist meestal geen beroepsuitleg maar de verhoudingstabel uit groep 7.
+       De motor mag dat zeggen in plaats van meer van hetzelfde te geven. */
     { id: 'rekenen.mbo.beroep', naam: 'Rekenen op de werkvloer', ref: '2F',
+      vereist: ['rekenen.g8.verhoudingen-procent'],
       les: 'Beroepsrekenen is verhoudingen: weet je de prijs of hoeveelheid van 1, dan kun je alles schalen. Reken altijd eerst terug naar 1.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Zet de gegevens in twee rijen en reken eerst terug naar een stuk, een meter of een uur. Vanaf een is elke hoeveelheid een keersom.' },
+        { soort: 'praktijk', tekst: 'Materiaal bestellen, een offerte narekenen, een receptuur opschalen: het is telkens dezelfde tabel met andere woorden erboven.' }],
       gen: { soort: 'verhouding', max: 60 } },
     { id: 'rekenen.mbo.geld', naam: 'Geldzaken en wisselgeld', ref: '2F',
+      vereist: ['rekenen.g8.procenten-komma-breuk'],
       les: 'Tel terug vanaf het betaalde bedrag: van de prijs naar het ronde tientje, dan naar het betaalde bedrag. Zo klopt de kassa altijd.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Ga van de prijs naar het eerstvolgende hele bedrag, dan met hele euro\'s naar het betaalde bedrag. Alles wat je onderweg optelde, is het wisselgeld.' },
+        { soort: 'praktijk', tekst: 'Btw, korting en een fooi zijn procenten van een bedrag; het rijtje 10%, 5% en 1% is aan de kassa genoeg om alles uit het hoofd te doen.' }],
       gen: { soort: 'geld', max: 50 } }
   ]},
   { vak: 'burgerschap', fasen: MBO, doelen: [

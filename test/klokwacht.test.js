@@ -22,7 +22,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { meet } = require('../scripts/klokwacht');
+const { meet, telIn } = require('../scripts/klokwacht');
 
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'KLOKWACHT.json');
@@ -62,4 +62,35 @@ test('geen enkele schermtoets wacht nog op de klok', () => {
     'deze bestanden wachten weer op een vaste tijd: ' + JSON.stringify(nu.perBestand) +
     '. Wacht op een toestand (wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering), ' +
     'op het antwoord van de server (klikEnWacht) of tot het scherm stil is (wachtOpRust).');
+});
+
+/* DE TELLER ZELF, GEVOERD MET EEN BEKENDE INVOER.
+
+   De drie beweringen hierboven lezen allemaal de echte testmap, en die staat op
+   NUL. Daardoor blijven ze waar ook als de teller kapot is: nul in, nul uit. De
+   mutatiemotor zag dat en meldde dit bestand als OVERLEEFD -- terecht, want een
+   ratel op nul kan niet zien of zijn eigen meter nog werkt (LAT.md regel 10).
+
+   Vandaar deze vier: een echte wacht telt, een wacht in een blokcommentaar niet
+   (anders zou het OPSCHRIJVEN waarom een wacht wegging de schuld laten stijgen),
+   een in regelcommentaar ook niet, en twee op een regel zijn er twee. Zonder
+   deze zou "de schuld staat op nul" een bewering zijn over een meter die niemand
+   ooit heeft zien uitslaan. */
+test('de teller telt een echte wacht en negeert er een in commentaar', () => {
+  /* De naam wordt hier OPGEBOUWD en staat nergens als letterlijke aanroep in dit
+     bestand. Dat is geen truc maar noodzaak: de meter leest deze map, dus een
+     voorbeeldwacht in een toets over de meter zou als schuld meetellen -- de
+     meter zou zijn eigen toets meten. Precies de eerste versie hiervan liet alle
+     drie de beweringen hierboven zakken, op vijf verzonnen wachten. */
+  const W = 'waitFor' + 'Timeout';
+  assert.strictEqual(telIn('await page.' + W + '(100);'), 1, 'een echte wacht telt');
+  assert.strictEqual(telIn('/* ooit stond hier ' + W + '(100) */'), 0, 'een blokcommentaar telt niet mee');
+  assert.strictEqual(telIn('// ' + W + '(100)'), 0, 'een regelcommentaar ook niet');
+  assert.strictEqual(telIn('a.' + W + ' (5); b.' + W + '(6);'), 2, 'twee op een regel zijn er twee');
+  assert.strictEqual(telIn('await wachtOpRust(page);'), 0, 'een wacht op een TOESTAND is geen schuld');
+  /* En de NAAM zonder aanroep is geen wacht. Zonder deze regel overleefde de
+     teller een mutatie die de haak uit zijn patroon haalt: dan telt elke
+     vermelding mee -- ook die in een register, een commit-bericht of dit
+     bestand -- en groeit de schuld zonder dat er een wacht bij kwam. */
+  assert.strictEqual(telIn('const naam = "' + W + '";'), 0, 'de naam zonder aanroep is geen wacht');
 });

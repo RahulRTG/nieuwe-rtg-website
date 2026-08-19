@@ -51,13 +51,26 @@ function zonderCommentaar(bron) {
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
 }
 
+/* DE TELLING ZELF, los van de map waarin hij loopt.
+
+   Hij stond binnen meet(), en daar viel hij niet te toetsen: meet() leest de
+   echte testmap, en die staat op NUL. Elke bewering erover blijft dus waar, ook
+   als de teller kapot is -- nul in, nul uit. De mutatiemotor zag dat en meldde
+   `klokwacht.test.js` als OVERLEEFD, en terecht: een ratel op nul kan niet zien
+   of zijn eigen meter nog werkt (LAT.md regel 10).
+
+   Met de telling apart kan een toets hem wel voeren: een echte wacht telt, een
+   wacht in commentaar niet, en twee op een regel zijn er twee. */
+function telIn(bron) {
+  return (zonderCommentaar(bron).match(/waitForTimeout\s*\(/g) || []).length;
+}
+
 function meet() {
   const perBestand = {};
   let totaal = 0;
   for (const naam of fs.readdirSync(TESTMAP).sort()) {
     if (!/\.(e2e|test)\.js$/.test(naam)) continue;
-    const bron = zonderCommentaar(fs.readFileSync(path.join(TESTMAP, naam), 'utf8'));
-    const n = (bron.match(/waitForTimeout\s*\(/g) || []).length;
+    const n = telIn(fs.readFileSync(path.join(TESTMAP, naam), 'utf8'));
     if (n) { perBestand[naam] = n; totaal += n; }
   }
   return { totaal, bestanden: Object.keys(perBestand).length, perBestand };
@@ -102,4 +115,4 @@ if (VASTLEGGEN) {
   console.log('\n  vastgelegd in KLOKWACHT.json');
 }
 
-module.exports = { meet };
+module.exports = { meet, telIn };

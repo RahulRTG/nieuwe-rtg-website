@@ -287,6 +287,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "auditspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/auditspoor.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "auth-rol.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1197,6 +1205,22 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "dubbeltik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/dubbeltik.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "dubbeltikgzip.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/compressie.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 8
+    },
     "duels2.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1670,6 +1694,15 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gezakte-toetsen.test.js": {
+      "soort": "puur",
+      "staat": "te langzaam",
+      "lekt": true,
+      "reden": "ook met --test-force-exit niet af binnen 360s; de toetsen zelf komen niet klaar, dus dit is traagheid en niet alleen een handle",
+      "module": "scripts/gezakte-toetsen.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
+    },
     "gezelschap.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1999,6 +2032,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "imageherkomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/imageherkomst.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "imap.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2256,6 +2297,11 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "klokwacht.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 2 mutaties in scripts/klokwacht.js, en dat kan niet anders: de ratel staat op nul, dus een gedragsmatige mutatie in de teller laat de uitkomst nul. De telling zelf is apart gezet (telIn) en met de hand op twee echte fouten nagetrokken -- commentaar niet strippen, en de haak uit het patroon -- die allebei raak zijn"
     },
     "kluis-binding.test.js": {
       "soort": "puur",
@@ -2738,7 +2784,11 @@
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
-      "staat": "geen toetsen gedraaid"
+      "staat": "gezakt",
+      "module": "server/kern/magnaatwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 12,
+      "geprobeerd": 4
     },
     "mail-eigen.test.js": {
       "soort": "puur",
@@ -3893,6 +3943,14 @@
     "persistentiestand.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "persoonseis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/persoonseis.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "pestgrens.test.js": {
       "soort": "puur",
@@ -5803,6 +5861,21 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "vakbewijs-kluis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vakbewijs.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "vakbewijs-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "vakken.test.js": {
       "soort": "server",

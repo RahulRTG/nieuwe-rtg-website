@@ -438,6 +438,20 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
+     motor: meet() leest de echte testmap, telt daar nul wachten, en elke
+     gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.
+     Twee mutaties geprobeerd, allebei overleefd -- en dat is hier geen uitspraak
+     over de toets.
+
+     De juiste mutatie zit in de TELLING zelf (het commentaar niet strippen, de
+     haak uit het patroon halen), en dat zijn wijzigingen aan een reguliere
+     expressie; die operator heeft deze motor niet. Daarom is de telling apart
+     gezet als telIn() en met de HAND op beide fouten nagetrokken: het
+     commentaar niet strippen laat alle vier de beweringen zakken, de haak
+     weghalen laat de vierde zakken. Zonder die twee zou "de schuld staat op nul"
+     een bewering zijn over een meter die niemand ooit heeft zien uitslaan. */
+  ['klokwacht.test.js', 'overleefde 2 mutaties in scripts/klokwacht.js, en dat kan niet anders: de ratel staat op nul, dus een gedragsmatige mutatie in de teller laat de uitkomst nul. De telling zelf is apart gezet (telIn) en met de hand op twee echte fouten nagetrokken -- commentaar niet strippen, en de haak uit het patroon -- die allebei raak zijn'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde
      er 17 en de toets overleefde ze allemaal, en dat is hier GEEN uitspraak over

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1022 bestanden en 6789 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1024 bestanden en 6802 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1022 |
-| losse beweringen (`test(...)`) | 6789 |
+| toetsbestanden | 1024 |
+| losse beweringen (`test(...)`) | 6802 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 95 |
+| alleen in de kop *genoemd*, nog niet gemeten | 23 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-896 bestanden, 6569 beweringen.
+897 bestanden, 6580 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -242,6 +242,7 @@ toets omvalt.
 | `gastroomservice.test.js` | 7 | gezakt op `liegpoort /api/` | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
 | `gastverzoek.test.js` | 12 | gezakt op `liegpoort /api/` | WAT EEN GAST VRAAGT IN PLAATS VAN BESTELT. De gastkant kon bestellen en afrekenen, maar niet zeggen "kunt u even komen". |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
+| `gebaar.test.js` | 11 | genoemd | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
 | `gebouw.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren). Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de receptie, badges, facilitaire meldingen, valet, de jetset-laag en de... |
 | `gebouwplus.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Enterprise (gebouwplus): de plus-laag van het kantoorgebouw. Getoetst: de manager van de demo-toren legt een huurcontract vast, verlengt en beeindigt het; leads schuiven door de fasen; energie-weken worden... |
 | `gedachten.test.js` | 7 | gezakt op `liegpoort /api/` | Het gedachtenboek (kern/gedachten.js). De belofte is dat dit GEEN materiaal is, en die wordt hier op drie manieren vastgezet: er is geen deur die de tekst ergens anders heen stuurt, niemand anders kan erbij, en... |
@@ -936,7 +937,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-126 bestanden, 220 beweringen.
+127 bestanden, 222 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -969,6 +970,7 @@ toets omvalt.
 | `doelen-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/doelen.html. De servertoets bewijst de rekenkern; deze bewijst dat een lid er ook echt bij kan: een doel neerzetten, een meting erin, en de datum verzetten als het anders liep. |
 | `eigensessieschermen.e2e.js` | 3 | -- | DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE TWEE DOORVERWIJSSTUBS. Twaalf van de vijftien schermen die na TAKEN 4.9 nog geen eigen toets hadden. |
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |
+| `gebaar.e2e.js` | 2 | -- | RTG Gebaren in een echte browser: de laden onder een regel, de drempel, de uitvoering en de weg terug. WAAROM DIT EEN E2E IS EN GEEN UNIT. |
 | `gedachten-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/gedachten.html. Het punt dat hier op het scherm zelf moet kloppen: bij een zin waar de crisisregel op aanslaat blijft de notitie STAAN en komt de hulp ernaast. |
 | `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: tien standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
 | `genootschap.e2e.js` | 1 | -- | Scherm-test voor Genootschap. De unit-toetsen (test/genootschap.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: oprichten, een bijeenkomst uitroepen en beantwoorden, en een peiling waarvan de... |

@@ -172,6 +172,21 @@
   tgs.src = '/shared/toegankelijk.js'; tgs.async = true;
   (document.head || document.documentElement).appendChild(tgs);
 
+  /* ---- de gebarenlaag: twee laden onder elke regel ----------------------
+     Hij ligt op elk appscherm en DOET IN RUST NIETS. Geen element erbij, geen
+     stijl erover; hij wordt pas wakker als een scherm zegt welke acties een
+     regel draagt (RTGGebaar.zet / RTGGebaar.lijst). Zo staat de bediening op
+     EEN plek in plaats van acht keer net anders (LAT.md regel 4), en kost een
+     scherm dat hem niet gebruikt precies niets.
+
+     Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
+     laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
+  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+    var gb = document.createElement('script');
+    gb.src = '/shared/gebaar.js'; gb.async = true;
+    (document.head || document.documentElement).appendChild(gb);
+  }
+
   function toost(t) {
     var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;
     document.body.appendChild(m);

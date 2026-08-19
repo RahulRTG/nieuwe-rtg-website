@@ -68,11 +68,15 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
 
 /* --- het register: tijdlijn links, dan de datumkolom, dan de inhoud --- */
 .reis{display:flex;align-items:stretch;gap:0;position:relative;
-  padding:0 0 0 1.15rem;color:inherit;text-decoration:none;}
+  padding:0 0 0 1.15rem;color:inherit;text-decoration:none;
+  /* De tijdlijn hieronder loopt DOOR de regels heen en hoort dus te blijven
+     staan als de regel wegschuift voor zijn acties (shared/gebaar.css). Deze
+     maat is precies de linkerpadding: daar woont de lijn met zijn stip. */
+  --gb-inzet:1.15rem;}
 /* de tijdlijn loopt DOOR tussen de regels; de stip zit op de datum. Zo lees
    je de reeks als een reis door de tijd en niet als losse dozen. */
 .reis::before{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;
-  background:var(--rtg-line);}
+  background:var(--rtg-line);z-index:1;}
 /* De stip zit op de MIDDENLIJN van zijn regel, net als de datum ernaast. Hij
    stond op een vaste afstand van boven (1,55rem); toen de datum naar het
    midden zakte bleef hij achter en wees hij nergens meer naar. Een tijdlijn
@@ -80,7 +84,10 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
    De lijn begint en eindigt daarom ook bij de eerste en laatste stip. */
 .reis:first-child::before{top:50%;}
 .reis:last-child::before{bottom:50%;}
-.reis .stip{position:absolute;left:0;top:50%;transform:translateY(-50%);
+/* z-index: de lijn en de stip blijven staan ALS de regel wegschuift voor zijn
+   acties (shared/gebaar.css). Zonder deze twee regels schuift de inhoud er
+   overheen en breekt de tijdlijn bij precies die ene regel. */
+.reis .stip{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:1;
   width:7px;height:7px;border-radius:50%;background:var(--rtg-sig-stil);}
 .reis[data-sig="gezond"]   .stip{background:var(--rtg-sig-gezond);}
 .reis[data-sig="aandacht"] .stip{background:var(--rtg-sig-aandacht);}

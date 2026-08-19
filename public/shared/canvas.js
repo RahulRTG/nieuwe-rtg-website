@@ -171,7 +171,34 @@
       stip.appendChild(wat);
       el.appendChild(stip);
     });
+    gebaren(el);
     return el;
+  }
+
+  /* Elke tijdlijnregel draagt zijn acties (shared/gebaar.js). Ze hangen aan de
+     LINK en niet aan de hele stip: dan schuift de tekst weg en blijft de lijn
+     met zijn stip staan -- de gebeurtenis beweegt, de tijd niet. Gedelegeerd,
+     want deze lijn wordt opnieuw getekend zodra er iets binnenkomt. */
+  function gebaren(el) {
+    if (el.dataset.gbAan) return;
+    if (!w.RTGGebaar) {
+      d.addEventListener('rtg-gebaar', function () { gebaren(el); }, { once: true });
+      return;
+    }
+    el.dataset.gbAan = '1';
+    var K = w.RTGGebaar.klaar;
+    w.RTGGebaar.lijst(el, '.cv-wat[href]', function (rij) {
+      var pak = function (k) { var x = rij.querySelector(k); return x ? x.textContent.trim() : ''; };
+      var titel = pak('.cv-titel'), toe = pak('.cv-toe');
+      var stip = rij.closest('.cv-stip');
+      var uur = stip ? (stip.querySelector('.cv-uur') || {}).textContent : '';
+      var href = rij.getAttribute('href');
+      return {
+        titel: titel,
+        rechts: [K.openen(href), K.delen({ titel: titel, url: href })],
+        links: [K.overnemen([String(uur || '').trim(), titel, toe].filter(Boolean).join(' \u00b7 '))]
+      };
+    });
   }
 
   /* ---------- Focus Mode ----------

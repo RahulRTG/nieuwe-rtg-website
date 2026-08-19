@@ -105,6 +105,26 @@ afgesloten -- zichtbaar, en niet aan te klikken. De a11y-poort bleef al die tijd
 groen. **Een poort die meet of een scherm toegankelijk is, meet niet of het nog
 werkt.** Alleen de gewone schermtoetsen zagen dit.
 
+**Werkt: de veeg is nooit de enige weg.** Sinds vandaag dragen regels acties die
+je met een veeg naar links of naar rechts tevoorschijn haalt (`shared/gebaar.js`,
+zie `ONTWERP.md` par. 6). Dat is precies het soort functie waar WCAG 2.5.7 over
+gaat: geen enkele handeling mag alleen met slepen te doen zijn. Vier andere wegen
+komen bij dezelfde acties uit -- vasthouden, een rechtermuisklik, de menutoets en
+de pijltoetsen -- en die openen een `<dialog>` met echte knoppen, echte namen en
+focus die terugvalt op de regel waar hij vandaan kwam. De regel zelf zegt met
+`aria-describedby` dát er acties aan hangen en hoe je erbij komt.
+
+De zichtbare lade onder de regel is met opzet `aria-hidden`: bijna elke regel
+hier is zelf een `<a>`, en een knop in een link is voor een schermlezer een knop
+in een link. De lade is dus het oppervlak voor een hand, de actielade dat voor een
+toets. `test/gebaar.test.js` zakt zodra iemand daar een echte knop in zet, en
+zodra een van de vier andere wegen verdwijnt.
+
+**Niet gemeten:** of iemand met een tremor de drempel haalt zonder per ongeluk
+door te vegen. De drempel ligt voorbij de volle lade én voorbij 55% van de regel,
+en wat niet terug te draaien is gaat alleen op vasthouden -- maar dat is een
+redenering, geen meting met een mens.
+
 **Werkt ook: elk raakvlak is minstens 24x24** (WCAG 2.5.8), gemeten op
 telefoonformaat. De meting begon op 267 stuks over 188 schermen en staat nu op
 nul, met een poort eronder die zakt zodra er een bijkomt.

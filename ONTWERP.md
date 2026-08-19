@@ -182,6 +182,29 @@ Op desktop permanent rechts. Selecteer een boeking → het paneel toont die
 boeking. Selecteer een betaling → hetzelfde paneel verandert. Je klikt niet meer
 door pagina's heen.
 
+### RTG Gebaren
+Een operationele regel is een **plank met twee laden eronder**. Veeg naar links
+en de rechterlade komt tevoorschijn, veeg naar rechts en de linker; veeg door en
+de eerste actie van die kant gebeurt meteen. De laden zijn onyx met de actie in
+kapitaaltjes — geen gekleurde blokken met een prullenbakje, want dat is precies
+de doosjes-UI uit par. 7.
+
+**De drempel is zichtbaar.** Voorbij het punt waar loslaten iets doet, neemt de
+eerste actie de hele lade over, wijkt de rest en licht de snede goud op — één
+keer, met één korte tik. Een doorveeg die je niet zag aankomen is geen bediening
+maar een ongeluk.
+
+**Vier wegen, één deur.** Vasthouden, rechtermuisklik, de menutoets en de
+pijltoetsen openen dezelfde acties als lijst, met echte knoppen in de bovenlaag.
+Dat is geen stapeling: het is dezelfde deur, die op elk toestel anders heet. De
+lade zelf is aria-hidden en is er voor de hand; de actielade is er voor de toets
+en de schermlezer. Wat niet terug te draaien is, gaat op vasthouden en nooit op
+een veeg.
+
+*Handhaving:* `test/gebaar.test.js` bewaakt wat je niet ziet (de laag raakt in
+rust geen enkel element aan, de lade draagt geen knop-in-een-link, het gebaar is
+nooit de enige weg), `test/gebaar.e2e.js` veegt in een echte browser.
+
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon
 voertuigen Haarlem`. Hier verdwijnt de AI natuurlijk in, in plaats van als los
@@ -287,6 +310,9 @@ onder draait:
 | Rahul verwerkt iets | kleine pulse |
 | Paneel opent | 180 ms, strak |
 | Teller verandert | zonder pagina-herlading |
+| Vinger sleept een regel | 1-op-1, zonder overgang — dat is geen animatie maar bediening |
+| Lade klapt terug | 180 ms, dezelfde als een paneel |
+| Hand boven een vlak | het licht volgt, één lichtpunt (MATERIAAL.md) |
 
 *Handhaving:* alle duren staan als tokens (`--rtg-tijd-kort`, `--rtg-tijd-paneel`)
 en elke animatie respecteert `prefers-reduced-motion`.

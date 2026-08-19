@@ -316,6 +316,18 @@ body.rtg-stijl [role="button"].hoofd{
   body.rtg-stijl [role="button"].hoofd:not([data-inbalk]){
     width:100%;max-width:100%;flex:1 1 100%;
   }
+  /* MAAR NIET IN EEN WERKBALK, en dat kostte een meting om te zien.
+     .ios-nav-acties scrolt sinds vandaag in zichzelf en heeft dus min-width:0;
+     `width:100%` van een gekrompen vak is 24 pixels. Op /apps/bestanden.html en
+     /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- mijn eigen
+     regel maakte de knop kleiner in plaats van bereikbaarder. Een knop in een
+     balk houdt zijn eigen maat; die balk regelt zijn breedte zelf. */
+  body.rtg-stijl .ios-nav-acties > [data-hoofdactie],
+  body.rtg-stijl .ios-nav-acties > .hoofd,
+  body.rtg-stijl .cmd-balk [data-hoofdactie],
+  body.rtg-stijl .cmd-balk .hoofd{
+    width:auto;max-width:none;flex:0 0 auto;
+  }
 }
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de

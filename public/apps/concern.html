@@ -65,6 +65,12 @@
     background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.6rem 1.1rem;
     font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .2s;}
   .melding.aan{opacity:1;}
+  /* DUIMMAAT VOOR DE HOOFDHANDELING (GRAMMATICA.md). Dit scherm draagt geen
+     body.rtg-stijl, dus de gedeelde regel in shared/rtg-ui.css bereikt hem
+     niet. 36px was te laag: genoeg om te raken met een trillende hand (WCAG
+     2.5.8 vraagt 24), te weinig voor een duim in beweging. */
+  [data-hoofdactie]{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  @media(max-width:760px){[data-hoofdactie]{width:100%}}
 </style>
 </head>
 <body>
@@ -119,7 +125,7 @@ function nieuwVak(){
     '<label class="veld">Naam<input id="nNaam" placeholder="Noordzee Hotels BV"></label>'+
     '<label class="veld">Land<input id="nLand" value="NL" maxlength="2"></label>'+
     '<label class="veld">Rechtsvorm (mag leeg)<select id="nRv"><option value="">Weet ik nog niet</option></select></label>'+
-    '</div><div class="rij r8"><button class="knop prim" id="nKnop">Begin een entiteit</button></div>';
+    '</div><div class="rij r8"><button class="knop prim" id="nKnop" data-hoofdactie>Begin een entiteit</button></div>';
 }
 
 /* ---- het beeld ---- */

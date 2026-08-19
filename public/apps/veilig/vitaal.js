@@ -34,7 +34,7 @@
           '<option value="120" selected>Twee uur</option>' +
           '<option value="30">Een half uur</option>' +
         '</select>' +
-        '<button class="knop hoofd groot" id="start" style="margin-top:1rem;">Zet de check-in aan</button>';
+        '<button class="knop hoofd groot h-mt100" id="start">Zet de check-in aan</button>';
       $('#start').addEventListener('click', async function () {
         try {
           await Veilig.plekDoorgeven();
@@ -55,12 +55,12 @@
     var laat = x.status === 'genade' || x.status === 'alarm';
     $('#wacht').innerHTML =
       '<button class="knop hoofd groot" id="in">Het gaat goed</button>' +
-      '<p class="tellerbij" id="bij" style="margin-top:.8rem;"></p>' +
+      '<p class="tellerbij h-mt80" id="bij"></p>' +
       '<p class="stil">' + Veilig.esc(x.label || '') +
         (x.herhaal ? ' &middot; elke ' + x.herhaal + ' uur' : '') + '</p>' +
-      '<div class="rij" style="margin-top:.8rem;">' +
-        '<button class="knop" id="plus" style="flex:1;">Een uur later</button>' +
-        '<button class="knop stop" id="stop" style="flex:1;">Uitzetten</button></div>';
+      '<div class="rij h-mt80">' +
+        '<button class="knop h-flex1" id="plus">Een uur later</button>' +
+        '<button class="knop stop h-flex1" id="stop">Uitzetten</button></div>';
 
     var rest = x.restSec;
     function loop() {

@@ -44,7 +44,7 @@
 
     h += '<div class="card"><div class="k">' + T('pd.wv.chk','Mijn checklijsten') + '</div>' +
       (c.lijsten.length ? c.lijsten.map(l =>
-        '<div style="margin-top:0.6rem;"><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
+        '<div class="h-mt60"><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
           meta(l.af + '/' + l.totaal + ' (' + l.pct + '%)') + '</div>' +
         l.items.map(i =>
           '<div class="mbrow"><div>' + (i.klaar ? '✓ ' : '○ ') + esc(i.tekst) +
@@ -72,7 +72,7 @@
      later op elk scherm en op elke afdruk. */
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
-    $('#wvVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + esc(titel) + '</b>' +
+    $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
       '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
@@ -138,7 +138,7 @@
     document.querySelectorAll('[data-wvt]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/werkvloer/bedieningskaart', { id: b.dataset.wvt });
-        $('#wvTafelVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
+        $('#wvTafelVak').innerHTML = '<div class="h-mt60"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
           d.stoelen.map(s => '<div class="mbrow"><div>' + esc(s.naam) +
             '<div style="font-size:0.72rem;line-height:1.45;color:' + (s.let_op ? 'var(--gold)' : 'var(--soft)') + ';">' +
             esc(s.regel) + '</div></div></div>').join('') +

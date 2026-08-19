@@ -34,7 +34,7 @@
       var rb = runbooks[i];
       u += '<div class="kaart"><h3>' + esc(rb.naam) + ' ' + C.niveau(rb.oordeel.niveau) + '</h3>' +
         '<p>' + esc(rb.wat) + '</p>' +
-        '<p class="meta" style="margin-top:.45rem;">Zet <b>' + esc(rb.veld) + '</b> op <b>' + esc(rb.naar) + '</b> · ' +
+        '<p class="meta h-mt45">Zet <b>' + esc(rb.veld) + '</b> op <b>' + esc(rb.naar) + '</b> · ' +
         (rb.terugDraaibaar ? 'terug te draaien' : 'NIET terug te draaien') +
         (rb.klantImpact ? ' · de klant merkt dit' : ' · geen klantimpact') + '</p>' +
         '<p class="meta">Risico ' + rb.oordeel.score + ' -- ' + esc(rb.oordeel.waarom) + '</p>' +
@@ -44,7 +44,7 @@
         (rb.kandidaten ? '<button class="knop" data-droog="' + esc(rb.id) + '">Droog draaien</button>' +
           '<button class="knop' + (rb.oordeel.niveau === 'auto' ? ' vol' : '') + '" data-voer="' + esc(rb.id) + '">Uitvoeren</button>' : '') +
         '</div>' +
-        (rb.oordeel.niveau === 'hand' && rb.kandidaten ? '<p class="meta" style="margin-top:.5rem;">Dit runbook staat op handmatig: uitvoeren vraagt uw expliciete akkoord en komt als zodanig in het journaal.</p>' : '') +
+        (rb.oordeel.niveau === 'hand' && rb.kandidaten ? '<p class="meta h-mt50">Dit runbook staat op handmatig: uitvoeren vraagt uw expliciete akkoord en komt als zodanig in het journaal.</p>' : '') +
         '<div class="meta" id="droog-' + esc(rb.id) + '"></div></div>';
     }
 
@@ -56,12 +56,12 @@
         '<p class="meta">' + (r.droog ? 'droogloop' : 'uitgevoerd') + ' door ' + esc(r.door) + ' · ' +
         r.geraakt + ' van ' + r.totaalKandidaten + ' · ' + C.niveau(r.niveau) + ' · risico ' + C.getal(r.score) +
         (r.reden ? ' · ' + esc(r.reden) : '') + '</p>' +
-        (r.voorbeelden && r.voorbeelden.length ? '<div class="meta" style="margin-top:.4rem;">' +
+        (r.voorbeelden && r.voorbeelden.length ? '<div class="meta h-mt40">' +
           r.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
           (r.geraakt > r.voorbeelden.length ? '<br>… en nog ' + (r.geraakt - r.voorbeelden.length) : '') + '</div>' : '') +
         (r.droog ? '' : r.teruggedraaid
-          ? '<p class="meta" style="margin-top:.5rem;">Teruggedraaid door ' + esc(r.terugDoor) + '.</p>'
-          : '<div class="crij" style="margin-top:.6rem;"><button class="knop weg" data-terug="' + esc(r.id) + '">Terugzetten naar de vorige toestand</button></div>') +
+          ? '<p class="meta h-mt50">Teruggedraaid door ' + esc(r.terugDoor) + '.</p>'
+          : '<div class="crij h-mt60"><button class="knop weg" data-terug="' + esc(r.id) + '">Terugzetten naar de vorige toestand</button></div>') +
         '</div>';
     }
     return u;

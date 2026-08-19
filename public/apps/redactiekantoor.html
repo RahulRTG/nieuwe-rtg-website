@@ -153,7 +153,7 @@ function schrijftafel(){
 function drukkerij(){
   const gepub=D.artikelen.filter(a=>a.status==='gepubliceerd');
   let h='<div class="item"><h3>Nieuwe editie</h3><div class="rij"><input class="veld" id="eT" style="flex:1;min-width:10rem;" placeholder="Titel van de editie"><select class="veld" id="eS"><option value="krant">krant</option><option value="magazine">magazine</option></select><input class="veld" id="eO" type="number" placeholder="oplage" value="1000" style="width:7rem;"></div>'
-    +'<div class="meta" style="margin-top:.4rem;">Kies de gepubliceerde stukken:</div><div class="rij">'+(gepub.length?gepub.map(a=>'<label style="font-size:.8rem;color:var(--muted);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" class="kies" value="'+a.id+'"> '+esc(a.kop)+'</label>').join(''):'<span class="leeg">Publiceer eerst een stuk op de schrijftafel.</span>')+'</div>'
+    +'<div class="meta h-mt40">Kies de gepubliceerde stukken:</div><div class="rij">'+(gepub.length?gepub.map(a=>'<label style="font-size:.8rem;color:var(--muted);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" class="kies" value="'+a.id+'"> '+esc(a.kop)+'</label>').join(''):'<span class="leeg">Publiceer eerst een stuk op de schrijftafel.</span>')+'</div>'
     +'<div class="rij"><button class="knop" id="eMaak">Editie samenstellen</button></div></div>';
   h+= D.edities.length ? D.edities.map(e=>{
     const acties='<div class="rij">'

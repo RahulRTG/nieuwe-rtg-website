@@ -406,7 +406,7 @@ async function laadStem(){
   uitZet('stemming', ['optie','stemmen','percentage'], (v.opties||[]).map(o => [o.label||'', o.stemmen||0, o.pct||0]));
   $('#p-stem').innerHTML = '<div class="item"><h4>'+esc(v.titel)+'</h4>'+
     v.opties.map(o => '<div class="meta">'+esc(o.label)+': '+o.stemmen+' ('+o.pct+'%)</div>').join('')+
-    '<div class="meta" style="margin-top:.3rem;">Totaal '+v.totaal+' · status: '+(v.open?'open':'gesloten')+'</div>'+
+    '<div class="meta h-mt30">Totaal '+v.totaal+' · status: '+(v.open?'open':'gesloten')+'</div>'+
     '<div class="rij"><button class="knop'+(v.open?' rood':'')+'" id="stemToggle">'+(v.open?'Stemming sluiten':'Stemming heropenen')+'</button></div></div>';
   $('#stemToggle').addEventListener('click', async () => {
     try { await api('/api/overheid/verkiezing/sluit', { open: !v.open }); meld('Bijgewerkt.'); laadStem(); laadRegie(); } catch(e){ meld(e.message); }

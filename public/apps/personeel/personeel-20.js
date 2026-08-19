@@ -45,8 +45,8 @@
       '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
       '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
-      '<button class="abtn" data-pdvk="contant" style="flex:1;">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
-      '<button class="abtn" data-pdvk="rtgpay" style="flex:1;">RTG Pay</button></div>'+
+      '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
+      '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+
       '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
       '<div class="card"><div class="k">'+T('pd.e.prog','Programma vandaag')+' \u00B7 '+totBinnen+'/'+totVerkocht+' '+T('pd.e.binnen2','binnen')+'</div>'+
       (slots.length ? slots.map(x =>

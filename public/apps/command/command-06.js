@@ -40,7 +40,7 @@
           '<div class="meta">' + esc(String(v.van)) + ' → ' + esc(String(v.naar)) + ' · voorgesteld door ' + esc(v.door) +
           ' op ' + esc(C.tijd(v.at)) + '</div>' +
           '<div class="meta">Reden: ' + esc(v.reden) + '</div>' +
-          '<div class="crij" style="margin-top:.45rem;">' +
+          '<div class="crij h-mt45">' +
           '<input class="veld" data-kr="' + esc(v.id) + '" placeholder="uw oordeel, kort" style="flex:1;min-width:12rem;">' +
           '<button class="knop vol" data-keur="' + esc(v.id) + '" data-ja="1">Goedkeuren</button>' +
           '<button class="knop weg" data-keur="' + esc(v.id) + '">Afwijzen</button></div></div>';
@@ -141,7 +141,7 @@
     var u = '<div class="kaart"><h3>' + esc(d.vraag) + '</h3>' +
       '<p>' + (d.knelpunten.length ? 'Knelpunt bij: <b>' + esc(d.knelpunten.join(', ')) + '</b>.' : 'Geen enkel domein komt boven 85% bezetting.') +
       ' Er komen ' + d.extraUitzonderingen + ' extra uitzonderingen bij; dat is ongeveer ' + d.extraMensuren + ' mensuur.</p>' +
-      '<p class="meta" style="margin-top:.5rem;">Model: ' + esc(d.model) + '</p></div>';
+      '<p class="meta h-mt50">Model: ' + esc(d.model) + '</p></div>';
     u += '<div class="kaart"><div class="schuif"><table class="ctab"><thead><tr><th>Domein</th><th>Volume nu</th><th>Straks</th>' +
       '<th>Bezetting</th><th>Wachtindex</th><th>Uitzonderingen</th></tr></thead><tbody>';
     for (var i = 0; i < d.regels.length; i++) {

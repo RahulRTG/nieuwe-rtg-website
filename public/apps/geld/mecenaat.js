@@ -87,7 +87,7 @@
           '<button type="button" id="mcGBet" aria-pressed="false">al betaald</button>' +
           '<button type="button" id="mcGFound" aria-pressed="false">via RTFoundation</button>' +
         '</div>' +
-        '<button class="knop hoofd" type="submit" style="margin-top:.7rem;">Vastleggen</button>' +
+        '<button class="knop hoofd h-mt70" type="submit">Vastleggen</button>' +
       '</form>' +
       '<h2>Uw giften</h2>' +
       '<div class="kaart" id="mcLijst">' +

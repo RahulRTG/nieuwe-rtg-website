@@ -43,7 +43,7 @@
               '</div>';
           }).join('')
         : '<div class="leeg">Nog geen taken.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-wtekst placeholder="Wat moet er gebeuren?" maxlength="300">' +
         (aliassen ? '<select class="veld" data-wvoor aria-label="Voor wie" style="max-width:11rem;">' +
           '<option value="">voor het team</option>' + aliassen + '</select>' : '') +
@@ -51,36 +51,36 @@
         '<button class="knop stil" data-wtaak type="button">Zet op de lijst</button></div>' +
 
       // documenten met versies
-      '<div class="sec" style="margin-top:.9rem;">Documenten</div>' +
+      '<div class="sec h-mt90">Documenten</div>' +
       (d.length
         ? d.map(function (x) {
             return '<div class="log"><b>' + esc(x.naam) + '</b> &middot; versie ' + x.versie +
               (x.samenvatting ? '<br>' + esc(x.samenvatting) : '') + '</div>';
           }).join('')
         : '<div class="leeg">Nog geen documenten. Dezelfde naam nog eens toevoegen maakt er een nieuwe versie van.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-dnaam placeholder="Naam van het document" maxlength="120">' +
         '<input class="veld" data-dsam placeholder="Waar gaat het over?" maxlength="500">' +
         '<button class="knop stil" data-ddoc type="button">Leg vast</button></div>' +
 
       // experimentlogboek en besluitenlog
-      '<div class="sec" style="margin-top:.9rem;">Logboek</div>' +
+      '<div class="sec h-mt90">Logboek</div>' +
       ((s.logboek || []).slice(0, 8).map(function (l) {
         return '<div class="log">' + esc(l.tekst) + ' &middot; ' + esc(l.wie || 'lab') + '</div>';
       }).join('') || '<div class="leeg">Nog niets.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-ltekst placeholder="Wat is er gebeurd?" maxlength="600">' +
         '<input class="veld" data-lapp placeholder="apparatuur (komma\'s)" maxlength="200" style="max-width:11rem;">' +
         '<button class="knop stil" data-llog type="button">Noteer</button></div>' +
 
-      '<div class="sec" style="margin-top:.9rem;">Besluitenlog</div>' +
+      '<div class="sec h-mt90">Besluitenlog</div>' +
       (bl.length
         ? bl.slice(0, 8).map(function (x) {
             return '<div class="log"><b>' + esc(x.tekst) + '</b> &middot; ' + esc(x.wie) +
               (x.waarom ? '<br>' + esc(x.waarom) : '') + '</div>';
           }).join('')
         : '<div class="leeg">Nog geen besluiten. Kleine keuzes die het onderzoek sturen horen hier; ze zijn niet te wissen.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-btekst placeholder="Wat is er besloten?" maxlength="500">' +
         '<input class="veld" data-bwaarom placeholder="Waarom?" maxlength="500">' +
         '<input class="veld" data-bdoor placeholder="Door wie" maxlength="80" style="max-width:9rem;">' +
@@ -127,7 +127,7 @@
                 (r.kalibratie.stand ? ' (' + esc(r.kalibratie.stand) + ')' : '') : 'n.v.t.') + '</div>';
           }).join('')
         : '<div class="leeg">Nog niets gereserveerd.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<select class="veld" data-resvapp aria-label="Apparaat">' +
           apparatuur.filter(function (a) { return a.actief; }).map(function (a) {
             return '<option value="' + esc(a.id) + '">' + esc(a.naam) + '</option>';

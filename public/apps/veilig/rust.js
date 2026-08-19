@@ -18,11 +18,11 @@
     if (r.aan) {
       $('#rust').innerHTML =
         '<p><strong>' + Veilig.esc(r.naam) + '</strong> staat aan.</p>' +
-        '<p class="stil" style="margin-top:.3rem;">' + Veilig.esc(r.uitleg) + '</p>' +
-        '<p class="stil" style="margin-top:.5rem;">Vanzelf voorbij om ' + Veilig.tijd(r.tot) +
+        '<p class="stil h-mt30">' + Veilig.esc(r.uitleg) + '</p>' +
+        '<p class="stil h-mt50">Vanzelf voorbij om ' + Veilig.tijd(r.tot) +
           (r.hangtAanWacht ? ', of zodra u incheckt in de Thuiswacht.' : '.') + '</p>' +
-        (r.notitie ? '<p class="stil" style="margin-top:.5rem;">' + Veilig.esc(r.notitie) + '</p>' : '') +
-        '<button class="knop groot" id="uit" style="margin-top:1rem;">Zet uit</button>';
+        (r.notitie ? '<p class="stil h-mt50">' + Veilig.esc(r.notitie) + '</p>' : '') +
+        '<button class="knop groot h-mt100" id="uit">Zet uit</button>';
       $('#uit').addEventListener('click', async function () {
         try { await Veilig.api('/api/veiligheid/rust/uit'); Veilig.melding('Uit.'); laad(); }
         catch (e) { Veilig.melding(e.message); }
@@ -42,7 +42,7 @@
       '</div>' +
       '<label class="stil lbl" for="notitie">Wilt u er iets bij zetten? (alleen voor uzelf)</label>' +
       '<input id="notitie" maxlength="120" placeholder="Bijv. eten met de kinderen">' +
-      '<button class="knop hoofd groot" id="aan" style="margin-top:.9rem;">Zet aan</button>';
+      '<button class="knop hoofd groot h-mt90" id="aan">Zet aan</button>';
 
     $('#rust').querySelectorAll('[data-id]').forEach(function (b) {
       b.addEventListener('click', function () {

@@ -33,7 +33,7 @@
         tafels.map(t => '<option' + (menuState.table === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' : '') +
       '<input class="ms-note" id="msNote" placeholder="' + T('app.ms.note','Allergie of opmerking (bijv. geen noten)') + '" value="' + menuState.note.replace(/"/g,'&quot;') + '">' +
       '<label class="ms-tag"><input type="checkbox" id="msTag"' + (menuState.tag ? ' checked' : '') + '> ' + T('app.ms.tag','Tag dit voor De Salon (7 dagen na verblijf)') + '</label>' +
-      '<select class="ms-note" id="msFooi" style="margin-top:0.4rem;" aria-label="' + T('erv.fooi','Fooi') + '">' +
+      '<select class="ms-note h-mt40" id="msFooi" aria-label="' + T('erv.fooi','Fooi') + '">' +
         '<option value="0">' + T('erv.fooi.geen','Geen fooi') + '</option>' +
         '<option value="p5"' + (menuState.fooi==='p5'?' selected':'') + '>' + T('erv.fooi.team','Fooi voor het team') + ': 5%</option>' +
         '<option value="p10"' + (menuState.fooi==='p10'?' selected':'') + '>' + T('erv.fooi.team','Fooi voor het team') + ': 10%</option>' +

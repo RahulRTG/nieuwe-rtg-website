@@ -119,7 +119,7 @@
     try {
       const d = await API.call('/supplier/pos/redeem', { code });
       const o = d.order;
-      box.innerHTML = '<div class="enroute here" style="margin-top:0.8rem;">✓ '+code+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
+      box.innerHTML = '<div class="enroute here h-mt80">✓ '+code+' · '+T('sup.guest','Gast')+' <b>'+o.codename+'</b> · '+
         o.items.map(i=>i.qty+'× '+i.name).join(', ')+' · '+eur(o.total)+
         (o.wasPaid ? ' · '+T('pos.waspaid','al betaald in de app') : ' · '+T('pos.chargedrtg','afgerekend via RTG'))+'</div>';
       inp.value = '';

@@ -134,8 +134,8 @@
       $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
         '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
         '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-        '<button class="knop2" id="spelJa" type="button" style="flex:1;">Graag</button>' +
-        '<button class="knop2 stil2" id="spelNee" type="button" style="flex:1;">Nu even niet</button></div>';
+        '<button class="knop2 h-flex1" id="spelJa" type="button">Graag</button>' +
+        '<button class="knop2 stil2 h-flex1" id="spelNee" type="button">Nu even niet</button></div>';
       $('#spelLaag').classList.add('open');
       $('#spelJa').addEventListener('click', async () => {
         $('#spelLaag').classList.remove('open');

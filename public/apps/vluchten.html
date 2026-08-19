@@ -135,7 +135,7 @@ async function laadMijn(){
     '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">Privejet</option><option value="helikopter">Helikopter</option></select>'+
     '<input class="veld" id="chBest" style="flex:1;min-width:8rem;" placeholder="Bestemming" maxlength="60"></div>'+
     '<div class="rij"><input class="veld" id="chDatum" type="date"><input class="veld" id="chTijd" type="time" value="12:00"><button class="knop" id="chVraag">Vraag aan</button></div>'+
-    ((d.charters||[]).length?'<div style="margin-top:.5rem;">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
+    ((d.charters||[]).length?'<div class="h-mt50">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
   $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){

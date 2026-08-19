@@ -74,7 +74,7 @@
     if (!user || !user.account || v === 'verified'){ el.innerHTML = ''; return; }
     if (v === 'pending'){
       el.innerHTML = '<div class="vbanner pending"><b>'+T('vf.pending.h','Verificatie in behandeling')+'</b><span>'+T('vf.pending.b','We controleren uw document. U kunt de app gewoon blijven gebruiken.')+'</span>'+
-        '<button class="vbtn" id="selfieStart" style="margin-top:0.5rem;">'+T('vf.selfie','Selfie toevoegen (gezichtscontrole)')+'</button></div>';
+        '<button class="vbtn h-mt50" id="selfieStart">'+T('vf.selfie','Selfie toevoegen (gezichtscontrole)')+'</button></div>';
       const sb = $('#selfieStart'); if (sb) sb.addEventListener('click', () => $('#selfieFile').click());
       return;
     }

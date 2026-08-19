@@ -50,16 +50,28 @@ function onderwerpVan(bron) {
   /* Anders: de eerste zin, en die mag over regels lopen. Een onderwerp dat
      midden in een bijzin ophoudt zegt minder dan geen onderwerp, want het
      leest als een fout in plaats van als een gat. */
+  const regelcommentaar = eerste.startsWith('//');
   const stukken = [];
   for (let r = i; r < Math.min(i + 4, regels.length); r++) {
-    let t = regels[r].trim();
+    const ruw = regels[r].trim();
+    /* HET COMMENTAAR IS AFGELOPEN, DUS HET ONDERWERP OOK. Zonder deze twee
+       regels liep de zeef door in de CODE eronder, en dan stond er in BUNDELS.md
+       "mijn zorgprofiel el.innerHTML = '<div class=..." -- een onderwerp dat
+       leest als een fout in plaats van als een wegwijzer. Gevonden doordat de
+       index na een andere ronde opnieuw werd voortgebracht en er ineens code in
+       stond. */
+    if (r > i && regelcommentaar && !ruw.startsWith('//')) break;
+    if (r > i && !regelcommentaar && !/^[*]|^[a-zA-Z(]/.test(ruw) && !ruw) break;
+    let t = ruw;
     if (r === i) t = t.replace(/^(\/\*|\/\/)/, '');
+    else if (regelcommentaar) t = t.replace(/^\/\//, '');
     const eind = t.indexOf('*/');                 // ook hier: de sluiter hoort niet in het onderwerp
-    if (eind > -1) t = t.slice(0, eind);
+    const sluit = eind > -1;
+    if (sluit) t = t.slice(0, eind);
     t = t.replace(/^\*+/, '').replace(/[-=*]{3,}/g, ' ').trim();
-    if (!t) { if (stukken.length) break; else continue; }
+    if (!t) { if (stukken.length) break; else if (sluit) break; else continue; }
     stukken.push(t);
-    if (/\.(\s|$)/.test(t)) break;
+    if (sluit || /\.(\s|$)/.test(t)) break;
   }
   let tekst = stukken.join(' ').replace(/\s+/g, ' ').trim();
   const punt = tekst.search(/\.(\s|$)/);

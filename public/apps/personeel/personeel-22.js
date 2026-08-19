@@ -8,7 +8,7 @@
         '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(d.codenaam)+' · '+(koop
           ? (T('pd.vk.aflevering','aflevering')+(d.concierge?' · '+T('pd.vk.concierge','concierge')+' '+esc(d.adres||''):' · '+T('pd.vk.ophalen','ophalen'))+' · '+eur(d.prijs||0))
           : (T('pd.vk.proefrit','proefrit')+(d.moment?' · '+esc(d.moment):'')))+'</div>'+
-        '<div style="margin-top:0.6rem;">'+knop+'</div></div>';
+        '<div class="h-mt60">'+knop+'</div></div>';
     }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.vk.geen','Niets in te plannen of af te leveren.')+'</div>';
     wrap.querySelectorAll('[data-vkgereden]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/verkoop/deal', { ref:b.dataset.vkgereden, actie:'gereden' }); toast(T('pd.vk.ok','Bijgewerkt.')); await laadVerkoop(); } catch(e){ toast(e.message); }

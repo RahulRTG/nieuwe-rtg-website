@@ -24,14 +24,14 @@
         return '<button data-blabel="' + x[0] + '" title="' + x[0] + '" style="width:22px;height:22px;border-radius:50%;border:2px solid ' +
           (k.label === x[0] ? 'var(--txt,#F4F1EC)' : 'var(--line)') + ';background:' + (x[1] === 'transparent' ? 'transparent' : x[1]) + ';cursor:pointer;"></button>';
       }).join('') +
-      '<span style="flex:1;"></span>' +
+      '<span class="h-flex1"></span>' +
       '<button data-bklaar="1" style="border-radius:999px;' + KNOP + '">' + (k.klaar ? 'Heropen' : '✓ Klaar') + '</button></div>' +
       '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">' +
       '<button data-bschuif="-1" style="' + KNOP + '">← lijst</button>' +
       '<button data-bschuif="1" style="' + KNOP + '">lijst →</button>' +
       '<button data-bop="-1" style="' + KNOP + '">↑</button>' +
       '<button data-bop="1" style="' + KNOP + '">↓</button>' +
-      '<span style="flex:1;"></span>' +
+      '<span class="h-flex1"></span>' +
       '<button data-bweg="1" style="color:var(--burgundy-on-dark,#C23A5E);' + KNOP.replace('color:inherit;', '') + '">Weg</button></div></div>';
   }
 

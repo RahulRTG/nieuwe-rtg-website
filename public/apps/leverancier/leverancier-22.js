@@ -45,7 +45,7 @@
     const adv = el.querySelector('#accAdvies');
     if (adv) adv.addEventListener('click', async () => {
       const box = el.querySelector('#accAdv');
-      box.innerHTML = '<div class="tkc-who" style="margin-top:0.6rem;">' + T('fn.advbezig', 'Ik kijk naar uw cijfers…') + '</div>';
+      box.innerHTML = '<div class="tkc-who h-mt60">' + T('fn.advbezig', 'Ik kijk naar uw cijfers…') + '</div>';
       try {
         const d = await API.call('/supplier/accountant/adviezen', {});
         box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.6rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +

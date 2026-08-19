@@ -1959,6 +1959,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "hulpklassen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/hulpcss.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 5
+    },
     "human-reality.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -93,7 +93,7 @@
 
     // de offertes: de koper ziet ze allemaal, een leverancier alleen zijn eigen
     if (h.offertes && h.offertes.length) {
-      uit += '<div style="margin-top:.4rem;">';
+      uit += '<div class="h-mt40">';
       h.offertes.forEach(function (o) {
         var gegund = h.gegundAan && h.gegundAan.offerteId === o.id;
         uit += '<div class="stil">' + esc(o.naam) + ': <b>' + euro(o.prijs) + '</b>' +
@@ -108,7 +108,7 @@
     // de stappen die DEZE zaak nu mag zetten, precies zoals de server ze noemt
     var stappen = (h.mag || []).filter(function (m) { return m !== 'gunnen' && KNOP[m]; });
     if (stappen.length) {
-      uit += '<div class="rij" style="margin-top:.5rem;">';
+      uit += '<div class="rij h-mt50">';
       stappen.forEach(function (m) {
         KNOP[m].vraagt.forEach(function (v) {
           uit += '<input class="veld" data-in="' + esc(h.id + ':' + v) + '" ' +

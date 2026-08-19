@@ -556,10 +556,10 @@
   function toonKantoorLogin(){
     $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
       '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
-      '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
+      '<div class="pinrow h-mt60"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
       '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
-      '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
-      '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
+      '<div class="k h-mt70">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
+      '<input class="hin h-mt40" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);
 /* aanmelden met de kassacode */
@@ -618,14 +618,14 @@
     $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.ka.staf','Personeel van een zaak')+'</button>'+
       '<div class="card" id="kaMeld">'+
         '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
-        '<input class="hin" id="kaNaam" maxlength="30" style="margin-top:0.4rem;" value="'+esc(naam)+'">'+
+        '<input class="hin h-mt40" id="kaNaam" maxlength="30" value="'+esc(naam)+'">'+
         '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+esc(x.naam)+'</option>').join('')+'</select>'+
         '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">'+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">'+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
         '<button class="abtn" id="kaMeldGo" style="margin-top:0.7rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
         '<div id="kaMFout" style="margin-top:0.4rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+
       '<div class="card" id="kaDienstBlok" hidden><div id="kaDienstTekst" style="font-size:0.9rem;"></div>'+
-        '<button class="abtn ghost" id="kaAfmeld" style="margin-top:0.6rem;">'+T('pd.ka.afmeld','Meld je af')+'</button></div>'+
-      '<div class="card"><div class="k">'+T('pd.ka.wie','Nu aan het werk')+'</div><div id="kaWie" style="margin-top:0.4rem;"></div></div>'+
+        '<button class="abtn ghost h-mt60" id="kaAfmeld">'+T('pd.ka.afmeld','Meld je af')+'</button></div>'+
+      '<div class="card"><div class="k">'+T('pd.ka.wie','Nu aan het werk')+'</div><div class="h-mt40" id="kaWie"></div></div>'+
       '<div class="card"><div class="k">'+T('pd.ka.chat','De chat van jouw kamer')+'</div>'+
         '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.4rem;"></div>'+
         '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
@@ -825,7 +825,7 @@
     const nuMissie = horecaMissies.filter(x=>x.status!=='klaar').sort((a,b)=>(a.prioriteit==='hoog'?-1:0)-(b.prioriteit==='hoog'?-1:0))[0];
     if (horecaOverdrachten.length) {
       const o=horecaOverdrachten[0];
-      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn h-mt70" id="hmAccept">Accepteer overdracht</button></div>');
       $('#hmAccept').addEventListener('click',async()=>{try{await API.call('/supplier/horeca/handover/accept',{id:o.id});toast('Overdracht geaccepteerd.');await laadZaken();renderAll();}catch(e){toast(e.message)}});
     }
     if (nuMissie) {
@@ -967,7 +967,7 @@
     const tw = $('#takenWrap');
     // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
     const kamers = (state && state.rooms || []).map(r => r.name);
-    const kamerSel = id => '<select class="hin" id="'+id+'" style="flex:1;"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
+    const kamerSel = id => '<select class="hin h-flex1" id="'+id+'"><option value="">'+T('hk.geenk','geen kamer')+'</option>'+kamers.map(k=>'<option>'+esc(k)+'</option>').join('')+'</select>';
     tw.innerHTML += '<div class="card"><div class="k">'+T('hk.klus.meld','Meld klus')+'</div>'+
       '<div class="row"><input class="hin" id="klusTekst" placeholder="'+T('hk.klus.ph','Omschrijf de klus...')+'" style="flex:2;">'+kamerSel('klusKamer')+'</div>'+
       '<button class="abtn" id="klusMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.klus.meld','Meld klus')+'</button></div>';
@@ -976,7 +976,7 @@
       '<div class="row"><input class="hin" id="lfItem" placeholder="'+T('hk.lf.item','Wat heb je gevonden?')+'" style="flex:2;">'+kamerSel('lfKamer')+'</div>'+
       '<div class="row"><input class="hin" id="lfPlek" placeholder="'+T('hk.lf.plek','Bewaarplek')+'"></div>'+
       '<button class="abtn" id="lfMeld" style="width:100%;margin-top:0.5rem;">'+T('hk.lf.meld','Registreer')+'</button>'+
-      (lf.length ? '<div class="k" style="margin-top:0.8rem;">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+
+      (lf.length ? '<div class="k h-mt80">'+T('hk.lf.recent','Laatst geregistreerd')+'</div>'+
         lf.map(x => '<div class="task"><div class="t"><b>'+esc(x.item)+'</b><span>'+(x.room?esc(x.room)+' · ':'')+(x.storage?esc(x.storage)+' · ':'')+timeAgo(x.at)+'</span></div></div>').join('') : '')+'</div>';
     tw.querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/ticket/status', { id:b.dataset.tk, status:b.dataset.st }); toast(b.dataset.st==='klaar'?T('pd.tickdone','Klus afgerond.'):T('pd.tickbusy','Opgepakt.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
@@ -1452,7 +1452,7 @@
       '<div class="card"><div class="k">'+T('pd.eh.h','EHBO, direct bij de hand')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">'+
         '<a href="tel:112" class="abtn" style="text-decoration:none;text-align:center;flex:1;">'+T('pd.eh.112','Bel 112')+'</a>'+
-        '<button class="abtn ghost" id="ehboAlarm" style="flex:1;">'+T('pd.eh.alarm','EHBO-alarm team')+'</button></div>'+
+        '<button class="abtn ghost h-flex1" id="ehboAlarm">'+T('pd.eh.alarm','EHBO-alarm team')+'</button></div>'+
       gids.map((g, i) =>
         '<div class="task" data-eh="'+i+'" style="cursor:pointer;"><span class="ic">'+g.i+'</span><div class="t"><b>'+g.t+'</b>'+
         (hulpOpen === i
@@ -1463,7 +1463,7 @@
 
       '<div class="card"><div class="k">'+T('pd.tp.h','Vertrouwenspersoon van RTG')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.76rem;line-height:1.5;color:var(--soft);">'+T('pd.tp.s','Volledig vertrouwelijk: uw werkgever ziet hier niets van. Alleen de vertrouwenspersoon van RTG leest en beantwoordt uw bericht. Voor alles wat u niet op de zaak kwijt kunt: van een onveilig gevoel tot problemen met een leidinggevende.')+'</div>'+
-      (tr.messages.length ? '<div class="chat" style="margin-top:0.6rem;">'+tr.messages.map(m =>
+      (tr.messages.length ? '<div class="chat h-mt60">'+tr.messages.map(m =>
         '<div class="msg '+(m.from === 'staff' ? 'me' : 'other')+'">'+(m.from === 'rtg' ? '<span class="who">'+T('pd.tp.rtg','Vertrouwenspersoon RTG')+'</span>' : '')+esc(m.text)+'</div>').join('')+'</div>' : '')+
       '<label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.6rem;font-size:0.76rem;color:var(--soft);"><input type="checkbox" id="tpAnon"'+(tr.anon ? ' checked' : '')+'> '+T('pd.tp.anon','Verstuur anoniem (uw naam wordt niet gedeeld)')+'</label>'+
       '<div class="compose" style="padding:0.6rem 0 0;"><input id="tpText" placeholder="'+T('pd.tp.ph','Vertel in vertrouwen wat er speelt...')+'"><button id="tpSend">'+T('pd.send','Stuur')+'</button></div></div>'+
@@ -1473,7 +1473,7 @@
       '<div style="margin-top:0.9rem;font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.ad.verlof','Verlof aanvragen')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.45rem;"><input type="date" id="vlVan" class="vlin" style="flex:1;min-width:0;"><input type="date" id="vlTot" class="vlin" style="flex:1;min-width:0;"></div>'+
       '<div class="compose" style="padding:0.5rem 0 0;"><input id="vlReden" placeholder="'+T('pd.ad.reden','Reden (mag leeg blijven)')+'"><button id="vlGo">'+T('pd.ad.vraag','Vraag aan')+'</button></div>'+
-      (vl.length ? '<div style="margin-top:0.6rem;">'+vl.map(v =>
+      (vl.length ? '<div class="h-mt60">'+vl.map(v =>
         '<div class="task"><span class="ic">'+(v.soort === 'ziek' ? '' : '')+'</span><div class="t"><b>'+(v.soort === 'ziek' ? T('pd.ad.zm','Ziekmelding')+' '+v.van : v.van+' t/m '+(v.tot || ''))+'</b><span>'+esc(v.reden || '')+'</span></div>'+
         '<span style="font-size:0.64rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:'+(VST[v.status] || [v.status, 'var(--soft)'])[1]+';">'+(VST[v.status] || [v.status])[0]+'</span></div>').join('')+'</div>' : '')+
       '</div>'+
@@ -1484,8 +1484,8 @@
           const ikGetekend = !!c.tekenPartij, zaakGetekend = !!c.tekenZaak;
           return '<div class="task" style="flex-direction:column;align-items:stretch;"><div class="t"><b>'+esc(c.titel)+'</b><span>'+T('pd.ct.'+c.soort, c.soort)+' \u00B7 '+(zaakGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.zaak','zaak')+' / '+(ikGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.ik','ik')+'</span></div>'+
           (c.velden && c.velden.length ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.2rem;">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
-          '<details style="margin-top:0.3rem;"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('pd.ct.lees','Voorwaarden')+'</summary><div style="font-size:0.76rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
-          (!ikGetekend && c.status !== 'geweigerd' ? '<button class="abtn" data-ctteken="'+c.ref+'" style="margin-top:0.5rem;">'+T('pd.ct.teken','Ondertekenen')+'</button>' : (ikGetekend ? '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--green);">\u2705 '+T('pd.ct.getekend','U tekende dit contract.')+'</div>' : ''))+
+          '<details class="h-mt30"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('pd.ct.lees','Voorwaarden')+'</summary><div style="font-size:0.76rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
+          (!ikGetekend && c.status !== 'geweigerd' ? '<button class="abtn h-mt50" data-ctteken="'+c.ref+'">'+T('pd.ct.teken','Ondertekenen')+'</button>' : (ikGetekend ? '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--green);">\u2705 '+T('pd.ct.getekend','U tekende dit contract.')+'</div>' : ''))+
           '</div>';
         }).join('')+'</div>' : '';
       })();
@@ -1749,8 +1749,8 @@
         )).join('') +
         '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.55rem;">'+
         VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--gold);"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
-        (tePakken.length ? '<button class="abtn" id="pdPakcheck" style="margin-top:0.5rem;">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
-        (teVertrekken.length ? '<button class="abtn" id="pdVertrek" style="margin-top:0.5rem;">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
+        (tePakken.length ? '<button class="abtn h-mt50" id="pdPakcheck">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
+        (teVertrekken.length ? '<button class="abtn h-mt50" id="pdVertrek">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
         (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
           rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
@@ -1758,7 +1758,7 @@
       (vrij.length ? vrij.map(o =>
         '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.4rem;accent-color:var(--gold);">'+
         '<div class="t"><b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.inpak?' · ✓ '+T('pd.bz.tasje','tas')+' '+esc(o.inpak.tas):'')+'</b><span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+'</span></div></label>'
-      ).join('') + '<button class="abtn" id="pdNeem" style="margin-top:0.6rem;">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
+      ).join('') + '<button class="abtn h-mt60" id="pdNeem">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenvrij','Niets klaar om mee te nemen. Nieuwe leveringen verschijnen hier live.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.ai','Snelle hulp (AI)')+'</div>'+
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
@@ -1864,7 +1864,7 @@
 
     h += '<div class="card"><div class="k">' + T('pd.wv.chk','Mijn checklijsten') + '</div>' +
       (c.lijsten.length ? c.lijsten.map(l =>
-        '<div style="margin-top:0.6rem;"><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
+        '<div class="h-mt60"><b>' + esc(l.titel) + '</b>' + (l.event ? ' · ' + esc(l.event) : '') +
           meta(l.af + '/' + l.totaal + ' (' + l.pct + '%)') + '</div>' +
         l.items.map(i =>
           '<div class="mbrow"><div>' + (i.klaar ? '✓ ' : '○ ') + esc(i.tekst) +
@@ -1892,7 +1892,7 @@
      later op elk scherm en op elke afdruk. */
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
-    $('#wvVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + esc(titel) + '</b>' +
+    $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
       '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
@@ -1958,7 +1958,7 @@
     document.querySelectorAll('[data-wvt]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/werkvloer/bedieningskaart', { id: b.dataset.wvt });
-        $('#wvTafelVak').innerHTML = '<div style="margin-top:0.6rem;"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
+        $('#wvTafelVak').innerHTML = '<div class="h-mt60"><b>' + T('pd.wv.tafel','Tafel') + ' ' + esc(d.tafel) + '</b>' +
           d.stoelen.map(s => '<div class="mbrow"><div>' + esc(s.naam) +
             '<div style="font-size:0.72rem;line-height:1.45;color:' + (s.let_op ? 'var(--gold)' : 'var(--soft)') + ';">' +
             esc(s.regel) + '</div></div></div>').join('') +
@@ -2124,8 +2124,8 @@
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=8?'#FF8589':a>=4?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
           '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (fase==='bezig'?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+T('vp.bezig','bezig')+'</div>':'')+
-          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkbar="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
-          '<button class="abtn" data-pkbar="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
+          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost h-flex1" data-pkbar="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
+          '<button class="abtn h-flex1" data-pkbar="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div></div>';
       }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.b.leeg','Geen open drankbonnen. Nieuwe bestellingen verschijnen hier vanzelf, live met het barscherm.')+'</div>';
     } else {
       const sec = pdaKant;
@@ -2172,8 +2172,8 @@
           (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
           pkGast(o)+
           (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
-          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkgo="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
-          '<button class="abtn" data-pkgo="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
+          '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost h-flex1" data-pkgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
+          '<button class="abtn h-flex1" data-pkgo="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div></div>';
       }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.k.leeg','Niets voor deze kant. Nieuwe bonnen verschijnen hier vanzelf, live met het keukenscherm.')+'</div>';
     }
 /* van kant wisselen op het keukenbord */
@@ -2264,15 +2264,15 @@
     const cartTot = winkelCart.reduce((n, r) => n + r.price * r.aantal, 0);
     html += '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.w.kassa','Mobiele kassa')+
       (winkelKlant?'<span style="color:var(--gold);font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
-      (winkelCart.length ? '<div style="margin-top:0.5rem;">'+winkelCart.map((r,i) => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
+      (winkelCart.length ? '<div class="h-mt50">'+winkelCart.map((r,i) => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
         '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
-        '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn" data-wbetaal="rtgpay" style="flex:1;">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
+        '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn h-flex1" data-wbetaal="rtgpay">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
         '<button class="abtn ghost" id="wCartLeeg" style="margin-top:0.5rem;width:100%;">'+T('pd.w.leeg','Bon leegmaken')+'</button></div>'
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
     // voorraad opzoeken
     html += '<div class="card"><div class="k">'+T('pd.w.zoek','Voorraad opzoeken')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wZoek', T('pd.w.zoekph','Naam, kleur of maat…'))+'<button class="abtn" id="wZoekBtn">'+T('pd.w.zoekbtn','Zoek')+'</button></div>'+
-      '<div id="wZoekUit" style="margin-top:0.5rem;"></div></div>';
+      '<div class="h-mt50" id="wZoekUit"></div></div>';
     // paskamerverzoeken
     const pk = pdRetail.paskamer || [];
     html += '<div class="card"><div class="k">'+T('pd.w.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
@@ -2286,7 +2286,7 @@
     // klant erbij pakken
     html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
-      '<div id="wKlantUit" style="margin-top:0.5rem;">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
+      '<div class="h-mt50" id="wKlantUit">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
     wrap.innerHTML = html;
     winkelBind(wrap);
   }
@@ -2447,8 +2447,8 @@
       '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
       '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
-      '<button class="abtn" data-pdvk="contant" style="flex:1;">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
-      '<button class="abtn" data-pdvk="rtgpay" style="flex:1;">RTG Pay</button></div>'+
+      '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
+      '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+
       '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
       '<div class="card"><div class="k">'+T('pd.e.prog','Programma vandaag')+' \u00B7 '+totBinnen+'/'+totVerkocht+' '+T('pd.e.binnen2','binnen')+'</div>'+
       (slots.length ? slots.map(x =>
@@ -2593,7 +2593,7 @@
         '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(d.codenaam)+' · '+(koop
           ? (T('pd.vk.aflevering','aflevering')+(d.concierge?' · '+T('pd.vk.concierge','concierge')+' '+esc(d.adres||''):' · '+T('pd.vk.ophalen','ophalen'))+' · '+eur(d.prijs||0))
           : (T('pd.vk.proefrit','proefrit')+(d.moment?' · '+esc(d.moment):'')))+'</div>'+
-        '<div style="margin-top:0.6rem;">'+knop+'</div></div>';
+        '<div class="h-mt60">'+knop+'</div></div>';
     }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.vk.geen','Niets in te plannen of af te leveren.')+'</div>';
     wrap.querySelectorAll('[data-vkgereden]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/verkoop/deal', { ref:b.dataset.vkgereden, actie:'gereden' }); toast(T('pd.vk.ok','Bijgewerkt.')); await laadVerkoop(); } catch(e){ toast(e.message); }
@@ -2710,7 +2710,7 @@
         if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
         return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
       }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
-      (me.role==='manager' ? '<div class="compose" style="margin-top:0.5rem;"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
+      (me.role==='manager' ? '<div class="compose h-mt50"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
       '<div id="netChat"></div></div>';
     const send = async () => {
       const inp = $('#tmMsg'); const text = (inp.value||'').trim(); if (!text) return;
@@ -2753,7 +2753,7 @@
     const box = document.getElementById('netChat'); if (!box) return;
     if (!netOpen){ box.innerHTML = ''; return; }
     const naam = (netwerk.find(v => v.code === netOpen) || {}).naam || netOpen;
-    box.innerHTML = '<div class="k" style="margin-top:0.7rem;">'+esc(naam)+'</div><div class="chat">'+
+    box.innerHTML = '<div class="k h-mt70">'+esc(naam)+'</div><div class="chat">'+
       (netBerichten.length ? netBerichten.map(m => '<div class="msg '+(m.code===code?'me':'other')+'"><span class="who">'+esc(m.naam+' · '+m.door)+'</span>'+esc(m.tekst)+'</div>').join('')
         : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><input id="netMsg" placeholder="'+T('pd.net.msgph','Bericht')+'"><button id="netSend">'+T('pd.send','Stuur')+'</button></div>';
@@ -2914,16 +2914,16 @@
         mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'',oranje:'',geel:'',groen:'',blauw:''}[p.triage]||'')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
     }
     // de ketenchat: het gedeelde kanaal en de eigen besloten groepen
-/* de ketenchat */
+/* de ketenchat tussen zaken */
     if (mkKeten && (mkKeten.kanalen || []).length){
       html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
         '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>
           '<button class="abtn '+(k.id===mkKanaal?'':'ghost')+'" data-mkkan="'+k.id+'"'+(k.id===mkKanaal?' aria-current="true"':'')+'>'+esc(k.naam)+'</button>').join('')+'</div>'+
-        '<div class="chat" style="margin-top:0.4rem;">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
+        '<div class="chat h-mt40">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
           '<div class="msg other"><span class="who">'+esc(m.van)+' · '+esc(m.korpsNaam || m.korps)+'</span>'+esc(m.tekst)+'</div>').join('')+'</div>'+
         (mkGesprek && mkGesprek.magSchrijven === false
           ? '<div style="font-size:0.75rem;color:var(--soft);margin-top:0.3rem;">'+T('pd.mk.meekijk','U kijkt mee als meldkamer; alleen de leden schrijven.')+'</div>'
-          : '<div class="compose" style="margin-top:0.4rem;"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
+          : '<div class="compose h-mt40"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
         '</div>';
     }
     wrap.innerHTML = html;

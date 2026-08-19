@@ -32,7 +32,7 @@
       } catch(e){ toast(e.message); }
     });
   }
-  function backBtn(){ return '<button class="sp-biz-btn" id="spBack2" style="margin-top:0.9rem;">← '+T('sp.back','Terug')+'</button>'; }
+  function backBtn(){ return '<button class="sp-biz-btn h-mt90" id="spBack2">← '+T('sp.back','Terug')+'</button>'; }
   function bindBack(fn){ const b = $('#spBack2'); if (b) b.addEventListener('click', fn); }
 
   $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));

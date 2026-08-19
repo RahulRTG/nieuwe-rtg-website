@@ -161,8 +161,8 @@
       }).join('') : '<div class="leeg">Nog niets gepland.</div>')+
       '<label for="bwat">Roep een bijeenkomst uit</label><input id="bwat" maxlength="90" placeholder="Waarvoor komen jullie samen?">'+
       '<div style="display:flex;gap:.4rem;margin-top:.4rem;"><input id="bdatum" type="date" aria-label="Datum"><input id="btijd" type="time" aria-label="Tijd"></div>'+
-      '<input id="bwaar" maxlength="120" placeholder="Waar?" style="margin-top:.4rem;">'+
-      '<input id="bplaatsen" inputmode="numeric" placeholder="Aantal plaatsen (mag leeg)" aria-label="Aantal plaatsen" style="margin-top:.4rem;">'+
+      '<input class="h-mt40" id="bwaar" maxlength="120" placeholder="Waar?">'+
+      '<input class="h-mt40" id="bplaatsen" inputmode="numeric" placeholder="Aantal plaatsen (mag leeg)" aria-label="Aantal plaatsen">'+
       '<div class="knoppen"><button class="knop" id="broep" type="button">Uitnodigen</button>'+
       '<button class="knop stil" id="bdatumai" type="button">Welke dag past de meesten?</button></div>'+
       '<div class="uit" id="udatum" hidden></div></div>';
@@ -176,13 +176,13 @@
       '<div class="uit" id="uprik" hidden></div>'+
       (b.length ? b.map(function(x){
         return '<div class="rij"><div class="tx"><b>'+esc(x.van)+'</b><small>'+esc(x.tekst)+'</small>'+
-          (x.peiling ? '<div style="margin-top:.4rem;">'+x.peiling.keuzes.map(function(k,i){
+          (x.peiling ? '<div class="h-mt40">'+x.peiling.keuzes.map(function(k,i){
             var pct = x.peiling.totaal ? Math.round(k.aantal/x.peiling.totaal*100) : 0;
             return '<button class="mini" data-stem="'+x.id+'" data-k="'+i+'" style="display:block;text-align:left;">'+
               esc(k.naam)+' · '+k.aantal+(x.peiling.mijnStem===i?' (jouw stem)':'')+'</button>'+
               '<div class="staaf"><i style="width:'+pct+'%;"></i></div>';
-          }).join('')+'<small style="margin-top:.3rem;">'+x.peiling.totaal+' stemmen</small></div>' : '')+
-          (x.reacties.length ? '<div style="margin-top:.4rem;">'+x.reacties.map(function(r){
+          }).join('')+'<small class="h-mt30">'+x.peiling.totaal+' stemmen</small></div>' : '')+
+          (x.reacties.length ? '<div class="h-mt40">'+x.reacties.map(function(r){
             return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+'</small>'; }).join('')+'</div>' : '')+
           '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" style="max-width:60%;">'+
           '<button class="mini" data-reageer="'+x.id+'">plaatsen</button>'+

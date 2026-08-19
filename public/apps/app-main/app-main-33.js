@@ -60,17 +60,17 @@
             '<div class="lh">' + T('vs.h','Rahul verwacht') + '</div>' +
             '<div class="ld">' + esc(v.wat) + ' · ' + esc(v.waarom) + '. ' +
               T('vs.d','Klopt het niet, dan negeert u dit gewoon; Rahul leert vanzelf bij.') + '</div>' +
-            '<button class="chip js-vsdoe" style="margin-top:0.5rem;">' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
+            '<button class="chip js-vsdoe h-mt50">' + T('vs.doe','Laat Rahul het klaarzetten') + '</button>' +
           '</div>'
         : '') +
       (pk.length
         ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
             '<div class="lh">' + T('pk.h','Pakketten van onze huizen') + '</div>' +
-            pk.map(p => '<div style="margin-top:0.45rem;">' +
+            pk.map(p => '<div class="h-mt45">' +
               '<div style="font-size:0.85rem;"><b>' + esc(p.naam) + '</b> · € ' + (p.prijsCenten/100).toFixed(2).replace('.', ',') + '</div>' +
               '<div style="font-size:0.72rem;color:var(--soft);">' + p.zaken.map(esc).join(' + ') +
                 (p.omschrijving ? ' · ' + esc(p.omschrijving) : '') + '</div>' +
-              '<button class="chip js-pkboek" data-pk="' + esc(p.id) + '" data-pknaam="' + esc(p.naam) + '" data-pkprijs="' + p.prijsCenten + '" style="margin-top:0.35rem;">' + T('pk.boek','Boek dit pakket') + '</button></div>').join('') +
+              '<button class="chip js-pkboek h-mt35" data-pk="' + esc(p.id) + '" data-pknaam="' + esc(p.naam) + '" data-pkprijs="' + p.prijsCenten + '">' + T('pk.boek','Boek dit pakket') + '</button></div>').join('') +
           '</div>'
         : '') +
       '<div class="live-start" style="margin-bottom:0.8rem;">' +

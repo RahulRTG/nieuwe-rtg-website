@@ -124,7 +124,7 @@
     e.style.left = x + 'px'; e.style.top = y + 'px';
     e.style.width = b + 'px'; e.style.height = h + 'px';
   }
-  /* ------------------------------------------------------------- surfaces -- */
+/* surfaces: een venster openen, sluiten en naar voren halen */
   function open(id, opties) {
     opties = opties || {};
     var bestaand = vind(id);
@@ -236,7 +236,7 @@
     }
     schik();
   }
-  /* --------------------------------------------------------- verplaatsen -- */
+/* verplaatsen: een surface aan zijn gouden greep verslepen */
   function sleep(s, ev) {
     var m = meet();
     var start = s.el.getBoundingClientRect();

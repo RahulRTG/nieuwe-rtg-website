@@ -94,7 +94,7 @@
     document.querySelector('.kop').style.display = 'none';
     $('#poort').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;">De Résidence</h2>' +
       '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
-      '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+      '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
   } else {
     const wens = new URLSearchParams(location.search).get('kamer') || 'lobby';
     betreed(wens);

@@ -73,7 +73,7 @@
       <input id="vnw" maxlength="40" placeholder="Bijv. zij/haar, hij/hem, die/diens">
       <label class="stil lbl" for="aanhef">Hoe spreekt Rahul u aan?</label>
       <input id="aanhef" maxlength="40" placeholder="Uw naam, of hoe u genoemd wilt worden">
-      <button class="knop hoofd" id="bewaar" style="margin-top:.8rem;">Bewaren</button>
+      <button class="knop hoofd h-mt80" id="bewaar">Bewaren</button>
     </div>
   </section>
 
@@ -144,9 +144,9 @@
         '> ' + Veilig.esc(k.naam) + '</label>').join('') + '</div>' +
       '<label class="stil lbl" for="eigen">Wilt u het zelf zeggen?</label>' +
       '<input id="eigen" maxlength="120" placeholder="In uw eigen woorden" value="' + Veilig.esc(g.eigen) + '">' +
-      '<label class="mini" style="margin-top:.8rem;"><input type="checkbox" id="fd"' + (g.feestdagen ? ' checked' : '') +
+      '<label class="mini h-mt80"><input type="checkbox" id="fd"' + (g.feestdagen ? ' checked' : '') +
         '> Rahul mag me feliciteren met feestdagen</label>' +
-      '<label class="mini" style="margin-top:.5rem;"><input type="checkbox" id="gb"' + (g.gebed ? ' checked' : '') +
+      '<label class="mini h-mt50"><input type="checkbox" id="gb"' + (g.gebed ? ' checked' : '') +
         '> Toon gebedstijden en de richting van Mekka</label>' +
       '<div id="gbOpties"' + (g.gebed ? '' : ' hidden') + '>' +
         '<label class="stil lbl" for="methode">Berekeningsmethode</label>' +
@@ -156,7 +156,7 @@
         '<select id="asr"><option value="standaard"' + (g.asr === 'standaard' ? ' selected' : '') + '>Standaard</option>' +
         '<option value="hanafi"' + (g.asr === 'hanafi' ? ' selected' : '') + '>Hanafi</option></select>' +
       '</div>' +
-      '<button class="knop hoofd" id="gBewaar" style="margin-top:.9rem;">Bewaren</button>';
+      '<button class="knop hoofd h-mt90" id="gBewaar">Bewaren</button>';
 
     $('#gb').addEventListener('change', e => { $('#gbOpties').hidden = !e.target.checked; });
     $('#gBewaar').addEventListener('click', async () => {
@@ -194,21 +194,21 @@
       if (d.vanavond && d.vanavond.length)
         h += d.vanavond.map(f => '<p><strong>Vanavond begint ' + Veilig.esc(f.naam) + '</strong> (die dag begint bij zonsondergang).</p>').join('');
       const komend = (d.feesten || []).filter(f => f.overDagen > 0).slice(0, 4);
-      if (komend.length) h += '<p class="stil" style="margin-top:.5rem;">Komende weken: ' +
+      if (komend.length) h += '<p class="stil h-mt50">Komende weken: ' +
         komend.map(f => Veilig.esc(f.naam) + ' (' + f.datum + (f.zekerheid === 'berekend' ? ', kan een dag schelen' : '') + ')').join(' &middot; ') + '</p>';
 
       if (d.gebed) {
-        h += '<h2 style="margin-top:1.2rem;">Gebedstijden</h2><p class="stil">' + Veilig.esc(d.gebed.methode) + '</p>' +
+        h += '<h2 class="h-mt120">Gebedstijden</h2><p class="stil">' + Veilig.esc(d.gebed.methode) + '</p>' +
           ['fajr', 'zonsopgang', 'dhuhr', 'asr', 'maghrib', 'isha'].filter(k => d.gebed[k]).map(k =>
             '<div class="rij"><span class="cn" style="text-transform:capitalize;">' + k + '</span><strong>' + lokaal(d.gebed[k]) + '</strong></div>').join('');
-        if (d.gebed.waarschuwing) h += '<p class="stil" style="margin-top:.5rem;">' + Veilig.esc(d.gebed.waarschuwing) + '</p>';
+        if (d.gebed.waarschuwing) h += '<p class="stil h-mt50">' + Veilig.esc(d.gebed.waarschuwing) + '</p>';
       }
-      if (d.qibla) h += '<h2 style="margin-top:1.2rem;">Richting van Mekka</h2>' +
+      if (d.qibla) h += '<h2 class="h-mt120">Richting van Mekka</h2>' +
         '<p><strong>' + d.qibla.graden + ' graden</strong> (' + Veilig.esc(d.qibla.streek) + '), ' + d.qibla.afstandKm + ' km hemelsbreed.</p>' +
-        '<p class="stil" style="margin-top:.3rem;">' + Veilig.esc(d.qibla.uitleg) + '</p>';
-      if (d.plekNodig) h += '<p class="stil" style="margin-top:.6rem;">Voor gebedstijden en de richting van Mekka ' +
+        '<p class="stil h-mt30">' + Veilig.esc(d.qibla.uitleg) + '</p>';
+      if (d.plekNodig) h += '<p class="stil h-mt60">Voor gebedstijden en de richting van Mekka ' +
         'is uw plek nodig. Die wordt alleen gebruikt om de zonnestand uit te rekenen en niet bewaard.</p>' +
-        '<button class="knop" id="plekKnop" style="margin-top:.5rem;">Gebruik mijn plek</button>';
+        '<button class="knop h-mt50" id="plekKnop">Gebruik mijn plek</button>';
       host.innerHTML = h || '<p class="stil">Voorlopig niets bijzonders.</p>';
       const pk = $('#plekKnop');
       if (pk) pk.addEventListener('click', () => {
@@ -231,7 +231,7 @@
       '<p class="stil">Dit geldt op elk scherm van RTG, niet alleen hier. U kunt het altijd terugzetten.</p>' +
       Object.keys(velden).map(veld => {
         const v = velden[veld];
-        return '<div style="margin-top:1rem;">' +
+        return '<div class="h-mt100">' +
           '<b style="display:block;">' + Veilig.esc(v.label) + '</b>' +
           '<span class="stil" style="display:block;margin:.15rem 0 .3rem;">' + Veilig.esc(v.uitleg) + '</span>' +
           v.opties.map(o => '<button class="keus" data-tgveld="' + veld + '" data-tgwaarde="' + o.id + '"' +
@@ -258,9 +258,9 @@
     try {
       const s = (await Veilig.api('/api/rahul/stemming')).stemming;
       $('#bui').innerHTML = '<p class="stemming">' + Veilig.esc(BUI[s.id] || s.id) + '</p>' +
-        '<p class="stil" style="margin-top:.4rem;">' +
+        '<p class="stil h-mt40">' +
         (s.vast ? 'Vastgezet vanuit de boardroom.' : (s.restMin != null ? 'Nog ongeveer ' + s.restMin + ' minuten, daarna slaat het weer om.' : '')) + '</p>' +
-        '<p class="stil" style="margin-top:.6rem;">Rahul heeft buien, net als iedereen. Het raakt alleen ' +
+        '<p class="stil h-mt60">Rahul heeft buien, net als iedereen. Het raakt alleen ' +
         'hoe hij praat: hij helpt even goed, en zodra het ergens over gaat laat hij zijn bui los.</p>';
     } catch (e) { $('#bui').innerHTML = '<p class="stil">Onbekend.</p>'; }
   }

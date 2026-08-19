@@ -236,9 +236,9 @@
   <div style="padding:.7rem;overflow-y:auto;">
     <canvas class="studio-cv" id="stCv" aria-label="Bewerk je foto"></canvas>
     <div class="strij" id="stFilters" role="group" aria-label="Filters"></div>
-    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;"></span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span style="flex:1;"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
+    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;"></span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span class="h-flex1"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
     <div class="strij" id="stEmojis" role="group" aria-label="Stickers"></div>
-    <input class="veld" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120" style="margin-top:.5rem;">
+    <input class="veld h-mt50" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120">
     <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:.55rem;">Versturen</button>
   </div>
 </div></div>
@@ -772,7 +772,7 @@ async function laadSnaps(){
   const snaps = d.snaps||[];
   if (!snaps.length) return;
   const el = document.createElement('div'); el.id='nieuweSnaps'; el.className='lijst'; el.style.marginBottom='.6rem';
-  el.innerHTML = '<div class="sec" style="margin-top:0;">Nieuwe snaps</div>' + snaps.map(sn=>
+  el.innerHTML = '<div class="sec h-mt0">Nieuwe snaps</div>' + snaps.map(sn=>
     '<div class="rij"><span class="av">◨</span><div class="nm">'+esc(sn.van)+'<small>stuurde je een snap</small></div><button class="knop mini" data-opensnap="'+esc(sn.id)+'">Bekijk</button></div>'
   ).join('');
   $('#vrienden').parentNode.insertBefore(el, $('#vrienden').previousElementSibling);

@@ -126,7 +126,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Verblijven boek je als lid. Open de app en log in met je RTG-account.</p>'+
-    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
 let ALLE = [], soort = '', MIJN = [];

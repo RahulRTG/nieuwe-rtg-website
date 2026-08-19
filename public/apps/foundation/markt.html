@@ -138,17 +138,17 @@
       </div>
       <label class="vl" for="pOms">Omschrijving <button type="button" class="knop grijs klein" id="pAiOms" style="float:right;">AI: schrijf voor mij</button></label>
       <textarea class="veld" id="pOms" maxlength="2000" placeholder="Vertel kort wat je aanbiedt, de staat en of het opgehaald of verzonden kan worden."></textarea>
-      <div class="rij" style="margin-top:.7rem;">
-        <div style="flex:1;">
-          <label class="vl" for="pPrijs" style="margin-top:0;">Vraagprijs (€)</label>
+      <div class="rij h-mt70">
+        <div class="h-flex1">
+          <label class="vl h-mt0" for="pPrijs">Vraagprijs (€)</label>
           <input class="veld" id="pPrijs" type="number" inputmode="numeric" min="0" placeholder="0 = gratis / t.e.a.b.">
         </div>
-        <div style="flex:1;">
-          <label class="vl" for="pPlaats" style="margin-top:0;">Plaats</label>
+        <div class="h-flex1">
+          <label class="vl h-mt0" for="pPlaats">Plaats</label>
           <input class="veld" id="pPlaats" maxlength="40" placeholder="Bijv. Ibiza">
         </div>
       </div>
-      <button type="button" class="knop grijs klein" id="pAiPrijs" style="margin-top:.5rem;">AI: stel een eerlijke prijs voor</button>
+      <button type="button" class="knop grijs klein h-mt50" id="pAiPrijs">AI: stel een eerlijke prijs voor</button>
       <div id="pAiUit" class="aihint"></div>
       <label class="vl">Ophalen of verzenden</label>
       <div class="chips" id="pLevering">
@@ -307,9 +307,9 @@
               '<button type="button" class="knop" id="dReageer">Stuur een bericht</button>' +
               '<button type="button" class="knop grijs" id="dMeld">Melden</button>' +
               '<button type="button" class="knop grijs" id="dBlok">Blokkeer verkoper</button></div>' +
-              '<div id="dReageerVak" hidden style="margin-top:.7rem;">' +
+              '<div class="h-mt70" id="dReageerVak" hidden>' +
               '<textarea class="veld" id="dBericht" placeholder="Hoi, is dit nog beschikbaar?"></textarea>' +
-              '<button type="button" class="knop" id="dVerstuur" style="margin-top:.5rem;">Verstuur</button>' +
+              '<button type="button" class="knop h-mt50" id="dVerstuur">Verstuur</button>' +
               '<div id="dReageerMeld" class="melding"></div></div>')) +
         '</div>';
       toon('detail');

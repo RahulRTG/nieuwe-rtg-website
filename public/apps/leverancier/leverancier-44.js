@@ -32,7 +32,7 @@
       '<div class="row-gap h-mt40"><input id="vrGewicht" class="st-in" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'" class="h-flex1"><input id="vrColli" class="st-in" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'" class="h-flex1">'+
       '<select id="vrIncoterm" class="st-in h-flex1">'+(d.incoterms||[]).map(t=>'<option'+(t==='DAP'?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
       '<div class="row-gap h-mt40"><input id="vrVanPlaats" class="st-in" placeholder="'+T('vr.vanplaats','Van: plaats')+'" maxlength="60" class="h-flex1"><input id="vrVanLand" class="st-in" placeholder="'+T('vr.vanland','Van: land')+'" maxlength="40" class="h-flex1"><input id="vrNaarPlaats" class="st-in" placeholder="'+T('vr.naarplaats','Naar: plaats')+'" maxlength="60" class="h-flex1"><input id="vrNaarLand" class="st-in" placeholder="'+T('vr.naarland','Naar: land')+'" maxlength="40" class="h-flex1"></div>'+
-      '<div class="sub" style="margin-top:0.55rem;">'+T('vr.route','De route, etappe voor etappe; het juiste vervoersdocument (AWB, B/L, CMR, CIM, CMNI) regelt de app per etappe:')+'</div>'+
+      '<div class="sub h-mt55">'+T('vr.route','De route, etappe voor etappe; het juiste vervoersdocument (AWB, B/L, CMR, CIM, CMNI) regelt de app per etappe:')+'</div>'+
       '<div id="vrEtappes">'+vrEtappeRijen()+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
       '<button id="vrEtPlus" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.78rem;">+ '+T('vr.etplus','Etappe')+'</button>'+
@@ -42,7 +42,7 @@
     const lopend = d.zendingen.filter(z=>z.status!=='afgeleverd'), af = d.zendingen.filter(z=>z.status==='afgeleverd');
     h += '<div class="st-sec h-mt100">'+T('vr.lopend','Lopende zendingen')+'</div>';
     h += lopend.length ? lopend.map(vrKaart).join('') : '<p class="sub">'+T('vr.geen','Geen lopende zendingen.')+'</p>';
-    if (af.length) h += '<details style="margin-top:0.6rem;"><summary class="sub" style="cursor:pointer;">'+T('vr.afgeleverd','Afgeleverd')+' ('+af.length+')</summary>'+af.map(vrKaart).join('')+'</details>';
+    if (af.length) h += '<details class="h-mt60"><summary class="sub" style="cursor:pointer;">'+T('vr.afgeleverd','Afgeleverd')+' ('+af.length+')</summary>'+af.map(vrKaart).join('')+'</details>';
     el.innerHTML = h;
 
     // de etappe-bouwer onthoudt wat er al getypt is voordat hij opnieuw tekent

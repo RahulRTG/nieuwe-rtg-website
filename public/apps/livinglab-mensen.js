@@ -34,7 +34,7 @@
         ? d.slice(0, 40).map(function (p) {
             return '<div class="log" data-alias="' + esc(p.alias) + '"><b>' + esc(p.alias) + '</b> &middot; ' +
               esc(rolNaam(p.rol)) + ' &middot; toestemming: ' + esc(p.toestemming) +
-              '<div class="rij" style="margin-top:.25rem;">' +
+              '<div class="rij h-mt25">' +
                 '<select class="veld" data-mrolzet aria-label="Rol wijzigen" style="font-size:.75rem;max-width:12rem;">' +
                   KADER.rollen.map(function (r) {
                     return '<option value="' + esc(r.rol) + '"' + (r.rol === p.rol ? ' selected' : '') + '>' +
@@ -45,15 +45,15 @@
               '</div></div>';
           }).join('')
         : '<div class="leeg">Nog niemand. Een deelnemer krijgt een pseudoniem en een eigen labpas; met die pas opent hij zijn onderzoek op /apps/labpas.html.</div>') +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="rij h-mt50">' +
         '<select class="veld" data-mrol aria-label="Rol">' + opt(KADER.rollen, 'rol', 'naam') + '</select>' +
         (e.toestemming && e.toestemming.regime !== 'geen'
           ? '<label class="chip"><input type="checkbox" data-mtoe checked> toestemming gegeven</label>' : '') +
         '<label class="chip"><input type="checkbox" data-mminder> minderjarig</label>' +
         (e.toestemming && e.toestemming.ouderlijk ? '<label class="chip"><input type="checkbox" data-mouder> ouderlijk akkoord</label>' : '') +
       '</div>' +
-      '<input class="veld" data-mpas placeholder="Labpaspoort-code (optioneel; niet bij een gescheiden studie)" maxlength="40" style="margin-top:.35rem;">' +
-      '<button class="knop" data-mbij type="button" style="margin-top:.35rem;">Voeg deelnemer toe</button>' +
+      '<input class="veld h-mt35" data-mpas placeholder="Labpaspoort-code (optioneel; niet bij een gescheiden studie)" maxlength="40">' +
+      '<button class="knop h-mt35" data-mbij type="button">Voeg deelnemer toe</button>' +
       '<div data-mnieuw></div></div>';
   }
 
@@ -66,7 +66,7 @@
       api('mens/bij', { id: s.id, rol: w('[data-mrol]'), toestemming: aan('[data-mtoe]'),
         minderjarig: aan('[data-mminder]'), ouderlijk: aan('[data-mouder]'), paspoort: w('[data-mpas]') })
         .then(function (r) {
-          q('[data-mnieuw]').innerHTML = '<div class="uitdaging" style="margin-top:.6rem;">' +
+          q('[data-mnieuw]').innerHTML = '<div class="uitdaging h-mt60">' +
             '<div class="sec">Labpas voor ' + esc(r.deelnemer.alias) + '</div>' +
             '<h2 style="font-family:monospace;font-size:1.15rem;">' + esc(r.deelnemer.pas) + '</h2>' +
             '<div class="leeg">Geef deze code aan de deelnemer. Hij komt maar één keer in beeld en is daarna ' +

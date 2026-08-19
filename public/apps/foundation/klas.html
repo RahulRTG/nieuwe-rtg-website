@@ -87,8 +87,8 @@ function teken(){
   $('#sScore').textContent = LES.score;
   const inhoud = $('#kInhoud'), opties = $('#kOpties');
   if (LES.fase === 'lobby'){
-    inhoud.innerHTML = '<h1 style="font-size:1.25rem;">'+esc(LES.titel)+'</h1><p class="stil" style="margin-top:.6rem;">'+esc(LES.uitleg||'')+'</p>'+
-      '<p class="stil" style="margin-top:.8rem;">De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
+    inhoud.innerHTML = '<h1 style="font-size:1.25rem;">'+esc(LES.titel)+'</h1><p class="stil h-mt60">'+esc(LES.uitleg||'')+'</p>'+
+      '<p class="stil h-mt80">De juf of meester start zo de eerste vraag. Lees de uitleg alvast rustig door.</p>';
     opties.innerHTML = ''; laatsteVraag = -2; return;
   }
   if (LES.fase === 'klaar'){

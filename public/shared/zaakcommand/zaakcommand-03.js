@@ -71,7 +71,7 @@
       }
       var d = o.data;
       var u = '<button class="zc-knop" id="zcTerug">← terug</button>' +
-        '<div class="zc-kaart" style="margin-top:.7rem;"><h3>' + esc(d.object.titel) + '</h3>' +
+        '<div class="zc-kaart h-mt70"><h3>' + esc(d.object.titel) + '</h3>' +
         '<p class="zc-meta">' + esc(d.object.label) + ' ' + esc(d.object.id) + (d.object.sub ? ' · ' + esc(d.object.sub) : '') + '</p></div>';
 
       u += '<div class="zc-kaart"><h3>Wat er kan</h3>';

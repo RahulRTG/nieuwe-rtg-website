@@ -68,7 +68,7 @@
 
     $('#uitdaging').innerHTML = '<div class="sec">De uitdaging</div><h2>' + esc(s.titel) + '</h2>' +
       '<div class="vraag">' + esc(s.vraagstuk || 'Dit onderzoek houdt zijn vraagstelling besloten om de deelnemers te beschermen.') + '</div>' +
-      '<div class="leeg" style="margin-top:.5rem;">U doet mee als ' + esc(rolNaam(d.rol)) + ', onder de naam ' + esc(d.alias) + '.</div>';
+      '<div class="leeg h-mt50">U doet mee als ' + esc(rolNaam(d.rol)) + ', onder de naam ' + esc(d.alias) + '.</div>';
 
     $('#route').innerHTML = route(s.stap);
 
@@ -85,7 +85,7 @@
         '<div><div style="font-weight:600;">' + esc(ik.niveauNaam) + '</div>' +
         '<div class="leeg" style="padding:0;">niveau ' + ik.niveau + (nvVolgend ? ' van 5' : ' &middot; hoogste niveau') + '</div></div></div>' +
       (ik.badges.length
-        ? '<div style="margin-top:.5rem;">' + ik.badges.map(function (b) {
+        ? '<div class="h-mt50">' + ik.badges.map(function (b) {
             return '<span class="badge" title="' + esc(b.uitleg) + '">' + esc(b.naam) + '</span>';
           }).join('') + '</div>'
         : '<div class="leeg">Nog geen badges. Ze komen niet van veel insturen, maar van goed werk: een bron natrekken, iemand echt spreken, een fout vastleggen, een conclusie herzien.</div>');
@@ -93,15 +93,15 @@
     $('#bijdrage').innerHTML = '<div class="sec">Uw bijdrage</div>' +
       '<div class="leeg">Wat heeft u gezien?</div>' +
       '<div class="rij"><input class="veld" id="obsVeld" placeholder="Bijv. Om 8 uur stond er weer water op de hoek" maxlength="500"></div>' +
-      '<div class="rij" style="margin-top:.4rem;"><select class="veld" id="obsM" aria-label="Hoe heeft u dit vastgesteld?">' +
+      '<div class="rij h-mt40"><select class="veld" id="obsM" aria-label="Hoe heeft u dit vastgesteld?">' +
         '<option value="">hoe vastgesteld?</option>' +
         KADER.methoden.map(function (m) { return '<option value="' + esc(m.methode) + '">' + esc(m.naam) + '</option>'; }).join('') +
       '</select><button class="knop" id="obsStuur" type="button">Stuur in</button></div>' +
-      '<div class="leeg" style="margin-top:.7rem;">Ging er iets mis, of klopte iets niet wat we eerder dachten? Dat is hier het waardevolst.</div>' +
+      '<div class="leeg h-mt70">Ging er iets mis, of klopte iets niet wat we eerder dachten? Dat is hier het waardevolst.</div>' +
       '<div class="rij"><select class="veld" id="refS" aria-label="Soort">' +
         KADER.reflectiesoorten.map(function (r) { return '<option value="' + esc(r) + '">' + esc(r) + '</option>'; }).join('') +
       '</select></div>' +
-      '<div class="rij" style="margin-top:.4rem;"><input class="veld" id="refT" placeholder="Wat viel tegen, ging mis of was onverwacht?" maxlength="600">' +
+      '<div class="rij h-mt40"><input class="veld" id="refT" placeholder="Wat viel tegen, ging mis of was onverwacht?" maxlength="600">' +
         '<button class="knop stil" id="refStuur" type="button">Leg vast</button></div>';
 
     $('#mijnTaken').innerHTML = '<div class="sec">Voor u</div>' +

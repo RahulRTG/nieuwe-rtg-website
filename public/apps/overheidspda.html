@@ -155,7 +155,7 @@ function kopStuk(titel){
   return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>';
 }
 function aiBlok(hint){
-  return '<div class="ai"><div class="rij" style="margin-top:0;"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';
+  return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';
 }
 function koppelBasis(herlaad){
   $('#terug').addEventListener('click', kiesScherm);

@@ -47,13 +47,13 @@
     if (s.stap === 'vraagstuk')
       return k + '<div class="sec">Het vraagstuk scherper maken</div>' +
         '<input class="veld" data-vsvraag placeholder="Wat speelt er werkelijk?" maxlength="600" value="' + esc(s.vraagstuk || '') + '">' +
-        '<input class="veld" data-vsdoel placeholder="Doel (optioneel)" maxlength="400" value="' + esc(s.doel || '') + '" style="margin-top:.35rem;">' +
+        '<input class="veld h-mt35" data-vsdoel placeholder="Doel (optioneel)" maxlength="400" value="' + esc(s.doel || '') + '">' +
         '<div class="leeg">Dit kan alleen NU. Zodra de hypothese er is staat het vraagstuk vast: ' +
           'een vraag die je bijstelt nadat je de uitkomst kent, is de oudste manier om jezelf gelijk te geven.</div>' +
         '<button class="knop stil" data-vszet type="button">Werk het vraagstuk bij</button>' +
-        '<div class="sec" style="margin-top:.9rem;">Hypothese</div>' +
+        '<div class="sec h-mt90">Hypothese</div>' +
         '<input class="veld" data-hyp placeholder="Wat verwachten we?" maxlength="500">' +
-        '<input class="veld" data-hypteg placeholder="Wat zou het TEGENDEEL bewijzen?" maxlength="500" style="margin-top:.4rem;">' +
+        '<input class="veld h-mt40" data-hypteg placeholder="Wat zou het TEGENDEEL bewijzen?" maxlength="500">' +
         '<div class="leeg">Zonder het tegendeel is dit een wens en geen hypothese; de server weigert hem dan ook.</div>' +
         '<button class="knop" data-hypzet type="button">Leg vast</button></div>';
 
@@ -63,11 +63,11 @@
           return '<label class="chip"><input type="checkbox" data-m value="' + esc(m.methode) + '"> ' + esc(m.naam) + '</label>';
         }).join('') + '</div>' +
         '<div class="leeg" data-advies>Kies methoden; het systeem rekent dan uit hoe groot de steekproef minstens moet zijn.</div>' +
-        '<div class="rij" style="margin-top:.4rem;">' +
+        '<div class="rij h-mt40">' +
           '<input class="veld" data-steek type="number" min="0" placeholder="Steekproef">' +
           '<input class="veld" data-meet type="number" min="0" placeholder="Meetmomenten"></div>' +
-        '<input class="veld" data-doel placeholder="Onderzoeksdoel: waaraan ziet u straks dat u het weet?" maxlength="500" style="margin-top:.4rem;">' +
-        '<button class="knop" data-planzet type="button" style="margin-top:.4rem;">Leg het plan vast</button></div>';
+        '<input class="veld h-mt40" data-doel placeholder="Onderzoeksdoel: waaraan ziet u straks dat u het weet?" maxlength="500">' +
+        '<button class="knop h-mt40" data-planzet type="button">Leg het plan vast</button></div>';
 
     /* Alleen `deelnemers`, en niet ook `plan`: die stap wordt hierboven al door
        het onderzoeksplan afgevangen, dus een tweede tak ervoor was dode code die
@@ -82,7 +82,7 @@
     if (s.stap === 'experiment' || s.stap === 'observaties')
       return k + '<div class="sec">Observatie toevoegen</div>' +
         '<input class="veld" data-obs placeholder="Wat is er waargenomen?" maxlength="500">' +
-        '<div class="rij" style="margin-top:.4rem;">' +
+        '<div class="rij h-mt40">' +
           '<select class="veld" data-obsm aria-label="Methode"><option value="">methode</option>' +
             KADER.methoden.map(function (m) { return '<option value="' + esc(m.methode) + '">' + esc(m.naam) + '</option>'; }).join('') +
           '</select>' +
@@ -93,7 +93,7 @@
         '<div class="rij"><select class="veld" data-rs aria-label="Soort reflectie">' +
           KADER.reflectiesoorten.map(function (r) { return '<option value="' + esc(r) + '">' + esc(r) + '</option>'; }).join('') +
         '</select></div>' +
-        '<input class="veld" data-rt placeholder="Wat viel tegen, ging mis, of was onverwacht?" maxlength="600" style="margin-top:.4rem;">' +
+        '<input class="veld h-mt40" data-rt placeholder="Wat viel tegen, ging mis, of was onverwacht?" maxlength="600">' +
         '<div class="leeg">Een eerdere conclusie herzien telt hier als het beste werk dat er is.</div>' +
         '<button class="knop" data-rzet type="button">Leg vast</button></div>';
 
@@ -108,7 +108,7 @@
         '<div class="rij"><select class="veld" data-bs aria-label="Besluit">' +
           KADER.besluiten.map(function (b) { return '<option value="' + esc(b) + '">' + esc(b) + '</option>'; }).join('') +
         '</select><input class="veld" data-bd placeholder="Uw naam" maxlength="80"></div>' +
-        '<input class="veld" data-br placeholder="Waarom dit besluit? Juist bij gestopt is dat de waardevolle regel." maxlength="600" style="margin-top:.4rem;">' +
+        '<input class="veld h-mt40" data-br placeholder="Waarom dit besluit? Juist bij gestopt is dat de waardevolle regel." maxlength="600">' +
         '<button class="knop" data-bzet type="button">Neem het besluit</button></div>';
 
     return k + '<div class="sec">' + esc(s.stap) + '</div><div class="leeg">Werk deze stap af via de onderdelen hieronder.</div></div>';

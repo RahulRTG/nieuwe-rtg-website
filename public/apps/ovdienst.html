@@ -74,7 +74,7 @@
         <label for="dLijn">Lijn</label><select id="dLijn"><option value="">De lijnen laden…</option></select>
         <label for="dNaam">Voertuig</label><input id="dNaam" maxlength="40" placeholder="Bijv. Bus 4">
         <div class="rij"><button class="knop vol" id="dStart" type="button">Start de dienst</button></div>
-        <p class="stil" style="margin-top:0.5rem;">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
+        <p class="stil h-mt50">Zodra de dienst loopt deelt deze PDA de positie; leden zien uw
           voertuig live aankomen bij hun halte.</p>
       </div>
       <div class="kaart">
@@ -86,7 +86,7 @@
 
     <!-- de lopende dienst -->
     <div id="loopt" class="weg">
-      <div class="kaart nuHero"><div class="nuLabel">Nu</div><h3 id="nuTitel">Rijd uw lijn</h3><p class="stil">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p><div class="tellers" style="margin-top:.8rem;"><span><b id="tAanBoord">0</b><span>aan boord</span></span><span><b id="tVandaag">0</b><span>vandaag</span></span></div><p class="stil" id="gpsStatus" style="margin-top:.6rem;">GPS delen…</p></div>
+      <div class="kaart nuHero"><div class="nuLabel">Nu</div><h3 id="nuTitel">Rijd uw lijn</h3><p class="stil">Uw positie en bezetting lopen automatisch mee. Kijk alleen naar uitzonderingen.</p><div class="tellers h-mt80"><span><b id="tAanBoord">0</b><span>aan boord</span></span><span><b id="tVandaag">0</b><span>vandaag</span></span></div><p class="stil h-mt60" id="gpsStatus">GPS delen…</p></div>
       <h2>Hierna</h2>
       <div class="kaart opdracht"><h2 style="margin:0 0 .5rem;">Veilige automatische dienst</h2>
         <div class="veilig">GPS en bezetting worden bijgewerkt nadat u de dienst zelf start.</div>
@@ -100,7 +100,7 @@
           <input id="codeVeld" maxlength="6" autocomplete="off" placeholder="XXXXXX">
           <button class="knop vol" type="submit">Check in</button>
         </form>
-        <p class="stil" style="margin-top:0.5rem;">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
+        <p class="stil h-mt50">Reizigers met de GPS-tik checken zichzelf in; die ziet u vanzelf in
           de teller verschijnen.</p>
         <div class="rij"><button class="knop rood" id="dStop" type="button">Stop de dienst</button></div>
       </div>
@@ -109,15 +109,15 @@
       <div class="kaart codeIn">
         <p class="stil">Scan de QR op het scherm van de reiziger, of tik de code in. Het antwoord is kort:
           geldig of niet, en waarom niet.</p>
-        <div class="rij" style="margin-top:0.6rem;">
+        <div class="rij h-mt60">
           <button class="knop vol" id="scanKnop" type="button">Scan een kaartje</button>
         </div>
-        <form class="rij" id="bewijsForm" style="margin-top:0.5rem;">
+        <form class="rij h-mt50" id="bewijsForm">
           <label for="bewijsVeld" style="position:absolute;left:-999px;">Code van het vervoerbewijs</label>
           <input id="bewijsVeld" maxlength="40" autocomplete="off" placeholder="Of tik de code in">
           <button class="knop" type="submit">Controleer</button>
         </form>
-        <div id="bewijsUit" class="weg" style="margin-top:0.7rem;"></div>
+        <div id="bewijsUit" class="weg h-mt70"></div>
       </div>
     </div>
   </section>

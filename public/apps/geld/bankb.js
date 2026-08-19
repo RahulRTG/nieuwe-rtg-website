@@ -19,7 +19,7 @@
           '<button class="knop bk-mini" data-bkq="Sta ik ergens rood en wat kan ik doen?">Sta ik rood?</button>' +
           '<button class="knop bk-mini" data-bkq="Wat kost een lening bij jullie en hoe werkt het?">Lening?</button>' +
         '</div>' +
-        '<div class="bk-rij" style="margin-top:.7rem;">' +
+        '<div class="bk-rij h-mt70">' +
           '<input id="bkAiV" placeholder="Vraag de AI-bankier iets…" style="flex:1;min-width:10rem;">' +
           '<button class="knop hoofd" id="bkAiB">Vraag</button></div>' +
         '<ul id="bkAiTips" class="stil" style="margin:.5rem 0 0 1.1rem;line-height:1.6;font-size:.8rem;"></ul>' +
@@ -42,16 +42,16 @@
       '<h2>Het financiële hart</h2>' +
       '<div class="kaart"><p class="stil">Alles op één afschrift: je bankrekeningen, je RTG Pay-wallet en ' +
         'betalingen die via een derde lopen; die dragen alleen een klein bronlabel, verder staan ze er als ' +
-        'elke eigen betaling.</p><div id="bkHart" style="margin-top:.5rem;"><p class="stil">Laden…</p></div></div>' +
+        'elke eigen betaling.</p><div class="h-mt50" id="bkHart"><p class="stil">Laden…</p></div></div>' +
       '<h2>Premium, inbegrepen · gratis</h2>' +
       '<div class="kaart"><strong>Inzichten</strong><p class="stil">Je uitgaven van deze maand, per soort.</p>' +
-        '<div id="bkInz" style="margin-top:.5rem;"></div></div>' +
+        '<div class="h-mt50" id="bkInz"></div></div>' +
       '<div class="kaart"><strong>Vaste-lasten-radar</strong><p class="stil">Terugkerende afschrijvingen, ' +
-        'automatisch herkend.</p><div id="bkVast" style="margin-top:.5rem;"></div></div>' +
+        'automatisch herkend.</p><div class="h-mt50" id="bkVast"></div></div>' +
       '<div class="kaart"><strong>Wisselgeld sparen</strong><p class="stil">Elke uitgave rekenen we af naar de ' +
         'hele euro; één veeg zet het wisselgeld van deze maand op je spaarrekening. Geen spaarrekening? Die komt ' +
         'er dan automatisch bij.</p>' +
-        '<div class="bk-rij" style="margin-top:.6rem;"><button class="knop" id="bkVeeg">Veeg mijn wisselgeld</button>' +
+        '<div class="bk-rij h-mt60"><button class="knop" id="bkVeeg">Veeg mijn wisselgeld</button>' +
         '<span id="bkVeegUit" class="stil"></span></div></div>';
   };
 

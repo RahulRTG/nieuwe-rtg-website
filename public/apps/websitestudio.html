@@ -441,7 +441,7 @@ function exporteer(){
 }
 
 // bediening
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p style="margin-top:1rem;"><a href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p class="h-mt100"><a href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);

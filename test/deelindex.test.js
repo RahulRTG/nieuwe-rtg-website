@@ -52,3 +52,19 @@ test('DE TEGENPROEF: de onderwerpzoeker vindt echt onderwerpen, en niet overal e
     'een zin die over twee regels loopt en pas hier eindigt',
     'een onderwerp mag over regels lopen maar houdt op bij de eerste punt');
 });
+
+/* DE DERDE TEGENPROEF, en die komt uit een echte fout. De zeef liep door in de
+   CODE onder een kort commentaar, want hij zocht naar een punt en een
+   commentaarregel zonder punt heeft die niet. In BUNDELS.md stond daardoor
+   "mijn zorgprofiel el.innerHTML = '<div class=..." -- een wegwijzer die leest
+   als een fout. Het commentaar is afgelopen bij zijn sluitteken, en daar houdt
+   het onderwerp dus ook op. */
+test('DE DERDE TEGENPROEF: het onderwerp stopt waar het commentaar stopt', () => {
+  assert.equal(onderwerpVan("/* mijn zorgprofiel */\nel.innerHTML = '<div class=\"live-start\">';"),
+    'mijn zorgprofiel', 'de code onder het commentaar hoort er niet bij');
+  assert.equal(onderwerpVan('// een regelcommentaar zonder punt\nconst x = 1;'),
+    'een regelcommentaar zonder punt', 'en bij een regelcommentaar houdt het op aan het eind van de regel');
+  assert.equal(onderwerpVan('// eerste regel van een uitleg\n// die op de tweede doorloopt\ncode();'),
+    'eerste regel van een uitleg die op de tweede doorloopt',
+    'twee regelcommentaren achter elkaar horen wel bij elkaar');
+});

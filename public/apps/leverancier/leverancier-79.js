@@ -78,7 +78,7 @@
         ? '<select class="tt-in" id="ttTafel" aria-label="' + T('tt.tafel','Tafel') + '"><option value="">' + T('tt.kies','Kies een tafel…') + '</option>' +
             tafels.map(t => '<option value="' + t.name + '">' + t.name + '</option>').join('') + '</select>'
         : '<input class="tt-in" id="ttTafel" placeholder="' + T('tt.tafelnr','Tafelnummer of -naam') + '">') +
-      '<div id="ttBody" style="margin-top:.8rem;"></div></div>';
+      '<div class="h-mt80" id="ttBody"></div></div>';
     document.body.appendChild(ov);
     ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     document.getElementById('ttSluit').addEventListener('click', () => ov.remove());

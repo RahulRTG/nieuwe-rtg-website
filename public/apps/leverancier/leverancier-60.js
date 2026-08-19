@@ -78,7 +78,7 @@
         '<div class="top"><div><div class="who">'+T('sup.guest','Gast')+' <span class="cn">'+r.customerCodename+'</span></div>'+
           '<div class="ref">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+' · '+timeAgo(r.at)+'</div></div>'+
           '<span class="pill '+ridePill(r.status)+'">'+tStatus(r.status)+'</span></div>'+
-        '<div class="ref" style="margin-top:0.25rem;">'+ritRegel(r)+
+        '<div class="ref h-mt25">'+ritRegel(r)+
           (r.driver?' ·  '+r.driver.name+(r.vehicle?' ('+r.vehicle.name+')':''):' · <span style="color:var(--amber,#B8860B);">'+T('sup.ride.nodriver','nog geen chauffeur')+'</span>')+'</div>'+
         (r.note?'<div class="ref">'+r.note+'</div>':'')+
         (r.zorg?'<div class="allergy">'+T('sup.zorgp','Zorgprofiel gast:')+' '+esc(zorgTekst(r.zorg))+'</div>':'')+

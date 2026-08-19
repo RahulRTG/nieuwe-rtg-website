@@ -19,6 +19,7 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
    staan; voor deze keuringen is dat genoeg. Staat in scripts/lib/bron.js omdat
    scripts/keuring.js hem ook gebruikt. */
 const { zonderCommentaar } = require('./lib/bron');
+const { paginaDraagt } = require('./lib/hulpcss');
 
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
@@ -2452,7 +2453,12 @@ console.log('\n37) elke pagina die een hulpklasse gebruikt, laadt ook rtg-hulpkl
         }
         if (!gebruikt) continue;
         met++;
-        if (!s.includes('rtg-hulpklassen.css')) {
+        /* Niet `s.includes(...)`: sinds het stijlblad via @import in rtg-ui.css
+           hangt, staat de naam op geen van de 231 pagina's die hem wel laden.
+           Die keten volgt ./lib/hulpcss.js, uit dezelfde bron als
+           scripts/hulpklassen-omzet.js -- twee kopieen zouden uiteenlopen en
+           dan ruilt de een iets in wat de ander afkeurt (regel 4). */
+        if (!paginaDraagt(s, p, PUB)) {
           mis++;
           fout(web(p) + ' gebruikt een hulpklasse maar laadt rtg-hulpklassen.css niet');
         }

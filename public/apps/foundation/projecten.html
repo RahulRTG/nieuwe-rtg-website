@@ -50,7 +50,7 @@
     <p class="intro">Een spreekbeurt, werkstuk of bouwplan: begin samen, verdeel de taken en houd bij wat af is. Nodig gezinsleden of vrienden uit; de buddy helpt met een plan.</p>
     <div class="kaart blok">
       <input class="veld" id="nTitel" placeholder="Waar gaan jullie aan werken? (bijv. Spreekbeurt over dolfijnen)" maxlength="80">
-      <input class="veld" id="nWat" style="margin-top:.4rem;" placeholder="Vertel er iets bij (mag leeg)" maxlength="300">
+      <input class="veld h-mt40" id="nWat" placeholder="Vertel er iets bij (mag leeg)" maxlength="300">
       <button class="knop" id="nMaak" style="width:100%;margin-top:.4rem;">Start het project</button>
       <div class="fout" id="nFout"></div>
     </div>
@@ -72,7 +72,7 @@
     <div class="kaart blok">
       <div id="pTaken"></div>
       <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-        <input class="veld" id="tNieuw" style="flex:1;" placeholder="Nieuwe taak…" maxlength="140">
+        <input class="veld h-flex1" id="tNieuw" placeholder="Nieuwe taak…" maxlength="140">
         <button class="knop klein" id="tMaak">+</button>
       </div>
       <button class="knop grijs" id="pAi" style="width:100%;margin-top:.5rem;">Laat de buddy een plan voorstellen</button>
@@ -83,7 +83,7 @@
     <div class="kaart blok">
       <div id="pNotities"><div class="leeg">Nog niets genoteerd.</div></div>
       <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-        <input class="veld" id="nNotitie" style="flex:1;" placeholder="Idee, bron of afspraak…" maxlength="500">
+        <input class="veld h-flex1" id="nNotitie" placeholder="Idee, bron of afspraak…" maxlength="500">
         <button class="knop klein" id="nPlaats">+</button>
       </div>
     </div>
@@ -91,14 +91,14 @@
     <h2 class="sec">Iemand erbij vragen</h2>
     <div class="kaart blok">
       <div class="keuzerij" id="uVrienden"><span class="leeg">Vrienden laden…</span></div>
-      <input class="veld" id="uCodenaam" placeholder="Of nodig uit op codenaam" style="margin-top:.3rem;">
+      <input class="veld h-mt30" id="uCodenaam" placeholder="Of nodig uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <button class="knop grijs" id="uStuur" style="width:100%;margin-top:.4rem;">Nodig uit</button>
       <div class="fout" id="uFout"></div>
     </div>
 
     <div class="rtgdeel-vast" style="display:flex;gap:.5rem;">
-      <button class="knop grijs" id="pTerug" style="flex:1;">← terug</button>
+      <button class="knop grijs h-flex1" id="pTerug">← terug</button>
       <button class="knop rood" id="pWeg" style="flex:0 1 auto;" hidden>Project opruimen</button>
     </div>
   </section>

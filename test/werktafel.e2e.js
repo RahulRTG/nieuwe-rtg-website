@@ -142,7 +142,10 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
   letOpFouten(page, fouten);
   try {
     await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
-    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+    /* Zelfde reden als hierboven. Deze had geen eigen wacht erna, dus die staat
+       er nu: het stijlblad is binnen -- de beweringen meten gestapelde lagen. */
+    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
 
     // 1) de intake staat open en hoort BOVENOP te liggen, ook op 1440px
     await page.waitForFunction(() => {
@@ -368,8 +371,11 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
       }) } });
     });
     // géén token: dit is een bezoeker die nog niets is
-    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+    /* Zelfde reden als hierboven: het teken waarop gewacht moet worden staat op
+       de volgende regel, niet in het laatste plaatje. */
+    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#agPasskey', { timeout: 20000 });
+    await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
 
     const uit = await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
@@ -481,8 +487,21 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
     });
 
-    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+       -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
+       wachten dan de beweringen nodig hebben, en onder belasting viel het om op
+       zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
+       vorm als wachten op de klok (TAKEN.md 6.5), met een ander teken ernaast.
+
+       Wat er WEL nodig is: de wereldkiezer staat er, het stijlblad is binnen en
+       de balk heeft een echte hoogte -- want er wordt opmaak gemeten (een hoogte
+       en een ::after). Precies dat, en niets meer. */
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    await page.waitForFunction(() => {
+      const b = document.querySelector('.cmd-balk');
+      return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
+    }, null, { timeout: 20000 });
 
     assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
     assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
@@ -532,8 +551,21 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
     }, token);
-    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+       -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
+       wachten dan de beweringen nodig hebben, en onder belasting viel het om op
+       zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
+       vorm als wachten op de klok (TAKEN.md 6.5), met een ander teken ernaast.
+
+       Wat er WEL nodig is: de wereldkiezer staat er, het stijlblad is binnen en
+       de balk heeft een echte hoogte -- want er wordt opmaak gemeten (een hoogte
+       en een ::after). Precies dat, en niets meer. */
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    await page.waitForFunction(() => {
+      const b = document.querySelector('.cmd-balk');
+      return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
+    }, null, { timeout: 20000 });
 
     const geland = await page.evaluate(() => ({
       tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),

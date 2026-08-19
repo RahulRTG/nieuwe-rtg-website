@@ -17,15 +17,13 @@ const path = require('path');
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
 
 // Playwright staat globaal geinstalleerd (zoals scripts/a11y.js hem vindt).
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende pad */ }
-  }
-  // Geen Playwright-pakket? Onze eigen browser-driver (CDP over pipe), maar alleen als er een Chromium-binary is.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 async function api(base, pad, body) {
   return (await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })).json();

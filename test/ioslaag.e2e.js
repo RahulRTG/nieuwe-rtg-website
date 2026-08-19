@@ -43,13 +43,13 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 /* Alle app-pagina's onder public/apps, als webpad. */
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {

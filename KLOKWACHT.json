@@ -2,11 +2,10 @@
  "uitleg": "Schermtoetsen die op een vaste tijd wachten in plaats van op een toestand. MAG ALLEEN KRIMPEN -- zie test/klokwacht.test.js. Wat ervoor in de plaats komt staat in test/helper.js (wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, klikEnWacht).",
  "hoe": "node scripts/klokwacht.js",
  "gemeten": {
-  "totaal": 69,
-  "bestanden": 29
+  "totaal": 46,
+  "bestanden": 26
  },
  "schuld": {
-  "appmenu.e2e.js": 5,
   "apps-ui.e2e.js": 4,
   "clipdeler.e2e.js": 1,
   "deelmenuronde.e2e.js": 5,
@@ -15,7 +14,6 @@
   "geld.e2e.js": 3,
   "gpsschakelaar.e2e.js": 1,
   "handelscherm.e2e.js": 1,
-  "horecascherm.e2e.js": 10,
   "identiteitschermen.e2e.js": 1,
   "ioslaag.e2e.js": 3,
   "juridischeschermen.e2e.js": 1,
@@ -33,7 +31,6 @@
   "wereldbreedte.e2e.js": 1,
   "werkruimte-objecten.e2e.js": 1,
   "werkschermen.e2e.js": 1,
-  "werktafel.e2e.js": 8,
   "zaal.e2e.js": 1
  }
 }

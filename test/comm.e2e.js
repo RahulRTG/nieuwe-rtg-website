@@ -38,13 +38,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 async function post(base, pad, body, tok) {
   const r = await fetch(base + pad, { method: 'POST',

@@ -194,17 +194,34 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     const sleutel = 'staatproef-' + r.pad.replace(/\W+/g, '');
     const lijf = { ...lijfVoor(r), idem: sleutel, idempotentieSleutel: sleutel };
 
-    const doe = async () => {
-      let st = await post(r.pad, lijf, tokenVoor(r.rol));
-      oproepen++;
-      if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; }
-      }
-      return st;
-    };
+    const doe = async () => { const st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; return st; };
 
-    const f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
-    const a = await doe();
+    let f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
+    let a = await doe();
+    /* OPNIEUW INLOGGEN GEBEURT BUITEN HET MEETVENSTER, en dat is geen nettigheid
+       maar een reparatie van zes valse bevindingen.
+
+       De hernieuwing stond hier binnen `doe()`, dus binnen f0..f1. Een route die
+       401 geeft OOK met een geldig token -- /api/rtfos/* wil een andere soort
+       sessie -- liet deze proef bij ELKE oproep opnieuw inloggen, en een inlog
+       schrijft zelf `securityLog` en `sessions` weg. Die twee stonden dus in
+       d01 EN in d12, en de uitslag las: "geweigerd (401) en de toestand
+       veranderde toch, ook bij de herhaling". Zes routes lang, over iets wat de
+       proef zelf deed. Nagemeten en op de kop af gereproduceerd: dezelfde route
+       met de hernieuwing ERBUITEN beweegt alleen de journalen.
+
+       Nu wordt er hooguit EEN keer hernieuwd, en daarna begint de meting
+       opnieuw met een verse f0 -- de inlog valt zo buiten het venster. De eerste
+       oproep die de 401 opleverde telt niet mee; hij deed per definitie geen
+       werk. Blijft het na de hernieuwing 401, dan is dat de route en niet het
+       token, en die wordt schoon gemeten. */
+    if (a.status === 401 && hernieuw) {
+      if (await hernieuw(r.rol)) {
+        hernieuwd++;
+        f0 = await vingerafdruk(); afdrukken++;
+        a = await doe();
+      }
+    }
     const f1 = await vingerafdruk(); afdrukken++;
     const b = await doe();
     const f2 = await vingerafdruk(); afdrukken++;

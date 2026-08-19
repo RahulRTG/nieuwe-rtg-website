@@ -165,6 +165,32 @@ test('en een collectie die NOOIT in stilte bewoog blijft altijd staan', () => {
   assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'GEZAKT');
 });
 
+/* DE HERNIEUWING VALT BUITEN HET MEETVENSTER.
+
+   Een route die 401 geeft ook met een geldig token liet deze proef bij elke
+   oproep opnieuw inloggen -- binnen f0..f1. Een inlog schrijft zelf weg, dus
+   stond dat in het verschil en las de uitslag als "geweigerd en de toestand
+   veranderde toch". Zes routes lang, over iets wat de proef zelf deed. */
+test('na een hernieuwing begint de meting opnieuw, zodat de inlog er niet in valt', async () => {
+  const afdrukken = [];
+  let beurt = 0, ingelogd = 0;
+  const uit = await draaiStaatproef({
+    /* Deze route blijft 401 geven, ook na de hernieuwing -- precies het geval
+       waar het misging. */
+    post: async () => ({ status: 401 }),
+    vingerafdruk: async () => ({ nr: ++beurt }),
+    verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]); return d(); },
+    hernieuw: async () => { ingelogd++; return true; },
+    routes: [{ method: 'POST', pad: '/api/x', rol: 'office' }],
+    tokenVoor: () => 't', lijfVoor: () => ({})
+  });
+  assert.equal(ingelogd, 1, 'er wordt hooguit EEN keer hernieuwd, niet bij elke oproep');
+  assert.equal(beurt, 4, 'vier vingerafdrukken: een verworpen start, en daarna het echte venster');
+  assert.deepEqual(afdrukken, [[2, 3], [3, 4]],
+    'het venster begint NA de inlog (2), niet ervoor (1) -- anders telt de inlog als routewerk');
+  assert.equal(uit.perRoute['POST /api/x'].rollback, 'bewezen');
+});
+
 /* ---------- de ronde ---------- */
 
 test('drie vingerafdrukken rond twee oproepen, en de ruis wordt toegepast', async () => {

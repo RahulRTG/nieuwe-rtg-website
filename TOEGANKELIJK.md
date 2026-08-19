@@ -169,6 +169,19 @@ tijd stond: het tegelraster van `/apps/foundation/index.html` liep 353 pixels
 buiten beeld. **Een scherm dat je nooit open hebt zien gaan, heb je niet
 gemeten** — en het stond wel als gemeten in dit document.
 
+Na die reparatie blijven er **drie** dicht, en die staan hier met naam in plaats
+van weggewerkt:
+
+| scherm | wat de deur vraagt | staat het nu |
+|---|---|---|
+| `/apps/foundation/campus.html` | een leerlingprofiel mét geboortedatum, niet het gezinsprofiel | **open** — de ronde maakt er een aan en zet dat token alleen voor dit scherm klaar |
+| `/apps/foundation/bord.html` | een tijdelijke schoolpas: een klassleutel die alleen in de tab van een lopende les bestaat en na dertig minuten vervalt | **dicht** |
+| `/apps/foundation/schrift.html` | dezelfde schoolpas, aan de leerlingkant | **dicht** |
+
+Die laatste twee zijn niet aan te maken zonder een les te starten, en dat vraagt
+een model achter `/api/les/maak`. Ze worden dus aan hun deur gemeten. Dat is
+geen nul en geen groen: **het is één regel, en die staat er.**
+
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146
 gevallen). En op 22 schermen zet `ios.js` die pil neer terwijl het scherm

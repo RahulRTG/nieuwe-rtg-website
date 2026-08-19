@@ -153,6 +153,33 @@ function startEchteServer() {
   }
   const RTF_SESSIE = { code: gezin.code, token: gezin.token, profiel: { naam: 'Papa', beheerder: true } };
 
+  /* EN EEN LEERLINGPROFIEL VOOR DE CAMPUS. Dat is het ene RTF-scherm dat een
+     gezinstoken NIET opent: "De Campus is de persoonlijke werkplek van een
+     leerlingprofiel". Een profieltoken opent hem wel, maar sluit de blokken die
+     alleen een beheerder ziet (het maakblok van klusjes, beheer.html), dus het
+     gezinsprofiel blijft de standaard en dit token wordt alleen voor campus
+     ingezet. De geboortedatum moet erbij: zonder leeftijd komt de leeftijdspoort
+     ervoor ("Vul eerst de geboortedatum in"). */
+  const kind = await fetch(basis + '/api/foundation/gezin/profiel/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: gezin.code, token: gezin.token, naam: 'Milan', rol: 'kind',
+      groep: 'kind', kleur: '#3A7BD5', geboortedatum: '2015-04-04' })
+  }).then(r => r.json()).catch(() => ({}));
+  const kiesKind = (kind && kind.profiel) ? await fetch(basis + '/api/foundation/gezin/profiel/kies', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: gezin.code, token: gezin.token, profielId: kind.profiel.id })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  const RTF_KIND = (kiesKind && kiesKind.token)
+    ? { code: gezin.code, token: kiesKind.token, profiel: kiesKind.profiel } : null;
+  if (!RTF_KIND) console.error('[a11y] LET OP: geen leerlingprofiel -- /apps/foundation/campus.html wordt aan zijn deur gemeten.');
+  /* Wat hier NIET lukt, en dat staat er liever dan een stil gat: bord.html en
+     schrift.html hangen achter een TIJDELIJKE SCHOOLPAS -- een klassleutel die
+     alleen in de tab van een lopende les bestaat en na dertig minuten vervalt.
+     Die is niet aan te maken zonder een les te starten (/api/les/maak, met een
+     model erachter). Die twee worden dus aan hun deur gemeten; zie
+     TOEGANKELIJK.md. */
+  const EIGEN_SESSIE = { '/apps/foundation/campus.html': RTF_KIND };
+
   /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
      een CSP met nonce mee en die blokkeert een inline script. In een IIFE, want
      evaluate met een string verwacht een expressie en BRON begint met functies. */
@@ -251,7 +278,18 @@ function startEchteServer() {
   const tel = await telefoon.newPage();
   console.log(`\n[a11y] ===== ronde TELEFOON, ${hand}handig (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
   for (const pad of PAGINAS) {
+    /* Een scherm met een eigen sessie krijgt die na het eerste bezoek en dan een
+       herlading -- addInitScript() STAPELT en geldt voor elke volgende pagina,
+       dus daarmee zou het leerlingprofiel de rest van de ronde meelopen. Zetten
+       en terugzetten in localStorage blijft bij dit ene scherm. */
+    const eigen = EIGEN_SESSIE[pad];
     await tel.goto(basis + pad, { waitUntil: 'load' });
+    if (eigen) {
+      try {
+        await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, eigen);
+        await tel.reload({ waitUntil: 'load' });
+      } catch (e) { /* dan meten we hem zoals hij staat */ }
+    }
     await tel.waitForTimeout(600);
     /* De mobiele meting eerst, want die is goedkoop en hangt niet af van de
        tweede meetronde die het raakvlak soms nodig heeft. */
@@ -285,6 +323,9 @@ function startEchteServer() {
       else if (m.gebreken.length) mobiu.duim.push(waar + ' \u2014 ' + m.hoofd.naam + ' (' + m.hoofd.merk + '): ' + m.gebreken.join('; '));
     } catch (e) {
       mobiu.breed.push(pad + ' [' + hand + ']: de mobiele meting kon niet draaien -- ' + e.message.split('\n')[0]);
+    }
+    if (eigen) {
+      try { await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, RTF_SESSIE); } catch (e) {}
     }
     if (hand !== 'rechts') continue;   // het raakvlak hangt niet van de hand af
     let res;

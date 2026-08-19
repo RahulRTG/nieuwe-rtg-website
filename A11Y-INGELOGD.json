@@ -101,6 +101,11 @@
    "stand": "0. Hij stond op 12, en die twaalf zijn opgelost in plaats van vrijgepleit.",
    "hoe": "De botsing tussen shared/ios.css (maak-actie bovenaan) en GRAMMATICA.md (de handeling hoort bij de duim) is beslecht in het voordeel van de grammatica: agenda, notities, galerij, bestanden, scanner, clips, media, websitestudio en sitemaker dragen hun hoofdhandeling nu in .rtg-duimbalk -- op telefoonmaat een vaste strook onderaan, daarboven gewoon een rij onder de kop. Dat moest in de DOM en niet met opmaak: .ios-nav draagt backdrop-filter, en dat maakt een eigen containing block, dus een position:fixed kind blijft bovenin hangen.",
    "wat er NIET is gebeurd": "geen uitzondering en geen getal met de hand op nul gezet. Wie deze tellers ooit weer ziet stijgen, kijkt naar een echt scherm."
+  },
+  "schermen die aan hun deur gemeten worden": {
+   "/apps/foundation/bord.html": "tijdelijke schoolpas -- een klassleutel die alleen in de tab van een lopende les bestaat en na 30 minuten vervalt; niet aan te maken zonder /api/les/maak, en daar hangt een model achter",
+   "/apps/foundation/schrift.html": "dezelfde schoolpas, aan de leerlingkant",
+   "waarom dit hier staat": "omdat 'gemeten' anders iets anders betekent dan het doet. Twee schermen van de 254 gaan niet open in deze ronde, en dat is een regel waard in plaats van een stille nul."
   }
  }
 }

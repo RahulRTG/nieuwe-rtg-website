@@ -141,20 +141,38 @@ function mobielInPagina(opt) {
     }
     return false;
   }
+  /* TEKSTKNOPEN EN NIET "BLADEREN", EN DAT VERSCHIL KOSTTE DRIE RONDES.
+
+     Hier stond `if (bl.children.length) continue` -- tel alleen elementen zonder
+     kinderen, want anders telt een alinea ook mee via zijn ouder. Dat klopt voor
+     dubbeltelling en is fout voor TEKST: een alinea met een <br> erin heeft een
+     kind, en werd dus overgeslagen. Op /apps/wereld.html stond de lege staat
+     ("Hier is het nog stil...") volledig in beeld op y 271 tot 432, en deze
+     meting telde er nul tekens -- honderdzestig pixels leesbare tekst die niet
+     bestond. Ik heb dat scherm twee rondes lang van een gebrek beschuldigd dat
+     in de meter zat.
+
+     Een TEKSTKNOOP hoort bij precies een ouder, dus dubbeltelling kan sowieso
+     niet, en <br>, <b> en <a> in een zin doen niet meer mee als "container". */
   var tekst = '', beelden = 0;
-  var bladeren = document.querySelectorAll('body *');
-  for (var t = 0; t < bladeren.length; t++) {
-    var bl = bladeren[t];
-    if (bl.children.length) continue;          // alleen bladeren: geen dubbeltelling
-    if (!zichtbaar(bl)) continue;
-    if (isSchil(bl)) continue;
+  var loop = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+  var kn;
+  while ((kn = loop.nextNode())) {
+    var stuk = (kn.nodeValue || '').replace(/\s+/g, ' ').trim();
+    if (!stuk) continue;
+    var ouder = kn.parentElement;
+    if (!ouder || !zichtbaar(ouder) || isSchil(ouder)) continue;
+    var kr = ouder.getBoundingClientRect();
+    if (kr.bottom < 0 || kr.top > H) continue; // buiten beeld telt niet mee
+    tekst += ' ' + stuk;
+  }
+  var beeldjes = document.querySelectorAll('img, canvas, svg, video, picture');
+  for (var t = 0; t < beeldjes.length; t++) {
+    var bl = beeldjes[t];
+    if (!zichtbaar(bl) || isSchil(bl)) continue;
     var br = bl.getBoundingClientRect();
-    if (br.bottom < 0 || br.top > H) continue; // buiten beeld telt niet mee
-    if (/^(img|canvas|svg|video|picture)$/i.test(bl.tagName) ) {
-      if (br.width * br.height >= 2000) beelden++;
-      continue;
-    }
-    tekst += ' ' + (bl.textContent || '');
+    if (br.bottom < 0 || br.top > H) continue;
+    if (br.width * br.height >= 2000) beelden++;
   }
   tekst = tekst.replace(/\s+/g, ' ').trim();
   var hoogste = tekst.length;

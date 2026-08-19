@@ -53,3 +53,61 @@
    kleur en de dichtheid blijven precies zoals ze waren. */
 header button{min-height:24px;display:inline-flex;align-items:center;}
 .pn-composer button,.pn-learning button{min-height:24px;}
+/* En de knoppen IN de kolommen, want die stonden hier niet. Ze waren op
+   telefoonmaat verborgen (.pn-column{display:none}), dus de raakvlakronde --
+   die op 390 meet -- heeft ze nooit gezien: "Onderzoek match" en "Simuleer
+   belofte" meten 23 hoog. Nu de kolommen niet meer verdwijnen, staan ze er.
+   Dat is precies wat je hoopt van zo'n reparatie: het gebrek dat eronder lag
+   komt mee naar boven in plaats van mee te verdwijnen.
+   Alleen de maat gaat omhoog; de 7px-inkt en de dichtheid blijven (ONTWERP.md). */
+.pn-column button{min-height:24px;}
+
+/* ====================================================================
+   DE BOVENKANT VAN EEN TELEFOON IS NIET VAN ONS, EN DE LINKERBOVENHOEK OOK NIET.
+
+   Twee gebreken die alleen op een ECHT toestel te zien zijn, gemeld met een
+   schermafdruk op 19 augustus 2026 en hier nagemeten:
+
+   1. DE KLOK EN DE BATTERIJ. Deze schil is een app van 100dvh en zette zijn
+      bovenste strook op y=0. Op een toestel met een inkeping loopt die strook
+      dus onder de statusbalk door en is de bovenste regel niet te lezen. Van de
+      schermen in dit huis doen er eenenzeventig `env(safe-area-inset-top)`;
+      deze familie deed er nul. (shared/reizen-veilig.css had de ONDERkant al
+      wel goed -- dat is het idioom dat hier gevolgd wordt.)
+
+   2. DE ZWEVENDE MENUKNOP. shared/appmenu.js hangt hem linksboven op zodra een
+      pagina geen kopbalk heeft die hij herkent (`header.kop`, `header.merkkop`,
+      `body > header`) -- en deze schil heeft die niet: zijn kop staat in <main>
+      en heet anders. Gemeten op 390 EN op 1280: de knop landt op 11,9 en ligt
+      precies op de eerste tab, respectievelijk op de eerste railknop. In de
+      afdruk las "Grand Hotel Amsterdam" als "Gr~and Hotel Amsterdam".
+
+      Waarom MARGIN en geen padding: de tabstrook scrolt in zichzelf
+      (overflow-x:auto), dus padding schuift gewoon mee weg en na twee tabs ligt
+      er weer een naam onder de knop. Een marge staat buiten de scroller.
+
+      body.amn-zwevend zet appmenu.js zelf, precies hiervoor -- zie de opmerking
+      daar over de apprij van de RTFoundation die als "ving Lab" las. Die vlag
+      werd tot nu toe op een enkele plek gebruikt (canvas.css); hier is de
+      tweede. 3.6rem is dezelfde reservering als daar.
+
+   Wat hier NIET gebeurt: de knop verplaatsen of appmenu.js leren deze koppen te
+   herkennen. Dat raakt elk scherm in het huis, en dit gaat over vijf. ==== */
+.pn-shell{padding-top:env(safe-area-inset-top,0px)}
+body.amn-zwevend .pn-rail{padding-top:56px}
+@media(max-width:760px){
+  body.amn-zwevend .pn-top{margin-left:3.6rem}
+  .pn-rail{padding:5px max(8px,env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  body.amn-zwevend .pn-rail{padding-top:5px}
+}
+/* EN DE RIJ MOET MEEGROEIEN, ANDERS KNIJPT DE VEILIGE ZONE DE LABELS ERUIT.
+
+   Eerste poging zette alleen opvulling ONDERIN de balk. Die balk is een
+   rasterrij van vaste hoogte (64px), dus 34 pixels reservering at 34 pixels
+   van de inhoud op: op een toestel met een thuisstreep bleven de iconen staan en
+   verdwenen de woorden eronder. Gemeten met een nagebootste inkeping.
+
+   De rij groeit nu mee. Dat gold ook al voor de balk die de onderkant WEL goed
+   had -- die knelde net zo hard, alleen had niemand er ooit met een inkeping
+   naar gekeken. */
+@media(max-width:760px){.pn-shell{grid-template-rows:1fr calc(64px + env(safe-area-inset-bottom,0px))}}

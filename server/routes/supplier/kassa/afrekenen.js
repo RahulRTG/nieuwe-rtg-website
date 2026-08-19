@@ -7,6 +7,8 @@ module.exports = (kern) => {
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
+  // de drie grenzen van een verzilvering staan op EEN plek; zie ./kaart.js
+  const { verzilver: verzilverKaart } = require('./kaart');
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
@@ -100,11 +102,20 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }
-  // een gebundelde kassabon voor het hele tafelticket
+  /* EEN GEBUNDELDE KASSABON VOOR HET HELE TAFELTICKET -- en die draagt een merk.
+
+     `omzetElders` zegt: dit is het KASSASTUK, de omzet staat al bij de
+     bestellingen hierboven. Zonder dat merk telde de maandboekhouding een tafel
+     die contant of met RTG Pay afrekende twee keer: een keer via de bonnen (die
+     nu op `paid` staan) en een keer via deze bundelbon. `financeVoor` sloeg
+     alleen `rtg` en `kamer` over, en dit is geen van beide -- de gast betaalde
+     werkelijk contant, dus de betaalwijze liegen om de optelling te redden zou
+     een tweede fout zijn. Vandaar een merk naast de betaalwijze in plaats van
+     eroverheen (TAKEN.md 4.28). */
   const sale = {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
-    room: chk.table, items: null, total: chk.subtotaal, method,
+    room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: true,
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
@@ -133,18 +144,15 @@ app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
   res.json({ ok: true, kaart });
 });
 
+/* De LOSSE inwisseling: saldo van de kaart halen zonder dat er een kassabon
+   bij hoort. De drie grenzen staan in ./kaart.js, want de kassabon die met een
+   kaart betaalt houdt precies dezelfde aan. Zonder `viaBon` is deze
+   verzilvering zelf het omzetmoment in de maandboekhouding. */
 app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === req.supplier.code);
-  if (!g) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
-  const bedrag = Math.round(Number(req.body.bedrag) * 100) / 100;
-  if (!(bedrag > 0)) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
-  g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
-  g.verzilveringen = g.verzilveringen || [];
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name });
+  const r = verzilverKaart(db, req.supplier.code, req.body.code, req.body.bedrag, req.actor.name, null);
+  if (r.error) return res.status(r.status).json({ error: r.error });
   save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + bedrag + ' van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ')');
-  res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
+  logActivity(req.supplier.code, req.actor, 'inde € ' + r.bedrag + ' van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ')');
+  res.json({ ok: true, saldo: r.kaart.saldo, kaart: { code: r.kaart.code, saldo: r.kaart.saldo } });
 });
 };

@@ -2,25 +2,45 @@
  "uitleg": "Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. Een route die hier NIET in staat is niet beproefd. Zie scripts/lib/staatproef.js voor de grens.",
  "gemeten": {
   "routesMetRol": 3092,
-  "beoordeeld": 2475,
+  "beoordeeld": 2468,
   "oproepen": 6198,
-  "state": 244,
-  "sideEffect": 244,
+  "state": 237,
+  "sideEffect": 237,
   "rollback": 2225,
   "rollbackGezakt": 6,
-  "idemBewezen": 241,
-  "idemGezakt": 3,
-  "ongemeten": 617,
+  "idemBewezen": 236,
+  "idemGezakt": 1,
+  "ongemeten": 624,
   "tokensHernieuwd": 14,
   "blindeRondes": 0,
   "collectiesInVingerafdruk": 147,
-  "ruisCollecties": 3,
+  "ruisCollecties": 4,
+  "tijdruisCollecties": 4,
+  "stilleRondes": 3,
+  "stilteMs": 11000,
   "begrenzing": 0
  },
  "omgevingsruis": [
   "apiSpoor",
   "doorgeefjournaal",
+  "rtgai",
+  "wacht"
+ ],
+ "ruisBijVerzoek": [
+  "apiSpoor",
+  "doorgeefjournaal",
   "rtgai"
+ ],
+ "ruisVanDeKlok": [
+  "apiSpoor",
+  "doorgeefjournaal",
+  "rtgai",
+  "wacht"
+ ],
+ "inStilteSomsBewogen": [
+  "techniek",
+  "ledenSites",
+  "veilig"
  ],
  "perRoute": [
   {
@@ -1902,11 +1922,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "techniek",
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in techniek, wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -1935,10 +1952,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "ledenSites"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in ledenSites was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -9612,10 +9627,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -11280,10 +11293,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -12994,10 +13005,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -14519,10 +14528,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -15272,12 +15279,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -15897,10 +15907,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -18393,12 +18401,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ideeen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: wacht"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -19465,10 +19473,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -20429,15 +20435,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -20644,15 +20647,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -20692,12 +20692,15 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -21450,10 +21453,9 @@
    "rollback": "ongemeten",
    "idempotentie": "bewezen",
    "collecties": [
-    "wacht",
     "weefselOrganen"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
@@ -22424,10 +22426,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -25300,12 +25300,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "waterMeldingen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: wacht"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -25380,9 +25380,10 @@
    "rollback": "ongemeten",
    "idempotentie": "bewezen",
    "collecties": [
+    "commandAlarmen",
     "waterAanslagen"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
@@ -26228,15 +26229,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -27086,10 +27084,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -27926,10 +27922,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -28723,10 +28717,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -29355,8 +29347,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -29475,10 +29469,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -31151,10 +31143,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -31753,10 +31743,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 503); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 503) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -32493,10 +32481,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -32723,8 +32709,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 403) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 403); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -35534,10 +35522,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "gebouwPlus"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in gebouwPlus was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -35933,8 +35919,10 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan"
+   "collecties": [
+    "commandAlarmen"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
   },
   {
    "methode": "POST",
@@ -36510,10 +36498,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -37083,15 +37069,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -37658,10 +37641,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 409); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 409) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -38233,10 +38214,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -38874,10 +38853,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -38890,12 +38867,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
+   "idempotentie": "GEZAKT",
    "collecties": [
     "magnaatPartnerstudio"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandAlarmen"
   },
   {
    "methode": "POST",
@@ -38969,10 +38946,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "geweigerd (status 400); de eenmalige wijziging in commandAlarmen was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 400) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -40074,15 +40049,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -40650,10 +40622,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -41636,10 +41606,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -42174,15 +42142,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -43580,15 +43545,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -44005,15 +43967,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -44517,10 +44476,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -44969,10 +44926,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -45012,15 +44967,12 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "commandAlarmen"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn"
   },
   {
    "methode": "POST",
@@ -46301,10 +46253,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan"
   },
   {
    "methode": "POST",
@@ -46713,12 +46663,12 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "wereld"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: wacht"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog"
   },
   {
    "methode": "POST",
@@ -47174,10 +47124,8 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 403); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust"
+   "collecties": [],
+   "reden": "geweigerd (status 403) en er bleef niets staan"
   },
   {
    "methode": "POST",

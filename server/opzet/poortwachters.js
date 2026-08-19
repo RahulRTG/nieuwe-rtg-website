@@ -96,7 +96,19 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
      verdwijnen. De volle suite is hier de bewaker: raakt er een geldpad los van
      deze lijst, dan verandert zijn antwoord en vallen de geldtoetsen om. */
   const GELDWEGEN = /^\/api\/(pay|bank|pakket|podium|directpay|betaal|munt|supplier\/(kassa|betaalverzoek))\b/;
-  const dubbeltik = maakDubbeltik({ log, overslaan: (req) => GELDWEGEN.test(req.path) });
+  /* TWEE WEGEN ONDER /api/pay VERPLAATSEN GEEN GELD, en die horen er dus wel
+     langs. `kascode` en `tikcode` MAKEN een code van vijf minuten; ze boeken
+     niets. De staatproef betrapte ze: een herhaling met dezelfde sleutel legde
+     een tweede rij in `payCodes` en verdrong de code die de gast op zijn scherm
+     had staan -- precies wat er misgaat als een load balancer één keer opnieuw
+     probeert. Voor een token dat vijf minuten leeft in hetzelfde proces is de
+     geheugenlaag de juiste maat; de duurzame laag van idem.js is dat voor GELD.
+
+     Dit is met opzet een lijst met NAMEN en geen versoepeling van GELDWEGEN:
+     een nieuwe route onder /api/pay blijft standaard overgeslagen, en wie hem
+     hier bij zet moet opschrijven waarom er geen geld beweegt. */
+  const GEEN_GELD = new Set(['/api/pay/kascode', '/api/pay/tikcode']);
+  const dubbeltik = maakDubbeltik({ log, overslaan: (req) => GELDWEGEN.test(req.path) && !GEEN_GELD.has(req.path) });
   app.use(dubbeltik.middleware());
 
   /* HET API-SPOOR. Staat naast de dubbeltik en om dezelfde reden hier: hij moet

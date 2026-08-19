@@ -35,7 +35,11 @@ function maakFiscaal({ db, centen, btwSplit }) {
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
     }
     for (const v of db.data.posSales[s.code] || []) {
-      if (v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+      /* `omzetElders` is het merk van een kassabon die alleen HET STUK is en
+         niet de omzet: het tafelticket bundelt bonnen die hierboven al per
+         bestelling zijn geteld. Zonder deze regel stond de maand van een zaak
+         die tafels contant laat afrekenen twee keer zo hoog (TAKEN.md 4.28). */
+      if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }
@@ -47,12 +51,27 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (b.supplierCode !== s.code || !b.paid || b.status === 'geweigerd' || !inMaand(b.paidAt || b.at)) continue;
       tel('dienst', b.price || 0);
     }
-    // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
+    /* Cadeaukaarten (meervoudig inwisselbaar): het btw-moment is de INWISSELING,
+       niet de verkoop -- de verkoop is een schuld aan de klant.
+
+       WAAROM ER TWEE GETALLEN ZIJN. Een verzilvering met `viaBon` hoort bij een
+       kassabon die met de kaart is betaald, en die bon staat hierboven al in de
+       potten -- met zijn eigen regels, dus met het juiste tarief per artikel.
+       Hem hier nog eens optellen was precies de dubbeltelling van TAKEN.md 4.27.
+       Een verzilvering ZONDER bon (de losse inwisseling aan de balie) heeft geen
+       ander omzetmoment, en die telt hier dus wel -- anders zou die omzet
+       nergens meer staan. `ingewisseld` in het rapport blijft het VOLLE bedrag:
+       dat is wat de ondernemer van zijn kaarten wil weten, en dat is een andere
+       vraag dan waar de omzet is geboekt. */
     const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
     const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
-    let gcIngewisseld = 0;
-    for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
-    if (gcIngewisseld) tel(basisCat, gcIngewisseld);
+    let gcIngewisseld = 0, gcZonderBon = 0;
+    for (const g of kaarten) for (const w of g.verzilveringen || []) {
+      if (!inMaand(w.at)) continue;
+      gcIngewisseld += w.bedrag;
+      if (!w.viaBon) gcZonderBon += w.bedrag;
+    }
+    if (gcZonderBon) tel(basisCat, gcZonderBon);
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.entries(potten).map(([cat, omzet]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, tarief.tariefVan(s, cat)) }))

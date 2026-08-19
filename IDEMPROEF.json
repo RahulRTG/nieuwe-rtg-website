@@ -3,8 +3,8 @@
  "gemeten": {
   "routesMetRol": 3092,
   "beoordeeld": 845,
-  "beschermd": 843,
-  "onbeschermd": 2,
+  "beschermd": 845,
+  "onbeschermd": 0,
   "ongemeten": 2247,
   "oproepen": 9298,
   "tokensHernieuwd": 22,
@@ -20020,8 +20020,8 @@
    "methode": "POST",
    "pad": "/api/pay/kascode",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -20092,8 +20092,8 @@
    "methode": "POST",
    "pad": "/api/pay/tikcode",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,

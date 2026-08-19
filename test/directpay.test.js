@@ -87,6 +87,17 @@ test('4b. twee keer op "stuur" drukken maakt EEN betaalverzoek', async () => {
   const na = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.openVerzoeken.length;
   assert.equal(na, voor + 1, 'er staat er precies EEN bij, geen twee');
 
+  /* EN HET WERKBOEK VAN DE ZAAK SCHRIJFT ER OOK MAAR EEN. Dat stond hier niet
+     en het ging dan ook mis: de idem-laag zit in de kern, maar `logActivity`
+     stond in de route ERBUITEN, dus de herhaling zette wel een tweede "stuurde
+     een betaalverzoek van € 45,00" onder. Een regel over een handeling die niet
+     gebeurd is -- en juist een werkboek hoort daarin te kloppen. Gevonden
+     doordat de staatproef `supplierActivity` zag bewegen bij een herhaling die
+     verder niets deed. */
+  const boek = (await api(base, '/api/supplier/state', {}, winkel)).body.state.activity || [];
+  const regels = boek.filter(a => /betaalverzoek/.test(String(a.text || '')) && /45[,.]00/.test(String(a.text || '')));
+  assert.equal(regels.length, 1, 'precies EEN regel in het werkboek, niet twee. Werkboek: ' + JSON.stringify(boek.slice(0, 6)));
+
   /* Een VERSE sleutel is wel een nieuw verzoek -- anders zou deze bescherming
      betekenen dat een zaak nooit twee keer hetzelfde bedrag kan vragen. */
   const derde = await api(base, '/api/supplier/betaalverzoek', { codename, bedrag: 45, omschrijving: 'Sjaal', idem: 'kassa-bon-992' }, winkel);

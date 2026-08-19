@@ -20,10 +20,12 @@
    bedrag draagt, is geen reparatie maar een derde cijfer erbij.
 
    WAT DEZE TOETS NIET DEKT, en dat hoort erbij te staan: bij een cadeaukaart
-   en bij een tafelticket op 'contant' telt de maandboekhouding zelf dubbel
-   (TAKEN.md 4.27 en 4.28). Die twee gevallen staan met opzet niet in toets 7 --
-   niet omdat ze niet bestaan, maar omdat ze een defect aan de ANDERE kant zijn
-   en hier dus niets over deze reparatie zouden zeggen.
+   telt de maandboekhouding zelf dubbel (TAKEN.md 4.27). Dat geval staat met
+   opzet niet in toets 7 -- niet omdat het niet bestaat, maar omdat het een
+   defect aan de ANDERE kant is en hier dus niets over deze reparatie zou zeggen.
+   Het tafelticket op 'contant' stond hier ook (TAKEN.md 4.28) en is sinds 19
+   augustus 2026 gerepareerd; het heeft nu een eigen toets (6b), en die legt
+   daarom een derde getal ernaast dat niet kan meebewegen: de som van de bonnen.
 
    Draai los: node --experimental-sqlite --test test/lidfactuur.test.js */
 const test = require('node:test');
@@ -259,6 +261,131 @@ test('6. een tafelticket in een keer afrekenen factureert elke bon aan de tafel 
     assert.equal(f1[0].totaal + f2[0].totaal, af.body.subtotaal,
       'samen precies het tafelticket');
     assert.equal(f1[0].methode, 'contant', 'de betaalwijze van de kassa reist mee');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* WAT ER MIS WAS AAN DE ANDERE KANT: DE BOEKHOUDING TELDE HET TAFELTICKET TWEE
+   KEER. Toets 6 hierboven laat zien dat elke bon aan de tafel zijn eigen factuur
+   krijgt -- dat klopte. Maar `/api/supplier/tafelticket/afrekenen` legt daar ook
+   nog EEN gebundelde kassabon overheen met het volle bedrag, en `financeVoor`
+   sloeg alleen `rtg` en `kamer` over. Een tafel die contant of met RTG Pay
+   afrekende, stond dus dubbel in de maandboekhouding (TAKEN.md 4.28).
+
+   De aangifte had er geen last van (die telt facturen, en die staan per bon),
+   dus toets 7 kon dit niet vinden: hij vergelijkt aangifte met boekhouding, en
+   hier was ALLEEN de boekhouding fout. Deze toets legt daarom een derde getal
+   ernaast dat niet kan meebewegen: de som van de bonnen zelf.
+
+   De bundelbon draagt nu `omzetElders: true`. Mutatie: dat merk weghalen (of de
+   regel in financeVoor) laat deze toets zakken op precies het dubbele. */
+test('6b. een tafelticket op contant telt de maandboekhouding NIET dubbel', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
+    const tafel = '9';
+    const lid = await registreer(base);
+    const item = await eersteItem(base, lid, 'KIKUNOI');
+    const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 2 }], table: tafel }, lid);
+    const r2 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: tafel }, lid);
+    assert.equal(r2.status, 200);
+
+    const tk = await api(base, '/api/supplier/tafelticket', { table: tafel }, mgr);
+    assert.equal(tk.status, 200, JSON.stringify(tk.body).slice(0, 200));
+    const af = await api(base, '/api/supplier/tafelticket/afrekenen',
+      { table: tafel, zegel: tk.body.ticket.zegel, at: tk.body.ticket.at, method: 'contant' }, mgr);
+    assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
+    await even();
+
+    /* De boekhouding rekent in grondslag (btw eraf) en het ticket in bedragen
+       INCLUSIEF btw; ze naast elkaar leggen zou een tariefverschil meten in
+       plaats van een dubbeltelling. De facturen dragen wel hetzelfde bedrag als
+       het ticket, dus die zijn de eerlijke maat. */
+    const f1 = await facturenOpRef(base, mgr, r1.body.order.ref);
+    const f2 = await facturenOpRef(base, mgr, r2.body.order.ref);
+    const somVanDeBonnen = Math.round((f1[0].totaal + f2[0].totaal) * 100);
+    assert.equal(somVanDeBonnen, Math.round(af.body.subtotaal * 100), 'de bonnen samen zijn het ticket');
+
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(fin.status, 200);
+    const omzetBoekhouding = Math.round((fin.body.btw || []).reduce((s2, r) => s2 + r.omzet, 0) * 100);
+    assert.ok(omzetBoekhouding > 0, 'de boekhouding telt deze omzet uberhaupt');
+    assert.equal(omzetBoekhouding, somVanDeBonnen,
+      'de maandboekhouding telt het tafelticket EEN keer; stond hij op ' + (somVanDeBonnen * 2) +
+      ', dan telt de bundelbon er weer bovenop');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* EN DE CADEAUKAART, HET SPIEGELBEELD ERVAN (TAKEN.md 4.27).
+
+   Er was GEEN betaalwijze 'cadeaukaart' aan de kassa. De kassa moest dus een bon
+   aanslaan en daarnaast de kaart verzilveren, en dan telde `financeVoor` de
+   omzet twee keer: een keer als bon en een keer als inwisseling. Andersom miste
+   de btw-aangifte een LOSSE inwisseling helemaal, want een verzilvering is geen
+   bon en boekt dus geen factuur.
+
+   'cadeaukaart' is nu een betaalwijze: de bon draagt de omzet met zijn eigen
+   regels (dus het juiste tarief per artikel) en de verzilveringen die bij een
+   bon horen dragen `viaBon`, waarop de maandboekhouding ze overslaat. Deze
+   toets legt beide kanten vast, want een reparatie die de ene kant dichtzet en
+   de andere opentrekt, is geen reparatie. */
+test('6c. een bon die met een cadeaukaart wordt betaald telt EEN keer, en de aangifte ziet hem', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const kaart = await api(base, '/api/supplier/giftcard/sell', { bedrag: 100 }, mgr);
+    assert.equal(kaart.status, 200, JSON.stringify(kaart.body).slice(0, 200));
+    const code = kaart.body.kaart.code;
+
+    /* De verkoop van de kaart is nog GEEN omzet: het saldo is een schuld aan de
+       klant. Dat stond er al en blijft zo -- als de verkoop hier zou meetellen,
+       meet de rest van deze toets niets. */
+    const voor = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((voor.body.btw || []).reduce((x, r) => x + r.omzet, 0) * 100), 0,
+      'een verkochte kaart is nog geen omzet');
+
+    // de gast eet voor 40 euro en betaalt met de kaart
+    const bon = await api(base, '/api/supplier/pos/sale', {
+      total: 40, method: 'cadeaukaart', giftcardCode: code,
+      items: [{ name: 'Kaiseki', qty: 1, price: 40 }]
+    }, mgr);
+    assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
+    assert.equal(bon.body.sale.method, 'cadeaukaart', 'de bon draagt de betaalwijze');
+    assert.equal(bon.body.sale.kaartCode, code, 'en welke kaart het was');
+    await even();
+
+    // het saldo is eraf, en precies een keer
+    const na = await api(base, '/api/supplier/giftcard/redeem', { code, bedrag: 0 }, mgr);
+    assert.equal(na.status, 400, 'nul blijft geen bedrag');
+    const rest = await api(base, '/api/supplier/giftcard/redeem', { code, bedrag: 60 }, mgr);
+    assert.equal(rest.status, 200, 'er staat nog zestig op: de kaart is EEN keer belast');
+    assert.equal(rest.body.saldo, 0);
+
+    /* Vijftig euro is door de kassa gegaan (40) en vijftig los verzilverd (60):
+       samen honderd, en dat is precies wat de boekhouding hoort te tellen. Zou
+       de bon dubbel tellen, dan stond hier 140. */
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    const omzet = Math.round((fin.body.btw || []).reduce((x, r) => x + r.omzet, 0) * 100);
+    assert.equal(omzet, 10000,
+      'de bon (40) plus de losse inwisseling (60); bij 14000 telt de kassabon dubbel');
+    assert.equal(Math.round(fin.body.giftcards.ingewisseld * 100), 10000,
+      'het kaartrapport blijft het VOLLE bedrag melden: dat is een andere vraag dan waar de omzet staat');
+
+    /* En de andere kant: de bon boekt een factuur, dus de btw-aangifte ziet die
+       omzet nu wel. Voor de losse inwisseling geldt dat nog steeds niet -- die
+       staat als open punt bij 4.27. */
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: fin.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    const omzetAangifte = (op.body.aangifte.tarieven || []).reduce((x, t) => x + t.omzetCenten, 0);
+    assert.ok(omzetAangifte > 0, 'de aangifte ziet de bon die met een kaart is betaald');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

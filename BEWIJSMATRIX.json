@@ -6,11 +6,11 @@
   "schakels": 11,
   "cellen": 46288,
   "telling": {
-    "bewezen": 18228,
+    "bewezen": 18216,
     "verklaard": 0,
     "nvt": 340,
-    "ongemeten": 27709,
-    "gezakt": 11
+    "ongemeten": 27723,
+    "gezakt": 9
   },
   "perSchakel": {
     "AUTH": {
@@ -42,17 +42,17 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 244,
+      "bewezen": 237,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3896,
+      "ongemeten": 3903,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 244,
+      "bewezen": 237,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3896,
+      "ongemeten": 3903,
       "gezakt": 0
     },
     "AUDIT": {
@@ -63,11 +63,11 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 842,
+      "bewezen": 844,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 3295,
-      "gezakt": 3
+      "gezakt": 1
     },
     "FAILURE": {
       "bewezen": 2,

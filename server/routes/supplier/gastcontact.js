@@ -83,7 +83,14 @@ app.post('/api/supplier/betaalverzoek', supplierAuth, (req, res) => {
     naarCodename: req.body.codename, bedragCenten: cent, omschrijving: req.body.omschrijving,
     idem: req.body.idem || req.body.idempotentieSleutel });
   if (r.error) return res.status(r.status).json({ error: r.error });
-  logActivity(req.supplier.code, req.actor, 'stuurde een betaalverzoek van € ' + (cent / 100).toFixed(2));
+  /* EEN HERHALING STUURT NIETS, DUS SCHRIJFT HIJ OOK NIETS IN HET WERKBOEK. De
+     idem-laag van directpay geeft bij dezelfde sleutel het BESTAANDE verzoek
+     terug (`herhaald: true`) -- maar deze regel stond erbuiten en zette er wel
+     een tweede "stuurde een betaalverzoek van € X" onder. Dat is een regel over
+     een handeling die niet gebeurd is, en juist een werkboek hoort daarin te
+     kloppen: gevonden doordat de staatproef `supplierActivity` zag bewegen bij
+     een herhaling die verder niets deed. */
+  if (!r.herhaald) logActivity(req.supplier.code, req.actor, 'stuurde een betaalverzoek van € ' + (cent / 100).toFixed(2));
   res.json(r);
 });
 app.post('/api/supplier/betaalverzoek/intrek', supplierAuth, (req, res) => {

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1027 bestanden en 6843 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1027 bestanden en 6846 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1027 |
-| losse beweringen (`test(...)`) | 6843 |
+| losse beweringen (`test(...)`) | 6846 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-901 bestanden, 6623 beweringen.
+901 bestanden, 6626 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -385,7 +385,7 @@ toets omvalt.
 | `levensloop.test.js` | 1 | gezakt op `liegpoort /api/` | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `lib.test.js` | 7 | gezakt op `===->!==#0` | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
 | `lidboard.test.js` | 21 | gezakt op `liegpoort /api/` | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vijf groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
-| `lidfactuur.test.js` | 8 | gezakt op `liegpoort /api/` | ELKE BETAALDE LIDTRANSACTIE LEVERT EEN FACTUUR OP -- en dus btw. Dit is de toets bij de reparatie in kern/lidacties/factuur.js. |
+| `lidfactuur.test.js` | 10 | gezakt op `liegpoort /api/` | ELKE BETAALDE LIDTRANSACTIE LEVERT EEN FACTUUR OP -- en dus btw. Dit is de toets bij de reparatie in kern/lidacties/factuur.js. |
 | `liegpoort.test.js` | 7 | gezakt op `false->true#0` | DE LIEGPOORT: liegt hij precies waar hij moet, en zwijgt hij waar het telt? WAAROM DIT ER IS. |
 | `life-schakelbaar.test.js` | 5 | gezakt op `liegpoort /api/` | STAAN DE RTG LIFE-DEUREN ECHT IN DE SCHAKELKAST? test/schakelkast-dekking.test.js telt of elke route in de CATALOGUS staat. |
 | `life.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Life (kern/life.js): het ene scherm. Wat hier bewezen wordt is vooral wat het scherm NIET doet: geen cijfer verzinnen waar geen bron is, geen nul waar niets gemeten is, en een kapotte laag niet stil laten... |
@@ -555,7 +555,7 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
-| `pay.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
+| `pay.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
 | `payroll-aangifte.test.js` | 10 | gezakt op `!==->===#0` | Payroll OS: de loonaangifte -- de derde uitgang uit dezelfde definitieve run. WAT HIER OP HET SPEL STAAT. |
 | `payroll-dekking.test.js` | 11 | gezakt op `===->!==#0` | Payroll OS: de DEKKING per land -- waar kan er loon draaien, en waar niet? WAT HIER OP HET SPEL STAAT. |
 | `payroll-dossier.test.js` | 9 | gezakt op `!==->===#0` | Payroll OS: HET DOSSIER -- de vier vragen, voor elk bedrag. DIT IS DE AFGESPROKEN MAATSTAF, en deze toets maakt hem toetsbaar. |

@@ -41,7 +41,7 @@
       '#paneel .lb-rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}' +
       '#paneel .lb-rij>*{flex:1;min-width:6rem;width:auto;}' +
       '#paneel .lb-knoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;}' +
-      '#paneel .lb-rood{color:var(--rtg-rood,#DE6E92);border-color:var(--rtg-rood,#DE6E92);}' +
+      '#paneel .lb-rood{color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));border-color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
       '#paneel .lb-item{display:flex;gap:.6rem;align-items:flex-start;' +
         'border-top:1px solid var(--rtg-line);padding:.55rem 0;font-size:.9rem;}' +
       '#paneel .lb-item:first-child{border-top:0;}' +

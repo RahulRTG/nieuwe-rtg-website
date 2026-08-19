@@ -2,7 +2,7 @@
 @import url('/fonts/fonts.css');
 :root{
   --bg:#0C0C0B; --paneel:#151412; --paneel2:#100F0E; --lijn:#2A2724;
-  --txt:#F7F5F1; --zacht:#A79F92; --goud:#C9A24B; --goud2:#e0bd6b;
+  --txt:#F7F5F1; --zacht:var(--rtg-leeszacht,#A79F92); --goud:#C9A24B; --goud2:#e0bd6b;
   --groen:#5FA56A; --rood:#B4574E; --bord:#12110F;
   --radius:16px; --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
   --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;

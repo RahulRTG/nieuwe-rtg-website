@@ -55,7 +55,7 @@
     '.rp-stop{background:transparent;color:#CFC9BE;border:1px solid rgba(255,255,255,.2) !important;}' +
     '.rp-waarom{background:none;border:none;color:var(--burgundy-on-dark,#C23A5E);font:inherit;font-size:.82rem;' +
     'cursor:pointer;padding:0;margin-top:.7rem;text-decoration:underline;}' +
-    '.rp-uitleg{font-size:.84rem;line-height:1.5;color:#A79F92;margin:.7rem 0 0;}' +
+    '.rp-uitleg{font-size:.84rem;line-height:1.5;color:var(--rtg-leeszacht,#A79F92);margin:.7rem 0 0;}' +
     '@media print{.rp-waas{display:none;}}';
 
   var waas = null, kaart = null, huidig = null;

@@ -62,7 +62,14 @@
 
 /* ---- zonstanden: de grond en de inkt ---- */
 /* daglicht: ivoor, zwarte inkt, zwarte pillen (couture) */
+/* EN HET GOUD DAT OP DIE GROND LEEST. De zonstand kiest hier de grond en de
+   inkt; het goud hoorde daar altijd al bij maar stond er niet. Een document dat
+   `var(--white)` als grond neemt, draait bij avond naar bijna-zwart -- en dan is
+   het diepe goud (#5E4F05) er precies zo onleesbaar als het lichte goud dat
+   overdag is. Gemeten: 2,4 op de avondgrond, 7,1 op de ochtendgrond, en
+   omgekeerd voor het hoogsel. Twee tinten, gekozen door dezelfde schakelaar. */
 :root[data-dagdeel="ochtend"], :root[data-dagdeel="middag"]{
+  --leesgoud:var(--gold-diep,#5E4F05);
   --white:var(--s-ochtend,#F4F2EA);
   --panel:var(--s-paneel-licht,#FEFDF9);
   --panel2:#FFFFFF;
@@ -83,6 +90,7 @@
 }
 /* avond en nacht: de vertrouwde donkere huisstijl, getint door het seizoen */
 :root[data-dagdeel="avond"], :root[data-dagdeel="nacht"]{
+  --leesgoud:var(--gold-tekst,#C0A544);
   --white:var(--s-avond,#14110E);
   --panel:var(--s-paneel-avond,#1C1712);
   --panel2:#221C16;

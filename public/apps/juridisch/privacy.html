@@ -20,14 +20,20 @@
    INKT -- bijna zwarte tekst op een bijna zwarte grond, 1,08:1. Een juridisch
    stuk is een document en geen appvlak; het schildert zijn eigen vlak, en dan
    allebei de kanten ervan. Zie data-rtg-eigenvlak op de body hierboven. */
-  body.rtg-stijl{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  /* EN MET data-rtg-eigenvlak ERBIJ, want anders wint de kit alsnog. `body.rtg-stijl`
+     hierboven is even specifiek als de regel in de gedeelde kit, dus besliste de
+     VOLGORDE -- en die kit wordt later ingesloten. Gemeten onder een thema stond
+     deze pagina daardoor gewoon donker (rgb(23,19,16)), leesbaar maar niet wat er
+     staat: een juridisch stuk hoort een document te zijn. Met het attribuut erbij
+     is de regel specifieker dan de kit en klopt de verklaring ook echt. */
+  body.rtg-stijl[data-rtg-eigenvlak]{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}
   header .wrap{display:flex;justify-content:space-between;align-items:center;}
   header a{font-size:0.8rem;color:var(--grey);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
   main{padding:clamp(3rem,7vw,5rem) 0 5rem;}
-  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold-diep,#5E4F05));font-weight:600;}
+  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--leesgoud,var(--rtg-leesgoud,var(--gold-diep,#5E4F05)));font-weight:600;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.15;margin:0.8rem 0 0.4rem;}
   .updated{font-size:0.78rem;color:var(--grey-soft);}
   h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:2.6rem 0 0.7rem;}

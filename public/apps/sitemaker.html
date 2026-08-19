@@ -30,7 +30,7 @@
   .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.8rem;font-weight:600;border-radius:10px;padding:.45rem .8rem;cursor:pointer;white-space:nowrap;}
   .knop:hover{border-color:var(--gold);}
   .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .knop.online{background:var(--green);border-color:var(--green);color:#fff;}
+  .knop.online{background:var(--green);border-color:var(--rtg-leesgroen,var(--green));color:#fff;}
   .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .swatches{display:flex;gap:.35rem;align-items:center;}
   /* 1.35rem is 21,6px en dus onder de 24 van WCAG 2.5.8; 1.5rem is precies 24 */
@@ -62,8 +62,8 @@
   .blok.sleep{opacity:.5;}
   .bewerk .blok.dim{opacity:.4;}
   .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
-  .vlabel.var{border-color:var(--green);color:var(--green);}
-  #versienoot{color:var(--green);}
+  .vlabel.var{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
+  #versienoot{color:var(--rtg-leesgroen,var(--green));}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
   /* onderweg-status-lint */
   .lint{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--card);border-bottom:1px solid var(--line);font-size:.82rem;color:var(--muted);}

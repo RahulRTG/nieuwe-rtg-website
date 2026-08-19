@@ -356,7 +356,7 @@
     background:var(--card);border:1px solid var(--line);color:var(--muted);
     border-radius:999px;padding:0.4rem 0.85rem;font-size:0.68rem;
   }
-  .notif-push.on{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .notif-push.on{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .notif-list{flex:1;overflow-y:auto;padding:0.5rem 0;}
   .notif-item{
     display:flex;gap:0.85rem;
@@ -444,7 +444,7 @@
     white-space:nowrap;
   }
   .pill.open{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
-  .pill.paid{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.paid{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .pill.req{color:var(--rtg-leesgoud,var(--gold));border-color:rgba(169,143,28,0.4);}
 
   .btn-pay{
@@ -678,11 +678,11 @@
   .mo-pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
   .mo-pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
-  .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .mo-pill.klaar,.mo-pill.geserveerd{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
   .mo-pay{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
-  .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
+  .mo-paid{font-size:0.68rem;color:var(--rtg-leesgroen,var(--green));font-weight:600;}
   /* De rekening (betalen na het eten) */
   .rek-card{background:var(--card);border:1px solid var(--burgundy);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
   .rek-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.6rem;}
@@ -731,7 +731,7 @@
   .live-partner .eta{text-align:right;white-space:nowrap;}
   .live-partner .eta .n{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--rtg-leesgoud,var(--gold));}
   .live-partner .eta .u{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
-  .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
+  .live-partner .eta.arr .n{color:var(--rtg-leesgroen,var(--green));font-size:0.9rem;}
   .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
   .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
   .live-acts .prim{background:var(--knop);color:var(--knop-txt);border-color:#fff;}
@@ -845,7 +845,7 @@
   /* De statusregel van een treffer, als klassen in plaats van style-attributen:
      die laatste houden style-src-attr in de CSP open (zie de norm). */
   .sc-st{font-size:0.72rem;color:var(--soft);}
-  .sc-st.ok{color:var(--green,#2E7D4F);}
+  .sc-st.ok{color:var(--rtg-leesgroen,var(--green,#2E7D4F));}
   .sc-st.wacht{color:var(--rtg-leesgoud,var(--gold));}
   .sc-av.klein{width:34px;height:34px;font-size:0.7rem;}
   .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
@@ -1560,7 +1560,7 @@
   .os-cc-tegels button:hover{color:var(--rtg-txt,#F4F0E9);background:rgba(255,255,255,0.06);}
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
   .os-cc-tegels button b svg{display:block;}
-  .os-cc-tegels button.aan{border-color:color-mix(in srgb, var(--green) 45%, transparent);color:var(--green);}
+  .os-cc-tegels button.aan{border-color:color-mix(in srgb, var(--green) 45%, transparent);color:var(--rtg-leesgroen,var(--green));}
   /* het aantal ongelezen meldingen op de tegel: hetzelfde stipje als de bel-badge
      had, want hij vertelt hetzelfde */
   .os-cc-tegels button{position:relative;}

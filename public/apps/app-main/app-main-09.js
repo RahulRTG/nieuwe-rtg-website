@@ -90,7 +90,7 @@
       $('#scRes').innerHTML = (d.results || []).map(r =>
         '<div class="sc-hit"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(r.codename) + '</span><b>' + escT(r.codename) + '</b>' +
         (r.status === 'geen' ? '<button data-scvz="' + escT(r.key) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>'
-         : r.status === 'verbonden' ? '<span style="color:var(--green,#2E7D4F);font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
+         : r.status === 'verbonden' ? '<span style="color:var(--rtg-leesgroen,var(--green,#2E7D4F));font-size:0.72rem;">✓ ' + T('sal.isverbonden','verbonden') + '</span>'
          : r.status === 'aangevraagd' ? '<span style="color:var(--soft);font-size:0.72rem;">' + T('sal.gevraagd','aangevraagd') + '</span>'
          : '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.72rem;">' + T('sal.wachtu','wacht op u') + '</span>') + '</div>'
       ).join('') || '<div style="font-size:0.78rem;color:var(--soft);">' + T('sal.niksgevonden','Geen leden gevonden met deze codenaam.') + '</div>';

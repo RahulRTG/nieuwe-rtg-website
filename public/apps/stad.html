@@ -74,7 +74,11 @@ function toast(t){ const m = $('#toast'); m.textContent = t; m.style.opacity = '
    hij er niet en leek stad.html schoon. De volle scan ving hem alsnog. Dat is
    precies waarom de scan over de ingelogde staat gaat en niet over een
    steekproef. */
-const STAND = { rustig: 'var(--green)', normaal: 'var(--txt)', druk: 'var(--rtg-rood)', stil: 'var(--soft)' };
+/* DE KLEUR STAAT HIER IN EEN INLINE STYLE, en daarmee viel deze kaart buiten
+   elke zoek-vervang op `color:var(--...)`. De tonen zijn nu dezelfde leestokens
+   als overal: ze kiezen per thema een waarde die op die grond leest. */
+const STAND = { rustig: 'var(--rtg-leesgroen,var(--green))', normaal: 'var(--txt)',
+  druk: 'var(--rtg-leesrood,var(--rtg-rood))', stil: 'var(--rtg-leeszacht,var(--soft))' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 let B = null;

@@ -77,10 +77,10 @@
     if (!mijn.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:0 0 0.5rem;">'+T('care.mijn','Mijn afspraken')+'</div>'+
       mijn.map(b => '<div class="card" style="border-color:rgba(139,195,168,0.35);">'+
-        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">'+esc(b.aanbiederNaam)+'</div>'+
+        '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgroen,var(--green,#8bc3a8));">'+esc(b.aanbiederNaam)+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+b.datum+' · '+b.tijd+' · '+eur(b.prijs)+' · '+
-          (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--rtg-leesgoud,var(--gold));">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
+          (b.paid ? '<span style="color:var(--rtg-leesgroen,var(--green,#8bc3a8));">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--rtg-leesgoud,var(--gold));">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.55rem;">'+
           (b.paid ? '' : '<button class="bz-groot" data-care-pay="'+esc(b.ref)+'" style="flex:1;">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+

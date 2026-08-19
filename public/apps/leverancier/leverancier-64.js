@@ -95,7 +95,7 @@
       const uit = document.getElementById('tkUit');
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#tkCode').value });
-        uit.innerHTML = '<span style="color:var(--green);">\u2705 '+esc(r.ticket.codename)+' \u00B7 '+esc(r.ticket.naam)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+T('tk2.welkom','welkom!')+'</span>';
+        uit.innerHTML = '<span style="color:var(--rtg-leesgroen,var(--green));">\u2705 '+esc(r.ticket.codename)+' \u00B7 '+esc(r.ticket.naam)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+T('tk2.welkom','welkom!')+'</span>';
         $('#tkCode').value = '';
         laadProgramma();
       } catch(e){ uit.innerHTML = '<span style="color:var(--burgundy);">\u26D4 '+esc(e.message)+'</span>'; }

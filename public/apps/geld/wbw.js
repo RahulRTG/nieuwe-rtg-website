@@ -34,7 +34,7 @@
       '#paneel .wb-rek{flex:1;}' +
       '#paneel .wb-bedrag{font-variant-numeric:tabular-nums;font-weight:600;}' +
       '#paneel .wb-plus{color:var(--rtg-groen,#4C9A75);}' +
-      '#paneel .wb-min{color:var(--rtg-rood,#DE6E92);}' +
+      '#paneel .wb-min{color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
       '#paneel .wb-naam{font-family:"Bodoni Moda",serif;font-size:1.3rem;font-weight:600;margin:.9rem 0 .1rem;}' +
       '#paneel .wb-balk{display:flex;align-items:center;gap:.7rem;padding:.35rem 0;font-size:.85rem;}' +
       '#paneel .wb-balk .naam{min-width:9rem;}' +

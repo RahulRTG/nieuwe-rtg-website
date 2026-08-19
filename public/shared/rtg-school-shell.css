@@ -16,7 +16,9 @@ body.school-shell{min-height:100%;padding:0!important;overflow-x:hidden}
    voor dit. Wit haalt 19,57:1; de rand houdt de vorm, het accent leeft verder
    in .school-ey en de actieve nav. Zie de kleurregel in CLAUDE.md. */
 .school-nav i{width:1.55rem;height:1.55rem;border:1px solid var(--rtg-line,var(--lijn));border-radius:.5rem;display:grid;place-items:center;color:var(--rtg-txt,#fff);font-size:.62rem;font-style:normal;font-weight:800}
-.school-veilig{margin-top:auto;padding:.72rem;border:1px solid color-mix(in oklab,var(--school-groen) 48%,var(--rtg-line,var(--lijn)));border-radius:.8rem;color:var(--rtg-muted,var(--zacht));font-size:.68rem;line-height:1.45}.school-veilig b{display:block;color:#91d39a;margin-bottom:.18rem}
+.school-veilig{margin-top:auto;padding:.72rem;border:1px solid color-mix(in oklab,var(--school-groen) 48%,var(--rtg-line,var(--lijn)));border-radius:.8rem;color:var(--rtg-muted,var(--zacht));font-size:.68rem;line-height:1.45}/* #91d39a is een licht groen: prima op pianolak, 1,2:1 op parelmoer. Het
+   leesgroen kiest per thema de toon die op die grond leest. */
+.school-veilig b{display:block;color:var(--rtg-leesgroen,#91d39a);margin-bottom:.18rem}
 .school-werk{min-width:0;min-height:100vh;background:var(--rtg-bg,var(--bg))}
 .school-boven{position:sticky;top:0;z-index:15;min-height:4.35rem;padding:.72rem 1.2rem!important;display:flex!important;align-items:center!important;gap:.8rem!important;flex-wrap:nowrap!important;border-bottom:1px solid var(--rtg-line,var(--lijn))!important;background:color-mix(in oklab,var(--rtg-bg,var(--bg)) 90%,transparent)!important;backdrop-filter:blur(14px)}
 .school-boven .school-boventitel{min-width:0}/* Het eyebrow-label is 9,3px en stond in --school-accent: 3,78:1 op de zwarte

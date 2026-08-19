@@ -52,7 +52,7 @@
   .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.5rem .9rem;cursor:pointer;white-space:nowrap;}
   .knop:hover{border-color:var(--gold);}
   .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .knop.groen{background:var(--green);border-color:var(--green);color:#fff;}
+  .knop.groen{background:var(--green);border-color:var(--rtg-leesgroen,var(--green));color:#fff;}
   .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem;}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem;text-align:center;}
   .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.7rem;}
@@ -63,7 +63,7 @@
   .art .t b{display:block;font-size:.92rem;}
   .art .t small{color:var(--soft);}
   .badge{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;padding:.14rem .5rem;border-radius:999px;border:1px solid var(--line);}
-  .badge.live{color:var(--green);border-color:var(--green);}
+  .badge.live{color:var(--rtg-leesgroen,var(--green));border-color:var(--rtg-leesgroen,var(--green));}
   .badge.concept{color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}
   .mini{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.28rem .55rem;font:inherit;font-size:.74rem;cursor:pointer;}
   .mini:hover{border-color:var(--gold);color:var(--txt);}
@@ -95,7 +95,7 @@
   .blok.sleep{opacity:.5;}
   .bewerk .blok.dim{opacity:.4;}
   .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
-  .vlabel.var{border-color:var(--green);color:var(--green);}
+  .vlabel.var{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:40;padding:1.2rem;}
   .sheet.open{display:grid;}

@@ -229,7 +229,7 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-melder.zien{min-height:auto;padding:.65rem .9rem;margin-bottom:1rem;opacity:1;}
 .rtg-melder.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
 .rtg-melder.let{background:color-mix(in srgb,var(--rtg-acc) 14%,transparent);border-color:var(--rtg-acc);}
-.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* --------------------------------------------------------- rest & rust -----*/
 .rtg-leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
@@ -325,7 +325,7 @@ body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud)
 body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);font-weight:700;}
 body.rtg-stijl .knop.prim:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
-body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
+body.rtg-stijl .knop.weg{color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
 /* .klein is de derde maat uit de woordenschat van het huis, naast .vol en .weg:
    een knopje dat in een regel of een chip meeloopt. Zonder deze regel kreeg zo'n
    knopje de volle maat en liep de regel eromheen het scherm af. */
@@ -345,7 +345,7 @@ body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text
 body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
-body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* ---- de overstap-laag, deel 2: de rest van de gedeelde woordenschat ----
    Na de eerste ronde bleek welke namen er nog meer overal terugkomen: statistiek-
@@ -389,7 +389,7 @@ body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
 body.rtg-stijl .status.ok,body.rtg-stijl .status.goed,body.rtg-stijl .badge.ok{
   color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
 body.rtg-stijl .status.rood,body.rtg-stijl .status.fout,body.rtg-stijl .badge.rood{
-  color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
+  color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
 
 /* de sectietitel binnen een kaart, en de inlogkaart van een werkplek */
 body.rtg-stijl .titel,body.rtg-stijl .sectiekop,body.rtg-stijl .st-sec{

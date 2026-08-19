@@ -127,7 +127,7 @@
   .order .allergy{margin-top:0.6rem;font-size:0.76rem;color:var(--amber);background:rgba(201,154,46,0.1);border:1px solid rgba(201,154,46,0.25);border-radius:8px;padding:0.4rem 0.6rem;}
   .order .salon{margin-top:0.5rem;font-size:0.68rem;color:var(--burgundy);letter-spacing:0.04em;}
   .order .enroute,.enroute{margin-top:0.6rem;font-size:0.76rem;color:var(--rtg-leesgoud,var(--gold));background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:8px;padding:0.45rem 0.65rem;line-height:1.4;}
-  .order .enroute.here,.enroute.here{color:var(--green);background:rgba(76,154,117,0.12);border-color:rgba(76,154,117,0.35);}
+  .order .enroute.here,.enroute.here{color:var(--rtg-leesgroen,var(--green));background:rgba(76,154,117,0.12);border-color:rgba(76,154,117,0.35);}
   .livedot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);display:inline-block;animation:livepulse 1.4s infinite;}
   @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 6px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .guest-row{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0;border-bottom:1px solid var(--line);}
@@ -135,7 +135,7 @@
   .guest-row .cn{font-weight:600;font-size:0.88rem;color:var(--rtg-leesgoud,var(--gold));}
   .guest-row .ge{font-size:0.72rem;color:var(--muted);}
   .guest-row .ge b{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--txt);}
-  .guest-row .ge.here{color:var(--green);font-weight:600;}
+  .guest-row .ge.here{color:var(--rtg-leesgroen,var(--green));font-weight:600;}
 
   /* ophaalcode op de orderkaart */
   .order .pickup{margin-top:0.45rem;font-size:0.72rem;color:var(--muted);}
@@ -171,7 +171,7 @@
   .tbl b{font-size:0.8rem;font-weight:600;}
   .tbl span{font-size:0.62rem;color:var(--soft);}
   .tbl i{font-style:normal;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;margin-top:0.2rem;}
-  .tbl-vrij{border-color:rgba(76,154,117,0.45);} .tbl-vrij i{color:var(--green);}
+  .tbl-vrij{border-color:rgba(76,154,117,0.45);} .tbl-vrij i{color:var(--rtg-leesgroen,var(--green));}
   .tbl-bezet{border-color:rgba(194,58,94,0.45);background:rgba(194,58,94,0.08);} .tbl-bezet i{color:var(--burgundy);}
   .tbl-gereserveerd{border-color:rgba(201,154,46,0.45);} .tbl-gereserveerd i{color:var(--amber);}
   .tbl-dicht{opacity:0.5;} .tbl-dicht i{color:var(--soft);}
@@ -209,18 +209,18 @@
   .ai-chip{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-family:inherit;}
   .ai-chip:active{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .ai-thread{display:flex;flex-direction:column;gap:0.6rem;margin-top:0.9rem;min-height:160px;}
-  .ai-did{display:block;margin-top:0.35rem;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);font-weight:700;}
+  .ai-did{display:block;margin-top:0.35rem;font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--rtg-leesgroen,var(--green));font-weight:700;}
 
   /* housekeeping + klussen */
   .hk-pill{display:inline-block;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:700;padding:0.12rem 0.5rem;border-radius:999px;border:1px solid var(--line);vertical-align:middle;margin-left:0.3rem;}
-  .hk-schoon{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .hk-schoon{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .hk-vuil{color:var(--amber);border-color:rgba(201,154,46,0.4);}
   .hk-bezig{color:#7FA8C9;border-color:rgba(127,168,201,0.4);}
   .hk-bezet{color:var(--txt);border-color:rgba(244,241,236,0.3);}
   .hk-defect{color:var(--burgundy);border-color:rgba(194,58,94,0.45);}
   .hk-chips{display:flex;gap:0.35rem;flex-wrap:wrap;width:100%;margin-top:0.5rem;}
   .hk-chip{background:none;border:1px solid var(--line);color:var(--soft);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.66rem;font-family:inherit;}
-  .hk-chip.on.hk-schoon{background:rgba(76,154,117,0.15);color:var(--green);border-color:rgba(76,154,117,0.5);}
+  .hk-chip.on.hk-schoon{background:rgba(76,154,117,0.15);color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.5);}
   .hk-chip.on.hk-vuil{background:rgba(201,154,46,0.15);color:var(--amber);border-color:rgba(201,154,46,0.5);}
   .hk-chip.on.hk-bezig{background:rgba(127,168,201,0.15);color:#7FA8C9;border-color:rgba(127,168,201,0.5);}
   .hk-chip.on.hk-bezet{background:rgba(244,241,236,0.1);color:var(--txt);}
@@ -268,7 +268,7 @@
   .door-row .dt{flex:1;min-width:0;}
   .door-row .dt b{display:block;font-size:0.88rem;font-weight:600;}
   .door-row .dt span{font-size:0.7rem;color:var(--soft);}
-  .door-row.open .dt span{color:var(--green);}
+  .door-row.open .dt span{color:var(--rtg-leesgroen,var(--green));}
   .door-row.open{background:rgba(76,154,117,0.06);border-radius:10px;padding-left:0.5rem;padding-right:0.5rem;}
 
   /* gastenkaart */
@@ -307,8 +307,8 @@
   .pill{display:inline-block;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.28rem 0.6rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap;}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);border-color:rgba(201,154,46,0.4);}
-  .pill.klaar,.pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
-  .pill.betaald{color:var(--green);}
+  .pill.klaar,.pill.geserveerd{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
+  .pill.betaald{color:var(--rtg-leesgroen,var(--green));}
   .pill.onbetaald{color:var(--soft);}
   .order .acts{margin-top:0.85rem;display:flex;gap:0.5rem;flex-wrap:wrap;}
   .obtn{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:0.5rem 0.9rem;font-size:0.74rem;font-weight:500;}

@@ -22,7 +22,7 @@ op telefoonformaat (390x844).
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
-| de drie andere thema's | 33 / 21 / 21, met een grens die alleen omlaag mag | tekst die alleen in de stand die je zelf niet gebruikt onleesbaar is |
+| de drie andere thema's | **0** op bordeaux en royal; champagne 12, grens 14 | tekst die alleen in de stand die je zelf niet gebruikt onleesbaar is |
 
 **HET GOUD WAS GEEN MERKBESLUIT MAAR EEN TOKEN DAT NIET MEETHEMAAT.** Toen de
 vierde ronde (champagne, bordeaux, royal) erbij kwam, stonden daar 470
@@ -40,8 +40,21 @@ vulkleur -- tot het nagerekend werd. Er bestaat per grond een goud dat wél lees
 De logotoon haalt het dus op géén enkele grond, en `--rtg-leesgoud` -- het token
 dat hier al voor bestaat -- wees op champagne naar precies die toon. Rechtgezet,
 en aangezet op de 933 plekken waar goud TEKST is; randen, vullingen en het
-beeldmerk houden hun goud. Daarmee zakte de ronde van 470 naar 75. Wat er nu nog
-ligt heeft geen gemeenschappelijke oorzaak meer.
+beeldmerk houden hun goud.
+
+Dezelfde vorm bleek te gelden voor drie andere tonen, en die hebben nu allemaal
+een leestoken per thema: het **groen** (de stand *vrij*, *gezond*), de **zachte
+onderregel** en het **rood** (*druk*, *verwijderen*). Alle vier zijn ze
+**dekkend**, en dat is geen detail: `--rtg-soft` en `--rtg-muted` dragen een alfa,
+en de keuring slaat een voorgrond met alfa over. Een zachte toon daarheen sturen
+zou de bevinding laten *verdwijnen* zonder hem op te lossen — het tegenovergestelde
+van wat deze poort moet doen.
+
+Daarmee ging de ronde van **470 naar 12**: bordeaux en royal staan op nul en zijn
+daar hard. Champagne houdt er twaalf, op vier schermen, en die hebben geen
+gemeenschappelijke oorzaak meer — twee ontwerpgereedschappen die de kleuren van de
+gebruiker zelf tonen, en twee schermen die hun eigen donkere vlak schilderen
+terwijl het thema licht is.
 
 **EN DE POORT ZELF WIEBELDE, DOORDAT PAGINA'S BIJ HET OPENEN VAN KLEUR
 VERANDERDEN.** De eerste grenzen zette ik op één meting, en de ronde daarna zakte

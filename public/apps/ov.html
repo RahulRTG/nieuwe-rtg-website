@@ -85,7 +85,14 @@
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
-  .moveHero{--accent:#5EE7F7;position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:26px;
+  /* DE ACCENTTOON MOET OOK OP EEN LICHT VLAK LEZEN. #5EE7F7 is een heldere
+     cyaan: prachtig op pianolak (10,5:1) en onleesbaar op parelmoer (1,4).
+     Op een lichte grond wordt het dezelfde kleur in de schaduw. */
+  /* Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
+     is hier de schakelaar. Zou er ooit een tweede lichte grond bij komen, dan
+     hoort deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
+  :root[data-rtg-thema="champagne"] .moveHero{--ov-accent:#155A63;}
+  .moveHero{--accent:var(--ov-accent,#5EE7F7);position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:26px;
     border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}
   .moveHero.private{--accent:#D8C8A0;background:linear-gradient(145deg,#24231e,#0c1015 72%)}.moveHero.lifestyle{--accent:#E8C98B;background:linear-gradient(145deg,#34251f,#17110f 72%)}
   .moveHero .eyebrow{font-size:.59rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}.moveHero h2{font:500 clamp(2rem,7vw,3.1rem)/1.02 'Bodoni Moda',serif;letter-spacing:0;text-transform:none;color:var(--txt);margin:.55rem 0;max-width:58%}.moveHero>p{max-width:48%}

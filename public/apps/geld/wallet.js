@@ -54,7 +54,7 @@
       '#paneel .wa-invoer{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0 1rem;}' +
       '#paneel .wa-invoer>*{flex:1;min-width:7rem;}' +
       '#paneel .wa-invoer .knop{flex:0 0 auto;}' +
-      '#paneel .knop.wa-weg{color:var(--rtg-rood,#C23A5E);border-color:rgba(194,58,94,.4);}' +
+      '#paneel .knop.wa-weg{color:var(--rtg-leesrood,var(--rtg-rood,#C23A5E));border-color:rgba(194,58,94,.4);}' +
       '#waScrim{position:fixed;inset:0;z-index:80;background:#F4F1EC;color:#0C0C0B;display:none;' +
         'flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;}' +
       '#waScrim.aan{display:flex;}' +

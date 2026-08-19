@@ -45,12 +45,12 @@
       '#paneel .lf-scheids{border-left:3px solid var(--rtg-groen,#4C9A75);border-radius:8px;' +
         'background:var(--rtg-card2,#1B1817);padding:.55rem .75rem;margin:.6rem 0;font-size:.83rem;line-height:1.45;}' +
       '#paneel .lf-scheids.twijfel{border-left-color:var(--rtg-goud,#C9A24B);}' +
-      '#paneel .lf-scheids.afraden{border-left-color:var(--rtg-rood,#DE6E92);}' +
+      '#paneel .lf-scheids.afraden{border-left-color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
       '#paneel .lf-stem{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}' +
       '#paneel .lf-stem .telling{margin-left:auto;font-size:.8rem;color:var(--rtg-soft);}' +
       '#paneel .lf-voor[aria-pressed="true"]{background:var(--rtg-groen,#4C9A75);border-color:var(--rtg-groen,#4C9A75);color:#08210F;}' +
-      '#paneel .lf-tegen[aria-pressed="true"]{background:var(--rtg-rood,#DE6E92);border-color:var(--rtg-rood,#DE6E92);color:#2A0C12;}' +
-      '#paneel .lf-fout{color:var(--rtg-rood,#DE6E92);font-size:.82rem;min-height:1rem;margin:.2rem 0;}';
+      '#paneel .lf-tegen[aria-pressed="true"]{background:var(--rtg-rood,#DE6E92);border-color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));color:#2A0C12;}' +
+      '#paneel .lf-fout{color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));font-size:.82rem;min-height:1rem;margin:.2rem 0;}';
     d.head.appendChild(st);
   }
 

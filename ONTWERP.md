@@ -255,6 +255,11 @@ Een telefoonontwerp uitrekken is geen desktopontwerp.
 schermtoetsen meten op 430px én op 1440px, zodat "het staat scheef op desktop"
 een zakkende toets is en geen smaakkwestie.
 
+*En wat eronder hangt:* een layout zegt waar dingen staan, niet wat een mens er
+kan. Dat tweede staat in **`ADAPTIEF.md`** — per capability een presentatie per
+vorm, met als harde grens dat een handeling die op bureau bestaat op telefoon
+niet mag verdwijnen. `test/adaptief.test.js` laat de bouw daarop zakken.
+
 ---
 
 ## 11. Dichtheid met contrast

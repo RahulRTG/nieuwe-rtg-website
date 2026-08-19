@@ -29,6 +29,7 @@
 <link href="/shared/seizoen-pas.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/command.css" rel="stylesheet">
+<link href="/shared/adaptief.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
@@ -1638,12 +1639,22 @@
      beginscherm) is weg met dat tweede scherm zelf. De kaartjes staan nu in
      de app waar ze horen; daar hoeft niets meer gekozen of gesleept. */
 </style>
+<!-- De adaptieve laag staat VOOR de werktafel: die bouwt zijn contextzone met
+     RTGAdaptiefBalk, en een defer-script dat later staat bestaat op dat moment
+     nog niet. De leer eerst, dan het register dat hem leest. Zie ADAPTIEF.md. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/lagen.js" defer></script>
+<script src="/shared/adaptief/balkknop.js" defer></script>
+<script src="/shared/adaptief/balk.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
 <script src="/shared/command/catalog.js" defer></script>
 <script src="/shared/command/console.js" defer></script>
 <script src="/shared/command/verdeler.js" defer></script>
 <script src="/shared/command/bank.js" defer></script>
 <script src="/shared/command/praat.js" defer></script>
 <script src="/shared/command/inlogpoort.js" defer></script>
+<script src="/shared/command/bladhaak.js" defer></script>
 <script src="/shared/command/werktafel.js" defer></script>
 <script src="/shared/command.js" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->

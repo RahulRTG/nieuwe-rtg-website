@@ -1,0 +1,196 @@
+/* DE ADAPTIEVE LAAG, in vorm. De regels staan in ADAPTIEF.md, het gedrag in
+   shared/adaptief/. Dit blad doet twee dingen en verder niets:
+
+     1. de drie tijdelijke lagen (lade, paneel, taakmodus)
+     2. de actiezone in de schilbalk -- de balk die contextueel wordt
+
+   ALLES HIER IS ONYXGLAS MET EEN HAARLIJN, hetzelfde materiaal als de console
+   van RTG Command en de bank eronder (MATERIAAL.md: kies een materiaal, geen
+   kleur). Geen tweede vormtaal voor "mobiel"; het is hetzelfde huis, alleen
+   anders ingedeeld.
+
+   De maten komen uit shared/adaptief.js en staan hier als token, zodat een
+   scherm ze kan overnemen zonder 44 nog eens over te typen. */
+
+:root{
+  /* De aanraakmaat. TOEGANKELIJK.md houdt 24x24 aan als harde poort (WCAG 2.2
+     AA); dit is de ontwerpmaat en die is groter, want een duim is geen muis. */
+  --rtg-raak:44px;
+  --rtg-laag-tijd:260ms;
+}
+
+/* ============================================================ de lagen == */
+.rtg-laag{position:fixed;inset:0;z-index:300;display:flex;pointer-events:none;}
+.rtg-laag .lg-doek{position:absolute;inset:0;background:rgba(6,6,6,.58);
+  opacity:0;transition:opacity var(--rtg-laag-tijd) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
+  pointer-events:auto;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+.rtg-laag.open .lg-doek{opacity:1;}
+
+.rtg-laag .lg-vak{position:relative;z-index:1;pointer-events:auto;display:flex;flex-direction:column;
+  min-height:0;color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
+  background:linear-gradient(180deg,#11100f,#080808 75%);
+  border:1px solid var(--rtg-line,#26241f);
+  box-shadow:0 -18px 60px rgba(0,0,0,.55);
+  transition:transform var(--rtg-laag-tijd) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));}
+/* Het licht valt langs de bovenrand in -- dezelfde behandeling als de console.
+   Champagnegoud, en alleen als haarlijn: goud is hier materiaal en geen accent. */
+.rtg-laag .lg-vak::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(192,165,68,.5),transparent);pointer-events:none;}
+
+/* ---- de lade: van onderen, over wat je las ---- */
+.rtg-laag-lade{align-items:flex-end;}
+.rtg-laag-lade .lg-vak{width:100%;max-height:min(76vh,620px);
+  border-top-left-radius:20px;border-top-right-radius:20px;border-bottom:0;
+  padding-bottom:env(safe-area-inset-bottom,0px);transform:translateY(101%);}
+.rtg-laag-lade.open .lg-vak{transform:translateY(0);}
+.lg-greep{flex:0 0 auto;width:44px;height:4px;margin:.7rem auto .2rem;border-radius:4px;
+  background:var(--rtg-line,#26241f);}
+
+/* ---- het paneel: op telefoon het scherm, op tablet van rechts ---- */
+.rtg-laag-paneel{align-items:stretch;justify-content:flex-end;}
+.rtg-laag-paneel .lg-vak{width:100%;transform:translateX(101%);}
+.rtg-laag-paneel.open .lg-vak{transform:translateX(0);}
+@media (min-width:640px){
+  .rtg-laag-paneel .lg-vak{width:min(420px,86vw);border-right:0;}
+}
+
+/* ---- de taakmodus: alles wijkt ---- */
+.rtg-laag-taak .lg-vak{width:100%;transform:translateY(2%);opacity:0;
+  transition:transform var(--rtg-laag-tijd) var(--rtg-veer,cubic-bezier(.22,.61,.36,1)),
+             opacity var(--rtg-laag-tijd) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));}
+.rtg-laag-taak.open .lg-vak{transform:none;opacity:1;}
+.rtg-laag-taak .lg-doek{display:none;}
+
+/* ---- kop, lijf, voet ---- */
+.lg-kop{flex:0 0 auto;display:flex;align-items:center;gap:.5rem;min-height:var(--rtg-raak);
+  padding:.35rem .35rem .35rem 1rem;border-bottom:1px solid var(--rtg-line,#26241f);}
+.lg-titel{flex:1 1 auto;min-width:0;margin:0;font:600 .82rem/1.3 var(--rtg-interface,'Inter',sans-serif);
+  letter-spacing:.01em;color:var(--rtg-txt,#F4F1EC);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lg-sluit{flex:0 0 auto;width:var(--rtg-raak);height:var(--rtg-raak);border:0;background:transparent;
+  color:var(--rtg-muted,#8A8680);display:grid;place-items:center;cursor:pointer;padding:0;}
+.lg-sluit svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;}
+.lg-sluit:hover{color:var(--rtg-txt,#F4F1EC);}
+.lg-lijf{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;padding:.5rem 0 .75rem;}
+.lg-voet{flex:0 0 auto;padding:.5rem .75rem calc(.5rem + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--rtg-line,#26241f);}
+.lg-klaar{width:100%;min-height:var(--rtg-raak);border:1px solid rgba(192,165,68,.42);
+  background:transparent;color:var(--gold-tekst,#C0A544);
+  font:600 .78rem var(--rtg-interface,'Inter',sans-serif);letter-spacing:.04em;cursor:pointer;}
+.lg-klaar:hover{background:rgba(192,165,68,.08);}
+
+/* De rijen in een lade zijn een REGISTER en geen rij pillen: haarlijnen, geen
+   afgeronde vlakken (ONTWERP.md par. 7). Dezelfde vorm als .rtg-register. */
+.lg-rij{display:flex;align-items:center;gap:.7rem;width:100%;min-height:var(--rtg-raak);
+  border:0;border-bottom:1px solid var(--rtg-line,#26241f);background:transparent;text-align:left;
+  color:var(--rtg-muted,#8A8680);padding:.5rem 1rem;cursor:pointer;
+  font:500 .8rem var(--rtg-interface,'Inter',sans-serif);}
+.lg-rij:last-child{border-bottom:0;}
+.lg-rij:hover,.lg-rij:focus-visible{color:var(--rtg-txt,#F4F1EC);background:rgba(255,255,255,.035);}
+.lg-rij[aria-pressed="true"]{color:var(--gold-tekst,#C0A544);}
+.lg-rij .lg-teken{flex:0 0 auto;width:22px;text-align:center;font-weight:600;}
+.lg-kopje{margin:.9rem 0 .2rem;padding:0 1rem;font:600 .56rem/1 var(--rtg-interface,'Inter',sans-serif);
+  letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-soft,#8A8680);}
+.lg-kopje:first-child{margin-top:.2rem;}
+
+body.rtg-laag-open{overflow:hidden;}
+
+/* ==================================================== de actiezone in de balk ==
+   De schilbalk had drie zones: de bank links, waar je bent in het midden, weg
+   hier rechts. De middenzone is nu een CONTEXTZONE en kan twee dingen tonen:
+   je werkbladen, of de handelingen die nu spelen.
+
+   Wat er nooit verandert is de STRUCTUUR: links de bank, rechts Rahul, en het
+   middenstuk begint altijd met waar je bent. Dat is wat "de balk mag veranderen,
+   zolang hij voorspelbaar blijft" hier betekent -- de inhoud beweegt, de plekken
+   niet. */
+/* EEN KETEN VAN min-width DIE NERGENS MAG BREKEN.
+
+   Gemeten op 390x844 met eenentwintig handelingen in de rij: de balk werd 1099px
+   breed. Niet de rij liep over -- de rij duwde het RASTER open. Een grid-item
+   heeft standaard `min-width:auto`, dus is zijn minimum de breedte van zijn
+   inhoud, en dat plantte zich voort van de actierij via de balk naar .cmd-werk
+   en de hele werktafel.
+
+   Wat je daarvan zag: geen foutmelding, geen horizontale schuifbalk (de body
+   staat op overflow:hidden), maar een balk die rustig doorliep tot buiten beeld
+   -- inclusief Rahul. En de overloop naar de lade sprong nooit aan, want in een
+   balk van 1099px past alles.
+
+   Dezelfde keten geldt voor de bladenrij die er al stond; die viel niet op omdat
+   er nooit meer dan twee werkbladen zijn. */
+body.rtg-command .cmd-werk{min-width:0;}
+.cmd-balk{min-width:0;max-width:100%;}
+.cmd-acties{flex:1 1 auto;min-width:0;display:none;align-items:stretch;gap:0;
+  border-left:1px solid var(--rtg-line);border-right:1px solid var(--rtg-line);}
+.cmd-balk[data-zone="acties"] .cmd-acties{display:flex;}
+.cmd-balk[data-zone="acties"] .cmd-balkbladen{display:none;}
+/* In de vraagstand van Rahul wijkt de contextzone, net als de bladen: dan is de
+   balk zijn vraagveld (WERELD.md). */
+.cmd-balk.vraagt .cmd-acties{display:none;}
+
+/* De ankerchip: waar je bent. Altijd de eerste, altijd op dezelfde plek, en een
+   tik erop geeft de lijst met waar je heen zou kunnen -- dus terug naar de
+   bladen. Zonder die weg terug zou een selectie je werkbladen wegnemen.
+
+   96px EN NIET MEER, en dat is gemeten en geen smaak. Op 390px houdt de balk 232
+   over tussen de bank en Rahul; bij een anker van 150 bleef daar één handeling
+   van over, met de rest achter ⋯. Op 96 passen er twee -- en een naam die niet
+   past wordt afgekapt met een titel eronder, wat beter is dan een handeling die
+   niet in beeld komt. */
+.cmd-anker{flex:0 1 auto;min-width:0;max-width:min(24vw,96px);display:flex;align-items:center;gap:.35rem;
+  border:0;border-right:1px solid var(--rtg-line);background:transparent;
+  color:var(--rtg-txt,#F4F1EC);padding:0 .7rem;cursor:pointer;
+  font:600 .74rem var(--rtg-interface,'Inter',sans-serif);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmd-anker::after{content:"";flex:0 0 auto;width:0;height:0;
+  border-left:3.5px solid transparent;border-right:3.5px solid transparent;
+  border-top:4px solid var(--rtg-soft,#8A8680);}
+.cmd-anker:hover{background:rgba(255,255,255,.04);}
+/* EEN KLASSE MET display WINT VAN [hidden], en dat is hier al eens misgegaan
+   (command.css, de kaart "Nu speelt" die altijd leeg bovenaan stond). Op het
+   beginscherm draagt de zone geen anker -- er is geen blad om anker van te zijn
+   -- en zonder deze regel stond er een lege knop met een pijltje voor de
+   werelden. */
+.cmd-anker[hidden]{display:none;}
+
+/* De handelingen zelf. Een rij knoppen op haarlijnen -- geen gevulde vlakken,
+   geen pillen: hetzelfde ritme als de balk al had (WERELD.md, "één instrument,
+   geen rij widgets"). Goud draagt alleen "staat aan", want dat is de enige
+   betekenis die kleur hier heeft (ONTWERP.md par. 4). */
+.cmd-actierij{flex:1 1 auto;min-width:0;display:flex;align-items:stretch;
+  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.cmd-actierij::-webkit-scrollbar{display:none;}
+.cmd-actie{flex:0 0 auto;min-width:var(--rtg-raak);min-height:var(--rtg-raak);
+  border:0;border-right:1px solid var(--rtg-line);background:transparent;
+  color:var(--rtg-muted,#8A8680);padding:0 .55rem;cursor:pointer;display:grid;place-items:center;
+  font:500 .82rem var(--rtg-interface,'Inter',sans-serif);
+  transition:color 140ms ease,background 140ms ease;}
+.cmd-actie:last-child{border-right:0;}
+.cmd-actie:hover,.cmd-actie:focus-visible{color:var(--rtg-txt,#F4F1EC);background:rgba(255,255,255,.045);}
+.cmd-actie[aria-pressed="true"]{color:var(--gold-tekst,#C0A544);}
+.cmd-actie svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;}
+/* De overloop. Wat niet past verdwijnt niet maar verhuist naar de lade -- dat is
+   de hele afspraak van deze laag in één knop. */
+.cmd-meer{flex:0 0 auto;width:var(--rtg-raak);min-height:var(--rtg-raak);border:0;
+  border-left:1px solid var(--rtg-line);background:transparent;color:var(--rtg-muted,#8A8680);
+  display:grid;place-items:center;cursor:pointer;font:600 .9rem var(--rtg-interface,'Inter',sans-serif);
+  letter-spacing:.1em;padding:0;}
+.cmd-meer:hover{color:var(--rtg-txt,#F4F1EC);background:rgba(255,255,255,.045);}
+/* Zelfde reden als bij het anker: past alles in de balk, dan hoort er geen ⋯ te
+   staan. Een overlooopknop zonder overloop belooft iets wat er niet is. */
+.cmd-meer[hidden]{display:none;}
+
+/* Vanaf 1000px bestaat de schilbalk niet (command.css); de contextzone dus ook
+   niet. Wat daar zijn werk doet is de werkbalk en het contextvlak van het scherm
+   zelf -- dezelfde capability, andere presentatie. */
+@media (min-width:1000px){
+  .cmd-acties{display:none!important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .rtg-laag .lg-vak,.rtg-laag .lg-doek{transition:none!important;}
+  .cmd-actie,.cmd-meer,.cmd-anker{transition:none!important;}
+}

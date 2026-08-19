@@ -71,6 +71,18 @@ app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
 bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
 voorgekookt werkblad) vóór je er iets bij zet.
 
+**`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
+gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
+context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen
+bereik, en de capability zelf verandert niet — alleen zijn vorm.** Geen mobiele
+versie en geen responsive-ronde: een capability declareert per vorm zijn
+presentatie (werkbalk, contextmenu, selectiebalk, lade, paneel, taakmodus), en de
+harde grens is dat **verbergen niet bestaat** — een handeling die op bureau
+bestaat en op telefoon geen vorm heeft, is een gebrek en laat de toets zakken.
+De schilbalk onderin is het eerste instrument: zijn middenzone draagt de werelden,
+de bladacties of de selectieacties, met links altijd de bank en rechts altijd
+Rahul. Lees die vóór je iets mobiel "even responsive" maakt.
+
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.

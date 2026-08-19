@@ -2,10 +2,13 @@
    deel6). Zie ../appgids.js voor de uitleg; nieuwe pagina's krijgen hier (of in
    het passende deel) een eigen entry.
 
-   Opgeknipt op de 10 kB-grens: de staart staat in ./deel1b.js, en dit bestand
-   hangt hem er zelf achter -- hetzelfde patroon als deel6 en deel10. De knip
-   zit op een entry-grens; de samengevoegde gids is er niet door veranderd. */
+   Opgeknipt op de 10 kB-grens: de staart staat in ./deel1b.js en ./deel1c.js,
+   en dit bestand hangt ze er zelf achter -- hetzelfde patroon als deel6 en
+   deel10. De knip zit op een entry-grens; de samengevoegde gids is er niet
+   door veranderd, en de VOLGORDE ook niet: eerst wat hier staat, dan deel1c,
+   dan deel1b. Wie die omzet, verandert stil welke entry wint. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
+
 
 module.exports = Object.assign({
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
@@ -58,40 +61,4 @@ module.exports = Object.assign({
   '/apps/pulse.html': G('Pulse: wat er nu speelt in jouw RTG-wereld, rustig gebundeld.',
     ['Lees de hoogtepunten van vandaag', 'Tik door naar de app waar iets gebeurt', 'Stel in waarover je seintjes wilt'],
     'Geen eindeloze feed: Pulse toont wat er is en houdt dan op. Dat is bewust.'),
-  '/apps/nieuws.html': G('RTG Nieuws: de redactie bundelt wat voor leden telt.',
-    ['Lees artikelen per rubriek', 'Bewaar wat je later wilt lezen', 'Reageer waar dat kan'],
-    'Kwaliteit boven snelheid: liever één goed stuk dan tien snelle.'),
-  '/apps/hotels.html': G('Verblijven: hotels, appartementen en villa\'s van onze partners, met ledenprijzen.',
-    ['Bekijk kamers, foto\'s en vrije data', 'Boek direct; de partner bevestigt', 'Open je kamer met keyless waar dat kan'],
-    'De ledenprijsgarantie geldt overal: nooit meer dan de publieke prijs van de partner zelf.'),
-  '/apps/reisbureau.html': G('Het RTG-reisbureau: samengestelde reizen tegen de nettoprijs.',
-    ['Blader door de reizen of vraag AI-reisadvies', 'Vraag een reis aan; een reisadviseur bevestigt', 'Volg en annuleer je aanvragen onder Mijn'],
-    'Vertel je wens in gewone woorden; het advies wijst de best passende reis aan en legt uit waarom.'),
-  '/apps/foodcourt.html': G('De Food Court: alle restaurants op een rij, reserveren in een paar tikken.',
-    ['Kies een restaurant en bekijk de tijdsloten', 'Reserveer; de zaak beslist en je krijgt bericht', 'Bekijk keuken, prijs en ledenvoordeel per zaak'],
-    'Reserveer ruim vooruit voor de populaire avonden; annuleren kan altijd netjes in de app.'),
-  '/apps/uitgaan.html': G('Uitgaan: bars, clubs en beachclubs met hun avonden en gastenlijsten.',
-    ['Bekijk de avonden per adres', 'Zet jezelf op de gastenlijst', 'Laat je entreecode zien aan de deur'],
-    'Je leeftijdslaag bepaalt wat je ziet; dat is voor je eigen veiligheid en die van de zaak.'),
-  '/apps/mall.html': G('De RTG Mall: de enige plek waar je bij RTG koopt, van eigen-merk tot boutieks, plus de bibliotheken.',
-    ['Bestel eigen-merk en boerderijproducten direct', 'Blader door de App- en Reis-Bibliotheek; installeren is inbegrepen', 'Leg mode apart of laat een maat naar de paskamer brengen'],
-    'De bibliotheken zijn een pas-voordeel: tienduizenden apps en een miljoen reisgidsen, zonder bijbetalen.'),
-  '/apps/pay.html': G('RTG Pay: betalen en tikken tussen vrienden, veilig en direct.',
-    ['Stuur of vraag een tik', 'Bekijk je saldo en geschiedenis', 'Splits een rekening met je gezelschap'],
-    'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
-  '/apps/rtgone.html': G('RTG One: de gezamenlijke command room voor personeel van RTG en RTF, met werkstromen, besluiten en governance in een gecontroleerde omgeving.',
-    ['Bekijk wat vandaag aandacht vraagt', 'Maak vanuit RTMAIL een werkstroom met eigenaar, bewijs en deadline', 'Leg besluiten via de juiste vier-ogenroute vast en volg iedere actie in het auditlog'],
-    'Wissel bewust tussen het RTG-huis, het RTF-huis en de gedeelde ruimte; gegevens en rechten blijven per huis afgeschermd.'),
-  '/apps/magnaat.html': G('Magnaat Wereld: oefen met echte RTG-werkprocessen in een volledig synthetische ondernemerswereld.',
-    ['Kies een functie of servicedossier', 'Werk via de afgeschermde computer en PDA', 'Reken gevolgen veilig door in de economische cockpit'],
-    'Geen spelhandeling raakt productiegegevens, echte betalingen of klantcommunicatie.'),
-  '/apps/magnaat-kantoor.html': G('Het RTG Controleregister: functies, dekkingsgaten, veilige zelftests, automatische kantoortaken en menselijke fasebesluiten.',
-    ['Bekijk de Capability Graph', 'Onderzoek open controlepunten', 'Laat alleen bevoegde mensen een voorstel naar test of pilot zetten'],
-    'De Future Engine adviseert; mensen beslissen en iedere pilot blijft een sandbox.'),
-  '/apps/ovcontrol.html': G('De OV Control Tower: live zicht op voertuigen, lijnen en geaggregeerde private operaties.',
-    ['Bewaak voertuigen en bezetting', 'Vergelijk prestaties per lijn', 'Grijp als bevoegd personeelslid in bij uitzonderingen'],
-    'Privéreizen blijven need-to-know: het bord toont capaciteit, nooit het profiel of de route van de hoofdgast.'),
-  '/apps/partner-worden.html': G('Partner worden: een gecontroleerde aanvraag voor een Business Pass en zakelijke RTG-werkplek.',
-    ['Meld aan met de Business Pass', 'Vul bedrijfs- en contactgegevens in', 'Volg de menselijke beoordeling en inrichting'],
-    'Een aanvraag zet niets automatisch live; een bevoegde medewerker beoordeelt en activeert.'),
-}, require('./deel1b'));
+}, require('./deel1c'), require('./deel1b'));

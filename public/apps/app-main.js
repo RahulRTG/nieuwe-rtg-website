@@ -3804,7 +3804,6 @@ var RTG_BOUW = '01582e69';
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
     loonstrook:  { naam: 'Loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'Privekantoor', url: '/apps/lifestyle.html' },
-    // "voor organisaties" (PLATFORM.md); kantoor.html staat er los naast
     werkos:      { naam: 'RTG Werk OS', url: '/apps/werk.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },

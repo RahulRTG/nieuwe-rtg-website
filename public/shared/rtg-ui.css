@@ -322,12 +322,62 @@ body.rtg-stijl [role="button"].hoofd{
      /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- mijn eigen
      regel maakte de knop kleiner in plaats van bereikbaarder. Een knop in een
      balk houdt zijn eigen maat; die balk regelt zijn breedte zelf. */
-  body.rtg-stijl .ios-nav-acties > [data-hoofdactie],
-  body.rtg-stijl .ios-nav-acties > .hoofd,
   body.rtg-stijl .cmd-balk [data-hoofdactie],
   body.rtg-stijl .cmd-balk .hoofd{
     width:auto;max-width:none;flex:0 0 auto;
   }
+
+  /* De hoofdhandeling in de kopbalk: zie .rtg-duimbalk hieronder. Met opmaak
+     alleen lukte dit niet -- .ios-nav en de kopbalken van deze schermen dragen
+     backdrop-filter, en dat maakt een eigen containing block, dus een
+     position:fixed kind blijft gewoon bovenin hangen. Het moest dus in de DOM,
+     en dat is ook eerlijker: de grammatica zegt dat de handeling onderaan
+     HOORT, niet dat hij er met een truc naartoe geschoven wordt. */
+  /* OUD, VERVALLEN:
+
+     Besloten op 19 augustus 2026, en het was een botsing tussen twee
+     huisdocumenten. De iOS-schil zet de maak-actie bovenaan -- dat is de
+     conventie die shared/ios.css met opzet bouwt -- en GRAMMATICA.md opent met
+     "ik wil iets doen -> mijn duim vindt het onderaan". Gemeten stonden vier
+     lijstschermen (agenda, notities, galerij, bestanden) met hun + op y=25 van
+     844, met tot duizend pixels pagina eronder. De grammatica wint.
+
+     ALLEEN wat in de kopbalk zit, en alleen op telefoonmaat. Een knop die al
+     ergens in de stroom staat blijft staan waar hij staat: die willekeurig naar
+     onderen trekken zou 45 schermen verbouwen voor een probleem dat er op vier
+     was. */
+}
+
+/* ---- DE DUIMBALK: waar de hoofdhandeling van een lijstscherm woont ---------
+
+   Besloten op 19 augustus 2026 na een botsing tussen twee huisdocumenten. De
+   iOS-schil zet de maak-actie in de kopbalk -- de conventie die shared/ios.css
+   met opzet bouwt -- en GRAMMATICA.md opent met "ik wil iets doen -> mijn duim
+   vindt het onderaan". Gemeten stonden vier lijstschermen met hun + op y=25 van
+   844, met tot duizend pixels pagina eronder. De grammatica wint.
+
+   Op TELEFOONMAAT is dit een vaste strook onderaan; daarboven is het gewoon een
+   rij onder de kop, rechts uitgelijnd zoals hij in de kopbalk stond. Zo verhuist
+   de knop waar het uitmaakt en verandert er op een bureau niets aan de
+   leesvolgorde. */
+.rtg-duimbalk{ display:flex; gap:.5rem; justify-content:flex-end;
+  padding:0 max(1rem, env(safe-area-inset-left,0px)) .6rem; }
+@media(max-width:760px){
+  body.rtg-stijl .rtg-duimbalk{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    /* --ios-thuis-ruimte is de strook die de iOS-schil voor zijn home-indicator
+       vrijhoudt (shared/ios.css). Zonder die marge legt deze balk zich over dat
+       streepje heen -- gemeten op /apps/notities.html. Schermen zonder de schil
+       kennen de variabele niet en vallen terug op de veilige zone alleen. */
+    padding:.7rem max(1rem, env(safe-area-inset-left,0px))
+            calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + .7rem);
+    background:color-mix(in srgb, var(--rtg-bg) 92%, transparent);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--rtg-line);
+  }
+  body.rtg-stijl .rtg-duimbalk > *{ flex:1 1 auto; }
+  /* ruimte eronder, anders legt de balk zich over de laatste regel van de lijst */
+  body.rtg-stijl:has(.rtg-duimbalk){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
 }
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de

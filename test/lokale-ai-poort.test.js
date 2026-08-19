@@ -137,3 +137,33 @@ test('6. de poort laat de bestaande capability-regels intact', async () => {
     assert.equal(zonderTools.kan({ tools: [{ name: 'doe' }] }), false, 'tools uit = geen tools claimen');
   } finally { s.server.close(); }
 });
+
+test('7. nul is een antwoord en geen leegte', async () => {
+  /* Hier stond `Number(x) || standaard`, en daarmee werd LOCAL_AI_WACHT_MS=0
+     stilletjes 20000 -- terwijl nul juist iets zegt: "niet in de rij, meteen
+     uitwijken". Wie dat zette kreeg het tegenovergestelde, zonder melding. */
+  const s = await maakModelserver(() => ({ traag: 300 }));
+  try {
+    const nul = maakClient(s.poort, { wachtMs: 0, herstelMs: 0 });
+    assert.equal(nul.wachtMs, 0, 'een expliciete nul blijft nul');
+    assert.equal(nul.herstelMs, 0);
+
+    const leeg = maakClient(s.poort, {});
+    assert.equal(leeg.wachtMs, 20000, 'niets gezet = de standaard');
+    assert.equal(leeg.herstelMs, 30000);
+    assert.equal(leeg.gelijktijdig, 2);
+
+    const onzin = maakClient(s.poort, { wachtMs: 'geen getal', gelijktijdig: -5 });
+    assert.equal(onzin.wachtMs, 20000, 'onzin valt terug op de standaard');
+    assert.equal(onzin.gelijktijdig, 1, 'en een negatief aantal wordt naar het minimum getild');
+
+    /* En het GEDRAG erachter: met wachtMs 0 gaat de tweede aanvrager niet in de
+       rij maar meteen door, zodat de keten kan uitwijken. */
+    const c = maakClient(s.poort, { gelijktijdig: 1, wachtMs: 0 });
+    const eerste = c.messages.create({ max_tokens: 50, messages: [{ role: 'user', content: 'hoi' }] });
+    await assert.rejects(
+      () => c.messages.create({ max_tokens: 50, messages: [{ role: 'user', content: 'hoi' }] }),
+      (e) => e.code === 'LOKAAL_BEZET', 'de tweede wacht niet, hij wijkt uit');
+    await eerste;
+  } finally { s.server.close(); }
+});

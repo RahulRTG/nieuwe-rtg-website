@@ -942,6 +942,10 @@ eronder (die bedient ook de betaalprovider en weet niets van een GPU):
 | `LOCAL_AI_STORINGSGRENS` | storingen op rij voordat de onderbreker aanslaat | 3 |
 | `LOCAL_AI_HERSTEL_MS` | hoe lang lokaal dan wordt overgeslagen, voordat er weer een verzoek langs mag | 30000 |
 
+Nul is bij deze twee tijden een geldig antwoord en geen leegte:
+`LOCAL_AI_WACHT_MS=0` betekent "niet in de rij, meteen uitwijken" en
+`LOCAL_AI_HERSTEL_MS=0` betekent "geen herstelvenster".
+
 Waarom de wachtrij een grens heeft: een lid drie minuten naar een leeg scherm
 laten kijken is erger dan de vraag naar buiten sturen. Waar die grens ligt is
 een keuze en geen natuurwet, dus hij staat in de env.

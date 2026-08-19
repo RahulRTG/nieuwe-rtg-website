@@ -112,10 +112,20 @@ class LocalAI extends OpenAI {
 
        Beide standen zijn af te lezen (staat()), zodat het luik op de meter kan
        laten zien dat de eigen server aan het worstelen is. */
-    this.gelijktijdig = Math.max(1, Number(opts.gelijktijdig || process.env.LOCAL_AI_GELIJKTIJDIG) || 2);
-    this.wachtMs = Math.max(0, Number(opts.wachtMs != null ? opts.wachtMs : process.env.LOCAL_AI_WACHT_MS) || 20000);
-    this.storingsgrens = Math.max(1, Number(opts.storingsgrens || process.env.LOCAL_AI_STORINGSGRENS) || 3);
-    this.herstelMs = Math.max(0, Number(opts.herstelMs != null ? opts.herstelMs : process.env.LOCAL_AI_HERSTEL_MS) || 30000);
+    /* NUL IS EEN ANTWOORD, GEEN LEEGTE. Hier stond `Number(x) || standaard`, en
+       daarmee werd LOCAL_AI_WACHT_MS=0 stilletjes 20000 en
+       LOCAL_AI_HERSTEL_MS=0 stilletjes 30000 -- terwijl nul juist iets zegt:
+       "niet in de rij, meteen uitwijken" en "geen herstelvenster". Wie dat zet
+       kreeg het tegenovergestelde van wat hij vroeg, zonder melding. */
+    const getal = (uitOpts, uitEnv, standaard, minimum) => {
+      const rauw = uitOpts != null ? uitOpts : uitEnv;
+      const n = Number(rauw);
+      return Math.max(minimum, (rauw != null && rauw !== '' && Number.isFinite(n)) ? n : standaard);
+    };
+    this.gelijktijdig = getal(opts.gelijktijdig, process.env.LOCAL_AI_GELIJKTIJDIG, 2, 1);
+    this.wachtMs = getal(opts.wachtMs, process.env.LOCAL_AI_WACHT_MS, 20000, 0);
+    this.storingsgrens = getal(opts.storingsgrens, process.env.LOCAL_AI_STORINGSGRENS, 3, 1);
+    this.herstelMs = getal(opts.herstelMs, process.env.LOCAL_AI_HERSTEL_MS, 30000, 0);
     this._bezig = 0;
     this._rij = [];
     this._storingen = 0;

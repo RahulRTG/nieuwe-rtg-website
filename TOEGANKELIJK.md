@@ -120,6 +120,37 @@ in een link. De lade is dus het oppervlak voor een hand, de actielade dat voor e
 toets. `test/gebaar.test.js` zakt zodra iemand daar een echte knop in zet, en
 zodra een van de vier andere wegen verdwijnt.
 
+**Niet gemeten, en het is erger dan dat: NIET TE METEN met de poort die er staat.**
+De acties rechtsboven in de iOS-balk (`.ios-nav-acties`) staan op 17px in
+`--ios-accent`, en dat is de DAGKLEUR — zestien ankertinten met een interpolatie
+ertussen, dus de kleur van die tekst hangt af van het seizoen en het uur. De
+contrastpoort ziet hem nooit: de balk is `rgba(12,12,11,0.72)` over een `body`
+met een verloop, en `achtergrond()` in `scripts/a11ykeuring.js` slaat een
+onoplosbare grond bewust over. "Contrast: 0 van 259" dekt deze tekst dus niet.
+
+Nagerekend met de rekenregel van diezelfde keuring, over alle zestien ankertinten,
+op de twee gronden die de balk kan hebben:
+
+| grond | zakt onder 4,5:1 |
+|---|---|
+| donker thema (onyx, bordeaux, royal) | **3 van 16** — zeenacht 3,83 · pruim 3,96 · lila 3,86 |
+| champagne (72% zwart over parel = rgb 77,76,73) | **15 van 16** — alleen citroen haalt het (5,13) |
+
+Het is geen fout in een scherm en geen browserblauw: het is het ontwerp dat op
+een plek uitkomt waar niemand het heeft nagerekend. Dezelfde les staat al in
+`shared/dagkleur.css` voor de tint als ACHTERGROND — daar is de inkt per tint
+uitgerekend. Voor de tint als TEKST is dat nooit gebeurd.
+
+En de voor de hand liggende reparatie is de verkeerde, ook dat is uitgerekend:
+om op de champagne-balk 4,5 te halen moet zeenacht van 47% naar 76% lichtheid
+(`#3E6FB0` → `#A5BEDF`), pruim en lila net zo. Dan zijn het pastels en is de
+seizoenstint weg. Vijftien van de zestien schuiven zichtbaar op. Een grond die
+tussen bijna-zwart en middengrijs kan liggen, draagt geen enkele verzadigde
+kleur op 4,5 — de keuze zit dus in het MATERIAAL van de balk of in de vraag of
+de dagkleur daar tekst mag zijn, en niet in de tint.
+
+*Dit staat hier als meting en als open besluit, niet als reparatie.*
+
 **Niet gemeten:** of iemand met een tremor de drempel haalt zonder per ongeluk
 door te vegen. De drempel ligt voorbij de volle lade én voorbij 55% van de regel,
 en wat niet terug te draaien is gaat alleen op vasthouden -- maar dat is een

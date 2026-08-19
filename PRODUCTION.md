@@ -368,7 +368,9 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   schrijfverzoek met een idem-sleutel (`idem` in het lijf of de kop
   `Idempotency-Key`) wordt één keer uitgevoerd; de herhaling krijgt het bewaarde
   antwoord met `herhaald: true`. Gemeten met `npm run idemproef`: van 15
-  beschermde en 100 onbeschermde routes naar **855 beschermd en 0 onbeschermd**.
+  beschermde en 100 onbeschermde routes naar **842 beschermd en 3 onbeschermd**
+  (die drie zijn geldroutes; die gaan bewust langs deze laag omdat ze hun eigen,
+  duurzame idempotentie hebben -- zie `TAKEN.md` 3.8).
   Drie grenzen staan in de kop van dat bestand en horen erbij: hij doet niets
   zonder sleutel (twee keer hetzelfde toevoegen zonder sleutel MAG twee items
   zijn), hij leeft in het geheugen van één proces (voor geld blijft

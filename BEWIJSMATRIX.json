@@ -1,15 +1,15 @@
 {
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
+  "journaalGelezen": ".routejournaal",
   "routes": 4208,
   "schakels": 11,
   "cellen": 46288,
   "telling": {
-    "bewezen": 18238,
+    "bewezen": 18228,
     "verklaard": 0,
     "nvt": 340,
-    "ongemeten": 27699,
+    "ongemeten": 27709,
     "gezakt": 11
   },
   "perSchakel": {
@@ -63,10 +63,10 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 852,
+      "bewezen": 842,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3285,
+      "ongemeten": 3295,
       "gezakt": 3
     },
     "FAILURE": {

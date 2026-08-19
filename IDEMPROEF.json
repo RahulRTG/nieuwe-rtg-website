@@ -1,12 +1,12 @@
 {
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "gemeten": {
-  "routesMetRol": 3091,
-  "beoordeeld": 855,
-  "beschermd": 855,
-  "onbeschermd": 0,
-  "ongemeten": 2236,
-  "oproepen": 9295,
+  "routesMetRol": 3092,
+  "beoordeeld": 845,
+  "beschermd": 842,
+  "onbeschermd": 3,
+  "ongemeten": 2247,
+  "oproepen": 9298,
   "tokensHernieuwd": 22,
   "blindeRondes": 0,
   "begrenzing": 0
@@ -760,8 +760,8 @@
    "methode": "POST",
    "pad": "/api/bank/overzicht",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -1312,8 +1312,8 @@
    "methode": "POST",
    "pad": "/api/betaal/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -1336,8 +1336,8 @@
    "methode": "POST",
    "pad": "/api/betaal/verzoeken",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -2302,6 +2302,18 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apispoor",
+   "rol": "office",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
    ]
   },
   {
@@ -19912,8 +19924,8 @@
    "methode": "POST",
    "pad": "/api/pakket/typen",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -20008,8 +20020,8 @@
    "methode": "POST",
    "pad": "/api/pay/kascode",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
    "statussen": [
     200,
     200,
@@ -20032,8 +20044,8 @@
    "methode": "POST",
    "pad": "/api/pay/overzicht",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -20080,8 +20092,8 @@
    "methode": "POST",
    "pad": "/api/pay/tikcode",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
    "statussen": [
     200,
     200,
@@ -20092,8 +20104,8 @@
    "methode": "POST",
    "pad": "/api/pay/tiks",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -20332,8 +20344,8 @@
    "methode": "POST",
    "pad": "/api/podium/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -20380,8 +20392,8 @@
    "methode": "POST",
    "pad": "/api/podium/weg",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -25324,12 +25336,12 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 503)",
    "statussen": [
+    503,
     200,
-    200,
-    200
+    503
    ]
   },
   {
@@ -25624,8 +25636,8 @@
    "methode": "POST",
    "pad": "/api/supplier/betaalverzoek",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
    "statussen": [
     200,
     200,
@@ -29968,8 +29980,8 @@
    "methode": "POST",
    "pad": "/api/supplier/kassa/dagrapport",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -29992,8 +30004,8 @@
    "methode": "POST",
    "pad": "/api/supplier/kassa/instel",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,

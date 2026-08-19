@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-18T23:32:21.942Z",
-  "commit": "2a2acf4",
+  "op": "2026-08-19T00:04:32.704Z",
+  "commit": "219dc41",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1019,
-  "onbeslist": 3117,
-  "blind": 51,
+  "bewezen": 1067,
+  "onbeslist": 3067,
+  "blind": 53,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -18915,12 +18915,12 @@
    "reden": "er is over DEZE route gelogen en kantoordienst.test.js zakte daarop"
   },
   "POST /api/office/paniek/bericht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "kantoordienst.test.js",
-    "kantoren.test.js"
+    "kantoordienst.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en kantoordienst.test.js zakte daarop"
   },
   "POST /api/kantoor/gesprek/start": {
    "staat": "bewezen",
@@ -19009,13 +19009,12 @@
    "reden": "er is over DEZE route gelogen en officebord.test.js zakte daarop"
   },
   "POST /api/kantoorpakket/deel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "kantoorpakket-alle.test.js",
-    "office-enterprise.test.js",
-    "office.test.js"
+    "office-enterprise.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en office-enterprise.test.js zakte daarop"
   },
   "POST /api/kantoorpakket/versies": {
    "staat": "onbeslist",
@@ -21028,12 +21027,12 @@
    "reden": "er is over DEZE route gelogen en verkoop-etalage.test.js zakte daarop"
   },
   "POST /api/supplier/service": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "mall-extern.test.js",
     "zaak-inrichting.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-inrichting.test.js zakte daarop"
   },
   "POST /api/supplier/mall/aanvragen": {
    "staat": "onbeslist",
@@ -21139,60 +21138,68 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 15); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/supplier/marina/passant": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/vertrek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/brandstof": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/brandstof/klaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/service": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/service/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/concierge": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/marina/concierge/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "marina.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en marina.test.js zakte daarop"
   },
   "POST /api/supplier/markt/plaats": {
    "staat": "onbeslist",
@@ -21333,16 +21340,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/podium/beslis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "medialijstdelen.test.js",
-    "mediasamen.test.js",
-    "mediazaak.test.js",
-    "podium.test.js",
-    "podiumhandel.test.js",
-    "podiumzaak.test.js"
+    "podiumhandel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en podiumhandel.test.js zakte daarop"
   },
   "GET /api/theater/kijk/:id": {
    "staat": "blind",
@@ -21612,18 +21615,20 @@
    "reden": "er is over DEZE route gelogen en moedertaal.test.js zakte daarop"
   },
   "POST /api/munt/opties": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "munten.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en munten.test.js zakte daarop"
   },
   "POST /api/munt/webhook": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "munten.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en munten.test.js zakte daarop"
   },
   "POST /api/office/muziek/beslis": {
    "staat": "onbeslist",
@@ -21684,11 +21689,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/kantoorpakket/fase": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "office-enterprise.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en office-enterprise.test.js zakte daarop"
   },
   "POST /api/office/payroll/aangifte/lijst": {
    "staat": "onbeslist",
@@ -22048,12 +22054,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 62); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/salon-naleving": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "office-tweede-helft.test.js",
     "salon-verplicht.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en salon-verplicht.test.js zakte daarop"
   },
   "POST /api/office/reisbureau": {
    "staat": "onbeslist",
@@ -24263,19 +24269,20 @@
    "reden": "er is over DEZE route gelogen en rtfcoderem.test.js zakte daarop"
   },
   "POST /api/rtf/tiener/potje": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "rtfgeld.test.js",
-    "tiener.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/foundation/gezin/geldschool": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfgeld.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfgeld.test.js zakte daarop"
+  },
+  "POST /api/foundation/gezin/geldschool": {
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "rtfgeld.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en rtfgeld.test.js zakte daarop"
   },
   "POST /api/rtfkantoor/kamers": {
    "staat": "onbeslist",
@@ -26307,25 +26314,28 @@
    "reden": "er is over DEZE route gelogen en salon-curatie.test.js zakte daarop"
   },
   "POST /api/supplier/salon/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "salon-verplicht.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en salon-verplicht.test.js zakte daarop"
   },
   "POST /api/supplier/salon/bio": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "salon-verplicht.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en salon-verplicht.test.js zakte daarop"
   },
   "POST /api/supplier/salon/folder": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "salon-verplicht.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en salon-verplicht.test.js zakte daarop"
   },
   "POST /api/office/atelierweb/salon": {
    "staat": "bewezen",
@@ -28903,32 +28913,36 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/supplier/staff/reset-pin": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "staffinvite.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en staffinvite.test.js zakte daarop"
   },
   "POST /api/supplier/staff/invites": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "staffinvite.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en staffinvite.test.js zakte daarop"
   },
   "POST /api/supplier/staff/invite/intrek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "staffinvite.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en staffinvite.test.js zakte daarop"
   },
   "POST /api/supplier/apply": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "staffinvite.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en staffinvite.test.js zakte daarop"
   },
   "POST /api/supplier/beauty": {
    "staat": "bewezen",
@@ -29071,76 +29085,76 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 15); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/supplier/comm/collega": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/comm/stuur": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/comm/gesprek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/comm/zoek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/comm/inbox": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/comm/typt": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/supplier/comm/lees": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/supplier/identiteit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/identiteit/opvraag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "supplier-comm-mob-payroll.test.js",
     "supplier-comm-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en supplier-comm-routes.test.js zakte daarop"
   },
   "POST /api/supplier/rtmail/verzonden": {
    "staat": "onbeslist",
@@ -30134,11 +30148,12 @@
    "reden": "er is over DEZE route gelogen en verkoop-etalage.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/supplier/betaalverzoek/intrek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "verzoek-intrekken.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en verzoek-intrekken.test.js zakte daarop"
   },
   "POST /api/supplier/beauty/uren": {
    "staat": "bewezen",
@@ -30609,27 +30624,28 @@
    "reden": "er is over DEZE route gelogen en werk-bij-inloggen.test.js zakte daarop"
   },
   "POST /api/supplier/werkbeleid": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "werkbeleid-dienst.test.js",
-    "zaak-en-mensen.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/supplier/werkbeleid/zet": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "werkbeleid-dienst.test.js",
-    "zaak-en-mensen.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/staff/pauze": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkbeleid-dienst.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkbeleid-dienst.test.js zakte daarop"
+  },
+  "POST /api/supplier/werkbeleid/zet": {
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "werkbeleid-dienst.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en werkbeleid-dienst.test.js zakte daarop"
+  },
+  "POST /api/staff/pauze": {
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "werkbeleid-dienst.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en werkbeleid-dienst.test.js zakte daarop"
   },
   "POST /api/bedrijf/besluit/raakt": {
    "staat": "onbeslist",
@@ -30684,25 +30700,28 @@
    "reden": "er is over DEZE route gelogen en werkgezondheid.test.js zakte daarop"
   },
   "POST /api/bedrijf/herkomst/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkgrens.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkgrens.test.js zakte daarop"
   },
   "POST /api/bedrijf/herkomst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkgrens.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkgrens.test.js zakte daarop"
   },
   "POST /api/bedrijf/mijnwerk": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkgrens.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkgrens.test.js zakte daarop"
   },
   "POST /api/bedrijf/indienst/stap": {
    "staat": "bewezen",
@@ -31638,67 +31657,76 @@
    "reden": "er is over DEZE route gelogen en werving-link.test.js zakte daarop"
   },
   "POST /api/supplier/wissel/opties": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "wisselen-en-historie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en wisselen-en-historie.test.js zakte daarop"
   },
   "POST /api/supplier/wissel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "wisselen-en-historie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en wisselen-en-historie.test.js zakte daarop"
   },
   "POST /api/supplier/ride/history": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "wisselen-en-historie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en wisselen-en-historie.test.js zakte daarop"
   },
   "POST /api/supplier/agenda/wijzig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/agenda/verwijder": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/ticket/add": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/ticket/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/lost/add": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/lost/done": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "zaak-balie.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 11); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en zaak-balie.test.js zakte daarop"
   },
   "POST /api/supplier/leave/decide": {
    "staat": "onbeslist",
@@ -37534,6 +37562,256 @@
    "toets": "kantoordienst.test.js",
    "merkt": true,
    "op": "2026-08-18T23:32:21.829Z"
+  },
+  "POST /api/office/paniek/bericht": {
+   "toets": "kantoordienst.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:00:59.329Z"
+  },
+  "POST /api/kantoorpakket/deel": {
+   "toets": "office-enterprise.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:00:59.563Z"
+  },
+  "POST /api/supplier/service": {
+   "toets": "zaak-inrichting.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:00:59.668Z"
+  },
+  "POST /api/supplier/marina/passant": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:12.281Z"
+  },
+  "POST /api/supplier/marina/brandstof/klaar": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:25.121Z"
+  },
+  "POST /api/supplier/marina/vertrek": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:25.437Z"
+  },
+  "POST /api/supplier/marina/service": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:25.451Z"
+  },
+  "POST /api/supplier/marina/brandstof": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:25.973Z"
+  },
+  "POST /api/supplier/marina/concierge/status": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:37.862Z"
+  },
+  "POST /api/supplier/marina/concierge": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:38.040Z"
+  },
+  "POST /api/supplier/marina/service/status": {
+   "toets": "marina.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:38.294Z"
+  },
+  "POST /api/office/podium/beslis": {
+   "toets": "podiumhandel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:38.951Z"
+  },
+  "POST /api/munt/opties": {
+   "toets": "munten.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:50.216Z"
+  },
+  "POST /api/munt/webhook": {
+   "toets": "munten.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:50.515Z"
+  },
+  "POST /api/office/salon-naleving": {
+   "toets": "salon-verplicht.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:51.323Z"
+  },
+  "POST /api/kantoorpakket/fase": {
+   "toets": "office-enterprise.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:01:51.501Z"
+  },
+  "POST /api/rtf/tiener/potje": {
+   "toets": "rtfgeld.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:02.664Z"
+  },
+  "POST /api/foundation/gezin/geldschool": {
+   "toets": "rtfgeld.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:03.016Z"
+  },
+  "POST /api/supplier/salon/status": {
+   "toets": "salon-verplicht.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:04.092Z"
+  },
+  "POST /api/supplier/salon/bio": {
+   "toets": "salon-verplicht.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:04.278Z"
+  },
+  "POST /api/supplier/salon/folder": {
+   "toets": "salon-verplicht.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:15.046Z"
+  },
+  "POST /api/supplier/staff/reset-pin": {
+   "toets": "staffinvite.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:30.671Z"
+  },
+  "POST /api/supplier/staff/invites": {
+   "toets": "staffinvite.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:31.788Z"
+  },
+  "POST /api/supplier/staff/invite/intrek": {
+   "toets": "staffinvite.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:32.226Z"
+  },
+  "POST /api/supplier/apply": {
+   "toets": "staffinvite.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:42.558Z"
+  },
+  "POST /api/supplier/comm/collega": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:57.719Z"
+  },
+  "POST /api/supplier/comm/stuur": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:58.412Z"
+  },
+  "POST /api/supplier/comm/gesprek": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:02:59.021Z"
+  },
+  "POST /api/supplier/comm/zoek": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:09.864Z"
+  },
+  "POST /api/supplier/comm/inbox": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:10.819Z"
+  },
+  "POST /api/supplier/comm/typt": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": false,
+   "op": "2026-08-19T00:03:12.169Z"
+  },
+  "POST /api/supplier/comm/lees": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": false,
+   "op": "2026-08-19T00:03:12.902Z"
+  },
+  "POST /api/supplier/identiteit": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:24.012Z"
+  },
+  "POST /api/supplier/identiteit/opvraag": {
+   "toets": "supplier-comm-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:24.750Z"
+  },
+  "POST /api/supplier/betaalverzoek/intrek": {
+   "toets": "verzoek-intrekken.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:26.497Z"
+  },
+  "POST /api/supplier/werkbeleid": {
+   "toets": "werkbeleid-dienst.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:27.063Z"
+  },
+  "POST /api/supplier/werkbeleid/zet": {
+   "toets": "werkbeleid-dienst.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:37.296Z"
+  },
+  "POST /api/staff/pauze": {
+   "toets": "werkbeleid-dienst.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:39.419Z"
+  },
+  "POST /api/bedrijf/herkomst/zet": {
+   "toets": "werkgrens.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:40.759Z"
+  },
+  "POST /api/bedrijf/herkomst": {
+   "toets": "werkgrens.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:41.307Z"
+  },
+  "POST /api/bedrijf/mijnwerk": {
+   "toets": "werkgrens.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:03:50.275Z"
+  },
+  "POST /api/supplier/agenda/wijzig": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:04.384Z"
+  },
+  "POST /api/supplier/wissel/opties": {
+   "toets": "wisselen-en-historie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:07.976Z"
+  },
+  "POST /api/supplier/wissel": {
+   "toets": "wisselen-en-historie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:08.228Z"
+  },
+  "POST /api/supplier/ride/history": {
+   "toets": "wisselen-en-historie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:10.126Z"
+  },
+  "POST /api/supplier/agenda/verwijder": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:19.049Z"
+  },
+  "POST /api/supplier/ticket/add": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:21.564Z"
+  },
+  "POST /api/supplier/ticket/status": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:22.400Z"
+  },
+  "POST /api/supplier/lost/add": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:24.528Z"
+  },
+  "POST /api/supplier/lost/done": {
+   "toets": "zaak-balie.test.js",
+   "merkt": true,
+   "op": "2026-08-19T00:04:32.554Z"
   }
  },
  "basislijn": {
@@ -37760,6 +38038,10 @@
   "geldregie.test.js": "groen",
   "gezinenleren.test.js": "groen",
   "hrplus.test.js": "groen",
-  "kantoordienst.test.js": "groen"
+  "kantoordienst.test.js": "groen",
+  "marina.test.js": "groen",
+  "staffinvite.test.js": "groen",
+  "supplier-comm-routes.test.js": "groen",
+  "wisselen-en-historie.test.js": "groen"
  }
 }

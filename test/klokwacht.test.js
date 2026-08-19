@@ -52,12 +52,14 @@ test('het register noemt de bestanden die het nog doen, en klopt met de meting',
     'deze bestanden wachten op de klok en staan niet in het register: ' + nieuwe.join(', '));
 });
 
-/* En de omgezette bestanden blijven omgezet: wie daar een klok terugzet, komt
-   niet weg met "het register stond het toe". */
-test('de drie omgezette schermtoetsen blijven zonder klok', () => {
-  for (const naam of ['livinglab.e2e.js', 'horecaschermen.e2e.js', 'werkscherm.e2e.js']) {
-    const bron = fs.readFileSync(path.join(WORTEL, 'test', naam), 'utf8');
-    assert.ok(!/waitForTimeout\s*\(/.test(bron.replace(/\/\*[\s\S]*?\*\//g, '')),
-      naam + ' wacht weer op de klok; deze drie zijn met de hand omgezet en horen zo te blijven');
-  }
+/* DE SCHULD STAAT OP NUL, en dat is een andere bewering dan "hij mag niet
+   groeien". Alle 162 wachten zijn omgezet en elk bestand is daarna gedraaid;
+   deze toets bewaakt dat er geen enkele terugkomt. Wie er toch een nodig heeft,
+   verantwoordt hem hier met naam en reden -- en dan pas in KLOKWACHT.json. */
+test('geen enkele schermtoets wacht nog op de klok', () => {
+  const nu = meet();
+  assert.strictEqual(nu.totaal, 0,
+    'deze bestanden wachten weer op een vaste tijd: ' + JSON.stringify(nu.perBestand) +
+    '. Wacht op een toestand (wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering), ' +
+    'op het antwoord van de server (klikEnWacht) of tot het scherm stil is (wachtOpRust).');
 });

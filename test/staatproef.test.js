@@ -15,7 +15,7 @@
    Draai los: node --test test/staatproef.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { weegStaat, zonderRuis, draaiStaatproef } = require('../scripts/lib/staatproef');
+const { weegStaat, zonderRuis, ruisUit, draaiStaatproef } = require('../scripts/lib/staatproef');
 
 const ok = { status: 200 };
 const nee = (s) => ({ status: s || 400 });
@@ -93,6 +93,35 @@ test('en zonder die filter meldt een weigering een bevinding over het journaal',
   assert.equal(weegStaat({ a: nee(404), b: nee(404), d01: ruw, d12: ruw }).rollback, 'GEZAKT');
   const schoon = zonderRuis(ruw, new Set(['doorgeefjournaal', 'rtgai']));
   assert.equal(weegStaat({ a: nee(404), b: nee(404), d01: schoon, d12: schoon }).rollback, 'bewezen');
+});
+
+/* DE DREMPEL VAN DE RUIS. Hij staat op "in ELKE ronde bewogen", en dat is geen
+   detail: zou hij op "ooit bewogen" staan, dan poetst een collectie die een keer
+   toevallig meebewoog voortaan echte tweede effecten weg. De ijkingen in
+   scripts/staatproef-route.js leveren de telling; deze functie is de regel. */
+test('ruis is wat in ELKE ronde bewoog, niet wat er ooit een keer bij zat', () => {
+  const geteld = new Map([['doorgeefjournaal', 4], ['wacht', 4], ['agenda', 3], ['notities', 1]]);
+  const ruis = ruisUit(geteld, 4);
+  assert.deepEqual([...ruis].sort(), ['doorgeefjournaal', 'wacht'],
+    'agenda bewoog in drie van de vier rondes en blijft dus gewoon meetellen');
+});
+
+test('en een stille ronde vangt de schakelaar die op de klok loopt', () => {
+  /* Dit is de meting die drie routes van GEZAKT afhaalde. server/opzet/diensten2.js
+     zet elke tien seconden een meting in `db.data.wacht`; landt die tik tussen de
+     twee oproepen van een route, dan leek de herhaling iets te doen. In stilte --
+     zonder dat er iets gevraagd wordt -- beweegt hij in elke ronde, en dan pas
+     mag hij eruit. */
+  const stil = new Map([['wacht', 3], ['techniek', 1], ['ledenSites', 1]]);
+  const tijdruis = ruisUit(stil, 3);
+  assert.deepEqual([...tijdruis], ['wacht']);
+  const ruw = d('wacht');
+  assert.equal(weegStaat({ a: ok, b: ok, d01: d('wereld'), d12: ruw }).idempotentie, 'GEZAKT',
+    'zonder de stille ijking leest een tik van de klok als een tweede effect');
+  const schoon = zonderRuis(ruw, tijdruis);
+  assert.equal(weegStaat({ a: ok, b: ok, d01: d('wereld'), d12: schoon }).idempotentie, 'bewezen');
+  /* En de tragere schakelaars blijven staan: die zijn NIET genegeerd. */
+  assert.equal(zonderRuis(d('techniek'), tijdruis).aantal, 1);
 });
 
 /* ---------- de ronde ---------- */

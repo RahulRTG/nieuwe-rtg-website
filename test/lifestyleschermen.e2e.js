@@ -38,7 +38,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, elevateTier } = require('./helper');
+const { startServer, letOpFouten, elevateTier, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -94,7 +94,8 @@ async function open(page, base, app, token) {
     localStorage.setItem('rtg_cookieinfo_v1', '1');
   }, token);
   await page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(900);   // de pagina haalt zijn gegevens na het laden op
+  // de pagina haalt zijn gegevens na het laden op: wachten tot dat klaar is
+  await wachtOpRust(page);
 }
 const schermtekst = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
@@ -114,6 +115,7 @@ test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en gee
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -192,6 +194,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -210,7 +213,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
         const knop = page.locator('text=' + a.tab).first();
         if (!await knop.count()) { stuk.push(a.app + ': tabblad "' + a.tab + '" staat er niet'); continue; }
         try { await knop.click({ timeout: 4000 }); } catch (e) { stuk.push(a.app + ': tabblad "' + a.tab + '" is niet aan te tikken'); continue; }
-        await page.waitForTimeout(400);
+        await wachtOpRust(page);
       }
 
       const tekst = await schermtekst(page);

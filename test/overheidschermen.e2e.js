@@ -29,7 +29,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -68,7 +68,7 @@ async function toon(page, base, app, token) {
     localStorage.removeItem('rtg_rijk_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname,
     tekst: document.body.innerText.replace(/\s+/g, ' ')
@@ -94,6 +94,7 @@ test('achter het loket komt een gewoon lid niet: vijf ambtenarenschermen vragen 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -137,6 +138,7 @@ test('de burgerkant staat wel open: de loketten van de gemeente en het rijk',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 

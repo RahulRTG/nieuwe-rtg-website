@@ -18,7 +18,7 @@
    slaagt hij in beide. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -85,7 +85,7 @@ async function naarDeel(page, zoek) {
     JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
   /* Even laten bezinken: openen zet de andere delen op display:none, en een
      klik vlak daarna landt anders op een kaart die net aan het verdwijnen is. */
-  await page.waitForTimeout(150);
+  await wachtOpRust(page);
 }
 
 test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
@@ -104,6 +104,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
     const page = await browser.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript((tok) => {

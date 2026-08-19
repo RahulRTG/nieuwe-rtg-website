@@ -21,12 +21,13 @@
    --vastleggen. Zo kan er geen nieuwe klok bij komen zonder dat iemand er iets
    van vindt.
 
-   WAAROM HIJ NIET OP NUL STAAT, en dat hoort hier te staan in plaats van in een
-   voetnoot: de drie zwaarste bestanden zijn omgezet (92 van de 162 wachten), en
-   dat waren geen zoek-vervang-rondes. Elk ervan legde een echte race bloot die
-   de vaste wachttijd toedekte -- twee bladen tegelijk in de DOM, een paneel dat
-   ingetypte velden wist bij het hertekenen, een lijst die na het antwoord nog
-   een keer opnieuw werd opgehaald. De rest staat er nog, geteld en met naam.
+   HIJ STAAT OP NUL, en dat is niet met zoek-vervang gehaald. Alle 162 wachten
+   zijn per stuk omgezet en elk bestand is daarna gedraaid. Onderweg legden ze
+   echte races bloot die de vaste tijd toedekte: twee bladen tegelijk in de DOM,
+   een paneel dat ingetypte velden wist bij het hertekenen, een veeg die een
+   sprong bleek te zijn, en twee wachten die matchten op tekst die al op het
+   scherm stond. De ratel blijft staan omdat een nul makkelijker te verliezen is
+   dan te halen.
 
    Draai:  node scripts/klokwacht.js
            node scripts/klokwacht.js --vastleggen

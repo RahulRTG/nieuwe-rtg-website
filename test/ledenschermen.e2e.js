@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -94,7 +94,7 @@ async function toon(page, base, app, token, wachtOp) {
       wachtOp, { timeout: 15000 }
     ).catch(() => { throw new Error('gewacht op "' + wachtOp + '" op ' + pad + ', maar dat verscheen niet'); });
   } else {
-    await page.waitForTimeout(1000);
+    await wachtOpRust(page);
   }
   return page.evaluate(() => ({
     pad: location.pathname,
@@ -107,6 +107,7 @@ async function opstelling() {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   return { browser, page, fouten };

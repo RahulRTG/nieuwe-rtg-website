@@ -11,7 +11,7 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -32,7 +32,8 @@ async function aanrakingen(page, base, stand) {
   await page.goto(base + '/apps/flits.html', { waitUntil: 'domcontentloaded' });
   await page.evaluate(s => { localStorage.setItem('rtg_os_gps', s); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, stand);
   await page.goto(base + '/apps/flits.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(400); // de aanroep gebeurt bij het laden, niet later
+  // de aanroep gebeurt bij het laden, niet later: wachten tot het laden klaar is
+  await wachtOpRust(page);
   return page.evaluate(() => window.__gpsAanrakingen);
 }
 
@@ -43,6 +44,7 @@ test('GPS-schakelaar: uit is uit, aan is aan',
   try {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(STUB);

@@ -444,23 +444,31 @@ async function volgVerzoeken(page) {
   });
 }
 
+/* `rondes` is het aantal opeenvolgende gelijke lezingen dat nodig is voordat
+   iets "stil" heet. Standaard een; hoger als het scherm een eigen wachttijd
+   heeft die je moet overleven -- shared/deelmenu.js bouwt bijvoorbeeld pas 120 ms
+   NA de laatste wijziging, en dan is een enkele gelijke ronde te vroeg. Dat is
+   geen verkapte klok: elke ronde die niet gelijk is, zet de teller terug, dus
+   hij wacht net zo lang als het scherm nodig heeft. */
 async function wachtOpRust(page, selector, opties) {
   const ms = (opties && opties.ms) || WACHT_MS;
+  const rondes = Math.max(1, (opties && opties.rondes) || 1);
   try {
     /* De vorige lezing WISSEN voor we beginnen. Zonder dit vergelijkt de eerste
        ronde met de tekst waarop de VORIGE wacht eindigde -- en die is vlak na een
        klik meestal nog gelijk, dus dan is hij meteen "stil" terwijl de
        hertekening nog moet komen. Precies de fout die deze wacht moet oplossen. */
-    await page.evaluate(() => { window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; });
-    await page.waitForFunction((s) => {
-      if (window.__rtgBezig) return false;
+    await page.evaluate(() => { window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; window.__rtgStil = 0; });
+    await page.waitForFunction(([s, n]) => {
+      if (window.__rtgBezig) { window.__rtgStil = 0; return false; }
       const el = s ? document.querySelector(s) : document.body;
-      if (!el) return false;
+      if (!el) { window.__rtgStil = 0; return false; }
       const nu = String(el.innerText || '');
       const zelfde = window.__rtgVorigeTekst === nu;
       window.__rtgVorigeTekst = nu;
-      return zelfde;
-    }, selector || null, { timeout: ms, polling: 100 });
+      window.__rtgStil = zelfde ? (window.__rtgStil || 0) + 1 : 0;
+      return window.__rtgStil >= n;
+    }, [selector || null, rondes], { timeout: ms, polling: 100 });
   } catch (e) {
     throw new Error('wachtte ' + ms + 'ms tot ' + (selector || 'het scherm') +
       ' stil was (geen lopend verzoek, geen hertekening), en dat werd het niet. ' + (await korteStand(page)));

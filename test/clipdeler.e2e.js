@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtOpRust } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -97,7 +97,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     assert.ok(!bestanden.some(f => f.includes(clipId)), 'er ligt geen clipbestand bij RTG');
 
     await makerPagina.reload({ waitUntil: 'load' });
-    await makerPagina.waitForTimeout(800);   // de pagina meldt zijn aanwezigheid
+    await wachtOpRust(makerPagina);   // de pagina meldt zijn aanwezigheid
 
     /* ---- de kijker: /apps/media.html, stand FLOW, en spelen ---- */
     const kijkCtx = await metToken(kijker);

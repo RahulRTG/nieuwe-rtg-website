@@ -16,7 +16,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -46,6 +46,7 @@ async function beheerToken(base, code) {
 async function zaakPagina(browser, base, token, fouten) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   letOpFouten(page, fouten);
   await page.addInitScript((t) => {
     localStorage.setItem('rtg_sup_token', t);
@@ -114,7 +115,7 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     /* ---- offerte uitbrengen vanaf het scherm, en de koper ziet de prijs ---- */
     await wasPagina.fill('#hOpen [data-in$=":prijs"]', '240');
     await wasPagina.click('#hOpen [data-stap="offreren"]');
-    await wasPagina.waitForTimeout(600);
+    await wachtOpRust(wasPagina);
 
     await clubPagina.reload({ waitUntil: 'load' });
     await clubPagina.waitForSelector('#hKoper [data-gun]', { timeout: 12000 });

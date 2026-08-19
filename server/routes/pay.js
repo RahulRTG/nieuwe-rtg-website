@@ -75,7 +75,14 @@ module.exports = (kern) => {
     }));
   });
 
-  // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
+  /* de tik: ontvangen met een aanraking (tikcode), betalen met een knop
+
+     GEEN IDEM-SLEUTEL, en dat is een besluit. `npm run idemproef` noemt deze
+     route onbeschermd omdat een herhaling een andere code teruggeeft. Klopt --
+     maar tikCode zet eerst elke lopende code van dit lid op verlopen, dus na
+     twee oproepen leeft er precies een en valt er niets op te tellen. Het geld
+     beweegt bij /api/pay/tik, en die draagt de sleutel wel. Nagemeten in
+     test/pay.test.js ("twee keer een code vragen laat er een leven"). */
   app.post('/api/pay/tikcode', auth, (req, res) => {
     if (geenGast(req, res)) return;
     res.json(pay.tikCode({ codenaam: liveCodename(req.session) }));
@@ -89,7 +96,11 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     res.json(pay.tikFeed(liveCodename(req.session)));
   });
-  // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
+  /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
+
+     Zelfde besluit als bij tikcode hierboven: een herhaling verdringt de vorige
+     code in plaats van er een tweede naast te zetten, en het geld beweegt pas
+     bij /api/supplier/pay/in. Dezelfde toets meet het na. */
   app.post('/api/pay/kascode', auth, (req, res) => {
     if (geenEchtAccount(req, res)) return;
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));

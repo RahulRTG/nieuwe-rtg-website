@@ -119,6 +119,22 @@ function weegStaat({ a, b, d01, d12 }) {
   return uit;
 }
 
+/* WELKE COLLECTIES TELLEN ALS RUIS -- de regel, los van hoe hij geteld is.
+
+   De ijkingen in scripts/staatproef-route.js tellen per collectie in hoeveel
+   rondes hij bewoog. Ruis is wat in ELKE ronde bewoog; wat maar soms bewoog is
+   geen ruis maar een losse gebeurtenis, en die hoort zichtbaar te blijven. Die
+   strengheid is het hele punt: een collectie die af en toe meebeweegt zou anders
+   een echt tweede effect kunnen wegpoetsen.
+
+   Hij staat hier en niet in het script omdat een regel die je niet los kunt
+   stellen, een regel is die niemand natelt. */
+function ruisUit(geteld, rondes) {
+  const uit = new Set();
+  for (const [collectie, n] of geteld) if (n >= rondes) uit.add(collectie);
+  return uit;
+}
+
 /* Het verschil ONTDAAN van de ruis. Een aparte functie, zodat de regel op een
    plek staat en de toets hem los kan stellen. */
 function zonderRuis(d, ruis) {
@@ -214,4 +230,4 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, CONTROL };
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, ruisUit, CONTROL };

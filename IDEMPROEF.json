@@ -3,8 +3,8 @@
  "gemeten": {
   "routesMetRol": 3092,
   "beoordeeld": 845,
-  "beschermd": 842,
-  "onbeschermd": 3,
+  "beschermd": 843,
+  "onbeschermd": 2,
   "ongemeten": 2247,
   "oproepen": 9298,
   "tokensHernieuwd": 22,
@@ -25636,8 +25636,8 @@
    "methode": "POST",
    "pad": "/api/supplier/betaalverzoek",
    "rol": "supplier",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,

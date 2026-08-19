@@ -33,7 +33,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -68,6 +68,7 @@ test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zij
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -85,7 +86,10 @@ test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zij
     /* En nu de mutatie waar het om gaat: de kaarten komen in #laag, dus NIET
        als direct kind van main. Op `subtree: false` ziet de observer dit niet. */
     await page.evaluate(html => { document.getElementById('laag').innerHTML = html; }, DRIE_KAARTEN);
-    await page.waitForTimeout(700);   // de wacht kijkt 120 ms na de laatste rust
+    /* Wachten op de UITKOMST: de wacht kijkt 120 ms na de laatste rust, dus
+       "het scherm is even stil" kan nog net te vroeg zijn -- de balk zelf niet. */
+    await wachtTot(page, () => document.querySelectorAll('.rtgdeel-balk').length === 1,
+      null, { wat: 'de balk die de wacht bouwt' });
 
     const balken = await page.evaluate(() => document.querySelectorAll('.rtgdeel-balk').length);
     assert.equal(balken, 1, 'de wacht is wakker geworden en heeft het menu gebouwd');
@@ -121,6 +125,7 @@ test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -134,7 +139,11 @@ test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
         '<div class="kaart"><h2>Enig deel</h2><p>een</p></div>' +
         '<div class="kaart"><h2>Tweede deel</h2><p>twee</p></div>';
     });
-    await page.waitForTimeout(700);
+    /* Hier wordt een AFWEZIGHEID beweerd, en die kun je niet afwachten met
+       "verschijnt het?". Drie stille rondes overleven de eigen wachttijd van de
+       wacht (120 ms na de laatste wijziging); blijft er dan nog niets, dan komt
+       er ook niets. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     const balken = await page.evaluate(() => document.querySelectorAll('.rtgdeel-balk').length);
     assert.equal(balken, 0, 'bij twee delen blijft de pagina een gewone rol');

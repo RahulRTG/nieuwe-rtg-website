@@ -15,7 +15,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -63,6 +63,7 @@ test('twee vrienden praten in hun potje; met een vreemde staat er geen invoervel
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -97,7 +98,9 @@ test('twee vrienden praten in hun potje; met een vreemde staat er geen invoervel
 
     await open(c.tok, random2.id);
     await page.waitForFunction(() => !document.querySelector('#vSpel').hidden, null, { timeout: 15000 });
-    await page.waitForTimeout(1500);
+    /* Hier wordt een AFWEZIGHEID beweerd (geen praatvenster bij een vreemde);
+       drie stille rondes zijn de eerlijke vervanger van "even wachten". */
+    await wachtOpRust(page, null, { rondes: 3 });
     const praatWeg = await page.evaluate(() => document.querySelector('#sPraat').hidden);
     assert.equal(praatWeg, true, 'bij een potje met een vreemde hoort er geen praatvenster te staan');
 

@@ -39,7 +39,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -94,6 +94,7 @@ test('de vier juridische pagina\'s dragen wat er wettelijk in moet',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -102,7 +103,7 @@ test('de vier juridische pagina\'s dragen wat er wettelijk in moet',
       await page.goto(base + p.pad, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => localStorage.setItem('rtg_cookieinfo_v1', '1'));
       await page.goto(base + p.pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await wachtOpRust(page);
       const tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
       /* Een juridische pagina van drie regels is geen juridische pagina. De

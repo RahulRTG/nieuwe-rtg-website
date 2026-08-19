@@ -36,7 +36,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -95,7 +95,7 @@ async function toon(page, base, app) {
      omzeild. */
   const ga = async () => {
     try { await page.goto(base + pad, { waitUntil: 'domcontentloaded' }); }
-    catch (e) { await page.waitForTimeout(400); }
+    catch (e) { await wachtOpRust(page); }
   };
   await ga();
   try {
@@ -105,7 +105,9 @@ async function toon(page, base, app) {
     }, SLEUTELS);
   } catch (e) { /* al doorverwezen; de sleutels stonden er toch niet */ }
   await ga();
-  await page.waitForTimeout(1300);
+  /* Deze schermen halen hun gegevens NA het laden op en kunnen onderweg nog
+     doorverwijzen; wachten tot het stil is vangt allebei. */
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname + location.search,
     deur: !!document.querySelector('.rtgdeur'),
@@ -120,6 +122,7 @@ async function opstelling() {
      mee in scripts/schermen.js. Dat is hier eerder misgegaan. */
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   return { browser, page, fouten };

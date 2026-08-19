@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,6 +45,7 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
@@ -62,7 +63,8 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     await page.evaluate(() => RTGSchil.open('office',
       { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));
     // de surfaces moeten geladen zijn voordat ze op berichten kunnen antwoorden
-    await page.waitForTimeout(4000);
+    // de surfaces moeten geladen zijn voordat ze op berichten kunnen antwoorden
+    await wachtOpRust(page, null, { rondes: 3 });
 
     /* Het object komt uit Reizen. We bootsen het OPPAKKEN na op de manier
        waarop de app het stuurt -- via postMessage uit het reizen-frame -- want

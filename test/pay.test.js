@@ -241,3 +241,44 @@ test('het saldo van de zaak uitbetalen is van de manager, innen en kijken van ie
   assert.equal(uit.status, 403, 'een medewerker zonder managerrechten betaalt niets uit');
   assert.match(uit.body.error, /manager/i);
 });
+
+/* DE TWEE ROUTES DIE DE IDEMPOTENTIEPROEF "ONBESCHERMD" NOEMT, EN WAAROM DAT
+   GEEN DEFECT IS.
+
+   `npm run idemproef` doet elke schrijfroute drie keer en houdt er nog twee over
+   die bij een herhaling een ANDER antwoord geven: `/api/pay/kascode` en
+   `/api/pay/tikcode`. Dat klopt ook -- ze geven een verse code terug. Maar een
+   ander ANTWOORD is niet hetzelfde als een tweede EFFECT, en dat verschil hoort
+   gemeten te worden in plaats van beweerd. Allebei zetten ze de vorige code van
+   dit lid dood voordat ze een nieuwe maken, dus na twee oproepen leeft er precies
+   een: er valt niets op te tellen. En er beweegt geen cent -- geld gaat pas lopen
+   bij `/api/supplier/pay/in` en `/api/pay/tik`, en die dragen wel een idem-sleutel
+   (de toetsen daarvoor staan hierboven).
+
+   Zonder deze toets zou "die twee zijn expres zo" in TAKEN.md 4.30 een bewering
+   zijn die niemand ooit nameet -- en dan is het een pleister, geen besluit. */
+test('twee keer een code vragen laat er een leven, niet twee (kascode en tikcode)', async () => {
+  // de kassacode: de tweede oproep verdringt de eerste
+  const eerste = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  const tweede = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  assert.equal(tweede.status, 200);
+  assert.notEqual(eerste.body.code, tweede.body.code,
+    'de herhaling geeft een verse code -- daarom noemt de proef deze route onbeschermd');
+  assert.equal((await api('supplier/pay/in', { code: eerste.body.code, centen: 100, idem: 'kas-oud-1' }, supToken)).status, 404,
+    'maar de eerste code is dood; er staan er nooit twee tegelijk open');
+  assert.equal((await api('supplier/pay/in', { code: tweede.body.code, centen: 100, idem: 'kas-nieuw-1' }, supToken)).status, 200,
+    'de laatste code is de enige die het doet');
+
+  // de tikcode: dezelfde vraag aan de kant van de ontvanger
+  const t1 = await api('pay/tikcode', {}, lidB.token);
+  const t2 = await api('pay/tikcode', {}, lidB.token);
+  assert.equal(t2.status, 200);
+  assert.notEqual(t1.body.code, t2.body.code, 'ook hier is de herhaling een verse code');
+  assert.equal((await api('pay/tik', { code: t1.body.code, centen: 100, idem: 'tik-oud-1' }, lidA.token)).status, 404,
+    'en ook hier vervalt de vorige zodra de nieuwe er is');
+  assert.equal((await api('pay/tik', { code: t2.body.code, centen: 100, idem: 'tik-nieuw-1' }, lidA.token)).status, 200,
+    'de laatste tik werkt wel');
+
+  // en na dit alles sluit het grootboek nog steeds op de cent
+  assert.equal((await (await fetch(base + '/api/pay/gezond')).json()).klopt, true, 'grootboek sluit');
+});

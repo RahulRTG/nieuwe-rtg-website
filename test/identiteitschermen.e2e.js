@@ -33,7 +33,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -49,7 +49,7 @@ async function toon(page, base, scherm, token) {
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
   }, token || null);
   await page.goto(base + '/apps/' + scherm + '.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(900);
+  await wachtOpRust(page);
   return page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 }
 
@@ -68,6 +68,7 @@ test('RTG iD en passkeys: uitleg voor iedereen, gegevens voor niemand zonder inl
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -115,6 +116,7 @@ test('Balans: het welzijnsscherm belooft geen streaks, en heeft ze ook niet',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 

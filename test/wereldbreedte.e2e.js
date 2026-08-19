@@ -19,7 +19,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -49,6 +49,7 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const teBreed = [];
   const navigatieBuiten = [];
   let instantReality = null;
@@ -58,7 +59,7 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
       /* Wachten op de OPMAAK, niet op de klok: zolang er geen stijlblad binnen is
          meet je een ongestileerde pagina, en die past altijd. */
       await page.waitForFunction(() => document.styleSheets.length > 0, { timeout: 15000 });
-      await page.waitForTimeout(1200);
+      await wachtOpRust(page);
       const m = await page.evaluate(() => ({
         venster: document.documentElement.clientWidth,
         inhoud: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),

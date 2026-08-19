@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -204,6 +204,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
 
     // 1. het oude pad blijft werken en komt uit bij de wallet-stand van RTG Geld
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'load' });
@@ -226,9 +227,10 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
           juist die kant kan stil terugkomen: een pas op de homescreen is een
           codenaam die je aan iedereen laat zien die over je schouder meekijkt. */
     const thuis = await ctx.newPage();
+    await volgVerzoeken(thuis);
     await thuis.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await thuis.waitForSelector('#osMappen .os-app, .os-wm', { timeout: 15000, state: 'attached' });
-    await thuis.waitForTimeout(1200);
+    await wachtOpRust(thuis);
     const opThuis = await thuis.evaluate(() => ({
       pas: document.querySelectorAll('.wa-pas, #waPas, #ledenpas').length,
       codenaam: document.querySelectorAll('.wa-pas .cn, #ledenpas .cn').length
@@ -387,7 +389,13 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.fill('#askInput', payload);
     await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
-    await page.waitForTimeout(400); // geef een (eventuele) onerror de tijd om te vuren
+    /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op
+       iets wat er juist niet hoort te zijn. Dat kan niet met "verschijnt het?",
+       dus wachten we tot het scherm stil is: geen lopend verzoek en geen
+       hertekening meer. Is er dan geen fout gevuurd, dan komt hij ook niet.
+       Drie stille rondes, want een enkele ronde is bij een polling van 100 ms
+       korter dan de 400 ms die hier vroeger stond. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     // de payload staat als TEKST in de bubbel, niet als uitgevoerd element
     assert.equal(await page.evaluate(() => document.querySelectorAll('#chat img').length), 0, 'de payload is niet als <img> uitgevoerd');
@@ -458,7 +466,17 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
        vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
     await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
-    await page.waitForTimeout(350);
+    /* De lade glijdt in 280 ms weg; meten terwijl hij beweegt meet de animatie.
+       Wachten tot de balk STIL LIGT is de vraag zelf: twee metingen achter
+       elkaar op dezelfde plaats. */
+    await wachtTot(page, () => {
+      const e = document.querySelector('#rtgCommand .cmd-balk');
+      if (!e) return false;
+      const top = Math.round(e.getBoundingClientRect().top);
+      const zelfde = window.__balkVorige === top;
+      window.__balkVorige = top;
+      return zelfde;
+    }, null, { wat: 'een balk die stil ligt' });
     assert.equal(await page.evaluate(() => {
       const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
@@ -557,6 +575,7 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
       try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
     });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     // zonder token: dan staat de poort er, en daar hangt de klok
     await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
 
@@ -606,10 +625,11 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
         try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
       });
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       // zonder token: dan staat de poort er, en die is wat we meten
       await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
-      await page.waitForTimeout(1200);
+      await wachtOpRust(page);
 
       const r = await page.evaluate(() => {
         const klok = document.querySelector('#gate .os-lock .rtg-ring');

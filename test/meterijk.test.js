@@ -760,7 +760,18 @@ test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
-    'server/kern/zz-ijk-tijdelijk-c.js']) {
+    'server/kern/zz-ijk-tijdelijk-c.js',
+    /* DEZE ONTBRAK, EN HIJ IS DE GEVAARLIJKSTE VAN DE ZEVEN. Twee ijkingen
+       (keuringStuk en endpointsZonderTest) zetten hier een route neer die een
+       ECHTE naam teruggeeft, en server/routes wordt automatisch gemount: blijft
+       hij staan, dan draait er een open endpoint dat de codenaamregel doorbreekt.
+       Precies het geval dat de opmerking hieronder beschrijft -- en juist die
+       stond niet in de lijst. Gevonden doordat hij op 19 augustus 2026 echt is
+       blijven staan: de suite werd door een time-out gedood, de `finally` van
+       metTijdelijkBestand kwam niet meer aan de beurt, en deze toets zag het
+       niet omdat hij er niet naar keek. `npm run check` regel 28 vond hem wel,
+       en dat is een vangnet en geen vervanging: die draait niet in elke ronde. */
+    'server/routes/zz-ijk-tijdelijk.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));

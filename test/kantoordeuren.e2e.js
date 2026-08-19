@@ -33,7 +33,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -65,6 +65,7 @@ test('de acht kantoor-apps tonen hun eigen deur en sturen niemand weg',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -79,7 +80,8 @@ test('de acht kantoor-apps tonen hun eigen deur en sturen niemand weg',
         localStorage.removeItem('rtg_sup_token');
       });
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(1200);   // een omleiding zou hierbinnen gebeuren
+      // een omleiding gebeurt bij het laden: wachten tot het scherm stil is
+      await wachtOpRust(page);
 
       const r = await page.evaluate(() => {
         const deur = document.querySelector('.rtgdeur');

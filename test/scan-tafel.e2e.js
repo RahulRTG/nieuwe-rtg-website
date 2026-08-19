@@ -6,7 +6,7 @@
    Draai: node --experimental-sqlite --test test/scan-tafel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,6 +43,7 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     // 3) browser: token in localStorage, app openen
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(([tok]) => {
@@ -88,7 +89,8 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
        die er toevallig nog staat. */
     await page.mouse.move(196, 4);
     await page.mouse.down();
-    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    // een veeg is een reeks bewegingen, geen sprong: `steps` in plaats van pauzes
+    for (const y of [20, 50, 90, 130]) await page.mouse.move(196, y, { steps: 4 });
     await page.mouse.up();
     await page.waitForSelector('#osCcScan', { state: 'visible', timeout: 8000 });
     await page.click('#osCcScan');

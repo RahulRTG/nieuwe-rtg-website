@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1030 bestanden en 6855 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1031 bestanden en 6863 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1030 |
-| losse beweringen (`test(...)`) | 6855 |
+| toetsbestanden | 1031 |
+| losse beweringen (`test(...)`) | 6863 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 103 |
+| niets van beide | 104 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-904 bestanden, 6635 beweringen.
+905 bestanden, 6643 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -712,7 +712,7 @@ toets omvalt.
 | `schoolkoppel.test.js` | 9 | gezakt op `liegpoort /api/` | De drie punten die na de enterprise-ronde openstonden, nu gebouwd en nagetrokken: de webhookbezorging, het machtigingenregister en de anonieme tevredenheidspeiling. Wat hier bewezen wordt: - een gebeurtenis wordt... |
 | `schoolniveau.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School: het niveau van een klas komt van de officiele ladder. Een klas had alleen een vrije naam ("3B", "Meester Jan"), en die naam ging als "niveau" de AI-bijles in en liet de toets-bibliotheek aan elke leraar... |
 | `schoolrest.test.js` | 10 | gezakt op `liegpoort /api/` | De achttien schoolroutes die na de enterprise-ronde nooit door een toets werden aangeraakt. WAAROM DIT BESTAND ER IS. |
-| `schoolschermen.test.js` | 16 | geen module gevonden | De zichtbare enterprise-belofte van RTG School. Deze toets voorkomt dat School Partner en het gezinsscherm opnieuw twee losse producten worden, of dat een schoolsleutel stilletjes permanent in de browser terechtkomt. |
+| `schoolschermen.test.js` | 17 | geen module gevonden | De zichtbare enterprise-belofte van RTG School. Deze toets voorkomt dat School Partner en het gezinsscherm opnieuw twee losse producten worden, of dat een schoolsleutel stilletjes permanent in de browser terechtkomt. |
 | `schooltaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de tweetalige klasgenoot: een kind uit het buitenland ziet de klas in de eigen taal EN in het Nederlands (de taal die het erbij leert). |
 | `schooltoets.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School x leerstof-motor: de leraar vinkt leerdoelen aan en heeft een SO/proefwerk/examen klaar (verse opgaven per leerling, server kijkt na, geen goed/fout-verklikker halverwege), een MO geeft de leraar de vragen... |
 | `schoolverbonden.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de verbonden klas: het lerarenteam (max drie vast), de waarnemer die een klas van een collega overneemt, de online les voor thuiswerken, en huiswerk dat aan een leerdoel hangt en zichzelf afvinkt als het... |
@@ -822,6 +822,7 @@ toets omvalt.
 | `tls-x509.test.js` | 3 | gezakt op `return-weg#0` | Bewijst dat onze eigen X.509/DER-laag echte, bruikbare bytes maakt: een self-signed certificaat dat OpenSSL (via Node's tls) accepteert in een ECHTE TLS-handshake, en een CSR die correct over de juiste inhoud is... |
 | `toegankelijk.test.js` | 6 | gezakt op `liegpoort /api/` | Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich hoort te gedragen. Wat hier bewezen wordt: de stand blijft staan, een onbekende waarde valt terug op normaal in plaats van stil te blijven... |
 | `toestellen.test.js` | 6 | gezakt op `liegpoort /api/` | Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Het zwaartepunt van deze toets is niet dat het werkt, maar dat de sleutel SMAL is. |
+| `toetskeuring.test.js` | 7 | -- | De toets als meetinstrument: keuring vooraf, spiegel achteraf. De beloftes die hier hard worden gemaakt: - de keuring BOUWT NIET. |
 | `training.test.js` | 9 | gezakt op `liegpoort /api/` | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |
 | `trainingsschema.test.js` | 10 | gezakt op `liegpoort /api/` | Het trainingsschema (kern/trainingsschema.js). dezelfde reden: RTG schrijft geen trainingsschema voor. |
 | `transfer.test.js` | 5 | gezakt op `liegpoort /api/` | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |

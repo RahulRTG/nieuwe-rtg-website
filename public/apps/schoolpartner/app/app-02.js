@@ -65,6 +65,7 @@
     if (window.SPart.instap) window.SPart.instap();
     if (window.SPart.taal) window.SPart.taal();
     if (window.SPart.opvolging) window.SPart.opvolging();
+    if (window.SPart.toetskeuring) window.SPart.toetskeuring();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {

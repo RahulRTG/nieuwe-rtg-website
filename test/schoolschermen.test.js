@@ -460,3 +460,23 @@ test('de keten na de hulplijn staat op het scherm, en de escalatie noemt geen ki
   assert.ok(partner.includes('id="opvolgVorm"'));
   assert.ok(dir.includes('id="dpBewaking"'), 'de directie-cockpit mist de escalatielijst');
 });
+
+test('de toets krijgt zelf een keuring en een spiegel, zonder leerlingen erin', () => {
+  const code = codeVan(lees('apps', 'schoolpartner', 'toetskeuring.js'));
+
+  assert.match(code, /\/school\/toets\/keuring/);
+  assert.match(code, /\/school\/toets\/spiegel/);
+
+  // elke opmerking zegt wat het kost om hem te verhelpen; anders is het gemopper
+  assert.match(code, /x\.wat_nu/, 'het scherm toont niet wat een opmerking kost om te verhelpen');
+  assert.match(code, /keuring/i);
+
+  /* De spiegel gaat over de toets. Het scherm hoort daar geen leerlingen bij te
+     halen: de server stuurt ze niet, en dit scherm vraagt er niet om. */
+  assert.doesNotMatch(code, /leerling|sleutel|\/school\/klas'/, 'het toetsbeeld haalt leerlingen erbij');
+  assert.match(code, /d\.genoeg/, 'de ondergrens hoort het scherm te sturen');
+  assert.match(code, /p\.onderscheid/, 'onderscheidend vermogen hoort erbij');
+
+  assert.ok(partner.includes('/apps/schoolpartner/toetskeuring.js'), 'School Partner laadt toetskeuring.js niet');
+  assert.ok(partner.includes('id="keurVorm"') && partner.includes('id="spiegelVorm"'));
+});

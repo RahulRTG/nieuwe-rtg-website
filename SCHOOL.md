@@ -59,6 +59,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Vervanger en nieuwe docent | briefing zonder zorgdossier, waarneming met einddatum, vijf stappen | `school/instap.js`, `school/waarneming.js` |
 | Taallaag en Family Bridge | vakbeleid met een harde regel, terugvertaling met betekeniscontrole, bon | `kern/taalbeleid.js`, `kern/betekenis.js`, `school/taalpoort.js` |
 | No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
+| Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -370,6 +371,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een onbeantwoorde hulpvraag escaleert | acuut na twee uur, anders na een schooldag | **ja** (`test/opvolging.test.js`) |
 | Een escalatie wijst niet terug naar een kind | vaste lijst velden, los getoetst | **ja**, met mutatie beproefd |
 | Afronden kan niet zonder dat iemand keek | 409 zolang er geen gezien-moment is | **ja**, met mutatie beproefd |
+| De keuring verandert niets aan een toets | ze geeft opmerkingen terug, geen toets | **ja** (`test/toetskeuring.test.js`) |
+| Talige zwaarte telt bij een zaakvak, niet bij taal | de knip komt uit het taalbeleid | **ja**, met mutatie beproefd |
+| Onder vijf gemaakte toetsen geen spiegel | hard getal in de toets, niet de constante | **ja**, met mutatie beproefd |
+| De spiegel noemt geen leerling | vaste sleutelverzameling per leerdoel | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -569,6 +574,10 @@ docent vertrekt: dat is het punt van Institutional Memory.
 
 ## 10. Toetsen als vak -- Assessment Compiler, Fairness Engine, Fingerprint
 
+> **Gebouwd op 19 augustus 2026.** De keuring vooraf (dekking, vorm, overlap,
+> tijd, taalbelasting) en de spiegel achteraf, met een ondergrens van vijf. De
+> belastingsparagraaf onderaan staat er nog niet.
+
 De docent zegt niet "maak dertig vragen" maar *ik wil betrouwbaar meten of 2 havo
 doelen A t/m F beheerst.* Daarop controleert de compiler dekking,
 moeilijkheidsverdeling, vraagvormen, verwachte tijd, taalbelasting, itemoverlap
@@ -583,6 +592,42 @@ culturele context; de docent beslist.
 maar ook de toets zelf: p-waarde per vraag, onderscheidend vermogen, onverwachte
 foutpatronen, mogelijke dubbelzinnigheid. Zo wordt de toetsbank elk jaar
 aantoonbaar beter in plaats van elk jaar ouder.
+
+### Wat er van deze paragraaf staat, en onder welke grenzen
+
+**De compiler bouwt niet, hij keurt.** Er wordt niets automatisch bijgemaakt,
+verwijderd of herschreven. Elke opmerking zegt wat er aan de hand is én wat het
+kost om het te verhelpen; de docent beslist. Dat is niet uit voorzichtigheid: een
+toets is een besluit over kinderen, en een besluit hoort een eigenaar te hebben.
+
+**Ze oordeelt over de echte vraag.** De keuring trekt een paar opgaven uit
+dezelfde generator die de toets straks gebruikt. Oordelen over een aanname in
+plaats van over de vraag die er komt, is oordelen over niets.
+
+**De Fairness Engine hangt aan het taalbeleid en niet aan een eigen lijst.** Een
+talig zware vraag is bij een zaakvak een probleem en bij een taalvak de opgave --
+dat onderscheid komt uit `kern/taalbeleid.js` (§8), zodat de twee niet uit elkaar
+lopen. Culturele context wordt genoemd maar nooit verwijderd: soms is het precies
+de bedoeling, en een compleet cultuurregister bestaat niet. Doen alsof het wel
+bestaat is erger dan een korte, herkenbare lijst.
+
+**De spiegel zegt niets onder vijf gemaakte toetsen.** Niet alleen omdat het
+statistisch zwak is, maar omdat "de p-waarde van deze toets" bij een klas van één
+de uitslag van dát kind ís, met een ander etiket erop. Een getal over de toets
+dat feitelijk over een kind gaat, is een omweg om de regel te breken dat een kind
+geen score buiten het potje krijgt. De vijf staat als hard getal in de toets en
+niet als geïmporteerde constante: een toets die zijn eigen ondergrens leent,
+zakt mee als iemand die verlaagt.
+
+**Er is geen p-waarde per vraag, en dat is geen omissie.** Elke leerling krijgt
+hier verse opgaven uit een generator, dus "vraag 3" is bij ieder kind een andere
+vraag. Een p-waarde per vraag zou een getal zijn dat nergens over gaat. Per
+leerdoel kan het wel, want dat is bij iedereen hetzelfde leerdoel.
+
+**En de spiegel gaat over de toets.** Er komt geen leerlingsleutel en geen naam
+uit; alles is over de groep geteld. Dat de berekening onderweg per leerling kijkt
+-- dat moet, voor het onderscheidend vermogen -- is iets anders dan het naar
+buiten laten komen.
 
 **Belasting.** Zes docenten geven onafhankelijk huiswerk; het systeem ziet de
 donderdag van de leerling. En de docent ziet zijn eigen week: eenennegentig open
@@ -768,7 +813,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 8. **No-Lost-Child opvolgbewaking.** Gedaan: de keten van gevraagd tot
    afgerond, de escalatie naar de directie zonder naam of tekst, en de twee
    keuzes van het kind na de knop (zie §12).
-9. **Assessment Compiler, Fairness Engine, Fingerprint.**
+9. **Assessment Compiler, Fairness Engine, Fingerprint.** Gedaan: de keuring
+   vooraf en de spiegel achteraf (zie §10). De belastingsparagraaf (de donderdag
+   van de leerling, de week van de docent) staat nog open.
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een

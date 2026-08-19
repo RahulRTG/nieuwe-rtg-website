@@ -203,6 +203,29 @@ async function wacht(basis, ms) {
     for (const c of (await verschilVan(v0, v1)).collecties || []) stilGeteld.set(c, (stilGeteld.get(c) || 0) + 1);
   }
   const tijdruis = ruisUit(stilGeteld, STIL_RONDES);
+
+  /* EN EEN LANGE STILTE, voor de schakelaars die TRAGER lopen dan het venster
+     hierboven. kern/command/alarm.js weegt eens per zestig seconden; die tik
+     haalt drie rondes van elf seconden nooit alle drie, maar kan wel net tussen
+     de twee oproepen van een route vallen -- en dan las de proef "de herhaling
+     bewoog de toestand opnieuw" over een route die niets deed.
+
+     Deze ene ronde is NIET voor de globale ruislijst. Wat hij oplevert is
+     `stilOoit`: collecties die in stilte uberhaupt bewegen. Die worden alleen
+     overgeslagen als de route ze bij zijn EERSTE oproep ook niet aanraakte --
+     twee voorwaarden tegelijk, zie zonderTijdtik in ./lib/staatproef.js. Zo
+     hoeft de globale lijst niet te verruimen en blijft `commandJournaal` scherp.
+
+     Vijfenzestig seconden: elk venster van meer dan zestig seconden bevat ten
+     minste een tik van een minuutschakelaar. */
+  const STIL_LANG_MS = Number(process.env.RTG_STAATPROEF_STIL_LANG_MS || 65000);
+  const v0 = await vingerafdruk();
+  await new Promise(r => setTimeout(r, STIL_LANG_MS));
+  const v1 = await vingerafdruk();
+  const stilOoit = new Set((await verschilVan(v0, v1)).collecties || []);
+  for (const c of stilGeteld.keys()) stilOoit.add(c);
+  for (const c of aanvraagRuis) stilOoit.delete(c);   // die gaan er toch al globaal uit
+
   const somsStil = [...stilGeteld].filter(([c, n]) => n < STIL_RONDES && !aanvraagRuis.has(c)).map(([c]) => c);
   const ruis = new Set([...aanvraagRuis, ...tijdruis]);
 
@@ -213,13 +236,14 @@ async function wacht(basis, ms) {
   console.log('  ruis bij een VERZOEK    (genegeerd)  : ' + (aanvraagRuis.size ? [...aanvraagRuis].join(', ') : 'geen'));
   console.log('  ruis van de KLOK        (genegeerd)  : ' + (tijdruis.size ? [...tijdruis].join(', ') : 'geen') +
     '   <- ' + STIL_RONDES + ' stille rondes van ' + STIL_MS + ' ms');
-  console.log('  in stilte SOMS bewogen  (beoordeeld) : ' + (somsStil.length ? somsStil.join(', ') : 'geen') +
-    '   <- tragere schakelaars; deze worden NIET genegeerd');
+  console.log('  in stilte OOIT bewogen  (voorwaardelijk): ' + (stilOoit.size ? [...stilOoit].join(', ') : 'geen') +
+    '\n' + ' '.repeat(41) + '<- alleen overgeslagen als de route ze bij de EERSTE oproep ook niet raakte');
+  console.log('  in stilte SOMS bewogen  (in de korte ronde): ' + (somsStil.length ? somsStil.join(', ') : 'geen'));
   console.log('  eenmalig bewogen (WEL beoordeeld)    : ' + (eenmalig.length ? eenmalig.join(', ') : 'geen') + '\n');
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: async (rol) => { try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {} return false; },
-    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, maxRoutes: MAX });
+    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, stilOoit, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 
@@ -264,6 +288,7 @@ async function wacht(basis, ms) {
     omgevingsruis: [...ruis],
     ruisBijVerzoek: [...aanvraagRuis],
     ruisVanDeKlok: [...tijdruis],
+    inStilteOoitBewogen: [...stilOoit],
     inStilteSomsBewogen: somsStil,
     perRoute: rijen
   }, null, 1) + '\n');

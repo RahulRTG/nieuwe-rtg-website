@@ -208,10 +208,26 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
         await wachtOpRust(page);
-        const r = await page.evaluate(() => ({
+        /* EEN LATE OMLEIDING, en die hoort hier gewoon te mogen. Twee van de
+           vier ingangen van de homescreen sturen door zodra hun eigen script
+           klaar is, en dat kan NA de rust vallen -- dan sterft de meting op een
+           vernielde context. Dat is geen defect maar precies wat een ingang
+           doet. Kwam de pagina ergens anders uit, dan is dit pad niet meer wat
+           we meten: de bestemming staat zelf ook in deze lijst en wordt daar
+           geteld. Zonder deze vangst zakte de toets op "Execution context was
+           destroyed" en las dat als een breuk in de balk. */
+        const meet = () => page.evaluate(() => ({
           eigen: document.querySelectorAll('.os-aibalk').length,
           metgezel: document.querySelectorAll('.mgz-balk').length
         }));
+        let r;
+        try { r = await meet(); }
+        catch (e) {
+          if (!/Execution context was destroyed|Target closed|Target page/.test(String(e && e.message))) throw e;
+          await wachtOpRust(page);
+          if (new URL(page.url()).pathname !== pad) continue;
+          r = await meet();
+        }
         const totaal = r.eigen + r.metgezel;
         if (totaal > 1) {
           fouten.push(pad + ': ' + totaal + ' balken (eigen ' + r.eigen + ', metgezel ' + r.metgezel + ')');

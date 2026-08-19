@@ -456,12 +456,33 @@ async function wachtOpVerandering(page, selector, oud, opties) {
 async function volgVerzoeken(page) {
   await page.addInitScript(() => {
     window.__rtgBezig = 0;
+    /* De ADRESSEN erbij, en niet alleen de teller. Blijft een wacht hangen op
+       "er loopt nog een verzoek", dan is de teller alleen een getal en moet je
+       gaan raden welk verzoek; met de lijst staat het in de foutmelding. Dat is
+       dezelfde regel als bij de gezakte toets: noem hem bij naam. */
+    window.__rtgInVlucht = [];
     const echt = window.fetch;
     window.fetch = function (...args) {
+      const waar = String((args[0] && args[0].url) || args[0] || '');
       window.__rtgBezig++;
-      return echt.apply(this, args).finally(() => { window.__rtgBezig--; });
+      window.__rtgInVlucht.push(waar);
+      return echt.apply(this, args).finally(() => {
+        window.__rtgBezig--;
+        const i = window.__rtgInVlucht.indexOf(waar);
+        if (i >= 0) window.__rtgInVlucht.splice(i, 1);
+      });
     };
   });
+}
+
+/* WAT HIELD HET SCHERM BEZIG -- de helft van een wachtmelding die er niet was.
+   "Het werd niet stil" zegt niet of er nog een verzoek liep, en welk. */
+async function watHieldHemBezig(page) {
+  try {
+    return await page.evaluate(() => 'op ' + location.pathname + ' liepen er ' + (window.__rtgBezig || 0) +
+      ' verzoeken' + (window.__rtgInVlucht && window.__rtgInVlucht.length
+        ? ' (' + window.__rtgInVlucht.slice(0, 4).join(', ') + ')' : '') + '.');
+  } catch (e) { return 'de stand was niet meer te lezen (' + (e && e.message) + ').'; }
 }
 
 /* `rondes` is het aantal opeenvolgende gelijke lezingen dat nodig is voordat
@@ -470,16 +491,25 @@ async function volgVerzoeken(page) {
    NA de laatste wijziging, en dan is een enkele gelijke ronde te vroeg. Dat is
    geen verkapte klok: elke ronde die niet gelijk is, zet de teller terug, dus
    hij wacht net zo lang als het scherm nodig heeft. */
+let rustMerkTeller = 0;
 async function wachtOpRust(page, selector, opties) {
   const ms = (opties && opties.ms) || WACHT_MS;
   const rondes = Math.max(1, (opties && opties.rondes) || 1);
+  /* EEN MERK PER WACHT, en het woont in het DOCUMENT. Hier stond een aparte
+     `page.evaluate` die de vorige lezing wiste voordat de wacht begon -- nodig,
+     want anders vergelijkt de eerste ronde met de tekst waarop de VORIGE wacht
+     eindigde en is hij meteen "stil". Maar die evaluate viel om als de pagina
+     precies dan navigeerde, en de vangst hieronder maakte daar een verzonnen
+     time-out van. Met een merk in het document doet de wacht het zelf: klopt het
+     merk niet -- eerste ronde, of een NIEUW document na een omleiding -- dan
+     begint de telling opnieuw. Een omleiding overleeft de wacht dus in plaats
+     van hem te laten liegen, en er is een evaluate minder om over te struikelen. */
+  const merk = 'rust-' + (++rustMerkTeller);
   try {
-    /* De vorige lezing WISSEN voor we beginnen. Zonder dit vergelijkt de eerste
-       ronde met de tekst waarop de VORIGE wacht eindigde -- en die is vlak na een
-       klik meestal nog gelijk, dus dan is hij meteen "stil" terwijl de
-       hertekening nog moet komen. Precies de fout die deze wacht moet oplossen. */
-    await page.evaluate(() => { window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; window.__rtgStil = 0; });
-    await page.waitForFunction(([s, n]) => {
+    await page.waitForFunction(([s, n, m]) => {
+      if (window.__rtgRustMerk !== m) {
+        window.__rtgRustMerk = m; window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; window.__rtgStil = 0;
+      }
       if (window.__rtgBezig) { window.__rtgStil = 0; return false; }
       const el = s ? document.querySelector(s) : document.body;
       if (!el) { window.__rtgStil = 0; return false; }
@@ -488,10 +518,17 @@ async function wachtOpRust(page, selector, opties) {
       window.__rtgVorigeTekst = nu;
       window.__rtgStil = zelfde ? (window.__rtgStil || 0) + 1 : 0;
       return window.__rtgStil >= n;
-    }, [selector || null, rondes], { timeout: ms, polling: 100 });
+    }, [selector || null, rondes, merk], { timeout: ms, polling: 100 });
   } catch (e) {
+    /* EN DE ECHTE FOUT GAAT MEE. Deze vangst zei altijd "het werd niet stil",
+       ook als de wacht was omgevallen op iets heel anders -- een vernielde
+       context bij een omleiding bijvoorbeeld. Dat is precies het soort melding
+       waar een halve dag in gaat zitten: hij leest als een diagnose en is er
+       geen. */
     throw new Error('wachtte ' + ms + 'ms tot ' + (selector || 'het scherm') +
-      ' stil was (geen lopend verzoek, geen hertekening), en dat werd het niet. ' + (await korteStand(page)));
+      ' stil was (geen lopend verzoek, geen hertekening), en dat werd het niet. ' +
+      (await watHieldHemBezig(page)) + ' ' + (await korteStand(page)) +
+      '\n  onderliggend: ' + String((e && e.message) || e).split('\n')[0]);
   }
 }
 

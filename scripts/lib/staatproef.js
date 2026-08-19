@@ -135,6 +135,38 @@ function ruisUit(geteld, rondes) {
   return uit;
 }
 
+/* DE TWEEDE, SCHERPERE REGEL: EEN TIK VAN DE KLOK DIE MAAR SOMS VALT.
+
+   De globale ruislijst hierboven is streng met opzet -- alleen wat in ELKE ronde
+   beweegt telt mee -- en dat laat een gat open. Een schakelaar die eens per
+   MINUUT loopt (kern/command/alarm.js doet dat) haalt die drempel niet, maar kan
+   wel net tussen de twee oproepen van een route vallen. Dan leest de proef "de
+   herhaling bewoog de toestand opnieuw" over een route die niets deed. Dat
+   gebeurde: /api/supplier/magnaat/studio/importeer viel over `commandAlarmen`.
+
+   Het venster oprekken tot boven die minuut zou werken, maar dan sleept de
+   globale lijst `commandJournaal` mee -- het auditjournaal van de commandkant --
+   en dan ziet niemand het meer als een echte route dat dubbel schrijft. Te duur.
+
+   VANDAAR TWEE VOORWAARDEN TEGELIJK, en alleen samen zijn ze veilig:
+
+     (a) de collectie is OOIT in stilte zien bewegen. Er werd toen niets
+         gevraagd, dus wat daar beweegt kan per definitie geen routewerk zijn.
+     (b) de collectie bewoog NIET bij de EERSTE oproep van deze route. Een route
+         doet twee keer hetzelfde; raakte hij die collectie de eerste keer niet
+         aan, dan is de tweede keer niet van hem.
+
+   (a) alleen is te zwak (een naloper van eerder werk haalt hem ook), (b) alleen
+   ook (een route kan bij een herhaling een ANDER pad nemen en daar iets loggen).
+   Samen blijft er weinig ruimte over om iets echts weg te poetsen -- en dat wat
+   overblijft staat in de grens onderaan dit bestand. */
+function zonderTijdtik(d12, d01, stilOoit) {
+  if (!d12 || !stilOoit || !stilOoit.size) return d12;
+  const bewoogAl = new Set((d01 && d01.collecties) || []);
+  const gewijzigd = (d12.gewijzigd || []).filter(g => !(stilOoit.has(g.collectie) && !bewoogAl.has(g.collectie)));
+  return { ...d12, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
+}
+
 /* Het verschil ONTDAAN van de ruis. Een aparte functie, zodat de regel op een
    plek staat en de toets hem los kan stellen. */
 function zonderRuis(d, ruis) {
@@ -144,7 +176,7 @@ function zonderRuis(d, ruis) {
   return { ...d, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
 }
 
-async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, maxRoutes }) {
+async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, stilOoit, maxRoutes }) {
   const perRoute = {};
   const tel = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
   let oproepen = 0, hernieuwd = 0, afdrukken = 0;
@@ -188,8 +220,12 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
       continue;
     }
 
-    const o = weegStaat({ a, b, d01: zonderRuis(await verschilVan(f0, f1), ruis),
-      d12: zonderRuis(await verschilVan(f1, f2), ruis) });
+    /* Eerst de globale ruis eruit (die geldt voor beide verschillen), dan pas de
+       tweede regel -- die vergelijkt d12 MET d01 en heeft ze dus allebei nodig
+       in dezelfde staat. Zie zonderTijdtik hierboven voor waarom er twee zijn. */
+    const d01 = zonderRuis(await verschilVan(f0, f1), ruis);
+    const d12 = zonderTijdtik(zonderRuis(await verschilVan(f1, f2), ruis), d01, stilOoit);
+    const o = weegStaat({ a, b, d01, d12 });
     perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
       statussen: [a.status, b.status], ...o };
 
@@ -230,4 +266,4 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, ruisUit, CONTROL };
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, zonderTijdtik, ruisUit, CONTROL };

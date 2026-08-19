@@ -144,23 +144,20 @@ jobs:
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
-      # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
-      # van de tests: te laag voor suites die een hulpje gebruiken, en op te
-      # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
-      # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
-      # De vloer staat in NORM.json (dekkingWaargenomenPct).
-      #
-      # DIT CIJFER MIST DE SCHERMSUITE, en dat is geen slordigheid maar een knip
-      # in de opzet: `npm run e2e` draait in de job "a11y" hieronder en schrijft
-      # daar zijn eigen .schermjournaal, in een andere werkmap. Endpoints die
-      # alleen vanuit de BROWSER worden aangeroepen -- /api/fout/client is de
-      # bekende -- staan hier dus als "nooit aangeraakt" terwijl er wel degelijk
-      # een toets voor is. scripts/dekking.js KAN sinds 19 augustus 2026 meer dan
-      # een journaal lezen (--lees mag herhaald) en meldt bovenaan welke suites
-      # meetelden; wat er nog moet gebeuren is de artefact-sprong tussen deze twee
-      # jobs, met een derde job die op allebei wacht. Zie TAKEN.md 6.8 (b).
-      - name: Waargenomen endpoint-dekking (uit het routejournaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+      # HET ROUTEJOURNAAL GAAT MEE ALS ARTEFACT, want het oordeel valt niet hier.
+      # De servers hierboven schreven op welk routepatroon ze echt hebben
+      # afgehandeld; de schermsuite doet dat ook, maar die draait in de job
+      # "a11y" en dus in een andere werkmap. Een dekkingscijfer uit een van de
+      # twee meldt endpoints als "nooit aangeraakt" terwijl er een toets voor is
+      # -- /api/fout/client wordt alleen vanuit de BROWSER aangeroepen. De job
+      # "dekking" hieronder wacht op allebei en telt de unie (TAKEN.md 6.8 b).
+      - name: Routejournaal bewaren voor de dekkingsjob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: routejournaal
+          path: routejournaal.log
+          retention-days: 1
+          if-no-files-found: error
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
@@ -265,3 +262,62 @@ jobs:
       # geen oordeel, en dan moet de e2e-fout de melding zijn en niet deze.
       - name: Schermdekking (welke apps heeft een toets echt geopend)
         run: node scripts/schermen.js
+      # En hetzelfde journaal gaat mee naar de dekkingsjob: daar telt het samen
+      # met dat van `npm test`. Zonder deze helft staan de endpoints die alleen
+      # de browser aanroept als "nooit aangeraakt" (TAKEN.md 6.8 b).
+      - name: Schermjournaal bewaren voor de dekkingsjob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: schermjournaal
+          path: .schermjournaal
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: true
+
+  # ---------------------------------------------------------------------------
+  # DE WAARGENOMEN DEKKING, EN WAAROM HIJ EEN EIGEN JOB HEEFT.
+  #
+  # De teller in de keuring zoekt routenamen in de TEKST van de tests: te laag
+  # voor suites die een hulpje gebruiken, en op te poetsen met een
+  # zoek-en-vervang. scripts/dekking.js vraagt het niet aan de tekst maar aan de
+  # server -- wat in het routejournaal staat is echt aangeroepen.
+  #
+  # Maar dat journaal wordt op TWEE plekken geschreven: `npm test` in de job
+  # "test" en `npm run e2e` in de job "a11y". Deze stap stond eerst in de job
+  # "test" en oordeelde dus over een meting die de hele schermsuite miste. Nu
+  # wacht hij op allebei en telt hij de unie; de meter zegt zelf bovenaan welke
+  # journalen meetelden, zodat een ontbrekende suite niet stil verdwijnt.
+  #
+  # `needs` op allebei betekent ook: is een van de twee rood, dan valt dit
+  # oordeel weg. Dat is met opzet -- een dekkingscijfer over een suite die niet
+  # is afgelopen, is geen cijfer.
+  dekking:
+    name: Waargenomen endpoint-dekking (beide journalen)
+    runs-on: ubuntu-latest
+    needs: [test, a11y]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Het journaal van npm test ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: routejournaal
+          path: journalen/test
+      - name: Het journaal van de schermsuite ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: schermjournaal
+          path: journalen/scherm
+      # De vloer staat in NORM.json (dekkingWaargenomenPct), het plafond in
+      # endpointsNooitAangeraakt. Die tweede is de scherpe: een afgerond
+      # percentage dekt tot een stuk of twaalf endpoints die nooit zijn geraakt.
+      - name: Waargenomen endpoint-dekking (uit beide routejournalen)
+        run: |
+          node --experimental-sqlite scripts/dekking.js \
+            --lees journalen/test/routejournaal.log \
+            --lees journalen/scherm/.schermjournaal

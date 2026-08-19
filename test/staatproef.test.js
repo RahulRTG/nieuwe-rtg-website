@@ -15,7 +15,7 @@
    Draai los: node --test test/staatproef.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { weegStaat, zonderRuis, ruisUit, draaiStaatproef } = require('../scripts/lib/staatproef');
+const { weegStaat, zonderRuis, zonderTijdtik, ruisUit, draaiStaatproef } = require('../scripts/lib/staatproef');
 
 const ok = { status: 200 };
 const nee = (s) => ({ status: s || 400 });
@@ -122,6 +122,47 @@ test('en een stille ronde vangt de schakelaar die op de klok loopt', () => {
   assert.equal(weegStaat({ a: ok, b: ok, d01: d('wereld'), d12: schoon }).idempotentie, 'bewezen');
   /* En de tragere schakelaars blijven staan: die zijn NIET genegeerd. */
   assert.equal(zonderRuis(d('techniek'), tijdruis).aantal, 1);
+});
+
+/* DE TWEEDE RUISREGEL, en de twee voorwaarden die alleen SAMEN veilig zijn.
+
+   Een schakelaar die eens per minuut loopt haalt de globale drempel niet (die
+   eist "in elke ronde"), maar kan wel net tussen de twee oproepen van een route
+   vallen. Het venster oprekken zou `commandJournaal` meeslepen, en dat is juist
+   het auditjournaal van de commandkant. Daarom mag een collectie alleen weg als
+   hij OOIT in stilte bewoog EN de route hem bij de EERSTE oproep niet raakte. */
+test('een tik van de klok telt niet mee als de route die collectie zelf niet raakte', () => {
+  const stilOoit = new Set(['commandAlarmen']);
+  const d01 = d('magnaatStudio');                       // wat de route echt deed
+  const d12 = d('commandAlarmen');                      // wat er bij de herhaling bewoog
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12 }).idempotentie, 'GEZAKT',
+    'zonder deze regel leest een minuuttik als een tweede effect');
+  const schoon = zonderTijdtik(d12, d01, stilOoit);
+  assert.equal(schoon.aantal, 0);
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'bewezen');
+});
+
+test('maar raakte de route die collectie WEL bij de eerste oproep, dan blijft hij staan', () => {
+  /* De gevaarlijke kant: een route die zijn eigen journaal bij ELKE oproep
+     bijschrijft, is precies wat deze kolom hoort te betrappen. Voorwaarde (b)
+     houdt hem binnen. */
+  const stilOoit = new Set(['commandJournaal']);
+  const d01 = d('commandJournaal', 'besluiten');
+  const d12 = d('commandJournaal');
+  const schoon = zonderTijdtik(d12, d01, stilOoit);
+  assert.deepEqual(schoon.collecties, ['commandJournaal'], 'niet weggepoetst');
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'GEZAKT');
+});
+
+test('en een collectie die NOOIT in stilte bewoog blijft altijd staan', () => {
+  /* Voorwaarde (a). Zonder die eis zou elke collectie die de route de tweede
+     keer voor het eerst aanraakt verdwijnen -- en dat is nu juist een tweede
+     effect met een ander pad, geen ruis. */
+  const d01 = d('notities');
+  const d12 = d('betalingen');
+  const schoon = zonderTijdtik(d12, d01, new Set(['wacht']));
+  assert.deepEqual(schoon.collecties, ['betalingen']);
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'GEZAKT');
 });
 
 /* ---------- de ronde ---------- */

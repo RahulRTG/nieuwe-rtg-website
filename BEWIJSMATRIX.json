@@ -6,11 +6,11 @@
   "schakels": 11,
   "cellen": 46288,
   "telling": {
-    "bewezen": 18216,
+    "bewezen": 18218,
     "verklaard": 0,
     "nvt": 340,
-    "ongemeten": 27723,
-    "gezakt": 9
+    "ongemeten": 27722,
+    "gezakt": 8
   },
   "perSchakel": {
     "AUTH": {
@@ -63,11 +63,11 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 844,
+      "bewezen": 846,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3295,
-      "gezakt": 1
+      "ongemeten": 3294,
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 2,

@@ -8,58 +8,14 @@
    leerpaspoort bijgeschreven (kern/onderwijs.js). Er zijn bewust geen
    scores buiten de sessie, geen reeksen en geen ranglijsten: leren is geen
    wedstrijd, en een fout is gewoon de volgende stap in de les. */
-const { REKENEN } = require('./leerstof-data/rekenen');
-const { TAAL } = require('./leerstof-data/taal');
-const { AARDRIJKSKUNDE } = require('./leerstof-data/aardrijkskunde');
-const { GESCHIEDENIS } = require('./leerstof-data/geschiedenis');
-const { NATUUR } = require('./leerstof-data/natuur');
-const { VERKEER, ENGELS_PO } = require('./leerstof-data/verkeer-engels');
-const { VO } = require('./leerstof-data/vo');
-const { VO2 } = require('./leerstof-data/vo2');
-const { VO3 } = require('./leerstof-data/vo3');
-const { VERVOLG } = require('./leerstof-data/vervolg');
 const { opgave } = require('./leerstof-gen');
-/* De graaf (voorkennis, uitlegvormen, meting, de keuring en het pad naar een
-   doel) woont in ./leerstof-fabric.js. Hier staat de stroom eromheen. */
+const { DOELEN, PER_GROEP, PER_FASE } = require('./leerstof-bibliotheek');
+/* De graaflaag (voorkennis, uitlegvormen, meting, de keuring en het pad naar
+   een doel) staat in ./leerstof-fabric.js; hij bezit de doelen niet, dus die
+   komen er hier bij. */
 const { UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad: fabricPad } = require('./leerstof-fabric');
-// de graaflaag bezit de doelen niet; hier komen ze erbij
 const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
-const OPGAVEN_PER_SESSIE = 5;
-const BEHAALD_BIJ = 4;
-
-
-
-/* alle leerdoelen plat, geindexeerd op id, met vak en groep erbij -- op
-   moduleniveau, zodat ook de schooltoetsen (school/toets.js) uit dezelfde
-   bibliotheek putten zonder de stateful motor nodig te hebben */
-const DOELEN = {};
-const PER_GROEP = {};
-for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL], ['aardrijkskunde', AARDRIJKSKUNDE],
-  ['geschiedenis', GESCHIEDENIS], ['natuur', NATUUR], ['verkeer', VERKEER], ['engels', ENGELS_PO]]) {
-  for (const g of lijn) {
-    PER_GROEP[g.groep] = PER_GROEP[g.groep] || [];
-    for (const d of g.doelen) {
-      DOELEN[d.id] = Object.assign({ vak, groep: g.groep }, d);
-      PER_GROEP[g.groep].push(d.id);
-    }
-  }
-}
-/* golf 3: het voortgezet en vervolgonderwijs, per FASE uit de niveauladder
-   (vmbo t/m wo). Zelfde bibliotheek, dus toetsen en huiswerk kunnen er net
-   zo uit putten als bij groep 1 t/m 8. */
-const PER_FASE = {};
-for (const blok of VO.concat(VO2, VO3, VERVOLG)) {
-  for (const fase of blok.fasen) {
-    PER_FASE[fase] = PER_FASE[fase] || [];
-    for (const d of blok.doelen) {
-      DOELEN[d.id] = DOELEN[d.id] || Object.assign({ vak: blok.vak, fase: blok.fasen[0] }, d);
-      PER_FASE[fase].push(d.id);
-    }
-  }
-}
-
-keurLeerstof(DOELEN);
 
 function maakLeerstof({ db, save, onderwijs }) {
   const nu = () => new Date().toISOString();

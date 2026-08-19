@@ -132,7 +132,8 @@ function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 const { GEN2, MEERKEUZE2 } = require('./leerstof-gen-meer');
 const { GENT, MEERKEUZE_TAAL } = require('./leerstof-gen-taal');
 const { GENW, MEERKEUZE_WERELD } = require('./leerstof-gen-wereld');
-for (const reeks of [GEN2, GENT, GENW]) {
+const { GENVO, MEERKEUZE_VO } = require('./leerstof-gen-vo');
+for (const reeks of [GEN2, GENT, GENW, GENVO]) {
   for (const naam of Object.keys(reeks)) {
     if (GEN[naam]) throw new Error('leerstof-gen: de soort "' + naam + '" bestaat twee keer');
     GEN[naam] = reeks[naam];
@@ -159,6 +160,6 @@ function opgave(gen) {
    de generatoren werkelijk doen, dus een soort die van vorm verandert zonder
    deze lijst bij te werken zakt. */
 const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm']
-  .concat(MEERKEUZE2, MEERKEUZE_TAAL, MEERKEUZE_WERELD).sort();
+  .concat(MEERKEUZE2, MEERKEUZE_TAAL, MEERKEUZE_WERELD, MEERKEUZE_VO).sort();
 
 module.exports = { opgave, SOORTEN: Object.keys(GEN), MEERKEUZE };

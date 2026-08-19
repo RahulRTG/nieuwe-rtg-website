@@ -1,4 +1,4 @@
-/* RTG School, leerlijn vervolgonderwijs: mbo (beroepsgericht), hbo en wo.
+/* RTG School, leerlijn vervolgonderwijs: het mbo.
    Zelfde vorm als de VO-leerlijn: blokken per vak met de fasen waarvoor ze
    gelden. Beroeps- en studievaardigheden in plaats van schoolvakken. */
 const MBO = ['mbo-1', 'mbo-2', 'mbo-3', 'mbo-4'];
@@ -6,6 +6,7 @@ const HBO = ['hbo-ad', 'hbo-b', 'hbo-m'];
 const WO = ['wo-b', 'wo-m', 'wo-phd'];
 
 module.exports.VERVOLG = [
+
   { vak: 'rekenen', fasen: MBO, doelen: [
     /* De voorkennis wijst hier naar de basisschool, en dat is geen slordigheid
        maar het punt van een graaf: een mbo'er die vastloopt op beroepsrekenen
@@ -28,43 +29,74 @@ module.exports.VERVOLG = [
   ]},
   { vak: 'burgerschap', fasen: MBO, doelen: [
     { id: 'burgerschap.mbo.kennis', naam: 'Burgerschap: hoe het land werkt', ref: '2F',
+      vereist: ['maatschappijleer.vo.rechtsstaat'],
       les: 'De Tweede Kamer maakt wetten en controleert de regering; de rechter toetst onafhankelijk; de gemeente regelt wat dichtbij is, van paspoort tot vergunning.',
-      gen: { soort: 'mc', vragen: [
-        ['Wie controleert de regering?', 'de Tweede Kamer', 'de politie', 'de burgemeester'],
-        ['Waar haal je een paspoort?', 'bij de gemeente', 'bij de provincie', 'bij de rechtbank'],
-        ['Wie spreekt recht in Nederland?', 'een onafhankelijke rechter', 'de minister', 'de Eerste Kamer'],
-        ['Verkiezingen voor de Tweede Kamer zijn normaal elke:', 'vier jaar', 'twee jaar', 'zes jaar']
-      ] } }
+      uitleg: [
+        { soort: 'stap', tekst: 'Vraag bij elk loket: is dit landelijk, provinciaal of gemeentelijk? Paspoort, uitkering en vergunning lopen bijna altijd via de gemeente.' },
+        { soort: 'praktijk', tekst: 'Als werknemer heb je rechten die in wetten staan: minimumloon, vakantiedagen, veilig werk. Die gelden ook als je werkgever iets anders zegt.' }],
+      gen: { soort: 'koppel', vraag: 'Wie regelt %s?',
+        paren: [['een paspoort', 'de gemeente'], ['een wet', 'de Tweede en Eerste Kamer'],
+          ['een uitspraak in een rechtszaak', 'de rechter'], ['het minimumloon', 'de landelijke overheid'],
+          ['een bouwvergunning', 'de gemeente'], ['de controle op de regering', 'de Tweede Kamer']] } }
   ]},
-  { vak: 'onderzoek', fasen: HBO, doelen: [
-    { id: 'onderzoek.hbo.bronnen', naam: 'Bronnen wegen', ref: '4F',
-      les: 'Een sterke bron is te herleiden (auteur en datum bekend), te controleren (verwijst zelf naar bronnen) en zo dicht mogelijk bij de oorsprong. Een mening is geen meting.',
-      gen: { soort: 'mc', vragen: [
-        ['Welke bron is voor onderzoek het sterkst?', 'een gepubliceerd onderzoek met methode en data', 'een anonieme post', 'een reclamefolder'],
-        ['Wat maakt een bron controleerbaar?', 'verwijzingen naar de onderliggende bronnen', 'veel lezers', 'een mooie opmaak'],
-        ['Een primaire bron is:', 'het oorspronkelijke materiaal zelf', 'een samenvatting ervan', 'een mening erover'],
-        ['Twee bronnen spreken elkaar tegen. Wat doe je?', 'een derde, onafhankelijke bron zoeken', 'de leukste kiezen', 'beide negeren']
-      ] } },
-    { id: 'statistiek.hbo.gemiddelde', naam: 'Beschrijvende statistiek', ref: '4F',
-      les: 'Het gemiddelde vertelt het midden, maar niet het hele verhaal: kijk ook naar de spreiding en naar uitschieters voordat je een conclusie trekt.',
-      gen: { soort: 'gemiddelde', max: 100 } }
+  /* Uit vo3.js hierheen verhuisd: dit zijn geen vo-doelen maar mbo-, hbo- en
+     wo-doelen, en ze horen bij de rest van het vervolgonderwijs te staan. Ze
+     draaiden op vier handgeschreven vragen; nu op tabellen. */
+  { vak: 'nederlands', fasen: MBO, doelen: [
+    { id: 'nederlands.mbo.zakelijk', naam: 'Zakelijk schrijven', ref: '2F',
+      vereist: ['taal.g8.formeel'],
+      les: 'Een zakelijke mail heeft een duidelijke onderwerpregel, een nette aanhef, een kernboodschap in de eerste zin en een vriendelijke afsluiting.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Zet de vraag of het verzoek in de eerste twee zinnen. Wie pas onderaan zegt wat hij wil, wordt de helft van de tijd niet gelezen.' },
+        { soort: 'praktijk', tekst: 'Een onderwerpregel als "vraag" helpt niemand. "Vraag over factuur 2024-118" wel: de ontvanger weet meteen wat hij erbij moet pakken.' }],
+      gen: { soort: 'koppel', vraag: 'Wat hoort bij %s?',
+        paren: [['de aanhef', 'Geachte heer of mevrouw'], ['de onderwerpregel', 'kort waar de mail over gaat'],
+          ['de eerste zin', 'de kernboodschap'], ['de afsluiting', 'Met vriendelijke groet'],
+          ['een bijlage', 'noem hem in de tekst'], ['de toon', 'beleefd en zakelijk, ook bij een klacht']] } }
   ]},
-  { vak: 'wetenschap', fasen: WO, doelen: [
-    { id: 'wetenschap.wo.methode', naam: 'De wetenschappelijke methode', ref: '4F',
-      les: 'Een hypothese is pas wetenschappelijk als hij te weerleggen is. Je toetst met een controlegroep, en correlatie is nog geen oorzakelijk verband.',
-      gen: { soort: 'mc', vragen: [
-        ['Een goede hypothese is:', 'toetsbaar en te weerleggen', 'altijd waar', 'een mening van een expert'],
-        ['Waarvoor dient een controlegroep?', 'om het effect met iets te kunnen vergelijken', 'om sneller klaar te zijn', 'om meer deelnemers te hebben'],
-        ['Correlatie betekent:', 'dat twee dingen samen bewegen', 'dat het een het ander veroorzaakt', 'dat het toeval bewezen is'],
-        ['Peer review is:', 'toetsing door onafhankelijke vakgenoten', 'een stemming onder studenten', 'een samenvatting door de auteur']
-      ] } },
-    { id: 'statistiek.wo.begrippen', naam: 'Statistische kernbegrippen', ref: '4F',
-      les: 'De mediaan is het middelste getal en trekt zich niets aan van uitschieters; het gemiddelde wel. Een grotere steekproef maakt een schatting stabieler, niet automatisch juister.',
-      gen: { soort: 'mc', vragen: [
-        ['Welke maat is ongevoelig voor uitschieters?', 'de mediaan', 'het gemiddelde', 'de som'],
-        ['Een grotere steekproef maakt een schatting:', 'stabieler', 'altijd juist', 'overbodig'],
-        ['Een steekproef moet vooral:', 'representatief zijn', 'zo groot mogelijk zijn', 'uit vrijwilligers bestaan'],
-        ['"Significant" betekent in de statistiek:', 'waarschijnlijk geen toeval', 'belangrijk voor iedereen', 'groot van omvang']
-      ] } }
+  { vak: 'digitaal', fasen: MBO, doelen: [
+    { id: 'digitaal.mbo.vaardig', naam: 'Digitaal vaardig op het werk', ref: '2F',
+      vereist: ['informatica.havo.veilig'],
+      les: 'Op het werk ga je zorgvuldig om met gegevens: sterke wachtwoorden, geen klantdata delen, en bij een verdacht bericht eerst checken voordat je klikt.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Vraag bij elk verzoek om gegevens: mag deze persoon dit weten, en langs welk kanaal hoort dit te gaan? Bij twijfel niet doen en melden.' },
+        { soort: 'praktijk', tekst: 'De meeste datalekken beginnen niet met een hack maar met een mens: een klik, een verkeerde geadresseerde of een groepsapp.' }],
+      gen: { soort: 'indeling', vraag: 'Wat doe je met %s?',
+        groepen: { 'melden en niet klikken': ['een verdachte mail met link', 'een onbekende usb-stick', 'een telefoontje dat om je wachtwoord vraagt'],
+          'nooit delen': ['klantgegevens in een groepsapp', 'je wachtwoord met een collega', 'een dossier via een prive-account'],
+          'gewoon doen': ['een update installeren', 'je scherm vergrendelen', 'tweestapsverificatie aanzetten'] } } }
+  ]},
+  { vak: 'loopbaan', fasen: MBO, doelen: [
+    { id: 'loopbaan.mbo.solliciteren', naam: 'Solliciteren', ref: '2F',
+      vereist: ['nederlands.mbo.zakelijk'],
+      les: 'Een sollicitatie is geen levensverhaal maar een antwoord op een vacature: waarom deze functie, wat kun je, en wat heb je gedaan dat dat laat zien.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Leg de vacature naast je brief. Elk gevraagd punt hoort een zin te krijgen met een voorbeeld erbij; wat er niet in staat, laat je weg.' },
+        { soort: 'praktijk', tekst: 'Op de vraag naar een zwak punt hoort geen verkapt sterk punt ("ik ben te perfectionistisch") maar iets echts, met wat je eraan doet.' }],
+      gen: { soort: 'indeling', vraag: 'Waar hoort %s?',
+        groepen: { 'in de brief': ['waarom juist deze functie', 'een voorbeeld van wat je deed', 'wanneer je kunt beginnen'],
+          'in het cv': ['je opleidingen met jaartallen', 'je werkervaring', 'je diploma\'s en certificaten'],
+          'laat je weg': ['je burgerservicenummer', 'een verhaal over je vorige baas', 'een foto als er niet om gevraagd is'] } } },
+    { id: 'loopbaan.mbo.arbeid', naam: 'Werken: contract en rechten', ref: '2F',
+      vereist: ['burgerschap.mbo.kennis'],
+      les: 'In je contract staat wat je doet, hoeveel je krijgt en voor hoe lang. Daarboven gelden wetten: minimumloon, vakantiedagen, veilige werkplek.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Lees drie dingen altijd: de duur (tijdelijk of vast), de uren, en het uurloon. De rest is meestal cao of wet.' },
+        { soort: 'praktijk', tekst: 'Afspraken die slechter zijn dan de wet, zijn ongeldig -- ook als je ze hebt getekend. Een handtekening zet de wet niet opzij.' }],
+      gen: { soort: 'koppel', vraag: 'Wat is %s?',
+        paren: [['een cao', 'afspraken voor een hele bedrijfstak'], ['het minimumloon', 'het wettelijk laagste uurloon'],
+          ['een proeftijd', 'de periode waarin beide partijen snel kunnen stoppen'], ['een tijdelijk contract', 'een contract met een einddatum'],
+          ['loonstrook', 'het overzicht van wat je verdiende en wat er af ging'], ['vakantiegeld', 'een percentage van je jaarloon, meestal in mei']] } }
+  ]},
+  { vak: 'veiligheid', fasen: MBO, doelen: [
+    { id: 'veiligheid.mbo.werkplek', naam: 'Veilig werken', ref: '2F',
+      les: 'Veilig werken is geen gevoel maar een gewoonte: ken de risico\'s van je werkplek, gebruik de middelen die er zijn, en meld wat bijna misging.',
+      uitleg: [
+        { soort: 'stap', tekst: 'Kijk voor je begint: wat kan hier misgaan, wat ligt er in de weg, en waar is de nooduitgang? Dertig seconden die een ongeluk schelen.' },
+        { soort: 'praktijk', tekst: 'Een bijna-ongeluk melden voelt overdreven en is het niet: bijna-ongelukken zijn de goedkoopste manier om echte te voorkomen.' }],
+      gen: { soort: 'indeling', vraag: 'Wat is %s?',
+        groepen: { 'beschermingsmiddel': ['veiligheidsbril', 'gehoorbescherming', 'werkhandschoenen', 'veiligheidsschoenen'],
+          'risico': ['een kabel over de looproute', 'een geblokkeerde nooduitgang', 'tillen met een gedraaide rug'],
+          'goede gewoonte': ['een bijna-ongeluk melden', 'machines uitzetten voor onderhoud', 'de werkplek opruimen'] } } }
   ]}
 ];

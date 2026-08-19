@@ -201,6 +201,24 @@ test('taal draait op regels en niet op vijf vaste woordparen', () => {
     assert.ok(d.gen.woorden.length >= 10, d.id + ' heeft een woordbank van ' + d.gen.woorden.length + ' woorden');
 });
 
+test('de hele bibliotheek draait op regels en tabellen, van groep 1 tot het wo', () => {
+  /* De omslag waar het bij het vullen om ging: geen enkel leerdoel put nog uit
+     een handgeschreven vragenlijst, en elk doel kan zichzelf op meer dan een
+     manier uitleggen. Zakt deze toets, dan is er een leerdoel bijgekomen dat
+     terugvalt op de oude vorm -- en die is na twee sessies een geheugenspel. */
+  const alle = Object.values(DOELEN);
+  assert.deepEqual(alle.filter(d => d.gen.soort === 'mc').map(d => d.id), [],
+    'deze leerdoelen putten nog uit een vaste vragenlijst');
+  assert.deepEqual(alle.filter(d => !(d.uitleg || []).length).map(d => d.id), [],
+    'deze leerdoelen leggen zichzelf maar op een manier uit');
+
+  // en elke fase van de ladder draagt zijn doelen maar EEN keer
+  const { PER_FASE } = require('../server/kern/leerstof');
+  for (const fase of Object.keys(PER_FASE))
+    assert.equal(new Set(PER_FASE[fase]).size, PER_FASE[fase].length,
+      'fase ' + fase + ' heeft dubbele leerdoelen');
+});
+
 test('het hele basisonderwijs draait op de Fabric, en elk vak is oefenbaar', () => {
   /* De belofte uit SCHOOL.md paragraaf 7: elke leerling kan elke schooldag elk
      actief vak oefenen. Voor het po is dat meetbaar: elk vak heeft leerdoelen,

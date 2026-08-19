@@ -243,6 +243,17 @@ tiende. De melding zegt EERST wat er gebeurd is en dan welk bericht: andersom
 werd hij op een telefoon afgekapt tot het onderwerp, met een knop Terugdraaien
 ernaast en geen woord over wat je terugdraait.
 
+Het derde is **RTG Notities**, en dat is het eerste bord waar de twee soorten
+actie naast elkaar liggen. Archiveren is de la — `bewaar {archief:true}` legt
+hem erin en `{archief:false}` haalt hem eruit, dus een echte weg terug. Weggooien
+is dat niet: de kern gooit de notitie echt van het bord en neemt een gekoppelde
+agenda-afspraak mee. Die actie krijgt daarom geen `terug`, en daarmee maakt de
+laag er vanzelf een borg van. Naast elkaar op één regel maakt dat het verschil
+zichtbaar zonder dat er een woord bij hoeft: het ene gaat op een veeg, het andere
+alleen als je hem vasthoudt. Het gedeelde bord houdt zijn knoppen — vastpinnen en
+archiveren horen bij de eigenaar, en een gedeelde notitie "weggooien" betekent
+iets anders (jezelf van de lijst halen) met een andere weg terug.
+
 **En de laag werkte tot 19 augustus 2026 niet op een telefoon.** `.gb-rij` kreeg
 zijn `position:relative` alleen binnen de mediaquery van het aanwijslicht —
 `(hover:hover) and (pointer:fine)` — en op een aanraakscherm is die onwaar. De
@@ -259,8 +270,9 @@ het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer, en
 regel draagt zijn plaatsanker buiten elke mediaquery), `test/gebaar.e2e.js` veegt
 in een echte browser — met een derde scenario in de aanraakstand, over een regel
 die zichzelf NIET plaatst, want een scherm dat dat wel doet verbergt de fout van
-de laag. `test/gebaar-bestanden.e2e.js` en `test/gebaar-rtmail.e2e.js` meten de
-belofte met een server erachter, tot aan een geweigerde aanvraag toe.
+de laag. `test/gebaar-bestanden.e2e.js`, `test/gebaar-rtmail.e2e.js` en
+`test/gebaar-notities.e2e.js` meten de belofte met een server erachter, tot aan
+een geweigerde aanvraag en een borg die pas op de tweede druk afgaat toe.
 
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon

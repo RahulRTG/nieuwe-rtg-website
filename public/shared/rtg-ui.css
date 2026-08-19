@@ -168,6 +168,28 @@ button.rtg-rij:hover .rtg-naam{text-decoration:underline;text-underline-offset:.
 }
 .rtg-veld:focus{outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
 .rtg-veld:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:1px;}
+
+/* HET VINKJE STOND IN SYSTEEMBLAUW, en dat is geen kleur van dit huis.
+   Een aanvinkvakje, een keuzerondje, een schuif en een voortgangsbalk krijgen
+   zonder `accent-color` de kleur van het BESTURINGSSYSTEEM -- op de meeste
+   toestellen #0075FF. Op een notitiebord in onyx staat dat als een postzegel op
+   een fluwelen envelop; gezien op apps/notities.html naast een gebarenlade.
+   CLAUDE.md zegt: geen nieuwe kleuren. Een kleur die je niet zelf zet, zet de
+   browser -- dezelfde les als bij de standaard-linkkleur (apps/media.html).
+
+   HET WORDT --rtg-goud EN NIET --rtg-acc, en dat is met kijken beslist. De
+   dagkleur was de eerste keuze -- die draagt hier immers de focusring -- maar de
+   dagkleur is er zestien, en vandaag was hij toevallig hsl(202 61% 57%): een
+   lucht-blauw dat op het scherm niet van systeemblauw te onderscheiden was. Een
+   kleur die soms hetzelfde is als de kleur die je wegneemt, neemt niets weg.
+   --rtg-goud is bovendien precies wat hier nodig is: de opmerking bij dat token
+   zegt met zoveel woorden dat het een VULKLEUR is en geen tekstkleur, en een
+   aangevinkt vakje is een vlak. Het vinkje zelf tekent de browser, met
+   gegarandeerd contrast op de accentkleur. */
+body.rtg-stijl input[type="checkbox"],
+body.rtg-stijl input[type="radio"],
+body.rtg-stijl input[type="range"],
+body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-veld::placeholder{color:var(--rtg-soft);}
 .rtg-label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}

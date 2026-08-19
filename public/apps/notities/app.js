@@ -204,5 +204,15 @@
   $('#nieuwNotitie').addEventListener('click', function () { nieuw('notitie'); });
   $('#nieuwLijst').addEventListener('click', function () { nieuw('lijst'); });
 
+  /* De handgreep voor de gebarenlaag (apps/notities/gebaren.js). Het bord houdt
+     zijn eigen staat -- welke notities er liggen en of het archief open staat --
+     en de veeg heeft allebei nodig. Apart bestand, zelfde reden als bij de kluis
+     en de post: de bediening van een scherm hoort niet door het scherm zelf
+     heen te lopen. */
+  window.RTGNotities = { api: api, laad: laad, meld: meld,
+    archief: function () { return archief; },
+    notitie: function (id) {
+      return (stand && (stand.eigen || []).filter(function (n) { return n.id === id; })[0]) || null;
+    } };
   if (!token) meld('Log eerst in op de leden-app.'); else laad();
 })();

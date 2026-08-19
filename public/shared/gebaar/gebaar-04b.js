@@ -72,7 +72,12 @@
         doe: function () { return kopieer(code, code + ' - ' + T('gebaar.gekopieerd2', 'gekopieerd', 'copied')); } };
     },
     overnemen: function (tekst) {
-      return { naam: T('gebaar.overnemen', 'Overnemen', 'Copy'), teken: 'archief',
+      /* HET KOPIEER-TEKEN EN NIET HET ARCHIEF-TEKEN. Hier stond 'archief', en op
+         het notitiebord kwam die actie naast Archiveren te liggen: twee knoppen
+         naast elkaar met precies hetzelfde plaatje en een ander gevolg. Kenmerk
+         en Overnemen doen allebei hetzelfde -- iets op het klembord zetten -- dus
+         die delen hun teken, en dat is de bedoeling. */
+      return { naam: T('gebaar.overnemen', 'Overnemen', 'Copy'), teken: 'kenmerk',
         doe: function (rij) {
           var t = typeof tekst === 'function' ? tekst(rij) : (tekst || alsTekst(rij));
           return kopieer(t, T('gebaar.overgenomen', 'De regel staat op uw klembord.', 'The row is on your clipboard.'));

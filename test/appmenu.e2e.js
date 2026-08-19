@@ -372,12 +372,12 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     await openLade(page);
     const deuren = await page.evaluate(() =>
       [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')].map((b) => b.textContent.trim()));
-    assert.ok(deuren.some((t) => /Bedieningspaneel/i.test(t)),
+    assert.ok(deuren.some((t) => /^Instellingen$/i.test(t)),
       'de voet van de bank heeft geen deur naar het bedieningspaneel, gevonden: ' + deuren.join(', '));
     /* Op NAAM en niet op positie: er staan twee systeemdeuren in de voet
        (Rahul boven het bedieningspaneel), dus `[data-systeem]` pakte de
        eerste en opende het vraagveld van Rahul. */
-    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Bedieningspaneel' }).first().click();
+    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Instellingen' }).first().click();
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim').getBoundingClientRect();

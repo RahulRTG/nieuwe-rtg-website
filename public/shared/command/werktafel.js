@@ -19,10 +19,18 @@
        stonden twee open()-aanroepen, en welke apps dat zouden zijn is een keuze
        van een mens en niet van het huis. */
     function zet(s){if(root&&stand!==s)sloop();stand=s;bouw()}
-    function bouw(){if(root||!o.magBestaan())return;root=d.createElement('div');root.id='rtgCommand';root.dataset.stand=stand;root.innerHTML='<aside class="cmd-bank"><div class="cmd-adem"></div><nav class="cmd-nav" aria-label="Hoofdnavigatie"></nav><div class="cmd-bankvoet"><button data-cmd="settings">'+svg('instel')+'<span>Pagina-instellingen</span></button></div></aside><main class="cmd-werk"><div class="cmd-tabs" role="tablist"></div><button class="cmd-toevoeg" aria-label="Werkblad openen">'+svg('plus')+'</button><div class="cmd-kiezer" hidden></div><div class="cmd-panes"></div><div class="cmd-praat" role="log" aria-live="polite" hidden></div><div class="cmd-balk"><button class="cmd-lade" aria-label="Werelden" aria-expanded="false">'+svg('menu')+'</button><div class="cmd-balkbladen" role="tablist"></div><button class="cmd-balksluit" aria-label="Sluit dit werkblad" hidden>'+svg('kruis')+'</button><form class="cmd-vraagvorm"><input class="cmd-vraagveld" type="text" maxlength="300" autocomplete="off" aria-label="Vraag Rahul" placeholder="Vraag Rahul\u2026"><button class="cmd-vraagstuur" type="submit" aria-label="Stuur naar Rahul">'+svg('verder')+'</button></form><button class="cmd-mondknop" type="button" aria-label="Vraag Rahul"></button></div></main>';d.body.appendChild(root);d.body.classList.add('rtg-command');consoleLaag=w.RTGCommandConsole({root:root,svg:svg,context:o.catalog.context,bestemming:o.bestemming,open:o.open,sluit:sluit,thuis:o.thuis,getPanes:function(){return panes},getActief:function(){return actief}});consoleLaag.bouw();bank=w.RTGCommandBank({root:root,svg:svg,apps:APPS,stand:stand,open:o.open,werelden:o.werelden,systeem:o.systeem,inlog:o.inlog});bank.bouw();praatLaag=w.RTGCommandPraat({root:root,bestemming:o.bestemming});praatLaag.bouw();if(w.RTGAdaptiefBalk)balkLaag=w.RTGAdaptiefBalk({root:root,werelden:o.werelden,open:o.open,panes:function(){return panes},actief:function(){return actief}});if(stand==='gesloten')poort.naar(root.querySelector('.cmd-panes'));else leeg();balk();if(balkLaag)balkLaag.bouw();
+    function bouw(){if(root||!o.magBestaan())return;root=d.createElement('div');root.id='rtgCommand';root.dataset.stand=stand;root.innerHTML=w.RTGCommandRomp(svg);d.body.appendChild(root);d.body.classList.add('rtg-command');consoleLaag=w.RTGCommandConsole({root:root,svg:svg,context:o.catalog.context,bestemming:o.bestemming,open:o.open,sluit:sluit,thuis:o.thuis,getPanes:function(){return panes},getActief:function(){return actief}});consoleLaag.bouw();bank=w.RTGCommandBank({root:root,svg:svg,apps:APPS,stand:stand,open:o.open,werelden:o.werelden,systeem:o.systeem,inlog:o.inlog});bank.bouw();praatLaag=w.RTGCommandPraat({root:root,bestemming:o.bestemming});praatLaag.bouw();if(w.RTGAdaptiefBalk)balkLaag=w.RTGAdaptiefBalk({root:root,werelden:o.werelden,open:o.open,panes:function(){return panes},actief:function(){return actief}});if(stand==='gesloten')poort.naar(root.querySelector('.cmd-panes'));else leeg();balk();if(balkLaag)balkLaag.bouw();
       root.querySelector('.cmd-toevoeg').onclick=function(){var k=root.querySelector('.cmd-kiezer');k.hidden=!k.hidden};
       root.querySelector('[data-cmd=settings]').onclick=function(){consoleLaag.toonBlad(3,true)};
+      if(stand!=='gesloten')hervat();
       }
+    /* Terug waar je gebleven was. Waarom dit MAG en de lege tafel niet meer de
+       enige stand is: shared/command/geheugen.js, met de twee wegen die wel
+       leeg blijven uitkomen. Staat er niets, dan blijft de lege keuze staan die
+       bouw() net heeft neergezet. */
+    function hervat(){if(!w.RTGCommandGeheugen)return;var g=w.RTGCommandGeheugen.lees();if(!g)return;
+      g.bladen.forEach(function(b){toon(b.url,b.titel)});
+      if(panes.length)select(Math.min(g.actief,panes.length-1))}
     /* Afbreken staat op EEN plek. Het stond in de matchMedia-luisteraar en liet
        `actief` en `consoleLaag` wijzen naar DOM die net weg was. */
     function sloop(){if(!root)return;poort.terug();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');}
@@ -71,6 +79,10 @@
       if(balkLaag)balkLaag.sync();
     }
     function sync(){if(!root)return;root.dataset.bladen=panes.length;var tabs=root.querySelector('.cmd-tabs');tabs.textContent='';
+      /* Hier wordt onthouden, en nul bladen wegschrijven IS het wissen. Zo komen
+         Home en het sluiten van je laatste blad allebei op een schone tafel uit
+         zonder dat daar een tweede regel voor nodig is (geheugen.js). */
+      if(stand!=='gesloten'&&w.RTGCommandGeheugen)w.RTGCommandGeheugen.schrijf(panes,actief);
       if(!panes.length){balk();if(stand!=='gesloten')leeg();return}
       balk();
       var oudLeeg=root.querySelector('.cmd-leeg');if(oudLeeg)oudLeeg.remove();panes.forEach(function(p,i){p.el.classList.toggle('actief',i===actief);var b=d.createElement('button');b.className='cmd-tab'+(i===actief?' actief':'');b.setAttribute('role','tab');b.innerHTML='<span>'+p.titel+'</span><i aria-label="Sluiten">×</i>';b.onclick=function(e){if(e.target.tagName==='I')sluit(i);else select(i)};tabs.appendChild(b)});verdeler();root.querySelectorAll('.cmd-nav button[data-url]').forEach(function(b){b.classList.toggle('actief',panes[actief]&&panes[actief].url===b.dataset.url)});if(consoleLaag)consoleLaag.intro()}

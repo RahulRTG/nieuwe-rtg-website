@@ -11,13 +11,43 @@ ONTWERP.md en MATERIAAL.md gaan over de vormtaal.
 > **Er is één beginscherm, en dat is de werktafel van RTG Command.**
 
 Wie inlogt komt daar uit. Wie zijn laatste werkblad sluit blijft daar. Wie op
-Home drukt komt daar terug. Drie handelingen, één plek — `land()`, `leeg()` en
-`thuis()` in `shared/command.js` en `shared/command/werktafel.js` komen alle drie
-op dezelfde toestand uit, en dat is geen toeval maar de hele afspraak.
+Home drukt komt daar terug. Drie handelingen, één plek.
 
-Het scherm zegt wat het is: *"Kies een wereld om te beginnen."* Er staat niets
-voorgekookt open. Wie binnenkomt kiest zelf; het huis opent geen activiteit,
-geen voorbeeld en geen dashboard voor hem.
+### En sinds 19 augustus: één van die drie eindigt niet meer leeg
+
+Hier stond dat alle drie op dezelfde **lege** tafel uitkwamen. Dat is voor
+inloggen omgedraaid: **je komt terug waar je gebleven was.** De andere twee
+blijven wél leeg uitkomen, en dat is de hele constructie:
+
+| | uitkomst |
+|---|---|
+| inloggen | je laatste werkbladen staan er weer |
+| Home | lege tafel, en het geheugen is gewist |
+| je laatste werkblad sluiten | lege tafel, en het geheugen is gewist |
+
+Zonder die laatste twee is er geen weg terug naar een schone tafel, en dan is
+hervatten geen gemak maar een gevangenis. Ze hoeven geen eigen regel:
+`sync()` schrijft de stand van dat moment weg, en **nul werkbladen wegschrijven
+ís het wissen**. Wie hier ooit een uitzondering maakt — "Home laat het geheugen
+staan" — maakt de lege tafel onbereikbaar.
+
+Wat er onthouden wordt is klein en met opzet: alleen het adres en de titel van
+een werkblad. Geen scrollpositie, geen formulierinhoud, geen sessie. Een
+werkblad is een iframe naar een gewone pagina; die bewaart zijn eigen dingen
+zelf, en dit hoort geen tweede plek te worden waar iets van een lid staat. Een
+adres dat niet met één schuine streep begint wordt geweigerd: anders trekt een
+regel in opslag een vreemde site de schil in. En bij uitloggen gaat het weg,
+naast `rtg_actieve_tab` — anders ziet de volgende mens op een gedeeld toestel de
+titels van de vorige.
+
+*Waar dat staat:* `shared/command/geheugen.js`, `land()` en `thuis()` in
+`shared/command.js`, `hervat()` en `sync()` in `shared/command/werktafel.js`.
+*Wat het bewaakt:* `test/werktafelgeheugen.test.js` en `test/werktafel.e2e.js`.
+
+Op een lege tafel zegt het scherm wat het is: *"Kies een wereld om te beginnen."*
+Er staat dan niets voorgekookt open. Het huis opent uit zichzelf nog steeds geen
+activiteit, geen voorbeeld en geen dashboard — het legt alleen terug wat je zelf
+had opengelaten.
 
 ## Wat hier stond, en waarom het weg is
 
@@ -220,17 +250,20 @@ niet gelijk zijn.
 zouden hier verzonnen zijn, en CANVAS.md is er hard over: een stand die niet
 gemeten kan worden, hoort niet getoond te worden.
 
-**Geen voorgekookt werkblad.** Het beginscherm begint leeg. Er stonden hier ooit
-twee `open()`-aanroepen; welke apps dat zouden zijn is een keuze van een mens en
-niet van het huis.
+**Geen voorgekookt werkblad.** Er stonden hier ooit twee `open()`-aanroepen;
+welke apps dat zouden zijn is een keuze van een mens en niet van het huis. Dat
+staat nog steeds, en hervatten is er geen uitzondering op maar het bewijs ervan:
+wat er na het inloggen openstaat heeft die mens zelf opengezet.
 
 **Geen foto's.** Getekend in CSS, SVG en canvas — geen stockbeeld, geen modellen
 (CLAUDE.md).
 
 ## Handhaving
 
-`test/werkscherm.e2e.js` meet de werktafel. `test/appmenu.e2e.js` meet de bank:
-dat de drie werelden er bovenaan staan, dat ze hun eigen glyf dragen, dat ze hun
+`test/werkscherm.e2e.js` meet de werktafel. `test/werktafelgeheugen.test.js` meet wat
+er tussen twee bezoeken wordt onthouden, inclusief dat nul werkbladen
+wegschrijven het wissen ís. `test/appmenu.e2e.js` meet de bank:
+dat de vier werelden er staan, dat ze hun eigen glyf dragen, dat ze hun
 huis als wérkblad openen, en dat het springboard niet terugkomt. `test/apps-ui.e2e.js`
 meet dat de sessie echt is hersteld en dat Rahul vanaf het beginscherm in één
 stap bereikbaar is — bóven de werktafel en niet erachter. `test/zware-bundels.test.js`
@@ -238,6 +271,7 @@ bewaakt dat `shared/glyf.js` vóór `apps/app-main.js` staat — zonder die volg
 dragen de werelden in de bank geen teken.
 
 Wat hier nog **niet** machinaal gehandhaafd wordt, en dus op mensen berust: dat er
-één beginscherm blijft. De drie wegen ernaartoe komen op één toestand uit omdat ze
+één beginscherm blijft. De drie wegen ernaartoe komen op één plek uit omdat ze
 dezelfde functies aanroepen, niet omdat een toets het meet. Wie een vierde weg
-bijbouwt, hoort hem daar te laten uitkomen.
+bijbouwt, hoort hem daar te laten uitkomen — en te kiezen of hij hervat of leeg
+begint, want die twee zijn sinds 19 augustus niet meer hetzelfde.

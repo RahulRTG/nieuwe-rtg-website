@@ -111,7 +111,7 @@ const stand = () => {
        werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
        leeft door in de voet van de bank. */
     paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-      .some(b => /Bedieningspaneel/i.test(b.textContent)),
+      .some(b => /^Instellingen$/i.test(b.textContent.trim())),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
@@ -371,7 +371,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
         paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-          .some(b => /Bedieningspaneel/i.test(b.textContent)),
+          .some(b => /^Instellingen$/i.test(b.textContent.trim())),
         tabs: tabs ? getComputedStyle(tabs).display : null,
       };
     });
@@ -498,9 +498,19 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
 
    De algemene MutationObserver is hieronder expres inert. Zonder die ingreep
    zou een indirecte class-mutatie dezelfde uitkomst tekenen en kon deze toets
-   groen blijven terwijl de inlogroute zelf niets deed. Dit is dus het scherm
-   uit de productbeslissing: een terugkerend lid, op telefoonformaat, nul
-   geopende bladen en alleen de uitnodiging om zelf een wereld te kiezen. */
+   groen blijven terwijl de inlogroute zelf niets deed.
+
+   EN LANDEN IS SINDS 19 AUGUSTUS 2026 TWEE DINGEN GEWORDEN. WERELD.md beloofde
+   dat inloggen altijd op een lege keuze uitkwam; dat is omgedraaid naar "je komt
+   terug waar je gebleven was" (shared/command/geheugen.js). Deze toets meet nu
+   allebei, want de oude helft is nog steeds waar en de nieuwe helft was het
+   hele punt:
+
+     zonder geheugen -> lege keuze, nul bladen (dit is nog steeds de eerste keer)
+     met geheugen    -> die bladen staan er weer
+
+   Wie alleen de eerste helft laat staan, kan `hervat()` slopen zonder dat er
+   iets rood wordt. */
 test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
   { skip: pw ? false : 'geen Playwright' }, async () => {
   const { srv, token, dataDir } = await opzet();
@@ -533,6 +543,38 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
     assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
     assert.equal(geland.balk, 48, 'onderaan hoort alleen de wereldbalk te staan');
     assert.match(geland.uitnodiging, /Kies een wereld/);
+
+    /* DE TWEEDE HELFT: hetzelfde lid, nu met twee bladen in zijn geheugen.
+       Dezelfde inlogroute hoort ze terug te zetten in plaats van te wissen.
+
+       DE MUTATIE: zet t.wis() terug in land() (shared/command.js). Dan is de
+       eerste helft hierboven nog groen en zakt deze. */
+    await page.evaluate(() => {
+      localStorage.setItem('rtg_cmd_bladen', JSON.stringify({
+        bladen: [{ url: '/apps/geld-command.html', titel: 'Geld' },
+          { url: '/apps/media.html', titel: 'Media' }], actief: 1 }));
+    });
+    await page.reload({ waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-pane', { timeout: 20000 });
+    const hervat = await page.evaluate(() => ({
+      bladen: [...document.querySelectorAll('.cmd-panes iframe')].map((f) => f.getAttribute('src')),
+      leeg: !!document.querySelector('.cmd-leeg')
+    }));
+    assert.deepEqual(hervat.bladen, ['/apps/geld-command.html', '/apps/media.html'],
+      'de inlogroute zet de onthouden werkbladen niet terug');
+    assert.equal(hervat.leeg, false, 'de lege keuze blijft staan terwijl er bladen zijn');
+
+    /* EN DE WEG TERUG NAAR EEN SCHONE TAFEL MOET BLIJVEN BESTAAN. Zonder deze
+       helft is hervatten geen gemak maar een gevangenis. */
+    await page.evaluate(() => { document.querySelector('.cmd-console [data-nav=home]').click(); });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    const thuis = await page.evaluate(() => ({
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      geheugen: localStorage.getItem('rtg_cmd_bladen')
+    }));
+    assert.equal(thuis.bladen, 0, 'Home hoort de tafel leeg te maken');
+    assert.equal(thuis.geheugen, null, 'Home hoort het geheugen mee te wissen');
+
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();

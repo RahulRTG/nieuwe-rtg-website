@@ -33,7 +33,7 @@ Uit elkaar getrokken luidt de zin:
 > **Core ondersteunt Worlds. Worlds organiseren Experiences. Access bepaalt wat
 > zichtbaar is. Passes bepalen commerciële rechten.**
 
-### De regel die daaruit volgt
+### De twee regels die daaruit volgen
 
 > **Een wereld draagt nooit de naam van een pas — ook niet de stam ervan.**
 >
@@ -49,6 +49,23 @@ Uit elkaar getrokken luidt de zin:
 > technische woordvergelijking te omzeilen. Vandaar **LivingOS**.
 >
 > *Handhaving:* `test/wereldregister.test.js` — exact woord én gedeelde stam.
+
+En de tweede, genomen op 19 augustus 2026:
+
+> **Een wereld en zijn huis houden elk hun eigen naam.**
+>
+> De bank zegt WorkOS, het huis zegt RTG Kantoor. Dat is geen seam die nog
+> dichtgemaakt moet worden maar het onderscheid zelf: **een wereld is een
+> context, een huis is een merk.** WorkOS is waar je bent; RTG Kantoor is wat je
+> opent. Zo ook TravelOS naast RTG Reizen, en FoundationOS naast RTFoundation.
+>
+> Het alternatief is geprobeerd en valt om op de vierde wereld: RTFoundation is
+> een publieke merknaam die 30% van de bijdragen draagt (`CLAUDE.md`) en die je
+> niet kunt hernoemen omdat een tegel anders heet. Eén regel die op drie van de
+> vier werkt, is geen regel.
+>
+> Wat je ervoor accepteert: de tegel heet anders dan de titelbalk erachter. Dat
+> is de prijs, en hij is bewust betaald.
 
 ## De beslisprocedure
 
@@ -475,9 +492,11 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
 
 ## Wat er open blijft
 
-- **De prijs zelf.** De ladder is nu wél te lezen (zie hieronder), maar wat een
-  trede mag kosten staat er niet in. €65 tegenover €20.000 tegenover prijs op
-  maat is een productbesluit.
+- **Het bedrag per trede.** *Waar* de prijs aan hangt is besloten (zie *De drie
+  passen* hieronder); wat een trede mag kosten staat nergens in de code en is
+  een productbesluit. Voor Lifestyle hangt daar wel een vraag aan die niet kan
+  wachten: als de prijs uitvoering koopt, moet er capaciteit tegenover staan, en
+  die planning bestaat nog niet.
 - **`/apps/private-office.html` en `/apps/lifestyle.html` zijn twee schermen met
   bijna dezelfde naam.** Private Office (Briefing, Council, The Table, Atelier,
   Vault) tegenover Het Privékantoor (de levensgraaf, de Control Tower, het
@@ -485,9 +504,6 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
   twee horen te zijn is een productvraag. Hetzelfde geldt voor Het Vooruitzicht
   en Instant Reality: twee schermen die allebei een intentie tot drie scenario's
   doorrekenen, met dezelfde Kyoto-reis als voorbeeld.
-- **Of WorkOS en RTG Kantoor twee namen voor hetzelfde zijn.** De bank zegt
-  WorkOS, het huis zegt RTG Kantoor. Dat kan (context tegenover merk), maar het
-  is een merkbesluit dat nog niet genomen is.
 - **Het startscherm.** `WERELD.md` zegt: er is één beginscherm en dat is de lege
   werktafel. Vier werelden als eerste keuze zou dat vervangen. Eigen besluit.
 - **De precieze domeinlijst per wereld.** De vijf regels hierboven zijn een eerste
@@ -537,6 +553,34 @@ met `npm run groepen`:
   veertien exclusieve functies (werkvloer, werkplek, metier, vakritmes, verkoop,
   zaakdoos, facturen, kantoorgesprek, werkmail, RTG Mail, wervingslink,
   werkruimtes), plus Zakelijk bankieren en Instant Reality.
+
+### En waar de prijs dan aan hangt
+
+Besloten op 19 augustus 2026, en het volgt uit de meting hierboven in plaats van
+uit een tarievenlijst:
+
+| trede | de prijs hangt aan |
+|---|---|
+| RTG Pass | het platform zelf, per mens |
+| Lifestyle Pass | **uitvoering** — er doet iemand het vóór je |
+| Business Pass | **schaal** — per organisatie, per vestiging, per medewerker |
+
+Waarom niet op functies: de meting zegt dat Lifestyle er drie meer heeft dan RTG
+Pass. Drie functies dragen geen factor driehonderd in prijs, en het alternatief —
+functies wéghalen bij RTG Pass om ruimte te maken — botst frontaal met de eerste
+merkregel uit `CLAUDE.md`: *premium, ook aan de onderkant.* De instap mag nooit
+budget aanvoelen, dus hij mag ook niet uitgekleed worden om een hogere trede te
+rechtvaardigen.
+
+Waarom uitvoering wél werkt voor Lifestyle: de suite heet niet toevallig **De
+Rechterhand**. Wat je koopt is niet een tegel maar dat iemand het regelt, en dat
+is uit te leggen zonder één extra functie te beloven — precies wat de AI-regel in
+`CLAUDE.md` ook vraagt, want die verbiedt de assistent om toegang toe te zeggen.
+
+**Wat daar meteen aan vastzit:** als de prijs uitvoering koopt, moet er
+capaciteit tegenover staan. Die planning bestaat nog niet, en zonder haar is
+"uitvoering" een belofte in plaats van een product. Dat is de eerste bouwvraag
+van deze trede, niet een detail eronder.
 
 **En de tweede lijst kent de eerste nu.** De client houdt een eigen
 `PREMIUM`-set van veertien app-sleutels (`apps/app-main`, `premiumPas =

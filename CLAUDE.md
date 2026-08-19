@@ -97,7 +97,12 @@ Privékantoor als verschil — je koopt uitvoering, geen functies), en **Busines
 krijgt daarbovenop een hele wereld (157, waarvan twaalf van de veertien
 exclusieve functies WorkOS zijn). Lifestyle is een strikte deelverzameling van
 Business; er is geen enkele functie die alleen Lifestyle heeft, en dat is een
-vorm en geen gat. Wat een trede mag kosten staat nergens in de code.
+vorm en geen gat. **Waar de prijs aan hangt is wel besloten en staat in
+WERELDEN.md:** RTG betaalt voor het platform, Lifestyle voor **uitvoering** (er
+doet iemand het vóór je) en Business voor **schaal** (per organisatie, per
+vestiging, per medewerker). Niet op functies — drie functies verschil dragen geen
+factor driehonderd, en functies weghalen bij RTG Pass botst met "premium, ook aan
+de onderkant". Het bedrag zelf staat nergens in de code.
 
 **`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
 gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel

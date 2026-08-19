@@ -158,7 +158,7 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
        Via openBank() en niet via .cmd-lade: deze pagina draait op de
        standaardbreedte van Playwright, en daar is de bank een vaste rail
        zonder greep. Zie test/helper.js. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcPin');
 

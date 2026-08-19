@@ -374,7 +374,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
        daarin Zoeken -- dat is Spotlight, en die brengt je met "Laat Rahul dit
        doen" naar precies hetzelfde scherm. Wat er daarna gemeten wordt is
        ongewijzigd: #chat mag de payload nooit uitvoeren. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });

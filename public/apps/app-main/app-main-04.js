@@ -23,6 +23,10 @@
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
+    /* En zijn werktafel staat leeg. Sinds WERELD.md hervat de werktafel je
+       laatste bladen (shared/command/geheugen.js); zonder deze regel zou de
+       volgende mens op een gedeeld toestel de titels van de vorige zien. */
+    try { localStorage.removeItem('rtg_cmd_bladen'); } catch(e){}
     location.reload();
   }
 

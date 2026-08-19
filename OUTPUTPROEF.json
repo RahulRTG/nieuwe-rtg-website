@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T22:32:03.366Z",
-  "commit": "ff9bbb8",
+  "op": "2026-08-19T23:04:38.898Z",
+  "commit": "2b2c9c0",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3810,
-  "onbeslist": 199,
+  "bewezen": 3870,
+  "onbeslist": 139,
   "blind": 178,
   "ongemeten": 8
  },
@@ -2154,242 +2154,276 @@
    "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/opname/herstel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/uitdienst/beeld": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/uitdienst/doe": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/overname": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/fusie/beeld": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/fusie/doe": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/document/lees": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/document/bevestig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/discovery": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/discovery/neem": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/overzicht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/nieuw": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/boom": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteiten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit/nieuw": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit/groep": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit/registratie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit/onderneming": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/entiteit/verwijder": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/feit/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/feit/beeindig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/opdatum": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/geschiedenis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/ubo": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/tekenen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/verloopt": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/vestigingen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/vestiging/nieuw": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/vestiging/zaak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/vestiging/zaaklos": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/vestiging/sluit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/readiness": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/concern/launch": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/toestemming": {
    "staat": "bewezen",
@@ -2504,11 +2538,12 @@
    "reden": "er is over DEZE route gelogen en facturatie.test.js zakte daarop"
   },
   "POST /api/facturen/ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/flits/rond": {
    "staat": "bewezen",
@@ -2583,11 +2618,12 @@
    "reden": "er is over DEZE route gelogen en gastbezorging.test.js zakte daarop"
   },
   "POST /api/gast/bezorg/betaling/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/gast/bezorg/check": {
    "staat": "bewezen",
@@ -2638,11 +2674,12 @@
    "reden": "er is over DEZE route gelogen en gastfoodcourt.test.js zakte daarop"
   },
   "POST /api/gast/foodcourt/mijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/gast/bezorg/mijn": {
    "staat": "bewezen",
@@ -2733,18 +2770,20 @@
    "reden": "er is over DEZE route gelogen en geldbeleid.test.js zakte daarop"
   },
   "POST /api/geld/beleid/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/geld/pot/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/geld/actielog": {
    "staat": "bewezen",
@@ -2939,18 +2978,20 @@
    "reden": "er is over DEZE route gelogen en toegankelijk.test.js zakte daarop"
   },
   "POST /api/ik/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/ik/geloof": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/ik/toegankelijk": {
    "staat": "bewezen",
@@ -2969,39 +3010,44 @@
    "reden": "er is over DEZE route gelogen en toegankelijk.test.js zakte daarop"
   },
   "POST /api/ik/vandaag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/rahul/stemming": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/instant-reality": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/instant-reality/event": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/instant-reality/partner": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/kantoor/wereld": {
    "staat": "bewezen",
@@ -3076,11 +3122,12 @@
    "reden": "er is over DEZE route gelogen en kleine-grendels.test.js zakte daarop"
   },
   "POST /api/labfonds/locatie/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/labfonds/doneer": {
    "staat": "bewezen",
@@ -3107,11 +3154,12 @@
    "reden": "er is over DEZE route gelogen en kleine-grendels.test.js zakte daarop"
   },
   "POST /api/labfonds/scheidsrechter": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/labfonds/beslis": {
    "staat": "bewezen",
@@ -3394,18 +3442,20 @@
    "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/leven/lijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/leven/cockpit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/leven/beleid": {
    "staat": "bewezen",
@@ -3456,32 +3506,36 @@
    "reden": "er is over DEZE route gelogen en levenbandroutes.test.js zakte daarop"
   },
   "POST /api/leven/band/verbreek": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/leven/deel/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/leven/deel/in": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/leven/mentor": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/life": {
    "staat": "bewezen",
@@ -3532,46 +3586,52 @@
    "reden": "er is over DEZE route gelogen en luchthaven-vip.test.js zakte daarop"
   },
   "POST /api/member/magnaat/overzicht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/taak/start": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/taak/antwoord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/taak/handeling": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/taak/actie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/kantoor/kies": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/member/magnaat/werkproces/start": {
    "staat": "onbeslist",
@@ -54024,6 +54084,306 @@
    "toets": "auth-rol.test.js",
    "merkt": true,
    "op": "2026-08-19T22:32:03.296Z"
+  },
+  "POST /api/concern/opname/herstel": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:37.945Z"
+  },
+  "POST /api/concern/uitdienst/doe": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:38.009Z"
+  },
+  "POST /api/concern/overname": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:38.448Z"
+  },
+  "POST /api/concern/uitdienst/beeld": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:38.580Z"
+  },
+  "POST /api/concern/fusie/beeld": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:55.346Z"
+  },
+  "POST /api/concern/fusie/doe": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:55.557Z"
+  },
+  "POST /api/concern/document/bevestig": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:55.820Z"
+  },
+  "POST /api/concern/document/lees": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:00:55.856Z"
+  },
+  "POST /api/concern/discovery": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:12.279Z"
+  },
+  "POST /api/concern/overzicht": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:12.352Z"
+  },
+  "POST /api/concern/discovery/neem": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:12.684Z"
+  },
+  "POST /api/concern/nieuw": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:12.709Z"
+  },
+  "POST /api/concern/entiteiten": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:28.861Z"
+  },
+  "POST /api/concern/boom": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:29.352Z"
+  },
+  "POST /api/concern/entiteit/nieuw": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:29.756Z"
+  },
+  "POST /api/concern/entiteit": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:29.884Z"
+  },
+  "POST /api/concern/entiteit/registratie": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:46.050Z"
+  },
+  "POST /api/concern/entiteit/groep": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:46.066Z"
+  },
+  "POST /api/concern/entiteit/verwijder": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:47.117Z"
+  },
+  "POST /api/concern/entiteit/onderneming": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:01:47.169Z"
+  },
+  "POST /api/concern/feit/zet": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:02.802Z"
+  },
+  "POST /api/concern/feit/beeindig": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:03.306Z"
+  },
+  "POST /api/concern/opdatum": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:04.127Z"
+  },
+  "POST /api/concern/geschiedenis": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:04.600Z"
+  },
+  "POST /api/concern/ubo": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:20.027Z"
+  },
+  "POST /api/concern/tekenen": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:20.359Z"
+  },
+  "POST /api/concern/verloopt": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:21.173Z"
+  },
+  "POST /api/concern/vestigingen": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:21.981Z"
+  },
+  "POST /api/concern/vestiging/nieuw": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:37.346Z"
+  },
+  "POST /api/concern/vestiging/zaak": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:37.721Z"
+  },
+  "POST /api/concern/vestiging/zaaklos": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:37.989Z"
+  },
+  "POST /api/concern/vestiging/sluit": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:38.790Z"
+  },
+  "POST /api/concern/readiness": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:55.038Z"
+  },
+  "POST /api/facturen/ai": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:55.146Z"
+  },
+  "POST /api/concern/launch": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:55.617Z"
+  },
+  "POST /api/gast/bezorg/betaling/status": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:02:56.605Z"
+  },
+  "POST /api/gast/foodcourt/mijn": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:11.981Z"
+  },
+  "POST /api/geld/beleid/weg": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:12.080Z"
+  },
+  "POST /api/geld/pot/weg": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:12.573Z"
+  },
+  "POST /api/ik/zet": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:13.444Z"
+  },
+  "POST /api/ik/geloof": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:29.050Z"
+  },
+  "POST /api/ik/vandaag": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:29.412Z"
+  },
+  "POST /api/rahul/stemming": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:29.433Z"
+  },
+  "POST /api/instant-reality": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:30.358Z"
+  },
+  "POST /api/instant-reality/event": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:45.959Z"
+  },
+  "POST /api/instant-reality/partner": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:46.333Z"
+  },
+  "POST /api/labfonds/locatie/maak": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:46.557Z"
+  },
+  "POST /api/labfonds/scheidsrechter": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:03:47.605Z"
+  },
+  "POST /api/leven/lijn": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:03.014Z"
+  },
+  "POST /api/leven/cockpit": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:03.116Z"
+  },
+  "POST /api/leven/band/verbreek": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:03.260Z"
+  },
+  "POST /api/leven/deel/zet": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:04.605Z"
+  },
+  "POST /api/leven/mentor": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:20.288Z"
+  },
+  "POST /api/member/magnaat/overzicht": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:20.353Z"
+  },
+  "POST /api/leven/deel/in": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:20.726Z"
+  },
+  "POST /api/member/magnaat/taak/start": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:21.630Z"
+  },
+  "POST /api/member/magnaat/taak/antwoord": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:37.691Z"
+  },
+  "POST /api/member/magnaat/taak/handeling": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:38.025Z"
+  },
+  "POST /api/member/magnaat/taak/actie": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:38.131Z"
+  },
+  "POST /api/member/magnaat/kantoor/kies": {
+   "toets": "auth-rol.test.js",
+   "merkt": true,
+   "op": "2026-08-19T23:04:38.811Z"
   }
  },
  "basislijn": {

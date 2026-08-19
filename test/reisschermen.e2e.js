@@ -196,9 +196,17 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
       const b = [...document.querySelectorAll('#zoneBalk button')].find(x => /18\+/.test(x.textContent));
       b.click();
     });
+    /* WACHTEN OP WAT DE BEWERING HIERONDER MEET, en niet op iets ernaast. Hier
+       stond alleen "poortReden heeft tekst", en dat is eerder waar dan dat het
+       POORTSCHERM ook echt vooraan staat: de app vult de reden en wisselt daarna
+       pas van paneel. In een volle ronde viel de meting daar precies tussen --
+       `vZaal` was nog zichtbaar en `vPoort` nog niet -- en dan leest de uitslag
+       als "de 18+-deur staat open" terwijl er niets mis is met de deur. Zelfde
+       fout als wachten op de klok, alleen met een ander teken ernaast. */
     await o.page.waitForFunction(() => {
       const p = document.getElementById('poortReden');
-      return p && p.textContent.trim().length > 0;
+      const poort = document.getElementById('vPoort');
+      return p && p.textContent.trim().length > 0 && poort && poort.offsetParent !== null;
     }, null, { timeout: 10000 });
 
     const reden = await o.page.evaluate(() => document.getElementById('poortReden').textContent);

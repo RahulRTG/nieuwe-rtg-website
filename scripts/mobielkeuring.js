@@ -231,6 +231,15 @@ function mobielInPagina(opt) {
   var uit = {
     venster: W, hoogte: H, inhoud: inhoud, dwinger: inhoud > W + 2 ? dwinger : null,
     tekens: tekst.length, beelden: beelden, hoogsteBlok: Math.round(hoogste), balkenBuiten: balkenBuiten,
+    /* WAT ER DAN WEL STOND. Zonder dit is "leeg" een verwijt zonder bewijs: ik
+       heb twee rondes lang zitten raden waarom /apps/wereld.html drie tekens
+       mat, met een reparatie die in een losse proef aantoonbaar werkte. Een
+       meting die alleen een getal geeft, laat je gissen naar de oorzaak. */
+    werkvlak: tekst.slice(0, 140),
+    hoofdHTML: (function () {
+      var m = document.querySelector('main') || document.querySelector('[role="main"]');
+      return m ? (m.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 140) : '(geen main)';
+    })(),
     leeg: tekst.length < 5 && beelden === 0,
     hoofd: null, hoe: hoe || 'geen', gebreken: []
   };

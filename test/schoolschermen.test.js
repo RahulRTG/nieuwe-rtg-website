@@ -520,8 +520,11 @@ test('de overdrachtskaart toont "nooit", de restlijst en wat een standaard niet 
   assert.match(code, /st\.kanNiet/, 'het scherm verzwijgt wat een standaard niet kan dragen');
   assert.match(code, /kan niet dragen/i);
 
-  // en er staat geen knop die doet alsof er iets verstuurd wordt
-  assert.doesNotMatch(code, /verstuur|verzend/i, 'er staat een verstuurknop terwijl er geen koppeling is');
+  /* Er staat geen knop die doet alsof er naar een externe dienst gestuurd
+     wordt: die verbinding is er niet. (Het woord "verzender" mag wel -- dat is
+     de school die een pakket klaarzette.) */
+  assert.doesNotMatch(code, /naar Edu-V|naar Entree|naar Edu-API|naar OSO stuur|verstuur naar/i,
+    'er staat een knop die doet alsof er een koppeling is');
 
   assert.ok(partner.includes('/apps/schoolpartner/overdracht.js'), 'School Partner laadt overdracht.js niet');
   assert.ok(partner.includes('id="overdrachtKaart"') && partner.includes('id="overdrachtPakket"'));
@@ -545,4 +548,26 @@ test('de taalvergelijking trekt geen conclusie en bewaart niets', () => {
 
   assert.ok(partner.includes('/apps/schoolpartner/taalcheck.js'), 'School Partner laadt taalcheck.js niet');
   assert.ok(partner.includes('id="taalcheckVorm"'));
+});
+
+test('de werkende overstap is geadresseerd, verloopt, en doet niet alsof', () => {
+  const code = codeVan(lees('apps', 'schoolpartner', 'overstap.js'));
+
+  assert.match(code, /\/school\/overdracht\/klaarzetten/);
+  assert.match(code, /\/school\/overdracht\/ophalen/);
+  assert.match(code, /\/school\/overdracht\/klaarstaand/, 'wat nog klaarstaat hoort zichtbaar te zijn');
+  assert.match(code, /naarSchool/, 'een pakket zonder geadresseerde is een sleutel die iedereen kan gebruiken');
+  assert.match(code, /vanSchool/, 'ophalen hoort te zeggen wie het klaarzette');
+  assert.match(code, /r\.body\.tot|x\.tot/, 'de vervaldatum hoort zichtbaar te zijn');
+
+  // dezelfde restlijst als bij het voorbeeld: geen tweede route met soepeler regels
+  assert.match(code, /d\.weggelaten/, 'de restlijst reist niet mee over de echte overstap');
+
+  /* En er staat geen knop die doet alsof er naar een externe dienst gestuurd
+     wordt: die verbinding is er niet. */
+  assert.doesNotMatch(code, /naar Edu-V|naar Entree|naar Edu-API|verstuur naar/i,
+    'er staat een knop die doet alsof er een koppeling is');
+
+  assert.ok(partner.includes('/apps/schoolpartner/overstap.js'), 'School Partner laadt overstap.js niet');
+  assert.ok(partner.includes('id="overdrachtOverstap"'));
 });

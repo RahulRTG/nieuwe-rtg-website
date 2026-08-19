@@ -63,6 +63,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
 | Belasting | de dag van de leerling over klassen heen, de week van de docent, niets bewaard | `kern/belasting.js`, `school/belasting.js` |
 | Overdracht en adapters | pakket per doel met een restlijst; vertaling naar vier standaarden, met wat ze niet kunnen | `kern/overdracht.js`, `kern/koppelvlak.js`, `school/overdracht.js` |
+| Overstap tussen RTG-scholen | geadresseerd pakket met een code, veertien dagen geldig, weg na ophalen | `school/overdracht.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -389,6 +390,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | De taalvergelijking draait niet bij een taalvak | poort uit het taalbeleid, met uitleg | **ja**, met mutatie beproefd |
 | Bij dezelfde zin trekt de test zich terug | een kale som heeft geen taal om over te struikelen | **ja**, met mutatie beproefd |
 | Er komt geen etiket uit | woord "lijkt", geen niveau, niets opgeslagen | **ja**, met mutatie beproefd |
+| Een pakket is geadresseerd | een andere school krijgt 403 | **ja**, met mutatie beproefd |
+| Een pakket verloopt binnen twee weken | venster getoetst, niet alleen "in de toekomst" | **ja**, met mutatie beproefd |
+| Na ophalen is het weg bij de verzender | tweede poging geeft 404 | **ja**, met mutatie beproefd |
+| Zorg overleeft een echte overstap niet | met een gevuld zorgdossier getoetst | **ja** (`test/overdracht.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -807,9 +812,22 @@ blijft staan met wie hem afsloot erbij.
 - **Integration Fabric.** Intern het canonieke onderwijsmodel; extern adapters
   voor Edu-V, Entree, Edu-API, OSO en overheidsdiensten. **Gebouwd op 19
   augustus 2026** als *vertaling* (`kern/koppelvlak.js`): heen en terug, met per
-  standaard een lijst van wat hij **niet** kan dragen. Er wordt nog niets
-  verstuurd en niets opgehaald -- er staat geen verbinding met Edu-V of Entree,
-  en zolang die er niet is hoort er niet te worden gedaan alsof.
+  standaard een lijst van wat hij **niet** kan dragen.
+
+  **En de overstap werkt echt -- tussen twee RTG-scholen.** School A zet een
+  pakket klaar met een code; school B haalt het op. Drie dingen die een losse
+  code niet geeft: het pakket is **geadresseerd** (alleen de genoemde school kan
+  het ophalen), het **verloopt** na veertien dagen, en het is **weg bij de
+  verzender** na het ophalen -- een overdracht is een overdracht en geen archief.
+  Het is hetzelfde pakket als hierboven, met dezelfde klassen en dezelfde
+  restlijst: er bestaat geen tweede route met soepeler regels, en zorg gaat ook
+  hier niet mee.
+
+  **Wat er niet is: een verbinding met Edu-V of Entree zelf.** Dat is geen
+  vertaalvraag maar een kwestie van sleutels, een contract en een partij aan de
+  andere kant. De vertaling ligt klaar en is los getoetst; de dag dat er een
+  tegenpartij is, is dat aansluiten en niet bouwen. Tot dan staat er geen knop
+  die doet alsof.
 - **Transition Continuity.** Bij een overstap gaat niet "dossier.zip" mee, maar
   per doel: nodig voor inschrijving / nodig voor onderwijscontinuïteit / alleen
   met specifieke toestemming / niet overdraagbaar. **Gebouwd op 19 augustus
@@ -906,10 +924,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    over klassen heen, en de week van de docent (zie §10).
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.
     Gedaan: de vertaling heen en terug met per standaard wat hij niet kan
-    dragen, en de overdracht per doel met een restlijst (zie §13). Wat er nog
-    niet is: een echte verbinding met een van die diensten. Dat is geen
-    vertaalvraag maar een kwestie van sleutels, contracten en een partij aan de
-    andere kant.
+    dragen, de overdracht per doel met een restlijst, en de werkende overstap
+    tussen twee RTG-scholen (zie §13). Wat er nog niet is: een verbinding met
+    een van die externe diensten zelf. Dat is geen vertaalvraag maar een kwestie
+    van sleutels, contracten en een partij aan de andere kant.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een
 toets bewaakt die iemand heeft zien zakken (LAT-regel 2).

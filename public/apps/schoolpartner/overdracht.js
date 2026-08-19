@@ -41,6 +41,9 @@ window.SPart.overdracht = function () {
     });
   }
 
+  /* Gedeeld met ./overstap.js: dezelfde restlijst hoort er hetzelfde uit te
+     zien, of hij nu bij een voorbeeld of bij een echte overstap staat. */
+  P.overdrachtLijst = lijst;
   function lijst(rijen, kop) {
     if (!rijen || !rijen.length) return '';
     return '<div class="kop" style="margin-top:.5rem;">' + esc(kop) + '</div>' + rijen.map(function (x) {

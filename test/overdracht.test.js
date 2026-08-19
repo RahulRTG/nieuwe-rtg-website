@@ -139,3 +139,66 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   assert.match(in1.body.uitleg, /plaatsen doet de administratie/i);
   assert.equal((await bh('/school/overdracht/inlezen', { standaard: 'zomaarwat', velden: {} })).status, 400);
 });
+
+/* ---------- de werkende overstap tussen twee RTG-scholen ---------- */
+test('een pakket is geadresseerd, verloopt, en is weg na ophalen', async () => {
+  const b = (await fnd('/school/school/maak', { naam: 'De Sprong', plaats: 'Ede' })).body;
+  const kantoor = await fetch(base + '/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'RTG-OFFICE' }) }).then(r => r.json());
+  await fetch(base + '/api/office/school/decide', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + kantoor.token },
+    body: JSON.stringify({ code: b.schoolCode, action: 'goedkeuren' }) });
+  const bh2 = (pad, body) => fnd(pad, Object.assign({ schoolCode: b.schoolCode, beheerToken: b.beheerToken }, body || {}));
+
+  const l = (await bh('/school/leerling/aanmeld', { naam: 'Sem', geboren: '2015-05-05', herkomst: 'De Vonk' })).body;
+  /* Met een echt zorgdossier erbij, anders bewijst de restlijst niets: een
+     verse leerling heeft nog geen zorg, en dan valt er ook niets weg te laten.
+     Juist dit is wat over een overstap NIET mee hoort te gaan. */
+  const zorg = await bh('/school/zorg/zet', { leerlingId: l.leerling.id,
+    behoefte: 'extra leestijd bij begrijpend lezen', plan: 'twee keer per week met de RT-er' });
+  assert.equal(zorg.status, 200, 'de zorgnotitie moest gezet kunnen worden: ' + JSON.stringify(zorg.body).slice(0, 120));
+
+  // zonder naam gaat er niets de deur uit, en zonder geadresseerde ook niet
+  assert.equal((await bh('/school/overdracht/klaarzetten',
+    { leerlingId: l.leerling.id, naarSchool: b.schoolCode })).status, 400);
+  assert.equal((await bh('/school/overdracht/klaarzetten',
+    { leerlingId: l.leerling.id, door: 'Administratie Vonk' })).status, 404);
+
+  const zet = await bh('/school/overdracht/klaarzetten', { leerlingId: l.leerling.id,
+    naarSchool: b.schoolCode, door: 'Administratie Vonk', doel: 'continuiteit' });
+  assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 160));
+  assert.ok(zet.body.code.startsWith('OD-'));
+  /* Verlopen betekent binnen een VENSTER en niet "ooit een keer": een datum in
+     het jaar 9999 ligt ook in de toekomst. Veertien dagen is de belofte, dus
+     hier het harde getal en niet de constante uit de module zelf. */
+  const dagen = (Date.parse(zet.body.tot) - Date.now()) / 86400000;
+  assert.ok(dagen > 0 && dagen <= 15, 'een pakket hoort binnen twee weken te verlopen, niet over ' + Math.round(dagen) + ' dagen');
+  assert.match(zet.body.uitleg, /Alleen die school/i);
+
+  // het staat klaar bij de verzender, met zijn vervaldatum
+  const klaar = (await bh('/school/overdracht/klaarstaand')).body;
+  assert.equal(klaar.pakketten.filter(p => p.code === zet.body.code).length, 1);
+
+  // een derde school kan hem niet ophalen: het pakket is geadresseerd
+  const derde = await bh('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
+  assert.equal(derde.status, 403);
+  assert.match(derde.body.error, /andere school geadresseerd/i);
+
+  // de geadresseerde wel, en krijgt de restlijst mee
+  const op = await bh2('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode });
+  assert.equal(op.status, 200);
+  assert.equal(op.body.velden.naam, 'Sem');
+  assert.equal(op.body.door, 'Administratie Vonk');
+  assert.ok(op.body.weggelaten.some(x => x.veld === 'zorg' && x.klasse === 'nooit'),
+    'de restlijst reist mee de overstap over');
+  /* En de inhoud van dat zorgdossier gaat nergens heen -- ook niet over een
+     echte overstap tussen twee scholen. */
+  assert.doesNotMatch(JSON.stringify(op.body), /extra leestijd|RT-er/,
+    'het zorgdossier reist mee over de overstap');
+  assert.match(op.body.uitleg, /niemand automatisch ingeschreven/i);
+
+  /* Weg bij de verzender: een overdracht is een overdracht en geen archief. */
+  assert.equal((await bh2('/school/overdracht/ophalen', { code: zet.body.code, vanSchool: sch.schoolCode })).status, 404);
+  assert.equal((await bh('/school/overdracht/klaarstaand')).body.pakketten
+    .filter(p => p.code === zet.body.code).length, 0);
+});

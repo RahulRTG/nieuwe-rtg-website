@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4033 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4036 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,7 +18,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4033 |
+| API-endpoints | 4036 |
 | servermodules (`server/**/*.js`) | 2231 |
 | routebestanden (`server/routes/**`) | 454 |
 | kernmodules (`server/kern/**`) | 1373 |

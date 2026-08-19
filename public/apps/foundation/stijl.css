@@ -99,8 +99,14 @@ input,textarea,select{font-family:inherit;}
   --goud:#C23A5E; --goud2:#C23A5E;
   --rtf-g1:#0C0C0B; --rtf-g2:#151412; --rtf-g3:#100F0E; --rtf-k:8%;
 }
-/* op bordeaux hoort witte tekst; het donkerbruin was op goud gerekend */
-:root[data-rtf-groep="tiener"] .knop, :root[data-rtf-groep="jong"] .knop, :root[data-rtf-groep="volw"] .knop{ color:#fff; }
+/* op bordeaux hoort witte tekst; het donkerbruin was op goud gerekend.
+   DE GROND STAAT ER NU BIJ, en dat is de reparatie van 19 augustus 2026: deze
+   regel zette alleen de INKT, en op elk scherm dat ook rtg-ui.css laadt won
+   `body.rtg-stijl .knop{background:var(--rtg-card)}` de grond. De knop werd dus
+   een kaartknop met witte tekst -- op onyx nog leesbaar, op champagne wit op
+   bijna-wit (1,04:1 op spelen.html). Inkt en grond horen in dezelfde regel,
+   anders lopen ze uit elkaar zodra iemand er een blad naast legt. */
+:root[data-rtf-groep="tiener"] .knop, :root[data-rtf-groep="jong"] .knop, :root[data-rtf-groep="volw"] .knop{ background:var(--goud); color:#fff; }
 :root[data-rtf-groep="tiener"] .knop.grijs, :root[data-rtf-groep="jong"] .knop.grijs, :root[data-rtf-groep="volw"] .knop.grijs{ color:var(--txt); }
 :root[data-rtf-groep="tiener"] .chat .b.ik, :root[data-rtf-groep="jong"] .chat .b.ik, :root[data-rtf-groep="volw"] .chat .b.ik{ color:#fff; }
 :root[data-rtf-groep="tiener"] .badge, :root[data-rtf-groep="jong"] .badge, :root[data-rtf-groep="volw"] .badge{

@@ -11,3 +11,21 @@
    het niet scrollen. Nul maakt de tweede rij de echte scrollvloer. */
 .hq-main{min-height:0!important;grid-template-rows:64px minmax(0,1fr)}
 @media(max-width:760px){.hq-main{grid-template-rows:52px minmax(0,1fr)}}
+
+/* DE COMMAND-SCHIL IS EEN DONKER EILAND, dus hij herdefinieert de huistokens
+   erbinnen. Zonder dit haalt alles wat je in de schil zet zijn inkt nog uit
+   het THEMA terwijl de grond hier hard donker is: onder champagne staat
+   --rtg-txt op bijna-zwart en werd de weg-terug-link in de RTG-deur
+   rgb(26,23,19) op rgb(14,14,14) -- 1,3:1, op alle acht de horecaschermen.
+   De deur repareren zou het symptoom repareren; het volgende onderdeel dat
+   hier binnenkomt had dezelfde fout gehad. Een eiland zet zijn eigen tokens. */
+.hq-shell{
+  --rtg-bg:var(--hq-bg); --bg:var(--hq-bg);
+  --rtg-grond:#090909;
+  --rtg-txt:var(--hq-text); --txt:var(--hq-text);
+  --rtg-muted:#aaa29a; --muted:#aaa29a;
+  --rtg-soft:var(--hq-soft); --soft:var(--hq-soft);
+  --rtg-line:var(--hq-line); --line:var(--hq-line);
+  --rtg-card:#111110; --card:#111110;
+  --rtg-card2:#151312; --card2:#151312;
+}

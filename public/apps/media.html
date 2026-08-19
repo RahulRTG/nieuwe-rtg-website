@@ -43,9 +43,18 @@
     border-bottom:2px solid transparent;}
   .standen button[aria-current="true"]{color:var(--txt);border-bottom-color:var(--gold);}
   /* de rij eronder zijn LINKS naar de losse apps en geen knoppen -- ze horen er
-     ook anders uit te zien, dus hier alleen de MAAT: 20px hoog was onder de 24
-     van WCAG 2.5.8. Verder blijft hun uiterlijk zoals het was. */
-  .standen a{padding:0.32rem 0.4rem;min-height:24px;display:inline-flex;align-items:center;white-space:nowrap;}
+     ook anders uit te zien, dus hier stond eerst alleen de MAAT: 20px hoog was
+     onder de 24 van WCAG 2.5.8.
+     "Verder blijft hun uiterlijk zoals het was" stond er ook, en dat was een
+     fout: hun uiterlijk WAS de standaardlinkkleur van de browser, en die kantelt
+     mee met color-scheme. Op onyx gaf dat rgb(158,158,255) -- leesbaar, dus
+     niemand zag het. Op champagne gaf dat #0000EE op een donker vlak: 1,85:1,
+     acht keer op dit ene scherm. Een kleur die je niet zelf zet, zet de browser.
+     Nu de huisinkt met een gouden onderstreping: goud is hier een accent en
+     geen tekstkleur, en in elk van de vier materialen leesbaar. */
+  .standen a{padding:0.32rem 0.4rem;min-height:24px;display:inline-flex;align-items:center;white-space:nowrap;
+    color:var(--txt);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;
+    text-decoration-color:var(--rtg-leesgoud,var(--gold));}
 
   main{padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 8rem);}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 0.6rem;}
@@ -97,7 +106,7 @@
   .melding.zien{opacity:1;}
 </style>
 </head>
-<body>
+<body data-rtg-eigenvlak="onyx">
 <aside class="media-bank" aria-label="RTG hoofdnavigatie">
   <nav>
     <a href="/apps/vandaag.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>

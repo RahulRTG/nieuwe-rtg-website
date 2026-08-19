@@ -18,7 +18,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
   .kop{display:flex;align-items:flex-end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.35rem;}
@@ -77,7 +77,7 @@
   .raster .geen{display:grid;place-items:center;font-size:.62rem;color:var(--soft);padding:.3rem;text-align:center;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
   .meer{width:100%;background:none;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:.7rem;font-size:.82rem;cursor:pointer;}
-  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 70%,transparent));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
   .aibalk form{display:flex;gap:.5rem;max-width:640px;margin:0 auto;}
   .aibalk button{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:.5rem .9rem;font-size:.82rem;cursor:pointer;white-space:nowrap;}
   .aibalk .uit{max-width:640px;margin:0 auto .5rem;font-size:.82rem;color:var(--muted);line-height:1.5;max-height:8rem;overflow:auto;}

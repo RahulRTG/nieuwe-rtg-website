@@ -24,6 +24,7 @@
   --rtg-soft:rgba(26,23,19,0.56);
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
+  --rtg-card2:rgba(255,255,255,0.70);
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-basis);  /* op licht mag de logotoon zelf lezen */
   --rtg-dagsterkte:0.16;
@@ -37,6 +38,7 @@
   --rtg-soft:rgba(244,240,233,0.56);
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
+  --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-tekst);  /* op donker het hoogsel: 8,11:1 */
   --rtg-dagsterkte:0.10;
@@ -50,6 +52,7 @@
   --rtg-soft:rgba(244,240,233,0.58);
   --rtg-line:var(--bordeaux-rand);
   --rtg-card:rgba(0,0,0,0.22);
+  --rtg-card2:rgba(0,0,0,0.34);
   --rtg-goud:var(--gold-tekst);
   /* op fluweel haalt zelfs het hoogsel maar 4,21:1, dus lees je hier ivoor */
   --rtg-leesgoud:var(--op-bordeaux);
@@ -64,10 +67,19 @@
   --rtg-soft:rgba(240,242,247,0.58);
   --rtg-line:var(--royal-rand);
   --rtg-card:rgba(0,0,0,0.20);
+  --rtg-card2:rgba(0,0,0,0.32);
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--op-royal);
   --rtg-dagsterkte:0.07;
 }
+
+/* --rtg-card2 STOND HIER NIET, EN DAT WAS EEN GAT.
+   Elk thema zette --rtg-card, geen enkel thema zette --rtg-card2, dus die
+   bleef op de basiswaarde uit rtg-ui.css staan: #1B1817, bijna zwart. Op
+   vijftien schermen is dat het vlak van de meldingsstrook (.melding), en de
+   tekst erop komt uit --rtg-txt -- die WEL meethemaat. Onder champagne gaf dat
+   rgb(26,23,19) op rgb(27,24,23): 1,01:1. Niet slecht leesbaar maar onzichtbaar.
+   Wie hier een token bijzet, zet hem in alle vier de blokken. */
 
 /* --rtg-goud IS EEN VULKLEUR EN GEEN TEKSTKLEUR.
    In de UI-kit vult dit token de primaire knop, met #1C1608 als inkt erop. Ik
@@ -104,5 +116,45 @@
       transparent 62%),
     var(--rtg-grond);
   background-attachment:fixed;
+  color:var(--rtg-txt);
+}
+
+/* EN EEN SCHERM MAG ZEGGEN DAT HET ALTIJD DONKER IS.
+   `data-rtg-eigenvlak="onyx"` is de tweede helft van diezelfde afspraak. Er is
+   een soort scherm dat geen thema verdraagt: een zoeker (camera), een kaart
+   (navigatie), een speler (media, muziek), een cockpit (living-os) en de
+   veiligheidspanelen. Die schilderen hun vlakken hard donker -- #0C0C0B, #141012,
+   rgba(21,19,18,.86) -- en halen hun inkt uit --rtg-txt, die WEL meethemaat.
+   Onder champagne, het enige lichte thema, gaf dat 62 keer bijna-zwart op
+   bijna-zwart. Een kaart wit maken is geen reparatie maar een ander scherm; en
+   elk vlak apart een inkt geven repareert alleen de vlakken die er vandaag zijn.
+
+   Dus verklaart zo'n scherm zichzelf onyx, en dan draait zijn HELE eiland terug
+   naar de donkere set: grond, inkt, kaarten, lijnen en het leesgoud. Wat er
+   daarna in dat scherm komt, klopt vanzelf. De thema-keuze van het lid blijft
+   overal elders staan; dit scherm doet er alleen niet aan mee. */
+/* De tokens staan op :ROOT en niet op de body, en dat is met een meting
+   geleerd. Een pagina schrijft `:root{--txt:var(--rtg-txt)}` -- die verwijzing
+   wordt opgelost OP :root, dus een --rtg-txt die pas op de body staat komt er
+   nooit in. Op navigatie.html bleef daardoor elke knop de champagne-inkt houden
+   terwijl de grond al onyx was: acht keer donker op donker, terwijl het scherm
+   zich net onyx had verklaard. Met :has() staat de waarde waar de pagina hem
+   leest. Het huis gebruikt :has() al (zie shared/ios.css). */
+:root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="onyx"]){
+  --rtg-bg:var(--onyx-basis);
+  --rtg-grond:var(--onyx-glans);
+  --rtg-txt:var(--op-onyx);
+  --rtg-muted:rgba(244,240,233,0.72);
+  --rtg-soft:rgba(244,240,233,0.56);
+  --rtg-line:var(--onyx-rand);
+  --rtg-card:#151312;
+  --rtg-card2:#1B1817;
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-dagsterkte:0.10;
+  color-scheme:dark;
+}
+:root[data-rtg-thema] body[data-rtg-eigenvlak="onyx"]{
+  background:var(--rtg-grond);
   color:var(--rtg-txt);
 }

@@ -19,7 +19,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   /* de browser-chrome (adresbalk + knoppen), in de huisstijl */
-  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
     display:flex;align-items:center;gap:.4rem;padding:calc(env(safe-area-inset-top) + .55rem) .7rem .55rem;}
   .nav{width:34px;height:34px;flex:0 0 auto;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;}
   .nav:hover{border-color:var(--gold);}

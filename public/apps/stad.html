@@ -17,7 +17,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
@@ -74,7 +74,7 @@ function toast(t){ const m = $('#toast'); m.textContent = t; m.style.opacity = '
    hij er niet en leek stad.html schoon. De volle scan ving hem alsnog. Dat is
    precies waarom de scan over de ingelogde staat gaat en niet over een
    steekproef. */
-const STAND = { rustig: 'var(--green)', normaal: '#F4F1EC', druk: 'var(--rtg-rood)', stil: 'var(--soft)' };
+const STAND = { rustig: 'var(--green)', normaal: 'var(--txt)', druk: 'var(--rtg-rood)', stil: 'var(--soft)' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 let B = null;
@@ -101,7 +101,7 @@ function render(){
     '<div class="sec">Hoe de stad er nu bij staat</div>' +
     '<div class="grid">' + B.domeinen.map(d =>
       '<div class="dom"><div class="l">' + esc(d.label) + '</div>' +
-      '<div class="w" style="color:' + (STAND[d.stand] || '#F4F1EC') + ';">' +
+      '<div class="w" style="color:' + (STAND[d.stand] || 'var(--txt)') + ';">' +
         (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
       '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) +
         (d.ovOnderweg != null ? ' ·  ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +

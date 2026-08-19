@@ -17,7 +17,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;padding:calc(env(safe-area-inset-top) + .55rem) .9rem .55rem;}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;padding:calc(env(safe-area-inset-top) + .55rem) .9rem .55rem;}
   .nav{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;flex:0 0 auto;}
   .nav:hover{border-color:var(--gold);}
   .titel{flex:1;font-family:'Bodoni Moda',serif;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

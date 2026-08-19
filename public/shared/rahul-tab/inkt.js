@@ -30,13 +30,31 @@
   var tab = d.querySelector('.rtg-rahul-tab');
   if (!tab) return;
 
+  /* GEEN GROND IS GEEN ZWART, en dat is de reparatie van 19 augustus 2026.
+     Hieronder viel deze functie terug op de achtergrondkleur van body, en die
+     leest bij een verloop `rgba(0, 0, 0, 0)`. De regex hapte in die eerste drie
+     nullen en gaf ZWART terug -- terwijl de grond op dat moment het lichte
+     champagne-verloop was. De tab koos dus zijn lichte inkt op een lichte grond:
+     rgb(242,238,232) op rgb(251,248,243), 1,09:1, op achttien plekken. De
+     terugval "zonder grond: de huiskleur, donker" was op een donker huis altijd
+     waar en werd onwaar zodra er een licht thema bestond.
+     Nu geeft hij null als hij het niet weet, en beslist de aanroeper. */
   function grondVan(el) {
     for (var n = el; n && n !== d.documentElement; n = n.parentElement) {
       var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(getComputedStyle(n).backgroundColor || '');
       if (m && (m[4] === undefined || Number(m[4]) > 0.5)) return [+m[1], +m[2], +m[3]];
     }
-    var b = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(d.body).backgroundColor || '');
-    return b ? [+b[1], +b[2], +b[3]] : [12, 12, 11];   // zonder grond: de huiskleur, donker
+    return null;
+  }
+  /* DE INKT VAN DE BUREN VERRAADT DE GROND. Staat er geen ondubbelzinnig vlak in
+     de keten -- een verloop, een afbeelding, een doorzichtige stapel -- dan is de
+     kleur van de tekst ERNAAST wel bekend, en die is per definitie gekozen om op
+     die grond te lezen. Lichte buurtekst betekent donkere grond. Dat werkt ook
+     als de tab in een donker eiland op een lichte pagina hangt (de iOS-balk zet
+     daar zijn eigen inkt), want dit leest de inkt op de plek van de tab zelf. */
+  function inktVan(el) {
+    var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(el).color || '');
+    return m ? [+m[1], +m[2], +m[3]] : null;
   }
   function helderheid(rgb) {
     var k = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
@@ -71,12 +89,17 @@
     return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   }
 
-  var grond = grondVan(tab.parentElement || tab);
-  var opLicht = verhouding(rgbVan('#14110E'), grond);
-  var opDonker = verhouding(rgbVan('#FFFFFF'), grond);
-  var licht = opLicht > opDonker;                 // welke kant geeft meer contrast?
+  var ouder = tab.parentElement || tab;
+  var grond = grondVan(ouder);
+  var licht;                                      // IS DE GROND LICHT?
+  if (grond) {
+    licht = verhouding(rgbVan('#14110E'), grond) > verhouding(rgbVan('#FFFFFF'), grond);
+  } else {
+    var buur = inktVan(ouder);
+    licht = buur ? helderheid(buur) < 0.5 : false; // lichte buurtekst = donkere grond
+  }
   var woord = licht ? '#3A3733' : '#F2EEE8';
-  if (verhouding(rgbVan(woord), grond) < 4.5) woord = licht ? '#14110E' : '#FFFFFF';
+  if (grond && verhouding(rgbVan(woord), grond) < 4.5) woord = licht ? '#14110E' : '#FFFFFF';
   /* DE ZACHTERE ONDERREGEL IS VERVALLEN, en dat is een besluit met een reden.
      Hij stond op #5A5651 of #8A8680 en zakte op elke MIDDENTOON: 4,07:1 op de
      goudgetinte tab, 2,37 op een lichte pagina. Die toon veilig houden vraagt een

@@ -1,5 +1,5 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Alle drie staan op nul en zijn hard. SINDS 19 AUGUSTUS 2026 BETEKENT DIE NUL IETS ANDERS DAN DAARVOOR: de keuring gaf tot die dag op zodra er een verloop in de keten stond, en de themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's: 1884 tekstelementen gewogen, 3042 overgeslagen -- alle 3042 om die ene reden. De oude nul ging dus over 38% van de tekst. De keuring rekent verlopen, doorzichtige lagen en dekkende pseudo-lagen nu uit (gronden() in scripts/a11ykeuring.js) en weegt 83%; de 60 fouten die daarmee zichtbaar werden zijn gerepareerd. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
+  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8), en sinds 19 augustus 2026 een VIERDE over de drie andere thema's (champagne, bordeaux, royal), ingelogd. De eerste drie staan op nul en zijn hard; de vierde heeft per thema een bovengrens die alleen omlaag mag, en de reden daarvoor staat onderaan bij 'de vierde ronde'. SINDS 19 AUGUSTUS 2026 BETEKENT DIE NUL IETS ANDERS DAN DAARVOOR: de keuring gaf tot die dag op zodra er een verloop in de keten stond, en de themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's: 1884 tekstelementen gewogen, 3042 overgeslagen -- alle 3042 om die ene reden. De oude nul ging dus over 38% van de tekst. De keuring rekent verlopen, doorzichtige lagen en dekkende pseudo-lagen nu uit (gronden() in scripts/a11ykeuring.js) en weegt 83%; de 60 fouten die daarmee zichtbaar werden zijn gerepareerd. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
   "gemeten": "2026-08-19",
   "uitgelogd": {
     "structureel": 0,
@@ -52,7 +52,8 @@
   "harde poorten": [
     "structureel = 0 in BEIDE staten",
     "contrast = 0 in BEIDE staten",
-    "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd"
+    "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd",
+    "onzichtbare tekst = 0 in alle vier de thema's; het accent-als-kleine-tekst staat per thema op een bovengrens die alleen omlaag mag"
   ],
   "wat de vensterafsluiting kapotmaakte, en wat dat leerde": {
     "waarom dit hier staat": "De maatregel van 17 augustus -- een open venster sluit de rest van de pagina af met inert -- brak drie schermtoetsen. Ze stonden alle drie in de CI en niet in de a11y-poort, dus de poort bleef groen terwijl er iets stuk was. Dat hoort in dit register, want het zegt iets over de grens van deze poort: hij meet of een scherm TOEGANKELIJK is, niet of het nog WERKT.",
@@ -77,5 +78,29 @@
       "de KOMPAS-onderregel van de Rahul-tab: die had een eigen zachtere toon die op elke middentoon zakte. Vervallen -- zie de toelichting in shared/rahul-tab/inkt.js"
     ],
     "wat de poort nog steeds niet meet": "830 van de 4927 tekstelementen (17%): een `url()` als achtergrond -- daar valt zonder de pixels niets van te rekenen -- en een keten die tot de wortel doorzichtig blijft, waar het doek van de browser zelf de grond is. Allebei geven ze null, en dat is eerlijker dan gokken."
+  },
+  "themas": {
+    "champagne": 170,
+    "bordeaux": 158,
+    "royal": 158
+  },
+  "themamarge": 3,
+  "de vierde ronde: de drie andere thema's": {
+    "waarom hij er is": "De eerste drie ronden keuren EEN stand: onyx, want daar valt shared/rtg-themas.js op terug als een lid niets kiest. Wie champagne, bordeaux of royal koos, kreeg een huis dat nooit gemeten was. Een keer geteld op 19 augustus 2026: onder champagne -- het enige LICHTE thema -- 116 stukken tekst die onzichtbaar waren (uitgelogd, telefoonformaat), en ingelogd op bureaubladbreedte nog eens 55 die de eerste meting niet kon zien. Bordeaux en royal hadden er nul van; die zijn allebei donker, net als onyx, dus de fout leefde alleen in de stand die niemand mat.",
+    "de fout, in twee spiegelbeelden": "Een vlak dat zijn grond hard donker schildert en zijn inkt uit het thema haalt, of een vlak dat zijn inkt hard licht zet en zijn grond aan het thema geeft. Half meedoen, precies wat de opmerking bij data-rtg-eigenvlak in rtg-themas.css al beschreef -- alleen nu ook binnen een scherm en binnen een component.",
+    "wat er bij de bron is veranderd": [
+      "--rtg-card2 stond in de basis (#1B1817, bijna zwart) en in GEEN enkel themablok; op vijftien schermen is dat het vlak van de meldingsstrook, met tekst uit --rtg-txt. Onder champagne 1,01:1. Nu in alle vier de blokken, en test/thema.test.js laat zakken wie een token maar in een materiaal zet.",
+      "89 kopbalken schreven linear-gradient(180deg,var(--bg),rgba(12,12,11,.86)): de ene stop themaat mee, de andere niet. Vertaald naar color-mix(in srgb,var(--bg) 86%,transparent) -- hetzelfde, maar in welk materiaal de grond ook is. Op onyx komt er exact dezelfde kleur uit, nagerekend in een browser: rgb(12,12,11) op 86%, alleen geschreven als color(srgb ...). De toets vond er daarna nog twee die ik met de hand had gemist (genootschap, salon, een verloop van 0deg).",
+      "De iOS-balk en de Command-schillen (.hq-shell, .wk-shell) zijn DONKERE EILANDEN: ze schilderen hun grond hard en zetten hun eigen inkt, maar alles wat je erin zet haalde zijn inkt nog uit de huistokens. Ze herdefinieren die tokens nu binnen het eiland, zodat ook het volgende onderdeel dat er binnenkomt klopt.",
+      "veiligheid.css zette --txt en --bg hard terwijl de themalaag de GROND van die schermen wel verzette: ivoor op parelmoer, twaalf keer over vijf schermen. De tokens leunen nu op het thema en zetten alleen de terugval.",
+      "Veertien schermen verdragen geen thema -- een zoeker, een kaart, een speler, een cockpit -- en verklaren zich nu data-rtg-eigenvlak=\"onyx\". Dan draait hun HELE eiland terug naar de donkere set. De thema-keuze van het lid blijft overal elders staan.",
+      "De Rahul-tab las een volledig doorzichtige body als ZWART: grondVan() viel terug op de achtergrondkleur van body, en die is bij een verloop rgba(0, 0, 0, 0) -- de regex hapte in die nullen. De tab koos dus zijn lichte inkt op een lichte grond, 1,09:1, op achttien plekken. Hij geeft nu null als hij het niet weet, en leest dan de inkt van de buren: lichte buurtekst betekent donkere grond.",
+      "Vier plekken zetten wit of ivoor hard met de reden 'op deze bijna-zwarte grond leest het accent niet' (de partnermerker op mall, het stapnummer en de nummerbadge in de schoolschil, de stand 'normaal' op stad). Die reden klopte, alleen was 'bijna-zwart' als constante opgeschreven. Nu --rtg-txt: dezelfde bedoeling, in elk materiaal.",
+      "De foundation-knop zette voor drie leeftijdsgroepen alleen de INKT wit ('op bordeaux hoort witte tekst') terwijl body.rtg-stijl .knop de GROND overnam. De grond staat nu in dezelfde regel, zodat ze niet meer uit elkaar kunnen lopen.",
+      "De RTG-pas (geld/wallet.js) schildert zijn eigen donkere kaart en haalde zijn tekst uit --rtg-txt en --rtg-soft. De pas zet die tokens nu op de kaart zelf."
+    ],
+    "wat de grens is en wat hij niet is": "Onzichtbare tekst is nul en dat is hard: komt er ergens een terug, dan gaat het getal omhoog en zakt de scan. Wat de grens WEL toelaat is de soort die overblijft: het goud en de andere accenten als KLEINE tekst. Dat is een merkbesluit (MATERIAAL.md: goud is een vulkleur en geen tekstkleur) en geen instelfout, en het raakt de vormtaal. Die op dag een hard afkeuren zou betekenen: de poort staat rood tot iemand dat besluit heeft genomen, en dan wordt hij uitgezet.",
+    "waarom er marge op zit": "Twee volle metingen op DEZELFDE code gaven champagne 167 en 166, bordeaux 155 en 155, royal 153 en 155. De ingelogde staat is data-afhankelijk (zie 'bekende grens van deze meting' hierboven): een scherm kleurt een waarde alleen bordeaux als er op dat moment echt iets druk is. De grens staat daarom op het gemeten maximum plus drie. Dat is geen ruimte om in te bouwen: wie het getal ziet kruipen, hoort te kijken, ook als het onder de grens blijft. Wie het omlaag kan brengen, zet het omlaag. De marge staat als themamarge in dit bestand en niet in de code, zodat de tip 'de grens kan strakker' hem kent en niet bij elke ronde afgaat -- een tip die altijd afgaat, leert mensen hem negeren.",
+    "gemeten": "2026-08-19, 259 schermen per thema, ingelogd, 600ms na load"
   }
 }

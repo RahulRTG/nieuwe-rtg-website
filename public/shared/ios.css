@@ -83,6 +83,25 @@
   -webkit-backdrop-filter:saturate(180%) blur(20px);
   backdrop-filter:saturate(180%) blur(20px);
 }
+/* DE BALK IS EEN DONKER EILAND, dus hij zet de huistokens erbinnen opnieuw.
+   Hij is altijd donker -- 72% zwart over welke grond dan ook -- terwijl de
+   pagina dat niet is. Alles wat de balk in gaat en zijn inkt uit --txt of
+   --rtg-txt haalt (de titel, een knop van de pagina zelf, de klok op
+   scherm.html) kreeg daarmee onder champagne de PAGINA-inkt op BALK-grond:
+   rgb(26,23,19) op rgb(29,27,26), 1,1:1. Per element repareren zou het volgende
+   element dat hier binnenkomt weer laten vallen. Dezelfde scheiding als bij
+   --ios-label en --ios-groot, nu als token: de schil beslist in de balk.
+   De gedempte tonen staan hier hoger dan buiten de balk (0.86 en 0.74 in plaats
+   van 0.70 en 0.60), want op champagne composeert dit materiaal naar
+   middengrijs en niet naar zwart; nagerekend haalt 0.74 daar 5,4:1. */
+.ios-nav{
+  color:var(--ios-inkt);
+  --rtg-txt:var(--ios-inkt); --txt:var(--ios-inkt);
+  --rtg-muted:rgba(244,241,236,0.86); --muted:rgba(244,241,236,0.86);
+  --rtg-soft:rgba(244,241,236,0.74); --soft:rgba(244,241,236,0.74);
+  --rtg-line:var(--ios-lijn); --line:var(--ios-lijn);
+}
+
 /* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
    en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
    worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +

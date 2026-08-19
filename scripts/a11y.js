@@ -246,6 +246,67 @@ function startEchteServer() {
   await telefoon.close();
   console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
 
+  /* ===== VIERDE RONDE: DE DRIE ANDERE THEMA'S =======================
+     De drie ronden hierboven keuren EEN stand: onyx, want dat is waar
+     rtg-themas.js op terugvalt als er niets gekozen is. Een lid dat champagne,
+     bordeaux of royal kiest, kreeg dus een huis dat nooit gemeten was.
+
+     Wat dat kostte, is een keer geteld voordat deze ronde er stond: onder
+     champagne -- het enige LICHTE thema -- 116 stukken tekst die onzichtbaar
+     waren, niet slecht leesbaar maar onzichtbaar, tot 1,01:1. Bijna allemaal
+     dezelfde fout in twee spiegelbeelden: een vlak dat zijn grond hard donker
+     schildert en zijn inkt uit het thema haalt, of andersom. Bordeaux en royal
+     hadden daar nul van; die zijn allebei donker, net als onyx, dus de fout viel
+     er niet op. Precies daarom moet dit een RONDE zijn en geen steekproef: wat
+     je niet meet, gaat kapot in de stand die je niet gebruikt.
+
+     De ronde draait INGELOGD, want uitgelogd zie je op de meeste schermen alleen
+     de poort. Structuur telt hier niet apart mee -- die hangt niet van een thema
+     af en staat in de twee ronden hierboven al hard op nul; komt er hier toch
+     iets, dan is dat een echte vondst en valt de scan. */
+  const THEMAS = ['champagne', 'bordeaux', 'royal'];
+  const perThema = [];
+  console.log(`\n[a11y] ===== ronde THEMA'S (${THEMAS.length} x ${PAGINAS.length} schermen, ingelogd) =====`);
+  for (const thema of THEMAS) {
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    await ctx.addInitScript((o) => {
+      try {
+        localStorage.setItem('rtg_member_token', o.t);
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+        localStorage.setItem('rtg_thema_v2', o.thema);
+      } catch (e) {}
+    }, { t: lid.token, thema });
+    const pg = await ctx.newPage();
+    let struct = 0, contr = 0;
+    for (const pad of PAGINAS) {
+      await pg.goto(basis + pad, { waitUntil: 'load' });
+      await pg.waitForTimeout(600);
+      let res;
+      try { res = await pg.evaluate(KEUR); }
+      catch (e) {
+        console.error(`[a11y] ${pad} (${thema}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
+        struct += 1; continue;
+      }
+      if (res.overtredingen.length) {
+        struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
+        console.log(`\n[a11y] ${pad} (${thema}): ${res.overtredingen.length} soort(en) structurele overtreding`);
+        for (const v of res.overtredingen) console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+      }
+      if (res.contrast.length) {
+        contr += res.contrast.reduce((n, v) => n + v.aantal, 0);
+        console.log(`\n[a11y] ${pad} (${thema}):`);
+        for (const v of res.contrast) {
+          console.log(`  · contrast: ${v.help} (${v.aantal}x)`);
+          for (const w of (v.waar || [])) console.log(`      ${w}`);
+        }
+      }
+    }
+    await ctx.close();
+    totaal += struct;
+    perThema.push({ thema, struct, contr });
+    console.log(`[a11y] thema ${thema}: ${struct} structureel, ${contr} contrast`);
+  }
+
   await browser.close();
   server.stop();
 
@@ -279,6 +340,25 @@ function startEchteServer() {
      zonder browser laten zakken. */
   const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
   if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
+  /* DE THEMA'S HEBBEN EEN BOVENGRENS EN GEEN NUL, en dat is geen zwakkere poort
+     maar een eerlijkere. De onzichtbare tekst is weg en staat hard op nul; wat
+     er onder de thema's overblijft is EEN soort: het goud en de andere accenten
+     als KLEINE tekst. Dat is een merkbesluit (MATERIAAL.md: goud is een
+     vulkleur en geen tekstkleur) en geen instelfout, en het raakt de vormtaal.
+     Die op dag een hard afkeuren zou betekenen: de poort staat rood tot iemand
+     dat besluit heeft genomen, en dan wordt hij uitgezet.
+
+     Dus staat er per thema een getal dat alleen OMLAAG mag. Komt er ergens een
+     bevinding bij -- ook een onzichtbare -- dan gaat het getal omhoog en zakt de
+     scan. Een thema zonder getal in het register is een fout en geen vrijstelling. */
+  for (const t of perThema) {
+    const bg = (grens.themas || {})[t.thema];
+    if (bg === undefined) {
+      fouten.push(`thema ${t.thema} staat niet in A11Y-INGELOGD.json -- een ronde zonder grens keurt niets`);
+      continue;
+    }
+    if (t.contr > bg) fouten.push(`${t.contr} contrastfouten op thema ${t.thema}, de grens is ${bg} -- er is er een BIJGEKOMEN`);
+  }
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
     for (const f of fouten) console.error('  · ' + f);
@@ -287,6 +367,15 @@ function startEchteServer() {
   if (raakOordeel.melding) console.log(raakOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
+  /* De tip "kan strakker" houdt rekening met de wiebel die in het register staat.
+     Zonder dat vuurt hij bij ELKE ronde, want de grens staat bewust een paar
+     boven de meting -- en een tip die altijd afgaat, leert mensen hem negeren. */
+  const marge = grens.themamarge || 0;
+  for (const t of perThema) {
+    const bg = (grens.themas || {})[t.thema];
+    if (bg !== undefined && t.contr + marge < bg)
+      console.log(`[a11y] De grens kan strakker: thema ${t.thema} ${t.contr} tegen ${bg} in A11Y-INGELOGD.json (wiebelmarge ${marge}).`);
+  }
   /* De slotregel noemde het contrast uitgelogd altijd "nul", omdat het dat een
      tijd lang was. Toen de meting op 19 augustus 2026 verlopen leerde lezen was
      het dat niet meer, en stond er een getal boven deze regel dat hem tegensprak.
@@ -295,5 +384,6 @@ function startEchteServer() {
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
     `contrast uitgelogd ${uitgelogd.contr} (grens ${grens.uitgelogd.contrast}), ` +
     `ingelogd ${ingelogd.contr} (grens ${grens.ingelogd.contrast}). ` +
-    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
+    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}. ` +
+    `Thema's: ` + perThema.map(t => `${t.thema} ${t.contr} (grens ${(grens.themas || {})[t.thema]})`).join(', ') + '.');
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

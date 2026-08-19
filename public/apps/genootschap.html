@@ -18,7 +18,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.35rem;}
   input,textarea,select,button{font:inherit;}
@@ -61,7 +61,7 @@
   .staaf i{display:block;height:100%;background:var(--burgundy);}
   .leeg{color:var(--soft);font-size:.85rem;padding:.6rem 0;}
   .uit{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
-  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 70%,transparent));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
   .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">

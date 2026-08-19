@@ -22,6 +22,7 @@ op telefoonformaat (390x844).
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| de drie andere thema's | **0** onzichtbare tekst; het accent-als-kleine-tekst staat op een bovengrens | een lid dat champagne kiest en zijn scherm leeg ziet |
 
 **DE NUL BIJ CONTRAST WAS NOOIT WAAR, EN DAT IS OP 19 AUGUSTUS 2026 GEBLEKEN.**
 De keuring gaf op zodra er ergens in de keten een verloop stond -- en de themalaag
@@ -40,10 +41,33 @@ plekken in gedeelde bladen en zes op een scherm. De nul staat er dus weer, en hi
 betekent nu iets anders dan de vorige: hij gaat over 83% van de tekst in plaats
 van 38%. Wat er nog buiten valt staat met naam in `A11Y-INGELOGD.json`.
 
-Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
+**EN DE POORT KEURDE MAAR EEN STAND, NAMELIJK ONYX.** Dat is waar de themalaag
+op terugvalt als een lid niets kiest, dus alle drie de ronden hierboven meten die
+ene. Wie champagne, bordeaux of royal koos, kreeg een huis dat nooit gemeten was.
+Op 19 augustus 2026 is dat een keer geteld: onder **champagne** -- het enige
+LICHTE thema -- stonden **116 stukken tekst die onzichtbaar waren**, niet slecht
+leesbaar maar onzichtbaar, tot 1,01:1. Bordeaux en royal hadden daar nul van; die
+zijn allebei donker, net als onyx, dus de fout leefde alleen in de stand die
+niemand mat. Ingelogd en op bureaubladbreedte kwamen er daarna nog 55 bij die de
+uitgelogde meting niet kon zien.
+
+Het was bijna allemaal EEN fout in twee spiegelbeelden: een vlak dat zijn grond
+hard donker schildert en zijn inkt uit het thema haalt, of andersom. Gerepareerd
+bij de bron -- `--rtg-card2` ontbrak in alle vier de themablokken, 89 kopbalken
+mengden een thema-stop met een harde bijna-zwarte stop, de iOS-balk en de
+Command-schillen zetten hun tokens niet als donker eiland, en veertien schermen
+die geen thema verdragen (een zoeker, een kaart, een speler, een cockpit)
+verklaren zich nu `data-rtg-eigenvlak="onyx"`. **Alle 171 zijn weg**; wat overblijft is het
+goud en de andere accenten als kleine tekst, en dat is een merkbesluit
+(MATERIAAL.md) en geen instelfout. Dat staat per thema als bovengrens in
+`A11Y-INGELOGD.json` en mag alleen omlaag.
+
+Die zes zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het
 raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd; wie iets
-vindt, meet nog een keer). `check.js` regel 49 doet het ondertitelregister.
+vindt, meet nog een keer), en de drie andere thema's in een vierde ronde,
+ingelogd. `check.js` regel 49 doet het ondertitelregister, en
+`test/thema.test.js` vangt de oorzaak zonder browser.
 
 ## De instellingen die een lid zelf zet
 

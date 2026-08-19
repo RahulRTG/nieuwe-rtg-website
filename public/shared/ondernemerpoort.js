@@ -75,7 +75,7 @@
     var ronden = (d.rondleidingen || []).map(function (r) {
       return '<div class="p-rond"><h3>' + esc(r.naam) + (r.klaar ? ' ✓' : '') + '</h3>' +
         '<ol>' + (r.stappen || []).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' +
-        (r.klaar ? '' : '<div class="poort-knoprij" style="margin-top:.7rem"><button class="p-online" data-rond="' + esc(r.id) + '">Gevolgd, vink af</button></div>') +
+        (r.klaar ? '' : '<div class="poort-knoprij h-mt70"><button class="p-online" data-rond="' + esc(r.id) + '">Gevolgd, vink af</button></div>') +
         '</div>';
     }).join('');
     kaart.innerHTML =

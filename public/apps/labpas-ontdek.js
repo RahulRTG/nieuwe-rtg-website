@@ -104,11 +104,11 @@
             Math.max(2, Math.min(100, Math.round((p.punten / p.volgende.vanaf) * 100))) + '%"></i></div>'
           : '') +
         (p.badges.length
-          ? '<div style="margin-top:.5rem;">' + p.badges.map(function (b) {
+          ? '<div class="h-mt50">' + p.badges.map(function (b) {
               return '<span class="badge" title="' + esc(b.uitleg) + '">' + esc(b.naam) + '</span>';
             }).join('') + '</div>'
           : '<div class="leeg">Nog geen badges.</div>') +
-        '<div class="sec" style="margin-top:.9rem;">Missies</div>' +
+        '<div class="sec h-mt90">Missies</div>' +
         (r.missies || []).map(function (m) {
           return '<div class="log"><b>' + esc(m.naam) + '</b><br>' + esc(m.uitleg) + '</div>';
         }).join('');

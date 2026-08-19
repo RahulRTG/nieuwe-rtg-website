@@ -56,7 +56,7 @@
         var st = x.status === 'ja' ? 'komt' : x.status === 'nee' ? 'komt niet' : 'nog geen antwoord';
         return '<div class="deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
           (x.status === 'ja' ? ' ja' : '') + '">' + st + '</span></div>';
-      }).join('') : '<p class="stil" style="margin-top:.4rem;">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
+      }).join('') : '<p class="stil h-mt40">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
     }
 
     $('#afDicht').addEventListener('click', dicht);

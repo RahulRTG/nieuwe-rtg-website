@@ -1,3 +1,4 @@
+/* een bestelkaart opbouwen */
     const E = Util.el;
     return E('div', { class: 'order', dataset: { ref: o.ref } },
       E('div', { class: 'top' },

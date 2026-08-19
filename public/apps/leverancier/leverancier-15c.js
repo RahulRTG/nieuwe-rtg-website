@@ -1,3 +1,4 @@
+/* het thuiskantoor: de zaak als host op RTG Thuis */
     if (kantoorSec === 'thuis'){
       // het THUIS-KANTOOR: de zaak als host op RTG Thuis (verhuur onder de
       // zaaknaam) -- dashboard, aanvragen, aanbod, prijsadvies en blokkades

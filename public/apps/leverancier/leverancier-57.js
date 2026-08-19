@@ -1,3 +1,4 @@
+/* de incidenten op het beveiligingsbord */
     if (cmd.incidenten && cmd.incidenten.length){
       h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
         cmd.incidenten.map(x => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+

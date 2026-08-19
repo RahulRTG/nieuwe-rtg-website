@@ -1,3 +1,4 @@
+/* een reactie toevoegen aan een kaartrij */
     el.querySelectorAll('[data-kradd]').forEach(b => b.addEventListener('click', async () => {
       const id = b.dataset.kradd;
       const text = el.querySelector('#krX'+id).value.trim();

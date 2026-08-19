@@ -22,7 +22,7 @@
         return '<div class="log" data-uit="' + esc(x.id) + '"><b>' + esc(x.titel) + '</b> &middot; ' + esc(x.uitgang) +
           ' &middot; <span class="pil' + (x.status === 'uitgevoerd' ? ' ok' : '') + '">' + esc(x.status) + '</span>' +
           (x.koppeling ? ' &middot; staat in het Onderzoekslab' : '') +
-          '<div class="rij" style="margin-top:.3rem;">' +
+          '<div class="rij h-mt30">' +
             '<select class="veld" data-ustatus aria-label="Status" style="font-size:.78rem;">' +
               KADER.uitgangstatus.map(function (st) { return '<option value="' + esc(st) + '">' + esc(st) + '</option>'; }).join('') +
             '</select>' +
@@ -34,7 +34,7 @@
       }).join('') : '<div class="leeg">Nog niets doorgezet. Een resultaat kan een pilot, werkorder, subsidieaanvraag, ' +
         'beleidsvoorstel, startupconcept, onderwijsproject of nieuw onderzoek worden.</div>') +
       (cs.length
-        ? '<div class="rij" style="margin-top:.5rem;">' +
+        ? '<div class="rij h-mt50">' +
             '<select class="veld" data-unieuw aria-label="Uitgang">' +
               KADER.uitgangen.map(function (u) {
                 var eis = KADER.uitgangeis[u.uitgang];
@@ -44,16 +44,16 @@
             '<select class="veld" data-uconc aria-label="Uit welke conclusie">' +
               cs.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.tekst).slice(0, 50) + ' [' + esc(c.graad) + ']</option>'; }).join('') +
             '</select></div>' +
-          '<input class="veld" data-utitel placeholder="Titel van het voorstel" maxlength="150" style="margin-top:.35rem;">' +
-          '<input class="veld" data-uoms placeholder="Waar gaat het om?" maxlength="600" style="margin-top:.35rem;">' +
-          '<button class="knop" data-umaak type="button" style="margin-top:.35rem;">Zet dit door</button>'
+          '<input class="veld h-mt35" data-utitel placeholder="Titel van het voorstel" maxlength="150">' +
+          '<input class="veld h-mt35" data-uoms placeholder="Waar gaat het om?" maxlength="600">' +
+          '<button class="knop h-mt35" data-umaak type="button">Zet dit door</button>'
         : '<div class="leeg">Er is nog geen conclusie om iets uit voort te laten komen.</div>') +
-      '<div class="sec" style="margin-top:.9rem;">Vervolgonderzoek</div>' +
+      '<div class="sec h-mt90">Vervolgonderzoek</div>' +
       '<div class="leeg">De keten van onderzoek naar onderzoek is wat een Living Lab onderscheidt van ' +
         'een reeks losse projecten: op het nieuwe dossier blijft staan waar de vraag vandaan kwam.</div>' +
       '<div class="rij"><input class="veld" data-vvtitel placeholder="Titel van het vervolgonderzoek" maxlength="120">' +
         '<button class="knop stil" data-vvmaak type="button">Start vervolg</button></div>' +
-      '<input class="veld" data-vvvraag placeholder="Het nieuwe vraagstuk" maxlength="600" style="margin-top:.35rem;">' +
+      '<input class="veld h-mt35" data-vvvraag placeholder="Het nieuwe vraagstuk" maxlength="600">' +
       '</div>';
   }
 

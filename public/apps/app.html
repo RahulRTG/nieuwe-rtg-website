@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="78494809">
+<meta name="rtg-bouw" content="4416650d">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1857,7 +1857,7 @@
         <div id="paspoortInbox"></div>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="tripList"></div>
-        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.</p>
+        <p class="sub h-mt100" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.</p>
         <div id="showroom"></div>
       </div>
 
@@ -2113,7 +2113,7 @@
       <button class="ms-close" id="cvClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="ms-body" id="cvBody">
-      <div class="field" style="margin-top:0.6rem;"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
+      <div class="field h-mt60"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
       <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
       <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
       <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
@@ -2189,21 +2189,21 @@
     <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
       <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.pax">Personen</span>
-          <select id="ridePax" class="ms-note" style="margin-top:0.3rem;"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
+          <select id="ridePax" class="ms-note h-mt30"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.bag">Koffers</span>
-          <select id="rideBag" class="ms-note" style="margin-top:0.3rem;"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
+          <select id="rideBag" class="ms-note h-mt30"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
         </label>
       </div>
       <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.plan">Wanneer</span>
-          <select id="ridePlan" class="ms-note" style="margin-top:0.3rem;"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
+          <select id="ridePlan" class="ms-note h-mt30"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.datum">Datum</span>
-          <input id="rideDatum" type="date" class="ms-note" style="margin-top:0.3rem;">
+          <input id="rideDatum" type="date" class="ms-note h-mt30">
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.tijd">Tijd</span>
-          <input id="rideTijd" type="time" class="ms-note" style="margin-top:0.3rem;">
+          <input id="rideTijd" type="time" class="ms-note h-mt30">
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">

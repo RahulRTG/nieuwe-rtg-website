@@ -200,7 +200,7 @@ function ensureChatEl(){
   ov = document.createElement('div'); ov.id='rtfchat';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;';
   ov.innerHTML='<div style="background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px 16px 0 0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column;">'+
-    '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn);"><b id="rcWie" style="flex:1;"></b><button id="rcX" style="background:none;border:none;color:var(--zacht);font-size:1.3rem;">✕</button></div>'+
+    '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn);"><b class="h-flex1" id="rcWie"></b><button id="rcX" style="background:none;border:none;color:var(--zacht);font-size:1.3rem;">✕</button></div>'+
     '<div id="rcMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
     '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn);"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" style="flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .85rem;color:var(--txt);"><button class="knop" id="rcSend" style="width:auto;">Stuur</button></div>'+
     '</div>';
@@ -283,7 +283,7 @@ Sessie.ophalen().then(d=>{
       (vanaf!=null && vanaf < 16
         ? 'Jij hoort bij de groep ' + esc(p.groepNaam||'') + '. Op de startpagina vind je juist leuke dingen die bij jou passen: leren, dromen en samen groeien. Later, vanaf 16, staan hier echte vacatures voor je klaar.'
         : 'Vraag de beheerder om je leeftijdsgroep in te stellen (Gezin beheren), dan verschijnen hier de vacatures.') +
-      '<div style="margin-top:.8rem;"><a class="knop grijs klein" href="index.html">← Terug naar start</a></div>';
+      '<div class="h-mt80"><a class="knop grijs klein" href="index.html">← Terug naar start</a></div>';
     return;
   }
   $('#werkkant').hidden = false;

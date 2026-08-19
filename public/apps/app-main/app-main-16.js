@@ -1,3 +1,4 @@
+/* het voertuigkanaal: partners en hun auto's */
     for (const p of vhPartners){
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.autos){
@@ -12,9 +13,9 @@
           html += '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+
             '<div class="bz-veld" style="flex:1;margin-top:0;"><label>'+T('vh.van','Ophalen')+'</label><input type="date" id="vhVan" value="'+vhKeuze.van+'"></div>'+
             '<div class="bz-veld" style="flex:1;margin-top:0;"><label>'+T('vh.tot','Inleveren')+'</label><input type="date" id="vhTot" value="'+vhKeuze.tot+'"></div></div>'+
-            '<button class="bz-groot" id="vhBoek" style="margin-top:0.7rem;">'+T('vh.boek','Boek en betaal, vaste prijs')+'</button>';
+            '<button class="bz-groot h-mt70" id="vhBoek">'+T('vh.boek','Boek en betaal, vaste prijs')+'</button>';
         } else {
-          html += '<button class="bz-btn" data-vhopen="'+p.code+':'+a.id+'" style="margin-top:0.45rem;">'+T('vh.kies','Kies periode')+'</button>';
+          html += '<button class="bz-btn h-mt45" data-vhopen="'+p.code+':'+a.id+'">'+T('vh.kies','Kies periode')+'</button>';
         }
         html += '</div>';
       }

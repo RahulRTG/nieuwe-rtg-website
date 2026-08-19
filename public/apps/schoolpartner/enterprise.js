@@ -12,7 +12,7 @@
 
   function kaart(kop, binnen, voet) {
     return '<div class="kaart"><div class="kop">' + kop + '</div>' + binnen +
-      (voet ? '<p class="stil" style="margin-top:.5rem;">' + voet + '</p>' : '') + '</div>';
+      (voet ? '<p class="stil h-mt50">' + voet + '</p>' : '') + '</div>';
   }
   function rij(links, rechts) {
     return '<div class="item"><span>' + links + '</span><span class="stil">' + rechts + '</span></div>';
@@ -44,7 +44,7 @@
       h += kaart('Leerlingen',
         rij('Ingeschreven', t.ingeschreven || 0) + rij('Aanmeldingen', t.aanmelding || 0) +
         rij('Wachtlijst', t.wachtlijst || 0) + rij('Uitgeschreven', t.uitgeschreven || 0) +
-        '<div class="rij" style="margin-top:.6rem;">' +
+        '<div class="rij h-mt60">' +
         '<input class="veld" id="enNaam" maxlength="60" placeholder="Naam van de leerling" aria-label="Naam van de leerling">' +
         '<select class="veld" id="enKlas" aria-label="Klas" style="flex:0 1 9rem;"><option value="">Zonder klas</option>' +
         (org.klassen || []).map(function (k) { return '<option value="' + esc(k.code) + '">' + esc(k.naam) + '</option>'; }).join('') +
@@ -90,7 +90,7 @@
         '<input class="veld" id="enNood" maxlength="400" placeholder="Wat is er aan de hand en wat moet men doen?" aria-label="Noodmelding">' +
         '<button class="knop p" id="enNoodGa" type="button">Meld calamiteit</button>' +
         '<button class="knop" id="enNoodAf" type="button">Alarm afmelden</button></div>' +
-        '<div id="enOntruimUit" class="stil" style="margin-top:.5rem;"></div>',
+        '<div id="enOntruimUit" class="stil h-mt50"></div>',
         'De melding landt in elke klas en dus bij elk gezin. Van de passen wordt alleen de huidige stand bewaard, geen looproute.');
 
       wortel.innerHTML = h;

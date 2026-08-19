@@ -1,4 +1,4 @@
-    /* dock */
+/* het dock onderin het werk-OS */
     const dock = document.createElement('nav');
     dock.className = 'wos-dock';
     dock.setAttribute('aria-label', 'Dock');

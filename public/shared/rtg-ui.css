@@ -16,6 +16,11 @@
 @import url('/shared/rtg-ontwerp.css');
 @import url('/shared/rtg-materiaal.css');
 @import url('/shared/rtg-themas.css');
+/* De hulpklassen lagen op EEN van de 259 pagina's (apps/leverancier.html) en
+   waren daarmee onbruikbaar om style="..."-attributen mee op te ruimen: een
+   omzetting elders zou de marge weghalen en er niets voor terugzetten. Via
+   deze import liggen ze op de 231 pagina's die rtg-ui.css laden. */
+@import url('/shared/rtg-hulpklassen.css');
 
 /* ====================== DE RTG UI-KIT ======================================
 

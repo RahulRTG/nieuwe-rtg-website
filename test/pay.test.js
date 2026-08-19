@@ -241,3 +241,58 @@ test('het saldo van de zaak uitbetalen is van de manager, innen en kijken van ie
   assert.equal(uit.status, 403, 'een medewerker zonder managerrechten betaalt niets uit');
   assert.match(uit.body.error, /manager/i);
 });
+
+/* DE HERHALING OP DE ROUTES DIE GELD VERPLAATSEN.
+
+   Elke geldbeweging in server/kern/pay/ loopt door metIdem() -- stuur, huisIn,
+   huisUit, het Klompje, de kassa, de uitbetaling en het opladen. Wat er niet was,
+   is een toets die dat voor STUREN en TIKKEN natrekt. `npm run idemproef` kon het
+   ook niet zeggen: van de 85 geldroutes staan er 79 op "ongemeten", omdat de
+   proef zelf geen geldige codenaam of kascode kan verzinnen en dus een 404 vangt.
+   Een route die alleen maar niet weerlegd is, is niet bewezen.
+
+   Dat is geen theoretische zorg. Een telefoon op een slechte verbinding stuurt
+   een POST twee keer -- de gebruiker ziet geen antwoord en tikt nog eens -- en
+   dan hangt het aan deze sleutel of er een of twee keer geld weggaat. */
+test('sturen met dezelfde sleutel boekt EEN keer, ook al vraag je het twee keer', async () => {
+  const voorA = (await api('pay/overzicht', {}, lidA.token)).body.saldo;
+  const voorB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  await api('pay/oplaad', { centen: 3000, idem: 'oplaad-voor-herhaling' }, lidA.token);
+
+  const sleutel = 'stuur-dubbel-1';
+  const een = await api('pay/stuur', { aan: lidB.codenaam, centen: 700, oms: 'Koffie', idem: sleutel }, lidA.token);
+  assert.equal(een.status, 200, 'de eerste gaat door: ' + JSON.stringify(een.body).slice(0, 120));
+  const twee = await api('pay/stuur', { aan: lidB.codenaam, centen: 700, oms: 'Koffie', idem: sleutel }, lidA.token);
+  assert.equal(twee.status, 200, 'de herhaling is geen fout maar hetzelfde antwoord');
+
+  const naA = (await api('pay/overzicht', {}, lidA.token)).body.saldo;
+  const naB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  assert.equal(naA, voorA + 3000 - 700, 'A is EEN keer 7 euro kwijt, niet twee keer');
+  assert.equal(naB, voorB + 700, 'en B kreeg er EEN keer 7 euro bij');
+});
+
+test('een VERSE sleutel is een tweede opdracht, en die hoort wel te boeken', async () => {
+  /* De tegenproef bij de toets hierboven: zonder deze zou een stuur() die
+     alles weigert ook slagen. Het verschil tussen "hij herkent de herhaling" en
+     "hij doet niets meer" is precies wat hier gemeten wordt. */
+  const voorB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+  const r = await api('pay/stuur', { aan: lidB.codenaam, centen: 300, oms: 'Nog een rondje', idem: 'stuur-vers-2' }, lidA.token);
+  assert.equal(r.status, 200);
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voorB + 300,
+    'een andere sleutel is een andere opdracht en boekt gewoon');
+});
+
+test('en de tik gaat langs dezelfde sleutel: twee keer aanraken kost een keer geld', async () => {
+  const code = await api('pay/tikcode', {}, lidB.token);
+  assert.equal(code.status, 200, 'B toont een tikcode');
+  const voorA = (await api('pay/overzicht', {}, lidA.token)).body.saldo;
+  const voorB = (await api('pay/overzicht', {}, lidB.token)).body.saldo;
+
+  const sleutel = 'tik-dubbel-1';
+  const een = await api('pay/tik', { code: code.body.code, centen: 450, oms: 'Tik', idem: sleutel }, lidA.token);
+  assert.equal(een.status, 200, 'de tik gaat door: ' + JSON.stringify(een.body).slice(0, 120));
+  await api('pay/tik', { code: code.body.code, centen: 450, oms: 'Tik', idem: sleutel }, lidA.token);
+
+  assert.equal((await api('pay/overzicht', {}, lidA.token)).body.saldo, voorA - 450, 'A betaalde EEN keer');
+  assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voorB + 450, 'B ontving EEN keer');
+});

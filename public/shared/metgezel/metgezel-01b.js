@@ -1,3 +1,4 @@
+/* de stijl en de bouwstenen van de metgezel */
     '.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };

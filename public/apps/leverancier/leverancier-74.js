@@ -1,3 +1,4 @@
+/* een gastlocatie stoppen */
     el.querySelectorAll('[data-glstop]').forEach(b => b.addEventListener('click', async () => {
       try {
         const r = await API.call('/supplier/gastlocatie/stop', { id: b.dataset.glstop });

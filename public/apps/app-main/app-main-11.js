@@ -1,3 +1,4 @@
+/* het videogesprek: aanbod, antwoord en de verbinding */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();
@@ -69,7 +70,7 @@
     $('#kletsBody').innerHTML =
       '<p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;">' + escT(d.uitleg || '') + '</p>' +
       '<label style="display:flex;gap:.6rem;align-items:flex-start;margin:.9rem 0;font-size:.85rem;">' +
-        '<input type="checkbox" id="kletsSchakel"' + (kletsAan ? ' checked' : '') + ' style="margin-top:.2rem;">' +
+        '<input class="h-mt20" type="checkbox" id="kletsSchakel"' + (kletsAan ? ' checked' : '') + '>' +
         '<span>Rahul mag met de Rahul van mijn vrienden kletsen over hoe mijn dag was.' +
         '<br><span style="color:var(--soft);font-size:.78rem;">Uit te zetten wanneer je wilt. Zolang het uit staat, gebeurt er niets.</span></span>' +
       '</label>' +
@@ -100,7 +101,7 @@
         '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
       '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
       (g.echt ? '' : ' Dit is een demogesprek: er staat geen AI-sleutel ingesteld.') + '</p>' +
-      '<button class="knop" id="kletsTerug" style="margin-top:.7rem;">Terug</button>';
+      '<button class="knop h-mt70" id="kletsTerug">Terug</button>';
     const t = $('#kletsTerug');
     if (t) t.addEventListener('click', async () => kletsTekenLeeg(await kletsLaad()));
   }

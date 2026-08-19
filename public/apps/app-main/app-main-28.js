@@ -1,3 +1,4 @@
+/* het springboard verslepen, met vinger en met muis */
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
       // waar de vinger begon: movementX/Y is bij touch in Safari altijd 0, dus

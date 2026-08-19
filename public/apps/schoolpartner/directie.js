@@ -32,7 +32,7 @@
           k.roosterRegels + ' roosterregels · ' + k.huiswerkWeek + ' opdrachten deze week · ' +
           k.openAbsenties + ' open ziekmelding(en)</span></div>';
       }).join('') || '<p class="stil">Nog geen klassen.</p>') +
-      '<p class="stil" style="margin-top:.5rem;">Alles op klasniveau; wie wat doet is aan de leraar en het gezin.</p></div>';
+      '<p class="stil h-mt50">Alles op klasniveau; wie wat doet is aan de leraar en het gezin.</p></div>';
     h += '<div class="kaart"><div class="kop">Schoolbrede mededeling</div>' +
       '<p class="stil">Een keer schrijven, elke klas (en dus elk gezin) ziet hem, met de directie als afzender.</p>' +
       '<div class="rij"><input class="veld" id="dpTekst" maxlength="400" placeholder="Bijv. vrijdag studiedag: de school is dicht" aria-label="Mededeling" style="flex:3;">' +
@@ -40,7 +40,7 @@
       ((d.mededelingen || []).map(function (m) {
         return '<p class="stil" style="margin:.35rem 0 0;">' + esc((m.at || '').slice(0, 10)) + ' · ' + esc(m.tekst) + '</p>';
       }).join('')) + '</div>';
-    h += '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="dpRapport" type="button">Schoolrapport (print)</button></div>';
+    h += '<div class="rij h-mt60"><button class="knop" id="dpRapport" type="button">Schoolrapport (print)</button></div>';
     w.innerHTML = h;
   }
 

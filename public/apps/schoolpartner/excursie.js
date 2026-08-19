@@ -76,7 +76,7 @@
       if (doe === 'stop') kl('/school/excursie/stop', { excursieId: id }).then(function (r) { meld(r.body.error || 'Gestopt; alle locaties zijn gewist.'); $('#exUit').innerHTML = ''; P.excursie(); });
       if (doe === 'kaart') kl('/school/excursie/kaart', { excursieId: id }).then(function (r) {
         if (r.body.error) return meld(r.body.error);
-        $('#exUit').innerHTML = '<div class="kop" style="margin-top:.6rem;">' + esc(r.body.titel) + ' · nu</div>' + plekkenHTML(esc, r.body) +
+        $('#exUit').innerHTML = '<div class="kop h-mt60">' + esc(r.body.titel) + ' · nu</div>' + plekkenHTML(esc, r.body) +
           '<p class="stil">Deze blik is gelogd en zichtbaar voor de gezinnen.</p>';
       });
       if (doe === 'plek') {

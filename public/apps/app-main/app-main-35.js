@@ -1,3 +1,4 @@
+/* betalen met Face ID vanuit een rekeningregel */
     document.querySelectorAll('.js-rpay').forEach(b => b.addEventListener('click', () => {
       const bedrag = eur(Number(b.dataset.rq));
       payWithFaceId(bedrag, async () => {

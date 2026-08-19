@@ -19,6 +19,13 @@ const maakGesprek = require('./imap');
 const CRLF = '\r\n';
 
 module.exports = (opties) => {
+  /* Poort, host en tlsOpties UIT DE OPTIES halen, zoals ./smtp-in-server.js dat
+     ook doet. Die regel ontbrak hier: start() gebruikte de drie namen wel maar
+     bond ze nergens, dus elke poging om IMAP aan te zetten liep op een
+     ReferenceError -- keurig weggevangen door de try/catch van de aanroeper, die
+     er "[imap] niet gestart" van maakte. Een deur die nooit opengaat en dat
+     meldt als een detail. */
+  const { poort, host, tlsOpties } = opties || {};
   const gesprek = maakGesprek(opties);
 
   /* De server. `tlsOpties` met een sleutel en certificaat maakt er IMAPS van;

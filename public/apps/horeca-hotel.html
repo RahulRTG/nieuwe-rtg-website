@@ -19,7 +19,7 @@
 <header>
   <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
   <span><span class="ey">RTG Horeca</span><h1>Gastrekening en roomservice</h1></span>
-  <span style="flex:1;"></span>
+  <span class="h-flex1"></span>
 </header>
 <main id="main">
   <div class="kpis">
@@ -45,19 +45,19 @@
       <button class="knop p" id="hOpen" type="button">Openen</button>
       <button class="knop" id="hToon" type="button">Toon</button>
     </div>
-    <p class="stil" style="margin-top:.4rem;">De toeristenbelasting is een eigen regel en zit niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.</p>
+    <p class="stil h-mt40">De toeristenbelasting is een eigen regel en zit niet in de kamerprijs: een gast hoort te zien wat hij aan wie betaalt.</p>
   </div>
 
   <div class="kaart">
     <div class="kop">De rekening</div>
     <div id="hDetail"><p class="stil">Kies een kamer.</p></div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij h-mt60">
       <select class="veld" id="hSoort" aria-label="Soort boeking" style="flex:0 1 10rem;"></select>
       <input class="veld" id="hOmschrijving" maxlength="100" placeholder="Omschrijving" aria-label="Omschrijving">
       <input class="veld" id="hBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag" style="flex:0 1 8rem;">
       <button class="knop p" id="hBoek" type="button">Op de rekening</button>
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij h-mt60">
       <select class="veld" id="hWijze" aria-label="Betaalwijze" style="flex:0 1 8rem;">
         <option value="pin">Pin</option><option value="contant">Contant</option>
         <option value="online">Online</option><option value="rekening">Op rekening</option>
@@ -72,7 +72,7 @@
       <input class="veld" id="hNachtDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de nachtrun" style="flex:0 1 11rem;">
       <button class="knop p" id="hNacht" type="button">Draaien</button>
     </div>
-    <p class="stil" id="hNachtUit" style="margin-top:.4rem;"></p>
+    <p class="stil h-mt40" id="hNachtUit"></p>
     <p class="stil">De nachtrun is idempotent op de datum: twee keer draaien boekt niet twee nachten.</p>
   </div>
 
@@ -85,7 +85,7 @@
       <input class="veld" id="hBorgReden" maxlength="160" placeholder="Reden van inhouding" aria-label="Reden van inhouding">
       <button class="knop" id="hBorgTerug" type="button">Afhandelen</button>
     </div>
-    <p class="stil" id="hBorgUit" style="margin-top:.4rem;"></p>
+    <p class="stil h-mt40" id="hBorgUit"></p>
     <p class="stil">Dit is een aantekening van de afspraak. Er wordt niets vastgezet bij de bank van de gast; dat kan alleen een betaaldienst.</p>
   </div>
 
@@ -96,21 +96,21 @@
       <input class="veld" id="sGasten" type="number" min="1" max="20" value="1" aria-label="Aantal personen" style="flex:0 1 5rem;">
       <button class="knop p" id="sOpen" type="button">Bestelling openen</button>
     </div>
-    <div id="sLijst" style="margin-top:.6rem;"></div>
-    <div id="sDetail" style="margin-top:.4rem;"></div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="h-mt60" id="sLijst"></div>
+    <div class="h-mt40" id="sDetail"></div>
+    <div class="rij h-mt60">
       <input class="veld" id="sNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Gerecht">
       <input class="veld" id="sPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
       <input class="veld" id="sAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
       <input class="veld" id="sAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
       <button class="knop p" id="sRegel" type="button">Zet erop</button>
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij h-mt60">
       <input class="veld" id="sServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Gewenste serveertijd" style="flex:0 1 8rem;">
       <button class="knop" id="sVrij" type="button">Naar de keuken</button>
       <button class="knop p" id="sOpKamer" type="button">Op de kamer boeken</button>
     </div>
-    <p class="stil" style="margin-top:.4rem;">Op de kamer boeken kan alleen als daar een open gastrekening staat. Anders verdwijnt een rekening in een kamer die leegstaat, en dat merkt niemand tot de dagafsluiting.</p>
+    <p class="stil h-mt40">Op de kamer boeken kan alleen als daar een open gastrekening staat. Anders verdwijnt een rekening in een kamer die leegstaat, en dat merkt niemand tot de dagafsluiting.</p>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

@@ -54,17 +54,17 @@
   // de bank staat nog niet aan: eerlijk zeggen, en wijzen op wat wel werkt
   B.offline = function () {
     return '<div class="kaart" style="text-align:center;padding:1.6rem;"><strong>Binnenkort</strong>' +
-      '<p class="stil" style="margin-top:.5rem;">RTG Rekening opent hier zodra RTG hem live zet. ' +
+      '<p class="stil h-mt50">RTG Rekening opent hier zodra RTG hem live zet. ' +
       'Je RTG Pay-wallet werkt gewoon door.</p></div>';
   };
 
   B.akkoordVraag = function () {
     return '<div class="kaart" style="text-align:center;padding:1.6rem;"><strong>Open je RTG Rekening</strong>' +
-      '<p class="stil" style="margin-top:.5rem;">Je eigen rekening binnen RTG: een echt IBAN, met tegoedrente van ' +
+      '<p class="stil h-mt50">Je eigen rekening binnen RTG: een echt IBAN, met tegoedrente van ' +
       w.Geld.esc(String(B.ov.spaarrentePct)) + '%, passen en meer. Gebouwd op hetzelfde grootboek als RTG Pay. ' +
       'Alle premium functies zijn inbegrepen, gratis. Heb je de Business Pass, dan komt je zakelijke rekening er ' +
       'automatisch bij. Ga je akkoord, dan openen we meteen je betaalrekening.</p>' +
-      '<button class="knop hoofd" id="bkAkk" style="margin-top:1rem;">Ik ga akkoord en open mijn rekening</button></div>';
+      '<button class="knop hoofd h-mt100" id="bkAkk">Ik ga akkoord en open mijn rekening</button></div>';
   };
 
   B.rekSelect = function (id) {

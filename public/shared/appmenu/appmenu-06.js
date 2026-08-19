@@ -1,4 +1,4 @@
-  /* ---------------------------------------------------------- de knop */
+/* de knop: de hamburger staat links, en verder niets */
   /* DE RTG-HEADERSTANDAARD: de hamburger staat LINKS, en verder niets.
      Hij stond rechtsboven in een afgerond vierkant met een eigen achtergrond,
      een rand en een blur -- een knopvlak dus, en daarmee het zwaarste element

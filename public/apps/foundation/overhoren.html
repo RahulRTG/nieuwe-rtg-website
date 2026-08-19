@@ -57,11 +57,11 @@
     <h2 class="sec">Nieuwe lijst</h2>
     <div class="kaart blok">
       <input class="veld" id="mNaam" placeholder="Naam van je lijst (bijv. Frans hoofdstuk 3)" maxlength="60">
-      <textarea class="veld" id="mParen" style="margin-top:.4rem;" placeholder="Elke regel een paar, met = ertussen:&#10;de hond = le chien&#10;de kat = le chat"></textarea>
+      <textarea class="veld h-mt40" id="mParen" placeholder="Elke regel een paar, met = ertussen:&#10;de hond = le chien&#10;de kat = le chat"></textarea>
       <button class="knop" id="mMaak" style="width:100%;margin-top:.4rem;">Lijst maken</button>
       <div style="text-align:center;margin:.5rem 0 .1rem;color:var(--zacht);font-size:.8rem;">of laat je buddy er een maken</div>
       <div style="display:flex;gap:.5rem;">
-        <input class="veld" id="mOnderwerp" style="flex:1;" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
+        <input class="veld h-flex1" id="mOnderwerp" placeholder="Waarover? (bijv. hoofdsteden van Europa)" maxlength="80">
         <button class="knop grijs" id="mAi">Maak</button>
       </div>
       <div class="fout" id="mFout"></div>
@@ -118,7 +118,7 @@
     <p class="intro" id="sIntro"></p>
     <div class="kaart blok">
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
-      <input class="veld" id="sCodenaam" placeholder="Of daag uit op codenaam" style="margin-top:.3rem;">
+      <input class="veld h-mt30" id="sCodenaam" placeholder="Of daag uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <button class="knop" id="sStart" style="width:100%;margin-top:.4rem;">Daag uit</button>
       <div class="fout" id="sFout"></div>

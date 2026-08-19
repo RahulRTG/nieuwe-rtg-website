@@ -1,3 +1,4 @@
+/* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */
   bouw();
 
   /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet

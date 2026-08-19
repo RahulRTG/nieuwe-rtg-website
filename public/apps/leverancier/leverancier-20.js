@@ -1,3 +1,4 @@
+/* het tarief van de zaak */
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
       html += '<div class="tkc"><h3>'+T('kt.tarief','Tarief')+'</h3>'+
@@ -51,7 +52,7 @@
         if (vakUren){
           const dagNamen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
           html += '<div class="tkc h-volbreed"><h3>'+T('vk.beschik','Beschikbaarheid')+'</h3>'+
-            '<div class="tkc-who" style="margin-top:0;">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
+            '<div class="tkc-who h-mt0">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
             '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">'+
             dagNamen.map((d,i)=>'<button class="obtn'+(vakUren.dagen[i]?' primary':'')+'" data-vakdag="'+i+'">'+d+'</button>').join('')+'</div>'+
             '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in" id="vakVan" type="time" value="'+vakUren.van+'" class="h-flex1">'+

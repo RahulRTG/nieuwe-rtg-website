@@ -1,3 +1,4 @@
+/* een bericht van de zaak verder plaatsen */
     el.querySelectorAll('[data-dpost]').forEach(elp => {
       const knop = elp.querySelector('.js-dverder');
       if (knop) knop.addEventListener('click', async () => {

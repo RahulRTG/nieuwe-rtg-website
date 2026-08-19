@@ -1,4 +1,4 @@
-  /* ------------------------------------------------------------- stijl */
+/* de stijl van het bedieningspaneel */
   /* De vormtaal van het bedieningspaneel (shared/bediening.js): een blad dat
      van onderen opkomt, donker, met een gouden accent. Bewust dezelfde vorm --
      het is hetzelfde soort ding, en twee soorten bladen naast elkaar is weer

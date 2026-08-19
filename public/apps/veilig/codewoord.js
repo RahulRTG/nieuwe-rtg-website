@@ -19,12 +19,12 @@
         /* Met opzet GEEN voorbeeldzin. Zou hier een zin staan, dan kiest een deel
            van de mensen precies die, en dan is het geen geheim meer. Wel uitleggen
            waaraan een goede zin voldoet; de zin zelf verzint u zelf. */
-        '<p class="stil" style="margin-top:.5rem;">Wij geven met opzet geen voorbeeld: een voorbeeldzin ' +
+        '<p class="stil h-mt50">Wij geven met opzet geen voorbeeld: een voorbeeldzin ' +
         'wordt door te veel mensen overgenomen en is dan geen geheim meer. Neem iets uit uw eigen ' +
         'huishouden dat u zonder nadenken typt en dat niemand vreemd vindt.</p>' +
-        '<p class="stil" style="margin-top:.4rem;">Hoofdletters, accenten en leestekens maken niet uit. ' +
+        '<p class="stil h-mt40">Hoofdletters, accenten en leestekens maken niet uit. ' +
         'Uw zin mag midden in een gewoon bericht staan.</p>' +
-        '<button class="knop hoofd groot" id="zet" style="margin-top:.8rem;">Instellen</button>';
+        '<button class="knop hoofd groot h-mt80" id="zet">Instellen</button>';
       $('#zet').addEventListener('click', async function () {
         var zin = $('#zin').value.trim();
         try {
@@ -38,13 +38,13 @@
     }
     $('#zinKaart').innerHTML =
       '<p>Uw codewoord staat ingesteld: <strong>' + st.aantal + ' woorden</strong>.</p>' +
-      '<p class="stil" style="margin-top:.4rem;">Meer laten we met opzet niet zien. ' +
+      '<p class="stil h-mt40">Meer laten we met opzet niet zien. ' +
       (st.keer ? 'Hij is ' + st.keer + ' keer herkend.' : 'Hij is nog niet gebruikt.') + '</p>' +
-      '<label class="mini" style="margin-top:.8rem;"><input type="checkbox" id="aan"' + (st.aan ? ' checked' : '') +
+      '<label class="mini h-mt80"><input type="checkbox" id="aan"' + (st.aan ? ' checked' : '') +
         '> het codewoord staat aan</label>' +
-      '<div class="rij" style="margin-top:.8rem;">' +
-        '<button class="knop" id="nieuw" style="flex:1;">Andere zin kiezen</button>' +
-        '<button class="knop stop" id="wis" style="flex:1;">Wissen</button></div>';
+      '<div class="rij h-mt80">' +
+        '<button class="knop h-flex1" id="nieuw">Andere zin kiezen</button>' +
+        '<button class="knop stop h-flex1" id="wis">Wissen</button></div>';
     $('#aan').addEventListener('change', async function (e) {
       try { await Veilig.api('/api/veiligheid/codewoord/schakel', { aan: e.target.checked }); laad(); }
       catch (err) { Veilig.melding(err.message); }
@@ -78,18 +78,18 @@
       '<div class="kaart">' +
         '<p class="stil">Kijk of uw zin nog wordt herkend. Hier gaat er nooit een alarm uit. ' +
         'Oefen als u alleen bent, niet als het erop aankomt.</p>' +
-        '<div class="rij" style="margin-top:.6rem;">' +
+        '<div class="rij h-mt60">' +
           '<input id="oefen" maxlength="200" placeholder="Typ uw zin, of een zin met uw zin erin" aria-label="Oefenzin">' +
           '<button class="knop" id="oefenKnop">Proberen</button>' +
         '</div>' +
-        '<p class="stil" id="oefenUit" style="margin-top:.5rem;"></p>' +
+        '<p class="stil h-mt50" id="oefenUit"></p>' +
       '</div>' +
       '<h2>Waar dit niet tegen helpt</h2>' +
       '<div class="kaart">' +
         '<p class="stil">Uw telefoon blijft het zwakke punt. Wie hem afpakt of afzet, zet ook dit uit. ' +
         'Het codewoord helpt op het moment dat u de telefoon nog in handen heeft maar niet vrij kunt ' +
         'praten; het is geen bescherming tegen iemand die uw toestel overneemt.</p>' +
-        '<p class="stil" style="margin-top:.6rem;">Kies daarom een zin die u onder spanning nog kunt ' +
+        '<p class="stil h-mt60">Kies daarom een zin die u onder spanning nog kunt ' +
         'typen, die in een gewoon gesprek niet opvalt, en die u niet per ongeluk gebruikt. Drie tot ' +
         'vijf woorden werkt het best.</p>' +
       '</div>',

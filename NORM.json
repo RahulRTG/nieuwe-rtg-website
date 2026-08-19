@@ -1,15 +1,15 @@
 {
-  "vastgelegd": "2026-08-17",
+  "vastgelegd": "2026-08-19",
   "meters": {
     "endpointsZonderTest": 1192,
-    "dekkingPct": 71,
+    "dekkingPct": 72,
     "keuringStuk": 0,
-    "keuringScheef": 18,
+    "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 891,
+    "testbestanden": 905,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 124,
+    "e2eBestanden": 126,
     "keuringOmvang": 161,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
@@ -18,23 +18,25 @@
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
-    "keuringTeGroot": 16,
-    "inlineStijlAttributen": 5927,
-    "browserpoortToetsen": 189,
+    "keuringTeGroot": 5,
+    "inlineStijlAttributen": 4936,
+    "browserpoortToetsen": 196,
     "kernBreedte": 1413,
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 155,
-    "toetsenOngevoeligPct": 2.5,
+    "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
-    "devPakketten": 1
+    "devPakketten": 1,
+    "bronBlindeBestanden": 0,
+    "delenZonderOnderwerp": 0
   },
   "notities": [
     {
       "datum": "2026-08-19",
-      "meter": "keuringOmvang 159 -> 161; toetsenOngevoeligPct 2.4 -> 2.5; toetsenNietGemeten NIET verhoogd (hersteld)",
-      "reden": "De snelheids- en kostenronde: vier te grote modules opgeknipt, de blokafsplitsing ontdubbeld, en een AI-budget per persoon erbij.\n\nEERST WAT IK WEL HEB HERSTELD, want dat is het grootste deel.\n\ntoetsenNietGemeten stond op 158 tegen een norm van 155. Drie toetsbestanden waren nieuw en de motor was er niet langs geweest: ai-rem, ai-budget en blokafsplitsing. Gedraaid, en alle drie staan nu op GEZAKT. De meter is terug op 155 en is dus niet opgehoogd.\n\nDaar kwam een les uit die groter is dan de meter. blokafsplitsing.test.js overleefde eerst negentien mutaties, en dat las als een slappe toets. Het was een verkeerd GERICHTE meting: de motor koppelt een toets aan de modules die hij RECHTSTREEKS requirt, en dit bestand requirde alleen stijl- en scriptafsplitsing -- twee dunne instelbestanden waar na het opknippen nauwelijks een operator in staat. De machine zelf werd nooit gemuteerd. De toets beproeft de gedeelde machine nu ook rechtstreeks (een derde, verzonnen soort blok, wat meteen de bewering vastlegt dat maakAfsplitsing echt instelbaar is en niet stilletjes aan zijn twee gebruikers vastzit), en hij zakt nu op ===->!== in blokafsplitsing.js. Wie een gedeelde machine achter dunne instelbestanden zet, maakt hem onzichtbaar voor de motor tenzij een toets hem noemt.\n\nkeuringOmvang stond op 163. Twee daarvan zijn TERUGGEBRACHT en niet opgehoogd:\n- server/middleware/voordeur.js was van 6.802 naar 10.129 bytes gegroeid door de vier nieuwe herschrijflagen -- 111 bytes onder de harde grens, oftewel een landmijn voor de volgende die hem aanraakt. De vijf herschrijvingen staan nu in middleware/herschrijfketen.js. Dat is een echte naad en geen knip om een getal: de VOLGORDE van die keten is dragend (twee lagen tellen blokken op volgnummer, twee andere veranderen het aantal), en die eigenschap hoort als keten leesbaar te zijn in plaats van verspreid door een responsafhandeling. Terug naar 7.580.\n- server/ai.js stond op 9.916, 324 onder de grens. jaNee() en tekst() staan nu in server/ai-kort.js: dat zijn twee gemaksvormen OP de uitwijkketen en geen deel ervan, gebruikt door elf modules. Terug naar 7.674.\n\nWAT IK WEL OPHOOG, en waarom niet.\n\nkeuringOmvang 159 -> 161. Twee bestanden blijven in de band vlak onder de 10 kB:\n- server/ai-meter.js op 9.423. Dat is 23 bytes de band in en 817 van de harde grens. Knippen om drieentwintig bytes is een knip om een getal; de naad die er wel was (de rem per aanroeper) is deze ronde al geknipt naar server/ai-rem.js.\n- server/middleware/blokafsplitsing.js op 9.876. Dit bestand IS de ontdubbeling: stijl- en scriptafsplitsing droegen dezelfde machine twee keer (codering, padcontrole, vingerafdruk, cache, brotli/gzip, 400/404), en die staat nu een keer. Netto staan er minder bytes dan ervoor. De naad die erin zit (pagina-kant tegenover uitleverkant) deelt zijn constanten en zijn deurcontrole; die uit elkaar trekken zou een machine over drie bestanden verspreiden om een teller te sparen.\n\ntoetsenOngevoeligPct 2.4 -> 2.5. Precies EEN overlever erbij op tien nieuw gemeten toetsen, en dat is test/modelkeuze.test.js. Die is niet te repareren en zijn eigen kop zei dat al voordat de motor er langs ging: hij bewaakt geen besturingsstroom maar BESTANDSINHOUD -- welke modelnaam in welk bestand staat. Geen enkele operator van deze motor (true->false, ===->!==, return-weg) raakt een tekenreeks, dus hij KAN niet zakken op wat er geprobeerd wordt. Dat is een grens van het gereedschap en geen slappe toets; met de hand zijn er vier mutaties op gedaan die alle vier raak waren (bijles naar Haiku, gesprek naar Sonnet, agenda stil terug naar Opus, Haiku uit de prijstabel). Wie deze meter echt wil verbeteren, moet de motor een operator geven die tekenreeksen verandert -- niet deze toets verbouwen.\n\nEERLIJKHEIDSHALVE: er is geen --vastleggen gedraaid. testbestanden, browserpoortToetsen en e2eBestanden staan alle drie BOVEN hun norm en blijven staan waar ze staan; die winst is niet van deze ronde en hem nu op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+      "meter": "keuringOmvang 159 -> 161; toetsenOngevoeligPct 1.1 -> 1.2 (gemeten NA het samengaan met main)",
+      "reden": "De snelheids- en kostenronde, opnieuw gemeten tegen de basislijn die main na PR 84 heeft neergezet -- niet overgenomen van voor die samenvoeging. Mijn eigen notitie van eerder vandaag stond op de oude basislijn en is daarmee vervallen; dit is de enige die telt.\n\nkeuringOmvang +2, en het zijn precies twee bestanden:\n- server/ai-meter.js op 9.423. Dat is 23 bytes de band in en 817 van de harde grens. Knippen om drieentwintig bytes is een knip om een getal; de naad die er wel was (de rem per aanroeper) is deze ronde al geknipt naar server/ai-rem.js.\n- server/middleware/blokafsplitsing.js op 9.876. Dit bestand IS een ontdubbeling: stijl- en scriptafsplitsing droegen dezelfde machine twee keer (codering, padcontrole, vingerafdruk, cache, brotli/gzip, 400/404). Netto staan er minder bytes dan ervoor. Zijn naad (pagina-kant tegenover uitleverkant) deelt de constanten en de deurcontrole; die uit elkaar trekken zou een machine over drie bestanden verspreiden om een teller te sparen.\n\nWAT IK WEL HEB TERUGGEBRACHT en dus niet ophoog: twee bestanden die door deze ronde de band in groeiden zijn eruit geknipt op een echte naad. middleware/voordeur.js stond op 10.129 bytes (111 onder de harde grens) door de vier nieuwe herschrijflagen; die vijf herschrijvingen staan nu in middleware/herschrijfketen.js, want de VOLGORDE van die keten is dragend en hoort als keten leesbaar te zijn. server/ai.js stond op 9.916; jaNee() en tekst() wonen nu in server/ai-kort.js.\n\ntoetsenOngevoeligPct 1.1 -> 1.2 door precies EEN overlever erbij. Van mijn tien nieuwe toetsbestanden zijn er negen bewezen gevoelig; test/modelkeuze.test.js overleeft, en dat stond in zijn eigen kop al voordat de motor er langs ging: hij bewaakt geen besturingsstroom maar BESTANDSINHOUD -- welke modelnaam in welk bestand staat. Ook de twee nieuwe operatoren van main (getal+1, regex-alternatief-weg) raken geen tekenreeks, dus hij kan nog steeds niet zakken op wat er geprobeerd wordt. Opnieuw nagegaan na de samenvoeging: negentien mutaties, alle negentien overleefd. Met de hand zijn er vier mutaties op gedaan die alle vier raak waren (bijles naar Haiku, gesprek naar Sonnet, agenda stil terug naar Opus, Haiku uit de prijstabel). Grens van het gereedschap, geen slappe toets.\n\nEEN VALKUIL DIE HIER BIJNA EEN VERKEERD GETAL OPLEVERDE, want die hoort opgeschreven. Git voegde MUTATIES.json bij deze samenvoeging TEKSTUEEL samen, en dat gaf een register met 22 overlevers: mijn oudere verdicten wonnen van de nieuwere van main voor elf toetsen die main juist had gerepareerd (bundeldelen, concern, genreregister, genretoegang, loghygiene, merge3.property, stillepost, strenge-poort, txgeld, txindex, txkap). Daar bovenop wint scripts/mutatie.js zijn eigen voortgangsbestand (server/data/mutatie-voortgang.json, buiten de repo) van de vastgelegde uitslag -- \"de tweede wint bij een botsing: die is later\" -- en het mijne droeg diezelfde oude stand, dus een herhaling van de meting zette ze opnieuw terug. Opgelost door het voortgangsbestand weg te gooien, MUTATIES.json van main te nemen en alleen mijn tien toetsen daar bovenop te meten. Uitkomst: 11 overlevers (de 10 van main plus modelkeuze), en geen enkel verdict van main teruggedraaid.\n\nEERLIJKHEIDSHALVE: geen --vastleggen gedraaid. endpointsZonderTest (1191 tegen 1192) en testbestanden (915 tegen 905) staan beter dan hun norm; die winst is deels van main en deels van deze tak, en hem op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
     },
     {
       "datum": "2026-08-18",

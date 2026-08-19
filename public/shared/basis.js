@@ -180,6 +180,7 @@
   window.addEventListener('offline', function () { toost(rtf ? 'Even geen internet; de app werkt gewoon door waar dat kan.' : 'Geen verbinding; de app werkt door waar dat kan.'); });
   window.addEventListener('online', function () { toost('De verbinding is terug.'); });
 
+/* de toegankelijkheidshelpers van de gedeelde laag */
   var MELDPLEKKEN = '#toast,.toast,#melding,.melding,[data-toast],.status';
   /* ---- de toegankelijkheidshelpers van de gedeelde laag ----
 

@@ -1,3 +1,4 @@
+/* de dorpschat, en de leeftijdscheck die ja of nee zegt en nooit gegevens */
     const pdc = wrap.querySelector('#pkDorpChat');
     if (pdc) pdc.addEventListener('click', () => openTab('team'));
     // de leeftijdscheck: de paspoort-bevestiging geeft ja/nee, nooit gegevens

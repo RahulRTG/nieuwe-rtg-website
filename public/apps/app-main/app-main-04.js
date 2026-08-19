@@ -1,3 +1,4 @@
+/* inloggen en de staat binnenhalen: token, pas en het eerste scherm */
     API.token = t;
     try {
       applyState((await API.call('/state')).state);

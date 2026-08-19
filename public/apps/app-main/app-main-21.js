@@ -1,3 +1,4 @@
+/* mijn bestellingen: betalen en volgen */
     $('#myOrders').querySelectorAll('.myorder').forEach(el => {
       const o = active.find(x => x.ref === el.dataset.ref);
       const pb = el.querySelector('.js-opay');

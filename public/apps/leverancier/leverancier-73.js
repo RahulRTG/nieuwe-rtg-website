@@ -1,3 +1,4 @@
+/* een uitgiftebundel openen */
     el.querySelectorAll('[data-ugdl]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/uitgifte/bundel', { id: b.dataset.ugdl });

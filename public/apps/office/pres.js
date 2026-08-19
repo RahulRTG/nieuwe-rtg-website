@@ -83,7 +83,7 @@
               return '<option value="' + x[0] + '"' + (x[0] === d.indeling ? ' selected' : '') + '>' + x[1] + '</option>';
             }).join('') + '</select>' +
           '<span style="color:var(--zacht);font-size:.75rem;">' + esc(uitleg) + '</span>' +
-          '<span style="flex:1"></span>' +
+          '<span class="h-flex1"></span>' +
           (magBewerken ? '<button class="mini" id="diaOp" type="button" title="Naar voren">↑</button>' +
             '<button class="mini" id="diaNeer" type="button" title="Naar achteren">↓</button>' +
             '<button class="mini" id="diaDup" type="button" title="Deze dia dupliceren">Dupliceer</button>' +

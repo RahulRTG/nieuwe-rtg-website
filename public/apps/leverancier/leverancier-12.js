@@ -1,3 +1,4 @@
+/* de tafelstatus en het inchecken van gasten */
     el.querySelectorAll('[data-sttbl]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/table/status', { id: b.dataset.sttbl, status: TBL_NEXT[b.dataset.cur]||'vrij' }); await refresh(); } catch(e){ toast(e.message); }
     }));

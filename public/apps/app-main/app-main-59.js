@@ -1,3 +1,4 @@
+/* de afspraken en hun status */
     for (const d of (s.dates || [])){
       const metNaam = escT(d.met);
       if (d.status === 'wacht-op-tekenen'){

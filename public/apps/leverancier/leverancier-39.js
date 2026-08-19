@@ -1,3 +1,4 @@
+/* een artikel bewaren in de retailcatalogus */
     if (artBewaar) artBewaar.addEventListener('click', async () => {
       const naam = $('#rArtNaam').value.trim();
       if (!naam) return toast(T('rt.geefnaam','Geef het artikel een naam.'));
@@ -83,7 +84,7 @@
         '<button class="obtn" data-pnvraag="idkaart">'+T('pn.idkaart','ID-kaart vragen')+'</button>'+
         '<button class="obtn" data-pnvraag="paspoort">'+T('pn.paspoort','Paspoort vragen')+'</button>'+
       '</div>'+
-      '<div id="pnUitslag" style="margin-top:0.7rem;"></div></div>';
+      '<div class="h-mt70" id="pnUitslag"></div></div>';
     // geopende inzage
     if (paspoortInzage) html += paspoortInzageKaart(paspoortInzage);
     // lopende en afgehandelde verzoeken

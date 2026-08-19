@@ -97,7 +97,7 @@
       vak.innerHTML = '<div class="rsm-uit">Kamer-code: <span class="rsm-code">' + esc(k.code) + '</span><br>Hier zijn: ' + k.leden.map(esc).join(', ') + '</div>' +
         '<div class="rsm-chat" data-chat>' + k.chat.map(function (c) { return '<div><b>' + esc(c.van) + ':</b> ' + esc(c.tekst) + '</div>'; }).join('') + '</div>' +
         '<form class="rsm-rij" data-zeg><input placeholder="Zeg iets" maxlength="300" aria-label="Chatbericht"><button class="rsm-go" type="submit">→</button></form>' +
-        '<div class="rsm-rij"><button class="rsm-stil" data-hier type="button" style="flex:1;">Kom hierheen</button><button class="rsm-stil" data-weg type="button">Verlaat</button></div>';
+        '<div class="rsm-rij"><button class="rsm-stil h-flex1" data-hier type="button">Kom hierheen</button><button class="rsm-stil" data-weg type="button">Verlaat</button></div>';
       var chatEl = vak.querySelector('[data-chat]'); chatEl.scrollTop = chatEl.scrollHeight;
       vak.querySelector('[data-zeg]').addEventListener('submit', function (ev) {
         ev.preventDefault(); var i2 = ev.target.querySelector('input'); var t = i2.value.trim(); if (!t) return; i2.value = '';

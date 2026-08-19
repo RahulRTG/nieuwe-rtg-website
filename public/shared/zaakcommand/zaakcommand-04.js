@@ -43,7 +43,7 @@
           x.onclick = function () {
             api('runbook/voer', { id: x.dataset.droog, droog: true }).then(function (rr) {
               vak.querySelector('#zcD-' + x.dataset.droog).innerHTML =
-                '<div style="margin-top:.5rem;">' + rr.run.geraakt + ' van ' + rr.run.totaalKandidaten + ' zouden wijzigen:<br>' +
+                '<div class="h-mt50">' + rr.run.geraakt + ' van ' + rr.run.totaalKandidaten + ' zouden wijzigen:<br>' +
                 rr.run.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') + '</div>';
             }).catch(function (e) { b.melden(e.message); });
           };

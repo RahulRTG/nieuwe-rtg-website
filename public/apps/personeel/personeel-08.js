@@ -1,3 +1,4 @@
+/* gevonden voorwerpen melden */
     const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
       const item = $('#lfItem').value.trim(); if (!item) return;
       try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast(''+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }

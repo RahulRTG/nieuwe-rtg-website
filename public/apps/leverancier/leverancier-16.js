@@ -1,3 +1,4 @@
+/* het AI-weekrooster: een voorstel op de verwachte drukte */
     if (kantoorSec === 'hr'){
       // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
       if (!agentData) laadAgent();

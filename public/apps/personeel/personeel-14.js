@@ -1,3 +1,4 @@
+/* de flitszoeker */
     if (pkfs) pkfs.addEventListener('click', () => {
       const inp = document.getElementById('pkFlIn');
       const q = (inp.value || '').trim();

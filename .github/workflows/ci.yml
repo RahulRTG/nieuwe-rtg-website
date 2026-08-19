@@ -144,6 +144,28 @@ jobs:
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
+
+      # EN DE LAT ZELF. NORM.json staat IN de tak, dus een tak kan hem verzetten
+      # en dan meet de stap hierboven de code tegen een lat die in dezelfde
+      # commit is verlaagd. Deze stap legt hem naast die van main: strakker mag
+      # altijd, losser alleen met een reden in `notities` die de meter bij naam
+      # noemt. De fetch is er omdat de checkout ondiep is en origin/main hier
+      # anders niet bestaat -- en dan zakt normbasis.js liever dan dat hij
+      # stilzwijgend slaagt.
+      - name: De basislijn van de norm (verlagen mag, stilletjes niet)
+        run: |
+          git fetch --depth=1 origin main
+          node scripts/normbasis.js --tegen FETCH_HEAD
+
+      # DE INSTROOM, NAAST DE VOORRAAD. endpointsZonderTest is een TOTAAL: een
+      # tak die drie routes toevoegt en er vier laat toetsen komt er groen
+      # doorheen. TAKEN.md 4.3 noemde 622 ongedekte endpoints, vandaag zijn het
+      # er 1192, en de ratel heeft in die hele periode niet een keer geklaagd --
+      # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
+      # draait de routekaart hier en in een worktree van main, en eist een toets
+      # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
+      - name: Nieuwe routes komen met een toets
+        run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de

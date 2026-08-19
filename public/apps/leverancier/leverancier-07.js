@@ -1,3 +1,4 @@
+/* een account voor alles: partner kiezen en de staat toepassen */
     if (pickCode) pickPartner(pickCode); else $('#staffPick').classList.remove('open');
   }
 

@@ -42,6 +42,46 @@ op een handeling opende eerst de uitgebreide lade — een tweede betekenis voor
 hetzelfde gebaar, naast "meer gereedschap" bij omhoog trekken. Zo verliest een
 taal zijn woorden. Lang drukken legt nu uit; meer gereedschap zit waar het hoort.
 
+## Eén handeling is de belangrijkste, en die wijst het scherm zelf aan
+
+De eerste zin van deze taal is *"ik wil iets doen → mijn duim vindt het
+onderaan."* Dat is een belofte over **één** handeling: de belangrijkste die dit
+scherm te bieden heeft. Een scherm met achttien even zware knoppen doet die
+belofte niet na, hoe netjes ze ook onderaan staan.
+
+**Het scherm wijst hem aan met `data-hoofdactie`.** Eén attribuut op één element,
+en verder niets:
+
+```html
+<button class="knop hoofd" data-hoofdactie>Voorbereiding vrijgeven →</button>
+```
+
+Waarom dat expliciet moet en niet af te leiden is: op 19 augustus 2026 is dat
+geprobeerd, over 257 schermen, en het antwoord is nee. `.hoofd` betekent in dit
+huis niet één ding — op `/apps/geld-command.html` draagt een **kaart** van
+350×236 met "96% match" die klasse. Een meting die zoiets als hoofdhandeling
+pakt, meet niets, en een slimmere selector maakt dat niet beter: hij maakt het
+alleen moeilijker te zien dat hij raadt.
+
+**Wat er dan aan die handeling wordt geëist**, en het zijn drie regels waar elk
+een reden onder ligt:
+
+| | eis | waarom |
+|---|---|---|
+| maat | minstens **44×44** | 24×24 is WCAG 2.5.8 — de ondergrens voor *raakbaar met een hand die trilt*. Een duim die beweegt heeft meer nodig. |
+| hoogte | middelpunt in de **onderste 60%**, of in een vaste balk | daarboven moet een mens zijn telefoon in de hand verschuiven, en dat is het moment waarop hij hem laat vallen |
+| zijkant | een **smalle** knop (< 60% van de breedte) niet in het kwart aan de **ankerzijde** | daar komt de duim niet — en welke kant dat is hangt af van de hand (`ADAPTIEF.md`) |
+
+**Een scherm zonder aangewezen hoofdhandeling is geen fout.** Een lijst, een
+overzicht, een dagbriefing: daar is niet één ding het belangrijkst. Die schermen
+staan in een eigen categorie en niet op de foutenlijst — anders wordt *"wijs maar
+iets aan"* de reparatie, en daar wordt geen enkel scherm beter van. Wat de meting
+oplevert is dus niet "hoeveel is er stuk" maar **hoeveel schermen hebben één
+handeling die er echt uitspringt, en klopt die dan ook**.
+
+*Wat het bewaakt:* `scripts/mobielkeuring.js`, als vierde ronde in
+`npm run a11y` — twee keer, één keer per hand.
+
 ## Het Command Dock
 
 De onderste balk heeft een vaste grammatica, in Docs net zo goed als in Bestanden,

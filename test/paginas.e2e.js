@@ -132,7 +132,13 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         missend.length = 0;
         let probe = null;
         try {
-          await page.goto(base + p, { waitUntil: 'load' });
+          /* `domcontentloaded` en niet `load`: `load` wacht tot ELK subverzoek
+             binnen is, en valt bij 258 pagina's onder belasting op een dag om op
+             zijn eigen tijdslimiet -- rood zonder dat er iets stuk is (TAKEN.md
+             4.39). De scan verliest er niets mee: de wacht hieronder blijft
+             juist doorlopen zolang er verzoeken binnenkomen, dus een plaatje of
+             een lettertype dat 404 geeft komt nog steeds langs `missend`. */
+          await page.goto(base + p, { waitUntil: 'domcontentloaded' });
           /* LATEN UITPRATEN, niet 900 ms aftellen.
 
              De meeste schermen doen hun eerste api-aanroep pas NA de load, en

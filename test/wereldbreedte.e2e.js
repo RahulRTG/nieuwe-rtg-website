@@ -55,7 +55,11 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
   let instantReality = null;
   try {
     for (const url of WERELDEN) {
-      await page.goto(srv.base + url, { waitUntil: 'load', timeout: 45000 });
+      /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+         plaatje, elk lettertype -- terwijl de regel eronder al op het echte
+         teken wacht. Onder belasting valt dat om op zijn eigen 45 seconden, en
+         dan is de uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+      await page.goto(srv.base + url, { waitUntil: 'domcontentloaded', timeout: 45000 });
       /* Wachten op de OPMAAK, niet op de klok: zolang er geen stijlblad binnen is
          meet je een ongestileerde pagina, en die past altijd. */
       await page.waitForFunction(() => document.styleSheets.length > 0, { timeout: 15000 });

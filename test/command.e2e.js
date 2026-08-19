@@ -47,7 +47,11 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, login.token);
 
-    await page.goto(base + '/apps/command.html', { waitUntil: 'load' });
+    /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+       plaatje, elk lettertype -- terwijl de twee regels eronder al op het echte
+       teken wachten. Onder belasting valt `load` om op zijn eigen tijdslimiet,
+       en dan is de uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+    await page.goto(base + '/apps/command.html', { waitUntil: 'domcontentloaded' });
 
     /* Het Command Center is er als de rail is getekend en de stand niet meer
        "laden" zegt. Dat laatste is het bewijs dat /api/command/start echt is

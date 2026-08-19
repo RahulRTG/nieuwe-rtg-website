@@ -53,7 +53,12 @@ async function zaakPagina(browser, base, token, fouten) {
     localStorage.setItem('rtg_lang', 'nl');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
   }, token);
-  await page.goto(base + '/apps/handel.html', { waitUntil: 'load' });
+  /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+     plaatje, elk lettertype -- terwijl beide aanroepers hierna als eerste op het
+     echte teken wachten (de gevulde keuzelijst, de kaart van de koper). Onder
+     belasting valt `load` om op zijn eigen tijdslimiet, en dan is de uitslag
+     rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+  await page.goto(base + '/apps/handel.html', { waitUntil: 'domcontentloaded' });
   return page;
 }
 
@@ -117,7 +122,9 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     await wasPagina.click('#hOpen [data-stap="offreren"]');
     await wachtOpRust(wasPagina);
 
-    await clubPagina.reload({ waitUntil: 'load' });
+    // zelfde reden als bij de goto hierboven: de regel eronder wacht al op het
+    // echte teken (de knop in de kaart van de koper).
+    await clubPagina.reload({ waitUntil: 'domcontentloaded' });
     await clubPagina.waitForSelector('#hKoper [data-gun]', { timeout: 12000 });
     assert.match(await clubPagina.textContent('#hKoper'), /Lavanda Wasserij/);
     assert.match(await clubPagina.textContent('#hKoper'), /240[.,]00/);

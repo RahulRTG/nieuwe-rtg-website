@@ -117,7 +117,15 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
      een gedeelde context (een keer opgebouwd bij het opstarten). Het rooster-
      deel gaat eerst de context in, omdat de PDA-laag (het commandocentrum,
      mijnDiensten) die functies gebruikt. */
-  const ctx = { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine,
+  /* LATE BINDING VOOR DE PLAATSLAAG. Deze module wordt in server.js gebouwd, ver
+     voordat kern/plaats bestaat (kernlaag6). De patrouillelaag wil bij het
+     inklokken weten of de bewaker binnen zijn post stond; die vraag kan hier dus
+     nog niet beantwoord worden. `laat` is de sleuf waar opzet/plaatsbronnen.js
+     hem later in hangt -- dezelfde vorm als kern.muziekSamen in kernlaag6.
+     Blijft hij leeg, dan is het antwoord "niets te zeggen" en niet "afwezig". */
+  const laat = { plaats: null, codenaamVanGuard: null };
+
+  const ctx = { db, save, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine, laat,
     BEV_FUNCTIES, BEV_SHIFTS, BEV_ERNST, AANVR_KLAAR,
     id, nu, vandaag, schoon, getal, shiftVan, isBeveiliging, defaults, functieAan,
     diensten, aanvragen, incidenten, rondes, guards, guardNaam, postVan, functieLijst, zetPost };
@@ -138,7 +146,10 @@ function maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, not
     bevMijnDiensten: mijnDiensten, bevInklok: inklok, bevUitklok: uitklok,
     bevRondeStart: rondeStart, bevRondeCheckpoint: rondeCheckpoint, bevRondeKlaar: rondeKlaar,
     bevMeldIncident: meldIncident, bevBeslisIncident: beslisIncident, bevSos: sos,
-    bevCommand: command
+    bevCommand: command,
+    /* De sleuf vullen. Wordt door opzet/plaatsbronnen.js aangeroepen zodra de
+       plaatslaag staat; daarvoor doet de patrouillelaag geen uitspraak. */
+    bevKoppelPlaats: (plaats, codenaamVanGuard) => { laat.plaats = plaats; laat.codenaamVanGuard = codenaamVanGuard; }
   };
 }
 

@@ -61,11 +61,46 @@ test('hekken zijn plaatsen, geen personen -- en ze dragen hun doel', () => {
   for (const veld of ['codenaam', 'key', 'lid', 'member']) {
     assert.ok(!tekst.includes(veld), 'een hek draagt geen ' + veld);
   }
-  const dienst = p.plaatsHekken('dienst');
-  assert.equal(dienst.hekken.length, 1, 'de zaak uit de navigatiekern is een hek');
-  assert.equal(dienst.straalM, 120, 'werk is strak; nadering is ruim');
-  assert.equal(p.plaatsHekken('nadering').straalM, 900);
+  assert.equal(p.plaatsHekken('nadering').hekken.length, 1, 'nadering pakt de zaak uit de navigatiekern');
+  assert.equal(p.plaatsHekken('nadering').straalM, 900, 'nadering is ruim');
   assert.equal(p.plaatsHekken('verzonnen').status, 400, 'het doel is een gesloten lijst');
+});
+
+test('aanwezigheid op je werk gaat over JOUW werkgevers, en niemand anders', () => {
+  const p = maak();
+  /* Hier stond `lagen: ['leverancier']` op het doel dienst, waardoor het toestel
+     van elk lid elke zaak van het eiland als hek kreeg. Onschuldig (openbare
+     plaatsen) maar verkeerd: aanwezigheid op je werk gaat over jouw werkgevers.
+     Zonder bron is de lijst dus leeg -- en dat is het juiste antwoord voor
+     iemand die hier niet werkt. */
+  assert.equal(p.plaatsHekken('dienst').hekken.length, 0,
+    'zonder bron heeft niemand een werkhek');
+  assert.equal(p.plaatsHekken('dienst').straalM, 120, 'werk is strak');
+
+  // een domein levert zijn eigen plaatsen, en filtert zelf per lid
+  const gezien = [];
+  p.plaatsBron('proefwerk', 'dienst', (codenaam) => {
+    gezien.push(codenaam);
+    return codenaam === IK ? [{ id: 'leverancier:ZAAK1', naam: 'Zaak Een',
+      soort: 'punt', punten: [{ lat: 38.91, lng: 1.43 }] }] : [];
+  });
+  const mijn = p.plaatsHekken('dienst', IK);
+  assert.equal(mijn.hekken.length, 1, 'mijn werkplek staat erin');
+  assert.equal(mijn.hekken[0].id, 'leverancier:ZAAK1');
+  assert.equal(mijn.hekken[0].bron, 'proefwerk', 'het hek noemt zijn bron');
+  assert.equal(mijn.hekken[0].straalM, 120, 'zonder eigen straal geldt die van het doel');
+  assert.equal(gezien[gezien.length - 1], IK, 'de bron krijgt de codenaam en filtert zelf');
+
+  /* EEN ANDER LID KRIJGT HEM NIET. Dit is de hele reden dat een bron de codenaam
+     krijgt: de hekkenlijst gaat naar het TOESTEL, dus een bron die niet filtert
+     lekt andermans plaatsen aan iedereen die de route aanroept. */
+  assert.equal(p.plaatsHekken('dienst', 'Iemand Anders 9999').hekken.length, 0,
+    'een ander lid krijgt mijn werkplek niet te zien');
+
+  // een bron die stukloopt neemt de rest niet mee
+  p.plaatsBron('kapot', 'dienst', () => { throw new Error('stuk'); });
+  assert.equal(p.plaatsHekken('dienst', IK).hekken.length, 1,
+    'een kapotte bron mag de goede niet meenemen');
 });
 
 test('een venster heeft altijd een reden en altijd een einde', () => {
@@ -157,6 +192,8 @@ test('een verlopen venster neemt zijn waarnemingen mee', () => {
 
 test('een domein krijgt binnen of buiten met een tijd, en nooit een plek', () => {
   const p = maak();
+  p.plaatsBron('proefwerk', 'dienst', () => [{ id: 'leverancier:Proefzaak',
+    naam: 'Proefzaak', soort: 'punt', punten: [{ lat: 38.91, lng: 1.43 }] }]);
   p.plaatsVensterOpen(IK, { doel: 'dienst', bron: 'dienstrooster' });
   const onbekend = p.plaatsAanwezig(IK, 'dienst', 'leverancier:Proefzaak');
   assert.equal(onbekend.bekend, false, 'zonder waarneming weten we het niet, en zeggen dat');
@@ -215,4 +252,49 @@ test('de hek-motor rekent een vlak hetzelfde als de server', () => {
     assert.equal(M._inVlak(p, vlak.punten), meetkunde.inVlak(p, vlak.punten),
       'toestel en server zijn het oneens over ' + JSON.stringify(p));
   }
+});
+
+/* ---------------------------------------------------------------------------
+   EN DE COORDINAAT DIE WEGGING, IN DE LA GECONTROLEERD.
+
+   Bij fase 2a verdween `d.lat = Number(lat)` uit het inklokken van een bewaker:
+   de rauwe positie werd op zijn dienst bewaard en NIEMAND las hem ooit. Een
+   mutatieproef zette hem terug -- en geen enkele schermtoets zakte, want
+   dienstPubliek() gaf hem toch al niet terug. Dat is dezelfde fout als eerder in
+   deze suite: door het raam kijken in plaats van in de la. Een belofte over wat
+   er NIET wordt bewaard, controleer je in de opslag zelf.
+
+   Vandaar deze unit-toets op de kern, met een nagemaakte database: hij ziet de
+   dienstregel zoals hij werkelijk wordt weggeschreven.
+   --------------------------------------------------------------------------- */
+test('een bewaker die inklokt laat geen coordinaat achter op zijn dienst', () => {
+  const zaak = { code: 'PROEF', name: 'Proefteam', type: 'beveiliging',
+    beveiliging: { posten: [{ id: 'p1', naam: 'Object', lat: 38.91, lng: 1.43, minMan: 1 }] } };
+  const db = { data: { bevDiensten: [], suppliers: [zaak] } };
+  const bev = require('../server/kern/beveiliging').maakBeveiliging({
+    db, save: () => {}, crypto,
+    accounts: { listStaff: () => [{ id: 7, name: 'Bewaker Zeven', role: 'staff' }],
+      publicStaff: (x) => ({ id: x.id, name: x.name, role: x.role }) },
+    findSupplier: (c) => (c === 'PROEF' ? zaak : null),
+    notify: () => {}, notifySupplier: () => {}, sseToSupplier: () => {}, sseToOffice: () => {},
+    logActivity: () => {}, haversine: () => 0
+  });
+  const dag = new Date().toISOString().slice(0, 10);
+  const zet = bev.bevZetDienst(zaak, { postId: 'p1', shiftId: 'nacht', datum: dag, guardId: 7 });
+  assert.ok(zet.dienst && zet.dienst.id, 'de dienst staat gepland: ' + JSON.stringify(zet));
+
+  // klok in MET een coordinaat erbij, zoals een oude client hem nog zou sturen
+  const r = bev.bevInklok('PROEF', 7, zet.dienst.id, 38.9115, 1.4412);
+  assert.equal(r.status, 200, 'de bewaker klokt gewoon in');
+
+  const rauw = db.data.bevDiensten.find(d => d.id === zet.dienst.id);
+  assert.ok(rauw, 'de dienstregel staat in de opslag');
+  assert.equal(rauw.status, 'ingeklokt');
+  /* IN DE LA: geen breedtegraad, geen lengtegraad. Niet "wordt niet getoond" --
+     niet bewaard (PLAATS.md grens 2: geen plaats zonder doel). */
+  assert.equal(rauw.lat, undefined, 'er staat geen breedtegraad op de dienst');
+  assert.equal(rauw.lng, undefined, 'en geen lengtegraad');
+  const tekst = JSON.stringify(rauw);
+  assert.ok(!tekst.includes('"lat"') && !tekst.includes('"lng"'),
+    'de opgeslagen dienstregel draagt geen coordinaat: ' + tekst);
 });

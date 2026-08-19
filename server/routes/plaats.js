@@ -24,11 +24,16 @@ module.exports = (kern) => {
     return false;
   };
   const wie = (req) => liveCodename(req.session);
+  /* De ledensleutel gaat mee naar de hekkenkant (en alleen daarheen). De laag
+     bewaart hem nergens: bronnen hebben hem nodig om een andere administratie te
+     bevragen -- de personeelsadministratie werkt op sleutels -- en de vertaling
+     codenaam -> sleutel loopt via de gids, die async is. */
+  const sleutel = (req) => req.session.key || null;
 
   // de hekken voor één doel -- dit is wat de motor op het toestel ophaalt
   app.post('/api/plaats/hekken', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, plaats.plaatsHekken((req.body || {}).doel));
+    stuur(res, plaats.plaatsHekken((req.body || {}).doel, wie(req), sleutel(req)));
   });
 
   // toestemming openen: altijd met een reden en altijd met een einde
@@ -49,7 +54,7 @@ module.exports = (kern) => {
      weigering is en geen stille opschoning. */
   app.post('/api/plaats/waarneem', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, plaats.plaatsWaarneem(wie(req), req.body || {}));
+    stuur(res, plaats.plaatsWaarneem(wie(req), req.body || {}, sleutel(req)));
   });
 
   // zelf-inzage gaat vrij: wie dit opent hoort niets te ontdekken dat er niet staat

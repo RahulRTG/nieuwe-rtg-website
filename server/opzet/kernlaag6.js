@@ -59,6 +59,7 @@ Object.assign(kern, require('../kern/navigatie').maakNavigatie({
    doorgeven aan de domeingrens levert een stille undefined op. */
 Object.assign(kern, require('../kern/plaats')({ db, save, crypto,
   weefsel: kern.weefsel, navPoi: kern.navPoi }));
+require('./plaatsbronnen')(kern, hulp);
 /* RTG Clips (kern/clips.js): korte verticale video's die alleen op het
    toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
    het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust

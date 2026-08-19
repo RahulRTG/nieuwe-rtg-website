@@ -62,12 +62,18 @@ module.exports = function maakPlaats({ db, save, crypto, weefsel, navPoi }) {
     plaats: {
       DOELEN: hek.DOELEN,
       // wat het toestel ophaalt om lokaal mee te kunnen rekenen
-      plaatsHekken: (doel) => hek.hekkenVoor(doel),
+      plaatsHekken: (doel, codenaam, key) => hek.hekkenVoor(doel, codenaam, key),
+      /* EEN DOMEIN LEVERT ZIJN EIGEN PLAATSEN (PLAATS.md fase 2b). Niet
+         kopieren en niet laten lezen: leveren, op het moment dat ernaar wordt
+         gevraagd. `fn(codenaam)` moet zelf filteren -- de lijst gaat naar het
+         toestel, dus een bron die plaatsen teruggeeft die dit lid niet mag zien,
+         lekt ze aan iedereen die de route aanroept. */
+      plaatsBron: (naam, doel, fn) => hek.bronToevoegen(naam, doel, fn),
       // toestemming met een einde
       plaatsVensterOpen: (codenaam, v) => vst.vensterOpen(codenaam, v),
       plaatsVensterSluit: (codenaam, doel) => vst.vensterSluit(codenaam, doel),
       // de uitkomst van de motor op het toestel
-      plaatsWaarneem: (codenaam, w) => wrn.waarneem(codenaam, w),
+      plaatsWaarneem: (codenaam, w, key) => wrn.waarneem(codenaam, w, key),
       // zelf-inzage: alles wat RTG nu van mij weet over plaats
       plaatsStand: (codenaam) => wrn.stand(codenaam),
       /* Voor andere domeinen: binnen of buiten, met een tijd. Dit is met opzet

@@ -199,7 +199,7 @@ Waar een functie hiermee botst, vervalt de functie.
 |---|---|---|
 | **1** | De laag: hekken, waarnemingen, vensters, actielog, bewaarbeleid, en de hek-motor op het toestel (`shared/plaats.js`) | **af** |
 | **2a** | Aanwezigheid, de motor + de eerste klant: `plaatsBijZaak()` met drie uitkomsten, stabiele hek-id's op zaakcode, en de prikklok (`/api/staff/clock`) die de bevestiging vastlegt | **af** |
-| **2b** | Eigen hekken: een zaak tekent haar eigen terrein. Dat ontsluit de posten van een beveiligingsteam, de depots van dispatch, de bezorgketen en werkorder-nabijheid — alle vier hangen daarop | open |
+| **2b** | Het bronnenregister: een domein levert zijn eigen plaatsen als hek. Twee bronnen bedraad (je werkplekken, de posten van je beveiligingsteam) | **af** |
 | **2c** | De aanzet vanaf het toestel: een lopende dienst hoort zelf een `dienst`-venster te openen in de app van het lid | open |
 | **3** | Plaats als bron voor `kern/voorspel/`, met de regel in het algoritmeregister erbij | open |
 | **4** | Nadering: arrival, mall, hoteldorp, avond/plan — klaarzetten vóór aankomst | open |
@@ -231,10 +231,49 @@ rekent ermee. Een coördinaat die niemand leest is geen functie maar alleen een
 risico — en juist bij een bewaker, wiens werkgever daarmee precies wist waar hij
 op welk moment stond. Weg, tot fase 2b de hek-bevestiging bij de post kan geven.
 
-**Waar 2b op wacht.** De posten van een beveiligingsteam, de depots van dispatch
-en de werkorders van het weefsel staan niet in de plekken van `kern/navigatie`,
-dus er is voor die vier consumenten nog geen hek. De verleiding is om de
-plaatslaag in elk van die domeinen te laten lezen; dat is precies de tweede
-waarheid die dit ontwerp vermijdt. De uitweg is een registratie: een zaak zet
-haar eigen hek, de plaatslaag houdt het en het domein dat de plek bezit houdt het
-bij. Dat is één API en het ontsluit alle vier tegelijk.
+### Wat fase 2b opleverde
+
+**Het bronnenregister** (`kern/plaats/bronnen.js`). De posten van een
+beveiligingsteam, de depots van een dispatch en de werkorders van het weefsel
+zijn ook plaatsen waar aanwezigheid telt, maar ze staan in geen enkele algemene
+plekkenlijst. Er waren drie wegen en twee ervan zijn fout:
+
+- **fout** — de plaatslaag laten lezen in elk van die domeinen. Dan kent hij de
+  datavorm van vijf andere domeinen en verandert hij mee met alle vijf.
+- **ook fout** — de hekken kopiëren naar `db.data.plaatsHekken` bij het
+  aanmaken. Dan bestaat de plek twee keer en lopen ze uiteen zodra er een adres
+  wijzigt.
+- **goed** — het domein dat de plek bezit *levert* hem, in dezelfde vorm, op het
+  moment dat ernaar wordt gevraagd. Niets gekopieerd, niets over een grens
+  gelezen, één waarheid. Het is het patroon dat dit huis al heeft in
+  `kern/geldgraaf/bronnen.js` en `kern/levensgraaf/bronnen.js`.
+
+**De harde regel voor een bron:** hij mag alleen plaatsen teruggeven die dit lid
+sowieso al mag zien. De hekkenlijst gaat naar het *toestel*, dus een bron die
+niet filtert zet die lijst op de telefoon van elk lid dat de route aanroept.
+Welke objecten een beveiligingsbedrijf bewaakt is bedrijfsgevoelig — daarom
+krijgt een bron de codenaam én de ledensleutel, en is filteren zijn taak en geen
+extraatje.
+
+**Twee bronnen bedraad** (`server/opzet/plaatsbronnen.js`, bewust een
+bedradingsbestand: de plaatslaag hoeft niet te weten hoe een beveiligingsteam
+zijn posten opslaat, en dat team hoeft niet te weten dat er zoiets als een hek
+bestaat):
+
+1. *werkplek* — de zaken waar dit lid werkelijk werkt. Hiervoor stond op het doel
+   `dienst` gewoon de hele leverancierslaag: elk toestel kreeg elke zaak van het
+   eiland als hek. Onschuldig, maar verkeerd — aanwezigheid op je werk gaat over
+   jouw werkgevers.
+2. *bevpost* — de posten van je eigen beveiligingsteam. Hiermee sluit de kring
+   die bij 2a openging: de rauwe positie op de dienst is weg, en wat ervoor
+   terugkomt is binnen of buiten de post, met een tijd.
+
+**En een mutatie die niet beet.** Het terugzetten van `d.lat` op de dienst liet
+geen enkele schermtoets zakken, want `dienstPubliek()` gaf hem toch al niet
+terug. Door het raam kijken in plaats van in de la — dezelfde fout als bij het
+sluiten van een venster in fase 1. Een belofte over wat er *niet* wordt bewaard,
+controleer je in de opslag zelf; daar staat nu een unit-toets op de kern voor.
+
+**Waar 2c op wacht.** Een `dienst`-venster gaat nu met de hand open. Het hoort te
+openen als een dienst begint, en dat vraagt een brug tussen de leden-app (waar de
+motor draait) en de personeels-app (waar de dienst leeft) die er nog niet is.

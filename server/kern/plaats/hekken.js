@@ -43,8 +43,13 @@
    beginwaarden en geen natuurkunde -- ze staan hier op één plek zodat ze te
    verstellen zijn zonder ze te moeten zoeken. */
 const DOEL = {
-  // aanwezigheid op het werk: prikklok, patrouille, dienstrooster
-  dienst: { lagen: ['leverancier'], straalM: 120, zones: false },
+  /* Aanwezigheid op het werk: prikklok, patrouille, dienstrooster. GEEN lagen,
+     en dat is de kern van fase 2b: hier stond `['leverancier']`, waardoor het
+     toestel van élk lid élke zaak van het eiland als hek kreeg. Onschuldig
+     (het zijn openbare plaatsen) maar verkeerd: aanwezigheid op je werk gaat
+     over JOUW werkgevers, en over niemand anders. Die komen nu uit een BRON die
+     per lid antwoordt -- zie bronToevoegen() hieronder. */
+  dienst: { lagen: [], straalM: 120, zones: false },
   // vervoer en bezorging: ophalen, afzetten, aangekomen
   rit: { lagen: ['leverancier', 'ov'], straalM: 150, zones: false },
   // de wacht en het alarm van RTG Veilig: waar kun je terecht
@@ -58,59 +63,22 @@ const DOELEN = Object.keys(DOEL);
 const MAX = 300;
 
 module.exports = ({ db, weefsel, navPoi }) => {
+  /* Waar de hekken vandaan komen staat in ./bronnen.js: de plekken van
+     kern/navigatie, de gebieden van het weefsel, en de domeinen die hun eigen
+     plaatsen leveren. Hier staat alleen wat een hek IS en wat er naar buiten mag. */
+  const { bronToevoegen, vanBronnen, vanPlekken, vanWeefsel } = require('./bronnen')({ weefsel, navPoi, DOEL });
 
   const eigen = () => { if (!Array.isArray(db.data.plaatsHekken)) db.data.plaatsHekken = []; return db.data.plaatsHekken; };
 
-  /* De plekken van de navigatiekern worden puntenhekken. We geven bewust GEEN
-     positie mee aan navPoi: die zou hij gebruiken om te sorteren, en dan zou de
-     server precies dat moeten weten wat hier niet hoort te komen. */
-  function vanPlekken(lagen, straalM) {
-    if (!lagen.length || typeof navPoi !== 'function') return [];
-    let r;
-    try { r = navPoi(lagen, null); } catch (e) { return []; }
-    if (!r || r.status !== 200 || !r.lagen) return [];
-    const uit = [];
-    for (const laag of lagen) {
-      for (const p of (r.lagen[laag] || [])) {
-        if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
-        /* Het id draagt de CODE als die er is, en anders de naam. Een zaak heeft
-           een code die niet verandert; een halte of een loket heeft alleen een
-           naam. Een hek-id dat meebeweegt met een hernoeming laat elke lopende
-           waarneming in het niets wijzen -- en juist bij aanwezigheid op het
-           werk is dat het verschil tussen "hij was er" en "onbekend". */
-        uit.push({ id: laag + ':' + (p.code || p.naam), naam: p.naam, bron: 'navigatie',
-          soort: 'punt', punten: [{ lat: p.lat, lng: p.lng }], straalM });
-      }
-    }
-    return uit;
-  }
-
-  /* De zones uit de gebiedenboom worden vlakhekken. Een vlak heeft geen straal:
-     je staat erin of niet, en dat is precies wat een zone hoort te betekenen.
-     Werkt het weefsel niet (of is de boom nog niet gezaaid), dan leveren we geen
-     zones in plaats van te doen alsof -- een hek dat niet bestaat mag niet als
-     leeg gebied naar een toestel, want dan meldt dat toestel "buiten" over iets
-     waar het nooit in kon zitten. */
-  function vanWeefsel() {
-    if (!weefsel || typeof weefsel.weefselGebieden !== 'function') return [];
-    let r;
-    try { r = weefsel.weefselGebieden({ niveau: 'zone' }); } catch (e) { return []; }
-    if (!r || r.status !== 200 || !Array.isArray(r.gebieden)) return [];
-    return r.gebieden
-      .filter(g => g.geometrie && g.geometrie.soort === 'vlak' &&
-        Array.isArray(g.geometrie.punten) && g.geometrie.punten.length >= 3)
-      .map(g => ({ id: 'zone:' + g.id, naam: g.naam || g.id, bron: 'weefsel',
-        soort: 'vlak', punten: g.geometrie.punten.map(p => ({ lat: p.lat, lng: p.lng })), straalM: 0 }));
-  }
-
   /* De hekken voor één doel. Dit is wat het toestel ophaalt, en er staat dus
      bewust geen enkel persoonsgegeven in. */
-  function hekkenVoor(doel) {
+  function hekkenVoor(doel, codenaam, key) {
     const d = String(doel || '');
     const regel = DOEL[d];
     if (!regel) return { status: 400, error: 'Onbekend doel.' };
     const lijst = (regel.zones ? vanWeefsel() : [])
       .concat(vanPlekken(regel.lagen, regel.straalM))
+      .concat(vanBronnen(d, codenaam, key))
       .concat(eigen().filter(h => h.doel === d))
       .map(h => ({ ...h, doel: d }));
     return { status: 200, doel: d, straalM: regel.straalM,
@@ -121,8 +89,8 @@ module.exports = ({ db, weefsel, navPoi }) => {
      een verzonnen hek-id te weigeren. Zonder deze controle kan een toestel
      waarnemingen sturen over hekken die niemand kent, en dan staat er in het
      actielog een geschiedenis van iets dat nooit heeft bestaan. */
-  function kentHek(doel, id) {
-    const r = hekkenVoor(doel);
+  function kentHek(doel, id, codenaam, key) {
+    const r = hekkenVoor(doel, codenaam, key);
     return r.status === 200 && r.hekken.some(h => h.id === String(id || ''));
   }
 
@@ -131,5 +99,5 @@ module.exports = ({ db, weefsel, navPoi }) => {
      staat de vorm ervan op vijf plaatsen en verandert hij op vier. */
   const hekVoorZaak = (code) => 'leverancier:' + String(code || '');
 
-  return { DOELEN, DOEL, hekkenVoor, kentHek, hekVoorZaak };
+  return { DOELEN, DOEL, hekkenVoor, kentHek, hekVoorZaak, bronToevoegen };
 };

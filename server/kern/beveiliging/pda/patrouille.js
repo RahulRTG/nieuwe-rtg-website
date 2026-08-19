@@ -6,7 +6,23 @@
 module.exports = (ctx) => {
   const { db, save, findSupplier, sseToSupplier, logActivity,
     id, nu, vandaag, schoon, isBeveiliging, functieAan,
-    diensten, rondes, guardNaam, postVan, dienstPubliek } = ctx;
+    diensten, rondes, guardNaam, postVan, dienstPubliek,
+    /* `laat` is de late-binding-sleuf uit kern/beveiliging.js: de plaatslaag
+       bestaat nog niet als deze module wordt gebouwd. Leeg = niets te zeggen. */
+    laat } = ctx;
+
+  /* De aanwezigheid van deze bewaker bij de post van zijn dienst. `plaats` mag
+     ontbreken (een kaal testproces mount de laag niet) en dan is er niets te
+     zeggen -- niet 'niet bevestigd', maar niets. */
+  function plekBijPost(s, d) {
+    const plaats = laat && laat.plaats;
+    if (!plaats || typeof plaats.plaatsAanwezig !== 'function' || typeof laat.codenaamVanGuard !== 'function') return null;
+    const codenaam = laat.codenaamVanGuard(s, d.guardId);
+    if (!codenaam) return { bevestigd: false, gemeten: false, sinds: null, reden: 'geen ledenaccount' };
+    const a = plaats.plaatsAanwezig(codenaam, 'dienst', 'bevpost:' + s.code + ':' + d.postId);
+    if (!a.bekend) return { bevestigd: false, gemeten: false, sinds: null, reden: 'niets waargenomen' };
+    return { bevestigd: !!a.binnen, gemeten: true, sinds: a.sinds, reden: null };
+  }
 
   function mijnDiensten(supplierCode, gid) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { diensten: [], ronde: null };
@@ -40,6 +56,17 @@ module.exports = (ctx) => {
     if (!d) return { status: 404, error: 'Dienst niet gevonden.' };
     if (d.status === 'afgerond') return { status: 409, error: 'Deze dienst is al afgerond.' };
     d.status = 'ingeklokt'; d.inklokAt = nu();
+    /* En hier komt terug wat de coordinaat hierboven nooit was: BINNEN OF BUITEN
+       DE POST, met een tijd. De hek-motor op het toestel van de bewaker heeft
+       dat zelf uitgerekend (opzet/plaatsbronnen.js levert de posten als hek);
+       wij vragen het alleen. Meer gebruikt, minder bewaard.
+
+       Drie uitkomsten, nooit twee -- 'niet gemeten' is iets anders dan 'niet
+       bevestigd', want een bewaker zonder gekoppeld ledenaccount hoort geen
+       verdachte bewaker te worden. En het blokkeert niets: inklokken buiten de
+       post gaat gewoon door. */
+    const plek = plekBijPost(s, d);
+    if (plek) d.plekIn = plek;
     save();
     logActivity(s.code, { name: d.guardNaam || 'Bewaker' }, 'klokte in op ' + ((postVan(s, d.postId) || {}).naam || 'post'));
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });

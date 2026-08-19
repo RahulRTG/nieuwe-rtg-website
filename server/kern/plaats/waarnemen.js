@@ -20,7 +20,7 @@ module.exports = ({ db, save, opslag, kentHek }) => {
 
   /* DE WAARNEMING. Het toestel heeft zelf gerekend; wij horen de uitkomst.
      Merk op wat hier NIET binnenkomt en ook niet mag: een positie. */
-  function waarneem(codenaam, w) {
+  function waarneem(codenaam, w, key) {
     ruim();
     if (!codenaam) return { status: 401, error: 'Geen lid.' };
     const body = w || {};
@@ -36,7 +36,11 @@ module.exports = ({ db, save, opslag, kentHek }) => {
     const venster = vensters().find(x => x.codenaam === codenaam && x.doel === doel && open(x));
     if (!venster) return { status: 403, error: 'Geen open venster voor dit doel.' };
     const hek = String(body.hek || '');
-    if (!kentHek(doel, hek)) return { status: 400, error: 'Onbekend hek.' };
+    /* De codenaam gaat mee: sinds fase 2b antwoorden bronnen per lid, dus "kent
+       dit hek" is een vraag over DIT lid. Zonder de codenaam zou een waarneming
+       over je eigen werkplek worden geweigerd omdat een leeg-gevraagde bron hem
+       niet kent. */
+    if (!kentHek(doel, hek, codenaam, key)) return { status: 400, error: 'Onbekend hek.' };
     const wat = body.wat === 'buiten' ? 'buiten' : body.wat === 'binnen' ? 'binnen' : null;
     if (!wat) return { status: 400, error: 'Een waarneming is binnen of buiten.' };
     /* Dezelfde overgang twee keer op rij is geen tweede feit. Een toestel dat op

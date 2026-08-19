@@ -12,9 +12,17 @@
    blad aanmeldt zodra er een openstaat, en de handelingen van een selectie zodra
    je iets aanwijst. De tabel staat in ADAPTIEF.md.
 
-   DE STRUCTUUR BLIJFT VOORSPELBAAR, en dat is de hele voorwaarde. Links is
-   altijd de bank, rechts is altijd Rahul, en het midden begint altijd met waar
-   je bent. Wat verandert is de INHOUD van het midden, nooit de plekken.
+   DE STRUCTUUR BLIJFT VOORSPELBAAR, en dat is de hele voorwaarde. De bank staat
+   altijd aan de ANKERZIJDE, Rahul altijd aan de DUIMZIJDE, en het midden begint
+   altijd met waar je bent. Wat verandert is de INHOUD van het midden, nooit de
+   plekken.
+
+   Welke kant dat is hangt af van de hand (shared/hand.js): voor een
+   rechtshandige is de ankerzijde links, voor een linkshandige rechts. Hier
+   stond "links is altijd de bank", en dat klopte maar voor een van de twee --
+   een linkshandige had de bank onder zijn duim en Rahul buiten bereik. Het
+   spiegelen zelf gebeurt in DOM-volgorde in shared/command/romp.js, juist zodat
+   de afspraak hieronder overeind blijft.
 
    WAT DEZE LAAG NIET WEET. Hij kent geen documenten, cellen of dia's. Hij vraagt
    het register (shared/adaptief/register.js) welke capabilities er nu spelen en

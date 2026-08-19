@@ -129,9 +129,52 @@ Het midden is nu een **contextzone**:
 | een blad open | de handelingen die dat blad aanmeldt, met zijn naam als anker ervoor |
 | een selectie | de handelingen van die selectie; zodra de selectie weg is, staat de vorige rij er weer |
 
-**De structuur blijft voorspelbaar, en dat is de voorwaarde.** Links is altijd de
-bank, rechts is altijd Rahul, het midden begint altijd met waar je bent. Wat
-verandert is de inhoud van het midden, nooit de plekken.
+**De structuur blijft voorspelbaar, en dat is de voorwaarde.** De bank staat
+altijd aan de **ankerzijde**, Rahul altijd aan de **duimzijde**, het midden
+begint altijd met waar je bent. Wat verandert is de inhoud van het midden, nooit
+de plekken.
+
+### Ankerzijde en duimzijde, en waarom hier niet "links" en "rechts" staat
+
+Hier stond: *"links is altijd de bank, rechts is altijd Rahul."* Dat klopte voor
+één van de twee handen. De duimboog van een linkshandige is het spiegelbeeld van
+die van een rechtshandige, dus die had de **bank** onder zijn duim en **Rahul**
+buiten bereik — precies omgekeerd aan wat deze regel bedoelde. Hetzelfde gold
+buiten de balk: in elk dialoogvenster lag *annuleren* het dichtstbij en
+*bevestigen* het verst weg, dus een linkshandige moest zich strekken voor wat hij
+wilde en raakte per ongeluk wat hij niet wilde.
+
+De belofte van deze regel is **voorspelbaarheid**, en die blijft heel. Hij is
+alleen op rollen geschreven in plaats van op kanten:
+
+| rol | rechtshandig | linkshandig |
+|---|---|---|
+| ankerzijde (de bank, de lade) | links | rechts |
+| duimzijde (Rahul, de bevestiging, de hoofdhandeling) | rechts | links |
+
+Een mens zet zijn hand één keer en daarna verschuift er nooit meer iets.
+Voorspelbaarheid is daarmee **per mens** in plaats van per pixel — en dat is wat
+de regel altijd al wilde.
+
+**Spiegelen gebeurt in DOM-volgorde, niet met `order`.** `order` verplaatst wel
+het beeld maar niet de leesvolgorde, en dan hoort een schermlezer de dingen in
+een andere volgorde dan een ziende ze ziet. Een gespiegelde balk is dus een
+*andere* balk en geen omgeklapte: `shared/command/romp.js` bouwt hem in de juiste
+volgorde op. Wat wél met opmaak mag is alles waar plaatsing **bereik** is en geen
+betekenis — de kant waar een lade opengaat, de uitlijning van een knoppenrij —
+en dat staat in `shared/hand.css`.
+
+*Waar dat staat:* `shared/hand.js` (de enige plek die de hand kent),
+`shared/hand.css`, `shared/command/romp.js`, en
+`server/middleware/voordeur.js` zet het attribuut al in de HTML zodat het scherm
+van een linkshandige niet bij elke start zichtbaar omklapt.
+*Wat het bewaakt:* `test/hand.test.js`, met vier mutaties.
+
+**En het is geen accountvoorkeur.** Welke hand iemand gebruikt is een
+lichaamskenmerk: het moet al kloppen op het inlogscherm, waar er nog geen account
+is om iets aan te hangen. Vandaar `localStorage` als waarheid en een cookie
+alleen als transport naar de server. De instelling staat in Instellingen
+(`/apps/ik.html`), onder *Welke hand u gebruikt*.
 
 **Lang drukken legt uit; omhoog trekken geeft meer.** Hier stond eerst dat lang
 drukken de uitgebreide lade opende. Dat was een tweede betekenis voor hetzelfde

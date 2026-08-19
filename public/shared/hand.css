@@ -1,0 +1,55 @@
+/* DE HANDZIJDE, IN OPMAAK.
+
+   shared/hand.js zet `data-hand="links"` of `"rechts"` op <html>; hier staat wat
+   dat betekent. Rechts is de standaard en staat daarom nergens apart: wat je
+   hieronder ziet is uitsluitend wat er voor een LINKSHANDIGE anders wordt.
+
+   WAT HIER NIET IN STAAT, EN WAAROM. De schilbalk spiegelt niet met `order`
+   maar in DOM-volgorde (shared/command/romp.js). `order` verplaatst wel het
+   beeld maar niet de leesvolgorde, en dan hoort een schermlezer de dingen in
+   een andere volgorde dan een ziende ze ziet -- precies de afspraak die
+   shared/adaptief/balk.js met zoveel woorden maakt ("een schermlezer leest ze
+   waar ze staan"). Een gespiegelde balk is een ANDERE balk, geen omgeklapte.
+
+   Wat hier wel in staat is alles waar plaatsing een gemak is en geen structuur:
+   de kant waar iets opengaat, en de kant waar de bevestiging ligt. */
+
+/* ---- knoprijen: de bevestiging hoort onder de duim ----------------------
+   Dit is de stilste van allemaal. Een dialoogvoet is overal rechts uitgelijnd
+   met annuleren links en bevestigen rechts. Voor een linkshandige ligt de
+   ANNULEERKNOP dan onder zijn duim en de bevestiging het verst weg: hij moet
+   zich strekken voor wat hij wil, en raakt per ongeluk wat hij niet wil.
+
+   `row-reverse` en niet `flex-end` omzetten: de knoppen houden hun onderlinge
+   volgorde in de DOM (annuleren voor bevestigen, zoals een schermlezer ze
+   hoort), maar de bevestiging komt aan de duimkant te liggen. */
+:root[data-hand="links"] dialog form > div,
+:root[data-hand="links"] dialog form > footer,
+:root[data-hand="links"] .knoprij,
+:root[data-hand="links"] .cmd-dialoog-voet {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* ---- lades, contextmenu's en zwevende panelen gaan open aan de duimzijde -- */
+:root[data-hand="links"] .rtg-lade,
+:root[data-hand="links"] .rtg-contextmenu,
+:root[data-hand="links"] .cmd-kiezer {
+  left: auto;
+  right: auto;
+}
+:root[data-hand="links"] .cmd-kiezer { left: 12px; right: auto; }
+
+/* ---- een zwevende hoofdactie hoort aan de duimzijde ---------------------- */
+:root[data-hand="links"] .rtg-fab,
+:root[data-hand="links"] .fab {
+  right: auto;
+  left: 16px;
+}
+
+/* ---- de schilbalk: alleen de uitlijning binnen de zones -----------------
+   De zones zelf wisselen van plek in de DOM (romp.js). Wat hier overblijft is
+   de richting waarin de contextzone uitloopt: hij hoort vanaf de duimzijde te
+   vullen, zodat de eerste handeling het dichtstbij ligt. */
+:root[data-hand="links"] .cmd-actierij { flex-direction: row-reverse; }
+:root[data-hand="links"] .cmd-balkbladen { flex-direction: row-reverse; }

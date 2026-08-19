@@ -16,6 +16,8 @@
 @import url('/shared/rtg-ontwerp.css');
 @import url('/shared/rtg-materiaal.css');
 @import url('/shared/rtg-themas.css');
+/* De handzijde: wat er voor een linkshandige spiegelt (shared/hand.js). */
+@import url('/shared/hand.css');
 
 /* ====================== DE RTG UI-KIT ======================================
 

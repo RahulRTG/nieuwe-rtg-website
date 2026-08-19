@@ -17,10 +17,11 @@
    structureel anders uit dan de boekhouding van diezelfde zaak.
 
    Het was ook niet bij te houden. De landentabel is LEVEND: de Regelwacht
-   (./regelwacht.js) legt er een herstart-vaste overlay overheen zodra een
-   tarief verandert. Twee vaste getallen in een andere module lopen daar per
-   definitie op achter -- die veranderen alleen als iemand ze met de hand
-   naloopt, en dat is precies wat niemand doet.
+   (./regelwacht.js) legt er zodra een tarief verandert een jaargang op
+   (./jaargangen.js) en projecteert de stand van vandaag op de tabel. Twee vaste
+   getallen in een andere module lopen daar per definitie op achter -- die
+   veranderen alleen als iemand ze met de hand naloopt, en dat is precies wat
+   niemand doet.
 
    Dat is LAT.md regel 4: nooit twee plekken die een waarheid vasthouden. Vanaf
    nu vragen ze het allebei hier, en dan KUNNEN ze niet meer uiteenlopen.
@@ -77,10 +78,21 @@ function catVanItem(s, naam, basis) {
   return m && m.station === 'bar' ? 'drank' : 'eten';
 }
 
-// Het percentage: de categorie in de landentabel, anders het standaardtarief.
-function tariefVan(s, cat) {
-  const t = LANDEN[landVan(s)].tarieven;
+/* HET PERCENTAGE UIT EEN TARIEVENTABEL: de categorie, anders het
+   standaardtarief. Los van `tariefVan` omdat er twee tabellen zijn die
+   dezelfde vraag krijgen -- de LOPENDE tabel (hieronder) en een
+   TERUGGEREKENDE tabel van een datum in het verleden (kern/fiscaal/
+   jaargangen.js, tariefOp). Die terugval op `standaard` twee keer opschrijven
+   is twee plekken die dezelfde waarheid vasthouden, en dan rekent de
+   herbouw van een oud bedrag ooit net anders dan het bedrag zelf. */
+function uitTabel(tarieven, cat) {
+  const t = tarieven || {};
   return t[cat] != null ? t[cat] : t.standaard;
 }
 
-module.exports = { landVan, basisCat, catVanItem, tariefVan, ETEN_GENRES };
+// Het percentage voor deze zaak, uit de tabel zoals hij NU geldt.
+function tariefVan(s, cat) {
+  return uitTabel(LANDEN[landVan(s)].tarieven, cat);
+}
+
+module.exports = { landVan, basisCat, catVanItem, tariefVan, uitTabel, ETEN_GENRES };

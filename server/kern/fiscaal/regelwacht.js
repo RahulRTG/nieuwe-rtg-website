@@ -4,17 +4,25 @@
    - De ingebouwde landtabellen (./landen.js, het peiljaar) blijven de
      veilige basis: zonder bron draait alles gewoon door.
    - Een UPDATE (uit de gekoppelde bron, of door het kantoor doorgevoerd)
-     wordt streng gevalideerd -- alleen bekende velden, alleen zinnige
-     waardes -- en dan IN PLACE op de gedeelde LANDEN-tabel gezet. Elke
-     rekenplek in het systeem (btw, loonrun, zzp, minimumloon) gebruikt
-     dezelfde tabel en rekent dus per direct met de nieuwe regels.
-   - De overlay wordt bewaard (db.data.fiscaalRegels) en bij het opstarten
-     opnieuw toegepast: een herstart verliest nooit een regel-update.
+     wordt hier streng gevalideerd -- alleen bekende velden, alleen zinnige
+     waardes -- en daarna VASTGELEGD ALS JAARGANG (./jaargangen.js) en op de
+     gedeelde LANDEN-tabel geprojecteerd. Elke rekenplek in het systeem (btw,
+     loonrun, zzp, minimumloon) gebruikt dezelfde tabel en rekent dus per
+     direct met de nieuwe regels.
+   - Een herstart verliest nooit een regel-update: de jaargangen staan in de
+     database en worden bij het opstarten opnieuw geprojecteerd.
    - Met FISCAAL_BRON_URL gezet haalt de dagelijkse controle de nieuwste
      tabellen op (JSON: { versie, landen: { NL: { uurloonMin: ... } } });
-     zonder bron meldt de status eerlijk dat het peiljaar de basis is. */
-module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
+     zonder bron meldt de status eerlijk dat het peiljaar de basis is.
+
+   DE TAAKVERDELING met ./jaargangen.js. Hier staat WAT EEN BRON MAG LEVEREN (de
+   validatie hieronder); daar staat hoe een wijziging wordt bewaard en
+   teruggevonden. Dat is niet altijd zo geweest: dit bestand hield zijn overlay
+   bij als platte kaart van laatste waarden, en overschreef daarmee de oude --
+   zie de kop daar voor wat dat onbeantwoordbaar maakte. */
+module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
   const haal = fetchImpl || ((...a) => fetch(...a));
+  const { jaargangen } = require('./jaargangen').maakJaargangen({ db, save, LANDEN, peiljaar, nu });
   const GETALLEN = { lasten: [0, 0.6], vakantiegeld: [0, 0.25], uurloonMin: [1, 100], alcoholLeeftijd: [16, 25] };
   const TEKSTEN = ['aangifte', 'extra'];
   // de reisregels (kern/reis.js zet ze op LANDEN[cc].reis) zijn net zo
@@ -24,10 +32,15 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
 
   const staat = () => (db.data.fiscaalRegels = db.data.fiscaalRegels || { versie: null, bron: null, at: null, wijzigingen: {} });
 
-  /* Valideer en pas een update toe; geeft per land terug wat er echt
+  /* Valideer een update en leg hem vast; geeft per land terug wat er echt
      veranderde. Onbekende landen en velden worden genegeerd, gekke waardes
-     geweigerd -- een slechte bron kan de tabellen nooit slopen. */
-  function pasToe(update, bron, versie) {
+     geweigerd -- een slechte bron kan de tabellen nooit slopen.
+
+     De vergelijking loopt tegen de LOPENDE tabel: alleen een waarde die echt
+     afwijkt van wat er nu geldt, is een wijziging. Een bron die elke dag
+     dezelfde tabel levert, stapelt daardoor geen jaargangen. */
+  function pasToe(update, bron, versie, opties) {
+    const o = opties || {};
     const gedaan = {};
     for (const [cc, velden] of Object.entries((update && update.landen) || update || {})) {
       if (!LANDEN[cc] || typeof velden !== 'object') continue;
@@ -36,57 +49,86 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
         if (GETALLEN[veld]) {
           const n = Number(waarde);
           const [min, max] = GETALLEN[veld];
-          if (Number.isFinite(n) && n >= min && n <= max && LANDEN[cc][veld] !== n) { LANDEN[cc][veld] = n; wijz[veld] = n; }
+          if (Number.isFinite(n) && n >= min && n <= max && LANDEN[cc][veld] !== n) wijz[veld] = n;
         } else if (veld === 'tarieven' && typeof waarde === 'object') {
           for (const [t, w] of Object.entries(waarde)) {
             const n = Number(w);
             if (LANDEN[cc].tarieven && t in LANDEN[cc].tarieven && Number.isFinite(n) && n >= 0 && n <= 30 && LANDEN[cc].tarieven[t] !== n) {
-              LANDEN[cc].tarieven[t] = n; (wijz.tarieven = wijz.tarieven || {})[t] = n;
+              (wijz.tarieven = wijz.tarieven || {})[t] = n;
             }
           }
         } else if (TEKSTEN.includes(veld) && typeof waarde === 'string' && waarde.trim()) {
           const s = waarde.replace(/[<>]/g, '').slice(0, 400);
-          if (LANDEN[cc][veld] !== s) { LANDEN[cc][veld] = s; wijz[veld] = s; }
+          if (LANDEN[cc][veld] !== s) wijz[veld] = s;
         } else if (veld === 'reis' && typeof waarde === 'object' && LANDEN[cc].reis) {
           const rs = LANDEN[cc].reis;
           for (const [rv, rw] of Object.entries(waarde)) {
-            if (REIS_ENUM[rv] && REIS_ENUM[rv].includes(rw) && rs[rv] !== rw) { rs[rv] = rw; (wijz.reis = wijz.reis || {})[rv] = rw; }
-            else if (rv === 'dagen') { const n = Number(rw); if (Number.isFinite(n) && n >= 0 && n <= 365 && rs.dagen !== n) { rs.dagen = n; (wijz.reis = wijz.reis || {}).dagen = n; } }
-            else if (rv === 'water') { const b = rw === true; if (typeof rw === 'boolean' && rs.water !== b) { rs.water = b; (wijz.reis = wijz.reis || {}).water = b; } }
+            if (REIS_ENUM[rv] && REIS_ENUM[rv].includes(rw) && rs[rv] !== rw) (wijz.reis = wijz.reis || {})[rv] = rw;
+            else if (rv === 'dagen') { const n = Number(rw); if (Number.isFinite(n) && n >= 0 && n <= 365 && rs.dagen !== n) (wijz.reis = wijz.reis || {}).dagen = n; }
+            else if (rv === 'water') { const b = rw === true; if (typeof rw === 'boolean' && rs.water !== b) (wijz.reis = wijz.reis || {}).water = b; }
             else if (REIS_TEKST[rv] && typeof rw === 'string') {
               const [min, max] = REIS_TEKST[rv];
               const s = rw.replace(/[<>]/g, '').trim().slice(0, max);
-              if (s.length >= min && rs[rv] !== s) { rs[rv] = s; (wijz.reis = wijz.reis || {})[rv] = s; }
+              if (s.length >= min && rs[rv] !== s) (wijz.reis = wijz.reis || {})[rv] = s;
             }
           }
           if (wijz.reis && !Object.keys(wijz.reis).length) delete wijz.reis;
         }
       }
-      if (Object.keys(wijz).length) gedaan[cc] = wijz;
+      if (Object.keys(wijz).length) {
+        /* VASTLEGGEN VOOR PROJECTEREN. De jaargang moet weten wat hij verving,
+           en dat kan alleen zolang de oude waarde nog op de tabel staat. */
+        const r = jaargangen.neemOp({ land: cc, wijzigingen: wijz, geldigVanaf: o.geldigVanaf,
+          bron: typeof bron === 'string' ? { soort: bron } : bron, versie,
+          rechtsgrond: o.rechtsgrond, bekendgemaaktOp: o.bekendgemaaktOp, door: o.door });
+        if (r && r.ok) gedaan[cc] = wijz;
+      }
     }
+    /* De projectie zet de stand van vandaag op de gedeelde tabel. Een wijziging
+       met een ingangsdatum in de toekomst ligt daarna klaar en doet nog niets. */
+    if (Object.keys(gedaan).length) jaargangen.projecteer();
     const st = staat();
-    // de overlay stapelt: latere updates winnen per veld, zodat een herstart
-    // altijd op de laatste stand uitkomt
-    for (const [cc, wijz] of Object.entries(gedaan)) {
-      const eerder = st.wijzigingen[cc] || {};
-      const eerderTarieven = eerder.tarieven, eerderReis = eerder.reis;
-      st.wijzigingen[cc] = Object.assign(eerder, JSON.parse(JSON.stringify(wijz)));
-      if (wijz.tarieven) st.wijzigingen[cc].tarieven = Object.assign(eerderTarieven || {}, wijz.tarieven);
-      if (wijz.reis) st.wijzigingen[cc].reis = Object.assign(eerderReis || {}, wijz.reis);
-    }
     if (Object.keys(gedaan).length || versie) {
       st.versie = versie || st.versie;
-      st.bron = bron || st.bron || 'kantoor';
+      st.bron = (typeof bron === 'string' ? bron : bron && bron.naam) || st.bron || 'kantoor';
       st.at = new Date().toISOString();
       save();
     }
     return { ok: true, gedaan, landen: Object.keys(gedaan).length };
   }
 
-  /* Bij het opstarten: de bewaarde overlay opnieuw op de tabellen zetten. */
-  function herstelOverlay() {
+  /* DE OUDE PLATTE OVERLAY, EEN KEER. Wat er vóór de jaargangen is
+     doorgevoerd, staat als kaart van laatste waarden in db.data.fiscaalRegels.
+     Die wordt hier omgezet naar één jaargang per land.
+
+     EERLIJK OVER WAT NIET TE REDDEN IS: wanneer elk veld veranderde, is nooit
+     vastgelegd. De omzetting zet ze daarom allemaal op de laatst bekende
+     updatedatum, met de herkomst 'overlay-migratie' erbij. Dat is geen
+     geschiedenis maar een beginstand -- en zo staat het er ook bij, want een
+     verzonnen ingangsdatum is erger dan een grove. */
+  function migreerOverlay() {
     const st = staat();
-    if (Object.keys(st.wijzigingen || {}).length) pasToe({ landen: st.wijzigingen }, st.bron, st.versie);
+    const oud = st.wijzigingen || {};
+    if (!Object.keys(oud).length) return { gemigreerd: 0 };
+    const vanaf = String(st.at || '').slice(0, 10) || (peiljaar + '-01-01');
+    let n = 0;
+    for (const [cc, wijz] of Object.entries(oud)) {
+      if (!LANDEN[cc] || !wijz || !Object.keys(wijz).length) continue;
+      const r = jaargangen.neemOp({ land: cc, wijzigingen: wijz, geldigVanaf: vanaf,
+        bron: { soort: 'overlay-migratie', naam: st.bron || null }, versie: st.versie,
+        rechtsgrond: 'Omgezet uit de platte overlay; de werkelijke ingangsdatum per veld is nooit vastgelegd.' });
+      if (r && r.ok) n++;
+    }
+    st.wijzigingen = {};
+    st.gemigreerdOp = new Date().toISOString();
+    save();
+    return { gemigreerd: n };
+  }
+
+  /* Bij het opstarten: de bewaarde jaargangen opnieuw op de tabellen zetten. */
+  function herstelOverlay() {
+    migreerOverlay();
+    return jaargangen.projecteer();
   }
 
   /* De dagelijkse controle: met een bron halen we de nieuwste tabellen op;
@@ -101,7 +143,8 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
       const r = await haal(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
       if (!r.ok) throw new Error('bron gaf ' + r.status);
       const data = await r.json();
-      const uit = pasToe(data, url, data.versie);
+      const uit = pasToe(data, { soort: 'bron', naam: url, url }, data.versie,
+        { geldigVanaf: data.geldigVanaf, bekendgemaaktOp: data.bekendgemaaktOp });
       st.checkUitslag = 'bron opgehaald; ' + uit.landen + ' land(en) bijgewerkt';
       save();
       return { ok: true, bron: url, bijgewerkt: uit.landen };
@@ -114,14 +157,18 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl }) => {
 
   function status() {
     const st = staat();
+    const tl = jaargangen.stand();
+    const bak = db.data.fiscaalJaargangen || {};
+    const metUpdates = Object.keys(bak).filter(cc => (bak[cc] || []).length);
     return { peiljaar, versie: st.versie, bron: st.bron, laatsteUpdate: st.at,
       laatsteCheck: st.laatsteCheck || null, checkUitslag: st.checkUitslag || null,
-      landenMetUpdates: Object.keys(st.wijzigingen || {}),
+      landenMetUpdates: metUpdates,
+      wijzigingen: tl.wijzigingen, ongecontroleerd: tl.ongecontroleerd, wachtend: tl.wachtend,
       totaal: Object.keys(LANDEN).length,
       landen: Object.entries(LANDEN).map(([cc, l]) => ({ code: cc, naam: l.naam, regio: l.regio || '', uurloonMin: l.uurloonMin,
         lasten: l.lasten, vakantiegeld: l.vakantiegeld, standaardBtw: l.tarieven && l.tarieven.standaard,
-        bijgewerkt: !!(st.wijzigingen || {})[cc] })).sort((a, b) => a.naam.localeCompare(b.naam)) };
+        bijgewerkt: (bak[cc] || []).length > 0 })).sort((a, b) => a.naam.localeCompare(b.naam)) };
   }
 
-  return { regelwacht: { pasToe, herstelOverlay, check, status } };
+  return { regelwacht: { pasToe, herstelOverlay, migreerOverlay, check, status, jaargangen } };
 };

@@ -933,6 +933,68 @@ uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
   `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
   cijfer verandert daardoor, en dat is de bedoeling.
 
+### Welke regels golden er op die dag (`kern/fiscaal/jaargangen.js`)
+
+De Regelwacht hield zijn overlay bij als een platte kaart van laatste waarden
+(`Object.assign(eerder, wijz)`). Dat beantwoordde "wat geldt er nu" en maakte
+"wat gold er toen" **onbeantwoordbaar**: de oude waarde werd overschreven, niet
+bewaard. Wat het NL-eten-tarief op 15 maart 2026 was, stond daarna nergens meer.
+Een administratie krijgt jaren later precies die tweede vraag — bij een controle,
+een bezwaar of een due diligence.
+
+De oplossing is geleend en niet verzonnen. Payroll doet dit al met jaargangen
+(`kern/payroll/regelpakket.js`): een tarief is daar nooit een constante maar een
+**versie** met een geldigheidsperiode en een herkomst, en de loonrun stempelt de
+versie die hij gebruikte op zichzelf. Twee regelmotoren in één huis is precies
+wat LAT-regel 4 verbiedt, dus de fiscale kant krijgt hetzelfde model.
+
+Het verschil met payroll: dat krijgt hele pakketten binnen (een JSON per land per
+jaar), de Regelwacht krijgt losse velden ("NL, eten, 11%") en zijn basis staat in
+code. Een momentopname per wijziging zou voor ~200 landen absurd zijn. Dus:
+
+    de basis (peiljaar, uit landen.js) + de wijzigingen tot een datum
+    = de tabel zoals hij op die datum was
+
+**Het scharnier is de basis.** De projectie schrijft in de gedeelde
+`LANDEN`-tabel — dat moet, anders zou elke lezer in huis moeten veranderen — dus
+na een projectie is `LANDEN` de huidige stand en niet meer het peiljaar. Er staat
+daarom een diepe kopie van de tabel zoals `landen.js` hem oplevert, gemaakt
+vóórdat er iets overheen ging. Het opbouwen zelf is puur en staat apart
+(`jaargangen-tijdlijn.js`).
+
+Wat dat oplevert:
+
+- **een tariefwijziging van juli verplaatst het tarief van juni niet** — de toets
+  waar het om begonnen is, en die vóór deze laag niet te schrijven was;
+- **een wijziging met een ingangsdatum in de toekomst ligt klaar en doet niets**,
+  dezelfde eigenschap als een payroll-jaargang die in november binnenkomt voor
+  1 januari. Voorheen onmogelijk: de overlay kende geen ingangsdatum, dus alles
+  wat binnenkwam gold meteen;
+- **de geschiedenis zegt wat er veranderde en wat het verving**, per land en per
+  (genest) veld;
+- **de projectie stapelt niet** maar bouwt terug op vanaf de basis, zodat een
+  wijziging die wegvalt ook echt uit het beeld verdwijnt.
+
+De oude platte overlay wordt eenmalig omgezet. Eerlijk over wat niet te redden
+is: wanneer elk veld veranderde is nooit vastgelegd, dus alles landt op de laatst
+bekende updatedatum met de herkomst `overlay-migratie` en die reden erbij. Een
+verzonnen ingangsdatum is erger dan een grove.
+
+Een wijziging draagt een `stand` (`ongecontroleerd` / `goedgekeurd`): wat het
+kantoor doorvoert heeft een mens gezien, wat een automatische bron levert niet.
+Beide worden geprojecteerd — net als voorheen. Aan die projectie een goedkeuring
+hangen zou bij de eerste de beste storing stilletjes de tarieven van het hele
+huis bevriezen; dat is een eigen besluit met een eigen zichtbare schakelaar. De
+stand wordt hier alleen vastgelegd, zodat dat besluit later te nemen is zonder
+archeologie.
+
+De tariefkeuze zelf (categorie, anders standaard) staat op één plek —
+`tarief.js` `uitTabel`, gedeeld door de lopende tabel en de teruggerekende. Een
+herbouwd bedrag dat net anders terugvalt dan het oorspronkelijke is geen herbouw.
+
+`test/fiscaal-jaargangen.test.js` dekt de vijf beweringen; elk is met een mutatie
+zien zakken.
+
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
 Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om

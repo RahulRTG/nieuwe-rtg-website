@@ -41,7 +41,27 @@ self.addEventListener('fetch', e => {
       ? caches.match(e.request).then(hit => hit ||
           fetch(e.request).then(res => {
             const copy = res.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy));
+            caches.open(CACHE).then(async c => {
+              await c.put(e.request, copy);
+              /* EN DE VORIGE VERSIE ERUIT.
+
+                 Een gestempeld adres verandert bij elke wijziging van het
+                 bestand, dus zonder dit blijft elke oude versie naast de nieuwe
+                 staan. De CACHE-naam ruimt dat niet op: die is een hash van de
+                 SCHIL (zie scripts/build.js), dus een uitrol die alleen
+                 /shared/klok.js aanraakt laat de naam ongemoeid en de oude
+                 klok.js blijft liggen. Over veel uitrollen groeit dat door.
+
+                 Hier hoogstens een per bestand: bij een treffer op hetzelfde
+                 pad met een ANDER stempel gaat de oude weg. Dit kost alleen
+                 werk als er echt iets nieuws gecachet wordt, niet bij een
+                 gewone treffer. */
+              if (!gestempeld) return;
+              for (const oud of await c.keys()) {
+                const u = new URL(oud.url);
+                if (u.pathname === url.pathname && u.search !== url.search) c.delete(oud);
+              }
+            });
             return res;
           }))
       /* "Network-first" is hier niet vanzelf waar. fetch(e.request) mag gewoon

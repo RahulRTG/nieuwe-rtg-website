@@ -273,4 +273,38 @@ function mobielInPagina(opt) {
 
 const BRON = 'window.__mobielKeur = ' + mobielInPagina.toString() + ';';
 
-module.exports = { BRON, MAAT, ONDER, SMAL, ANKERKWART };
+/* HET OORDEEL STAAT APART VAN DE METING, en puur: geen browser, geen bestanden.
+   Zo kan test/mobiel.test.js de poort laten DICHTGAAN zonder een scherm te
+   openen -- een poort die je nooit hebt zien sluiten is geen poort (LAT.md
+   regel 9). Dezelfde vorm als veltRaakvlak in ./raakvlakkeuring.js.
+
+   VIER SOORTEN, EN EEN VIJFDE DIE GEEN FOUT IS. Te breed, leeg, een balk half
+   buiten beeld en een hoofdhandeling buiten duimbereik zijn gebreken. Het
+   aantal schermen ZONDER aangewezen hoofdhandeling is dat niet: dat is
+   werkvoorraad (GRAMMATICA.md), en die hoort geteld te worden en niet
+   afgekeurd. Vandaar dat hij hier wel binnenkomt en nergens `faalt` maakt. */
+function veltMobiel(gevonden, grens) {
+  const g = grens || {};
+  const SOORT = [
+    ['breed', 'scherm(en) dat op 390px buiten beeld loopt'],
+    ['leeg', 'scherm(en) dat past en niets toont'],
+    ['balk', 'balk(en) die half buiten het venster steekt'],
+    ['duim', 'hoofdhandeling(en) buiten duimbereik']
+  ];
+  const erger = [], beter = [];
+  for (const [sleutel, wat] of SOORT) {
+    const nu = Number(gevonden[sleutel]) || 0;
+    const mag = Number(g[sleutel]) || 0;
+    if (nu > mag) erger.push(nu + ' ' + wat + ', de grens is ' + mag);
+    else if (nu < mag) beter.push(sleutel + ': ' + nu + ' tegen ' + mag);
+  }
+  if (erger.length) {
+    return { faalt: true, melding: '\n[a11y] MISLUKT op telefoonformaat:\n  \u00b7 ' + erger.join('\n  \u00b7 ') };
+  }
+  if (beter.length) {
+    return { faalt: false, melding: '\n[a11y] De telefoongrenzen kunnen strakker (A11Y-INGELOGD.json): ' + beter.join(', ') };
+  }
+  return { faalt: false, melding: '' };
+}
+
+module.exports = { BRON, mobielInPagina, veltMobiel, MAAT, ONDER, SMAL, ANKERKWART };

@@ -22,11 +22,35 @@ op telefoonformaat (390x844).
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| past op een telefoon | **0** te breed, **0** leeg | een scherm waarvan de rechterhelft weg is, of dat niets toont |
+| duimbereik | **0** buiten bereik, per hand gemeten | de belangrijkste knop op de plek waar jouw duim niet komt |
 
-Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
+Die zeven zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het
 raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd; wie iets
-vindt, meet nog een keer). `check.js` regel 49 doet het ondertitelregister.
+vindt, meet nog een keer), en breedte plus duimbereik in een vierde die TWEE
+keer draait: een keer rechtshandig en een keer linkshandig, want de duimboog van
+een linkshandige is het spiegelbeeld (`ADAPTIEF.md`). `check.js` regel 49 doet
+het ondertitelregister.
+
+### Een nul die niemand gemeten had
+
+Dit hoort erbij, want het raakt hoe je de tabel hierboven moet lezen. Tot 19
+augustus 2026 zocht `scripts/a11y.js` zijn browser met een eigen lader, en die
+kwam uit op een Playwright waarvan de chromium **niet bestond** (1234, terwijl er
+1194 stond). Het pakket laadt in dat geval gewoon; alleen de browser ontbreekt.
+De scan doet dan wat hij hoort te doen op een kale CI — *"geen browser, scan
+overgeslagen"*, met exitcode 0.
+
+Gevolg: hier draaide hij niet, terwijl dit document en `A11Y-INGELOGD.json` een
+**nul** meldden. Die nul was per ongeluk waar — de scan is op 19 augustus voor
+het eerst met een echte browser gedraaid en kwam op precies dezelfde uitkomst —
+maar dat wisten we niet toen we hem opschreven, en dat is het verschil tussen
+een meting en een aanname (`LAT.md` regel 9).
+
+Wat er is veranderd: de vindwijze staat nu op één plek (`scripts/lib/scherm.js`,
+gedeeld met `test/helper.js`) en de scan **drukt af waarmee hij gemeten heeft**,
+zodat "overgeslagen" nooit meer op stilte lijkt.
 
 ## De instellingen die een lid zelf zet
 
@@ -108,6 +132,29 @@ werkt.** Alleen de gewone schermtoetsen zagen dit.
 **Werkt ook: elk raakvlak is minstens 24x24** (WCAG 2.5.8), gemeten op
 telefoonformaat. De meting begon op 267 stuks over 188 schermen en staat nu op
 nul, met een poort eronder die zakt zodra er een bijkomt.
+
+**En werkt ook: het scherm past, en de belangrijkste knop ligt onder je duim.**
+Dat is een tweede laag boven 24x24, en het onderscheid is de moeite waard:
+24 pixels is de ondergrens om iets te kunnen RAKEN met een hand die trilt, 44 is
+wat een duim in beweging nodig heeft — in een trein, lopend, met één hand.
+`GRAMMATICA.md` belooft het eerste van die twee met zoveel woorden: *"ik wil iets
+doen → mijn duim vindt het onderaan."*
+
+De ronde begon op elf schermen die op 390px rechts buiten beeld liepen (tot
+1289px, zonder mogelijkheid ernaartoe te scrollen) en negentien met de
+hoofdhandeling te klein of buiten bereik. Beide staan nu op nul.
+
+Eén ding daaraan is nieuw en niet vanzelfsprekend: **het bereik wordt per hand
+gemeten**. Acht schermen hadden hun hoofdhandeling in het kwart waar de duim
+niet komt — en *welke* acht dat waren, verschilde tussen een linkshandige en een
+rechtshandige. Een scherm dat alleen voor rechtshandigen klopt, is niet af.
+
+**Wat hier NOG NIET staat**, en het is de grootste post: van de 257 schermen
+wijzen er **18** hun hoofdhandeling aan. De conventie bestaat (`data-hoofdactie`,
+`GRAMMATICA.md`) en de poort meet wat gedeclareerd is; de overige 239 zijn niet
+gemeten op duimbereik omdat er niets te meten valt. Dat is geen fout die
+verborgen wordt — het getal staat in `A11Y-INGELOGD.json` — maar het is wel de
+eerlijke maat van hoe ver dit is.
 
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146

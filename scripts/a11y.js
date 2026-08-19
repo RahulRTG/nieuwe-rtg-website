@@ -319,15 +319,28 @@ function startEchteServer() {
      zonder browser laten zakken. */
   const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
   if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
+  /* En de telefoonronde velt op dezelfde manier: het oordeel staat puur in
+     mobielkeuring.veltMobiel, zodat test/mobiel.test.js de poort kan laten
+     dichtgaan zonder een browser. Het aantal schermen ZONDER aangewezen
+     hoofdhandeling doet hier niet mee -- dat is werkvoorraad en geen gebrek
+     (GRAMMATICA.md). */
+  const mobielOordeel = mobiel.veltMobiel(
+    { breed: mobiu.breed.length, leeg: mobiu.leeg.length, balk: mobiu.balk.length, duim: mobiu.duim.length },
+    grens.telefoon || {});
+  if (mobielOordeel.faalt) fouten.push(mobielOordeel.melding.trim().replace(/^\[a11y\] MISLUKT op telefoonformaat:\s*/, 'op telefoonformaat: '));
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
     for (const f of fouten) console.error('  · ' + f);
     process.exit(1);
   }
   if (raakOordeel.melding) console.log(raakOordeel.melding);
+  if (mobielOordeel.melding) console.log(mobielOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
     `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}. ` +
-    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
+    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}. ` +
+    `Telefoonronde over twee handen: ${mobiu.breed.length} te breed, ${mobiu.leeg.length} leeg, ` +
+    `${mobiu.balk.length} balk buiten beeld, ${mobiu.duim.length} buiten duimbereik; ` +
+    `${mobiu.geenHoofd.length} metingen zonder aangewezen hoofdhandeling (werkvoorraad, geen gebrek).`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

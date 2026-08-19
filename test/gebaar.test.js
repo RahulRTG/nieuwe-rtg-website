@@ -240,6 +240,35 @@ test('het licht landt op de knop die dit huis echt gebruikt', () => {
     '.knop wordt buiten een :where() gepakt; dan wint dit blad van de pagina in plaats van andersom');
 });
 
+test('de regel draagt zelf een plaatsanker, ook zonder muis', () => {
+  /* DE FOUT DIE HIER ONDER LIGT IS DE ERGSTE VAN DEZE LAAG, en hij stond er
+     vanaf dag een. `position:relative` op .gb-rij stond alleen in de
+     mediaquery van het AANWIJSLICHT -- `(hover:hover) and (pointer:fine)`.
+     Op een telefoon is die onwaar, dus was de regel `position:static` en zocht
+     de lade (position:absolute) een andere voorouder: de pagina.
+
+     Gemeten in een echte browser met aanraakemulatie, voordat dit gerepareerd
+     werd: regel 350x62 op y=80, lade 97x844 op y=0. Een balk van de bovenkant
+     tot de onderkant van het scherm, NAAST de regel in plaats van erin. De veeg
+     heeft dus nooit op een telefoon gewerkt -- het apparaat waar hij voor is.
+
+     Waarom geen enkele toets dat zag: ze draaiden allemaal in een context met
+     een muis, en daar zette de lichtregel de positie er per ongeluk bij. Een
+     eigenschap die je nodig hebt, mag geen bijwerking van een andere regel zijn.
+
+     DE MUTATIE: haal position:relative uit de .gb-rij-regel bovenaan het blad.
+     Deze toets zakt; alles daarboven blijft groen, want die meten met een muis. */
+  const buitenMedia = CSSKAAL.split('@media')[0];
+  const regel = buitenMedia.split('}').map((brok) => {
+    const i = brok.indexOf('{');
+    return i < 0 ? null : { kiezer: brok.slice(0, i).trim(), inhoud: brok.slice(i + 1) };
+  }).filter(Boolean).filter((r) => /(^|,)\s*\.gb-rij\s*(,|$)/.test(r.kiezer));
+
+  assert.ok(regel.length, '.gb-rij hoort een regel te hebben BUITEN elke @media');
+  assert.ok(regel.some((r) => /position\s*:\s*relative/.test(r.inhoud)),
+    '.gb-rij krijgt position:relative alleen binnen een @media; op een telefoon valt de lade dan buiten de regel');
+});
+
 test('de drie wereldregisters delen EEN bouwer', () => {
   /* Kantoor, Sociaal en Reizen tekenen dezelfde .reis-regel. De eerste versie
      had de actiebouwer in kantoor.html staan; bij het tweede scherm was dat al

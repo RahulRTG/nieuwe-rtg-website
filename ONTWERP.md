@@ -220,10 +220,36 @@ Het eerste domein is RTG Bestanden: naar links is de prullenbak (`/weg`, terug
 met `/herstel`), naar rechts de ster. In de prullenbak zelf is een tweede `/weg`
 onomkeerbaar, en juist daar valt de borg vanzelf op zijn plek.
 
+Het tweede is **RTMAIL**, en dat is het gebaar dat een lid al meebrengt van
+buiten dit huis: opzij is weg, de andere kant is markeren. Juist daarom moet hij
+hier kloppen — een veeg die op post iets anders doet dan overal, is verwarrender
+dan geen veeg. Naar links liggen Opbergen en Weggooien, naar rechts de ster,
+sluimeren tot morgen en overnemen. Alles is omkeerbaar: opbergen, weggooien en
+terugzetten zijn dezelfde route (`verplaats`) met een andere map, en sluimeren
+gaat terug met `verplaats` naar `in` (dat wist het sluimermoment). Er is hier dus
+geen enkele borg, en dat is de reden dat dit domein het tweede is en niet het
+tiende. De melding zegt EERST wat er gebeurd is en dan welk bericht: andersom
+werd hij op een telefoon afgekapt tot het onderwerp, met een knop Terugdraaien
+ernaast en geen woord over wat je terugdraait.
+
+**En de laag werkte tot 19 augustus 2026 niet op een telefoon.** `.gb-rij` kreeg
+zijn `position:relative` alleen binnen de mediaquery van het aanwijslicht —
+`(hover:hover) and (pointer:fine)` — en op een aanraakscherm is die onwaar. De
+lade is absoluut geplaatst en zocht dus de PAGINA als houvast: gemeten met
+aanraakemulatie stond er naast een regel van 62 pixels een lade van 844, van de
+bovenkant tot de onderkant van het scherm. Geen enkele toets of schermafdruk zag
+het, want die draaiden allemaal met een muis — en daar zette de lichtregel de
+positie er per ongeluk bij. Een eigenschap die je nodig hebt, mag geen bijwerking
+van een andere regel zijn.
+
 *Handhaving:* `test/gebaar.test.js` bewaakt wat je niet ziet (de laag raakt in
 rust alleen aan wat met naam geleend is, de lade draagt geen knop-in-een-link,
-het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer),
-`test/gebaar.e2e.js` veegt in een echte browser.
+het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer, en de
+regel draagt zijn plaatsanker buiten elke mediaquery), `test/gebaar.e2e.js` veegt
+in een echte browser — met een derde scenario in de aanraakstand, over een regel
+die zichzelf NIET plaatst, want een scherm dat dat wel doet verbergt de fout van
+de laag. `test/gebaar-bestanden.e2e.js` en `test/gebaar-rtmail.e2e.js` meten de
+belofte met een server erachter, tot aan een geweigerde aanvraag toe.
 
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon

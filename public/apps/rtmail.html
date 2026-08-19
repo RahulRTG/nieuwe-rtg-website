@@ -442,9 +442,17 @@ async function hulp(m, wat){
     if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('aangewezen'); setTimeout(()=>el.classList.remove('aangewezen'),1600); }
   }));
 }
+/* De handgreep voor de gebarenlaag (apps/rtmail/gebaren.js). Dit scherm houdt
+   zijn eigen staat -- welke map open staat en welke berichten er liggen -- en de
+   veeg heeft alle drie nodig. Apart bestand omdat dit blad tegen de maat van
+   check.js regel 13 aan loopt, en omdat een veeg iets anders is dan een postvak:
+   wie hier leest wat de post DOET, hoeft niet langs de bediening. */
+window.RTGMail = { api: api, laad: laadInbox,
+  map: () => MAP, bericht: (i) => LIJST[i] };
 laadInbox();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug')) laadInbox(); });
 </script>
+<script src="/apps/rtmail/gebaren.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

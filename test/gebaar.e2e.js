@@ -235,3 +235,105 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* DE DERDE PROEF DRAAIT OP EEN TELEFOON, EN DAT IS GEEN LUXE.
+
+   De twee proeven hierboven draaien in een context met een MUIS, en dat deed
+   elke schermafdruk en elke meting van deze laag ook. Daardoor stond er
+   maandenlang een fout in die niemand kon zien: `position:relative` op .gb-rij
+   zat alleen in de mediaquery van het aanwijslicht -- `(hover:hover) and
+   (pointer:fine)`. Op een telefoon is die onwaar, dus was de regel static en
+   zocht de lade (position:absolute) de PAGINA als houvast.
+
+   Gemeten voor de reparatie: regel 350x62 op y=80, lade 97x844 op y=0. Een balk
+   van boven naar beneden over het hele scherm. De veeg heeft dus nooit gewerkt
+   op het apparaat waar hij voor bedoeld is.
+
+   Deze proef meet de enige vraag die dat had gevangen: ligt de lade IN de
+   regel? Niet of hij mooi is, niet of hij opengaat -- of hij op zijn plek zit. */
+test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar-tel-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const t = Date.now();
+    const reg = await (await fetch(base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Gebaar tel ' + t, email: 'gt' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' })
+    })).json();
+    assert.ok(reg.token, 'de proef heeft een ingelogd lid nodig');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: BROWSER });
+    /* isMobile + hasTouch zet in Chromium de apparaatemulatie aan, en daarmee
+       ook `pointer:coarse` en `hover:none` -- precies de stand waarin de fout
+       zat. Zonder deze twee vlaggen meet deze proef hetzelfde als de andere. */
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true
+    });
+    const page = await context.newPage();
+    const paginaFouten = [];
+    letOpFouten(page, paginaFouten);
+    await page.addInitScript((tok) => {
+      localStorage.setItem('rtg_member_token', tok);
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, reg.token);
+    await page.goto(base + '/apps/kantoor.html', { waitUntil: 'load' });
+    await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
+    assert.equal(await page.evaluate(() => matchMedia('(hover:hover) and (pointer:fine)').matches), false,
+      'deze proef hoort in de aanraakstand te draaien; anders meet hij hetzelfde als de twee hierboven');
+
+    /* EEN KALE REGEL, EN DAT IS EEN KEUZE DIE UIT DEZE FOUT KOMT. De eerste
+       versie van deze proef veegde over een .reis uit het wereldregister -- en
+       zakte NIET onder de mutatie, want rtg-wereld.css zet daar zelf
+       `position:relative` op. De fout raakte dus juist de schermen die dat niet
+       doen: .item in de kluis, .rij in de post. Wat hier gemeten wordt is de
+       BELOFTE VAN DE LAAG -- RTGGebaar.zet werkt op elke regel -- en niet het
+       toeval van een scherm dat zichzelf al had geplaatst. */
+    await page.evaluate(() => {
+      const r = document.createElement('div');
+      r.id = 'proefregel';
+      r.textContent = 'Een regel die zichzelf niet plaatst';
+      r.style.cssText = 'margin:120px 12px;padding:18px;background:#151312;border:1px solid #333';
+      /* VOORAAN en niet achteraan: boundingBox() rekent in het VENSTER, en op
+         een scherm van 390x844 staat het eind van de body ver onder de rand.
+         De muisaanwijzer landde daardoor buiten beeld en er kwam geen lade --
+         een proef die faalt om de verkeerde reden is net zo min een proef. */
+      document.body.insertBefore(r, document.body.firstChild);
+      window.RTGGebaar.zet(r, { rechts: [{ naam: 'Opbergen', doe: function () {} }] });
+    });
+    await page.waitForSelector('#proefregel.gb-rij', { timeout: 5000 });
+
+    const rij = page.locator('#proefregel');
+    await rij.scrollIntoViewIfNeeded();
+    const doos = await rij.boundingBox();
+    await veeg(page, doos, -150, false);
+    await page.waitForTimeout(320);
+
+    const meting = await page.evaluate(() => {
+      const r = document.getElementById('proefregel');
+      const l = r && r.querySelector('.gb-lade');
+      if (!l) return null;
+      const rb = r.getBoundingClientRect(), lb = l.getBoundingClientRect();
+      /* De regel mag zijn plaatsanker alleen van de LAAG hebben; had hij er zelf
+         een, dan meet deze proef niets. Vandaar dat we hier de eigen stijl
+         teruglezen en niet de berekende. */
+      return { eigenPositie: r.style.position || 'static',
+        regelH: Math.round(rb.height), ladeH: Math.round(lb.height),
+        binnenIn: lb.y >= rb.y - 1 && lb.y + lb.height <= rb.y + rb.height + 1
+          && lb.x >= rb.x - 1 && lb.x + lb.width <= rb.x + rb.width + 1 };
+    });
+    await page.mouse.up();
+    assert.ok(meting, 'de veeg hoort ook op een aanraakscherm een lade te openen');
+    assert.equal(meting.eigenPositie, 'static',
+      'deze proef meet niets als de regel zichzelf al plaatst -- dan verbergt het scherm de fout van de laag');
+    assert.ok(meting.binnenIn,
+      'de lade valt buiten de regel: ' + meting.ladeH + 'px hoog tegen een regel van ' + meting.regelH + 'px');
+
+    assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens de proef');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

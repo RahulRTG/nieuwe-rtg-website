@@ -12,6 +12,28 @@
    wordt nu gepold tot de server het zegt, met een grens eromheen; wat de laag
    belooft is dat het GEBEURT, niet dat het binnen een seconde gebeurt.
 
+   EN HIJ ZAKT SOMS, EN IK WEET NIET WAAROM. Op 19 augustus 2026 gemeten: tegen
+   een KOUD gestarte server (zoals hier) zakt hij ongeveer een op de vijf keer,
+   altijd op dezelfde plek -- de doorveeg gebeurt niet en het bestand staat er na
+   acht seconden nog. Tegen de warme ontwikkelserver: nul op tien. De handtekening
+   van zo'n ronde is: de regel draagt zijn klasse (`item gb-rij`), beide globals
+   staan er, en er komt GEEN lade en GEEN data-gb -- het gebaar begint dus niet
+   eens.
+
+   Wat het niet is, met een meting erbij: het is niet de regel zelf (beide
+   bestanden hebben dezelfde opbouw en maat), niet het aantal pointermoves (23,
+   elke ronde), en niet het aanwijslicht (de reparatie van position:relative
+   veranderde niets aan de kans). Wat het wel kan zijn is een hertekening van de
+   lijst tussen het neerkomen en de eerste beweging: forceer die met de hand en
+   het gebaar sterft precies zo. Alleen doet bestanden/app.js dat uit zichzelf
+   niet -- laad() draait een keer -- dus dat is een gelijkende oorzaak en geen
+   bewezen.
+
+   Dit staat hier en niet weggepoetst met een langere wachttijd, want een toets
+   die soms zakt is een dobbelsteen, en een dobbelsteen die je stiller maakt is
+   erger dan een die rammelt. Wie hem opnieuw ziet zakken: begin bij die
+   handtekening, en niet bij de wachttijden.
+
    Draai: node --test test/gebaar-bestanden.e2e.js  (slaat over zonder Playwright) */
 const test = require('node:test');
 const assert = require('node:assert/strict');

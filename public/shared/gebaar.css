@@ -22,8 +22,23 @@
 
 /* ------------------------------------------------------------- de plank -- */
 /* pan-y: verticaal scrollen blijft van de browser, horizontaal is van ons.
-   Zonder deze regel vecht de veeg met de pagina en verliest hij altijd. */
-.gb-rij{touch-action:pan-y;-webkit-touch-callout:none;}
+   Zonder deze regel vecht de veeg met de pagina en verliest hij altijd.
+
+   EN position:relative, want de lade is absoluut geplaatst en zoekt een
+   voorouder om zich aan vast te houden. Die stond hier NIET: hij stond in de
+   muis-mediaquery onderaan dit blad, bij het aanwijslicht. Op een telefoon --
+   `(hover:hover) and (pointer:fine)` is daar onwaar -- was de regel dus
+   `position:static` en plaatste de lade zich tegen de PAGINA. Gemeten in een
+   echte browser met aanraakemulatie: regel 350x62 op y=80, lade 97x844 op y=0.
+   Een balk van boven naar beneden over het hele scherm, naast de regel, in
+   plaats van erin. De veeg heeft daarmee nog nooit op een telefoon gewerkt --
+   en dat is precies het apparaat waar hij voor is.
+
+   Waarom niemand het zag: elke toets en elke schermafdruk draaide in een
+   browsercontext met een muis, en daar zette de lichtregel de positie er per
+   ongeluk bij. Een eigenschap die je nodig hebt, hoort niet als bijwerking van
+   een andere regel te bestaan; hier staat hij nu zelf. */
+.gb-rij{position:relative;touch-action:pan-y;-webkit-touch-callout:none;}
 
 /* Tijdens het gebaar geen tekstselectie en geen sleeplink: allebei zijn ze de
    browser die denkt dat je iets anders doet dan vegen. */

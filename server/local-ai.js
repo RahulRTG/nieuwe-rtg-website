@@ -16,6 +16,10 @@
    over in plaats van de foto stil te verwijderen. */
 'use strict';
 const OpenAI = require('./openai');
+/* De tijd uit de klok van dit huis. Het herstelvenster van de onderbreker
+   hieronder is tijdgedrag, en met server/lib/klok.js is dat te beproeven
+   (RTG_KLOK) zonder een halve minuut te moeten wachten. */
+const klok = require('./lib/klok');
 
 function heeftBeeld(params) {
   return (params && params.messages || []).some(m => Array.isArray(m.content) &&
@@ -126,14 +130,14 @@ class LocalAI extends OpenAI {
      timeout te betalen. Zodra het herstelvenster om is mag er weer een verzoek
      langs; faalt die, dan staat _storingen nog boven de grens en gaat de klep
      meteen weer open. Dat is het halfopen-gedrag, zonder een derde toestand. */
-  _onderbrokenTot(nu) { return this._openTot > (nu || Date.now()) ? this._openTot : 0; }
+  _onderbrokenTot(nu) { return this._openTot > (nu || klok.nu()) ? this._openTot : 0; }
 
   staat(nu) {
     const open = this._onderbrokenTot(nu);
     return {
       bezig: this._bezig, wachtend: this._rij.length, gelijktijdig: this.gelijktijdig,
       storingen: this._storingen, onderbroken: !!open,
-      onderbrokenNog: open ? Math.max(0, open - (nu || Date.now())) : 0
+      onderbrokenNog: open ? Math.max(0, open - (nu || klok.nu())) : 0
     };
   }
 
@@ -159,7 +163,7 @@ class LocalAI extends OpenAI {
   }
 
   async _doorDePoort(werk) {
-    const nu = Date.now();
+    const nu = klok.nu();
     if (this._onderbrokenTot(nu)) {
       throw Object.assign(new Error('De eigen modelserver is tijdelijk overgeslagen na herhaalde storingen.'),
         { code: 'LOKAAL_ONDERBROKEN' });
@@ -175,7 +179,7 @@ class LocalAI extends OpenAI {
       return uit;
     } catch (e) {
       this._storingen += 1;
-      if (this._storingen >= this.storingsgrens) this._openTot = Date.now() + this.herstelMs;
+      if (this._storingen >= this.storingsgrens) this._openTot = klok.nu() + this.herstelMs;
       throw e;
     } finally {
       this._geefSlotTerug();

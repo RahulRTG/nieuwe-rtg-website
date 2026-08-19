@@ -32,6 +32,11 @@
    tegen het duurste tarief dat we kennen: liever te vroeg dicht dan te laat.
    ========================================================================== */
 'use strict';
+/* De tijd komt uit de klok van dit huis en niet rechtstreeks uit het
+   besturingssysteem. Dat is hier geen formaliteit: de dagwissel van deze meter
+   IS tijdgedrag, en met server/lib/klok.js is die te beproeven (RTG_KLOK) in
+   plaats van af te wachten tot het middernacht is. Zie de kop van lib/klok.js. */
+const klok = require('./lib/klok');
 
 /* Prijzen per miljoen tokens, in dollar. Peildatum 2026-08-19.
    Te overschrijven met RTG_AI_PRIJZEN (JSON), zodat een prijswijziging geen
@@ -99,7 +104,7 @@ const LEEG = () => ({ dag: '', aanroepen: 0, gefaald: 0, tokensIn: 0, tokensUit:
   lokaal: { aanroepen: 0, gefaald: 0, tokensIn: 0, tokensUit: 0, perModel: {} } });
 let staat = LEEG();
 
-const vandaag = (nu) => new Date(nu || Date.now()).toISOString().slice(0, 10);
+const vandaag = (nu) => new Date(nu || klok.nu()).toISOString().slice(0, 10);
 function huidig(nu) {
   const d = vandaag(nu);
   if (staat.dag !== d) { staat = LEEG(); staat.dag = d; }
@@ -224,7 +229,7 @@ function magNogVoor(sleutel, nu) {
   if (!max) return true;
   const k = sleutel === undefined ? wie() : sleutel;
   if (!k) return true;
-  const t = nu || Date.now();
+  const t = nu || klok.nu();
   const b = beurten.get(k) || { vanaf: t, n: 0 };
   if (t - b.vanaf > BEURT_VENSTER) { b.vanaf = t; b.n = 0; }
   if (b.n >= max) { beurten.set(k, b); return false; }
@@ -239,7 +244,7 @@ function contextMiddleware() {
 }
 
 const opruimer = setInterval(() => {
-  const t = Date.now();
+  const t = klok.nu();
   for (const [k, b] of beurten) if (t - b.vanaf > BEURT_VENSTER * 2) beurten.delete(k);
 }, BEURT_VENSTER);
 if (opruimer.unref) opruimer.unref();

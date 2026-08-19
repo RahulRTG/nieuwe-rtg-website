@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T13:16:54.136Z",
-  "commit": "515780e",
+  "op": "2026-08-19T13:17:42.914Z",
+  "commit": "2091f41",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2265,
-  "onbeslist": 1814,
-  "blind": 108,
+  "bewezen": 2274,
+  "onbeslist": 1804,
+  "blind": 109,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -1093,12 +1093,12 @@
    "reden": "er is over DEZE route gelogen en arena.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtf/spel/online": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "arena.test.js",
-    "spelpoort.test.js"
+    "arena.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en arena.test.js zakte daarop"
   },
   "GET /api/rtf/social/stream": {
    "staat": "bewezen",
@@ -1109,20 +1109,20 @@
    "reden": "er is over DEZE route gelogen en arena.test.js zakte daarop"
   },
   "POST /api/rtf/spel/zichtbaar-zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "arena.test.js",
-    "spelpoort.test.js"
+    "arena.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en arena.test.js zakte daarop"
   },
   "POST /api/rtf/spel/zichtbaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "arena.test.js",
-    "spelpoort.test.js"
+    "arena.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en arena.test.js zakte daarop"
   },
   "POST /api/office/atelier": {
    "staat": "bewezen",
@@ -1205,28 +1205,28 @@
    "reden": "er is over DEZE route gelogen en bedrijfeigenaar.test.js zakte daarop"
   },
   "POST /api/bedrijf/post/omzetten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "rtmail-werk.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-werk.test.js zakte daarop"
   },
   "POST /api/bedrijf/post/herkomst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "rtmail-werk.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-werk.test.js zakte daarop"
   },
   "POST /api/bedrijf/post/context": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "rtmail-werk.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtmail-werk.test.js zakte daarop"
   },
   "POST /api/account/rollen": {
    "staat": "bewezen",
@@ -6316,20 +6316,20 @@
    "reden": "er is over DEZE route gelogen en zaak-vloot-en-facturen.test.js zakte daarop"
   },
   "POST /api/live/update": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "gastzorg.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastzorg.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/live/stop": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "gastzorg.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastzorg.test.js zakte daarop"
   },
   "POST /api/live/state": {
    "staat": "onbeslist",
@@ -6775,20 +6775,20 @@
    "reden": "er is over DEZE route gelogen en noodkaart.test.js zakte daarop"
   },
   "POST /api/locatie/deel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "gastzorg.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastzorg.test.js zakte daarop"
   },
   "POST /api/locatie/stop": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "gastzorg.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 23); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastzorg.test.js zakte daarop"
   },
   "POST /api/locatie/mijn": {
    "staat": "onbeslist",
@@ -45190,6 +45190,56 @@
    "toets": "arena.test.js",
    "merkt": true,
    "op": "2026-08-19T13:16:54.004Z"
+  },
+  "POST /api/rtf/spel/zichtbaar-zet": {
+   "toets": "arena.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:16:54.379Z"
+  },
+  "POST /api/rtf/spel/online": {
+   "toets": "arena.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:16:54.396Z"
+  },
+  "POST /api/rtf/spel/zichtbaar": {
+   "toets": "arena.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:05.631Z"
+  },
+  "POST /api/live/update": {
+   "toets": "gastzorg.test.js",
+   "merkt": false,
+   "op": "2026-08-19T13:17:17.747Z"
+  },
+  "POST /api/bedrijf/post/omzetten": {
+   "toets": "rtmail-werk.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:18.590Z"
+  },
+  "POST /api/bedrijf/post/herkomst": {
+   "toets": "rtmail-werk.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:18.763Z"
+  },
+  "POST /api/bedrijf/post/context": {
+   "toets": "rtmail-werk.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:19.010Z"
+  },
+  "POST /api/live/stop": {
+   "toets": "gastzorg.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:41.956Z"
+  },
+  "POST /api/locatie/stop": {
+   "toets": "gastzorg.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:42.642Z"
+  },
+  "POST /api/locatie/deel": {
+   "toets": "gastzorg.test.js",
+   "merkt": true,
+   "op": "2026-08-19T13:17:42.805Z"
   }
  },
  "basislijn": {
@@ -45568,6 +45618,8 @@
   "podium.test.js": "groen",
   "beveiligingsteam.test.js": "groen",
   "verzorging.test.js": "groen",
-  "arena.test.js": "groen"
+  "arena.test.js": "groen",
+  "rtmail-werk.test.js": "groen",
+  "gastzorg.test.js": "groen"
  }
 }

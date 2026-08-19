@@ -201,6 +201,26 @@ test('taal draait op regels en niet op vijf vaste woordparen', () => {
     assert.ok(d.gen.woorden.length >= 10, d.id + ' heeft een woordbank van ' + d.gen.woorden.length + ' woorden');
 });
 
+test('het hele basisonderwijs draait op de Fabric, en elk vak is oefenbaar', () => {
+  /* De belofte uit SCHOOL.md paragraaf 7: elke leerling kan elke schooldag elk
+     actief vak oefenen. Voor het po is dat meetbaar: elk vak heeft leerdoelen,
+     elk leerdoel heeft een generator, en elk leerdoel legt zichzelf op meer
+     dan een manier uit. */
+  const po = Object.values(DOELEN).filter(d => d.groep != null);
+  const perVak = {};
+  for (const d of po) perVak[d.vak] = (perVak[d.vak] || 0) + 1;
+  for (const vak of ['rekenen', 'taal', 'aardrijkskunde', 'geschiedenis', 'natuur', 'verkeer', 'engels'])
+    assert.ok(perVak[vak] >= 4, 'vak ' + vak + ' heeft maar ' + (perVak[vak] || 0) + ' leerdoelen in het po');
+  assert.deepEqual(po.filter(d => !(d.uitleg || []).length).map(d => d.id), [],
+    'elk po-leerdoel hoort zichzelf op meer dan een manier uit te leggen');
+  assert.ok(po.length >= 100, 'het po telt ' + po.length + ' leerdoelen');
+
+  /* En geen enkel vak hangt nog aan een handgeschreven vragenlijstje: 'mc' met
+     vijf vragen was precies de vorm die na twee sessies een geheugenspel is. */
+  const vast = po.filter(d => d.gen.soort === 'mc');
+  assert.deepEqual(vast.map(d => d.id), [], 'deze po-leerdoelen putten nog uit een vaste vragenlijst');
+});
+
 test('rekenen is de proef op de som: een leerlijn met voorkennis en meer dan een uitleg', () => {
   const rek = Object.values(DOELEN).filter(d => d.vak === 'rekenen' && d.groep != null);
   assert.ok(rek.length >= 45, 'de leerlijn rekenen po telt ' + rek.length + ' doelen');

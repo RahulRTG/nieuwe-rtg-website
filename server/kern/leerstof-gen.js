@@ -131,7 +131,8 @@ function gcd(a, b) { return b ? gcd(b, a % b) : a; }
    niet hoeven weten in welk bestand hij staat. */
 const { GEN2, MEERKEUZE2 } = require('./leerstof-gen-meer');
 const { GENT, MEERKEUZE_TAAL } = require('./leerstof-gen-taal');
-for (const reeks of [GEN2, GENT]) {
+const { GENW, MEERKEUZE_WERELD } = require('./leerstof-gen-wereld');
+for (const reeks of [GEN2, GENT, GENW]) {
   for (const naam of Object.keys(reeks)) {
     if (GEN[naam]) throw new Error('leerstof-gen: de soort "' + naam + '" bestaat twee keer');
     GEN[naam] = reeks[naam];
@@ -158,6 +159,6 @@ function opgave(gen) {
    de generatoren werkelijk doen, dus een soort die van vorm verandert zonder
    deze lijst bij te werken zakt. */
 const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm']
-  .concat(MEERKEUZE2, MEERKEUZE_TAAL).sort();
+  .concat(MEERKEUZE2, MEERKEUZE_TAAL, MEERKEUZE_WERELD).sort();
 
 module.exports = { opgave, SOORTEN: Object.keys(GEN), MEERKEUZE };

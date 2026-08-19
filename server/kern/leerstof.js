@@ -10,8 +10,10 @@
    wedstrijd, en een fout is gewoon de volgende stap in de les. */
 const { REKENEN } = require('./leerstof-data/rekenen');
 const { TAAL } = require('./leerstof-data/taal');
-const { AARDRIJKSKUNDE, GESCHIEDENIS } = require('./leerstof-data/wereld');
-const { NATUUR, VERKEER, ENGELS_PO } = require('./leerstof-data/natuur');
+const { AARDRIJKSKUNDE } = require('./leerstof-data/aardrijkskunde');
+const { GESCHIEDENIS } = require('./leerstof-data/geschiedenis');
+const { NATUUR } = require('./leerstof-data/natuur');
+const { VERKEER, ENGELS_PO } = require('./leerstof-data/verkeer-engels');
 const { VO } = require('./leerstof-data/vo');
 const { VO2 } = require('./leerstof-data/vo2');
 const { VO3 } = require('./leerstof-data/vo3');

@@ -758,12 +758,11 @@
     },
     "bundeldelen.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bundel.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 8
+      "staat": "gezakt",
+      "module": "scripts/bundel.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "bureau.test.js": {
       "soort": "server",

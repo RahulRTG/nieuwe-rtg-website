@@ -2500,6 +2500,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "leverancierpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/leverancierpoort.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "lib.test.js": {
       "soort": "puur",
       "staat": "gezakt",

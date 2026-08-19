@@ -129,7 +129,7 @@ module.exports = function maakVergeten(kern) {
        gezegeld en er komt een regel bij die zegt dát er is herschreven, met de
        oude kop erin. Zo verdwijnt de persoon zonder dat het spoor stilletjes
        een ander verleden gaat vertellen. */
-    try { if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, 'recht op vergetelheid (AVG art. 17)'); } catch (e) {}
+    if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, 'recht op vergetelheid (AVG art. 17)');
     // alle sessies van dit lid uitloggen
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
     save();

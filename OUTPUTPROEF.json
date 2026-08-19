@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T16:07:36.236Z",
-  "commit": "2608e91",
+  "op": "2026-08-19T16:35:18.337Z",
+  "commit": "5449543",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2963,
-  "onbeslist": 1089,
-  "blind": 135,
+  "bewezen": 3012,
+  "onbeslist": 1039,
+  "blind": 136,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -12048,12 +12048,12 @@
    "reden": "er is over DEZE route gelogen en pay.test.js zakte daarop"
   },
   "POST /api/office/bank/partnerrail": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "bank.test.js",
     "bankdeuren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bankdeuren.test.js zakte daarop"
   },
   "POST /api/office/securitylog": {
    "staat": "bewezen",
@@ -12120,18 +12120,20 @@
    "reden": "er is over DEZE route gelogen en bankhart.test.js zakte daarop"
   },
   "POST /api/office/bank/opdrachten/ronde": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "bankdeuren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bankdeuren.test.js zakte daarop"
   },
   "POST /api/office/bank/opdrachten/opnieuw": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "bankdeuren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bankdeuren.test.js zakte daarop"
   },
   "POST /api/office/bank/autoriseer/annuleer": {
    "staat": "bewezen",
@@ -24789,38 +24791,28 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/vrijwilliger/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-doelgroepen.test.js",
-    "rtfos-netwerk.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos-uitvoering.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilliger/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-doelgroepen.test.js",
-    "rtfos-netwerk.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos-uitvoering.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-doelgroepen.test.js",
-    "rtfos-netwerk.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteiten": {
    "staat": "onbeslist",
@@ -24847,13 +24839,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/activiteit/open": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-doelgroepen.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/activiteit/inschrijven": {
    "staat": "onbeslist",
@@ -24872,37 +24863,36 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/vergadering/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
-    "rtfos-governance.test.js",
-    "rtfos-uitvoering.test.js"
+    "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering/agenda": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering/presentie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering/besluit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering": {
    "staat": "onbeslist",
@@ -24913,12 +24903,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/beleid/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/beleid": {
    "staat": "onbeslist",
@@ -24929,12 +24919,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/beleid/bevestig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/herkomst": {
    "staat": "onbeslist",
@@ -24945,281 +24935,300 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 38); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtfos/herkomst/beoordeel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-bestuur.test.js",
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilliger/koppel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-netwerk.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilliger/evaluatie": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-netwerk.test.js",
-    "rtfos-portalen.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtfos/vrijwilliger/code": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/casus/code": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/portaal/vrijwilliger": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/portaal/vrijwilliger/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilligers": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/portaal/vrijwilliger/uren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/vrijwilliger/uren-bevestig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/casus/stap": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/casus/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/portaal/deelnemer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/partner/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/partner/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/partner/document": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-doelgroepen.test.js",
-    "rtfos-portalen.test.js",
-    "rtfos.test.js"
+    "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/portaal/deelnemer/intrekken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/publiek/steden": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/publiek/stad": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-doelgroepen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 34); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-doelgroepen.test.js zakte daarop"
   },
   "POST /api/rtfos/vergadering/vaststellen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/beleid/herzien": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/jaarverslag/opstellen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/jaarverslag/publiceren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/jaarverslag/vaststellen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/jaarverslagen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/publiek/jaarverslagen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/risico/meld": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/risico/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/uitgave/aanvraag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfos-governance.test.js",
-    "rtfos-uitvoering.test.js",
-    "rtfos.test.js"
+    "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/meldcode/open": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/meldcode/stap": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/meldcode/sluit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/vergaderingen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/risicos": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/risico/herbeoordeel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/meldcodes": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/jaarverslag/aanvullen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtfos-governance.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtfos-governance.test.js zakte daarop"
   },
   "POST /api/rtfos/blauwdruk/deel": {
    "staat": "onbeslist",
@@ -48976,6 +48985,256 @@
    "toets": "bankdeuren.test.js",
    "merkt": true,
    "op": "2026-08-19T16:07:36.129Z"
+  },
+  "POST /api/office/bank/opdrachten/opnieuw": {
+   "toets": "bankdeuren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:31:39.569Z"
+  },
+  "POST /api/office/bank/opdrachten/ronde": {
+   "toets": "bankdeuren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:31:39.609Z"
+  },
+  "POST /api/office/bank/partnerrail": {
+   "toets": "bankdeuren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:31:39.817Z"
+  },
+  "POST /api/rtfos/vrijwilliger/maak": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:31:54.973Z"
+  },
+  "POST /api/rtfos/activiteit/maak": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:09.874Z"
+  },
+  "POST /api/rtfos/vrijwilliger/zet": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:10.219Z"
+  },
+  "POST /api/rtfos/vrijwilliger/koppel": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:10.253Z"
+  },
+  "POST /api/rtfos/activiteit/open": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:10.748Z"
+  },
+  "POST /api/rtfos/vrijwilliger/evaluatie": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": false,
+   "op": "2026-08-19T16:32:24.828Z"
+  },
+  "POST /api/rtfos/vrijwilliger/code": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:24.978Z"
+  },
+  "POST /api/rtfos/casus/code": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:25.226Z"
+  },
+  "POST /api/rtfos/portaal/vrijwilliger": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:25.720Z"
+  },
+  "POST /api/rtfos/portaal/vrijwilliger/zet": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:39.875Z"
+  },
+  "POST /api/rtfos/portaal/vrijwilliger/uren": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:39.954Z"
+  },
+  "POST /api/rtfos/vrijwilligers": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:40.517Z"
+  },
+  "POST /api/rtfos/vrijwilliger/uren-bevestig": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:40.780Z"
+  },
+  "POST /api/rtfos/casus/status": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:55.117Z"
+  },
+  "POST /api/rtfos/casus/stap": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:55.127Z"
+  },
+  "POST /api/rtfos/portaal/deelnemer": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:55.207Z"
+  },
+  "POST /api/rtfos/partner/maak": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:32:55.496Z"
+  },
+  "POST /api/rtfos/portaal/deelnemer/intrekken": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:10.313Z"
+  },
+  "POST /api/rtfos/partner/document": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:10.534Z"
+  },
+  "POST /api/rtfos/partner/status": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:10.630Z"
+  },
+  "POST /api/rtfos/publiek/steden": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:10.767Z"
+  },
+  "POST /api/rtfos/publiek/stad": {
+   "toets": "rtfos-doelgroepen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:25.647Z"
+  },
+  "POST /api/rtfos/vergadering/maak": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:41.413Z"
+  },
+  "POST /api/rtfos/vergadering/agenda": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:41.743Z"
+  },
+  "POST /api/rtfos/vergadering/presentie": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:41.753Z"
+  },
+  "POST /api/rtfos/beleid/maak": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:57.163Z"
+  },
+  "POST /api/rtfos/vergadering/besluit": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:57.278Z"
+  },
+  "POST /api/rtfos/beleid/bevestig": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:57.486Z"
+  },
+  "POST /api/rtfos/herkomst/beoordeel": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:33:58.245Z"
+  },
+  "POST /api/rtfos/vergadering/vaststellen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:12.761Z"
+  },
+  "POST /api/rtfos/beleid/herzien": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:13.855Z"
+  },
+  "POST /api/rtfos/jaarverslag/opstellen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:14.020Z"
+  },
+  "POST /api/rtfos/jaarverslag/publiceren": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:14.970Z"
+  },
+  "POST /api/rtfos/jaarverslag/vaststellen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:29.642Z"
+  },
+  "POST /api/rtfos/jaarverslagen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:30.799Z"
+  },
+  "POST /api/rtfos/publiek/jaarverslagen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:31.455Z"
+  },
+  "POST /api/rtfos/risico/meld": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:31.883Z"
+  },
+  "POST /api/rtfos/risico/zet": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:45.500Z"
+  },
+  "POST /api/rtfos/meldcode/open": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:46.481Z"
+  },
+  "POST /api/rtfos/uitgave/aanvraag": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:47.012Z"
+  },
+  "POST /api/rtfos/meldcode/stap": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:34:47.863Z"
+  },
+  "POST /api/rtfos/meldcode/sluit": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:01.574Z"
+  },
+  "POST /api/rtfos/vergaderingen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:02.419Z"
+  },
+  "POST /api/rtfos/risicos": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:02.458Z"
+  },
+  "POST /api/rtfos/risico/herbeoordeel": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:04.095Z"
+  },
+  "POST /api/rtfos/meldcodes": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:17.641Z"
+  },
+  "POST /api/rtfos/jaarverslag/aanvullen": {
+   "toets": "rtfos-governance.test.js",
+   "merkt": true,
+   "op": "2026-08-19T16:35:18.191Z"
   }
  },
  "basislijn": {
@@ -49403,6 +49662,8 @@
   "keuken.test.js": "groen",
   "lab2-bewoner.test.js": "groen",
   "schoolbeeld.test.js": "groen",
-  "bankdeuren.test.js": "groen"
+  "bankdeuren.test.js": "groen",
+  "rtfos-doelgroepen.test.js": "groen",
+  "rtfos-governance.test.js": "groen"
  }
 }

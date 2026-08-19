@@ -85,7 +85,7 @@ module.exports = (ctx) => {
     if (anthropic) {
       try {
         const r = await anthropic.messages.create({
-          model: 'claude-opus-4-8', max_tokens: 300,
+          model: 'claude-haiku-4-5', max_tokens: 300,
           system: 'Je helpt iemand een korte, eerlijke, vriendelijke advertentietekst schrijven voor een tweedehands marktplaats. Nederlands, geen overdrijving, noem staat en of ophalen/verzenden kan. Geen contactgegevens.',
           messages: [{ role: 'user', content: 'Titel: ' + titel + '\nCategorie: ' + categorie + '\nStaat: ' + staat + '\nWat ik erover kwijt wil: ' + (beschrijving || '(niks)') }]
         });

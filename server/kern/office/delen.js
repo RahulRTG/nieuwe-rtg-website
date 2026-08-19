@@ -134,7 +134,7 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
         const prompt = opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal
           : opdracht === 'engels' ? 'Translate this business document into professional British English. Keep the structure. Return only the translation:\n' + kaal
           : 'Schrijf twee tot vier zinnen die dit stuk logisch voortzetten, in het Nederlands' + (w ? ' (wens: ' + w + ')' : '') + ':\n' + kaal;
-        const uit = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 600,
+        const uit = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 600,
           messages: [{ role: 'user', content: prompt }] });
         const tekst = (uit.content || []).map(c => c.text || '').join('').trim();
         if (tekst) return { status: 200, opdracht, voorstel: tekst.slice(0, 4000) };

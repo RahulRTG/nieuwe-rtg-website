@@ -25,8 +25,11 @@
 
    Het tweede blok (foundation, media, identiteit, geld) staat in
    ./cat-domeinen2.js; samen zijn ze een lijst. */
-const { LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { LEDEN, LEDEN_RTF, WERKOS } = require('./doelgroepen');
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
+/* ZAAK bestaat nog voor de paden die hun doelgroep AL uit hun prefix halen
+   (/api/supplier, /api/staff). De werkfuncties hieronder hebben die prefix niet
+   en dragen daarom WERKOS: dezelfde wereld, drie relaties. Zie doelgroepen.js. */
 const ZAAK = ['leverancier', 'personeel'];
 
 module.exports = [
@@ -67,18 +70,18 @@ module.exports = [
     uitleg: 'De fluisterlijn binnen de sociale laag.', paden: ['/api/fluister'] },
 
   // ---------- werk en zaken ----------
-  { id: 'dom-werkvloer', categorie: 'Werk (zaken en personeel)', naam: 'De werkvloer', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-werkvloer', categorie: 'Werk (zaken en personeel)', naam: 'De werkvloer', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Tafels, keukenbord en bedieningskaart op de vloer van een zaak.', paden: ['/api/werkvloer'] },
-  { id: 'dom-werkplek', categorie: 'Werk (zaken en personeel)', naam: 'De werkplek', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-werkplek', categorie: 'Werk (zaken en personeel)', naam: 'De werkplek', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het persoonlijke werkstation van een medewerker.', paden: ['/api/werkplek'] },
-  { id: 'dom-metier', categorie: 'Werk (zaken en personeel)', naam: 'Metier (vakwerk)', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-metier', categorie: 'Werk (zaken en personeel)', naam: 'Metier (vakwerk)', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het vakwerk van zelfstandigen en ambachtslieden.', paden: ['/api/metier'] },
-  { id: 'dom-vak', categorie: 'Werk (zaken en personeel)', naam: 'Vakritmes', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-vak', categorie: 'Werk (zaken en personeel)', naam: 'Vakritmes', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Werkritmes en tijdregistratie per vak.', paden: ['/api/vak'] },
-  { id: 'dom-verkoop', categorie: 'Werk (zaken en personeel)', naam: 'Verkoop', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-verkoop', categorie: 'Werk (zaken en personeel)', naam: 'Verkoop', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De verkoopkant van een zaak, inclusief proefritten.', paden: ['/api/verkoop'] },
-  { id: 'dom-doos', categorie: 'Werk (zaken en personeel)', naam: 'De zaakdoos', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-doos', categorie: 'Werk (zaken en personeel)', naam: 'De zaakdoos', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De doos op locatie: zaakserver, netwerk en updates.', paden: ['/api/doos'] },
-  { id: 'dom-facturen', categorie: 'Werk (zaken en personeel)', naam: 'Facturen', standaard: true, doelgroepen: ZAAK,
+  { id: 'dom-facturen', categorie: 'Werk (zaken en personeel)', naam: 'Facturen', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De facturatie van en naar een zaak.', paden: ['/api/facturen'] }
 ];

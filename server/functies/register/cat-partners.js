@@ -2,7 +2,7 @@
    vijf categorieen - Partners (leveranciers), RTG-Backoffice, RTFoundation,
    Betalen & verificatie en Personeel & integraties. Verbatim afgesplitst uit
    register.js; de leden-groepen komen uit ./doelgroepen. */
-const { LEDEN, LEDEN_GAST } = require('./doelgroepen');
+const { LEDEN, LEDEN_GAST, WERKOS } = require('./doelgroepen');
 
 module.exports = [
   // ---- Partners (leveranciers) ----
@@ -76,7 +76,7 @@ module.exports = [
     uitleg: 'De vacature- en sollicitatielaag binnen de RTFoundation-app.', paden: ['/api/rtf/apply', '/api/rtf/vacatures', '/api/rtf/solliciteer'] },
 
   // ---- Werk OS (de werkplek van een organisatie) ----
-  { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: ['intern', 'business'],
+  { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte werkt meer.', paden: ['/api/bedrijf'] },
 
   // ---- Betalen & verificatie ----
@@ -97,7 +97,7 @@ module.exports = [
      hij verbindt een mens aan een zaak. Kan de boardroom hem niet sluiten, dan
      is er bij misbruik geen knop -- alleen een uitrol. */
   { id: 'werving', categorie: 'Personeel & integraties', naam: 'Wervingslink (in dienst via een link)', standaard: true,
-    doelgroepen: ['leverancier', 'personeel'],
+    doelgroepen: WERKOS,
     uitleg: 'De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.',
     paden: ['/api/werving'] },
   { id: 'stuur', categorie: 'Personeel & integraties', naam: 'Rahul doet het (AI-stuur)', standaard: true,

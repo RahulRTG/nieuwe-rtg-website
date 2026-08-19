@@ -87,14 +87,13 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 42 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 40 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 10 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 11 |
-| **FoundationOS** | `/apps/foundation/index.html` | RTFoundation en haar maatschappelijke werk | 1 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 2 |
 
-Die laatste kolom telt items in `MAPPEN` en geen schermen: FoundationOS draagt
-één item dat naar een huis met 71 schermen leidt. De tabel wordt machinaal
-vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
+Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
+machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
 
 ### LivingOS — mijn dagelijks leven
 
@@ -122,11 +121,38 @@ tegenstrijdigheid maar de reden dat het één wereld moet zijn:
 | operations | Meldkamer | rol |
 | specialist | Metier, Vakritmes | rol |
 
-In het functieregister staat die tweedeling vandaag nog als twee losse dingen:
-`Werk OS (werkruimtes)` draagt `intern, business`, terwijl `De werkvloer`, `De
-werkplek`, `Metier` en `Vakritmes` `leverancier, personeel` dragen. Een wereld
-eroverheen ontkent dat verschil niet — **de commerciële verpakking zit binnen de
-wereld**, niet eromheen.
+Een wereld eroverheen ontkent die verschillen niet — **de commerciële verpakking
+zit binnen de wereld**, niet eromheen. En het register zegt dat sinds vandaag
+ook: twaalf werkfuncties dragen samen de groep `WERKOS` (`intern`, `business`,
+`leverancier`, `personeel`) in plaats van twee losse setjes.
+
+### De fout die daaronder lag
+
+Dit was niet alleen een indelingsvraag. Het register zei `leverancier, personeel`
+op elf werkfuncties, maar hun paden — `/api/werkvloer`, `/api/werkplek`,
+`/api/metier`, `/api/vak`, `/api/verkoop`, `/api/doos`, `/api/facturen`,
+`/api/kantoor`, `/api/werkmail`, `/api/mail/binnen`, `/api/werving` — beginnen
+niet met `/api/supplier` of `/api/staff`. De doelgroep viel daar dus terug op de
+**pas**, en een partner of medewerker heeft geen pas.
+
+Gevolg: op die elf functies stonden schakelaars op het bord **die nooit verkeer
+zagen**. Ze kleurden groen of rood en stuurden niets. Dat is precies de stilste
+storing die er is — een meter die geruststelt.
+
+De reparatie heeft twee helften, en ze horen bij elkaar:
+
+1. `server/functies/doelgroep.js` leest op de werkpaden de **relatie tot de
+   organisatie** uit de sessie: `office` → `intern`, een zaaksessie met
+   `manager` → `leverancier`, zonder → `personeel`. Een lid zonder werksessie
+   volgt nog steeds zijn pas: dat is de werkgever die zijn eigen zaak bestuurt.
+2. Het register declareert die vier op dezelfde functies (`WERKOS`).
+
+De sessie zegt met opzet **niet** uit welke app je komt: een medewerker logt één
+keer in en gebruikt daarmee zowel de partner-app als de PDA. Op een gedeeld pad
+valt dus niet af te lezen welk scherm belt — en dat hoeft ook niet. Wat het bord
+wil sturen is niet het scherm maar de mens: wie de zaak bestuurt tegenover wie er
+werkt. `test/functies.test.js` houdt beide helften vast, en meet ook dat er geen
+schakelaar meer op het bord staat die niemand kan bereiken.
 
 Daarmee lost ook iets op waar de vorige kaart een aparte wereld voor optuigde:
 RTG is gewoon één werkgever binnen WorkOS. Backoffice, Boardroom en Meldkamer
@@ -172,6 +198,38 @@ functieregister dragen 48 functies de doelgroep `foundation`, maar er zijn er
 als tussen WorkOS en RTG Kantoor, en tussen TravelOS en RTG Reizen. Een huis is
 een merk; een wereld is een context.
 
+## Het Vooruitzicht — de cockpit van LivingOS
+
+Er stond een app die `Living OS` heette, en na de hernoeming van de wereld
+stonden ze in de bank vier regels uit elkaar: `LivingOS` onder *Werelden*,
+`Living OS` onder *Software*. Dezelfde botsing als LifeOS tegenover Lifestyle
+Pass, maar erger — dezelfde woorden, dezelfde lijst. Gevonden met een browser en
+niet met een grep, want geen enkele toets hield een wereldnaam tegen de
+softwarecatalogus.
+
+De uitweg was niet hernoemen om het hernoemen: dat scherm **is** de cockpit van
+LivingOS. Kijk waar het uit bestaat en het is letterlijk het wereldpatroon van
+`PLATFORM.md`, laag voor laag:
+
+| laag (`PLATFORM.md`) | op dat scherm |
+|---|---|
+| graaf | de drie gesimuleerde werelden, met geld, tijd, energie, mensen, beleving |
+| beleid | *Meereizende regels* — menselijk akkoord boven €500, minimaal delen |
+| cockpit | het scherm zelf, uitzonderingsgestuurd |
+| gegronde Rahul | de balk onderaan, met bronnen onder *Waarom deze wereld?* |
+| actielog | *Replay* — terugspoelen om oorzaak en herstel te begrijpen |
+
+Het heet nu **Het Vooruitzicht** en hangt als eerste onderdeel in LivingOS. De
+bestandsnaam (`/apps/living-os.html`, `shared/living-os.css`) blijft: een
+bestandsnaam is geen merknaam.
+
+**Het is niet uit de softwarecatalogus gehaald, en dat is een bewuste correctie
+op het eerste plan.** Die catalogus is namelijk ook Rahuls routeertabel
+(`appUit` in `shared/command/catalog.js`): wie er een regel uit haalt, sloopt
+"open het gastdossier". Twee apps staan om precies die reden al in allebei de
+lijsten — Reizen & Veilig en Gastdossier hangen in TravelOS én in de catalogus.
+Wat er dus fout was, was de NAAM en niet de plaats.
+
 ## Instellingen — en waarom het geen wereld is
 
 *Mijn account, identiteit, privacy en controle.*
@@ -182,10 +240,24 @@ Het is preciezer om te zeggen wat het echt is:
 
 > **Instellingen is het enige zichtbare gezicht van RTG Core.**
 
-Mechanisch staat het vandaag in het bedieningspaneel in de voet van de bank
-(`WERELD.md`), samen met thema, taal, push, meldingen, Zegel en uitloggen. De
-vier identiteitsapps — Wie ben ik, RTG Veilig, Passkeys, Juridisch — staan nog in
-LivingOS. Zie *Wat er nog niet gedaan is*.
+Mechanisch is dat het bedieningspaneel in de voet van de bank (`WERELD.md`),
+samen met thema, taal, push, meldingen, Zegel en uitloggen. Daar staan sinds
+vandaag ook de vier identiteitsapps bij: **Wie ben ik, RTG Veilig, Passkeys,
+Juridisch**. Ze stonden in LivingOS en gaan niet over een dag maar over het
+systeem.
+
+In `MAPPEN` hebben ze een eigen ingang gekregen die géén `wereld` draagt maar een
+`paneel`. Dat lost twee dingen tegelijk op: `wereldBij()` filtert de map vanzelf
+uit de werelden weg (Instellingen is geen wereld), en `openMap` opent het paneel
+in plaats van een eigen tegelveld (Instellingen is geen tweede scherm). Ze
+verdwijnen daarmee niet uit Spotlight, want dat indexeert `MAPPEN` en niet de
+werelden — en ze zomaar uit het register halen zou verbergen zijn, wat
+`ADAPTIEF.md` verbiedt.
+
+**Wat hier nog wringt:** het paneel staat in HTML (`apps/app.html`) en het
+register in JS (`MAPPEN`). Wie er een vijfde bij zet, moet dat op beide plekken
+doen. Dat is genoemd in de code zelf in plaats van het te laten opvallen als er
+ooit een mist.
 
 ## RTG Core — de laag die met de mens meereist
 
@@ -289,35 +361,58 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 - `PREMIUM` staat niet langer in hetzelfde bestand als `MAPPEN`
   (`app-main-24a3.js`). Dezelfde snede als deze kaart: waar iets is, tegenover
   wie het mag zien.
+- De app `Living OS` heet nu **Het Vooruitzicht** en is de cockpit van LivingOS.
+  Zie de paragraaf hieronder.
+- **Instellingen** is ingericht: de vier identiteitsapps staan in het
+  bedieningspaneel en hebben in `MAPPEN` een eigen ingang met `paneel` in plaats
+  van `wereld`.
+- **Het gezin is uit FoundationOS naar LivingOS gegaan.** Niet als
+  bestandsverhuizing maar als deur: `os:rtf` (RTF Mini, Kids, Tiener, Jong,
+  Volwassen) hangt nu in LivingOS, en FoundationOS wijst naar de publieke kant
+  van de stichting (`os-publiek.html`, *"Wat wij doen, bij u in de buurt"*) met
+  het partnerportaal ernaast. Gemeten: 62 van de 71 schermen onder
+  `/apps/foundation/` gaan over het leven van een kind, negen over de stichting
+  als organisatie. Niet `os.html`: dat is een kantoorconsole achter een
+  kantoorcode, geen voordeur voor een lid.
+- Drie bestanden gingen over de 10 KB en zijn gesplitst langs een echte grens:
+  `app-main-26b` (tekenen) tegenover `app-main-26c` (openen en hernoemen), en
+  `functies/toegang.js` (mag dit pad) tegenover `functies/doelgroep.js` (wie
+  belt er).
+- **WorkOS heeft één toegangsmodel gekregen**, en dat legde een gemeten fout
+  bloot. Zie de paragraaf bij WorkOS hierboven.
+- **De Rechterhand staat in het register**, zodat elke telling van wat een pas
+  krijgt eindelijk klopt. Zie *De drie passen* hieronder.
+- `test/beginscherm.test.js` telde nog hard op DRIE werelden, en die telling is
+  nu vier. Dat getal staat er met opzet hard in: een vijfde wereld hoort een
+  besluit te zijn dat je in dat bestand komt opschrijven, niet iets dat erbij
+  sluipt.
+
+Eén ding dat ik in de vorige versie van dit document verkeerd had staan: er stond
+dat een map zonder `wereld` `openMap` zou breken. Dat is niet zo — `openMap` viel
+al terug op een tegelveld. Het probleem was niet dat het brak maar dat het het
+verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
 
 **Nog niet gedaan**, met de reden erbij:
 
-- **De levensschermen uit FoundationOS naar LivingOS.** Ongeveer 60 van de 71
-  schermen onder `public/apps/foundation/` gaan over het leven van een kind en
-  niet over de stichting. Dat is een echte verhuizing met een eigen service
-  worker, een eigen sessiemodel en `LEVEN.md` eroverheen; hij hoort niet als
-  bijvangst van een hernoeming te gebeuren.
-- **De vier identiteitsapps naar Instellingen.** `link:ik`, `link:veilig`,
-  `link:passkeys` en `link:juridisch` staan nog in LivingOS. Ze horen bij Core,
-  en Core heeft in de bank precies één gezicht: het bedieningspaneel. Een map
-  zonder `wereld` valt vandaag stil uit de bank maar breekt `openMap` in
-  `app-main-29.js`; dat is eerst een kleine reparatie en daarna een verhuizing.
-- **De werkvloer en de werkruimte onder één WorkOS-toegangsmodel.** Vandaag zijn
-  het twee losse functiegroepen met verschillende doelgroepen. Ze samenvoegen
-  raakt de prijs (zie hieronder) en is dus geen kaartbesluit.
-- **Het huis van LivingOS toont de reisonderdelen nog steeds.** `/apps/rtg.html`
-  heeft een REIZEN-paneel en een rij van negen reiskaarten onder "Alle
-  diensten". Die staan er dubbel zolang TravelOS ze ook draagt. Dat is een
-  schermbesluit: welke zes domeinen LivingOS aan zijn voordeur toont is een
-  ontwerpvraag, en die hoort niet als bijvangst van een kaart beantwoord te
-  worden.
+- **De bestanden zelf staan nog onder `/apps/foundation/`.** De deur staat in de
+  goede wereld, de map heet nog hoe hij heet. Dat is met opzet: die 62 schermen
+  delen een service worker, een sessiemodel en `LEVEN.md`, en een mapnaam is geen
+  merknaam (zie *Wat dit NIET verandert*).
+- **Het huis van LivingOS loopt achter op zijn eigen wereld.** `/apps/rtg.html`
+  toont nog een REIZEN-paneel en negen reiskaarten die nu bij TravelOS horen, en
+  het toont Wie ben ik, Passkeys en Juridisch die nu bij Instellingen horen.
+  RTFoundation is er wél bij gezet. Dat is een schermbesluit: welke domeinen
+  LivingOS aan zijn voordeur toont is een ontwerpvraag, en die hoort niet als
+  bijvangst van een kaart beantwoord te worden. Niets is onbereikbaar — het staat
+  alleen op twee plekken.
 
 ## Wat dit NIET verandert
 
 - **Geen scherm verhuist.** De elf reisonderdelen wisselen van wereld, maar
   blijven exact dezelfde schermen op exact dezelfde adressen.
 - **Geen pas verandert.** `?pas=`, `PREMIUM` en de toonregels per pas blijven
-  precies zoals ze zijn.
+  precies zoals ze zijn. Het register zegt nu wél wat de code al deed, maar er
+  komt niemand bij en er gaat niemand af.
 - **Geen huis verandert van naam.** RTG Kantoor, RTG Reizen en RTFoundation
   houden hun titel. Een huis is een merk, een wereld is een context.
 - **Geen bestandsnaam wijzigt.** `shared/rosapps.js` en `rosthema.js` heten nog
@@ -325,28 +420,9 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 
 ## Wat er open blijft
 
-- **Het prijsverschil tussen de passen.** Gemeten: Business draagt 145 functies,
-  Lifestyle 142, RTG 140 — en er zijn **twee** functies die alleen Business heeft
-  (Zakelijk bankieren, Instant Reality) en **nul** die alleen Lifestyle heeft. Dat
-  is geen basis voor €65 tegenover €20.000. Het zakelijke aanbod moet waarde
-  verkopen als organisatiebezit, beheer, personeel, workflows, governance,
-  rechten, data, automatisering, SLA's, compliance en schaal — niet als drie
-  extra tegels. Dat is een productvraag, geen kaartvraag, maar hij komt door deze
-  indeling wel scherp boven.
-- **`LivingOS` botst met een app die `Living OS` heet.** Dit is met een browser
-  gevonden en niet met een grep: in de bank staat nu `LivingOS` onder
-  *Werelden* en vier regels lager `Living OS` onder *Software*. Dat is
-  `/apps/living-os.html` — *"geld, tijd, energie, mensen en beleving als een
-  samenhangende wereld vooruit bekijken"* — genoemd op vijf plekken
-  (`shared/command/catalog.js`, `apps/rtg.html`, `apps/private-office.html`,
-  `apps/partner-network.html`, de appgids). Dezelfde botsing als LifeOS tegenover
-  Lifestyle Pass, maar erger: dezelfde woorden, in dezelfde lijst, vier regels
-  uit elkaar. Er is nog niets aan gedaan, want er zijn drie uitwegen en ze zijn
-  geen van drieën vanzelfsprekend: de wereld hernoemen (maar die naam is bewust
-  gekozen), de app hernoemen (maar naar wat), of de app opvatten als de
-  **cockpit van LivingOS** en hem daarin laten opgaan — wat inhoudelijk het
-  beste past, want dat is precies de vorm die `PLATFORM.md` van een wereld
-  vraagt.
+- **De prijs zelf.** De ladder is nu wél te lezen (zie hieronder), maar wat een
+  trede mag kosten staat er niet in. €65 tegenover €20.000 tegenover prijs op
+  maat is een productbesluit.
 - **Of WorkOS en RTG Kantoor twee namen voor hetzelfde zijn.** De bank zegt
   WorkOS, het huis zegt RTG Kantoor. Dat kan (context tegenover merk), maar het
   is een merkbesluit dat nog niet genomen is.
@@ -355,6 +431,58 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 - **De precieze domeinlijst per wereld.** De vijf regels hierboven zijn een eerste
   indeling op wat er in de code staat, geen uitputtende lijst.
 
+## De drie passen, na twee reparaties
+
+De vorige versie van dit document zei dat het verschil tussen de passen "geen
+basis is voor €65 tegenover €20.000": Business had twee exclusieve functies,
+Lifestyle nul. Dat klopte als meting en niet als conclusie — er waren twee dingen
+kapot in het register, en allebei maakten de ladder onleesbaar.
+
+**Eén: de Rechterhand stond nergens in het register.** De veertien apps van de
+Lifestyle-suite (Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat,
+Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties, Rendez-vous) worden
+op de server gewoon afgedwongen — `routes/member/rechterhand.js` weigert iedereen
+die geen Lifestyle of Business heeft. Maar hun paden vielen onder de generieke
+functie `member`, en die draagt `rtg` en `gast`. Het bord zei dus dat een RTG-pas
+dit heeft terwijl de route 403 gaf; elke telling las Lifestyle als nul; en de
+enige knop die de suite kon raken was de knop die de hele ledenapp uitzet.
+
+**Twee: de elf werkfuncties van WorkOS**, hierboven beschreven.
+
+Beide zijn geen productwijziging maar een correctie: er komt niemand bij en er
+gaat niemand af, het register zegt alleen wat de code al deed. Wat er daarna
+staat:
+
+| | functies | uniek | dat is |
+|---|---:|---:|---|
+| Gratis app | 44 | . | rondkijken, bestellen, Rahul |
+| RTG Pass | 140 | . | het hele platform voor één mens |
+| Lifestyle Pass | 143 | 3* | + De Rechterhand, RTG Zakelijk, Het Privékantoor |
+| Business Pass | 157 | 14 | + WorkOS: de organisatie |
+
+\* die drie zijn Lifestyle **en** Business: Lifestyle is een strikte deelverzameling
+van Business. Er is geen enkele functie die alleen Lifestyle heeft, en dat is nu
+een bewuste vorm en geen meetfout.
+
+Daarmee is de ladder in één zin per trede te zeggen, en elke zin is na te rekenen
+met `npm run groepen`:
+
+- **RTG Pass** — het hele platform, voor jezelf.
+- **Lifestyle Pass** — hetzelfde platform, maar er doet iemand het vóór je: de
+  Rechterhand-suite, het zakelijke netwerk en het Privékantoor. Je koopt geen
+  functies maar uitvoering.
+- **Business Pass** — daarbovenop een hele wereld: WorkOS, met twaalf van de
+  veertien exclusieve functies (werkvloer, werkplek, metier, vakritmes, verkoop,
+  zaakdoos, facturen, kantoorgesprek, werkmail, RTG Mail, wervingslink,
+  werkruimtes), plus Zakelijk bankieren en Instant Reality.
+
+**Wat hier nog niet klopt:** de client houdt daarnaast een eigen `PREMIUM`-set
+van veertien app-sleutels (`apps/app-main`, `premiumPas = lifestyle || business`)
+die niets van het register weet en geen onderscheid maakt tussen Lifestyle en
+Business. Twee lijsten met verschillende korrel, allebei over hetzelfde. Dat is
+de volgende reparatie, en `scripts/groepen.js` legt ze tot die tijd naast elkaar
+in plaats van te doen alsof er één is.
+
 ## Handhaving
 
 `test/wereldregister.test.js` bewaakt wat machinaal te bewaken is:
@@ -362,6 +490,7 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 - elk item in een wereld gaat ergens heen (fail-closed);
 - geen item staat in twee werelden;
 - geen wereld draagt de naam van een pas, **noch de stam ervan**;
+- geen wereld draagt de naam van een **app uit de softwarecatalogus**;
 - de werelden in `MAPPEN` zijn exact de werelden die dit document verklaart —
   drift tussen kaart en code laat de bouw zakken.
 
@@ -373,9 +502,9 @@ Wat op mensen berust: of een domein in de juiste wereld staat. Dat is een
 oordeel, en het hoort hier te worden opgeschreven in plaats van in een tabel
 verstopt te raken.
 
-En wat geen enkele toets vandaag ziet: of een wereldnaam botst met de naam van
-een APP. De pasnamen staan in een lijst en zijn dus te toetsen; de
-softwarecatalogus (`shared/command/catalog.js`) staat naast `MAPPEN` en niemand
-vergelijkt de twee. Daar is `Living OS` doorheen gekomen. Zodra dat besluit
-gevallen is, hoort die vergelijking hier bij te komen — anders is de volgende
-botsing weer een toevalstreffer.
+Wat nog steeds op mensen berust bij het NAAMGEVEN: er wordt nu tegen twee
+lijsten getoetst (passen en softwarecatalogus), maar niet tegen de honderden
+namen in `LINKS` en `OSAPPS`. Een wereld die straks zo heet als een app diep in
+een andere wereld, komt er nog steeds doorheen. Dat is een bewuste grens: die
+namen zijn niet allemaal merknamen, en een toets die op elk woord aanslaat leert
+je zijn meldingen negeren.

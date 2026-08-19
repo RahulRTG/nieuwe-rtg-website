@@ -11,15 +11,15 @@ staan loodrecht op elkaar: een wereld is een plek, een groep is een publiek.
 | groep | functies | wie dat is |
 |---|---:|---|
 | **RTG-leden** | 140 | Leden met de RTG Pass. |
-| **Lifestyle** | 142 | Leden met de Lifestyle Pass. |
-| **Business** | 145 | Leden met de Business Pass (zakelijk). |
+| **Lifestyle** | 143 | Leden met de Lifestyle Pass. |
+| **Business** | 157 | Leden met de Business Pass (zakelijk). |
 | **Gratis app** | 44 | De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen). |
-| **Leveranciers** | 53 | Partners en hun personeel in de partner-app. |
-| **Personeel** | 41 | Medewerkers in de personeels-app (PDA). |
+| **Leveranciers** | 54 | Partners en hun personeel in de partner-app. |
+| **Personeel** | 42 | Medewerkers in de personeels-app (PDA). |
 | **Foundation** | 48 | Gezinnen, leerlingen en scholen in de RTF-app. |
-| **RTG intern** | 9 | De RTG-backoffice en integraties (intern). |
+| **RTG intern** | 20 | De RTG-backoffice en integraties (intern). |
 
-Totaal 190 functieschakelaars in 16 categorieën.
+Totaal 191 functieschakelaars in 16 categorieën.
 
 ## Het verschil tussen de passen
 
@@ -28,22 +28,46 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
 | | functies | waarvan uniek |
 |---|---:|---:|
 | RTG Pass | 140 | . |
-| Lifestyle Pass | 142 | 0 |
-| Business Pass | 145 | 3 |
+| Lifestyle Pass | 143 | 0 |
+| Business Pass | 157 | 14 |
 | Gratis app | 44 | . |
 
 **Wat er boven de RTG Pass uit komt, de hele lijst:**
 
+- **De Rechterhand (Lifestyle-suite)** -- Lifestyle + Business
+  <br>De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- Lifestyle + Business
   <br>De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
 - **Het Privékantoor (Lifestyle)** -- Lifestyle + Business
   <br>De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
 - **Werk OS (werkruimtes)** -- Business
   <br>De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Wervingslink (in dienst via een link)** -- Business
+  <br>De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
+- **De werkvloer** -- Business
+  <br>Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
+- **De werkplek** -- Business
+  <br>Het persoonlijke werkstation van een medewerker.
+- **Metier (vakwerk)** -- Business
+  <br>Het vakwerk van zelfstandigen en ambachtslieden.
+- **Vakritmes** -- Business
+  <br>Werkritmes en tijdregistratie per vak.
+- **Verkoop** -- Business
+  <br>De verkoopkant van een zaak, inclusief proefritten.
+- **De zaakdoos** -- Business
+  <br>De doos op locatie: zaakserver, netwerk en updates.
+- **Facturen** -- Business
+  <br>De facturatie van en naar een zaak.
 - **Zakelijk bankieren** -- Business
   <br>Bulkbetalingen en de salarisrun vanaf een zakelijke rekening.
+- **Kantoorgesprek** -- Business
+  <br>Het gesprek waarmee een zaak zijn kantoor inricht.
 - **Instant Reality** -- Business
   <br>De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.
+- **Werkmail bezorgen** -- Business
+  <br>De bezorging van interne werkmail.
+- **RTG Mail: post van buiten aannemen** -- Business
+  <br>De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 
 ## En de tweede lijst, die de eerste niet kent
 
@@ -333,7 +357,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Lifestyle -- 142 functies
+## Lifestyle -- 143 functies
 
 *Leden met de Lifestyle Pass.*
 
@@ -344,6 +368,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Snaps & 24-uurs verhalen** -- Foto-snaps en verhalen die na 24 uur verdwijnen.
 - **Vrienden verbinden** -- Vriendschapsverzoeken en de vriendengraaf tussen leden: zoeken op codenaam, of toevoegen met de eigen contactpin (ook als QR).
 - **Vacatures & solliciteren (leden)** -- Leden solliciteren met hun cv op vacatures bij partners.
+- **De Rechterhand (Lifestyle-suite)** -- De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
 - **RTG Wereld (de ene sociale app)** -- De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app.
 - **Het Privékantoor (Lifestyle)** -- De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
@@ -520,7 +545,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Business -- 145 functies
+## Business -- 157 functies
 
 *Leden met de Business Pass (zakelijk).*
 
@@ -531,6 +556,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Snaps & 24-uurs verhalen** -- Foto-snaps en verhalen die na 24 uur verdwijnen.
 - **Vrienden verbinden** -- Vriendschapsverzoeken en de vriendengraaf tussen leden: zoeken op codenaam, of toevoegen met de eigen contactpin (ook als QR).
 - **Vacatures & solliciteren (leden)** -- Leden solliciteren met hun cv op vacatures bij partners.
+- **De Rechterhand (Lifestyle-suite)** -- De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
 - **RTG Wereld (de ene sociale app)** -- De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app.
 - **Het Privékantoor (Lifestyle)** -- De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
@@ -614,6 +640,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Personeel & integraties
 
+- **Wervingslink (in dienst via een link)** -- De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
 - **Rahul doet het (AI-stuur)** -- De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf).
 
 ### Diensten (leden)
@@ -652,6 +679,19 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Boeken** -- De bibliotheek en het lezen.
 - **Fluister** -- De fluisterlijn binnen de sociale laag.
 - **De krant** -- De openbare krant: de gids, een uitgave openen en een artikel lezen.
+
+### Werk (zaken en personeel)
+
+- **De werkvloer** -- Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
+- **De werkplek** -- Het persoonlijke werkstation van een medewerker.
+- **Metier (vakwerk)** -- Het vakwerk van zelfstandigen en ambachtslieden.
+- **Vakritmes** -- Werkritmes en tijdregistratie per vak.
+- **Verkoop** -- De verkoopkant van een zaak, inclusief proefritten.
+- **De zaakdoos** -- De doos op locatie: zaakserver, netwerk en updates.
+- **Facturen** -- De facturatie van en naar een zaak.
+- **Kantoorgesprek** -- Het gesprek waarmee een zaak zijn kantoor inricht.
+- **Werkmail bezorgen** -- De bezorging van interne werkmail.
+- **RTG Mail: post van buiten aannemen** -- De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 
 ### RTFoundation
 
@@ -713,7 +753,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Personeel -- 41 functies
+## Personeel -- 42 functies
 
 *Medewerkers in de personeels-app (PDA).*
 
@@ -723,6 +763,10 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG OV (reizen)** -- Alle vervoer in een app: de kaart, twee snelle check-ins, de dienst-PDA en de routetekenaar.
 - **RTG Vervoer (Mobility OS)** -- De vervoerskern: een rit aanvragen en volgen, de vloot en de dispatch van een vervoerder, en de bedrijfspendel.
 - **RTG Eye (werkvloer-camera)** -- De camerablik van de werkvloer: voertuigschouw en het handsfree uitgifteregister.
+
+### RTG-Backoffice
+
+- **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
 
 ### Personeel & integraties
 
@@ -790,7 +834,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Leveranciers -- 53 functies
+## Leveranciers -- 54 functies
 
 *Partners en hun personeel in de partner-app.*
 
@@ -817,6 +861,10 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Sollicitaties bij partners** -- Vacatures uitzetten en sollicitaties ontvangen bij de partner.
 - **Regie: zien & op de lijst zetten** -- De stand van de eigen zaak, de zoekbalk erover, het objectdossier en de uitzonderingenrij -- ook op de PDA van de vloer.
 - **Regie: rechtzetten & regels** -- Administratieve drift rechtzetten, een ronde terugdraaien, de eigen grenzen zetten en het spoor van de zaak lezen.
+
+### RTG-Backoffice
+
+- **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
 
 ### Betalen & verificatie
 
@@ -972,7 +1020,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## RTG intern -- 9 functies
+## RTG intern -- 20 functies
 
 *De RTG-backoffice en integraties (intern).*
 
@@ -990,7 +1038,21 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Command: besturen** -- Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.
 - **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
 
+### Personeel & integraties
+
+- **Wervingslink (in dienst via een link)** -- De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
+
 ### Werk (zaken en personeel)
 
+- **De werkvloer** -- Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
+- **De werkplek** -- Het persoonlijke werkstation van een medewerker.
+- **Metier (vakwerk)** -- Het vakwerk van zelfstandigen en ambachtslieden.
+- **Vakritmes** -- Werkritmes en tijdregistratie per vak.
+- **Verkoop** -- De verkoopkant van een zaak, inclusief proefritten.
+- **De zaakdoos** -- De doos op locatie: zaakserver, netwerk en updates.
+- **Facturen** -- De facturatie van en naar een zaak.
+- **Kantoorgesprek** -- Het gesprek waarmee een zaak zijn kantoor inricht.
 - **RTG One** -- Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.
+- **Werkmail bezorgen** -- De bezorging van interne werkmail.
+- **RTG Mail: post van buiten aannemen** -- De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 

@@ -16,6 +16,22 @@ module.exports = [
     uitleg: 'Vriendschapsverzoeken en de vriendengraaf tussen leden: zoeken op codenaam, of toevoegen met de eigen contactpin (ook als QR).', paden: ['/api/member/connect', '/api/member/pin'] },
   { id: 'member-werk', categorie: 'Leden (RTG-app)', naam: 'Vacatures & solliciteren (leden)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Leden solliciteren met hun cv op vacatures bij partners.', paden: ['/api/member/apply'] },
+  /* DE RECHTERHAND STOND NERGENS IN DIT REGISTER, en dat maakte elke meting van
+     "wat krijgt Lifestyle" onwaar. De veertien apps van de suite -- Reisboek,
+     Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek,
+     Cercle, Hangar, Entourage, Attenties, Rendez-vous en de Rechterhand zelf --
+     worden op de server WEL afgedwongen (routes/member/rechterhand.js weigert
+     iedereen die geen lifestyle of business is), maar hun paden vielen onder
+     `member` hierboven. Dat is de generieke ledenfunctie, en die draagt
+     rtg + gast. Het bord zei dus dat een RTG-pas dit heeft terwijl de route 403
+     gaf, GROEPEN.md telde nul functies die alleen Lifestyle heeft, en de enige
+     knop die de suite kon raken was de knop die de hele ledenapp uitzet.
+
+     Langste prefix wint (functies/toegang.js), dus deze regel neemt het van
+     `member` over zodra hij hier staat. Er verandert niets aan wie er binnenkomt
+     -- de route deed dat al -- alleen zegt het register nu hetzelfde. */
+  { id: 'rechterhand', categorie: 'Leden (RTG-app)', naam: 'De Rechterhand (Lifestyle-suite)', standaard: true, doelgroepen: ['lifestyle', 'business'],
+    uitleg: 'De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous. Uit = de hele suite is dicht; de rest van de ledenapp blijft draaien.', paden: ['/api/member/rechterhand', '/api/member/rendezvous'] },
   { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },
   { id: 'wereld', categorie: 'Leden (RTG-app)', naam: 'RTG Wereld (de ene sociale app)', standaard: true, doelgroepen: LEDEN,

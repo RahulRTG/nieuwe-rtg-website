@@ -33,18 +33,25 @@
   const MAPPEN = [
     /* --- één gecentreerde rij --- */
     /* LIVINGOS EN NIET RTG, EN OOK NIET LIFEOS. Twee besluiten in een naam.
-       `rtg` is de naam van de INSTAPPAS (naast lifestyle en business), en pas en
-       wereld zijn twee loodrechte assen: de pas zegt wie je bent, de wereld waar
-       je bent. Vielen die woorden samen, dan las een lid een plek als een prijs.
-       Maar `LifeOS` -- de eerste kandidaat -- haalde de toets alleen op een
+       `rtg` is de naam van de INSTAPPAS, en pas en wereld zijn twee loodrechte
+       assen: vielen die woorden samen, dan las een lid een plek als een prijs.
+       En `LifeOS` -- de eerste kandidaat -- haalde de toets alleen op een
        technische woordvergelijking: `life` is niet `lifestyle`, terwijl een lid
-       wel degelijk "Life" naast een pas ziet staan die "Lifestyle" heet. Een
-       regel die je op de letter volgt en niet op de bedoeling, is geen regel.
-       Vandaar LivingOS: het dagelijks leven, en geen stam die tegen een pasnaam
-       aanschurkt. test/wereldregister.test.js toetst nu ook op de stam.
-       Het huis (/apps/rtg.html) en de glyf houden hun naam: een huis is een merk
-       en een wereld is een context. */
+       wel "Life" ziet staan naast een pas die "Lifestyle" heet. Een regel die je
+       op de letter volgt en niet op de bedoeling, is geen regel; de toets kijkt
+       nu ook naar de stam. Het huis (/apps/rtg.html) en de glyf houden hun naam:
+       een huis is een merk, een wereld is een context. */
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
+      'link:vooruitzicht',
+    /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
+       van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
+       in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
+       Tiener, Jong en Volwassen gaan over babyboek, dromen, gevoel, gezondheid,
+       ochtend, rust, opvoeden, school en club -- dat is iemands dagelijks leven
+       en geen stichtingswerk. Gemeten: 62 van de 71 schermen onder
+       /apps/foundation/ zijn zo. De stichting houdt de andere negen.
+       Er verhuist geen bestand: alleen de deur staat nu in de juiste wereld. */
+      'os:rtf',
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek',
@@ -65,7 +72,13 @@
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport',
+      'link:nieuws', 'link:krant', 'link:sport'] },
+    /* INSTELLINGEN, EN MET OPZET ZONDER `wereld`. Een wereld is een context waar
+       je in leeft; deze vier gaan niet over een dag maar over het systeem. Ze
+       zijn RTG Core, en Core heeft in de bank een gezicht: het bedieningspaneel
+       in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
+       instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
+    { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
       'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
@@ -79,24 +92,12 @@
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker'] },
-    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM.
-       Elf onderdelen naast de tweeenveertig van LivingOS -- geteld in het
-       functieregister zijn het er veertien van de 190. Een wereld is geen
-       categorie in een spreadsheet maar een bestemming in het hoofd van een
-       mens, en deze bezit een hele reeks van vertrekken tot thuiskomen:
-       bedenken, vervoer, verblijf, onderweg, aankomst, lokaal vervoer, terug.
-       Luchtvaart, OV, Hospitality, Invisible Arrival en destination services
-       kunnen hier later onder groeien zonder dat de kaart hoeft te wijzigen.
-
-       DEZE ELF STONDEN IN LIVINGOS, als eerste blok. Ze zijn er letterlijk uit
-       geknipt; geen enkel item is nieuw en geen enkel item is verdwenen.
-       scripts/check.js regel 44 en test/wereldregister.test.js bewaken dat ze
-       nu in precies EEN wereld staan.
-
-       Het huis bestond al en was alleen nergens aan opgehangen:
-       /apps/reizen.html, "uw reiswereld op een plek -- alles wat eraan komt,
-       uit alle reisapps tegelijk" (server/kern/appgids-data/deel11.js), met een
-       eigen webmanifest. Precies wat een wereldhuis is. */
+    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
+       wereld is geen categorie in een spreadsheet maar een bestemming in het
+       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
+       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
+       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
+       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
     { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
@@ -127,18 +128,17 @@
        nooit in beeld komen (openMap navigeert, zie 26.js). Het
        levens-command-center staat daarom als tegel OP de hub zelf, in de
        oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
-    /* FOUNDATIONOS IS DE WERELD, RTFOUNDATION IS HET MERK ERIN. Dezelfde regel
-       als bij WorkOS en RTG Kantoor, en hier doet hij het meeste werk: onder
-       /apps/foundation/ staan 71 schermen, waarvan er ACHT over de stichting
-       als organisatie gaan (os-bestuur, os-donateur, os-vrijwilliger, os-veld,
-       os-deelnemer, os-publiek, os-portaal, os). De rest -- babyboek, dromen,
-       gevoel, gezondheid, ochtend, rust, opvoeden, campus, bieb, club,
-       speeltuin -- is het leven van een kind, en dat hoort in LivingOS.
-
-       WERELDEN.md maakt daar een principe van: de bouwer van een capability
-       bepaalt niet in welke wereld hij thuishoort, de gebruikerscontext doet
-       dat. RTFoundation mag dus eigenaar zijn van iets dat aan de voorkant in
-       LivingOS verschijnt. Die verhuizing is nog niet gedaan; hij staat in
-       WERELDEN.md als genoemde stap met zijn telling erbij. */
-    { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
+    /* FOUNDATIONOS IS DE WERELD, RTFOUNDATION IS HET MERK ERIN. Van de 71
+       schermen onder /apps/foundation/ gaan er acht over de stichting; de rest
+       is het leven van een kind en hoort in LivingOS. Want de bouwer van een
+       capability bepaalt niet in welke wereld hij hoort, de gebruikerscontext
+       doet dat (WERELDEN.md). Die verhuizing staat daar als genoemde stap. */
+    /* HET HUIS IS os-publiek EN NIET os-portaal, en dat scheelde een deur die naar
+       het verkeerde publiek leidt. os.html is een kantoorconsole achter een
+       kantoortoken ("KANTOORCODE"), os-portaal.html heet met zoveel woorden
+       "Portaal voor partners, gemeenten en ondernemers", en os-publiek.html zegt
+       "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
+       een lid; de andere twee zijn deuren BINNEN de wereld. */
+    { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
+      'link:rtfbuurt', 'link:rtfportaal'] }
   ];

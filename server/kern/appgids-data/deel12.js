@@ -16,7 +16,7 @@ module.exports = {
     ['Beschrijf het gewenste resultaat en de harde grenzen', 'Bekijk wat lokaal klaarstaat en waarop providers nog moeten antwoorden',
       'Geef alleen de voorbereiding vrij; boeken en betalen blijven apart geblokkeerd'],
     'Gereed betekent pas gereed als de echte provider dat heeft bevestigd; een mooie voorspelling is geen bewijs.'),
-  '/apps/living-os.html': G('Living OS: geld, tijd, energie, mensen en beleving als een samenhangende wereld vooruit bekijken.',
+  '/apps/living-os.html': G('Het Vooruitzicht, de cockpit van LivingOS: geld, tijd, energie, mensen en beleving als een samenhangende wereld vooruit bekijken.',
     ['Vergelijk de waarschijnlijke, ideale en verstoorde wereld', 'Bekijk in de beslisgraaf wat Rahul mag voorbereiden en wat alleen u mag doen',
       'Spoel een verandering terug om oorzaak, gevolg en herstel te begrijpen'],
     'Een simulatie helpt kiezen maar beslist niet. Menselijk akkoord blijft zichtbaar op iedere onomkeerbare grens.'),

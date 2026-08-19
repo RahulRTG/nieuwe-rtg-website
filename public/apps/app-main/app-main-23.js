@@ -69,6 +69,18 @@
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
     ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    /* De cockpit van LivingOS (WERELDEN.md). Het bestand heet nog living-os,
+       want een bestandsnaam is geen merknaam; de APP heette dat ook, en dat
+       botste vier regels ver in de bank met de WERELD LivingOS. */
+    vooruitzicht:{ naam: 'Het Vooruitzicht', url: '/apps/living-os.html' },
+    /* De STICHTING, en niet het gezin eromheen. Onder /apps/foundation/ staan
+       71 schermen; negen daarvan gaan over RTFoundation als organisatie en de
+       rest over het leven van een kind (WERELDEN.md). Deze twee zijn de deuren
+       naar die negen: het portaal (donateur, vrijwilliger, deelnemer) en de
+       publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
+       een kantoortoken en is geen deur voor een lid. */
+    rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

@@ -446,7 +446,7 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     assert.deepEqual(b.koppen, ['Werelden', 'Software'],
       'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
       'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
@@ -512,7 +512,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 
     const b = await werelden(page);
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
       'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],

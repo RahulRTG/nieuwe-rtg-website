@@ -89,6 +89,16 @@ de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
 vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
 laat zakken in plaats van stil verkeerd te blijven staan.
 
+**De ladder van de drie passen staat daar ook**, en hij is na te rekenen met
+`npm run groepen` (dat schrijft `GROEPEN.md` uit de bron): **RTG Pass** is het
+hele platform voor één mens (140 functies), **Lifestyle** is hetzelfde platform
+maar er doet iemand het vóór je (143, met De Rechterhand, RTG Zakelijk en het
+Privékantoor als verschil — je koopt uitvoering, geen functies), en **Business**
+krijgt daarbovenop een hele wereld (157, waarvan twaalf van de veertien
+exclusieve functies WorkOS zijn). Lifestyle is een strikte deelverzameling van
+Business; er is geen enkele functie die alleen Lifestyle heeft, en dat is een
+vorm en geen gat. Wat een trede mag kosten staat nergens in de code.
+
 **`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
 gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
 context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen

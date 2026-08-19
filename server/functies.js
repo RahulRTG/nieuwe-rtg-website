@@ -42,12 +42,12 @@
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS, FASES } = require('./functies/register');
 const { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd,
-  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels } = require('./functies/toegang');
+  doelgroepVanVerzoek, tierNaarDoelgroep, WERKPADEN, volgKoppels } = require('./functies/toegang');
 const { catalogus, valideerVoorstel, duidVoorstel } = require('./functies/voorstel');
 
 module.exports = {
   FUNCTIES, CATEGORIEEN, OP_ID, DOELGROEPEN, DOELGROEP_IDS, KOPPELS, FASES,
   functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd, catalogus,
-  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, valideerVoorstel, duidVoorstel
+  doelgroepVanVerzoek, tierNaarDoelgroep, WERKPADEN, volgKoppels, valideerVoorstel, duidVoorstel
 };

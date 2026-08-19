@@ -83,8 +83,14 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
         let gebruiker = null, tier = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        if (tok && !gebruiker) { try { const ses = sessionFor(tok); if (ses && ses.tier) tier = ses.tier; } catch (e) {} }
-        const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
+        /* De sessie hoort er ALTIJD bij te worden gehaald en niet alleen als het
+           accounttoken faalt: op de werkpaden van WorkOS leest
+           doelgroepVanVerzoek de relatie tot de organisatie uit de sessie, en
+           een medewerker die met zijn RTG-account binnenkwam heeft ALLEBEI. */
+        let sessie = null;
+        if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+        if (tok && !gebruiker && sessie && sessie.tier) tier = sessie.tier;
+        const doel = functies.doelgroepVanVerzoek(p, gebruiker, sessie) ||
           (tier ? functies.tierNaarDoelgroep(tier) : null);
         const raakt = doel && Array.isArray(f.doelgroepen) && f.doelgroepen.includes(doel);
         if (raakt) {
@@ -133,10 +139,10 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
     try { if (tok) user = accounts.verifyToken(tok); } catch (e) {}
     // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
     // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
-    if (tok && !user) {
-      try { const s = sessionFor(tok); if (s && s.tier) sessieTier = s.tier; } catch (e) {}
-    }
-    const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
+    let sessie = null;
+    if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+    if (tok && !user && sessie && sessie.tier) sessieTier = sessie.tier;
+    const doelgroep = functies.doelgroepVanVerzoek(p, user, sessie) ||
       (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
 
     // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als

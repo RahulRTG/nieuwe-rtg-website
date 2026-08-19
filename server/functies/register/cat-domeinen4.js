@@ -12,7 +12,7 @@
    /api/book, /api/booking, /api/bookings, /api/hotels en /api/partnertrips.
    Dat zijn vijf paden en EEN dienst; wie ze los zou schakelen kan een halve
    dienst overhouden, en daar heeft niemand iets aan. */
-const { DOELGROEPEN, LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { DOELGROEPEN, LEDEN, LEDEN_RTF, WERKOS } = require('./doelgroepen');
 const ALLE = DOELGROEPEN.map(d => d.id).filter(d => d !== 'intern');
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 
@@ -66,7 +66,7 @@ module.exports = [
     uitleg: 'De sparlijst: iets parkeren om er later op terug te komen.', paden: ['/api/spar'] },
   { id: 'ov-bijles', categorie: 'RTFoundation', naam: 'Bijles', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Het bijlesgesprek met de begeleider.', paden: ['/api/bijles'] },
-  { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: ['leverancier', 'personeel'],
+  { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },
   { id: 'ov-arrival', categorie: 'Diensten (leden)', naam: 'Invisible Arrival', standaard: true, doelgroepen: ALLE,
     uitleg: 'De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.', paden: ['/api/arrival'] },
@@ -74,7 +74,7 @@ module.exports = [
     uitleg: 'De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.', paden: ['/api/instant-reality'] },
   { id: 'ov-rtgone', categorie: 'Werk (zaken en personeel)', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
     uitleg: 'Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.', paden: ['/api/rtgone'] },
-  { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: ['leverancier', 'personeel'],
+  { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] },
   /* De buitenpoort van RTG Mail. Deze hoort NAAR ZIJN AARD in de kast: hij is
      publiek (een vreemde mailserver heeft geen inlog bij ons), en als er ooit
@@ -82,7 +82,7 @@ module.exports = [
      vanuit de boardroom dicht kunnen zonder dat er iemand bij de code hoeft.
      Dat is precies waar de schakelkast voor bestaat. */
   { id: 'ov-mail-binnen', categorie: 'Werk (zaken en personeel)', naam: 'RTG Mail: post van buiten aannemen',
-    standaard: true, doelgroepen: ['leverancier', 'personeel'],
+    standaard: true, doelgroepen: WERKOS,
     uitleg: 'De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.',
     paden: ['/api/mail/binnen'] }
 ];

@@ -221,6 +221,41 @@ test('geen wereld draagt de naam van een pas', () => {
   assert.deepEqual(zoek, [], 'deze werelden dragen de naam van een pas');
 });
 
+test('geen wereld draagt de naam van een app uit de softwarecatalogus', () => {
+  /* DIT GAT IS MET EEN BROWSER GEVONDEN EN NIET MET EEN GREP, en dat hoort hier
+     te staan. De bank van de werktafel heeft twee kopjes -- Werelden en Software
+     -- en na de hernoeming stond er `LivingOS` onder het eerste en vier regels
+     lager `Living OS` onder het tweede. Dezelfde woorden, dezelfde lijst, een
+     half scherm uit elkaar.
+
+     Waarom niets dat ving: de pasnamen staan in een lijst van drie en worden
+     hierboven getoetst, maar de softwarecatalogus (shared/command/catalog.js)
+     staat naast MAPPEN en niemand hield ze tegen elkaar. Twee lijsten die elkaar
+     niet kennen is precies waar LAT.md regel 4 over gaat.
+
+     De vergelijking is op het KALE woord: spaties, koppeltekens en hoofdletters
+     gaan eraf, want een lid leest "Living OS" en "LivingOS" als hetzelfde.
+     Alleen de NAAM wordt vergeleken en niet het adres: een app die in een wereld
+     hangt EN in de catalogus staat is geen fout maar het huispatroon -- de
+     catalogus is ook Rahuls routeertabel (appUit), dus wie hem daaruit haalt
+     sloopt "open het gastdossier". Reizen & Veilig en Gastdossier staan om die
+     reden in allebei.
+
+     DE MUTATIE: zet de catalogusnaam van /apps/living-os.html terug op
+     'Living OS'. */
+  const CAT = fs.readFileSync(path.join(PUB, 'shared/command/catalog.js'), 'utf8');
+  const m = /var APPS=(\[[\s\S]*?\]),openTeller/.exec(CAT);
+  assert.ok(m, 'de APPS-lijst in shared/command/catalog.js is niet meer te lezen');
+  const APPS = Function('return (' + m[1] + ');')();
+  assert.ok(APPS.length >= 5, 'de softwarecatalogus is leeg; deze toets meet dan niets');
+
+  const kaal = (x) => String(x).toLowerCase().replace(/[\s·-]+/g, '');
+  const catNamen = new Map(APPS.map((a) => [kaal(a[0]), a[0]]));
+  const zoek = WERELDEN.filter((w) => catNamen.has(kaal(w.naam)))
+    .map((w) => 'de wereld ' + w.naam + ' heet hetzelfde als de app "' + catNamen.get(kaal(w.naam)) + '"');
+  assert.deepEqual(zoek, [], 'deze werelden delen hun naam met een app in de bank');
+});
+
 test('de werelden in MAPPEN zijn exact de werelden die WERELDEN.md verklaart', () => {
   /* DE KAART EN DE CODE LOPEN UIT ELKAAR ZONDER DAT IEMAND IETS MERKT, en dat is
      hier al een keer gebeurd: WERELDEN.md beschreef ROS, Concern en Fundament

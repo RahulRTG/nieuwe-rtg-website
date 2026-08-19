@@ -2,7 +2,7 @@
    dezelfde namen, zodat toevoegen nooit de betekenis van een index verandert. */
 (function(w){
   'use strict';
-  var APPS=[['Vandaag','/apps/vandaag.html','home'],['Instant Reality','/apps/instant-reality.html','home'],['Private Office','/apps/private-office.html','home'],['Living OS','/apps/living-os.html','home'],['Partner Network','/apps/partner-network.html','reis'],['Reizen & Veilig','/apps/reizen-veilig.html','reis'],['Leven','/apps/leven.html','home'],['Geld','/apps/geld-command.html','geld'],['Sociaal','/apps/sociaal.html','salon'],['Media','/apps/media.html','play'],['Horeca','/apps/horeca.html','salon'],['Gastdossier','/apps/reisboek.html','mens']],openTeller={};
+  var APPS=[['Vandaag','/apps/vandaag.html','home'],['Instant Reality','/apps/instant-reality.html','home'],['Private Office','/apps/private-office.html','home'],['Het Vooruitzicht','/apps/living-os.html','home'],['Partner Network','/apps/partner-network.html','reis'],['Reizen & Veilig','/apps/reizen-veilig.html','reis'],['Leven','/apps/leven.html','home'],['Geld','/apps/geld-command.html','geld'],['Sociaal','/apps/sociaal.html','salon'],['Media','/apps/media.html','play'],['Horeca','/apps/horeca.html','salon'],['Gastdossier','/apps/reisboek.html','mens']],openTeller={};
   function appMetNaam(naam){for(var i=0;i<APPS.length;i++)if(APPS[i][0]===naam)return APPS[i];return null}
   function titelVan(url,t){if(t)return t;for(var i=0;i<APPS.length;i++)if(url.indexOf(APPS[i][1])===0)return APPS[i][0];return 'Werkblad'}
   function hash(s){var h=0;for(var i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return h}

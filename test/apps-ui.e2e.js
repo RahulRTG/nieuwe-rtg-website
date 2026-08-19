@@ -139,7 +139,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         return {
           koppen: [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim()),
           werelden: [...nav.querySelectorAll('button[data-url]')].map((b) => b.dataset.url)
-            .filter((u) => /^\/apps\/(rtg|kantoor|foundation)/.test(u)),
+            .filter((u) => /^\/apps\/(rtg|kantoor|reizen|foundation)/.test(u)),
           leeg: (document.querySelector('#rtgCommand .cmd-leeg') || {}).textContent || '',
           springboard: zicht('.os-thuisscherm'),
           klok: !!document.getElementById('homeKlok')
@@ -148,8 +148,8 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.deepEqual(start.koppen, ['Werelden', 'Software'],
         'de bank scheidt de werelden niet van de software: ' + start.koppen.join(', '));
       assert.deepEqual(start.werelden,
-        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-        'de drie werelden staan niet in de bank');
+        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+        'de vier werelden staan niet in de bank');
       assert.match(start.leeg, /Kies een wereld/i,
         'de werktafel begint niet op een lege keuze: "' + start.leeg + '"');
       assert.equal(start.springboard, false, 'het springboard staat weer in beeld');

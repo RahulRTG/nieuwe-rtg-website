@@ -38,17 +38,24 @@ const reg = require('./lib/wereldregister');
 
 const DOEL = path.join(reg.WORTEL, 'WERELDLIJST.md');
 
+/* HET LANGE STREEPJE UIT EEN CODEPUNT. Regel 3 van scripts/check.js verbiedt em-,
+   en- en figure-streepjes in de BRON (huisstijl), en dat is terecht: in code zijn
+   ze niet van elkaar te onderscheiden. De UITVOER is een document en leest wel
+   met een lang streepje, net als WERELDEN.md. check.js lost dat voor zichzelf op
+   dezelfde manier op -- zijn eigen regex is uit codepunten opgebouwd. */
+const STREEP = String.fromCharCode(0x2014);
+
 /* De volgorde van MAPPEN blijft staan: dat is de volgorde waarin een lid ze in
    de bank ziet, en die opnieuw sorteren maakt dit document moeilijker te
    vergelijken met het scherm. */
 function bouw() {
   const r = [];
-  r.push('# De wereldlijst — wat er precies in elke wereld hangt');
+  r.push('# De wereldlijst ' + STREEP + ' wat er precies in elke wereld hangt');
   r.push('');
   r.push('**Dit bestand is gegenereerd. Bewerk het niet met de hand.**');
   r.push('Draai `npm run wereldlijst`; `scripts/check.js` zakt als het achterloopt.');
   r.push('');
-  r.push('De bron is `MAPPEN` in de app-main-bundel — de enige lijst werelden');
+  r.push('De bron is `MAPPEN` in de app-main-bundel ' + STREEP + ' de enige lijst werelden');
   r.push('(`WERELD.md`). `WERELDEN.md` beschrijft *waarom* de werelden zo lopen;');
   r.push('dit zegt *wat* erin zit.');
   r.push('');
@@ -82,7 +89,7 @@ function bouw() {
   for (const s of stuk) {
     r.push('## ' + s.w.naam);
     r.push('');
-    r.push('Huis: `' + s.w.wereld + '` — ' + s.w.items.length + ' onderdelen.');
+    r.push('Huis: `' + s.w.wereld + '` ' + STREEP + ' ' + s.w.items.length + ' onderdelen.');
     r.push('');
     r.push('| onderdeel | soort | komt uit op |');
     r.push('|---|---|---|');
@@ -112,7 +119,7 @@ function bouw() {
       los.map((t) => '`tab:' + t + '` (' + reg.TABS[t] + ')').join(', ') + '.');
     r.push('');
     r.push('Dat hoeft geen fout te zijn. `tab:home` ís het beginscherm van de');
-    r.push('ledenapp en hoort nergens onder te hangen, en `tab:ai` is Rahul — die is');
+    r.push('ledenapp en hoort nergens onder te hangen, en `tab:ai` is Rahul ' + STREEP + ' die is');
     r.push('RTG Core en reist met de mens mee in plaats van in één wereld te wonen');
     r.push('(`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te staan: een');
     r.push('tab die nergens in hangt is voor een lid alleen via de tabbalk te vinden,');

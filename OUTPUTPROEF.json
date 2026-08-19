@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-19T02:48:19.639Z",
-  "commit": "e1cd674",
-  "boomVuil": true,
+  "op": "2026-08-19T03:17:24.762Z",
+  "commit": "feedda7",
+  "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1241,
-  "onbeslist": 2884,
+  "bewezen": 1246,
+  "onbeslist": 2879,
   "blind": 62,
   "ongemeten": 8
  },
@@ -13701,39 +13701,44 @@
    "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/boerderij/taak/klaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "boerderij.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/boerderij/ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "boerderij.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/boerderij/product": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "boerderij.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/boerderij/naar-salon": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "boerderij.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/boerderij/type": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "boerderij.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en boerderij.test.js zakte daarop"
   },
   "POST /api/supplier/bord": {
    "staat": "bewezen",
@@ -38707,6 +38712,31 @@
    "toets": "boerderij.test.js",
    "merkt": true,
    "op": "2026-08-19T02:48:19.518Z"
+  },
+  "POST /api/supplier/boerderij/product": {
+   "toets": "boerderij.test.js",
+   "merkt": true,
+   "op": "2026-08-19T03:17:13.489Z"
+  },
+  "POST /api/supplier/boerderij/ai": {
+   "toets": "boerderij.test.js",
+   "merkt": true,
+   "op": "2026-08-19T03:17:13.535Z"
+  },
+  "POST /api/supplier/boerderij/taak/klaar": {
+   "toets": "boerderij.test.js",
+   "merkt": true,
+   "op": "2026-08-19T03:17:13.596Z"
+  },
+  "POST /api/supplier/boerderij/naar-salon": {
+   "toets": "boerderij.test.js",
+   "merkt": true,
+   "op": "2026-08-19T03:17:13.793Z"
+  },
+  "POST /api/supplier/boerderij/type": {
+   "toets": "boerderij.test.js",
+   "merkt": true,
+   "op": "2026-08-19T03:17:24.586Z"
   }
  },
  "basislijn": {

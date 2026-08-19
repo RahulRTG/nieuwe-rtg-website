@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T14:33:37.150Z",
-  "commit": "399ed80",
+  "op": "2026-08-19T14:35:03.562Z",
+  "commit": "e36a436",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2690,
-  "onbeslist": 1369,
+  "bewezen": 2710,
+  "onbeslist": 1349,
   "blind": 128,
   "ongemeten": 8
  },
@@ -20111,96 +20111,108 @@
    "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/project-uitnodig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/projecten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/project-antwoord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/taak-maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/project-staat": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/taak-zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/notitie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/project-ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/project-weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/schrijf-opdracht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/schrijf-feedback": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/schrijf-bewaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leren/schrijfsels": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "leren.test.js",
-    "rtf-veilig.test.js"
+    "leren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren.test.js zakte daarop"
   },
   "POST /api/rtf/leven/kring": {
    "staat": "bewezen",
@@ -26677,47 +26689,52 @@
    "reden": "er is over DEZE route gelogen en schooldirectie.test.js zakte daarop"
   },
   "POST /api/foundation/school/rooster/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/cijfer/geef": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "school.test.js",
-    "schoolbeeld.test.js"
+    "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/ziekmelden": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/absentie/afhandelen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/bericht/gezin": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/bericht/leraar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/mededeling": {
    "staat": "bewezen",
@@ -26728,11 +26745,12 @@
    "reden": "er is over DEZE route gelogen en schooltaal.test.js zakte daarop"
   },
   "POST /api/office/schools": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "school.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 28); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en school.test.js zakte daarop"
   },
   "POST /api/foundation/school/leraar/overzicht": {
    "staat": "onbeslist",
@@ -47548,6 +47566,106 @@
    "toets": "leren.test.js",
    "merkt": true,
    "op": "2026-08-19T14:33:36.908Z"
+  },
+  "POST /api/rtf/leren/projecten": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:41.861Z"
+  },
+  "POST /api/rtf/leren/project-uitnodig": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:41.917Z"
+  },
+  "POST /api/rtf/leren/project-antwoord": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:44.113Z"
+  },
+  "POST /api/rtf/leren/taak-maak": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:52.172Z"
+  },
+  "POST /api/rtf/leren/project-staat": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:54.804Z"
+  },
+  "POST /api/rtf/leren/taak-zet": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:54.957Z"
+  },
+  "POST /api/rtf/leren/notitie": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:33:57.412Z"
+  },
+  "POST /api/rtf/leren/project-ai": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:05.492Z"
+  },
+  "POST /api/rtf/leren/schrijf-opdracht": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:08.492Z"
+  },
+  "POST /api/rtf/leren/project-weg": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:08.932Z"
+  },
+  "POST /api/rtf/leren/schrijf-feedback": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:11.248Z"
+  },
+  "POST /api/rtf/leren/schrijf-bewaar": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:19.396Z"
+  },
+  "POST /api/rtf/leren/schrijfsels": {
+   "toets": "leren.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:22.511Z"
+  },
+  "POST /api/foundation/school/rooster/zet": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:38.152Z"
+  },
+  "POST /api/foundation/school/cijfer/geef": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:39.701Z"
+  },
+  "POST /api/foundation/school/ziekmelden": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:48.415Z"
+  },
+  "POST /api/foundation/school/absentie/afhandelen": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:50.964Z"
+  },
+  "POST /api/foundation/school/bericht/gezin": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:52.433Z"
+  },
+  "POST /api/foundation/school/bericht/leraar": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:34:54.155Z"
+  },
+  "POST /api/office/schools": {
+   "toets": "school.test.js",
+   "merkt": true,
+   "op": "2026-08-19T14:35:03.428Z"
   }
  },
  "basislijn": {
@@ -47959,6 +48077,7 @@
   "stadshardware.test.js": "groen",
   "zaakcommand-routes.test.js": "groen",
   "stadsbesluit.test.js": "groen",
-  "leren.test.js": "groen"
+  "leren.test.js": "groen",
+  "school.test.js": "groen"
  }
 }

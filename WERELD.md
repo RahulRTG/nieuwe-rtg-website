@@ -37,13 +37,22 @@ is de klok geworden. Wat er van hem over is:
   Daar is het het eerste wat je ziet, en dáár is het merk het antwoord op een
   leeg scherm. Op een beginscherm was het een groot rond ding boven de dingen
   waarvoor je kwam.
-- **De werelden staan bovenaan de bank** van de werktafel, boven de software en
-  onder een eigen kopje (`shared/command/bank.js`). Ze dragen hetzelfde teken als
-  hun huis, in goud, want een wereld is hier geen app maar een huis.
-- **De onderdelen staan op het huis zelf.** `/apps/rtg.html`, `/apps/kantoor.html`
-  en `/apps/foundation/index.html` dragen ze alle drie compleet. Ze een tweede
-  keer in de bank hangen zou een rail van veertig regels geven, en de vraag welke
-  van de twee lijsten de echte is.
+- **De werelden staan in de bank** van de werktafel, en sinds 19 augustus 2026
+  staat er verder niets meer boven de voet (`shared/command/bank.js`). Ze dragen
+  hetzelfde teken als hun huis, in goud, want een wereld is hier geen app maar
+  een huis.
+- **Er stond een tweede kopje, en dat is weg.** Onder "Software" hingen twaalf
+  apps uit `shared/command/catalog.js` die in geen enkele wereld stonden. Een lid
+  moest daardoor bij elk ding twee vragen beantwoorden: in welke wereld hoort
+  dit, en zo niet, staat het dan in de lijst ernaast? Die twaalf staan nu in de
+  wereld waar ze horen (`WERELDEN.md`). De catalogus zelf blijft bestaan — hij is
+  Rahuls routeertabel en de bron van werkbladtitels — maar hij tekent geen bank
+  meer. `test/wereldregister.test.js` zakt als er ooit weer een app in staat die
+  nergens hangt.
+- **De onderdelen staan op het huis zelf.** `/apps/rtg.html`,
+  `/apps/kantoor.html`, `/apps/reizen.html` en `/apps/foundation/os-publiek.html`
+  dragen ze. Ze een tweede keer in de bank hangen zou een rail van veertig regels
+  geven, en de vraag welke van de twee lijsten de echte is.
 - **`shared/wereld.js`, `shared/wereld.css` en `test/wereld.e2e.js` zijn
   verwijderd**, samen met de schakelaar Wereld / Rooster, de momenten op de
   wijzerplaat, de gouden ring van Rahul en de ritme-teller die alleen die ring
@@ -181,7 +190,7 @@ werelden ziet ontstaan, heeft de fout te pakken waar LAT.md regel 4 over gaat:
 twee lijsten die op verschillende momenten worden bijgewerkt, zíjn twee lijsten.
 
 Nul werelden is een geldige stand en geen storing — een gast, of een pagina
-zonder `app-main`. Dan staat er geen kopje en houdt de bank zijn software.
+zonder `app-main`. Dan staat er geen kopje en is de bank leeg op zijn voet na.
 
 ## Dezelfde lucht als de poort
 

@@ -256,6 +256,46 @@ test('geen wereld draagt de naam van een app uit de softwarecatalogus', () => {
   assert.deepEqual(zoek, [], 'deze werelden delen hun naam met een app in de bank');
 });
 
+test('elke app uit de softwarecatalogus hangt in een wereld', () => {
+  /* DIT IS DE TOETS DIE DE SOFTWARE-RIJ VERVANGT.
+
+     De bank had onder de werelden een tweede kopje, "Software", met twaalf apps
+     uit shared/command/catalog.js. Negen daarvan hingen in geen enkele wereld:
+     ze bestonden alleen in die rij. Zolang de rij er stond viel dat niemand op
+     -- ze waren immers te zien. Nu de rij weg is, is precies dat het gevaar:
+     een app die in de catalogus staat en nergens in een wereld hangt, is
+     nergens meer te vinden en niemand merkt het. Dezelfde stilte als link:bank
+     bovenaan dit bestand, alleen een niveau hoger.
+
+     De catalogus mag NIET leeg: hij is ook Rahuls routeertabel (appUit) en de
+     bron van werkbladtitels (titelVan). Wat hij niet meer mag zijn, is een
+     tweede plek waar software woont.
+
+     Vergelijken gaat op ADRES en niet op naam: de catalogus noemt
+     /apps/reisboek.html "Gastdossier" en LINKS noemt hem "Reisboek". Het hekje
+     gaat eraf, want een stand woont in hetzelfde scherm.
+
+     DE MUTATIE: haal 'link:horeca' uit de items van WorkOS. Deze toets hoort
+     dan Horeca bij naam te noemen. */
+  const CAT = fs.readFileSync(path.join(PUB, 'shared/command/catalog.js'), 'utf8');
+  const m = /var APPS=(\[[\s\S]*?\]),openTeller/.exec(CAT);
+  assert.ok(m, 'de APPS-lijst in shared/command/catalog.js is niet meer te lezen');
+  const APPS = Function('return (' + m[1] + ');')();
+  assert.ok(APPS.length >= 5, 'de softwarecatalogus is leeg; deze toets meet dan niets');
+
+  /* Elk adres dat via een wereld te bereiken is, uit LINKS en uit OSAPPS. */
+  const bereikbaar = new Set();
+  for (const x of ITEMS) {
+    let u = null;
+    if (x.item.startsWith('link:')) u = (LINKS[x.item.slice(5)] || {}).url;
+    if (x.item.startsWith('os:')) u = (OSAPPS[x.item.slice(3)] || {}).url;
+    if (u) bereikbaar.add(kaal(u));
+  }
+  const zoek = APPS.filter((a) => !bereikbaar.has(kaal(a[1])))
+    .map((a) => a[0] + ' (' + a[1] + ') staat in de catalogus maar in geen enkele wereld');
+  assert.deepEqual(zoek, [], 'deze apps zijn nergens meer te vinden');
+});
+
 test('de werelden in MAPPEN zijn exact de werelden die WERELDEN.md verklaart', () => {
   /* DE KAART EN DE CODE LOPEN UIT ELKAAR ZONDER DAT IEMAND IETS MERKT, en dat is
      hier al een keer gebeurd: WERELDEN.md beschreef ROS, Concern en Fundament

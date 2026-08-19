@@ -145,8 +145,8 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
           klok: !!document.getElementById('homeKlok')
         };
       });
-      assert.deepEqual(start.koppen, ['Werelden', 'Software'],
-        'de bank scheidt de werelden niet van de software: ' + start.koppen.join(', '));
+      assert.deepEqual(start.koppen, ['Werelden'],
+        'de bank hoort alleen werelden te dragen (WERELDEN.md): ' + start.koppen.join(', '));
       assert.deepEqual(start.werelden,
         ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
         'de vier werelden staan niet in de bank');

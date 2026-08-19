@@ -1,5 +1,15 @@
 /* De ene catalogus en contexttaal van RTG Command. Router en werktafel lezen
-   dezelfde namen, zodat toevoegen nooit de betekenis van een index verandert. */
+   dezelfde namen, zodat toevoegen nooit de betekenis van een index verandert.
+
+   WAT DEZE LIJST WEL EN NIET IS, sinds 19 augustus 2026. Hij tekende ook de
+   sectie "Software" in de bank, onder de werelden. Die sectie is weg
+   (WERELDEN.md): een app hoort in de context waarin een mens hem gebruikt, en
+   die twaalf hangen nu in MAPPEN in hun eigen wereld.
+
+   Wat hij nog WEL is, en waarom hij dus niet leeg mag: Rahuls routeertabel
+   (appUit -- "toon het gastdossier") en de bron van werkbladtitels (titelVan).
+   Een naam hier weghalen sloopt allebei. Toevoegen mag, maar dan moet de app
+   ook in een wereld hangen; test/wereldregister.test.js zakt anders. */
 (function(w){
   'use strict';
   var APPS=[['Vandaag','/apps/vandaag.html','home'],['Instant Reality','/apps/instant-reality.html','home'],['Private Office','/apps/private-office.html','home'],['Het Vooruitzicht','/apps/living-os.html','home'],['Partner Network','/apps/partner-network.html','reis'],['Reizen & Veilig','/apps/reizen-veilig.html','reis'],['Leven','/apps/leven.html','home'],['Geld','/apps/geld-command.html','geld'],['Sociaal','/apps/sociaal.html','salon'],['Media','/apps/media.html','play'],['Horeca','/apps/horeca.html','salon'],['Gastdossier','/apps/reisboek.html','mens']],openTeller={};

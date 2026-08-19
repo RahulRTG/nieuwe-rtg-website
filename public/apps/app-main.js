@@ -3700,6 +3700,28 @@ var RTG_BOUW = '01582e69';
        publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
        een kantoortoken en is geen deur voor een lid. */
     rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
+       De bank had onder de werelden een tweede kopje, Software, met twaalf apps
+       die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
+       wil afschaffen: 'staat dit in een wereld of in de lijst ernaast?' Een app
+       hoort in de context waarin een mens hem gebruikt, en anders nergens.
+       Negen kregen hier een sleutel; Reizen & Veilig, Gastdossier en Het
+       Vooruitzicht hingen al ergens. shared/command/catalog.js houdt zijn lijst
+       -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
+       geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
+       uit die catalogus ook echt in een wereld hangt. */
+    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
+    sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    instantreality:{ naam: 'Instant Reality', url: '/apps/instant-reality.html' },
+    /* Privekantoor (link:rechterhand) wijst naar /apps/lifestyle.html en dit
+       naar /apps/private-office.html: twee schermen, bijna dezelfde naam. Dat
+       staat als open punt in WERELDEN.md; hier krijgt elk zijn eigen sleutel
+       zodat ze in elk geval allebei ergens hangen. */
+    privateoffice:{ naam: 'Private Office', url: '/apps/private-office.html' },
+    horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
     rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
@@ -3882,19 +3904,20 @@ var RTG_BOUW = '01582e69';
      FoundationOS. De pas bepaalt wat binnen zo'n huis beschikbaar is, nooit of
      de voordeur er armer uitziet.
 
-     Een wereld hoeft niet even groot te zijn als de andere. TravelOS draagt elf
-     onderdelen en LivingOS tweeenveertig; dat is geen scheefheid maar het
-     verschil tussen een reis en een dagelijks leven. Wat wel voor alle vier
-     geldt: alle apps blijven in precies één wereld ingedeeld en premiumrechten
-     worden pas op onderdeelniveau toegepast. Zo blijft RTG voor elke pas
-     compleet ogen, terwijl Lifestyle en Business aantoonbaar meer ontsluiten.
+     Een wereld hoeft niet even groot te zijn als de andere; dat is geen
+     scheefheid maar het verschil tussen een reis en een dagelijks leven. Wat
+     wel voor alle vier geldt: een app staat in precies EEN wereld en
+     premiumrechten gelden pas op onderdeelniveau.
+
+     EN ER IS GEEN LIJST ERNAAST MEER. De bank had onder de werelden een tweede
+     kopje (Software) met twaalf apps die nergens in hingen; die twaalf staan nu
+     in de wereld waar ze horen. Wie hier iets niet kwijt kan, heeft niet een
+     lijst nodig maar het antwoord op de contextvraag hierboven.
 
      WAT HIER NIET STAAT is RTG Core: RTG iD, inloggen, de gegevenspoort,
      meldingen, taal, Rahul, betalen. Vierentwintig functies zitten in ELKE
-     doelgroep (server/functies/register, zie GROEPEN.md) en reizen met de mens
-     mee van wereld naar wereld. Een laag die overal geldt is geen tegel op een
-     beginscherm; wie hem hier als vijfde wereld ziet verschijnen, heeft de fout
-     te pakken waar WERELDEN.md over gaat.
+     doelgroep (zie GROEPEN.md) en reizen met de mens mee. Een laag die overal
+     geldt is geen tegel op een beginscherm.
 
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
@@ -3912,7 +3935,8 @@ var RTG_BOUW = '01582e69';
        nu ook naar de stam. Het huis (/apps/rtg.html) en de glyf houden hun naam:
        een huis is een merk, een wereld is een context. */
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
-      'link:vooruitzicht',
+      'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
+      'link:geldcommand', 'link:mediaos', 'link:instantreality', 'link:privateoffice',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
@@ -3961,7 +3985,7 @@ var RTG_BOUW = '01582e69';
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker'] },
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het
        hoofd van een mens, en deze bezit de hele keten van vertrekken tot

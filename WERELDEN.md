@@ -87,8 +87,8 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 40 |
-| **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 10 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 47 |
+| **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 12 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 2 |
 
@@ -230,6 +230,50 @@ op het eerste plan.** Die catalogus is namelijk ook Rahuls routeertabel
 lijsten — Reizen & Veilig en Gastdossier hangen in TravelOS én in de catalogus.
 Wat er dus fout was, was de NAAM en niet de plaats.
 
+## Er is geen lijst ernaast
+
+De bank van de werktafel had twee kopjes: **Werelden** en daaronder **Software**.
+Die tweede droeg twaalf apps uit `shared/command/catalog.js`, en negen ervan
+hingen in geen enkele wereld — ze bestonden alleen in die rij.
+
+Dat is precies de vraag die deze kaart wil afschaffen. Een lid moest bij elk ding
+twee dingen weten: in welke wereld het hoort, en zo niet, of het dan in de lijst
+ernaast staat. Zolang beide lijsten zichtbaar waren viel dat niemand op; het was
+alleen een tweede voorraadkast naast de eerste.
+
+> **Een app hoort in de context waarin een mens hem gebruikt, of nergens.**
+
+Uitgevoerd met de contextvraag, en niet met wie hem gebouwd heeft:
+
+| app | wereld | waarom |
+|---|---|---|
+| Vandaag | LivingOS | de dagbriefing van één mens |
+| Leven | LivingOS | zijn levenslijn |
+| Sociaal | LivingOS | zijn mensen |
+| Geld | LivingOS | zijn geld |
+| Media | LivingOS | zijn vrije tijd |
+| Instant Reality | LivingOS | een eigen plan veilig verkennen |
+| Private Office | LivingOS | zaken die persoonlijk oordeel vragen |
+| Het Vooruitzicht | LivingOS | de cockpit van die wereld (hing er al) |
+| Horeca | WorkOS | een zaak besturen |
+| Partner Network | WorkOS | bedrijven die samenwerken |
+| Reizen & Veilig | TravelOS | hing er al |
+| Gastdossier | TravelOS | hing er al |
+
+**De catalogus zelf blijft.** Hij is ook Rahuls routeertabel (`appUit` — *"toon
+het gastdossier"*) en de bron van werkbladtitels (`titelVan`); wie hem leeghaalt
+sloopt allebei. Hij tekent alleen geen bank-sectie meer.
+
+Er zat één stille fout onder: `/apps/rtg.html` — het huis van LivingOS — droeg in
+zijn eigen zijbalk exact diezelfde twaalf, met twee verkeerde adressen. "Vandaag"
+wees naar `/apps/app.html` (de werktafel, waar de topbar ook al heen ging) terwijl
+er een Vandaag-app bestaat, en "Private Office" wees naar `/apps/lifestyle.html`,
+dat Het Privékantoor is. Twee schermen met bijna dezelfde naam, allebei echt.
+Beide staan er nu onder hun eigen naam.
+
+*Handhaving:* `test/wereldregister.test.js` — elke app uit de catalogus hangt in
+een wereld, vergeleken op adres en niet op naam.
+
 ## Instellingen — en waarom het geen wereld is
 
 *Mijn account, identiteit, privacy en controle.*
@@ -366,6 +410,12 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 - **Instellingen** is ingericht: de vier identiteitsapps staan in het
   bedieningspaneel en hebben in `MAPPEN` een eigen ingang met `paneel` in plaats
   van `wereld`.
+- **De Software-rij in de bank is weg.** Onder de werelden stond een tweede
+  kopje met twaalf apps uit `shared/command/catalog.js` — Vandaag, Instant
+  Reality, Private Office, Het Vooruitzicht, Partner Network, Reizen & Veilig,
+  Leven, Geld, Sociaal, Media, Horeca, Gastdossier. Negen daarvan hingen in geen
+  enkele wereld. Ze staan nu waar ze horen: zeven in LivingOS, twee in WorkOS,
+  drie hingen al in TravelOS of LivingOS. Zie *Er is geen lijst ernaast* hieronder.
 - **Het gezin is uit FoundationOS naar LivingOS gegaan.** Niet als
   bestandsverhuizing maar als deur: `os:rtf` (RTF Mini, Kids, Tiener, Jong,
   Volwassen) hangt nu in LivingOS, en FoundationOS wijst naar de publieke kant
@@ -423,6 +473,13 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
 - **De prijs zelf.** De ladder is nu wél te lezen (zie hieronder), maar wat een
   trede mag kosten staat er niet in. €65 tegenover €20.000 tegenover prijs op
   maat is een productbesluit.
+- **`/apps/private-office.html` en `/apps/lifestyle.html` zijn twee schermen met
+  bijna dezelfde naam.** Private Office (Briefing, Council, The Table, Atelier,
+  Vault) tegenover Het Privékantoor (de levensgraaf, de Control Tower, het
+  mandaat). Ze hangen nu allebei in LivingOS onder hun eigen naam, maar of het er
+  twee horen te zijn is een productvraag. Hetzelfde geldt voor Het Vooruitzicht
+  en Instant Reality: twee schermen die allebei een intentie tot drie scenario's
+  doorrekenen, met dezelfde Kyoto-reis als voorbeeld.
 - **Of WorkOS en RTG Kantoor twee namen voor hetzelfde zijn.** De bank zegt
   WorkOS, het huis zegt RTG Kantoor. Dat kan (context tegenover merk), maar het
   is een merkbesluit dat nog niet genomen is.

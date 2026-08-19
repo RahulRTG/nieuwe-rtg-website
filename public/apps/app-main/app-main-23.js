@@ -80,6 +80,28 @@
        publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
        een kantoortoken en is geen deur voor een lid. */
     rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
+       De bank had onder de werelden een tweede kopje, Software, met twaalf apps
+       die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
+       wil afschaffen: 'staat dit in een wereld of in de lijst ernaast?' Een app
+       hoort in de context waarin een mens hem gebruikt, en anders nergens.
+       Negen kregen hier een sleutel; Reizen & Veilig, Gastdossier en Het
+       Vooruitzicht hingen al ergens. shared/command/catalog.js houdt zijn lijst
+       -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
+       geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
+       uit die catalogus ook echt in een wereld hangt. */
+    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
+    sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    instantreality:{ naam: 'Instant Reality', url: '/apps/instant-reality.html' },
+    /* Privekantoor (link:rechterhand) wijst naar /apps/lifestyle.html en dit
+       naar /apps/private-office.html: twee schermen, bijna dezelfde naam. Dat
+       staat als open punt in WERELDEN.md; hier krijgt elk zijn eigen sleutel
+       zodat ze in elk geval allebei ergens hangen. */
+    privateoffice:{ naam: 'Private Office', url: '/apps/private-office.html' },
+    horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
     rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },

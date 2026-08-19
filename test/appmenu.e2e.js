@@ -157,17 +157,20 @@ async function wachtWerelden(page) {
   }, null, { timeout: 20000 });
 }
 
-/* De drie werelden zoals ze in de bank staan, in volgorde. De software eronder
-   blijft buiten beeld: die komt uit de catalogus van Command en niet uit MAPPEN,
-   en deze toetsen gaan over de werelden. */
+/* De werelden zoals ze in de bank staan, in volgorde.
+
+   HIER STOND EEN GRENS, en die is niet meer nodig. De bank had twee secties --
+   Werelden en daaronder Software -- en deze functie las tot het TWEEDE kopje om
+   de software buiten beeld te houden. Dat tweede kopje bestaat niet meer
+   (WERELDEN.md): de twaalf apps die eronder hingen staan nu in de wereld waar ze
+   horen, en de nav draagt alleen nog werelden. De voet (Rahul, Instellingen,
+   Pagina-instellingen) staat in .cmd-bankvoet en niet hierin. */
 async function werelden(page) {
   return page.evaluate(() => {
     const nav = document.querySelector('#rtgCommand .cmd-nav');
     const koppen = [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim());
-    const grens = nav.querySelector('.cmd-kop:nth-of-type(2)');
     const uit = [];
     for (const el of [...nav.children]) {
-      if (el === grens) break;
       if (el.tagName !== 'BUTTON') continue;
       const r = el.getBoundingClientRect();
       uit.push({
@@ -443,8 +446,12 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     await openLade(page);
 
     const b = await werelden(page);
-    assert.deepEqual(b.koppen, ['Werelden', 'Software'],
-      'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
+    /* EEN KOPJE EN NIET TWEE. Er stond ook "Software" met twaalf apps eronder
+       die in geen wereld hingen; dat is weg (WERELDEN.md) en die twaalf staan
+       nu in hun eigen wereld. De bank draagt navigatie en geen tweede
+       voorraadkast. */
+    assert.deepEqual(b.koppen, ['Werelden'],
+      'de bank hoort alleen werelden te dragen, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
       'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');

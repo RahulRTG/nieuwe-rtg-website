@@ -33,18 +33,26 @@ function laadPlaywright() {
 }
 const pw = laadPlaywright();
 
-/* Dezelfde twaalf als in de bank van de werktafel (shared/command/catalog.js).
-   Bewust hier uitgeschreven en niet uit die module gelezen: dit is een lijst van
-   SCHERMEN die op een telefoon moeten passen, en dat blijft gelden als de
-   catalogus ooit anders wordt ingedeeld. */
-const WERELDEN = [
+/* Dezelfde twaalf als in shared/command/catalog.js. Bewust hier uitgeschreven en
+   niet uit die module gelezen: dit is een lijst van SCHERMEN die op een telefoon
+   moeten passen, en dat blijft gelden als de catalogus ooit anders wordt
+   ingedeeld.
+
+   ZE HEETTEN HIER "WERELDEN" EN DAT ZIJN ZE NIET. Toen deze toets werd
+   geschreven stonden ze in de bank onder het kopje Software, naast de werelden,
+   en werd het woord er losjes voor gebruikt. Sinds WERELDEN.md is een wereld een
+   van de vier menselijke contexten (LivingOS, WorkOS, TravelOS, FoundationOS) en
+   zijn deze twaalf gewone schermen die daarin hangen. De variabele houdt zijn
+   naam niet: een toets die het huisvocabulaire tegenspreekt, leert je het
+   verkeerde woord. */
+const SCHERMEN = [
   '/apps/vandaag.html', '/apps/instant-reality.html', '/apps/private-office.html',
   '/apps/living-os.html', '/apps/partner-network.html', '/apps/reizen-veilig.html',
   '/apps/leven.html', '/apps/geld-command.html', '/apps/sociaal.html',
   '/apps/media.html', '/apps/horeca.html', '/apps/reisboek.html',
 ];
 
-test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Playwright' }, async () => {
+test('elk scherm uit de catalogus past op een telefoon van 390px', { skip: pw ? false : 'geen Playwright' }, async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-breedte-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dataDir } });
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -54,7 +62,7 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
   const navigatieBuiten = [];
   let instantReality = null;
   try {
-    for (const url of WERELDEN) {
+    for (const url of SCHERMEN) {
       await page.goto(srv.base + url, { waitUntil: 'load', timeout: 45000 });
       /* Wachten op de OPMAAK, niet op de klok: zolang er geen stijlblad binnen is
          meet je een ongestileerde pagina, en die past altijd. */

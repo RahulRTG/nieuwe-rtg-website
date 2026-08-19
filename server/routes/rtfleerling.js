@@ -60,6 +60,7 @@ module.exports = (kern) => {
   app.post('/api/rtf/leerling/antwoord', auth, handel((l, b) => leerstof.leerstofOefenAntwoord(l.sleutel, b)));
   // de Memory Engine, ook voor de leerling in de Foundation-app
   app.post('/api/rtf/leerling/herhalen', auth, handel((l) => leerstof.leerstofHerhalen(l.sleutel)));
+  app.post('/api/rtf/leerling/dag', auth, handel((l) => leerstof.leerstofDag(l.sleutel)));
   app.post('/api/rtf/leerling/herhaal', auth, handel((l, b) => doelMag(l, b.doel) ? leerstof.leerstofHerhaalStart(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/examen', auth, handel((l, b) => faseMag(l, b.fase) && l.rechten.leeftijd >= 12 ? vervolg.examenStart(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/examen-antwoord', auth, handel((l, b) => vervolg.examenAntwoord(l.sleutel, b)));

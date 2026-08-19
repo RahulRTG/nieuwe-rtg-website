@@ -23,6 +23,10 @@ const { maakHerhalen } = require('./leerstof-herhalen');
    daaraan hangt Explain Differently -- dezelfde stof in de vorm die bij dat
    patroon past. Zegt niets als er niets narekenbaars te zeggen valt. */
 const { duiding, andersUitgelegd } = require('./leerstof-denkfout');
+/* De Daily Learning Guarantee: wat staat er vandaag klaar. Brengt bij elkaar
+   wat er al is en bewaart zelf niets -- zie de kop van ./leerstof-dag.js. */
+const { maakDag } = require('./leerstof-dag');
+const { maakLijn } = require('./leerstof-lijn');
 const { DENKFOUTEN } = require('./leerstof-denkfout-lijst');
 const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
@@ -36,51 +40,12 @@ function maakLeerstof({ db, save, onderwijs }) {
   }
   const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 
-  /* ---- de leerlijn voor een groep: wat leer je hier, en wat heb je al ---- */
-  function vakken(key, d) {
-    // per fase (vmbo t/m wo) of per groep (1 t/m 8): zelfde antwoordvorm
-    const fase = String(d && d.fase || '').trim();
-    if (fase) {
-      if (!PER_FASE[fase]) return { status: 400, error: 'Voor deze fase is er (nog) geen leerlijn.' };
-      const behaaldF = (onderwijs.mijn(key).doelen) || {};
-      const perVakF = {};
-      for (const id of PER_FASE[fase]) {
-        const doel = DOELEN[id];
-        perVakF[doel.vak] = perVakF[doel.vak] || [];
-        perVakF[doel.vak].push({ id, naam: doel.naam, ref: doel.ref || null, behaald: !!behaaldF[id] });
-      }
-      return { ok: true, fase, vakken: Object.entries(perVakF).map(([vak, doelen]) => ({ vak, doelen })) };
-    }
-    const groep = Number(String(d && d.groep || '').replace(/\D/g, ''));
-    if (!PER_GROEP[groep]) return { status: 400, error: 'Kies een groep van 1 tot en met 8, of een fase uit de ladder.' };
-    const pas = onderwijs.mijn(key);
-    const behaald = (pas.doelen) || {};
-    const perVak = {};
-    for (const id of PER_GROEP[groep]) {
-      const doel = DOELEN[id];
-      perVak[doel.vak] = perVak[doel.vak] || [];
-      perVak[doel.vak].push({ id, naam: doel.naam, ref: doel.ref || null, behaald: !!behaald[id] });
-    }
-    return { ok: true, groep, vakken: Object.entries(perVak).map(([vak, doelen]) => ({ vak, doelen })) };
-  }
+  /* De LEES-kant (de leerlijn per groep of fase, de les, het pad naar een doel)
+     staat in ./leerstof-lijn.js: dat zijn vragen met een antwoord, hier staat
+     wat een leerling doet. */
+  const { vakken, les, leerstofPad } = maakLijn({ onderwijs });
 
-  function les(key, d) {
-    const doel = DOELEN[String(d && d.doel || '')];
-    if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
-    const behaald = key ? ((onderwijs.mijn(key).doelen) || {}) : {};
-    const onder = pad(doel.id, behaald).filter(x => x.id !== doel.id);
-    return { ok: true, doel: { id: doel.id, naam: doel.naam, vak: doel.vak, groep: doel.groep, les: doel.les, ref: doel.ref || null,
-      /* Andere uitleg van HETZELFDE doel. Het leerdoel verandert niet; de weg
-         ernaartoe wel. Wie de eerste uitleg niet snapt, is niet geholpen met
-         diezelfde uitleg nog een keer. */
-      uitleg: (doel.uitleg || []).map(u => ({ soort: u.soort, tekst: u.tekst })),
-      meting: doel.meting || STANDAARD_METING },
-      voorkennis: onder,
-      ontbreekt: onder.filter(x => !x.behaald),
-      /* Zonder voorkennis-informatie zou dit veld liegen; daarom zegt hij het
-         zelf als er niets onder ligt. */
-      let: onder.length ? null : 'Voor dit leerdoel staat (nog) geen voorkennis in de leerlijn.' };
-  }
+  const { dagplan } = maakDag({ onderwijs, DOELEN, PER_GROEP, PER_FASE });
 
   const { herhaalLijst, herhaalStart, herhaalKlaar } =
     maakHerhalen({ onderwijs, sessies, save, opgave, DOELEN, nu });
@@ -168,16 +133,8 @@ function maakLeerstof({ db, save, onderwijs }) {
   }
 
   return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord,
-    leerstofHerhalen: herhaalLijst, leerstofHerhaalStart: herhaalStart,
-    leerstofPad: (key, d) => {
-      const doel = DOELEN[String(d && d.doel || '')];
-      if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
-      const behaald = (onderwijs.mijn(key).doelen) || {};
-      const rij = pad(doel.id, behaald);
-      return { ok: true, doel: doel.id, naam: doel.naam, pad: rij,
-        ontbreekt: rij.filter(x => x.id !== doel.id && !x.behaald),
-        uitleg: 'Dit is de weg naar dit leerdoel: eerst wat eronder ligt, dan het doel zelf.' };
-    },
+    leerstofHerhalen: herhaalLijst, leerstofHerhaalStart: herhaalStart, leerstofDag: dagplan,
+    leerstofPad,
     DOELEN };
 }
 

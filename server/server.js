@@ -961,7 +961,7 @@ const leerstof = require('./kern/leerstof').maakLeerstof({ db, save, onderwijs }
 /* De school mag bewijs in het leerpaspoort schrijven: een becijferde toets is
    bewijs dat een leerling een leerdoel beheerst. Laat gebonden, want de
    foundation-router bestaat eerder dan deze kern (zie foundation.js). */
-rtf.setOnderwijs(onderwijs);
+rtf.setOnderwijs(onderwijs, leerstof);
 const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon, anthropic });
 const vervolg = require('./kern/leerstof-vervolg').maakVervolg({ db, save, onderwijs });
 /* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,

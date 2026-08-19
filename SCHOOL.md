@@ -54,6 +54,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Proof of Learning | elke beheersing draagt haar bewijs; zes soorten, zelfgemeld telt minder, school bevestigt | `kern/onderwijs-bewijs.js`, `school/bewijs.js` |
 | Memory Engine | herhaalmoment per behaald doel; drie vragen, reeks 2/7/21/60/180 dagen | `kern/onderwijs-geheugen.js`, `kern/leerstof-herhalen.js` |
 | Misconception Graph | 18 denkpatronen uit het feit van de opgave; klasbeeld zonder wie | `kern/leerstof-denkfout.js`, `school/denkfout.js` |
+| Daily Learning Guarantee | dagplan uit huiswerk, herhalingen en leerlijn; vijf stukken, niets bewaard | `kern/leerstof-dag.js`, `school/dag.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -237,6 +238,48 @@ van generatieve AI dan een chatbot naast het scherm.
 
 ---
 
+## 5b. De Daily Learning Guarantee -- elke dag weet je waar je staat
+
+> **Gebouwd op 19 augustus 2026.** Een dagplan uit wat er al is, begrensd op
+> vijf stukken, met per stuk de reden erbij -- en er wordt niets van bewaard.
+
+Deze laag verzint niets nieuws; ze brengt bij elkaar wat §2 tot en met §5
+hebben opgeleverd. Wat er in een dag komt:
+
+1. **wat de school vroeg** -- huiswerk met een leerdoel, van een mens die deze
+   klas kent, en dat weegt zwaarder dan wat de motor zelf voorstelt;
+2. **wat terugkomt** -- de openstaande herhalingen uit §4;
+3. **waar je gebleven bent** -- het eerste doel in je leerlijn dat nog open
+   staat en waarvan de voorkennis wél af is.
+
+**De garantie is niet "er is altijd werk" maar "je weet altijd waar je
+staat".** Een leerling zonder fase krijgt de ladder te zien in plaats van een
+lege lijst; een leerling die zijn fase rond heeft, krijgt dat te horen met de
+volgende trede erbij. En een kind dat de school in een klas heeft geplaatst
+zonder ooit zelf een fase te kiezen, draait op de fase van de klas -- juist die
+leerling zou anders alleen huiswerk zien, en juist voor hem is dit bedoeld.
+
+**Er wordt niets bewaard, en dat kan ook niet.** `kern/leerstof-dag.js` krijgt
+geen `db` en geen `save` mee. Dat is geen vergetelheid maar het ontwerp: een
+plan dat je niet kunt opslaan, kun je later ook niet stiekem laten tellen. Geen
+reeks, geen "vijf dagen achter elkaar", geen percentage af, geen lijst van wat
+een kind niet heeft gedaan. Zo'n teller is het verslavende patroon dat dit huis
+niet bouwt, en hij zou bovendien over de 18+-grens van de progressielaag heen
+stappen.
+
+**Het is een voorstel en het is begrensd.** Wie veertig herhalingen open heeft
+staan, ziet er geen veertig: een berg is geen plan, en de rest komt vanzelf een
+andere dag. Elk stuk draagt zijn reden in gewone taal, zodat het een uitnodiging
+is en geen bevel van een machine. De vijf is een belofte en geen instelling --
+hem verhogen laat een toets zakken, zodat iemand er nog een keer over nadenkt.
+
+Wat er bewust **niet** in staat: een doel waarvan de voorkennis nog open is
+(dat is precies de opgave waar een kind op vastloopt zonder te weten waarom),
+en tijdsdruk die wij verzinnen. Een deadline van de leraar staat er zoals hij
+is, zonder aftelklok.
+
+---
+
 ## 6. Proof of Learning -- waarom denkt RTG dat ik dit kan?
 
 > **Gebouwd op 19 augustus 2026.** Elk behaald leerdoel draagt zijn bewijs, de
@@ -305,6 +348,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een denkfout wordt nooit gegokt | past niets, dan zegt de server niets | **ja** (`test/denkfout.test.js`) |
 | De klas telt patronen zonder wie | opslagvorm is aantal + datum, meer niet | **ja**, op de opslag met mutatie beproefd |
 | Het feit van een opgave verlaat de server niet | met de bouwstenen is het antwoord uit te rekenen | **ja** (`test/denkfout.test.js`) |
+| Een ingeschreven leerling weet elke dag wat er klaarstaat | dagplan levert minstens een stuk zolang er iets open is | **ja** (`test/dagplan.test.js`) |
+| Een dagplan telt nooit over dagen heen | de module krijgt geen db en geen save | **ja**, met mutatie beproefd |
+| Een dagplan is hoogstens vijf stukken | harde bovengrens in de toets, niet de constante zelf | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -527,8 +573,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 4. **Misconception Graph + Explain Differently.** Gedaan: achttien
    denkpatronen, geduid uit het feit van de opgave; de duiding en een andere
    uitleg meteen bij de leerling, de telling zonder wie bij de leraar.
-5. **Daily Learning Guarantee.** Het dagbudget dat uit 1 t/m 4 volgt -- en pas
-   dán, want een dagplan zonder inhoud is een lege agenda.
+5. **Daily Learning Guarantee.** Gedaan: het dagplan dat uit 1 t/m 4 volgt --
+   huiswerk vooraan, dan wat terugkomt, dan waar je gebleven bent; begrensd op
+   vijf en met niets dat over dagen heen telt (zie §5b).
 6. **Teacher Flow en Attention OS.** Administratie als bijproduct.
 7. **Taallaag en Family Bridge.** Meaning preservation vóór massale uitrol.
 8. **No-Lost-Child opvolgbewaking.**

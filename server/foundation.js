@@ -96,12 +96,16 @@ router.get('/health', (req, res) => {
    een school die dan al draait, hoort niet om te vallen maar het bewijs
    gewoon over te slaan. */
 let onderwijsKern = null;
-function setOnderwijs(o) { onderwijsKern = o; }
+let leerstofKern = null;
+function setOnderwijs(o, l) { onderwijsKern = o; if (l) leerstofKern = l; }
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-  onderwijs: () => onderwijsKern, rtfHandle });
+  /* Allebei als FUNCTIE en niet als waarde: deze module wordt bij het
+     opstarten een keer opgebouwd, en dan bestaan de kernen nog niet. Een
+     getter helpt niet -- die wordt bij het doorgeven al uitgelezen. */
+  onderwijs: () => onderwijsKern, leerstof: () => leerstofKern, rtfHandle });
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 

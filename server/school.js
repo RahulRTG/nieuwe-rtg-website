@@ -106,7 +106,7 @@ module.exports = (ctx) => {
   /* De drie lagen (beheer, klas, gezin) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten; de klaslaag
      levert gemiddelde() aan de gezinslaag via die context. */
-  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, onderwijs: ctx.onderwijs, rtfHandle: ctx.rtfHandle,
+  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, onderwijs: ctx.onderwijs, rtfHandle: ctx.rtfHandle, leerstof: ctx.leerstof,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
@@ -124,6 +124,7 @@ module.exports = (ctx) => {
   require('./school/hulplijn')(sctx); // golf 4: de ene knop van het kind (toestemming bepaalt wie meeleest)
   require('./school/bewijs')(sctx); // Proof of Learning: observaties van de leraar in het leerpaspoort
   require('./school/denkfout')(sctx); // Misconception Graph: het klasbeeld, geteld zonder wie
+  require('./school/dag')(sctx); // Daily Learning Guarantee: wat staat er vandaag klaar
 
   /* ---------- de enterprise-lagen ----------
      Rollen eerst: die levert poort() en het journaal waar alle lagen hieronder

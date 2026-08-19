@@ -201,6 +201,37 @@
     }
   }
 
+  /* ---- de Daily Learning Guarantee: wat staat er vandaag klaar ----
+
+     Dit scherm verzint niets: het toont wat de server heeft samengesteld uit
+     de herhalingen en de leerlijn, met per stuk de reden erbij. Twee dingen
+     die hier bewust NIET staan: een teller over dagen heen (die bestaat niet,
+     de server bewaart geen plan) en enige vorm van tijdsdruk. Het is een
+     voorstel; iets anders doen mag altijd, en dat staat er ook. */
+  async function toonDag() {
+    var el = document.getElementById('dagLijst');
+    if (!el) return;
+    try {
+      var d = await api('/api/leerstof/dag');
+      el.innerHTML = (d.stukken.length
+        ? d.stukken.map(function (x) {
+            var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
+            return '<div class="doel"><span>' + esc(x.naam) +
+              ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(x.vak) + ')</span><br>' +
+              '<span style="color:var(--soft);font-size:.76rem;">' + esc(x.waarom) + '</span></span>' +
+              '<span class="rij"><button class="knop" data-' + knop + '="' + esc(x.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">Doen</button></span></div>';
+          }).join('')
+        : '<div class="leeg">' + esc(d.let || '') + '</div>') +
+        '<p class="leeg" style="margin:.5rem 0 0;">' + esc(d.uitleg) + '</p>';
+      el.querySelectorAll('[data-oefen]').forEach(function (b) {
+        b.addEventListener('click', function () { oefenStart(b.dataset.oefen); });
+      });
+      el.querySelectorAll('[data-herhaal]').forEach(function (b) {
+        b.addEventListener('click', function () { herhaalStart(b.dataset.herhaal); });
+      });
+    } catch (e) { el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  }
+
   /* ---- de Memory Engine: wat komt er terug ----
 
      Drie dingen die dit scherm met opzet NIET doet. Er staat niet bij hoe lang
@@ -273,14 +304,13 @@
           (d.slot ? esc(d.slot) : (d.behaald ? 'Dit leerdoel staat nu in je leerpaspoort.' : esc(d.advies || '')));
         laadPaspoort();
         toonHerhalingen();
+        toonDag();
       } else {
         uit.innerHTML = regel;
         vraagToon('oefenKaart', d.vraag, d.opties, 'oefenStand', d.nr + 1 + '/' + d.totaal);
       }
     } catch (e) { meld(e.message); }
   }
-
-
   async function laadPaspoort() {
     MIJN = await api('/api/onderwijs/mijn');
     toonPaspoort();
@@ -344,6 +374,7 @@
     document.getElementById('oefenStuur').addEventListener('click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
     document.getElementById('oefenIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });
     toonHerhalingen();
+    toonDag();
     if (window.RTGSchoolMeer) RTGSchoolMeer.start();
   }
 

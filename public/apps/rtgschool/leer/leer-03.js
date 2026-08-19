@@ -15,6 +15,37 @@
     }
   }
 
+  /* ---- de Daily Learning Guarantee: wat staat er vandaag klaar ----
+
+     Dit scherm verzint niets: het toont wat de server heeft samengesteld uit
+     de herhalingen en de leerlijn, met per stuk de reden erbij. Twee dingen
+     die hier bewust NIET staan: een teller over dagen heen (die bestaat niet,
+     de server bewaart geen plan) en enige vorm van tijdsdruk. Het is een
+     voorstel; iets anders doen mag altijd, en dat staat er ook. */
+  async function toonDag() {
+    var el = document.getElementById('dagLijst');
+    if (!el) return;
+    try {
+      var d = await api('/api/leerstof/dag');
+      el.innerHTML = (d.stukken.length
+        ? d.stukken.map(function (x) {
+            var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
+            return '<div class="doel"><span>' + esc(x.naam) +
+              ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(x.vak) + ')</span><br>' +
+              '<span style="color:var(--soft);font-size:.76rem;">' + esc(x.waarom) + '</span></span>' +
+              '<span class="rij"><button class="knop" data-' + knop + '="' + esc(x.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">Doen</button></span></div>';
+          }).join('')
+        : '<div class="leeg">' + esc(d.let || '') + '</div>') +
+        '<p class="leeg" style="margin:.5rem 0 0;">' + esc(d.uitleg) + '</p>';
+      el.querySelectorAll('[data-oefen]').forEach(function (b) {
+        b.addEventListener('click', function () { oefenStart(b.dataset.oefen); });
+      });
+      el.querySelectorAll('[data-herhaal]').forEach(function (b) {
+        b.addEventListener('click', function () { herhaalStart(b.dataset.herhaal); });
+      });
+    } catch (e) { el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  }
+
   /* ---- de Memory Engine: wat komt er terug ----
 
      Drie dingen die dit scherm met opzet NIET doet. Er staat niet bij hoe lang
@@ -87,79 +118,10 @@
           (d.slot ? esc(d.slot) : (d.behaald ? 'Dit leerdoel staat nu in je leerpaspoort.' : esc(d.advies || '')));
         laadPaspoort();
         toonHerhalingen();
+        toonDag();
       } else {
         uit.innerHTML = regel;
         vraagToon('oefenKaart', d.vraag, d.opties, 'oefenStand', d.nr + 1 + '/' + d.totaal);
       }
     } catch (e) { meld(e.message); }
   }
-
-
-  async function laadPaspoort() {
-    MIJN = await api('/api/onderwijs/mijn');
-    toonPaspoort();
-  }
-
-  /* Meenemen: het leerpaspoort is van de leerling en gaat een leven lang mee,
-     dus hoort het ook het huis uit te kunnen. De app kent zijn eigen model, dus
-     geeft hij dat door in plaats van de gedeelde laag het scherm te laten
-     raden: per behaald leerdoel de naam, het vak, de fase en de dag. Geen
-     scores en geen rangorde -- die houdt deze app bewust ook niet bij. */
-  if (window.RTGUitvoer) RTGUitvoer.bron(function () {
-    var ids = MIJN && MIJN.doelen ? Object.keys(MIJN.doelen) : [];
-    if (!ids.length) return null;
-    return {
-      naam: 'leerpaspoort',
-      kolommen: ['leerdoel', 'vak', 'fase', 'datum'],
-      rijen: ids.map(function (id) {
-        var w = MIJN.doelen[id] || {}, i = DOELINFO[id] || {};
-        return [i.naam || id, i.vak || '',
-          w.fase ? (LADDER ? faseNaam(w.fase) : w.fase) : '', String(w.op || '').slice(0, 10)];
-      })
-    };
-  });
-
-  async function start() {
-    try {
-      LADDER = await api('/api/onderwijs/ladder');
-      vulKiezers();
-      await laadPaspoort();
-    } catch (e) { meld(e.message); }
-    /* De opties worden per vraag opnieuw getekend; een luisteraar op de
-       container vangt ze allemaal, zonder per knop opnieuw te binden.
-
-       Hij stond hierboven, BUITEN start(), en dat was de fout waar de
-       paginascan al een ronde over klaagde. Uitgelogd vervangt het scherm
-       zijn hele #main door de inlogkaart -- #oefenOpties bestaat dan niet
-       meer, en een getElementById op niets kreeg alsnog een addEventListener.
-       Dat is geen fout van start(): die draaide helemaal niet. Alles wat aan
-       de DOM hangt hoort binnen start(), zoals in examen.js en bijles.js. */
-    document.getElementById('oefenOpties').addEventListener('click', function (e) {
-      var b = e.target.closest('[data-antw]');
-      if (b) oefenAntwoord(b.dataset.antw);
-    });
-    document.getElementById('inschrijfKnop').addEventListener('click', async function () {
-      var f = document.getElementById('ladderKies').value;
-      if (!f) { meld('Kies eerst een fase op de ladder.'); return; }
-      try { await api('/api/onderwijs/inschrijf', { fase: f }); meld('Ingeschreven; je paspoort loopt vanaf hier mee.'); laadPaspoort(); }
-      catch (e) { meld(e.message); }
-    });
-    document.getElementById('jaarKnop').addEventListener('click', async function () {
-      try { await api('/api/onderwijs/jaar-over', {}); meld('Een leerjaar erbij.'); laadPaspoort(); }
-      catch (e) { meld(e.message); }
-    });
-    document.getElementById('leerKies').addEventListener('change', function () {
-      if (!this.value) return;
-      // de basisschool-leerlijn hangt aan de groep (po-g3 -> groep 3), de
-      // rest aan de fase; de server kent beide vormen met hetzelfde antwoord
-      var po = /^po-g(\d)$/.exec(this.value);
-      toonVakken(po ? { groep: po[1] } : { fase: this.value });
-    });
-    document.getElementById('oefenStuur').addEventListener('click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
-    document.getElementById('oefenIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });
-    toonHerhalingen();
-    if (window.RTGSchoolMeer) RTGSchoolMeer.start();
-  }
-
-  window.RTGSchool = { start: start, laadPaspoort: laadPaspoort, oefenAntwoord: oefenAntwoord };
-})();

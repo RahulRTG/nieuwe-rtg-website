@@ -11,6 +11,13 @@ const path = require('node:path');
 
 const PUB = path.join(__dirname, '..', 'public');
 const lees = (...delen) => fs.readFileSync(path.join(PUB, ...delen), 'utf8');
+/* Meten aan de CODE en niet aan het commentaar. Een bestand dat belooft "hier
+   komt geen ranglijst" bevat het woord ranglijst, en een toets die daarover
+   valt dwingt je om de uitleg weg te halen -- precies verkeerd om. Deze knipt
+   blokcommentaar en hele commentaarregels eruit; wat overblijft is wat het
+   scherm werkelijk doet. */
+const codeVan = (bron) => bron.replace(/\/\*[\s\S]*?\*\//g, '')
+  .split('\n').filter(r => !/^\s*\/\//.test(r)).join('\n');
 const partner = lees('apps', 'schoolpartner.html');
 const partnerApp = lees('apps', 'schoolpartner', 'app.js');
 const school = lees('apps', 'foundation', 'school.html');
@@ -256,11 +263,10 @@ test('de Memory Engine loopt door dezelfde oefenweg, zonder verwijt', () => {
   assert.match(start, /vraagToon\('oefenKaart'/, 'een herhaling hoort door dezelfde kaart te lopen');
   assert.doesNotMatch(leer, /herhaal-antwoord|herhaalAntwoord/, 'een herhaling wordt beantwoord door dezelfde functie');
 
-  /* En er komt geen merkteken bij dat zegt "dit had je moeten weten". Alleen
-     de KAART wordt hierop gemeten en niet het hele bestand: de kop van dat
-     bestand belooft met zoveel woorden dat zo'n merkteken er niet komt. */
-  const kaart = leer.slice(leer.indexOf('async function toonHerhalingen'), leer.indexOf('async function herhaalStart'));
-  assert.doesNotMatch(kaart, /te laat|achterstand|had je moeten|vergeten|fout/i);
+  /* En er komt geen merkteken bij dat zegt "dit had je moeten weten". Gemeten
+     aan de code en niet aan het commentaar: dit bestand belooft in zijn eigen
+     kop dat zo'n merkteken er niet komt, en die belofte hoort te mogen staan. */
+  assert.doesNotMatch(codeVan(leer), /te laat|achterstand|had je moeten|vergeten/i);
   for (const bron of [rtgschool, leerpaspoort]) {
     assert.ok(bron.includes('id="herhaalLijst"'), 'het scherm mist de kaart met wat terugkomt');
     assert.match(bron, /Niet omdat het fout ging/, 'de kaart hoort zelf te zeggen waarom iets terugkomt');
@@ -304,4 +310,31 @@ test('de Misconception Graph staat op drie schermen, en noemt nooit een kind', (
   assert.ok(partner.includes('/apps/schoolpartner/denkfout.js'), 'School Partner laadt denkfout.js niet');
   assert.ok(partner.includes('id="denkfoutVorm"'));
   assert.ok(school.includes('school-oefenen.js'));
+});
+
+test('het dagplan staat op drie schermen, zonder teller en zonder tijdsdruk', () => {
+  const leer = lees('apps', 'rtgschool', 'leer.js');
+  const dag = lees('apps', 'foundation', 'school-dag.js');
+  const rtgschool = lees('apps', 'rtgschool.html');
+
+  assert.match(leer, /\/api\/leerstof\/dag/);
+  assert.match(dag, /\/school\/dag/);
+
+  /* De twee dingen die een dagplan bederven: een teller over dagen heen (dan
+     wordt het een reeks die je niet mag missen) en zelfverzonnen haast. Geen
+     van beide hoort in een scherm te kunnen sluipen. */
+  for (const bron of [codeVan(leer), codeVan(dag)]) {
+    assert.doesNotMatch(bron, /streak|reeks|achter elkaar|op rij|dagen af/i, 'er sluipt een teller in het dagplan');
+    assert.doesNotMatch(bron, /nog maar|schiet op|haast|te laat/i, 'er sluipt tijdsdruk in het dagplan');
+  }
+  /* Elk stuk toont zijn REDEN. Op het renderen gemeten en niet op het woord
+     "waarom": dat staat in leer.js ook al op de knop van Proof of Learning, en
+     dan slaagt deze toets zonder dat er iets getoond wordt. */
+  assert.match(codeVan(leer), /esc\(x\.waarom\)/, 'het dagplan toont de reden per stuk niet');
+  assert.match(codeVan(dag), /esc\(s\.waarom\)/, 'het dagplan toont de reden per stuk niet');
+  // en het scherm zegt zelf dat het een voorstel is
+  for (const bron of [rtgschool, leerpaspoort])
+    assert.match(bron, /voorstel, geen opdracht/i, 'het scherm doet alsof het een opdrachtenlijst is');
+  assert.ok(rtgschool.includes('id="dagLijst"') && leerpaspoort.includes('id="dagLijst"'));
+  assert.ok(school.includes('school-dag.js'), 'School laadt school-dag.js niet');
 });

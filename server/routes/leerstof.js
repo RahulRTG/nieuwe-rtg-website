@@ -17,6 +17,9 @@ module.exports = (kern) => {
      Er is geen aparte antwoordroute -- een herhaling loopt door /antwoord, want
      een herhaalvraag hoort er hetzelfde uit te zien als een nieuwe vraag. */
   app.post('/api/leerstof/herhalen', auth, (req, res) => stuur(res, leerstof.leerstofHerhalen(req.session.key)));
+  /* De Daily Learning Guarantee: wat staat er vandaag klaar. Wordt telkens
+     uitgerekend en nooit bewaard -- er is dus geen reeks om bij te houden. */
+  app.post('/api/leerstof/dag', auth, (req, res) => stuur(res, leerstof.leerstofDag(req.session.key)));
   app.post('/api/leerstof/herhaal', auth, (req, res) => stuur(res, leerstof.leerstofHerhaalStart(req.session.key, req.body || {})));
   // golf 3: examentraining (terugblik pas aan het eind, zoals een echt examen)
   app.post('/api/leerstof/examen', auth, (req, res) => stuur(res, vervolg.examenStart(req.session.key, req.body || {})));

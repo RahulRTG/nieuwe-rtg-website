@@ -18,12 +18,10 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
-const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
-const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
-const { herschrijfHtml: stijlafsplitsingHtml } = require('./stijlafsplitsing');
-const { herschrijfHtml: versieadresHtml } = require('./versieadres');
-const { herschrijfHtml: scriptafsplitsingHtml } = require('./scriptafsplitsing');
 const { CSP, magnaatHtml, STIJLSTEMPEL } = require('./csp');
+/* De vijf herschrijvingen en hun volgorde staan apart; die volgorde is dragend
+   en hoort als keten leesbaar te zijn. Zie ./herschrijfketen.js. */
+const { herschrijfPagina } = require('./herschrijfketen');
 
 /* Een verzoek intern doorverwijzen naar een ander pad.
 
@@ -92,45 +90,7 @@ function cspNonce(publicDir, aan) {
       if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       const magnaat = req.query && String(req.query.magnaat || '') === '1' && rel.startsWith('/apps/');
-      /* HET GROTE INLINE <script>-BLOK ALS EERSTE, op de RAUWE bron.
-
-         Dit moet hier staan en nergens anders. De uitleverkant zoekt het blok
-         terug op VOLGNUMMER in het bronbestand, dus de telling hier en daar
-         moeten over dezelfde tekst gaan. magnaatHtml hieronder maskeert een
-         <script>-tag en scriptbundelHtml verderop vervangt een hele RIJ
-         <script>-tags door een; draait deze laag daarna, dan telt hij anders
-         dan de bron en levert de pagina het VERKEERDE blok uit.
-
-         Andersom kan het wel: wat hier een <script src> wordt, was een gewoon
-         (niet-uitgesteld) blok en blijft dat ook -- het breekt een rij
-         uitgestelde scripts precies zoals het inline blok dat deed, dus de
-         lagen hieronder zien hetzelfde. Zie ./scriptafsplitsing.js.
-
-         (De stijlkant heeft dit probleem niet: geen enkele laag hieronder
-         verandert het aantal <style>-blokken, dus die mag later draaien.) */
-      html = scriptafsplitsingHtml(html, rel);
-      html = magnaatHtml(html, magnaat);
-      /* Een rij opeenvolgende stijlbladen wordt EEN verwijzing. Dit gaat voor de
-         stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie
-         ./stijlbundel.js voor wat er wel en niet in mag. */
-      html = stijlbundelHtml(html);
-      /* En een groot inline <style>-blok wordt een eigen blad. Dit staat NA de
-         stijlbundel met opzet: die bepaalt zijn rijen met het blok nog op zijn
-         plek (een <style> breekt een rij, zie stijlbundel-rij.js), zodat de
-         nieuwe verwijzing niet alsnog een rij in wordt getrokken en de cascade
-         verschuift. Zie ./stijlafsplitsing.js. */
-      html = stijlafsplitsingHtml(html, rel);
-      /* En hetzelfde voor een rij UITGESTELDE scripts. Dat mocht lang niet,
-         omdat een fout in het ene script het volgende zou meeslepen; in de
-         bundel krijgt elk bestand daarom zijn eigen try/catch, waarmee dat
-         verschil weg is. Zie ./scriptbundel.js. */
-      html = scriptbundelHtml(html);
-      /* En als laatste rewrite: elke overgebleven verwijzing naar een .js of
-         .css krijgt de vingerafdruk van dat bestand mee, zodat een
-         herhaalbezoek er niet meer naar hoeft te vragen. Staat NA de twee
-         bundels met opzet: die maken hun eigen adressen met een querystring,
-         en die blijven ongemoeid. Zie ./versieadres.js. */
-      html = versieadresHtml(html, publicDir);
+      html = herschrijfPagina(html, rel, publicDir, magnaat);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen

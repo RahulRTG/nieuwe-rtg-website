@@ -107,6 +107,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "ai-budget.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-budget.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ai-cache.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -143,6 +151,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "ai-rem.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-rem.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ai-uitwijk.test.js": {
       "soort": "puur",
@@ -651,6 +667,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "blokafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/blokafsplitsing.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 20
     },
     "boardroom-poort.test.js": {
       "soort": "server",

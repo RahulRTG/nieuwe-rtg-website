@@ -64,7 +64,7 @@ function reden(p, kijker) {
    deel vast: welke posts kandidaat zijn en wat we precies vragen. Geeft de AI geen
    oordeel (geen sleutel, storing, onleesbaar antwoord), dan blijft p.belangrijk
    ongezet en doet de heuristiek hierboven het werk. */
-const { jaNee } = require('../ai');
+const { jaNee } = require('../ai-kort');
 const BELANG_MAX = 40;   // hoogstens zoveel posts per ronde, tegen een AI-rekening die wegloopt
 const BELANG_VRAAG = 'Bepaal of een korte Salon-post maatschappelijk belangrijk is (raakt de gemeenschap, gezondheid, veiligheid, natuur/klimaat, liefdadigheid, onderwijs of mensenrechten) of gewoon persoonlijk. Antwoord met exact "ja" of "nee".';
 

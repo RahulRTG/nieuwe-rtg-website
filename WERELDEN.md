@@ -104,7 +104,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 47 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 45 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 12 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 2 |
@@ -269,9 +269,8 @@ Uitgevoerd met de contextvraag, en niet met wie hem gebouwd heeft:
 | Sociaal | LivingOS | zijn mensen |
 | Geld | LivingOS | zijn geld |
 | Media | LivingOS | zijn vrije tijd |
-| Instant Reality | LivingOS | een eigen plan veilig verkennen |
-| Private Office | LivingOS | zaken die persoonlijk oordeel vragen |
 | Het Vooruitzicht | LivingOS | de cockpit van die wereld (hing er al) |
+| Privékantoor | LivingOS | zaken die persoonlijk oordeel vragen |
 | Horeca | WorkOS | een zaak besturen |
 | Partner Network | WorkOS | bedrijven die samenwerken |
 | Reizen & Veilig | TravelOS | hing er al |
@@ -290,6 +289,71 @@ Beide staan er nu onder hun eigen naam.
 
 *Handhaving:* `test/wereldregister.test.js` — elke app uit de catalogus hangt in
 een wereld, vergeleken op adres en niet op naam.
+
+## De twee dubbele paren
+
+*Besloten en uitgevoerd op 19 augustus 2026.*
+
+Vier schermen beloofden twee dingen. **Het Vooruitzicht** en **Instant Reality**
+rekenden allebei één intentie door naar drie werelden en twee beslissingen, met
+dezelfde Kyoto-reis als voorbeeld. **Private Office** en **Het Privékantoor**
+waren allebei een rustige directietafel voor zaken die een handtekening vragen.
+Een lid dat de bank opende, moest bij elk paar raden welke van de twee de echte
+was.
+
+Het besluit was: **één scherm per paar, de ander gaat erin op, en wereld en huis
+houden elk hun eigen naam.** Bij het uitvoeren bleek de mechaniek per paar
+tegengesteld te liggen, en dat is de moeite waard om vast te leggen — want het
+antwoord op *welke van de twee blijft staan* volgde niet uit de naam maar uit de
+meting.
+
+| paar | blijft | wat de ander had |
+|---|---|---|
+| Het Vooruitzicht ← Instant Reality | de vorm | **de motor** |
+| Het Privékantoor ← Private Office | de motor | de vorm |
+
+- **Het Vooruitzicht was het decor.** `living-os.js` (2,6 KB) deed geen enkele
+  `/api/`-aanroep: drie werelden in een object, een `setWorld()` en een
+  trefwoordvergelijking. Instant Reality had wél de motor —
+  `server/kern/instant-reality.js` met versies, idempotente sleutels, een 409 op
+  een verlopen beeld en een statusladder die pas *gereed* zegt als een provider
+  dat bevestigt, plus drie toetsen. Het gekozen scherm opslokken zou dus een
+  werkende capability in een maquette hebben gestopt. De motor is daarom
+  *hierheen gehaald*: `living-os.js` praat nu met `/api/instant-reality`, en het
+  tweede scherm is weg. `server/routes/instant-reality.js`,
+  `server/kern/instant-reality.js` en `test/instant-reality.test.js` blijven; het
+  pad houdt zijn naam omdat een bestaande API hernoemen meer kost dan het
+  oplevert.
+- **Bij het Privékantoor lag het andersom.** `private-office.js` (2,5 KB) deed
+  ook geen enkele aanroep; het Privékantoor draait op
+  `server/kern/lifestyle/` en `server/kern/bureau/` met een levensgraaf, een
+  Control Tower, cases met een echt team en een mandaatschuif. De richting klopte
+  daar dus meteen.
+
+**Wat er meekwam, en wat niet.** Van Instant Reality: de statusladder, de
+Decision Compression (16 → 2), het Delta Event met *simuleer +6 uur*, het
+bewerkbare intentieveld en de One Reality-regel. Van Private Office: de Council
+— maar niet als zes vaste stemmen met een vast advies over een verzonnen reis.
+Dat was decor. De gedachte erachter (*voordat u tekent hoort u te zien wie eraan
+gewerkt heeft*) is er wél, en staat nu op de werkelijke bezetting van uw zaak
+(`server/kern/bureau/cases.js`, `teamVoor`). Zit er niemand op, dan staat er
+niets: een lege raad is eerlijker dan een verzonnen unanimiteit. De Continuity
+Vault kwam mee als de lijst die er al lag — *dit blijft van u* boven het
+mandaatlogboek.
+
+**En één gebrek dat pas bij het samenvoegen zichtbaar werd.** De vijf knoppen in
+de balk van Het Vooruitzicht waren nergens aan gebonden. Op bureaumaat viel dat
+niet op — de drie panelen staan daar naast elkaar — maar op telefoonmaat toont
+dat scherm er precies één, en waren *intent* en *beslissingen* dus onbereikbaar.
+Dat is exact wat `ADAPTIEF.md` verbiedt: **verbergen bestaat niet.** De balk kiest
+nu het paneel op een telefoon en schuift het in beeld op een bureau, en de
+beslissende actie staat in het wereldpaneel zelf — het enige paneel dat een
+telefoon standaard toont.
+
+*Handhaving:* `test/wereldregister.test.js` (elke app uit de catalogus hangt in
+een wereld, vergeleken op adres) en `test/wereldbreedte.e2e.js` (het scherm past
+op 390px, toont daar zijn hoofdwereld met een raakbare hoofdactie, en elk van de
+vijf balkknoppen levert werkelijk een zichtbaar paneel op).
 
 ## Instellingen — en waarom het geen wereld is
 
@@ -444,7 +508,9 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
   Reality, Private Office, Het Vooruitzicht, Partner Network, Reizen & Veilig,
   Leven, Geld, Sociaal, Media, Horeca, Gastdossier. Negen daarvan hingen in geen
   enkele wereld. Ze staan nu waar ze horen: zeven in LivingOS, twee in WorkOS,
-  drie hingen al in TravelOS of LivingOS. Zie *Er is geen lijst ernaast* hieronder.
+  drie hingen al in TravelOS of LivingOS. Twee van die twaalf bestaan sindsdien
+  niet meer als eigen scherm — zie *De twee dubbele paren* hieronder. Zie ook
+  *Er is geen lijst ernaast* hieronder.
 - **Het gezin is uit FoundationOS naar LivingOS gegaan.** Niet als
   bestandsverhuizing maar als deur: `os:rtf` (RTF Mini, Kids, Tiener, Jong,
   Volwassen) hangt nu in LivingOS, en FoundationOS wijst naar de publieke kant
@@ -497,13 +563,6 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
   een productbesluit. Voor Lifestyle hangt daar wel een vraag aan die niet kan
   wachten: als de prijs uitvoering koopt, moet er capaciteit tegenover staan, en
   die planning bestaat nog niet.
-- **`/apps/private-office.html` en `/apps/lifestyle.html` zijn twee schermen met
-  bijna dezelfde naam.** Private Office (Briefing, Council, The Table, Atelier,
-  Vault) tegenover Het Privékantoor (de levensgraaf, de Control Tower, het
-  mandaat). Ze hangen nu allebei in LivingOS onder hun eigen naam, maar of het er
-  twee horen te zijn is een productvraag. Hetzelfde geldt voor Het Vooruitzicht
-  en Instant Reality: twee schermen die allebei een intentie tot drie scenario's
-  doorrekenen, met dezelfde Kyoto-reis als voorbeeld.
 - **Het startscherm.** `WERELD.md` zegt: er is één beginscherm en dat is de lege
   werktafel. Vier werelden als eerste keuze zou dat vervangen. Eigen besluit.
 - **De precieze domeinlijst per wereld.** De vijf regels hierboven zijn een eerste
@@ -552,7 +611,8 @@ met `npm run groepen`:
 - **Business Pass** — daarbovenop een hele wereld: WorkOS, met twaalf van de
   veertien exclusieve functies (werkvloer, werkplek, metier, vakritmes, verkoop,
   zaakdoos, facturen, kantoorgesprek, werkmail, RTG Mail, wervingslink,
-  werkruimtes), plus Zakelijk bankieren en Instant Reality.
+  werkruimtes), plus Zakelijk bankieren en de scenariolaag achter Het
+  Vooruitzicht.
 
 ### En waar de prijs dan aan hangt
 

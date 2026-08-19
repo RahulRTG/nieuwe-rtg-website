@@ -44,7 +44,7 @@
        een huis is een merk, een wereld is een context. */
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
-      'link:geldcommand', 'link:mediaos', 'link:instantreality', 'link:privateoffice',
+      'link:geldcommand', 'link:mediaos',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,

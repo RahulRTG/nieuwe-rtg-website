@@ -62,8 +62,8 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
   <br>Bulkbetalingen en de salarisrun vanaf een zakelijke rekening.
 - **Kantoorgesprek** -- Business
   <br>Het gesprek waarmee een zaak zijn kantoor inricht.
-- **Instant Reality** -- Business
-  <br>De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.
+- **Het Vooruitzicht (scenariolaag)** -- Business
+  <br>De controleerbare scenariolaag voor intenties, voorbereiding, providerbewijs en uitzonderingen; het scherm heet Het Vooruitzicht.
 - **Werkmail bezorgen** -- Business
   <br>De bezorging van interne werkmail.
 - **RTG Mail: post van buiten aannemen** -- Business
@@ -236,7 +236,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
-- **RTG Instant Reality** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen.
+- **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -424,7 +424,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
-- **RTG Instant Reality** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen.
+- **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -612,7 +612,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
-- **RTG Instant Reality** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen.
+- **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -668,7 +668,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Aandacht en voorspellen** -- De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.
 - **Sparren en parkeren** -- De sparlijst: iets parkeren om er later op terug te komen.
 - **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
-- **Instant Reality** -- De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.
+- **Het Vooruitzicht (scenariolaag)** -- De controleerbare scenariolaag voor intenties, voorbereiding, providerbewijs en uitzonderingen; het scherm heet Het Vooruitzicht.
 
 ### Cultuur en gezelschap
 

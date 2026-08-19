@@ -112,7 +112,7 @@
 </head>
 <body class="rtg-stijl">
 <header>
-  <div><div class="ey">Lifestyle Pass</div><h1>Het Privékantoor</h1></div>
+  <div><div class="ey">Lifestyle Pass · uw private office</div><h1>Het Privékantoor</h1></div>
   <a class="terug" href="/apps/app.html?pas=lifestyle">← app</a>
 </header>
 <!-- DE APPS VAN DEZE WERELD. Het Privekantoor toont wat er speelt; deze rij
@@ -223,6 +223,18 @@ async function vNu(){
   P(h);
   zetUit('Nu', ['Soort','Wat','Toelichting'], d.regels.map(r=>[r.soort, r.tekst, r.detail||'']));
 
+  /* DE RAAD. Dit is wat er van Private Office over is nadat dat scherm hierin
+     opging (WERELDEN.md, "de twee dubbele paren"). Daar stonden zes vaste
+     stemmen met een vast advies over een verzonnen reis -- decor. De gedachte
+     erachter was wel goed: voordat u iets tekent hoort u te zien wie eraan
+     gewerkt heeft, en waar zij van elkaar verschillen. Hier is dat geen decor
+     maar de werkelijke bezetting van uw zaak (server/kern/bureau/cases.js,
+     teamVoor). Zit er niemand op, dan staat er ook niets: een lege raad is
+     eerlijker dan een verzonnen unanimiteit. */
+  const raad = a => a.length ? '<div class="lbl">Wie er voor u aan werkt</div>'
+    + a.map(x=>'<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'
+      + x.team.map(r=>'<span class="goud">'+esc(r)+'</span>').join(' · ')+'</div></div></div>').join('') : '';
+
   async function brief(moment){
     const u = $('#brUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
     try{
@@ -235,7 +247,7 @@ async function vNu(){
             + lijst('Verder deze week', d.restVanDeWeek, punt)
             + lijst('Achterstallig', d.achterstallig, punt)
             + lijst('Wacht op u', d.beslissingen, x=>'<div class="meta">'+esc(x.titel)+' · '+esc(x.reden)+'</div>')
-            + lijst('Wij doen vandaag', d.wijDoen, x=>'<div class="meta">'+esc(x.titel)+' ('+esc(x.team.join(', '))+')</div>')
+            + raad(d.wijDoen)
           : lijst('Vandaag gebeurd', d.gebeurd, x=>'<div class="meta">'+esc(x.zaak)+' → '+esc(x.status)+'<br><span class="zacht">'+esc(x.notitie)+'</span></div>')
             + '<div class="meta mt-s">' + d.doorOns + ' door ons, ' + d.doorU + ' door u · ' + d.lopend + ' lopen er nog.</div>'
             + lijst('Morgen', d.morgen, punt)
@@ -660,6 +672,14 @@ async function vMandaat(){
         + '<button class="knop klein js-grensk" data-d="'+esc(x.domein)+'">Vastzetten</button></div>'
         + '<div class="meta fijner">Tot dit bedrag pakken wij het op zonder u te storen. Daarboven leggen wij het voor.</div>' : '')
     + '</div>').join('');
+  /* DE CONTINUITY VAULT, de tweede helft van wat Private Office hierheen
+     bracht. Daar was het een belofte in een kader; hier is het de lijst
+     eronder. Wat u ons gaf staat bij u vast en niet bij de mensen die het
+     uitvoeren: wisselt een partner, een medewerker of een leverancier, dan
+     wisselt uw mandaat niet mee. */
+  h += '<div class="kaart"><h2>Dit blijft van u</h2><div class="sub">Uw huisregels, uw grenzen en het bewijs van wat u ons gaf staan op uw naam, '
+    + 'niet op die van de mensen die het uitvoeren. Wisselt er een partner, een medewerker of een leverancier, dan verandert er hieraan niets. '
+    + 'Wat u ooit heeft vastgelegd is hieronder terug te lezen, met de oude stand erbij.</div></div>';
   if(d.log.length){
     h += '<div class="kaart"><h2>Wat u ons gaf</h2><div class="sub">Elke wijziging, met de oude stand erbij.</div>'
       + d.log.map(l=>'<div class="item"><div class="body"><b>'+esc(l.naam)+'</b><div class="meta">L'+l.van+' → L'+l.naar

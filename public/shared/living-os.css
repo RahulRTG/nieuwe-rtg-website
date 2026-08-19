@@ -27,3 +27,76 @@
    hand met tremor niet te raken. Alleen de maat gaat omhoog; de tekst, de
    kleur en de dichtheid blijven precies zoals ze waren. */
 .lo-panel>header button{min-height:24px;display:inline-flex;align-items:center;}
+
+
+/* ---- opgenomen uit Instant Reality -------------------------------------
+   Dit scherm en Instant Reality beloofden hetzelfde (een intentie wordt drie
+   werelden en twee beslissingen); alleen had Instant Reality de motor en dit
+   scherm de vorm. De motor staat nu hier, en deze regels dragen wat er met hem
+   meekwam: het bewerkbare intentieveld met zijn tokens, de statusladder die pas
+   'gereed' zegt als een provider dat bevestigt, de decision compression, het
+   delta-event en de One Reality-regel.
+
+   De maten volgen de Command-modus van dit scherm en niet die van het
+   opgeheven scherm; raakvlakken blijven op 24px (WCAG 2.5.8). */
+.lo-quote{display:block;width:100%;margin:20px 0 12px;padding:0 0 0 15px;border:0;border-left:1px solid var(--gold);border-radius:0;background:transparent;color:#bab2aa;font:400 13px/1.6 'Bodoni Moda';resize:none;min-height:74px;outline:0}
+.lo-quote:focus{border-left-color:#e0c569;color:#ded5cb}
+.lo-tokens{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:22px}
+.lo-tokens span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;font-size:8px;color:#6f6a65}
+.lo-tokens span.on{border-color:rgba(192,165,68,.38);color:#c6bcae}
+
+.lo-status{margin-top:20px;border-top:1px solid var(--line)}
+.lo-status header{display:flex;justify-content:space-between;padding:15px 0}
+.lo-status header b{font:500 15px 'Bodoni Moda'}
+.lo-status header small{font-size:6px;letter-spacing:.12em;color:#817a74}
+.lo-status>div{display:grid;grid-template-columns:31px 1fr auto;gap:9px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.lo-status i{width:29px;height:29px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-style:normal;font:500 9px 'Bodoni Moda'}
+.lo-status .done i{color:#72bd94}
+.lo-status .active i{border-color:rgba(192,165,68,.45);color:#c9b85f}
+.lo-status p{display:flex;flex-direction:column;gap:3px;margin:0}
+.lo-status b{font-size:9px}
+.lo-status small{font-size:8px;color:#8e8882}
+.lo-status em{font-style:normal;font-size:7px;color:#8b847e}
+.lo-status .done em{color:#72bd94}
+.lo-status .active em{color:#c9b85f}
+
+.lo-compress{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:10px;margin-top:18px;border:1px solid var(--line);border-radius:11px;padding:13px}
+.lo-compress span{font-size:7px;letter-spacing:.13em;color:#aaa049}
+.lo-compress strong{font:500 29px 'Bodoni Moda'}
+.lo-compress i{font-style:normal;color:#9f914b}
+.lo-compress p{grid-column:2/5;display:flex;justify-content:space-between;margin:-7px 0 0;font-size:7px;color:var(--soft)}
+
+.lo-hoofdactie{width:100%;margin-top:16px;min-height:44px;border:1px solid rgba(192,165,68,.4);border-radius:13px;background:rgba(192,165,68,.09);color:#d3c176;font:500 11px Inter;cursor:pointer}
+.lo-hoofdactie:disabled{border-color:var(--line);background:transparent;color:#7c766f;cursor:default}
+
+.lo-delta{margin-top:20px;border-top:1px solid var(--line)}
+.lo-delta header{display:flex;justify-content:space-between;align-items:center;padding:15px 0}
+.lo-delta header b{font:500 15px 'Bodoni Moda'}
+.lo-delta header button{min-height:24px;border:1px solid var(--line);border-radius:999px;background:transparent;color:#aa9e61;padding:0 10px;font-size:8px;cursor:pointer}
+.lo-delta>em{font-style:normal;font-size:7px;letter-spacing:.13em;color:#b5a64f}
+.lo-delta>p{font-size:9px;line-height:1.5;color:#918a83}
+.lo-delta>div{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.lo-delta>div span{display:flex;flex-direction:column;gap:3px;background:#100f0e;padding:9px 7px;font-size:7px;color:#827c76}
+.lo-delta>div b{font-size:9px;color:#c8c0b8}
+.lo-disruption .lo-delta>em{color:#d4708c}
+
+.lo-proof{display:grid;grid-template-columns:24px 1fr;gap:9px;align-items:center;margin-top:18px;border:1px solid var(--line);border-radius:11px;padding:11px}
+.lo-proof>i{width:8px;height:8px;margin:8px;border-radius:50%;background:#72bd94;box-shadow:0 0 11px #72bd94}
+.lo-proof p{display:flex;flex-direction:column;gap:3px;margin:0}
+.lo-proof b{font-size:9px}
+.lo-proof small{font-size:8px;color:#8e8882}
+
+/* ---- de balk kiest het paneel op telefoonmaat ---------------------------
+   De vijf knoppen links stonden er al, maar waren nergens aan gebonden: op een
+   telefoon toonde dit scherm ALTIJD het wereldpaneel en waren intent en
+   beslissingen niet te bereiken. Dat is precies wat ADAPTIEF.md verbiedt --
+   verbergen bestaat niet. Op bureaumaat staan de drie panelen gewoon naast
+   elkaar en schuift de knop het paneel in beeld. */
+@media(max-width:760px){
+  body[data-view="intent"] .lo-worlds,
+  body[data-view="decisions"] .lo-worlds,
+  body[data-view="evidence"] .lo-worlds{display:none}
+  body[data-view="intent"] .lo-intent{display:block}
+  body[data-view="decisions"] .lo-decisions,
+  body[data-view="evidence"] .lo-decisions{display:block}
+}

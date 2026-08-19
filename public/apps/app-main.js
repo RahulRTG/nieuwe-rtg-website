@@ -3718,12 +3718,14 @@ var RTG_BOUW = '01582e69';
     leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
     sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
     geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
-    instantreality:{ naam: 'Instant Reality', url: '/apps/instant-reality.html' },
-    /* Privekantoor (link:rechterhand) wijst naar /apps/lifestyle.html en dit
-       naar /apps/private-office.html: twee schermen, bijna dezelfde naam. Dat
-       staat als open punt in WERELDEN.md; hier krijgt elk zijn eigen sleutel
-       zodat ze in elk geval allebei ergens hangen. */
-    privateoffice:{ naam: 'Private Office', url: '/apps/private-office.html' },
+    /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
+       samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
+       paren"). Instant Reality en Het Vooruitzicht (link:vooruitzicht) beloofden
+       allebei een intentie in drie werelden met twee beslissingen; Private
+       Office en het Privekantoor (link:rechterhand) allebei een directietafel.
+       Vier ingangen naar twee dingen. Wie de oude sleutel nog gebruikt, komt
+       niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
+       bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
     partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
     rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
@@ -3940,7 +3942,7 @@ var RTG_BOUW = '01582e69';
        een huis is een merk, een wereld is een context. */
     { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
-      'link:geldcommand', 'link:mediaos', 'link:instantreality', 'link:privateoffice',
+      'link:geldcommand', 'link:mediaos',
     /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
        van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
        in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,

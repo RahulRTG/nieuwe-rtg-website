@@ -67,8 +67,13 @@ module.exports = [
   { id: 'arrival', categorie: 'Eigen apps', naam: 'RTG Invisible Arrival', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.',
     paden: ['/api/arrival'] },
-  { id: 'instantreality', categorie: 'Eigen apps', naam: 'RTG Instant Reality', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen.',
+  /* Dit is de MOTOR onder Het Vooruitzicht (/apps/living-os.html) en niet meer
+     een eigen scherm: Instant Reality is 19 augustus 2026 in dat scherm
+     opgegaan. Het pad houdt zijn naam, want dat is de bestaande API en die
+     hernoemen kost meer dan het oplevert; de naam hier volgt het scherm. */
+  { id: 'instantreality', categorie: 'Eigen apps', naam: 'RTG Het Vooruitzicht (scenario- en eventlaag)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: ' +
+      'intenties, drie werelden, providerbewijs en herstel bij een verstoring.',
     paden: ['/api/instant-reality'] },
   { id: 'rtgone', categorie: 'Eigen apps', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De bestuurlijke regielaag voor intenties, beloften, overdracht, goedkeuringen, projecten en herstelbare automatisering.',

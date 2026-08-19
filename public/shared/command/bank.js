@@ -93,8 +93,8 @@
 
        ER STOND HIER EEN TWEEDE KOPJE, "SOFTWARE", en dat is 19 augustus 2026
        weggehaald. Daaronder hingen twaalf apps uit shared/command/catalog.js die
-       in geen enkele wereld stonden -- Vandaag, Instant Reality, Private Office,
-       Partner Network, Leven, Geld, Sociaal, Media, Horeca en de rest. Een lid
+       in geen enkele wereld stonden -- Vandaag, Het Vooruitzicht, Partner
+       Network, Leven, Geld, Sociaal, Media, Horeca en de rest. Een lid
        moest daardoor bij elk ding twee vragen beantwoorden: in welke wereld
        hoort dit, en zo niet, staat het dan in de lijst ernaast? Dat is precies
        de vraag die WERELDEN.md afschaft: een app hoort in de context waarin een

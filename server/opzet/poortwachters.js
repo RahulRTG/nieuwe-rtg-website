@@ -30,6 +30,7 @@ module.exports = function poortwachters(deps) {
   const { schakelaars } = require('../middleware/functieschakelaars');
   const { jsonGzip, statischGzip } = require('../middleware/compressie');
   const { maakDubbeltik } = require('../lib/dubbeltik');
+  const { maakAuditspoor } = require('./auditspoor');
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
   const { stijlbundel, PAD: stijlbundelPad } = require('../middleware/stijlbundel');
 const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbundel');
@@ -84,6 +85,14 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   const dubbeltik = maakDubbeltik({ log });
   app.use(dubbeltik.middleware());
 
+  /* HET API-SPOOR. Staat naast de dubbeltik en om dezelfde reden hier: hij moet
+     voor alle routers hangen, zodat er geen route is die er langs kan. Hij
+     noteert NA het antwoord (res.finish), dus hij weet dan wie de route heeft
+     ingelogd en hij houdt de bezoeker nergens mee op. Zie de kop van
+     ./auditspoor.js voor wat er wel en niet in een regel staat. */
+  const auditspoor = maakAuditspoor({ db, save, sessionFor: (t) => sessionFor(t) });
+  app.use(auditspoor.middleware());
+
   let scanNet = null;
   app.use((req, res, next) => (scanNet ? scanNet(req, res, next) : next()));
 
@@ -130,5 +139,5 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
     }
   }));
 
-  return { functies, functiewachter, rtf, CSP_NONCE, dubbeltik, zetScanNet: (n) => { scanNet = n; } };
+  return { functies, functiewachter, rtf, CSP_NONCE, dubbeltik, auditspoor, zetScanNet: (n) => { scanNet = n; } };
 };

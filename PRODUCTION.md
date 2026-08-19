@@ -354,6 +354,16 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
 - **Betaal-naad** — `server/betaal.js`: idempotente betalingen (geen
   dubbele afschrijving bij herhaling) en webhook-verificatie met handtekening.
   Zonder Stripe-key draait de demo-provider.
+- **Auditspoor** — `server/opzet/auditspoor.js` schrijft elke GESLAAGDE
+  schrijfhandeling weg in een hash-geketend journaal (wie, wat, wanneer, welke
+  status; nooit het verzoeklijf, want een auditlog met alle lijven is zelf het
+  datalek). Wie er een regel in wijzigt of uit knipt, breekt de keten, en
+  `POST /api/command/apispoor` (backoffice) laat die controle draaien. Gemeten
+  met `npm run auditproef`: **860 schrijfroutes laten aantoonbaar een spoor na,
+  0 niet**, keten heel. Wat het NIET dekt: wie de nieuwste regels weggooit houdt
+  een kloppende keten over -- daarvoor moet het kopzegel buiten deze database
+  worden vastgelegd (`server/lib/keten-anker.js`, bewust nog niet in bedrijf;
+  `TAKEN.md` 3.7).
 - **Dubbeltik** — `server/lib/dubbeltik.js` staat vóór alle routers: een
   schrijfverzoek met een idem-sleutel (`idem` in het lijf of de kop
   `Idempotency-Key`) wordt één keer uitgevoerd; de herhaling krijgt het bewaarde

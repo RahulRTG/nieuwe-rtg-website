@@ -346,6 +346,171 @@ function letOpFouten(page, bak) {
 function bewaakKind(kind) { if (kind && kind.stderr) luisterOpFouten(kind); return kind; }
 
 
+/* ============================================================================
+   WACHTEN OP EEN TOESTAND, NIET OP DE KLOK.
+
+   WAAR DIT VANDAAN KOMT. `page.waitForTimeout(2500)` met de opmerking "de
+   widgets halen hun bron op" is een gok, en een gok die twee kanten op fout
+   gaat: op een rustige machine te lang (de suite duurt onnodig minuten langer)
+   en onder belasting te kort (rood zonder dat er iets stuk is). Dat laatste is
+   het ergste, want een suite die af en toe rood geeft zonder dat iemand weet
+   waarop, wordt binnen een maand genegeerd. Er stonden er 162, verdeeld over
+   35 bestanden; twee ervan hebben hier echt een halve dag zoeken gekost
+   (TAKEN.md 6.5).
+
+   Wat hieronder staat wacht op wat er MOET GEBEUREN in plaats van op hoe lang
+   dat ongeveer duurt. Twee eisen die het bruikbaar maken:
+
+   1. HIJ VERTELT WAAROP HIJ WACHTTE. Een kale "Timeout 15000ms exceeded" laat
+      de volgende lezer opnieuw zoeken. Deze gooit met wat er verwacht werd EN
+      met de eerste tweehonderd tekens die er wel stonden.
+   2. HIJ IS BEGRENSD. Een wacht zonder bovengrens hangt de hele suite op; de
+      grens staat hoog genoeg voor een trage machine (RTG_E2E_WACHT om hem te
+      verzetten) en is geen verkapte klok: hij gaat af als er iets stuk is, niet
+      als het even duurt.
+   ========================================================================== */
+const WACHT_MS = Number(process.env.RTG_E2E_WACHT || 15000);
+
+async function korteStand(page) {
+  try {
+    const t = await page.evaluate(() => (document.body ? document.body.innerText : '').replace(/\s+/g, ' ').slice(0, 200));
+    return 'wat er wel stond: "' + t + '"';
+  } catch (e) { return 'de pagina was niet meer te lezen (' + (e && e.message) + ')'; }
+}
+
+/* Wacht tot een uitdrukking in de pagina waar is. `wat` is de zin die in de
+   foutmelding komt -- schrijf hem als wat je verwachtte, niet als code. */
+async function wachtTot(page, fn, arg, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  const wat = (opties && opties.wat) || 'de verwachte toestand';
+  try {
+    await page.waitForFunction(fn, arg, { timeout: ms });
+  } catch (e) {
+    throw new Error('wachtte ' + ms + 'ms op ' + wat + ', en die kwam niet. ' + (await korteStand(page)));
+  }
+}
+
+/* Wacht tot een patroon in de zichtbare tekst staat. Standaard in de hele
+   pagina; `in` beperkt het tot een selector. */
+async function wachtOpTekst(page, patroon, opties) {
+  const bron = patroon instanceof RegExp ? patroon.source : String(patroon).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const vlaggen = patroon instanceof RegExp ? patroon.flags.replace(/g/g, '') : 'i';
+  const sel = (opties && opties.in) || 'body';
+  await wachtTot(page, ([b, v, s]) => {
+    const el = document.querySelector(s);
+    if (!el) return false;
+    return new RegExp(b, v).test(String(el.innerText || el.textContent || '').replace(/\s+/g, ' '));
+  }, [bron, vlaggen, sel], { ms: opties && opties.ms, wat: 'tekst ' + patroon + ' in ' + sel });
+}
+
+/* Wacht tot de tekst van een element VERANDERT ten opzichte van wat er stond.
+
+   Dit is de wacht voor het geval waarin je niet kunt zeggen wat er komt: een
+   melding die ook leeg kan blijven, een lijst die korter wordt, een antwoord
+   waarvan de toets juist wil controleren dat het NIET iets zegt. Op de tekst
+   wachten die je verwacht kan daar niet -- dus wacht je op het moment dat het
+   scherm iets nieuws heeft gezegd. Neem de oude tekst op met tekstVan(). */
+async function wachtOpVerandering(page, selector, oud, opties) {
+  await wachtTot(page, ([s, o]) => {
+    const el = document.querySelector(s);
+    if (!el) return false;
+    return String(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() !== o;
+  }, [selector, String(oud || '').replace(/\s+/g, ' ').trim()],
+  { ms: opties && opties.ms, wat: 'een nieuwe tekst in ' + selector });
+}
+
+/* WACHTEN TOT HET SCHERM STIL IS -- de enige eerlijke vervanger van "even 800ms".
+
+   Waarom dit nodig is naast wachten op een antwoord: een scherm dat een antwoord
+   krijgt, tekent zichzelf daarna opnieuw, en soms haalt het onderweg nog iets.
+   Wie tussen die twee in typt, ziet zijn invoer verdwijnen -- en stuurt lege
+   velden mee. Dat is precies waar de Living Lab-toets op omviel toen de vaste
+   wachttijden eruit gingen: het scherm zei "Wat heeft u waargenomen?" over een
+   veld dat de toets aantoonbaar had gevuld.
+
+   Stil betekent hier twee dingen tegelijk: er loopt geen verzoek meer, EN de
+   tekst is tussen twee pollingrondes niet veranderd. Dat is geen verkapte klok:
+   duurt het langer, dan wacht hij langer; is het meteen klaar, dan gaat hij
+   meteen door. volgVerzoeken() moet vóór de eerste goto worden aangeroepen,
+   want hij hangt een teller om window.fetch. */
+async function volgVerzoeken(page) {
+  await page.addInitScript(() => {
+    window.__rtgBezig = 0;
+    const echt = window.fetch;
+    window.fetch = function (...args) {
+      window.__rtgBezig++;
+      return echt.apply(this, args).finally(() => { window.__rtgBezig--; });
+    };
+  });
+}
+
+async function wachtOpRust(page, selector, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  try {
+    /* De vorige lezing WISSEN voor we beginnen. Zonder dit vergelijkt de eerste
+       ronde met de tekst waarop de VORIGE wacht eindigde -- en die is vlak na een
+       klik meestal nog gelijk, dus dan is hij meteen "stil" terwijl de
+       hertekening nog moet komen. Precies de fout die deze wacht moet oplossen. */
+    await page.evaluate(() => { window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; });
+    await page.waitForFunction((s) => {
+      if (window.__rtgBezig) return false;
+      const el = s ? document.querySelector(s) : document.body;
+      if (!el) return false;
+      const nu = String(el.innerText || '');
+      const zelfde = window.__rtgVorigeTekst === nu;
+      window.__rtgVorigeTekst = nu;
+      return zelfde;
+    }, selector || null, { timeout: ms, polling: 100 });
+  } catch (e) {
+    throw new Error('wachtte ' + ms + 'ms tot ' + (selector || 'het scherm') +
+      ' stil was (geen lopend verzoek, geen hertekening), en dat werd het niet. ' + (await korteStand(page)));
+  }
+}
+
+/* Klik, en wacht op het ANTWOORD VAN DE SERVER in plaats van op een geschatte
+   duur. Voor de gevallen waarin niet vooraf te zeggen is wat er op het scherm
+   komt (een lijst die vult, een melding die ook leeg kan blijven): de handeling
+   is klaar zodra het verzoek dat hij afvuurt beantwoord is.
+
+   `urlDeel` is een stuk van het pad, bijvoorbeeld '/horeca/hotel/open'. Zonder
+   dat wacht hij op het eerstvolgende POST-antwoord van de eigen API -- ruim
+   genoeg voor een scherm dat er maar een afvuurt, en te ruim voor een scherm
+   dat er drie doet; noem in dat geval het pad. */
+async function klikEnWacht(page, selector, urlDeel, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  const deel = urlDeel || '/api/';
+  try {
+    const [antwoord] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes(deel) && r.request().method() !== 'GET', { timeout: ms }),
+      page.click(selector)
+    ]);
+    return antwoord;
+  } catch (e) {
+    throw new Error('klikte op ' + selector + ' en wachtte ' + ms + 'ms op een antwoord van ' + deel +
+      ', dat niet kwam. ' + (await korteStand(page)));
+  }
+}
+
+async function tekstVan(page, selector) {
+  return page.evaluate((s) => {
+    const el = document.querySelector(s);
+    return el ? String(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+  }, selector);
+}
+
+/* Wacht tot een element zichtbaar is (of juist verborgen). Werkt ook op
+   elementen die met `hidden` worden geschakeld, en dat is hier de gewone
+   manier: de apps zetten hele blokken aan en uit. */
+async function wachtOpZichtbaar(page, selector, opties) {
+  const weg = !!(opties && opties.weg);
+  await wachtTot(page, ([s, w]) => {
+    const el = document.querySelector(s);
+    const zichtbaar = !!el && !el.hidden && el.offsetParent !== null;
+    return w ? !zichtbaar : zichtbaar;
+  }, [selector, weg], { ms: opties && opties.ms, wat: selector + (weg ? ' verdwenen' : ' zichtbaar') });
+}
+
+
 /* EEN BEWERING OVER "VANDAAG" GELDT MAAR BINNEN EEN KALENDERDAG.
 
    Drie toetsen rekenden een datum uit (morgen, een verjaardag, "over negen
@@ -458,6 +623,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

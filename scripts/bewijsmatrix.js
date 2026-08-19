@@ -87,6 +87,7 @@ const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) |
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
+const AUDIT = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
 const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
 const UITVOER = (argv.find(a => a.startsWith('--uitvoer=')) || '').slice(10) || inWortel('UITVOERPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
@@ -121,7 +122,16 @@ const SCHAKELS = [
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
+    bron: 'scripts/auditproef-route.js (roept de route aan en vraagt daarna aan het spoor of er een regel bij kwam)',
+    nvtBijLezen: true,
+    /* HIER STOND "een hashketen over het auditlog; die bestaat nog niet als
+       algemene voorziening", en dat klopte maar voor de helft. De hashketen
+       bestond wel (kern/command/journaal.js); wat ontbrak was BEREIK -- alleen
+       RTG Command schreef erin. server/opzet/auditspoor.js geeft nu elke
+       schrijfroute een regel in dezelfde vorm. */
+    nodig: 'het kopzegel buiten deze database vastleggen. De keten betrapt een gewijzigde of ' +
+      'weggeknipte regel, maar wie de NIEUWSTE regels weggooit houdt een kloppende keten over; ' +
+      'alleen een anker bij een derde ziet dat (server/lib/keten-anker.js, bewust niet in bedrijf).' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -295,6 +305,7 @@ function bouw(invoer) {
   const keten = inv.keten !== undefined ? inv.keten : ketenUitslag();
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
+  const auditKaart = inv.audit !== undefined ? inv.audit : perRouteKaart(AUDIT);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOER);
 
@@ -406,6 +417,18 @@ function bouw(invoer) {
            wegen. Geprobeerd-en-ongemeten hoort zichtbaar te blijven, anders is
            het niet te onderscheiden van een route waar niemand aanklopte. */
         else if (uv) cellen[s.id] = { staat: 'ongemeten', bron: 'uitvoerproef', reden: 'nooit een 2xx' };
+        else cellen[s.id] = { staat: 'ongemeten' };
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        /* GEZAKT IS HIER WEL EEN DEFECT-OORDEEL, anders dan bij IDEMPOTENCY. Een
+           schrijfhandeling die lukt zonder spoor is achteraf niet terug te
+           vinden, en dat is letterlijk wat deze kolom belooft. */
+        const a = auditKaart && auditKaart.get(sleutel);
+        if (a && a.audit === 'bewezen') cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden };
+        else if (a && a.audit === 'gezakt') cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden };
+        else if (a) cellen[s.id] = { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
         else cellen[s.id] = { staat: 'ongemeten' };
         continue;
       }

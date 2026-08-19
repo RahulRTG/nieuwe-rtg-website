@@ -2,92 +2,92 @@
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": null,
-  "routes": 4182,
+  "routes": 4208,
   "schakels": 11,
-  "cellen": 46002,
+  "cellen": 46288,
   "telling": {
-    "bewezen": 16521,
+    "bewezen": 18238,
     "verklaard": 0,
-    "nvt": 272,
-    "ongemeten": 29081,
-    "gezakt": 128
+    "nvt": 340,
+    "ongemeten": 27699,
+    "gezakt": 11
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4181,
+      "bewezen": 4208,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 0,
-      "gezakt": 1
+      "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3073,
+      "bewezen": 3091,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 2618,
+      "bewezen": 2658,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1564,
+      "ongemeten": 1550,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 759,
+      "bewezen": 766,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3423,
+      "ongemeten": 3442,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 236,
+      "bewezen": 244,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3878,
+      "ongemeten": 3896,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 236,
+      "bewezen": 244,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3878,
+      "ongemeten": 3896,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 0,
+      "bewezen": 860,
       "verklaard": 0,
-      "nvt": 0,
-      "ongemeten": 4182,
+      "nvt": 68,
+      "ongemeten": 3280,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 133,
+      "bewezen": 852,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3862,
-      "gezakt": 119
+      "ongemeten": 3285,
+      "gezakt": 3
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4180,
+      "ongemeten": 4206,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2210,
+      "bewezen": 2222,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 1896,
+      "ongemeten": 1910,
       "gezakt": 8
     },
     "PRIVACY": {
-      "bewezen": 3073,
+      "bewezen": 3091,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     }
   },

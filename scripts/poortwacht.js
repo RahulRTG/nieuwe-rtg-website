@@ -88,6 +88,30 @@ const PUBLIEK = new Map([
   ['/api/stad/algoritmes', 'het transparantieregister: welke rekenregels meedraaien, met hun beslisruimte en hun bekende beperkingen'],
   ['/api/stad/besluiten', 'het besluitenregister; er zitten geen personen in -- fracties stemmen met zetels en een collegestem draagt een functie'],
   ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
+  /* NAGEMETEN OP 19 AUGUSTUS 2026, en dit was de enige open deur van de ronde.
+     Invisible Arrival is de gastenkant: een gast zonder account typt een wens
+     ("morgen om acht uur met z'n vieren") en krijgt terug hoe het systeem die
+     leest. De route doet niets anders: hij leest req.body.tekst, haalt er met
+     vaste patronen datum, tijd, personen en wensen uit, en geeft dat terug. Er
+     komt geen database aan te pas, er wordt niets bewaard, en er gaat niets
+     terug wat de beller niet zelf heeft ingetypt. De vervolgstap
+     (/api/arrival/request) is WEL dicht: die eist een aanvraagcode.
+
+     Achter een inlog zetten zou de functie kapotmaken -- een gast heeft per
+     definitie geen account -- en hem hier ongenoemd laten staan is erger: dan
+     staat deze ronde rood om een deur die met opzet openstaat, en dan leert
+     iedereen die uitslag wegkijken. Hij heeft een eigen rem per IP
+     (interpretRem) en een lijfgrens van 500 tekens. */
+  /* DE TWEE METERS, en waarom ze hier staan zonder dat ze publiek zijn. De
+     ronde klopt aan vanaf 127.0.0.1, en dat is precies het adres dat de
+     meetpoort (server/meetpoort.js) wél binnenlaat als er geen
+     RTG_METRICS_TOKEN is gezet -- de gewone opzet met Prometheus naast de app.
+     Van buiten geeft hij 404, en met een token gezet moet dat token mee. Deze
+     ronde meet dus zijn eigen adres en niet een open deur; zonder deze regel
+     staat er twee keer "open" waar niets opendoet. */
+  ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
+  ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
+  ['/api/arrival/interpret', 'de gastenkant van Invisible Arrival: een gast heeft per definitie geen account. Leest alleen de meegestuurde tekst met vaste patronen, raakt de database niet en bewaart niets; met een eigen rem per IP'],
   ['/api/pasprijzen', 'de prijzen staan op de website'],
   ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],
   ['/api/rtf/vacatures', 'vacatures zijn openbaar; daar solliciteer je op'],

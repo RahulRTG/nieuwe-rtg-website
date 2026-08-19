@@ -412,7 +412,7 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 /* De haak voor eigen domeinen: hij wordt hier leeg meegegeven en pas gevuld
    zodra de webmaker bestaat. Zolang hij leeg is, verandert er niets. */
 const eigenWeb = {};
-const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters')({
+const { rtf, CSP_NONCE, zetScanNet, functies, auditspoor } = require('./opzet/poortwachters')({
   app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar, eigenWeb,
   // hoisted of verderop in dit bestand; lui doorgegeven
   sseToOffice: (ev, data) => sseToOffice(ev, data),
@@ -1977,6 +1977,10 @@ const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, 
    uitsluitend via deze kern met de gedeelde data en realtime praat. Zo kan een
    domein later als eigen proces draaien zonder de routecode te veranderen. */
 const kern = {
+  /* Het API-spoor komt uit de poortwachters (opzet/auditspoor.js) en gaat als
+     `apiSpoor` de kern in, zodat RTG Command hem kan tonen en nakijken. Hij
+     wordt daar gelezen, nooit geschreven: schrijven doet de middleware. */
+  apiSpoor: auditspoor.journaal,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal,

@@ -109,10 +109,13 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
      wijst. Een url-versie vraagt dus eerst hash-besef en daarna een ronde per
      wereld. Dat is een eigen stuk werk; tot die tijd staat hier wat hij NIET
      ziet, in plaats van dat het stil blijft. */
-  const SCHULD = new Set([
-    '/apps/kantoor.html mist onderneming', '/apps/kantoor.html mist loonstrook',
-    '/apps/kantoor.html mist browser', '/apps/kantoor.html mist sitemaker'
-  ]);
+  /* DE LIJST IS LEEG, en dat is nieuws. Er stonden vier apps op -- Onderneming,
+     Loonstrook, Browser en Sitemaker -- die in WorkOS hingen terwijl
+     /apps/kantoor.html er nergens naar wees. Ze staan er nu in de rij "Werk".
+     Leeg laten en niet weghalen: de constructie eromheen is wat de lijst weer
+     laat groeien zichtbaar maakt, en een lege verzameling zegt dat er vandaag
+     niets openstaat. */
+  const SCHULD = new Set([]);
 
   const gemist = [], nogOpen = new Set();
   for (const m of mappen) {

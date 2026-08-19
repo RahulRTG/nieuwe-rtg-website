@@ -8,12 +8,17 @@
      Business. De registry kent de apps voor iedereen; hier staat wie ze mag
      zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt.
 
-     LET OP DE KORREL, want dit is de tweede plek waar staat wat een pas krijgt.
-     De server kent 190 functieschakelaars met doelgroepen
-     (server/functies/register), deze set kent veertien APP-sleutels en kent
-     geen verschil tussen Lifestyle en Business. Die twee weten niets van
-     elkaar; scripts/groepen.js legt ze in GROEPEN.md naast elkaar in plaats van
-     te doen alsof er een is. */
+     DIT IS DE TWEEDE PLEK WAAR STAAT WAT EEN PAS KRIJGT, en sinds vandaag
+     weten die twee van elkaar. De server weigert /api/member/rechterhand aan
+     wie geen Lifestyle of Business heeft; dezelfde veertien sleutels staan als
+     `apps` op de functie `rechterhand` in het register, en
+     test/wereldregister.test.js legt ze naast deze set. Wie er een vijftiende
+     bij zet, zet hem op beide plekken of de bouw zakt.
+
+     De korrel blijft wel verschillen, en dat is geen slordigheid: de server
+     schakelt op FUNCTIE en per doelgroep, deze set verbergt APPS en kent geen
+     verschil tussen Lifestyle en Business. Wat ze nu delen is de inhoud, niet
+     de vorm. */
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';

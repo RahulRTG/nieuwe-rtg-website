@@ -11,11 +11,13 @@
      server/functies/register/   190 functieschakelaars, elk met zijn doelgroepen
      apps/app-main (PREMIUM)     de apps die de client achter een dure pas houdt
 
-   Die twee weten NIETS van elkaar. De server kent 190 functies met doelgroepen,
-   de client kent een set van veertien app-sleutels. Wat een pas krijgt, staat dus
-   op twee plekken -- en dat is precies het soort tweedeling waar LAT.md regel 4
-   over gaat. Dit script legt ze naast elkaar in plaats van te doen alsof er een
-   is.
+   Ze kenden elkaar NIET, en dat is 19 augustus 2026 half opgelost. De inhoud is
+   nu gedeeld: de veertien sleutels staan als `apps` op de functie `rechterhand`
+   in het register, en test/wereldregister.test.js zakt als de client er iets
+   anders van maakt. De VORM verschilt nog steeds -- de server schakelt op
+   functie en per doelgroep, de client verbergt apps en kent geen verschil
+   tussen Lifestyle en Business. Dit script legt ze daarom nog altijd naast
+   elkaar in plaats van te doen alsof het er een is.
 
    Draai: npm run groepen */
 const fs = require('fs');

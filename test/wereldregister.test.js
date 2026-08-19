@@ -296,6 +296,47 @@ test('elke app uit de softwarecatalogus hangt in een wereld', () => {
   assert.deepEqual(zoek, [], 'deze apps zijn nergens meer te vinden');
 });
 
+test('de PREMIUM-set van de client is dezelfde suite als het register kent', () => {
+  /* TWEE LIJSTEN OVER HETZELFDE, en ze kenden elkaar niet.
+
+     De server weigert /api/member/rechterhand aan wie geen Lifestyle of
+     Business heeft (routes/member/rechterhand.js). De client houdt daarnaast
+     een eigen `PREMIUM`-set met veertien app-sleutels, om diezelfde apps bij
+     een RTG-pas uit de mappen en uit Spotlight te houden. Zolang die twee niets
+     van elkaar wisten, kon er een app bijkomen die de server weigert en de
+     client toont -- een tegel die 403 geeft -- of andersom: een app die de
+     client verbergt terwijl iedereen erbij mag.
+
+     Dat is geen theorie. De register-regel bestond tot vandaag helemaal niet;
+     de suite viel onder de generieke functie `member`, die rtg en gast draagt.
+     Het bord zei dus dat een RTG-pas dit heeft terwijl de route 403 gaf.
+
+     De lijst woont nu in het register (`apps` op de functie `rechterhand`) en
+     deze toets legt hem naast de client. Wie er een vijftiende bij zet, zet hem
+     op beide plekken of de bouw zakt.
+
+     DE MUTATIE: haal 'cellier' uit de PREMIUM-set in app-main-24a3.js. */
+  const R = require(path.join(WORTEL, 'server/functies/register'));
+  const f = R.OP_ID.rechterhand;
+  assert.ok(f, 'de functie `rechterhand` staat niet meer in het register');
+  assert.ok(Array.isArray(f.apps) && f.apps.length >= 5,
+    'de functie `rechterhand` draagt geen `apps`-lijst; deze toets meet dan niets');
+
+  const m = /const PREMIUM = new Set\(\[([\s\S]*?)\]\)/.exec(BRON);
+  assert.ok(m, 'de PREMIUM-set is niet meer te lezen uit de app-main-bundel');
+  const client = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]);
+
+  assert.deepEqual([...client].sort(), [...f.apps].sort(),
+    'de client en het register zijn het oneens over wat de Lifestyle-suite is\n' +
+    '  client:   ' + [...client].sort().join(', ') + '\n' +
+    '  register: ' + [...f.apps].sort().join(', '));
+
+  /* En elke sleutel moet ook echt een app zijn: een naam die nergens op slaat
+     verbergt niets en weigert niets, hij staat er alleen. */
+  const onbekend = f.apps.filter((k) => !LINKS[k] && !OSAPPS[k]);
+  assert.deepEqual(onbekend, [], 'deze premium-sleutels wijzen naar geen enkele app');
+});
+
 test('de werelden in MAPPEN zijn exact de werelden die WERELDEN.md verklaart', () => {
   /* DE KAART EN DE CODE LOPEN UIT ELKAAR ZONDER DAT IEMAND IETS MERKT, en dat is
      hier al een keer gebeurd: WERELDEN.md beschreef ROS, Concern en Fundament

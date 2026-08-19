@@ -410,6 +410,18 @@ nooit de naam van een pas draagt. Die regel is hier alleen aangescherpt.
 - **Instellingen** is ingericht: de vier identiteitsapps staan in het
   bedieningspaneel en hebben in `MAPPEN` een eigen ingang met `paneel` in plaats
   van `wereld`.
+- **Het huis van LivingOS draagt alleen nog LivingOS.** `/apps/rtg.html` had
+  standen Reizen en Veilig, een reiskaart bovenaan, negen reisapps onder "Alle
+  diensten" en de drie identiteitsapps. Die horen nu in TravelOS en in
+  Instellingen, en beide zijn vanuit de bank op elk scherm te bereiken. Het
+  reisdossier blijft er wél staan: dat is geen deur maar een briefing over je
+  eigen leven, net als Vandaag. De regel die daaruit volgt: **een huis houdt zijn
+  eigen domeinen en zijn briefings, en laat de deuren naar andere werelden aan de
+  bank.**
+- **De schuldlijst van `test/beginscherm.test.js` is leeg.** Daar stonden vier
+  apps die in WorkOS hingen terwijl `/apps/kantoor.html` er nergens naar wees:
+  Onderneming, Loonstrook, Browser en Sitemaker. Ze waren alleen te bereiken door
+  het adres met de hand in te typen. Ze staan nu op het huis.
 - **De Software-rij in de bank is weg.** Onder de werelden stond een tweede
   kopje met twaalf apps uit `shared/command/catalog.js` — Vandaag, Instant
   Reality, Private Office, Het Vooruitzicht, Partner Network, Reizen & Veilig,
@@ -448,13 +460,6 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
   goede wereld, de map heet nog hoe hij heet. Dat is met opzet: die 62 schermen
   delen een service worker, een sessiemodel en `LEVEN.md`, en een mapnaam is geen
   merknaam (zie *Wat dit NIET verandert*).
-- **Het huis van LivingOS loopt achter op zijn eigen wereld.** `/apps/rtg.html`
-  toont nog een REIZEN-paneel en negen reiskaarten die nu bij TravelOS horen, en
-  het toont Wie ben ik, Passkeys en Juridisch die nu bij Instellingen horen.
-  RTFoundation is er wél bij gezet. Dat is een schermbesluit: welke domeinen
-  LivingOS aan zijn voordeur toont is een ontwerpvraag, en die hoort niet als
-  bijvangst van een kaart beantwoord te worden. Niets is onbereikbaar — het staat
-  alleen op twee plekken.
 
 ## Wat dit NIET verandert
 
@@ -533,12 +538,18 @@ met `npm run groepen`:
   zaakdoos, facturen, kantoorgesprek, werkmail, RTG Mail, wervingslink,
   werkruimtes), plus Zakelijk bankieren en Instant Reality.
 
-**Wat hier nog niet klopt:** de client houdt daarnaast een eigen `PREMIUM`-set
-van veertien app-sleutels (`apps/app-main`, `premiumPas = lifestyle || business`)
-die niets van het register weet en geen onderscheid maakt tussen Lifestyle en
-Business. Twee lijsten met verschillende korrel, allebei over hetzelfde. Dat is
-de volgende reparatie, en `scripts/groepen.js` legt ze tot die tijd naast elkaar
-in plaats van te doen alsof er één is.
+**En de tweede lijst kent de eerste nu.** De client houdt een eigen
+`PREMIUM`-set van veertien app-sleutels (`apps/app-main`, `premiumPas =
+lifestyle || business`) om diezelfde apps bij een RTG-pas uit de mappen en uit
+Spotlight te houden. Die lijst wist niets van het register: er kon een app
+bijkomen die de server weigert en de client toont — een tegel die 403 geeft — of
+andersom. De veertien sleutels staan nu als `apps` op de functie `rechterhand`
+in het register, en `test/wereldregister.test.js` legt ze naast de client. Wie er
+een vijftiende bij zet, zet hem op beide plekken of de bouw zakt.
+
+Wat nog wél verschilt is de **korrel**, en dat is geen slordigheid: de server
+schakelt op functie en per doelgroep, de client verbergt apps en kent geen
+verschil tussen Lifestyle en Business. Ze delen de inhoud, niet de vorm.
 
 ## Handhaving
 

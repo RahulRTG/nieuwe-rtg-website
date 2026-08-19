@@ -30,7 +30,16 @@ module.exports = [
      Langste prefix wint (functies/toegang.js), dus deze regel neemt het van
      `member` over zodra hij hier staat. Er verandert niets aan wie er binnenkomt
      -- de route deed dat al -- alleen zegt het register nu hetzelfde. */
+  /* `apps` STAAT ER OMDAT HET ELDERS AL STOND. De client houdt in
+     apps/app-main-24a3.js een eigen `PREMIUM`-set met precies deze veertien
+     sleutels, om ze bij een RTG-pas uit de mappen en uit Spotlight te houden.
+     Dat is een tweede lijst over hetzelfde (LAT.md regel 4), en zolang die
+     twee elkaar niet kenden kon er een app bijkomen die de server wel weigert
+     en de client wel toont, of andersom. Hij staat nu HIER, en
+     test/wereldregister.test.js legt de twee naast elkaar. */
   { id: 'rechterhand', categorie: 'Leden (RTG-app)', naam: 'De Rechterhand (Lifestyle-suite)', standaard: true, doelgroepen: ['lifestyle', 'business'],
+    apps: ['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe', 'mecenaat',
+      'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous'],
     uitleg: 'De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous. Uit = de hele suite is dicht; de rest van de ledenapp blijft draaien.', paden: ['/api/member/rechterhand', '/api/member/rendezvous'] },
   { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },

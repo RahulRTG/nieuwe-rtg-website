@@ -182,6 +182,22 @@ Die laatste twee zijn niet aan te maken zonder een les te starten, en dat vraagt
 een model achter `/api/les/maak`. Ze worden dus aan hun deur gemeten. Dat is
 geen nul en geen groen: **het is één regel, en die staat er.**
 
+**En één soort gebrek zag geen enkele ronde, omdat een browservenster geen
+telefoon is.** Er zit geen statusbalk boven en geen thuisstreep onder, dus
+`env(safe-area-inset-*)` is nul en een scherm dat die zone negeert ziet er in de
+keuring perfect uit. Vijf schermen deden dat — de Command-modus-familie
+(`partner-network`, `reizen-veilig`, `living-os`, en via dat blad ook
+`geld-command` en `leven`) — en dat kwam boven met een **schermafdruk van een
+echt toestel**, niet met een meting. De bovenste strook liep onder de klok door
+en de menuknop lag op de eerste tab.
+
+Dat hoeft niet zo te blijven: Chromium kán een inkeping nabootsen
+(`Emulation.setSafeAreaInsetsOverride`), en dat is gebruikt om deze reparatie in
+beide richtingen te meten — mét de reparatie begint de kop op 59 en houdt de
+balk 39 pixels vrij, zonder op 0 en 5. **De ronde zelf draagt die inkeping nog
+niet.** Zolang dat zo is, geldt voor de veilige zone wat voor dit hele document
+geldt: gemeten met een browser, niet met een toestel.
+
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146
 gevallen). En op 22 schermen zet `ios.js` die pil neer terwijl het scherm

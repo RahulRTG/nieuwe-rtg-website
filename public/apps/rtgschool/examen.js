@@ -41,12 +41,12 @@
       var uit = document.getElementById('examenUit');
       uit.innerHTML = '<b>' + d.goed + ' van de ' + d.totaal + ' goed</b>' +
         (d.cijferIndicatie != null ? ' &middot; cijferindicatie ' + esc(String(d.cijferIndicatie)) + ' <span class="pil">advies, geen cijfer</span>' : '') +
-        '<div style="margin-top:.5rem;">' + (d.terugblik || []).map(function (t) {
+        '<div class="h-mt50">' + (d.terugblik || []).map(function (t) {
           return '<div class="doel"><span>' + (t.goed ? '<span class="pil ok">goed</span> ' : '<span class="pil">fout</span> ') +
             esc(t.vraag) + '<br><span style="color:var(--soft);font-size:.78rem;">jouw antwoord: ' + esc(t.jouwAntwoord || '-') +
             (t.goed ? '' : ' &middot; juist: ' + esc(t.juisteAntwoord)) + '</span></span></div>';
         }).join('') + '</div>' +
-        (d.advies ? '<p class="eerlijk" style="margin-top:.6rem;">' + esc(d.advies) + '</p>' : '');
+        (d.advies ? '<p class="eerlijk h-mt60">' + esc(d.advies) + '</p>' : '');
     } catch (e) { meld(e.message); }
   }
 
@@ -57,7 +57,7 @@
       var d = await api('/api/onderwijs/advies');
       uit.innerHTML = '<p style="line-height:1.7;">' + esc(d.advies) + '</p>' +
         (d.doelenTotaal ? '<p class="leeg">' + d.doelenBehaald + ' van de ' + d.doelenTotaal + ' leerdoelen van je fase behaald.</p>' : '') +
-        (d.eerlijk ? '<p class="eerlijk" style="margin-top:.5rem;">' + esc(d.eerlijk) + '</p>' : '');
+        (d.eerlijk ? '<p class="eerlijk h-mt50">' + esc(d.eerlijk) + '</p>' : '');
     } catch (e) { uit.innerHTML = '<span class="leeg">' + esc(e.message) + '</span>'; }
   }
 

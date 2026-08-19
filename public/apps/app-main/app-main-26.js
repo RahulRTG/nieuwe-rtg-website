@@ -1,3 +1,4 @@
+/* de taakbalk: welke knop welk tabblad opent */
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');

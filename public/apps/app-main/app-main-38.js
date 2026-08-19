@@ -1,3 +1,4 @@
+/* de artikelen van een partner, met drops die nog niet los zijn */
     const now = Date.now();
     html += (r.artikelen || []).map(a => {
       const drop = a.drop && a.drop.releaseMs > now;

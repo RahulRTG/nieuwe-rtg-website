@@ -23,7 +23,7 @@
       uit += '<div class="sec">Thuistaal · ' + esc(x.kind.naam) + ' · klas ' + esc(x.klas.code) + '</div><div class="kaart blok">' +
         '<div class="mini" style="margin-bottom:.4rem;">Kom je uit het buitenland? Zet je eigen taal erbij: je ziet alles dan in twee talen, en het Nederlands leer je er vanzelf bij.</div>' +
         '<div style="display:flex;gap:.4rem;">' +
-        '<input class="veld" data-taalin="' + esc(x.klas.code) + ':' + esc(x.kind.profielId) + '" value="' + esc(x.taal || '') + '" placeholder="Taalcode (en, uk, ar, tr, ...)" maxlength="5" style="flex:1;">' +
+        '<input class="veld h-flex1" data-taalin="' + esc(x.klas.code) + ':' + esc(x.kind.profielId) + '" value="' + esc(x.taal || '') + '" placeholder="Taalcode (en, uk, ar, tr, ...)" maxlength="5">' +
         '<button class="knop mini" data-taalzet="' + esc(x.klas.code) + ':' + esc(x.kind.profielId) + '">Bewaar</button></div></div>';
       // de tweetalige weergave: NL en de eigen taal naast elkaar
       if (x.vertaling) {

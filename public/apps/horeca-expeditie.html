@@ -19,7 +19,7 @@
 <header>
   <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
   <span><span class="ey">RTG Horeca</span><h1>Expeditie en keukenregie</h1></span>
-  <span style="flex:1;"></span>
+  <span class="h-flex1"></span>
   <button class="knop" id="eVerversNu" type="button">Ververs</button>
 </header>
 <main id="main">
@@ -33,7 +33,7 @@
   <div class="kaart">
     <div class="kop">Aan de pas</div>
     <div id="eRegie"></div>
-    <p class="stil" style="margin-top:.5rem;">Staat-koud is het aantal minuten dat het eerste bord van een tafel al klaar staat terwijl de rest nog loopt. Uitgeven blijft een handeling van een mens: er wordt hier niets automatisch afgevinkt.</p>
+    <p class="stil h-mt50">Staat-koud is het aantal minuten dat het eerste bord van een tafel al klaar staat terwijl de rest nog loopt. Uitgeven blijft een handeling van een mens: er wordt hier niets automatisch afgevinkt.</p>
   </div>
 
   <div class="kaart">
@@ -42,7 +42,7 @@
       <input class="veld" id="eKokken" type="number" min="1" max="60" value="3" aria-label="Aantal koks" style="flex:0 1 6rem;">
       <button class="knop" id="eDruk" type="button">Herbereken</button>
     </div>
-    <p class="stil" id="eDrukUit" style="margin-top:.4rem;"></p>
+    <p class="stil h-mt40" id="eDrukUit"></p>
     <p class="stil" id="eWaarschuwing"></p>
     <p class="stil">Dit is een advies met de rekensom erbij. Het systeem zet zelf niets dicht: een systeem dat op de drukste avond van het jaar de bestellingen dichtzet, sluit de omzet af. Dat besluit hoort bij de chef.</p>
   </div>
@@ -54,7 +54,7 @@
       <input class="veld" id="eMinuten" type="number" min="1" max="180" placeholder="Minuten" aria-label="Minuten" style="flex:0 1 7rem;">
       <button class="knop p" id="eTijd" type="button">Vastleggen</button>
     </div>
-    <p class="stil" style="margin-top:.4rem;">Zonder eigen tijd rekent het bord met een standaard per station. Wat hier staat, maakt het vertragingssignaal pas scherp.</p>
+    <p class="stil h-mt40">Zonder eigen tijd rekent het bord met een standaard per station. Wat hier staat, maakt het vertragingssignaal pas scherp.</p>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

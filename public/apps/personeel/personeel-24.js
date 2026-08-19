@@ -1,3 +1,4 @@
+/* het alarm: trillen en tonen */
     setTimeout(() => el.classList.remove('on'), 8000);
   }
 

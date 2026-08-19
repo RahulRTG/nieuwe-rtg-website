@@ -95,7 +95,7 @@
         <button class="knop stil" id="meldGps" type="button" style="width:auto;">Gebruik mijn locatie</button>
         <span id="meldGpsUit" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
-      <button class="knop" id="meldGo" style="margin-top:.8rem;">Melding versturen</button>
+      <button class="knop h-mt80" id="meldGo">Melding versturen</button>
     </div>
     <h3 style="margin:1.2rem 0 .6rem;">Mijn meldingen</h3>
     <div id="meldMijn"><div class="leeg">Nog geen meldingen.</div></div>
@@ -117,7 +117,7 @@
       <input class="veld" id="vhNieuw" maxlength="160" placeholder="Straat, nummer, plaats">
       <div class="lbl">Ingangsdatum (optioneel)</div>
       <input class="veld" id="vhDatum" type="date">
-      <button class="knop" id="vhGo" style="margin-top:.8rem;">Verhuizing doorgeven</button>
+      <button class="knop h-mt80" id="vhGo">Verhuizing doorgeven</button>
     </div>
     <h3 style="margin:1.2rem 0 .6rem;">Mijn afspraken</h3>
     <div id="bzMijn"><div class="leeg">Nog geen afspraken.</div></div>
@@ -132,7 +132,7 @@
       <textarea class="veld" id="vgOms" maxlength="800" placeholder="Wat wil je doen, waar en wanneer?"></textarea>
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="vgLoc" maxlength="160" placeholder="Adres of plek">
-      <button class="knop" id="vgGo" style="margin-top:.8rem;">Aanvraag indienen</button>
+      <button class="knop h-mt80" id="vgGo">Aanvraag indienen</button>
     </div>
     <h3 style="margin:1.2rem 0 .6rem;">Mijn aanvragen</h3>
     <div id="vgMijn"><div class="leeg">Nog geen aanvragen.</div></div>
@@ -142,8 +142,8 @@
     <div class="kaart">
       <h3>Afvalkalender</h3>
       <div class="lbl">Postcode</div>
-      <div style="display:flex;gap:.5rem;"><input class="veld" id="afPost" maxlength="8" placeholder="Bijv. 07800" style="flex:1;"><button class="knop stil" id="afGo" style="width:auto;">Toon</button></div>
-      <div class="kal" id="afKal" style="margin-top:.8rem;"></div>
+      <div style="display:flex;gap:.5rem;"><input class="veld h-flex1" id="afPost" maxlength="8" placeholder="Bijv. 07800"><button class="knop stil" id="afGo" style="width:auto;">Toon</button></div>
+      <div class="kal h-mt80" id="afKal"></div>
       <div class="lbl">Grofvuil op afspraak</div>
       <input class="veld" id="gvWat" maxlength="300" placeholder="Wat moet opgehaald worden?">
       <button class="knop stil" id="gvGo" style="margin-top:.6rem;width:auto;">Grofvuil aanvragen</button>
@@ -262,7 +262,7 @@ async function laadMijnMeldingen(){
   $('#meldMijn').innerHTML = l.length ? l.map(m =>
     '<div class="item"><h4>'+esc(m.categorieLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
     '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+' · '+esc(m.ploeg)+'</span>'+
-    ((m.updates&&m.updates.length)?'<div class="meta" style="margin-top:.3rem;">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+
+    ((m.updates&&m.updates.length)?'<div class="meta h-mt30">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+
     '</div>').join('') : '<div class="leeg">Nog geen meldingen.</div>';
 }
 
@@ -320,7 +320,7 @@ async function laadMijnVerg(){
   $('#vgMijn').innerHTML = l.length ? l.map(v =>
     '<div class="item"><h4>'+esc(v.soortLabel)+'</h4><div class="meta">'+esc(v.omschrijving)+(v.locatie?' · '+esc(v.locatie):'')+'</div>'+
     '<span class="status '+(v.status==='verleend'?'op':v.status==='geweigerd'?'af':'')+'">'+esc(v.status)+'</span>'+
-    ((v.voorwaarden&&v.voorwaarden.length)?'<div class="meta" style="margin-top:.3rem;">Voorwaarden: '+v.voorwaarden.map(esc).join('; ')+'</div>':'')+
+    ((v.voorwaarden&&v.voorwaarden.length)?'<div class="meta h-mt30">Voorwaarden: '+v.voorwaarden.map(esc).join('; ')+'</div>':'')+
     '</div>').join('') : '<div class="leeg">Nog geen aanvragen.</div>';
 }
 
@@ -364,7 +364,7 @@ async function laadBekend(){
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het gemeenteloket is er voor inwoners met een RTG-account. Open de app en log in.</p>'+
-    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { start(); }
 </script>
 <button class="rahulfab" id="rahulFab" type="button">Vraag Rahul</button>

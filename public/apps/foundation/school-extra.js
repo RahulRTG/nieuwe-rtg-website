@@ -49,7 +49,7 @@
     }).join('') || '<div class="mini">Stel je eerste vraag; Rahul denkt geduldig met je mee, op jouw niveau.</div>';
     return kaart('Rahul Bijles', lijn +
       '<div style="display:flex;gap:.4rem;margin-top:.5rem;">' +
-      '<input class="veld" id="bijlesIn" placeholder="Wat wil je leren of snap je nog niet?" maxlength="600" style="flex:1;">' +
+      '<input class="veld h-flex1" id="bijlesIn" placeholder="Wat wil je leren of snap je nog niet?" maxlength="600">' +
       '<button class="knop mini" data-doe="bijles" data-klas="' + esc(kc) + '">Vraag</button></div>');
   }
 
@@ -112,7 +112,7 @@
       uit += kaart('Telefoonboom · klas ' + esc(kc),
         '<button class="knop mini" data-doe="belleraar" data-klas="' + esc(kc) + '">Bel de leraar in de app</button>' + alarm + takken +
         '<div class="rij" style="display:flex;gap:.4rem;margin-top:.4rem;">' +
-        '<input class="veld" data-nummer="' + esc(kc) + '" placeholder="' + (boom.nummerGezet ? 'Nummer staat erin; hier wijzigen' : 'Jullie telefoonnummer voor de boom') + '" style="flex:1;">' +
+        '<input class="veld h-flex1" data-nummer="' + esc(kc) + '" placeholder="' + (boom.nummerGezet ? 'Nummer staat erin; hier wijzigen' : 'Jullie telefoonnummer voor de boom') + '">' +
         '<button class="knop mini" data-doe="nummer" data-klas="' + esc(kc) + '">Bewaar</button></div>');
     }
     return uit;

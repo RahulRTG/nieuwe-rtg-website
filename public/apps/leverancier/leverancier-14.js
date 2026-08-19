@@ -1,3 +1,4 @@
+/* de eigen backoffice van de zaak */
     if (kantoorSec === 'bo'){
       // de eigen backoffice van de zaak, met dezelfde patronen als het
       // RTG-controlecentrum maar dan uitsluitend over dit bedrijf

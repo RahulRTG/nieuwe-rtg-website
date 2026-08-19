@@ -414,7 +414,7 @@ async function toonSite(adres,pad){
   }
 }
 
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
 else {
   const start=new URLSearchParams(location.search).get('adres');
   if(start){ const p=parseAdres(start); ga(p.adres.length>=2?{adres:p.adres,pad:p.pad}:'start'); } else ga('start');

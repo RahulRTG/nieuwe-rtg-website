@@ -1,4 +1,4 @@
-  /* --------------------------------------------------------- het blad */
+/* het blad dat van onderen opkomt */
   var scrim = null, blad = null, knop = null, laatstFocus = null;
 
   /* De titel zegt WAAR JE BENT: de naam van deze app, uit de navigatiebalk of

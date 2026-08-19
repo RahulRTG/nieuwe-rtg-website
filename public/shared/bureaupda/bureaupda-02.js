@@ -114,7 +114,7 @@
               '<div style="font-size:.82rem;line-height:1.55;"><b>' + esc(c[B.velden[0]]) + '</b> · ' + esc(c[B.velden[1]]) + '</div>'
             : '<div class="leeg">Nog geen concept.</div>') +
           (o.kritiek ? '<div style="margin-top:.45rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">' + esc(o.kritiek) + '</div>' : '') +
-          '<div class="rij" style="margin-top:.6rem;">' +
+          '<div class="rij h-mt60">' +
             '<button class="knop stil" data-concept="' + esc(o.id) + '">' + (c ? 'Herteken' : 'Teken') + '</button>' +
             '<button class="knop stil" data-kritiek="' + esc(o.id) + '">Kritiek</button>' +
             (nx ? '<button class="knop" data-next="' + esc(o.id) + '" data-s="' + esc(nx) + '" style="margin-left:auto;">→ ' + esc(nx) + '</button>' : '') +

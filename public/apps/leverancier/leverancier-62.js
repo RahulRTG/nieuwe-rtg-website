@@ -1,3 +1,4 @@
+/* de shift-samenvatting: het avondbriefingmoment */
     laadShift();
   }
 

@@ -1,3 +1,4 @@
+/* de meldingenlijst en het ongelezen-merk */
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +

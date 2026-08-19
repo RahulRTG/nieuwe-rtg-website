@@ -60,45 +60,45 @@
           (kl.tekenaars >= 2 ? ', waarvan minstens één onafhankelijk' : '') + '.' : '') + '</div>' +
 
       // 1. de klasse vaststellen
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="rij h-mt50">' +
         '<select class="veld" data-eklasse aria-label="Risicoklasse">' +
           opt(KADER.risico, 'klasse', 'naam', e.klasse) + '</select>' +
         (tek ? '<select class="veld" data-eklassedoor aria-label="Vastgesteld door">' + tek + '</select>' : '') +
         '<button class="knop stil" data-eklassezet type="button">' +
           (e.vastgesteld ? 'Klasse wijzigen' : 'Klasse vaststellen') + '</button></div>' +
-      '<input class="veld" data-eklassereden placeholder="Reden (alleen nodig bij VERLAGEN)" maxlength="300" style="margin-top:.35rem;">' +
+      '<input class="veld h-mt35" data-eklassereden placeholder="Reden (alleen nodig bij VERLAGEN)" maxlength="300">' +
       (e.vastgesteld ? '' : '<div class="gebrek">De klasse is nog niet door een mens vastgesteld.</div>') +
 
       // 2. de ethische review
-      (kl.review ? '<div class="sec" style="margin-top:.9rem;">Ethische review</div>' +
+      (kl.review ? '<div class="sec h-mt90">Ethische review</div>' +
         (review.length ? review.map(function (r) {
           return '<div class="log"><b>' + esc(r.oordeel) + '</b> door ' + esc(r.door) +
             (r.onafhankelijk ? ' (onafhankelijk)' : '') + (r.notitie ? '<br>' + esc(r.notitie) : '') + '</div>';
         }).join('') : '<div class="leeg">Nog geen handtekening.</div>') +
-        (tek ? '<div class="rij" style="margin-top:.35rem;">' +
+        (tek ? '<div class="rij h-mt35">' +
           '<select class="veld" data-erdoor aria-label="Tekenaar">' + tek + '</select>' +
           '<select class="veld" data-eroordeel aria-label="Oordeel">' +
             '<option value="akkoord">akkoord</option><option value="voorwaarden">voorwaarden</option>' +
             '<option value="afgewezen">afgewezen</option></select></div>' +
-          '<input class="veld" data-ernotitie placeholder="Toelichting (verplicht bij voorwaarden of afwijzing)" maxlength="500" style="margin-top:.35rem;">' +
+          '<input class="veld h-mt35" data-ernotitie placeholder="Toelichting (verplicht bij voorwaarden of afwijzing)" maxlength="500">' +
           '<button class="knop stil" data-erzet type="button">Teken de review</button>'
           : GEEN_TEKENAAR) : '') +
 
       // 3. de privacytoets
-      (kl.privacy ? '<div class="sec" style="margin-top:.9rem;">Privacytoets</div>' +
+      (kl.privacy ? '<div class="sec h-mt90">Privacytoets</div>' +
         (e.privacytoets
           ? '<div class="log">Uitgevoerd door ' + esc(e.privacytoets.door) + ' &middot; ' +
               (e.privacytoets.velden || []).length + ' velden<br>Bewust weggelaten: ' + esc(e.privacytoets.weggelaten) + '</div>'
           : '<div class="gebrek">De privacytoets ontbreekt.</div>') +
-        '<input class="veld" data-pvelden placeholder="Welke gegevens verzamelt u? (komma\'s ertussen)" maxlength="600" style="margin-top:.35rem;">' +
-        '<input class="veld" data-pgrond placeholder="Op welke grondslag?" maxlength="200" style="margin-top:.35rem;">' +
-        '<input class="veld" data-pweg placeholder="Wat laat u bewust WEG? (dit veld is het punt)" maxlength="300" style="margin-top:.35rem;">' +
-        (tek ? '<div class="rij" style="margin-top:.35rem;"><select class="veld" data-pdoor aria-label="Uitgevoerd door">' + tek + '</select>' +
+        '<input class="veld h-mt35" data-pvelden placeholder="Welke gegevens verzamelt u? (komma\'s ertussen)" maxlength="600">' +
+        '<input class="veld h-mt35" data-pgrond placeholder="Op welke grondslag?" maxlength="200">' +
+        '<input class="veld h-mt35" data-pweg placeholder="Wat laat u bewust WEG? (dit veld is het punt)" maxlength="300">' +
+        (tek ? '<div class="rij h-mt35"><select class="veld" data-pdoor aria-label="Uitgevoerd door">' + tek + '</select>' +
           '<button class="knop stil" data-pzet type="button">Leg de privacytoets vast</button></div>' : GEEN_TEKENAAR)
         : '') +
 
       // 4. toestemming
-      '<div class="sec" style="margin-top:.9rem;">Toestemming</div>' +
+      '<div class="sec h-mt90">Toestemming</div>' +
       '<div class="leeg">Nu: ' + esc((e.toestemming || {}).regime || 'geen') +
         ((e.toestemming || {}).ouderlijk ? ' &middot; met ouderlijke toestemming' : '') + '</div>' +
       '<div class="rij"><select class="veld" data-tregime aria-label="Toestemmingsregime">' +
@@ -107,15 +107,15 @@
         }).join('') + '</select>' +
         '<label class="chip"><input type="checkbox" data-touder' +
           ((e.toestemming || {}).ouderlijk ? ' checked' : '') + '> ouderlijk</label></div>' +
-      '<input class="veld" data-ttekst placeholder="Wat vertelt u de deelnemer precies?" maxlength="1000" style="margin-top:.35rem;">' +
+      '<input class="veld h-mt35" data-ttekst placeholder="Wat vertelt u de deelnemer precies?" maxlength="1000">' +
       '<button class="knop stil" data-tzet type="button">Leg de toestemming vast</button>' +
 
       // 5. stopcriteria
-      '<div class="sec" style="margin-top:.9rem;">Stopcriteria</div>' +
+      '<div class="sec h-mt90">Stopcriteria</div>' +
       ((e.stopcriteria || []).length
         ? (e.stopcriteria).map(function (c) { return '<div class="log">' + esc(c.tekst) + '</div>'; }).join('')
         : '<div class="gebrek">Er is geen enkel stopcriterium beschreven.</div>') +
-      '<div class="rij" style="margin-top:.35rem;"><input class="veld" data-sctekst placeholder="Waarbij stopt dit onderzoek direct?" maxlength="300">' +
+      '<div class="rij h-mt35"><input class="veld" data-sctekst placeholder="Waarbij stopt dit onderzoek direct?" maxlength="300">' +
         '<button class="knop stil" data-sczet type="button">Voeg toe</button></div>' +
 
       '</div>';

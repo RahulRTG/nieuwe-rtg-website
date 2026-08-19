@@ -1,3 +1,4 @@
+/* de zigzag: de bits in de QR-matrix leggen */
     var n = M.n, idx = 0, dir = -1, col = n - 1;
     while (col > 0) {
       if (col === 6) col--; // sla timing-kolom over

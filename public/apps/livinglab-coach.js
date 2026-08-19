@@ -30,7 +30,7 @@
         '<button class="knop stil" data-coach type="button">Vraag</button></div>' +
       '<div class="ai" data-cuit hidden></div>' +
 
-      '<div class="sec" style="margin-top:.9rem;">Welke methode past hierbij?</div>' +
+      '<div class="sec h-mt90">Welke methode past hierbij?</div>' +
       '<div class="rij">' +
         '<select class="veld" data-cambitie aria-label="Hoe sterk wilt u het maken?">' +
           KADER.bewijs.map(function (b) {
@@ -41,7 +41,7 @@
       '<div class="leeg" data-cmuit></div>' +
 
       (s.stap === 'resultaten' || s.stap === 'besluit'
-        ? '<div class="sec" style="margin-top:.9rem;">Laat de coach een conclusie formuleren</div>' +
+        ? '<div class="sec h-mt90">Laat de coach een conclusie formuleren</div>' +
           '<div class="rij"><input class="veld" data-cctekst placeholder="Waar moet hij naar kijken?" maxlength="300">' +
             '<button class="knop stil" data-cconc type="button">Stel voor</button></div>' +
           '<div class="leeg">Het voorstel komt binnen als <b>aanname</b> en met het label "voorstel van de coach". ' +

@@ -24,6 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
+const { gedektIn } = require('./lib/routedekking');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -51,11 +52,24 @@ const publicJs = alle.filter(p => p.includes('/public/') && p.endsWith('.js') &&
 const lees = p => { try { return fs.readFileSync(p, 'utf8'); } catch (e) { return ''; } };
 const kort = p => path.relative(WORTEL, p);
 
-/* Bouwsel is geen bron. public/dist/** is geminificeerd, en public/apps/x.js
-   is de samengeplakte versie van public/apps/x/NN-*.js. Een melding op een
-   bouwsel is dezelfde melding drie keer; we kijken alleen naar de bron. */
-const isBouwsel = p => p.includes('/public/dist/') ||
-  (/\/public\/apps\/[^/]+\.js$/.test(p) && fs.existsSync(p.replace(/\.js$/, '')));
+/* Bouwsel is geen bron. public/dist/** is geminificeerd, en een bundel is de
+   samengeplakte versie van zijn delen. Een melding op een bouwsel is dezelfde
+   melding twee keer; we kijken alleen naar de bron.
+
+   EN DE LIJST KWAM UIT EEN PADPATROON IN PLAATS VAN UIT DE BRON. Hier stond
+   `/public/apps/<naam>.js` plus "bestaat er een map met dezelfde naam". Dat
+   dekte 20 van de 51 bundels. De andere 31 wonen in public/shared/ -- glyf,
+   klok3d, i18n, ios, basis, en sinds vandaag media -- en werden dus GEWOON
+   MEEGETELD naast hun eigen delen: 643 kilobyte tekst die twee keer in elke
+   telling zat. Bij `dubbelingen` is dat het ergste denkbare geval, want een
+   bundel is per definitie honderd procent gelijk aan zijn delen.
+
+   De lijst komt nu uit scripts/bundel.js zelf, want daar staat welke bundels er
+   zijn. Een tweede lijst hier zou uit de pas lopen met de eerste, en dat is
+   precies hoe deze fout is ontstaan (LAT.md regel 4). */
+const BUNDELPADEN = new Set(Object.keys(require('./bundel').bundels)
+  .map(n => path.join(WORTEL, 'public', n)));
+const isBouwsel = p => p.includes('/public/dist/') || BUNDELPADEN.has(p);
 
 /* Alleen wat de gebruiker echt te zien krijgt telt mee: tekst tussen
    aanhalingstekens, op regels die geen commentaar zijn. Een regel die het
@@ -135,22 +149,10 @@ function dekking() {
      journaal dat de server tijdens de testrun zelf schrijft (server/routelog.js).
      Wat daar in staat is aangeroepen. Deze teller blijft staan omdat hij snel is
      en geen suite hoeft te draaien -- maar hij is de indicatie, niet het bewijs. */
-  function gedekt(route) {
-    if (testTekst.includes(route)) return true;
-    /* Ook de vorm MET leidende slash maar ZONDER /api-prefix. Dat is hoe een
-       test hem schrijft als haar helper de prefix zelf plakt:
-       `l.call('/member/boardroom/zetveel')`. Die endpoints werden geteld als
-       ongedekt terwijl de test ze wel degelijk aanroept -- de teller keek naar
-       de verkeerde vorm. Een indicatie die de goede gevallen mist, stuurt je
-       naar werk dat al gedaan is. */
-    const staart = route.slice(5);          // zonder '/api/'
-    for (const vorm of [staart, '/' + staart]) {
-      if (testTekst.includes("'" + vorm + "'") ||
-          testTekst.includes('"' + vorm + '"') ||
-          testTekst.includes('`' + vorm + '`')) return true;
-    }
-    return false;
-  }
+  /* De vorm zelf woont in ./lib/routedekking.js: scripts/nieuweroutes.js stelt
+     dezelfde vraag over de routes die in een tak NIEUW zijn, en twee kopieen van
+     deze zeef zouden binnen een week uiteenlopen (LAT.md regel 4). */
+  const gedekt = (route) => gedektIn(route, testTekst);
   const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
   if (pct < 60) meld('scheef', 'dekking', 'Minder dan zestig procent van de endpoints komt in een test voor (' + pct + '%).',
@@ -206,7 +208,9 @@ const GEWOGEN = new Map([
   ['public/apps/app-main/app-main-48.js | Uw deel is betaald.',
     'bevestiging na een geslaagde betaling via /splits/betaal'],
   ['server/kern/fluister/acties.js | is betaald;',
-    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen']
+    'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen'],
+  ['server/kern/mobiliteit/reis.js | De vervoerbewijzen zijn betaald.',
+    'hangt aan nuBetaald: de zin valt alleen als de boeking in het grootboek van dit huis echt is afgerekend, en anders staat er null']
 ]);
 
 function beloftes() {

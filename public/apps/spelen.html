@@ -176,32 +176,32 @@
   <section id="vNieuw" hidden>
     <div class="kop2"><h1 id="nTitel">Nieuw potje</h1><a class="terug" data-terug>← terug</a></div>
     <div class="kaart blok" id="nGrootteBlok" hidden>
-      <div class="sec" style="margin-top:0;">Met hoeveel?</div>
+      <div class="sec h-mt0">Met hoeveel?</div>
       <div class="keuzerij" id="nGroottes"></div>
     </div>
     <div class="kaart blok" id="nTaalBlok" hidden>
-      <div class="sec" style="margin-top:0;">In welke taal?</div>
+      <div class="sec h-mt0">In welke taal?</div>
       <div class="keuzerij" id="nTalen"></div>
     </div>
     <!-- Wat er aan DIT spel te kiezen valt. De keuzes komen van de server (uit
          de descriptor): een lijst in deze pagina zou stil achterlopen zodra er
          een stad of een vorm bij komt. -->
     <div class="kaart blok" id="nVariantBlok" hidden>
-      <div class="sec" style="margin-top:0;">Hoe wil je spelen?</div>
+      <div class="sec h-mt0">Hoe wil je spelen?</div>
       <div id="nVarianten"></div>
     </div>
     <!-- alleen bij spellen die een beurt van uren of dagen aankunnen -->
     <div class="kaart blok" id="nTempoBlok" hidden>
-      <div class="sec" style="margin-top:0;">Hoeveel tijd per beurt?</div>
+      <div class="sec h-mt0">Hoeveel tijd per beurt?</div>
       <div class="keuzerij" id="nTempi"></div>
       <div class="leeg" style="padding:.3rem 0 0;">Bij een lange beurt hoef je niet tegelijk online te zijn. Loopt de tijd af, dan kan je tegenstander de partij toewijzen; vanzelf gebeurt er niets.</div>
     </div>
     <div class="kaart blok">
-      <div class="sec" style="margin-top:0;">Tegen wie?</div>
+      <div class="sec h-mt0">Tegen wie?</div>
       <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
       <!-- je team in een tik; alleen zichtbaar als je er een hebt -->
       <div class="keuzerij" id="nTeams" hidden></div>
-      <input class="veld" id="nCodenaam" placeholder="Of nodig uit op codenaam (bijv. Gouden Ibis 1234)" style="margin-top:.3rem;">
+      <input class="veld h-mt30" id="nCodenaam" placeholder="Of nodig uit op codenaam (bijv. Gouden Ibis 1234)">
       <div class="leeg" style="padding:.3rem 0 0;">Samen spelen maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <div class="leeg" id="nProost" hidden style="padding:.3rem 0 0;">Proost is 18+: iedereen in het potje heeft een geverifieerde volwassen leeftijd nodig. Drink met mate; water doet ook gewoon mee.</div>
       <div class="leeg" id="nSeconden" hidden style="padding:.3rem 0 0;">30 Seconden speel je 2 tegen 2 (vier spelers): jij en speler 3 tegen speler 2 en 4. Omschrijven doe je via een belletje of aan tafel.</div>
@@ -235,7 +235,7 @@
       <div class="leeg" id="damInfo"></div>
     </div>
     <div id="sRummi" hidden>
-      <div class="sec" style="margin-top:0;">De tafel <small id="rZak"></small></div>
+      <div class="sec h-mt0">De tafel <small id="rZak"></small></div>
       <div id="rTafel"></div>
       <div class="sec">Jouw rek <small>(tik stenen aan en leg ze)</small></div>
       <div class="rset" id="rRek" style="cursor:default;border-style:solid;"></div>
@@ -1466,7 +1466,7 @@ function tekenMagnaatEco(){
   const score=(hu.scores?Object.entries(hu.scores):[]).map(([k,v])=>'<span class="chip">'+esc(k)+' <b>'+v+'</b></span>').join('');
   hv.innerHTML='<div class="sec">Hospitality Universe <small>live testmodus</small></div>'+
     '<div class="pinfo"><b>'+(hu.status==='live'?'SIMULATIE LIVE':hu.status==='afgerond'?'DIENST AFGEROND':'KLAAR VOOR EEN DIENST')+'</b><br><small>'+
-    esc((hu.bron&&hu.bron.soort)||'synthetisch')+' · moment '+(hu.tick||0)+' · '+esc(hu.fase||'voorbereiding')+'</small><div class="keuzerij" style="margin-top:.7rem;">'+score+'</div></div>'+
+    esc((hu.bron&&hu.bron.soort)||'synthetisch')+' · moment '+(hu.tick||0)+' · '+esc(hu.fase||'voorbereiding')+'</small><div class="keuzerij h-mt70">'+score+'</div></div>'+
     (hu.status==='gereed'?'<div class="keuzerij">'+['goud','rood','zwart','platina'].map(x=>'<button class="chip" data-hstart="'+x+'">'+x+'</button>').join('')+'</div><div class="keuzerij"><input class="veld" id="huCode" maxlength="8" placeholder="Anonieme live-code"><button class="chip" data-hkoppel>Koppel tellingen</button></div>':'')+
     (hu.status==='live'?'<div class="keuzerij"><button class="chip aan" data-hstap>Speel volgend moment</button>'+['ziek','allergie','regen','pin','koeling','dubbel','document','levering','noshow','privacy'].map(x=>'<button class="chip mini" data-hchaos="'+x+'">+'+x+'</button>').join('')+'</div>':'')+
     (hu.incidenten||[]).filter(x=>x.status==='open').map(x=>'<div class="rij"><div class="nm">'+esc(x.titel)+'<small>'+esc(x.as)+' · menselijke keuze vereist</small></div><div class="keuzerij">'+x.keuzes.map(k=>'<button class="chip mini" data-hbesluit="'+esc(x.id)+'" data-keuze="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div></div>').join('')+

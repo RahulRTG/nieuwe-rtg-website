@@ -53,7 +53,7 @@
         '" style="height:' + (n === 0 ? 4 : Math.round(8 + n / top * 44)) + 'px" title="' + n + ' afspraken"></div>' +
         '<div class="bl-lbl">' + (isNaN(x) ? '' : DAGL[x.getDay()]) + '</div></div>';
     }).join('') + '</div>' +
-    '<p class="stil" style="margin-top:.6rem;">' + b.vrijeDagen + ' lege dag(en) &middot; ' +
+    '<p class="stil h-mt60">' + b.vrijeDagen + ' lege dag(en) &middot; ' +
       b.avonden + ' avondafspraken &middot; groen is een dag zonder verplichtingen.</p>';
   }
 
@@ -90,7 +90,7 @@
         '<span style="white-space:nowrap;">' +
         '<button class="knop" type="button" data-ropen="' + esc(x.naam) + '">Lees</button> ' +
         '<button class="knop stilrand" type="button" data-rwis="' + esc(x.naam) + '" aria-label="wis recept">&#10005;</button></span></div>';
-    }).join('') || '<p class="stil" style="margin-top:.4rem;">Nog geen recepten bewaard.</p>';
+    }).join('') || '<p class="stil h-mt40">Nog geen recepten bewaard.</p>';
   }
 
   async function bewaar() {

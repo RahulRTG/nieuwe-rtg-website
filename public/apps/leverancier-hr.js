@@ -39,16 +39,16 @@
         h += '<div class="sub" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.58rem;margin-top:0.45rem;">' + T(FASEN[fase][0], FASEN[fase][1]) + '</div>' +
           st2.map(s => '<button class="obtn' + (s.klaar ? '' : ' ghost') + '" data-hrvink="' + t.id + '" data-stap="' + s.id + '" style="display:block;width:100%;text-align:left;margin-top:0.25rem;font-size:0.76rem;">' + (s.klaar ? '✓ ' : '○ ') + esc(s.tekst) + '</button>').join('');
       }
-      h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="st-in" data-hrstapin="' + t.id + '" placeholder="' + T('hr2.stap', 'Eigen stap toevoegen') + '" style="flex:1;">' +
+      h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="st-in h-flex1" data-hrstapin="' + t.id + '" placeholder="' + T('hr2.stap', 'Eigen stap toevoegen') + '">' +
         '<button class="obtn" data-hrstap="' + t.id + '">+</button></div></div>';
     }
     const zonder = (ctx.staff || []).filter(s => !open.some(t => t.staffId === s.id));
     if (zonder.length){
-      h += '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;"><select class="st-in" id="hrStartWie" style="flex:1;">' +
+      h += '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;"><select class="st-in h-flex1" id="hrStartWie">' +
         zonder.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('') + '</select>' +
         '<button class="obtn primary" id="hrStart">' + T('hr2.start', 'Start traject') + '</button></div>';
     }
-    if (klaar.length) h += '<div class="tkc-who" style="margin-top:0.5rem;">✓ ' + klaar.length + ' ' + T('hr2.afgerond', 'traject(en) afgerond.') + '</div>';
+    if (klaar.length) h += '<div class="tkc-who h-mt50">✓ ' + klaar.length + ' ' + T('hr2.afgerond', 'traject(en) afgerond.') + '</div>';
     return h + '</div>';
   }
 
@@ -58,7 +58,7 @@
       '<div class="tkc-who">' + T('hr2.gesprek.s', 'Vast ritme, geen scores: wat gaat goed, wat heeft aandacht, welke afspraken. Alleen management en de medewerker zelf zien dit.') + '</div>' +
       g.slice(-8).reverse().map(x => '<div class="st-row" style="cursor:pointer;" data-hropen="' + x.id + '"><span>' + esc(x.name) + '<span class="sub">' + esc(x.datum) + ' · ' + esc(x.onderwerp) + '</span></span><span class="sub">' + (openGesprek === x.id ? '−' : '+') + '</span></div>' +
         (openGesprek === x.id ? '<div class="tkc-who" style="border-left:2px solid var(--gold);padding-left:0.7rem;">' + esc(x.verslag) + (x.afspraken ? '<br><b>' + T('hr2.afspraken', 'Afspraken') + ':</b> ' + esc(x.afspraken) : '') + '</div>' : '')).join('');
-    h += '<div class="st-form" style="margin-top:0.5rem;">' + staffKeus('hrGwie') +
+    h += '<div class="st-form h-mt50">' + staffKeus('hrGwie') +
       '<input class="st-in" id="hrGond" placeholder="' + T('hr2.onderwerp', 'Onderwerp, bijv. eerste kwartaal') + '">' +
       '<textarea class="st-in" id="hrGver" placeholder="' + T('hr2.verslag', 'Verslag: wat gaat goed, wat heeft aandacht') + '" style="min-height:56px;resize:vertical;"></textarea>' +
       '<input class="st-in" id="hrGafs" placeholder="' + T('hr2.afspraken', 'Afspraken') + '">' +
@@ -75,9 +75,9 @@
       (verlopend.length ? verlopend.map(v => '<div class="st-row"><span><b>' + esc(v.name) + '</b> · ' + esc(v.soort) + '</span><span class="sub" style="' + verloopKleur(v) + '">' + (v.verlopen ? T('hr2.verlopen', 'verlopen') : T('hr2.verloopt', 'verloopt') + ' ' + esc(v.verlooptOp)) + '</span></div>').join('') : '') +
       c.slice(-10).reverse().map(x => '<div class="st-row"><span>' + esc(x.name) + '<span class="sub">' + esc(x.soort) + (x.verlooptOp ? ' · t/m ' + esc(x.verlooptOp) : '') + '</span></span>' +
         '<button class="obtn warn" data-hrcweg="' + x.id + '">✕</button></div>').join('');
-    h += '<div class="st-form" style="margin-top:0.5rem;">' + staffKeus('hrCwie') +
+    h += '<div class="st-form h-mt50">' + staffKeus('hrCwie') +
       '<input class="st-in" id="hrCsoort" placeholder="' + T('hr2.soort', 'Soort, bijv. EHBO of BHV') + '">' +
-      '<div style="display:flex;gap:0.4rem;"><input class="st-in" id="hrCtot" type="date" title="' + T('hr2.verloopt', 'verloopt') + '" style="flex:1;"></div>' +
+      '<div style="display:flex;gap:0.4rem;"><input class="st-in h-flex1" id="hrCtot" type="date" title="' + T('hr2.verloopt', 'verloopt') + '"></div>' +
       '<button class="obtn primary" id="hrCnieuw" style="align-self:flex-start;">' + T('hr2.toevoegen', 'Voeg toe') + '</button></div></div>';
     return h;
   }

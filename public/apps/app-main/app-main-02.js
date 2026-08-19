@@ -1,3 +1,4 @@
+/* de API-laag van de app: elke aanroep met token, taal en foutafhandeling */
     if (!API.token) return;
     try {
       const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });

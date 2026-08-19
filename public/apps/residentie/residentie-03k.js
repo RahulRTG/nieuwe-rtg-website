@@ -47,8 +47,8 @@
     $('#spelKeuze').innerHTML = '<h2>De tafel is gedekt</h2>' +
       '<div class="sub">' + esc(naam) + ' met ' + esc(wie) + ' -- de uitnodiging is onderweg</div>' +
       '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-      '<button class="knop2" id="tafelGa" type="button" style="flex:1;">Naar de speeltafel</button>' +
-      '<button class="knop2 stil2" id="tafelHier" type="button" style="flex:1;">Hier wachten</button></div>';
+      '<button class="knop2 h-flex1" id="tafelGa" type="button">Naar de speeltafel</button>' +
+      '<button class="knop2 stil2 h-flex1" id="tafelHier" type="button">Hier wachten</button></div>';
     $('#spelLaag').classList.add('open');
     $('#tafelGa').addEventListener('click', () => { location.href = '/apps/spelen.html?potje=' + encodeURIComponent(id) + '&pas=rtg'; });
     $('#tafelHier').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
@@ -65,8 +65,8 @@
     $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
       '<div class="sub">' + esc(uit.van || 'een lid') + ' vraagt u aan de speeltafel voor een potje ' + esc(uit.naam || KASTNAAM[d.soort] || 'spel') + '</div>' +
       '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-      '<button class="knop2" id="bordJa" type="button" style="flex:1;">Speel mee</button>' +
-      '<button class="knop2 stil2" id="bordNee" type="button" style="flex:1;">Nu even niet</button></div>';
+      '<button class="knop2 h-flex1" id="bordJa" type="button">Speel mee</button>' +
+      '<button class="knop2 stil2 h-flex1" id="bordNee" type="button">Nu even niet</button></div>';
     $('#spelLaag').classList.add('open');
     $('#bordJa').addEventListener('click', async () => {
       try {

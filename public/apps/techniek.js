@@ -1,3 +1,4 @@
+/* de techniekpagina: de basis */
 (function(){
   var $ = function(s){ return document.querySelector(s); };
   var el = Util.el, vervang = Util.vervang;
@@ -86,6 +87,7 @@
     }}, 'Intrekken');
     return el('div',{class:'zeker'}, el('div',{class:'mid'}, el('div',{class:'naam'}, t.naam||'?'), el('div',{class:'muted'}, t.email||('#'+t.id))), knop);
   }
+/* eigenaarschap overdragen, en de modernisering door de AI */
   /* ---------- eigenaarschap overdragen ----------
      Bewust stroef: een bevestiging waarin het adres letterlijk staat, en het
      eigen wachtwoord erbij. Wie dit per ongeluk aanklikt raakt anders in één
@@ -179,6 +181,7 @@
   });
   $('#bAvTest').addEventListener('click', function(){
     var eicar = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+/* de virusscanner beproeven met een EICAR-bestand */
     api('/api/techniek/wacht/av-test', { method:'POST', body:{ inhoud:eicar, naam:'eicar.com', mime:'application/octet-stream' } })
       .then(function(d){ toast('Scanner: ' + d.resultaat.verdict + ' (' + (d.resultaat.redenen[0]||'') + ')'); laadWacht(); })
       .catch(function(e){ toast(e.message); });
@@ -427,6 +430,7 @@
     }
     // overzicht: globale schakel + doelgroep-pillen (alleen als >1 doelgroep)
     var wachtG = isWacht(f.id, null);
+/* een functie globaal aan- of uitzetten */
     var schakel = el('button',{class:'schakel '+(f.aan?'aan':'uit'), disabled: wachtG||null,
       'aria-label':(f.aan?'Globaal uitzetten: ':'Globaal aanzetten: ')+f.naam,
       onclick:function(){ zetFunctie({ id:f.id, aan:!f.aan }); }}, f.aan?'AAN':'UIT');
@@ -495,6 +499,7 @@
       kaart);
   }
 
+/* het doelgroepfilter met chips, en het zoeken erin */
   /* ---------- doelgroep-filter (chips) + zoeken ---------- */
   function chip(id, label, kleur){
     var actief = actieveDg===id;
@@ -607,6 +612,7 @@
   });
   var noodremAan = true;
   $('#bBevAuto').addEventListener('click', function(){
+/* de automatische noodrem aan- of uitzetten */
     if (noodremAan && !confirm('De automatische noodrem uitzetten? Bij een brute-force-aanval springen de zekeringen dan NIET meer vanzelf.')) return;
     api('/api/techniek/beveiliging/auto', { method:'POST', body:{ aan: !noodremAan } })
       .then(function(d){ toast(d.autoReactie ? 'Noodrem aan: zekeringen springen vanzelf bij een aanval.' : 'Noodrem uit.'); laad(); })

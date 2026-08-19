@@ -1,3 +1,4 @@
+/* een teamtip plaatsen */
     if (t.kanBeheren) {
       const titelInp = E('input', { placeholder: T('pd.tr.title', 'Titel, bijv. Onze wijn-aanpak'), style: { width: '100%', marginBottom: '0.4rem' } });
       const tekstInp = E('input', { placeholder: T('pd.tr.text', 'De tip in een of twee zinnen...') });

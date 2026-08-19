@@ -1,3 +1,4 @@
+/* een activiteit toevoegen of verwijderen */
     document.querySelectorAll('[data-tkdel]').forEach(k => k.addEventListener('click', async () => {
       try { await API.call('/supplier/activiteit', { id: k.dataset.tkdel, weg: true }); await refresh(); await laadProgramma(); openTab('tickets'); } catch(e){ toast(e.message); }
     }));

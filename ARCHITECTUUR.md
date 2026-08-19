@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3990 |
-| servermodules (`server/**/*.js`) | 2179 |
-| routebestanden (`server/routes/**`) | 454 |
-| kernmodules (`server/kern/**`) | 1336 |
+| servermodules (`server/**/*.js`) | 2198 |
+| routebestanden (`server/routes/**`) | 456 |
+| kernmodules (`server/kern/**`) | 1339 |
 | schermen (`public/**/*.html`) | 259 |
-| gedeelde browsermodules (`public/shared/*.js`) | 221 |
-| toetsbestanden (`test/*.test.js`) | 896 |
+| gedeelde browsermodules (`public/shared/*.js`) | 223 |
+| toetsbestanden (`test/*.test.js`) | 905 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -65,6 +65,7 @@ inzagelog
 verzoekketen
 poortwachters
 ai
+leverancierpoort
 diensten
 media
 kluis
@@ -138,10 +139,10 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(169) auth(103) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(25)
+app(170) auth(104) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(25)
 accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
 boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) findSupplier(10)
-express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8)
+rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) logActivity(8)
 noteFailedTry(7) kern(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6) talen(6)
 loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```

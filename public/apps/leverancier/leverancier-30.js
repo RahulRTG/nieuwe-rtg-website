@@ -1,3 +1,4 @@
+/* de boerderijkaart: dier of gewas, met zijn cijfers */
     const o = boer, st = o.stats || {}, isDier = o.kind !== 'gewas', isGewas = o.kind !== 'dier';
     const sel = 'style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt);"';
     let html = '';

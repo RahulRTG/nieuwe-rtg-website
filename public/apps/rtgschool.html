@@ -73,12 +73,12 @@
   <div class="kaart">
     <div class="sec">Mijn leerpaspoort</div>
     <div id="paspoort" class="leeg">Laden...</div>
-    <div class="rij" style="margin-top:.5rem;">
+    <div class="rij h-mt50">
       <select class="veld" id="ladderKies" aria-label="Kies een fase op de ladder"></select>
       <button class="knop" id="inschrijfKnop" type="button">Inschrijven</button>
       <button class="knop stil" id="jaarKnop" type="button" hidden>Jaar erbij</button>
     </div>
-    <p class="eerlijk" id="eerlijk" style="margin-top:.6rem;"></p>
+    <p class="eerlijk h-mt60" id="eerlijk"></p>
   </div>
 
   <div class="deel" id="deelLeren">Leren en oefenen</div>
@@ -114,7 +114,7 @@
       <button class="knop" id="examenStartKnop" type="button">Start de training</button>
     </div>
     <div id="examenBlok" hidden>
-      <div class="sec" style="margin-top:.6rem;">Vraag <span id="examenStand">1/10</span></div>
+      <div class="sec h-mt60">Vraag <span id="examenStand">1/10</span></div>
       <div class="vraagblok" id="examenVraag"></div>
       <div class="opties" id="examenOpties"></div>
       <div class="rij"><input class="veld" id="examenIn" placeholder="Jouw antwoord" autocomplete="off"><button class="knop" id="examenStuur" type="button">Antwoord</button></div>
@@ -133,7 +133,7 @@
   <div class="kaart">
     <div class="sec">Rahul Bijles: jouw eigen bijlesleraar</div>
     <div class="chat" id="bijlesLog"><div class="leeg">Rahul kent je niveau uit je leerpaspoort en legt uit op jouw tempo. Stel je vraag.</div></div>
-    <div class="rij" style="margin-top:.5rem;"><input class="veld" id="bijlesIn" placeholder="Bijv. leg breuken nog eens uit" maxlength="600"><button class="knop" id="bijlesStuur" type="button">Vraag</button></div>
+    <div class="rij h-mt50"><input class="veld" id="bijlesIn" placeholder="Bijv. leg breuken nog eens uit" maxlength="600"><button class="knop" id="bijlesStuur" type="button">Vraag</button></div>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
@@ -150,7 +150,7 @@ const api = (pad, body) => fetch(pad, {
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="kaart"><h2 style="font-size:1.2rem;">Log eerst in</h2>'+
     '<p class="leeg">RTG School hoort bij je RTG-account: je leerpaspoort gaat een leven lang met je mee. Open de app en log in.</p>'+
-    '<p style="margin-top:.6rem;"><a href="/apps/app.html" style="color:var(--gold);">Naar de app &rarr;</a></p></div>';
+    '<p class="h-mt60"><a href="/apps/app.html" style="color:var(--gold);">Naar de app &rarr;</a></p></div>';
 } else if (window.RTGSchool) { RTGSchool.start(); }
 else { window.addEventListener('load', () => window.RTGSchool && RTGSchool.start()); }
 </script>

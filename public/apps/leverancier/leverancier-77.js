@@ -1,3 +1,4 @@
+/* de paskamerverzoeken van een retailzaak */
     const pk = wvRetail.paskamer || [];
     html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
       (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+

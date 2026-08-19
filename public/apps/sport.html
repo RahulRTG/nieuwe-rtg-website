@@ -145,7 +145,7 @@ async function laadStand(){
   $('#inhoud').innerHTML='<div class="item"><h4>'+esc(d.competitie||'De stand')+'</h4><div style="overflow-x:auto;"><table>'+
     '<tr><th>#</th><th></th><th>G</th><th>W</th><th>GL</th><th>V</th><th>+/-</th><th>P</th></tr>'+
     d.tabel.map((r,i)=>'<tr'+(r.team===d.team?' class="eigen"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.team)+'</td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.gl+'</td><td>'+r.v+'</td><td>'+(r.dv-r.dt)+'</td><td><b>'+r.p+'</b></td></tr>').join('')+
-    '</table></div><div class="meta" style="margin-top:.5rem;">Live berekend uit de uitslagen die de club invoert.</div></div>';
+    '</table></div><div class="meta h-mt50">Live berekend uit de uitslagen die de club invoert.</div></div>';
 }
 
 async function laadTickets(voorWedstrijd){
@@ -158,12 +158,12 @@ async function laadTickets(voorWedstrijd){
   if(!VAK) VAK=(p.vakken[0]||{}).id;
   $('#inhoud').innerHTML=
     '<div class="item" style="background:var(--card2);"><h4>Kies de wedstrijd</h4>'+
-    '<div class="rij"><select class="veld" id="tkW" style="flex:1;">'+thuis.map(w=>'<option value="'+esc(w.wedstrijdId)+'"'+(voorWedstrijd===w.wedstrijdId?' selected':'')+'>'+esc(w.club)+' - '+esc(w.tegen)+' · '+esc(w.datum)+' '+esc(w.tijd)+'</option>').join('')+'</select></div></div>'+
+    '<div class="rij"><select class="veld h-flex1" id="tkW">'+thuis.map(w=>'<option value="'+esc(w.wedstrijdId)+'"'+(voorWedstrijd===w.wedstrijdId?' selected':'')+'>'+esc(w.club)+' - '+esc(w.tegen)+' · '+esc(w.datum)+' '+esc(w.tijd)+'</option>').join('')+'</select></div></div>'+
     '<h3 style="font-size:1rem;margin:.2rem 0 .4rem;">De plattegrond van het stadion</h3>'+
     p.vakken.map(v=>'<button class="vak'+(v.id===VAK?' aan':'')+'" data-vak="'+esc(v.id)+'"><b>'+esc(v.naam)+'</b> · '+eur(v.prijsCenten)+' p.p.'+
       '<div class="vz">'+(vzBij(v.id)||'vrij vak')+'</div></button>').join('')+
-    '<div class="item"><div class="rij" style="margin-top:0;"><select class="veld" id="tkN">'+[1,2,3,4,5,6,7,8].map(n=>'<option value="'+n+'">'+n+' ticket'+(n>1?'s':'')+'</option>').join('')+'</select>'+
-    '<button class="knop" id="tkGo" style="flex:1;">Reserveer</button></div>'+
+    '<div class="item"><div class="rij h-mt0"><select class="veld" id="tkN">'+[1,2,3,4,5,6,7,8].map(n=>'<option value="'+n+'">'+n+' ticket'+(n>1?'s':'')+'</option>').join('')+'</select>'+
+    '<button class="knop h-flex1" id="tkGo">Reserveer</button></div>'+
     '<div class="meta">Afrekenen aan de poort: contant of RTG Pay bij de kassa. Uw code licht op onder Mijn tickets.</div></div>';
   document.querySelectorAll('[data-vak]').forEach(b2=>b2.onclick=()=>{ VAK=b2.dataset.vak; laadTickets($('#tkW').value); });
   $('#tkGo').onclick=async()=>{

@@ -35,7 +35,7 @@
           (b.voorbeelden && b.voorbeelden.length ? '<div class="meta">' + esc(b.voorbeelden.join(' · ')) + '</div>' : '') +
           '</div>';
       }
-      u += '<p class="meta" style="margin-top:.6rem;">' + esc(d.gemeten.drempel) + '.' +
+      u += '<p class="meta h-mt60">' + esc(d.gemeten.drempel) + '.' +
         (d.gemeten.onvolledig ? ' Let op: minstens één collectie is groter dan de scangrens, dus dit beeld is niet volledig.' : '') +
         '</p></div>';
 
@@ -81,7 +81,7 @@
         d.knopen.map(function (k) {
           return '<tr><td>' + esc(k.label) + '</td><td class="meta">' + esc(k.domein) + '</td><td>' + k.aantal + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
-        (d.losse.length ? '<p class="meta" style="margin-top:.6rem;">Los in de graaf (niets verwijst ernaar en ze verwijzen nergens heen): ' +
+        (d.losse.length ? '<p class="meta h-mt60">Los in de graaf (niets verwijst ernaar en ze verwijzen nergens heen): ' +
           esc(d.losse.join(', ')) + '. Dat is een uitslag, geen fout -- maar het is wel waar een koppeling zou kunnen ontbreken.</p>' : '') +
         '</div>';
 
@@ -97,7 +97,7 @@
           id: document.querySelector('#grI').value, diepte: Number(document.querySelector('#grD').value || 2) })
           .then(function (w) {
             document.querySelector('#grPad').innerHTML =
-              '<p class="meta" style="margin-top:.7rem;">Vanaf <b>' + esc(w.start.titel) + '</b>: ' +
+              '<p class="meta h-mt70">Vanaf <b>' + esc(w.start.titel) + '</b>: ' +
               w.knopen + ' knopen tot diepte ' + w.diepte + (w.grens ? ' -- ' + esc(w.grens) : '') + '</p>' +
               w.lagen.map(function (l) {
                 return '<div class="lijn"><b>stap ' + l.stap + '</b> <span class="meta">' + l.aantal + '</span>' +

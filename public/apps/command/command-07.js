@@ -41,7 +41,7 @@
         '<p class="meta">' + a.actiesDitUur + ' van ' + a.actiesMax + ' handelingen dit uur · ' +
         C.euro(a.centenVandaag) + ' van ' + C.euro(a.centenMax) + ' vandaag · foutkans ' + a.foutkans + '%</p>' +
         '<div class="staaf"><i style="width:' + Math.min(100, Math.round(a.actiesDitUur / a.actiesMax * 100)) + '%"></i></div>' +
-        '<div class="crij" style="margin-top:.7rem;">' +
+        '<div class="crij h-mt70">' +
         (a.gestopt ? '<button class="knop" data-hervat="' + esc(a.naam) + '">Hervatten</button>'
           : '<button class="knop weg" data-stop="' + esc(a.naam) + '">Stoppen</button>') +
         '</div></div>';
@@ -53,7 +53,7 @@
       var so = rechten.soorten[s];
       u += '<div class="lijn"><b>' + esc(so.id) + '</b> <span class="meta">· hooguit ' + so.maxMinuten + ' minuten · nu ' + so.nuActief + ' actief</span>' +
         '<div class="meta">' + esc(so.wat) + '</div>' +
-        '<div class="crij" style="margin-top:.45rem;">' +
+        '<div class="crij h-mt45">' +
         '<input class="veld" data-aan="' + esc(so.id) + '" placeholder="aan wie" style="width:11rem;">' +
         '<input class="veld" data-rrd="' + esc(so.id) + '" placeholder="reden" style="flex:1;min-width:11rem;">' +
         '<button class="knop" data-geef="' + esc(so.id) + '">Tijdelijk geven</button>' +
@@ -68,9 +68,9 @@
       u += '<div class="lijn"><b>' + esc(x.recht) + '</b>' + (x.nood ? ' <span class="cniveau hand">nooddeur</span>' : '') +
         '<div class="meta">' + esc(x.aan) + ' · gegeven door ' + esc(x.door) + ' · tot ' + esc(C.tijd(x.tot)) + '</div>' +
         '<div class="meta">' + esc(x.reden) + '</div>' +
-        '<div class="crij" style="margin-top:.4rem;"><button class="knop weg" data-introk="' + esc(x.id) + '">Nu intrekken</button></div></div>';
+        '<div class="crij h-mt40"><button class="knop weg" data-introk="' + esc(x.id) + '">Nu intrekken</button></div></div>';
     }
-    u += '<p class="meta" style="margin-top:.5rem;">' + rechten.verlopen + ' recht(en) zijn verlopen of ingetrokken; die staan in het journaal.</p></div>';
+    u += '<p class="meta h-mt50">' + rechten.verlopen + ' recht(en) zijn verlopen of ingetrokken; die staan in het journaal.</p></div>';
     return u;
   }
 

@@ -164,7 +164,7 @@
     pakEl.innerHTML =
       '<div class="kop">Jouw pakket</div>' +
       '<div class="kaart"><h3>'+esc(a.naam)+'</h3><p class="intro">'+esc(a.kort)+'</p>' +
-        '<div class="kop" style="margin-top:1rem;">De 3D-plattegrond</div>' + plattegrond(a.indeling) +
+        '<div class="kop h-mt100">De 3D-plattegrond</div>' + plattegrond(a.indeling) +
       '</div>' +
       '<div class="kaart"><h3>Werkplekken</h3>' + a.werkplekken.map(function(w){
         return '<div class="rij"><b>'+esc(w.naam)+'</b><span>'+esc(w.wat)+'</span></div>'; }).join('') + '</div>' +

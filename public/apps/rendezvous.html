@@ -105,7 +105,7 @@ async function profiel(){
     +'<span class="lbl">Wat u zoekt</span><input class="veld" id="zoekt" value="'+esc(p.zoekt)+'" placeholder="Bijv. iemand die van zeilen en kunst houdt.">'
     +'<span class="lbl">Wensen (met komma\'s)</span><input class="veld" id="wensen" value="'+esc((p.wensen||[]).join(', '))+'" placeholder="reizen, fine dining, cultuur">'
     +'<span class="lbl">Locaties waar u openstaat voor een date (met komma\'s)</span><input class="veld" id="locaties" value="'+esc((p.locaties||[]).join(', '))+'" placeholder="Ibiza, Saint-Tropez, Gstaad">'
-    +'<div style="margin-top:.8rem;"><button class="knop" id="bewaar">Bewaren</button></div></div>';
+    +'<div class="h-mt80"><button class="knop" id="bewaar">Bewaren</button></div></div>';
   h+='<div class="note">Bij een match stelt Rahul een jetset-date voor op een locatie die u beiden hebt aangegeven of voor openstaat. Rahul belooft niets; De Rechterhand regelt de date pas als u beiden akkoord bent.</div>';
   $('#main').innerHTML=h;
   $('#bewaar').onclick=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen:$('#wensen').value,locaties:$('#locaties').value}); meld('Profiel bewaard.'); }catch(e){ meld(e.message); } };
@@ -125,7 +125,7 @@ async function ontdek(){
     return '<div class="kand'+(isMatch?' match':'')+'"><div class="nm">'+esc(k.codenaam)+(isMatch?'<span class="badge">match</span>':geliked?'<span class="badge" style="background:var(--card);color:var(--gold);border:1px solid var(--gold);">geliked</span>':k.likteMij?'<span class="badge">vindt u al leuk</span>':'')+'</div>'
       +(k.over?'<div class="over">'+esc(k.over)+'</div>':'')
       +(k.zoekt?'<div class="note">Zoekt: '+esc(k.zoekt)+'</div>':'')
-      +'<div style="margin-top:.4rem;">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'
+      +'<div class="h-mt40">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'
       +(k.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">U staat allebei open voor: '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')
       +'<div class="acts">'+(isMatch?'':'<button class="knop stil" data-pas="'+k.id+'">Overslaan</button><button class="knop hart" data-like="'+k.id+'">Leuk</button>')+(isMatch?'<button class="knop" data-ga="1">Ga naar Matches</button>':'')+'</div></div>';
   }).join('');
@@ -143,7 +143,7 @@ async function matches(){
   if(!d.matches.length){ $('#main').innerHTML='<div class="leeg">Nog geen matches. Like iemand bij Ontdek; is het wederzijds, dan verschijnt de match hier.</div>'; return; }
   let h=d.matches.map(m=>'<div class="kaart match"><div class="nm" style="font-family:Bodoni Moda,serif;font-size:1.15rem;">'+esc(m.codenaam)+'</div>'
     +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>')
-    +'<div style="margin-top:.7rem;"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button></div>'
+    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button></div>'
     +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div></div>').join('');
   $('#main').innerHTML=h;
   document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });

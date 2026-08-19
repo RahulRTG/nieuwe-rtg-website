@@ -22,7 +22,7 @@
    De write-behind flush en het inlezen van andermans wijzigingen staan in
    ./sync; hier de pool, het schema, het laden, het luisteren en het afsluiten. */
 
-const KANAAL = 'rtg_kv';
+const { KANAAL } = require('./schrijflanen');
 const klok = require('../lib/klok');
 
 function maakPg({ merge3, kluis, log, url }) {

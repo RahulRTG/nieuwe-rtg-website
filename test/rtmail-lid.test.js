@@ -74,6 +74,28 @@ test('Smart Action Dock maakt vanuit een bericht een agenda-item en project', as
   assert.ok(na.berichten[0].workflow.some(x => x.soort === 'project'));
 });
 
+test('een agenda-actie ZONDER datum valt terug op morgen', async () => {
+  /* DE TAK DIE ER NIET IN ZAT. De toets hierboven geeft altijd een datum mee,
+     en dan staat de klok in de andere helft van de ternary -- die werd dus
+     nooit aangeraakt. Precies daar stond `klokNu`, een naam die bij het
+     afsplitsen van ./rtmail-lid.js uit rtmail.js in het bereik achterbleef:
+     een ReferenceError, netjes weggevangen tot een 500. Een tak die geen enkele
+     toets aanraakt, is een tak waar zoiets ongezien in kan blijven staan.
+     Zie TAKEN.md 6.17. */
+  const inbox = await json(await api('/api/member/rtmail/inbox', {}, token));
+  const id = inbox.berichten[0].id;
+  const r = await api('/api/member/rtmail/workflow', { id, actie: 'agenda' }, token);
+  assert.equal(r.status, 200, 'zonder datum hoort hij zelf een dag te kiezen');
+  const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const agenda = await json(await api('/api/agenda/mijn-lijst', {}, token));
+  assert.ok(agenda.items.some(x => x.datum === morgen),
+    'de terugval is morgen; gevonden: ' + agenda.items.map(x => x.datum).join(', '));
+
+  // en een datum die NIET op de vorm past valt op dezelfde tak terug
+  const stuk = await api('/api/member/rtmail/workflow', { id, actie: 'agenda', datum: '15 januari' }, token);
+  assert.equal(stuk.status, 200);
+});
+
 test('zonder inlog blijft het postvak dicht', async () => {
   const r = await fetch(BASE + '/api/member/rtmail/inbox', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(r.status, 401);

@@ -65,6 +65,50 @@ test('een MIME-joker of glob in een string opent geen commentaar', () => {
   }
 });
 
+/* EEN BACKTICK LOOPT OVER REGELS, EN DAT IS DE ZESDE VORM.
+
+   De vijf hierboven kwamen uit de fout van 17 augustus. Deze kwam uit de METER
+   die daarna is gebouwd: bronBlindeBestanden kruist deze functie met de lexer
+   van de AST-scanner en wees zeven bestanden aan waar nog steeds bron
+   verdween. Allemaal dezelfde vorm -- CSS in een template literal, met
+   commentaar erin.
+
+   Vandaag was dat onschuldig (het IS commentaar, alleen van een andere taal),
+   maar het mechanisme is precies dat van toen: een template met een openende
+   /* zonder sluiter erin eet door de echte code heen. Die laatste zin is wat
+   de derde bewering hieronder meet.
+
+   De grens per regel blijft staan voor ' en " -- die bestaat om de apostrof in
+   proza ("pagina's") hoogstens EEN regel te laten verstoren, en een backtick
+   komt in proza niet voor. */
+test('een template literal over meerdere regels houdt zijn inhoud', () => {
+  const bron = 'const css = `\n  /* rood, want waarschuwing */\n  .x{color:red}\n`;\nconst na = 1;';
+  const uit = zonderCommentaar(bron);
+  assert.match(uit, /rood, want waarschuwing/, 'wat in een template staat is geen commentaar van dit bestand');
+  assert.match(uit, /\.x\{color:red\}/);
+  assert.match(uit, /const na = 1;/);
+});
+
+test('en een openend commentaarteken in zo n template eet de code erna niet op', () => {
+  /* DIT IS WAAR HET OM GING. Zonder de meerregelige backtick werd de template
+     niet als string gezien, opende de /* erin een commentaar, en verdween alles
+     tot de eerstvolgende sluiter -- inclusief echte code. */
+  const bron = 'const css = `\n  .x{}  /* nooit gesloten\n`;\nconst blijft = 42;\n/* echt commentaar */\nconst ook = 7;';
+  const uit = zonderCommentaar(bron);
+  assert.match(uit, /const blijft = 42;/, 'de code na de template blijft staan');
+  assert.match(uit, /const ook = 7;/);
+  assert.doesNotMatch(uit, /echt commentaar/, 'en het echte commentaar gaat gewoon weg');
+});
+
+test('DE TEGENPROEF: een apostrof in proza kost nog steeds hoogstens die ene regel', () => {
+  /* De grens per regel voor ' en " mag hier niet mee zijn opgerekt: dan zou een
+     losse apostrof in HTML-proza de rest van het BESTAND als string lezen. */
+  const bron = "<p>Alle pagina's van dit huis</p>\n/* weg */\n<p>einde</p>\nKLAAR";
+  const uit = zonderCommentaar(bron);
+  assert.doesNotMatch(uit, /weg/, 'het commentaar erna gaat nog steeds weg');
+  assert.match(uit, /KLAAR/);
+});
+
 test('een blokcommentaar begint niet binnen een regelcommentaar', () => {
   const bron = '// alleen voor image/*\nfunction magie() { return 1; }\n/* weg */ EINDE';
   const uit = zonderCommentaar(bron);

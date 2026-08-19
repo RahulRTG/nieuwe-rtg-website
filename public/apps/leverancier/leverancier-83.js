@@ -1,3 +1,4 @@
+/* de recepten en hun marges */
     if (rec.length) h += '<div class="card"><div class="tt-h">'+T('vr.recepten','Recepten en marge')+'</div>'+
       rec.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;">'+
         '<div class="st-row"><span><b>'+esc(r.naam)+'</b> <span class="sub">'+geld(r.prijs)+(r.regels.length?' · '+T('vr.kost','kost')+' '+geld(r.kostprijs)+' · '+T('vr.marge','marge')+' '+geld(r.marge)+(r.margePct!=null?' ('+r.margePct+'%)':''):'')+'</span></span>'+

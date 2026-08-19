@@ -22,7 +22,7 @@
 
   function teken(w, plan, blik, ctx) {
     var esc = ctx.esc, T = ctx.T;
-    var h = '<div class="st-sec" style="margin-top:1.2rem;">' + T('dp.kop', 'Het draaiboek van vandaag') + '</div>';
+    var h = '<div class="st-sec h-mt120">' + T('dp.kop', 'Het draaiboek van vandaag') + '</div>';
     h += '<div class="sub" style="border-left:2px solid var(--gold);padding:0.3rem 0 0.3rem 0.7rem;margin-bottom:0.55rem;">' + esc(plan.advies) + '</div>';
     h += plan.taken.map(function (t2) {
       var p = PRIO[t2.prio] || PRIO[3];
@@ -32,7 +32,7 @@
         '<span class="sub" style="font-size:0.6rem;letter-spacing:0.1em;color:' + p[1] + ';">' + T('dp.p' + t2.prio, p[0]) + '</span></div>';
     }).join('');
     if (blik && blik.dagen) {
-      h += '<div class="st-sec" style="margin-top:1.1rem;">' + T('dp.week', 'De week vooruit') + '</div>';
+      h += '<div class="st-sec h-mt110">' + T('dp.week', 'De week vooruit') + '</div>';
       h += '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.3rem;">' + blik.dagen.map(function (d2) {
         return '<div style="border:1px solid var(--line);border-radius:10px;padding:0.4rem 0.2rem;text-align:center;' + (d2.n ? '' : 'opacity:0.45;') + '">' +
           '<span class="sub" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;">' + esc(d2.dag) + '</span>' +
@@ -43,7 +43,7 @@
         return '<b>' + esc(d2.dag) + '</b> ' + esc(d2.items.join(' · '));
       }).join('<br>') + '</div>';
     }
-    h += '<div class="row-gap" style="margin-top:0.7rem;"><button id="dpPrint" style="' + GOUD + 'flex:1;">' + T('dp.print', 'Draaiboek (print)') + '</button>' +
+    h += '<div class="row-gap h-mt70"><button id="dpPrint" style="' + GOUD + 'flex:1;">' + T('dp.print', 'Draaiboek (print)') + '</button>' +
       '<button id="dpDeel" style="' + STIL + '">' + T('wf.deel', 'Delen') + '</button>' +
       '<button id="dpRahul" style="' + STIL + 'flex:1;">' + T('dp.rahul', 'Rahul plant de dag') + '</button></div>' +
       '<div id="dpRahulUit" class="sub" style="margin-top:0.5rem;white-space:pre-wrap;"></div>';

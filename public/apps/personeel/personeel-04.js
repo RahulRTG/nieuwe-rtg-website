@@ -139,9 +139,9 @@
   function toonKantoorLogin(){
     $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.back','Terug')+'</button>'+
       '<div class="card"><div class="k">'+T('pd.ka.code','Kantoorcode')+'</div>'+
-      '<div class="pinrow" style="margin-top:0.6rem;"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
+      '<div class="pinrow h-mt60"><input id="kaCode" type="password" autocomplete="current-password" style="letter-spacing:0.1em;" placeholder="&bull;&bull;&bull;&bull;">'+
       '<button id="kaGo">'+T('pd.ka.binnen','Binnen')+'</button></div>'+
-      '<div class="k" style="margin-top:0.7rem;">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
-      '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
+      '<div class="k h-mt70">'+T('pd.ka.totp','TOTP-code (alleen als die is ingesteld)')+'</div>'+
+      '<input class="hin h-mt40" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);

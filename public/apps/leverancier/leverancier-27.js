@@ -1,3 +1,4 @@
+/* de weekbeschikbaarheid opslaan */
     if (opslaan) opslaan.addEventListener('click', async () => {
       const dagen = {};
       el.querySelectorAll('[data-wvdag]').forEach(rij => {

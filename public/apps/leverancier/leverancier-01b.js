@@ -1,3 +1,4 @@
+/* de partnercatalogus: welke zaken er in de demo bestaan */
     { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
     { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'', sub:'Verzekeringsadvies · Ibiza-stad' },
     { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'', sub:"Wintersport & seizoensresort · Val d'Aurora" }

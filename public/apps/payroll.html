@@ -82,8 +82,8 @@
         <input class="veld" id="lrPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
         <button class="knop" id="lrDraai">Draai de loonrun</button>
       </div>
-      <div class="noot" style="margin-top:.45rem;">Uurloon per land (nooit onder het minimum), plus vakantiegeld, min loonheffing; de werkgeverslasten uit de fiscale landtabellen staan ernaast. Elke medewerker krijgt zijn loonstrook in de personeels-app; de uitbetaling loopt via RTG Pay.</div>
-      <div id="lrUit" style="margin-top:.6rem;"></div>
+      <div class="noot h-mt45">Uurloon per land (nooit onder het minimum), plus vakantiegeld, min loonheffing; de werkgeverslasten uit de fiscale landtabellen staan ernaast. Elke medewerker krijgt zijn loonstrook in de personeels-app; de uitbetaling loopt via RTG Pay.</div>
+      <div class="h-mt60" id="lrUit"></div>
     </div>
   </section>
   <section id="tabMatch" hidden>
@@ -126,7 +126,7 @@
         <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
         <button class="knop" id="ctLaad">Toon personeel</button>
       </div>
-      <div id="ctLijst" style="margin-top:.6rem;"></div>
+      <div class="h-mt60" id="ctLijst"></div>
     </div>
 
     <div class="kaart">
@@ -136,23 +136,23 @@
         <input class="veld" id="osPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
         <button class="knop" id="osOpen">Open concept</button>
       </div>
-      <div class="noot" style="margin-top:.45rem;">De uren komen uit de klok van de zaak zelf; ze worden niet meegestuurd. Een ontbrekende uitklok wordt niet geschat maar gemeld.</div>
-      <div id="osUit" style="margin-top:.6rem;"></div>
+      <div class="noot h-mt45">De uren komen uit de klok van de zaak zelf; ze worden niet meegestuurd. Een ontbrekende uitklok wordt niet geschat maar gemeld.</div>
+      <div class="h-mt60" id="osUit"></div>
     </div>
 
     <div class="kaart" id="osRunKaart" hidden>
       <div class="sec" id="osRunTitel">Loonrun</div>
       <div id="osBevindingen"></div>
-      <div id="osStroken" style="margin-top:.6rem;"></div>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="h-mt60" id="osStroken"></div>
+      <div class="rij h-mt60">
         <button class="knop" id="osKeur">Goedkeuren als administrateur</button>
         <button class="knop" id="osDef">Definitief maken</button>
         <button class="knop" id="osJournaal">Loonjournaal</button>
         <button class="knop" id="osAangifte">Loonaangifte</button>
         <button class="knop" id="osDossier">Dossier (vier vragen)</button>
       </div>
-      <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
-      <div id="osNaRun" style="margin-top:.6rem;"></div>
+      <div class="noot h-mt45">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
+      <div class="h-mt60" id="osNaRun"></div>
     </div>
   </section>
 
@@ -170,8 +170,8 @@
         <button class="knop" id="wlRonde">Nu overal bijwerken</button>
       </div>
       <div id="wlTelling"></div>
-      <div id="wlVerval" style="margin-top:.5rem;"></div>
-      <div id="wlLanden" style="margin-top:.6rem;"><div class="leeg">Nog niet geladen.</div></div>
+      <div class="h-mt50" id="wlVerval"></div>
+      <div class="h-mt60" id="wlLanden"><div class="leeg">Nog niet geladen.</div></div>
     </div>
 
     <div class="kaart">
@@ -272,7 +272,7 @@ async function laadMatch(){
       '<div class="regel"><b>' + esc(v.vacature.func) + '</b><span class="kpi">' + esc(v.vacature.bedrijf) + ' · ' + esc(v.vacature.plaats || '') + '</span>' +
       '<span class="r kpi">' + v.kandidaten.map(k => esc(k.naam) + ' (' + esc(k.rol) + ', score ' + k.score + ')').join(' · ') + '</span></div>').join('')
       || '<div class="leeg">Nog geen matches; zodra iemand zich open voor werk zet, verschijnt hij hier.</div>') +
-    '<div class="sec" style="margin-top:.7rem;">Per persoon: welke bedrijven passen</div>' +
+    '<div class="sec h-mt70">Per persoon: welke bedrijven passen</div>' +
     (d.open.map(p =>
       '<div class="regel"><b>' + esc(p.naam) + '</b><span class="kpi">' + esc(p.rol) + ' · nu bij ' + esc(p.zaak) + '</span>' +
       '<span class="r kpi">' + (p.kansen.map(k => esc(k.bedrijf) + ' -- ' + esc(k.func) + ' (score ' + k.score + ')').join(' · ') || 'nog geen passende vacature') + '</span></div>').join('')
@@ -649,14 +649,14 @@ async function toonAangifte(a){
     rubriek('Zvw werkgever', a.totalen.zvwWerkgever) +
     '<div class="regel"><b>Te betalen aan de Belastingdienst</b><span class="r"><b>' +
       eurC(a.teBetalenCenten) + '</b></span></div>' +
-    '<div class="noot" style="margin-top:.4rem;">' + a.nominatief.length +
+    '<div class="noot h-mt40">' + a.nominatief.length +
       ' werknemer(s) in het nominatieve deel; de optelling daarvan IS het bedrag hierboven.</div>' +
     aansluiting +
     (a.stand === 'ingediend'
       ? '<div class="noot">Ingediend door ' + esc(a.ingediendDoor) + ' op ' + esc(String(a.ingediendOp).slice(0, 10)) +
         ', kenmerk ' + esc(a.kenmerk) + '.</div>'
-      : '<button class="knop" id="osDienIn" style="margin-top:.5rem;">Vastleggen als ingediend</button>' +
-        '<div class="noot" style="margin-top:.35rem;">RTG verstuurt de aangifte niet zelf; dit legt vast DAT hij is ingediend, met het kenmerk van de Belastingdienst erbij.</div>');
+      : '<button class="knop h-mt50" id="osDienIn">Vastleggen als ingediend</button>' +
+        '<div class="noot h-mt35">RTG verstuurt de aangifte niet zelf; dit legt vast DAT hij is ingediend, met het kenmerk van de Belastingdienst erbij.</div>');
 
   const d = document.getElementById('osDienIn');
   if (d) d.addEventListener('click', async () => {

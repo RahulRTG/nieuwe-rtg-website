@@ -11,7 +11,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { bouw } = require('../scripts/deelindex.js');
+const { bouw, tabelveilig } = require('../scripts/deelindex.js');
 const { onderwerpVan } = require('../scripts/lib/bundeldeel.js');
 
 const WORTEL = path.join(__dirname, '..');
@@ -67,4 +67,25 @@ test('DE DERDE TEGENPROEF: het onderwerp stopt waar het commentaar stopt', () =>
   assert.equal(onderwerpVan('// eerste regel van een uitleg\n// die op de tweede doorloopt\ncode();'),
     'eerste regel van een uitleg die op de tweede doorloopt',
     'twee regelcommentaren achter elkaar horen wel bij elkaar');
+});
+
+test('een onderwerp met een backslash splijt de tabelcel niet', () => {
+  /* Hier ontsnapte alleen de pijp. Een onderwerp `a\|b` werd dan `a\\|b`, en
+     Markdown leest die twee backslashes als EEN ontsnapte backslash -- waarna
+     de pijp weer een celgrens is en de rij een kolom opschuift. Wie ontsnapt,
+     ontsnapt eerst zijn eigen ontsnappingsteken. CodeQL noemde het
+     js/incomplete-sanitization; de fout zelf is ouder dan die melding.
+
+     Vandaag draagt geen enkel van de 394 delen een backslash in zijn
+     onderwerpregel, dus BUNDELS.md verandert er niet van. Dat is precies waarom
+     dit hier staat en niet in het voortbrengsel: een fout die nog niemand raakt
+     is een fout die niemand ziet aankomen. */
+  assert.equal(tabelveilig('a\\|b'), 'a\\\\\\|b',
+    'eerst de backslash, dan de pijp');
+  assert.equal(tabelveilig('gewoon | pijp'), 'gewoon \\| pijp',
+    'een kale pijp ontsnapt nog steeds');
+  assert.equal(tabelveilig('geen leestekens'), 'geen leestekens',
+    'en tekst zonder leestekens blijft zoals hij is');
+  assert.equal(tabelveilig('regel\neen'), 'regel een',
+    'een regelovergang breekt de tabel op dezelfde stille manier');
 });

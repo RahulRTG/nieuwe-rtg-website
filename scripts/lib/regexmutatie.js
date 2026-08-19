@@ -29,10 +29,40 @@
    uitkomst nog een keer door new RegExp() gaat voordat hij wordt teruggegeven. */
 'use strict';
 
-/* Het lijf en de vlaggen van een regex-literal, of null als het er geen is. */
+/* Het lijf en de vlaggen van een regex-literal, of null als het er geen is.
+
+   MET DE HAND EN NIET MET EEN REGEX. Hier stond er wel een:
+
+     \/^\\/((?:\\\\.|\\[(?:\\\\.|[^\\]])*\\]|[^/])+)\\/([a-z]*)$\/
+
+   en die is katastrofaal traag op invoer die NET niet past. De drie
+   alternatieven overlappen -- een teken binnen [...] wordt ook door [^/]
+   gedekt -- dus bij een literal zonder sluitende slash probeert de motor elke
+   verdeling van de tekens over die alternatieven. CodeQL zag het (regel
+   js/redos, bevindingen 120 en 121) en het is geen theorie: deze functie krijgt
+   tokentekst uit WILLEKEURIGE bronbestanden, dus een regel als /[][][][]...
+   zonder afsluiting zet de mutatiemotor stil.
+
+   Een regex die de overlap weghaalt kan ook, maar dan staat dezelfde kennis --
+   wat telt als klasse, wat als ontsnapping -- twee keer in dit bestand: hier in
+   patroonvorm en hieronder in laatsteTopNiveauPijp als lus. Dus hier dezelfde
+   lus. Een keer lezen, geen terugkrabbelen, en de twee functies kunnen niet
+   meer uit de pas lopen. */
 function ontleed(tekst) {
-  const m = /^\/((?:\\.|\[(?:\\.|[^\]])*\]|[^/])+)\/([a-z]*)$/.exec(String(tekst));
-  return m ? { lijf: m[1], vlaggen: m[2] } : null;
+  const s = String(tekst);
+  if (s[0] !== '/') return null;
+  let i = 1, klasse = false;
+  for (; i < s.length; i++) {
+    const c = s[i];
+    if (c === '\\') { i++; continue; }
+    if (klasse) { if (c === ']') klasse = false; continue; }
+    if (c === '[') { klasse = true; continue; }
+    if (c === '/') break;
+  }
+  if (klasse || i >= s.length || s[i] !== '/' || i === 1) return null;
+  const vlaggen = s.slice(i + 1);
+  if (!/^[a-z]*$/.test(vlaggen)) return null;
+  return { lijf: s.slice(1, i), vlaggen };
 }
 
 /* De positie van het LAATSTE | dat op het hoogste niveau staat, of -1. */

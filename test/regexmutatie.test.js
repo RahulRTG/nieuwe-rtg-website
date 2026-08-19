@@ -122,3 +122,37 @@ test('regex-alternatief-weg pakt alleen echte regex-tokens, geen deling', () => 
   assert.equal(muteer('const q = a / b | c / d;', regexOp, 0), null,
     'twee delingen met een pijp ertussen zijn geen regex -- daar muteren zou onzin-code geven');
 });
+
+test('ontleed loopt een literal zonder sluitende slash lineair af, niet exponentieel', () => {
+  /* CodeQL vond hier js/redos (bevindingen 120 en 121). Er stond een regex
+     waarvan de drie alternatieven elkaar overlapten -- een teken binnen [...]
+     valt ook onder [^/] -- en die probeert bij een NIET-passende invoer elke
+     verdeling van de tekens over die alternatieven.
+
+     Dat is geen theorie: ontleed() krijgt tokentekst uit willekeurige
+     bronbestanden. Nagemeten met het oude patroon: 20 herhalingen van [] zonder
+     sluitende slash kostte 81 ms, en het is exponentieel -- 26 herhalingen is
+     ruim vier seconden, 30 is anderhalve minuut. De mutatiemotor staat dan stil
+     op een bestand dat niets bijzonders doet.
+
+     Deze toets gebruikt 30 herhalingen: onder de oude versie loopt hij niet af
+     binnen de grens, onder de nieuwe kost hij microseconden. De grens staat op
+     een seconde en niet op tien milliseconden, want een trage bouwmachine mag
+     dit niet rood maken -- het verschil dat we meten is vier ordes groot. */
+  const kwaad = '/' + '[]'.repeat(30) + 'X';
+  const start = process.hrtime.bigint();
+  assert.equal(ontleed(kwaad), null, 'zonder sluitende slash is het geen literal');
+  const ms = Number(process.hrtime.bigint() - start) / 1e6;
+  assert.ok(ms < 1000, 'ontleed deed er ' + ms.toFixed(1) + ' ms over; dat hoort microseconden te zijn');
+});
+
+test('DE TEGENPROEF: ontleed leest een literal MET klassen nog steeds goed', () => {
+  /* De reparatie hierboven mag niet "altijd null" worden -- dan is de snelheid
+     gekocht met blindheid. Een slash binnen een tekenklasse sluit de literal
+     niet af, en dat is precies wat de oude regex ook deed. */
+  assert.deepEqual(ontleed('/[/]|a/g'), { lijf: '[/]|a', vlaggen: 'g' });
+  assert.deepEqual(ontleed('/a\\/b/'), { lijf: 'a\\/b', vlaggen: '' });
+  assert.equal(ontleed('//'), null, 'een leeg lijf is geen literal maar commentaar');
+  assert.equal(ontleed('/a/G'), null, 'vlaggen zijn kleine letters');
+  assert.equal(ontleed('/[a/'), null, 'een klasse die openblijft is geen literal');
+});

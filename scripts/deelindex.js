@@ -41,6 +41,22 @@ function delenVan(map) {
   });
 }
 
+/* Een onderwerpregel in een tabelcel. De PIJP moet ontsnappen, anders splijt
+   hij de cel -- maar de BACKSLASH eerst, en dat stond er niet.
+
+   Wat er misging als een onderwerp zelf een backslash draagt: `a\\|b` werd
+   `a\\\\|b`, en Markdown leest die twee backslashes als een ontsnapte backslash
+   waarna de pijp weer gewoon een celgrens is. De rij schuift dan een kolom op.
+   CodeQL noemt dat js/incomplete-sanitization (bevinding 119) en heeft gelijk:
+   wie ontsnapt, ontsnapt eerst zijn eigen ontsnappingsteken.
+
+   Een regelovergang kan er niet in zitten (onderwerpVan geeft een enkele regel),
+   maar hij staat er toch bij: een cel met een harde regelovergang breekt de
+   tabel op dezelfde stille manier, en dit is de plek waar dat hoort. */
+function tabelveilig(tekst) {
+  return String(tekst).replace(/([\\|])/g, '\\$1').replace(/[\r\n]+/g, ' ');
+}
+
 function bouw() {
   const uit = [];
   uit.push('# De bundeldelen', '');
@@ -64,7 +80,7 @@ function bouw() {
     uit.push('`public/' + bundels[bundel] + '/` -- ' + delen.length + ' delen, ' +
       delen.reduce((s, d) => s + d.regels, 0) + ' regels in de delen' + (kaal ? ', waarvan ' + kaal + ' zonder onderwerp' : ''), '');
     uit.push('| deel | onderwerp |', '|---|---|');
-    for (const d of delen) uit.push('| `' + d.naam + '` | ' + (d.onderwerp ? d.onderwerp.replace(/\|/g, '\\|') : '--') + ' |');
+    for (const d of delen) uit.push('| `' + d.naam + '` | ' + (d.onderwerp ? tabelveilig(d.onderwerp) : '--') + ' |');
     uit.push('');
   }
   uit.splice(kop, 0, '**' + namen.length + ' bundels, ' + totaal + ' delen, ' + zonder + ' zonder onderwerp.**', '');
@@ -84,5 +100,5 @@ function main() {
   return 0;
 }
 
-module.exports = { bouw, delenVan };
+module.exports = { bouw, delenVan, tabelveilig };
 if (require.main === module) process.exit(main());

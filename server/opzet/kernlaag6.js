@@ -52,6 +52,13 @@ Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
 Object.assign(kern, require('../kern/navigatie').maakNavigatie({
   db, save, crypto, haversine, flitsRond: kern.flitsRond, flitsMeld: kern.flitsMeld
 }));
+/* De PLAATSLAAG (kern/plaats/, zie PLAATS.md): hekken, vensters, waarnemingen
+   en het actielog. Hij LEEST de geometrie die er al ligt -- de gebiedenboom van
+   het stadsweefsel (kernlaag1) en de zaken -- en bezit zelf geen positie. Hier
+   gemount en niet eerder, omdat het weefsel er dan staat; een halve motor
+   doorgeven aan de domeingrens levert een stille undefined op. */
+Object.assign(kern, require('../kern/plaats')({ db, save, crypto,
+  weefsel: kern.weefsel, navPoi: kern.navPoi }));
 /* RTG Clips (kern/clips.js): korte verticale video's die alleen op het
    toestel van de maker staan (OPFS); RTG bewaart enkel titel, affiche en
    het signaal-doorgeefluik. De feed is een eindige dagselectie, bewust

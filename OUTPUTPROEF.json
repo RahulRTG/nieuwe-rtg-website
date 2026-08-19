@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T22:00:21.521Z",
-  "commit": "0fe4f84",
+  "op": "2026-08-19T22:28:41.840Z",
+  "commit": "e79c319",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3751,
-  "onbeslist": 259,
+  "bewezen": 3761,
+  "onbeslist": 249,
   "blind": 177,
   "ongemeten": 8
  },
@@ -15218,74 +15218,84 @@
    "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/journey": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/missions": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/missions/activeer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/missions/status": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/missions/voorstel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/recovery/beslis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/recovery/open": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/simulatie/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/simulatie/voorstellen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/spatial": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/venue/concept": {
    "staat": "onbeslist",
@@ -53664,6 +53674,56 @@
    "toets": "commandlagen.test.js",
    "merkt": true,
    "op": "2026-08-19T22:00:21.437Z"
+  },
+  "POST /api/supplier/horeca/missions/activeer": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:15.269Z"
+  },
+  "POST /api/supplier/horeca/journey": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:15.709Z"
+  },
+  "POST /api/supplier/horeca/missions": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:15.768Z"
+  },
+  "POST /api/supplier/horeca/missions/status": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:16.205Z"
+  },
+  "POST /api/supplier/horeca/missions/voorstel": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:27.930Z"
+  },
+  "POST /api/supplier/horeca/recovery/beslis": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:28.400Z"
+  },
+  "POST /api/supplier/horeca/simulatie/maak": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:29.065Z"
+  },
+  "POST /api/supplier/horeca/recovery/open": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:29.417Z"
+  },
+  "POST /api/supplier/horeca/spatial": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:41.345Z"
+  },
+  "POST /api/supplier/horeca/simulatie/voorstellen": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T22:28:41.701Z"
   }
  },
  "basislijn": {

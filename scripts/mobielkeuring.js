@@ -90,12 +90,23 @@ function mobielInPagina(opt) {
   /* Een pagina die past kan nog steeds leeg zijn: Instant Reality verborg op
      telefoonmaat al zijn artikelen, en de breedtescan stond groen terwijl een
      mens een zwart vlak zag. Vandaar: staat er ergens werkelijk iets? */
+  /* EERSTE POGING WAS EEN LIJST TAGS (main, section, article, .kaart, form,
+     table, ul) en die meldde 132 van de 514 metingen als leeg -- ruim een
+     kwart. Dat is geen bevinding maar een kapotte meting: veel schermen bouwen
+     hun inhoud in een div, en dan is de hoogste `section` nul.
+
+     Wat de vraag echt is: STAAT ER IETS. Dus: het hoogste zichtbare element dat
+     breed genoeg is om inhoud te zijn, welk merk het ook draagt. Een scherm dat
+     werkelijk zwart is haalt dat niet, en een scherm dat vol staat wel -- wat de
+     bouwer ook voor tag koos. */
   var hoogste = 0;
-  var blokken = document.querySelectorAll('body main, body section, body article, body .kaart, body form, body table, body ul');
+  var blokken = document.querySelectorAll('body *');
   for (var b = 0; b < blokken.length; b++) {
-    if (!zichtbaar(blokken[b])) continue;
-    var hb = blokken[b].getBoundingClientRect().height;
-    if (hb > hoogste) hoogste = hb;
+    var eb = blokken[b];
+    if (!zichtbaar(eb)) continue;
+    var rb = eb.getBoundingClientRect();
+    if (rb.width < 40) continue;
+    if (rb.height > hoogste) hoogste = rb.height;
   }
 
   /* ---- 3. VASTE BALKEN BLIJVEN IN BEELD -------------------------------- */
@@ -108,6 +119,15 @@ function mobielInPagina(opt) {
     if (st.position !== 'fixed' && st.position !== 'sticky') continue;
     var rr = el.getBoundingClientRect();
     if (rr.height < 24 || rr.height > H) continue;      // geen overlay over het hele scherm
+    /* HELEMAAL BUITEN BEELD IS GEEN GEBREK MAAR EEN BEDOELING. De eerste versie
+       meldde 378 van de 514 metingen, en dat was op 189 schermen dezelfde knop:
+       de SPRINGLINK op y -64..-33 (TOEGANKELIJK.md). Die hoort daar te staan tot
+       iemand hem focust. Hetzelfde geldt voor een sticky die weggescrold is.
+
+       Wat een echt gebrek is: een balk die WEL in beeld hoort en er half
+       uitsteekt -- dan bestaat hij maar is hij niet te bereiken. Dus alleen
+       elementen die het venster raken. */
+    if (rr.bottom <= 0 || rr.top >= H) continue;
     if (rr.top >= -1 && rr.bottom <= H + 1) continue;   // netjes in beeld
     balkenBuiten.push(merk(el) + ' y ' + Math.round(rr.top) + '..' + Math.round(rr.bottom) + ' bij ' + H);
     if (balkenBuiten.length >= 5) break;

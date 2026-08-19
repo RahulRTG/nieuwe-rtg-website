@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T04:26:25.409Z",
-  "commit": "a682361",
+  "op": "2026-08-19T04:58:55.536Z",
+  "commit": "a863c23",
   "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1280,
-  "onbeslist": 2844,
+  "bewezen": 1285,
+  "onbeslist": 2839,
   "blind": 63,
   "ongemeten": 8
  },
@@ -17889,41 +17889,44 @@
    "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/offreren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "handelsketen.test.js",
-    "supplier-comm-mob-payroll.test.js"
+    "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/gunnen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "handelsketen.test.js",
-    "supplier-comm-mob-payroll.test.js"
+    "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/plannen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/leveren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/factureren": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/betalen": {
    "staat": "onbeslist",
@@ -38910,6 +38913,31 @@
    "toets": "handelsketen.test.js",
    "merkt": true,
    "op": "2026-08-19T04:26:25.220Z"
+  },
+  "POST /api/supplier/handel/plannen": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:57:05.374Z"
+  },
+  "POST /api/supplier/handel/offreren": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:57:06.048Z"
+  },
+  "POST /api/supplier/handel/leveren": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:57:06.285Z"
+  },
+  "POST /api/supplier/handel/gunnen": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:57:06.413Z"
+  },
+  "POST /api/supplier/handel/factureren": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:58:55.343Z"
   }
  },
  "basislijn": {

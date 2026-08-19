@@ -424,7 +424,7 @@
         '<label for="kNaam">Naam van het kanaal</label><input id="kNaam" maxlength="40">' +
         '<label for="kGenre">Genre</label><select id="kGenre"></select>' +
         '<label for="kBio">Waar gaat het over?</label><input id="kBio" maxlength="300">' +
-        '<div class="rij"><button class="knop vol" id="kStart" type="button">Kanaal aanmelden</button></div>';
+        '<div class="rij"><button class="knop vol hoofd" id="kStart" type="button" data-hoofdactie>Kanaal aanmelden</button></div>';
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#kGenre').appendChild(o); }
       kaart.querySelector('#kStart').addEventListener('click', async () => {
         const r = await api('kanaal/aanmeld', { naam: $('#kNaam').value, genre: $('#kGenre').value, bio: $('#kBio').value });

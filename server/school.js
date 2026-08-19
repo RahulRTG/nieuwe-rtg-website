@@ -123,6 +123,7 @@ module.exports = (ctx) => {
   require('./school/bellen')(sctx); // bellen binnen de app (klas-belkanaal, geen nummers nodig)
   require('./school/hulplijn')(sctx); // golf 4: de ene knop van het kind (toestemming bepaalt wie meeleest)
   require('./school/bewijs')(sctx); // Proof of Learning: observaties van de leraar in het leerpaspoort
+  require('./school/denkfout')(sctx); // Misconception Graph: het klasbeeld, geteld zonder wie
 
   /* ---------- de enterprise-lagen ----------
      Rollen eerst: die levert poort() en het journaal waar alle lagen hieronder

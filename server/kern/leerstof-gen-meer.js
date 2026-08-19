@@ -43,7 +43,7 @@ const GEN2 = {
        getallen erin ("schrijf het zo: 3 rest 2") is bij 29 : 9 toevallig het
        antwoord zelf -- en dan heeft een kind het goed zonder te rekenen. */
     return { v: (heel * deler + rest) + ' : ' + deler + ' = ?  (schrijf eerst hoe vaak het past, dan het woord rest, dan wat overblijft)',
-      a: heel + ' rest ' + rest };
+      a: heel + ' rest ' + rest, feit: { soort: 'deelrest', heel, rest, deler } };
   },
 
   // afronden op tientallen, honderdtallen of duizendtallen
@@ -56,7 +56,7 @@ const GEN2 = {
     while (n % stap === 0) n = stap + r(stap * 40);
     const rest = n % stap;
     const uit = rest * 2 >= stap ? n - rest + stap : n - rest;
-    return { v: 'Rond ' + n + ' af op ' + (stap === 10 ? 'tientallen' : stap === 100 ? 'honderdtallen' : 'duizendtallen'), a: String(uit) };
+    return { v: 'Rond ' + n + ' af op ' + (stap === 10 ? 'tientallen' : stap === 100 ? 'honderdtallen' : 'duizendtallen'), a: String(uit), feit: { soort: 'afronden', n, stap } };
   },
 
   // hoeveel tijd zit ertussen: klokkijken dat ergens over gaat
@@ -104,7 +104,7 @@ const GEN2 = {
     const start = -(1 + r(max));
     const stijging = 1 + r(max + 10);
     return { v: 'Het is ' + start + ' graden. Het wordt ' + stijging + ' graden warmer. Hoe warm is het dan?',
-      a: String(start + stijging) };
+      a: String(start + stijging), feit: { soort: 'negatief', start, stijging } };
   },
 
   // kwadraten en wortels: de stap naar de wiskunde van het vo

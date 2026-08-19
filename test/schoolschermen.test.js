@@ -279,3 +279,29 @@ test('elke route die leer.js aanroept staat in de vertaaltabel van het leerpaspo
   for (const pad of gevraagd)
     assert.ok(leerpaspoort.includes("'" + pad + "':"), 'leerpaspoort.html vertaalt ' + pad + ' niet');
 });
+
+test('de Misconception Graph staat op drie schermen, en noemt nooit een kind', () => {
+  const leer = lees('apps', 'rtgschool', 'leer.js');
+  const oefenen = lees('apps', 'foundation', 'school-oefenen.js');
+  const kaart = lees('apps', 'schoolpartner', 'denkfout.js');
+
+  // de leerling ziet WAT er gedacht is, en de stof meteen anders uitgelegd
+  for (const bron of [leer, oefenen]) {
+    assert.match(bron, /denkfout\.naam/, 'het scherm toont de duiding niet');
+    assert.match(bron, /Anders uitgelegd/, 'Explain Differently ontbreekt');
+  }
+
+  // de leraar ziet het klasbeeld, en kan een patroon afsluiten
+  assert.match(kaart, /\/school\/denkfout\/klas/);
+  assert.match(kaart, /\/school\/denkfout\/besproken/);
+  assert.match(kaart, /x\.aantal/, 'het klasbeeld hoort te tellen');
+  /* En het noemt geen kind. Niet omdat het scherm zich inhoudt, maar omdat de
+     server het niet stuurt -- deze toets bewaakt dat het scherm er ook niet om
+     vraagt en er geen eigen lijstje van maakt. */
+  assert.doesNotMatch(kaart, /leerling:|sleutel|profielId|\/school\/klas'/,
+    'het klasbeeld hoort niets over losse leerlingen op te halen');
+
+  assert.ok(partner.includes('/apps/schoolpartner/denkfout.js'), 'School Partner laadt denkfout.js niet');
+  assert.ok(partner.includes('id="denkfoutVorm"'));
+  assert.ok(school.includes('school-oefenen.js'));
+});

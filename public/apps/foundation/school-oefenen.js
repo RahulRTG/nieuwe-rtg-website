@@ -85,14 +85,21 @@
     /* Oefenen is leren: hier WEL meteen goed of fout, met het juiste antwoord
        erbij. Bij een toets gebeurt dat niet; zie de kop van dit bestand. */
     var terug = r.goed ? 'Goed.' : 'Niet goed; het juiste antwoord is ' + r.juisteAntwoord + '.';
+    /* De Misconception Graph: heeft de server kunnen narekenen WAT er gedacht
+       is, dan staat dat erbij, met dezelfde stof anders uitgelegd eronder.
+       Kwam hij er niet uit, dan staat er niets extra's -- liever niets dan een
+       gok, want een verzonnen duiding stuurt een kind de verkeerde kant op. */
+    var extra = (r.denkfout ? '<div style="margin-top:.35rem;"><b>' + esc(r.denkfout.naam) + '.</b> ' + esc(r.denkfout.uitleg) + '</div>' : '') +
+      (r.anders ? '<div style="margin-top:.3rem;opacity:.9;"><i>Anders uitgelegd (' + esc(r.anders.soort) + '):</i> ' + esc(r.anders.tekst) + '</div>' : '');
     if (!r.klaar) {
       vraag(r);
       var u = wortel.querySelector('#oefenUit');
-      if (u) u.textContent = terug;
+      if (u) u.innerHTML = esc(terug) + extra;
       return;
     }
-    melding(terug + ' Je had er ' + r.aantalGoed + ' van de ' + r.totaal + ' goed. ' +
-      (r.afgevinkt ? 'Het huiswerk staat afgevinkt.' : (r.advies || '')));
+    var v = vak();
+    if (v) v.innerHTML = '<div class="mini">' + esc(terug + ' Je had er ' + r.aantalGoed + ' van de ' + r.totaal + ' goed. ' +
+      (r.afgevinkt ? 'Het huiswerk staat afgevinkt.' : (r.advies || ''))) + extra + '</div>';
     BEZIG = null;
     setTimeout(laad, 1600);
   }

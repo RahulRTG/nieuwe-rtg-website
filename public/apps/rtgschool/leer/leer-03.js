@@ -71,6 +71,12 @@
       var d = await api('/api/leerstof/antwoord', { antwoord: antw });
       var uit = document.getElementById('oefenUit');
       var regel = d.goed ? 'Goed zo.' : 'Bijna: het juiste antwoord was "' + esc(d.juisteAntwoord) + '". Een fout is gewoon de volgende stap in de les.';
+      /* De Misconception Graph: als de server heeft kunnen narekenen WAT er
+         gedacht is, staat dat hier -- met daaronder dezelfde stof op een
+         andere manier uitgelegd. Komt de server er niet uit, dan staat er
+         niets extra's: een verzonnen duiding stuurt je de verkeerde kant op. */
+      if (d.denkfout) regel += '<div style="margin-top:.4rem;"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
+      if (d.anders) regel += '<div style="margin-top:.35rem;opacity:.9;"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';
         document.getElementById('oefenIn').parentElement.hidden = true;

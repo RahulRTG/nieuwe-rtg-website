@@ -53,6 +53,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | de hele bibliotheek | **geen enkel leerdoel** put nog uit een handgeschreven vragenlijst; 333 uitlegvarianten | `test/leerfabric.test.js` |
 | Proof of Learning | elke beheersing draagt haar bewijs; zes soorten, zelfgemeld telt minder, school bevestigt | `kern/onderwijs-bewijs.js`, `school/bewijs.js` |
 | Memory Engine | herhaalmoment per behaald doel; drie vragen, reeks 2/7/21/60/180 dagen | `kern/onderwijs-geheugen.js`, `kern/leerstof-herhalen.js` |
+| Misconception Graph | 18 denkpatronen uit het feit van de opgave; klasbeeld zonder wie | `kern/leerstof-denkfout.js`, `school/denkfout.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -183,19 +184,50 @@ precies de berg waar deze laag tegen bedoeld is.
 
 ## 5. De Misconception Graph -- een fout is geen fout maar een denkfout
 
+> **Gebouwd op 19 augustus 2026.** Achttien denkpatronen, geduid uit het feit
+> van de opgave; de leerling krijgt de duiding en meteen een andere uitleg, de
+> klas krijgt de telling zonder wie.
+
 `antwoord = fout` is de armste vorm van informatie die een schoolsysteem kan
 bewaren. Rijker: **welk denkpatroon** leidde ertoe.
 
 ```
-misconception.fractions.add_denominator   -- teller én noemer opgeteld
-misconception.units.no_conversion         -- eenheden niet omgerekend
-misconception.dt.past_tense_stem          -- stam en tijd door elkaar
+maal.plus-in-plaats-van-maal   -- 3 x 7 = 10: opgeteld in plaats van vermenigvuldigd
+breuken.noemer-opgeteld        -- 1/3 + 1/3 = 2/6: de noemer meegeteld
+eenheden.niet-omgerekend       -- 1 meter = 1 centimeter: het getal laten staan
+dt.t-vergeten                  -- hij ___ met de kale stam
 ```
 
-Wat dat oplevert is niet een cijfer maar een les: *elf van de zesentwintig
-leerlingen lijken dezelfde denkfout te maken.* Daar hoort een klassikale
-mini-uitleg bij met drie controlevragen -- en die maakt de docent beter, in
-plaats van hem te vervangen.
+**Hoe dit werkt zonder te raden.** Een opgave draagt sinds deze laag een
+*feit*: de bouwstenen waaruit hij is gemaakt (de twee getallen, de bewerking,
+de noemer, de eenheid). Dat feit blijft op de server -- de client krijgt alleen
+de vraag -- en daarmee is een fout antwoord narekenbaar te duiden. Geen model,
+geen gok: 3 x 7 met antwoord 10 **is** 3 + 7, en anders zeggen we niets.
+
+**Liever niets dan een gok.** Past een fout op geen enkele regel, dan is het
+gewoon een fout en staat er niets extra's. Een verzonnen denkfout is erger dan
+geen: hij stuurt een kind een verkeerde uitleg in. Een specifieke duiding gaat
+bovendien altijd vóór een algemene -- 3 x 7 = 5 is geen telfout maar een plus.
+
+**Twee keer hetzelfde weegt zwaarder dan ontbrekende voorkennis.** Wie binnen
+één sessie twee keer hetzelfde denkt, mist geen bouwsteen maar heeft een stap
+anders geleerd; dan wijst het advies daarheen in plaats van naar de leerlijn
+eronder.
+
+Wat dat oplevert is niet een cijfer maar een les: *dit denkpatroon is deze week
+elf keer langsgekomen bij dit leerdoel.* Daar hoort een klassikale mini-uitleg
+bij -- en die maakt de docent beter, in plaats van hem te vervangen. Een patroon
+dat de leraar heeft besproken verdwijnt uit het overzicht; dat is geen
+opruimknop maar de werkwijze, want een berg oude signalen betekent niets meer.
+
+**Geteld en niet bijgehouden wie.** In de klas staat per leerdoel per denkfout
+een aantal en een laatste datum, en verder niets: geen leerlingsleutel, geen
+lijst, geen weg terug naar een kind. Daarom staat er "elf keer" en niet "elf
+van de zesentwintig leerlingen" -- dat laatste vraagt om identiteit, en die
+wordt hier niet vastgelegd. De prijs is dat een leraar niet ziet wie het was;
+de winst is dat niemand het ooit kan opvragen. De toets meet dat op de
+**opslag** en niet op het antwoord, want een sleutel die stil in de database
+belandt is precies wat een dossier van de missers van een kind zou worden.
 
 Daaraan vast zit **Explain Differently**: hetzelfde leerdoel, andere
 representatie. Eenvoudiger, visueel, stap voor stap, als praktijkvoorbeeld, als
@@ -270,6 +302,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een herhaalvraag ziet eruit als een nieuwe vraag | zelfde kaart, zelfde antwoordroute; geen tweede weg | **ja** (`test/schoolschermen.test.js`) |
 | Herhalen meldt nooit hoe laat je bent | de open lijst draagt geen datum en geen achterstand | **ja**, met mutatie beproefd |
 | Een mindere herhaling wist niets | leerdoel blijft staan, reeks valt EEN trede terug | **ja** (`test/geheugen.test.js`) |
+| Een denkfout wordt nooit gegokt | past niets, dan zegt de server niets | **ja** (`test/denkfout.test.js`) |
+| De klas telt patronen zonder wie | opslagvorm is aantal + datum, meer niet | **ja**, op de opslag met mutatie beproefd |
+| Het feit van een opgave verlaat de server niet | met de bouwstenen is het antwoord uit te rekenen | **ja** (`test/denkfout.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -489,8 +524,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 3. **Memory Engine.** Gedaan: retentiestand per behaald doel, de drie
    herhaalvragen door dezelfde weg als een oefensessie, en de kaart "wat komt
    er terug" op beide leerlingschermen.
-4. **Misconception Graph + Explain Differently.** Foutpatronen classificeren en
-   dezelfde stof anders aanbieden.
+4. **Misconception Graph + Explain Differently.** Gedaan: achttien
+   denkpatronen, geduid uit het feit van de opgave; de duiding en een andere
+   uitleg meteen bij de leerling, de telling zonder wie bij de leraar.
 5. **Daily Learning Guarantee.** Het dagbudget dat uit 1 t/m 4 volgt -- en pas
    dán, want een dagplan zonder inhoud is een lege agenda.
 6. **Teacher Flow en Attention OS.** Administratie als bijproduct.

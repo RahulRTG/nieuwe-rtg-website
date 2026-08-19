@@ -10,6 +10,10 @@
      en bij vier van de vijf goed vinkt het huiswerk zichzelf af. */
 const { DOELEN } = require('../kern/leerstof');
 const { opgave } = require('../kern/leerstof-gen');
+/* De Misconception Graph: een fout antwoord bij huiswerk wordt geduid en voor
+   de KLAS geteld -- zonder wie. Zie ./denkfout.js voor die grens. */
+const { duiding, andersUitgelegd } = require('../kern/leerstof-denkfout');
+const { tel } = require('./denkfout');
 
 const MAX_LERAREN = 3;
 const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
@@ -103,7 +107,9 @@ module.exports = (sctx) => {
     const d = h && h.doel ? eigenVeld(DOELEN, h.doel) : null;
     if (!d) return res.status(404).json({ error: 'Dit huiswerk heeft geen oefenbaar leerdoel.' });
     const vragen = [];
-    for (let i = 0; i < 5; i++) { const o = opgave(d.gen); vragen.push({ v: o.v, a: o.a, opties: o.opties || null }); }
+    /* Het feit (de bouwstenen van de opgave) reist mee de sessie in en blijft
+       op de server: daarmee is een fout antwoord narekenbaar te duiden. */
+    for (let i = 0; i < 5; i++) { const o = opgave(d.gen); vragen.push({ v: o.v, a: o.a, opties: o.opties || null, feit: o.feit || null }); }
     oefenwerk(k)[l.sleutel] = { huiswerkId: h.id, vragen, ix: 0, goed: 0 };
     save();
     res.json({ ok: true, doel: h.doel, les: d.les, nr: 1, totaal: 5, vraag: vragen[0].v, opties: vragen[0].opties });
@@ -122,6 +128,15 @@ module.exports = (sctx) => {
     const klaar = w.ix >= w.vragen.length;
     // oefenen is leren: hier WEL meteen goed/fout en het juiste antwoord
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: w.ix, totaal: w.vragen.length, klaar };
+    if (!goed) {
+      const df = duiding(vraag.feit, vraag.a, req.body.antwoord);
+      if (df) {
+        uit.denkfout = { id: df.id, naam: df.naam, uitleg: df.uitleg };
+        const hw = (k.huiswerk || []).find(x => x.id === w.huiswerkId);
+        uit.anders = andersUitgelegd(DOELEN[(hw && hw.doel) || ''], df);
+        tel(k, (hw && hw.doel) || '', df.id, nu());
+      }
+    }
     if (klaar) {
       uit.aantalGoed = w.goed;
       uit.afgevinkt = false;

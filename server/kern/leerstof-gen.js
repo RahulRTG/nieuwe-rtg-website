@@ -26,11 +26,11 @@ const GEN = {
       const [x, y] = op === '-' && b > a ? [b, a] : [a, b];
       const uit = op === '+' ? x + y : x - y;
       return { v: String(x).replace('.', ',') + ' ' + op + ' ' + String(y).replace('.', ',') + ' =', a: String(Math.round(uit * 10) / 10).replace('.', ',') }; }
-    if (op === 'x') { const a = 2 + r(9), b = Math.max(2, r(max)); return { v: a + ' x ' + b + ' =', a: String(a * b) }; }
+    if (op === 'x') { const a = 2 + r(9), b = Math.max(2, r(max)); return { v: a + ' x ' + b + ' =', a: String(a * b), feit: { soort: 'som', op: 'x', a, b } }; }
     let a = 1 + r(max), b = 1 + r(max);
-    if (op === '+') { while (a + b > max) { a = 1 + r(max); b = 1 + r(max); } return { v: a + ' + ' + b + ' =', a: String(a + b) }; }
+    if (op === '+') { while (a + b > max) { a = 1 + r(max); b = 1 + r(max); } return { v: a + ' + ' + b + ' =', a: String(a + b), feit: { soort: 'som', op: '+', a, b } }; }
     if (b > a) [a, b] = [b, a];
-    return { v: a + ' - ' + b + ' =', a: String(a - b) };
+    return { v: a + ' - ' + b + ' =', a: String(a - b), feit: { soort: 'som', op: '-', a, b } };
   },
   buur(g) {
     const stap = g.stap || 1;
@@ -39,8 +39,8 @@ const GEN = {
     return { v: 'Welk getal komt ' + (na ? 'na' : 'voor') + ' ' + n + (stap > 1 ? ' (in stappen van ' + stap + ')' : '') + '?', a: String(na ? n + stap : n - stap) };
   },
   splits(g) { const heel = 3 + r(g.max - 2), deel = 1 + r(heel - 1); return { v: deel + ' en hoeveel is samen ' + heel + '?', a: String(heel - deel) }; },
-  tafel(g) { const t = kies(g.tafels), n = 1 + r(10); return { v: n + ' x ' + t + ' =', a: String(n * t) }; },
-  deel(g) { const t = kies(g.tafels), n = 1 + r(10); return { v: (n * t) + ' : ' + t + ' =', a: String(n) }; },
+  tafel(g) { const t = kies(g.tafels), n = 1 + r(10); return { v: n + ' x ' + t + ' =', a: String(n * t), feit: { soort: 'tafel', n, t } }; },
+  deel(g) { const t = kies(g.tafels), n = 1 + r(10); return { v: (n * t) + ' : ' + t + ' =', a: String(n), feit: { soort: 'deel', deeltal: n * t, deler: t } }; },
   klok(g) {
     const uur = 1 + r(12);
     if (g.stap === 30) { const half = r(2) === 1; return { v: 'Wat is een ' + (half ? 'half uur' : 'heel uur') + ' na ' + uur + ':00?', a: half ? uur + ':30' : (uur === 12 ? 1 : uur + 1) + ':00' }; }
@@ -63,7 +63,7 @@ const GEN = {
   'breuk-som'() {
     const noemer = kies([3, 4, 5, 6, 8, 10]);
     const a = 1 + r(noemer - 2), b = 1 + r(noemer - 1 - a);
-    return { v: a + '/' + noemer + ' + ' + b + '/' + noemer + ' =', a: (a + b) + '/' + noemer };
+    return { v: a + '/' + noemer + ' + ' + b + '/' + noemer + ' =', a: (a + b) + '/' + noemer, feit: { soort: 'breuk-som', a, b, noemer } };
   },
   verhouding(g) {
     const stuks = 2 + r(3), prijs = 1 + r(Math.floor(g.max / 2)), vraag = stuks + 1 + r(4);
@@ -72,7 +72,7 @@ const GEN = {
   procent(g) {
     const p = kies(g.procenten);
     const basis = (100 / gcd(p, 100)) * (1 + r(5));
-    return { v: p + '% van ' + basis + ' =', a: String(basis * p / 100) };
+    return { v: p + '% van ' + basis + ' =', a: String(basis * p / 100), feit: { soort: 'procent', p, basis } };
   },
   gemiddelde(g) {
     const m = 2 + r(g.max - 4), d = 1 + r(3);
@@ -93,7 +93,7 @@ const GEN = {
   metriek() {
     const C = [['1 meter', '100', 'centimeter'], ['1 kilometer', '1000', 'meter'], ['1 liter', '10', 'deciliter'], ['1 kilogram', '1000', 'gram'], ['1 centimeter', '10', 'millimeter']];
     const [van, a, naar] = kies(C);
-    return { v: van + ' = hoeveel ' + naar + '?', a };
+    return { v: van + ' = hoeveel ' + naar + '?', a, feit: { soort: 'metriek', factor: Number(a) } };
   },
   letter(g) { const w = kies(g.woorden); return { v: 'Met welke letter begint "' + w + '"?', a: w[0] }; },
   rijm(g) {
@@ -117,7 +117,8 @@ const GEN = {
   dt(g) {
     const w = kies(g.ww);
     if (g.tijd === 'tt') { const hij = r(2) === 1;
-      return { v: 'Vul in: ' + (hij ? 'hij ___' : 'ik ___') + ' (' + w[0] + ')', a: hij ? w[2] : w[1] }; }
+      return { v: 'Vul in: ' + (hij ? 'hij ___' : 'ik ___') + ' (' + w[0] + ')', a: hij ? w[2] : w[1],
+        feit: { soort: 'dt', juist: hij ? 'hij' : 'ik', ik: w[1], hij: w[2] } }; }
     const mv = r(2) === 1;
     return { v: 'Vul in (verleden tijd): ' + (mv ? 'wij ___' : 'ik ___') + ' (' + w[0] + ')', a: mv ? w[2] : w[1] };
   }

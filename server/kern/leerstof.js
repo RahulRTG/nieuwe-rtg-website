@@ -19,6 +19,11 @@ const { UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad: fabricPad } = requi
    ./leerstof-herhalen.js -- en die lopen met opzet door dezelfde antwoordweg
    als een gewone oefensessie. */
 const { maakHerhalen } = require('./leerstof-herhalen');
+/* De Misconception Graph: een fout antwoord wordt geduid als denkpatroon, en
+   daaraan hangt Explain Differently -- dezelfde stof in de vorm die bij dat
+   patroon past. Zegt niets als er niets narekenbaars te zeggen valt. */
+const { duiding, andersUitgelegd } = require('./leerstof-denkfout');
+const { DENKFOUTEN } = require('./leerstof-denkfout-lijst');
 const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
 
@@ -103,6 +108,18 @@ function maakLeerstof({ db, save, onderwijs }) {
     s.ix += 1;
     const klaar = s.ix >= s.vragen.length;
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: s.ix, totaal: s.vragen.length, aantalGoed: s.goed, klaar };
+    /* Een fout antwoord dat op een bekend denkpatroon uitkomt, krijgt de duiding
+       en meteen een ANDERE uitleg van hetzelfde doel mee. Komt het nergens op
+       uit, dan zeggen we niets: een verzonnen denkfout stuurt een kind een
+       verkeerde uitleg in. */
+    if (!goed) {
+      const df = duiding(vraag.feit, vraag.a, d && d.antwoord);
+      if (df) {
+        uit.denkfout = { id: df.id, naam: df.naam, uitleg: df.uitleg };
+        uit.anders = andersUitgelegd(DOELEN[s.doel], df);
+        s.patronen = (s.patronen || []).concat(df.id);
+      }
+    }
     if (klaar && s.herhaling) {
       /* Een herhaling loopt tot hier precies gelijk aan een oefensessie -- dat
          is de belofte -- en pas aan het eind anders: het doel is al behaald,
@@ -127,11 +144,18 @@ function maakLeerstof({ db, save, onderwijs }) {
         const mist = pad(s.doel, behaald).filter(x => x.id !== s.doel && !x.behaald);
         const doel = DOELEN[s.doel];
         uit.ontbreekt = mist.slice(0, 3);
-        uit.advies = mist.length
-          ? 'Hieronder staat nog iets open: ' + mist.slice(0, 2).map(x => x.naam).join(' en ') + '. Doe dat eerst; daarna gaat dit vanzelf beter.'
-          : (doel.uitleg || []).length
-            ? 'Lees de uitleg eens op een andere manier; dezelfde stof kan er heel anders uitzien.'
-            : 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
+        /* Een patroon dat zich HERHAALT weegt zwaarder dan ontbrekende
+           voorkennis: wie twee keer hetzelfde denkt, mist geen bouwsteen maar
+           heeft een stap anders geleerd. Daarom staat dit vooraan. */
+        const vaak = (s.patronen || []).find((id, i, l) => l.indexOf(id) !== i);
+        uit.advies = vaak
+          ? 'Twee keer ging het hier op dezelfde manier: ' + DENKFOUTEN[vaak].naam + '. ' + DENKFOUTEN[vaak].uitleg + ' Lees de uitleg hieronder; die legt het van een andere kant.'
+          : mist.length
+            ? 'Hieronder staat nog iets open: ' + mist.slice(0, 2).map(x => x.naam).join(' en ') + '. Doe dat eerst; daarna gaat dit vanzelf beter.'
+            : (doel.uitleg || []).length
+              ? 'Lees de uitleg eens op een andere manier; dezelfde stof kan er heel anders uitzien.'
+              : 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
+        if (vaak) uit.anders = andersUitgelegd(doel, DENKFOUTEN[vaak]);
       }
       delete sessies()['lid:' + key];
     } else {

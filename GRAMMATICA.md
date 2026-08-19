@@ -63,6 +63,13 @@ huis niet één ding — op `/apps/geld-command.html` draagt een **kaart** van
 pakt, meet niets, en een slimmere selector maakt dat niet beter: hij maakt het
 alleen moeilijker te zien dat hij raadt.
 
+Er is er nog één geprobeerd en gesneuveld: *"de enige zichtbare verzendknop"*.
+Die klinkt redelijk en raadt toch. Op `/apps/app.html` koos hij de verzendknop
+van het Rahul-veld — 24×24 — als hoofdhandeling van het **beginscherm**, terwijl
+de handeling daar is: *kies een wereld*, en dat zijn er vier. Wat telt is dus
+alleen `data-hoofdactie`, of `.hoofd` op iets dat je werkelijk aanraakt (een
+knop, een link).
+
 **Wat er dan aan die handeling wordt geëist**, en het zijn drie regels waar elk
 een reden onder ligt:
 

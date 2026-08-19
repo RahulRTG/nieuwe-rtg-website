@@ -123,7 +123,13 @@ function mobielInPagina(opt) {
      Een vaste balk telt niet mee, een vaste OVERLAY wel. Dat verschil is de
      hoogte: een balk is een strook, een poort bedekt het scherm. Zonder dat
      onderscheid zou "deze ruimte blijft nog dicht" -- een volwaardig antwoord
-     aan een mens -- als leeg scherm gelden. */
+     aan een mens -- als leeg scherm gelden.
+
+     EN DE DREMPEL LIGT LAAG, met opzet. Hij stond op veertig tekens en
+     veroordeelde /apps/clips.html, dat netjes zegt "Dat was het voor nu -- de
+     dagselectie is eindig; zo hoort het". Een goede lege staat IS kort. Wat
+     deze meting hoort te vangen is NIETS, niet WEINIG: het scherm dat past,
+     rendert en een mens een zwart vlak toont. Dat meet nul. */
   var SCHIL = 'nav,header,footer,aside,[role="navigation"],[role="banner"],[role="contentinfo"]';
   function isSchil(el) {
     if (el.closest && el.closest(SCHIL)) return true;
@@ -200,8 +206,15 @@ function mobielInPagina(opt) {
        met "96% match" hem, en die als hoofdhandeling meten levert een getal op
        dat nergens over gaat. Een knop, een link of iets met role=button is
        ondubbelzinnig; een div niet. */
-    ['button.hoofd, a.hoofd, [role="button"].hoofd', 'eigen merk (.hoofd op een knop)'],
-    ['button[type="submit"], input[type="submit"]', 'verzendknop']
+    ['button.hoofd, a.hoofd, [role="button"].hoofd', 'eigen merk (.hoofd op een knop)']
+    /* HIER STOND EEN DERDE: "de enige zichtbare verzendknop". Die leek redelijk
+       en raadde toch. Op /apps/app.html koos hij de verzendknop van het
+       Rahul-veld (24x24) als hoofdhandeling van het BEGINSCHERM -- terwijl de
+       handeling daar is: kies een wereld, en dat zijn er vier. Een scherm dat
+       geen een handeling heeft die eruit springt, hoort dat te melden en niet
+       een willekeurige knop tot norm verheven te krijgen.
+
+       Sindsdien geldt alleen wat het scherm ZELF aanwijst (GRAMMATICA.md). */
   ];
   for (var z = 0; z < zoek.length && !hoofd; z++) {
     var lijst = document.querySelectorAll(zoek[z][0]);
@@ -212,14 +225,13 @@ function mobielInPagina(opt) {
        de eerste van pakken zou een willekeurige knop tot norm verheffen. Voor
        een EXPLICIET merk geldt dat niet: wie er twee aanwijst, wijst aan. */
     if (!gezien.length) continue;
-    if (z === 2 && gezien.length > 1) { hoe = 'meerdere verzendknoppen, geen aanwijzing'; break; }
     hoofd = gezien[0]; hoe = zoek[z][1];
   }
 
   var uit = {
     venster: W, hoogte: H, inhoud: inhoud, dwinger: inhoud > W + 2 ? dwinger : null,
     tekens: tekst.length, beelden: beelden, hoogsteBlok: Math.round(hoogste), balkenBuiten: balkenBuiten,
-    leeg: tekst.length < 40 && beelden === 0,
+    leeg: tekst.length < 5 && beelden === 0,
     hoofd: null, hoe: hoe || 'geen', gebreken: []
   };
 

@@ -18,13 +18,31 @@ function regimeVan(landCode) {
       'De Regelwacht werkt de tarieven van dit land automatisch bij.'] };
 }
 
+/* WAAROM HIER GEEN JAARGANG ONDER LIGT, en waarom dat er met zoveel woorden bij
+   staat. De btw-tarieven, werkgeverslasten en minimumlonen worden sinds
+   ./jaargangen.js per ingangsdatum bewaard, dus die zijn terug te rekenen. De
+   ZZP-tabel hierboven (schijven, zelfstandigenaftrek, MKB-vrijstelling,
+   heffingskortingen) is dat NIET: die staat als vaste data in ./landen.js op het
+   peiljaar en de Regelwacht raakt hem niet aan.
+
+   Deze functie zonder meer een jaartal laten aannemen zou dus een antwoord geven
+   dat eruitziet als "de regels van 2023" en het niet is. Dat is precies de
+   schijnzekerheid die je bij een fiscale tool niet wilt. Een jaar dat afwijkt
+   van het peiljaar wordt daarom niet geweigerd -- de som blijft bruikbaar als
+   indicatie -- maar hij zegt bovenaan wat er aan de hand is. */
 function zzpBerekening(land, winstIn, opties) {
   const landCode = LANDEN[land] ? land : 'NL';
   const Z = regimeVan(landCode);
   const winst = Math.max(0, Math.min(5000000, Math.round(Number(winstIn) || 0)));
   if (!winst) return { error: 'Vul de verwachte jaarwinst in.', status: 400 };
   const o = opties || {};
-  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR };
+  const jaar = Number(o.jaar) || FISCAAL_PEILJAAR;
+  const out = { land: landCode, landNaam: LANDEN[landCode].naam, regime: Z.regime, winst, posten: [], regels: Z.regels.slice(), indicatie: true, peiljaar: FISCAAL_PEILJAAR, jaar };
+  if (jaar !== FISCAAL_PEILJAAR) {
+    out.buitenPeiljaar = true;
+    out.regels.unshift('Let op: dit is gerekend met de tabellen van peiljaar ' + FISCAAL_PEILJAAR +
+      ', niet met die van ' + jaar + '. De zzp-regimes (schijven, aftrekposten, heffingskortingen) worden nog niet per ingangsdatum bewaard, anders dan de btw-tarieven en de werkgeverslasten. Voor ' + jaar + ' zijn dit dus niet de regels die toen golden.');
+  }
   let belasting = 0, belastbaar = winst;
   if (landCode === 'NL') {
     const uren = o.urencriterium !== false;

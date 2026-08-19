@@ -995,6 +995,52 @@ herbouwd bedrag dat net anders terugvalt dan het oorspronkelijke is geen herbouw
 `test/fiscaal-jaargangen.test.js` dekt de vijf beweringen; elk is met een mutatie
 zien zakken.
 
+#### En de rekenplekken die het moeten doen
+
+De jaargangen maken terugrekenen *mogelijk*; drie rekenplekken deden het niet en
+herschreven daarmee stilletjes een afgesloten dag of maand zodra de Regelwacht
+iets bijwerkte. Ze vragen het nu aan één plek (`kern/fiscaal/regelbron.js`), die
+zonder jaargangen netjes terugvalt op de lopende tabel — en dat ook zegt.
+
+**De maandboekhouding (`financeVoor`)** pot nu per categorie **én per tarief**,
+met het percentage van de dag van de transactie zelf. Verandert een tarief
+halverwege de maand, dan staan er twee regels in plaats van één: de omzet van
+voor en na de ingangsdatum hoort niet op een hoop, want dan draagt één van beide
+helften het verkeerde percentage af. Zo telt de btw-aangifte ook
+(`btwtelling.js` pot per tarief). Verandert er niets, dan is er per categorie
+precies één pot en ziet niemand verschil. De werkgeverslasten, het vakantiegeld
+en het minimumloon komen van een **peildag**: de laatste dag van de maand, maar
+nooit later dan vandaag — anders telt op de tiende al een wijziging mee die pas
+op de dertigste ingaat.
+
+**Het Z-rapport (`rapporten.js`)** gebruikt het tarief van díé dag. Daar zat nog
+een tweede probleem: dit bestand had een **eigen kopie** van de categorie-logica
+— de derde — met precies de bug die `tarief.js` kwam opheffen. Een zaak zonder
+kaart, kamers of ritten werd `eten`, dus een kledingwinkel kreeg het lage tarief
+over een jas terwijl zijn factuur en zijn maandboekhouding het standaardtarief
+zeiden. Eén zaak, één dag, twee cijfers.
+
+> **Dit verandert een cijfer.** Het Z-rapport van een zaak zonder kaart, kamers
+> of ritten gaat van het verlaagde naar het standaardtarief. Dat cijfer hoort te
+> veranderen — het stond fout, en het is dezelfde correctie die de factuur en de
+> boekhouding al hadden ondergaan.
+
+**De zzp-tool** is bewust *niet* half temporeel gemaakt. De schijven,
+aftrekposten en heffingskortingen staan als vaste data op het peiljaar en de
+Regelwacht raakt ze niet aan, dus er valt niets terug te rekenen. Een jaartal
+laten aannemen zou een antwoord geven dat eruitziet als "de regels van 2023" en
+het niet is. Hij accepteert nu een `jaar` en zegt bij een jaar buiten het
+peiljaar uitdrukkelijk dat dit niet de regels van dat jaar zijn — de som blijft
+gelijk, en juist daarom moet die zin er staan. **De ZZP-tabellen onder de
+jaargangen brengen is de volgende echte stap**, en die is hiermee niet gezet.
+
+Elke uitkomst draagt een `regelstand`: op welke dag is teruggerekend, uit welke
+bron (`jaargangen` of `lopend`), en welke wijzigingen golden er toen. Zonder die
+stempel is het herbouwen van een bedrag later een gok.
+
+`test/fiscaal-terugrekenen.test.js` dekt de vijf beweringen, elk met een mutatie
+zien zakken.
+
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
 Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om

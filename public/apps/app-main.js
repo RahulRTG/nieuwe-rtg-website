@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '78494809';
+var RTG_BOUW = 'a5263be9';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3792,14 +3792,26 @@ var RTG_BOUW = '78494809';
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
     rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
     // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
-    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' }
+    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' },
+    /* Bank ONTBRAK, en dat was stil. `link:bank` stond wel in MAPPEN, maar
+       zonder deze regel geeft itemDef() undefined, wordt itemZichtbaar() false
+       en tekent RTG zich gewoon een tegel kleiner -- zonder fout, zonder lege
+       plek. De stand zelf bestond al die tijd (apps/geld/bankc.js, id 'bank').
+       test/wereldregister.test.js vangt dit soort gaten nu. */
+    bank:        { naam: 'Bank',          url: '/apps/geld.html#bank' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
      sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam).
      RTFoundation is EEN app: een tik toont de leeftijdskeuze en opent dan
      de hub in de passende jas (?groep= zet de bril op). */
+  /* WERK STOND ER WEL EN BESTOND ER NIET. `os:werk` staat in RTG Kantoor en
+     openOsApp() heeft er een eigen tak voor (openWerkKiezer), maar de wacht
+     bovenaan die functie -- `const app = OSAPPS[naam]; if (!app) return;` --
+     kwam daarvoor. Zonder deze regel was de werkplekkiezer dus onbereikbaar EN
+     was de tegel onzichtbaar: twee gaten die elkaar verborgen. */
   const OSAPPS = {
+    werk:        { naam: 'Werk' },
     bellen:      { naam: 'Bellen' },
     videobellen: { naam: 'Videobellen' },
     snaps:       { naam: 'Snaps' },

@@ -1,13 +1,13 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Structuur en raakvlak staan op nul en zijn hard. CONTRAST NIET, en sinds 19 augustus 2026 staat daar een eerlijk getal in plaats van een nul die nooit waar was: de keuring gaf tot die dag op zodra er een verloop in de keten stond, en de themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's: 1884 tekstelementen gewogen, 3042 overgeslagen -- alle 3042 om die ene reden. De poort mat dus 38% van de tekst en meldde daarover nul. Nu rekent hij verlopen en doorzichtige lagen uit (scripts/a11ykeuring.js, gronden()) en weegt hij 83%. Wat er sindsdien uitkomt staat hieronder als BOVENGRENS die alleen omlaag mag, precies zoals het raakvlak dat ooit deed.",
+  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Alle drie staan op nul en zijn hard. SINDS 19 AUGUSTUS 2026 BETEKENT DIE NUL IETS ANDERS DAN DAARVOOR: de keuring gaf tot die dag op zodra er een verloop in de keten stond, en de themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's: 1884 tekstelementen gewogen, 3042 overgeslagen -- alle 3042 om die ene reden. De oude nul ging dus over 38% van de tekst. De keuring rekent verlopen, doorzichtige lagen en dekkende pseudo-lagen nu uit (gronden() in scripts/a11ykeuring.js) en weegt 83%; de 60 fouten die daarmee zichtbaar werden zijn gerepareerd. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
   "gemeten": "2026-08-19",
   "uitgelogd": {
     "structureel": 0,
-    "contrast": 26
+    "contrast": 0
   },
   "ingelogd": {
     "structureel": 0,
-    "contrast": 34
+    "contrast": 0
   },
   "raakvlak": {
     "onder24": 0,
@@ -62,13 +62,20 @@
     "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
   },
   "contrast": {
-    "waarom deze getallen geen nul zijn": "Ze waren nooit nul; ze waren ongemeten. De vorige nul ging over 38% van de tekst. Deze 26 en 34 zijn wat er overblijft nadat drie systeemfouten die de nieuwe meting blootlegde zijn gerepareerd -- zie hieronder. Ze horen te krimpen, en de poort zakt zodra er een bijkomt.",
-    "de drie systeemfouten die de nieuwe meting blootlegde": [
-      "de drie juridische pagina's (voorwaarden, privacy, partnervoorwaarden) verklaren zichzelf licht, maar de gedeelde `body.rtg-stijl` en de themalaag zijn specifieker en namen alleen de GROND over: bijna zwarte tekst op een bijna zwarte grond, 1,08:1, op een juridisch stuk. 156 bevindingen. Ze dragen nu data-rtg-eigenvlak en schilderen hun eigen grond EN inkt.",
-      "de grote iOS-titel (.ios-groot) stond op --ios-inkt, en dat is de inkt van de BALK, die altijd donker is. Op het champagne-thema gaf dat lichte letters op een lichte grond op vrijwel elk scherm: 104 bevindingen, 1,06:1. Hij draagt nu de inkt van de PAGINA.",
-      "de gedeelde tabbalk (.rtgdeel-balk) gebruikte --muted en --txt: een vaste grijstoon en een vaste lichte, allebei blind voor het thema. Niet-actief haalde 4,07:1 waar 4,5 moet, en actief stond op champagne licht op licht. 70 bevindingen. Hij gebruikt nu --rtg-muted en --rtg-txt."
+    "stand bij het openen van deze ronde": "60 contrastfouten (26 uitgelogd, 34 ingelogd), zichtbaar geworden toen de keuring verlopen leerde lezen -- ze waren nooit nul, ze waren ongemeten",
+    "de vijf oorzaken die het leeuwendeel droegen": [
+      "de drie juridische pagina's verklaren zichzelf licht, maar de gedeelde `body.rtg-stijl` en de themalaag zijn specifieker en namen alleen de GROND over: bijna zwarte tekst op een bijna zwarte grond, 1,08:1, op een juridisch stuk. Ze dragen nu data-rtg-eigenvlak en schilderen hun eigen grond EN inkt",
+      "de grote iOS-titel stond op --ios-inkt, en dat is de inkt van de BALK, die altijd donker is; op een licht thema gaf dat lichte letters op een lichte grond op vrijwel elk scherm",
+      "drie gedeelde componenten (de tabbalk, de uitvoerknop, de horeca-rail) gebruikten --muted en --txt: een vaste grijstoon en een vaste lichte, allebei blind voor het thema. Nu --rtg-muted en --rtg-txt",
+      "--burgundy-on-dark stond als KLEINE tekst op donker (2,84:1) in de RTFoundation en op schoolpartner -- iets dat CLAUDE.md met zoveel woorden verbiedt en dat de poort tot nu toe niet kon zien",
+      "de dagkleur stond als accentTEKST in de iOS-balk en op vier plekken in de UI-kit; geen van de zestien ankertinten haalt 4,5 op alle vier de thema-gronden"
     ],
-    "wat er nog open staat": "De 26 en 34 hierboven, met als grootste groepen een gedempte grijstoon op donkere kaarten (16x) en --burgundy-on-dark als KLEINE tekst (8x) -- dat laatste verbiedt CLAUDE.md met zoveel woorden, en de poort kon het tot nu toe niet zien.",
+    "en de staart die daarna overbleef": [
+      "het gouden bovenschrift en de vertrouwens-chips van bestellen.html: kleine tekst op een grond die naar licht oranje loopt. De chips maakten hun eigen grond LICHTER (wit op 12%) en daarmee hun witte tekst onleesbaar",
+      "het schoolmerkbeeld: wit op groen, 2,37:1. Niet de merkgroen veranderd maar er licht van afgehaald -- dezelfde tint, in de schaduw",
+      "de kicker van de juridische pagina's: goud op een LICHTE grond haalt 4,34; --gold-diep, het bestaande huistoken voor goud in de schaduw, haalt 7,22",
+      "de KOMPAS-onderregel van de Rahul-tab: die had een eigen zachtere toon die op elke middentoon zakte. Vervallen -- zie de toelichting in shared/rahul-tab/inkt.js"
+    ],
     "wat de poort nog steeds niet meet": "830 van de 4927 tekstelementen (17%): een `url()` als achtergrond -- daar valt zonder de pixels niets van te rekenen -- en een keten die tot de wortel doorzichtig blijft, waar het doek van de browser zelf de grond is. Allebei geven ze null, en dat is eerlijker dan gokken."
   }
 }

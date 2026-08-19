@@ -204,11 +204,50 @@ function uitersten(kleuren) {
   }
   return licht === donker ? [licht] : [licht, donker];
 }
+/* EEN ::after DIE HET HELE VLAK BEDEKT, IS EEN LAAG. Een voorouderwandeling
+   ziet alleen elementen, en dit huis legt zijn waas graag in een pseudo-element:
+   `.hero:after{position:absolute;inset:0;background:linear-gradient(...)}` met de
+   tekst op z-index 1 erboven. De keuring meldde die hero daardoor als wit op
+   licht oranje, terwijl er een donkere waas tussen zit die hem gewoon leesbaar
+   maakt. Dat kostte een onnodige verdonkering van dat scherm voordat ik het
+   doorhad -- een vals alarm laat je iets repareren dat niet stuk is.
+
+   Alleen een pseudo die het vlak ECHT bedekt telt mee: absoluut gepositioneerd
+   met alle vier de zijden op nul. Een waas die maar een hoek raakt, laat de rest
+   van de tekst op de oude grond staan, en dan is de oude grond de eerlijke. */
+function pseudoLagen(el, welke) {
+  const s = getComputedStyle(el, welke);
+  if (!s || !s.content || s.content === 'none') return null;
+  if (s.position !== 'absolute' && s.position !== 'fixed') return null;
+  if (['top', 'right', 'bottom', 'left'].some((k) => parseFloat(s[k]) !== 0)) return null;
+  const uit = [];
+  const bi = s.backgroundImage;
+  if (bi && bi !== 'none') {
+    for (const laag of laagStukken(bi)) {
+      const st = verloopStops(laag);
+      if (!st) return null;
+      uit.push({ kandidaten: uitersten(st), dekt: dektHelemaal(st) });
+      if (dektHelemaal(st)) return uit;
+    }
+  }
+  const c = kleur(s.backgroundColor);
+  if (c && c[3] > 0) uit.push({ kandidaten: [c], dekt: c[3] >= 1 });
+  return uit.length ? uit : null;
+}
 function gronden(el) {
   const lagen = [];                  // van boven (het element) naar beneden
   let p = el, dekt = false;
   while (p && p.nodeType === 1) {
     const s = getComputedStyle(p);
+    /* de pseudo's van dit element liggen BOVEN zijn eigen achtergrond */
+    if (p !== el) {
+      for (const welke of ['::after', '::before']) {
+        const pl = pseudoLagen(p, welke);
+        if (pl) for (const l of pl) { lagen.push(l.kandidaten); if (l.dekt) { dekt = true; break; } }
+        if (dekt) break;
+      }
+      if (dekt) break;
+    }
     const bi = s.backgroundImage;
     if (bi && bi !== 'none') {
       /* Van boven naar beneden door de lagen van dit element. Zodra er een dekt,
@@ -369,7 +408,7 @@ function keurInPagina() {
 }
 
 const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar,
-  mengOver, laagStukken, verloopStops, uitersten, gronden, achtergrond, adres, keurInPagina]
+  mengOver, laagStukken, verloopStops, uitersten, pseudoLagen, gronden, achtergrond, adres, keurInPagina]
   .concat([]) // dektHelemaal is een pijlfunctie en gaat als tekst mee, hieronder
   .map(f => f.toString()).join('\n\n') +
   '\nconst dektHelemaal = ' + dektHelemaal.toString() + ';\n' +

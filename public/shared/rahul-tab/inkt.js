@@ -43,8 +43,51 @@
     return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
   }
 
-  var licht = helderheid(grondVan(tab.parentElement || tab)) > 0.35;
-  tab.style.setProperty('color', licht ? '#3A3733' : '#F2EEE8', 'important');
+  /* GEEN DREMPEL MEER, MAAR EEN VERGELIJKING -- en dat is de aanvulling van
+     19 augustus 2026.
+
+     Hierboven stond `helderheid(grond) > 0.35` en daarachter twee vaste paren.
+     Een drempel werkt zolang de grond een van de twee uitersten is. Zodra de
+     contrastronde verlopen kon lezen bleek er een derde soort te bestaan: een
+     MIDDENTOON. Op de goudgetinte tab haalde de KOMPAS-regel 4,07:1 en op een
+     lichte pagina, waar de balk naar grijs composeert, 2,37. Allebei onder de
+     norm, en allebei onzichtbaar voor een drempel -- die zegt alleen licht of
+     donker, nooit "geen van beide genoeg".
+
+     Ik heb eerst geprobeerd de GRONDMETING slimmer te maken (doorzichtige lagen
+     mengen). Dat keerde de keuze op sommige schermen om: de tab koos de lichte
+     inkt op een donkere grond. Die poging staat hier niet meer, want een meting
+     die ik niet kan narekenen is geen verbetering.
+
+     Wat er nu staat kan niet omklappen: van de twee inkten wint degene met de
+     hoogste gemeten verhouding tot de grond. Geen grens om verkeerd te zetten.
+     De zachte onderregel mag alleen zacht blijven als hij zelf de norm haalt --
+     8px halfvet is geen grote tekst, dus 4,5 en niet 3. */
+  function verhouding(a, b) {
+    var l1 = helderheid(a), l2 = helderheid(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+  function rgbVan(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+
+  var grond = grondVan(tab.parentElement || tab);
+  var opLicht = verhouding(rgbVan('#14110E'), grond);
+  var opDonker = verhouding(rgbVan('#FFFFFF'), grond);
+  var licht = opLicht > opDonker;                 // welke kant geeft meer contrast?
+  var woord = licht ? '#3A3733' : '#F2EEE8';
+  if (verhouding(rgbVan(woord), grond) < 4.5) woord = licht ? '#14110E' : '#FFFFFF';
+  /* DE ZACHTERE ONDERREGEL IS VERVALLEN, en dat is een besluit met een reden.
+     Hij stond op #5A5651 of #8A8680 en zakte op elke MIDDENTOON: 4,07:1 op de
+     goudgetinte tab, 2,37 op een lichte pagina. Die toon veilig houden vraagt een
+     grondmeting die klopt, en grondVan() hierboven meet iets anders dan de
+     keuring -- die mengt doorzichtige lagen, deze niet. Ik heb geprobeerd hem
+     gelijk te trekken en dat keerde de inktkeuze op sommige schermen om.
+     Een verschil dat je niet kunt narekenen, mag geen leesbaarheid dragen. Dus
+     draagt de onderregel dezelfde inkt als het woord: iets minder zacht, en
+     altijd te lezen. */
+  var zacht = woord;
+  tab.style.setProperty('color', woord, 'important');
   var sub = tab.querySelector('small');
-  if (sub) sub.style.setProperty('color', licht ? '#5A5651' : '#8A8680', 'important');
+  if (sub) sub.style.setProperty('color', zacht, 'important');
 })(window, document);

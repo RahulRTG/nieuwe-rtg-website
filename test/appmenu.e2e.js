@@ -135,13 +135,21 @@ async function metLid(fn) {
    Twee wachtmomenten en niet een: #osMappen is nog steeds de registry waar de
    bank uit gevuld wordt (app-main reikt hem aan, zie app-main-29c.js), dus de
    bank kan pas kloppen als die registry klaar is. Wachten op alleen de bank
-   levert een toets op die soms een tel te vroeg meet. */
+   levert een toets op die soms een tel te vroeg meet.
+
+   HIER STOND `=== 3` EN DAT WAS EEN PROXY DIE VERLIEP. Het was een telling van
+   tegels, bedoeld als "de registry is klaar", en toen WERELDEN.md er een vierde
+   wereld en Instellingen bij zette liep hij vast op een tijdslimiet -- vier
+   toetsen vielen om zonder dat er iets aan die toetsen mankeerde. Een
+   wachtvoorwaarde hoort te noemen WAAROP hij wacht: de vier wereldtegels, bij
+   hun sleutel. Komt er een wereld bij, dan hoort die hier ook te staan. */
+const WERELDTEGELS = ['map-rtg', 'map-werk', 'map-reizen', 'map-rtf'];
 async function wachtWerelden(page) {
-  await page.waitForFunction(() => {
+  await page.waitForFunction((sleutels) => {
     const app = document.getElementById('app');
-    return !!(app && app.classList.contains('active') &&
-      document.querySelectorAll('#osMappen .os-app').length === 3);
-  }, null, { timeout: 60000 });
+    if (!app || !app.classList.contains('active')) return false;
+    return sleutels.every((s) => document.querySelector('#osMappen .os-app[data-sleutel="' + s + '"]'));
+  }, WERELDTEGELS, { timeout: 60000 });
   /* De werktafel hoort er dan ook te zijn: de intake staat buiten deze toetsen
      (zie metLid), dus is #onbGate dicht en is er geen grendel meer. */
   await page.waitForSelector('#rtgCommand .cmd-nav', { state: 'attached', timeout: 20000 });
@@ -414,16 +422,17 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
   });
 });
 
-test('de bank zet de drie werelden boven de software, en het springboard is weg',
+test('de bank zet de vier werelden bovenaan, en het springboard is weg',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
 
-     Hij mat de voordeur: drie wereldtegels als één gecentreerde rij op het
+     Hij mat de voordeur: drie wereldtegels (er zijn er nu vier) als één
+     gecentreerde rij op het
      springboard, met de klok eronder en de balk van Rahul aan de onderrand.
      Dat springboard is geen scherm meer -- het beginscherm is de werktafel van
      RTG Command (WERELD.md) -- en de werelden staan nu bovenaan de bank.
 
-     Wat hetzelfde bleef is de VRAAG: staan de drie werelden er, staan ze
+     Wat hetzelfde bleef is de VRAAG: staan de werelden er, staan ze
      bovenaan, en zijn ze echt te zien? Een rij die op nul pixels staat of onder
      de software wegzakt komt door elke telling heen. Wat er bij komt is de
      andere helft van dezelfde afspraak: het springboard mag NIET meer in beeld

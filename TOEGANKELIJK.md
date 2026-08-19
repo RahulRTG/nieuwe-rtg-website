@@ -23,7 +23,7 @@ op telefoonformaat (390x844).
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
 | past op een telefoon | **0** te breed, **0** leeg | een scherm waarvan de rechterhelft weg is, of dat niets toont |
-| duimbereik | **0** buiten bereik, per hand gemeten | de belangrijkste knop op de plek waar jouw duim niet komt |
+| duimbereik | **0** buiten bereik, per hand gemeten over 89 aangewezen hoofdhandelingen | de belangrijkste knop op de plek waar jouw duim niet komt |
 
 Die zeven zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het
@@ -149,12 +149,25 @@ gemeten**. Acht schermen hadden hun hoofdhandeling in het kwart waar de duim
 niet komt — en *welke* acht dat waren, verschilde tussen een linkshandige en een
 rechtshandige. Een scherm dat alleen voor rechtshandigen klopt, is niet af.
 
-**Wat hier NOG NIET staat**, en het is de grootste post: van de 257 schermen
-wijzen er **18** hun hoofdhandeling aan. De conventie bestaat (`data-hoofdactie`,
-`GRAMMATICA.md`) en de poort meet wat gedeclareerd is; de overige 239 zijn niet
-gemeten op duimbereik omdat er niets te meten valt. Dat is geen fout die
-verborgen wordt — het getal staat in `A11Y-INGELOGD.json` — maar het is wel de
-eerlijke maat van hoe ver dit is.
+**Wat hier NOG NIET staat**, en het is de grootste post: van de 254 schermen
+wijzen er **89** hun hoofdhandeling aan (bij het openen van deze ronde waren het
+er 18). De conventie bestaat (`data-hoofdactie`, `GRAMMATICA.md`) en de poort
+meet wat gedeclareerd is; de overige 165 zijn niet gemeten op duimbereik omdat
+er niets te meten valt — een lijst, een cockpit of een dagbriefing heeft niet
+één handeling die eruit springt. Dat is geen fout die verborgen wordt — het
+getal staat in `A11Y-INGELOGD.json` — maar het is wel de eerlijke maat van hoe
+ver dit is.
+
+**En één blinde vlek is er tussenuit gekomen die geen enkele teller liet zien.**
+De keuring logde in met een RTG-lidmaatschap, en de RTF-leerling- en
+gezinsschermen hangen achter een tweede deur die daar los van staat
+(`apps/foundation/sessie.js`). Vijfenvijftig schermen — 22% van dit huis — zijn
+dus rondenlang gemeten als "gaat open, past, geen hoofdhandeling", terwijl er in
+werkelijkheid een slot in beeld stond. De keuring maakt nu ook een gezin met een
+profiel aan. Meteen daarna kwam er een echt gebrek achter vandaan dat er al die
+tijd stond: het tegelraster van `/apps/foundation/index.html` liep 353 pixels
+buiten beeld. **Een scherm dat je nooit open hebt zien gaan, heb je niet
+gemeten** — en het stond wel als gemeten in dit document.
 
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146

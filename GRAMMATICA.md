@@ -86,8 +86,30 @@ iets aan"* de reparatie, en daar wordt geen enkel scherm beter van. Wat de metin
 oplevert is dus niet "hoeveel is er stuk" maar **hoeveel schermen hebben één
 handeling die er echt uitspringt, en klopt die dan ook**.
 
+**En waar hij dan mag staan, staat er ook bij** — twee klassen, allebei uit een
+meting geboren en allebei in `shared/rtg-ui.css`:
+
+| klasse | wat hij zegt | wat er gebeurt |
+|---|---|---|
+| `.rtg-duimbalk` | *dit blokje is de handelingsstrook van dit scherm* | op telefoonmaat een vaste strook onderaan, daarboven een gewone rij onder de kop |
+| `.rtg-duimeind` | *deze rij draagt de hoofdhandeling* | de knop houdt zijn eigen maat naast het veld, en klapt om voor een linkshandige (`shared/hand.css`) |
+
+Zonder markering is het antwoord **volle breedte**, en dat is met opzet het
+faalgedrag: volle breedte kent geen kant en is dus nooit een duimgebrek. Een
+vergeten markering levert een andere vorm op, geen defect.
+
+Die tweede klasse verving een regel die het probeerde te *raden*: `:has(> input)`
+— "zit er een veld in hetzelfde blok, laat de knop dan smal". Dat leek een
+structuurtoets en was een gok naar opmaak. Op `/apps/foundation/klas.html` staan
+twee velden van `width:100%` ónder elkaar met de knop eronder; de gok maakte er
+een knop van 65 pixels in de linkerhoek van een kinderscherm van. **CSS kan niet
+zien of twee dingen op dezelfde regel staan, dus wordt het gezegd.** Gemeten over
+alle schermen: tweeentwintig hoofdhandelingen delen echt hun regel met een veld.
+
 *Wat het bewaakt:* `scripts/mobielkeuring.js`, als vierde ronde in
-`npm run a11y` — twee keer, één keer per hand.
+`npm run a11y` — twee keer, één keer per hand. Stand op 19 augustus 2026: 89 van
+de 254 schermen wijzen een hoofdhandeling aan, en alle vier de tellers (maat,
+hoogte, zijkant, breedte) staan op nul.
 
 ## Het Command Dock
 

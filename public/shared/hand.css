@@ -26,6 +26,13 @@
 :root[data-hand="links"] dialog form > div,
 :root[data-hand="links"] dialog form > footer,
 :root[data-hand="links"] .knoprij,
+/* .rtg-duimeind is dezelfde afspraak voor een rij die geen dialoogvoet is: "de
+   laatste knop in deze rij is de hoofdhandeling, en die hoort onder de duim".
+   Nodig omdat de veldrij-regel onderaan dit blad alleen ziet wat een DIRECT
+   broertje van een veld is; de voet onder een tekstvak (/apps/pulse.html) is
+   dat niet, en daar stond "Plaatsen" op x 89 van 390 -- voor een rechtshandige
+   in de verkeerde hoek. */
+:root[data-hand="links"] .rtg-duimeind,
 :root[data-hand="links"] .cmd-dialoog-voet {
   flex-direction: row-reverse;
   justify-content: flex-end;
@@ -54,21 +61,8 @@
 :root[data-hand="links"] .cmd-actierij { flex-direction: row-reverse; }
 :root[data-hand="links"] .cmd-balkbladen { flex-direction: row-reverse; }
 
-/* ---- een hoofdhandeling naast zijn veld hoort aan de duimzijde -----------
-   "Bekijken" naast een codeveld, "Zoek" naast een zoekveld: die knop staat in
-   elk huis rechts van het veld, en voor een linkshandige is dat precies de
-   verste hoek. Gemeten op 19 augustus 2026: op de vier RTFoundation-portalen
-   stond hij op x 310 van 390 -- in het kwart waar die duim niet komt.
-
-   Zelfde truc als bij de dialoogvoet hierboven: row-reverse, dus het VELD komt
-   eerst in de DOM en de knop erna (een schermlezer hoort ze in de goede
-   volgorde), maar de knop ligt aan de duimkant. Het veld heeft flex:1 en vult
-   de rest, dus de uitlijning van de rij verandert verder niet.
-
-   Bewust zo smal: alleen een rij die een veld EN de aangewezen hoofdhandeling
-   draagt. `.rij` is in dit huis een algemene klasse; die in zijn geheel
-   omklappen zou pillen, labels en meta-regels meespiegelen die niets met de
-   duim te maken hebben. */
-:root[data-hand="links"] *:has(> input, > textarea, > select):has(> [data-hoofdactie]) {
-  flex-direction: row-reverse;
-}
+/* De veldrij-regel die hier stond is opgegaan in .rtg-duimeind hierboven: die
+   klasse zegt van EEN rij dat hij de hoofdhandeling draagt, en dat is precies
+   wat hier gespiegeld moet worden. Twee lijsten over hetzelfde is er een te
+   veel (LAT.md regel 4), en de :has()-versie raadde bovendien naar opmaak --
+   zie de uitleg in shared/rtg-ui.css. */

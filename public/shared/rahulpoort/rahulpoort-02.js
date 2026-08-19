@@ -9,6 +9,18 @@
       '<div class="rp-zin" role="status" aria-live="polite"></div>' +
       '<div class="rp-rij"><select hidden aria-hidden="true"></select>' +
       '<input autocomplete="off" spellcheck="false">' +
+      /* GEEN data-hoofdactie OP DEZE PIJL, EN DAT IS EEN BESLUIT.
+
+         De eerste ingeving was hem wel aan te wijzen: een poort heeft toch een
+         handeling? Maar deze pijl staat op opacity:0 tot de rij focus heeft of
+         gevuld is (zie de stijl hierboven), en hij is 24 breed. Hem aanwijzen
+         zou twee dingen tegelijk beweren die niet waar zijn: dat er bij het
+         openen van het scherm een hoofdhandeling ZICHTBAAR is, en dat die 44
+         pixels meet. De echte hoofdhandeling van deze poort is het VELD --
+         typen en Enter -- en dat is geen knop.
+
+         Wat er dus staat is: dit scherm wijst niets aan. Dat is werkvoorraad in
+         de telefoonronde en geen gebrek, en dat is hier het eerlijke antwoord. */
       '<button type="button" aria-label="' + esc(opt.stuurLabel || 'Stuur') + '">&#8594;</button></div>' +
       '<div class="rp-paden"></div></div>';
 

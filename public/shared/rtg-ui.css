@@ -288,11 +288,28 @@ body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
 
    Gemeten op 19 augustus 2026: veertien schermen droegen een hoofdhandeling van
    24 tot 43 pixels. Deze regel tilt ze alle veertien in een keer. */
-body.rtg-stijl [data-hoofdactie],
+/* WAAROM [data-hoofdactie] HIER GEEN body.rtg-stijl DRAAGT EN .hoofd WEL.
+
+   Dat scheelde drie schermen. `.rtg-stijl` zegt "deze pagina doet mee met de
+   UI-kit", en dat is een keuze per pagina; `data-hoofdactie` is een AFSPRAAK VAN
+   HET HUIS (GRAMMATICA.md) en staat er alleen waar ik hem zelf heb gezet. Met
+   de kitklasse ervoor sloegen /apps/avond.html, /apps/media.html en
+   /apps/bestellen.html over -- die laden rtg-ui.css wel maar dragen de klasse
+   niet -- en stond de aangewezen hoofdhandeling daar op 39,6 hoog.
+
+   Bij `.hoofd` blijft de klasse er wel staan, en met reden: die naam is in dit
+   huis overbelast. Op /apps/geld-command.html is .hoofd een kaart van 350x236.
+   Zonder de kitklasse zou deze regel die kaart gaan opmaken. */
+[data-hoofdactie],
 body.rtg-stijl button.hoofd,
 body.rtg-stijl a.hoofd,
 body.rtg-stijl [role="button"].hoofd{
-  min-height:44px;
+  /* min-WIDTH ook, en dat had er vanaf het begin moeten staan: GRAMMATICA.md
+     zegt 44x44 en deze regel deed alleen de hoogte. Een "+" naast een zoekveld
+     is 12,3 breed en 44 hoog -- gemeten op /apps/comm.html, waar de knop door
+     de veld-uitzondering hierboven terecht zijn eigen maat houdt en die maat
+     dus te klein is. */
+  min-height:44px;min-width:44px;
   display:inline-flex;align-items:center;justify-content:center;
 }
 
@@ -310,32 +327,44 @@ body.rtg-stijl [role="button"].hoofd{
    Niet in een vaste balk onderaan: daar staat hij al binnen bereik, en daar is
    de breedte een ontwerpkeuze van die balk (ADAPTIEF.md). */
 @media(max-width:760px){
-  body.rtg-stijl [data-hoofdactie]:not([data-inbalk]),
-  body.rtg-stijl button.hoofd:not([data-inbalk]),
-  body.rtg-stijl a.hoofd:not([data-inbalk]),
-  body.rtg-stijl [role="button"].hoofd:not([data-inbalk]){
+  [data-hoofdactie],
+  body.rtg-stijl button.hoofd,
+  body.rtg-stijl a.hoofd,
+  body.rtg-stijl [role="button"].hoofd{
     width:100%;max-width:100%;flex:1 1 100%;
   }
-  /* MAAR NIET IN EEN WERKBALK, en dat kostte een meting om te zien.
-     .ios-nav-acties scrolt sinds vandaag in zichzelf en heeft dus min-width:0;
-     `width:100%` van een gekrompen vak is 24 pixels. Op /apps/bestanden.html en
-     /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- mijn eigen
-     regel maakte de knop kleiner in plaats van bereikbaarder. Een knop in een
-     balk houdt zijn eigen maat; die balk regelt zijn breedte zelf. */
-  body.rtg-stijl .cmd-balk [data-hoofdactie],
-  body.rtg-stijl .cmd-balk .hoofd,
-  /* EN NIET ALS HIJ BIJ EEN VELD HOORT. "Bekijken" naast een codeveld,
-     "Zoek" naast een zoekveld: die twee horen op een regel. Volle breedte
-     duwde de knop onder het veld en maakte er twee losse dingen van -- gemeten
-     op de drie RTFoundation-portalen, waar de koppeling zo sneuvelde.
 
-     Die :not([data-inbalk]) hieronder staat er niet voor de sier, en hem
-     weglaten kostte een halve ronde. `:has()` telt voor de zwaarte van zijn
-     ZWAARSTE ARGUMENT, en dat is hier `input` -- een element, geen klasse. De
-     uitzondering woog dus (0,2,2) tegen de (0,3,1) van de regel erboven, en
-     verloor. Met :not() erbij is het (0,3,2) en wint hij. Gemeten in een echte
-     browser op 19 augustus 2026: zonder 374 pixels breed, met 66. */
-  body.rtg-stijl *:has(> input, > textarea, > select) > [data-hoofdactie]:not([data-inbalk]){
+  /* TWEE UITZONDERINGEN, EN ALLEBEI MET EEN NAAM ERBIJ IN PLAATS VAN EEN GOK.
+
+     Hier stond `*:has(> input, > textarea, > select) > [data-hoofdactie]`: "als
+     er een veld in hetzelfde blok zit, laat de knop dan smal". Dat leek een
+     structuurtoets en was een gok naar OPMAAK. Op /apps/foundation/klas.html
+     staan twee velden van width:100% ONDER elkaar met de knop eronder, ook
+     width:100%; die :has() zag "een veld en de knop in hetzelfde blok", maakte
+     er width:auto van en zette een knop van 65 pixels in de linkerhoek van een
+     scherm voor kinderen. Mijn eigen uitzondering brak een scherm dat al klopte.
+
+     CSS kan niet zien of iets op DEZELFDE REGEL staat, dus wordt het gezegd.
+     Gemeten over alle schermen: tweeentwintig hoofdhandelingen delen echt hun
+     regel met een veld, en die dragen nu `.rtg-duimeind` op hun rij -- dezelfde
+     klasse waarmee shared/hand.css die rij voor een linkshandige omklapt, want
+     het is dezelfde afspraak: DEZE RIJ DRAAGT DE HOOFDHANDELING.
+
+     Vergeten te merken is ongevaarlijk: dan wordt de knop volle breedte, en dat
+     is nooit een duimgebrek -- alleen een andere vorm. Dat is het goede
+     faalgedrag voor een regel als deze.
+
+     `data-inbalk` stond hier als ontsnappingsluik en werd door niets gezet
+     (LAT.md regel 3: wat niets meet, hoort weg). De werkbalken staan er nu bij
+     naam. */
+  .cmd-balk [data-hoofdactie],
+  body.rtg-stijl .cmd-balk .hoofd,
+  /* .ios-nav-acties scrolt in zichzelf en heeft dus min-width:0; `width:100%`
+     van een gekrompen vak is 24 pixels. Op /apps/bestanden.html en
+     /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- de regel
+     maakte de knop kleiner in plaats van bereikbaarder. */
+  .ios-nav-acties [data-hoofdactie],
+  .rtg-duimeind > [data-hoofdactie]{
     width:auto;max-width:none;flex:0 0 auto;
   }
 
@@ -375,7 +404,7 @@ body.rtg-stijl [role="button"].hoofd{
 .rtg-duimbalk{ display:flex; gap:.5rem; justify-content:flex-end;
   padding:0 max(1rem, env(safe-area-inset-left,0px)) .6rem; }
 @media(max-width:760px){
-  body.rtg-stijl .rtg-duimbalk{
+  .rtg-duimbalk{
     position:fixed; left:0; right:0; bottom:0; z-index:60;
     /* --ios-thuis-ruimte is de strook die de iOS-schil voor zijn home-indicator
        vrijhoudt (shared/ios.css). Zonder die marge legt deze balk zich over dat
@@ -387,7 +416,7 @@ body.rtg-stijl [role="button"].hoofd{
     backdrop-filter:blur(10px);
     border-top:1px solid var(--rtg-line);
   }
-  body.rtg-stijl .rtg-duimbalk > *{ flex:1 1 auto; }
+  .rtg-duimbalk > *{ flex:1 1 auto; }
   /* Ruimte eronder, anders legt de balk zich over de laatste regel van de lijst.
 
      De :not([hidden] *) is er sinds /apps/foundation/index.html: dat scherm
@@ -395,7 +424,7 @@ body.rtg-stijl [role="button"].hoofd{
      hangt in het welkomblad. Een balk in een verborgen blad wordt niet getekend,
      maar :has() ziet hem wel -- zonder deze uitzondering kregen de andere drie
      bladen van dat scherm 5,5rem lucht onderaan waar niets stond. */
-  body.rtg-stijl:has(.rtg-duimbalk:not([hidden] *)){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
+  body:has(.rtg-duimbalk:not([hidden] *)){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
 }
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de

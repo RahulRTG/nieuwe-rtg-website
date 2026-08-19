@@ -90,8 +90,12 @@
   <h1>Clips</h1>
   <span class="rek"></span>
   <button class="knop" id="volgbaar" type="button" aria-pressed="false">Alleen met ondertitel</button>
-  <button class="knop" id="studioOpen" type="button">Maak een clip</button>
 </header>
+<!-- "Maak een clip" stond in de kopbalk, op y 22 van 844. GRAMMATICA.md opent
+     met "ik wil iets doen -> mijn duim vindt het onderaan", dus staat hij nu in
+     de vaste strook (shared/rtg-ui.css, .rtg-duimbalk). Boven telefoonmaat is
+     dat gewoon een rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop" id="studioOpen" type="button" data-hoofdactie>Maak een clip</button></div>
 
 <main id="feed" aria-label="De dagselectie van vandaag"></main>
 

@@ -276,16 +276,29 @@ function mobielInPagina(opt) {
      De uitzondering is smal met opzet: het veld moet ZICHTBAAR zijn en in
      dezelfde rij staan. Een verzendknop onderaan een lang formulier waarvan het
      veld boven de vouw ligt, valt er dus niet onder. */
+  /* HOORT DEZE KNOP BIJ EEN VELD? Dan geldt de duimlijn niet: hij wordt bereikt
+     vanaf het veld waar net in getypt is, en losweken van dat veld maakt er twee
+     losse dingen van.
+
+     Drie niveaus omhoog en 150 pixels, en die twee getallen komen ergens vandaan.
+     Eerst stond hier alleen "een BROERTJE dat een veld is, op dezelfde regel"
+     (40 pixels), en dat ving de knop naast een codeveld wel en de knop onder een
+     tekstvak niet: op /apps/pulse.html staat "Plaatsen" in een .voet ONDER de
+     textarea, dus geen broertje en niet op dezelfde regel. Drie niveaus dekt
+     veld -> rij -> voet -> kaart; 150 pixels is ruim een tekstvak van vier
+     regels en te weinig voor een knop die verderop op het scherm staat. */
   var bijVeld = false;
-  if (hoofd.parentElement) {
-    var buren = hoofd.parentElement.children;
-    for (var bz = 0; bz < buren.length; bz++) {
-      var bn = buren[bz];
-      if (bn === hoofd) continue;
-      if (!/^(input|textarea|select)$/i.test(bn.tagName)) continue;
+  var tak = hoofd, niveau = 0;
+  while (tak && niveau < 3 && !bijVeld) {
+    tak = tak.parentElement; niveau++;
+    if (!tak) break;
+    var velden = tak.querySelectorAll('input, textarea, select');
+    for (var bz = 0; bz < velden.length; bz++) {
+      var bn = velden[bz];
       if (!zichtbaar(bn)) continue;
+      if (bn.type === 'hidden') continue;
       var bnr = bn.getBoundingClientRect();
-      if (Math.abs((bnr.top + bnr.height / 2) - midY) < 40) { bijVeld = true; break; }
+      if (Math.abs((bnr.top + bnr.height / 2) - midY) < 150) { bijVeld = true; break; }
     }
   }
   uit.hoofd.bijVeld = bijVeld;

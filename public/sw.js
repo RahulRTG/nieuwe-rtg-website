@@ -20,8 +20,22 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
-  // Iconen en manifests veranderen zelden: die mogen uit de cache komen.
-  const staticAsset = /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
+  /* Draagt het adres de VINGERAFDRUK van het bestand (?v=...), dan mag het uit
+     de cache zonder navragen.
+
+     Dit is precies de uitzondering op de regel hieronder, en hij mag omdat de
+     angst die die regel bewaakt hier niet meer kan uitkomen. Die angst is:
+     nieuwe html naast een oud script, en dat is een zwart scherm. Met een
+     vingerafdruk in het adres verwijst nieuwe html naar een NIEUW adres -- het
+     oude wordt simpelweg niet meer opgevraagd, dus het kan niet meer naast
+     nieuwe html terechtkomen. Zie server/middleware/versieadres.js.
+
+     Wat het scheelt: een herhaalbezoek deed 67 verzoeken (62 daarvan een 304)
+     en duurde 900 ms terwijl er maar 43 KB over de lijn ging. Al die tijd zat
+     in het navragen zelf. */
+  const gestempeld = url.searchParams.has('v');
+  // Iconen en manifests veranderen zelden: die mogen ook uit de cache komen.
+  const staticAsset = gestempeld || /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
   e.respondWith(
     staticAsset
       ? caches.match(e.request).then(hit => hit ||

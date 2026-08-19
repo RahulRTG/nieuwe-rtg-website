@@ -21,6 +21,7 @@ const crypto = require('crypto');
 const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
 const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
 const { herschrijfHtml: stijlafsplitsingHtml } = require('./stijlafsplitsing');
+const { herschrijfHtml: versieadresHtml } = require('./versieadres');
 const { CSP, magnaatHtml, STIJLSTEMPEL } = require('./csp');
 
 /* Een verzoek intern doorverwijzen naar een ander pad.
@@ -106,6 +107,12 @@ function cspNonce(publicDir, aan) {
          bundel krijgt elk bestand daarom zijn eigen try/catch, waarmee dat
          verschil weg is. Zie ./scriptbundel.js. */
       html = scriptbundelHtml(html);
+      /* En als laatste rewrite: elke overgebleven verwijzing naar een .js of
+         .css krijgt de vingerafdruk van dat bestand mee, zodat een
+         herhaalbezoek er niet meer naar hoeft te vragen. Staat NA de twee
+         bundels met opzet: die maken hun eigen adressen met een querystring,
+         en die blijven ongemoeid. Zie ./versieadres.js. */
+      html = versieadresHtml(html, publicDir);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen

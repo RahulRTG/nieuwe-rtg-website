@@ -54,8 +54,47 @@ const crypto = require('crypto');
 const PAD = '/stijlblok.css';
 
 /* Vanaf welke omvang loont het. Onder deze grens weegt een extra verzoek niet
-   op tegen de bytes die je uitspaart; gemeten over public/ liggen er 60
-   schermen boven, en die dragen samen het leeuwendeel van de 3,5 MB. */
+   op tegen de bytes die je uitspaart.
+
+   DE GRENS IS GEMETEN, NIET GEKOZEN. Over alle 258 schermen:
+
+     drempel 5000:  60 blokken uit  60 schermen, 0,62 MB uit de HTML
+     drempel 3000: 122 blokken uit 121 schermen, 0,85 MB
+     drempel 2000: 178 blokken uit 175 schermen, 0,98 MB
+     drempel 1500: 203 blokken uit 200 schermen, 1,02 MB
+     drempel 1000: 228 blokken uit 216 schermen, 1,05 MB
+
+   De sprong zit tussen 5000 en 3000: het aantal gedekte schermen verdubbelt
+   ruim. Daaronder vlakt het af -- van 2000 naar 1000 komt er nog 0,07 MB bij
+   voor vijftig extra verzoeken, en dat is de verkeerde ruil.
+
+   3000 HEEFT HIER GESTAAN EN IS TERUGGEDRAAID. Die 0,23 MB extra klinkt goed,
+   maar het is ONVERPAKT gemeten, en dat is precies het getal dat misleidt.
+   Nagerekend op wat er werkelijk over de lijn gaat, over de 62 schermen die
+   het verschil maken:
+
+     minder HTML          75.129 bytes gzip   (1212 per scherm)
+     extra verzoeken          62             (1 per scherm)
+     los op te halen CSS  77.470 bytes brotli (1250 per scherm)
+
+   Het eerste bezoek wordt er dus iets SLECHTER van: 38 bytes meer en een
+   extra verzoek. Pas het herhaalbezoek wint, met 1212 bytes.
+
+   "MAAR OP HTTP/2 IS EEN VERZOEK TOCH BIJNA GRATIS." Dat was het tegenargument,
+   en productie draait inderdaad HTTP/2 (npm run live:init zet RTG_TLS=1, en
+   web/index.js kiest dan lib/tls: HTTP/2 met HTTP/1.1-terugval). Dus is het
+   nagemeten, met een echte browser op 80 ms latentie en 12 Mbit, vijf ronden,
+   mediaan, over HTTP/2:
+
+                       drempel 5000    drempel 3000
+     kantoren.html        595 ms          620 ms
+     ov.html              566 ms          575 ms
+
+   Ook daar dus geen winst op het eerste bezoek, eerder iets verlies. De 1212
+   bytes per herhaalbezoek wegen daar niet tegenop. Blijft 5000.
+
+   (Ter vergelijking, dezelfde pagina eerste bezoek: HTTP/1.1 1404 ms tegen
+   HTTP/2 1117 ms. Het protocol scheelt 20%; deze drempel scheelt niets.) */
 const DREMPEL = 5000;
 
 /* Alleen een KAAL <style>-blok. Een media=, een een eigen type= of wat dan ook

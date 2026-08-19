@@ -6,11 +6,11 @@
   "schakels": 11,
   "cellen": 46288,
   "telling": {
-    "bewezen": 18221,
+    "bewezen": 18223,
     "verklaard": 0,
     "nvt": 340,
     "ongemeten": 27725,
-    "gezakt": 2
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
@@ -77,11 +77,11 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2228,
+      "bewezen": 2230,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 1910,
-      "gezakt": 2
+      "gezakt": 0
     },
     "PRIVACY": {
       "bewezen": 3091,

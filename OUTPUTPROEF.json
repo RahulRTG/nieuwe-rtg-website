@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-19T03:19:25.954Z",
-  "commit": "10cc494",
-  "boomVuil": true,
+  "op": "2026-08-19T04:26:25.409Z",
+  "commit": "a682361",
+  "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1275,
-  "onbeslist": 2849,
+  "bewezen": 1280,
+  "onbeslist": 2844,
   "blind": 63,
   "ongemeten": 8
  },
@@ -16991,12 +16991,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 21); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/supplier/horeca/folio/open": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "gastroomservice.test.js",
-    "horeca-hotel-event.test.js"
+    "gastroomservice.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastroomservice.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/folio": {
    "staat": "bewezen",
@@ -17015,19 +17015,20 @@
    "reden": "er is over DEZE route gelogen en gastroomservice.test.js zakte daarop"
   },
   "POST /api/supplier/horeca/club/band": {
-   "staat": "onbeslist",
-   "toetsen": [
-    "gastroomservice.test.js",
-    "horeca-bezorg-club.test.js"
-   ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
-  },
-  "POST /api/gast/band": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "gastroomservice.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en gastroomservice.test.js zakte daarop"
+  },
+  "POST /api/gast/band": {
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
+   "toetsen": [
+    "gastroomservice.test.js"
+   ],
+   "reden": "er is over DEZE route gelogen en gastroomservice.test.js zakte daarop"
   },
   "POST /api/gast/verzoek": {
    "staat": "bewezen",
@@ -17872,20 +17873,20 @@
    "reden": "er is over DEZE route gelogen en hack.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/supplier/handel/aanvraag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "handelsketen.test.js",
-    "supplier-comm-mob-payroll.test.js"
+    "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/mijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "handelsketen.test.js",
-    "supplier-comm-mob-payroll.test.js"
+    "handelsketen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en handelsketen.test.js zakte daarop"
   },
   "POST /api/supplier/handel/offreren": {
    "staat": "onbeslist",
@@ -38884,6 +38885,31 @@
    "toets": "gastroomservice.test.js",
    "merkt": true,
    "op": "2026-08-19T03:19:25.846Z"
+  },
+  "POST /api/supplier/horeca/folio/open": {
+   "toets": "gastroomservice.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:22:47.697Z"
+  },
+  "POST /api/gast/band": {
+   "toets": "gastroomservice.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:22:47.894Z"
+  },
+  "POST /api/supplier/horeca/club/band": {
+   "toets": "gastroomservice.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:22:47.933Z"
+  },
+  "POST /api/supplier/handel/aanvraag": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:26:15.073Z"
+  },
+  "POST /api/supplier/handel/mijn": {
+   "toets": "handelsketen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T04:26:25.220Z"
   }
  },
  "basislijn": {
@@ -39152,6 +39178,7 @@
   "hulpdienst.test.js": "groen",
   "clubdorp.test.js": "groen",
   "foundation-markt.test.js": "groen",
-  "gastroomservice.test.js": "groen"
+  "gastroomservice.test.js": "groen",
+  "handelsketen.test.js": "groen"
  }
 }

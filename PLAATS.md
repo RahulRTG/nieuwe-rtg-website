@@ -203,6 +203,39 @@ het `waarom` per verwachting, en daar staat plaats nu ook in. Dat is uitleg op
 de plek waar een lid kijkt, maar het is geen register. Of dat register
 huisbreed moet worden, is een eigen beslissing en geen bijvangst van deze fase.
 
+### Wat fase 4 opleverde: een knop die niet meer met de hand hoeft
+
+De grootste verrassing van deze fase was dat de functie er al stond. **Invisible
+Arrival** heeft een tijdelijke pass met drie knoppen — *Ik vertrek nu*, *Ik ben in
+de buurt*, *Ik ben gearriveerd* — waarmee een gast vrijwillig een status deelt
+zodat de zaak zijn tafel kan klaarzetten. Met eronder, letterlijk op het scherm:
+*een status delen is vrijwillig, bevat geen GPS en vervalt automatisch na uw
+bezoek.*
+
+Fase 4 zet daar dus geen tweede functie naast. Hij haalt het handwerk eruit: als
+de gast dat wil, meldt zijn toestel zelf dat hij in de buurt is. Dezelfde puls,
+hetzelfde gevolg, dezelfde keten — de handknoppen blijven gewoon staan, en wie
+nee zegt merkt niets.
+
+**De twee werelden raken elkaar alleen op het toestel.** Een Arrival Pass is
+anoniem (een accessToken, geen account); de plaatslaag werkt op codenamen. Op de
+server worden die twee nergens aan elkaar geknoopt: het arrival-domein leert geen
+codenaam en de plaatslaag leert geen pass. De enige plek waar ze samenkomen is de
+browser van de mens over wie het gaat. Wie dit ooit naar de server wil verplaatsen
+"omdat het makkelijker is", koppelt daarmee een anonieme pass aan een identiteit.
+
+**De belofte is een meting geworden.** "Bevat geen GPS" was een zin op een scherm.
+`test/plaatsnadering.e2e.js` leest nu elk verzoek van die pagina mee — naar de
+plaatslaag én naar de pass — en eist dat er geen coördinaat in staat, en dat wat
+de zaak te zien krijgt er ook geen draagt. De mutatie die de positie alsnog
+meestuurt, laat die toets zakken.
+
+**En langslopen is geen aankomst.** De naderingshekken zijn 900 meter ruim en
+gelden voor álle zaken; op een eiland loop je er zo drie voorbij. Alleen het hek
+van de zaak waar je bezoek voor is, geeft de puls. Zonder die regel zou de puls
+de zaak iets over je route vertellen in plaats van over je bezoek — en dat is een
+ander product.
+
 ## 5. De grenzen
 
 Waar een functie hiermee botst, vervalt de functie.
@@ -249,7 +282,7 @@ Waar een functie hiermee botst, vervalt de functie.
 | **2b** | Het bronnenregister: een domein levert zijn eigen plaatsen als hek. Twee bronnen bedraad (je werkplekken, de posten van je beveiligingsteam) | **af** |
 | **2c** | De brug: een lopende dienst wordt in de app van het lid aangeboden, en het venster sluit als de dienst voorbij is | **af** |
 | **3** | Plaats als bron voor `kern/voorspel/`: nabijheid verandert de volgorde en houdt het stille seintje in, en leert nooit iets | **af** |
-| **4** | Nadering: arrival, mall, hoteldorp, avond/plan — klaarzetten vóór aankomst | open |
+| **4** | Nadering: de aankomstpuls van Invisible Arrival hoeft niet meer met de hand, en de belofte "bevat geen GPS" is nu een meting | **af** |
 
 De volgorde is niet vrij. Fase 2, 3 en 4 bouwen alle drie op fase 1; ze eerder
 beginnen levert de vijfde positie-opslag op, en dan is dit document een verhaal

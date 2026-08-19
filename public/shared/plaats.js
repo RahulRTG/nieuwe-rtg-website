@@ -39,6 +39,11 @@
   var R = 6371000;
 
   var doel = null, hekken = [], binnen = {}, stopVolgen = null, bezig = false;
+  /* Wie er meeluistert op een hek-overgang. De motor MELDT alleen; wat er daarna
+     gebeurt is aan de laag erboven (shared/plaatsnadering.js zet er bijvoorbeeld
+     de aankomstpuls van een Arrival Pass mee). Zo blijft deze motor een motor:
+     hij rekent en meldt, hij handelt niet. */
+  var luisteraars = [];
 
   function rad(d) { return d * Math.PI / 180; }
   function meters(a, b) {
@@ -101,6 +106,13 @@
       if (nu === was) continue;
       binnen[h.id] = nu;
       api('waarneem', { doel: doel, hek: h.id, wat: nu ? 'binnen' : 'buiten' });
+      /* En de meeluisteraars, met het HEK en niet met de plek. Wie hier ooit
+         `plek` doorgeeft omdat het handig is, geeft de coordinaat door aan alles
+         wat meeluistert -- en dan is de grens van PLAATS.md par. 1 zo lek als
+         het aantal luisteraars. */
+      for (var j = 0; j < luisteraars.length; j++) {
+        try { luisteraars[j]({ doel: doel, hek: h.id, wat: nu ? 'binnen' : 'buiten' }); } catch (e) {}
+      }
     }
   }
 
@@ -131,6 +143,7 @@
   function stop() {
     if (stopVolgen) { try { stopVolgen(); } catch (e) {} stopVolgen = null; }
     hekken = []; binnen = {}; doel = null; bezig = false;
+    // de luisteraars blijven staan: een scherm dat opnieuw start, luistert nog
   }
 
   function stand() {
@@ -139,7 +152,15 @@
     return { doel: doel, hekken: hekken.length, binnen: lijst };
   }
 
-  window.RTGPlaats = { start: start, stop: stop, stand: stand,
+  /* Meeluisteren op een overgang. Geeft een afmeldfunctie terug; zonder die
+     blijft een scherm dat weggaat meerekenen aan iets dat niemand meer ziet. */
+  function opWissel(cb) {
+    if (typeof cb !== 'function') return function () {};
+    luisteraars.push(cb);
+    return function af() { luisteraars = luisteraars.filter(function (x) { return x !== cb; }); };
+  }
+
+  window.RTGPlaats = { start: start, stop: stop, stand: stand, opWissel: opWissel,
     // voor toetsen en voor wie de rekenregel wil narekenen zonder een browser
     _staatIn: staatIn, _inVlak: inVlak, _meters: meters, MARGE_M: MARGE_M, SLECHT_M: SLECHT_M };
 })();

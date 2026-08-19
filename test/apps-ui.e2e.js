@@ -379,6 +379,25 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
     await page.fill('#osZoekInput', 'iets vragen');
+    /* WACHTEN IN PLAATS VAN AANNEMEN -- en eerlijk erbij: dit is GEEN bewezen
+       reparatie, het is een leesbaardere faalvorm.
+
+       Op 19 augustus zakte deze toets een keer in CI op "Cannot read properties
+       of undefined (reading 'click')": `b` was undefined, dus de knop stond niet
+       in de lijst. Lokaal is dat niet na te spelen, ook niet herhaald.
+
+       En de voor de hand liggende verklaring -- de lijst is nog niet getekend --
+       houdt geen stand. zoek() hangt als GEWONE input-listener aan #osZoekInput
+       (app-main.js) en tekent de rij synchroon zodra er iets getypt is; als
+       page.fill() klaar is, hoort die rij er dus al te staan. Deze wachtregel is
+       dan een no-op.
+
+       Waarom hij er toch staat: als de rij er ooit weer niet is, zakt deze toets
+       nu op een time-out die zegt WAT er ontbrak, in plaats van op een TypeError
+       drie regels verderop. De oorzaak van die ene CI-storing is daarmee NIET
+       gevonden en blijft open -- als hij terugkomt, is de melding bruikbaar. */
+    await page.waitForFunction(() => [...document.querySelectorAll('#osZoekLijst button')]
+      .some((x) => /Laat Rahul dit doen/i.test(x.textContent)), null, { timeout: 10000 });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('#osZoekLijst button')]
         .find((x) => /Laat Rahul dit doen/i.test(x.textContent));

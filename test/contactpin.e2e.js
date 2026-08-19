@@ -26,15 +26,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { laadScherm, startServer, stop } = require('./helper');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
+   hier tweeendertig keer misging. */
+const pw = laadScherm();
 
 /* Een browser die bij DEZE playwright hoort is er niet overal; op een machine
    met een eigen Chrome/Chromium wijzen we hem gewoon aan. Zelfde patroon en

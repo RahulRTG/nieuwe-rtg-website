@@ -18,18 +18,14 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
+   hier tweeendertig keer misging. */
+const pw = laadScherm();
 
 async function api(base, pad, body) {
   const r = await fetch(base + pad, { method: 'POST', headers: { 'content-type': 'application/json' },
@@ -116,8 +112,28 @@ test('de contextuele schilbalk', { skip: pw ? false : 'playwright ontbreekt', co
       await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
       const acties = page.locator('#rtgCommand .cmd-actie');
       assert.ok(await acties.count() >= 1, 'de werelden horen als knop in de balk te staan');
-      const namen = await acties.evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
-      assert.ok(namen.some((n) => /RTG/i.test(n || '')), 'de werelden dragen hun eigen naam: ' + namen.join(', '));
+      /* HIER STOND /RTG/i, EN DAT WAS EEN PROXY DIE VERLIEP. De werelden heetten
+         ROS, RTG Kantoor en RTFoundation, dus "er zit RTG in" leek een goede
+         manier om te zeggen dat de knoppen hun eigen naam dragen. Sinds
+         WERELDEN.md heten ze LivingOS, WorkOS, TravelOS en FoundationOS en zakte
+         deze toets op een hernoeming in plaats van op een gebrek.
+
+         Nu vergelijkt hij met de bank op DEZELFDE pagina: welke werelden er zijn
+         weet het scherm zelf, en de balk hoort er niets anders van te maken. Dat
+         overleeft de volgende hernoeming en meet meer dan eerst. */
+      const namen = await acties.evaluateAll((els) => els.map((e) => (e.getAttribute('aria-label') || '').trim()));
+      const inBank = await page.evaluate(() => {
+        const nav = document.querySelector('#rtgCommand .cmd-nav');
+        const uit = []; let sectie = '';
+        for (const el of nav ? nav.children : []) {
+          if (el.tagName !== 'BUTTON' && el.tagName !== 'A') { sectie = el.textContent.trim(); continue; }
+          if (/wereld/i.test(sectie)) uit.push(el.textContent.trim());
+        }
+        return uit;
+      });
+      assert.ok(inBank.length >= 1, 'voorwaarde: de bank draagt werelden');
+      assert.deepEqual(namen.filter((n) => inBank.includes(n)).sort(), [...inBank].sort(),
+        'de balk draagt andere namen dan de bank: balk=' + namen.join(', ') + ' bank=' + inBank.join(', '));
 
       // en een tik erop opent het werkblad meteen -- geen tussenstap
       await acties.first().click();

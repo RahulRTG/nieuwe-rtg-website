@@ -8,6 +8,41 @@ const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
 
+/* DE BROWSER VOOR EEN SCHERMTOETS, en waarom dit hier staat en niet 32 keer.
+
+   EEN GEVONDEN PAKKET IS NIET HETZELFDE ALS EEN WERKENDE BROWSER, en dat is
+   precies waar dit op stukliep. Tweeendertig e2e-bestanden droegen elk een eigen
+   `laadPlaywright()` -- in zes verschillende varianten -- die zo begon:
+
+       try { return require('playwright') } catch (e) {}
+       try { const eigen = require('../server/lib/browser'); ... } catch (e) {}
+
+   Het pakket staat er, dus de eerste regel slaagt altijd en de tweede werd nooit
+   bereikt. Alleen: het pakket wijst naar een chromium-build die er niet staat
+   (`chromium-1234` terwijl 1194 geinstalleerd is). Elke toets in die 32
+   bestanden viel daardoor om op een INSTALLATIEBANNER van Playwright, en die
+   ziet eruit als een omgevingsmelding en niet als een rode toets.
+
+   Wat dat kostte: de zes bestanden die de werktafel bewaken konden niet meer
+   zakken. Een hernoeming in de bank (Bedieningspaneel -> Instellingen) stond
+   twee commits lang stuk zonder dat iets rood werd -- LAT.md regel 2, een toets
+   die je niet hebt zien zakken is geen toets.
+
+   De reparatie is een regel: neem het pakket alleen als zijn binary er ECHT
+   staat, en val anders terug op onze eigen driver (server/lib/browser, CDP over
+   een pipe, geen dependency). Waar Playwright netjes geinstalleerd is verandert
+   er niets. */
+function laadScherm() {
+  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
+    try {
+      const mod = require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright');
+      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) return mod;
+    } catch (e) { /* volgende pad */ }
+  }
+  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
+  return null;
+}
+
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.
 function vrijePoort() {
@@ -457,7 +492,7 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+module.exports = { laadScherm, vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

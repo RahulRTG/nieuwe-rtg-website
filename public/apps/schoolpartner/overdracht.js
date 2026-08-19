@@ -10,12 +10,18 @@
       NIET in zit en waarom. Een overdracht die alleen toont wat meegaat, laat
       de ontvangende school denken dat ze alles heeft.
    3. DE VORM. Pas daarna Edu-V, Entree, Edu-API of OSO -- met bij elke
-      standaard wat hij niet kan dragen. Zou de vorm eerst komen, dan bepaalt
-      een koppelvlak wat er over een kind gedeeld wordt.
+      standaard wat hij niet kan dragen, EN waar de veldnamen vandaan komen.
+      Zou de vorm eerst komen, dan bepaalt een koppelvlak wat er over een kind
+      gedeeld wordt.
 
    ER GAAT HIER NIETS DE DEUR UIT. Deze schermen LATEN ZIEN wat een pakket zou
    bevatten; er staat geen verstuurknop, want er is geen koppeling. Zolang die
    er niet is, hoort er ook niet te worden gedaan alsof.
+
+   EN DAT GELDT OOK VOOR DE VELDNAMEN. Van drie van de vier standaarden is de
+   kaart nooit tegen een specificatie gehouden. Dat staat op het scherm, bij de
+   standaard en bij de vertaling -- niet alleen in een commentaarregel die de
+   gebruiker nooit ziet.
 
    Zelfde SPart-patroon; app.js roept SPart.overdracht() aan. */
 window.SPart = window.SPart || {};
@@ -35,10 +41,27 @@ window.SPart.overdracht = function () {
       }).join('') +
         '<div class="kop" style="margin-top:.6rem;">Wat een standaard niet kan dragen</div>' +
         r.body.standaarden.map(function (st) {
-          return '<div class="item"><span><b>' + esc(st.naam) + '</b><br><span class="stil">' +
-            st.kanNiet.map(esc).join('; ') + '</span></span></div>';
+          return '<div class="item"><span><b>' + esc(st.naam) + '</b> <span class="tag' +
+            (st.gelezen ? '' : ' aan') + '">' + (st.gelezen ? 'nagekeken' : 'onbevestigd') + '</span>' +
+            '<br><span class="stil">' + esc(st.kanNiet.map(String).join('; ')) + '</span>' +
+            '<br><span class="stil">Bron: ' + esc(st.bron) + '</span></span></div>';
         }).join('') + '<p class="stil">' + esc(r.body.uitleg) + '</p>';
     });
+  }
+
+  /* De herkomst van een veldkaart, in beeld. Een vertaling die er af ziet
+     terwijl niemand de specificatie heeft gelezen, is erger dan geen
+     vertaling: daar bouwt de volgende school op. */
+  function herkomst(v) {
+    if (!v) return '';
+    return (v.waarschuwing
+      ? '<p class="stil"><b>Niet nagekeken:</b> ' + esc(v.waarschuwing) + '</p>' +
+        (v.onbevestigd || []).map(function (o) {
+          return '<div class="item"><span><b>' + esc(o.veld) + '</b> gaat als <b>' + esc(o.extern) +
+            '</b><br><span class="stil">' + esc(o.waarom) + '</span></span></div>';
+        }).join('')
+      : '<p class="stil"><b>Nagekeken</b> in de specificatie zelf.</p>') +
+      (v.bron ? '<p class="stil">Bron: ' + esc(v.bron) + '</p>' : '');
   }
 
   /* Gedeeld met ./overstap.js: dezelfde restlijst hoort er hetzelfde uit te
@@ -84,7 +107,8 @@ window.SPart.overdracht = function () {
             (d.vorm ? '<div class="kop" style="margin-top:.5rem;">Als ' + esc(d.vorm.naam) + '</div>' +
               '<div class="stil">' + esc(Object.keys(d.vorm.velden).join(', ') || 'niets') + '</div>' +
               lijst(d.vorm.weggelaten, 'Past niet in deze standaard') +
-              '<p class="stil"><b>' + esc(d.vorm.naam) + ' kan niet dragen:</b> ' + d.vorm.kanNiet.map(esc).join('; ') + '</p>' : '') +
+              '<p class="stil"><b>' + esc(d.vorm.naam) + ' kan niet dragen:</b> ' + d.vorm.kanNiet.map(esc).join('; ') + '</p>' +
+              herkomst(d.vorm) : '') +
             '<p class="stil">' + esc(d.uitleg) + '</p>';
         });
     });
@@ -109,6 +133,7 @@ window.SPart.overdracht = function () {
           if (r.body.error) return meld(r.body.error);
           q('inUit').innerHTML = '<div><b>Overgenomen:</b> ' + esc(Object.keys(r.body.velden).join(', ') || 'niets') + '</div>' +
             lijst(r.body.geweigerd, 'Geweigerd, want niet op onze kaart') +
+            herkomst(r.body) +
             '<p class="stil">' + esc(r.body.uitleg) + '</p>';
         });
     });

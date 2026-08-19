@@ -62,7 +62,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
 | Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
 | Belasting | de dag van de leerling over klassen heen, de week van de docent, niets bewaard | `kern/belasting.js`, `school/belasting.js` |
-| Overdracht en adapters | pakket per doel met een restlijst; vertaling naar vier standaarden, met wat ze niet kunnen | `kern/overdracht.js`, `kern/koppelvlak.js`, `school/overdracht.js` |
+| Overdracht en adapters | pakket per doel met een restlijst; vertaling naar vier standaarden, met wat ze niet kunnen en waar hun veldnamen vandaan komen | `kern/overdracht.js`, `kern/koppelvlak.js`, `kern/koppelvlak-kaarten.js`, `school/overdracht.js` |
 | Overstap tussen RTG-scholen | geadresseerd pakket met een code, veertien dagen geldig, weg na ophalen | `school/overdracht.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
@@ -386,6 +386,8 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een pakket zegt wat er niet in zit | weggelaten-lijst met een reden per gegeven | **ja**, met mutatie beproefd |
 | Ons model groeit niet mee met een koppelvlak | onbekend veld van buiten wordt geweigerd en gemeld | **ja**, met mutatie beproefd |
 | Elke standaard zegt wat hij niet kan | kanNiet-lijst per standaard, ook op het scherm | **ja**, met mutatie beproefd |
+| Elke veldnaam zegt waar hij vandaan komt | staat per veld (bevestigd/onbevestigd), bron per standaard, en geen derde staat | **ja**, met mutatie beproefd |
+| Een onbevestigde veldnaam reist nooit zonder etiket | `bevestigd`, `onbevestigd` en een waarschuwing in elk antwoord, en op het scherm | **ja**, met mutatie beproefd |
 | Een vertaalde opgave houdt hetzelfde antwoord | de vraag wordt opnieuw gesteld uit het feit | **ja** (`test/taalcheck.test.js`) |
 | De taalvergelijking draait niet bij een taalvak | poort uit het taalbeleid, met uitleg | **ja**, met mutatie beproefd |
 | Bij dezelfde zin trekt de test zich terug | een kale som heeft geen taal om over te struikelen | **ja**, met mutatie beproefd |
@@ -825,9 +827,33 @@ blijft staan met wie hem afsloot erbij.
 
   **Wat er niet is: een verbinding met Edu-V of Entree zelf.** Dat is geen
   vertaalvraag maar een kwestie van sleutels, een contract en een partij aan de
-  andere kant. De vertaling ligt klaar en is los getoetst; de dag dat er een
-  tegenpartij is, is dat aansluiten en niet bouwen. Tot dan staat er geen knop
-  die doet alsof.
+  andere kant. Tot die er is, staat er geen knop die doet alsof.
+
+  **En hier stond een te mooie zin.** Er stond: *"de dag dat er een tegenpartij
+  is, is dat aansluiten en niet bouwen"*. Dat was niet waar, en de reden is
+  pijnlijk simpel: de veldnamen in `kern/koppelvlak.js` waren **verzonnen**. Ze
+  klonken als een standaard (`opleidingCode`, `groepCode`, `eduPersonOrgUnit`)
+  en waren het niet. Op **19 augustus 2026** is dat nagezocht en gecorrigeerd,
+  met dit resultaat:
+
+  | Standaard | Nagekeken? | Wat er is gecorrigeerd |
+  |---|---|---|
+  | **Entree Federatie** | **ja**, tegen REFEDS eduPerson 202208 v4.4.0 | `eduPersonOrgUnit` bestaat niet (wel `eduPersonOrgUnitDN`, en dat is een organisatieonderdeel en geen klas); `eduPersonAffiliation` is geen opleiding maar een soort persoon (faculty, student, staff, alum, member, affiliate, employee, library-walk-in); eduPerson kent helemaal geen geboortedatum. Alle drie zijn nu een bevestigde `null` met de reden erbij. |
+  | **Edu-V** | nee, specificatie onbereikbaar | De hele leerlingkaart (`volledigeNaam`, `geboortedatum`, `opleidingCode`, `groepCode`) was verzonnen en is verwijderd. De openbare API-lijst die wel te zien was (Catalogue, Course, Association, Results, Usage, Employees, Delivery) gaat over leermiddelen en toegang, niet over een leerlingdossier. |
+  | **Edu-API** | nee, specificatie onbereikbaar | `person.displayName` verwijderd (een bron noemt `legalName.familyName`, dus de naam is daar vermoedelijk samengesteld); de rest staat er als **onbevestigde werknaam**. |
+  | **OSO** | nee, XSD onbereikbaar | De Nederlandse namen staan er als **onbevestigde werknaam**; wat er inhoudelijk in het dossier zit is wel publiek beschreven, de elementnamen niet. |
+
+  Drie van de vier specificaties waren vanaf deze machine niet te openen
+  (edustandaard.nl, developers.wiki.kennisnet.nl, edu-v.atlassian.net,
+  1edtech.org, imsglobal.org). Dat is dus **niet** opgelost, en het staat nu in
+  de code in plaats van in iemands hoofd: elk veld draagt `bevestigd` of
+  `onbevestigd`, elke standaard draagt een **bron**, en geen antwoord van
+  `naarBuiten`/`naarBinnen` reist zonder die vlag. Een ongelezen specificatie is
+  nooit bevestigd -- ook niet als er toevallig geen veld meereist.
+
+  De eerlijke versie van de zin luidt dus: **de vertaling ligt klaar en is los
+  getoetst; aansluiten begint met het nakijken van de veldnamen, en dat kan pas
+  als de specificaties te lezen zijn.**
 - **Transition Continuity.** Bij een overstap gaat niet "dossier.zip" mee, maar
   per doel: nodig voor inschrijving / nodig voor onderwijscontinuïteit / alleen
   met specifieke toestemming / niet overdraagbaar. **Gebouwd op 19 augustus

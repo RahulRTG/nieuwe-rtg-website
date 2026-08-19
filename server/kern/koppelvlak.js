@@ -10,7 +10,11 @@
      naarBuiten -- ons model vertalen naar de velden van een standaard;
      naarBinnen -- velden van buiten terugbrengen tot ons model.
 
-   TWEE HARDE REGELS.
+   De kaarten zelf staan in ./koppelvlak-kaarten.js, met per veld waar de naam
+   vandaan komt. Dat is bewust een apart bestand: dit hier is het mechaniek,
+   dat daar is het bewijs.
+
+   DRIE HARDE REGELS.
 
    1. WAT WIJ NIET KENNEN, KOMT ER NIET IN. Een veld van buiten dat niet op de
       kaart staat, wordt GEWEIGERD en gemeld -- niet meegenomen "voor later".
@@ -19,69 +23,86 @@
       `kanNiet`. Dat is de zin die het verschil maakt tussen eerlijk in de code
       en oneerlijk in een verkooppraatje: wie deze adapter gebruikt, hoort van
       tevoren te weten wat er onderweg verdwijnt.
+   3. EEN ONGECONTROLEERDE VELDNAAM REIST NOOIT ZONDER DAT ETIKET. Elk antwoord
+      draagt `bevestigd` en een lijst `onbevestigd`. Een vertaling die er
+      gecontroleerd uitziet terwijl niemand de specificatie heeft gelezen, is
+      erger dan geen vertaling: daar bouwt de volgende iemand op.
 
    WAT DIT NIET IS. Er wordt hier niets verstuurd en niets opgehaald; er is geen
    verbinding met Edu-V of Entree. Dit is de VERTALING, en die is los te
-   toetsen. Zolang er geen echte koppeling staat, hoort er ook niet te worden
-   gedaan alsof -- dat is precies wat er tot nu toe over deze paragraaf in
-   SCHOOL.md stond. */
-const STANDAARDEN = {
-  eduv: {
-    naam: 'Edu-V',
-    heen: { naam: 'volledigeNaam', geboren: 'geboortedatum', opleiding: 'opleidingCode', klasCode: 'groepCode' },
-    kanNiet: ['de overstapgeschiedenis van een leerling', 'de reden van een plaatsing',
-      'het onderscheid tussen een aanmelding en een inschrijving'] },
-  entree: {
-    naam: 'Entree Federatie',
-    heen: { naam: 'displayName', geboren: null, opleiding: 'eduPersonAffiliation', klasCode: 'eduPersonOrgUnit' },
-    kanNiet: ['een geboortedatum (dit is een inlogfederatie en geen administratie)',
-      'inhoudelijke onderwijsgegevens zoals opleiding of voortgang',
-      'documenten en bewijsstukken van een leerling'] },
-  eduapi: {
-    naam: 'Edu-API',
-    heen: { naam: 'person.displayName', geboren: 'person.dateOfBirth', opleiding: 'program.code', klasCode: 'group.code' },
-    kanNiet: ['zorg- en ondersteuningsgegevens (met opzet buiten de standaard)',
-      'onze leerdoelenstructuur met voorkennis en bewijs; die kent Edu-API niet'] },
-  oso: {
-    naam: 'OSO (overstapdossier)',
-    heen: { naam: 'naam', geboren: 'geboortedatum', opleiding: 'onderwijssoort', klasCode: 'groep',
-      herkomst: 'vorigeSchool', overstappen: 'overstaphistorie' },
-    kanNiet: ['leerdoelen en bewijs van beheersing zoals wij die kennen',
-      'de reden waarom een gegeven wel of niet is meegestuurd'] }
-};
+   toetsen -- maar alleen de Entree-kaart is tegen een specificatie gehouden.
+   Zolang er geen echte koppeling staat, hoort er ook niet te worden gedaan
+   alsof. */
+const { STANDAARDEN } = require('./koppelvlak-kaarten');
+
+const kies = (standaard) => STANDAARDEN[String(standaard || '')] || null;
+const onbekend = () => ({ status: 400,
+  error: 'Deze standaard kennen we niet. Bekend: ' + Object.keys(STANDAARDEN).join(', ') + '.' });
+
+/* Een veld dat helemaal niet op de kaart staat. Of dat betekent "de standaard
+   kent dit niet" hangt ervan af of iemand die standaard heeft gelezen; bij een
+   ongelezen specificatie is "kent hij niet" zelf een gok. */
+function buitenDeKaart(s) {
+  return s.gelezen
+    ? 'Dit gegeven kent ' + s.naam + ' niet.'
+    : 'Dit gegeven staat niet op onze kaart, en die kaart is niet tegen de specificatie gehouden. Of ' + s.naam + ' het kent, weten wij dus niet.';
+}
+
+/* De staat van een vertaling. Bevestigd vraagt TWEE dingen: de specificatie is
+   gelezen, EN elke veldnaam die meereist is nagekeken. Een kaart met een half
+   nagekeken naam is niet half betrouwbaar maar onbetrouwbaar, en een kaart uit
+   een specificatie die niemand heeft geopend is dat helemaal -- ook als er
+   toevallig geen veld meereist. */
+function staatVan(s, onbev) {
+  const bevestigd = !!s.gelezen && onbev.length === 0;
+  const reden = [];
+  if (!s.gelezen) reden.push('de specificatie van ' + s.naam + ' is nooit gelezen (' + s.bron + ')');
+  if (onbev.length) reden.push(onbev.length + (onbev.length === 1 ? ' veldnaam is' : ' veldnamen zijn') + ' niet nagekeken; welke, staat in de lijst onbevestigd');
+  return { bevestigd,
+    onbevestigd: onbev,
+    bron: s.bron,
+    waarschuwing: bevestigd ? null
+      : reden.join(', en ') + '. Zolang dat zo is, is dit geen koppeling maar een voorstel.' };
+}
 
 /* Ons model naar buiten. Velden die de standaard niet kent, gaan niet mee en
    worden GEMELD -- stil weglaten is hoe gegevens onderweg verdwijnen zonder
    dat iemand het merkt. */
 function naarBuiten(canoniek, standaard) {
-  const s = STANDAARDEN[String(standaard || '')];
-  if (!s) return { status: 400, error: 'Deze standaard kennen we niet. Bekend: ' + Object.keys(STANDAARDEN).join(', ') + '.' };
-  const uit = {}, weg = [];
+  const s = kies(standaard);
+  if (!s) return onbekend();
+  const uit = {}, weg = [], onbev = [];
   for (const [veld, waarde] of Object.entries(canoniek || {})) {
-    const naam = Object.prototype.hasOwnProperty.call(s.heen, veld) ? s.heen[veld] : undefined;
-    if (naam) uit[naam] = waarde;
-    else weg.push({ veld, waarom: naam === null
-      ? 'De standaard heeft hier geen veld voor.'
-      : 'Dit gegeven kent ' + s.naam + ' niet.' });
+    const r = Object.prototype.hasOwnProperty.call(s.heen, veld) ? s.heen[veld] : null;
+    if (r && r.veld) {
+      uit[r.veld] = waarde;
+      if (r.staat !== 'bevestigd') onbev.push({ veld, extern: r.veld, waarom: r.waarom });
+      continue;
+    }
+    weg.push({ veld, waarom: r ? r.waarom : buitenDeKaart(s), staat: r ? r.staat : (s.gelezen ? 'bevestigd' : 'onbevestigd') });
   }
-  return { ok: true, standaard, naam: s.naam, velden: uit, weggelaten: weg, kanNiet: s.kanNiet,
-    uitleg: 'Wat ' + s.naam + ' niet kan dragen, staat hierboven. Een koppeling die dat verzwijgt, laat de ontvanger denken dat hij alles heeft.' };
+  return Object.assign({ ok: true, standaard, naam: s.naam, velden: uit, weggelaten: weg, kanNiet: s.kanNiet,
+    uitleg: 'Wat ' + s.naam + ' niet kan dragen, staat hierboven. Een koppeling die dat verzwijgt, laat de ontvanger denken dat hij alles heeft.' },
+  staatVan(s, onbev));
 }
 
 /* Van buiten naar binnen. Alles wat niet op de kaart staat wordt geweigerd en
    gemeld; ons model groeit niet mee met wat een leverancier stuurt. */
 function naarBinnen(extern, standaard) {
-  const s = STANDAARDEN[String(standaard || '')];
-  if (!s) return { status: 400, error: 'Deze standaard kennen we niet. Bekend: ' + Object.keys(STANDAARDEN).join(', ') + '.' };
+  const s = kies(standaard);
+  if (!s) return onbekend();
   const terug = {};
-  for (const [veld, naam] of Object.entries(s.heen)) if (naam) terug[naam] = veld;
-  const uit = {}, geweigerd = [];
+  for (const [veld, r] of Object.entries(s.heen)) if (r && r.veld) terug[r.veld] = { veld, r };
+  const uit = {}, geweigerd = [], onbev = [];
   for (const [naam, waarde] of Object.entries(extern || {})) {
-    if (terug[naam]) uit[terug[naam]] = waarde;
-    else geweigerd.push({ veld: naam, waarom: 'Dit veld staat niet op onze kaart en wordt niet overgenomen.' });
+    const t = Object.prototype.hasOwnProperty.call(terug, naam) ? terug[naam] : null;
+    if (!t) { geweigerd.push({ veld: naam, waarom: 'Dit veld staat niet op onze kaart en wordt niet overgenomen.' }); continue; }
+    uit[t.veld] = waarde;
+    if (t.r.staat !== 'bevestigd') onbev.push({ veld: t.veld, extern: naam, waarom: t.r.waarom });
   }
-  return { ok: true, standaard, naam: s.naam, velden: uit, geweigerd,
-    uitleg: 'Geweigerde velden zijn niet bewaard "voor later": ons model volgt geen koppelvlak. Hoort een veld er wel bij, dan komt het op de kaart en niet in een uitzondering.' };
+  return Object.assign({ ok: true, standaard, naam: s.naam, velden: uit, geweigerd,
+    uitleg: 'Geweigerde velden zijn niet bewaard "voor later": ons model volgt geen koppelvlak. Hoort een veld er wel bij, dan komt het op de kaart en niet in een uitzondering.' },
+  staatVan(s, onbev));
 }
 
 module.exports = { naarBuiten, naarBinnen, STANDAARDEN };

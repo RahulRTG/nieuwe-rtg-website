@@ -12,7 +12,12 @@
    - een veld van buiten dat wij niet kennen wordt geweigerd en gemeld: ons
      model groeit niet mee met wat een leverancier stuurt (grens 12);
    - elke standaard zegt wat hij NIET kan dragen -- eerlijk in de code is niet
-     genoeg als het antwoord het verzwijgt.
+     genoeg als het antwoord het verzwijgt;
+   - en elke veldnaam zegt WAAR HIJ VANDAAN KOMT. Tot 19 augustus 2026 stonden
+     hier verzonnen veldnamen die eruitzagen als een standaard. Een naam die
+     niemand heeft nagekeken mag bestaan, maar nooit zonder dat etiket: geen
+     antwoord uit deze module reist zonder `bevestigd`, en een onbevestigde
+     naam trekt altijd een waarschuwing.
    Draai los: node --experimental-sqlite --test test/overdracht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -100,9 +105,86 @@ test('elke standaard zegt wat hij niet kan dragen', () => {
   const uit = naarBuiten({ naam: 'Iris', geboren: '2016-03-02' }, 'entree');
   assert.equal(uit.velden.displayName, 'Iris');
   assert.equal(uit.velden.geboortedatum, undefined, 'Entree is een inlogfederatie, geen administratie');
-  assert.match(uit.weggelaten.find(x => x.veld === 'geboren').waarom, /geen veld voor/i);
+  assert.match(uit.weggelaten.find(x => x.veld === 'geboren').waarom, /geboorteattribuut/i);
   assert.ok(uit.kanNiet.length);
   assert.equal(naarBuiten({}, 'ditbestaatniet').status, 400);
+});
+
+/* ---------- waar een veldnaam vandaan komt ----------
+
+   DE FOUT DIE HIER IS GEMAAKT. Deze kaarten droegen namen die niemand had
+   nagekeken: eduPersonOrgUnit (bestaat niet; eduPersonOrgUnitDN wel),
+   eduPersonAffiliation als opleiding (dat is een soort persoon, geen
+   opleiding), en voor Edu-V een complete leerlingkaart die verzonnen was.
+   Deze toetsen houden de correctie vast EN de regel eronder: een onbevestigde
+   naam reist nooit zonder etiket. */
+test('elke veldnaam draagt een staat en elke standaard een bron', () => {
+  for (const [id, s] of Object.entries(STANDAARDEN)) {
+    assert.equal(typeof s.bron, 'string', id + ' heeft geen bronvermelding');
+    assert.ok(s.bron.length > 20, id + ' is te vaag over zijn bron');
+    assert.equal(typeof s.gelezen, 'boolean', id + ' zegt niet of de specificatie is gelezen');
+    for (const [veld, r] of Object.entries(s.heen)) {
+      assert.ok(['bevestigd', 'onbevestigd'].includes(r.staat),
+        id + '.' + veld + ' heeft geen staat; een derde staat bestaat niet');
+      assert.ok(r.waarom && r.waarom.length > 20, id + '.' + veld + ' zegt niet waarom');
+      /* Een null is ook een bewering: die mag alleen staan met een reden erbij,
+         en een BEVESTIGDE null zegt "wij hebben nagekeken dat het er niet is". */
+      if (r.veld !== null) assert.equal(typeof r.veld, 'string', id + '.' + veld);
+    }
+  }
+});
+
+test('een onbevestigde veldnaam reist nooit zonder waarschuwing', () => {
+  /* Entree is de enige kaart waarvan de specificatie is gelezen. Gaat er niets
+     onbevestigds mee, dan is het antwoord bevestigd en zwijgt het. */
+  const stil = naarBuiten({ geboren: '2016-03-02' }, 'entree');
+  assert.equal(stil.bevestigd, true);
+  assert.equal(stil.waarschuwing, null);
+  assert.deepEqual(stil.onbevestigd, []);
+
+  /* Reist er wel een onbevestigde naam mee, dan staat dat er drie keer bij:
+     de vlag, de lijst en de zin. */
+  const wel = naarBuiten({ naam: 'Iris' }, 'entree');
+  assert.equal(wel.bevestigd, false);
+  assert.deepEqual(wel.onbevestigd.map(x => x.veld), ['naam']);
+  assert.match(wel.waarschuwing, /niet nagekeken/i);
+  assert.match(wel.waarschuwing, /geen koppeling/i);
+
+  /* En een standaard waarvan de specificatie NOOIT is gelezen, is nooit
+     bevestigd -- ook niet als er toevallig geen veld meereist. Anders zou een
+     lege vertaling uit een ongelezen kaart er betrouwbaar uitzien. */
+  const leeg = naarBuiten({ zorg: 'x' }, 'eduv');
+  assert.deepEqual(leeg.velden, {});
+  assert.equal(leeg.bevestigd, false, 'een ongelezen kaart is nooit bevestigd');
+  assert.match(leeg.waarschuwing, /nooit gelezen/i);
+
+  /* Dezelfde regel de andere kant op: inlezen mag net zo min doen alsof. */
+  const binnen = naarBinnen({ naam: 'Iris' }, 'oso');
+  assert.equal(binnen.bevestigd, false);
+  assert.deepEqual(binnen.onbevestigd.map(x => x.extern), ['naam']);
+  assert.ok(binnen.bron.length > 20);
+});
+
+test('de namen die fout waren, staan er niet meer', () => {
+  /* Alleen de VELDNAMEN, niet de uitleg eromheen: die noemt de oude fout met
+     zoveel woorden en hoort dat te blijven doen. */
+  const namen = Object.values(STANDAARDEN)
+    .flatMap(s => Object.values(s.heen).map(r => r.veld)).filter(Boolean);
+  /* eduPersonOrgUnit bestaat niet in eduPerson 202208; eduPersonOrgUnitDN wel. */
+  for (const n of namen) assert.doesNotMatch(n, /^eduPersonOrgUnit$/,
+    'eduPersonOrgUnit bestaat niet: eduPerson 202208 kent alleen eduPersonOrgUnitDN');
+  /* eduPersonAffiliation mag genoemd worden, maar niet als opleiding gebruikt:
+     de toegestane waarden zijn soorten personen. */
+  assert.equal(STANDAARDEN.entree.heen.opleiding.veld, null);
+  assert.equal(STANDAARDEN.entree.heen.klasCode.veld, null);
+  assert.equal(STANDAARDEN.entree.heen.geboren.veld, null);
+  for (const [veld, r] of Object.entries(STANDAARDEN.entree.heen)) {
+    if (r.veld) assert.notEqual(r.veld, 'eduPersonAffiliation', veld + ' gebruikt een soort persoon als gegeven');
+  }
+  /* En Edu-V draagt geen verzonnen leerlingkaart meer. */
+  for (const [veld, r] of Object.entries(STANDAARDEN.eduv.heen)) {
+    assert.equal(r.veld, null, 'Edu-V.' + veld + ' draagt weer een niet-nagekeken veldnaam');
+  }
 });
 
 test('een veld van buiten dat wij niet kennen wordt geweigerd en gemeld', () => {
@@ -123,6 +205,12 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   assert.equal(kaart.status, 200, JSON.stringify(kaart.body).slice(0, 140));
   assert.equal(kaart.body.velden.filter(v => v.klasse === 'nooit').length >= 4, true);
   assert.ok(kaart.body.standaarden.every(s => s.kanNiet.length));
+  /* De herkomst reist mee tot op het scherm. Een lijst van vier standaarden
+     zonder bron laat een school denken dat er vier koppelingen klaarliggen. */
+  assert.ok(kaart.body.standaarden.every(s => typeof s.bron === 'string' && s.bron.length > 20),
+    'de kaart noemt de standaarden zonder te zeggen waar hun veldnamen vandaan komen');
+  assert.deepEqual(kaart.body.standaarden.filter(s => s.gelezen).map(s => s.id), ['entree'],
+    'alleen de Entree-kaart is tegen een specificatie gehouden');
   assert.match(kaart.body.uitleg, /geen dossier mee/i);
 
   const l = (await bh('/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;
@@ -131,6 +219,8 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
   assert.ok(p.body.velden.naam);
   assert.ok(p.body.vorm.velden.naam, 'de vorm van OSO gebruikt zijn eigen veldnamen');
   assert.ok(p.body.vorm.kanNiet.length);
+  assert.equal(p.body.vorm.bevestigd, false, 'de OSO-veldnamen zijn nooit nagekeken');
+  assert.match(p.body.vorm.waarschuwing, /nooit gelezen/i);
   assert.match(p.body.uitleg, /niets verstuurd/i, 'het antwoord hoort te zeggen dat er niets de deur uit ging');
 
   const in1 = await bh('/school/overdracht/inlezen', { standaard: 'oso', velden: { naam: 'Iris', onzin: 1 } });

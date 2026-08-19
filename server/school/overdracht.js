@@ -16,7 +16,10 @@
    ER GAAT HIER NIETS DE DEUR UIT. Deze routes LATEN ZIEN wat een pakket zou
    bevatten; versturen doet een mens langs de bestaande koppelingen. Zolang er
    geen echte verbinding met Edu-V of OSO staat, hoort er ook niet te worden
-   gedaan alsof er een is. */
+   gedaan alsof er een is -- en dat geldt ook voor de veldnamen zelf: van drie
+   van de vier standaarden hebben wij de specificatie niet kunnen lezen, dus
+   die kaarten reizen met het etiket onbevestigd mee. Zie
+   kern/koppelvlak-kaarten.js. */
 const { pakket, KAART } = require('../kern/overdracht');
 const { naarBuiten, naarBinnen, STANDAARDEN } = require('../kern/koppelvlak');
 
@@ -34,7 +37,12 @@ module.exports = (sctx) => {
     const g = poort(req, res, 'leerling'); if (!g) return;
     res.json({ ok: true,
       velden: Object.entries(KAART).map(([veld, r]) => ({ veld, klasse: r.klasse, waarom: r.waarom })),
-      standaarden: Object.entries(STANDAARDEN).map(([id, s]) => ({ id, naam: s.naam, kanNiet: s.kanNiet })),
+      /* De bron reist mee. Een lijst standaarden zonder herkomst laat een
+         school denken dat er vier koppelingen klaarliggen; er ligt een
+         vertaling klaar, en van drie ervan is de veldkaart nooit tegen een
+         specificatie gehouden. */
+      standaarden: Object.entries(STANDAARDEN).map(([id, s]) => ({ id, naam: s.naam, kanNiet: s.kanNiet,
+        gelezen: !!s.gelezen, bron: s.bron })),
       uitleg: 'Bij een overstap gaat er geen dossier mee maar een pakket per doel. Wat op "nooit" staat, gaat ook met toestemming niet mee.' });
   });
 

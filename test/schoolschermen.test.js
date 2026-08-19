@@ -520,6 +520,17 @@ test('de overdrachtskaart toont "nooit", de restlijst en wat een standaard niet 
   assert.match(code, /st\.kanNiet/, 'het scherm verzwijgt wat een standaard niet kan dragen');
   assert.match(code, /kan niet dragen/i);
 
+  /* En bij de vorm hoort de HERKOMST van de veldnamen. Van drie van de vier
+     standaarden is de kaart nooit tegen een specificatie gehouden; staat dat
+     alleen in een commentaarregel, dan ziet de school vier koppelingen die er
+     niet zijn. */
+  assert.match(code, /st\.bron\b/, 'het scherm noemt vier standaarden zonder te zeggen waar hun veldnamen vandaan komen');
+  assert.match(code, /st\.gelezen\b/, 'het scherm laat nagekeken en onbevestigd er hetzelfde uitzien');
+  assert.match(code, /v\.waarschuwing\b/, 'de waarschuwing bij een ongecontroleerde vertaling komt niet op het scherm');
+  assert.match(code, /v\.onbevestigd\b/, 'en welke veldnamen dat dan zijn, ook niet');
+  assert.match(code, /herkomst\(d\.vorm\)/, 'de herkomst hangt niet aan de vertaling in het pakket');
+  assert.match(code, /herkomst\(r\.body\)/, 'en niet aan wat er van buiten wordt ingelezen');
+
   /* Er staat geen knop die doet alsof er naar een externe dienst gestuurd
      wordt: die verbinding is er niet. (Het woord "verzender" mag wel -- dat is
      de school die een pakket klaarzette.) */

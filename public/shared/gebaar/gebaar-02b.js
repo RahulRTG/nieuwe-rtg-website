@@ -47,6 +47,18 @@
         var pos = getComputedStyle(kind[i]).position;
         if (pos === 'absolute' || pos === 'fixed') kind[i].setAttribute('data-gb-vast', '');
       }
+      /* DE RONDING VAN DE REGEL, ZODAT DE SNEDE HEM VOLGT. De lade is een
+         rechthoek en de regel heeft ronde hoeken; zonder deze maat eindigt een
+         open lade in een scherpe hoek naast een ronde regel -- op post viel dat
+         meteen op. CSS kan een border-radius niet zelf in een clip-path lezen,
+         dus wordt hij hier gemeten en doorgegeven. De lade krijgt hem een pixel
+         kleiner: zij ligt BINNEN de rand van de regel en een gelijke ronding
+         puilt daar net overheen. */
+      var cs = getComputedStyle(g.rij);
+      var buiten = parseFloat(kant === 'rechts' ? cs.borderTopRightRadius : cs.borderTopLeftRadius) || 0;
+      var rand = parseFloat(kant === 'rechts' ? cs.borderRightWidth : cs.borderLeftWidth) || 0;
+      px(g.rij, '--gb-rond', buiten + 'px');
+      px(g.rij, '--gb-rond-lade', Math.max(0, buiten - rand) + 'px');
       g.rij.setAttribute('data-gb', kant);
       px(g.rij, '--gb-duur', '0ms');
       g.lade = bouwLade(g.rij, kant, lijst, g.rij.offsetWidth * 0.72);

@@ -59,7 +59,10 @@
      --gb-marge   de snede laat zoveel buiten de regel staan (de stip hangt
                   BUITEN de regel, zoals die van .cv-wat op -3,5px)
    Allebei nul als een scherm niets zegt, en dan gebeurt er precies niets. */
-.gb-rij[data-gb]{clip-path:inset(0 0 0 calc(-1 * var(--gb-marge,0px)));}
+/* `round` erachter, want een regel met ronde hoeken hoort niet met een rechte
+   snede te eindigen. --gb-rond wordt bij het vastklikken gemeten (zie
+   gebaar-02b.js); zonder meting is hij nul en snijdt hij zoals hiervoor. */
+.gb-rij[data-gb]{clip-path:inset(0 0 0 calc(-1 * var(--gb-marge,0px)) round var(--gb-rond,0px));}
 
 /* De inhoud schuift, de lade niet, en wat absoluut gepositioneerd is blijft
    staan: een tijdlijnstip hoort bij de TIJDLIJN en niet bij de plank. */
@@ -73,12 +76,21 @@
    plank en lade elkaar nooit en is er geen z-index-vraag: de een gaat weg waar
    de ander komt. */
 .gb-lade{
+  /* content-box, en dat is geen detail: de snedelijn hieronder is een border van
+     1px, en met border-box zou die pixel van de INHOUD afgaan. De knoppenrij is
+     precies --gb-vol breed, dus dan puilt hij er een pixel uit en ziet de laatste
+     letter er geschaafd uit. Zo staat de lijn ernaast in plaats van erin. */
+  box-sizing:content-box;
   position:absolute;top:0;bottom:0;width:var(--gb-lade,0px);
   overflow:hidden;background:var(--onyx-glans,#0C0C0B);
   transition:width var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
 }
-.gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));}
-.gb-lade[data-kant="links"]{left:var(--gb-inzet,0px);border-right:1px solid var(--gold-rand,rgba(192,165,68,.52));}
+/* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
+   want daar raken ze elkaar. */
+.gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));
+  border-radius:0 var(--gb-rond-lade,0px) var(--gb-rond-lade,0px) 0;}
+.gb-lade[data-kant="links"]{left:var(--gb-inzet,0px);border-right:1px solid var(--gold-rand,rgba(192,165,68,.52));
+  border-radius:var(--gb-rond-lade,0px) 0 0 var(--gb-rond-lade,0px);}
 
 /* De knoppen zijn aan de SNEDE geplakt en niet aan de buitenrand: ze rijden met
    de plank mee naar binnen in plaats van op hun plek te wachten. */
@@ -90,7 +102,11 @@
   flex:1 0 auto;min-width:3.4rem;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.34rem;
   background:transparent;border:0;border-inline-start:1px solid rgba(255,255,255,.07);
-  padding:.35rem .4rem;cursor:pointer;
+  /* RUIM AAN DE ZIJKANT, want deze labels staan in kapitaaltjes met .16em
+     spatiering: bij .4rem raakte WEGGOOIEN de rand van zijn eigen vlak en las
+     het als afgekapte tekst. De laatste letterspatie telt bovendien mee in de
+     breedte, dus optisch stond het woord al iets te links. */
+  padding:.4rem .8rem;cursor:pointer;
   font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
   color:var(--rtg-soft,#8A8680);
@@ -99,7 +115,7 @@
 .gb-doe:first-child{border-inline-start:0;}
 .gb-doe svg{width:20px;height:20px;stroke-width:1.5;flex:none;}
 /* Een naam mag over twee regels: liever twee regels dan een half woord. */
-.gb-doe > span{text-align:center;line-height:1.3;max-width:8.5rem;}
+.gb-doe > span{text-align:center;line-height:1.3;max-width:8.5rem;margin-inline-end:-.16em;}
 .gb-doe:hover,.gb-doe:focus-visible{color:var(--op-onyx,#F4F0E9);}
 
 /* STATUS NOOIT OP KLEUR ALLEEN (ONTWERP.md par. 5): een ingrijpende actie is

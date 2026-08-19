@@ -117,18 +117,45 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
       'Terugdraaien hoort het bericht terug in het postvak te zetten');
 
     // 3. de andere kant draagt de acties die niets verplaatsen
+    /* OP TELEFOONBREEDTE, want daar bijt de regel die hieronder gemeten wordt.
+       Op 900 pixels passen alle drie de acties gewoon naast elkaar en meet deze
+       bewering niets -- de lade past zich aan de regel aan, en dat is de
+       bedoeling. */
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForSelector('#main .rij[data-i].gb-rij');
     const weer = page.locator('#main .rij[data-i]').first();
     const d2 = await weer.boundingBox();
     await page.mouse.move(d2.x + d2.width * 0.15, d2.y + d2.height / 2);
     await page.mouse.down();
     for (let i = 1; i <= 16; i++) await page.mouse.move(d2.x + d2.width * 0.15 + i * 11, d2.y + d2.height / 2);
+    /* DE LADE TOONT ALLEEN WAT ER HEEL OP PAST. Post heeft aan deze kant drie
+       acties en op een regel van deze breedte passen er twee; de derde stond
+       eerder half in beeld en las als 'OVER'. Wat er niet bij past hoort er
+       UIT te vallen, niet afgeknipt te worden -- en het hoort wel in de
+       actielade te staan, want dat is de weg voor de toets en de schermlezer. */
     assert.deepEqual(await page.evaluate(() =>
       [...document.querySelectorAll('#main .gb-lade .gb-doe > span')].map((s) => s.textContent)),
-      ['Ster', 'Sluimeren tot morgen', 'Overnemen'],
+      ['Ster', 'Sluimeren tot morgen'],
       'naar rechts horen de acties te liggen die het bericht laten staan waar het ligt');
+    assert.ok(await page.evaluate(() => {
+      const l = document.querySelector('#main .gb-lade');
+      const r = l.getBoundingClientRect();
+      return [...l.querySelectorAll('.gb-doe')].every((e) => e.getBoundingClientRect().right <= r.right + 0.6);
+    }), 'geen enkele actie mag over de rand van de lade steken; een half woord is geen knop');
     await page.mouse.up();
     await page.keyboard.press('Escape');
+
+    // en de derde actie is niet weg, hij staat waar de toets hem vindt
+    await page.waitForSelector('#main .rij[data-i].gb-rij');
+    await page.locator('#main .rij[data-i]').first().focus();
+    await page.keyboard.press('ContextMenu');
+    await page.waitForSelector('.gb-blad', { timeout: 5000 });
+    const inBlad = await page.evaluate(() =>
+      [...document.querySelectorAll('.gb-blad menu button > span')].map((s) => s.textContent));
+    assert.ok(inBlad.some((t) => /Overnemen/.test(t)),
+      'wat niet in de lade past, hoort wel in de actielade te staan: ' + JSON.stringify(inBlad));
+    await page.keyboard.press('Escape');
+    await page.setViewportSize({ width: 900, height: 900 });
 
     // 4. wat de server weigert, komt TERUG op het scherm en verandert daar niets
     await page.route('**/api/member/rtmail/verplaats', (r) => r.fulfill({

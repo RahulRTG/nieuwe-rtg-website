@@ -75,7 +75,19 @@
        lang zijn natuurlijke breedte, wordt hij gemeten, en daarna binnen de grens
        gehouden -- want een lade die de halve regel opeet is ook geen lade. */
     binnen.style.width = 'max-content';
-    var vol = Math.round(Math.min(Math.max(lijst.length * KNOP, binnen.offsetWidth), max));
+    /* EN ALLEEN WAT ER HEEL OP PAST. De grens hierboven knipte tot vandaag de
+       LADE af terwijl de knoppen hun eigen breedte hielden (flex:1 0 auto), dus
+       de laatste actie stond half in beeld: op de post las 'Overnemen' als
+       'OVER'. Precies de fout die de opmerking hierboven al beschrijft, een laag
+       hoger. Wat er niet bij past gaat er dus UIT -- en dat kost niets, want de
+       actielade (vasthouden, menutoets, de greep) toont ze alle drie. De eerste
+       blijft altijd staan: dat is de actie die een volle veeg uitvoert. */
+    var breed = [], i;
+    for (i = 0; i < binnen.children.length; i++) breed.push(binnen.children[i].offsetWidth);
+    var houd = 1, som = breed[0] || 0;
+    while (houd < breed.length && som + breed[houd] <= max) { som += breed[houd]; houd++; }
+    while (binnen.children.length > houd) binnen.removeChild(binnen.lastChild);
+    var vol = Math.round(Math.min(Math.max(houd * KNOP, som), max));
     binnen.style.width = '';
     px(lade, '--gb-vol', vol + 'px');
     lade.vol = vol;

@@ -194,6 +194,17 @@ eerste actie de hele lade over, wijkt de rest en licht de snede goud op — éé
 keer, met één korte tik. Een doorveeg die je niet zag aankomen is geen bediening
 maar een ongeluk.
 
+**De lade toont alleen wat er heel op past, en hij eindigt zoals de regel
+eindigt.** Twee dingen die je pas ziet als je kijkt, en die er tot 19 augustus
+2026 allebei naast zaten. De lade werd afgeknipt op 72% van de regel terwijl de
+knoppen hun eigen breedte hielden, dus stond de laatste half in beeld: op de post
+las *Overnemen* als *OVER*. Wat er niet bij past valt er nu UIT — en dat kost
+niets, want de actielade toont ze alle drie. De eerste blijft altijd staan: dat
+is de actie die een volle veeg uitvoert. En de lade was een rechthoek tegen een
+regel met ronde hoeken; nu meet de laag de ronding van de regel en volgt de snede
+hem. Een half woord is geen knop, en een scherpe hoek naast een ronde regel is
+geen afwerking.
+
 **Vier wegen, één deur.** Vasthouden, rechtermuisklik, de menutoets en de
 pijltoetsen openen dezelfde acties als lijst, met echte knoppen in de bovenlaag.
 Dat is geen stapeling: het is dezelfde deur, die op elk toestel anders heet. De

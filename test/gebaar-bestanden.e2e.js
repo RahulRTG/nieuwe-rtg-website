@@ -112,6 +112,35 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     await page.waitForSelector('#lijst .item.gb-rij', { timeout: 20000 });
     assert.equal(await page.locator('#lijst .item').count(), 2, 'beide bestanden horen op het bord te staan');
 
+    /* 0. EERST: PAST DE KNOP IN ZIJN EIGEN LADE? Gemeten op de OPEN lade en niet
+       tijdens het vegen -- zolang de vinger staat is de lade zo breed als er
+       geveegd is en heeft de knop ruimte die hij daarna niet heeft. En aan DEZE
+       kant, want hier ligt EEN actie: dan is de lade exact zo breed als zijn
+       knop, en dat is de enige stand waarin een pixel verschil zichtbaar wordt.
+       De snedelijn is een border van 1px, en op een pagina die
+       `*{box-sizing:border-box}` zet -- zoals deze -- gaat die pixel van de
+       INHOUD af. Dan puilt de knoppenrij er precies zoveel uit en ziet de
+       laatste letter er geschaafd uit. Daarom staat .gb-lade op content-box. */
+    const eerste = page.locator('#lijst .item').first();
+    const d0 = await eerste.boundingBox();
+    await page.mouse.move(d0.x + d0.width * 0.8, d0.y + d0.height / 2);
+    await page.mouse.down();
+    for (let i = 1; i <= 16; i++) await page.mouse.move(d0.x + d0.width * 0.8 - i * 7, d0.y + d0.height / 2);
+    await page.mouse.up();
+    await page.waitForTimeout(420);
+    const uit = await page.evaluate(() => {
+      const l = document.querySelector('#lijst .gb-lade');
+      if (!l) return ['er staat geen open lade om te meten'];
+      const lb = l.getBoundingClientRect();
+      return [...l.querySelectorAll('.gb-doe')]
+        .filter((e) => e.getBoundingClientRect().right > lb.right + 0.6)
+        .map((e) => e.textContent.trim() + ' steekt ' +
+          Math.round((e.getBoundingClientRect().right - lb.right) * 10) / 10 + 'px uit zijn lade');
+    });
+    assert.deepEqual(uit, [], 'geen enkele knop mag over de rand van zijn lade steken');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+
     // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
     const rij = page.locator('#lijst .item').first();
     const naam = (await rij.locator('b').textContent()).trim();

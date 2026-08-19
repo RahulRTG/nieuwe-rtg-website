@@ -226,7 +226,19 @@
        lang zijn natuurlijke breedte, wordt hij gemeten, en daarna binnen de grens
        gehouden -- want een lade die de halve regel opeet is ook geen lade. */
     binnen.style.width = 'max-content';
-    var vol = Math.round(Math.min(Math.max(lijst.length * KNOP, binnen.offsetWidth), max));
+    /* EN ALLEEN WAT ER HEEL OP PAST. De grens hierboven knipte tot vandaag de
+       LADE af terwijl de knoppen hun eigen breedte hielden (flex:1 0 auto), dus
+       de laatste actie stond half in beeld: op de post las 'Overnemen' als
+       'OVER'. Precies de fout die de opmerking hierboven al beschrijft, een laag
+       hoger. Wat er niet bij past gaat er dus UIT -- en dat kost niets, want de
+       actielade (vasthouden, menutoets, de greep) toont ze alle drie. De eerste
+       blijft altijd staan: dat is de actie die een volle veeg uitvoert. */
+    var breed = [], i;
+    for (i = 0; i < binnen.children.length; i++) breed.push(binnen.children[i].offsetWidth);
+    var houd = 1, som = breed[0] || 0;
+    while (houd < breed.length && som + breed[houd] <= max) { som += breed[houd]; houd++; }
+    while (binnen.children.length > houd) binnen.removeChild(binnen.lastChild);
+    var vol = Math.round(Math.min(Math.max(houd * KNOP, som), max));
     binnen.style.width = '';
     px(lade, '--gb-vol', vol + 'px');
     lade.vol = vol;
@@ -345,6 +357,18 @@
         var pos = getComputedStyle(kind[i]).position;
         if (pos === 'absolute' || pos === 'fixed') kind[i].setAttribute('data-gb-vast', '');
       }
+      /* DE RONDING VAN DE REGEL, ZODAT DE SNEDE HEM VOLGT. De lade is een
+         rechthoek en de regel heeft ronde hoeken; zonder deze maat eindigt een
+         open lade in een scherpe hoek naast een ronde regel -- op post viel dat
+         meteen op. CSS kan een border-radius niet zelf in een clip-path lezen,
+         dus wordt hij hier gemeten en doorgegeven. De lade krijgt hem een pixel
+         kleiner: zij ligt BINNEN de rand van de regel en een gelijke ronding
+         puilt daar net overheen. */
+      var cs = getComputedStyle(g.rij);
+      var buiten = parseFloat(kant === 'rechts' ? cs.borderTopRightRadius : cs.borderTopLeftRadius) || 0;
+      var rand = parseFloat(kant === 'rechts' ? cs.borderRightWidth : cs.borderLeftWidth) || 0;
+      px(g.rij, '--gb-rond', buiten + 'px');
+      px(g.rij, '--gb-rond-lade', Math.max(0, buiten - rand) + 'px');
       g.rij.setAttribute('data-gb', kant);
       px(g.rij, '--gb-duur', '0ms');
       g.lade = bouwLade(g.rij, kant, lijst, g.rij.offsetWidth * 0.72);

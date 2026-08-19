@@ -307,8 +307,13 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
     const rij = page.locator('#proefregel');
     await rij.scrollIntoViewIfNeeded();
     const doos = await rij.boundingBox();
-    await veeg(page, doos, -150, false);
-    await page.waitForTimeout(320);
+    /* LOSLATEN en dan pas meten. Blijft de vinger staan, dan is de lade zo breed
+       als er geveegd is en heeft de knop ruimte die hij bij een OPEN lade niet
+       heeft -- precies de stand waarin de pixel van de snedelijn zichtbaar wordt.
+       Na loslaten staat de lade op zijn eigen maat, en dat is de maat die een
+       lid ziet. */
+    await veeg(page, doos, -150, true);
+    await page.waitForTimeout(420);
 
     const meting = await page.evaluate(() => {
       const r = document.getElementById('proefregel');
@@ -323,7 +328,6 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
         binnenIn: lb.y >= rb.y - 1 && lb.y + lb.height <= rb.y + rb.height + 1
           && lb.x >= rb.x - 1 && lb.x + lb.width <= rb.x + rb.width + 1 };
     });
-    await page.mouse.up();
     assert.ok(meting, 'de veeg hoort ook op een aanraakscherm een lade te openen');
     assert.equal(meting.eigenPositie, 'static',
       'deze proef meet niets als de regel zichzelf al plaatst -- dan verbergt het scherm de fout van de laag');

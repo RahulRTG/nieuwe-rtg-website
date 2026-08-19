@@ -254,8 +254,16 @@ function mobielInPagina(opt) {
     positie: st2.position
   };
 
+  function preciezer(n) {
+    var heel = Math.round(n);
+    return Math.abs(n - heel) < 0.05 ? String(heel) : n.toFixed(1);
+  }
   if (hr.width < MAAT || hr.height < MAAT) {
-    uit.gebreken.push('maat ' + Math.round(hr.width) + 'x' + Math.round(hr.height) + ', hoort ' + MAAT);
+    /* NIET AFRONDEN NAAR EEN GETAL DAT SLAAGT. 43,67 werd hier "44" en dan
+       staat er een gebrek op de lijst met een maat die klopt -- ik heb er een
+       kwartier naar gekeken voordat ik doorhad dat het getal loog. Een tiende
+       erbij als het geen heel getal is. */
+    uit.gebreken.push('maat ' + preciezer(hr.width) + 'x' + preciezer(hr.height) + ', hoort ' + MAAT);
   }
   /* EEN KNOP DIE BIJ EEN VELD HOORT, WORDT BEREIKT VANAF DAT VELD.
 

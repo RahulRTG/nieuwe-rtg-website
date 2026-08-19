@@ -129,6 +129,30 @@ function startEchteServer() {
     await browser.close(); server.stop(); process.exit(1);
   }
 
+  /* EN EEN GEZIN, WANT ANDERS MEET DE TELEFOONRONDE VIJFENVIJFTIG KEER EEN DEUR.
+
+     Dit is de duurste meetfout van de hele ronde geweest. De RTF-leerling- en
+     gezinsschermen hangen achter een tweede deur (apps/foundation/sessie.js:
+     "Deze ruimte blijft nog dicht -- kies eerst jouw eigen profiel"), en die
+     deur staat LOS van het RTG-lidmaatschap. Met alleen `lid` opende geen enkel
+     van die schermen: de keuring mat vijfenvijftig keer hetzelfde slot en
+     rapporteerde ze alle vijfenvijftig als "geen hoofdhandeling". Dat is geen
+     bevinding maar een blinde vlek met een getal eromheen -- 22% van het
+     platform stond in het register als gemeten terwijl het nooit open is
+     geweest.
+
+     Een gezin plus een profiel kost twee POSTs. De e2e-toetsen deden dit al
+     (test/rtfagenda.e2e.js); de keuring niet. */
+  const gezin = await fetch(basis + '/api/foundation/gezin/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gezinsnaam: 'Keurgezin', naam: 'Papa', pin: '1234' })
+  }).then(r => r.json()).catch(() => ({}));
+  if (!gezin || !gezin.token) {
+    console.error('[a11y] MISLUKT: geen proefgezin, dus de RTF-schermen zouden achter hun deur blijven staan.');
+    await browser.close(); server.stop(); process.exit(1);
+  }
+  const RTF_SESSIE = { code: gezin.code, token: gezin.token, profiel: { naam: 'Papa', beheerder: true } };
+
   /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
      een CSP met nonce mee en die blokkeert een inline script. In een IIFE, want
      evaluate met een string verwacht een expressie en BRON begint met functies. */
@@ -213,9 +237,16 @@ function startEchteServer() {
   const mobiu = { breed: [], leeg: [], balk: [], duim: [], geenHoofd: [], gemeten: 0 };
   for (const hand of ['rechts', 'links']) {
   const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-  await telefoon.addInitScript((t) => {
-    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-  }, lid.token);
+  await telefoon.addInitScript((z) => {
+    try {
+      localStorage.setItem('rtg_member_token', z.token);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.setItem('rtg_lang', 'nl');
+      /* zie de opmerking bij RTF_SESSIE: zonder dit staat een kwart van de
+         schermen achter zijn eigen deur en meet deze ronde die deur */
+      localStorage.setItem('rtf_sessie', JSON.stringify(z.rtf));
+    } catch (e) {}
+  }, { token: lid.token, rtf: RTF_SESSIE });
   await telefoon.addCookies([{ name: 'rtg_hand', value: hand, url: basis }]);
   const tel = await telefoon.newPage();
   console.log(`\n[a11y] ===== ronde TELEFOON, ${hand}handig (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
@@ -225,7 +256,25 @@ function startEchteServer() {
     /* De mobiele meting eerst, want die is goedkoop en hangt niet af van de
        tweede meetronde die het raakvlak soms nodig heeft. */
     try {
-      const m = await tel.evaluate(MOB(hand));
+      let m = await tel.evaluate(MOB(hand));
+      /* WIE IETS VINDT, MEET NOG EEN KEER -- zelfde reden als bij het raakvlak
+         hieronder, en het is hier precies zo misgegaan. /apps/kantoorpda.html
+         stuurt door naar de personeels-app, en die kaart komt binnen met een
+         schaal-animatie: 600ms na load stond een knop met min-height:44px op
+         43,67 hoog. Dat is een moment en geen maat. Een scherm dat PERMANENT te
+         klein of te hoog staat, meldt zich in de tweede meting gewoon weer.
+
+         Alleen bij een gebrek, want dat kost alleen iets op de schermen die iets
+         vinden -- en dat zijn er hopelijk nul. */
+      if (m.hoofd && m.gebreken.length) {
+        try {
+          await tel.waitForFunction(
+            () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+            null, { timeout: 1500 });
+        } catch (e) { /* een scherm dat blijft bewegen meten we zoals het staat */ }
+        await tel.waitForTimeout(300);
+        try { m = await tel.evaluate(MOB(hand)); } catch (e) { /* de eerste meting blijft staan */ }
+      }
       mobiu.gemeten++;
       const waar = pad + ' [' + hand + ']';
       if (m.venster !== 390) mobiu.breed.push(waar + ': het venster is ' + m.venster + ' en niet 390 -- deze meting zegt niets');

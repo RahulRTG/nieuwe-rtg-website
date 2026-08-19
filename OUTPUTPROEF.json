@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T20:59:56.488Z",
-  "commit": "ca7e795",
+  "op": "2026-08-19T21:25:02.163Z",
+  "commit": "e2f6d23",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3514,
-  "onbeslist": 509,
+  "bewezen": 3524,
+  "onbeslist": 499,
   "blind": 164,
   "ongemeten": 8
  },
@@ -1544,28 +1544,28 @@
    "reden": "er is over DEZE route gelogen en bank-beheer.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/bank/pas/bevries": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/pas/limiet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/pas/betaal": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/pas/sluit": {
    "staat": "bewezen",
@@ -1576,28 +1576,28 @@
    "reden": "er is over DEZE route gelogen en bank-beheer.test.js zakte daarop"
   },
   "POST /api/bank/krediet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/krediet/aanvraag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/krediet/aflossing": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/terugkerend": {
    "staat": "bewezen",
@@ -1624,12 +1624,12 @@
    "reden": "er is over DEZE route gelogen en bank-beheer.test.js zakte daarop"
   },
   "POST /api/bank/bulk": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/salaris": {
    "staat": "bewezen",
@@ -1640,12 +1640,12 @@
    "reden": "er is over DEZE route gelogen en bank-beheer.test.js zakte daarop"
   },
   "POST /api/bank/advies": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/bank/hart": {
    "staat": "bewezen",
@@ -11898,11 +11898,12 @@
    "reden": "er is over DEZE route gelogen en bankdeuren.test.js zakte daarop"
   },
   "POST /api/staff/klok/correctie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/office/bank/salaris/voorstel": {
    "staat": "bewezen",
@@ -12001,11 +12002,12 @@
    "reden": "er is over DEZE route gelogen en loonstrook-portaal.test.js zakte daarop"
   },
   "POST /api/bank/afschrift.csv": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 69); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en bank.test.js zakte daarop"
   },
   "POST /api/office/bank/opdrachten": {
    "staat": "bewezen",
@@ -52253,6 +52255,56 @@
    "toets": "bank.test.js",
    "merkt": true,
    "op": "2026-08-19T20:59:56.392Z"
+  },
+  "POST /api/bank/pas/betaal": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:38.554Z"
+  },
+  "POST /api/bank/pas/limiet": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:38.666Z"
+  },
+  "POST /api/bank/krediet": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:38.728Z"
+  },
+  "POST /api/bank/pas/bevries": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:38.730Z"
+  },
+  "POST /api/bank/advies": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:50.259Z"
+  },
+  "POST /api/bank/krediet/aflossing": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:50.417Z"
+  },
+  "POST /api/bank/krediet/aanvraag": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:50.511Z"
+  },
+  "POST /api/bank/bulk": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:24:50.731Z"
+  },
+  "POST /api/staff/klok/correctie": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:25:01.953Z"
+  },
+  "POST /api/bank/afschrift.csv": {
+   "toets": "bank.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:25:02.050Z"
   }
  },
  "basislijn": {

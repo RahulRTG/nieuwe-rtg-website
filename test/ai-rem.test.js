@@ -21,6 +21,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const rem = require('../server/ai-rem');
+const ctx = require('../server/ai-context');
 
 const schoon = () => { delete process.env.RTG_AI_BEURTEN_PER_MINUUT; rem.nulstel(); };
 
@@ -46,7 +47,7 @@ test('2. zonder context geen rem -- achtergrondwerk hoort niet stil te vallen', 
   assert.equal(rem.wie(), null);
   for (let i = 0; i < 20; i++) assert.equal(rem.magNogVoor(), true);
   // binnen een context telt hij wel
-  rem.inContext('9.9.9.9', () => {
+  ctx.inContext('9.9.9.9', () => {
     assert.equal(rem.wie(), '9.9.9.9');
     assert.equal(rem.magNogVoor(), true);
     assert.equal(rem.magNogVoor(), false, 'binnen de context remt hij wel');

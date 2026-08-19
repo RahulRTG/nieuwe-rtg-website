@@ -31,9 +31,12 @@
 /* De tijd komt uit de klok van dit huis: het venster van deze rem IS
    tijdgedrag, en met server/lib/klok.js is dat te beproeven (RTG_KLOK). */
 const klok = require('./lib/klok');
-const { AsyncLocalStorage } = require('async_hooks');
+/* Wie deze aanroep doet komt uit de gedeelde context; zie ./ai-context.js voor
+   waarom dat er een is en niet twee. Deze laag gebruikt daar alleen het IP van:
+   een rem per minuut hoort bij een verbinding, niet bij een persoon. Het budget
+   per persoon staat in ./ai-budget.js en kijkt naar de sessie. */
+const ctx = require('./ai-context');
 
-const context = new AsyncLocalStorage();
 const beurten = new Map(); // sleutel -> { vanaf, n }
 const BEURT_VENSTER = 60000;
 
@@ -42,9 +45,8 @@ function beurtGrens() {
   return Number.isFinite(v) && v >= 0 ? v : 60;
 }
 
-/* Wie doet deze aanroep. */
-const wie = () => context.getStore() || null;
-function inContext(sleutel, fn) { return context.run(String(sleutel || ''), fn); }
+/* Wie doet deze aanroep -- voor deze laag: welk IP. */
+const wie = () => ctx.ip() || null;
 
 function magNogVoor(sleutel, nu) {
   const max = beurtGrens();
@@ -59,12 +61,6 @@ function magNogVoor(sleutel, nu) {
   return true;
 }
 
-/* De middleware die de context zet. Meer doet hij niet: het tellen gebeurt pas
-   als er echt een extern model wordt aangeroepen. */
-function contextMiddleware() {
-  return (req, res, next) => inContext(req.ip || '', () => next());
-}
-
 function nulstel() { beurten.clear(); }
 
 const opruimer = setInterval(() => {
@@ -73,4 +69,4 @@ const opruimer = setInterval(() => {
 }, BEURT_VENSTER);
 if (opruimer.unref) opruimer.unref();
 
-module.exports = { magNogVoor, inContext, contextMiddleware, beurtGrens, wie, nulstel };
+module.exports = { magNogVoor, beurtGrens, wie, nulstel };

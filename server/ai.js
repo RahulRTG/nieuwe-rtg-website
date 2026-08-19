@@ -16,6 +16,7 @@ const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
 const meter = require('./ai-meter');
 const rem = require('./ai-rem');
+const budget = require('./ai-budget');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -78,6 +79,17 @@ function maakAI(opts) {
             laatste = laatste || Object.assign(new Error('Te veel modelaanroepen achter elkaar. Probeer het over een minuut opnieuw.'), { code: 'AI_TE_SNEL' });
             continue;
           }
+          /* En het budget van deze PERSOON. Alleen extern, om dezelfde reden
+             als hierboven: de eigen modelserver kost geen geld. Een oppervlak
+             van de RTFoundation sluit hier nooit -- zie ./ai-budget.js. */
+          if (!aanbieder.lokaal) {
+            let ruimte = null;
+            try { ruimte = budget.magNog(); } catch (e2) {}
+            if (ruimte && !ruimte.mag) {
+              laatste = laatste || Object.assign(new Error(budget.BERICHT), { code: 'AI_BUDGET_OP' });
+              continue;
+            }
+          }
           try {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
@@ -90,7 +102,14 @@ function maakAI(opts) {
               if (aanbieder.lokaal) meter.boekLokaal(
                 (typeof aanbieder.modelVoor === 'function' ? aanbieder.modelVoor(params) : null)
                   || (aanbieder.modellen && aanbieder.modellen.tekst), uit && uit.usage);
-              else meter.boek(params && params.model, uit && uit.usage);
+              else {
+                const kosten = meter.boek(params && params.model, uit && uit.usage);
+                /* Het budget telt in euro en de meter in dollar; de omrekening
+                   staat in ./ai-budget-beleid.js. Ook een vrijgestelde aanroep
+                   wordt geboekt -- je wilt zien wat de Foundation kost, hij
+                   wordt er alleen niet op afgesloten. */
+                budget.boek(kosten);
+              }
             } catch (e2) {}
             return uit;
           } catch (e) {

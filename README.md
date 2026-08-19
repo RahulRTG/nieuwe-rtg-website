@@ -911,7 +911,7 @@ geteld en daar staan de kranen:
 
 | schakelaar | wat | standaard |
 |---|---|---|
-| `RTG_AI_DAGPLAFOND` | dagplafond in dollar; daarboven gaan externe modellen dicht | uit (geen plafond) |
+| `RTG_AI_DAGPLAFOND` | dagplafond in dollar voor het hele huis; daarboven gaan externe modellen dicht | 50 (`npm run live:init` schrijft hem) |
 | `RTG_AI_BEURTEN_PER_MINUUT` | modelaanroepen per aanroeper per minuut; 0 zet de rem uit | 60 |
 | `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
 
@@ -931,6 +931,69 @@ meet en grijpt in als het geld op is, de rem stopt iemand die er in een minuut
 doorheen gaat. De prijzen zijn een tabel met een
 peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
 boekhouding.
+
+## Het AI-budget per persoon (`server/ai-budget.js`)
+
+De twee grenzen hierboven missen allebei iets. Het huisplafond telt het HELE
+huis: dat vangt een lek, maar pas als iedereen er last van heeft -- de kraan
+gaat voor de honderdste bezoeker dicht doordat de eerste hem heeft
+leeggetrokken. De rem telt per MINUUT: die vangt een uitschieter, maar een
+script dat netjes 59 per minuut doet loopt een dag lang door.
+
+Wat ertussen zat is een grens die bij de **persoon** hoort.
+
+| pas | venster | budget |
+|---|---|---|
+| gratis (en wie niet is ingelogd) | per dag | € 0,50 |
+| RTG Pass | per maand | € 15 |
+| Lifestyle Pass en Business Pass | per maand | € 5.000 |
+
+**Kijk naar het venster, niet naar het bedrag.** € 0,50 per dag is over een
+maand ook € 15 -- precies de RTG Pass. Het verschil is dus niet hoeveel je
+krijgt maar hoe vrij je erin bent: een RTG-lid mag zijn maand op één dag
+opmaken, een gratis gebruiker nooit meer dan een halve euro op een dag. Wie wil
+dat een betalend lid ook méér krijgt, verandert één getal in `BUDGETTEN`
+(`server/ai-budget-beleid.js`, of `RTG_AI_BUDGETTEN` als JSON in de omgeving).
+
+**Een IP is geen persoon.** De rem hiernaast sleutelt op IP, en voor een grens
+per minuut is dat prima. Voor een dag- of maandbudget is het op twee manieren
+fout tegelijk: een kantoor deelt één IP met honderd collega's, die dan samen
+één budget zouden krijgen, en een lid dat van wifi naar 4G loopt zou opeens
+iemand anders zijn met een vol budget. De sleutel is daarom de sessiesleutel
+van het lid (`user-<id>`) -- pseudoniem, zoals de rest van de operationele
+data; de echte naam blijft in de identiteitskluis. Wie niet is ingelogd valt
+terug op het IP en krijgt het gratis-budget, want anders is uitloggen de manier
+om er onderuit te komen.
+
+**De Foundation sluit nooit.** Alles onder `/api/foundation`, `/api/rtf`,
+`/api/bijles`, `/api/onderwijs` en `/api/member/leren` telt wel mee maar wordt
+nooit afgesloten. Dat volgt uit een regel die er al stond (`test/modelkeuze.test.js`):
+wat een kind te horen krijgt is geen kostenpost. Een bijlesdocent die halverwege
+een som stopt omdat het tegoed op is, is precies dat wel. Alleen het huisplafond
+kan die aanroepen nog stoppen. De lijst staat op één plek, met een reden per
+regel, en is bewust géén vlag die elke aanroeper zelf moet zetten -- zo'n vlag
+ben je een keer vergeten, en dan valt een kind stil.
+
+**Wat het niet is: geen aftelteller en geen verkooptrechter.** Er komt nergens
+"nog twaalf vragen vandaag" in beeld; dat is kunstmatige schaarste, en dat is
+precies wat CLAUDE.md verbiedt. Het budget is onzichtbaar tot het op is. En het
+bericht dat je dan krijgt noemt met opzet géén andere pas: zodra een grens per
+pas verschilt is "upgrade voor meer AI" de vanzelfsprekende volgende zin, en
+dan is de rem een verkoopargument geworden (LIFE.md: een relatie is geen
+trechter). Het bericht wijst naar wat er wél kan -- de handmatige werkmodus.
+
+**De munt.** De aanbieders factureren in dollar, deze budgetten staan in euro.
+Daar zit dus een koers tussen, met een peildatum, overschrijfbaar met
+`RTG_AI_KOERS` -- en die veroudert net zo hard als de prijstabel. Hij bewaakt
+een orde van grootte; het is geen boekhouding. **De ingebouwde koers (1 EUR =
+1,08 USD, peildatum 19 augustus 2026) is een aanname die iemand hoort na te
+kijken: dit huis heeft geen koersbron en verzint er ook geen.**
+
+De stand staat op hetzelfde luik als de meter (`GET /api/techniek/ai/kosten`):
+de bedragen per pas, hoeveel mensen er verbruik hebben, hoeveel er aan hun
+grens zitten, en wat de vrijgestelde oppervlakken kostten. Bewust een AANTAL en
+geen lijst -- wie er aan zijn grens zit is een gegeven over een lid, en dat
+hoort niet in een kostenoverzicht te staan omdat het toevallig te tellen is.
 
 ## De eigen modelserver heeft een poort (`server/local-ai-poort.js`)
 

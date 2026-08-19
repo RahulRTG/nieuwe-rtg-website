@@ -105,3 +105,35 @@ test('6. het luik toont ook hoe de eigen modelserver ervoor staat', () => {
   route({ app: app2, techAuth: () => {}, eigenaarAlleen: () => {}, anthropic: {} });
   assert.equal(roep(app2.gemount[0].fn).lokaleServer, null);
 });
+
+test('7. het luik toont het budget per pas, maar nooit WIE eraan zit', () => {
+  /* Een kostenoverzicht dat per persoon laat zien hoeveel iemand de AI
+     gebruikt, is geen kostenoverzicht meer maar een gedragsrapport -- en het
+     zou codenamen naast verbruik zetten. Het aantal zegt genoeg om te merken
+     dat een grens te krap staat. */
+  meter.nulstel();
+  const budget = require('../server/ai-budget');
+  budget.zetOpslag(() => ({ data: {
+    'lid:user-1': { venster: '2026-08', cent: 1500, aanroepen: 40, pas: 'rtg' },
+    'lid:user-2': { venster: '2026-08', cent: 10, aanroepen: 2, pas: 'rtg' },
+    'lid:user-3': { venster: '2026-08-19', cent: 8, aanroepen: 3, pas: 'gratis', vrijCent: 8 }
+  }, bewaar() {} }));
+
+  const app = neppApp();
+  route({ app, techAuth: () => {}, eigenaarAlleen: () => {} });
+  const uit = roep(app.gemount[0].fn);
+
+  assert.ok(uit.budget, 'het budget staat op het luik');
+  assert.equal(uit.budget.perPas.gratis.euro, 0.5, 'de bedragen staan erbij');
+  assert.equal(uit.budget.perPas.gratis.venster, 'dag');
+  assert.equal(uit.budget.perPas.rtg.venster, 'maand');
+  assert.equal(uit.budget.mensenMetVerbruik, 3);
+  assert.equal(uit.budget.mensenOpDeGrens, 1, 'een van de drie zit aan zijn grens');
+  assert.equal(uit.budget.vrijgesteldEuro, 0.08, 'en wat de Foundation kostte');
+
+  /* En nu de grens die ertoe doet: geen enkele sleutel komt mee naar buiten. */
+  const alles = JSON.stringify(uit);
+  for (const sleutel of ['user-1', 'user-2', 'user-3', 'lid:']) {
+    assert.equal(alles.includes(sleutel), false, 'het luik hoort ' + sleutel + ' niet te noemen');
+  }
+});

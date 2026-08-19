@@ -1,11 +1,9 @@
 /* DE SCHILBALK ALS COMMANDBALK: van een strook die zegt waar je bent, naar een
    instrument dat meebeweegt met wat je doet.
 
-   WAT ER STOND. Onderaan de werktafel lag een balk met drie zones: de bank
-   links, je werkbladen in het midden, Rahul rechts. Met nul bladen stond er
-   "Kies een wereld" -- een zin, geen bediening. Om bij een wereld te komen moest
-   je eerst de lade openen: twee handelingen voor de enige handeling die dat
-   scherm heeft.
+   WAT ER STOND. Een balk met drie zones en, bij nul bladen, de zin "Kies een
+   wereld" -- geen bediening. Naar een wereld liep via de lade: twee handelingen
+   voor de enige handeling die dat scherm heeft.
 
    WAT ER NU STAAT. Dezelfde drie zones op dezelfde plekken, maar het midden is
    een CONTEXTZONE: de werelden als er niets openstaat, de handelingen die een
@@ -15,14 +13,9 @@
    DE STRUCTUUR BLIJFT VOORSPELBAAR, en dat is de hele voorwaarde. De bank staat
    altijd aan de ANKERZIJDE, Rahul altijd aan de DUIMZIJDE, en het midden begint
    altijd met waar je bent. Wat verandert is de INHOUD van het midden, nooit de
-   plekken.
-
-   Welke kant dat is hangt af van de hand (shared/hand.js): voor een
-   rechtshandige is de ankerzijde links, voor een linkshandige rechts. Hier
-   stond "links is altijd de bank", en dat klopte maar voor een van de twee --
-   een linkshandige had de bank onder zijn duim en Rahul buiten bereik. Het
-   spiegelen zelf gebeurt in DOM-volgorde in shared/command/romp.js, juist zodat
-   de afspraak hieronder overeind blijft.
+   plekken. Welke kant dat is hangt van de hand af; het spiegelen gebeurt in
+   DOM-volgorde in shared/command/romp.js, en waarom staat daar en in
+   ADAPTIEF.md.
 
    WAT DEZE LAAG NIET WEET. Hij kent geen documenten, cellen of dia's. Hij vraagt
    het register (shared/adaptief/register.js) welke capabilities er nu spelen en

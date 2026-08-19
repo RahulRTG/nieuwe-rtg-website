@@ -116,4 +116,5 @@ module.exports = (ctx) => {
   require('./school/aandacht')(sctx); // Attention OS: een lijst per dag, in drie bakken
   require('./school/les')(sctx); // de les afronden in een handeling, en het lesgeheugen
   require('./school/instap')(sctx); // de vervanger en de nieuwe docent: minimale context, vijf stappen
+  require('./school/taalpoort')(sctx); // de taallaag: vakbeleid, en de terugvertaling voor de deur uitgaat
 };

@@ -41,6 +41,15 @@
         return '<p class="stil" style="margin:.35rem 0 0;">' + esc((m.at || '').slice(0, 10)) + ' · ' + esc(m.tekst) + '</p>';
       }).join('')) + '</div>';
     h += '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="dpRapport" type="button">Schoolrapport (print)</button></div>';
+    /* Thuistaal per vak: een schoolbesluit en geen keuze van een leraar. Bij
+       een taalvak zet de server "volledig" terug naar wat het vak toelaat en
+       zegt dat ook -- daar is de taal zelf wat je meet. */
+    h += '<div class="kaart"><div class="kop">Thuistaal per vak</div>' +
+      '<p class="stil">Bij rekenen en de zaakvakken mag de thuistaal er volledig naast; bij een taalvak is de taal zelf wat u meet, dus blijft het bij de vraagstelling.</p>' +
+      '<div class="rij"><input class="veld" id="dpTaalVak" maxlength="40" placeholder="Vak" aria-label="Vak">' +
+      '<select class="veld" id="dpTaalStand" aria-label="Hoeveel steun"><option value="volledig">volledig</option>' +
+      '<option value="instructie">alleen de vraagstelling</option><option value="geen">geen</option></select>' +
+      '<button class="knop" id="dpTaal" type="button">Vastleggen</button></div></div>';
     w.innerHTML = h;
   }
 
@@ -54,6 +63,20 @@
       });
     });
     w.querySelector('#dpRapport').addEventListener('click', function () { rapport(esc); });
+    /* Het taalbeleid per vak. Hier en niet bij de leraar, want dit is een
+       schoolbesluit -- en de server zet een taalvak terug naar wat het toelaat
+       en meldt dat, in plaats van het stil bij te stellen. */
+    w.querySelector('#dpTaal').addEventListener('click', function () {
+      var vak = (w.querySelector('#dpTaalVak').value || '').trim().toLowerCase();
+      var stand = w.querySelector('#dpTaalStand').value;
+      if (!vak) return meld('Noem het vak.');
+      var beleid = {}; beleid[vak] = stand;
+      api('/school/taalbeleid/zet', { schoolCode: S.code, beheerToken: S.token, beleid: beleid })
+        .then(function (r) {
+          if (r.body.error) return meld(r.body.error);
+          meld(r.body.uitleg);
+        });
+    });
   }
 
   /* Het drukklare Schoolrapport: de organisatie op een A4 -- personeel,

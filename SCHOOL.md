@@ -57,6 +57,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Daily Learning Guarantee | dagplan uit huiswerk, herhalingen en leerlijn; vijf stukken, niets bewaard | `kern/leerstof-dag.js`, `school/dag.js` |
 | Attention OS en Teacher Flow | een lijst in drie bakken, les afronden in een handeling, lesgeheugen | `school/aandacht.js`, `school/les.js` |
 | Vervanger en nieuwe docent | briefing zonder zorgdossier, waarneming met einddatum, vijf stappen | `school/instap.js`, `school/waarneming.js` |
+| Taallaag en Family Bridge | vakbeleid met een harde regel, terugvertaling met betekeniscontrole, bon | `kern/taalbeleid.js`, `kern/betekenis.js`, `school/taalpoort.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -360,6 +361,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een vervanger ziet geen zorgdossier | de vorm van de briefing ligt vast | **ja**, met mutatie beproefd |
 | Een waarneming verloopt | de klas-poort weigert een verlopen waarnemer | **ja** (`test/instap.test.js`) |
 | Een nieuwe docent krijgt er nooit meer dan vijf | alle standen nagerekend, geen afkapgrens | **ja**, met mutatie beproefd |
+| Een taalvak kan nooit volledig vertaald | het maximum staat in de kern, niet in een instelling | **ja**, met mutatie beproefd |
+| Een teruggezette keuze wordt gemeld | het antwoord noemt het vak en de reden | **ja**, met mutatie beproefd |
+| Verschoven betekenis houdt een bericht tegen | ontkenning, verplichting, getal en datum geteld | **ja**, met mutatie beproefd |
+| Geen bonnetje, geen bericht | elk verstuurd bericht draagt model, gebruik en naam | **ja** (`test/taallaag.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -375,6 +380,10 @@ Wie een belofte toevoegt zonder meting, voegt geen belofte toe maar een risico.
 ---
 
 ## 8. De taallaag -- leren ondanks een taalbarrière, zonder het Nederlands weg te nemen
+
+> **Gebouwd op 19 augustus 2026.** Het vakbeleid met de harde regel, en de
+> poort naar het gezin met de terugvertaling en het bonnetje. De Language
+> Independence Test staat er nog niet -- zie het eind van deze paragraaf.
 
 Niet overal een vertaalknop. Elke inhoudseenheid draagt een canonieke vorm plus
 representaties per taal, en de school stelt de regel in:
@@ -397,6 +406,55 @@ Daaraan vast twee dingen:
 - **Meaning preservation in oudercommunicatie.** Bij gevoelige berichten ziet de
   docent vóór verzenden de terugvertaling, met de betekenisverschillen
   gemarkeerd: *"moet aanwezig zijn" kwam terug als "zou aanwezig moeten zijn".*
+
+### Wat er van deze paragraaf staat, en onder welke grenzen
+
+**Drie standen van steun, en het Nederlands verdwijnt nooit.** *Volledig* (les
+en uitleg mogen in de thuistaal ernaast), *instructie* (alleen de vraagstelling
+mag mee; de te meten inhoud blijft Nederlands) en *geen*. Steun staat er altijd
+NAAST en vervangt niets: naast elkaar lezen is precies hoe je een taal erbij
+leert.
+
+**De harde regel is geen instelling.** Een school mag dit beleid aanpassen --
+scholen verschillen, en wie hier lesgeeft weet beter wat zijn kinderen nodig
+hebben. Maar bij een taalvak kan het nooit op *volledig*. Dat is de meting zelf:
+een school die dat aanzet, meet vanaf dat moment niets meer en merkt het pas bij
+het examen. Vandaar dat de regel in de kern staat en niet in een schermpje met
+een schuifje, en dat het opslaan de keuze al terugzet. Een onbekend vak valt
+terug op *instructie*: een vak dat we niet kennen kan een taalvak zijn.
+
+**Terugzetten gebeurt hardop.** Wordt een keuze bijgesteld, dan zegt het
+antwoord welk vak en waarom. Stil bijstellen is erger dan weigeren: dan denkt
+een school dat het aanstaat.
+
+**Meaning preservation is een telling en geen oordeel.** Vier dingen mogen er
+nooit uit vallen, en dat zijn precies de vier waar het misgaat: een ontkenning
+(*niet, geen, nooit*), een verplichting (*moet* dat terugkomt als *zou moeten*),
+een getal (12,50 dat 1250 wordt) en een datum. De controle vergelijkt het
+origineel met de terugvertaling en telt; ze kan niet hallucineren en ze werkt
+ook zonder model.
+
+Dat laatste is opzet. **Een model laten beoordelen of een vertaling klopt, is
+het probleem met zichzelf laten nakijken**: dezelfde soort fout die de vertaling
+maakte, maakt de beoordeling. Wat de telling niet kan is nuance beoordelen --
+daarvoor is de mens er, en die is hier het sluitstuk en geen formaliteit.
+
+**Geen bonnetje, geen bericht** (grens 5). Elk vertaald bericht dat een gezin
+bereikt draagt een bon: welk model, welke gegevens wél en welke expliciet níét,
+wanneer, en op wiens naam. De vertaal-AI ziet alleen de tekst -- geen kindnaam,
+geen dossier, geen klas (grens 4) -- en dat staat op diezelfde bon. Verschuift
+er iets in een ontkenning, verplichting, getal of datum, dan is bevestigen niet
+genoeg: dan zegt de docent apart dat hij het gezien heeft. En is er geen
+vertaling te maken, dan gebeurt er niets stils: het bericht gaat niet "maar toch
+even" in het Nederlands de deur uit.
+
+**De Language Independence Test staat er nog niet, en dat is een keuze.** Hij
+vraagt om dezelfde conceptuele vraag in een tweede taal, en de opgaven komen
+hier uit generatoren die Nederlandse zinnen bouwen. Een vraag half vertalen
+levert een andere vraag op, en dan meet de test iets anders dan hij belooft. Wat
+er eerst moet komen is een taalvorm voor de opgavesjablonen zelf; tot die er is,
+zou de uitkomst een aanwijzing zijn die op niets stoelt -- en juist bij deze
+functie is dat gevaarlijk, want ze gaat over hoe je naar een kind kijkt.
   De docent corrigeert vóór verzending. Een vertaal-API zonder terugblik is bij
   leerplicht en zorg te gevaarlijk.
 - **Family Bridge.** Een ouder die geen Nederlands spreekt moet vanaf dag één
@@ -630,6 +688,9 @@ formulier, met daarna hooguit twee keuzes (wanneer, en van wie).
   sessie bewaren, geen oneindige lijst. Bestaande huisregel, hier bevestigd.
 - Geen tweede leerlingenlijst. School Core is de wortel: een leerling bestaat
   één keer (LAT-regel 4).
+- Geen AI die zijn eigen vertaling nakijkt. De betekeniscontrole is een telling
+  van ontkenningen, verplichtingen, getallen en data; een model dat zijn eigen
+  werk beoordeelt, maakt bij het nakijken dezelfde fout als bij het vertalen.
 
 ---
 
@@ -658,7 +719,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 6. **Teacher Flow en Attention OS.** Gedaan: de lijst in drie bakken, de les
    afronden in een handeling, het lesgeheugen, en de instap van de vervanger en
    de nieuwe docent (zie §9).
-7. **Taallaag en Family Bridge.** Meaning preservation vóór massale uitrol.
+7. **Taallaag en Family Bridge.** Gedaan: het vakbeleid met de harde regel en
+   de poort naar het gezin met terugvertaling, betekeniscontrole en bon (zie
+   §8). De Language Independence Test staat bewust nog open: die vraagt eerst
+   om een taalvorm voor de opgavesjablonen.
 8. **No-Lost-Child opvolgbewaking.**
 9. **Assessment Compiler, Fairness Engine, Fingerprint.**
 10. **Integration Fabric** (Edu-V, Entree, Edu-API, OSO) -- als adapters.

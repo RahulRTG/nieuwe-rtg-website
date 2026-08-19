@@ -387,3 +387,34 @@ test('de vervanger en de nieuwe docent hebben een scherm, met de firewall erop',
   assert.ok(partner.includes('/apps/schoolpartner/instap.js'), 'School Partner laadt instap.js niet');
   assert.ok(partner.includes('id="startVorm"') && partner.includes('id="vervangVorm"'));
 });
+
+test('de taallaag staat op het scherm: het beleid en de poort met de bon', () => {
+  const bron = lees('apps', 'schoolpartner', 'taal.js');
+  const code = codeVan(bron);
+
+  assert.match(code, /\/school\/taalbeleid/);
+  assert.match(code, /\/school\/bericht\/controleer/);
+  assert.match(code, /\/school\/bericht\/verstuur/);
+
+  // de reden waarom een vak wel of geen volledige steun krijgt, staat erbij
+  assert.match(code, /esc\(v\.reden\)/, 'een leraar hoort te lezen waarom een vak geen vertaling krijgt');
+  assert.match(code, /v\.maximum/, 'het scherm toont niet wat een vak hoogstens toestaat');
+
+  // de terugvertaling en de verschillen staan er, en de bon ook
+  assert.match(code, /Terugvertaald/);
+  assert.match(code, /verschillen/);
+  assert.match(code, /bon\.nietGebruikt/, 'de bon zegt niet wat er buiten de vertaling is gebleven');
+  assert.match(code, /bevestigd: true/);
+  assert.match(code, /verschillenGezien/, 'bij een verschoven betekenis hoort een aparte bevestiging');
+  assert.match(code, /op naam de deur uit/i, 'het scherm laat versturen zonder naam toe');
+
+  /* Het beleid INSTELLEN is een schoolbesluit en staat bij de directie, niet
+     bij de leraar: die heeft het beheer-token niet en hoort dat ook niet te
+     hebben. */
+  const dir = codeVan(lees('apps', 'schoolpartner', 'directie.js'));
+  assert.match(dir, /\/school\/taalbeleid\/zet/);
+  assert.match(dir, /beheerToken: S\.token/);
+
+  assert.ok(partner.includes('/apps/schoolpartner/taal.js'), 'School Partner laadt taal.js niet');
+  assert.ok(partner.includes('id="taalbeleidVorm"') && partner.includes('id="berichtVorm"'));
+});

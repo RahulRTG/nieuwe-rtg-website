@@ -447,7 +447,7 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
       'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation bovenaan te dragen');
+      'de bank hoort exact ROS, RTG Kantoor en RTFoundation bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
       'deze werelden staan wel in de bank maar zijn nul groot');
@@ -511,7 +511,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
     const b = await werelden(page);
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+      'de bank hoort exact ROS, RTG Kantoor en RTFoundation te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],
       'deze werelden dragen geen eigen glyf maar het standaard icoon:\n' +

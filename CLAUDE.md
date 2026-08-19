@@ -71,6 +71,17 @@ app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
 bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
 voorgekookt werkblad) vóór je er iets bij zet.
 
+**`WERELDEN.md` is de kaart** — drie werelden, en de pas die er dwars op staat.
+**ROS** (de wereld van de persoon), **Concern** (de wereld van de organisatie) en
+**Fundament** (waar RTG zelf draait), met de acht domeinen een niveau lager. De
+harde regel: **een wereld draagt nooit de naam van een pas** — `rtg`, `lifestyle`
+en `business` zeggen wie je bent, een wereld zegt waar je bent, en vallen die
+woorden samen dan leest een lid een plek als een prijs. Vandaar Concern en niet
+Business. De vertrouwenslaag (poorten, bewijs, gates) is met opzet géén wereld:
+die geldt overal en woont op de server; Fundament is het publiek dat hem bedient.
+`test/wereldregister.test.js` houdt het register fail-closed — een item dat
+nergens heen gaat, laat de bouw zakken in plaats van stil een tegel te schelen.
+
 **`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
 gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
 context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen

@@ -162,6 +162,37 @@ test('geen enkel item staat in twee werelden', () => {
   assert.deepEqual(dubbel, [], 'deze items staan in meer dan één wereld');
 });
 
+test('geen wereld draagt de naam van een pas', () => {
+  /* PAS EN WERELD ZIJN TWEE LOODRECHTE ASSEN (WERELDEN.md). De pas zegt wie je
+     bent -- `rtg`, `lifestyle`, `business`, en `?pas=` herbouwt daarop de hele
+     ledenapp. De wereld zegt waar je bent.
+
+     Vallen die woorden samen, dan leest een lid een PLEK als een PRIJS. Een
+     RTG-Pass-houder met een horecazaak hoort thuis in de wereld waar je een zaak
+     bestuurt, maar zou "Business" lezen als "dat is die dure pas, niet voor mij".
+     Daarom heet die wereld Concern.
+
+     De vergelijking is op het KALE woord: "RTG Business" botst net zo hard als
+     "Business", want het lid leest het tweede woord.
+
+     DE MUTATIE: hernoem RTG Kantoor naar 'RTG Business'. */
+  const PASSEN = ['rtg', 'lifestyle', 'business'];
+  const zoek = [];
+  for (const w of WERELDEN) {
+    const woorden = String(w.naam).toLowerCase().split(/[\s·-]+/).filter(Boolean);
+    /* Het merk zelf mag vooraan staan ("RTG Kantoor"): dat is de afzender en niet
+       de pas. Wat niet mag is dat de rest van de naam een pas is. */
+    const rest = woorden[0] === 'rtg' ? woorden.slice(1) : woorden;
+    for (const woord of rest) {
+      if (PASSEN.includes(woord)) zoek.push(w.naam + ' draagt de pasnaam "' + woord + '"');
+    }
+    if (!rest.length && woorden[0] === 'rtg') {
+      zoek.push(w.naam + ' is precies de naam van de instappas');
+    }
+  }
+  assert.deepEqual(zoek, [], 'deze werelden dragen de naam van een pas');
+});
+
 test('twee LINKS-regels wijzen niet naar precies hetzelfde adres', () => {
   /* Twee sleutels voor één bestemming is hetzelfde soort fout als één sleutel in
      twee werelden: welke van de twee de echte is, blijkt pas als er iets aan

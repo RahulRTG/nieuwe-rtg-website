@@ -120,15 +120,25 @@ fase 1 af), **LEVEN.md** (RTFoundation als Life OS, de grenzen van een
 platform dat bij de geboorte begint) en **LIFE.md** (RTG Sociaal als Life OS:
 het leven tússen mensen, met het levensmoment als ingang in plaats van de app).
 
-**Een open beslissing over deze kaart.** De eigenaar heeft op 11 augustus 2026
-een tweede indeling in acht genoemd — Life, Business, Money, Mobility,
-Hospitality, Media, Foundation, Identity — en dat is niet de acht hierboven:
-Reizen en Kantoor verdwijnen daarin als eigen wereld, Hospitality en Business
-komen erbij. Dat raakt werkende software en de omleidingen die er al liggen, dus
-het hoort een eigen beslissing te zijn en geen bijvangst. Zolang die niet
-genomen is, geldt de tabel hierboven. Het staat hier opgeschreven zodat niemand
-het later voor vergeten aanziet (LAT-regel 6); de uitwerking staat in LIFE.md
-par. 8.
+**Die beslissing is genomen op 19 augustus 2026, en staat in `WERELDEN.md`.**
+
+Hij is geen van beide kaarten geworden. De acht van 11 augustus (Life, Business,
+Money, Mobility, Hospitality, Media, Foundation, Identity) botsten op iets wat
+geen van beide lijsten zag: **`Business` en `Life` zijn geen werelden maar
+pasnamen.** `rtg`, `lifestyle` en `business` zijn de drie passen, en `?pas=`
+herbouwt daarop de hele ledenapp. Pas en wereld zijn dus twee loodrechte assen —
+wie is dit, tegenover waar ben ik — en een wereld die heet zoals een pas laat een
+lid een plek lezen als een prijs.
+
+Wat er wél is besloten: **drie werelden — ROS, Concern en Fundament** — met de
+acht domeinen een niveau lager. Er hoefde dus niets te sneuvelen; de acht zijn
+gezakt in plaats van geschrapt. De volledige kaart, de regel dat een wereld nooit
+de naam van een pas draagt, en wat er bewust open bleef staan in `WERELDEN.md`;
+`test/wereldregister.test.js` handhaaft wat machinaal te handhaven is.
+
+De tabel hierboven blijft geldig als **volgorde van bouwen** — hij zegt welke
+domeinen samengevoegd zijn en welke nog niet. Hij zegt sinds dit besluit niet
+meer welke wereld iets is.
 
 ---
 

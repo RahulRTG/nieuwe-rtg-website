@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'a5263be9';
+var RTG_BOUW = '01582e69';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3878,7 +3878,15 @@ var RTG_BOUW = 'a5263be9';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- één gecentreerde rij --- */
-    { sleutel: 'map-rtg', naam: 'RTG', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
+    /* ROS EN NIET RTG, en dat is geen cosmetiek. `rtg` is de naam van de
+       INSTAPPAS (naast lifestyle en business), en pas en wereld zijn twee
+       loodrechte assen: de pas zegt wie je bent, de wereld waar je bent. Vielen
+       die woorden samen, dan las een lid een plek als een prijs -- en heette de
+       wereld van het persoonlijke leven precies zoals de goedkoopste pas.
+       WERELDEN.md legt de kaart vast, test/wereldregister.test.js handhaaft de
+       regel. Het huis (/apps/rtg.html) en de glyf houden hun naam: die gaan over
+       het merk en niet over de pas. */
+    { sleutel: 'map-rtg', naam: 'ROS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',

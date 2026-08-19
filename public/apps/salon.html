@@ -44,7 +44,10 @@
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
   .post{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:1rem;overflow:hidden;}
   .post .top{display:flex;align-items:center;gap:.6rem;padding:.8rem .9rem .5rem;}
-  .post .naam{font-weight:600;font-size:.9rem;cursor:pointer;background:none;border:none;color:inherit;padding:0;text-align:left;}
+  /* De naam boven een post is een knop (hij opent het profiel) en meet 23 hoog.
+     Gevonden in de tabletband; op 390 haalt hij het net omdat de regel daar
+     afbreekt. Alleen het raakvlak groeit -- de letter blijft .9rem. */
+  .post .naam{font-weight:600;font-size:.9rem;cursor:pointer;background:none;border:none;color:inherit;padding:0;text-align:left;display:inline-flex;align-items:center;min-height:24px;}
   .post .plek{font-size:.72rem;color:var(--soft);}
   .post .merk{font-size:.6rem;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.02rem .4rem;margin-left:auto;}
   .kar{position:relative;background:#000;}

@@ -21,7 +21,7 @@ op telefoonformaat (390x844).
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
-| raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| raakvlak (24x24) | **0**, op telefoon- EN tabletformaat | een knop die een trillende hand niet raakt |
 | past op een telefoon | **0** te breed, **0** leeg | een scherm waarvan de rechterhelft weg is, of dat niets toont |
 | duimbereik | **0** buiten bereik, per hand gemeten over 89 aangewezen hoofdhandelingen | de belangrijkste knop op de plek waar jouw duim niet komt |
 
@@ -197,6 +197,28 @@ beide richtingen te meten — mét de reparatie begint de kop op 59 en houdt de
 balk 39 pixels vrij, zonder op 0 en 5. **De ronde zelf draagt die inkeping nog
 niet.** Zolang dat zo is, geldt voor de veilige zone wat voor dit hele document
 geldt: gemeten met een browser, niet met een toestel.
+
+**Sinds 19 augustus 2026 draagt de telefoonronde die inkeping wel**, en de
+uitkomst was rustig: over 254 schermen met een statusbalk van 59 en een
+thuisstreep van 34 kwam er **geen enkel nieuw gebrek** bij. De rest van dit huis
+deed de veilige zone dus al goed; alleen de Command-modus-familie deed het niet.
+
+**En de tabletband wordt nu ook gemeten** — 834x1112, ingelogd. Die band was
+nooit door een browser getekend, en dat was geen detail: twee gebreken bestonden
+alleen daar. Op `/apps/rtg.html` is een dossierregel een link naar een
+betaalpagina die op 390 afbreekt en 74 hoog meet, en op 700 en 834 op één regel
+past en 20 meet; op `/apps/salon.html` geldt hetzelfde voor de naam boven een
+post. **Onzichtbaar voor de raakvlakronde, want die meet 390 — waar het
+toevallig goed gaat.**
+
+**Twee deuren die dicht stonden, staan nu open.** `bord.html` en `schrift.html`
+hangen achter een tijdelijke schoolpas, en hier stond dat die niet te maken was
+zonder een model. Dat was verkeerd gemeten: `/api/les/maak` heeft een handmatige
+werkmodus. De keuring maakt nu zelf een les aan — en de eerste keer dat
+`bord.html` werkelijk openging lag er meteen een gebrek (de dikte-schuifregelaar
+op 96x16). Dat is nu twee keer hetzelfde patroon, na de RTF-gezinsdeur:
+**elke deur die dicht blijft in een keuring is een stuk huis waarvan niemand
+weet wat er staat.**
 
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146

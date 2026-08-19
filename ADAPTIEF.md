@@ -53,6 +53,24 @@ plus `stem` als kanaal. Die grenzen staan op één plek — `MAAT` in
 `command.css` een vaste rail wordt. Een tweede getal ernaast zou een strook van
 veertig pixels opleveren waar de ene laag "telefoon" zegt en de andere "desktop".
 
+**En er staat wél een tweede getal in dit huis: 760.** De duimregels in
+`shared/rtg-ui.css` — volle breedte voor de hoofdhandeling, de vaste strook
+onderaan — lopen tot `max-width:760px`, terwijl de tabletvorm hierboven al bij
+640 begint. Tussen 640 en 760 krijgt een tablet dus de **telefoonbehandeling**.
+
+Dat was tot 19 augustus 2026 geen besluit maar een toeval, en nu is het een
+besluit: **het blijft zo.** De twee getallen beantwoorden verschillende vragen.
+640 gaat over de VORM — hoeveel context past er naast elkaar. 760 gaat over de
+HAND — tot hoever houd je een toestel nog vast in plaats van dat het ergens op
+ligt. Een scherm van 700 pixels wordt vastgehouden, en dan is een hoofdhandeling
+binnen duimbereik geen fout maar precies wat `GRAMMATICA.md` belooft.
+
+Gemeten voordat dit werd opgeschreven: 700 en 834 naast elkaar over alle 254
+schermen gaven exact dezelfde uitkomst — nul te breed, nul leeg, en dezelfde
+twee raakvlakken. De overlap richt dus geen schade aan; ze was alleen nergens
+verantwoord. De keuring meet sindsdien 834 als vaste tabletronde, met 700 als
+het getal dat de discussie voedde.
+
 De presentaties, met hun diepte en of ze dominant zijn:
 
 | presentatie | vormen | diepte | dominant |

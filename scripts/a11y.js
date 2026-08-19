@@ -423,6 +423,73 @@ function startEchteServer() {
   }
   await telefoon.close();
   }
+  /* ===== VIJFDE RONDE: DE TABLETBAND =========================================
+
+     ADAPTIEF.md kent telefoon (<640), tablet (640-999) en bureau (>=1000). De
+     rondes hierboven meten 390 en het bureaubladvenster; alles ertussen was tot
+     vandaag NOOIT door een browser getekend, en dat is geen detail: een gebrek
+     kan precies daar zitten en nergens anders.
+
+     Dat bleek ook. Op /apps/rtg.html is een dossierregel een link naar een
+     betaalpagina: op 390 breekt hij af en meet 74 hoog, op 700 en 834 past hij
+     op een regel en meet 20. Op /apps/salon.html geldt hetzelfde voor de naam
+     boven een post (23). Allebei onzichtbaar voor de raakvlakronde, want die
+     meet 390 -- waar het toevallig goed gaat.
+
+     EEN BREEDTE EN NIET TWEE. De eerste meting draaide 700 en 834 naast elkaar
+     en gaf op allebei exact dezelfde twee vondsten; een tweede venster kost dan
+     een ronde en levert niets. 834 is een iPad staand -- ruim boven de 760 waar
+     de duimregels van rtg-ui.css ophouden, dus dit meet de ECHTE tabletvorm en
+     niet nog een keer de telefoonvorm.
+
+     WAT HIER NIET GEMETEN WORDT: leegte en duimbereik. Die twee gaan over een
+     hand aan een telefoon (GRAMMATICA.md), en een tablet ligt op tafel. Breedte
+     en raakvlak gaan wel over elk toestel dat je aanraakt. */
+  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, serviceWorkers: 'block' });
+  await tabletC.addInitScript((z) => {
+    try {
+      localStorage.setItem('rtg_member_token', z.token);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtf_sessie', JSON.stringify(z.rtf));
+    } catch (e) {}
+  }, { token: lid.token, rtf: RTF_SESSIE });
+  const tab = await tabletC.newPage();
+  console.log(`\n[a11y] ===== ronde TABLET (${PAGINAS.length} schermen, 834x1112, ingelogd) =====`);
+  const tabu = { breed: [], klein: [], gemeten: 0 };
+  for (const pad of PAGINAS) {
+    await tab.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
+    await tab.waitForTimeout(600);
+    try {
+      const m = await tab.evaluate(MOB('rechts'));
+      tabu.gemeten++;
+      if (m.venster === 834 && m.inhoud > m.venster + 2) {
+        tabu.breed.push(pad + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
+      }
+    } catch (e) { /* dit scherm meet niet; de breedte-teller blijft eerlijk */ }
+    let res;
+    try { res = await tab.evaluate(RAAK); } catch (e) { continue; }
+    if (res.klein.length) {
+      /* wie iets vindt, meet nog een keer -- zelfde reden als hierboven */
+      try {
+        await tab.waitForFunction(
+          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+          null, { timeout: 1500 });
+      } catch (e) {}
+      await tab.waitForTimeout(300);
+      try { res = await tab.evaluate(RAAK); } catch (e) {}
+      if (res.klein.length) {
+        tabu.klein.push(pad + ': ' + res.klein.slice(0, 4).join(' | '));
+        console.log(`\n[a11y] ${pad} (tablet): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+        for (const w of res.klein.slice(0, 6)) console.log(`  \u00b7 ${w}`);
+      }
+    }
+  }
+  await tabletC.close();
+  console.log(`[a11y] ronde tablet: ${tabu.gemeten} schermen op 834 \u2014 ` +
+    `${tabu.breed.length} te breed, ${tabu.klein.length} met een te klein raakvlak`);
+  for (const x of tabu.breed) console.log(`  \u00b7 te breed: ${x}`);
+
   console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
   const mobielTotaal = mobiu.breed.length + mobiu.leeg.length + mobiu.balk.length + mobiu.duim.length;
   console.log(`[a11y] ronde telefoon: ${mobiu.gemeten} metingen over twee handen \u2014 ` +
@@ -478,6 +545,15 @@ function startEchteServer() {
     { breed: mobiu.breed.length, leeg: mobiu.leeg.length, balk: mobiu.balk.length, duim: mobiu.duim.length },
     grens.telefoon || {});
   if (mobielOordeel.faalt) fouten.push(mobielOordeel.melding.trim().replace(/^\[a11y\] MISLUKT op telefoonformaat:\s*/, 'op telefoonformaat: '));
+  /* De tabletband telt mee in het oordeel, anders is hij een rapport dat niemand
+     leest. Zelfde grens als de andere twee: nul. */
+  const tabGrens = (grens.tablet || {});
+  if (tabu.breed.length > (tabGrens.breed || 0)) {
+    fouten.push(`${tabu.breed.length} scherm(en) dat op 834 buiten beeld loopt, de grens is ${tabGrens.breed || 0}`);
+  }
+  if (tabu.klein.length > (tabGrens.klein || 0)) {
+    fouten.push(`${tabu.klein.length} scherm(en) met een raakvlak onder ${raakvlak.GRENS}x${raakvlak.GRENS} op tabletformaat, de grens is ${tabGrens.klein || 0}`);
+  }
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
     for (const f of fouten) console.error('  · ' + f);

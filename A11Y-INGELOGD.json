@@ -109,5 +109,13 @@
    "/apps/foundation/schrift.html": "dezelfde schoolpas, aan de leerlingkant",
    "waarom dit hier staat": "omdat 'gemeten' anders iets anders betekent dan het doet. Twee schermen van de 254 gaan niet open in deze ronde, en dat is een regel waard in plaats van een stille nul."
   }
+ },
+ "tablet": {
+  "breed": 0,
+  "klein": 0,
+  "waar": "de vijfde ronde: 834x1112, ingelogd -- een iPad staand, ruim boven de 760 waar de duimregels ophouden",
+  "waarom deze ronde bestaat": "ADAPTIEF.md kent telefoon (<640), tablet (640-999) en bureau (>=1000), en de band ertussen was tot 19 augustus 2026 NOOIT door een browser getekend. Dat is geen detail: een gebrek kan precies daar zitten en nergens anders. Twee voorbeelden kwamen meteen boven. Op /apps/rtg.html is een dossierregel een link naar een betaalpagina: op 390 breekt hij af en meet 74 hoog, op 700 en 834 past hij op een regel en meet 20. Op /apps/salon.html geldt hetzelfde voor de naam boven een post (23). Allebei onzichtbaar voor de raakvlakronde, want die meet 390 -- waar het toevallig goed gaat.",
+  "een breedte en niet twee": "De eerste meting draaide 700 en 834 naast elkaar en gaf op allebei exact dezelfde twee vondsten. Een tweede venster kost dan een ronde en levert niets. 700 blijft wel het interessante getal voor een MENS: daar geldt volgens ADAPTIEF.md de tabletvorm terwijl de duimregels van rtg-ui.css nog tot 760 lopen.",
+  "wat hier NIET gemeten wordt": "leegte en duimbereik. Die twee gaan over een hand aan een telefoon (GRAMMATICA.md); een tablet ligt op tafel. Breedte en raakvlak gaan wel over elk toestel dat je aanraakt."
  }
 }

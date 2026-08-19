@@ -360,7 +360,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/apps/app-main/app-main-52.js', 'een HTML-opbouw in een string, in een keer'],
     ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
-    ['public/shared/flagship/flagship-02.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
@@ -429,57 +428,28 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
-    'server/kern/journalistiek.js',
     /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
        eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
        zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
        beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
        WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
        zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
-    /* RTMAIL bevat de bestaande mailboxroutes plus de nieuwe Smart Action Dock.
-       De workflowroutes krijgen in een volgende onderhoudssnede een eigen
-       router; tot die veilige bedrading blijft dit een zichtbare waarschuwing. */
-    'server/routes/rtmail.js',
-    'server/kern/werkplaats.js',
-    'server/lokaal-tls.js',
-    'server/techniek.js',
-    'server/trio.js',
+    /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
+       De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
+       comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
+       (journalistiek, rtmail, werkplaats, lokaal-tls, techniek, trio) en het
+       eerste deel van de app-gids: allemaal geknipt in een eerdere ronde,
+       allemaal onder de grens, en allemaal nog op de lijst.
 
-    /* DE COMMUNICATIEKERN EN WAT ERAAN VASTZIT. Deze zeven kwamen erbij toen de
-       zes losse berichtenvoorraden naar een kern verhuisden, en ze staan hier
-       met een reden per stuk -- niet als groep, want dan is het geen lijst maar
-       een uitzondering met zeven namen.
+       De maten die erbij stonden waren daardoor onwaar geworden -- er stond
+       "15,1 KB" bij een bestand van 9,1. En erger: zolang de regel er staat mag
+       datzelfde bestand ongemerkt weer over de grens groeien, want de
+       uitzondering geldt nog.
 
-       Er is al geknipt waar de naad echt zat: kern/comm/index.js ging van 25,7
-       naar 15,1 KB (./tonen.js en ./deelnemer.js), kern/comm/gast.js van 15,5
-       naar 9,4 (./gast-verhuizing.js en ./gast-lijsten.js), kern/ledenbalie.js
-       van 13,7 naar 9,2 (-dossier en -klachten). Wat hieronder staat is wat er
-       DAARNA nog over de grens ligt. */
+       Regel 13 rekent dat nu na: een NOG-regel waarvan het bestand al onder de
+       grens zit, is een harde fout. Zo kan deze lijst alleen nog krimpen door
+       werk, en niet groeien door vergeetachtigheid. */
 
-    // 15,1 KB, waarvan 3,6 KB architectuurkop -- die legt de hele kern uit en
-    // hoort bij de ingang. De volgende snede is bericht() + het sein eruit;
-    // dat is echte bedrading (elke module schrijft via bericht) en hoort een
-    // eigen ronde met de toetsen ernaast.
-    'server/kern/comm/index.js',
-    // 10,4 KB: het actormodel is EEN tabel (lid/zaak/mens/gezin/kantoor) met de
-    // wissels die eruit volgen (naam, sein, voornaam). Knippen zou de vorm van
-    // een sleutel scheiden van wat je ermee mag -- precies wat hier bij elkaar
-    // hoort, want dat is de poort. Kandidaat voor MAG, niet voor een snede.
-    'server/kern/comm/wie.js',
-    // 10,2 en 11,1 KB: de twee deuren naar de kern (lid en zaak). Ze delen hun
-    // vorm; de snede die er hoort is een gedeelde routelaag voor allebei, en
-    // dat is een verbouwing van twee bestanden tegelijk.
-    'server/routes/member/comm.js',
-    'server/routes/supplier/comm.js',
-    // 10,1 KB: de auth-routes groeiden met startHerstel(), dat de ledenbalie
-    // hergebruikt. De herstelstroom staat al apart (routes/auth/herstel.js);
-    // wat hier over is, is de bedrading eromheen.
-    'server/routes/auth.js',
-    // 10,3 KB: de vergetelheid raakt elke voorraad, en sinds de verhuizing ook
-    // de vier oude berichtenstapels. Elke regel is een andere plek in de
-    // database; ze uit elkaar halen maakt "wat wordt er gewist" moeilijker na
-    // te lopen, en dat is juist de vraag die dit bestand moet beantwoorden.
-    'server/kern/vergeten.js',
     /* server/mail.js STOND HIER en is er weer af: de naad die er met naam bij
        stond -- "tussen het opstellen en het afleveren" -- is geknipt, en er
        bleken er drie te zitten. Het opstellen van het bericht (RFC-koppen,
@@ -505,11 +475,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/magnaat-controle.js',
     'server/kern/magnaat-economie.js',
     'server/kern/magnaatwereld.js'
-    ,
-    // De app-gids is een declaratieve kaart. De nieuwe enterprise-ingangen
-    // brachten dit deel net over de grens; bij de volgende gidsronde verhuizen
-    // ze als één groep naar deel1b.
-    'server/kern/appgids-data/deel1.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {
@@ -528,7 +493,37 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
   if (nog.length) {
     console.log('  ! nog op te knippen (' + nog.length + '): ' + nog.join(', '));
   }
-  if (!teGroot) ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
+  /* EEN LIJST DIE NIETS MEER BEWAAKT, LEEST ALS DEKKING DIE ER NIET IS.
+     Dezelfde controle als bij regel 47, en om dezelfde reden. Twee vormen:
+
+     SPOKEN -- een regel die een bestand noemt dat niet meer bestaat. Die
+     beschermt niets en houdt de reden erbij levend alsof hij ergens over gaat.
+     Er stond er een: public/shared/flagship/flagship-02.js.
+
+     AFGERONDE REGELS in NOG -- NOG betekent "moet nog geknipt worden". Staat het
+     bestand inmiddels onder de grens, dan is dat werk KLAAR en hoort de regel
+     eruit. Doe je dat niet, dan mag datzelfde bestand ongemerkt weer over de
+     grens groeien: de uitzondering staat er nog. Precies het gat waar een lijst
+     die alleen maar aangroeit voor bedoeld is.
+
+     MAG is met opzet NIET zo streng. Dat is een BESLUIT ("dit bestand mag groot
+     zijn, en waarom"), geen taak. Een besluit dat vandaag niet bijt, hoort te
+     blijven staan met zijn redenering -- anders moet die opnieuw worden gevoerd
+     zodra het bestand weer groeit. Wel telt het spookbestand ook daar. */
+  const bestaat = (r) => fs.existsSync(path.join(ROOT, r));
+  const spoken = [...MAG.keys(), ...NOG].filter(r => !bestaat(r));
+  const afgerond = [...NOG].filter(r => bestaat(r) && fs.statSync(path.join(ROOT, r)).size <= MAX);
+  if (spoken.length) {
+    fout('de lijst noemt bestanden die niet meer bestaan: ' + spoken.join(', ') +
+      ' -- haal ze eruit, anders belooft de lijst dekking die er niet is');
+  }
+  if (afgerond.length) {
+    fout('deze staan in NOG maar zijn al onder de grens: ' + afgerond.join(', ') +
+      ' -- haal ze van de lijst, anders mogen ze ongemerkt weer overheen groeien');
+  }
+  if (!teGroot && !spoken.length && !afgerond.length) {
+    ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
+  }
 }
 
 

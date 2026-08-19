@@ -475,10 +475,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // database; ze uit elkaar halen maakt "wat wordt er gewist" moeilijker na
     // te lopen, en dat is juist de vraag die dit bestand moet beantwoorden.
     'server/kern/vergeten.js',
-    // 10,7 KB: de postbus. Ging over de grens toen de outbox een teller kreeg
-    // (twee mails in dezelfde milliseconde overschreven elkaar). De naad zit
-    // tussen het opstellen en het afleveren.
-    'server/mail.js',
+    /* server/mail.js STOND HIER en is er weer af: de naad die er met naam bij
+       stond -- "tussen het opstellen en het afleveren" -- is geknipt, en er
+       bleken er drie te zitten. Het opstellen van het bericht (RFC-koppen,
+       codering, DKIM) staat in mail-opstellen.js, de SMS-kant met de
+       sandbox-zekering in mail-lokaal.js, en het vangnet met zijn pad in
+       mail-outbox.js. Wat overblijft is de keuze tussen de drie standen. */
     /* 11,4 en 10,7 KB: allebei stonden ze tientallen bytes onder de grens en
        gingen ze erover door een gemeten oorzaak uit de beproevingsladder. De
        crashproef (kill -9 onder schrijflast) vond een dubbele boeking doordat

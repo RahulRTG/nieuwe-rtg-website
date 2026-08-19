@@ -228,7 +228,7 @@ const METERS = [
      kruisproef niets kan zeggen. Zie scripts/lib/bronblind.js voor waarom de
      voor de hand liggende meters (ratio, tekens, grootste blok) hier niets
      scheiden, en waar deze proef ophoudt (HTML en CSS). */
-  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
+  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: 'bestanden (.js, en de inline scripts van .html) waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
   /* Vijftig bundels worden geserveerd als EEN bestand en bewerkt als 394 losse
      delen, en die delen heten naar hun volgnummer (app-main-04aa.js). Hernoemen
      is overwogen en afgeslagen -- vijftig mappen die van naam veranderen botst

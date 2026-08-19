@@ -276,7 +276,24 @@ const IJKINGEN = {
         const metStuk = meetBlind({ wortel: dir, mappen: ['server'] });
         assert.equal(metStuk.lexfout, 1, 'onleesbare bron telt als lexfout');
         assert.equal(metStuk.ongedekt, 1, 'en een lexfout telt mee in de meter, niet als stille nul');
-        return blind.ongedekt - schoon.ongedekt;
+
+        /* EN DE HTML-WEG, want die telt sinds 19 augustus mee in dezelfde meter.
+           Een pagina met een MIME-joker in de markup en een scriptblok erachter:
+           de kapotte verwijderaar eet vanaf die joker vooruit en raakt het script
+           kwijt, de gerepareerde niet. Dat is in het klein wat er op 17 augustus
+           over acht pagina's gebeurde. */
+        fs.rmSync(path.join(dir, 'server', 'stuk.js'));
+        fs.mkdirSync(path.join(dir, 'public'));
+        fs.writeFileSync(path.join(dir, 'public', 'ijk.html'),
+          '<input type="file" accept="image/*">\n' +
+          '<script>\nconst telefoon = 1;\n/* een gewoon commentaar */\nconst blijft = 2;\n</scr' + 'ipt>\n');
+        const paginaSchoon = meetBlind({ wortel: dir, mappen: ['public'] });
+        assert.equal(paginaSchoon.bestanden, 1, 'de pagina is echt gelezen');
+        assert.equal(paginaSchoon.ongedekt, 0, 'met de gerepareerde verwijderaar blijft het script heel');
+        const paginaBlind = meetBlind({ wortel: dir, mappen: ['public'], strip: kapot });
+        assert.equal(paginaBlind.ongedekt, 1, 'met die van voor 17 augustus raakt de pagina bron kwijt');
+
+        return blind.ongedekt - schoon.ongedekt + paginaBlind.ongedekt;
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },

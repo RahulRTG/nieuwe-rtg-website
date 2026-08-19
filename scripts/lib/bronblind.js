@@ -56,12 +56,15 @@
    template met een openend /* zonder sluiter erin zou wel degelijk door de
    echte code heen eten. Zeven is daarom een stand, geen doel.
 
-   DE GRENS VAN DEZE PROEF, HARDOP: hij dekt .js en niets anders. De lexer
-   spreekt JavaScript, geen HTML en geen CSS -- en juist public/apps/app.html
-   was met 59.166 tekens het op een na ergste geval van 17 augustus, met twee
-   <video>-elementen die daardoor buiten het bereik van elke scanner vielen. Die
-   kant hangt nog volledig op test/bron.test.js. Dat staat als open regel in
-   TAKEN.md en hoort niet stilletjes voor gedekt door te gaan.
+   DE GRENS VAN DEZE PROEF, HARDOP. Sinds 19 augustus dekt hij ook .html, maar
+   alleen via de INLINE SCRIPTBLOKKEN daarvan (zie blindInHtml hieronder). De
+   markup zelf blijft ongedekt: de lexer spreekt JavaScript en geen HTML. Dat is
+   minder erg dan het klinkt, want een openend commentaarteken in een attribuut
+   eet VOORUIT en komt op een pagina die iets doet vroeg of laat een scriptblok
+   tegen -- nagemeten met de kapotte verwijderaar van 17 augustus: acht pagina's
+   raken dan 60.014 tokens kwijt, met kantoren.html als ergste (22.084). Maar een
+   pagina met markup en ZONDER inline script is hier nog steeds onzichtbaar, en
+   CSS-bestanden helemaal.
 
    EEN LEXFOUT TELT MEE ALS BLIND. Een bestand dat de lexer niet kan lezen is
    een bestand waarover deze proef niets zegt, en LAT.md regel 10 is helder over
@@ -98,14 +101,70 @@ function blindIn(bron, strip = zonderCommentaar) {
   return { lexfout: false, kwijt, eerste };
 }
 
-function jsBestanden(wortel, mappen) {
+/* DE HTML-KANT, en die was het gevaarlijkst.
+
+   public/apps/app.html was op 17 augustus met 59.166 tekens het op een na
+   ergste geval: 784 regels markup en script vielen buiten het bereik van elke
+   scanner, en twee <video>-elementen werden daardoor door geen enkele keuring
+   gezien. De kruisproef hierboven dekte dat niet -- de lexer spreekt JavaScript
+   en geen HTML.
+
+   Wat wel kan: de INLINE SCRIPTS eruit halen en die lexen. Dat dekt de markup
+   niet rechtstreeks, maar het vangt wel precies de schade die telt: een openend
+   commentaarteken in een attribuut (accept="image/*") eet VOORUIT, en op een
+   pagina die iets doet komt daar vroeg of laat een scriptblok achteraan. Loopt
+   er bron weg, dan raakt dit blok tokens kwijt.
+
+   Het knippen gebeurt op dezelfde manier als in scripts/check.js regel 12, dat
+   elk inline script al ontleedt -- maar dan met de vraag "staat het er na het
+   strippen nog", in plaats van "is het geldige JS". */
+const SCRIPT_OPEN = /<script(?![^>]*\bsrc=)[^>]*>/gi;
+
+function scriptBlokken(bron) {
+  const uit = [];
+  const laag = bron.toLowerCase();
+  SCRIPT_OPEN.lastIndex = 0;
+  let m;
+  while ((m = SCRIPT_OPEN.exec(bron))) {
+    const start = m.index + m[0].length;
+    const eind = laag.indexOf('</scr' + 'ipt>', start);
+    if (eind < 0) break;                     // een niet-gesloten script: check.js regel 12 klaagt daar al over
+    uit.push(bron.slice(start, eind));
+    SCRIPT_OPEN.lastIndex = eind;
+  }
+  return uit;
+}
+
+/* De hele pagina wordt in EEN keer gestript (zo lezen de keuringen hem ook), en
+   daarna kijken we per scriptblok of zijn tokens er nog staan. */
+function blindInHtml(bron, strip = zonderCommentaar) {
+  const blokken = scriptBlokken(bron);
+  if (!blokken.length) return { lexfout: false, kwijt: 0, eerste: null, blokken: 0 };
+  const gestript = strip(bron);
+  let kwijt = 0, eerste = null, lexfout = false, cursor = 0;
+  for (const blok of blokken) {
+    let tokens;
+    try { tokens = lex(blok); } catch (e) { lexfout = true; continue; }
+    for (const t of tokens) {
+      if (t.type === 'eof') continue;
+      const tekst = blok.slice(t.start, t.end);
+      if (!tekst.trim()) continue;
+      const p = gestript.indexOf(tekst, cursor);
+      if (p < 0) { kwijt++; if (eerste === null) eerste = tekst.slice(0, 80); }
+      else cursor = p + tekst.length;
+    }
+  }
+  return { lexfout, kwijt, eerste, blokken: blokken.length };
+}
+
+function bronBestanden(wortel, mappen) {
   const uit = [];
   const ga = (dir) => {
     let namen; try { namen = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
     for (const e of namen) {
       const p = path.join(dir, e.name);
       if (e.isDirectory()) { if (!OVERSLAAN.test(e.name)) ga(p); }
-      else if (e.name.endsWith('.js')) uit.push(p);
+      else if (e.name.endsWith('.js') || e.name.endsWith('.html')) uit.push(p);
     }
   };
   for (const m of mappen) { const d = path.join(wortel, m); if (fs.existsSync(d)) ga(d); }
@@ -135,13 +194,17 @@ const TAFEL = new Map();
 
 function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], strip } = {}) {
   const uit = { bestanden: 0, lexfout: 0, blind: 0, tokensKwijt: 0, lijst: [] };
-  for (const vol of jsBestanden(wortel, mappen)) {
+  for (const vol of bronBestanden(wortel, mappen)) {
     let bron, st;
     try { st = fs.statSync(vol); bron = fs.readFileSync(vol, 'utf8'); } catch (e) { continue; }
     if (!bron.length) continue;
     uit.bestanden++;
     const sleutel = strip ? null : vol + '|' + st.mtimeMs + '|' + st.size;
-    const r = (sleutel && TAFEL.has(sleutel)) ? TAFEL.get(sleutel) : blindIn(bron, strip);
+    /* Een .js-bestand is in zijn geheel code; van een .html telt alleen wat er
+       in de inline scriptblokken staat. Twee proeven, een meter -- want de vraag
+       is dezelfde: raakt de verwijderaar hier bron kwijt? */
+    const proef = vol.endsWith('.html') ? blindInHtml : blindIn;
+    const r = (sleutel && TAFEL.has(sleutel)) ? TAFEL.get(sleutel) : proef(bron, strip);
     if (sleutel) TAFEL.set(sleutel, r);
     const rel = path.relative(wortel, vol).replace(/\\/g, '/');
     if (r.lexfout) { uit.lexfout++; uit.lijst.push({ bestand: rel, reden: 'lexfout' }); continue; }
@@ -156,4 +219,4 @@ function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], s
   return uit;
 }
 
-module.exports = { blindIn, meetBlind, jsBestanden };
+module.exports = { blindIn, blindInHtml, scriptBlokken, meetBlind, bronBestanden };

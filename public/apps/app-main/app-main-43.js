@@ -1,3 +1,4 @@
+/* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
   }
   // Betaalgeschiedenis van de gratis gebruiker: wat is besteld en betaald.

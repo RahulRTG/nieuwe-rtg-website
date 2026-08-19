@@ -1,3 +1,4 @@
+/* de bon van de kassa naar een bestelling */
     if (type==='restaurant'||type==='bar'||type==='club'){
       const items = (state.menu||[]).filter(m=>bon[m.id]).map(m=>({ name:m.name, qty:bon[m.id], price:m.price }));
       if (!items.length){ toast(T('pos.empty','Tik eerst gerechten aan.')); return; }

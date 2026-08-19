@@ -1,3 +1,4 @@
+/* het contactenblok op het beginscherm, met de lege staat */
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
         '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+

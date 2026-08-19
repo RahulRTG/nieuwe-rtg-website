@@ -1,3 +1,4 @@
+/* het videogesprek: aanbod, antwoord en de verbinding */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();

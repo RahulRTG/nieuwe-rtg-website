@@ -1,3 +1,4 @@
+/* een tafel afrekenen */
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
       const rekenAf = async (extra) => {
         try {

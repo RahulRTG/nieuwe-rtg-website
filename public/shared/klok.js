@@ -210,6 +210,7 @@
     const maak = (naam, at) => {
       const n = document.createElementNS(NS, naam);
       for (const [k, v] of Object.entries(at)) n.setAttribute(k, v);
+/* de wijzerplaat tekenen */
       svg.appendChild(n);
       return n;
     };
@@ -416,6 +417,7 @@
       lume.setAttribute('stroke', '#E7E2CC'); lume.setAttribute('stroke-width', (w * 0.4).toFixed(2));
       lume.setAttribute('stroke-linecap', 'round');
       g.append(body, lume);
+/* de wijzers laten draaien */
       wijzers.appendChild(g);
       let vorige = null;
       return { draai: graden => {

@@ -1,3 +1,4 @@
+/* de events van de zaak */
     if (kantoorSec === 'events'){
       const evs = state.events || [];
       html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+

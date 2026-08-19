@@ -1,3 +1,4 @@
+/* een bezichtiging aanvragen bij een vastgoedpartner */
     document.querySelectorAll('[data-vgint]').forEach(b => b.addEventListener('click', async () => {
       const [code, pid] = b.dataset.vgint.split(':');
       const wens = prompt(T('vg.m.wensvraag','Wanneer zou u willen bezichtigen? (bijv. zaterdagochtend)'));

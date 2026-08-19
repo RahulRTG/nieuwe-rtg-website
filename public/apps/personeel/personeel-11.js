@@ -1,3 +1,4 @@
+/* de minibar boeken vanaf de kamer */
     wrap.querySelectorAll('[data-mbboek]').forEach(b => b.addEventListener('click', async () => {
       const items = Object.entries(mbTel).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
       if (!items.length) return;

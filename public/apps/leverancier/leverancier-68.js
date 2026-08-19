@@ -1,3 +1,4 @@
+/* een boot toevoegen of verwijderen */
     document.querySelectorAll('[data-chdel]').forEach(k => k.addEventListener('click', async () => {
       try { await API.call('/supplier/boot', { id: k.dataset.chdel, weg: true }); await refresh(); openTab('charter'); } catch(e){ toast(e.message); }
     }));

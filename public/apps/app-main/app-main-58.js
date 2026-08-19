@@ -1,3 +1,4 @@
+/* de knoppen onder een Salon-bericht */
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
       el.querySelector('.js-like').addEventListener('click', ev => {

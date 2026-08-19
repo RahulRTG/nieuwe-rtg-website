@@ -1,3 +1,4 @@
+/* het zorgaanbod: klinieken, behandelingen en het medische onderscheid */
     for (const a of aanb){
       const medisch = a.soort === 'kliniek' || (a.behandelingen || []).some(b => b.soort === 'medisch');
       html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'')+'</span>'+

@@ -1,3 +1,4 @@
+/* de bedieningspas: wat kan er nu gelopen worden, en waarheen */
     if (stationMode === 'bediening'){
       /* De bedieningspas: wat kan er NU gelopen worden en waarheen. Spoed en
          het langst wachtende eerst; de bestemming (tafel of ophaalcode) staat

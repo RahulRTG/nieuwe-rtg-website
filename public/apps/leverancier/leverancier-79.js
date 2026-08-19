@@ -1,3 +1,4 @@
+/* de aanwezigheidsteller op nul zetten */
     document.getElementById('awLeeg').addEventListener('click', async () => {
       if (!confirm(T('aw.leegvraag','De teller op nul zetten?'))) return;
       try { const d = await API.call('/supplier/aanwezig/leeg', {}); awToon(d.aanwezig); } catch(e){ toast(e.message); }

@@ -1,3 +1,4 @@
+/* de instellingen van de zaak opslaan */
     const fnS = el.querySelector('#fnSave'); if (fnS) fnS.addEventListener('click', async () => {
       try {
         await API.call('/supplier/settings', { land: el.querySelector('#fnLand').value, uurloon: Number(el.querySelector('#fnUur').value) });

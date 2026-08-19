@@ -1,3 +1,4 @@
+/* aanmelden met de kassacode */
     const go = async () => {
       $('#kaFout').textContent = '';
       try {

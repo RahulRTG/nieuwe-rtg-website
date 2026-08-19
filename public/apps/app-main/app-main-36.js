@@ -1,3 +1,4 @@
+/* een verblijf tonen: foto's en kamers */
     if (s.photos && s.photos.length)
       head += '<div class="ms-photos">' + s.photos.map(p => '<img src="' + p + '" alt="">').join('') + '</div>';
     if (s.rooms && s.rooms.length){

@@ -145,6 +145,7 @@
       $('#rApotheek').innerHTML = z.apotheken.map(a => '<option value="' + a.code + '">' + esc(a.naam) + '</option>').join('');
       $('#eigenRecepten').innerHTML = (z.eigenRecepten || []).slice(0, 5).map(r => esc(r.middel) + ' (' + esc(r.status) + ')').join('<br>');
     }
+/* doorverwijzen naar een andere dienst */
     if (z.verwijsDoelen && z.verwijsDoelen.length) {
       $('#kVerwijs').hidden = false;
       $('#vNaar').innerHTML = z.verwijsDoelen.map(v => '<option value="' + v.code + '">' + esc(v.naam) + ' (' + esc(v.soort) + ')</option>').join('');
@@ -305,6 +306,7 @@
     laadKetenGesprek();
   }
   async function laadKetenGesprek() {
+/* het ketengesprek */
     if (!ktGekozen) { $('#ktChat').innerHTML = ''; return; }
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });

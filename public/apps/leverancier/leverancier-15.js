@@ -1,3 +1,4 @@
+/* de boekhouding van de zaak: btw, personeelskosten en cadeaukaarten */
     if (kantoorSec === 'fin'){
       // de boekhouding van de zaak: btw per genre, personeelskosten uit de
       // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie

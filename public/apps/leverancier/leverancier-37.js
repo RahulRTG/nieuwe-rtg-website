@@ -1,3 +1,4 @@
+/* de collecties van een retailzaak */
     const cols = retailData.collecties || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.collecties','Collecties')+'</div>'+
       (cols.length ? '<div class="h-mt50">'+cols.map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.naam)+'</span><span class="pr">'+esc(c.seizoen)+' '+c.jaar+'</span></div>'+

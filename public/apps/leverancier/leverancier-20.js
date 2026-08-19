@@ -1,3 +1,4 @@
+/* het tarief van de zaak */
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
       html += '<div class="tkc"><h3>'+T('kt.tarief','Tarief')+'</h3>'+

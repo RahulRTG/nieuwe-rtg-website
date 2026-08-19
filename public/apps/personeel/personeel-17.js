@@ -1,3 +1,4 @@
+/* de pas: wat er klaarstaat en wat er nog loopt */
     if (pdaKant === 'pas'){
       const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at)));
       const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');

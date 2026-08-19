@@ -228,7 +228,14 @@ const METERS = [
      kruisproef niets kan zeggen. Zie scripts/lib/bronblind.js voor waarom de
      voor de hand liggende meters (ratio, tekens, grootste blok) hier niets
      scheiden, en waar deze proef ophoudt (HTML en CSS). */
-  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' }
+  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
+  /* Vijftig bundels worden geserveerd als EEN bestand en bewerkt als 394 losse
+     delen, en die delen heten naar hun volgnummer (app-main-04aa.js). Hernoemen
+     is overwogen en afgeslagen -- vijftig mappen die van naam veranderen botst
+     met elke tak die openstaat -- dus draagt elk deel zijn onderwerp bovenin, en
+     zet scripts/deelindex.js daar BUNDELS.md van. Deze meter telt de delen die
+     dat nog niet doen. */
+  { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -558,6 +565,15 @@ function meet(bronnen) {
   try { bronBlindeBestanden = require('./lib/bronblind').meetBlind({ wortel: WORTEL }).ongedekt; }
   catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* De delen zonder onderwerpregel, uit dezelfde bron als BUNDELS.md zelf
+     (regel 4: geen tweede implementatie). */
+  let delenZonderOnderwerp;
+  try {
+    const { delenVan } = require('./deelindex');
+    delenZonderOnderwerp = Object.values(require('./bundel').bundels)
+      .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
+  } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
   let grenzen;
@@ -625,7 +641,8 @@ function meet(bronnen) {
     toetsenNietGemeten: mutaties.nietGemeten,
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen,
-    bronBlindeBestanden
+    bronBlindeBestanden,
+    delenZonderOnderwerp
   };
 }
 

@@ -1,3 +1,4 @@
+/* het gesprek met Rahul: versturen, wachten en het antwoord tonen */
     async function stuur(){
       const tekst = inp.value.trim();
       if (!tekst || bezig) return;

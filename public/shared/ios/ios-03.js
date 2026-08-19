@@ -1,3 +1,4 @@
+/* de randveeg: vanaf de schermrand naar binnen vegen */
 
   /* ---------------------------------------------------- 4. de randveeg */
   function randveeg() {

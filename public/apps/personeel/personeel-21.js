@@ -1,3 +1,4 @@
+/* een verkoopslot kiezen */
     wrap.querySelectorAll('[data-pdvk]').forEach(b => b.addEventListener('click', async () => {
       const uit = document.getElementById('pdVkUit');
       const slot = slots[parseInt(($('#pdVkSlot')||{}).value, 10) || 0];

@@ -1,3 +1,4 @@
+/* het ketengesprek */
     if (!ktGekozen) { $('#ktChat').innerHTML = ''; return; }
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });

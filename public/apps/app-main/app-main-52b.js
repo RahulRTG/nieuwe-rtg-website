@@ -1,3 +1,4 @@
+/* de reactieteller onder een bericht */
                     (k.reactiesTotaal ? '<div style="font-size:0.62rem;color:var(--soft);margin-top:0.3rem;">' + k.reactiesTotaal + ' ' + T('zak.k.reacties','reactie(s)') + '</div>' : '')
                   : ''))) +
             '</div>';

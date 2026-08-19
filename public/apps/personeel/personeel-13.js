@@ -1,3 +1,4 @@
+/* Fluister: de persoonlijke assistent, nooit gedeeld met de werkgever */
     $('#hulpWrap').innerHTML =
       // Fluister: de persoonlijke assistent van dit personeelslid (eigen
       // geheugen, nooit gedeeld met de werkgever)

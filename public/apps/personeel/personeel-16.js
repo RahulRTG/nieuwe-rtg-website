@@ -1,3 +1,4 @@
+/* de bezorg-AI: advies bij een rit */
     document.querySelectorAll('[data-pdbzai]').forEach(b => b.addEventListener('click', async () => {
       const uit = document.getElementById('pdBzAiUit');
       uit.textContent = '\u2026';

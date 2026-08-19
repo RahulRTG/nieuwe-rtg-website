@@ -210,6 +210,7 @@
   }
   function plaatsData(M, codewords) {
     var bits = []; for (var i = 0; i < codewords.length; i++) for (var b = 7; b >= 0; b--) bits.push((codewords[i] >> b) & 1);
+/* de zigzag: de bits in de QR-matrix leggen */
     var n = M.n, idx = 0, dir = -1, col = n - 1;
     while (col > 0) {
       if (col === 6) col--; // sla timing-kolom over

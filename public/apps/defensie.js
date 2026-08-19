@@ -57,6 +57,7 @@
   const MAT_OPTS = ['inzetbaar', 'in-onderhoud', 'defect'];
   const BEV_OPTS = ['aangevraagd', 'goedgekeurd', 'onderweg', 'geleverd', 'afgewezen'];
 
+/* het overzicht laden en de stand bijhouden */
   async function laad() {
     const d = await api('def/overzicht');
     STAND = d;

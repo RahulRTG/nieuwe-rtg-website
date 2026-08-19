@@ -1,3 +1,4 @@
+/* de toegankelijkheidshelpers van de gedeelde laag */
   var MELDPLEKKEN = '#toast,.toast,#melding,.melding,[data-toast],.status';
   /* ---- de toegankelijkheidshelpers van de gedeelde laag ----
 

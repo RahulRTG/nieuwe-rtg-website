@@ -1,3 +1,4 @@
+/* De Salon is verplicht: de profielkaart met compleetheidsmeter */
     if (salonStatus === null){ laadSalonStatus(); }
     let html = '';
     // De Salon is verplicht: een blijvende profielkaart met compleetheidsmeter

@@ -1,3 +1,4 @@
+/* de zakelijke specificatie op een factuur */
     const bizSpec = inv => {
       if (user.tier !== 'business') return '';
       const total = inv.netto + inv.bijdrage;

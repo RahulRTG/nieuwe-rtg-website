@@ -112,6 +112,7 @@
       statusVan(vlak, 'Speelt: rechtstreeks ontvangen, niets bij RTG bewaard');
     }
 
+/* de ontvangende kant van een gedeelde clip */
     function kijkOntvang(d) {
       if (!ontvangst || d.clipId !== ontvangst.clipId) return Promise.resolve();
       if (d.kind === 'offer') {

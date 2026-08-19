@@ -1,3 +1,4 @@
+/* de rittenkaart van een chauffeur */
           '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' ·  '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
           (r.note?'<div class="tkc-alg">'+r.note+'</div>':'')+
           (r.pickupEtaMin!=null && r.status==='onderweg' ? '<div class="tkc-who">~'+r.pickupEtaMin+' min '+T('ch.naargast','naar de gast')+'</div>':'')+

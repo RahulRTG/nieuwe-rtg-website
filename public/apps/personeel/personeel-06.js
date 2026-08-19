@@ -1,3 +1,4 @@
+/* de borden van dit personeelslid */
     const wrap = $('#pdBordenWrap');
     if (!wrap || !window.BordenUI) return;
     if (pdBordenUI) { pdBordenUI.refresh(); return; }

@@ -1096,6 +1096,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "deelindex.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/deelindex.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "defensie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3203,6 +3211,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "nieuweroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/routedekking.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "noodkaart.test.js": {
       "soort": "server",

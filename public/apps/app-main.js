@@ -1,3 +1,4 @@
+/* de bouwstempel: HTML en script moeten van dezelfde bouw zijn */
 (function(){
 /* HTML EN SCRIPT MOETEN VAN DEZELFDE BOUW ZIJN.
 
@@ -12,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '78494809';
+var RTG_BOUW = '98425446';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -144,6 +145,7 @@ var RTG_BOUW = '78494809';
   }
   // Een PDF (factuur, overzicht) ophalen met het token en als download aanbieden.
   async function downloadPdf(pad, body, filename){
+/* de API-laag van de app: elke aanroep met token, taal en foutafhandeling */
     if (!API.token) return;
     try {
       const res = await fetch('/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token }, body: JSON.stringify(body || {}) });
@@ -280,6 +282,7 @@ var RTG_BOUW = '78494809';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
+/* de demomelding: een demo is een toestand, geen terugval na een storing */
   const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
 
   /* Een demo is een toestand, geen terugval na een storing. De melding stond
@@ -349,6 +352,7 @@ var RTG_BOUW = '78494809';
   }
   function stem(rtg, business, lifestyle){
     if (lang() === 'en') return null;
+/* de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen */
     const s = pasStem();
     return s === 'business' ? business : s === 'lifestyle' ? lifestyle : rtg;
   }
@@ -471,6 +475,7 @@ var RTG_BOUW = '78494809';
     if (!API.enabled) return;
     let t = null; try { t = localStorage.getItem('rtg_member_token'); } catch(e){}
     if (!t) return;
+/* inloggen en de staat binnenhalen: token, pas en het eerste scherm */
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
@@ -984,6 +989,7 @@ var RTG_BOUW = '78494809';
       catch(e){ zeg('rahul', T('ag.mis','Het gesprek wil even niet starten; zeg iets, dan probeer ik het opnieuw.')); gesprek = null; }
       bezig = false;
     }
+/* het gesprek met Rahul: versturen, wachten en het antwoord tonen */
     async function stuur(){
       const tekst = inp.value.trim();
       if (!tekst || bezig) return;
@@ -1113,6 +1119,7 @@ var RTG_BOUW = '78494809';
         '<button class="go" style="padding:.2rem .6rem;" data-cja="'+escT(r.key)+'">Accepteer</button>'+
         '<button class="go" style="background:transparent;color:var(--muted);padding:.2rem .4rem;" data-cnee="'+escT(r.key)+'">✕</button></div>';
     });
+/* het contactenblok op het beginscherm, met de lege staat */
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
         '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
@@ -1253,6 +1260,7 @@ var RTG_BOUW = '78494809';
   function onbVraagPaspoort(){
     const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
     onbZeg(T('onb.q.paspoort','Tot slot je paspoort, zodat ik zeker weet dat jij het bent. Scan het met de RTG-scanner of kies een foto.'));
+/* de onboarding: het paspoort scannen of een bestand kiezen */
     onbActies([
       { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
           if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: function(d, mrz){ onbPaspoortUpload(d, mrz); } });
@@ -1410,6 +1418,7 @@ var RTG_BOUW = '78494809';
     try { snaps = (await API.call('/member/snaps')).snaps || []; } catch(e){}
     let box = el.querySelector('#snapStrip');
     if (!box){ box = document.createElement('div'); box.id='snapStrip'; el.insertBefore(box, el.firstChild.nextSibling); }
+/* de storyrij bovenaan De Salon */
     let h = '<div style="display:flex;gap:.6rem;overflow-x:auto;padding:.2rem 0 .7rem;">';
     h += '<button id="storyPlus" style="flex:0 0 auto;background:none;border:none;text-align:center;width:3.6rem;cursor:pointer;"><span style="display:flex;width:3rem;height:3rem;border-radius:50%;margin:0 auto;align-items:center;justify-content:center;font-size:1.2rem;background:var(--card2);border:2px dashed var(--gold);color:var(--gold);">＋</span><span style="display:block;font-size:.6rem;color:var(--soft);margin-top:.2rem;">Verhaal</span></button>';
     h += stories.map(v=>'<button class="js-story" data-id="'+escT(v.id)+'" style="flex:0 0 auto;background:none;border:none;text-align:center;width:3.6rem;cursor:pointer;"><span style="display:flex;width:3rem;height:3rem;border-radius:50%;margin:0 auto;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;background:var(--card2);border:2px solid '+(v.gezien?'var(--line)':'var(--gold)')+';">'+initCN(v.van)+'</span><span style="display:block;font-size:.6rem;color:var(--soft);margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escT(v.vanMij?'Jij':v.van)+'</span></button>').join('');
@@ -1799,6 +1808,7 @@ var RTG_BOUW = '78494809';
   async function stuurDm(){
     const text = $('#dmInput').value.trim();
     if (!text || !dmWith) return;
+/* de directe berichten: versturen en aan het gesprek toevoegen */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });
@@ -1966,6 +1976,7 @@ var RTG_BOUW = '78494809';
       return;
     }
     if (!call || d.from !== call.withKey) return;
+/* het videogesprek: aanbod, antwoord en de verbinding */
     if (d.kind === 'accept'){
       const pc = maakPc();
       const offer = await pc.createOffer();
@@ -2146,6 +2157,7 @@ var RTG_BOUW = '78494809';
     const ccTel = $('#osCcBelTel');
     if (ccTel){ ccTel.hidden = n <= 0; ccTel.textContent = n > 0 ? (n > 9 ? '9+' : n) : ''; }
     const list = $('#notifList');
+/* de meldingenlijst en het ongelezen-merk */
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
@@ -2501,6 +2513,7 @@ var RTG_BOUW = '78494809';
     const el = $('#tkAanbod'); if (!el) return;
     if (!tkPartners.length){ el.innerHTML = ''; return; }
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';
+/* het ticketkanaal: partners, activiteiten en hun tijden */
     for (const p of tkPartners){
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.activiteiten){
@@ -2619,6 +2632,7 @@ var RTG_BOUW = '78494809';
     const dagen = [];
     for (let d = 0; d < 7; d++){ dagen.push(new Date(Date.now() + d * 86400000).toISOString().slice(0, 10)); }
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('care.aanbod','Spa’s, wellness en klinieken')+'</div>';
+/* het zorgaanbod: klinieken, behandelingen en het medische onderscheid */
     for (const a of aanb){
       const medisch = a.soort === 'kliniek' || (a.behandelingen || []).some(b => b.soort === 'medisch');
       html += '<div class="card"><div style="display:flex;gap:0.5rem;align-items:baseline;"><span style="font-size:1.1rem;">'+esc(a.icon||'')+'</span>'+
@@ -2767,6 +2781,7 @@ var RTG_BOUW = '78494809';
       } catch(e){ toast(e.message); }
     });
   }
+/* de zorgpakketten: wat er loopt en wat er te kiezen valt */
   function renderCarePakketten(){
     const el = $('#carePakketten'); if (!el) return;
     if (!carePak.length && !carePakMijn.length){ el.innerHTML = ''; return; }
@@ -2807,6 +2822,7 @@ var RTG_BOUW = '78494809';
       html += '</div>';
     }
     el.innerHTML = html;
+/* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
       try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }
@@ -2911,6 +2927,7 @@ var RTG_BOUW = '78494809';
     if (!vhPartners.length){ el.innerHTML = ''; return; }
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('vh.kop','Autoverhuur, RTG-veilig')+'</div>'+
       '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem;">'+T('vh.uitleg','Vaste prijs vooraf betaald. Staat vastgelegd met foto\'s voor en na. SOS-knop en RTG als scheidsrechter.')+'</div>';
+/* het voertuigkanaal: partners en hun auto's */
     for (const p of vhPartners){
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.autos){
@@ -3025,6 +3042,7 @@ var RTG_BOUW = '78494809';
   function renderChAanbod(){
     const el = $('#chAanbod'); if (!el) return;
     if (!chPartners.length){ el.innerHTML = ''; return; }
+/* het chauffeurskanaal: vaste prijzen per partner */
     let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('ch.kop','Boten & jachten, RTG-veilig')+'</div>'+
       '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem;">'+T('ch.uitleg','Vaste prijs vooraf. Met of zonder schipper (bareboat met vaarbewijs). Staat met foto\'s voor en na, SOS op zee en RTG als scheidsrechter.')+'</div>';
     for (const p of chPartners){
@@ -3124,6 +3142,7 @@ var RTG_BOUW = '78494809';
     }
     el.innerHTML = html;
     document.querySelectorAll('[data-vgopen]').forEach(b => b.addEventListener('click', () => { vgOpen = b.dataset.vgopen; laadVastgoed(); }));
+/* een bezichtiging aanvragen bij een vastgoedpartner */
     document.querySelectorAll('[data-vgint]').forEach(b => b.addEventListener('click', async () => {
       const [code, pid] = b.dataset.vgint.split(':');
       const wens = prompt(T('vg.m.wensvraag','Wanneer zou u willen bezichtigen? (bijv. zaterdagochtend)'));
@@ -3216,6 +3235,7 @@ var RTG_BOUW = '78494809';
       const wens = prompt(T('vk.wens','Wanneer wilt u proefrijden? (bv. zaterdagochtend)')) || '';
       try { await API.call('/verkoop/proefrit', { supplierCode: b.dataset.code, autoId: b.dataset.id, wens }); toast('' + T('vk.proefok','Proefrit aangevraagd. De zaak plant hem in.')); laadShowroom(); } catch(e){ toast(e.message); }
     }));
+/* een auto kopen of inruilen, met een bod */
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
       const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);
       if (bod === null) return;
@@ -3307,6 +3327,7 @@ var RTG_BOUW = '78494809';
     const el = $('#bzInhoud'); if (!el) return;
     const p = bzZaak;
     const n = Object.values(bzMand).reduce((a,b)=>a+b,0);
+/* de bazaar van een partner: producten en bestellen */
     el.innerHTML =
       '<button class="bz-btn" id="bzTerug" style="margin-bottom:0.8rem;">\u2039 '+T('bz.terug','Alle partners')+'</button>'+
       '<div class="card"><b>'+esc(p.name)+'</b>'+
@@ -3414,6 +3435,7 @@ var RTG_BOUW = '78494809';
         }).join('')
       : '');
     $('#myOrders').querySelectorAll('[data-rekpay]').forEach(b => b.addEventListener('click', () => vraagRekening(b.dataset.rekpay)));
+/* mijn bestellingen: betalen en volgen */
     $('#myOrders').querySelectorAll('.myorder').forEach(el => {
       const o = active.find(x => x.ref === el.dataset.ref);
       const pb = el.querySelector('.js-opay');
@@ -3546,6 +3568,7 @@ var RTG_BOUW = '78494809';
     boekKeuze = null;
     $('#boekSup').textContent = s.name;
     const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+/* het boekingsblad: de diensten van een partner kiezen */
     $('#boekBody').innerHTML =
       (s.vak ? '<div style="font-size:0.72rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;">' + s.vak + ' · ' + s.city + '</div>' : '') +
       s.services.map(x =>
@@ -3618,6 +3641,7 @@ var RTG_BOUW = '78494809';
      Rahul, zodat "rekenen af" via de AI langs precies dit pad loopt.
      Losse part (5-10 KB-discipline), afgesplitst van 20-navigatie-genres-10.js. */
   function vraagRekening(code){
+/* de lopende rekening bij een partner opvragen */
     API.call('/rekening', { supplierCode: code }).then(d => {
       const r = d.rekening;
       if (!r || !r.aantal) return toast(T('app.rek.leeg','Er staat geen lopende rekening open.'));
@@ -3981,6 +4005,7 @@ var RTG_BOUW = '78494809';
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
   function metAlgPin(af) {
     if (Date.now() < pinOkTot) return af(null);
+/* de algemene pin: zetten of vragen */
     API.call('/pin/status', {}).then(st => {
       const zetten = !st.gezet;
       belTitel.textContent = zetten ? T('pin.zet', 'Kies uw algemene pin') : T('pin.vraag', 'Algemene pin');
@@ -4194,6 +4219,7 @@ var RTG_BOUW = '78494809';
     return window.RTGGlyf ? RTGGlyf.svg(sleutel) : null;
   }
   function tegelInhoud(item) { // svg (tab), glyf (link/os-app) of monogram in de tegel
+/* de taakbalk: welke knop welk tabblad opent */
     if (item.startsWith('tab:')) {
       const svg = tabKnop(item.slice(4)) && tabKnop(item.slice(4)).querySelector('svg');
       return svg ? svg.cloneNode(true) : document.createTextNode('•');
@@ -4499,6 +4525,7 @@ var RTG_BOUW = '78494809';
     hernoemDoel = map;
     hernoemIn.value = mapNaam(map);
     hernoemScrim.classList.add('open');
+/* een map hernoemen op het springboard */
     setTimeout(() => { hernoemIn.focus(); hernoemIn.select(); }, 60);
   }
   if (hernoemOk) hernoemOk.addEventListener('click', () => { if (hernoemDoel) zetMapNaam(hernoemDoel, hernoemIn.value); sluitScrims(); });
@@ -4707,6 +4734,7 @@ var RTG_BOUW = '78494809';
   }
   if (klaarKnop) klaarKnop.addEventListener('click', () => zetWiebel(false));
   rijen.forEach(grid => {
+/* het springboard verslepen, met vinger en met muis */
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
       // waar de vinger begon: movementX/Y is bij touch in Safari altijd 0, dus
@@ -4880,6 +4908,7 @@ var RTG_BOUW = '78494809';
   // de realtime-bus, dus wikkelen we start() in en haken we daar op mee.
   if (window.RTGRealtime && typeof RTGRealtime.start === 'function') {
     const echteStart = RTGRealtime.start.bind(RTGRealtime);
+/* de realtime-verbinding starten en herstellen */
     RTGRealtime.start = (token, opts) => {
       opts = opts || {};
       const oud = opts.onChange;
@@ -5225,6 +5254,7 @@ var RTG_BOUW = '78494809';
     RTGCommand.systeem(knop ? [{ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }
+/* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */
   bouw();
 
   /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet
@@ -5416,7 +5446,8 @@ var RTG_BOUW = '78494809';
     if (open) open.addEventListener('click', function () { openSound(true); });
     toon(RTGSpeler.opStand(toon));
     // de muziek loopt met je mee: stond ze aan, dan pakt ze op je eerste tik weer op
-    if (window.RTGGeluid) RTGGeluid.hervatBijGebaar();  })();
+    if (window.RTGGeluid) RTGGeluid.hervatBijGebaar();/* Onderweg: de live reis */
+  })();
 })();
   /* ---------- Onderweg (live reis) ---------- */
   let liveData = null;
@@ -5447,6 +5478,7 @@ var RTG_BOUW = '78494809';
         '<button class="live-go" id="liveDeel" style="margin-top:0.45rem;background:none;border:1px solid var(--line);color:var(--txt);">' + T('live.deel','Deel mijn live locatie met deze zaak') + '</button>' +
         '<div style="margin-top:0.4rem;font-size:0.62rem;color:var(--soft);line-height:1.5;">' + T('live.deel.s','Alleen deze zaak ziet dan waar u bent, tot de zaak het niet meer nodig heeft of u het zelf stopt.') + '</div>' +
       '</div>';
+/* het live-paneel: van modus wisselen */
     $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
       liveMode = b.dataset.mode;
       $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));
@@ -5535,6 +5567,7 @@ var RTG_BOUW = '78494809';
       try { const r = await API.call('/asset/wachtlijst', { assetId: b.dataset.id }); toast('' + T('as.wlok','U staat op de wachtlijst, positie') + ' ' + r.positie + '.'); renderAssets(); }
       catch(e){ toast(e.message); }
     }));
+/* een asset herroepen binnen de bedenktijd */
     el.querySelectorAll('.js-asherroep').forEach(b => b.addEventListener('click', async () => {
       if (!window.confirm(T('as.herroepvraag','Herroepen binnen de bedenktijd? U krijgt de volledige koopsom') + ' (' + eur(Number(b.dataset.p)) + ') ' + T('as.herroepvraag2','terug via een Tik.'))) return;
       try { const r = await API.call('/asset/herroep', { ticketId: b.dataset.tid }); toast('↩ ' + T('as.herroepok','Herroepen. De Tik van') + ' ' + eur(r.terug) + ' ' + T('as.uitok2','staat in uw tegoed.')); renderAssets(); }
@@ -5655,6 +5688,7 @@ var RTG_BOUW = '78494809';
       zorg = (await API.call('/zorgprofiel')).zorg;
       delen = await API.call('/locatie/mijn');
     } catch(e){ el.innerHTML = ''; return; }
+/* mijn zorgprofiel */
     el.innerHTML =
       '<div class="live-start" style="margin-top:0.8rem;">' +
         '<div class="lh">' + T('zorg.h','Mijn zorgprofiel') + '</div>' +
@@ -5772,6 +5806,7 @@ var RTG_BOUW = '78494809';
 
     $('#liveStop').addEventListener('click', stopLive);
     $('#liveSim').addEventListener('click', simulateRide);
+/* betalen met Face ID vanuit een rekeningregel */
     document.querySelectorAll('.js-rpay').forEach(b => b.addEventListener('click', () => {
       const bedrag = eur(Number(b.dataset.rq));
       payWithFaceId(bedrag, async () => {
@@ -5901,6 +5936,7 @@ var RTG_BOUW = '78494809';
         [1,2,3,4,5,6,8,10].map(n => '<option' + (n===2?' selected':'') + '>' + n + '</option>').join('') + '</select>' +
         '<button class="vbtn" id="rsvGo">' + T('erv.reserveer','Reserveer') + '</button></div>';
     }
+/* een verblijf tonen: foto's en kamers */
     if (s.photos && s.photos.length)
       head += '<div class="ms-photos">' + s.photos.map(p => '<img src="' + p + '" alt="">').join('') + '</div>';
     if (s.rooms && s.rooms.length){
@@ -6005,6 +6041,7 @@ var RTG_BOUW = '78494809';
         toast('' + d.door.name + ' ' + T('vb.deuropen','is open; hij vergrendelt zelf weer na') + ' ' + d.door.relockSec + 's.');
       } catch(e){ toast(e.message); }
     };
+/* de deur van kamer of entree openen, en een kamer boeken */
     const dk = $('#vbDeurKamer'); if (dk) dk.addEventListener('click', () => deur('kamer'));
     const de = $('#vbDeurEntree'); if (de) de.addEventListener('click', () => deur('entree'));
     // een kamer boeken: datums kiezen, een knop, het huis bevestigt
@@ -6086,6 +6123,7 @@ var RTG_BOUW = '78494809';
       (v.bericht ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + esc(v.bericht) + '</div>' : '') +
       '<div style="font-size:0.8rem;margin-top:0.3rem;">' + v.items.map(i => esc(i.naam)).join(' · ') + '</div><div style="font-size:0.68rem;color:var(--soft);margin-top:0.2rem;">' + T('rt.m.van','van') + ' ' + esc(v.van) + '</div></div>').join('');
     // de artikelen
+/* de artikelen van een partner, met drops die nog niet los zijn */
     const now = Date.now();
     html += (r.artikelen || []).map(a => {
       const drop = a.drop && a.drop.releaseMs > now;
@@ -6216,6 +6254,7 @@ var RTG_BOUW = '78494809';
   }
   function renderCvCard(){
     const el = $('#homeCv'); if (!el) return;
+/* de cv-kaart: klaar of nog niet */
     el.innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('cv.card.k','Werken via RTG')+'</div>'+
       (myCvReady
         ? '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
@@ -6339,6 +6378,7 @@ var RTG_BOUW = '78494809';
   let apChatId = null, apChatTimer = null;
   function apMsgHtml(m){
     const mij = m.van === 'sollicitant';
+/* een chatbericht opmaken, met vertaling voor de ander */
     const inner = mij ? escT(m.tekst) : '<span class="xlate">' + escT(m.tekst) + '</span>';
     return '<div class="dm-m' + (mij ? ' mine' : '') + '">' + inner + '</div>';
   }
@@ -6452,6 +6492,7 @@ var RTG_BOUW = '78494809';
   document.querySelectorAll('#pcAttn [data-attn]').forEach(b => b.addEventListener('click', async () => {
     if (!pchat) return;
     try { await API.call('/aandacht', { supplierCode: pchat.code, reden: b.dataset.attn }); toast(T('app.attn.ok','Het team is gewaarschuwd en komt eraan.')); }
+/* sparren met Rahul, en de geparkeerde gedachten */
     catch(e){ toast(e.message); }
   }));
 
@@ -6578,6 +6619,7 @@ var RTG_BOUW = '78494809';
     const open = (paspoortInboxData.verzoeken || []).filter(v => v.status === 'aangevraagd');
     const lopend = (paspoortInboxData.verzoeken || []).filter(v => v.status === 'goedgekeurd');
     let html = '';
+/* de verzoeken van partners om een niveau: u beslist */
     if (open.length) html += open.map(v => '<div class="vbanner" style="border-color:var(--gold,#c9a227);">' +
       '<b>'+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
       '<span>'+(v.reden?esc(v.reden)+' · ':'')+T('pi.uitleg','U beslist. Bij goedkeuren ziet de partner dit 10 minuten; daarna vervalt het vanzelf.')+'</span>' +
@@ -6678,6 +6720,7 @@ var RTG_BOUW = '78494809';
     const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
     const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
+/* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
   }
   // Betaalgeschiedenis van de gratis gebruiker: wat is besteld en betaald.
@@ -6768,6 +6811,7 @@ var RTG_BOUW = '78494809';
     else if (window.GezinRT){ GezinRT.setLeden(kan.leden); }
     let chats=[]; try{ chats=(await GezinRT.chats()).chats||[]; }catch(e){}
     const byId={}; chats.forEach(c=> byId[c.id]=c);
+/* het gezinsblok: chatten en bellen met het gezin */
     box.innerHTML='<div class="label">Chat en bellen</div>'+
       '<div class="meta" style="margin-bottom:.4rem;">Bericht of (video)bel het gezin in de app.</div>'+
       kan.leden.map(function(l){ var c=byId[l.id]||{}; return '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);"><span style="width:2rem;height:2rem;border-radius:50%;background:'+(l.kleur||'#C9A24B')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.85rem;font-weight:700;color:#0C0C0B;">'+(l.avatar||esc((l.naam||'?').charAt(0).toUpperCase()))+'</span><div class="grow-min"><b>'+esc(l.naam)+'</b>'+(c.ongelezen?' <span style="color:var(--burgundy);">('+c.ongelezen+')</span>':'')+(c.laatste?'<div class="meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(c.laatste)+'</div>':'')+'</div><button class="go" style="padding:.2rem .5rem;" data-chat="'+l.id+'">Chat</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-bel="'+l.id+'">'+RTGGlyf.svgHTML('bellen')+'</button><button class="go" style="background:transparent;padding:.2rem .4rem;" data-video="'+l.id+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'; }).join('')+
@@ -6847,6 +6891,7 @@ var RTG_BOUW = '78494809';
   // web-push aanzetten voor gezinsmeldingen op de telefoon
   function urlB64ToUint8(base64){
     const pad='='.repeat((4-base64.length%4)%4); const b=(base64+pad).replace(/-/g,'+').replace(/_/g,'/');
+/* pushmeldingen aanzetten en de sleutel omzetten */
     const raw=atob(b); const arr=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i); return arr;
   }
   async function ensurePush(interactief){
@@ -6995,6 +7040,7 @@ var RTG_BOUW = '78494809';
     if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--soft);padding:0.6rem 0;">' + T('munt.laden','Adres aanmaken…') + '</div>';
     let vz;
     try { vz = await cfg.maak(munt); }
+/* de details van een verzending */
     catch(e){ if (det) det.innerHTML = '<div style="font-size:0.8rem;color:var(--burgundy);padding:0.6rem 0;">' + (e.message || T('munt.fout','Kon geen adres maken.')) + '</div>'; return; }
     if (!det || !vz) return;
     const dot = '<span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0;"></span>';
@@ -7104,6 +7150,7 @@ var RTG_BOUW = '78494809';
     // (incl. afboekcode en btw). RTG en Lifestyle houden de rustige weergave.
     const eurC = n => '€ ' + Number(n).toLocaleString(lang() === 'en' ? 'en-US' : 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const specRow = (l, v, strong) => '<div style="display:flex;justify-content:space-between;gap:1rem;"><span>' + l + '</span><span style="text-align:right;flex-shrink:0;' + (strong ? 'color:var(--txt);font-weight:600;' : '') + '">' + v + '</span></div>';
+/* de zakelijke specificatie op een factuur */
     const bizSpec = inv => {
       if (user.tier !== 'business') return '';
       const total = inv.netto + inv.bijdrage;
@@ -7198,6 +7245,7 @@ var RTG_BOUW = '78494809';
     }));
     const dlo = $('#dlOverzicht');
     if (dlo) dlo.addEventListener('click', () => downloadPdf('/facturen/overzicht', payFilterJaar !== 'alle' ? { jaar: payFilterJaar } : {}, 'RTG-factuuroverzicht' + (payFilterJaar !== 'alle' ? '-' + payFilterJaar : '') + '.pdf'));
+/* alles in een keer betalen */
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '') +
@@ -7321,6 +7369,7 @@ var RTG_BOUW = '78494809';
   function renderBoekhouder(){
     const wrap = $('#bhWrap');
     if (!wrap) return;
+/* het boekland van een zakelijk lid */
     if (user.tier !== 'business'){ wrap.innerHTML = ''; return; }
     let land = 'NL';
     try { land = localStorage.getItem('rtg_boekland') || 'NL'; } catch(e){}
@@ -7424,6 +7473,7 @@ var RTG_BOUW = '78494809';
 
   function aiAnswer(q){
     const l = q.toLowerCase().trim();
+/* de antwoorden van Rahul op een bevestiging of een paklijst */
     if (/^(ja|graag|ja graag|doe maar|prima|goed|regel het|ja, regel het|yes|please|go ahead|sure|arrange it)\b/.test(l))
       return T('ai.a.yes','Geregeld. De paklijst staat klaar (lichte kleding, zwemkleding, zonnebrand, lichte trui voor de avond) en het dagplan voor 20 juli is ingepland: 10:00 boot naar Formentera, lunch aan boord, 21:00 tafel bij Sal de Mar.\n\nIk bewaak nu de bevestiging van Sal de Mar. U hoeft niets te doen.');
     if (l.includes('inpak') || l.includes('paklijst') || l.includes('pack'))
@@ -7554,6 +7604,7 @@ var RTG_BOUW = '78494809';
       lijst.map(s => '<button class="js-dppick" data-code="' + s.code + '" style="display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;color:var(--txt);font-family:inherit;cursor:pointer;"><span style="font-size:1.1rem;">' + (s.icon || RTGGlyf.svgHTML('gebouw')) + '</span><span><b style="font-size:0.86rem;">' + escT(s.name) + '</b><span style="display:block;font-size:0.68rem;color:var(--soft);">' + escT(s.typeLabel || '') + (s.city ? ' · ' + escT(s.city) : '') + '</span></span></button>').join('') +
       '</div>';
     ov.querySelector('#dpPickX').addEventListener('click', () => ov.remove());
+/* een betaalpartner kiezen */
     ov.querySelectorAll('.js-dppick').forEach(b => b.addEventListener('click', () => {
       const s = lijst.find(x => x.code === b.dataset.code); ov.remove();
       betaalPartner(s.code, s.name, { bron });
@@ -7632,6 +7683,7 @@ var RTG_BOUW = '78494809';
 
   async function zakRender(){
     const body = $('#zakBody');
+/* het zakelijke blad: feed en lijsten */
     body.innerHTML = '<div style="color:var(--soft);font-size:0.8rem;padding:1rem 0;">…</div>';
     try {
       if (zakView === 'feed'){
@@ -7710,6 +7762,7 @@ var RTG_BOUW = '78494809';
                 : (k.open
                   ? '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="js-kretxt" data-id="' + k.id + '" placeholder="' + T('zak.k.reageerph','Reageer met wat u kunt betekenen…') + '" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.75rem;color:var(--txt);font-family:inherit;font-size:0.72rem;">' +
                     '<button class="js-kre" data-id="' + k.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.68rem;cursor:pointer;">↩</button></div>' +
+/* de reactieteller onder een bericht */
                     (k.reactiesTotaal ? '<div style="font-size:0.62rem;color:var(--soft);margin-top:0.3rem;">' + k.reactiesTotaal + ' ' + T('zak.k.reacties','reactie(s)') + '</div>' : '')
                   : ''))) +
             '</div>';
@@ -7803,6 +7856,7 @@ var RTG_BOUW = '78494809';
   /* ---------- interactieve AI-agenda in de backoffice + ballon op boBtn ---------- */
   let memberAgenda = null;
   function agendaBadgeLid(n){
+/* de ballon op de boardroom-knop */
     const btn = document.getElementById('boBtn'); if (!btn) return;
     btn.style.position = 'relative';
     let b = btn.querySelector('.ag-ballon');
@@ -8086,6 +8140,7 @@ var RTG_BOUW = '78494809';
     }
 
     // weergave: RTG en Lifestyle kunnen tussen het pas-thema en klassiek donker
+/* het thema van de vaste pas */
     if (vastePas === 'rtg' || vastePas === 'lifestyle'){
       const pasNaam = vastePas === 'rtg' ? T('bo2.thema.bordeaux','Bordeaux (RTG)') : T('bo2.thema.parel','Parelmoer (Lifestyle)');
       const nu = pasThemaHuidig();
@@ -8208,6 +8263,7 @@ var RTG_BOUW = '78494809';
       '<div class="zg-tel" id="zgTel"></div>'+
       '<button class="zg-btn sec" id="zgSluit">'+T('zg.klaar','Klaar')+'</button></div>';
     document.getElementById('zgQr').appendChild(canvas);
+/* het zegel: aftellen en sluiten */
     document.getElementById('zgSluit').addEventListener('click', sluitZegel);
     const eind = Date.now() + (d.geldigMin || 5) * 60000;
     const tel = document.getElementById('zgTel');
@@ -8313,6 +8369,7 @@ var RTG_BOUW = '78494809';
     const isGuest = user && user.tier === 'guest';
     // RTG Zakelijk: de ingang staat aan voor de Lifestyle en Business Pass
     const zakL = $('#zakLauncher');
+/* de zakelijke lade voor Business en Lifestyle */
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';
       zakL.innerHTML = '<button id="zakOpenBtn" style="display:flex;align-items:center;gap:0.7rem;width:100%;text-align:left;background:none;border:1px solid var(--gold);border-radius:14px;padding:0.75rem 1rem;margin-bottom:0.8rem;color:var(--txt);font-family:inherit;cursor:pointer;">' +
@@ -8404,6 +8461,7 @@ var RTG_BOUW = '78494809';
     }).join('');
     hydrateMsgs($('#feed'));
 
+/* de knoppen onder een Salon-bericht */
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
       el.querySelector('.js-like').addEventListener('click', ev => {
@@ -8561,6 +8619,7 @@ var RTG_BOUW = '78494809';
     }
     // lopende afspraken (tekenen / actief / noodgeval)
     let blokken = '';
+/* de afspraken en hun status */
     for (const d of (s.dates || [])){
       const metNaam = escT(d.met);
       if (d.status === 'wacht-op-tekenen'){
@@ -8676,6 +8735,7 @@ var RTG_BOUW = '78494809';
   window.addEventListener('rtglang', async () => {
     if (!user) return;
     const active = (document.querySelector('.tabbar button.active') || {}).dataset;
+/* van taal wisselen: alles opnieuw ophalen */
     const tab = active ? active.tab : 'home';
     // inhoud opnieuw ophalen in de nieuwe taal (facturen, reis, menu's)
     if (API.live){ try { applyState((await API.call('/state')).state); } catch (e) {} }

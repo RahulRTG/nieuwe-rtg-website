@@ -1,3 +1,4 @@
+/* de personeelsapp: de basis (helpers, taal, elementen) */
 (function(){
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
@@ -111,6 +112,7 @@
       valet.map(v => '<div class="task"><div class="t"><b>'+esc(v.wie)+'</b><span>'+T('pd.geb.valet','valet')+' · '+esc(v.status)+'</span></div>'+
         (v.status==='gevraagd' ? '<button class="abtn" data-pgvv="'+v.id+'">'+T('pd.geb.voorrijden','Voorrijden')+'</button>' : '<button class="abtn" data-pgvk="'+v.id+'">'+T('pd.geb.klaar','Klaar')+'</button>')+'</div>').join('')+
       jetset.map(j => '<div class="task"><div class="t"><b>'+JET[j.soort]+' · '+esc(j.voorWie)+'</b><span>'+esc(j.wens)+' · '+esc(j.moment)+' · '+esc(j.status)+'</span></div>'+
+/* de gebeurtenissen van vandaag: valet, jetset en bevestigingen */
         (j.status==='aangevraagd' ? '<button class="abtn" data-pgjb="'+j.id+'">'+T('pd.geb.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pgja="'+j.id+'">'+T('pd.geb.afgerond','Afgerond')+'</button>')+'</div>').join('')+
       ((valet.length+jetset.length) ? '' : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.geenjetset','Geen open verzoeken.')+'</div>')+'</div>';
     wrap.innerHTML = html;
@@ -560,6 +562,7 @@
       '<input class="hin" id="kaTotp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" style="margin-top:0.4rem;">'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);
+/* aanmelden met de kassacode */
     const go = async () => {
       $('#kaFout').textContent = '';
       try {
@@ -634,6 +637,7 @@
         '<div class="pd-card-copy">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
         '<a class="abtn pd-block" href="/apps/magnaat-kantoor.html">Open de dekkingsmatrix</a></div>'+
       '<div style="margin-top:0.6rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';
+/* de dienstkeuze en de sectorstap */
     $('#kaTerug').addEventListener('click', stepSector);
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;
@@ -705,6 +709,7 @@
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;
   function renderBorden(){
+/* de borden van dit personeelslid */
     const wrap = $('#pdBordenWrap');
     if (!wrap || !window.BordenUI) return;
     if (pdBordenUI) { pdBordenUI.refresh(); return; }
@@ -853,6 +858,7 @@
         const inp = document.getElementById('coachVraag'); if (inp) inp.focus();
       }));
     }
+/* in- en uitklokken */
     const kb = document.getElementById('klokBtn');
     if (kb) kb.addEventListener('click', async () => {
       kb.disabled = true;
@@ -989,6 +995,7 @@
       const text = $('#klusTekst').value.trim(); if (!text) return;
       try { await API.call('/supplier/ticket/add', { text, room: $('#klusKamer').value }); toast(''+T('hk.klusok','Klus gemeld.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
     });
+/* gevonden voorwerpen melden */
     const lm = $('#lfMeld'); if (lm) lm.addEventListener('click', async () => {
       const item = $('#lfItem').value.trim(); if (!item) return;
       try { await API.call('/supplier/lost/add', { item, room: $('#lfKamer').value, storage: $('#lfPlek').value }); toast(''+T('hk.lfok','Geregistreerd.')); await refresh(); openTab('taken'); } catch(e){ toast(e.message); }
@@ -1111,6 +1118,7 @@
     const t = pkTools;
     if (!t || pkToolsKant !== pkDorpKant || !Array.isArray(t.tools)) return '';
     const kop = titel => '<div style="margin-top:0.5rem;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;">'+esc(titel)+'</div>';
+/* de gereedschappen op een bord tekenen */
     const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+(icoon?icoon+' ':'')+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';white-space:nowrap;">'+rechts+'</b>':'')+'</div>';
     return t.tools.map(w => {
       if (w.type === 'cijfers') return kop(w.titel)+regel('', w.items.map(i => esc(i.label)+' <b>'+esc(String(i.waarde))+'</b>').join(' · '), '');
@@ -1208,6 +1216,7 @@
       catch(e){ toast(e.message); }
     }));
     // elke afdeling in een tik bij de teamchat, de collegachat en de teamcall
+/* de dorpschat, en de leeftijdscheck die ja of nee zegt en nooit gegevens */
     const pdc = wrap.querySelector('#pkDorpChat');
     if (pdc) pdc.addEventListener('click', () => openTab('team'));
     // de leeftijdscheck: de paspoort-bevestiging geeft ja/nee, nooit gegevens
@@ -1289,6 +1298,7 @@
     }));
     wrap.querySelectorAll('[data-mbplus]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbplus] = (mbTel[b.dataset.mbplus]||0)+1; renderKamers(); }));
     wrap.querySelectorAll('[data-mbmin]').forEach(b => b.addEventListener('click', () => { mbTel[b.dataset.mbmin] = Math.max(0,(mbTel[b.dataset.mbmin]||0)-1); renderKamers(); }));
+/* de minibar boeken vanaf de kamer */
     wrap.querySelectorAll('[data-mbboek]').forEach(b => b.addEventListener('click', async () => {
       const items = Object.entries(mbTel).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
       if (!items.length) return;
@@ -1372,6 +1382,7 @@
     }
 
     let beheer = null;
+/* een teamtip plaatsen */
     if (t.kanBeheren) {
       const titelInp = E('input', { placeholder: T('pd.tr.title', 'Titel, bijv. Onze wijn-aanpak'), style: { width: '100%', marginBottom: '0.4rem' } });
       const tekstInp = E('input', { placeholder: T('pd.tr.text', 'De tip in een of twee zinnen...') });
@@ -1426,6 +1437,7 @@
       afgewezen: [T('pd.vl.no','afgewezen'), 'var(--burgundy)'],
       gemeld: [T('pd.vl.zm','gemeld'), 'var(--green)']
     };
+/* Fluister: de persoonlijke assistent, nooit gedeeld met de werkgever */
     $('#hulpWrap').innerHTML =
       // Fluister: de persoonlijke assistent van dit personeelslid (eigen
       // geheugen, nooit gedeeld met de werkgever)
@@ -1520,6 +1532,7 @@
       } catch(e){ toast(e.message); }
     };
     const pkfs = document.getElementById('pkFlStuur');
+/* de flitszoeker */
     if (pkfs) pkfs.addEventListener('click', () => {
       const inp = document.getElementById('pkFlIn');
       const q = (inp.value || '').trim();
@@ -1649,6 +1662,7 @@
     return 'geo:0,0?q=' + encodeURIComponent(o.adres || '');
   }
   function afstandNaar(o){
+/* de afstand tot een opdracht, uit GPS */
     if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
     return meters(gpsPos, o.geo);
   }
@@ -1955,6 +1969,7 @@
   }
 
   document.querySelectorAll('.tabbar button[data-tab="werkvloer"]').forEach(b => b.addEventListener('click', laadWerkvloer));
+/* de bezorg-AI: advies bij een rit */
     document.querySelectorAll('[data-pdbzai]').forEach(b => b.addEventListener('click', async () => {
       const uit = document.getElementById('pdBzAiUit');
       uit.textContent = '\u2026';
@@ -2071,6 +2086,7 @@
       '<button class="abtn'+(pdaPasBel?'':' ghost')+'" data-pkbel style="margin-left:auto;">'+(pdaPasBel?'':'')+' '+T('pd.k.pasbel','Pas-bel')+'</button>'+
       (ikBinnen()?'':'<span style="flex-basis:100%;font-size:0.68rem;color:var(--soft);">'+T('pd.k.nietin','Niet ingeklokt: pings staan uit tot je inklokt (tab Vandaag).')+'</span>')+'</div>';
     html += pkVoorraadKaart();
+/* de pas: wat er klaarstaat en wat er nog loopt */
     if (pdaKant === 'pas'){
       const opDePas = live.filter(o => (o.stations||{}).keuken === 'klaar').sort((a,b) => ((b.spoed?1:0)-(a.spoed?1:0)) || (new Date(a.pasAt||a.at)-new Date(b.pasAt||b.at)));
       const bezig = live.filter(o => (o.stations||{}).keuken !== 'klaar');
@@ -2160,6 +2176,7 @@
           '<button class="abtn" data-pkgo="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
       }).join('') : '<div class="card" style="color:var(--soft);font-size:0.85rem;">'+T('pd.k.leeg','Niets voor deze kant. Nieuwe bonnen verschijnen hier vanzelf, live met het keukenscherm.')+'</div>';
     }
+/* van kant wisselen op het keukenbord */
     wrap.innerHTML = html;
     wrap.querySelectorAll('[data-pkkant]').forEach(b => b.addEventListener('click', () => {
       pdaKant = b.dataset.pkkant;
@@ -2263,6 +2280,7 @@
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.geenpk','Geen open verzoeken.')+'</div>')+'</div>';
     // apart gelegd
     const ap = pdRetail.apart || [];
+/* apart gelegd: de klant erbij pakken */
     if (ap.length) html += '<div class="card"><div class="k">'+T('pd.w.apart','Apart gelegd')+' ('+ap.length+')</div>'+
       ap.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
     // klant erbij pakken
@@ -2382,6 +2400,7 @@
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.boer.geentaak','Geen open taken.')+'</div>')+'</div>';
     // Percelen: oogsten en water geven
     const perc = (o.percelen||[]).filter(p => p.gewasLabel && p.fase !== 'geoogst');
+/* de percelen en het oogsten */
     if (perc.length) html += '<div class="card"><div class="k">'+T('pd.boer.perc','Percelen')+'</div>'+
       perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'':'')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
         (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);"></button>')+'</div>').join('')+'</div>';
@@ -2448,6 +2467,7 @@
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }
     });
     // de deurverkoop: het kaartje is meteen betaald en de code kan naar binnen
+/* een verkoopslot kiezen */
     wrap.querySelectorAll('[data-pdvk]').forEach(b => b.addEventListener('click', async () => {
       const uit = document.getElementById('pdVkUit');
       const slot = slots[parseInt(($('#pdVkSlot')||{}).value, 10) || 0];
@@ -2563,6 +2583,7 @@
     if (!heeftVerkoop()){ wrap.innerHTML = ''; return; }
     if (!pdVerkoop){ wrap.innerHTML = '<div class="card">…</div>'; laadVerkoop(); return; }
     const lijst = pdVerkoop.pda || [];
+/* de deals: koop of huur */
     wrap.innerHTML = lijst.length ? lijst.map(d => {
       const koop = d.soort === 'koop';
       const knop = koop
@@ -2665,6 +2686,7 @@
     const team = state.team || [];
     const act = (state.activity || []).slice(0, 10);
     const staff = (state.staff || []).filter(m => m.id !== me.staffId);
+/* het team van vandaag */
     $('#teamWrap').innerHTML =
       (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
         staff.map(m=>{
@@ -2755,6 +2777,7 @@
     }
     el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(from)+'</b><span>'+T('pd.buzzcalls','roept u op')+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
+/* het alarm: trillen en tonen */
     setTimeout(() => el.classList.remove('on'), 8000);
   }
 
@@ -2891,6 +2914,7 @@
         mkZorg.seh.slice(0, 6).map(p => '<div class="task"><span class="ic">'+({rood:'',oranje:'',geel:'',groen:'',blauw:''}[p.triage]||'')+'</span><div class="t"><b>'+esc(p.klacht)+'</b><span>'+esc(p.status)+' · via '+esc(p.via)+'</span></div></div>').join('')+'</div>';
     }
     // de ketenchat: het gedeelde kanaal en de eigen besloten groepen
+/* de ketenchat */
     if (mkKeten && (mkKeten.kanalen || []).length){
       html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
         '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>

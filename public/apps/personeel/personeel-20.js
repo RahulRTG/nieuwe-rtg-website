@@ -1,3 +1,4 @@
+/* de percelen en het oogsten */
     if (perc.length) html += '<div class="card"><div class="k">'+T('pd.boer.perc','Percelen')+'</div>'+
       perc.map(p => '<div class="task"><span class="ic">'+(p.fase==='te-oogsten'?'':'')+'</span><div class="t"><b>'+esc(p.naam)+' · '+esc(p.gewasLabel)+'</b><span>'+(p.fase==='te-oogsten'?T('pd.boer.oogstklaar','oogstklaar'):(p.restDagen+' '+T('pd.boer.dgn','dagen tot oogst')))+'</span></div>'+
         (p.fase==='te-oogsten' ? '<button class="abtn" data-boogst="'+p.id+'">'+T('pd.boer.oogsten','Oogst')+'</button>' : '<button class="abtn" data-bwater="'+p.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);"></button>')+'</div>').join('')+'</div>';

@@ -1,3 +1,4 @@
+/* de zorgpakketten: wat er loopt en wat er te kiezen valt */
   function renderCarePakketten(){
     const el = $('#carePakketten'); if (!el) return;
     if (!carePak.length && !carePakMijn.length){ el.innerHTML = ''; return; }

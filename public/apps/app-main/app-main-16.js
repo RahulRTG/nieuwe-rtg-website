@@ -1,3 +1,4 @@
+/* het voertuigkanaal: partners en hun auto's */
     for (const p of vhPartners){
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.autos){

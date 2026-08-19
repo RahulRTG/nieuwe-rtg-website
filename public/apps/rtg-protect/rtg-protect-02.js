@@ -1,3 +1,4 @@
+/* het beveiligd-merk op het scherm */
     var badge = document.createElement('div');
     badge.className = 'rtgp-badge zicht';
     badge.textContent = 'Beveiligd';

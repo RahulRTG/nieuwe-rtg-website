@@ -1,3 +1,4 @@
+/* mijn zorgprofiel */
     el.innerHTML =
       '<div class="live-start" style="margin-top:0.8rem;">' +
         '<div class="lh">' + T('zorg.h','Mijn zorgprofiel') + '</div>' +

@@ -1,3 +1,4 @@
+/* in- en uitklokken */
     const kb = document.getElementById('klokBtn');
     if (kb) kb.addEventListener('click', async () => {
       kb.disabled = true;

@@ -1,3 +1,4 @@
+/* de ketenchat */
     if (mkKeten && (mkKeten.kanalen || []).length){
       html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
         '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>

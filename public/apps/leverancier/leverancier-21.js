@@ -1,3 +1,4 @@
+/* een prijs doorgeven aan RTG */
     if (kantoorSec === 'prijzen'){
       const h = state.prices || [];
       html += '<div class="tkc"><h3>'+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+

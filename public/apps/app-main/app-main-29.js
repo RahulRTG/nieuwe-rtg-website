@@ -1,3 +1,4 @@
+/* de realtime-verbinding starten en herstellen */
     RTGRealtime.start = (token, opts) => {
       opts = opts || {};
       const oud = opts.onChange;

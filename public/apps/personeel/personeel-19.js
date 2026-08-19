@@ -1,3 +1,4 @@
+/* apart gelegd: de klant erbij pakken */
     if (ap.length) html += '<div class="card"><div class="k">'+T('pd.w.apart','Apart gelegd')+' ('+ap.length+')</div>'+
       ap.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
     // klant erbij pakken

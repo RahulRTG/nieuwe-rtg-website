@@ -281,6 +281,37 @@ const IJKINGEN = {
     }
   },
 
+  delenZonderOnderwerp: {
+    /* GEIJKT OP DE ZEEF EN NIET OP DE BOOM, en dat is hier een keuze met een
+       reden. De proef van bronBlindeBestanden hierboven zet zijn foute invoer in
+       een TIJDELIJKE map; dat kan hier niet, want een bundeldeel telt alleen mee
+       als het in public/ staat -- en een verzonnen deel in public/ zou meteen
+       test/bundeldelen.test.js laten zakken (de bundel is dan niet meer de som
+       van zijn delen). Een ijking die een andere toets sloopt om zichzelf te
+       bewijzen, is de kwaal erger dan de kwaal.
+
+       Dus toetst deze proef de zeef in beide richtingen -- ziet hij een deel MET
+       onderwerp, en ziet hij er een ZONDER -- plus dat de meter over de echte
+       boom een getal geeft dat leeft. Zonder die laatste regel zou een zeef die
+       nergens meer wordt aangeroepen hier gewoon groen blijven. */
+    proef: () => {
+      const { onderwerpVan } = require('../scripts/lib/bundeldeel');
+      const met = onderwerpVan('/* de contactpin: je eigen code, als tekst en als QR */\ncode();');
+      assert.equal(met, 'de contactpin: je eigen code, als tekst en als QR', 'een onderwerp wordt gezien');
+      assert.equal(onderwerpVan('  const x = 1;\n  /* pas hieronder een uitleg die lang genoeg is */'), null,
+        'een deel dat met code begint draagt geen onderwerpregel');
+      assert.equal(onderwerpVan('/* deel 4b */\ncode();'), null, 'zeven letters is geen onderwerp');
+
+      const { delenVan } = require('../scripts/deelindex');
+      const { bundels } = require('../scripts/bundel');
+      const delen = Object.values(bundels).flatMap(m => delenVan(m));
+      assert.ok(delen.length > 300, 'de teller leest echt de delen (' + delen.length + ')');
+      const kaal = delen.filter(d => !d.onderwerp).length;
+      assert.ok(delen.some(d => d.onderwerp), 'en hij vindt er ook mét onderwerp -- anders zegt de telling niets');
+      return kaal + 1;   // gezien: de zeef slaat uit op alle drie de invoeren
+    }
+  },
+
   /* DE DRIE GRENSMETERS. Geijkt op een VERZONNEN bron en niet op de repo: de
      teller krijgt een stukje code te lezen dat ik zelf schrijf, dus ik weet het
      antwoord vooraf. Een meter die alleen zijn eigen routemap kan lezen, is niet

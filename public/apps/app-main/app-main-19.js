@@ -1,3 +1,4 @@
+/* een auto kopen of inruilen, met een bod */
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
       const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);
       if (bod === null) return;

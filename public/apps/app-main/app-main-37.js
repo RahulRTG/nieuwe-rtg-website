@@ -1,3 +1,4 @@
+/* de deur van kamer of entree openen, en een kamer boeken */
     const dk = $('#vbDeurKamer'); if (dk) dk.addEventListener('click', () => deur('kamer'));
     const de = $('#vbDeurEntree'); if (de) de.addEventListener('click', () => deur('entree'));
     // een kamer boeken: datums kiezen, een knop, het huis bevestigt

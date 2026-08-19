@@ -1,3 +1,4 @@
+/* de deals: koop of huur */
     wrap.innerHTML = lijst.length ? lijst.map(d => {
       const koop = d.soort === 'koop';
       const knop = koop

@@ -1,3 +1,4 @@
+/* de personeelskiezer: wie ben jij */
     if (fallback) list = all;
     spH2().textContent = mgmt ? T('sp.r.mgmt','Management') : func;
     spDeck().textContent = fallback ? T('sp.nofunc','Nog niemand met deze functie; kies uw naam uit het team.') : T('sp.pickname','Kies uw naam en voer uw pincode in.');

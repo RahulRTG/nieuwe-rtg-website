@@ -1,3 +1,4 @@
+/* het boekingsblad: de diensten van een partner kiezen */
     $('#boekBody').innerHTML =
       (s.vak ? '<div style="font-size:0.72rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;">' + s.vak + ' · ' + s.city + '</div>' : '') +
       s.services.map(x =>

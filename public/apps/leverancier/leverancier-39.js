@@ -1,3 +1,4 @@
+/* een artikel bewaren in de retailcatalogus */
     if (artBewaar) artBewaar.addEventListener('click', async () => {
       const naam = $('#rArtNaam').value.trim();
       if (!naam) return toast(T('rt.geefnaam','Geef het artikel een naam.'));

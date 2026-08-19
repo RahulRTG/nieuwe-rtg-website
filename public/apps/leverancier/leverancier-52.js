@@ -1,3 +1,4 @@
+/* de polis van een verzekeringszaak */
     let d; try { d = await API.call('/supplier/polis'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+

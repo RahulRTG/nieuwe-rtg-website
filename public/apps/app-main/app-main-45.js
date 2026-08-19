@@ -1,3 +1,4 @@
+/* pushmeldingen aanzetten en de sleutel omzetten */
     const raw=atob(b); const arr=new Uint8Array(raw.length); for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i); return arr;
   }
   async function ensurePush(interactief){

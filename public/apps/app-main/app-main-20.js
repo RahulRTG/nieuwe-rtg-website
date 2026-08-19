@@ -1,3 +1,4 @@
+/* de bazaar van een partner: producten en bestellen */
     el.innerHTML =
       '<button class="bz-btn" id="bzTerug" style="margin-bottom:0.8rem;">\u2039 '+T('bz.terug','Alle partners')+'</button>'+
       '<div class="card"><b>'+esc(p.name)+'</b>'+

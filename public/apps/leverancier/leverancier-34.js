@@ -1,3 +1,4 @@
+/* creator: leveranciers vinden en open oproepen */
     if (mk){
       // CREATOR: leveranciers vinden + open oproepen
       html += '<div class="card"><div class="tt-h">'+T('sw.vind','Vind een leverancier om mee samen te werken')+'</div>'+

@@ -1,3 +1,4 @@
+/* het zakelijke blad: feed en lijsten */
     body.innerHTML = '<div style="color:var(--soft);font-size:0.8rem;padding:1rem 0;">…</div>';
     try {
       if (zakView === 'feed'){

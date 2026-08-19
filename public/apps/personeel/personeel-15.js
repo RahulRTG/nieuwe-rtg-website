@@ -1,3 +1,4 @@
+/* de afstand tot een opdracht, uit GPS */
     if (!gpsPos || !o.geo || !Number.isFinite(o.geo.lat)) return null;
     return meters(gpsPos, o.geo);
   }

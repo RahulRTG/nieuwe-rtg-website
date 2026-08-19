@@ -1,3 +1,4 @@
+/* de ballon op de boardroom-knop */
     const btn = document.getElementById('boBtn'); if (!btn) return;
     btn.style.position = 'relative';
     let b = btn.querySelector('.ag-ballon');

@@ -1,3 +1,4 @@
+/* het gebouwbeheer: de knoppen en hun acties */
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       try { await API.call(pad, body(b.dataset)); renderGebouw(); } catch(e){ toast(e.message); }
     }));

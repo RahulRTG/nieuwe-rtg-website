@@ -1,3 +1,4 @@
+/* de golfbaan: status en de winkel */
     el.querySelectorAll('[data-gfbaan]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/golf/baan', { status: b.dataset.gfbaan }); renderGolf(); } catch(e){ toast(e.message); }
     }));

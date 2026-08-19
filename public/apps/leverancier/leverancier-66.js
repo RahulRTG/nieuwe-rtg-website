@@ -1,3 +1,4 @@
+/* de vloot van een voertuigzaak */
     const autos = state.autos || [];
     html += '<div class="card"><div class="tt-h">'+T('vh.vloot','Vloot')+' ('+autos.filter(a=>a.actief!==false).length+')</div>'+
       autos.filter(a => a.actief !== false).map(a =>

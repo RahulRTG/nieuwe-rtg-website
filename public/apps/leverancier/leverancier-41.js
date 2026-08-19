@@ -1,3 +1,4 @@
+/* de functies van een groothandel aan- en uitzetten */
     el.querySelectorAll('.js-ghf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/groothandel/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); renderGroothandel(); } catch(e){ toast(e.message); }
     }));

@@ -1,3 +1,4 @@
+/* de leverancier-app: de basis (helpers, taal, elementen) */
 (function(){
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
@@ -66,6 +67,7 @@
     { code:'NIDO',    name:'Nido Kinderopvang & Nanny', type:'Kinderopvang', icon:'', sub:'Opvang & nanny-service · Santa Gertrudis' },
     { code:'PORTELL', name:'Marina Portell', type:'Marina', icon:'', sub:'Marina & jachthaven · Marina Botafoch' },
     { code:'AURELIA', name:'Aurelia Weddings & Events', type:'Weddings', icon:'', sub:'Weddings & privé-events · Sant Antoni' },
+/* de partnercatalogus: welke zaken er in de demo bestaan */
     { code:'LEXNOVA', name:'LexNova Advocaten & Notarissen', type:'Professioneel', icon:'', sub:'Advocaat, notaris, fiscalist · Vara de Rey' },
     { code:'SEGUR',   name:'Segur Advies', type:'Verzekeringen', icon:'', sub:'Verzekeringsadvies · Ibiza-stad' },
     { code:'VALAURA', name:"Val d'Aurora Resort", type:'Wintersport', icon:'', sub:"Wintersport & seizoensresort · Val d'Aurora" }
@@ -136,6 +138,7 @@
      code, alle andere zaken aan hun type. */
   const TYPE2SECTOR = { apartment: 'appartement', jet: 'privejet', activiteit: 'activiteiten', verhuur: 'autoverhuur' };
   function sectorVan(sup){
+/* de sector van een zaak bepalen */
     if (!sup) return null;
     for (const k of Object.keys(SECTOR_DEF)){
       if (!SECTOR_DEF[k].legacy && SECTOR_DEF[k].codes.includes(sup.code)) return k;
@@ -147,6 +150,7 @@
   function naarEigenSector(sup){
     const doel = sectorVan(sup);
     if (!doel || SECTOR === doel) return false;
+/* de sectorwissel en de tabbladen per sector */
     location.replace(location.pathname + '?sector=' + doel);
     return true;
   }
@@ -187,6 +191,7 @@
     verkoop:  { label:'Verkoop',   svg:'<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5.5" rx="1.8"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/><path d="M9.5 9.2l1.6 1.6 3-3"/>', cap:'huur' },
     retail:   { label:'Mode',      svg:'<path d="M8 4l-4 3 1.5 2.5L7 8.5V20h10V8.5l1.5 1L20 7l-4-3-2 1.5a2 2 0 0 1-4 0z"/>', cap:'retail' },
     winkelvloer:{ label:'Winkelvloer', svg:'<path d="M4 7h16l-1 4a3 3 0 0 1-3 2.4H8A3 3 0 0 1 5 11z"/><path d="M4 7 6 3h12l2 4"/><path d="M6 13v7h12v-7"/><path d="M10 20v-4h4v4"/>', cap:'retail' },
+/* de sectoriconen */
     zorgbalie:{ label:'Zorgbalie', svg:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>', cap:'care' },
     charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
     groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },
@@ -252,6 +257,7 @@
   let apChatId = null, apChatTimer = null;
   function escT(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function ensureApChatEl(){
+/* het chatvenster met een partner */
     let ov = document.getElementById('apchat'); if (ov) return ov;
     ov = document.createElement('div'); ov.id='apchat';
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;';
@@ -367,6 +373,7 @@
     const password = document.getElementById('enPass').value;
     const pin = document.getElementById('enPin').value.trim();
     msg.className = 'enroll-msg';
+/* aanmelden als medewerker bij een zaak */
     msg.textContent = T('enr.busy','Bezig met aanmelden...');
     try {
       const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password, pin });
@@ -507,6 +514,7 @@
     let list = mgmt ? all.filter(m => m.role === 'manager')
       : all.filter(m => (m.func||'').toLowerCase() === String(func).toLowerCase());
     const fallback = !mgmt && !list.length;
+/* de personeelskiezer: wie ben jij */
     if (fallback) list = all;
     spH2().textContent = mgmt ? T('sp.r.mgmt','Management') : func;
     spDeck().textContent = fallback ? T('sp.nofunc','Nog niemand met deze functie; kies uw naam uit het team.') : T('sp.pickname','Kies uw naam en voer uw pincode in.');
@@ -669,6 +677,7 @@
     try { localStorage.removeItem('rtg_sup_token'); localStorage.removeItem('rtg_sup_station'); } catch(e){}
     $('#app').classList.remove('active');
     $('#gate').style.display = '';
+/* een account voor alles: partner kiezen en de staat toepassen */
     if (pickCode) pickPartner(pickCode); else $('#staffPick').classList.remove('open');
   }
 
@@ -840,6 +849,7 @@
   function stStats(list){
     const ages = list.map(o => ageMin(o.at));
     const laat = ages.filter(a => a >= 12).length;
+/* de bonnenstatistiek van de kassa */
     const oudste = ages.length ? Math.max.apply(null, ages) : 0;
     return '<div class="st-stats">'+
       '<div class="st-stat"><b>'+list.length+'</b><span>'+T('kds.open','Open bonnen')+'</span></div>'+
@@ -1004,6 +1014,7 @@
           out.push({ e, it, due: dueOf(e, it) });
       }
     }
+/* de looplijst per station, op tijd gesorteerd */
     out.sort((a, b) => a.due.localeCompare(b.due) || (a.it.time.localeCompare(b.it.time)));
     return out;
   }
@@ -1050,6 +1061,7 @@
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
     if (stationMode === 'keuken' || stationMode === 'bar'){ laadWerkvloer(); html += werkvloerBalk(); }
+/* de bedieningspas: wat kan er nu gelopen worden, en waarheen */
     if (stationMode === 'bediening'){
       /* De bedieningspas: wat kan er NU gelopen worden en waarheen. Spoed en
          het langst wachtende eerst; de bestemming (tafel of ophaalcode) staat
@@ -1151,6 +1163,7 @@
         return '<div class="tkc h-volbreed">'+
           '<div class="tkc-top"><span class="tkc-code" style="font-size:1.3rem;">'+r.customerCodename+'</span><span class="tkc-age">'+tStatus(r.status)+'</span></div>'+
           '<div class="tkc-who" style="font-size:0.95rem;">'+(r.from||'')+' → '+(r.to||T('sup.opendest','open bestemming'))+'</div>'+
+/* de rittenkaart van een chauffeur */
           '<div class="tkc-who">'+ritRegel(r)+(r.vehicle?' ·  '+r.vehicle.name+' ('+(r.vehicle.plate||'')+')':'')+'</div>'+
           (r.note?'<div class="tkc-alg">'+r.note+'</div>':'')+
           (r.pickupEtaMin!=null && r.status==='onderweg' ? '<div class="tkc-who">~'+r.pickupEtaMin+' min '+T('ch.naargast','naar de gast')+'</div>':'')+
@@ -1263,6 +1276,7 @@
             const p = vuurplan(o).plan[sec];
             if (!p || p.doe !== 'wacht') return;
             (o.items||[]).forEach(it => { if (sectieOf(it) === sec){ const r = straks[it.name] = straks[it.name] || { n:0, min:p.min }; r.n += it.qty; r.min = Math.min(r.min, p.min); } });
+/* de straks-taken en de mise-en-place van vandaag */
           });
           const straksRows = Object.entries(straks).sort((a,b)=>a[1].min-b[1].min).slice(0,6);
           const dmsK = (state.dailyMeps||{})[new Date().toISOString().slice(0,10)];
@@ -1371,6 +1385,7 @@
       }
       html += runsheetStrip(st);
     }
+/* de keukenhulp: live advies van het model of de regelcoach */
     el.innerHTML = html;
     bindStation(el);
   }
@@ -1509,6 +1524,7 @@
     el.querySelectorAll('[data-stserve]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/order/status', { ref: b.dataset.stserve, status: 'geserveerd' }); await refresh(); } catch(e){ toast(e.message); }
     }));
+/* de tafelstatus en het inchecken van gasten */
     el.querySelectorAll('[data-sttbl]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/table/status', { id: b.dataset.sttbl, status: TBL_NEXT[b.dataset.cur]||'vrij' }); await refresh(); } catch(e){ toast(e.message); }
     }));
@@ -1852,6 +1868,7 @@
       ['kamers','\uD83C\uDFE1',T('kt.units','Verblijven')],
       ['deuren','\uD83D\uDEAA',T('kt.deuren','Deuren')]
     );
+/* de secties van een taxi- of jetzaak */
     if (type === 'taxi' || type === 'jet') secs.push(
       ['ritten','\uD83D\uDDFA',T('kt.ritten','Ritten')],
       ['historie','\uD83D\uDCD2',T('kt.historie','Historie')],
@@ -1872,6 +1889,7 @@
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
     if (kantoorMsg){ html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);">'+kantoorMsg+'</div>'; }
 
+/* de eigen backoffice van de zaak */
     if (kantoorSec === 'bo'){
       // de eigen backoffice van de zaak, met dezelfde patronen als het
       // RTG-controlecentrum maar dan uitsluitend over dit bedrijf
@@ -1932,6 +1950,7 @@
               ' ('+k.voorstel.aandelen.map(a => eur(a.centen)).join(' / ')+', 10% '+T('sy.voordeel','pakketvoordeel')+')</span></span>'+
             '<button class="obtn" data-synkans="'+i+'">'+T('sy.stel','Stel voor')+'</button></div>').join('')+
           synDeals.slice(0,6).map(d => {
+/* de aandelen in een deal, en wie akkoord is */
             const mij = d.aandelen.find(a => a.code === mijnCode) || {};
             return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
               '<span class="sub">'+d.aandelen.map(a => esc(a.naam)+' '+eur(a.centen)+(a.akkoord?' ✓':' …')).join(' + ')+
@@ -1986,6 +2005,7 @@
             : '<div class="tkc-who">'+T('bz.geentop','Nog geen verkopen. Zodra er via de app of de kassa verkocht wordt, staan de toppers hier.')+'</div>')+'</div>';
       }
     }
+/* de boekhouding van de zaak: btw, personeelskosten en cadeaukaarten */
     if (kantoorSec === 'fin'){
       // de boekhouding van de zaak: btw per genre, personeelskosten uit de
       // klokuren en een boekhoudkundig correcte cadeaukaartenadministratie
@@ -2068,6 +2088,7 @@
           '<div id="accAdv"></div></div>';
       }
     }
+/* het thuiskantoor: de zaak als host op RTG Thuis */
     if (kantoorSec === 'thuis'){
       // het THUIS-KANTOOR: de zaak als host op RTG Thuis (verhuur onder de
       // zaaknaam) -- dashboard, aanvragen, aanbod, prijsadvies en blokkades
@@ -2247,6 +2268,7 @@
         }
       }
     }
+/* het AI-weekrooster: een voorstel op de verwachte drukte */
     if (kantoorSec === 'hr'){
       // het AI-weekrooster: voorstel op de verwachte drukte, de gemachtigde stelt vast
       if (!agentData) laadAgent();
@@ -2313,12 +2335,14 @@
           : '<div class="tkc-who">'+T('kt.niemandin','Niemand is nu ingeklokt.')+'</div>')+
         (klok2.vandaag.length ? '<div class="tkc-who h-mt40">'+T('kt.klokv','Vandaag geklokt')+': '+klok2.vandaag.length+' '+T('kt.klokr','registratie(s)')+' \u00B7 '+[...new Set(klok2.vandaag.map(e=>e.name))].length+' '+T('kt.klokp','personen')+'</div>' : '')+'</div>';
     }
+/* hr-plus: inwerken, groeigesprekken, certificaten en dienstjaren */
     if (kantoorSec === 'hr'){
       // hr-plus (los script leverancier-hr.js): inwerktrajecten,
       // groeigesprekken, certificaten & bevoegdheden en dienstjaren;
       // display:contents laat de kaarten in het kantoorraster meelopen
       html += '<div id="hrPlusWortel" style="display:contents;"></div>';
     }
+/* de menukaart per station (keuken of bar) */
     if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
       const stn = kantoorSec;
       const items = (state.menu||[]).filter(m=>(m.station==='bar')===(stn==='bar'));
@@ -2386,6 +2410,7 @@
         '<div class="st-form"><div class="row-gap"><input class="st-in" id="ktTn" placeholder="'+T('kt.tafelnaam','Tafelnaam')+'" class="h-flex2"><input class="st-in" id="ktTs" type="number" placeholder="4" class="h-flex1"></div>'+
         '<button class="bigbtn" id="ktTAdd" class="h-mt20">'+T('kt.tafeladd','Tafel toevoegen')+'</button></div></div>';
     }
+/* de events van de zaak */
     if (kantoorSec === 'events'){
       const evs = state.events || [];
       html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+
@@ -2452,6 +2477,7 @@
         '<button class="bigbtn" id="kRmAdd" class="h-mt20">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
         '<div class="tkc-who">'+T('kt.hknote','Tik op de bezem om de housekeeping-status door te schakelen; Dicht = direct onzichtbaar voor gasten.')+'</div></div>';
     }
+/* de minibar-catalogus */
     if (kantoorSec === 'minibar'){
       const cat = (state.minibar && state.minibar.catalog) || [];
       html += '<div class="tkc h-volbreed"><h3>'+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+
@@ -2540,6 +2566,7 @@
         '<div class="row-gap"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" class="h-flex2"><input class="st-in" id="ktVs" type="number" placeholder="4" class="h-flex1"></div>'+
         '<button class="bigbtn" id="ktVAdd" class="h-mt20">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
     }
+/* het tarief van de zaak */
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
       html += '<div class="tkc"><h3>'+T('kt.tarief','Tarief')+'</h3>'+
@@ -2701,6 +2728,7 @@
         '<div class="row-gap"><input class="st-in" id="vpCap" type="number" min="1" max="20" value="'+(vakUren.capaciteit||1)+'" style="width:5.5rem;">'+
         '<button class="obtn" id="vpCapZet">'+T('vp.bewaar','Bewaar')+'</button></div></div>';
     }
+/* een prijs doorgeven aan RTG */
     if (kantoorSec === 'prijzen'){
       const h = state.prices || [];
       html += '<div class="tkc"><h3>'+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
@@ -2799,6 +2827,7 @@
       } catch(e){ toast(e.message); }
     });
     // boekhouding: land en uurloon opslaan, cadeaukaarten en de AI-boekhouder
+/* de instellingen van de zaak opslaan */
     const fnS = el.querySelector('#fnSave'); if (fnS) fnS.addEventListener('click', async () => {
       try {
         await API.call('/supplier/settings', { land: el.querySelector('#fnLand').value, uurloon: Number(el.querySelector('#fnUur').value) });
@@ -3059,6 +3088,7 @@
       try { await API.call('/werkvloer/checklijst/deel', { id: b.dataset.wvdeel, met: met.split(',').map(s => s.trim()).filter(Boolean) });
         wvVerse(); } catch(e){ toast(e.message); }
     }));
+/* een medewerker uitnodigen */
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
@@ -3161,6 +3191,7 @@
       try { await API.call('/supplier/event', { action:'remove', id: b.dataset.kevdel }); await refresh(); } catch(e){ toast(e.message); }
     }));
     // draaiboek: regel toevoegen / weghalen / plakken / uploaden / AI
+/* een reactie toevoegen aan een kaartrij */
     el.querySelectorAll('[data-kradd]').forEach(b => b.addEventListener('click', async () => {
       const id = b.dataset.kradd;
       const text = el.querySelector('#krX'+id).value.trim();
@@ -3447,6 +3478,7 @@
   function werkvensterBlokHtml(inst){
     const wv = (inst && inst.werkvenster) || { aan: false, dagen: {}, vrijgesteld: [] };
     const DAG = [[1,T('wv.ma','ma')],[2,T('wv.di','di')],[3,T('wv.wo','wo')],[4,T('wv.do','do')],[5,T('wv.vr','vr')],[6,T('wv.za','za')],[0,T('wv.zo','zo')]];
+/* de weekbeschikbaarheid per dag */
     const rows = DAG.map(d => {
       const slot = wv.dagen[d[0]] || {};
       return '<div class="st-row" data-wvdag="'+d[0]+'" style="gap:0.5rem;">'+
@@ -3546,6 +3578,7 @@
       b.textContent = '' + (aan ? T('wv.thuisaan','Thuiswerk aan') : T('wv.thuisuit','Thuiswerk uit'));
     }));
     const opslaan = el.querySelector('#wvSave');
+/* de weekbeschikbaarheid opslaan */
     if (opslaan) opslaan.addEventListener('click', async () => {
       const dagen = {};
       el.querySelectorAll('[data-wvdag]').forEach(rij => {
@@ -3731,6 +3764,7 @@
     const canEdit = actor().manager;
     const c = onbCfg.config, cnt = onbCfg.ondertekenaars || [];
     let h = '';
+/* het aanmeldformulier aanpassen in gewone taal */
     if (canEdit) h += '<div class="card" style="border-color:var(--gold);"><div class="tt-h">\u2728 '+T('onb.ai','Aanpassen met AI')+'</div>'+
       '<p class="sub">'+T('onb.ai.s','Beschrijf in gewone taal wat u wilt. Bijv. "voeg het veld BSN toe" of "zet in het contract dat annuleren tot 24 uur vooraf kan".')+'</p>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="onbAiIn" class="st-in h-flex1" placeholder="'+T('onb.ai.ph','Wat wilt u aanpassen?')+'"><button class="obtn primary" id="onbAiGo">'+T('onb.ai.go','Aanpassen')+'</button></div>'+
@@ -3819,6 +3853,7 @@
     if (!has('boerderij')){ el.innerHTML = ''; return; }
     if (!boer){ el.innerHTML = '<div class="empty">…</div>'; laadBoerderij(); return; }
     const canEdit = actor().manager;
+/* de boerderijkaart: dier of gewas, met zijn cijfers */
     const o = boer, st = o.stats || {}, isDier = o.kind !== 'gewas', isGewas = o.kind !== 'dier';
     const sel = 'style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt);"';
     let html = '';
@@ -3912,6 +3947,7 @@
     el.querySelectorAll('[data-naarsalon]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/naar-salon', { id: b.dataset.naarsalon }); toast(T('boer.salonok','In de Salon gezet; leden zien het nu.')); boerToe(r); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-proddel]').forEach(b => b.addEventListener('click', async () => { try { boerToe(await API.call('/supplier/boerderij/product', { weg: true, id: b.dataset.proddel })); } catch(e){ toast(e.message); } }));
     const prAdd = $('#boerPrAdd'); if (prAdd) prAdd.addEventListener('click', async () => { const naam = $('#boerPrNaam').value.trim(); if (!naam) return; try { boerToe(await API.call('/supplier/boerderij/product', { naam, eenheid: $('#boerPrEenh').value.trim()||'kg', prijs: Number($('#boerPrPrijs').value)||0 })); } catch(e){ toast(e.message); } });
+/* de boerderij-AI: een vraag over het bedrijf */
     const aiGo = $('#boerAiGo'); if (aiGo){
       const doeAi = async () => { const vraag = $('#boerAiIn').value.trim(); if (!vraag) return; const out = $('#boerAiOut'); out.innerHTML = '<div class="ds">'+T('boer.aidenkt','Even denken...')+'</div>';
         try { const r = await API.call('/supplier/boerderij/ai', { vraag }); out.innerHTML = '<div class="mitem"'+(r.gedaan?' style="border-left:3px solid #7EE0A3;"':'')+'><div class="ds" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div></div>'; $('#boerAiIn').value=''; if (r.overzicht){ boer = r.overzicht; } if (r.gedaan) renderBoerderij(); }
@@ -3979,6 +4015,7 @@
     const pOp = $('#crProfielOp'); if (pOp) pOp.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/profiel', { niche: $('#crNiche').value, bio: $('#crBio').value })); toast(T('cr.profielok','Profiel opgeslagen.')); } catch(e){ toast(e.message); } });
     el.querySelectorAll('[data-pfvset]').forEach(b => b.addEventListener('click', async () => { const i2 = el.querySelector('[data-pfvin="'+b.dataset.pfvset+'"]'); try { crToe(await API.call('/supplier/creator/platform', { id: b.dataset.pfvset, volgers: i2?Number(i2.value):0 })); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-pfdel]').forEach(b => b.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/platform', { weg: true, id: b.dataset.pfdel })); } catch(e){ toast(e.message); } }));
+/* portfolio en trajecten van een creator */
     const pfAdd = $('#crPfAdd'); if (pfAdd) pfAdd.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/platform', { platform: $('#crPfPlat').value, handle: $('#crPfHandle').value, volgers: Number($('#crPfVolg').value)||0 })); } catch(e){ toast(e.message); } });
     el.querySelectorAll('[data-trdel]').forEach(b => b.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/tarief', { weg: true, id: b.dataset.trdel })); } catch(e){ toast(e.message); } }));
     const trAdd = $('#crTrAdd'); if (trAdd) trAdd.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/tarief', { soort: $('#crTrSoort').value, prijs: Number($('#crTrPrijs').value)||0 })); } catch(e){ toast(e.message); } });
@@ -4023,6 +4060,7 @@
         '</div>').join('')
         : '<div class="ds h-mt50">'+T('sw.geen','Nog geen samenwerkingen. Start er hieronder een.')+'</div>')+'</div>';
 
+/* creator: leveranciers vinden en open oproepen */
     if (mk){
       // CREATOR: leveranciers vinden + open oproepen
       html += '<div class="card"><div class="tt-h">'+T('sw.vind','Vind een leverancier om mee samen te werken')+'</div>'+
@@ -4084,6 +4122,7 @@
     html += '<div class="card"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">'+
       [[st.verkocht||0, T('fact.verkocht','verkoopfacturen')],[geld(st.omzet||0), T('fact.omzet','omzet')],[geld(st.btwAfdracht||0), T('fact.btwaf','btw')]]
       .map(c => '<div style="background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.6rem;text-align:center;"><div style="font-size:1.05rem;font-weight:700;color:var(--gold);">'+c[0]+'</div><div style="font-size:0.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.05em;">'+c[1]+'</div></div>').join('')+'</div></div>';
+/* de AI-factuurtool */
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('fact.ai','AI-factuurtool')+'</div>'+
         '<p class="sub h-mt30">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+
@@ -4162,6 +4201,7 @@
     const aiPr = $('#mktAiPrijs'); if (aiPr) aiPr.addEventListener('click', async () => {
       try { const r = await API.call('/supplier/markt/ai', { soort:'prijs', titel:$('#mktTitel').value.trim(), categorie:$('#mktCat').value, staat:$('#mktStaat').value }); if (r.prijs && !$('#mktPrijs').value) $('#mktPrijs').value = r.prijs.midden; uit.textContent = r.tekst||''; } catch(e){}
     });
+/* iets op de marktplaats plaatsen */
     const plaatsBtn = $('#mktPlaatsBtn'); if (plaatsBtn) plaatsBtn.addEventListener('click', async () => {
       const m = $('#mktMelding');
       try {
@@ -4249,6 +4289,7 @@
   function retailCatalogusView(canEdit){
     let html = '';
     // collecties
+/* de collecties van een retailzaak */
     const cols = retailData.collecties || [];
     html += '<div class="card"><div class="tt-h">'+T('rt.collecties','Collecties')+'</div>'+
       (cols.length ? '<div class="h-mt50">'+cols.map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.naam)+'</span><span class="pr">'+esc(c.seizoen)+' '+c.jaar+'</span></div>'+
@@ -4323,6 +4364,7 @@
   function retailClienteling(canEdit){
     if (retailKlant) return retailKlantDossier(canEdit);
     const kl = retailData.klanten || [];
+/* clienteling: het klantdossier van een retailzaak */
     let html = '<div class="card"><div class="tt-h">'+T('rt.klantdossier','Clienteling')+' ('+kl.length+')</div>'+
       '<p class="ds" style="margin:0.4rem 0 0.2rem;">'+T('rt.clienteltip','Het geheime wapen van elk modehuis: maten, verlanglijst, aankoophistorie en stylist-notities per klant.')+'</p>'+
       (kl.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+kl.map(k => '<button class="mitem" data-rklant="'+esc(k.key)+'" style="text-align:left;width:100%;background:var(--card);border:1px solid var(--line);cursor:pointer;"><div class="r1"><span class="nm">'+esc(k.codenaam||k.key)+'</span><span class="pr">'+geld(k.besteedTotaal)+'</span></div><div class="ds">'+k.aankopen+' '+T('rt.aankopen','aankopen')+' · '+(k.wishlist?k.wishlist.length:0)+' '+T('rt.opverlang','op verlanglijst')+'</div></button>').join('')+'</div>'
@@ -4395,6 +4437,7 @@
     const artAnn = el.querySelector('#rArtAnnuleer');
     if (artAnn) artAnn.addEventListener('click', () => { retailArtBewerk = null; renderRetail(); });
     const artBewaar = el.querySelector('#rArtBewaar');
+/* een artikel bewaren in de retailcatalogus */
     if (artBewaar) artBewaar.addEventListener('click', async () => {
       const naam = $('#rArtNaam').value.trim();
       if (!naam) return toast(T('rt.geefnaam','Geef het artikel een naam.'));
@@ -4583,6 +4626,7 @@
       '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
     wireFuncBlok(el);
+/* de functies van een groothandel aan- en uitzetten */
     el.querySelectorAll('.js-ghf').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/groothandel/functie', { id:b.dataset.id, aan: b.dataset.aan!=='true' }); renderGroothandel(); } catch(e){ toast(e.message); }
     }));
@@ -4662,6 +4706,7 @@
     try { await API.call('/supplier/inkoop/bestel', { groothandelCode: code, regels }); toast(T('ink.besteld','Bestelling geplaatst.')); renderInkoop(); } catch(e){ toast(e.message); }
   }
   async function inkAi(code){
+/* de inkoop-AI: wat is er nodig bij deze groothandel */
     const box = $('#inkai-'+code); if (box) box.innerHTML = '<p class="sub">'+T('ink.aidenkt','De AI kijkt naar uw verkoop en mise-en-place…')+'</p>';
     try {
       const v = await API.call('/supplier/inkoop/ai', { groothandelCode: code });
@@ -4736,6 +4781,7 @@
     el.innerHTML = h;
     const aan = $('#vkAan'); if (aan) aan.addEventListener('change', async () => { try { await API.call('/supplier/verkoop/aan', { aan: aan.checked }); renderVerkoop(); } catch(e){ toast(e.message); } });
     el.querySelectorAll('[data-vkplan]').forEach(b => b.addEventListener('click', async () => { const m = prompt(T('vk.moment','Wanneer? (bv. za 10:00)')); if(m===null) return; try { await API.call('/supplier/verkoop/deal', { ref:b.dataset.vkplan, actie:'plan', moment:m }); renderVerkoop(); } catch(e){ toast(e.message); } }));
+/* een verkoopaanvraag aanvaarden of een tegenbod doen */
     el.querySelectorAll('[data-vkact]').forEach(b => b.addEventListener('click', async () => {
       const actie = b.dataset.act; const body = { ref:b.dataset.vkact, actie };
       if (actie==='aanvaard'){ const p = prompt(T('vk.tegenbod','Verkoopprijs bevestigen of tegenbod (€):'), b.dataset.prijs||''); if(p===null) return; body.prijs = p; if (b.dataset.inruil==='1'){ const t = prompt(T('vk.taxatie','Inruil taxeren op (€):'),'0'); if(t!==null) body.taxatie = t; } }
@@ -4816,6 +4862,7 @@
   function vrKaart(z){
     const docs = z.etappes.map(e => esc(e.document)).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
     let acties = '';
+/* de statusknoppen van een vrachtzending */
     if (z.status==='onderweg') acties += '<button data-vret="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.etklaar','Etappe klaar')+'</button>';
     if (z.status==='douane') acties += '<button data-vrdouane="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.douane','Douane heeft ingeklaard')+'</button>';
     if (z.status==='aangekomen') acties += '<button data-vraf="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.afleveren','Afleveren')+'</button>';
@@ -4892,6 +4939,7 @@
     el.querySelectorAll('[data-vret]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/etappe', { id:b.dataset.vret }); renderVracht(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-vrdouane]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/douane', { id:b.dataset.vrdouane }); renderVracht(); } catch(e){ toast(e.message); } }));
     el.querySelectorAll('[data-vraf]').forEach(b => b.addEventListener('click', async () => { try { await API.call('/supplier/vracht/afleveren', { id:b.dataset.vraf }); toast(''+T('vr.klaar','Afgeleverd en getekend.')); renderVracht(); } catch(e){ toast(e.message); } }));
+/* een melding in het vrachtlogboek */
     el.querySelectorAll('[data-vrmeld]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('vr.meldvraag','Korte melding voor het logboek (de klant ziet dit op de volgcode):')); if (!t) return;
       try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t }); renderVracht(); } catch(e){ toast(e.message); }
@@ -4958,6 +5006,7 @@
     h += '<p class="sub h-mt50">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;
 
+/* het gebouwbeheer: de knoppen en hun acties */
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       try { await API.call(pad, body(b.dataset)); renderGebouw(); } catch(e){ toast(e.message); }
     }));
@@ -5032,6 +5081,7 @@
     const bind4 = (id, fn) => { const b = el.querySelector('#'+id); if (b) b.addEventListener('click', fn); };
     bind4('gfBoek', async () => { try { await API.call('/supplier/golf/tee', { naam: $('#gfNaam').value, spelers: $('#gfSpelers').value, datum: $('#gfDatum').value, tijd: $('#gfTijd').value }); toast(T('golf.geboekt','Teetime geboekt.')); renderGolf(); } catch(e){ toast(e.message); } });
     bind4('gfLes', async () => { try { await API.call('/supplier/golf/les', { proId: $('#gfPro').value, naam: $('#gfLesNaam').value, datum: $('#gfLesDatum').value, tijd: $('#gfLesTijd').value }); renderGolf(); } catch(e){ toast(e.message); } });
+/* de golfbaan: status en de winkel */
     el.querySelectorAll('[data-gfbaan]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/golf/baan', { status: b.dataset.gfbaan }); renderGolf(); } catch(e){ toast(e.message); }
     }));
@@ -5114,6 +5164,7 @@
     if (!has('beauty')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/beauty'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
+/* de kengetallen van een beautysalon */
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.afsprakenVandaag, T('bs.k.af','afspraken vandaag')],[k.wachtenden, T('bs.k.wacht','in de wachtrij')],[k.inDeStoel, T('bs.k.stoel','in de stoel')],[eur(k.omzetVandaag), T('bs.k.omzet','omzet vandaag')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
@@ -5185,6 +5236,7 @@
     h += '<p class="sub h-mt50">'+esc(d.verwijzing||'')+'</p>';
     el.innerHTML = h;
 
+/* petcare: de acties op een verblijf */
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       try { await API.call(pad, body(b.dataset, b)); renderPetcare(); } catch(e){ toast(e.message); }
     }));
@@ -5263,6 +5315,7 @@
     const k = d.kpi;
     const goud = 'background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;';
     const knop = (attr, id, tekst, vol) => '<button '+attr+'="'+id+'" style="'+(vol?'background:var(--gold);color:#000;border:none;':'background:none;border:1px solid var(--line);color:var(--soft);')+'border-radius:8px;padding:0.35rem 0.7rem;font-family:inherit;font-size:0.72rem;'+(vol?'font-weight:600;':'')+'">'+tekst+'</button>';
+/* de kengetallen van een jachthaven */
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.bezet+' van '+k.ligplaatsen, T('mr.k.bezet','ligplaatsen bezet')],[k.passanten, T('mr.k.pas','passanten')],[k.brandstofOpen, T('mr.k.brand','brandstof open')],[k.serviceOpen, T('mr.k.svc','service open')],[k.conciergeOpen, T('mr.k.con','concierge open')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
@@ -5333,6 +5386,7 @@
     if (!has('weddings')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/weddings'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
+/* de kengetallen van een weddingplanner */
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.events, T('wd.k.events','draaiboeken')],[k.gepland, T('wd.k.gepland','gepland')],[k.takenOpen, T('wd.k.taken','taken open')],[k.gedraaid, T('wd.k.gedraaid','gedraaid')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
@@ -5412,6 +5466,7 @@
   async function renderPolis(){
     const el = $('#polWrap'); if (!el) return;
     if (!has('polis')){ el.innerHTML = ''; return; }
+/* de polis van een verzekeringszaak */
     let d; try { d = await API.call('/supplier/polis'); } catch(e){ el.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; return; }
     const k = d.kpi;
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
@@ -5618,6 +5673,7 @@
       '</div>';
     let h = funcBlok(T('zb.functies','Functies (aan/uit)'), d.functies||[], zbChips);
     // HR
+/* de HR-cijfers op het zaakbord */
     const hr = d.hr || {};
     h += '<div class="st-sec">'+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
       zbCel(hr.teamAantal||0, T('zb.team','Team'))+zbCel(hr.ingeklokt||0, T('zb.ingeklokt','Ingeklokt'))+
@@ -5873,6 +5929,7 @@
       catch(e){ toast(e.message); }
     }));
   }
+/* een cel op het zaakbord, en de samenvatting van schakelaars */
   function zbCel(n, label, waarschuw){
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
   }
@@ -5981,6 +6038,7 @@
       '<input id="bevPostMin" type="number" min="1" value="1" style="width:5rem;" title="'+T('bev.min','min. bezetting')+'">'+
       '<button class="abtn" id="bevPostAdd">'+T('bev.postadd','Post toevoegen')+'</button></div></div>';
     // 7) incidenten
+/* de incidenten op het beveiligingsbord */
     if (cmd.incidenten && cmd.incidenten.length){
       h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
         cmd.incidenten.map(x => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
@@ -6082,6 +6140,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
+/* alles opnieuw tekenen, en het actieve tabblad zichtbaar maken */
     renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderRegie(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
@@ -6177,6 +6236,7 @@
   // allergie) wordt structureel als tekstknoop gezet -> altijd veilig, en elke
   // knop draagt zijn eigen handler (geen losse her-binding meer).
   function orderKaart(o){
+/* een bestelkaart opbouwen */
     const E = Util.el;
     return E('div', { class: 'order', dataset: { ref: o.ref } },
       E('div', { class: 'top' },
@@ -6270,6 +6330,7 @@
       '</div>'+
       (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
+/* een tafel afrekenen */
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
       const rekenAf = async (extra) => {
         try {
@@ -6389,6 +6450,7 @@
         '</div>'
       ).join('')
     ).join('') : '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>';
+/* een gerecht aan de menukaart toevoegen */
     if (canEdit){
       html += '<div class="card" style="margin-top:1.2rem;"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
         '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
@@ -6511,6 +6573,7 @@
     el.innerHTML = html;
     bindKassa(type);
     laadZ();
+/* de shift-samenvatting: het avondbriefingmoment */
     laadShift();
   }
 
@@ -6595,6 +6658,7 @@
 
   // hotel: bedrag op de kamer zetten of direct afrekenen
   function kassaHotel(){
+/* afrekenen, of op de kamer laten schrijven */
     const rooms = state.rooms || [];
     return '<div class="card"><div class="tt-h">'+T('pos.charge','Afrekening of kamerlast')+'</div>'+
       '<div class="field"><label>'+T('pos.roomlbl','Kamer (optioneel)')+'</label><select id="posRoom" style="width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
@@ -6730,6 +6794,7 @@
 
   async function paySale(type, method){
     let body = { method };
+/* de bon van de kassa naar een bestelling */
     if (type==='restaurant'||type==='bar'||type==='club'){
       const items = (state.menu||[]).filter(m=>bon[m.id]).map(m=>({ name:m.name, qty:bon[m.id], price:m.price }));
       if (!items.length){ toast(T('pos.empty','Tik eerst gerechten aan.')); return; }
@@ -6843,6 +6908,7 @@
       const g = document.getElementById('tkGast-' + k.dataset.tkg);
       if (g) g.style.display = g.style.display === 'none' ? '' : 'none';
     }));
+/* een activiteit toevoegen of verwijderen */
     document.querySelectorAll('[data-tkdel]').forEach(k => k.addEventListener('click', async () => {
       try { await API.call('/supplier/activiteit', { id: k.dataset.tkdel, weg: true }); await refresh(); await laadProgramma(); openTab('tickets'); } catch(e){ toast(e.message); }
     }));
@@ -6906,6 +6972,7 @@
           (knop ? '<div class="h-mt50">'+knop+'</div>' : '')+'</div>';
       }).join('') : '<div class="empty">'+T('vh.geen','Nog geen huren. Betaalde boekingen verschijnen hier live.')+'</div>')+'</div>';
     // de vloot
+/* de vloot van een voertuigzaak */
     const autos = state.autos || [];
     html += '<div class="card"><div class="tt-h">'+T('vh.vloot','Vloot')+' ('+autos.filter(a=>a.actief!==false).length+')</div>'+
       autos.filter(a => a.actief !== false).map(a =>
@@ -7077,6 +7144,7 @@
       };
       file.click();
     }));
+/* een boot toevoegen of verwijderen */
     document.querySelectorAll('[data-chdel]').forEach(k => k.addEventListener('click', async () => {
       try { await API.call('/supplier/boot', { id: k.dataset.chdel, weg: true }); await refresh(); openTab('charter'); } catch(e){ toast(e.message); }
     }));
@@ -7179,6 +7247,7 @@
       (v.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(v.zorg))+'</span>':'')+'</span>'+
       (knoppen?'<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+knoppen+'</span>':'')+
     '</div>';
+/* de receptie van vandaag */
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.h','Receptie vandaag')+'</div>'+
       '<div class="pos-chips h-mt40">'+
         '<span>'+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+
@@ -7272,6 +7341,7 @@
     let p; try { p = await API.call('/supplier/kamerplanning', {}); } catch(e){ el.innerHTML = ''; return; }
     if (!p.kamers.length){ el.innerHTML = ''; return; }
     const dagLabel = d => d.slice(8, 10);
+/* de kamerkalender */
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.plan','Kamerkalender')+' <span class="sub">('+p.dagen.length+' '+T('vr.dagen','dagen')+')</span></div>'+
       '<div style="display:flex;gap:2px;margin:0.5rem 0 0.15rem;padding-left:96px;overflow:hidden;">'+p.dagen.map(d => '<span style="width:16px;flex-shrink:0;font-size:0.55rem;color:var(--soft);text-align:center;">'+dagLabel(d)+'</span>').join('')+'</div>'+
       p.kamers.map(k => '<div style="display:flex;align-items:center;gap:0;margin-top:3px;">'+
@@ -7361,6 +7431,7 @@
       try { localStorage.setItem('rtg_dorp_kant', dorpKant); } catch(e){}
       renderDorp();
     }));
+/* een bericht van de zaak verder plaatsen */
     el.querySelectorAll('[data-dpost]').forEach(elp => {
       const knop = elp.querySelector('.js-dverder');
       if (knop) knop.addEventListener('click', async () => {
@@ -7482,6 +7553,7 @@
   }
   async function submitMinibar(){
     if (!mbRoom) return;
+/* de minibar tellen, per kamer */
     const items = Object.entries(mbQty).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
     try {
       const d = await API.call('/supplier/minibar/count', { room: mbRoom, items });
@@ -7588,6 +7660,7 @@
     el.querySelectorAll('[data-ugteken]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/uitgifte/teken', { id: b.dataset.ugteken }); toast(T('ug.getekend','Getekend.')); laadUitgifte(); } catch(e){ toast(e.message); }
     }));
+/* een uitgiftebundel openen */
     el.querySelectorAll('[data-ugdl]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/uitgifte/bundel', { id: b.dataset.ugdl });
@@ -7709,6 +7782,7 @@
       : '<div class="softline">'+T('gl.leeg','Nog geen gasten die hun locatie met u delen.')+'</div>')+'</div>';
   }
   function bindGastLoc(el){
+/* een gastlocatie stoppen */
     el.querySelectorAll('[data-glstop]').forEach(b => b.addEventListener('click', async () => {
       try {
         const r = await API.call('/supplier/gastlocatie/stop', { id: b.dataset.glstop });
@@ -7912,6 +7986,7 @@
   function renderPage(){
     const el = $('#pageWrap'); if (!el) return;
     const photos = state.photos || [];
+/* De Salon is verplicht: de profielkaart met compleetheidsmeter */
     if (salonStatus === null){ laadSalonStatus(); }
     let html = '';
     // De Salon is verplicht: een blijvende profielkaart met compleetheidsmeter
@@ -7991,6 +8066,7 @@
     el.querySelectorAll('[data-phdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/photo/remove', { index: Number(b.dataset.phdel) }); await refresh(); openTab('page'); } catch(e){ toast(e.message); }
     }));
+/* een foto uploaden bij de zaak */
     const f = $('#phFile'); if (f) f.addEventListener('change', () => {
       const file = f.files && f.files[0]; if (!file) return;
       if (file.size > 1024*1024){ toast(T('sup.phtoobig','Foto te groot (max 1 MB).')); return; }
@@ -8104,6 +8180,7 @@
     html += '<div class="card"><div class="tt-h">'+T('wv.zoek','Voorraad opzoeken')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
       '<div id="wvZoekUit" class="h-mt50"></div></div>';
+/* de paskamerverzoeken van een retailzaak */
     const pk = wvRetail.paskamer || [];
     html += '<div class="card"><div class="tt-h">'+T('wv.paskamer','Paskamerverzoeken')+' ('+pk.length+')</div>'+
       (pk.length ? pk.map(v => '<div class="mitem"><div class="r1"><span class="nm">'+esc(v.artikelNaam)+' · '+esc(v.maat)+'</span></div>'+
@@ -8226,6 +8303,7 @@
      de server gelogd als officiele ID-check. */
   function zcStijlEenmalig(){
     if (document.getElementById('rtg-zc-stijl')) return;
+/* de stijl van het zegelvenster */
     const st = document.createElement('style'); st.id = 'rtg-zc-stijl';
     st.textContent = [
       '.zc-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:center;justify-content:center;padding:1.2rem;}',
@@ -8329,6 +8407,7 @@
     document.getElementById('awSluit').addEventListener('click', () => ov.remove());
     ov.querySelectorAll('[data-awplus]').forEach(b => b.addEventListener('click', () => awPas(b.dataset.awplus, 1)));
     ov.querySelectorAll('[data-awmin]').forEach(b => b.addEventListener('click', () => awPas(b.dataset.awmin, -1)));
+/* de aanwezigheidsteller op nul zetten */
     document.getElementById('awLeeg').addEventListener('click', async () => {
       if (!confirm(T('aw.leegvraag','De teller op nul zetten?'))) return;
       try { const d = await API.call('/supplier/aanwezig/leeg', {}); awToon(d.aanwezig); } catch(e){ toast(e.message); }
@@ -8446,6 +8525,7 @@
     inp.value = '';
     aiMsgs.push({ role: 'user', text: q });
     aiMsgs.push({ role: 'ai', text: '…' });
+/* de AI-draad van de zaak */
     renderAIThread();
     try {
       const d = await API.call('/supplier/ai', { q });
@@ -8522,6 +8602,7 @@
     const apps = (state.applications || []).filter(x => x.status === 'nieuw');
     const decided = (state.applications || []).filter(x => x.status !== 'nieuw').slice(0, 4);
     html += '<div class="card"><div class="tt-h">'+T('ap.h','Sollicitaties')+(apps.length?' <i class="gc-unread">'+apps.length+'</i>':'')+'</div>';
+/* het cv van een sollicitant die via RTG kwam */
     const apCv = x => {
       if (!x.viaRTG || !x.cv) return '';
       const c = x.cv, parts = [];
@@ -8643,6 +8724,7 @@
   // security-alarm: schermvullend, met locatie
   function showAlarm(d){
     if (navigator.vibrate) navigator.vibrate([500,150,500,150,800]);
+/* het alarmvenster */
     let el = document.getElementById('alarmOverlay');
     if (!el){
       el = document.createElement('div');
@@ -8779,6 +8861,7 @@
       : '<div class="softline">'+T('vr.leeg','Nog geen voorraaditems. Het management zet hieronder de lijst op.')+'</div>')+'</div>';
     // recepten en marge per gerecht: dit maakt de afboeking automatisch
     const rec = (d.recepten||[]);
+/* de recepten en hun marges */
     if (rec.length) h += '<div class="card"><div class="tt-h">'+T('vr.recepten','Recepten en marge')+'</div>'+
       rec.map(r => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;">'+
         '<div class="st-row"><span><b>'+esc(r.naam)+'</b> <span class="sub">'+geld(r.prijs)+(r.regels.length?' · '+T('vr.kost','kost')+' '+geld(r.kostprijs)+' · '+T('vr.marge','marge')+' '+geld(r.marge)+(r.margePct!=null?' ('+r.margePct+'%)':''):'')+'</span></span>'+
@@ -8877,6 +8960,7 @@
   function renderBell(){
     const unread = notifs.filter(n=>!n.read).length;
     const b = $('#bellBadge'); b.style.display = unread>0?'flex':'none'; b.textContent = unread>9?'9+':unread;
+/* de meldingenlijst van de zaak */
     $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
       '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(window.RTGGlyf&&RTGGlyf.heeft(n.icon)?RTGGlyf.svgHTML(n.icon,{klasse:'gl-inline'}):(n.icon||'•'))+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'
     ).join('') : '<div class="empty">'+T('sup.nonotif','Nog geen meldingen. Nieuwe bestellingen en betalingen ziet u hier live.')+'</div>';

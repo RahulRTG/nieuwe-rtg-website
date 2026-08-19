@@ -1,3 +1,4 @@
+/* het boekland van een zakelijk lid */
     if (user.tier !== 'business'){ wrap.innerHTML = ''; return; }
     let land = 'NL';
     try { land = localStorage.getItem('rtg_boekland') || 'NL'; } catch(e){}

@@ -1,3 +1,4 @@
+/* van kant wisselen op het keukenbord */
     wrap.innerHTML = html;
     wrap.querySelectorAll('[data-pkkant]').forEach(b => b.addEventListener('click', () => {
       pdaKant = b.dataset.pkkant;

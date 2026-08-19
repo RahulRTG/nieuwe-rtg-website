@@ -1,3 +1,4 @@
+/* petcare: de acties op een verblijf */
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       try { await API.call(pad, body(b.dataset, b)); renderPetcare(); } catch(e){ toast(e.message); }
     }));

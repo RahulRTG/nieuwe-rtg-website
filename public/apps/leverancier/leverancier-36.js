@@ -1,3 +1,4 @@
+/* iets op de marktplaats plaatsen */
     const plaatsBtn = $('#mktPlaatsBtn'); if (plaatsBtn) plaatsBtn.addEventListener('click', async () => {
       const m = $('#mktMelding');
       try {

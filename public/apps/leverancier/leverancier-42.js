@@ -1,3 +1,4 @@
+/* de inkoop-AI: wat is er nodig bij deze groothandel */
     const box = $('#inkai-'+code); if (box) box.innerHTML = '<p class="sub">'+T('ink.aidenkt','De AI kijkt naar uw verkoop en mise-en-place…')+'</p>';
     try {
       const v = await API.call('/supplier/inkoop/ai', { groothandelCode: code });

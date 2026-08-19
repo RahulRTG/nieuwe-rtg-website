@@ -1,3 +1,4 @@
+/* een chatbericht opmaken, met vertaling voor de ander */
     const inner = mij ? escT(m.tekst) : '<span class="xlate">' + escT(m.tekst) + '</span>';
     return '<div class="dm-m' + (mij ? ' mine' : '') + '">' + inner + '</div>';
   }

@@ -1,3 +1,4 @@
+/* het zegel: aftellen en sluiten */
     document.getElementById('zgSluit').addEventListener('click', sluitZegel);
     const eind = Date.now() + (d.geldigMin || 5) * 60000;
     const tel = document.getElementById('zgTel');

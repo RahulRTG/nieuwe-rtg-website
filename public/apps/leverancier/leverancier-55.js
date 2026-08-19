@@ -1,3 +1,4 @@
+/* de HR-cijfers op het zaakbord */
     const hr = d.hr || {};
     h += '<div class="st-sec">'+T('zb.hr','HR')+'</div><div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+
       zbCel(hr.teamAantal||0, T('zb.team','Team'))+zbCel(hr.ingeklokt||0, T('zb.ingeklokt','Ingeklokt'))+

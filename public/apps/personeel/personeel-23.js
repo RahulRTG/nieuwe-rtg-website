@@ -1,3 +1,4 @@
+/* het team van vandaag */
     $('#teamWrap').innerHTML =
       (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
         staff.map(m=>{

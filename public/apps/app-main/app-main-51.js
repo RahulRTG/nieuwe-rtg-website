@@ -1,3 +1,4 @@
+/* een betaalpartner kiezen */
     ov.querySelectorAll('.js-dppick').forEach(b => b.addEventListener('click', () => {
       const s = lijst.find(x => x.code === b.dataset.code); ov.remove();
       betaalPartner(s.code, s.name, { bron });

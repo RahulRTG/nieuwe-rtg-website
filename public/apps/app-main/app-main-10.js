@@ -1,3 +1,4 @@
+/* de directe berichten: versturen en aan het gesprek toevoegen */
     $('#dmInput').value = '';
     try {
       const d = await API.call('/member/dm/send', { toKey: dmWith, text });

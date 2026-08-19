@@ -1,3 +1,4 @@
+/* het live-paneel: van modus wisselen */
     $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
       liveMode = b.dataset.mode;
       $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));

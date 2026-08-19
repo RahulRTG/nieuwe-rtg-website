@@ -1,3 +1,4 @@
+/* de onboarding: het paspoort scannen of een bestand kiezen */
     onbActies([
       { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
           if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: function(d, mrz){ onbPaspoortUpload(d, mrz); } });

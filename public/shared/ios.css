@@ -29,6 +29,28 @@
   --ios-grijs:rgba(244,241,236,0.60);
   --ios-lijn:rgba(255,255,255,0.10);
   --ios-accent:var(--dag-kleur,#C23A5E);
+  /* HET LABEL IS GEEN ACCENT, EN DAT IS MET REKENWERK GELEERD.
+     De acties en de terugknop stonden hier op --ios-accent, en dat is de
+     DAGKLEUR: zestien ankertinten met een interpolatie ertussen, dus de kleur
+     van die tekst hing af van het seizoen en het uur. Nagerekend over alle
+     zestien, op de gronden die deze balk kan hebben (hij is 72% zwart over de
+     grond van het thema): op een donker thema zakken zeenacht, pruim en lila
+     onder 4,5:1, en op champagne -- waar de balk naar middengrijs composeert --
+     zakken er vijftien van de zestien. De contrastpoort zag dat nooit: een
+     doorzichtige balk over een verloop is geen oplosbare grond, en
+     scripts/a11ykeuring.js slaat die bewust over.
+
+     De tint oplichten was de verkeerde reparatie, ook dat is uitgerekend:
+     zeenacht moest van 47% naar 76% lichtheid en werd daarmee een pastel. Een
+     grond die tussen bijna-zwart en middengrijs kan liggen, draagt geen enkele
+     verzadigde kleur op 4,5.
+
+     Dit is de parelinkt van het huis en geen nieuwe kleur. Gemeten op de vier
+     gronden: 17,23 / 16,62 / 16,62 / 7,56. Elk seizoen, elk uur, elk thema.
+     De dagkleur ademt hier nog steeds mee -- in de focusring hieronder en
+     overal waar een app --dag-kleur zelf gebruikt -- alleen niet meer in tekst
+     die je moet kunnen lezen. Zie TOEGANKELIJK.md voor de hele meting. */
+  --ios-label:var(--op-onyx,#F4F0E9);
   --ios-materiaal:rgba(12,12,11,0.72);
 
   --ios-balk:44px;                                  /* de vaste hoogte van iOS */
@@ -77,7 +99,14 @@
   display:inline-flex; align-items:center; gap:0.12rem;
   background:none; border:none; padding:0.3rem 0.4rem 0.3rem 0.1rem;
   font:400 17px/1 'Inter',system-ui,sans-serif;
-  color:var(--ios-accent); cursor:pointer; text-decoration:none;
+  /* !important omdat de UI-kit dezelfde knop OOK kleurt: `body.rtg-stijl .terug`
+     is specifieker dan `.ios-terug` en zet de inkt van de PAGINA. Dat klopt daar
+     -- alleen staat deze knop niet op de pagina maar in de balk, en de balk is
+     altijd donker, ook onder een licht thema. Zonder deze regel kreeg de
+     terugknop op champagne de donkere pagina-inkt op de donkere balk: 2,08:1.
+     Gemeten, niet beredeneerd. De rest van dit blad overschrijft op dezelfde
+     manier; dat is wat een schil doet. */
+  color:var(--ios-label) !important; cursor:pointer; text-decoration:none;
   max-width:9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .ios-terug svg{width:17px; height:22px; flex:none; stroke-width:2.4;}
@@ -103,7 +132,7 @@
 }
 .ios-nav-acties > *{
   font:400 17px/1 'Inter',system-ui,sans-serif !important;
-  color:var(--ios-accent) !important;
+  color:var(--ios-label) !important;
   background:none !important; border:none !important;
   padding:0.3rem 0.45rem !important; border-radius:8px;
   cursor:pointer; white-space:nowrap;

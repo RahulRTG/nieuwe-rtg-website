@@ -89,8 +89,24 @@
 .rtg-intro{margin:0 0 1.4rem;}
 .rtg-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
 .rtg-intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
-/* de weg terug staat linksboven, in het accent, en is een gewone link */
-.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);text-decoration:none;font-size:.85rem;
+/* DE WEG TERUG STAAT LINKSBOVEN, EN NIET MEER IN HET ACCENT.
+
+   --rtg-acc is de DAGKLEUR (zie boven), en die verandert met het seizoen en het
+   uur. Als tekst nagerekend over alle zestien ankertinten, op de grond van elk
+   van de vier thema's: op onyx zakken er 3 onder 4,5:1, op bordeaux 4, op royal
+   3 -- en op champagne, waar de grond parel is, 15 van de 16. GEEN ENKELE tint
+   haalt het op alle vier. De contrastpoort zag dit niet omdat een verloop als
+   grond bewust wordt overgeslagen (scripts/a11ykeuring.js).
+
+   Dit geldt voor alle vier de plekken waar het accent hieronder TEKST was: deze
+   weg terug, dezelfde in de stijl-schil, het merk-plaatje en de hover van een
+   knoprij. Ze dragen nu --rtg-txt, de inkt die het thema zelf al meebrengt:
+   17,23 op onyx, 13,57 op bordeaux, 14,65 op royal, 15,72 op champagne.
+
+   Het accent blijft waar het GEEN tekst is: als vlak, als rand, als schakelaar.
+   Daar is de inkt al per tint uitgerekend (shared/dagkleur.css) en klopt het.
+   test/balkkleur.test.js zakt zodra de dagkleur hier weer tekst wordt. */
+.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);text-decoration:none;font-size:.85rem;
   /* Een terugweg is een knop en geen zin, dus 24x24 (WCAG 2.5.8) -- de breedte
      telt mee, want vaak is het alleen een pijl. Bewust min-* en geen padding:
      deze selector is specifieker dan de .terug van een pagina zelf, en met een
@@ -123,7 +139,11 @@
 /* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
 button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
   color:inherit;font:inherit;text-align:left;cursor:pointer;}
-button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
+/* De hover was ALLEEN een kleurverschil, en dan nog in de dagkleur -- dubbel
+   mis: ONTWERP.md par. 5 zegt dat een toestand nooit op kleur alleen leunt, en
+   die kleur was ook nog eens niet altijd leesbaar. Een streep werkt in elk
+   thema, elk seizoen en voor wie kleur niet ziet. */
+button.rtg-rij:hover .rtg-naam{text-decoration:underline;text-underline-offset:.18em;}
 
 /* ------------------------------------------------------------- knoppen ----*/
 .rtg-knop{
@@ -170,7 +190,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    "altijd aan". Klein en in het accent, zodat het opvalt zonder te schreeuwen. */
 .rtg-merk{
   display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  font-weight:700;color:var(--rtg-acc);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
+  font-weight:700;color:var(--rtg-txt);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
   border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
 }
 .rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
@@ -238,7 +258,7 @@ body.rtg-stijl h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter
 body.rtg-stijl .kop h1{font-size:1.7rem;}
 body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
-body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);
+body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);
   text-decoration:none;font-size:.85rem;min-height:24px;min-width:24px;}
 
 /* de sectiekaart: alles wat een blok inhoud omvat, krijgt dezelfde kaart */

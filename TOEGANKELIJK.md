@@ -149,7 +149,28 @@ tussen bijna-zwart en middengrijs kan liggen, draagt geen enkele verzadigde
 kleur op 4,5 — de keuze zit dus in het MATERIAAL van de balk of in de vraag of
 de dagkleur daar tekst mag zijn, en niet in de tint.
 
-*Dit staat hier als meting en als open besluit, niet als reparatie.*
+**Gerepareerd op 19 augustus 2026, en breder dan waar het begon.** Dezelfde tint
+stond ook in de UI-kit als tekst -- `--rtg-acc` is dezelfde dagkleur -- op vier
+plekken: de weg terug (twee keer), het merk-plaatje en de hover van een knoprij.
+Daar is de grond de PAGINA, en het beeld is er even slecht: 3 tot 4 van de 16
+zakken op de donkere thema's, 15 van de 16 op champagne. Geen enkele tint haalt
+alle vier.
+
+Alle zes de plekken dragen nu de inkt die het thema zelf al meebrengt
+(`--rtg-txt`, en in de balk `--ios-label`, want die is altijd donker ook onder
+een licht thema). Gemeten in een echte browser op alle vier de thema's: **7,56
+tot 17,23:1**, waar de norm 4,5 is. De hover van een knoprij was bovendien
+*alleen* een kleurverschil; dat is nu een streep, want `ONTWERP.md` par. 5 zegt
+dat een toestand nooit op kleur alleen leunt.
+
+De dagkleur blijft waar hij geen tekst is: als vlak, als rand, als schakelaar,
+en in de focusring van de balk. Daar is de inkt per tint al uitgerekend.
+
+*Handhaving:* `test/balkkleur.test.js` rekent de balkgrond uit met dezelfde
+`ratio()` als de keuring -- de enige manier die hier kan, want de poort zelf zal
+deze grond blijven overslaan -- en zakt zodra de dagkleur ergens weer tekst
+wordt, zodra de labelkleur op een van de vier gronden onder de norm komt, of
+zodra de cijfers hierboven niet meer kloppen.
 
 **Niet gemeten:** of iemand met een tremor de drempel haalt zonder per ongeluk
 door te vegen. De drempel ligt voorbij de volle lade én voorbij 55% van de regel,

@@ -1,5 +1,5 @@
 {
- "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, doet een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8), en sinds 19 augustus 2026 een VIERDE die twee keer draait -- een keer per hand -- voor breedte, leegte en duimbereik. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
+ "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, doet een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8), een VIERDE die twee keer draait -- een keer per hand -- voor breedte, leegte en duimbereik, en sinds 19 augustus 2026 een VIJFDE op tabletformaat (834) voor breedte en raakvlak. De telefoonronde draagt daarbij een INKEPING (59 boven, 34 onder): zonder die zone ziet een scherm dat haar negeert er in de keuring perfect uit. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
  "gemeten": "2026-08-19",
  "uitgelogd": {
   "structureel": 0,

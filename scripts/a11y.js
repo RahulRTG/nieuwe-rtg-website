@@ -568,5 +568,9 @@ function startEchteServer() {
     `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}. ` +
     `Telefoonronde over twee handen: ${mobiu.breed.length} te breed, ${mobiu.leeg.length} leeg, ` +
     `${mobiu.balk.length} balk buiten beeld, ${mobiu.duim.length} buiten duimbereik; ` +
-    `${mobiu.geenHoofd.length} metingen zonder aangewezen hoofdhandeling (werkvoorraad, geen gebrek).`);
+    `${mobiu.geenHoofd.length} metingen zonder aangewezen hoofdhandeling (werkvoorraad, geen gebrek). ` +
+    /* De tabletronde hoort in deze zin, anders staat hij nergens in het bewijs:
+       een ronde die je alleen ziet als hij iets vindt, is geen ronde maar een
+       alarm. */
+    `Tabletronde op 834: ${tabu.breed.length} te breed, ${tabu.klein.length} met een te klein raakvlak.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

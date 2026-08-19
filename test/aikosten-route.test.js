@@ -137,3 +137,55 @@ test('7. het luik toont het budget per pas, maar nooit WIE eraan zit', () => {
     assert.equal(alles.includes(sleutel), false, 'het luik hoort ' + sleutel + ' niet te noemen');
   }
 });
+
+/* ---------------------------------------------------------------------------
+   EN NU ECHT OVER HTTP.
+
+   De vijf toetsen hierboven monteren de route op een NAGEMAAKTE app. Dat is
+   snel en het bewijst de bedrading -- welke wachters ervoor hangen, en wat het
+   antwoord draagt -- maar het bewijst niet dat het endpoint bestaat op een
+   draaiende server. En het laat geen spoor na in het routejournaal.
+
+   Dat tweede is geen bijzaak. scripts/dekking.js leest het journaal dat de
+   servers tijdens de suite zelf schrijven en eist dat ELK endpoint er echt in
+   staat (NORM.json, dekkingWaargenomenPct 100). Een route die alleen op een
+   nagemaakte app is getoetst, telt daar terecht niet mee: de meter meet
+   waarnemingen en geen beweringen. Deze PR liet de teller daardoor zakken.
+
+   Vandaar deze ene echte aanroep. Hij kost een server, en dat is de prijs voor
+   een endpoint dat aantoonbaar bestaat.
+--------------------------------------------------------------------------- */
+const { startServer, stop } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+test('7. het luik bestaat echt op een draaiende server, en blijft dicht zonder eigenaar', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-aikosten-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });
+  try {
+    const url = srv.base + '/api/techniek/ai/kosten';
+
+    // zonder inlog: dicht
+    assert.equal((await fetch(url)).status, 401, 'zonder techniek-inlog blijft het luik dicht');
+
+    // met de eigenaar erachter: open, en met de velden die een scherm nodig heeft
+    const inlog = await fetch(srv.base + '/api/techniek/inloggen', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })
+    }).then(r => r.json());
+    assert.ok(inlog.token, 'de eigenaar komt op de technische pagina');
+
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + inlog.token } });
+    assert.equal(r.status, 200);
+    const d = await r.json();
+    assert.equal(typeof d.aanroepen, 'number');
+    assert.ok(d.perModel && typeof d.perModel === 'object', 'de uitsplitsing per model hoort erin');
+    assert.ok(d.lokaal && typeof d.lokaal.aanroepen === 'number', 'en de interne emmer');
+    assert.match(String(d.let || ''), /schatting/i, 'met de kanttekening dat het een schatting is');
+    assert.ok(d.peildatum, 'en de peildatum van de prijstabel');
+  } finally {
+    stop(srv.child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

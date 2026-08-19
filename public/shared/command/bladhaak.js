@@ -37,9 +37,19 @@
       var doc = p.frame.contentDocument, st = doc.createElement('style');
       st.textContent = VERBERG;
       doc.head.appendChild(st);
-      p.frame.contentWindow.addEventListener('scroll', klein, { passive: true });
+      /* Het bovendocument hoort te weten dat er in een blad wordt gewerkt: de
+         chrome van het dock zakt dan in (shared/adaptief/diepte.js). Een frame
+         kan dat niet zelf vertellen, en de schil kan het niet zien -- vandaar
+         dat het hier wordt doorgegeven, op de enige plek waar we allebei de
+         kanten in handen hebben. */
+      var beweegt = function () {
+        klein();
+        try { d.dispatchEvent(new w.CustomEvent('rtg-blad-beweegt')); } catch (x) {}
+      };
+      p.frame.contentWindow.addEventListener('scroll', beweegt, { passive: true });
+      doc.addEventListener('input', beweegt, true);
       var sc = doc.querySelectorAll('[class*=content],main');
-      for (var i = 0; i < sc.length; i++) sc[i].addEventListener('scroll', klein, { passive: true });
+      for (var i = 0; i < sc.length; i++) sc[i].addEventListener('scroll', beweegt, { passive: true });
     } catch (e) {}
   };
 })(window, document);

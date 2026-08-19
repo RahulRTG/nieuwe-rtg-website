@@ -6,6 +6,11 @@ vormtaal en noemt in paragraaf 10 de drie layouts; dit is wat daaronder hangt.
 `WERELD.md` beschrijft het beginscherm en de schilbalk waar dit in landt,
 `WERKRUIMTE.md` het desktopparadigma, `TOEGANKELIJK.md` de harde poorten.
 
+**`GRAMMATICA.md` staat hier bovenop.** Dit document zegt WAAR een handeling
+terechtkomt op welk apparaat; de grammatica zegt HOE je hem aanraakt (vijf
+gebaren) en WAT hij weegt (vijf trappen, van `licht` tot `plechtig`). Wie een
+capability declareert, heeft ze allebei nodig.
+
 ## De regel, in één zin
 
 > **Bureau toont veel context tegelijk; telefoon toont één duidelijke taak met
@@ -126,9 +131,13 @@ Het midden is nu een **contextzone**:
 
 **De structuur blijft voorspelbaar, en dat is de voorwaarde.** Links is altijd de
 bank, rechts is altijd Rahul, het midden begint altijd met waar je bent. Wat
-verandert is de inhoud van het midden, nooit de plekken. Lang drukken opent de
-uitgebreide vorm van diezelfde handeling — een snelweg, nooit de enige weg: alles
-wat daarachter zit staat ook in de lade achter `⋯`.
+verandert is de inhoud van het midden, nooit de plekken.
+
+**Lang drukken legt uit; omhoog trekken geeft meer.** Hier stond eerst dat lang
+drukken de uitgebreide lade opende. Dat was een tweede betekenis voor hetzelfde
+gebaar, naast die van omhoog trekken, en zo verliest een taal zijn woorden
+(`GRAMMATICA.md`). Meer gereedschap zit nu waar het hoort: omhoog trekken, of de
+`⋯` ernaast.
 
 **Twee dingen die hier bewust zijn ingeleverd.** Bij een selectie wijkt het anker,
 en daarmee de weg terug naar je werkbladen; op 390px houdt de balk 232 pixels over

@@ -38,7 +38,37 @@
   function plat(c) {
     return { id: c.id, naam: c.naam, label: c.label || c.naam, groep: c.groep,
       primair: !!c.primair, telefoon: c.vormen.telefoon, tablet: c.vormen.tablet,
-      bureau: c.vormen.bureau, stem: c.vormen.stem };
+      bureau: c.vormen.bureau, stem: c.vormen.stem,
+      /* HET GEWICHT MOET MEE, en dat is geen detail. Bleef het achter, dan werd
+         een handeling die in het werkblad "zwaar" heet in het dock een gewone
+         tik -- de bevestiging zou verdwijnen precies doordat je hem van een
+         andere kant aanraakt. De verhindering gaat om dezelfde reden mee. */
+      gewicht: c.gewicht || 'licht',
+      verhinderd: c.verhinderd || null };
+  }
+
+  /* EEN FUNCTIE GAAT NIET OVER DE GRENS, EN DAT MAG NIET STIL MISLUKKEN.
+
+     `ongedaan` is een functie: de weg terug hoort te draaien waar de handeling
+     zelf draait, in het werkblad. postMessage kan hem niet klonen -- hij gooit
+     dan op het HELE bericht, en dus verdween niet alleen de weg terug maar de
+     complete context. Een handeling met gewicht "terug" en geen ongedaan wordt
+     bovendien van rechtswege een trap hoger (gewicht.js), dus je zou stilzwijgend
+     een bevestiging krijgen waar een ongedaan-knop hoorde.
+
+     Wat er wél overgaat is de MEDEDELING dat er een weg terug is. Het
+     bovendocument maakt daar een postbode van, precies zoals bij doe(). */
+  function platteStaat(staat) {
+    var uit = {};
+    Object.keys(staat || {}).forEach(function (id) {
+      var s = staat[id] || {}, kopie = {};
+      Object.keys(s).forEach(function (k) {
+        if (typeof s[k] === 'function') { if (k === 'ongedaan') kopie.kanOngedaan = true; return; }
+        kopie[k] = s[k];
+      });
+      uit[id] = kopie;
+    });
+    return uit;
   }
 
   /* ======================================================= in het werkblad == */
@@ -56,14 +86,22 @@
       try {
         w.parent.postMessage({ merk: MERK, soort: 'context', caps: caps,
           ctx: { bron: ctx.bron, titel: ctx.titel, acties: ctx.acties,
-            selectie: ctx.selectie, staat: ctx.staat || {} } }, HERKOMST);
+            selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [] } }, HERKOMST);
       } catch (e) {}
     });
     w.addEventListener('message', function (e) {
       if (e.origin !== HERKOMST || e.source !== w.parent) return;
       var m = e.data;
-      if (!m || m.merk !== MERK || m.soort !== 'doe') return;
-      A.doe(String(m.id || ''));
+      if (!m || m.merk !== MERK) return;
+      var id = String(m.id || '');
+      if (m.soort === 'doe') { A.doe(id, m.extra || undefined); return; }
+      /* De weg terug draait hier, want hier woont de handeling. De functie wordt
+         uit de LEVENDE context gehaald en niet uit een kopie: wie hem zou
+         bewaren, houdt straks een ongedaan vast van een bestand dat allang dicht
+         is. */
+      if (m.soort !== 'ongedaan') return;
+      var st = (A.context().staat || {})[id];
+      if (st && typeof st.ongedaan === 'function') { try { st.ongedaan(); } catch (x) {} }
     });
     /* Weggaan hoort ook een bericht te zijn. Zonder dit bleef de balk de
        handelingen van een document tonen dat al gesloten was -- knoppen die naar
@@ -100,6 +138,7 @@
     (m.caps || []).forEach(function (c) {
       A.declareer({ id: c.id, naam: c.naam, label: c.label, groep: c.groep, primair: c.primair,
         telefoon: c.telefoon, tablet: c.tablet, bureau: c.bureau, stem: c.stem,
+        gewicht: c.gewicht, verhinderd: c.verhinderd,
         /* De handeling zelf blijft in het frame. Wat hier staat is de postbode
            en niet de uitvoering: het bovendocument weet niet wat "vet" doet en
            hoort dat ook niet te weten. */
@@ -108,7 +147,18 @@
           try { bron.contentWindow.postMessage({ merk: MERK, soort: 'doe', id: c.id }, HERKOMST); } catch (x) {}
         } });
     });
-    A.context(m.ctx || {});
+    /* De mededeling "hier is een weg terug" wordt hier weer een functie. Zo ziet
+       gewicht.js in het bovendocument precies wat hij zou zien als de handeling
+       hier woonde -- en hoeft hij van deze hele grens niets te weten. */
+    var ctx = m.ctx || {};
+    Object.keys(ctx.staat || {}).forEach(function (id) {
+      if (!ctx.staat[id] || !ctx.staat[id].kanOngedaan) return;
+      ctx.staat[id].ongedaan = function () {
+        if (!bron || !bron.contentWindow) return;
+        try { bron.contentWindow.postMessage({ merk: MERK, soort: 'ongedaan', id: id }, HERKOMST); } catch (x) {}
+      };
+    });
+    A.context(ctx);
   });
 
   /* HET BLAD WISSELT, DE CONTEXT NIET -- en dat was stil fout.

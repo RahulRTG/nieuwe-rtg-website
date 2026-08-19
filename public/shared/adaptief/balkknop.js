@@ -36,15 +36,33 @@
     b.title = it.naam;
     b.setAttribute('aria-label', it.naam);
     if (it.aan !== undefined) b.setAttribute('aria-pressed', it.aan ? 'true' : 'false');
+    /* VERHINDERD IS NIET WEG EN NIET DOOD -- EN OOK NIET `disabled`.
+
+       Hier stond eerst aria-disabled. Dat leest als "deze knop doet niets", en
+       dat is precies wat hij niet is: hij doet iets ANDERS, namelijk zichzelf
+       uitleggen. Een schermlezer die "uitgeschakeld" hoort, slaat hem over -- en
+       dan is de uitleg onbereikbaar voor precies degene die hem het hardst
+       nodig heeft.
+
+       Wat er nu staat: een gewone, bedienbare knop met de stand in zijn NAAM.
+       Wie hem hoort, hoort meteen wat er aan de hand is en dat er meer te weten
+       valt. */
+    if (it.verhinderd) {
+      b.classList.add('verhinderd');
+      b.dataset.verhinderd = '1';
+      b.setAttribute('aria-label', it.naam + ', niet beschikbaar. Tik voor de reden.');
+      b.title = it.naam + ' · waarom kan dit niet?';
+    }
     zetTeken(b, it);
     b.onclick = function () { voer(it); };
-    /* Lang drukken opent de uitgebreide vorm van diezelfde handeling. Dat is
-       een SNELWEG en nooit de enige weg: alles wat hier achter zit, staat ook
-       in de lade achter ⋯. Een gebaar dat je moet kennen om ergens te komen,
-       is een verstopte functie met een strik erom. */
+    /* LANG DRUKKEN LEGT UIT. Dat is de betekenis die dit gebaar in het hele huis
+       heeft (grammatica.js: tik doet, lang legt uit), en hier stond iets anders:
+       lang drukken opende de uitgebreide lade. Dat was een tweede betekenis voor
+       hetzelfde gebaar, en precies zo verliest een taal zijn woorden. Meer
+       gereedschap zit nu waar het hoort: omhoog trekken, of de ⋯ ernaast. */
     var klok = null;
     b.addEventListener('pointerdown', function () {
-      klok = w.setTimeout(function () { klok = null; openLade(); }, 480);
+      klok = w.setTimeout(function () { klok = null; uitleg(it); }, 480);
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (n) {
       b.addEventListener(n, function () { if (klok) { w.clearTimeout(klok); klok = null; } });
@@ -61,9 +79,25 @@
     b.textContent = it.label || it.naam;
   }
 
+  /* ELKE TIK LOOPT LANGS HET GEWICHT. Dat is de reden dat een zware handeling
+     niet per ongeluk licht kan worden: er is één ingang, en die kent de trap.
+     Ontbreekt de gewichtlaag, dan draait alleen wat licht is -- stil zwaar
+     uitvoeren is de enige uitkomst die hier niet mag. */
   function voer(it) {
+    if (it.verhinderd) { uitleg(it); return; }
+    if (w.RTGGewicht) { w.RTGGewicht.voer(it); return; }
+    if ((it.gewicht || 'licht') !== 'licht') {
+      if (w.console && w.console.warn) w.console.warn('[balk] ' + it.id + ': gewicht zonder gewichtlaag');
+      return;
+    }
     if (it.doe) { try { it.doe(); } catch (e) {} return; }
     if (A) A.doe(it.id);
+  }
+  /* Uitleg is er ook zonder de waarom-laag: dan blijft er tenminste de naam. Een
+     lang ingedrukte knop die niets doet, leest als kapot. */
+  function uitleg(it) {
+    if (w.RTGWaarom) { w.RTGWaarom.leguit(it); return; }
+    if (w.RTGLagen) w.RTGLagen.lade({ titel: it.naam });
   }
 
   /* De lade met alles. Rijen op haarlijnen, gegroepeerd zoals de capability
@@ -82,8 +116,9 @@
             lijf.appendChild(k);
           }
           var r = d.createElement('button');
-          r.type = 'button'; r.className = 'lg-rij';
+          r.type = 'button'; r.className = 'lg-rij' + (it.verhinderd ? ' verhinderd' : '');
           if (it.aan !== undefined) r.setAttribute('aria-pressed', it.aan ? 'true' : 'false');
+          if (it.verhinderd) r.setAttribute('aria-label', it.naam + ', niet beschikbaar. Tik voor de reden.');
           var t = d.createElement('span'); t.className = 'lg-teken';
           zetTeken(t, it);
           r.appendChild(t);

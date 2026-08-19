@@ -77,6 +77,14 @@
     if (spec && typeof spec.doe === 'function') c.doe = spec.doe;
     if (spec && spec.teken) c.teken = spec.teken;
     if (spec && spec.label) c.label = spec.label;
+    /* WAT EEN HANDELING WEEGT EN WAAROM HIJ SOMS NIET KAN, hoort bij de
+       capability en niet bij het scherm. Zou het bij het scherm horen, dan is
+       "extern delen" in het ene scherm zwaar en in het andere een gewone tik --
+       en dan is het geen gewicht meer maar een gewoonte. De tabellen staan in
+       shared/adaptief/grammatica.js; hier wordt alleen doorgegeven. */
+    c.gewicht = (spec && spec.gewicht) || 'licht';
+    if (spec && spec.verhinderd) c.verhinderd = spec.verhinderd;
+    if (spec && spec.gebaren) c.gebaren = lijst(spec.gebaren);
     return c;
   }
 

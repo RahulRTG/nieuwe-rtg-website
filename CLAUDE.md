@@ -83,6 +83,21 @@ De schilbalk onderin is het eerste instrument: zijn middenzone draagt de werelde
 de bladacties of de selectieacties, met links altijd de bank en rechts altijd
 Rahul. Lees die vóór je iets mobiel "even responsive" maakt.
 
+**`GRAMMATICA.md` is de RTG Mobile Interaction Grammar** — de vaste manier waarop
+álle RTG-software op een telefoon reageert, in zeven zinnen: *ik wil iets doen →
+mijn duim vindt het onderaan; ik wil meer → ik trek de interface naar me toe; ik
+selecteer iets → RTG begrijpt mijn context; ik wil weten wat er gebeurt → RTG toont
+de toestand zonder mij te storen; ik doe iets gevoeligs → RTG vertraagt precies
+genoeg; ik maak een fout → ik kan bijna altijd terug; ik wissel van RTG-product →
+de bediening voelt bekend.* Vijf gebaren met elk één betekenis (tik doet, lang
+drukken legt uit, omhoog trekken geeft meer, selectie verandert de acties, de orb
+stelt voor), vijf gewichten van `licht` tot `plechtig`, en drie grenzen die niet
+mogen sneuvelen: **ongedaan vóór bevestigen** (twintig "weet u het zeker?"-vragen
+leren mensen op ja drukken), **een verhindering draagt altijd een reden** (er komt
+geen grijze knop zonder uitleg bij), en **de orb stelt voor maar beslist nooit** —
+wat er gebeurt loopt langs capability, verhindering en gewicht, en `plechtig` wordt
+door een mens afgemaakt. Lees die vóór je een handeling toevoegt aan een scherm.
+
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.

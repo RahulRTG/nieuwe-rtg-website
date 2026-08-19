@@ -38,10 +38,10 @@
   var VOORAAN = {
     'office.tekst': {
       selectie: ['bold', 'italic', 'formatBlock<h2>', 'link', 'hiliteColor', 'underline'],
-      rust: ['undo', 'redo', 'insertUnorderedList', 'formatBlock<h1>', 'tabel']
+      rust: ['delen', 'fase', 'undo', 'redo', 'insertUnorderedList', 'formatBlock<h1>', 'tabel']
     },
-    'office.blad': { selectie: [], rust: [] },
-    'office.pres': { selectie: [], rust: [] }
+    'office.blad': { selectie: [], rust: ['delen', 'fase'] },
+    'office.pres': { selectie: [], rust: ['presenteren', 'delen'] }
   };
 
   /* De sleutel van een werkbalkknop. data-cmd plus data-waarde, want vier
@@ -138,7 +138,14 @@
      balk iets anders dan het document. */
   function standen(knoppen) {
     var uit = {};
-    knoppen.forEach(function (k) { uit[k.id] = { aan: k.knop.classList.contains('aan') }; });
+    knoppen.forEach(function (k) {
+      var s = { aan: k.knop.classList.contains('aan') };
+      /* De inhoud van de bevestiging hoort bij dit MOMENT en niet bij de
+         declaratie: welke classificatie er aan dit stuk hangt kan straks anders
+         zijn. Hij rijdt dus mee met de context. */
+      if (k.bevestiging) s.bevestiging = k.bevestiging;
+      uit[k.id] = s;
+    });
     return uit;
   }
 
@@ -151,12 +158,14 @@
     return !!(s && vel && s.rangeCount && !s.isCollapsed && vel.contains(s.getRangeAt(0).commonAncestorContainer));
   }
 
-  /* De presentatie heeft geen werkbalk om uit te lezen; zijn bediening staat in
-     de dia-kolom en twee handelingen daar zijn van een andere VORM (een
-     taakmodus, een keuzelijst die een lade wordt). Dat is een eigen onderwerp en
-     staat in office/adaptief-pres.js. Ontbreekt dat bestand, dan werkt de rest
-     gewoon door: dan meldt een presentatie alleen niets. */
+  /* De presentatie heeft geen werkbalk om uit te lezen: zijn bediening staat in
+     de dia-kolom, en presenteren is een taakmodus. Eigen onderwerp, eigen
+     bestand (office/adaptief-pres.js). */
   var pres = w.RTGOfficeAdaptiefPres ? w.RTGOfficeAdaptiefPres({ tik: tik }) : null;
+  /* De toestand van het document zelf -- opslag, classificatie, meelezers -- en de
+     twee handelingen die zwaarder wegen dan een werkbalkknop. Eigen bestand, want
+     dat is een ander onderwerp dan een werkbalk uitlezen. */
+  var staat = w.RTGOfficeAdaptiefStaat ? w.RTGOfficeAdaptiefStaat({ tik: tik }) : null;
 
   /* ------------------------------------------------------------- melden --
      Eén functie die kijkt wat er op het scherm staat en dat doorgeeft. Het
@@ -173,9 +182,15 @@
       bron = 'office.pres';
       knoppen = pres ? pres.caps() : [];
     }
+    /* De documenthandelingen komen erbij zodra er een document open is -- maar
+       NIET tijdens een selectie: wie tekst heeft aangewezen is aan het opmaken,
+       en "Delen" tussen vet en cursief is een handeling uit een andere laag die
+       precies op de verkeerde plek staat. */
+    if (bron && staat && stand !== 'selectie') knoppen = knoppen.concat(staat.caps());
     if (!bron || !knoppen.length) { A.wisContext(); return; }
     A.context({ bron: bron, titel: titel(), acties: ordenen(bron, knoppen, stand),
-      selectie: stand === 'selectie', staat: standen(knoppen) });
+      selectie: stand === 'selectie', staat: standen(knoppen),
+      rail: staat ? staat.rail() : [] });
   }
 
   /* WANNEER MELDEN. Niet op een tijdklok maar op wat er echt gebeurt: een ander

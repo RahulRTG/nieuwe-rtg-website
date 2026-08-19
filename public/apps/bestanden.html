@@ -94,6 +94,8 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/adaptief.css" rel="stylesheet">
+<link href="/shared/grammatica.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>
@@ -166,6 +168,15 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/bestanden/app.js"></script>
 <script src="/apps/bestanden/paneel.js"></script>
+<!-- De adaptieve laag: de leer, de grammatica, het register, de tijdelijke lagen
+     en de brug naar het dock van RTG Command. De afnemer staat erachter, want die
+     leest het paneel uit. Zie ADAPTIEF.md en GRAMMATICA.md. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/lagen.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/bestanden/adaptief.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

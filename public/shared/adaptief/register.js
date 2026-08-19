@@ -28,10 +28,15 @@
   if (w.RTGAdaptief) return;
   var leer = w.RTGAdaptiefLeer;
   if (!leer) return;                       // zonder de leer geen register
+  /* De grammatica keurt de andere helft: gebaren, gewicht en de verplichte reden
+     bij een verhindering. Hij mag ontbreken -- dan draait alles op `licht` en is
+     er niets zwaars te declareren, wat een eerlijker uitkomst is dan een zware
+     handeling die stil als lichte doorgaat. */
+  var gram = w.RTGGrammatica || null;
 
   var caps = {}, gebrek = [], gemeld = {};
   var luisterVorm = [], luisterCtx = [];
-  var nu = { bron: '', titel: '', acties: [], selectie: false, staat: {}, sleutel: '' };
+  var nu = { bron: '', titel: '', acties: [], selectie: false, staat: {}, rail: [], sleutel: '' };
 
   /* ------------------------------------------------------------- de vorm --
      Twee mediaqueries en geen resize-teller: de vorm verandert op een grens en
@@ -73,7 +78,12 @@
   function declareer(spec) {
     var c = leer.normaliseer(spec);
     if (!c.id) return null;
-    var bevindingen = leer.keur([c]);
+    var bevindingen = leer.keur([c]).concat(gram ? gram.keur([c]) : []);
+    if (!gram && c.gewicht && c.gewicht !== 'licht') {
+      bevindingen.push({ soort: 'gewichtloos', id: c.id,
+        wat: 'gewicht "' + c.gewicht + '" gedeclareerd zonder grammatica-laag' });
+      c.gewicht = 'licht';
+    }
     if (bevindingen.length) {
       bevindingen.forEach(function (b) {
         gebrek.push(b);
@@ -105,13 +115,15 @@
     var st = Object.keys(c.staat || {}).sort().map(function (k) {
       return k + (c.staat[k] && c.staat[k].aan ? '+' : '-');
     }).join(',');
-    return [c.bron, c.titel, c.selectie ? 's' : '-', (c.acties || []).join('|'), st].join('|~|');
+    var rl = (c.rail || []).map(function (x) { return x && (x.sleutel + ':' + x.tekst + ':' + x.staat); }).join(',');
+    return [c.bron, c.titel, c.selectie ? 's' : '-', (c.acties || []).join('|'), st, rl].join('|~|');
   }
   function context(c) {
     if (c === undefined) return nu;
     var v = { bron: String((c && c.bron) || ''), titel: String((c && c.titel) || ''),
       acties: (c && Array.isArray(c.acties) ? c.acties : []).slice(),
-      selectie: !!(c && c.selectie), staat: (c && c.staat) || {} };
+      selectie: !!(c && c.selectie), staat: (c && c.staat) || {},
+      rail: (c && Array.isArray(c.rail) ? c.rail : []) };
     v.sleutel = sleutelVan(v);
     if (v.sleutel === nu.sleutel) return nu;
     nu = v;
@@ -131,9 +143,19 @@
      niets staat gebeurt er niets -- geen fout, want een capability mag ook
      alleen een declaratie zijn die door de brug wordt uitgevoerd (in een frame,
      shared/adaptief/brug.js). */
+  /* EEN VERHINDERDE HANDELING WORDT HIER GEWEIGERD EN NIET ALLEEN GRIJS
+     GETEKEND. Een knop die er uitgeschakeld uitziet maar bij een toetsaanslag of
+     via de orb alsnog draait, is geen beperking maar een lek. */
+  function mag(id) {
+    var c = caps[id];
+    if (!c) return false;
+    var st = nu.staat && nu.staat[id];
+    return !((st && st.verhinderd) || c.verhinderd);
+  }
   function doe(id, arg) {
     var c = caps[id];
     if (!c || typeof c.doe !== 'function') return false;
+    if (!mag(id)) return false;
     try { c.doe(arg); } catch (e) { if (w.console) w.console.error('[adaptief] ' + id, e); return false; }
     return true;
   }
@@ -149,8 +171,21 @@
       if (!p.length) return null;          // geen vorm hier: gebreken() weet ervan
       var st = nu.staat && nu.staat[id];
       var it = { id: c.id, naam: c.naam, label: c.label || c.naam, teken: c.teken,
-        groep: c.groep, primair: c.primair, presentaties: p, diepte: leer.diepte(c, vm) };
+        groep: c.groep, primair: c.primair, presentaties: p, diepte: leer.diepte(c, vm),
+        gewicht: c.gewicht || 'licht' };
       if (st && st.aan !== undefined) it.aan = !!st.aan;
+      /* EEN VERHINDERING KOMT UIT DE CONTEXT ALS HIJ ER IS, ANDERS UIT DE
+         DECLARATIE. Dat onderscheid is nodig: "extern delen mag niet" kan een
+         vaste eigenschap van de handeling zijn (beleid) of van dit ene stuk
+         (classificatie). Het tweede weet alleen het scherm, op dit moment. */
+      var h = (st && st.verhinderd) || c.verhinderd;
+      if (h && gram) it.verhinderd = gram.verhindering(h);
+      /* WAT ER IN DE BEVESTIGING KOMT TE STAAN, is net zo goed context: aan wie
+         je deelt en om welk bedrag het gaat, hangt van dit moment af en niet van
+         de declaratie. Zonder dit zou de lade "Gaat naar" leeg laten -- en dan is
+         het weer een "weet u het zeker?" zonder inhoud. */
+      if (st && st.bevestiging) it.bevestiging = st.bevestiging;
+      if (st && typeof st.ongedaan === 'function') it.ongedaan = st.ongedaan;
       return it;
     }).filter(Boolean);
   }
@@ -168,6 +203,7 @@
     opContext: function (f) { if (typeof f === 'function') { luisterCtx.push(f); f(nu); } },
     voorNu: voorNu,
     doe: doe,
+    mag: mag,
     gebreken: function () { return gebrek.slice(); }
   };
 })(window, document);

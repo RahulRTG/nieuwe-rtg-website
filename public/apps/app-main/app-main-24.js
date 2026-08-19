@@ -49,6 +49,11 @@
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
     loonstrook:  { naam: 'Loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'Privekantoor', url: '/apps/lifestyle.html' },
+    /* RTG Werk OS -- "voor organisaties" (PLATFORM.md), en daar staat
+       apps/kantoor.html ERNAAST als Office: agenda, taken, documenten. Twee
+       verschillende dingen dus, en geen dubbel paar zoals Instant Reality dat
+       was. Ook dit scherm was nergens vandaan te bereiken. */
+    werkos:      { naam: 'RTG Werk OS', url: '/apps/werk.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
     table:       { naam: 'Table',         url: '/apps/table.html' },

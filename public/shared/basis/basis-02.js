@@ -13,7 +13,7 @@
      gevulde uur-/minuut-/secondewijzers met een subtiel gouden bevel en een
      zachte diepte -- strak en netjes. Het uitbundige opengewerkte 3D-skelet
      (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
-     leeft nog als eigen concept op /apps/horloge.html. ---- */
+     leeft in shared/horlogewerk.js, op het inlogscherm. ---- */
 
   /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
      met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets

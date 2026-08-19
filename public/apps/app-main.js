@@ -3717,6 +3717,18 @@ var RTG_BOUW = '01582e69';
     vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
     leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
     sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
+       contexten met een schakelaar Alles / Lifestyle / Business / Communities /
+       Prive. Hij bezit die domeinen niet en plaatsen loopt er nooit langs; wie
+       in Lifestyle plaatst, plaatst in De Salon.
+
+       Hij stond hier niet, en niets in het huis linkte ernaar: een scherm van
+       23 KB dat gebouwd, gedocumenteerd en onbereikbaar was (gevonden met
+       scripts/lib/bereik.js op 19 augustus 2026). Hij hangt in LivingOS en niet
+       in een van de vijf werelden die hij toont, want de contextvraag van
+       WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
+       met zijn dagelijks leven. */
+    wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
     geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
     /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
        samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
@@ -3792,6 +3804,11 @@ var RTG_BOUW = '01582e69';
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
     loonstrook:  { naam: 'Loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'Privekantoor', url: '/apps/lifestyle.html' },
+    /* RTG Werk OS -- "voor organisaties" (PLATFORM.md), en daar staat
+       apps/kantoor.html ERNAAST als Office: agenda, taken, documenten. Twee
+       verschillende dingen dus, en geen dubbel paar zoals Instant Reality dat
+       was. Ook dit scherm was nergens vandaan te bereiken. */
+    werkos:      { naam: 'RTG Werk OS', url: '/apps/werk.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
     table:       { naam: 'Table',         url: '/apps/table.html' },
@@ -3957,7 +3974,7 @@ var RTG_BOUW = '01582e69';
       'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+      'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
@@ -3990,7 +4007,7 @@ var RTG_BOUW = '01582e69';
        dat verschil niet -- de commerciele verpakking zit BINNEN de wereld.
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:werkos', 'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het

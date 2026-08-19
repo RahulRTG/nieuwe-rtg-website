@@ -93,6 +93,18 @@
     vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
     leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
     sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
+       contexten met een schakelaar Alles / Lifestyle / Business / Communities /
+       Prive. Hij bezit die domeinen niet en plaatsen loopt er nooit langs; wie
+       in Lifestyle plaatst, plaatst in De Salon.
+
+       Hij stond hier niet, en niets in het huis linkte ernaar: een scherm van
+       23 KB dat gebouwd, gedocumenteerd en onbereikbaar was (gevonden met
+       scripts/lib/bereik.js op 19 augustus 2026). Hij hangt in LivingOS en niet
+       in een van de vijf werelden die hij toont, want de contextvraag van
+       WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
+       met zijn dagelijks leven. */
+    wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
     geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
     /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
        samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele

@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 45 |
-| **WorkOS** | `/apps/kantoor.html` | 12 |
+| **LivingOS** | `/apps/rtg.html` | 46 |
+| **WorkOS** | `/apps/kantoor.html` | 13 |
 | **TravelOS** | `/apps/reizen.html` | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 2 |
-| | **samen** | **70** |
+| | **samen** | **72** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 45 onderdelen.
+Huis: `/apps/rtg.html` — 46 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -48,6 +48,7 @@ Huis: `/apps/rtg.html` — 45 onderdelen.
 | Nalatenschap | `link:nalatenschap` | `/apps/geld.html#nalatenschap` |
 | Logboek | `link:logboek` | `/apps/geld.html#logboek` |
 | Salon | `tab:salon` | `/apps/app.html (stand salon)` |
+| Alles bij elkaar | `link:wereldlaag` | `/apps/wereld.html` |
 | Vandaag | `link:pulse` | `/apps/pulse.html` |
 | Vrienden | `link:vrienden` | `/apps/foundation/vrienden.html` |
 | Snaps | `os:snaps` | kiezer in de app |
@@ -77,10 +78,11 @@ Huis: `/apps/rtg.html` — 45 onderdelen.
 
 ## WorkOS
 
-Huis: `/apps/kantoor.html` — 12 onderdelen.
+Huis: `/apps/kantoor.html` — 13 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
+| RTG Werk OS | `link:werkos` | `/apps/werk.html` |
 | RTG One | `link:rtgone` | `/apps/rtgone.html` |
 | RTMail | `link:rtmail` | `/apps/rtmail.html` |
 | Magnaat | `link:magnaat` | `/apps/magnaat.html` |

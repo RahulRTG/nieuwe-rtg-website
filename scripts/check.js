@@ -3383,5 +3383,56 @@ console.log('\n50) WERELDLIJST.md loopt niet achter op het wereldregister');
   }
 }
 
+/* 51) ELK SCHERM IS ERGENS VANDAAN TE BEREIKEN.
+
+   Een scherm dat bestaat, door de a11y-keuring gaat, in de schermdekking
+   meetelt en waar geen enkele weg heen loopt, is geen scherm maar een bestand.
+   Dat is de stilste soort dode code: alle meters staan groen.
+
+   Gevonden op 19 augustus 2026, en het leverde er elf op. Twee daarvan waren
+   vitrines uit de tijd dat er nog een marketinglaag was (het skelethorloge en
+   een skyline van het ecosysteem) -- die stonden in geen enkel document en zijn
+   weg. Twee andere waren juist WEL gedocumenteerd en gebouwd: /apps/werk.html
+   staat in PLATFORM.md als "voor organisaties" en /apps/wereld.html in README.md
+   als de wereldlaag. Die hadden geen deur en hangen nu in hun wereld.
+
+   DE LIJST HIERONDER IS GEEN UITZONDERINGSLIJST MAAR EEN BESLUIT PER REGEL. Wie
+   er een bij zet, schrijft op waarom een scherm nergens vandaan bereikbaar HOORT
+   te zijn -- en dat is bij een omleiding of een QR-landing een goed antwoord, en
+   bij al het andere geen.
+
+   De meting staat in scripts/lib/bereik.js; daar staat ook wat hij niet ziet
+   (een adres dat een script uit stukjes samenstelt), dus dit is een ondergrens. */
+console.log('\n51) elk scherm is vanaf de bank te bereiken');
+{
+  const MAG_LOS = new Map([
+    ['/apps/berichten.html', 'omleiding: Berichten is een stand van RTG Comm geworden; het pad blijft voor links van buiten'],
+    ['/apps/codewoord.html', 'omleiding: Codewoord is een stand van RTG Veilig geworden'],
+    ['/apps/thuisrust.html', 'omleiding: Thuisrust is een stand van RTG Veilig geworden'],
+    ['/apps/thuiswacht.html', 'omleiding: Thuiswacht is een stand van RTG Veilig geworden'],
+    ['/apps/vitaal.html', 'omleiding: Vitaal is een stand van RTG Veilig geworden'],
+    ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
+    ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link']
+  ]);
+  try {
+    const { meet } = require('./lib/bereik');
+    const r = meet();
+    const onbekend = r.wezen.filter((p) => !MAG_LOS.has(p));
+    const verdwenen = [...MAG_LOS.keys()].filter((p) => !r.wezen.includes(p));
+    if (onbekend.length) {
+      for (const p of onbekend) fout('nergens vandaan te bereiken: ' + p + ' -- hang hem ergens, of zet hem met een reden in MAG_LOS');
+    } else if (verdwenen.length) {
+      /* Een naam op de lijst die niet meer los staat, groeit stil mee -- zelfde
+         controle als bij regel 28, 47 en 49. */
+      for (const p of verdwenen) fout('staat in MAG_LOS maar is wel bereikbaar (of bestaat niet meer): ' + p);
+    } else {
+      ok(r.totaal + ' schermen, ' + r.wezen.length + ' met opzet los: ' +
+        r.wezen.map((p) => p.replace('/apps/', '')).join(', '));
+    }
+  } catch (e) {
+    fout('de bereikbaarheid kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

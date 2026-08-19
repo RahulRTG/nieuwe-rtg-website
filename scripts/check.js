@@ -490,12 +490,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        ledengids apart) zijn echte bedrading en staan in TAKEN.md. */
     'server/db/index.js',
     'server/db/ledengids.js',
-    /* 11,3 KB: dezelfde crashproef-ronde. De rijstrook-sleutels (geld + idem)
-       gingen elk in een eigen transactie en een kill -9 tussen die twee commits
-       boekte dubbel; nu schrijft de rijstrook als EEN transactie. De snede
-       bestaat (schrijfEen + de twee schrijflanen naar een eigen deel) en staat
-       in TAKEN.md 4.23. */
-    'server/pg/sync.js',
+    /* server/pg/sync.js STOND HIER en is er weer af: de snede die er met naam
+       bij stond -- "schrijfEen + de twee schrijflanen naar een eigen deel" --
+       is gemaakt. Het slot, de merge, het versienummer, de NOTIFY en de twee
+       lanen wonen nu in server/pg/schrijflanen.js; wat in sync.js overblijft is
+       het beleid (wat gaat mee, in welke volgorde). Zo hoort deze lijst te
+       krimpen: niet door de grens te verzetten. */
     // De geïmporteerde enterprise-motoren hebben benoemde sneden, maar hun
     // opslag- en migratiebedrading wordt pas na deze release afzonderlijk
     // geknipt met de integratietoetsen ernaast.

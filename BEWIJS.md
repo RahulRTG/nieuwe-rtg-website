@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1027 bestanden en 6825 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1027 bestanden en 6828 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1027 |
-| losse beweringen (`test(...)`) | 6825 |
+| losse beweringen (`test(...)`) | 6828 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 851 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-901 bestanden, 6605 beweringen.
+901 bestanden, 6608 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -554,7 +554,7 @@ toets omvalt.
 | `pas-escalatie.test.js` | 5 | gezakt op `liegpoort /api/` | Merkregel-poort: de Lifestyle- en Business Pass komen UITSLUITEND na een menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het tier-veld bij /api/auth/register direct een Business Pass (gevonden... |
 | `paspoort.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor de paspoort-/identiteitslaag (kern/paspoort.js): het gecontroleerde, toestemmingsgestuurde kanaal waarlangs een partner de identiteit achter een codenaam opvraagt. Dekt: de directe... |
 | `pasprijs.test.js` | 6 | gezakt op `===->!==#0` | WAT KOST EEN PAS PER MAAND? EEN ANTWOORD. |
-| `pay.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
+| `pay.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Pay: de interne betaallaag. Een wallet per lid op een dubbel grootboek, alles EEN knop: opladen via de betaal-naad, Klompjes (de RTG-eigen betaalverzoeken, ook gesplitst) die je met een tik betaalt waarbij de... |
 | `payroll-aangifte.test.js` | 10 | gezakt op `!==->===#0` | Payroll OS: de loonaangifte -- de derde uitgang uit dezelfde definitieve run. WAT HIER OP HET SPEL STAAT. |
 | `payroll-dekking.test.js` | 11 | gezakt op `===->!==#0` | Payroll OS: de DEKKING per land -- waar kan er loon draaien, en waar niet? WAT HIER OP HET SPEL STAAT. |
 | `payroll-dossier.test.js` | 9 | gezakt op `!==->===#0` | Payroll OS: HET DOSSIER -- de vier vragen, voor elk bedrag. DIT IS DE AFGESPROKEN MAATSTAF, en deze toets maakt hem toetsbaar. |

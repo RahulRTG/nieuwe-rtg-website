@@ -44,17 +44,15 @@ const { alleSchermen } = require('./schermen');
    public. */
 const PAGINAS = alleSchermen().concat(['/site/404.html']);
 
-function laadPlaywright() {
-  const paden = [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules'];
-  for (const p of paden) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); }
-    catch (e) { /* volgende pad */ }
-  }
-  // Geen Playwright-pakket? Val terug op onze eigen browser-driver (CDP over de
-  // pipe-transport), maar alleen als er echt een Chromium-binary staat.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* DE BROWSER KOMT UIT scripts/lib/scherm.js EN NIET UIT EEN EIGEN LADER.
+
+   Hier stond een laadPlaywright() met een terugval die nooit draaide, want
+   `require('playwright')` slaagt ook als de browser erachter ontbreekt. Op deze
+   machine wees de standaard Playwright naar chromium-1234 terwijl er 1194
+   stond: deze scan meldde zich dus af met "geen browser" terwijl er een was --
+   en dan staat er in TOEGANKELIJK.md een nul die niemand gemeten heeft. Zie de
+   kop van die module voor de hele vindwijze. */
+const { laadScherm: laadPlaywright, herkomst: browserHerkomst } = require('./lib/scherm');
 
 /* DE ECHTE SERVER, NIET EEN STATISCHE MAP.
 
@@ -98,12 +96,14 @@ function startEchteServer() {
 
 (async () => {
   const pw = laadPlaywright();
+  console.log('[a11y] browser: ' + browserHerkomst());
   if (!pw) {
     console.log('[a11y] Playwright niet beschikbaar; scan overgeslagen (statische a11y-regels draaien in check.js).');
     process.exit(STRICT ? 1 : 0);
   }
   const { BRON, velt } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
   const raakvlak = require('./raakvlakkeuring');   // WCAG 2.5.8, derde ronde op telefoonformaat
+  const mobiel = require('./mobielkeuring');       // past het, en is het met een duim te doen (GRAMMATICA.md)
   const server = await startEchteServer();
   const basis = server.basis;
 
@@ -196,17 +196,48 @@ function startEchteServer() {
      precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Zie de
      opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
      alle animaties is geworden. */
+  const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
+  const MOB = (hand) => '(function(){' + mobiel.BRON + '\nreturn window.__mobielKeur(' + JSON.stringify({
+    hand, maat: mobiel.MAAT, onder: mobiel.ONDER, smal: mobiel.SMAL, kwart: mobiel.ANKERKWART
+  }) + ')})()';
+  let raakTotaal = 0;
+  /* TWEE HANDEN, EN DAAROM STAAT ER EEN LUS OMHEEN.
+
+     Sinds shared/hand.js legt het huis de dingen aan de kant van de duim, en
+     welke kant dat is verschilt per mens (ADAPTIEF.md, ankerzijde/duimzijde).
+     Een scherm dat alleen voor rechtshandigen klopt is niet af, en dat is
+     alleen te zien door het twee keer te meten.
+
+     Het RAAKVLAK draait maar een keer: die maat hangt niet van de hand af, en
+     twee keer meten zou hem dubbel tellen. */
+  const mobiu = { breed: [], leeg: [], balk: [], duim: [], geenHoofd: [], gemeten: 0 };
+  for (const hand of ['rechts', 'links']) {
   const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   await telefoon.addInitScript((t) => {
     try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
   }, lid.token);
+  await telefoon.addCookies([{ name: 'rtg_hand', value: hand, url: basis }]);
   const tel = await telefoon.newPage();
-  const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
-  let raakTotaal = 0;
-  console.log(`\n[a11y] ===== ronde RAAKVLAK (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
+  console.log(`\n[a11y] ===== ronde TELEFOON, ${hand}handig (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
   for (const pad of PAGINAS) {
     await tel.goto(basis + pad, { waitUntil: 'load' });
     await tel.waitForTimeout(600);
+    /* De mobiele meting eerst, want die is goedkoop en hangt niet af van de
+       tweede meetronde die het raakvlak soms nodig heeft. */
+    try {
+      const m = await tel.evaluate(MOB(hand));
+      mobiu.gemeten++;
+      const waar = pad + ' [' + hand + ']';
+      if (m.venster !== 390) mobiu.breed.push(waar + ': het venster is ' + m.venster + ' en niet 390 -- deze meting zegt niets');
+      else if (m.inhoud > m.venster + 2) mobiu.breed.push(waar + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
+      if (m.hoogsteBlok < 120) mobiu.leeg.push(waar + ': het hoogste zichtbare blok is ' + m.hoogsteBlok + 'px');
+      for (const b of m.balkenBuiten) mobiu.balk.push(waar + ': ' + b);
+      if (!m.hoofd) mobiu.geenHoofd.push(waar);
+      else if (m.gebreken.length) mobiu.duim.push(waar + ' \u2014 ' + m.hoofd.naam + ' (' + m.hoofd.merk + '): ' + m.gebreken.join('; '));
+    } catch (e) {
+      mobiu.breed.push(pad + ' [' + hand + ']: de mobiele meting kon niet draaien -- ' + e.message.split('\n')[0]);
+    }
+    if (hand !== 'rechts') continue;   // het raakvlak hangt niet van de hand af
     let res;
     try { res = await tel.evaluate(RAAK); }
     catch (e) {
@@ -241,7 +272,19 @@ function startEchteServer() {
     }
   }
   await telefoon.close();
+  }
   console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+  const mobielTotaal = mobiu.breed.length + mobiu.leeg.length + mobiu.balk.length + mobiu.duim.length;
+  console.log(`[a11y] ronde telefoon: ${mobiu.gemeten} metingen over twee handen \u2014 ` +
+    `${mobiu.breed.length} te breed, ${mobiu.leeg.length} leeg, ${mobiu.balk.length} balk buiten beeld, ` +
+    `${mobiu.duim.length} buiten duimbereik, ${mobiu.geenHoofd.length} zonder aangewezen hoofdhandeling`);
+  for (const [kop, lijst] of [['te breed', mobiu.breed], ['leeg', mobiu.leeg],
+    ['balk buiten beeld', mobiu.balk], ['buiten duimbereik', mobiu.duim]]) {
+    if (!lijst.length) continue;
+    console.log(`\n[a11y] telefoon \u2014 ${kop} (${lijst.length}):`);
+    for (const r of lijst.slice(0, 40)) console.log('  \u00b7 ' + r);
+    if (lijst.length > 40) console.log(`  \u00b7 ... en nog ${lijst.length - 40}`);
+  }
 
   await browser.close();
   server.stop();

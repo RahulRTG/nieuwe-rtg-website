@@ -32,16 +32,10 @@ const fs = require('node:fs');
    staat, en val anders terug op onze eigen driver (server/lib/browser, CDP over
    een pipe, geen dependency). Waar Playwright netjes geinstalleerd is verandert
    er niets. */
-function laadScherm() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try {
-      const mod = require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright');
-      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) return mod;
-    } catch (e) { /* volgende pad */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* De vindwijze staat in scripts/lib/scherm.js, want scripts/a11y.js heeft hem
+   ook nodig en twee laders van dezelfde browser lopen uiteen (LAT.md regel 4).
+   Daar staat ook wat er hier tweeendertig keer misging. */
+const { laadScherm } = require('../scripts/lib/scherm');
 
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.

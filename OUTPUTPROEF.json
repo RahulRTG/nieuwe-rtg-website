@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-19T08:21:22.188Z",
-  "commit": "e79034a",
-  "boomVuil": true,
+  "op": "2026-08-19T08:46:45.441Z",
+  "commit": "1591778",
+  "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1721,
-  "onbeslist": 2384,
+  "bewezen": 1726,
+  "onbeslist": 2379,
   "blind": 82,
   "ongemeten": 8
  },
@@ -26873,28 +26873,28 @@
    "reden": "er is over DEZE route gelogen en schoolbel.test.js zakte daarop"
   },
   "POST /api/foundation/school/telefoonboom/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "schoolbel.test.js",
-    "schoolexcursie.test.js"
+    "schoolbel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 16); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en schoolbel.test.js zakte daarop"
   },
   "POST /api/foundation/school/telefoonboom/mijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "schoolbel.test.js",
-    "schoolexcursie.test.js"
+    "schoolbel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 16); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en schoolbel.test.js zakte daarop"
   },
   "POST /api/foundation/school/telefoonboom": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "schoolbel.test.js",
-    "schoolexcursie.test.js"
+    "schoolbel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 16); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en schoolbel.test.js zakte daarop"
   },
   "POST /api/foundation/school/directie/cockpit": {
    "staat": "bewezen",
@@ -29359,11 +29359,12 @@
    "reden": "er is over DEZE route gelogen en talen114.test.js zakte daarop"
   },
   "POST /api/supplier/chat/history": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "talen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 16); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en talen.test.js zakte daarop"
   },
   "POST /api/vertaal/ui": {
    "staat": "bewezen",
@@ -29912,11 +29913,12 @@
    "reden": "er is over DEZE route gelogen en uitgeven-inwisselen.test.js zakte daarop"
   },
   "POST /api/supplier/uitgifte/start": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "uitgifte.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 16); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en uitgifte.test.js zakte daarop"
   },
   "POST /api/supplier/uitgifte/bundel": {
    "staat": "onbeslist",
@@ -41355,6 +41357,31 @@
    "toets": "schoolbel.test.js",
    "merkt": true,
    "op": "2026-08-19T08:21:22.081Z"
+  },
+  "POST /api/supplier/chat/history": {
+   "toets": "talen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T08:46:31.002Z"
+  },
+  "POST /api/foundation/school/telefoonboom/maak": {
+   "toets": "schoolbel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T08:46:34.477Z"
+  },
+  "POST /api/foundation/school/telefoonboom/mijn": {
+   "toets": "schoolbel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T08:46:34.488Z"
+  },
+  "POST /api/foundation/school/telefoonboom": {
+   "toets": "schoolbel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T08:46:34.492Z"
+  },
+  "POST /api/supplier/uitgifte/start": {
+   "toets": "uitgifte.test.js",
+   "merkt": true,
+   "op": "2026-08-19T08:46:45.199Z"
   }
  },
  "basislijn": {

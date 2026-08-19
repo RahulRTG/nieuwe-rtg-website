@@ -884,6 +884,10 @@ geteld en daar staan de kranen:
 | `RTG_AI_BEURTEN_PER_MINUUT` | modelaanroepen per aanroeper per minuut; 0 zet de rem uit | 60 |
 | `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
 
+De stand is af te lezen op `GET /api/techniek/ai/kosten` (techniek-inlog en
+alleen de eigenaar): aanroepen, tokens, kosten en de uitsplitsing per model. Een
+totaalbedrag zegt dat het duur is, de uitsplitsing zegt waardoor.
+
 Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
 (`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de
 handmatige werkmodus die dit huis al draagt. De rem telt MODELAANROEPEN en geen

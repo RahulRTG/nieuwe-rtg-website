@@ -114,6 +114,14 @@
       "operator": "===->!==",
       "gezakt": 1
     },
+    "ai-meter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-meter.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ai-oproepen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -149,6 +157,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "aikosten-route.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-meter.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 8
     },
     "aipoort.test.js": {
       "soort": "puur",
@@ -2581,6 +2597,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "lokale-ai-poort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/local-ai.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "lokale-taal.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3087,6 +3111,15 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "modelkeuze.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/ai-meter.js"
+      ],
+      "geprobeerd": 22,
+      "posities": 8
     },
     "moedertaal.test.js": {
       "soort": "server",
@@ -4894,6 +4927,14 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "scriptafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/scriptafsplitsing.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "scriptbundel.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -5412,6 +5453,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "stijlafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/stijlafsplitsing.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "stijlbundel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5929,6 +5978,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/verraadtelling.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "versieadres.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/versieadres.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1

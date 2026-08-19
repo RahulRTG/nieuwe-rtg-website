@@ -18,6 +18,23 @@
    alleen bestaat doordat het model hem opvolgt -- en zeker waar een kind
    meeleest -- blijft hij staan.
 
+   DEZE TOETS STAAT IN MUTATIES.json ALS "OVERLEEFD", EN DAT IS EERLIJK.
+   De mutatiemotor verandert OPERATOREN in de bron (true->false, ===->!==,
+   return-weg). Deze toets bewaakt geen besturingsstroom maar BESTANDSINHOUD:
+   welke modelnaam in welk bestand staat. Geen enkele operator raakt dat, dus
+   hij kan niet zakken op wat de motor probeert -- en dat is geen zwakte van de
+   toets maar een grens van het gereedschap.
+
+   Zakken kan hij wel, op de mutatie die er hier toe doet. Met de hand
+   nagegaan, en alle vier gepakt:
+     kern/bijles.js naar Haiku            -> zakt (kindgericht)
+     kletspraat/gesprek.js naar Sonnet    -> zakt (onbewaakte merkregel)
+     kern/agenda.js stil terug naar Opus  -> zakt (de andere kant)
+     Haiku uit de prijstabel van de meter -> zakt
+
+   Wie deze toets ooit sterker wil maken volgens de motor, moet niet de toets
+   verbouwen maar de motor een operator geven die tekenreeksen verandert.
+
    Draai los: node --test test/modelkeuze.test.js
    ========================================================================== */
 const test = require('node:test');

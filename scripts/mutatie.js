@@ -138,6 +138,51 @@ function codemasker(bron) {
       while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
       uit(i, j + 1); i = j + 1; continue;
     }
+    /* EN EEN REGEXLITERAL, want die kan een aanhalingsteken bevatten.
+
+       Zonder dit las de masker de apostrof in `/url\\(\\s*(['"]?)...\\)/i` als het
+       begin van een tekenreeks, en gold alles tot het VOLGENDE aanhalingsteken
+       als tekst. In server/middleware/stijlafsplitsing.js sloeg dat 1796 tekens
+       echte code over -- de hele magVerhuizen(), met zijn return true en return
+       false. De motor meldde dan "geen bruikbare mutatie", en dat leest als
+       "hier valt niets te meten" terwijl het "ik kon de code niet zien" was.
+       Over server/ gemeten: 5 modules, 13 mutatieplekken onzichtbaar, waaronder
+       functies/toegang.js.
+
+       WANNEER IS EEN / EEN REGEX EN WANNEER EEN DEELSTREEP. Daar bestaat geen
+       waterdichte regel zonder een echte ontleder, maar wel een die het in
+       gewone code altijd goed heeft: een regex kan alleen staan waar een
+       WAARDE wordt verwacht. Dus kijken we naar het laatste betekenisvolle
+       teken ervoor. Is dat een operator, een haakje-open, een komma of het eind
+       van een sleutelwoord als return, dan begint hier een waarde en dus een
+       regex. Is het een naam, een cijfer of een haakje-dicht, dan stond er iets
+       waar je door KUNT delen. Bij twijfel doen we niets -- dan blijft het
+       gedrag zoals het was. */
+    if (c === '/') {
+      let k = i - 1;
+      while (k >= 0 && /\s/.test(bron[k])) k--;
+      const vorige = k >= 0 ? bron[k] : '';
+      const woord = /[A-Za-z_$]/.test(vorige) ? (bron.slice(0, k + 1).match(/[A-Za-z_$][A-Za-z0-9_$]*$/) || [''])[0] : '';
+      const WAARDEWOORD = /^(return|typeof|instanceof|case|in|of|new|delete|void|do|else|yield|await)$/;
+      const waardePlek = vorige === '' || '(,=:[!&|?{};+-*%~^<>'.includes(vorige) || WAARDEWOORD.test(woord);
+      if (waardePlek) {
+        let j = i + 1, inKlasse = false, gesloten = false;
+        while (j < bron.length) {
+          const t = bron[j];
+          if (t === '\\') { j += 2; continue; }
+          if (t === '\n') break;                 // een regex loopt nooit over een regeleinde
+          if (inKlasse) { if (t === ']') inKlasse = false; j++; continue; }
+          if (t === '[') { inKlasse = true; j++; continue; }
+          if (t === '/') { gesloten = true; break; }
+          j++;
+        }
+        if (gesloten) {
+          let e = j + 1;
+          while (e < bron.length && /[gimsuyd]/.test(bron[e])) e++;
+          uit(i, e); i = e; continue;
+        }
+      }
+    }
     i++;
   }
   return masker;

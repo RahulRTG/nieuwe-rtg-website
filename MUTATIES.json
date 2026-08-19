@@ -4251,7 +4251,7 @@
       "staat": "gezakt",
       "module": "scripts/lib/regexmutatie.js",
       "operator": "===->!==#0",
-      "gezakt": 4,
+      "gezakt": 5,
       "geprobeerd": 1
     },
     "regie.test.js": {

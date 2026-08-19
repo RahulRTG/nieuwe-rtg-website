@@ -71,3 +71,54 @@ test('DE TWEEDE TEGENPROEF: de mutatie verandert echt wat er matcht', () => {
   assert.equal(na.test('hond'), false, 'en het weggelaten alternatief niet meer');
   assert.equal(/kat|hond/.test('hond'), true, 'terwijl het origineel dat wel deed');
 });
+
+/* DE TWEEDE NIEUWE OPERATOR: getal+1.
+
+   Plafonds, drempels, tijden en indexen staan overal in dit huis, en tot deze
+   ronde keek geen enkele operator naar WAARDEN -- alleen naar tekens. Daardoor
+   kreeg juist een toets over een grens bijna geen schoten: test/txkap.test.js
+   gaat over wat er gebeurt bij de 50.001e boeking, en dat is een getal.
+
+   Wat hier vastligt is dat hij het goede getal pakt en de rest met rust laat:
+   een getal in een tekenreeks of in commentaar is geen gedrag, en muteren daar
+   meet of de toets tekst leest. */
+const { OPERATOREN, muteer, codemasker } = require('../scripts/mutatie.js');
+
+const op = (naam) => {
+  const gevonden = OPERATOREN.find(o => o.naam === naam);
+  assert.ok(gevonden, 'operator ' + naam + ' bestaat');
+  return gevonden;
+};
+
+test('getal+1 verhoogt het eerste getal in CODE met een', () => {
+  assert.equal(muteer('const cap = 5;', op('getal+1'), 0), 'const cap = 6;');
+  assert.equal(muteer('const a = 0; const b = 9;', op('getal+1'), 1), 'const a = 0; const b = 10;',
+    'en met een index pakt hij de tweede');
+});
+
+test('DE TEGENPROEF: een getal in een tekenreeks of commentaar telt niet als gedrag', () => {
+  /* Zou hij die wel pakken, dan meet de proef of de toets TEKST leest in plaats
+     van gedrag -- en dan is "gezakt" een valse geruststelling. */
+  assert.equal(muteer("const s = 'versie 5';", op('getal+1'), 0), null,
+    'een getal in een tekenreeks is geen gedrag');
+  assert.equal(muteer('/* wacht 10 seconden */', op('getal+1'), 0), null,
+    'en een getal in commentaar al helemaal niet');
+  const gemengd = "/* 7 */ const s = 'x 8'; const echt = 9;";
+  assert.equal(muteer(gemengd, op('getal+1'), 0), "/* 7 */ const s = 'x 8'; const echt = 10;",
+    'tussen ruis door pakt hij precies het getal dat in code staat');
+});
+
+test('het masker markeert commentaar en tekenreeksen als niet-code', () => {
+  const bron = "const a = 1; /* twee */ const b = 'drie';";
+  const masker = codemasker(bron);
+  assert.equal(masker[bron.indexOf('1')], true, 'een getal in code telt');
+  assert.equal(masker[bron.indexOf('twee')], false, 'commentaar niet');
+  assert.equal(masker[bron.indexOf('drie')], false, 'een tekenreeks niet');
+});
+
+test('regex-alternatief-weg pakt alleen echte regex-tokens, geen deling', () => {
+  const regexOp = op('regex-alternatief-weg');
+  assert.equal(muteer('const r = /kat|hond/;', regexOp, 0), 'const r = /kat/;');
+  assert.equal(muteer('const q = a / b | c / d;', regexOp, 0), null,
+    'twee delingen met een pijp ertussen zijn geen regex -- daar muteren zou onzin-code geven');
+});

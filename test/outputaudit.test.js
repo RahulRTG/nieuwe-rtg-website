@@ -218,6 +218,40 @@ test('6. de basislijn vervangt de controlerun zonder het oordeel te verzwakken',
   }
 });
 
+test('7. een herschrijving van het register gooit het geheugen niet weg', () => {
+  /* DE RAMP DIE DIT AFDEKT: een kale `node scripts/outputproef.js`-run (zonder
+     --meet) rekende de telling uit `gericht` op schijf, maar schreef het
+     register terug ZONDER `gericht` en `basislijn`. De telling bleef kloppen
+     (2198 bewezen), het geheugen was leeg -- en de eerstvolgende band begon
+     doodleuk opnieuw op 4155 routes. Twee grendels:
+
+     a. metGeheugen() hangt het geheugen van schijf aan elke uitslag, en een
+        vers gemeten `gericht` wint van de schijf.
+     b. ELK schrijfpad naar OUTPUTPROEF.json gaat door metGeheugen(). Dat is een
+        bron-toets omdat het hoofdblok niet los aan te roepen is; wie een
+        schrijfpad toevoegt zonder metGeheugen zakt hier. */
+  const o = require('../scripts/outputproef');
+  const echt = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'OUTPUTPROEF.json'), 'utf8'));
+
+  const uit = o.metGeheugen({ iets: 1 });
+  assert.deepEqual(Object.keys(uit.gericht), Object.keys(echt.gericht || {}),
+    'metGeheugen hoort gericht van schijf terug te hangen');
+  assert.deepEqual(uit.basislijn, echt.basislijn || {},
+    'metGeheugen hoort de basislijn van schijf terug te hangen');
+
+  const vers = { 'GET /api/zo': { toets: 'x.test.js', merkt: true, op: 'nu' } };
+  assert.deepEqual(o.metGeheugen({}, vers).gericht, vers,
+    'een vers gemeten gericht wint van de schijf');
+
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'outputproef.js'), 'utf8');
+  const schrijvers = bron.match(/fs\.writeFileSync\(UITSLAG[^\n]*/g) || [];
+  assert.ok(schrijvers.length >= 2, 'beide schrijfpaden horen te bestaan');
+  for (const regel of schrijvers) {
+    assert.match(regel, /metGeheugen\(/,
+      'elk schrijfpad naar OUTPUTPROEF.json hoort door metGeheugen te gaan: ' + regel);
+  }
+});
+
 test('4. een ontbrekend journaal geeft een REDEN en geen nullen', () => {
   /* De fout die dit huis al twee keer heeft gemaakt: een meter zonder invoer die
      stil een cijfer toont. Beide proeven horen te zeggen dat ze niets weten. */

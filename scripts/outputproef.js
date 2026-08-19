@@ -184,6 +184,23 @@ function eerderGemeten() {
   } catch (e) { return {}; }
 }
 
+/* Het geheugen van het register: `gericht` (elke route waarover al gelogen is)
+   en `basislijn` (welke toets zonder leugen groen of rood was). meet() rekent
+   de telling UIT dat geheugen, maar geeft het niet terug; wie het register
+   wegschrijft zonder deze velden terug te hangen, houdt een kloppende telling
+   over een leeg geheugen -- de volgende run meet dan alles opnieuw. Dat is
+   precies een keer gebeurd (een kale `meet()`-run schreef 2198 bewezen weg
+   zonder gericht/basislijn, en de band begon weer op 4155 routes). Elk
+   schrijfpad hoort daarom door metGeheugen() te gaan. */
+function metGeheugen(uit, versGericht) {
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) {}
+  return Object.assign(uit, {
+    gericht: versGericht || oud.gericht || {},
+    basislijn: oud.basislijn || {}
+  });
+}
+
 /* `versGericht` is de uitslag van een gerichte ronde die NOG NIET op schijf
    staat. Zonder die parameter liep elke batch een ronde achter: meet() las de
    gerichte metingen van schijf, terwijl de verse pas NA meet() in het bestand
@@ -351,7 +368,7 @@ function gerichteRonde(aantal) {
   return gericht;
 }
 
-module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten,
+module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen,
   gerichteRonde, kiesKandidaten, meetEen, basislijnVan };
 
 if (require.main !== module) return;
@@ -361,7 +378,7 @@ if (MEET) {
   const gericht = gerichteRonde(MEET);
   if (!gericht) { process.exitCode = 2; return; }
   const na = meet(gericht);
-  if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(Object.assign(na, { gericht }), null, 1) + '\n');
+  if (!na.fout) fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(na, gericht), null, 1) + '\n');
   console.log('  weggeschreven in OUTPUTPROEF.json\n');
   process.exitCode = 0;
   return;
@@ -371,7 +388,7 @@ const uit = meet();
 if (uit.fout) { console.error('\n  ' + uit.fout + '\n'); process.exitCode = 2; return; }
 if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
 
-fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
+fs.writeFileSync(UITSLAG, JSON.stringify(metGeheugen(uit), null, 1) + '\n');
 console.log('\n=== DE OUTPUT-PROEF ===\n');
 console.log('  journaal              : ' + path.relative(WORTEL, JOURNAAL));
 console.log('  routes met een toets  : ' + uit.routes);

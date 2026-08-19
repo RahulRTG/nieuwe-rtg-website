@@ -104,5 +104,5 @@ module.exports = (kern, huisAuth) => {
   app.post('/api/werkplek/bureau/hardware/kritiek', huisAuth, doe('hardware', 'aiKritiek', 'idVraag', true));  /* De tweede helft van de bureaus staat in ./werkplek-bureaus-b.js: dit
      bestand liep over de 10 kB-grens. De helpers hierboven gaan mee, want ze
      dragen de foutafhandeling van alle bureaus. */
-  require('./werkplek-bureaus-b')({ app, db, huisAuth, doe });
+  require('./werkplek-bureaus-b')({ app, db, huisAuth, doe, kies, BUREAUS });
 };

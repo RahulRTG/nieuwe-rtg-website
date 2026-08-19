@@ -6100,6 +6100,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "vrijenamen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/vrijenamen.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "vuurplan.test.js": {
       "soort": "puur",
       "staat": "geen bruikbare mutatie",

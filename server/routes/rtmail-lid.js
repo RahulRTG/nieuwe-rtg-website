@@ -16,6 +16,13 @@
    een lid-adres dat undefined bleef. Wie hier een derde hulpje bij nodig heeft,
    ziet dat op dezelfde manier. */
 'use strict';
+/* De klok komt hier RECHTSTREEKS uit ./lib/klok en niet als parameter mee: het
+   is een module en dus per proces een. `klokNu` stond in ./rtmail.js als vrije
+   naam in het bereik en werd hieronder gewoon gebruikt -- na de knip was dat een
+   ReferenceError op de workflow-actie 'agenda', en die werd door geen enkele
+   toets aangeraakt. Dezelfde soort fout als bij werkplek-bureaus-b.js; zie
+   TAKEN.md 6.17. */
+const { nu: klokNu } = require('../lib/klok');
 
 module.exports = (kern, { wie, lidCodenaam }) => {
   const { app, auth, geenGast, rtmail, agenda, leren, facturatie } = kern;

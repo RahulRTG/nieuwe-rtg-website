@@ -155,7 +155,8 @@ function certVoor(opties) {
 /* CRL, CSR en de DER/PEM-verpakking staan in x509-pakket.js. Opgeknipt omdat
    dit bestand boven de 10 KB kwam. De bouwstenen gaan mee naar binnen, zodat de
    afhankelijkheid een kant op loopt: x509 -> x509-pakket. */
-const pakket = require('./x509-pakket')({ OID, extensie, algId, naam, serieel, derVeld, akiExt, sanExtWaarde });
+const pakket = require('./x509-pakket')({ OID, extensie, algId, naam, serieel, derVeld, akiExt, sanExtWaarde,
+  genKeyPair });
 const { maakCRL, maakCSR, derNaarPem, pemNaarDer, b64url, certInfo } = pakket;
 
 module.exports = { genKeyPair, selfSigned, certVoor, bouwCert, maakCSR, maakCRL, skiVan, derNaarPem, pemNaarDer, b64url, certInfo, OID };

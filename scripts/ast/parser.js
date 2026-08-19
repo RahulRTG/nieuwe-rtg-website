@@ -76,8 +76,18 @@ function parse(bron, opties) {
         case 'continue': return sprong('ContinueStatement');
         case 'debugger': { volgende(); puntkomma(); return knoop('DebuggerStatement', t, {}); }
         case 'with': { volgende(); eetLees('('); const object = expressie(); eetLees(')'); return af(knoop('WithStatement', t, { object, body: statement() })); }
-        case 'import': if (!(piekN(1).type === 'lees' && (piekN(1).value === '(' || piekN(1).value === '.'))) return importDecl(); break;
-        case 'export': return exportDecl();
+        /* ESM WORDT HIER NIET GEPARSEERD, EN DAT ZEGT HIJ NU OOK. Hier stond
+           `return importDecl()` en `return exportDecl()`, en die twee functies
+           bestaan in dit bestand niet -- ze zijn nooit geschreven. Een bestand
+           met import/export gaf dus geen nette parsefout maar een kale
+           `ReferenceError: importDecl is not defined`, en een lezer zoekt dan
+           naar een bug in zijn eigen code in plaats van naar de grens van dit
+           gereedschap. Dit huis is CommonJS, dus de grens is echt; alleen de
+           melding was er niet. Betrapt door keuringsregel 50. */
+        case 'import': if (!(piekN(1).type === 'lees' && (piekN(1).value === '(' || piekN(1).value === '.'))) {
+          throw new Error('regel ' + t.lijn + ': ESM-import wordt door deze parser niet gelezen (dit huis is CommonJS)');
+        } break;
+        case 'export': throw new Error('regel ' + t.lijn + ': ESM-export wordt door deze parser niet gelezen (dit huis is CommonJS)');
       }
     }
     // gelabeld statement:  naam:

@@ -5,12 +5,20 @@
 
    De gedeelde bouwstenen (asn1, de OID-tabel, extensie()) komen uit x509.js
    zelf. Die geeft ze mee bij het laden, zodat er geen kringverwijzing ontstaat:
-   x509 -> x509-pakket, en niet terug. */
+   x509 -> x509-pakket, en niet terug.
+
+   `genKeyPair` HOORT DAAR OOK BIJ EN STOND ER NIET. maakCSR() hieronder maakt
+   zelf een sleutelpaar als de aanroeper er geen meegeeft, en die functie woont
+   in x509.js. Na de knip was dat een ReferenceError -- alleen op de tak zonder
+   eigen sleutel, dus geen enkele aanroeper in dit huis raakte hem aan. Zelfde
+   soort fout als bij werkplek-bureaus-b.js en rtmail-lid.js; sinds vandaag
+   betrapt keuringsregel 50 hem. */
 'use strict';
 const crypto = require('crypto');
 const a = require('./asn1');
 
-module.exports = ({ OID, extensie, algId, naam, serieel, derVeld, akiExt, sanExtWaarde }) => {
+module.exports = ({ OID, extensie, algId, naam, serieel, derVeld, akiExt, sanExtWaarde,
+  genKeyPair }) => {
   /* Een CRL (RFC 5280): de door de CA ondertekende lijst van ingetrokken serials.
      Interne clients halen die op om een ingetrokken cert te weigeren. */
   function maakCRL(o) {

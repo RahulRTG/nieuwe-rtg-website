@@ -3397,5 +3397,79 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   }
 }
 
+/* ============================================================================
+   50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft
+
+   WAAR DIT UIT KOMT. Een groot bestand opknippen ziet er onschuldig uit: de
+   regels verhuizen en de code is woord voor woord dezelfde. Maar een blok dat in
+   zijn oude bestand een naam uit het OMRINGENDE bereik plukte, vindt die na de
+   knip niet meer -- en JavaScript zegt dat pas als de regel echt draait.
+
+   Op 19 augustus 2026 ging dat op EEN dag vijf keer mis, en alle vijf stil:
+
+     werkplek-bureaus-b.js  `kies` en `BUREAUS` bleven achter. /api/werkplek/
+       bureaus gooide een ReferenceError, die de try/catch eromheen omzette in
+       een 500 met "Er ging iets mis". Voor elk huis kapot, twee dagen lang.
+     rtmail-lid.js          `klokNu` bleef achter; de tak die hem gebruikt werd
+       door geen enkele toets aangeraakt.
+     leverancierpoort.js    `grootSupplierSync`, plus een require-pad dat vanuit
+       een map dieper niet meer klopte.
+     x509-pakket.js         `genKeyPair`; maakCSR() zonder eigen sleutel liep
+       erop vast. Deze stond er al vanaf een eerdere ronde.
+     imap-server.js         `poort`, `host` en `tlsOpties` werden nergens uit de
+       opties gehaald, dus IMAP kon uberhaupt niet starten.
+     schrift.js             de context heet `octx`, maar de AI-buddy las `ctx`.
+
+   Wat geen van zes betrapte: `node --check` (het is geldige syntaxis),
+   scripts/routekaart.js (die START de server, hij doet geen verzoek) en de
+   keuring (die leest tekst). Vandaar deze regel.
+
+   HIJ IS MET OPZET VOORZICHTIG. scripts/lib/vrijenamen.js telt een naam als
+   gebonden zodra het bestand hem ERGENS bindt, hoe diep dan ook -- een echte
+   scope-analyse zou ook betrappen dat de binding in een ANDER bereik staat,
+   maar elke fout daarin is een vals alarm op een regel die verder klopt. In een
+   harde poort is een vals alarm duurder dan een gemist geval. De nul hieronder
+   is dus geen garantie; hij is de ondergrens. */
+console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft');
+{
+  const { vrijeNamen } = require('./lib/vrijenamen');
+  let gekeken = 0, stuk = 0;
+  const kapot = [];
+  /* ALLEEN server/ EN scripts/, en public/ met opzet niet. Daar is een vrije
+     naam juist de NORMALE vorm: de browser deelt EEN bereik over alle
+     script-tags van een pagina heen, dus shared/uitvoer.js zet RTGUitvoer op
+     window en apps/agenda/app.js leest hem. Die bestanden hier meenemen zou
+     honderden meldingen geven op code die precies doet wat ze hoort te doen --
+     en een regel die honderd keer onterecht rood staat, leert niemand meer
+     iets. Wat public/ WEL bewaakt staat in regel 19 (geen twee modules die
+     dezelfde window-naam opeisen) en regel 42. */
+  for (const map of ['server', 'scripts']) {
+    const m = path.join(ROOT, map);
+    if (!fs.existsSync(m)) continue;
+    loop(m, /\.js$/, (f) => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.includes('/data/')) return;
+      let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+      gekeken++;
+      const r = vrijeNamen(bron);
+      /* Een bestand dat de eigen parser niet leest, is geen bevinding van DEZE
+         regel -- regel 5 (de AST-scan) gaat daarover. Stil overslaan zou het
+         cijfer hieronder wel mooier maken, dus het wordt geteld en genoemd. */
+      if (r.fout) { stuk++; return; }
+      if (r.namen.length) kapot.push(rel + ' -> ' + r.namen.join(', '));
+    });
+  }
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 12)) {
+      fout('gebruikt een naam die dit bestand nergens heeft: ' + k +
+        ' -- geef hem mee als parameter, of haal hem zelf op met require()');
+    }
+    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' bestanden');
+  } else {
+    ok(gekeken + ' bestanden nagelopen, geen enkele vrije naam' +
+      (stuk ? ' (' + stuk + ' niet te lezen voor de eigen parser; zie regel 5)' : ''));
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

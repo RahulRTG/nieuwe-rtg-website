@@ -8,10 +8,21 @@
 
    Hij krijgt de helpers van het eerste deel mee in plaats van ze na te bouwen:
    `doe` draagt de foutafhandeling en de argumentvormen van alle bureaus, en een
-   tweede kopie daarvan zou binnen een week uiteenlopen (LAT.md regel 4). */
+   tweede kopie daarvan zou binnen een week uiteenlopen (LAT.md regel 4).
+
+   EN `kies` EN `BUREAUS` STONDEN HIER EERST NIET BIJ. Ze staan in het eerste
+   deel en werden hieronder gewoon gebruikt -- in server.js waren ze vrije namen
+   in hetzelfde bereik, na de knip niet meer. /api/werkplek/bureaus gooide
+   daardoor een ReferenceError, die de try/catch eromheen netjes omzette in een
+   500 met "Er ging iets mis". Geen crash, geen melding in de toets-uitvoer,
+   alleen een endpoint dat het voor ELK huis niet meer deed.
+
+   Gevonden door test/werkplek.test.js in CI en niet door mij: de routekaart
+   bewijst dat de server OPSTART met dezelfde routes, en dat is precies wat hij
+   bewijst -- hij doet geen verzoek. Zie TAKEN.md 6.17. */
 'use strict';
 
-module.exports = ({ app, db, huisAuth, doe }) => {
+module.exports = ({ app, db, huisAuth, doe, kies, BUREAUS }) => {
   // architect
   app.post('/api/werkplek/bureau/architect', huisAuth, doe('architect', 'overzicht', 'geen'));
   app.post('/api/werkplek/bureau/architect/maak', huisAuth, doe('architect', 'ontwerpMaak', 'body'));

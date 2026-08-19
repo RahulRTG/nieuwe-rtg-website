@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T11:00:12.673Z",
-  "commit": "8bebd7e",
+  "op": "2026-08-19T11:28:34.501Z",
+  "commit": "fa2b092",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 1947,
-  "onbeslist": 2149,
+  "bewezen": 1957,
+  "onbeslist": 2139,
   "blind": 91,
   "ongemeten": 8
  },
@@ -20714,74 +20714,84 @@
    "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/importeer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/proef/start": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/proef/stap": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/relatie": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/relatie/beslis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/indienen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/magnaat/studio/indienen/intrekken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/office/magnaat/partners": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/office/magnaat/partner/beslis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/techniek/controle/integriteit": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "magnaat-partnerstudio-routes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 18); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en magnaat-partnerstudio-routes.test.js zakte daarop"
   },
   "POST /api/supplier/tafelticket": {
    "staat": "bewezen",
@@ -42623,6 +42633,56 @@
    "toets": "magnaat-partnerstudio-routes.test.js",
    "merkt": true,
    "op": "2026-08-19T11:00:12.563Z"
+  },
+  "POST /api/supplier/magnaat/studio/relatie": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:09.279Z"
+  },
+  "POST /api/supplier/magnaat/studio/importeer": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:09.299Z"
+  },
+  "POST /api/supplier/magnaat/studio/proef/start": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:09.558Z"
+  },
+  "POST /api/supplier/magnaat/studio/proef/stap": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:09.661Z"
+  },
+  "POST /api/supplier/magnaat/studio/relatie/beslis": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:21.298Z"
+  },
+  "POST /api/supplier/magnaat/studio/indienen/intrekken": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:21.652Z"
+  },
+  "POST /api/supplier/magnaat/studio/indienen": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:22.329Z"
+  },
+  "POST /api/office/magnaat/partners": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:22.391Z"
+  },
+  "POST /api/office/magnaat/partner/beslis": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:34.038Z"
+  },
+  "POST /api/techniek/controle/integriteit": {
+   "toets": "magnaat-partnerstudio-routes.test.js",
+   "merkt": true,
+   "op": "2026-08-19T11:28:34.300Z"
   }
  },
  "basislijn": {

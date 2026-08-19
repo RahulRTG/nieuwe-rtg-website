@@ -19,6 +19,8 @@
      -> "het interne verkeer blijft eruit" ZAKT (RAAK)
    - `vorig` niet meer zetten in kern/command/journaal.js
      -> "een gewijzigde regel breekt de keten" ZAKT (RAAK, via de ketencontrole)
+   - na een wissing niet opnieuw zegelen
+     -> "een gewist lid verdwijnt uit het spoor" ZAKT op de ketencontrole (RAAK)
 
    Los: node --test test/auditspoor.test.js
    ========================================================================== */
@@ -202,6 +204,53 @@ test('een weggeknipte regel breekt de keten ook', async () => {
        niet-in-bedrijf. */
     const vers = opzet();
     assert.strictEqual(vers.auditspoor.journaal.controleer().heel, true);
+  } finally { srv.close(); }
+});
+
+/* HET RECHT OP VERGETELHEID TEGENOVER DE ONVERANDERLIJKE KETEN. Allebei waar,
+   en de uitweg is niet kiezen maar opschrijven: de actor gaat eruit, de keten
+   wordt opnieuw gezegeld, en de herschrijving staat er als regel in met de kop
+   van vóór de wissing erbij. */
+test('een gewist lid verdwijnt uit het spoor, en de wissing staat er zelf in', async () => {
+  const { db, auditspoor } = opzet();
+  const { srv, poort } = await maakServer(auditspoor, (req, res) => {
+    req.session = { key: req.headers['x-wie'] || 'user-9' };
+    res.status(200).json({ ok: true });
+  });
+  try {
+    await roep(poort, 'POST', '/api/een', {}, { 'x-wie': 'user-9' });
+    await roep(poort, 'POST', '/api/twee', {}, { 'x-wie': 'user-9' });
+    await roep(poort, 'POST', '/api/drie', {}, { 'x-wie': 'user-8' });
+    const kopVoor = auditspoor.journaal.recent(1)[0].zegel;
+
+    const uit = auditspoor.journaal.wisActor('user-9', 'recht op vergetelheid (AVG art. 17)');
+    assert.strictEqual(uit.geraakt, 2, 'precies de twee regels van dit lid');
+
+    const alles = JSON.stringify(db.data.apiSpoor);
+    assert.ok(!/user-9(?![0-9])/.test(alles), 'de sleutel van het lid staat er nergens meer in');
+    assert.ok(alles.includes('user-8'), 'en die van iemand anders staat er nog gewoon');
+    assert.strictEqual(auditspoor.journaal.controleer().heel, true, 'de keten klopt na het opnieuw zegelen');
+
+    const laatste = auditspoor.journaal.recent(1)[0];
+    assert.match(laatste.actie, /wissing/, 'de herschrijving staat als regel in het spoor');
+    assert.strictEqual(laatste.voor.kopVoorWissing, kopVoor, 'met de kop van vóór de wissing erbij');
+    assert.match(laatste.reden, /AVG/, 'en met de grond');
+  } finally { srv.close(); }
+});
+
+test('wissen van een actor die er niet in staat, laat de keten met rust', async () => {
+  const { auditspoor } = opzet();
+  const { srv, poort } = await maakServer(auditspoor, (req, res) => {
+    req.session = { key: 'user-1' };
+    res.status(200).json({ ok: true });
+  });
+  try {
+    await roep(poort, 'POST', '/api/een', {});
+    const voor = auditspoor.journaal.recent(1)[0].zegel;
+    const uit = auditspoor.journaal.wisActor('user-999');
+    assert.strictEqual(uit.geraakt, 0);
+    assert.strictEqual(auditspoor.journaal.recent(1)[0].zegel, voor,
+      'geen wissing, geen herschrijving: het spoor blijft bit voor bit gelijk');
   } finally { srv.close(); }
 });
 

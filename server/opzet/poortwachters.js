@@ -82,7 +82,21 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
      compressie en voor alle routers. test/dubbeltikgzip.test.js zet die twee in
      deze volgorde en eist een herhaling op een antwoord van boven de kilobyte.
      En mist hij er tocht een, dan zegt hij dat nu hardop (zie dubbeltik.js). */
-  const dubbeltik = maakDubbeltik({ log });
+  /* DE GELDWEGEN GAAN HIER LANGS, en dat is geen uitzondering maar de regel
+     "waar een sterkere laag staat, hoort deze niet ervoor". server/lib/idem.js
+     doet idempotentie voor geld DUURZAAM (de sleutel landt in dezelfde commit
+     als de boeking, dus hij overleeft een herstart) en met een afdruk van de
+     geld-bepalende velden. Sommige van die routes geven op een herhaling ook een
+     EIGEN antwoord: /api/pakket/koop zegt `alBetaald: true` in plaats van de
+     eerste bon nog eens.
+
+     Zet je de dubbeltik daarvoor, dan vervangt een geheugenlaag dat antwoord
+     door een kopie van de eerste -- zonder er veiligheid aan toe te voegen, want
+     die zat er al. Precies dat gebeurde: test/synergie.test.js zag `alBetaald`
+     verdwijnen. De volle suite is hier de bewaker: raakt er een geldpad los van
+     deze lijst, dan verandert zijn antwoord en vallen de geldtoetsen om. */
+  const GELDWEGEN = /^\/api\/(pay|bank|pakket|podium|directpay|betaal|munt|supplier\/(kassa|betaalverzoek))\b/;
+  const dubbeltik = maakDubbeltik({ log, overslaan: (req) => GELDWEGEN.test(req.path) });
   app.use(dubbeltik.middleware());
 
   /* HET API-SPOOR. Staat naast de dubbeltik en om dezelfde reden hier: hij moet

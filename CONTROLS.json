@@ -1,10 +1,10 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 12,
-    "groen": 10,
+    "controls": 13,
+    "groen": 12,
     "nietInBedrijf": 1,
-    "nietGroen": 1
+    "nietGroen": 0
   },
   "controls": [
     {
@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.594Z",
+        "at": "2026-08-19T03:27:04.117Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -65,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.768Z",
+        "at": "2026-08-19T03:27:04.306Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -93,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.925Z",
+        "at": "2026-08-19T03:27:04.481Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.620Z",
+        "at": "2026-08-19T03:27:05.177Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -165,7 +165,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.787Z",
+        "at": "2026-08-19T03:27:05.333Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -181,20 +181,20 @@
       ],
       "bewijsstuk": "KLOK.json -- hoeveel code nog buiten de tijdmachine staat",
       "dekking": {
-        "beproefd": 2,
-        "totaal": 659,
+        "beproefd": 36,
+        "totaal": 655,
         "eenheid": "modules die de tijd vragen",
         "tellers": {
-          "directeTijdsaanroepen": 1298
+          "directeTijdsaanroepen": 1284
         },
-        "pct": 0.3
+        "pct": 5.5
       },
-      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
+      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1294 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:20.237Z",
+        "at": "2026-08-19T03:27:06.880Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -222,9 +222,10 @@
       },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
-        "staat": "niet gemeten",
-        "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-12T14:59:28.787Z",
+        "staat": "GROEN",
+        "beweringen": 18,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:37.293Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -241,8 +242,8 @@
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
       "dekking": {
-        "beproefd": 2937,
-        "totaal": 2937,
+        "beproefd": 3093,
+        "totaal": 3093,
         "eenheid": "schrijfroutes met een rol",
         "tellers": {
           "doorbraken": 0,
@@ -257,7 +258,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:28.931Z",
+        "at": "2026-08-19T03:27:37.466Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -273,24 +274,24 @@
       ],
       "bewijsstuk": "INVOERPROEF.json -- per route hoeveel rommel erheen ging en wat eruit kwam",
       "dekking": {
-        "beproefd": 2510,
-        "totaal": 2936,
+        "beproefd": 2660,
+        "totaal": 3092,
         "eenheid": "routes waar rommel voorbij de poort kwam",
         "tellers": {
           "breuken": 0,
           "sporen": 0,
-          "achterEenPoort": 426,
+          "achterEenPoort": 432,
           "blindeRondes": 0,
-          "tokensHernieuwd": 13
+          "tokensHernieuwd": 10
         },
-        "pct": 85.5
+        "pct": 86
       },
       "grens": "meet twee foutklassen op routes met een herkenbare rol: omvallen op rommel (5xx of geen antwoord) en een antwoord dat interne details meegeeft. Hij zegt NIETS over of de validatie het juiste heeft geweigerd -- een route die alles slikt en 200 teruggeeft telt hier als dicht. Routes achter een tweede grendel (KYC, onboarding) staan als ongemeten met reden.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.085Z",
+        "at": "2026-08-19T03:27:37.631Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -306,25 +307,57 @@
       ],
       "bewijsstuk": "IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam",
       "dekking": {
-        "beproefd": 12,
-        "totaal": 106,
+        "beproefd": 855,
+        "totaal": 855,
         "eenheid": "routes waar een tweede effect zichtbaar zou zijn",
         "tellers": {
-          "onbeschermd": 94,
-          "ongemeten": 2830,
+          "onbeschermd": 0,
+          "ongemeten": 2236,
           "blindeRondes": 0,
-          "tokensHernieuwd": 24
+          "tokensHernieuwd": 22
         },
-        "pct": 11.3
+        "pct": 100
       },
       "grens": "kijkt van BUITEN naar het antwoord, niet naar de database. Een route die zijn tweede effect niet in het antwoord laat zien (een stille toevoeging aan een lijst die niet wordt teruggegeven) telt hier als ongemeten en niet als beschermd -- daarvoor is de per-route vingerafdruk nodig die er nog niet is. En \"onbeschermd\" is geen defect-oordeel: twee keer op bewaren drukken hoort twee notities op te leveren. Het is een TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 12,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.233Z",
+        "at": "2026-08-19T03:27:37.800Z",
         "bestanden": [
           "test/idemproef.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/auditproef.js",
+      "control": "AUDITSPOOR",
+      "wat": "elke geslaagde schrijfhandeling laat een regel na die niemand ongemerkt kan wijzigen",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/auditspoor.test.js"
+      ],
+      "bewijsstuk": "AUDITPROEF.json -- per route of er een spoor achterbleef, plus de ketencontrole",
+      "dekking": {
+        "beproefd": 860,
+        "totaal": 860,
+        "eenheid": "schrijfroutes die werkelijk werk deden",
+        "tellers": {
+          "gezakt": 0,
+          "ongemeten": 2231,
+          "blindeRondes": 0,
+          "ketenHeel": null
+        },
+        "pct": 100
+      },
+      "grens": "kijkt van BUITEN: hij ziet dat er een regel bij komt en dat de keten heel is. Hij controleert niet of die regel het juiste verhaal vertelt (de goede actor bij de goede handeling), en hij zegt niets over iemand met schrijftoegang tot de database die de HELE keten opnieuw uitrekent -- daarvoor moet het kopzegel buiten de deur worden vastgelegd.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 13,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:38.655Z",
+        "bestanden": [
+          "test/auditspoor.test.js"
         ]
       }
     },
@@ -339,26 +372,26 @@
       ],
       "bewijsstuk": "STAATPROEF.json -- per route welke collecties bewogen, en wat de herhaling deed",
       "dekking": {
-        "beproefd": 2338,
-        "totaal": 2936,
+        "beproefd": 2475,
+        "totaal": 3092,
         "eenheid": "routes waar de toestand is gemeten",
         "tellers": {
-          "state": 224,
-          "sideEffect": 224,
-          "rollback": 2107,
-          "rollbackGezakt": 7,
-          "idemBewezen": 124,
-          "idemGezakt": 100,
+          "state": 244,
+          "sideEffect": 244,
+          "rollback": 2225,
+          "rollbackGezakt": 6,
+          "idemBewezen": 241,
+          "idemGezakt": 3,
           "blindeRondes": 0
         },
-        "pct": 79.6
+        "pct": 80
       },
       "grens": "ziet de DATABASE en niets daarbuiten: een mail, een push of een betaling bij een derde valt er niet onder, dus SIDE_EFFECT betekent hier \"buiten de eigen collectie\" en niet \"buiten het huis\". Ziet ook geen wijziging die zichzelf binnen één verzoek opheft. Een route waar de eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 27,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.487Z",
+        "at": "2026-08-19T03:27:38.940Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -375,21 +408,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 15044,
-        "totaal": 43857,
+        "beproefd": 18238,
+        "totaal": 46288,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 28431,
-          "gezakt": 122
+          "ongemeten": 27699,
+          "gezakt": 11
         },
-        "pct": 34.3
+        "pct": 39.4
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 17,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.822Z",
+        "at": "2026-08-19T03:27:39.468Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

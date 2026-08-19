@@ -60,6 +60,9 @@
       btwDetail(toon)+
       (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
         eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
+      /* De bewijsketen onder de aangifte (deel 12a2). Bewust ONDER het detail
+         en niet ernaast: eerst wat er staat, dan waarom het er staat. */
+      btwWaaromKaart(toon)+
       btwNaheffingen()+
       '</div>';
   }
@@ -120,6 +123,7 @@
         btwData = null; await laadBtw();
       } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
     }));
+    btwWaaromBedrading(el);   // deel 12a2; hijst over de bundel heen
     const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
       btwMsg = '';
       try {

@@ -601,6 +601,11 @@
   .btw-melding{color:var(--gold);margin-top:0.4rem;}
   .btw-eerder{margin-top:0.6rem;}
   .btw-blok{border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.6rem;}
+  /* De facturen onder een tarief: de onderste trede van de bewijsketen die
+     hier zichtbaar is. Als een rustige rij en niet als tabel -- het zijn
+     verwijzingen om na te lopen, geen cijfers om te lezen. */
+  .wrm-fact{display:flex;flex-wrap:wrap;gap:0.15rem 0.9rem;padding:0.1rem 0 0.5rem;font-size:0.76rem;color:var(--muted);}
+  .wrm-fact .sub{display:inline;font-size:0.7rem;color:var(--soft);}
   .btw-blok .streep{border-top:1px solid var(--line);}
   .btw-btw{color:var(--gold);}
   .btw-saldo{font-size:1.05rem;}
@@ -1452,6 +1457,13 @@ window.I18N = { en: {
   'fn.btwkenmerk':'reference', 'fn.btwkenmerk.ph':'Reference from the tax authority',
   'fn.btwdien':'Record as filed', 'fn.btwmaakcorr':'Draw up correction', 'fn.btweerder':'Earlier',
   'fn.btwbij':'The return has been updated with the invoices booked since.',
+  'fn.wrm':'Why this amount?', 'fn.wrm.knop':'Unfold', 'fn.wrm.bezig':'Working…',
+  'fn.wrm.tar':'Revenue', 'fn.wrm.fact':'invoices', 'fn.wrm.meer':'and more',
+  'fn.wrm.scheef':'The breakdown does not add up',
+  'fn.wrm.scheef.s':'These items do not add up to the amount the return is based on. Difference',
+  'fn.wrm.vreemd':'A rate that did not exist that day', 'fn.wrm.vreemd.s':'back then this country had',
+  'fn.wrm.herb':'Rebuild this amount', 'fn.wrm.groen':'Equal to the cent', 'fn.wrm.rood':'Not equal',
+  'fn.wrm.nu':'Counted now', 'fn.wrm.toen':'filed',
   'fn.nh':'Additional assessment from the tax authority', 'fn.nh.stand':'status', 'fn.nh.boete':'penalty',
   'fn.nh.vervalt':'due', 'fn.nh.besluit':'decision on your objection',
   'fn.nh.reden':'Why do you disagree?', 'fn.nh.bezwaar':'Object',

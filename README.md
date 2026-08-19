@@ -1096,6 +1096,80 @@ een mutatie zien zakken, en twee door de API heen op de poorten, want een
 verklaring legt de complete omzet mét factuurnummers open en is daarmee zo
 mogelijk gevoeliger dan de aangifte zelf.
 
+#### "Waarom dit bedrag?" in het Kantoor
+
+De bewijsketen staat als kaart onder de btw-aangifte
+(`public/apps/leverancier/leverancier-12a2.js`): vouw open geeft de opbouw per
+tarief met de factuurnummers eronder, en op een ingediende aangifte staat
+"Herbouw dit bedrag" — op de cent gelijk of niet, zonder tussenweg.
+
+Het scherm rekent **niets** uit, ook niet "even" de som als controle: dan staat
+er een derde teller in huis. Ook het oordeel of de opbouw aansluit komt van de
+server.
+
+**Uitzonderingsgestuurd** (ONTWERP.md): klopt alles, dan staat er een rustige
+opbouw en verder niets. Alleen een opbouw die niet aansluit en een tarief dat die
+dag niet bestond krijgen kleur. Een scherm dat bij "alles in orde" al een groen
+vinkje toont, leert de lezer over kleur heen te kijken — en dan valt de ene keer
+dat het misgaat ook niet meer op. `test/btw-waarom-scherm.e2e.js` toetst dus
+beide kanten: dat de eigen factuur eronder verschijnt, én dat er géén bevinding
+staat als er niets aan de hand is.
+
+### De zzp-regimes per ingangsdatum (`kern/fiscaal/zzpwacht.js`)
+
+De landentabel stond al per jaargang vast; de zzp-tabel niet, dus de zzp-tool
+rekende elk jaar met de tarieven van nu. Diezelfde jaargangen-store draagt nu ook
+deze tabel — eigen bak, eigen basis, eigen geneste velden — met een eigen
+validatie, want wat een bron mag leveren verschilt per tabel: een btw-tarief
+tussen 0 en 30 zegt niets over een heffingskorting.
+
+Twee dingen die hier stuk waren of bijna stuk gingen:
+
+- **De diepe kopie liep door JSON.** De hoogste belastingschijf staat als
+  `[Infinity, 0.495]` in de tabel, en `JSON.stringify` maakt daar `null` van.
+  De schijvenlus rekent dan `Math.min(belastbaar, null)` = 0 en kent de
+  toptariefschijf geen inkomen meer toe: een berekening die er goed uitziet en
+  te laag is. De kopie gaat nu via `structuredClone`.
+- **`regimeOp` geeft altijd iets terug** — is er niets vastgelegd, dan de basis.
+  Dat doorgeven als "de regels van 2023" is precies de schijnzekerheid die deze
+  ronde moest wegnemen. Er gaat nu pas een regime mee als de tijdlijn iets over
+  die datum te zeggen heeft; anders zegt de tool zelf dat er met de tabel van nu
+  is gerekend.
+
+De schijventabel wordt als geheel vervangen en nooit samengevoegd: schijf 1 van
+2026 met schijf 3 van 2024 eronder telt gewoon door en ziet er volstrekt normaal
+uit.
+
+### De vier zekerheidsklassen (`kern/fiscaal/zekerheid.js`)
+
+Elke fiscale uitkomst droeg dezelfde zin — "voorlichting, geen bindend fiscaal
+advies" — en die stond zowel onder een btw-aangifte die tot op de cent uit het
+factuurregister is geteld als onder een zzp-schatting op een verwachte jaarwinst.
+Dat doet allebei tekort: het eerste wordt onnodig vaag, het tweede onterecht
+stevig, en wie overal hetzelfde voorbehoud leest, leest het na een week niet meer.
+
+| Klasse | Term | Betekenis |
+|---|---|---|
+| `bepaald` | DETERMINISTIC | Wet en gegevens leiden eenduidig tot deze uitkomst; mag als feit worden gepresenteerd |
+| `uitlegbaar` | INTERPRETIVE | Meerdere verdedigbare behandelingen; wij kiezen er één en zeggen welke en waarom |
+| `advies` | ADVISORY | Wij rekenen voor, een mens met vakkennis beoordeelt |
+| `voorbehouden` | PROHIBITED_AUTOMATION | Dit mag RTG niet zelfstandig doen |
+
+De regel eronder: **automatiseer wat objectief automatiseerbaar is, en maak
+nergens zekerheid waar die niet is.**
+
+Drie dingen die niet mogen sneuvelen. Een uitkomst die niemand heeft ingedeeld
+valt terug op de vóórzichtige klasse en zégt dat hij niet is ingedeeld — nooit
+stilzwijgend "bepaald". `voorbehouden` is een grens en geen nog-te-bouwen
+functie; indienen namens een ondernemer, een boete opleggen, een naheffing
+vaststellen en toegang tot een pas beloven staan er alle vier in. En `bepaald`
+betekent "over de uitkomst is geen discussie als de gegevens kloppen", niet
+"gegarandeerd juist" — daarvoor is de bewijsketen er.
+
+De klassen hangen aan de maandboekhouding, de aangifte, de verklaring en de
+zzp-som, en vervangen de vlakke zin ook in de system prompts van de
+AI-boekhouders. CLAUDE.md draagt de merkregel.
+
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
 Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om

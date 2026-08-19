@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-19T14:59:18.846Z",
-  "commit": "150f5ba",
-  "boomVuil": true,
+  "op": "2026-08-19T15:27:53.817Z",
+  "commit": "1092b56",
+  "boomVuil": false,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2764,
-  "onbeslist": 1294,
+  "bewezen": 2769,
+  "onbeslist": 1289,
   "blind": 129,
   "ongemeten": 8
  },
@@ -3332,44 +3332,44 @@
    "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/member/leren/project-ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "leren-leden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 29); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/member/leren/schrijf-opdracht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "leren-leden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 29); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/member/leren/schrijf-feedback": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "leren-leden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 29); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/member/leren/schrijf-bewaar": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "leren-leden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 29); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/member/leren/schrijfsels": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "leren-leden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 29); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en leren-leden.test.js zakte daarop"
   },
   "POST /api/leven/lijn": {
    "staat": "onbeslist",
@@ -47958,6 +47958,31 @@
    "toets": "leren-leden.test.js",
    "merkt": true,
    "op": "2026-08-19T14:59:18.746Z"
+  },
+  "POST /api/member/leren/schrijf-bewaar": {
+   "toets": "leren-leden.test.js",
+   "merkt": true,
+   "op": "2026-08-19T15:27:42.387Z"
+  },
+  "POST /api/member/leren/project-ai": {
+   "toets": "leren-leden.test.js",
+   "merkt": true,
+   "op": "2026-08-19T15:27:42.453Z"
+  },
+  "POST /api/member/leren/schrijf-opdracht": {
+   "toets": "leren-leden.test.js",
+   "merkt": true,
+   "op": "2026-08-19T15:27:42.759Z"
+  },
+  "POST /api/member/leren/schrijf-feedback": {
+   "toets": "leren-leden.test.js",
+   "merkt": true,
+   "op": "2026-08-19T15:27:42.805Z"
+  },
+  "POST /api/member/leren/schrijfsels": {
+   "toets": "leren-leden.test.js",
+   "merkt": true,
+   "op": "2026-08-19T15:27:53.689Z"
   }
  },
  "basislijn": {

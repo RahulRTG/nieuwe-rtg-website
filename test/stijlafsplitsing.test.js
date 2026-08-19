@@ -82,8 +82,8 @@ test('6. de index telt ALLE blokken, ook de blokken die blijven staan', () => {
   const html = '<head>' + klein + blokTag(groot()) + '</head>';
   const uit = herschrijfHtml(html, '/apps/app.html');
   assert.equal(verwijzing(uit).i, 1, 'het tweede blok is index 1');
-  assert.equal(blokUit(html, 1).css.length >= DREMPEL, true, 'en index 1 is inderdaad het grote blok');
-  assert.equal(blokUit(html, 0).css, '.k{color:blue}', 'index 0 blijft het kleine blok');
+  assert.equal(blokUit(html, 1).inhoud.length >= DREMPEL, true, 'en index 1 is inderdaad het grote blok');
+  assert.equal(blokUit(html, 0).inhoud, '.k{color:blue}', 'index 0 blijft het kleine blok');
 });
 
 test('7. verandert het blok, dan verandert het adres mee', () => {

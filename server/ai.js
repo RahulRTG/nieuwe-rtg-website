@@ -14,8 +14,8 @@ const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
-const { kompasStatus } = require('./ai-kompas');
 const meter = require('./ai-meter');
+const rem = require('./ai-rem');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -73,8 +73,8 @@ function maakAI(opts) {
             continue;
           }
           /* En de rem per aanroeper. Telt modelaanroepen en geen routes, zodat
-             een nieuwe route er automatisch onder valt; zie ./ai-meter.js. */
-          if (!aanbieder.lokaal && !meter.magNogVoor()) {
+             een nieuwe route er automatisch onder valt; zie ./ai-rem.js. */
+          if (!aanbieder.lokaal && !rem.magNogVoor()) {
             laatste = laatste || Object.assign(new Error('Te veel modelaanroepen achter elkaar. Probeer het over een minuut opnieuw.'), { code: 'AI_TE_SNEL' });
             continue;
           }
@@ -110,47 +110,9 @@ function maakAI(opts) {
   return client;
 }
 
-/* Eén eerlijk contract voor schermen en routes. Beschikbaarheid zegt alleen of
-   vrije modelverrijking mogelijk is; nooit of de onderliggende app werkt. */
-function beschikbaarheid(ai) {
-  const beschikbaar = !!(ai && ai.messages && typeof ai.messages.create === 'function');
-  const kan = (params) => beschikbaar && (typeof ai.kan !== 'function' || ai.kan(params));
-  const infos = beschikbaar && Array.isArray(ai.providerInfo) ? ai.providerInfo : [];
-  const heeftLokaal = infos.some(x => x.lokaal) || (beschikbaar && ai.bron === 'lokaal');
-  const heeftExtern = infos.some(x => !x.lokaal) || (beschikbaar && !infos.length && ai.bron !== 'lokaal');
-  const lokaalViaNetwerk = infos.some(x => x.lokaal && x.verwerking === 'eigen-netwerk');
-  const route = params => beschikbaar
-    ? (typeof ai.routes === 'function' ? ai.routes(params) : (kan(params) ? (ai.aanbieders || []) : []))
-    : [];
-  const pTekst = { messages: [{ role: 'user', content: 'x' }] };
-  const pTools = { tools: [{ name: 'doe' }], messages: [{ role: 'user', content: 'x' }] };
-  const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
-  const hybride = heeftLokaal && heeftExtern;
-  const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
-  const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
-  const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
-  return {
-    beschikbaar,
-    modus,
-    verwerking,
-    privacy: hybride ? 'kan-extern-verwerken' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
-    aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
-    mogelijkheden: {
-      tekst: kan(pTekst),
-      hulpmiddelen: kan(pTools),
-      beeld: kan(pBeeld)
-    },
-    routes: { tekst: route(pTekst), hulpmiddelen: route(pTools), beeld: route(pBeeld) },
-    kernprocessen: 'beschikbaar',
-    uitwijk: {
-      navigatie: 'menu-en-zoeken',
-      uitvoering: 'schermen-en-workflows',
-      samenvatten: 'lokale-extractie',
-      beslissingen: 'menselijk-akkoord'
-    },
-    kompas: kompasStatus({ hybride, heeftLokaal, lokaleGrens, beschikbaar })
-  };
-}
+/* Wat we hierover aan SCHERMEN vertellen -- modus, verwerking, privacy, welke
+   capability via welke aanbieder loopt -- staat in ./ai-stand.js. Dat is een
+   andere vraag dan deze: hier wordt uitgeweken, daar wordt verantwoord. */
 
 /* Een kort ja/nee-oordeel, via dezelfde uitwijkketen. Losse modules die maar
    een classificatie nodig hebben (is dit maatschappelijk belangrijk? hoort dit
@@ -201,4 +163,4 @@ async function tekst(ai, system, prompt, opties) {
   } catch (e) { return null; }
 }
 
-module.exports = { maakAI, bouwKetting, beschikbaarheid, jaNee, tekst, MODEL_KORT };
+module.exports = { maakAI, bouwKetting, jaNee, tekst, MODEL_KORT };

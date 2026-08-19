@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, anthropic, aiSystemPrompt, cannedAnswer, trChat, convOf, talen,
     memberSays, accounts } = kern;
-  const aiStatus = () => require('../../ai').beschikbaarheid(anthropic);
+  const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
 
   app.post('/api/ai/status', auth, (req, res) => res.json(aiStatus()));
 

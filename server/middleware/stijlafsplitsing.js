@@ -31,6 +31,12 @@
    ook NA stijlbundelHtml: die heeft zijn rijen dan al bepaald met het blok nog
    op zijn plek, en de nieuwe verwijzing wordt niet alsnog een rij in getrokken.
 
+   DE MACHINE ZELF STAAT IN ./blokafsplitsing.js. Deze laag en ./scriptafsplitsing.js
+   deden hetzelfde werk met een andere tag; wat hier staat is de AFWEGING (mag
+   een stijlblok verhuizen, en wat maakt er een onverplaatsbaar) plus de meting.
+   Het gereedschap eromheen -- codering, padcontrole, vingerafdruk, cache,
+   compressie, koppen -- staat een keer, hiernaast.
+
    GEEN SERVERGEHEUGEN, dezelfde keuze als bij de twee bundels ernaast: de
    verwijzing beschrijft zichzelf (welk bestand, welk blok), en de server leest
    dat blok gewoon opnieuw uit de bron. Een tabel op de server zou na een
@@ -46,15 +52,12 @@
    ook geen 304.
    ========================================================================== */
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const zlib = require('zlib');
-const crypto = require('crypto');
+const { maakAfsplitsing, codeer, decodeer, DREMPEL, GOED_PAGINA } = require('./blokafsplitsing');
 
 const PAD = '/stijlblok.css';
 
-/* Vanaf welke omvang loont het. Onder deze grens weegt een extra verzoek niet
-   op tegen de bytes die je uitspaart.
+/* DE DREMPEL ZELF STAAT IN ./blokafsplitsing.js, want hij geldt voor allebei de
+   soorten blok. Hij is HIER gemeten, dus de meting staat hier.
 
    DE GRENS IS GEMETEN, NIET GEKOZEN. Over alle 258 schermen:
 
@@ -95,13 +98,11 @@ const PAD = '/stijlblok.css';
 
    (Ter vergelijking, dezelfde pagina eerste bezoek: HTTP/1.1 1404 ms tegen
    HTTP/2 1117 ms. Het protocol scheelt 20%; deze drempel scheelt niets.) */
-const DREMPEL = 5000;
-
-/* Alleen een KAAL <style>-blok. Een media=, een een eigen type= of wat dan ook
+/* Alleen een KAAL <style>-blok. Een media=, een eigen type= of wat dan ook
    hangt gedrag aan het blok, en dat kun je niet naar een los blad verplaatsen
    zonder het te veranderen -- <link> kent dat gedrag anders. Zelfde strengheid
    als de rij-controle in ./stijlbundel-rij.js. */
-const STYLE = /<style\b([^>]*)>([\s\S]*?)<\/style>/gi;
+const STYLE = /<style\b([^>]*)>([\s\S]*?)<\/style>/i;
 
 /* Twee dingen die bij verhuizing stuk zouden gaan, allebei beschreven in
    ./stijlbundel.js:
@@ -122,109 +123,17 @@ function magVerhuizen(css) {
   return true;
 }
 
-const codeer = (p) => Buffer.from(p, 'utf8').toString('base64url');
-const decodeer = (s) => {
-  try { return Buffer.from(String(s || ''), 'base64url').toString('utf8'); }
-  catch (e) { return ''; }
-};
-/* Zelfde strengheid als GOED_PAD hiernaast, maar voor de PAGINA: geen spaties,
-   geen dubbele punt, geen .., en die (?!\/) zodat //ergens.anders/x.html er niet
-   doorheen komt -- dat is voor een browser een volledig adres bij een vreemde
-   server. */
-const GOED_PAGINA = /^\/(?!\/)[A-Za-z0-9_\-/.]+\.html$/;
-
-const vinger = (css) => crypto.createHash('sha1').update(css).digest('base64url').slice(0, 12);
-
 /* Uit te zetten met RTG_STIJLAFSPLITSING=0, net als de nonce-laag ernaast. De
    pagina valt dan terug op het inline blok: trager en dikker, maar identiek. */
 const AAN = String(process.env.RTG_STIJLAFSPLITSING || '1') !== '0';
 
-/* ---- de pagina-kant: blok eruit, verwijzing ervoor in de plaats ---- */
-function herschrijfHtml(html, paginaPad) {
-  if (!AAN) return html;
-  if (!GOED_PAGINA.test(paginaPad) || paginaPad.indexOf('..') !== -1) return html;
-  if (html.indexOf('<style') === -1 && html.indexOf('<STYLE') === -1) return html;
-  let index = -1;
-  STYLE.lastIndex = 0;
-  return html.replace(STYLE, (heel, attrs, css) => {
-    index++;
-    if (String(attrs || '').trim() !== '') return heel;   // niet kaal: laten staan
-    if (css.length < DREMPEL) return heel;
-    if (!magVerhuizen(css)) return heel;
-    return '<link href="' + PAD + '?f=' + codeer(paginaPad) + '&i=' + index +
-           '&v=' + vinger(css) + '" rel="stylesheet">';
-  });
-}
+const machine = maakAfsplitsing({
+  PAD, TAG: STYLE, naam: 'style', type: 'text/css; charset=utf-8',
+  /* Tweehonderd stijlblokken op een pagina is al ruim voorbij alles wat hier
+     staat; daarboven is het geen verwijzing van ons. */
+  maxIndex: 200, aan: AAN, magVerhuizen,
+  verwijzing: (url) => '<link href="' + url + '" rel="stylesheet">'
+});
 
-/* ---- de uitleverkant: het blok terugzoeken in de bron ---- */
-function blokUit(html, index) {
-  let i = -1, gevonden = null;
-  STYLE.lastIndex = 0;
-  html.replace(STYLE, (heel, attrs, css) => {
-    i++;
-    if (i === index) gevonden = { attrs: String(attrs || '').trim(), css };
-    return heel;
-  });
-  return gevonden;
-}
-
-function stijlafsplitsing(publicDir) {
-  const cache = new Map(); // pad -> { mtime, size, blokken: Map(index -> {css, gz, br}) }
-  return (req, res, next) => {
-    if (req.path !== PAD) return next();
-    const paginaPad = decodeer(req.query && req.query.f);
-    const index = Number(req.query && req.query.i);
-    if (!GOED_PAGINA.test(paginaPad) || paginaPad.indexOf('..') !== -1) {
-      return res.status(400).type('text/plain').send('/* geen blok gevraagd */');
-    }
-    if (!Number.isInteger(index) || index < 0 || index > 200) {
-      return res.status(400).type('text/plain').send('/* geen blok gevraagd */');
-    }
-    const bestand = path.join(publicDir, paginaPad);
-    if (!bestand.startsWith(publicDir + path.sep)) return res.status(400).type('text/plain').send('/* buiten de map */');
-
-    let st;
-    try { st = fs.statSync(bestand); } catch (e) { return next(); }
-    const stempel = st.mtimeMs + ':' + st.size;
-
-    let hit = cache.get(paginaPad);
-    if (!hit || hit.stempel !== stempel) { hit = { stempel, blokken: new Map() }; cache.set(paginaPad, hit); }
-    let blok = hit.blokken.get(index);
-    if (!blok) {
-      let html;
-      try { html = fs.readFileSync(bestand, 'utf8'); } catch (e) { return next(); }
-      const gevonden = blokUit(html, index);
-      /* Staat het blok er niet meer (de pagina is gewijzigd terwijl er nog een
-         oude verwijzing openstond), dan is 404 het eerlijke antwoord: de
-         browser heeft dat adres al, en de nieuwe pagina vraagt een nieuwe url. */
-      if (!gevonden) return res.status(404).type('text/plain').send('/* blok bestaat niet meer */');
-      blok = { css: Buffer.from(gevonden.css, 'utf8') };
-      hit.blokken.set(index, blok);
-    }
-
-    res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    res.setHeader('Vary', 'Accept-Encoding');
-    /* De vingerafdruk staat in de url (zie de kop): zelfde adres is per
-       definitie dezelfde inhoud, dus dit mag echt lang blijven staan. */
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-
-    const ae = String(req.headers['accept-encoding'] || '');
-    const br = /\bbr\b/.test(ae), gz = !br && /\bgzip\b/.test(ae);
-    /* Stand 6, net als de twee bundels hiernaast: negen tiende van de winst van
-       stand 11 voor een vijftigste van de tijd. Eenmalig per blok, daarna uit
-       deze cache. */
-    if (br) {
-      if (!blok.br) blok.br = zlib.brotliCompressSync(blok.css, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 6 } });
-      res.setHeader('Content-Encoding', 'br');
-      return res.end(blok.br);
-    }
-    if (gz) {
-      if (!blok.gz) blok.gz = zlib.gzipSync(blok.css, { level: 6 });
-      res.setHeader('Content-Encoding', 'gzip');
-      return res.end(blok.gz);
-    }
-    return res.end(blok.css);
-  };
-}
-
-module.exports = { stijlafsplitsing, herschrijfHtml, blokUit, magVerhuizen, codeer, decodeer, PAD, DREMPEL, GOED_PAGINA };
+module.exports = { stijlafsplitsing: machine.uitleveren, herschrijfHtml: machine.herschrijfHtml,
+  blokUit: machine.blokUit, magVerhuizen, codeer, decodeer, PAD, DREMPEL, GOED_PAGINA };

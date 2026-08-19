@@ -432,7 +432,7 @@ try {
   anthropic = require('./ai').maakAI({ log });
   if (anthropic) {
     i18n.setAnthropic(anthropic);
-    const aiStand = require('./ai').beschikbaarheid(anthropic);
+    const aiStand = require('./ai-stand').beschikbaarheid(anthropic);
     console.log('Modelverrijking actief (' + aiStand.modus + '); aanbieders: ' + anthropic.aanbieders.join(', ') + '.');
   } else {
     console.log('Regelgestuurde werkmodus actief; vrije modelverrijking staat uit.');
@@ -649,7 +649,7 @@ function memberTemplate() {
 // Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
 // het proces leeft.)
 app.get('/api/health', (req, res) => {
-  const model = require('./ai').beschikbaarheid(anthropic);
+  const model = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({
     ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,

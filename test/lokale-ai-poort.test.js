@@ -24,6 +24,10 @@ const http = require('node:http');
 
 const LocalAI = require('../server/local-ai');
 
+/* De poort woont in ../server/local-ai-poort.js; hij wordt hier via de echte
+   LocalAI beproefd, want dat is de manier waarop hij in huis wordt gebruikt --
+   een poort die alleen los werkt zegt niets over de keten eromheen. */
+
 /* Een nagemaakte OpenAI-compatibele modelserver. `gedrag` bepaalt per verzoek
    wat hij doet, zodat een toets traagheid en storing kan naspelen. */
 function maakModelserver(gedrag) {
@@ -145,17 +149,17 @@ test('7. nul is een antwoord en geen leegte', async () => {
   const s = await maakModelserver(() => ({ traag: 300 }));
   try {
     const nul = maakClient(s.poort, { wachtMs: 0, herstelMs: 0 });
-    assert.equal(nul.wachtMs, 0, 'een expliciete nul blijft nul');
-    assert.equal(nul.herstelMs, 0);
+    assert.equal(nul.poort.wachtMs, 0, 'een expliciete nul blijft nul');
+    assert.equal(nul.poort.herstelMs, 0);
 
     const leeg = maakClient(s.poort, {});
-    assert.equal(leeg.wachtMs, 20000, 'niets gezet = de standaard');
-    assert.equal(leeg.herstelMs, 30000);
-    assert.equal(leeg.gelijktijdig, 2);
+    assert.equal(leeg.poort.wachtMs, 20000, 'niets gezet = de standaard');
+    assert.equal(leeg.poort.herstelMs, 30000);
+    assert.equal(leeg.poort.gelijktijdig, 2);
 
     const onzin = maakClient(s.poort, { wachtMs: 'geen getal', gelijktijdig: -5 });
-    assert.equal(onzin.wachtMs, 20000, 'onzin valt terug op de standaard');
-    assert.equal(onzin.gelijktijdig, 1, 'en een negatief aantal wordt naar het minimum getild');
+    assert.equal(onzin.poort.wachtMs, 20000, 'onzin valt terug op de standaard');
+    assert.equal(onzin.poort.gelijktijdig, 1, 'en een negatief aantal wordt naar het minimum getild');
 
     /* En het GEDRAG erachter: met wachtMs 0 gaat de tweede aanvrager niet in de
        rij maar meteen door, zodat de keten kan uitwijken. */

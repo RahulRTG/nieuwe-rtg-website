@@ -7,7 +7,8 @@ const basis = path.join(__dirname, '..');
 const lees = p => fs.readFileSync(path.join(basis, p), 'utf8');
 
 test('AI-beschikbaarheid onderscheidt verrijking van de werkende kern', () => {
-  const { maakAI, beschikbaarheid } = require('../server/ai');
+  const { maakAI } = require('../server/ai');
+  const { beschikbaarheid } = require('../server/ai-stand');
   const ai = maakAI({ anthropicKey: '', openaiKey: '', geminiKey: '', volgorde: [] });
   assert.equal(ai, null);
   assert.deepEqual(beschikbaarheid(ai), {
@@ -38,7 +39,8 @@ test('AI-beschikbaarheid onderscheidt verrijking van de werkende kern', () => {
 });
 
 test('lokale AI wordt als prive lokale verwerking getoond', () => {
-  const { maakAI, beschikbaarheid } = require('../server/ai');
+  const { maakAI } = require('../server/ai');
+  const { beschikbaarheid } = require('../server/ai-stand');
   const ai = maakAI({ localUrl: 'http://127.0.0.1:11434', local: { model: 'rtg-local', tools: true }, externUit: true });
   const s = beschikbaarheid(ai);
   assert.equal(s.beschikbaar, true);
@@ -54,7 +56,8 @@ test('lokale AI wordt als prive lokale verwerking getoond', () => {
 });
 
 test('een modelserver op het eigen netwerk wordt niet als verwerking op dit apparaat gelabeld', () => {
-  const { maakAI, beschikbaarheid } = require('../server/ai');
+  const { maakAI } = require('../server/ai');
+  const { beschikbaarheid } = require('../server/ai-stand');
   const ai = maakAI({ localUrl: 'http://192.168.1.20:11434',
     local: { model: 'rtg-local', lanToestaan: true }, externUit: true });
   const s = beschikbaarheid(ai);
@@ -64,7 +67,8 @@ test('een modelserver op het eigen netwerk wordt niet als verwerking op dit appa
 });
 
 test('een externe uitwijk naast lokaal wordt zichtbaar als hybride, nooit als volledig prive', () => {
-  const { maakAI, beschikbaarheid } = require('../server/ai');
+  const { maakAI } = require('../server/ai');
+  const { beschikbaarheid } = require('../server/ai-stand');
   const ai = maakAI({ localUrl: 'http://127.0.0.1:11434', local: { model: 'rtg-local', tools: false },
     anthropicKey: 'sk-test', anthropic: { apiKey: 'sk-test' } });
   const s = beschikbaarheid(ai);

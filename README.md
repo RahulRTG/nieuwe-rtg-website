@@ -857,6 +857,12 @@ browser over HTTP/2 op 80 ms latentie en 12 Mbit, mediaan van vijf ronden.
 | `middleware/versieadres.js` | elke `.js`/`.css`-verwijzing krijgt `?v=`, en mag dan `immutable` | `RTG_VINGERAFDRUK=0` |
 | `middleware/voordeur.js` | paginacompressie asynchroon (libuv-threadpool i.p.v. de event loop) | -- |
 
+De eerste twee zijn EEN machine met twee instellingen: het gereedschap
+(codering, padcontrole, vingerafdruk, cache, compressie, koppen) staat in
+`middleware/blokafsplitsing.js`, de afweging per soort blok bij de twee lagen
+zelf -- waarom een stijlblok mag verhuizen zonder dat de cascade schuift, en
+een scriptblok zonder dat de uitvoervolgorde schuift.
+
 Waarom dit ertoe doet: over alle 258 schermen was 74% van de 4,7 MB HTML inline
 CSS en JS. Dat is de ene bron die NOOIT gecachet kan worden -- een pagina draagt
 een eigen nonce, dus elk antwoord is anders. Op `/apps/app.html`:
@@ -875,7 +881,7 @@ byte-voor-byte de inline blokken, en over 1294 elementen x 25 berekende
 eigenschappen is er geen verschil. Alle 259 schermen zijn met en zonder de
 lagen langsgelopen; geen enkel scherm gedraagt zich anders.
 
-## De modelkraan: een meter en twee kranen (`server/ai-meter.js`)
+## De modelkraan: een meter en twee kranen (`server/ai-meter.js`, `server/ai-rem.js`)
 
 EERST DE STAND VAN ZAKEN, want die is minder alarmerend dan het klinkt:
 `npm run live:init` schrijft `RTG_AI_UIT=1`, dus productie start ZONDER model,
@@ -919,11 +925,14 @@ Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
 (`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de
 handmatige werkmodus die dit huis al draagt. De rem telt MODELAANROEPEN en geen
 routes, via dezelfde `AsyncLocalStorage` die `db/index.js` al gebruikt, zodat
-een nieuwe route er automatisch onder valt. De prijzen zijn een tabel met een
+een nieuwe route er automatisch onder valt. Meter en rem staan apart
+(`ai-meter.js` en `ai-rem.js`) omdat ze verschillende dingen doen: de meter
+meet en grijpt in als het geld op is, de rem stopt iemand die er in een minuut
+doorheen gaat. De prijzen zijn een tabel met een
 peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
 boekhouding.
 
-## De eigen modelserver heeft een poort (`server/local-ai.js`)
+## De eigen modelserver heeft een poort (`server/local-ai-poort.js`)
 
 Een externe aanbieder schaalt mee; een eigen modelserver niet. Die doet er twee,
 misschien vier tegelijk, en daarboven wordt hij niet langzamer maar STUK: alles
@@ -932,8 +941,10 @@ naar de betaalde aanbieder. Dat is de dure faalstand, en hij is stil -- de
 rekening ziet hem eerder dan een mens, en ondertussen verlaat de inhoud wel het
 huis.
 
-Twee kleppen daartegen, allebei in `local-ai.js` en niet in de HTTP-laag
-eronder (die bedient ook de betaalprovider en weet niets van een GPU):
+Twee kleppen daartegen, allebei in `local-ai-poort.js` en niet in de HTTP-laag
+eronder (die bedient ook de betaalprovider en weet niets van een GPU).
+`local-ai.js` ernaast gaat over modelkeuze en de netwerkgrens; de poort gaat
+over capaciteit:
 
 | schakelaar | wat | standaard |
 |---|---|---|

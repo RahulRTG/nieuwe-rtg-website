@@ -85,9 +85,9 @@ test('6. de index telt ALLE script-elementen, ook die blijven staan', () => {
   const html = '<body><script src="/eerst.js"></script>' + tag('var k=1;') + tag(groot()) + '</body>';
   const uit = herschrijfHtml(html, '/apps/app.html');
   assert.equal(verwijzing(uit).i, 2, 'het derde script-element is index 2');
-  assert.equal(blokUit(html, 1).js, 'var k=1;', 'index 1 is het kleine blok');
-  assert.ok(blokUit(html, 2).js.length >= DREMPEL, 'index 2 is het grote blok');
-  assert.equal(blokUit(html, 0).js, '', 'index 0 is het externe script, zonder inhoud');
+  assert.equal(blokUit(html, 1).inhoud, 'var k=1;', 'index 1 is het kleine blok');
+  assert.ok(blokUit(html, 2).inhoud.length >= DREMPEL, 'index 2 is het grote blok');
+  assert.equal(blokUit(html, 0).inhoud, '', 'index 0 is het externe script, zonder inhoud');
 });
 
 test('7. verandert het blok, dan verandert het adres mee', () => {

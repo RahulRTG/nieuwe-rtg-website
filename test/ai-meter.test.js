@@ -14,9 +14,11 @@
      2. EEN ONBEKEND MODEL TELT DUUR. Liever te vroeg dicht dan te laat.
      3. HET PLAFOND SLUIT, EN ALLEEN VOOR WIE GELD KOST.
      4. GEEN PLAFOND INGESTELD = NIETS VERANDERT. Dat is de stand van vandaag.
-     5. DE REM TELT AANROEPEN EN GEEN ROUTES, zodat route nummer 101 er
-        automatisch onder valt -- en hij remt niets zonder context, want
-        achtergrondwerk hoort niet stil te vallen omdat een bezoeker druk was.
+     5. DE INTERNE AI TELT IN ZIJN EIGEN EMMER, zonder bedrag, en raakt het
+        plafond niet -- anders zet een druk eigen model de externe uitwijk
+        dicht, precies verkeerd om.
+
+   De rem per aanroeper staat in ./ai-rem.test.js: die stopt, deze meet.
 
    Draai los: node --test test/ai-meter.test.js
    ========================================================================== */
@@ -24,8 +26,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const meter = require('../server/ai-meter');
 
-const schoon = () => { delete process.env.RTG_AI_DAGPLAFOND; delete process.env.RTG_AI_PRIJZEN;
-  delete process.env.RTG_AI_BEURTEN_PER_MINUUT; meter.nulstel(); };
+const schoon = () => { delete process.env.RTG_AI_DAGPLAFOND; delete process.env.RTG_AI_PRIJZEN; meter.nulstel(); };
 
 test('1. elke tokensoort tegen zijn eigen prijs', () => {
   schoon();
@@ -115,49 +116,9 @@ test('8. een antwoord zonder usage telt als aanroep, niet als kosten', () => {
   assert.equal(s.kostenUsd, 0);
 });
 
-/* ---- DE REM PER AANROEPER ---- */
-
-test('9. de rem telt modelaanroepen per aanroeper, niet routes', () => {
-  schoon();
-  process.env.RTG_AI_BEURTEN_PER_MINUUT = '3';
-  const t = Date.parse('2026-08-19T10:00:00Z');
-  assert.equal(meter.magNogVoor('1.2.3.4', t), true);
-  assert.equal(meter.magNogVoor('1.2.3.4', t), true);
-  assert.equal(meter.magNogVoor('1.2.3.4', t), true);
-  assert.equal(meter.magNogVoor('1.2.3.4', t), false, 'de vierde valt buiten');
-  // een ANDERE aanroeper heeft zijn eigen bak
-  assert.equal(meter.magNogVoor('5.6.7.8', t), true, 'de buurman wordt niet meegeremd');
-  // en een minuut later mag het weer
-  assert.equal(meter.magNogVoor('1.2.3.4', t + 61000), true, 'nieuw venster');
-  schoon();
-});
-
-test('10. zonder context geen rem -- achtergrondwerk hoort niet stil te vallen', () => {
-  schoon();
-  process.env.RTG_AI_BEURTEN_PER_MINUUT = '1';
-  // buiten een context: meter.wie() is null, dus de rem laat door
-  assert.equal(meter.wie(), null);
-  for (let i = 0; i < 20; i++) assert.equal(meter.magNogVoor(), true);
-  // binnen een context telt hij wel
-  meter.inContext('9.9.9.9', () => {
-    assert.equal(meter.wie(), '9.9.9.9');
-    assert.equal(meter.magNogVoor(), true);
-    assert.equal(meter.magNogVoor(), false, 'binnen de context remt hij wel');
-  });
-  schoon();
-});
-
-test('11. op nul staat de rem uit', () => {
-  schoon();
-  process.env.RTG_AI_BEURTEN_PER_MINUUT = '0';
-  assert.equal(meter.beurtGrens(), 0);
-  for (let i = 0; i < 200; i++) assert.equal(meter.magNogVoor('1.2.3.4'), true);
-  schoon();
-});
-
 /* ---- DE INTERNE AI: EIGEN EMMER, GEEN BEDRAG ---- */
 
-test('12. de interne AI telt mee, maar kost geen geld', () => {
+test('9. de interne AI telt mee, maar kost geen geld', () => {
   /* Zonder dit staat de meter op nul terwijl de eigen modelserver al het werk
      doet -- de keten is lokaal-eerst, dus dat is juist de normale stand. */
   schoon();
@@ -172,7 +133,7 @@ test('12. de interne AI telt mee, maar kost geen geld', () => {
   assert.equal(s.lokaal.perModel['mijn-model'], 2, 'per lokaal model uitgesplitst');
 });
 
-test('13. de interne AI raakt het dagplafond niet', () => {
+test('10. de interne AI raakt het dagplafond niet', () => {
   /* De kraan is voor de rekening. Zou intern meetellen, dan zou een druk eigen
      model de externe uitwijk dichtzetten -- precies verkeerd om. */
   schoon();
@@ -183,7 +144,7 @@ test('13. de interne AI raakt het dagplafond niet', () => {
   schoon();
 });
 
-test('14. het aandeel extern is het signaal dat de eigen server afhaakt', () => {
+test('11. het aandeel extern is het signaal dat de eigen server afhaakt', () => {
   schoon();
   assert.equal(meter.stand().aandeelExtern, null, 'zonder verkeer zegt een percentage niets');
   for (let i = 0; i < 9; i++) meter.boekLokaal('mijn-model', {});
@@ -194,7 +155,7 @@ test('14. het aandeel extern is het signaal dat de eigen server afhaakt', () => 
   schoon();
 });
 
-test('15. een mislukte interne aanroep telt apart', () => {
+test('12. een mislukte interne aanroep telt apart', () => {
   schoon();
   meter.boekLokaalFout();
   meter.boekFout();

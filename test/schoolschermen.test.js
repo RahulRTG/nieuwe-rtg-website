@@ -240,3 +240,42 @@ test('Proof of Learning staat op beide schermen: het bewijs en de observatie', (
   assert.ok(partner.includes('/apps/schoolpartner/bewijs.js'), 'School Partner laadt bewijs.js niet');
   assert.ok(partner.includes('id="bewijsVorm"'));
 });
+
+test('de Memory Engine loopt door dezelfde oefenweg, zonder verwijt', () => {
+  const leer = lees('apps', 'rtgschool', 'leer.js');
+  const rtgschool = lees('apps', 'rtgschool.html');
+
+  assert.match(leer, /\/api\/leerstof\/herhalen/, 'het scherm vraagt niet op wat er terugkomt');
+  assert.match(leer, /\/api\/leerstof\/herhaal'/, 'en start de herhaling niet');
+
+  /* De kern van de belofte: een herhaalvraag ziet er hetzelfde uit als een
+     nieuwe vraag. Daarom loopt hij door dezelfde kaart (vraagToon op
+     'oefenKaart') en is er GEEN eigen antwoordroute -- die zou het verschil
+     alsnog binnenlaten. */
+  const start = leer.slice(leer.indexOf('async function herhaalStart'), leer.indexOf('async function oefenStart'));
+  assert.match(start, /vraagToon\('oefenKaart'/, 'een herhaling hoort door dezelfde kaart te lopen');
+  assert.doesNotMatch(leer, /herhaal-antwoord|herhaalAntwoord/, 'een herhaling wordt beantwoord door dezelfde functie');
+
+  /* En er komt geen merkteken bij dat zegt "dit had je moeten weten". Alleen
+     de KAART wordt hierop gemeten en niet het hele bestand: de kop van dat
+     bestand belooft met zoveel woorden dat zo'n merkteken er niet komt. */
+  const kaart = leer.slice(leer.indexOf('async function toonHerhalingen'), leer.indexOf('async function herhaalStart'));
+  assert.doesNotMatch(kaart, /te laat|achterstand|had je moeten|vergeten|fout/i);
+  for (const bron of [rtgschool, leerpaspoort]) {
+    assert.ok(bron.includes('id="herhaalLijst"'), 'het scherm mist de kaart met wat terugkomt');
+    assert.match(bron, /Niet omdat het fout ging/, 'de kaart hoort zelf te zeggen waarom iets terugkomt');
+  }
+});
+
+/* Deze toets komt uit een echte fout: leerpaspoort.html hergebruikt leer.js met
+   een vertaaltabel naar /api/rtf/leerling/*, en een nieuwe route in leer.js
+   zonder regel in die tabel wordt een verzoek aan "/api/rtf/leerlingundefined".
+   Dat is stil kapot -- het scherm meldt alleen "er ging iets mis". */
+test('elke route die leer.js aanroept staat in de vertaaltabel van het leerpaspoort', () => {
+  const leer = lees('apps', 'rtgschool', 'leer.js');
+  const gevraagd = [...new Set((leer.match(/api\('\/api\/[a-z0-9/-]+'/g) || [])
+    .map(m => m.slice(5, -1)))];
+  assert.ok(gevraagd.length >= 6, 'de scan vindt te weinig routes; klopt het patroon nog?');
+  for (const pad of gevraagd)
+    assert.ok(leerpaspoort.includes("'" + pad + "':"), 'leerpaspoort.html vertaalt ' + pad + ' niet');
+});

@@ -51,7 +51,8 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | het hele po | **111 doelen** over zeven vakken, elk met voorkennis en meer dan een uitleg | `kern/leerstof-data/` |
 | vo t/m wo | **55 doelen** over twintig vakken; vmbo 15, havo 34, vwo 38, mbo 10, hbo 4, wo 5 | `kern/leerstof-data/vo-*.js`, `vervolg*.js` |
 | de hele bibliotheek | **geen enkel leerdoel** put nog uit een handgeschreven vragenlijst; 333 uitlegvarianten | `test/leerfabric.test.js` |
-| Proof of Learning | elke beheersing draagt haar bewijs; vijf soorten, zelfgemeld telt minder, school bevestigt | `kern/onderwijs.js`, `school/bewijs.js` |
+| Proof of Learning | elke beheersing draagt haar bewijs; zes soorten, zelfgemeld telt minder, school bevestigt | `kern/onderwijs-bewijs.js`, `school/bewijs.js` |
+| Memory Engine | herhaalmoment per behaald doel; drie vragen, reeks 2/7/21/60/180 dagen | `kern/onderwijs-geheugen.js`, `kern/leerstof-herhalen.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -135,6 +136,10 @@ erbij, precies zoals `school/analyse-signalen.js` dat vandaag al doet. Zie §11.
 
 ## 4. De Memory Engine -- van leren-toets-vergeten naar leren-beheersen-onthouden
 
+> **Gebouwd op 19 augustus 2026.** Elk behaald leerdoel draagt een
+> herhaalmoment, wat terugkomt zijn drie korte vragen, en die lopen door
+> dezelfde weg als een gewone oefensessie.
+
 Schoolsoftware kijkt naar gisteren. Deze laag kijkt naar wat een leerling
 **dreigt te vergeten**. Elke beheerste node krijgt een retentiestand en een
 herhaalmoment; wat terugkomt zijn drie korte controlevragen, niet de hele les
@@ -143,6 +148,36 @@ opnieuw.
 De regel eromheen: **herhalen is geen straf en geen achterstand.** Een
 herhaalvraag ziet er in het scherm hetzelfde uit als een nieuwe vraag, en er
 komt geen enkele markering bij die zegt "dit had je moeten weten".
+
+**Die belofte staat in de weg zelf en niet in het scherm.** Een herhaalsessie
+zet zichzelf in dezelfde sessieplek als een oefensessie en wordt beantwoord
+door dezelfde functie; alleen het starten gaat langs een eigen route, en alleen
+het einde loopt anders af. Er is met opzet geen `herhaal-antwoord`: een tweede
+antwoordweg is precies de plek waar het verschil alsnog binnensluipt.
+
+**En de server meldt niet hoe laat het is.** Wat openstaat komt terug als een
+naam en een vak, zonder datum en zonder aantal dagen. Dat is geen keuze van het
+scherm: er kan geen "je bent twaalf dagen te laat" op een scherm belanden omdat
+het nergens vandaan te halen is. Wat nog moet komen draagt wel een datum -- een
+vooruitzicht is geen verwijt.
+
+**De reeks in dagen is 2, 7, 21, 60, 180.** Een geslaagde ophaling zet een
+trede hoger; een mindere zet **een** trede terug en nooit naar nul, en laat het
+doel binnenkort terugkomen. Wie het na twee maanden even kwijt is, begint niet
+opnieuw bij af. Een leerdoel raak je door een mindere ronde niet kwijt, en er
+wordt geen bewijs vastgelegd van wat er niet lukte: dit huis houdt geen dossier
+bij van de missers van een kind.
+
+**Wat je op school laat zien, hoef je thuis niet nog eens.** Bewijs van school
+(een becijferde toets, een observatie) schuift het moment vooruit -- alleen
+vooruit, want dit mag een herhaling nooit naar voren halen.
+
+Twee dingen die eruit volgen. Een geslaagde herhaling na weken is **beter
+bewijs** dan de eerste sessie, dus ze telt mee in Proof of Learning als een
+eigen soort. En een leerdoel van vóór deze laag krijgt zijn eerste moment bij
+de eerste keer kijken en niet met terugwerkende kracht: dat laatste zou een
+leerling met honderd doelen op dag een honderd herhalingen geven, en dat is
+precies de berg waar deze laag tegen bedoeld is.
 
 ---
 
@@ -232,6 +267,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een leerdoel staat op precies één plek | de bibliotheek gooit bij een dubbele id | **ja** (`kern/leerstof-bibliotheek.js`) |
 | Beheersing draagt altijd haar bewijs | elk behaald doel heeft bewijsregels; een leerling kan ze opvragen | **ja** (`test/bewijs.test.js`) |
 | Een leerling bevestigt zichzelf niet | toets en observatie alleen via school | **ja**, met mutatie beproefd |
+| Een herhaalvraag ziet eruit als een nieuwe vraag | zelfde kaart, zelfde antwoordroute; geen tweede weg | **ja** (`test/schoolschermen.test.js`) |
+| Herhalen meldt nooit hoe laat je bent | de open lijst draagt geen datum en geen achterstand | **ja**, met mutatie beproefd |
+| Een mindere herhaling wist niets | leerdoel blijft staan, reeks valt EEN trede terug | **ja** (`test/geheugen.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -448,7 +486,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    "Waarom?" bij de leerling, de observatie bij de leraar, en de brug van een
    becijferde schooltoets naar het leerpaspoort -- de eerste keer dat een
    schoolmodule het paspoort bijschrijft.
-3. **Memory Engine.** Retentiestand per node en de drie herhaalvragen.
+3. **Memory Engine.** Gedaan: retentiestand per behaald doel, de drie
+   herhaalvragen door dezelfde weg als een oefensessie, en de kaart "wat komt
+   er terug" op beide leerlingschermen.
 4. **Misconception Graph + Explain Differently.** Foutpatronen classificeren en
    dezelfde stof anders aanbieden.
 5. **Daily Learning Guarantee.** Het dagbudget dat uit 1 t/m 4 volgt -- en pas

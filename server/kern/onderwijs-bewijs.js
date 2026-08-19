@@ -23,10 +23,16 @@ const BEWIJSSOORTEN = {
   oefening: { naam: 'oefensessie', zelf: true },
   huiswerk: { naam: 'oefen-huiswerk', zelf: true },
   praktijk: { naam: 'praktijkopdracht', zelf: true },
+  herhaling: { naam: 'herhaling na een tijd', zelf: true },
   toets: { naam: 'toets', zelf: false },
   observatie: { naam: 'gezien door een leraar', zelf: false }
 };
 const MAX_BEWIJS = 20;
+/* De Memory Engine plant het herhaalmoment; hier wordt het alleen AANGEZET bij
+   een nieuw doel en VOORUITGESCHOVEN bij bewijs van school ("je hebt het net
+   laten zien"). Het opschuiven van de reeks zelf gebeurt daar en nergens
+   anders, anders heeft het rooster twee eigenaren. */
+const { begin, uitstel } = require('./onderwijs-geheugen');
 
 /* De beheersing volgt UIT het bewijs en wordt nooit opgeslagen: een
    opgeslagen oordeel raakt los van waar het op stoelde. */
@@ -75,10 +81,12 @@ function maakBewijs({ paspoort, save, nu, scho }) {
     if (!p.doelen[doel]) p.doelen[doel] = { fase: p.fase || scho(d.fase, 20) || null, op: nu(), bewijs: [] };
     const rij = p.doelen[doel];
     if (!Array.isArray(rij.bewijs)) rij.bewijs = [];
+    begin(rij, nu());
     if (soort) {
       rij.bewijs.push({ soort, at: nu(), detail: scho(d.bewijs && d.bewijs.detail, 120) || null,
         door: opties.vanSchool ? (scho(d.bewijs && d.bewijs.door, 60) || 'school') : null });
       if (rij.bewijs.length > MAX_BEWIJS) rij.bewijs.splice(0, rij.bewijs.length - MAX_BEWIJS);
+      if (!BEWIJSSOORTEN[soort].zelf) uitstel(rij, nu());
       rij.laatste = nu();
     }
     p.at = nu(); save();

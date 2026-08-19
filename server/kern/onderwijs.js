@@ -9,6 +9,7 @@
    systeem maar besloten door een mens. */
 const { FASEN, TRAPPEN, REFERENTIE, DOORSTROOM, EERLIJK } = require('./onderwijs-ladder');
 const { maakBewijs, beheersingVan, BEWIJSSOORTEN } = require('./onderwijs-bewijs');
+const { maakGeheugen } = require('./onderwijs-geheugen');
 
 function maakOnderwijs({ db, save, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
@@ -97,8 +98,12 @@ function maakOnderwijs({ db, save, schoon }) {
      Proof of Learning woont in een eigen module: het paspoort weet WAT je
      kunt, die laag weet WAAROM we dat denken. Zelfde opslag, andere vraag. */
   const { doelBehaald, bewijsVan } = maakBewijs({ paspoort, save, nu, scho });
+  /* De Memory Engine: wanneer komt een behaald doel terug. Ook hier geldt dat
+     het bij het leerdoel in het paspoort hoort en niet in een lijst ernaast. */
+  const { herhalingen, noteerOphaling, staatOpen } = maakGeheugen({ paspoort, save, nu });
 
-  return { ladder, mijn, inschrijf, jaarOver, doelBehaald, bewijsVan, beheersingVan, magNaar, FASEN, BEWIJSSOORTEN };
+  return { ladder, mijn, inschrijf, jaarOver, doelBehaald, bewijsVan, beheersingVan,
+    herhalingen, noteerOphaling, staatOpen, magNaar, FASEN, BEWIJSSOORTEN };
 }
 
 module.exports = { maakOnderwijs };

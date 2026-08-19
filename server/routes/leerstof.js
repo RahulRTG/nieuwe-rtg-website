@@ -13,6 +13,11 @@ module.exports = (kern) => {
   app.post('/api/leerstof/pad', auth, (req, res) => stuur(res, leerstof.leerstofPad(req.session.key, req.body || {})));
   app.post('/api/leerstof/oefen', auth, (req, res) => stuur(res, leerstof.leerstofOefenStart(req.session.key, req.body || {})));
   app.post('/api/leerstof/antwoord', auth, (req, res) => stuur(res, leerstof.leerstofOefenAntwoord(req.session.key, req.body || {})));
+  /* De Memory Engine: wat komt er terug, en de drie vragen die dat dan zijn.
+     Er is geen aparte antwoordroute -- een herhaling loopt door /antwoord, want
+     een herhaalvraag hoort er hetzelfde uit te zien als een nieuwe vraag. */
+  app.post('/api/leerstof/herhalen', auth, (req, res) => stuur(res, leerstof.leerstofHerhalen(req.session.key)));
+  app.post('/api/leerstof/herhaal', auth, (req, res) => stuur(res, leerstof.leerstofHerhaalStart(req.session.key, req.body || {})));
   // golf 3: examentraining (terugblik pas aan het eind, zoals een echt examen)
   app.post('/api/leerstof/examen', auth, (req, res) => stuur(res, vervolg.examenStart(req.session.key, req.body || {})));
   app.post('/api/leerstof/examen-antwoord', auth, (req, res) => stuur(res, vervolg.examenAntwoord(req.session.key, req.body || {})));

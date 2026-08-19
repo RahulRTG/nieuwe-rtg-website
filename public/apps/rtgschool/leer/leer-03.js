@@ -15,6 +15,46 @@
     }
   }
 
+  /* ---- de Memory Engine: wat komt er terug ----
+
+     Drie dingen die dit scherm met opzet NIET doet. Er staat niet bij hoe lang
+     iets geleden is (de server stuurt dat niet eens mee bij wat openstaat), er
+     komt geen merkteken bij dat zegt "dit had je moeten weten", en de vragen
+     zelf lopen door precies dezelfde kaart en dezelfde functies als een gewone
+     oefensessie -- een herhaalvraag hoort er hetzelfde uit te zien als een
+     nieuwe vraag. */
+  async function toonHerhalingen() {
+    var el = document.getElementById('herhaalLijst');
+    if (!el) return;
+    try {
+      var d = await api('/api/leerstof/herhalen');
+      el.innerHTML = d.open.length
+        ? d.open.slice(0, 12).map(function (o) {
+            return '<div class="doel"><span>' + esc(o.naam) + ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(o.vak) + ')</span></span>' +
+              '<span class="rij"><button class="knop" data-herhaal="' + esc(o.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">' + d.vragen + ' vragen</button></span></div>';
+          }).join('')
+        : '<div class="leeg">Er staat vandaag niets klaar om terug te halen.' +
+          (d.later.length ? ' Het eerstvolgende komt op ' + esc(String(d.later[0].volgende).slice(0, 10)) + '.' : '') + '</div>';
+      el.querySelectorAll('[data-herhaal]').forEach(function (b) {
+        b.addEventListener('click', function () { herhaalStart(b.dataset.herhaal); });
+      });
+    } catch (e) { el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  }
+
+  /* Zelfde kaart, zelfde vraagweergave, zelfde antwoordknop als hierboven:
+     alleen het STARTEN gaat langs een andere route, en het aantal vragen is
+     kleiner. Vanaf de eerste vraag is er geen verschil meer. */
+  async function herhaalStart(doelId) {
+    try {
+      var d = await api('/api/leerstof/herhaal', { doel: doelId });
+      var k = document.getElementById('oefenKaart');
+      k.hidden = false;
+      document.getElementById('oefenUit').textContent = '';
+      vraagToon('oefenKaart', d.vraag, d.opties, 'oefenStand', d.nr + '/' + d.totaal + ' \u00b7 ' + d.naam);
+      k.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (e) { meld(e.message); }
+  }
+
   async function oefenStart(doelId) {
     try {
       var d = await api('/api/leerstof/oefen', { doel: doelId });
@@ -34,9 +74,13 @@
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';
         document.getElementById('oefenIn').parentElement.hidden = true;
+        /* Een herhaling eindigt anders dan een oefensessie: er valt niets bij
+           te schrijven, want het doel stond er al. Het slotwoord komt van de
+           server, zodat er hier geen tweede versie van diezelfde toon ontstaat. */
         uit.innerHTML = regel + '<br><b>' + d.aantalGoed + ' van de ' + d.totaal + ' goed.</b> ' +
-          (d.behaald ? 'Dit leerdoel staat nu in je leerpaspoort.' : esc(d.advies || ''));
+          (d.slot ? esc(d.slot) : (d.behaald ? 'Dit leerdoel staat nu in je leerpaspoort.' : esc(d.advies || '')));
         laadPaspoort();
+        toonHerhalingen();
       } else {
         uit.innerHTML = regel;
         vraagToon('oefenKaart', d.vraag, d.opties, 'oefenStand', d.nr + 1 + '/' + d.totaal);
@@ -107,6 +151,7 @@
     });
     document.getElementById('oefenStuur').addEventListener('click', function () { oefenAntwoord(document.getElementById('oefenIn').value); });
     document.getElementById('oefenIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') oefenAntwoord(this.value); });
+    toonHerhalingen();
     if (window.RTGSchoolMeer) RTGSchoolMeer.start();
   }
 

@@ -14,6 +14,11 @@ const { DOELEN, PER_GROEP, PER_FASE } = require('./leerstof-bibliotheek');
    een doel) staat in ./leerstof-fabric.js; hij bezit de doelen niet, dus die
    komen er hier bij. */
 const { UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad: fabricPad } = require('./leerstof-fabric');
+/* De Memory Engine: wat een leerling dreigt te vergeten komt terug als drie
+   korte vragen. De planning staat in kern/onderwijs-geheugen.js, de vragen in
+   ./leerstof-herhalen.js -- en die lopen met opzet door dezelfde antwoordweg
+   als een gewone oefensessie. */
+const { maakHerhalen } = require('./leerstof-herhalen');
 const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
 
@@ -72,6 +77,9 @@ function maakLeerstof({ db, save, onderwijs }) {
       let: onder.length ? null : 'Voor dit leerdoel staat (nog) geen voorkennis in de leerlijn.' };
   }
 
+  const { herhaalLijst, herhaalStart, herhaalKlaar } =
+    maakHerhalen({ onderwijs, sessies, save, opgave, DOELEN, nu });
+
   /* ---- oefenen: vijf verse opgaven, een tegelijk, antwoorden op de server ---- */
   function oefenStart(key, d) {
     const doel = DOELEN[String(d && d.doel || '')];
@@ -95,7 +103,13 @@ function maakLeerstof({ db, save, onderwijs }) {
     s.ix += 1;
     const klaar = s.ix >= s.vragen.length;
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: s.ix, totaal: s.vragen.length, aantalGoed: s.goed, klaar };
-    if (klaar) {
+    if (klaar && s.herhaling) {
+      /* Een herhaling loopt tot hier precies gelijk aan een oefensessie -- dat
+         is de belofte -- en pas aan het eind anders: het doel is al behaald,
+         dus er valt niets bij te schrijven maar wel iets te plannen. */
+      Object.assign(uit, herhaalKlaar(key, s));
+      delete sessies()['lid:' + key];
+    } else if (klaar) {
       uit.behaald = s.goed >= (s.drempel || BEHAALD_BIJ);
       if (uit.behaald) {
         /* Het bewijs reist mee: wat er is gedaan en hoe het ging. Zonder dat
@@ -130,6 +144,7 @@ function maakLeerstof({ db, save, onderwijs }) {
   }
 
   return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord,
+    leerstofHerhalen: herhaalLijst, leerstofHerhaalStart: herhaalStart,
     leerstofPad: (key, d) => {
       const doel = DOELEN[String(d && d.doel || '')];
       if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };

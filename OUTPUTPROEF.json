@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T21:34:03.910Z",
-  "commit": "3a0d19b",
+  "op": "2026-08-19T21:35:34.057Z",
+  "commit": "e857668",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3657,
-  "onbeslist": 359,
-  "blind": 171,
+  "bewezen": 3681,
+  "onbeslist": 334,
+  "blind": 172,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -14474,74 +14474,84 @@
    "reden": "er is over DEZE route gelogen en command-routes-herstel.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/command/canary": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/zandbak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/mdm": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/apipoort": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/land": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/stad": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/alarm": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/herkomst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/kwaliteit": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/command/graaf": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/slo": {
    "staat": "bewezen",
@@ -14560,39 +14570,44 @@
    "reden": "er is over DEZE route gelogen en slo-routes.test.js zakte daarop"
   },
   "POST /api/command/canary/start": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/mdm/samen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/apipoort/sleutel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/land/activeer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/stad/start": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "commandlagen.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 135); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en commandlagen.test.js zakte daarop"
   },
   "POST /api/command/alarm/stil": {
    "staat": "onbeslist",
@@ -16547,11 +16562,12 @@
    "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/rtf/social/snap/view": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/rtf/social/story/post": {
    "staat": "bewezen",
@@ -16562,11 +16578,12 @@
    "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/opdracht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "GET /api/stream": {
    "staat": "bewezen",
@@ -16577,25 +16594,28 @@
    "reden": "er is over DEZE route gelogen en samen.test.js zakte daarop"
   },
   "POST /api/rtf/social/call": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/rtf/social/kind/contacten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/rtf/social/kind/verwijder": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/translate": {
    "staat": "blind",
@@ -16614,32 +16634,36 @@
    "reden": "er is over DEZE route gelogen en payroll.test.js zakte daarop"
   },
   "POST /api/rtf/vacatures": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/rtf/solliciteer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/foundation/gezin/sollicitaties": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/supplier/vacature/verwijder": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/fout/client": {
    "staat": "bewezen",
@@ -16674,11 +16698,12 @@
    "reden": "er is over DEZE route gelogen en talen.test.js zakte daarop"
   },
   "GET /api/foundation/impact": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "foundation.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/techniek/fouten/wis": {
    "staat": "bewezen",
@@ -53064,6 +53089,131 @@
    "toets": "foundation.test.js",
    "merkt": true,
    "op": "2026-08-19T21:34:03.734Z"
+  },
+  "POST /api/rtf/social/snap/view": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:06.118Z"
+  },
+  "POST /api/rtf/social/opdracht": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:07.564Z"
+  },
+  "POST /api/rtf/social/call": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:17.194Z"
+  },
+  "POST /api/rtf/social/kind/verwijder": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:22.381Z"
+  },
+  "POST /api/rtf/social/kind/contacten": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:22.460Z"
+  },
+  "POST /api/rtf/vacatures": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:24.078Z"
+  },
+  "POST /api/rtf/solliciteer": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:33.287Z"
+  },
+  "POST /api/foundation/gezin/sollicitaties": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:38.922Z"
+  },
+  "POST /api/supplier/vacature/verwijder": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:39.002Z"
+  },
+  "GET /api/foundation/impact": {
+   "toets": "foundation.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:40.840Z"
+  },
+  "POST /api/command/canary": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:34:54.844Z"
+  },
+  "POST /api/command/zandbak": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:00.856Z"
+  },
+  "POST /api/command/mdm": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:01.170Z"
+  },
+  "POST /api/command/apipoort": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:03.320Z"
+  },
+  "POST /api/command/land": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:06.067Z"
+  },
+  "POST /api/command/stad": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:12.015Z"
+  },
+  "POST /api/command/alarm": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:12.042Z"
+  },
+  "POST /api/command/herkomst": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:14.665Z"
+  },
+  "POST /api/command/kwaliteit": {
+   "toets": "commandlagen.test.js",
+   "merkt": false,
+   "op": "2026-08-19T21:35:17.472Z"
+  },
+  "POST /api/command/graaf": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:22.828Z"
+  },
+  "POST /api/command/canary/start": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:23.031Z"
+  },
+  "POST /api/command/mdm/samen": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:25.787Z"
+  },
+  "POST /api/command/apipoort/sleutel": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:28.635Z"
+  },
+  "POST /api/command/land/activeer": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:33.668Z"
+  },
+  "POST /api/command/stad/start": {
+   "toets": "commandlagen.test.js",
+   "merkt": true,
+   "op": "2026-08-19T21:35:33.972Z"
   }
  },
  "basislijn": {
@@ -53519,6 +53669,7 @@
   "bank.test.js": "groen",
   "spelpoort.test.js": "groen",
   "bureau.test.js": "groen",
-  "foundation.test.js": "groen"
+  "foundation.test.js": "groen",
+  "commandlagen.test.js": "groen"
  }
 }

@@ -87,9 +87,21 @@ router.get('/health', (req, res) => {
   res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
 });
 
+/* De onderwijskern (het leerpaspoort) komt LAAT binnen: hij wordt in
+   server.js gemaakt, na deze module. School heeft hem nodig om bewijs van
+   beheersing in het paspoort van een leerling te schrijven -- een toets die
+   een leraar becijfert, is bewijs dat die leerling iets kan.
+
+   Daarom een getter en geen waarde: bij het opstarten is hij er nog niet, en
+   een school die dan al draait, hoort niet om te vallen maar het bewijs
+   gewoon over te slaan. */
+let onderwijsKern = null;
+function setOnderwijs(o) { onderwijsKern = o; }
+
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
-require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic });
+require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+  onderwijs: () => onderwijsKern, rtfHandle });
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 
@@ -138,4 +150,4 @@ function leerlingPassen(sess) {
 
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };
+module.exports = { setOnderwijs, router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };

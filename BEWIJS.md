@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1023 bestanden en 6809 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1024 bestanden en 6813 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1023 |
-| losse beweringen (`test(...)`) | 6809 |
+| toetsbestanden | 1024 |
+| losse beweringen (`test(...)`) | 6813 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 96 |
+| niets van beide | 97 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-897 bestanden, 6589 beweringen.
+898 bestanden, 6593 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -118,6 +118,7 @@ toets omvalt.
 | `bewaartermijnen.test.js` | 10 | gezakt op `false->true` | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
 | `bewaarveger.test.js` | 11 | gezakt op `+->-` | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |
 | `bewaarwacht.test.js` | 7 | gezakt op `===->!==` | DE BEWAARWACHT -- kijkt vanzelf, en houdt zich in. Een bewaarbeleid faalt op twee manieren die allebei stil zijn: niemand kijkt ooit -> de termijn staat op papier en nergens anders de wacht wist zelf -> data... |
+| `bewijs.test.js` | 3 | -- | Proof of Learning: bewijs onder elke beheersing. De belofte die hier hard wordt gemaakt: "behaald" is geen bewering meer maar een conclusie uit bewijs, en een leerling kan altijd navragen waarop die conclusie berust. |
 | `bewijsmatrix.test.js` | 17 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
 | `bezorg.test.js` | 5 | gezakt op `liegpoort /api/` | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |
 | `bezorging.test.js` | 1 | gezakt op `liegpoort /api/` | DE BEZORGING -- van assortiment tot voordeur, met GPS. WAAROM DIT ER IS De bezorgketen raakt vier mensen achter elkaar: de manager richt de dienst in, een lid bestelt en betaalt, een bezorger neemt de rit aan, en de... |
@@ -707,7 +708,7 @@ toets omvalt.
 | `schoolkoppel.test.js` | 9 | gezakt op `liegpoort /api/` | De drie punten die na de enterprise-ronde openstonden, nu gebouwd en nagetrokken: de webhookbezorging, het machtigingenregister en de anonieme tevredenheidspeiling. Wat hier bewezen wordt: - een gebeurtenis wordt... |
 | `schoolniveau.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School: het niveau van een klas komt van de officiele ladder. Een klas had alleen een vrije naam ("3B", "Meester Jan"), en die naam ging als "niveau" de AI-bijles in en liet de toets-bibliotheek aan elke leraar... |
 | `schoolrest.test.js` | 10 | gezakt op `liegpoort /api/` | De achttien schoolroutes die na de enterprise-ronde nooit door een toets werden aangeraakt. WAAROM DIT BESTAND ER IS. |
-| `schoolschermen.test.js` | 7 | geen module gevonden | De zichtbare enterprise-belofte van RTG School. Deze toets voorkomt dat School Partner en het gezinsscherm opnieuw twee losse producten worden, of dat een schoolsleutel stilletjes permanent in de browser terechtkomt. |
+| `schoolschermen.test.js` | 8 | geen module gevonden | De zichtbare enterprise-belofte van RTG School. Deze toets voorkomt dat School Partner en het gezinsscherm opnieuw twee losse producten worden, of dat een schoolsleutel stilletjes permanent in de browser terechtkomt. |
 | `schooltaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de tweetalige klasgenoot: een kind uit het buitenland ziet de klas in de eigen taal EN in het Nederlands (de taal die het erbij leert). |
 | `schooltoets.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School x leerstof-motor: de leraar vinkt leerdoelen aan en heeft een SO/proefwerk/examen klaar (verse opgaven per leerling, server kijkt na, geen goed/fout-verklikker halverwege), een MO geeft de leraar de vragen... |
 | `schoolverbonden.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de verbonden klas: het lerarenteam (max drie vast), de waarnemer die een klas van een collega overneemt, de online les voor thuiswerken, en huiswerk dat aan een leerdoel hangt en zichzelf afvinkt als het... |

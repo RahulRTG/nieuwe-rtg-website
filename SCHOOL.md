@@ -51,6 +51,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | het hele po | **111 doelen** over zeven vakken, elk met voorkennis en meer dan een uitleg | `kern/leerstof-data/` |
 | vo t/m wo | **55 doelen** over twintig vakken; vmbo 15, havo 34, vwo 38, mbo 10, hbo 4, wo 5 | `kern/leerstof-data/vo-*.js`, `vervolg*.js` |
 | de hele bibliotheek | **geen enkel leerdoel** put nog uit een handgeschreven vragenlijst; 333 uitlegvarianten | `test/leerfabric.test.js` |
+| Proof of Learning | elke beheersing draagt haar bewijs; vijf soorten, zelfgemeld telt minder, school bevestigt | `kern/onderwijs.js`, `school/bewijs.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -171,6 +172,11 @@ van generatieve AI dan een chatbot naast het scherm.
 
 ## 6. Proof of Learning -- waarom denkt RTG dat ik dit kan?
 
+> **Gebouwd op 19 augustus 2026.** Elk behaald leerdoel draagt zijn bewijs, de
+> leerling kan het opvragen, en een becijferde schooltoets landt vanzelf in het
+> paspoort. Wat hieronder staat is dus geen plan meer maar de beschrijving van
+> wat er draait.
+
 `mastered = true` is een bewering. Een bewering hoort bewijs te dragen:
 
 ```
@@ -185,6 +191,22 @@ Elke leerling kan dat opvragen -- letterlijk de vraag "waarom denkt RTG dat ik
 dit kan?" -- en elke docent ook. Dat sluit aan op de bewijsarchitectuur die dit
 huis al draagt (`BEWIJS.md`, `BEWIJSMATRIX.json`): een claim zonder bewijs is
 hier geen claim.
+
+**Vijf soorten bewijs, en niet alles weegt even zwaar.** Een oefensessie, een
+oefen-huiswerk en een praktijkopdracht meld je zelf; een toets en een
+observatie komen van school, met de naam van wie het zag. Alleen met
+bevestiging van buiten je eigen sessies kan een beheersing **sterk** worden --
+anders is "bevestigd door school" een vinkje dat iedereen zelf zet. De server
+weigert een leerling die zichzelf een toets toekent.
+
+**Wat sterk maakt is onafhankelijkheid, geen hoeveelheid.** Twee bevestigingen
+van school (een toets en een observatie) wegen zwaarder dan drie eigen
+oefensessies achter elkaar: die kunnen alle drie op dezelfde goede dag vallen.
+
+**En er komt geen getal uit.** De beheersing is een woord -- enkel, stevig,
+sterk -- met de telling erbij. Geen percentage, geen vergelijking, geen
+ranglijst; het woord wordt bovendien niet opgeslagen maar telkens uit het
+bewijs afgeleid, want een opgeslagen oordeel raakt los van waar het op stoelde.
 
 Twee dingen die daaruit volgen:
 
@@ -208,6 +230,8 @@ worden -- door de school, door ons, door een toezichthouder.
 | Elke leerling kan elke schooldag elk actief vak oefenen | dekkingsmeter: vakken met minstens één oefenbaar leerdoel per fase | **ja** voor po en vo; mbo t/m wo dun |
 | Een oefening is nooit na drie keer een geheugenspel | geen enkel leerdoel put uit een vaste vragenlijst | **ja**, hele bibliotheek (`test/leerfabric.test.js`) |
 | Een leerdoel staat op precies één plek | de bibliotheek gooit bij een dubbele id | **ja** (`kern/leerstof-bibliotheek.js`) |
+| Beheersing draagt altijd haar bewijs | elk behaald doel heeft bewijsregels; een leerling kan ze opvragen | **ja** (`test/bewijs.test.js`) |
+| Een leerling bevestigt zichzelf niet | toets en observatie alleen via school | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -420,8 +444,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
    basisonderwijs af, het vo op de kern van twintig vakken, het vervolgonderwijs
    een begin. Verdiepen per fase blijft werk -- maar het is nu vullen van een
    bestaande vorm en niet meer omzetten.
-2. **Proof of Learning.** Bewijs onder elke beheersing, en het scherm dat de
-   vraag "waarom denkt RTG dat ik dit kan?" beantwoordt.
+2. **Proof of Learning.** Gedaan: bewijs onder elke beheersing, de knop
+   "Waarom?" bij de leerling, de observatie bij de leraar, en de brug van een
+   becijferde schooltoets naar het leerpaspoort -- de eerste keer dat een
+   schoolmodule het paspoort bijschrijft.
 3. **Memory Engine.** Retentiestand per node en de drie herhaalvragen.
 4. **Misconception Graph + Explain Differently.** Foutpatronen classificeren en
    dezelfde stof anders aanbieden.

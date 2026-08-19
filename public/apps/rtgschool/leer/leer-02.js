@@ -15,13 +15,45 @@
         return '<div class="vakkop">' + esc(v.vak) + '</div>' + v.doelen.map(function (doel) {
           return '<div class="doel"><span>' + (doel.behaald ? '<span class="pil ok">behaald</span> ' : '') + esc(doel.naam) +
             (doel.ref ? ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(doel.ref) + ')</span>' : '') + '</span>' +
-            '<span class="rij"><button class="knop stil" data-les="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Les</button>' +
-            '<button class="knop" data-oefen="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Oefenen</button></span></div>';
+            '<span class="rij">' +
+            (doel.behaald ? '<button class="knop stil" data-waarom="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Waarom?</button>' : '') +
+            '<button class="knop stil" data-les="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Les</button>' +
+            '<button class="knop" data-oefen="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Oefenen</button></span></div>' +
+            '<div class="leeg" id="waarom-' + esc(doel.id).replace(/[^A-Za-z0-9-]/g, '_') + '" hidden></div>';
         }).join('');
       }).join('') || '<div class="leeg">Voor deze keuze staat er nog geen leerlijn klaar.</div>';
       el.querySelectorAll('[data-les]').forEach(function (b) { b.addEventListener('click', function () { toonLes(b.dataset.les); }); });
       el.querySelectorAll('[data-oefen]').forEach(function (b) { b.addEventListener('click', function () { oefenStart(b.dataset.oefen); }); });
+      el.querySelectorAll('[data-waarom]').forEach(function (b) { b.addEventListener('click', function () { toonBewijs(b.dataset.waarom); }); });
     } catch (e) { el.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  }
+
+  /* PROOF OF LEARNING: "waarom denkt RTG dat ik dit kan?"
+
+     Een leerdoel stond hier als "behaald" -- een bewering zonder onderbouwing,
+     en precies de zwarte doos die een leerling niet kan navragen. Deze knop
+     geeft het antwoord: het bewijs zelf, op volgorde, met wie het zag. Er komt
+     geen cijfer uit en er wordt niets vergeleken met een ander. */
+  var BEWIJSNAAM = { oefening: 'Zelf geoefend', huiswerk: 'Oefen-huiswerk', praktijk: 'Praktijkopdracht',
+    toets: 'Toets op school', observatie: 'Gezien door een leraar' };
+
+  async function toonBewijs(doelId) {
+    var vak = document.getElementById('waarom-' + doelId.replace(/[^A-Za-z0-9-]/g, '_'));
+    if (!vak) return;
+    if (!vak.hidden) { vak.hidden = true; return; }
+    vak.hidden = false;
+    vak.innerHTML = 'Bewijs wordt opgehaald...';
+    try {
+      var d = await api('/api/onderwijs/bewijs', { doel: doelId });
+      vak.innerHTML = '<b>Beheersing: ' + esc(d.beheersing.woord) + '</b> &mdash; ' + esc(d.beheersing.uitleg) +
+        '<div style="margin-top:.35rem;">' + (d.bewijs || []).map(function (b) {
+          return '&bull; ' + esc(BEWIJSNAAM[b.soort] || b.soort) +
+            (b.detail ? ': ' + esc(b.detail) : '') +
+            (b.door ? ' <span style="opacity:.8;">(' + esc(b.door) + ')</span>' : '') +
+            ' <span style="opacity:.7;">' + esc(String(b.at).slice(0, 10)) + '</span>';
+        }).join('<br>') + '</div>' +
+        '<div style="margin-top:.35rem;opacity:.85;">' + esc(d.uitleg) + '</div>';
+    } catch (e) { vak.textContent = e.message; }
   }
 
   /* De les draagt sinds de Learning Fabric twee dingen meer: wat er ONDER dit

@@ -218,3 +218,25 @@ test('de tweede ronde schermen draagt de beloftes van zijn serverlaag', () => {
   for (const naam of ['school-toets.js', 'school-verlof.js', 'school-oefenen.js'])
     assert.ok(school.includes(naam), 'School laadt ' + naam + ' niet');
 });
+
+test('Proof of Learning staat op beide schermen: het bewijs en de observatie', () => {
+  const leer = lees('apps', 'rtgschool', 'leer.js');
+  const bewijs = lees('apps', 'schoolpartner', 'bewijs.js');
+
+  // de leerling kan de vraag stellen die een zwarte doos niet beantwoordt
+  assert.match(leer, /\/api\/onderwijs\/bewijs/);
+  assert.match(leer, /waarom denkt RTG dat ik dit kan/i, 'de vraag staat er met zoveel woorden');
+  /* Geen vergelijking en geen cijfer: het scherm toont het WOORD van de
+     beheersing met de reden erbij. (Op het woord "ranglijst" toetsen kan niet:
+     dit bestand belooft in zijn eigen kop dat het er geen heeft.) */
+  assert.match(leer, /beheersing\.woord/, 'het scherm toont het woord, niet een getal');
+  assert.match(leer, /beheersing\.uitleg/, 'met de reden erbij');
+  assert.doesNotMatch(leer, /percentiel|beter dan de klas|gemiddelde van de klas/i, 'bewijs is geen vergelijking');
+
+  // de leraar legt vast wat hij ZIET, met een waarneming erbij
+  assert.match(bewijs, /\/school\/bewijs\/observatie/);
+  assert.match(bewijs, /\/school\/bewijs\/leerling/);
+  assert.match(bewijs, /Wat zag u/, 'een observatie zonder waarneming is een vinkje');
+  assert.ok(partner.includes('/apps/schoolpartner/bewijs.js'), 'School Partner laadt bewijs.js niet');
+  assert.ok(partner.includes('id="bewijsVorm"'));
+});

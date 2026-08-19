@@ -98,7 +98,11 @@ function maakLeerstof({ db, save, onderwijs }) {
     if (klaar) {
       uit.behaald = s.goed >= (s.drempel || BEHAALD_BIJ);
       if (uit.behaald) {
-        const b = onderwijs.doelBehaald(key, { doel: s.doel });
+        /* Het bewijs reist mee: wat er is gedaan en hoe het ging. Zonder dat
+           is "behaald" een bewering zonder onderbouwing -- precies wat Proof
+           of Learning uit de wereld helpt. */
+        const b = onderwijs.doelBehaald(key, { doel: s.doel,
+          bewijs: { soort: 'oefening', detail: s.goed + ' van ' + s.vragen.length + ' goed' } });
         if (b.error) uit.behaald = false; // geen paspoort (bijv. niet ingeschreven): eerlijk melden
         uit.paspoort = b.error || 'bijgeschreven';
       } else {

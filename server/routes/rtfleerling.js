@@ -49,6 +49,8 @@ module.exports = (kern) => {
       doorstroom: (ladder.doorstroom || []).filter(d => ids.has(d.van)).map(d => Object.assign({}, d, { naar: d.naar.filter(id => ids.has(id)) })) });
   }));
   app.post('/api/rtf/leerling/paspoort', auth, handel((l) => onderwijs.mijn(l.sleutel)));
+  // hetzelfde bewijs, voor de leerling in de Foundation-app
+  app.post('/api/rtf/leerling/bewijs', auth, handel((l, b) => onderwijs.bewijsVan(l.sleutel, b)));
   app.post('/api/rtf/leerling/inschrijf', auth, handel((l, b) => faseMag(l, b.fase) ? onderwijs.inschrijf(l.sleutel, b) : dicht()));
   app.post('/api/rtf/leerling/jaar-over', auth, handel((l) => onderwijs.jaarOver(l.sleutel)));
   app.post('/api/rtf/leerling/vakken', auth, handel((l, b) => b.fase && !faseMag(l, b.fase) ? dicht() : leerstof.leerstofVakken(l.sleutel, b)));

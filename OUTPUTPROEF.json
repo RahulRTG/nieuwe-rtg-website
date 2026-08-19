@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T11:37:03.988Z",
-  "commit": "0e406ac",
+  "op": "2026-08-19T12:01:15.147Z",
+  "commit": "c0e517b",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 2066,
-  "onbeslist": 2019,
+  "bewezen": 2076,
+  "onbeslist": 2009,
   "blind": 102,
   "ongemeten": 8
  },
@@ -31679,74 +31679,84 @@
    "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/koppel/betaald": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/koppel/teken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/office/koppel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/keukenbord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijst": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijsten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijst/vink": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijst/item": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijst/deel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/werkvloer/checklijst/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "werkvloer.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en werkvloer.test.js zakte daarop"
   },
   "POST /api/supplier/werkvormen": {
    "staat": "onbeslist",
@@ -43306,6 +43316,56 @@
    "toets": "werkvloer.test.js",
    "merkt": true,
    "op": "2026-08-19T11:37:03.871Z"
+  },
+  "POST /api/werkvloer/keukenbord": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:00:49.995Z"
+  },
+  "POST /api/werkvloer/koppel/betaald": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:00:50.253Z"
+  },
+  "POST /api/werkvloer/koppel/teken": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:00:50.276Z"
+  },
+  "POST /api/office/koppel": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:00:50.566Z"
+  },
+  "POST /api/werkvloer/checklijst": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:02.242Z"
+  },
+  "POST /api/werkvloer/checklijsten": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:02.423Z"
+  },
+  "POST /api/werkvloer/checklijst/vink": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:02.611Z"
+  },
+  "POST /api/werkvloer/checklijst/item": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:03.219Z"
+  },
+  "POST /api/werkvloer/checklijst/weg": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:14.612Z"
+  },
+  "POST /api/werkvloer/checklijst/deel": {
+   "toets": "werkvloer.test.js",
+   "merkt": true,
+   "op": "2026-08-19T12:01:14.966Z"
   }
  },
  "basislijn": {

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T16:35:18.337Z",
-  "commit": "5449543",
+  "op": "2026-08-19T17:08:59.178Z",
+  "commit": "ed1d05d",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3012,
-  "onbeslist": 1039,
-  "blind": 136,
+  "bewezen": 3062,
+  "onbeslist": 979,
+  "blind": 146,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -16510,12 +16510,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtf/social/respond": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "foundation.test.js",
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/snaps": {
    "staat": "onbeslist",
@@ -16532,12 +16532,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 110); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/rtf/social/story/post": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "foundation.test.js",
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/opdracht": {
    "staat": "onbeslist",
@@ -24150,74 +24150,84 @@
    "reden": "er is over DEZE route gelogen en routedekking.test.js zakte daarop"
   },
   "POST /api/rtf/social/block": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/unblock": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/report": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/stories": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/story/view": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/social/dm": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/versies": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/terug": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/ster": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/vul": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtf/kantoorpakket/uitslag": {
    "staat": "onbeslist",
@@ -28720,12 +28730,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 43); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/weefsel/werk": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/onderhoud/plan": {
    "staat": "onbeslist",
@@ -28750,20 +28760,20 @@
    "reden": "er is over DEZE route gelogen en stadskansen.test.js zakte daarop"
   },
   "POST /api/office/weefsel/waarneming": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/werk/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/prestatie": {
    "staat": "onbeslist",
@@ -28829,20 +28839,20 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 43); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/weefsel/object/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/plaats": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/energie/opdracht": {
    "staat": "onbeslist",
@@ -28908,12 +28918,12 @@
    "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 43); de gevoeligheid is niet aan deze route toe te schrijven"
   },
   "POST /api/office/weefsel/zaak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbestuur.test.js",
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/stad/paspoort": {
    "staat": "bewezen",
@@ -29132,102 +29142,116 @@
    "reden": "er is over DEZE route gelogen en stadsraad.test.js zakte daarop"
   },
   "POST /api/office/weefsel/object/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/aandacht": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/uitval": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/keten": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/object": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/zaken": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/reeks/veeg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/kaart": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/gebied/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/relatie/maak": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/relaties": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/relatie/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/zaak/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/office/weefsel/trend": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "stadsweefsel.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en stadsweefsel.test.js zakte daarop"
   },
   "POST /api/supplier/staff/reset-pin": {
    "staat": "bewezen",
@@ -29678,74 +29702,84 @@
    "reden": "er is over DEZE route gelogen en techniek-functies.test.js zakte daarop"
   },
   "POST /api/techniek/toegang": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/bewaren/veeg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/sso": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/sso/schakel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/sso/scimsleutel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/sso/proef": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/av-test": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/analyseer": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/beslis": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/quarantaine": {
    "staat": "bewezen",
@@ -29756,11 +29790,12 @@
    "reden": "er is over DEZE route gelogen en wachtdeur.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/opruimen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/techniek/wacht/lastafworp": {
    "staat": "bewezen",
@@ -29771,123 +29806,140 @@
    "reden": "er is over DEZE route gelogen en wachtdeur.test.js zakte daarop"
   },
   "GET /api/techniek/sso": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/techniek/wacht/bord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "DELETE /api/techniek/sso/:org": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "DELETE /api/techniek/sso/scimsleutel/:org": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "GET /api/scim/v2/ServiceProviderConfig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/scim/v2/ResourceTypes": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/scim/v2/Schemas": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/scim/v2/Users": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/scim/v2/Users": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/scim/v2/Users/:id": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "PATCH /api/scim/v2/Users/:id": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "PUT /api/scim/v2/Users/:id": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "DELETE /api/scim/v2/Users/:id": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/sso/waarheen": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "GET /api/sso/terug": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/sso/wissel": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/sso/start": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "techniek-sso-scim.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 36); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/supplier/gebouw/zaal/weg": {
    "staat": "bewezen",
@@ -49235,6 +49287,306 @@
    "toets": "rtfos-governance.test.js",
    "merkt": true,
    "op": "2026-08-19T16:35:18.191Z"
+  },
+  "POST /api/office/weefsel/werk/zet": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:40.895Z"
+  },
+  "POST /api/office/weefsel/werk": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:41.287Z"
+  },
+  "POST /api/office/weefsel/object/zet": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:41.333Z"
+  },
+  "POST /api/office/weefsel/waarneming": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:41.348Z"
+  },
+  "POST /api/office/weefsel/object/maak": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:53.931Z"
+  },
+  "POST /api/office/weefsel/plaats": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:54.095Z"
+  },
+  "POST /api/office/weefsel/zaak": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:54.185Z"
+  },
+  "POST /api/office/weefsel/aandacht": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:05:54.408Z"
+  },
+  "POST /api/office/weefsel/object": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:06.521Z"
+  },
+  "POST /api/office/weefsel/uitval": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:07.078Z"
+  },
+  "POST /api/office/weefsel/zaken": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:07.229Z"
+  },
+  "POST /api/office/weefsel/keten": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:07.368Z"
+  },
+  "POST /api/office/weefsel/reeks/veeg": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:19.378Z"
+  },
+  "POST /api/office/weefsel/kaart": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:19.635Z"
+  },
+  "POST /api/office/weefsel/gebied/maak": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:20.029Z"
+  },
+  "POST /api/office/weefsel/relatie/maak": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:20.154Z"
+  },
+  "POST /api/office/weefsel/relaties": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:31.698Z"
+  },
+  "POST /api/office/weefsel/relatie/weg": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:32.320Z"
+  },
+  "POST /api/office/weefsel/trend": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:32.674Z"
+  },
+  "POST /api/office/weefsel/zaak/zet": {
+   "toets": "stadsweefsel.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:32.916Z"
+  },
+  "POST /api/techniek/toegang": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:55.779Z"
+  },
+  "POST /api/techniek/ai": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:56.146Z"
+  },
+  "POST /api/techniek/bewaren/veeg": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:56.760Z"
+  },
+  "POST /api/techniek/sso": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:06:57.358Z"
+  },
+  "POST /api/techniek/sso/schakel": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:07.623Z"
+  },
+  "POST /api/techniek/sso/scimsleutel": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:07.959Z"
+  },
+  "POST /api/techniek/sso/proef": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:08.631Z"
+  },
+  "POST /api/techniek/wacht/av-test": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:09.570Z"
+  },
+  "POST /api/techniek/wacht/analyseer": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:19.897Z"
+  },
+  "POST /api/techniek/wacht/beslis": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:20.339Z"
+  },
+  "POST /api/techniek/wacht/opruimen": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:20.619Z"
+  },
+  "GET /api/techniek/sso": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:21.510Z"
+  },
+  "GET /api/techniek/wacht/bord": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:32.150Z"
+  },
+  "DELETE /api/techniek/sso/:org": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:32.257Z"
+  },
+  "DELETE /api/techniek/sso/scimsleutel/:org": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:32.507Z"
+  },
+  "GET /api/scim/v2/ServiceProviderConfig": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:33.600Z"
+  },
+  "GET /api/scim/v2/ResourceTypes": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:43.912Z"
+  },
+  "GET /api/scim/v2/Schemas": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:44.045Z"
+  },
+  "GET /api/scim/v2/Users": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:44.311Z"
+  },
+  "POST /api/scim/v2/Users": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:07:45.663Z"
+  },
+  "GET /api/scim/v2/Users/:id": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:55.550Z"
+  },
+  "PUT /api/scim/v2/Users/:id": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:56.264Z"
+  },
+  "PATCH /api/scim/v2/Users/:id": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:56.269Z"
+  },
+  "DELETE /api/scim/v2/Users/:id": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:07:57.857Z"
+  },
+  "POST /api/sso/waarheen": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:08:07.721Z"
+  },
+  "POST /api/sso/wissel": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:08.627Z"
+  },
+  "GET /api/sso/terug": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:08:08.635Z"
+  },
+  "GET /api/sso/start": {
+   "toets": "techniek-sso-scim.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:08:10.192Z"
+  },
+  "POST /api/rtf/social/respond": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:31.717Z"
+  },
+  "POST /api/rtf/social/block": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:32.634Z"
+  },
+  "POST /api/rtf/social/story/post": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:33.196Z"
+  },
+  "POST /api/rtf/social/unblock": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:34.440Z"
+  },
+  "POST /api/rtf/social/report": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:44.002Z"
+  },
+  "POST /api/rtf/social/stories": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:44.983Z"
+  },
+  "POST /api/rtf/social/story/view": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:45.139Z"
+  },
+  "POST /api/rtf/social/dm": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:46.822Z"
+  },
+  "POST /api/rtf/kantoorpakket/versies": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:55.885Z"
+  },
+  "POST /api/rtf/kantoorpakket/terug": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:56.883Z"
+  },
+  "POST /api/rtf/kantoorpakket/ster": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:08:57.114Z"
+  },
+  "POST /api/rtf/kantoorpakket/vul": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:08:59.100Z"
   }
  },
  "basislijn": {
@@ -49664,6 +50016,9 @@
   "schoolbeeld.test.js": "groen",
   "bankdeuren.test.js": "groen",
   "rtfos-doelgroepen.test.js": "groen",
-  "rtfos-governance.test.js": "groen"
+  "rtfos-governance.test.js": "groen",
+  "stadsweefsel.test.js": "groen",
+  "techniek-sso-scim.test.js": "groen",
+  "rtf-veilig.test.js": "groen"
  }
 }

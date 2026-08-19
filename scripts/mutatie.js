@@ -673,6 +673,28 @@ if (require.main === module) {
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
 
+  /* HET AFBOUWSLOT, EN WAAROM HET HIER ONTBRAK.
+
+     Dit is het meest bronmuterende script in huis: het verandert echte
+     bestanden in server/ en zet ze in een finally terug. Precies waar
+     scripts/afbouw-slot.js voor bedoeld is ("een tijdelijk ijkbestand mag nooit
+     een geldige scan vervuilen") -- maar het slot werd alleen gepakt door
+     test-runner.js, release-gate.js en staging-repetitie.js. Draaide iemand
+     `npm run mutatie` naast `npm test`, dan las de suite gemuteerde bron en
+     zakten er toetsen op code die niemand had geschreven.
+
+     Twee dingen die dit voorkomt, en de tweede is de ergste:
+       1. een andere lezer ziet halverwege een gemuteerd bestand;
+       2. ruimEerderOp() hieronder zet de LEVENDE mutaties van een tweede
+          mutatieronde terug -- die denkt dan dat hij zijn eigen bron muteert
+          terwijl er al iets anders in staat, en de uitslag is onzin.
+
+     Daarom vóór ruimEerderOp(), en binnen require.main: test/mutatiewacht.test.js
+     IMPORTEERT deze module, en een slot dat bij het laden dichtklapt zou die
+     toets het slot laten grijpen zonder ooit iets te muteren. */
+  const geefAfbouwSlotVrij = require('./afbouw-slot').pak('mutatiemotor');
+  void geefAfbouwSlotVrij; // pak() hangt zichzelf al aan exit/SIGINT/SIGTERM
+
   /* EERST OPRUIMEN WAT EEN VORIGE RONDE HEEFT LATEN STAAN, en het HARDOP zeggen.
      Een stille opruiming laat niemand weten dat er iets was blijven liggen, en dan
      mist iedereen het patroon dat de motor wordt afgebroken op een manier die zijn

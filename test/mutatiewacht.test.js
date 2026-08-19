@@ -209,3 +209,48 @@ test('zetTerug ruimt alles op en laat niets in de lijst staan', () => {
     fs.rmSync(map, { recursive: true, force: true });
   }
 });
+
+/* ============================================================================
+   EN: WACHT HIJ OP EEN ANDERE BRONMUTERENDE RONDE?
+
+   De opruimwacht hierboven gaat over een CRASH. Dit gaat over
+   GELIJKTIJDIGHEID, en dat is een andere storing met dezelfde oorzaak: deze
+   motor verandert echte bestanden in server/.
+
+   scripts/afbouw-slot.js bestaat daarvoor ("een tijdelijk ijkbestand mag nooit
+   een geldige scan vervuilen"), maar werd alleen gepakt door test-runner.js,
+   release-gate.js en staging-repetitie.js. Draaide iemand `npm run mutatie`
+   naast `npm test`, dan las de suite gemuteerde bron en zakten er toetsen op
+   code die niemand had geschreven -- en erger: ruimEerderOp() in de motor zet
+   de LEVENDE mutaties van een tweede ronde terug, waarna beide uitslagen onzin
+   zijn.
+   ========================================================================== */
+test('de motor weigert zolang een andere bronmuterende ronde het slot heeft', async () => {
+  const WORTEL = path.join(__dirname, '..');
+  const SLOT = path.join(WORTEL, '.release', 'afbouw-slot');
+  /* Draait deze toets ONDER de volledige suite, dan houdt test-runner.js het
+     slot al vast -- dat is precies de stand die we willen beproeven, en we
+     blijven er dan vanaf. Draait hij los, dan zetten we zelf een slot op naam
+     van dit proces (dat leeft, dus de motor mag het niet als verweesd opruimen)
+     en halen het daarna weg. */
+  const alGehouden = fs.existsSync(SLOT);
+  if (!alGehouden) {
+    fs.mkdirSync(SLOT, { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(SLOT, 'eigenaar.json'),
+      JSON.stringify({ pid: process.pid, taak: 'toets-gelijktijdigheid', gestart: new Date().toISOString() }));
+  }
+  try {
+    const uit = await new Promise((klaar) => {
+      const kind = spawn(process.execPath, [MOTOR, 'mutatiewacht.test.js'], { cwd: WORTEL });
+      let tekst = '';
+      kind.stdout.on('data', d => tekst += d);
+      kind.stderr.on('data', d => tekst += d);
+      kind.on('close', (code) => klaar({ code, tekst }));
+    });
+    assert.notEqual(uit.code, 0, 'de motor hoort te weigeren zolang het slot bezet is');
+    assert.match(uit.tekst, /Afbouw is al actief/,
+      'en te zeggen WIE het slot heeft, anders staat iemand te zoeken naar een proces dat hij niet ziet');
+  } finally {
+    if (!alGehouden) fs.rmSync(SLOT, { recursive: true, force: true });
+  }
+});

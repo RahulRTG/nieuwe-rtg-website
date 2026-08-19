@@ -71,16 +71,23 @@ app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
 bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
 voorgekookt werkblad) vóór je er iets bij zet.
 
-**`WERELDEN.md` is de kaart** — drie werelden, en de pas die er dwars op staat.
-**ROS** (de wereld van de persoon), **Concern** (de wereld van de organisatie) en
-**Fundament** (waar RTG zelf draait), met de acht domeinen een niveau lager. De
-harde regel: **een wereld draagt nooit de naam van een pas** — `rtg`, `lifestyle`
-en `business` zeggen wie je bent, een wereld zegt waar je bent, en vallen die
-woorden samen dan leest een lid een plek als een prijs. Vandaar Concern en niet
-Business. De vertrouwenslaag (poorten, bewijs, gates) is met opzet géén wereld:
-die geldt overal en woont op de server; Fundament is het publiek dat hem bedient.
-`test/wereldregister.test.js` houdt het register fail-closed — een item dat
-nergens heen gaat, laat de bouw zakken in plaats van stil een tegel te schelen.
+**`WERELDEN.md` is de kaart** — vier werelden, een kern eronder, en de pas die er
+dwars op staat. **LivingOS** (mijn dagelijks leven), **WorkOS** (mijn werk en
+organisaties), **TravelOS** (mijn reizen) en **FoundationOS** (RTFoundation en
+haar maatschappelijke werk), met de domeinen een niveau lager. Het document trekt
+vier begrippen uit elkaar die steeds door elkaar liepen: **World** (waar ben ik),
+**Capability** (wat kan het systeem), **Access** (wat mag ik) en **Pass** (waar
+betaal ik voor) — *Core ondersteunt Worlds, Worlds organiseren Experiences,
+Access bepaalt wat zichtbaar is, Passes bepalen commerciële rechten.* Bij twijfel
+is er één vraag: **in welke context denkt de mens dat hij zich bevindt wanneer hij
+dit gebruikt?** Daaruit volgt dat de bouwer van een capability niet bepaalt in
+welke wereld hij hoort — RTFoundation mag eigenaar zijn van iets dat in LivingOS
+verschijnt. Twee harde regels: **een wereld draagt nooit de naam van een pas, ook
+niet de stam ervan** (`LifeOS` sneuvelde daarop tegenover Lifestyle Pass), en
+**RTG Core is geen wereld** — 24 functies zitten in élke doelgroep en reizen met
+de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
+vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
+laat zakken in plaats van stil verkeerd te blijven staan.
 
 **`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
 gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel

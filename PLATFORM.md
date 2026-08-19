@@ -130,11 +130,20 @@ herbouwt daarop de hele ledenapp. Pas en wereld zijn dus twee loodrechte assen �
 wie is dit, tegenover waar ben ik — en een wereld die heet zoals een pas laat een
 lid een plek lezen als een prijs.
 
-Wat er wél is besloten: **drie werelden — ROS, Concern en Fundament** — met de
-acht domeinen een niveau lager. Er hoefde dus niets te sneuvelen; de acht zijn
-gezakt in plaats van geschrapt. De volledige kaart, de regel dat een wereld nooit
-de naam van een pas draagt, en wat er bewust open bleef staan in `WERELDEN.md`;
-`test/wereldregister.test.js` handhaaft wat machinaal te handhaven is.
+Wat er wél is besloten: **vier werelden — LivingOS, WorkOS, TravelOS en
+FoundationOS** — met de domeinen een niveau lager, en **RTG Core** als
+horizontale laag die geen wereld is. Er hoefde dus niets te sneuvelen; de acht
+zijn gezakt in plaats van geschrapt.
+
+De eerste versie van dat besluit had er drie (ROS, Concern, Fundament) en hield
+één dag stand. Wat hem omgooide was een telling: 24 functies zitten in élke
+doelgroep, en dus hoorde de horizontale laag nergens in een wereld thuis; en de
+bestuurskant van RTG had geen eigen wereld nodig zodra WorkOS twee
+toegangsmodellen mag dragen — RTG is gewoon één werkgever daarin. De volledige
+kaart, de regel dat een wereld nooit de naam van een pas draagt (noch de stam
+ervan), en wat er bewust open bleef staan in `WERELDEN.md`;
+`test/wereldregister.test.js` handhaaft wat machinaal te handhaven is, inclusief
+of de kaart en de code nog hetzelfde zeggen.
 
 De tabel hierboven blijft geldig als **volgorde van bouwen** — hij zegt welke
 domeinen samengevoegd zijn en welke nog niet. Hij zegt sinds dit besluit niet

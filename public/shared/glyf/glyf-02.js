@@ -26,6 +26,10 @@
     cercle: '<path d="M4 8.2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4z"/><path d="M14 6.5v11" stroke-dasharray="1.4 2"/>',
 
     /* --- reizen & onderweg --- */
+    /* De wereldglyf van TravelOS. Bewust GEEN vliegtuig: die is al de glyf van
+       Vluchten, en een wereld die het teken van een van zijn eigen apps draagt,
+       leest als die app. Een bol met meridiaan is de reis zelf en geen vervoer. */
+    reizen: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2.4 2.2 3.6 5 3.6 8s-1.2 5.8-3.6 8c-2.4-2.2-3.6-5-3.6-8s1.2-5.8 3.6-8z"/>',
     vluchten: '<path d="M11.2 3.4c.5 0 .9.5.9 1.3v4.7l7.4 4.4v1.8l-7.4-2.2v3.5l2.1 1.5v1.3l-3-.9-3 .9v-1.3l2.1-1.5v-3.5L3 15.6v-1.8l7.3-4.4V4.7c0-.8.4-1.3.9-1.3z"/>',
     ov: '<rect x="4.5" y="4.5" width="15" height="12.5" rx="2.2"/><path d="M4.5 12h15"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/>',
     flits: '<path d="M8.5 20L11 4M15.5 20L13 4"/><path d="M12 6.5v1.6M12 11.2v1.6M12 15.9v1.6"/>',

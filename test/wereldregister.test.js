@@ -175,8 +175,27 @@ test('geen wereld draagt de naam van een pas', () => {
      De vergelijking is op het KALE woord: "RTG Business" botst net zo hard als
      "Business", want het lid leest het tweede woord.
 
-     DE MUTATIE: hernoem RTG Kantoor naar 'RTG Business'. */
+     EN OP DE STAM, en dat is de tweede versie van deze toets. De eerste keek
+     alleen of een woord GELIJK was aan een pasnaam. Daar kwam `LifeOS`
+     doorheen: `lifeos` is niet `lifestyle`, dus groen -- terwijl een lid wel
+     degelijk "Life" naast een pas ziet staan die "Lifestyle" heet. Dat is de
+     regel op de letter volgen en niet op de bedoeling, en een toets die dat
+     toelaat is precies zo veel waard als geen toets.
+
+     Vier tekens gedeelde kop is de grens, en die is niet willekeurig gekozen:
+     `life`/`lifestyle` deelt er vier en botst, `livi`/`life` deelt er twee en
+     botst niet. Onder de vier zou elke wereld die met een r begint tegen `rtg`
+     aanlopen.
+
+     DE MUTATIE (exact woord): hernoem WorkOS naar 'RTG Business'.
+     DE MUTATIE (stam): hernoem LivingOS naar 'LifeOS'. */
   const PASSEN = ['rtg', 'lifestyle', 'business'];
+  const KOP = 4;                                  // gedeelde kop vanaf hier botst
+  const gedeeldeKop = (a, b) => {
+    let n = 0;
+    while (n < a.length && n < b.length && a[n] === b[n]) n++;
+    return n;
+  };
   const zoek = [];
   for (const w of WERELDEN) {
     const woorden = String(w.naam).toLowerCase().split(/[\s·-]+/).filter(Boolean);
@@ -184,13 +203,54 @@ test('geen wereld draagt de naam van een pas', () => {
        de pas. Wat niet mag is dat de rest van de naam een pas is. */
     const rest = woorden[0] === 'rtg' ? woorden.slice(1) : woorden;
     for (const woord of rest) {
-      if (PASSEN.includes(woord)) zoek.push(w.naam + ' draagt de pasnaam "' + woord + '"');
+      if (PASSEN.includes(woord)) {
+        zoek.push(w.naam + ' draagt de pasnaam "' + woord + '"');
+        continue;
+      }
+      for (const pas of PASSEN) {
+        if (gedeeldeKop(woord, pas) >= KOP) {
+          zoek.push(w.naam + ' deelt de stam "' + woord.slice(0, gedeeldeKop(woord, pas)) +
+            '" met de pas "' + pas + '"');
+        }
+      }
     }
     if (!rest.length && woorden[0] === 'rtg') {
       zoek.push(w.naam + ' is precies de naam van de instappas');
     }
   }
   assert.deepEqual(zoek, [], 'deze werelden dragen de naam van een pas');
+});
+
+test('de werelden in MAPPEN zijn exact de werelden die WERELDEN.md verklaart', () => {
+  /* DE KAART EN DE CODE LOPEN UIT ELKAAR ZONDER DAT IEMAND IETS MERKT, en dat is
+     hier al een keer gebeurd: WERELDEN.md beschreef ROS, Concern en Fundament
+     terwijl MAPPEN ROS, RTG Kantoor en RTFoundation droeg. Twee van de drie
+     namen stonden alleen in het document. Een kaart die niet klopt is erger dan
+     geen kaart, want er wordt naar verwezen alsof hij de waarheid is.
+
+     De tabel in WERELDEN.md is daarom machinaal leesbaar gemaakt: naam, huis en
+     het aantal onderdelen. Alle drie worden hier vergeleken met de bron. Het
+     AANTAL staat er bewust bij -- een kaart die zegt dat TravelOS elf
+     onderdelen heeft terwijl er nog twee bij zijn gezet, is precies zo stil
+     verkeerd als een naam die niet meer bestaat.
+
+     DE MUTATIE: verander in WERELDEN.md de regel van TravelOS naar
+     `| **TravelOS** | /apps/reizen.html | ... | 12 |`. */
+  const KAART = fs.readFileSync(path.join(WORTEL, 'WERELDEN.md'), 'utf8');
+  const RIJ = /^\|\s*\*\*([^*|]+)\*\*\s*\|\s*`([^`|]+)`\s*\|[^|]*\|\s*(\d+)\s*\|\s*$/gm;
+  const verklaard = [];
+  let m;
+  while ((m = RIJ.exec(KAART))) verklaard.push({ naam: m[1].trim(), huis: m[2].trim(), n: Number(m[3]) });
+
+  assert.ok(verklaard.length >= 2,
+    'de werelden-tabel in WERELDEN.md is niet meer te lezen; deze toets meet dan niets');
+
+  const uitCode = WERELDEN.map((w) => w.naam + ' -> ' + w.wereld + ' (' + w.items.length + ')').sort();
+  const uitKaart = verklaard.map((w) => w.naam + ' -> ' + w.huis + ' (' + w.n + ')').sort();
+  assert.deepEqual(uitCode, uitKaart,
+    'WERELDEN.md en MAPPEN zijn uit de pas gelopen\n' +
+    '  code:  ' + uitCode.join('\n         ') + '\n' +
+    '  kaart: ' + uitKaart.join('\n         '));
 });
 
 test('twee LINKS-regels wijzen niet naar precies hetzelfde adres', () => {

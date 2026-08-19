@@ -446,8 +446,8 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     assert.deepEqual(b.koppen, ['Werelden', 'Software'],
       'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact ROS, RTG Kantoor en RTFoundation bovenaan te dragen');
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
+      'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
       'deze werelden staan wel in de bank maar zijn nul groot');
@@ -479,9 +479,11 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
-     dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
-     instappas: geen hoofdwereld mag daar terugvallen op een kaal monogram of
-     verdwijnen.
+     dezelfde vier volledige huizen (WERELDEN.md). Daarom toetst dit pad bewust
+     met de instappas: geen hoofdwereld mag daar terugvallen op een kaal
+     monogram of verdwijnen. TravelOS is de kleinste van de vier en juist
+     daarom de scherpste meting: elf onderdelen zijn genoeg voor een wereld,
+     maar niet als hij zijn beeldmerk kwijtraakt.
 
      DE METING IS DRIE KEER VERHUISD, en dat hoort hier te staan.
 
@@ -510,8 +512,8 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 
     const b = await werelden(page);
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact ROS, RTG Kantoor en RTFoundation te dragen');
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
+      'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],
       'deze werelden dragen geen eigen glyf maar het standaard icoon:\n' +

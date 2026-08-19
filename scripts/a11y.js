@@ -230,7 +230,7 @@ function startEchteServer() {
       const waar = pad + ' [' + hand + ']';
       if (m.venster !== 390) mobiu.breed.push(waar + ': het venster is ' + m.venster + ' en niet 390 -- deze meting zegt niets');
       else if (m.inhoud > m.venster + 2) mobiu.breed.push(waar + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
-      if (m.hoogsteBlok < 120) mobiu.leeg.push(waar + ': het hoogste zichtbare blok is ' + m.hoogsteBlok + 'px');
+      if (m.leeg) mobiu.leeg.push(waar + ': het werkvlak draagt ' + m.tekens + ' tekens en ' + m.beelden + ' beelden');
       for (const b of m.balkenBuiten) mobiu.balk.push(waar + ': ' + b);
       if (!m.hoofd) mobiu.geenHoofd.push(waar);
       else if (m.gebreken.length) mobiu.duim.push(waar + ' \u2014 ' + m.hoofd.naam + ' (' + m.hoofd.merk + '): ' + m.gebreken.join('; '));

@@ -272,6 +272,51 @@ body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line)
 body.rtg-stijl .knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
 body.rtg-stijl .knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
 body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
+
+/* DE HOOFDHANDELING HEEFT DUIMMAAT (GRAMMATICA.md).
+
+   `.knop` levert 12,8px tekst met 8px lucht: samen 37 tot 40 pixels hoog. Dat
+   haalt WCAG 2.5.8 ruim (24) en is dus te RAKEN met een hand die trilt -- maar
+   de grammatica belooft iets sterkers voor de belangrijkste handeling van een
+   scherm: "mijn duim vindt het onderaan". Een duim in beweging, in een trein of
+   lopend, heeft 44 nodig.
+
+   Waarom dit alleen de hoofdhandeling raakt en niet elke knop: dat is een
+   besluit. De Command-modus van ONTWERP.md staat met opzet dicht en klein, en
+   alles op 44 zetten zou die vormtaal slopen voor een winst die nergens
+   gemeten is. 44 voor de ene knop die ertoe doet, 24 voor de rest.
+
+   Gemeten op 19 augustus 2026: veertien schermen droegen een hoofdhandeling van
+   24 tot 43 pixels. Deze regel tilt ze alle veertien in een keer. */
+body.rtg-stijl [data-hoofdactie],
+body.rtg-stijl button.hoofd,
+body.rtg-stijl a.hoofd,
+body.rtg-stijl [role="button"].hoofd{
+  min-height:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* EN OP EEN TELEFOON PAKT HIJ DE VOLLE BREEDTE.
+
+   Dit lost het bereik op, en het is de enige manier die voor BEIDE handen
+   tegelijk werkt. Een smalle knop die rechts in een rij staat is voor een
+   rechtshandige prima en voor een linkshandige net buiten bereik; hem naar
+   links schuiven draait het probleem alleen om. Volle breedte kent geen kant.
+
+   Gemeten op 19 augustus 2026: acht van de negentien schermen met een
+   aangewezen hoofdhandeling hadden hem in het kwart waar de duim van die mens
+   niet komt -- en welke acht dat waren, verschilde per hand.
+
+   Niet in een vaste balk onderaan: daar staat hij al binnen bereik, en daar is
+   de breedte een ontwerpkeuze van die balk (ADAPTIEF.md). */
+@media(max-width:760px){
+  body.rtg-stijl [data-hoofdactie]:not([data-inbalk]),
+  body.rtg-stijl button.hoofd:not([data-inbalk]),
+  body.rtg-stijl a.hoofd:not([data-inbalk]),
+  body.rtg-stijl [role="button"].hoofd:not([data-inbalk]){
+    width:100%;max-width:100%;flex:1 1 100%;
+  }
+}
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de
    handeling waar het om gaat": publiceren, versturen, vastleggen. Die eigen

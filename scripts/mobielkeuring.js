@@ -103,24 +103,55 @@ function mobielInPagina(opt) {
   /* Een pagina die past kan nog steeds leeg zijn: Instant Reality verborg op
      telefoonmaat al zijn artikelen, en de breedtescan stond groen terwijl een
      mens een zwart vlak zag. Vandaar: staat er ergens werkelijk iets? */
-  /* EERSTE POGING WAS EEN LIJST TAGS (main, section, article, .kaart, form,
-     table, ul) en die meldde 132 van de 514 metingen als leeg -- ruim een
-     kwart. Dat is geen bevinding maar een kapotte meting: veel schermen bouwen
-     hun inhoud in een div, en dan is de hoogste `section` nul.
+  /* DRIE POGINGEN VERDER, EN ELKE VORIGE SNEUVELDE OP EEN ECHT SCHERM.
 
-     Wat de vraag echt is: STAAT ER IETS. Dus: het hoogste zichtbare element dat
-     breed genoeg is om inhoud te zijn, welk merk het ook draagt. Een scherm dat
-     werkelijk zwart is haalt dat niet, en een scherm dat vol staat wel -- wat de
-     bouwer ook voor tag koos. */
-  var hoogste = 0;
-  var blokken = document.querySelectorAll('body *');
-  for (var b = 0; b < blokken.length; b++) {
-    var eb = blokken[b];
-    if (!zichtbaar(eb)) continue;
-    var rb = eb.getBoundingClientRect();
-    if (rb.width < 40) continue;
-    if (rb.height > hoogste) hoogste = rb.height;
+     1. Een lijst tags (main, section, .kaart, form, ...) -> 132 van de 514
+        metingen leeg, want veel schermen bouwen hun inhoud in een div.
+     2. De HOOGTE van het hoogste zichtbare element -> /apps/gast.html rood,
+        terwijl dat de QR-landingspagina is die terecht een zin lang is.
+     3. De tekst in <main> een laag diep -> 130 metingen leeg, en om drie
+        verschillende redenen tegelijk: /apps/foundation/babyboek.html heeft
+        helemaal geen <main>, /apps/camera.html heeft een <main> waarvan de
+        kinderen nul hoog zijn terwijl de boodschap in een laag eronder staat,
+        en de toegangspoort van de stichting is een overlay.
+
+     Wat de vraag steeds al was: STAAT ER IETS LEESBAARS DAT GEEN SCHIL IS.
+     Dus tellen we de tekst van alle zichtbare BLADEREN -- elementen zonder
+     kinderen, zodat niets dubbel telt -- en laten we weg wat schil is:
+     navigatie, koppen, voeten, en vaste balken.
+
+     Een vaste balk telt niet mee, een vaste OVERLAY wel. Dat verschil is de
+     hoogte: een balk is een strook, een poort bedekt het scherm. Zonder dat
+     onderscheid zou "deze ruimte blijft nog dicht" -- een volwaardig antwoord
+     aan een mens -- als leeg scherm gelden. */
+  var SCHIL = 'nav,header,footer,aside,[role="navigation"],[role="banner"],[role="contentinfo"]';
+  function isSchil(el) {
+    if (el.closest && el.closest(SCHIL)) return true;
+    for (var q = el; q && q !== document.body; q = q.parentElement) {
+      var qs = getComputedStyle(q);
+      if (qs.position !== 'fixed' && qs.position !== 'sticky') continue;
+      /* een strook is schil, een poort is inhoud */
+      if (q.getBoundingClientRect().height < H * 0.4) return true;
+    }
+    return false;
   }
+  var tekst = '', beelden = 0;
+  var bladeren = document.querySelectorAll('body *');
+  for (var t = 0; t < bladeren.length; t++) {
+    var bl = bladeren[t];
+    if (bl.children.length) continue;          // alleen bladeren: geen dubbeltelling
+    if (!zichtbaar(bl)) continue;
+    if (isSchil(bl)) continue;
+    var br = bl.getBoundingClientRect();
+    if (br.bottom < 0 || br.top > H) continue; // buiten beeld telt niet mee
+    if (/^(img|canvas|svg|video|picture)$/i.test(bl.tagName) ) {
+      if (br.width * br.height >= 2000) beelden++;
+      continue;
+    }
+    tekst += ' ' + (bl.textContent || '');
+  }
+  tekst = tekst.replace(/\s+/g, ' ').trim();
+  var hoogste = tekst.length;
 
   /* ---- 3. VASTE BALKEN BLIJVEN IN BEELD -------------------------------- */
   var balkenBuiten = [];
@@ -142,6 +173,17 @@ function mobielInPagina(opt) {
        elementen die het venster raken. */
     if (rr.bottom <= 0 || rr.top >= H) continue;
     if (rr.top >= -1 && rr.bottom <= H + 1) continue;   // netjes in beeld
+    /* EEN GEPARKEERDE SHEET IS GEEN KAPOTTE BALK. /apps/navigatie.html houdt
+       zijn routepaneel op translateY(102%) tot je het opent; daarvan steekt elf
+       pixel het venster in, en dat is bedoeld en niet stuk. Hetzelfde geldt voor
+       elke lade die net onder de rand wacht.
+
+       Wat wel een gebrek is: een balk die zich grotendeels TOONT en er dan
+       uitloopt -- dan denkt een mens dat hij hem kan gebruiken en kan hij er de
+       helft niet van raken. Dus: minstens 24 pixels en een kwart van zijn eigen
+       hoogte moet in beeld staan voordat dit meetelt. */
+    var binnen = Math.min(rr.bottom, H) - Math.max(rr.top, 0);
+    if (binnen < 24 || binnen < rr.height * 0.25) continue;
     balkenBuiten.push(merk(el) + ' y ' + Math.round(rr.top) + '..' + Math.round(rr.bottom) + ' bij ' + H);
     if (balkenBuiten.length >= 5) break;
   }
@@ -176,7 +218,8 @@ function mobielInPagina(opt) {
 
   var uit = {
     venster: W, hoogte: H, inhoud: inhoud, dwinger: inhoud > W + 2 ? dwinger : null,
-    hoogsteBlok: Math.round(hoogste), balkenBuiten: balkenBuiten,
+    tekens: tekst.length, beelden: beelden, hoogsteBlok: Math.round(hoogste), balkenBuiten: balkenBuiten,
+    leeg: tekst.length < 40 && beelden === 0,
     hoofd: null, hoe: hoe || 'geen', gebreken: []
   };
 

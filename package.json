@@ -77,6 +77,7 @@
     "samenhang": "node --experimental-sqlite scripts/samenhang.js",
     "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen",
     "kaart": "node scripts/kaart.js",
+    "wereldlijst": "node scripts/wereldlijst.js",
     "bewijs": "node scripts/bewijs.js",
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",

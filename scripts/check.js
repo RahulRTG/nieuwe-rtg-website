@@ -3358,5 +3358,30 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   }
 }
 
+/* 50) DE WERELDLIJST LOOPT NIET ACHTER OP HET REGISTER.
+
+   Zelfde vorm als regel 40 (de kaart) en 46 (de SLO-tabel): WERELDLIJST.md wordt
+   uit `MAPPEN` gegenereerd, dus hoort hij gelijk te zijn aan wat de code nu
+   zegt. Verhuist er een onderdeel naar een andere wereld, dan wordt deze regel
+   rood tot iemand `npm run wereldlijst` draait -- en dat is een commando, geen
+   schrijfwerk.
+
+   Waarom dit ernaast moet en test/wereldregister.test.js niet volstaat: die
+   toets meet dat elk item ergens OP UITKOMT. Hij zegt niets over de vraag of het
+   document dat mensen lezen nog dezelfde inhoud beschrijft. */
+console.log('\n50) WERELDLIJST.md loopt niet achter op het wereldregister');
+{
+  try {
+    const wl = require('./wereldlijst');
+    const opSchijf = fs.existsSync(wl.DOEL) ? fs.readFileSync(wl.DOEL, 'utf8') : null;
+    const verwacht = wl.bouw();
+    if (opSchijf === null) fout('WERELDLIJST.md bestaat niet -- draai: npm run wereldlijst');
+    else if (opSchijf !== verwacht) fout('WERELDLIJST.md loopt achter op de code -- draai: npm run wereldlijst');
+    else ok('WERELDLIJST.md is gelijk aan wat MAPPEN nu zegt');
+  } catch (e) {
+    fout('de wereldlijst kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

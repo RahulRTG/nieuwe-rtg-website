@@ -112,6 +112,11 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
 
+**Wat er precies in elke wereld hangt staat in [`WERELDLIJST.md`](WERELDLIJST.md)**
+— alle zeventig onderdelen met hun adres, uit `MAPPEN` geschreven door
+`npm run wereldlijst`. Dit document zegt *waarom* de werelden zo lopen; die lijst
+zegt *wat* erin zit, en regel 50 van `scripts/check.js` houdt de twee gelijk.
+
 ### LivingOS — mijn dagelijks leven
 
 Alles wat van mij is en wat ik op een gewone dag doe: geld, sociaal, het huis en
@@ -560,13 +565,35 @@ verkéérde deed: een tweede instellingenscherm naast het paneel dat er al was.
 
 - **Het bedrag per trede.** *Waar* de prijs aan hangt is besloten (zie *De drie
   passen* hieronder); wat een trede mag kosten staat nergens in de code en is
-  een productbesluit. Voor Lifestyle hangt daar wel een vraag aan die niet kan
-  wachten: als de prijs uitvoering koopt, moet er capaciteit tegenover staan, en
-  die planning bestaat nog niet.
-- **Het startscherm.** `WERELD.md` zegt: er is één beginscherm en dat is de lege
-  werktafel. Vier werelden als eerste keuze zou dat vervangen. Eigen besluit.
-- **De precieze domeinlijst per wereld.** De vijf regels hierboven zijn een eerste
-  indeling op wat er in de code staat, geen uitputtende lijst.
+  een productbesluit. Voor Lifestyle hangt daar een vraag aan die niet kan
+  wachten, en die is 19 augustus 2026 nagemeten: **er is geen capaciteitsmodel.**
+  `server/kern/lifestyle/` en `server/kern/bureau/` kennen verzoeken, zaken, een
+  team per zaak en een mandaatschuif, maar nergens staat wie er beschikbaar is,
+  hoeveel zaken één Rechterhand kan dragen, of wat er gebeurt als er meer
+  binnenkomt dan er uit kan. `cases-soorten.js` draagt wel het label *Staf &
+  planning*, maar dat is een soort zaak en geen bezetting. Als de prijs
+  uitvoering koopt, is dat het eerste dat gebouwd moet worden — niet omdat het
+  document dat zegt, maar omdat de belofte anders alleen op papier staat.
+- **De domeinnamen per wereld.** Dit punt is voor de helft dicht. *Welke
+  onderdelen* in welke wereld hangen staat nu voluit in **`WERELDLIJST.md`**,
+  gegenereerd uit `MAPPEN` met `npm run wereldlijst` en bewaakt door regel 50 van
+  `scripts/check.js`: verhuist er iets, dan wordt de keuring rood tot het
+  document bij is. Wat er *niet* in staat is de laag ertussen — welke onderdelen
+  samen "het huishouden" heten of "zorg en gezin". Die namen staan nergens in de
+  code, en ze uit de bestandsnamen afleiden zou een indeling opleveren die
+  stelliger klinkt dan wat het huis werkelijk weet. Dat is een ontwerpbesluit.
+
+## Wat er dicht is gegaan
+
+- **Het startscherm.** Hier stond: *"`WERELD.md` zegt: er is één beginscherm en
+  dat is de lege werktafel. Vier werelden als eerste keuze zou dat vervangen."*
+  Dat is geen keuze meer maar de gemeten stand: de werktafel **is** het
+  beginscherm, en de vier werelden zijn wat er op die tafel te kiezen valt — ze
+  staan bovenaan de bank en de lege tafel zegt letterlijk *"Kies een wereld om te
+  beginnen."* Ze vervangen elkaar dus niet; de een is het meubel en de ander de
+  inhoud. Wat er sinds 19 augustus wél veranderde staat in `WERELD.md`: inloggen
+  komt terug waar je gebleven was, en alleen Home en het sluiten van je laatste
+  blad eindigen nog leeg.
 
 ## De drie passen, na twee reparaties
 

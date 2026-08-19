@@ -55,6 +55,23 @@ const GOED_PAGINA = /^\/(?!\/)[A-Za-z0-9_\-/.]+\.html$/;
 
 const vinger = (tekst) => crypto.createHash('sha1').update(tekst).digest('base64url').slice(0, 12);
 
+/* Deze controle staat er twee keer, en dat is met opzet -- lees dit voordat je
+   hem "opruimt" tot een gedeelde hulpfunctie.
+
+   Bij de uitlevering hieronder gaat het paginapad de padexpressie in
+   (path.join). De invoer komt uit een QUERYPARAMETER, base64url-gedecodeerd, en
+   is dus volledig door de aanvrager te bepalen -- anders dan req.path, dat de
+   routelaag al genormaliseerd heeft. De controle die dat afvangt moet dan ook
+   VLAK VOOR die padexpressie staan.
+
+   Toen hij hier eenmalig als goedePagina() stond, sloeg js/path-injection aan
+   op precies dat pad. Niet omdat de bescherming ontbrak, maar omdat de analyse
+   een sanitizer niet over een functiegrens volgt -- exact het gedrag dat in
+   .github/codeql/codeql-config.yml al beschreven staat bij eigenVeld(). Daar is
+   het opgelost met een uitzondering omdat de helper daar echt gedeeld MOET
+   zijn; hier hoeft dat niet, dus hier hoort geen uitzondering maar de controle
+   op zijn plek. Een uitzondering die je niet nodig hebt, verzwakt de query voor
+   het geval dat je hem later wel nodig had. */
 const goedePagina = (p) => GOED_PAGINA.test(p) && p.indexOf('..') === -1;
 
 /* ---------------------------------------------------------------------------
@@ -103,19 +120,29 @@ function maakAfsplitsing(soort) {
   }
 
   function uitleveren(publicDir) {
+    /* De wortel eerst absoluut maken, zoals ../web/bestanden.js het ook doet:
+       de startsWith() hieronder vergelijkt anders tegen een pad dat zelf nog
+       een .. of een relatief begin kan bevatten, en dan zegt die vergelijking
+       niet wat ze lijkt te zeggen. */
+    const wortel = path.resolve(publicDir);
     const cache = new Map(); // pad -> { stempel, blokken: Map(index -> {ruw, gz, br}) }
     return (req, res, next) => {
       if (req.path !== soort.PAD) return next();
       const paginaPad = decodeer(req.query && req.query.f);
-      const index = Number(req.query && req.query.i);
-      if (!goedePagina(paginaPad)) {
+      /* LEEGTE IS GEEN NUL. Number('') is 0, dus `?i=` zou stilzwijgend het
+         EERSTE blok opleveren -- een antwoord op een vraag die niet gesteld is.
+         Dezelfde fout als in ../local-ai.js, daar andersom (nul werd leegte). */
+      const rauweIndex = req.query && req.query.i;
+      const index = (rauweIndex == null || rauweIndex === '') ? NaN : Number(rauweIndex);
+      /* INLINE, en niet via goedePagina() -- zie de uitleg bij die functie. */
+      if (!GOED_PAGINA.test(paginaPad) || paginaPad.indexOf('..') !== -1) {
         return res.status(400).type('text/plain').send('/* geen blok gevraagd */');
       }
       if (!Number.isInteger(index) || index < 0 || index > soort.maxIndex) {
         return res.status(400).type('text/plain').send('/* geen blok gevraagd */');
       }
-      const bestand = path.join(publicDir, paginaPad);
-      if (!bestand.startsWith(publicDir + path.sep)) return res.status(400).type('text/plain').send('/* buiten de map */');
+      const bestand = path.join(wortel, paginaPad);
+      if (!bestand.startsWith(wortel + path.sep)) return res.status(400).type('text/plain').send('/* buiten de map */');
 
       let st;
       try { st = fs.statSync(bestand); } catch (e) { return next(); }

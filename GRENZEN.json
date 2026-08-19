@@ -1257,7 +1257,9 @@
       "payrollOS"
     ],
     "plaats": [
-      "plaats"
+      "plaats",
+      "werkbeleidPauzeStand",
+      "werkgeversVan"
     ],
     "planners": [
       "advies",

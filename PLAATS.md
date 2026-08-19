@@ -200,7 +200,7 @@ Waar een functie hiermee botst, vervalt de functie.
 | **1** | De laag: hekken, waarnemingen, vensters, actielog, bewaarbeleid, en de hek-motor op het toestel (`shared/plaats.js`) | **af** |
 | **2a** | Aanwezigheid, de motor + de eerste klant: `plaatsBijZaak()` met drie uitkomsten, stabiele hek-id's op zaakcode, en de prikklok (`/api/staff/clock`) die de bevestiging vastlegt | **af** |
 | **2b** | Het bronnenregister: een domein levert zijn eigen plaatsen als hek. Twee bronnen bedraad (je werkplekken, de posten van je beveiligingsteam) | **af** |
-| **2c** | De aanzet vanaf het toestel: een lopende dienst hoort zelf een `dienst`-venster te openen in de app van het lid | open |
+| **2c** | De brug: een lopende dienst wordt in de app van het lid aangeboden, en het venster sluit als de dienst voorbij is | **af** |
 | **3** | Plaats als bron voor `kern/voorspel/`, met de regel in het algoritmeregister erbij | open |
 | **4** | Nadering: arrival, mall, hoteldorp, avond/plan — klaarzetten vóór aankomst | open |
 
@@ -274,6 +274,35 @@ terug. Door het raam kijken in plaats van in de la — dezelfde fout als bij het
 sluiten van een venster in fase 1. Een belofte over wat er *niet* wordt bewaard,
 controleer je in de opslag zelf; daar staat nu een unit-toets op de kern voor.
 
-**Waar 2c op wacht.** Een `dienst`-venster gaat nu met de hand open. Het hoort te
-openen als een dienst begint, en dat vraagt een brug tussen de leden-app (waar de
-motor draait) en de personeels-app (waar de dienst leeft) die er nog niet is.
+### Wat fase 2c opleverde: de brug, met een mens ertussen
+
+De hek-motor draait in de leden-app; een dienst leeft in de personeels-app. Die
+twee sessies raken elkaar bewust nooit — dat is de kracht van het ontwerp, en
+tegelijk de reden dat een venster alleen met de hand open kon.
+
+**De deur die dicht moest blijven.** Het lag voor de hand om de zaak het te laten
+doen: bij het inklokken meteen een venster openen op het account van de
+medewerker. Eén regel code, en klaar. Maar dan opent een *werkgever* een
+toestemming op de telefoon van zijn personeel, en toestemming die een ander voor
+je geeft is geen toestemming. `test/plaatsdienstbrug.test.js` toets 2 bewaakt
+precies die deur.
+
+**Wat er wel mag is klaarzetten.** `/api/plaats/dienst` vertelt het *lid* dat zijn
+eigen dienst loopt — eigen data, geen andere mens erin, geen plek erin. Zijn eigen
+app (`shared/plaatsdienst.js`) biedt het hem aan met dezelfde rustige kaart als
+`plek.js`, en de tekst zegt wat er gebeurt én wat er niet gebeurt: *je werkgever
+ziet dat je er was, niet waar je bent geweest.* Eén tik en het staat aan; geen tik
+en er gebeurt niets, deze sessie niet meer gevraagd.
+
+**Uitgeklokt is uitgekeken.** Het venster sluit zodra de reden ervoor weg is — niet
+alleen een einddatum die vanzelf verloopt, maar een toestemming die weggaat op het
+moment dat ze niet meer nodig is. En alleen een venster dat de app zélf voor die
+dienst opende: een venster dat het lid om een andere reden openzette, is niet van
+ons om te sluiten.
+
+**Waarom hier een schermtoets naast de servertoets staat.** De serverkant bewijst
+dat de zaak geen venster opent en dat er na het uitklokken niets ligt. Wat die
+toets niet kan zien is het stuk waar het om draait: dat er een *mens* tussen zit.
+Een app die stilletjes zelf op ja drukt, komt daar precies zo doorheen.
+`test/plaatsdienstbrug.e2e.js` meet in een echte browser dat het aanbod verschijnt
+en dat er tot de tik niets is waargenomen.

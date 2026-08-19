@@ -20,7 +20,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
@@ -40,11 +40,11 @@
   .v2{background:linear-gradient(135deg,#2a1e2b,#6a3a55);} .v3{background:linear-gradient(135deg,#232b1e,#5c6a3a);}
   .v4{background:linear-gradient(135deg,#1e222b,#3a4d6a);} .v5{background:linear-gradient(135deg,#2b271e,#6a5a3a);}
   .v6{background:linear-gradient(135deg,#2b1e1e,#6a3a3a);} .v7{background:linear-gradient(135deg,#1e2b26,#3a6a5a);}
-  .badge{background:rgba(0,0,0,.55);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:.1rem .55rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+  .badge{background:rgba(0,0,0,.55);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:20px;padding:.1rem .55rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
   .huis .inhoud{padding:.8rem .9rem 1rem;display:flex;flex-direction:column;gap:.25rem;}
   .huis .meta{font-size:.7rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
   .huis h3{font-size:1.05rem;}
-  .huis .prijs{color:var(--gold);font-size:.85rem;font-variant-numeric:tabular-nums;}
+  .huis .prijs{color:var(--rtg-leesgoud,var(--gold));font-size:.85rem;font-variant-numeric:tabular-nums;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.4rem 0;text-align:center;}
   .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
   .blad.open{display:block;}
@@ -71,8 +71,8 @@
   body.rtg-stijl .tabs > button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .boeking{border-bottom:1px solid var(--line);padding:.7rem 0;font-size:.86rem;}
   .boeking:last-child{border-bottom:none;}
-  .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
-  .deur{font-family:'Bodoni Moda',serif;font-size:1.5rem;letter-spacing:.35em;color:var(--gold);}
+  .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  .deur{font-family:'Bodoni Moda',serif;font-size:1.5rem;letter-spacing:.35em;color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -225,14 +225,14 @@ async function openHuis(id){
       '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
       '<div style="margin-top:.4rem;">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
         '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
-        (HUIDIG.keyless?'<span class="chip" style="color:var(--gold);border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
+        (HUIDIG.keyless?'<span class="chip" style="color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
       '<div class="kaart"><h3 style="font-size:1rem;">Prijs</h3>'+
         (p ? '<div class="r"><span class="k">'+p.nachten+' nachten × '+euro(p.perNacht)+'</span><span>'+euro(p.basis)+'</span></div>'+
           (p.korting ? '<div class="r"><span class="k">Korting ('+p.kortingPct+'%)</span><span>− '+euro(p.korting)+'</span></div>' : '')+
           (p.schoonmaak ? '<div class="r"><span class="k">Schoonmaak</span><span>'+euro(p.schoonmaak)+'</span></div>' : '')+
-          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--gold);">'+euro(0)+'</span></div>'+
+          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--rtg-leesgoud,var(--gold));">'+euro(0)+'</span></div>'+
           (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
-          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--gold);">'+euro(p.totaal)+'</b></div>'+
+          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(p.totaal)+'</b></div>'+
           (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
           '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+
             (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
@@ -330,7 +330,7 @@ async function laadBord(){
     const d = await api('bord');
     $('#hBord').innerHTML =
       '<div class="r"><span class="k">Huizen live</span><span>'+d.live+' van '+d.huizen+'</span></div>'+
-      '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--gold);">'+euro(d.inkomstenTotaal)+'</b></div>'+
+      '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(d.inkomstenTotaal)+'</b></div>'+
       '<div class="r"><span class="k">Bezetting komende 30 dagen</span><span>'+d.bezettingPct+'%</span></div>'+
       '<div class="r"><span class="k">Superhost</span><span>'+(d.superhost?'★ ja':'nog niet (3 verblijven, gemiddeld 4,8+)')+'</span></div>'+
       '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(d.uitbetaling)+'</div>'+

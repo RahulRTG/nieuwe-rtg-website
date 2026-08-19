@@ -22,6 +22,37 @@ op telefoonformaat (390x844).
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| de drie andere thema's | 33 / 21 / 21, met een grens die alleen omlaag mag | tekst die alleen in de stand die je zelf niet gebruikt onleesbaar is |
+
+**HET GOUD WAS GEEN MERKBESLUIT MAAR EEN TOKEN DAT NIET MEETHEMAAT.** Toen de
+vierde ronde (champagne, bordeaux, royal) erbij kwam, stonden daar 470
+bevindingen, en na de reparatie van de onzichtbare tekst was er nog EEN soort
+over: goud als kleine tekst. Dat leek een keuze uit `MATERIAAL.md` -- goud is een
+vulkleur -- tot het nagerekend werd. Er bestaat per grond een goud dat wél leest:
+
+| goud | op een licht vlak | op onyx |
+|---|---|---|
+| `#A98F1C` (het harde goud van de zaakschermen) | 2,56 | 6,18 |
+| `#857007` (de logotoon) | 3,94 | 4,02 |
+| `#C0A544` (`--gold-tekst`) | 1,95 | **8,11** |
+| `#5E4F05` (`--gold-diep`) | **6,55** | 2,42 |
+
+De logotoon haalt het dus op géén enkele grond, en `--rtg-leesgoud` -- het token
+dat hier al voor bestaat -- wees op champagne naar precies die toon. Rechtgezet,
+en aangezet op de 933 plekken waar goud TEKST is; randen, vullingen en het
+beeldmerk houden hun goud. Daarmee zakte de ronde van 470 naar 75. Wat er nu nog
+ligt heeft geen gemeenschappelijke oorzaak meer.
+
+**EN DE POORT ZELF WIEBELDE, DOORDAT PAGINA'S BIJ HET OPENEN VAN KLEUR
+VERANDERDEN.** De eerste grenzen zette ik op één meting, en de ronde daarna zakte
+de scan. Dat bleek geen ruis: `shared/seizoen.css` zette een overgang van 0,8
+seconde op de achtergrondkleur van elke `body`, bedoeld voor de wisseling van het
+licht ("als een zonsondergang") — maar hij gold ook bij de eerste weergave. Elke
+pagina fadede bij het openen dus bijna een seconde van de kleur waarmee hij begon
+naar de kleur die hij hoort te hebben, en de keuring meet op 600 ms precies daarin.
+De overgang wordt nu pas een frame ná de eerste toepassing gearmeerd. Gemeten over
+drie ronden daarna: de wiebel ging van zes naar één. Dat is niet alleen een
+stabielere poort maar ook een pagina die meteen de goede kleur heeft.
 | de drie andere thema's | **0** onzichtbare tekst; het accent-als-kleine-tekst staat op een bovengrens | een lid dat champagne kiest en zijn scherm leeg ziet |
 
 **DE NUL BIJ CONTRAST WAS NOOIT WAAR, EN DAT IS OP 19 AUGUSTUS 2026 GEBLEKEN.**

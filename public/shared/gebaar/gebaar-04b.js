@@ -84,10 +84,26 @@
         } };
     },
     /* De regel heeft zelf al een knop; de veeg drukt hem in. Zo blijft er EEN
-       waarheid over wat die knop doet, en niet een tweede kopie ernaast. */
+       waarheid over wat die knop doet, en niet een tweede kopie ernaast.
+
+       EN DE LAAG SLIKTE ZIJN EIGEN KLIK OP. Na een gebaar staat slikRij op de
+       regel, want de ECHTE klik die achter een veeg aankomt is de staart van dat
+       gebaar en hoort niet door te lekken naar de link eronder. Maar de klik die
+       we hier ZELF sturen komt uit diezelfde regel, dus die werd net zo hard
+       tegengehouden -- en dan doet de veeg niets. Gemeten op De Salon: bewaren
+       bereikte de server nooit.
+
+       Daarom wordt de onderdrukking precies om deze ene klik heen opgetild, en
+       daarna teruggezet: de naklik van de vinger wordt nog steeds geslikt. Dat
+       kan omdat .click() synchroon is -- er zit geen ander gebaar tussen. */
     eigenKnop: function (naam, teken, kiezer) {
       return { naam: naam, teken: teken || 'openen',
-        doe: function (rij) { var b = rij.querySelector(kiezer); if (b) b.click(); } };
+        doe: function (rij) {
+          var b = rij.querySelector(kiezer);
+          if (!b) return;
+          var bewaar = slikRij; slikRij = null;
+          try { b.click(); } finally { slikRij = bewaar; }
+        } };
     }
   };
 

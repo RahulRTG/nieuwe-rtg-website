@@ -60,12 +60,12 @@
       } else {
         const h = histData;
         html += '<div class="tkc h-volbreed"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
-          '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--gold);">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
+          '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" class="h-flex1">'+
           '<button class="obtn" id="ktHzGo">'+T('kt.zoek','Zoek')+'</button></div>'+
           (h.items.length ? h.items.map(r =>
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
-            '<b style="color:var(--gold);">'+(r.quote?eur(r.quote):'')+'</b></div>'
+            '<b style="color:var(--rtg-leesgoud,var(--gold));">'+(r.quote?eur(r.quote):'')+'</b></div>'
           ).join('') : '<div class="tkc-who">'+(histQ ? T('kt.nietsgevonden','Niets gevonden voor deze zoekopdracht.') : T('kt.geenhistorie','Nog geen afgeronde ritten.'))+'</div>')+
           (h.pages > 1 ? '<div style="display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-top:0.6rem;">'+
             '<button class="obtn" data-khist="-1"'+(h.page<=1?' disabled':'')+'>‹</button>'+

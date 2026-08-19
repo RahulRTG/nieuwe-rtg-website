@@ -10,7 +10,7 @@
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);">'+T('care.pakket','Pakket')+'</div>'+
         '<div style="margin-top:0.3rem;font-size:0.92rem;"><b>'+esc(b.naam)+'</b></div>'+
         '<div class="soft-sm">'+b.nachten+' '+T('care.nachten','nachten')+' · '+esc(b.hotelNaam)+' · '+b.datum+' '+b.tijd+' · '+eur(b.prijs)+
-          ' · '+(b.paid?'<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>':'<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
+          ' · '+(b.paid?'<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>':'<span style="color:var(--rtg-leesgoud,var(--gold));">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
         (b.paid?'':'<button class="bz-groot" data-carepakpay="'+esc(b.ref)+'" style="margin-top:0.5rem;">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
         '</div>';
     }
@@ -21,7 +21,7 @@
         '<div style="flex:1;"><b>'+esc(p.naam)+'</b>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+esc(p.beschrijving)+'</div>'+
         '<div class="soft-sm" style="margin-top:0.25rem;">'+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
-        '<div style="text-align:right;white-space:nowrap;"><div style="color:var(--gold);font-size:0.95rem;">'+eur(p.prijs)+'</div>'+
+        '<div style="text-align:right;white-space:nowrap;"><div style="color:var(--rtg-leesgoud,var(--gold));font-size:0.95rem;">'+eur(p.prijs)+'</div>'+
         (p.bespaar>0?'<div class="soft-sm" style="color:var(--green,#8bc3a8);">'+T('care.bespaar','bespaar')+' '+eur(p.bespaar)+'</div>':'')+'</div></div>';
       if (open){
         const k = carePakKeuze;

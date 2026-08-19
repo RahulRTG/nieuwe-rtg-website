@@ -85,7 +85,7 @@
       '<div class="tt-top" style="display:flex;justify-content:space-between;gap:0.5rem;"><b>'+''.repeat(r.score)+'<span style="opacity:0.25;">'+''.repeat(5-r.score)+'</span> · '+esc(r.codename||'gast')+'</b><time style="color:var(--soft);font-size:0.7rem;">'+timeAgo(r.at)+'</time></div>'+
       (r.tekst ? '<div style="margin-top:0.35rem;font-size:0.86rem;">'+esc(r.tekst)+'</div>' : '')+
       (r.reactie
-        ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--gold);">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
+        ? '<div style="margin-top:0.5rem;border-left:3px solid var(--gold);padding:0.4rem 0.7rem;font-size:0.82rem;"><b style="color:var(--rtg-leesgoud,var(--gold));">'+T('rev2.uw','Uw reactie')+'</b> · '+timeAgo(r.reactie.at)+'<br>'+esc(r.reactie.tekst)+'</div>'
         : '<div class="tt-compose h-mt50"><input id="rv-'+r.id+'" placeholder="'+T('rev2.ph','Schrijf een persoonlijke reactie...')+'">'+
           '<button class="obtn ghost" data-rvai="'+r.id+'"></button><button data-rvsend="'+r.id+'">'+T('team.send','Stuur')+'</button></div>')+
       '</div>').join('')

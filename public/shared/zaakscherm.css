@@ -29,12 +29,12 @@ h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
 header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));
   backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
   border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
 header h1{font-size:1.15rem;}
 header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
 main{padding:1rem 1.1rem;max-width:920px;margin:0 auto;}
 .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
-.kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
+.kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0 0 .5rem;}
 .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
 .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
 .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);

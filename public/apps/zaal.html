@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:900px;margin:0 auto;}
@@ -30,7 +30,7 @@
     display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   /* De weergaverij (Alles / Onder de RTG-naam / Van mij) is de eigen schakelaar
@@ -51,20 +51,20 @@
   body.rtg-stijl #fAlles.aan,body.rtg-stijl #fRtg.aan,body.rtg-stijl #fMij.aan{background:none;
     color:var(--txt);border-bottom-color:var(--gold);}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.3rem 0 .5rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.3rem 0 .5rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.05rem;
     margin-bottom:.7rem;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.4rem .55rem;}
   .kaart h2{font-size:1.05rem;}
   .onder{font-size:.78rem;color:var(--muted);margin-top:.15rem;}
-  .onder .rtg{color:var(--gold);}
+  .onder .rtg{color:var(--rtg-leesgoud,var(--gold));}
   .meta{font-size:.72rem;color:var(--soft);margin-top:.35rem;}
   .credits{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   .credit{font-size:.62rem;border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;color:var(--muted);}
-  .credit b{color:var(--gold);font-weight:600;}
+  .credit b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
   .reactie{border-top:1px solid var(--line);padding:.45rem 0;font-size:.83rem;}
-  .reactie .wie{color:var(--gold);font-size:.68rem;letter-spacing:.06em;}
+  .reactie .wie{color:var(--rtg-leesgoud,var(--gold));font-size:.68rem;letter-spacing:.06em;}
   .bodem{text-align:center;color:var(--soft);font-size:.8rem;padding:1.4rem 0;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
     border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;

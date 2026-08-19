@@ -36,12 +36,12 @@
       try {
         const d2 = await API.call('/supplier/belasting', { winst: Number(el.querySelector('#zbBelWinst').value) });
         const rij = (l, v, sterk) => '<div style="display:flex;justify-content:space-between;gap:0.8rem;"><span>'+l+'</span><span style="flex-shrink:0;'+(sterk?'color:var(--txt);font-weight:600;':'')+'">'+v+'</span></div>';
-        box.innerHTML = '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;">'+d2.regime+' · '+d2.landNaam+'</div>'+
+        box.innerHTML = '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.35rem;">'+d2.regime+' · '+d2.landNaam+'</div>'+
           rij(T('zb.bel.winst','Jaarwinst'), eur(d2.winst))+
           d2.posten.map(p2 => rij(p2.label, (p2.bedrag<0?'- ':'')+eur(Math.abs(p2.bedrag)))).join('')+
           rij(T('zb.bel.betalen','Te betalen (indicatie)'), eur(d2.belasting), true)+
           rij(T('zb.bel.netto','Netto over'), eur(d2.netto), true)+
-          '<div style="margin-top:0.5rem;color:var(--gold);">'+T('zb.bel.zet','Zet ~')+d2.reserveerPct+'% '+T('zb.bel.opzij','opzij: ongeveer')+' '+eur(d2.perMaand)+' '+T('zb.bel.pm','per maand')+'.</div>'+
+          '<div style="margin-top:0.5rem;color:var(--rtg-leesgoud,var(--gold));">'+T('zb.bel.zet','Zet ~')+d2.reserveerPct+'% '+T('zb.bel.opzij','opzij: ongeveer')+' '+eur(d2.perMaand)+' '+T('zb.bel.pm','per maand')+'.</div>'+
           '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">'+T('zb.bel.disc','Indicatie; dit is voorlichting, geen bindend fiscaal advies.')+'</div>';
       } catch(e){ box.textContent = e.message; }
     });

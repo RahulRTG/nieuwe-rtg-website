@@ -4,7 +4,7 @@
       p.producten.map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.7rem;">'+
         '<div style="flex:1;"><div style="font-size:0.88rem;">'+esc(x.name)+'</div>'+(x.desc?'<div class="soft-sm">'+esc(x.desc)+'</div>':'')+'</div>'+
-        '<span style="color:var(--gold);font-size:0.82rem;">'+eur(x.price)+'</span>'+
+        '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.82rem;">'+eur(x.price)+'</span>'+
         '<span style="display:flex;align-items:center;gap:0.45rem;">'+
         '<button class="bz-btn" data-bzmin="'+x.id+'" style="padding:0.2rem 0.7rem;">\u2212</button><b>'+(bzMand[x.id]||0)+'</b><button class="bz-btn" data-bzplus="'+x.id+'" style="padding:0.2rem 0.7rem;">+</button></span></div>'
       ).join('')+'</div>'+
@@ -92,7 +92,7 @@
           return '<div class="myorder" data-ref="' + o.ref + '">' +
             '<div class="r1"><div><div class="nm">' + o.supplierName + '</div><div class="sub2">' + o.items.reduce((n,i)=>n+i.qty,0) + ' ' + T('app.items','item(s)') + ' · ' + timeAgo(o.at) + '</div></div>' +
               '<div style="text-align:right;"><div class="amt">' + eur(o.total) + '</div><span class="mo-pill ' + pc + '">' + tStatus(o.status) + '</span></div></div>' +
-            (o.regieKorting ? '<div class="sub2" style="text-align:right;color:var(--gold);">✦ ' + T('app.ledenvoordeel','RTG-ledenvoordeel') + ' − ' + eur(o.regieKorting) + '</div>' : '') +
+            (o.regieKorting ? '<div class="sub2" style="text-align:right;color:var(--rtg-leesgoud,var(--gold));">✦ ' + T('app.ledenvoordeel','RTG-ledenvoordeel') + ' − ' + eur(o.regieKorting) + '</div>' : '') +
             '<div class="acts">' + (o.paid
               ? '<span class="mo-paid">✓ '+T('app.paid','Betaald')+'</span>'
               : '<button class="mo-pay js-opay">' + FID_MINI + T('app.paywithfid','Betaal met Face ID') + '</button>') +

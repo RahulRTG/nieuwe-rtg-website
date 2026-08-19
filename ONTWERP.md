@@ -263,6 +263,23 @@ alleen als je hem vasthoudt. Het gedeelde bord houdt zijn knoppen — vastpinnen
 archiveren horen bij de eigenaar, en een gedeelde notitie "weggooien" betekent
 iets anders (jezelf van de lijst halen) met een andere weg terug.
 
+Het vierde is **De Salon**, en dat is het eerste domein waar niet elke actie de
+regel weghaalt. Archiveren, verbergen en verwijderen halen een post uit je
+tijdlijn, dus die lopen via `klaar.server()`. Bewaren doet dat niet — een
+bewaarde post blijft gewoon staan — dus daar drukt de veeg de knop in die op de
+regel zelf al staat (`klaar.eigenKnop()`). Zo blijft er één waarheid over wat
+bewaren doet, en die staat op het scherm en niet in de gebarenlaag. Wat je mag
+hangt bovendien af van wiens post het is: op je eigen post archiveer je, op die
+van iemand anders verberg je — dat is iets anders en het heet hier ook anders.
+
+Dat vierde domein legde meteen een fout in de laag zelf bloot: **de laag slikte
+zijn eigen klik op.** Na een gebaar staat `slikRij` op de regel, want de echte
+klik die achter een veeg aankomt hoort niet door te lekken naar de link eronder —
+maar de klik die `eigenKnop` zelf stuurt komt uit diezelfde regel en werd net zo
+hard tegengehouden. Bewaren bereikte de server dus nooit. De onderdrukking wordt
+nu precies om die ene klik heen opgetild en daarna teruggezet; de naklik van de
+vinger wordt nog steeds geslikt.
+
 **En de laag werkte tot 19 augustus 2026 niet op een telefoon.** `.gb-rij` kreeg
 zijn `position:relative` alleen binnen de mediaquery van het aanwijslicht —
 `(hover:hover) and (pointer:fine)` — en op een aanraakscherm is die onwaar. De
@@ -279,9 +296,10 @@ het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer, en
 regel draagt zijn plaatsanker buiten elke mediaquery), `test/gebaar.e2e.js` veegt
 in een echte browser — met een derde scenario in de aanraakstand, over een regel
 die zichzelf NIET plaatst, want een scherm dat dat wel doet verbergt de fout van
-de laag. `test/gebaar-bestanden.e2e.js`, `test/gebaar-rtmail.e2e.js` en
-`test/gebaar-notities.e2e.js` meten de belofte met een server erachter, tot aan
-een geweigerde aanvraag en een borg die pas op de tweede druk afgaat toe.
+de laag. `test/gebaar-bestanden.e2e.js`, `test/gebaar-rtmail.e2e.js`,
+`test/gebaar-notities.e2e.js` en `test/gebaar-salon.e2e.js` meten de belofte met
+een server erachter, tot aan een geweigerde aanvraag, een borg die pas op de
+tweede druk afgaat en een veeg die de eigen knop van het scherm indrukt toe.
 
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon

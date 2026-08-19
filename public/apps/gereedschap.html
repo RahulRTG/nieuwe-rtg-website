@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:760px;margin:0 auto;}
@@ -29,13 +29,13 @@
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
   .paneel{display:none;}
   .paneel.open{display:block;}
   /* Het gereedschap houdt zijn eigen schakelaar in de kop (Rekenmachine / Wekker
@@ -55,16 +55,16 @@
   #rkScherm{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;
     color:var(--txt);font:500 1.6rem 'Inter',sans-serif;text-align:right;padding:.9rem .9rem;
     font-variant-numeric:tabular-nums;}
-  #rkUitkomst{text-align:right;color:var(--gold);font-size:1rem;min-height:1.5rem;margin:.3rem .2rem .6rem;}
+  #rkUitkomst{text-align:right;color:var(--rtg-leesgoud,var(--gold));font-size:1rem;min-height:1.5rem;margin:.3rem .2rem .6rem;}
   #rkToetsen{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;}
   #rkToetsen button{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);
     font:600 1.05rem 'Inter',sans-serif;padding:.85rem 0;cursor:pointer;}
   #rkToetsen button:hover{border-color:var(--gold);}
-  #rkToetsen .op{color:var(--gold);}
+  #rkToetsen .op{color:var(--rtg-leesgoud,var(--gold));}
   #rkToetsen .gelijk{background:var(--gold);border-color:var(--gold);color:#0C0C0B;grid-column:span 2;}
   .zaak{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.8rem;}
   .zaak .vak{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
-  .zaak .vak b{display:block;font-size:.72rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;}
+  .zaak .vak b{display:block;font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;}
   .zaak .uitkomst{font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.5;}
 
   /* wekkers, timers, klokken */

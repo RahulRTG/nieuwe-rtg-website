@@ -61,7 +61,7 @@
         '<b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.etaMin?' · '+o.etaMin+' min':'')+'</b>'+
         '<span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+(m!=null?' · '+(m<1000?m+' m':(m/1000).toFixed(1)+' km'):'')+'</span>'+
         '<span style="color:var(--soft);">'+keten+'</span>'+
-        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
+        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
     };
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.bz.gps','Live GPS')+'</div>'+
@@ -83,11 +83,11 @@
           o.status==='onderweg' ? '<button class="abtn" data-pdbz="'+o.ref+'" data-st="bezorgd">'+T('pd.bz.bezorgd','Bezorgd')+'</button>' : ''
         )).join('') +
         '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.55rem;">'+
-        VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--gold);"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
+        VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
         (tePakken.length ? '<button class="abtn" id="pdPakcheck" style="margin-top:0.5rem;">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
         (teVertrekken.length ? '<button class="abtn" id="pdVertrek" style="margin-top:0.5rem;">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
         (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
-          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
+          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
       (vrij.length ? vrij.map(o =>

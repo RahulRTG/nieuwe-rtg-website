@@ -20,9 +20,9 @@
   .hero{text-align:center;padding:1rem 0 1.4rem;}
   .kick{margin-bottom:.7rem;}
   .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
-  .logo b{color:var(--goud);font-weight:600;}
+  .logo b{color:var(--rtg-leesgoud,var(--goud));font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
-  .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
+  .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--rtg-leesgoud,var(--goud));border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   /* De hub in de RTG OS-look: de tegels zijn app-iconen op een hoofdscherm,
      squircles met een klein label eronder; de teksten en pijlen zwijgen. */
   .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem .5rem;}
@@ -45,11 +45,11 @@
   .tile p{display:none;}
   .tile .cta{display:none;}
   .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
-  .gratis b{color:var(--goud);}
+  .gratis b{color:var(--rtg-leesgoud,var(--goud));}
   /* AI-buddy-kiezer */
   .buddy{padding:.9rem 1rem;margin:.2rem 0 1.5rem;}
   .buddy-t{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin-bottom:.6rem;}
-  .buddy-nm{color:var(--goud);margin-left:.5rem;text-transform:none;letter-spacing:0;font-weight:600;}
+  .buddy-nm{color:var(--rtg-leesgoud,var(--goud));margin-left:.5rem;text-transform:none;letter-spacing:0;font-weight:600;}
   .buddy-keuze{display:flex;gap:.6rem;}
   .buddy-b{flex:1;background:var(--paneel2);border:2px solid var(--lijn);border-radius:12px;padding:.55rem;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.85rem;cursor:pointer;transition:border-color .12s,transform .12s;}
   .buddy-b span{font-size:1.5rem;}
@@ -63,7 +63,7 @@
   .uitleg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-top:2rem;text-align:left;}
   @media(max-width:560px){.uitleg{grid-template-columns:1fr;}}
   .uitleg .u{padding:1rem 1.1rem;}
-  .uitleg .u b{color:var(--goud);display:block;margin-bottom:.3rem;}
+  .uitleg .u b{color:var(--rtg-leesgoud,var(--goud));display:block;margin-bottom:.3rem;}
   .uitleg .u p{color:var(--zacht);font-size:.85rem;line-height:1.45;}
   .profwrap{max-width:40rem;margin:0 auto;text-align:center;padding-top:2.5rem;}
   .profgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(6rem,1fr));gap:1.2rem;margin-top:2rem;justify-content:center;}
@@ -92,7 +92,7 @@
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .mini > a{display:inline-block;padding:.25rem 0;min-height:24px;}
-  .mini a{color:var(--goud);text-decoration:none;cursor:pointer;}
+  .mini a{color:var(--rtg-leesgoud,var(--goud));text-decoration:none;cursor:pointer;}
   #balk{position:sticky;top:0;background:var(--bg);z-index:30;}
   h3.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.8rem 0 .8rem;}
   h3.sec:first-of-type{margin-top:.6rem;}

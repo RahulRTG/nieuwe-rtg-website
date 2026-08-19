@@ -10,7 +10,7 @@
     const t = b.totalen;
     $('#rampKpis').innerHTML =
       '<div class="rkpi"><b style="color:var(--groen);">' + t.eenhedenVrij + '</b><span>eenheden vrij</span></div>' +
-      '<div class="rkpi"><b style="color:var(--gold);">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
+      '<div class="rkpi"><b style="color:var(--rtg-leesgoud,var(--gold));">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
       '<div class="rkpi"><b style="color:var(--groen);">' + t.beddenVrij + '</b><span>bedden vrij</span></div>' +
       '<div class="rkpi"><b>' + t.sehWachtend + '</b><span>SEH wacht</span></div>' +
       '<div class="rkpi"><b style="color:var(--rood);">' + t.meldingenOpen + '</b><span>open meldingen</span></div>';

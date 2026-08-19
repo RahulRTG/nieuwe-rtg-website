@@ -15,14 +15,14 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
   .kaart h2{font-size:1.08rem;margin-bottom:.5rem;}
   .att{border:1px solid var(--gold);border-radius:12px;padding:.6rem .9rem;margin-bottom:.9rem;background:color-mix(in srgb,var(--gold) 8%,transparent);}
-  .att .r{font-size:.85rem;color:var(--gold);}
+  .att .r{font-size:.85rem;color:var(--rtg-leesgoud,var(--gold));}
   .reis{cursor:pointer;transition:border-color .2s;}
   .reis:hover{border-color:var(--gold);}
   .reis .nm{font-weight:600;font-size:1.05rem;}
@@ -85,7 +85,7 @@ async function laad(){
   BOEK=d;
   if(open){ const r=d.reizen.find(x=>x.id===open); if(r){ return detail(r); } open=null; }
   let h='';
-  if(d.attenties.length) h+='<div class="att"><div class="lbl" style="margin-top:0;color:var(--gold);">Documenten die aandacht vragen</div>'+d.attenties.map(a=>'<div class="r">'+(a.verlopen?'':'• ')+esc(a.soort)+(a.houder?' ('+esc(a.houder)+')':'')+' - '+(a.verlopen?'verlopen ':'geldig tot ')+dt(a.geldigTot)+' · '+esc(a.reis)+'</div>').join('')+'</div>';
+  if(d.attenties.length) h+='<div class="att"><div class="lbl" style="margin-top:0;color:var(--rtg-leesgoud,var(--gold));">Documenten die aandacht vragen</div>'+d.attenties.map(a=>'<div class="r">'+(a.verlopen?'':'• ')+esc(a.soort)+(a.houder?' ('+esc(a.houder)+')':'')+' - '+(a.verlopen?'verlopen ':'geldig tot ')+dt(a.geldigTot)+' · '+esc(a.reis)+'</div>').join('')+'</div>';
   h+='<div class="kaart"><h2>Nieuwe reis</h2><span class="lbl">Naam</span><input class="veld" id="nNaam" placeholder="Bijv. Ibiza zomer"><div class="rij" style="margin-top:.4rem;"><div><span class="lbl">Bestemming</span><input class="veld" id="nBest"></div><div><span class="lbl">Van</span><input class="veld" id="nVan" type="date"></div><div><span class="lbl">Tot</span><input class="veld" id="nTot" type="date"></div></div><div style="margin-top:.7rem;"><button class="knop" id="nDoe">In het boek</button></div></div>';
   h+= d.reizen.length ? d.reizen.map(r=>'<div class="kaart reis" data-id="'+r.id+'"><div class="nm">'+esc(r.naam)+'</div><div class="meta">'+esc(r.bestemming||'')+(r.van?' · '+dt(r.van)+(r.tot?' - '+dt(r.tot):''):'')+' · '+(r.legs.length)+' legs · '+(r.documenten.length)+' documenten</div></div>').join('') : '<div class="kaart"><div class="leeg">Nog geen reizen. Zet hierboven uw eerste reis in het boek.</div></div>';
   h+=AIBOX('Bijv. wat moet ik regelen voor deze reis?');

@@ -53,7 +53,7 @@
     const pct = luchtPct();
     const lines = m.filter(x=>bon[x.id]).map(x=>'<div class="pos-line"><span>'+bon[x.id]+'× '+mNaam(x)+'</span><span>'+eur(x.price*bon[x.id])+(pct?' ·  '+eur(luchtPrijs(x.price)*bon[x.id]):'')+'</span></div>').join('');
     return '<div class="card"><div class="tt-h">'+T('pos.newbon','Nieuwe bon')+
-      (pct?' <span style="font-size:0.64rem;color:var(--gold);letter-spacing:0.08em;">'+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
+      (pct?' <span style="font-size:0.64rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.08em;">'+T('pos.luchtzijde','LUCHTZIJDE')+' +'+pct+'%</span>':'')+'</div>'+
       '<div class="pos-pay" style="margin:0.4rem 0 0.2rem;">'+
         '<button class="obtn" id="posVertaal">'+(MENU_VERTAAL.naar?MENU_VERTAAL.naar.toUpperCase():T('pos.vertaal','Vertaal de kaart'))+'</button>'+
         (pct?'<button class="obtn" id="posPass">'+T('pos.pass','Boarding pass')+'</button>':'')+

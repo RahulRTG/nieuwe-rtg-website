@@ -10,7 +10,7 @@
     try { lijst = (await call('/aanmelding/lijst', { status: 'in behandeling' })).aanmeldingen || []; } catch(e){ return; }
     el.innerHTML = lijst.length ? lijst.map(a => {
       const gedaan = (a.reis || []).map(s => s.naam).join(' · ');
-      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--gold);font-size:0.7rem;">op uitnodiging</span>' : '';
+      const uitnod = a.viaUitnodiging ? ' <span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.7rem;">op uitnodiging</span>' : '';
       return '<div class="vrow" data-id="'+a.id+'">' +
         '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
           '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
@@ -33,7 +33,7 @@
         el.insertAdjacentHTML('beforeend',
           '<div style="margin-top:.7rem;border-top:1px solid var(--line,#2a2a2a);padding-top:.6rem;font-size:0.8rem;color:var(--soft);line-height:1.7;">' +
           '<b style="color:var(--txt);">'+b.aantalLeden+'</b> '+T('bo.aanmlopend','lopende lidmaatschap(pen), 12 maanden automatisch.')+'<br>' +
-          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--gold);">'+eur(b.totaal.foundation)+'</b> ('+
+          T('bo.aanmnaarfound','Per jaar naar de RTFoundation')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(b.totaal.foundation)+'</b> ('+
           T('bo.aanmlokaal','20% lokaal')+' '+eur(b.totaal.lokaal)+' &middot; '+T('bo.aanmrtf','10% RTF')+' '+eur(b.totaal.rtf)+')</div>');
       }
     } catch(e){}

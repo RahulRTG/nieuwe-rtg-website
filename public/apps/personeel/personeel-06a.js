@@ -32,12 +32,12 @@
     const nuMissie = horecaMissies.filter(x=>x.status!=='klaar').sort((a,b)=>(a.prioriteit==='hoog'?-1:0)-(b.prioriteit==='hoog'?-1:0))[0];
     if (horecaOverdrachten.length) {
       const o=horecaOverdrachten[0];
-      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--rtg-leesgoud,var(--gold));">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
       $('#hmAccept').addEventListener('click',async()=>{try{await API.call('/supplier/horeca/handover/accept',{id:o.id});toast('Overdracht geaccepteerd.');await laadZaken();renderAll();}catch(e){toast(e.message)}});
     }
     if (nuMissie) {
       $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:rgba(169,143,28,.48);background:linear-gradient(145deg,rgba(127,22,52,.14),var(--card));">'+
-        '<div class="k" style="color:var(--gold);">RAHUL SERVICE COMPASS · NU</div><div class="shift-big" style="color:var(--txt);">'+esc(nuMissie.titel)+'</div>'+
+        '<div class="k" style="color:var(--rtg-leesgoud,var(--gold));">RAHUL SERVICE COMPASS · NU</div><div class="shift-big" style="color:var(--txt);">'+esc(nuMissie.titel)+'</div>'+
         '<div style="margin-top:.4rem;font-size:.76rem;line-height:1.55;color:var(--soft);">'+esc(nuMissie.sectie)+' · circa '+nuMissie.minuten+' min'+(nuMissie.detail?' · '+esc(nuMissie.detail):'')+'</div>'+
         '<div class="row" style="margin-top:.75rem;">'+(nuMissie.status==='nieuw'?'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="bezig">Start nu</button>':'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="klaar">Gereed</button><button class="abtn ghost" data-hmnu="'+nuMissie.id+'" data-hmnst="hulp">Vraag hulp</button><button class="abtn ghost" id="hmDraag">Overdragen</button>')+'<button class="abtn ghost" id="hmAlle">Bekijk hierna</button></div></div>');
       document.querySelectorAll('[data-hmnu]').forEach(b=>b.addEventListener('click',async()=>{
@@ -51,7 +51,7 @@
     // tafels staan bovenaan, zodat niemand ooit wordt vergeten.
     const A = (aandacht && aandacht.aandacht) || [], TT = (aandacht && aandacht.traagTafels) || [];
     if (A.length || TT.length){
-      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
+      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--rtg-leesgoud,var(--gold));">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
       h += A.map(a => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(a.reden)+(a.tafel?' · '+esc(a.tafel):'')+'</b><span>'+esc(a.codename)+' · '+timeAgo(a.at)+'</span></div><button class="abtn" data-aankl="'+a.id+'">'+T('pd.help','Help')+'</button></div>').join('');
       h += TT.map(t => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div><button class="abtn ghost" data-coachref="'+esc(t.ref)+'" data-coachtafel="'+esc(t.tafel||t.ref)+'" title="'+T('pd.tr.coachtable','Vraag de coach over deze tafel')+'"></button></div>').join('');
       h += '</div>';

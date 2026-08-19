@@ -22,7 +22,7 @@
   /* de werkbalk van de studio */
   header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
     display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.05rem;}
   header .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;}
   .titelin{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.85rem;border-radius:10px;padding:.4rem .6rem;min-width:12rem;}
@@ -30,7 +30,7 @@
   .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.8rem;font-weight:600;border-radius:10px;padding:.45rem .8rem;cursor:pointer;white-space:nowrap;}
   .knop:hover{border-color:var(--gold);}
   .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .swatches{display:flex;gap:.35rem;align-items:center;}
   .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
@@ -97,14 +97,14 @@
   .bewerk .blok:hover>.bwbalk{display:flex;}
   .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
-  .bwbalk button.aan{border-color:var(--gold);color:var(--gold);}
+  .bwbalk button.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .bwbalk button svg{display:block;}
   .bwbalk .weg:hover{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .grip{cursor:grab;}
   .blok.sleep{opacity:.5;}
   /* blok dat op de HUIDIGE versie verborgen is: tijdens bewerken vaag met een label */
   .bewerk .blok.dim{opacity:.4;}
-  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--gold);font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
+  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
   .vlabel.var{border-color:var(--green,#4C9A75);color:var(--green,#4C9A75);}
   .vnoot{padding:.5rem 1rem;background:var(--card);border-bottom:1px solid var(--line);font-size:.82rem;color:var(--green,#4C9A75);}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
@@ -128,7 +128,7 @@
   .lijstrij button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
   .inlog{max-width:440px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>

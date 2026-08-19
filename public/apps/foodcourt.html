@@ -21,7 +21,7 @@
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
@@ -58,14 +58,14 @@
   .step{display:flex;align-items:center;gap:.5rem;}
   .step button{width:2.2rem;height:2.2rem;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:1.1rem;cursor:pointer;}
   .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 .5rem;}
-  .dienst{font-size:.7rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin:.6rem 0 .3rem;}
+  .dienst{font-size:.7rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.12em;text-transform:uppercase;margin:.6rem 0 .3rem;}
   .slots{display:flex;gap:.45rem;flex-wrap:wrap;}
   .slot{border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:10px;padding:.5rem .7rem;font:inherit;font-size:.86rem;cursor:pointer;font-variant-numeric:tabular-nums;}
   .slot:hover:not(:disabled){border-color:var(--gold);}
   .slot:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/adresvoorstel.js"></script>
@@ -87,7 +87,7 @@
 <section class="blad" id="blad" aria-label="Reserveren">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Food Court</button>
-    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey" id="bladMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
   </div>
   <div class="paneel">
     <div id="bladDeal"></div>

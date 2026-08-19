@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
@@ -29,7 +29,7 @@
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
@@ -86,7 +86,7 @@
 
   /* de lijst: gegroepeerd per dag, met de uitnodigingen erin */
   .ldag{margin-bottom:1rem;}
-  .ldag h3{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;}
+  .ldag h3{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.35rem;}
   .litem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;
     margin-bottom:.45rem;display:flex;gap:.7rem;align-items:center;cursor:pointer;}
   .litem .tijd{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.78rem;min-width:5.4rem;}
@@ -94,7 +94,7 @@
   .litem .wat b{display:block;font-weight:600;font-size:.9rem;}
   .litem .wat small{color:var(--soft);font-size:.72rem;}
   .litem.eco{border-left:3px solid var(--gold);}
-  .litem .bron{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+  .litem .bron{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
 
   /* het afspraak-paneel */
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
@@ -111,7 +111,7 @@
   .deeln{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding:.35rem 0;
     display:flex;justify-content:space-between;gap:.6rem;}
   .deeln .st{color:var(--soft);font-size:.7rem;}
-  .deeln .st.ja{color:var(--gold);}
+  .deeln .st.ja{color:var(--rtg-leesgoud,var(--gold));}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
     border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}

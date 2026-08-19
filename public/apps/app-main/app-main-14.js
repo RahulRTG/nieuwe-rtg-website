@@ -23,7 +23,7 @@
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="flex:1;"><div style="font-size:0.88rem;">'+esc(b.naam)+
             ' <span style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:'+(b.soort==='medisch'?'var(--gold)':'var(--green,#8bc3a8)')+';">'+(b.soort==='medisch'?T('care.med','medisch'):T('care.well','wellness'))+'</span></div>'+
             '<div class="soft-sm">'+b.duurMin+' '+T('care.min','min')+(behlr?' · '+esc(behlr.naam):'')+'</div></div>'+
-            '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(b.prijs)+'</span></div>';
+            '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.82rem;white-space:nowrap;">'+eur(b.prijs)+'</span></div>';
         if (open){
           const k = careKeuze;
           html += '<div style="margin-top:0.5rem;">'+

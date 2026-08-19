@@ -28,7 +28,7 @@
         const r = await API.call('/supplier/ticket/deurverkoop', body);
         // de code blijft staan als het programma zich ververst
         pdVkLaatst = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+' \u00B7 \u20AC '+r.ticket.total+'</b>'+
-          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
+          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--rtg-leesgoud,var(--gold));">'+esc(r.ticket.code)+'</div>'+
           '<div style="font-size:0.72rem;color:var(--soft);">'+T('pd.e.geefcode','Geef deze entreecode aan de gast.')+'</div>';
         uit.innerHTML = pdVkLaatst;
         laadEntree();

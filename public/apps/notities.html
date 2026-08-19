@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
@@ -29,13 +29,13 @@
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
 
   /* het bord: kolommen die zelf hun plek zoeken; vastgepind eerst */
   #bord,#gedeeldBord{columns:16rem;column-gap:.7rem;}
@@ -48,7 +48,7 @@
   .nkaart .taak{display:flex;gap:.4rem;align-items:baseline;font-size:.8rem;color:var(--muted);padding:.1rem 0;}
   .nkaart .taak.af{color:var(--soft);text-decoration:line-through;}
   .nkaart .meta{font-size:.62rem;color:var(--soft);margin-top:.4rem;display:flex;gap:.5rem;flex-wrap:wrap;}
-  .nkaart .meta .goud{color:var(--gold);}
+  .nkaart .meta .goud{color:var(--rtg-leesgoud,var(--gold));}
 
   /* de editor */
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;

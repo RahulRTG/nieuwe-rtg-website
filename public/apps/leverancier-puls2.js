@@ -27,7 +27,7 @@
     h += plan.taken.map(function (t2) {
       var p = PRIO[t2.prio] || PRIO[3];
       return '<div style="display:flex;align-items:center;gap:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.45rem 0.6rem;margin-top:0.4rem;' + (t2.klaar ? 'opacity:0.45;' : '') + '">' +
-        '<button data-dpklaar="' + esc(t2.id) + '" aria-label="' + T('dp.vink', 'Afvinken') + '" style="' + STIL + 'min-width:2rem;' + (t2.klaar ? 'color:var(--gold);border-color:var(--gold);' : '') + '">' + (t2.klaar ? '✓' : '○') + '</button>' +
+        '<button data-dpklaar="' + esc(t2.id) + '" aria-label="' + T('dp.vink', 'Afvinken') + '" style="' + STIL + 'min-width:2rem;' + (t2.klaar ? 'color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);' : '') + '">' + (t2.klaar ? '✓' : '○') + '</button>' +
         '<span style="font-size:0.8rem;line-height:1.45;flex:1;' + (t2.klaar ? 'text-decoration:line-through;' : '') + '">' + esc(t2.tekst) + '</span>' +
         '<span class="sub" style="font-size:0.6rem;letter-spacing:0.1em;color:' + p[1] + ';">' + T('dp.p' + t2.prio, p[0]) + '</span></div>';
     }).join('');

@@ -21,11 +21,11 @@
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
   .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
-  .mijncn b{color:var(--goud);}
+  .mijncn b{color:var(--rtg-leesgoud,var(--goud));}
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
   .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
-  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
+  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--rtg-leesgoud,var(--goud));}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
@@ -70,7 +70,7 @@
   .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
   .opkaart .em{font-size:1.6rem;}
   .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
-  .opkaart .tx b{color:var(--goud);}
+  .opkaart .tx b{color:var(--rtg-leesgoud,var(--goud));}
   .opkaart .tx small{display:block;color:var(--zacht);font-size:.72rem;margin-top:.15rem;}
   /* snap-studio */
   .studio-cv{width:100%;border-radius:12px;display:block;touch-action:none;background:#111;}
@@ -81,7 +81,7 @@
   .stkleur.aan{border-color:#fff;transform:scale(1.12);}
   .stemoji{font-size:1.2rem;background:#26221d;border-radius:9px;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
   .stemoji.aan{border-color:var(--goud);}
-  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
+  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));cursor:pointer;opacity:.75;}
   /* bellen */
   .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
   .belwrap{position:relative;width:100%;height:70vh;max-height:70vh;display:flex;align-items:center;justify-content:center;background:#000;}

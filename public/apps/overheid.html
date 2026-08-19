@@ -19,7 +19,7 @@
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
@@ -62,7 +62,7 @@
   .balk{height:6px;border-radius:3px;background:var(--gold);margin-top:.35rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   .bad{display:inline-block;min-width:1.1rem;text-align:center;background:var(--burgundy);color:#fff;border-radius:999px;font-size:.68rem;padding:.02rem .35rem;margin-left:.3rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -95,7 +95,7 @@
       <div class="lbl">Al ingehouden loonheffing (€, optioneel)</div>
       <input class="veld" id="ibIngehouden" inputmode="numeric" placeholder="Leeg = schatting">
       <div style="margin-top:.7rem;border-top:1px solid var(--line);padding-top:.6rem;">
-        <div class="lbl" style="color:var(--gold);">Laat Rahul het invullen</div>
+        <div class="lbl" style="color:var(--rtg-leesgoud,var(--gold));">Laat Rahul het invullen</div>
         <textarea class="veld" id="ibAi" maxlength="300" placeholder="Bijv. ik verdien 48.000 bruto en had 3.200 aan hypotheekrente"></textarea>
         <button class="knop stil" id="ibAiGo" style="margin-top:.5rem;width:auto;">Rahul vult de velden in</button>
       </div>

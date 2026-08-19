@@ -28,7 +28,7 @@
   .kop{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem .7rem;background:linear-gradient(180deg,rgba(12,12,11,.92),rgba(12,12,11,0));pointer-events:none;}
   .kop>*{pointer-events:auto;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;text-decoration:none;}
-  .kop .ey{font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);}
+  .kop .ey{font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .kop h1{font-size:1.25rem;line-height:1.15;}
   .kop .sub{font-size:.72rem;color:var(--soft);}
   .kop .rek{flex:1;}
@@ -36,7 +36,7 @@
   .kop .knoppen{display:flex;gap:.5rem;overflow-x:auto;max-width:64vw;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   .kop .knoppen::-webkit-scrollbar{display:none;}
   .knopje{background:rgba(21,19,18,.85);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.45rem .85rem;font:inherit;font-size:.78rem;cursor:pointer;backdrop-filter:blur(6px);white-space:nowrap;flex:0 0 auto;}
-  .knopje.aan{border-color:var(--gold);color:var(--gold);}
+  .knopje.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   /* de chatbalk */
   /* de zaal-balk staat boven de OS-brede stuurbalk (handenvrij, bottom:0) */
   .balk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(4.4rem + env(safe-area-inset-bottom));z-index:6;display:flex;gap:.4rem;width:min(560px,94vw);background:color-mix(in srgb,var(--rtg-card,#151312) 88%,transparent);border:1px solid var(--line);border-radius:999px;padding:.4rem;backdrop-filter:blur(8px);}
@@ -53,16 +53,16 @@
   .rij-item:hover{border-color:var(--gold);}
   .rij-item b{font-family:'Bodoni Moda',serif;font-weight:500;display:block;}
   .rij-item .m{font-size:.72rem;color:var(--soft);}
-  .rij-item .tel{margin-left:auto;font-size:.74rem;color:var(--gold);white-space:nowrap;}
+  .rij-item .tel{margin-left:auto;font-size:.74rem;color:var(--rtg-leesgoud,var(--gold));white-space:nowrap;}
   .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;margin-top:.6rem;}
   .cat{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.5rem .6rem;color:var(--txt);font:inherit;font-size:.76rem;cursor:pointer;text-align:left;}
-  .cat.aan{border-color:var(--gold);color:var(--gold);}
+  .cat.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .veldje{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.84rem;padding:.5rem .7rem;width:100%;}
   .paneel .knop2{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
   .paneel .stil2{background:transparent;color:var(--txt);border:1px solid var(--line);}
   .melding{position:fixed;left:50%;bottom:13rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:22vh auto 0;text-align:center;padding:0 1.2rem;position:relative;z-index:7;}
-  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   /* het spelpaneel: info, timing-meter en de speelknop */
   .spelbalk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(8rem + env(safe-area-inset-bottom));z-index:6;width:min(560px,94vw);background:rgba(21,19,18,.92);border:1px solid var(--gold);border-radius:16px;padding:.65rem .8rem;backdrop-filter:blur(8px);}
   .spelbalk .info{font-size:.78rem;margin-bottom:.45rem;}

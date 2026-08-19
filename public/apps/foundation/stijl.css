@@ -24,16 +24,16 @@ input,textarea,select{font-family:inherit;}
 .kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:var(--radius);}
 .zacht{color:var(--zacht);}
 .serif{font-family:var(--serif);}
-.badge{display:inline-block;background:#241f16;color:var(--goud);border-radius:999px;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
+.badge{display:inline-block;background:#241f16;color:var(--rtg-leesgoud,var(--goud));border-radius:999px;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#3a352d;}
 .dot.aan{background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.7);}
-.kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--goud);font-weight:700;}
+.kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));font-weight:700;}
 .campus-ingang{display:grid;grid-template-columns:1fr auto;gap:.32rem 1rem;align-items:center;padding:1rem 1.1rem;margin:0 0 1rem;text-decoration:none;color:var(--txt);background:radial-gradient(circle at 92% 12%,color-mix(in oklab,var(--goud) 22%,transparent),transparent 38%),var(--paneel);transition:transform .15s,border-color .15s;}
 .campus-ingang:hover{transform:translateY(-2px);border-color:var(--goud);}
-.campus-ingang .campus-merk{grid-column:1;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--goud);font-weight:800;}
+.campus-ingang .campus-merk{grid-column:1;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));font-weight:800;}
 .campus-ingang strong{grid-column:1;font-family:var(--serif);font-size:1.15rem;font-weight:600;}
 .campus-ingang span:not(.campus-merk){grid-column:1;color:var(--zacht);font-size:.77rem;line-height:1.45;}
-.campus-ingang b{grid-column:2;grid-row:1/4;color:var(--goud);font-size:.78rem;white-space:nowrap;}
+.campus-ingang b{grid-column:2;grid-row:1/4;color:var(--rtg-leesgoud,var(--goud));font-size:.78rem;white-space:nowrap;}
 @media(max-width:560px){.campus-ingang{grid-template-columns:1fr}.campus-ingang b{grid-column:1;grid-row:auto;margin-top:.35rem}}
 /* gedeelde AI-chat (coach-pagina's) */
 .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}

@@ -25,7 +25,7 @@
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
   .veld,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);
     font:inherit;font-size:0.85rem;padding:0.55rem 0.7rem;}
-  .knop{background:var(--card);border:1px solid var(--gold);border-radius:10px;color:var(--gold);
+  .knop{background:var(--card);border:1px solid var(--gold);border-radius:10px;color:var(--rtg-leesgoud,var(--gold));
     font:inherit;font-size:0.85rem;padding:0.55rem 0.95rem;cursor:pointer;}
   .knop.klein{font-size:0.72rem;padding:0.3rem 0.6rem;}
   .knop:focus-visible,.veld:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
@@ -35,11 +35,11 @@
   .melding:first-child{border-top:none;}
   .prio{display:inline-block;border-radius:6px;padding:0.05rem 0.45rem;font-size:0.68rem;margin-right:0.4rem;border:1px solid var(--line);}
   .prio.p1{color:var(--rood);border-color:var(--rood);}
-  .prio.p2{color:var(--gold);border-color:var(--gold);}
+  .prio.p2{color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}
   .prio.p3{color:var(--groen);border-color:var(--groen);}
   .eenheid{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:0.25rem 0.55rem;margin:0.2rem 0.3rem 0 0;font-size:0.75rem;}
   .eenheid.vrij{border-color:var(--groen);color:var(--groen);}
-  .eenheid.onderweg,.eenheid.ter-plaatse{border-color:var(--gold);color:var(--gold);}
+  .eenheid.onderweg,.eenheid.ter-plaatse{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .log{font-size:0.72rem;color:var(--soft);margin-top:0.3rem;line-height:1.5;}
   .chat{max-height:16rem;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.6rem;}
   .chat .b{border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;font-size:0.83rem;line-height:1.5;max-width:85%;}

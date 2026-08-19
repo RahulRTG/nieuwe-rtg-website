@@ -820,12 +820,12 @@
     const nuMissie = horecaMissies.filter(x=>x.status!=='klaar').sort((a,b)=>(a.prioriteit==='hoog'?-1:0)-(b.prioriteit==='hoog'?-1:0))[0];
     if (horecaOverdrachten.length) {
       const o=horecaOverdrachten[0];
-      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--rtg-leesgoud,var(--gold));">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn" id="hmAccept" style="margin-top:.7rem;">Accepteer overdracht</button></div>');
       $('#hmAccept').addEventListener('click',async()=>{try{await API.call('/supplier/horeca/handover/accept',{id:o.id});toast('Overdracht geaccepteerd.');await laadZaken();renderAll();}catch(e){toast(e.message)}});
     }
     if (nuMissie) {
       $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:rgba(169,143,28,.48);background:linear-gradient(145deg,rgba(127,22,52,.14),var(--card));">'+
-        '<div class="k" style="color:var(--gold);">RAHUL SERVICE COMPASS · NU</div><div class="shift-big" style="color:var(--txt);">'+esc(nuMissie.titel)+'</div>'+
+        '<div class="k" style="color:var(--rtg-leesgoud,var(--gold));">RAHUL SERVICE COMPASS · NU</div><div class="shift-big" style="color:var(--txt);">'+esc(nuMissie.titel)+'</div>'+
         '<div style="margin-top:.4rem;font-size:.76rem;line-height:1.55;color:var(--soft);">'+esc(nuMissie.sectie)+' · circa '+nuMissie.minuten+' min'+(nuMissie.detail?' · '+esc(nuMissie.detail):'')+'</div>'+
         '<div class="row" style="margin-top:.75rem;">'+(nuMissie.status==='nieuw'?'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="bezig">Start nu</button>':'<button class="abtn" data-hmnu="'+nuMissie.id+'" data-hmnst="klaar">Gereed</button><button class="abtn ghost" data-hmnu="'+nuMissie.id+'" data-hmnst="hulp">Vraag hulp</button><button class="abtn ghost" id="hmDraag">Overdragen</button>')+'<button class="abtn ghost" id="hmAlle">Bekijk hierna</button></div></div>');
       document.querySelectorAll('[data-hmnu]').forEach(b=>b.addEventListener('click',async()=>{
@@ -839,7 +839,7 @@
     // tafels staan bovenaan, zodat niemand ooit wordt vergeten.
     const A = (aandacht && aandacht.aandacht) || [], TT = (aandacht && aandacht.traagTafels) || [];
     if (A.length || TT.length){
-      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
+      let h = '<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--rtg-leesgoud,var(--gold));">'+T('pd.attn','Aandacht gevraagd')+' ('+(A.length+TT.length)+')</div>';
       h += A.map(a => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(a.reden)+(a.tafel?' · '+esc(a.tafel):'')+'</b><span>'+esc(a.codename)+' · '+timeAgo(a.at)+'</span></div><button class="abtn" data-aankl="'+a.id+'">'+T('pd.help','Help')+'</button></div>').join('');
       h += TT.map(t => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(t.tafel||t.ref)+'</b><span>'+esc(t.codename)+' · '+t.minuten+' min '+T('pd.waiting','zonder aandacht')+'</span></div><button class="abtn ghost" data-coachref="'+esc(t.ref)+'" data-coachtafel="'+esc(t.tafel||t.ref)+'" title="'+T('pd.tr.coachtable','Vraag de coach over deze tafel')+'"></button></div>').join('');
       h += '</div>';
@@ -1472,7 +1472,7 @@
           const ikGetekend = !!c.tekenPartij, zaakGetekend = !!c.tekenZaak;
           return '<div class="task" style="flex-direction:column;align-items:stretch;"><div class="t"><b>'+esc(c.titel)+'</b><span>'+T('pd.ct.'+c.soort, c.soort)+' \u00B7 '+(zaakGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.zaak','zaak')+' / '+(ikGetekend?'\u2705':'\u25CB')+' '+T('pd.ct.ik','ik')+'</span></div>'+
           (c.velden && c.velden.length ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.2rem;">'+c.velden.map(v=>esc(v.label)+': '+esc(v.waarde)).join(' \u00B7 ')+'</div>' : '')+
-          '<details style="margin-top:0.3rem;"><summary style="cursor:pointer;font-size:0.72rem;color:var(--gold);">'+T('pd.ct.lees','Voorwaarden')+'</summary><div style="font-size:0.76rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
+          '<details style="margin-top:0.3rem;"><summary style="cursor:pointer;font-size:0.72rem;color:var(--rtg-leesgoud,var(--gold));">'+T('pd.ct.lees','Voorwaarden')+'</summary><div style="font-size:0.76rem;color:var(--muted);white-space:pre-wrap;margin-top:0.3rem;">'+esc(c.tekst)+'</div></details>'+
           (!ikGetekend && c.status !== 'geweigerd' ? '<button class="abtn" data-ctteken="'+c.ref+'" style="margin-top:0.5rem;">'+T('pd.ct.teken','Ondertekenen')+'</button>' : (ikGetekend ? '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--green);">\u2705 '+T('pd.ct.getekend','U tekende dit contract.')+'</div>' : ''))+
           '</div>';
         }).join('')+'</div>' : '';
@@ -1712,7 +1712,7 @@
         '<b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.etaMin?' · '+o.etaMin+' min':'')+'</b>'+
         '<span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+(m!=null?' · '+(m<1000?m+' m':(m/1000).toFixed(1)+' km'):'')+'</span>'+
         '<span style="color:var(--soft);">'+keten+'</span>'+
-        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
+        '<span><a href="'+kaartLink(o)+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></span></div>'+(extra||'')+'</div>';
     };
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.bz.gps','Live GPS')+'</div>'+
@@ -1734,11 +1734,11 @@
           o.status==='onderweg' ? '<button class="abtn" data-pdbz="'+o.ref+'" data-st="bezorgd">'+T('pd.bz.bezorgd','Bezorgd')+'</button>' : ''
         )).join('') +
         '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.55rem;">'+
-        VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--gold);"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
+        VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
         (tePakken.length ? '<button class="abtn" id="pdPakcheck" style="margin-top:0.5rem;">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
         (teVertrekken.length ? '<button class="abtn" id="pdVertrek" style="margin-top:0.5rem;">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
         (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
-          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
+          rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
       (vrij.length ? vrij.map(o =>
@@ -1882,7 +1882,7 @@
       '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
-      '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--gold);">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
+      '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
       '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
       T('pd.wv.tekenuit','Uw naam komt automatisch bij de handtekening te staan; het bureau ziet hem meteen.') + '</div></div>';
     const cv = $('#wvCanvas'), ctx = cv.getContext('2d');
@@ -2105,8 +2105,8 @@
         const fase = (o.stations||{}).bar;
         const items = (o.items||[]).filter(pkBarItem);
         return '<div class="card" style="border-left:4px solid '+(a>=8?'#E5484D':a>=4?'#C99A2E':'#2E7D5B')+';">'+
-          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=8?'#FF8589':a>=4?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=8?'#FF8589':a>=4?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
+          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--rtg-leesgoud,var(--gold));">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (fase==='bezig'?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+T('vp.bezig','bezig')+'</div>':'')+
           '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost" data-pkbar="'+o.ref+'" data-phase="bezig" style="flex:1;">'+T('st.start','Start')+'</button>':'')+
           '<button class="abtn" data-pkbar="'+o.ref+'" data-phase="klaar" style="flex:1;">'+T('st.ready','Klaar')+'</button></div></div>';
@@ -2140,9 +2140,9 @@
       pkMinOver(nuPer);
       const nuRows = Object.entries(nuPer).sort((a,b)=>b[1]-a[1]).slice(0,6);
       if (nuRows.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">'+T('lijn.maaknu','Maak nu, in een keer')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
+        '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--rtg-leesgoud,var(--gold));">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
       if (pkOverLijst().length) html += '<div class="card"><div class="k">'+T('over.h','Op de pas over')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--gold);">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
+        '<div style="margin-top:0.4rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--rtg-leesgoud,var(--gold));">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
       html += mijn.length ? mijn.map(o => {
         const a = pkAge(o.at);
         const p = pkPlan(o).plan[sec];
@@ -2150,8 +2150,8 @@
         const fase = (o.secties||{})[sec];
         const items = (o.items||[]).filter(it => pkSectieOf(it) === sec);
         return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
-          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
+          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--rtg-leesgoud,var(--gold));">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+esc(o.allergyNote)+'</div>':'')+
           (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
           pkGast(o)+
@@ -2246,7 +2246,7 @@
     // mobiele kassa (bon)
     const cartTot = winkelCart.reduce((n, r) => n + r.price * r.aantal, 0);
     html += '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.w.kassa','Mobiele kassa')+
-      (winkelKlant?'<span style="color:var(--gold);font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
+      (winkelKlant?'<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
       (winkelCart.length ? '<div style="margin-top:0.5rem;">'+winkelCart.map((r,i) => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
         '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
         '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn" data-wbetaal="rtgpay" style="flex:1;">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
@@ -2275,7 +2275,7 @@
   function winkelKlantKaart(k){
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
     return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
-      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--rtg-leesgoud,var(--gold));">'+eur(k.besteedTotaal)+'</span></div>'+
       '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
       (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
       ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
@@ -2478,7 +2478,7 @@
         const r = await API.call('/supplier/ticket/deurverkoop', body);
         // de code blijft staan als het programma zich ververst
         pdVkLaatst = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+' \u00B7 \u20AC '+r.ticket.total+'</b>'+
-          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
+          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--rtg-leesgoud,var(--gold));">'+esc(r.ticket.code)+'</div>'+
           '<div style="font-size:0.72rem;color:var(--soft);">'+T('pd.e.geefcode','Geef deze entreecode aan de gast.')+'</div>';
         uit.innerHTML = pdVkLaatst;
         laadEntree();
@@ -2815,7 +2815,7 @@
     for (let i = 0; i < 7; i++){
       const dt = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
       const aan = dt === zbData.datum;
-      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--gold);':'')+'"'+(aan?' aria-current="date"':'')+'>'+
+      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));':'')+'"'+(aan?' aria-current="date"':'')+'>'+
         (i===0 ? T('pd.zb.vandaag','vandaag') : dt.slice(8)+'/'+dt.slice(5,7))+'</button>');
     }
     const perBehandelaar = (zbData.behandelaars || []).map(b => {

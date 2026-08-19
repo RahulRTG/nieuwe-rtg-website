@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
@@ -29,13 +29,13 @@
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   .veld,select.veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
 
   /* het quotum: een dunne eerlijke meter */
   .meter{height:4px;background:var(--card2);border-radius:2px;overflow:hidden;margin:.3rem 0 .9rem;}
@@ -45,7 +45,7 @@
   #pad{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
   /* min-height erbij: .15rem boven en onder bracht de knop net niet op 24 (WCAG 2.5.8) */
   #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;min-height:24px;}
-  #pad button:hover{color:var(--gold);}
+  #pad button:hover{color:var(--rtg-leesgoud,var(--gold));}
   #pad .hier{color:var(--txt);font-weight:600;}
   .mapkaart{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);border:1px solid var(--line);
     border-radius:10px;padding:.5rem .75rem;margin:0 .5rem .5rem 0;cursor:pointer;font-size:.84rem;}
@@ -59,13 +59,13 @@
   .item:hover{border-color:var(--gold);}
   .item .ext{flex:0 0 auto;width:2.3rem;height:2.3rem;border:1px solid var(--line);border-radius:8px;
     display:flex;align-items:center;justify-content:center;font-size:.56rem;font-weight:700;
-    letter-spacing:.06em;color:var(--gold);background:var(--card2);text-transform:uppercase;}
+    letter-spacing:.06em;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);text-transform:uppercase;}
   .item .wat{flex:1;min-width:0;}
   .item .wat b{display:block;font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .item .wat span{font-size:.68rem;color:var(--soft);display:flex;gap:.55rem;flex-wrap:wrap;}
-  .item .wat .goud{color:var(--gold);}
+  .item .wat .goud{color:var(--rtg-leesgoud,var(--gold));}
   .item.weg .wat b{text-decoration:line-through;color:var(--muted);}
-  .sleep{border:2px dashed var(--gold);border-radius:14px;padding:2rem 1rem;text-align:center;color:var(--gold);
+  .sleep{border:2px dashed var(--gold);border-radius:14px;padding:2rem 1rem;text-align:center;color:var(--rtg-leesgoud,var(--gold));
     display:none;margin-bottom:.7rem;}
   body.sleept .sleep{display:block;}
 

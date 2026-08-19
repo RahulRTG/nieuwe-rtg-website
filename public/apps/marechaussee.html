@@ -22,7 +22,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.25rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
   main{padding:1rem;max-width:680px;margin:0 auto;}
@@ -45,7 +45,7 @@
   .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
   .status.open{border-color:var(--burgundy);color:var(--burgundy);}
   .status.ok{border-color:var(--green);color:var(--green);}
-  .status.goud{border-color:var(--gold);color:var(--gold);}
+  .status.goud{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .sig{border-left:3px solid var(--burgundy);}
   .leeg{color:var(--muted);font-size:.86rem;padding:.9rem 0;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
@@ -54,7 +54,7 @@
   .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
   .ai .uit{font-size:.84rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.45rem;}
   .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
-  .nr{font-family:'Bodoni Moda',serif;color:var(--gold);letter-spacing:.05em;}
+  .nr{font-family:'Bodoni Moda',serif;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.05em;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>

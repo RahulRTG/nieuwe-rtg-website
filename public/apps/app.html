@@ -182,7 +182,7 @@
   .login-form input:focus{border-color:var(--burgundy);}
   .login-form button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
   .login-form button:active{opacity:0.85;}
-  .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
+  .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--rtg-leesgoud,var(--gold));font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
   .gate-switch:hover{text-decoration:underline;}
   .vbanner{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.4rem;}
   .vbanner.pending{border-color:var(--line);}
@@ -200,7 +200,7 @@
   .vakrij .vbtn{margin-top:0;}
   .vaksub{font-size:0.72rem;color:var(--muted);line-height:1.45;}
   .vak-ok{color:var(--muted);}
-  .vak-pending{color:var(--gold);}
+  .vak-pending{color:var(--rtg-leesgoud,var(--gold));}
   /* --burgundy en niet --burgundy-on-dark: dat laatste bestaat in dit scherm
      niet, en dan gooit de browser de hele regel weg zonder iets te melden. */
   .vak-open{color:var(--burgundy);}
@@ -293,7 +293,7 @@
     font-size:0.5rem;
     letter-spacing:0.24em;
     text-transform:uppercase;
-    color:var(--gold);
+    color:var(--rtg-leesgoud,var(--gold));
   }
   .code-chip{
     display:inline-flex;
@@ -405,7 +405,7 @@
   }
   .card .big{font-family:'Bodoni Moda',serif;font-size:1.7rem;margin-top:0.35rem;}
   .card .big.accent{color:var(--burgundy);}
-  .card .big.gold{color:var(--gold);}
+  .card .big.gold{color:var(--rtg-leesgoud,var(--gold));}
   .card .meta{margin-top:0.3rem;font-size:0.78rem;color:var(--muted);}
   .card .go{
     margin-top:0.9rem;
@@ -445,7 +445,7 @@
   }
   .pill.open{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.paid{color:var(--green);border-color:rgba(76,154,117,0.4);}
-  .pill.req{color:var(--gold);border-color:rgba(169,143,28,0.4);}
+  .pill.req{color:var(--rtg-leesgoud,var(--gold));border-color:rgba(169,143,28,0.4);}
 
   .btn-pay{
     display:inline-flex;
@@ -605,7 +605,7 @@
   .comment{font-size:0.78rem;color:var(--muted);padding:0.3rem 0;}
   .comment b{color:var(--txt);font-weight:600;}
   .msg-note{display:block;}
-  .msg-toggle{background:none;border:none;padding:0;margin-top:0.15rem;color:var(--gold);font-size:0.66rem;cursor:pointer;font-family:inherit;letter-spacing:0.02em;}
+  .msg-toggle{background:none;border:none;padding:0;margin-top:0.15rem;color:var(--rtg-leesgoud,var(--gold));font-size:0.66rem;cursor:pointer;font-family:inherit;letter-spacing:0.02em;}
   .msg-toggle:hover{text-decoration:underline;}
   .cform{display:flex;gap:0.5rem;margin-top:0.6rem;}
   .cform input{
@@ -715,7 +715,7 @@
   @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.4);}70%{box-shadow:0 0 0 5px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
   .live-headline{margin-top:0.7rem;font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.15;}
-  .live-headline em{font-style:normal;color:var(--gold);}
+  .live-headline em{font-style:normal;color:var(--rtg-leesgoud,var(--gold));}
   .live-sub{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
   .live-map{position:relative;height:130px;margin:0.9rem 0 0.2rem;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 30% 30%,rgba(194,58,94,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
   .live-map .mk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.9rem;transition:left 0.9s ease,top 0.9s ease;}
@@ -729,7 +729,7 @@
   .live-partner .pt b{display:block;font-size:0.86rem;font-weight:600;}
   .live-partner .pt span{font-size:0.72rem;color:var(--muted);}
   .live-partner .eta{text-align:right;white-space:nowrap;}
-  .live-partner .eta .n{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--gold);}
+  .live-partner .eta .n{font-family:'Bodoni Moda',serif;font-size:1.1rem;color:var(--rtg-leesgoud,var(--gold));}
   .live-partner .eta .u{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
   .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
   .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
@@ -750,7 +750,7 @@
   .pc-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;}
   .pc-msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
   .pc-msg.them{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-top-left-radius:5px;}
-  .pc-msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
+  .pc-msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.15rem;}
   .pc-msg.me .who{color:rgba(255,255,255,0.65);}
   .pc-msg time{display:block;margin-top:0.25rem;font-size:0.58rem;color:var(--soft);}
   .pc-empty{padding:1.6rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;}
@@ -781,12 +781,12 @@
   .ms-room:last-child{border-bottom:none;}
   .ms-room .rt b{display:block;font-size:0.88rem;font-weight:600;}
   .ms-room .rt span{font-size:0.72rem;color:var(--muted);}
-  .ms-room .rp{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--gold);white-space:nowrap;}
+  .ms-room .rp{font-family:'Bodoni Moda',serif;font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));white-space:nowrap;}
 
   /* partner-post in De Salon */
   .post .visual img{width:100%;height:100%;object-fit:cover;display:block;}
   .a-partner{background:linear-gradient(140deg,#A98F1C,#6E5B10)!important;}
-  .partner-badge{display:inline-block;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--gold);border:1px solid rgba(169,143,28,0.45);border-radius:999px;padding:0.14rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
+  .partner-badge{display:inline-block;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--rtg-leesgoud,var(--gold));border:1px solid rgba(169,143,28,0.45);border-radius:999px;padding:0.14rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
   .v-partner{background:linear-gradient(160deg,#2a2415 0%,#6E5B10 70%,#A98F1C 100%);}
 
   .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
@@ -799,7 +799,7 @@
   .zak-kaart{border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-top:0.7rem;}
   .zak-chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.66rem;color:var(--muted);margin:0.25rem 0.25rem 0 0;}
   .zak-chip.klik{cursor:pointer;}
-  .zak-chip.mijn{border-color:var(--gold);color:var(--gold);}
+  .zak-chip.mijn{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .zak-open{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7EE0A3;border:1px solid #2a5c3f;border-radius:999px;padding:0.15rem 0.5rem;}
 
   /* ---- Salon-connecties: vrienden, dm en bellen ---- */
@@ -825,7 +825,7 @@
   .sc-res{margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;}
   .sc-hit{display:flex;align-items:center;gap:0.6rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.8rem;font-size:0.82rem;}
   .sc-hit b{flex:1;}
-  .sc-hit button{border:1px solid var(--gold);background:none;color:var(--gold);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.72rem;}
+  .sc-hit button{border:1px solid var(--gold);background:none;color:var(--rtg-leesgoud,var(--gold));border-radius:999px;padding:0.3rem 0.8rem;font-size:0.72rem;}
   /* De contactpin: je eigen code als tekst en als QR, plus het vak om die van
      een ander in te typen of te scannen. Ligt onder het zoekvak in dezelfde la,
      en gaat met dezelfde knop open en dicht. */
@@ -846,7 +846,7 @@
      die laatste houden style-src-attr in de CSP open (zie de norm). */
   .sc-st{font-size:0.72rem;color:var(--soft);}
   .sc-st.ok{color:var(--green,#2E7D4F);}
-  .sc-st.wacht{color:var(--gold);}
+  .sc-st.wacht{color:var(--rtg-leesgoud,var(--gold));}
   .sc-av.klein{width:34px;height:34px;font-size:0.7rem;}
   .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
   .sc-pin-noot{margin-top:0.55rem;font-size:0.7rem;line-height:1.45;color:var(--soft);}
@@ -890,9 +890,9 @@
   .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
   .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
   .ms-close{background:none;border:none;color:var(--muted);font-size:1rem;}
-  .pc-salon{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:0.25rem 0.7rem;font-size:0.72rem;font-weight:600;margin-left:auto;margin-right:0.5rem;white-space:nowrap;}
+  .pc-salon{background:none;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:999px;padding:0.25rem 0.7rem;font-size:0.72rem;font-weight:600;margin-left:auto;margin-right:0.5rem;white-space:nowrap;}
   .ms-body{flex:1;overflow-y:auto;padding:0.5rem 1.25rem 1rem;}
-  .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1rem 0 0.4rem;}
+  .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1rem 0 0.4rem;}
   .ms-item{padding:0.8rem 0;border-bottom:1px solid var(--line);display:flex;gap:0.8rem;align-items:flex-start;}
   .ms-item .info{flex:1;min-width:0;}
   .ms-item .nm{font-weight:600;font-size:0.86rem;}
@@ -997,7 +997,7 @@
   .os-datum{
     margin:0.2rem 0 0.1rem;
     font-size:calc(var(--e) * 0.77);letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--gold);font-weight:600;
+    color:var(--rtg-leesgoud,var(--gold));font-weight:600;
   }
   /* EEN LAY-OUT, DIE MEESCHAALT.
 
@@ -1205,7 +1205,7 @@
      komen omdat je niet weet of hij nog ergens vandaan komt.) */
   .os-groet-sub{
     font-size:calc(var(--e) * 0.62);letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--gold);text-align:center;margin:0;font-weight:600;
+    color:var(--rtg-leesgoud,var(--gold));text-align:center;margin:0;font-weight:600;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 

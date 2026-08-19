@@ -53,7 +53,7 @@
           '<button class="obtn" id="mktAiOms">'+T('mkt.aioms','AI-omschrijving')+'</button>'+
           '<button class="obtn" id="mktAiPrijs">'+T('mkt.aiprijs','AI-prijs')+'</button>'+
         '</div>'+
-        '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
+        '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--rtg-leesgoud,var(--gold));"></div>'+
         '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" class="h-mt20"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
         '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet in De Salon')+'</button>'+
         '<div id="mktMelding" class="sub h-mt40"></div></div>';

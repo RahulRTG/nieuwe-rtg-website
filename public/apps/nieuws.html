@@ -19,7 +19,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.5rem;}
   main{padding:1.1rem;max-width:680px;margin:0 auto;}
   /* de rubriekenrij is de eigen schakelaar van deze app; hij houdt zijn eigen
@@ -34,7 +34,7 @@
   .rub.aan{color:var(--txt);border-bottom-color:var(--gold);}
   .art{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;cursor:pointer;transition:border-color .15s;}
   .art:hover{border-color:var(--gold);}
-  .art .rlbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);}
+  .art .rlbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .art h2{font-size:1.25rem;line-height:1.25;margin:.25rem 0 .3rem;}
   .art .intro{font-size:.9rem;color:var(--muted);line-height:1.55;}
   .art .meta{font-size:.72rem;color:var(--soft);margin-top:.45rem;}
@@ -94,7 +94,7 @@ async function lees(id){
   let d; try{ d=await api('/artikel',{id}); }catch(e){ OPEN=null; meld(e.message); return laad(); }
   const a=d.artikel;
   $('#main').innerHTML='<button class="knop stil" id="terug">← alle artikelen</button>'
-    +'<article class="lees" style="margin-top:.8rem;"><div class="rlbl" style="font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);">'+esc(a.rubriek)+'</div>'
+    +'<article class="lees" style="margin-top:.8rem;"><div class="rlbl" style="font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(a.rubriek)+'</div>'
     +'<h2>'+esc(a.kop)+'</h2><div style="font-size:.75rem;color:var(--soft);">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div>'
     +(a.intro?'<div style="font-size:.98rem;color:var(--muted);line-height:1.6;margin-top:.6rem;font-style:italic;">'+esc(a.intro)+'</div>':'')
     +'<div class="tekst">'+esc(a.tekst)+'</div>'

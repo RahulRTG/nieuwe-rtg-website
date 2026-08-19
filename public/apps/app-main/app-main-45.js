@@ -46,7 +46,7 @@
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label" style="margin-top:1.2rem;">' + T('erv.agenda','Mijn programma') + '</div>' +
       dagen.map(d =>
-        '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
+        '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
         d.items.map(it =>
           '<div class="rowitem"><div class="t"><b>' + (AGENDA_ICO[it.soort] || '·') + ' ' + it.titel + '</b><span>' + (it.tijd || T('erv.heledag','hele dag')) + ' · ' + tStatus(it.status) + '</span></div></div>'
         ).join('')

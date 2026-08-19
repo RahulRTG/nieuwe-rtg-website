@@ -5,7 +5,7 @@
         html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="flex:1;"><div style="font-size:0.88rem;">'+esc(a.name)+'</div>'+
           (a.desc?'<div class="soft-sm">'+esc(a.desc)+(a.duur?' \u00B7 '+esc(a.duur):'')+'</div>':'')+'</div>'+
-          '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.prijs)+' p.p.</span></div>';
+          '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.82rem;white-space:nowrap;">'+eur(a.prijs)+' p.p.</span></div>';
         if (open){
           const k = tkKeuze;
           const dagen = [];
@@ -80,7 +80,7 @@
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green,#8bc3a8);">'+esc(b.aanbiederNaam)+'</div>'+
         '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(b.behandelingNaam)+'</b>'+(b.behandelaarNaam?' · '+esc(b.behandelaarNaam):'')+'</div>'+
         '<div class="soft-sm" style="margin-top:0.15rem;">'+b.datum+' · '+b.tijd+' · '+eur(b.prijs)+' · '+
-          (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
+          (b.paid ? '<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>' : '<span style="color:var(--rtg-leesgoud,var(--gold));">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
         '<div style="display:flex;gap:0.4rem;margin-top:0.55rem;">'+
           (b.paid ? '' : '<button class="bz-groot" data-care-pay="'+esc(b.ref)+'" style="flex:1;">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
           '<button class="bz-btn" data-care-annul="'+esc(b.ref)+'">'+T('care.annuleer','Annuleer')+'</button>'+
@@ -99,7 +99,7 @@
     const list = (careOv && careOv.intakes) || [];
     if (!list.length){ el.innerHTML = ''; return; }
     el.innerHTML = '<div class="card" style="border-color:rgba(208,172,87,0.3);">'+
-      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">'+T('care.intakes','Gedeelde medische context')+'</div>'+
+      '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+T('care.intakes','Gedeelde medische context')+'</div>'+
       list.map(i => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.5rem;">'+
         '<div style="font-size:0.85rem;">'+esc(i.aanbiederNaam)+'<div class="soft-sm">'+T('care.tot','tot')+' '+i.vervaltOp+'</div></div>'+
         '<button class="bz-btn" data-care-intakestop="'+esc(i.id)+'">'+T('care.stopdelen','Stop delen')+'</button></div>').join('')+

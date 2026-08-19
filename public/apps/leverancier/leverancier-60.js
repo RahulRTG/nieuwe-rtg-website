@@ -64,7 +64,7 @@
   const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
   function ridePill(st){ return st==='aangevraagd'?'nieuw':RIT_KLAAR(st)?'klaar':'bereiding'; }
   function ritRegel(r){
-    return (r.passengers?''+r.passengers+' ':'')+(r.luggage?''+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--gold);">'+eur(r.quote)+'</b>':'');
+    return (r.passengers?''+r.passengers+' ':'')+(r.luggage?''+r.luggage+' ':'')+(r.km?'· '+r.km+' km ':'')+(r.quote?'· <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(r.quote)+'</b>':'');
   }
   function renderRides(){
     const list = (state.rides || []).filter(r => !RIT_KLAAR(r.status));

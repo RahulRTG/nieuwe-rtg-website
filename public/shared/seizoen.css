@@ -116,7 +116,18 @@
   --soft:var(--grey-soft);
 }
 
-/* de wisseling van het licht verloopt zacht, als een zonsondergang */
-:root[data-dagdeel] body{
+/* de wisseling van het licht verloopt zacht, als een zonsondergang -- MAAR PAS
+   ALS ER IETS TE WISSELEN VALT. Deze regel stond op `:root[data-dagdeel] body`
+   en gold daarmee ook bij de EERSTE weergave: elke pagina fadede bij het openen
+   acht tienden van een seconde van de kleur waarmee hij begon naar de kleur die
+   hij hoort te hebben. Op de juridische pagina's, die zich licht verklaren
+   terwijl het thema fluweel is, zag je dus bijna een seconde lang bordeaux voor
+   het wit stond. De contrastronde ving datzelfde moment en gaf de ene ronde 19
+   bevindingen en de volgende 26 -- geen wiebel maar een pagina die nog aan het
+   veranderen was.
+   `data-licht-zacht` komt er pas een frame NA de eerste toepassing op (zie
+   shared/seizoen.js). Een zonsondergang blijft dus zacht; het openen van een
+   pagina is geen zonsondergang. */
+:root[data-dagdeel][data-licht-zacht] body{
   transition:background-color 0.8s ease, color 0.8s ease;
 }

@@ -14,7 +14,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
   main{padding:1.1rem;max-width:920px;margin:0 auto;}
   .stil{color:var(--muted);font-size:.88rem;line-height:1.6;}
@@ -44,7 +44,7 @@
   .voorstel ul{margin:.4rem 0 0 1.1rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;}
-  .inlog a{color:var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -130,7 +130,7 @@ async function laad(){
 function tekenMerken(){
   $('#merken').innerHTML = MERKEN.length ? MERKEN.map(m =>
     '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+RTGGlyf.tekst(m.icon)+' '+esc(m.naam)+
-    (m.partner?' <small style="color:var(--gold);">partner</small>':'')+'</b>'+
+    (m.partner?' <small style="color:var(--rtg-leesgoud,var(--gold));">partner</small>':'')+'</b>'+
     '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
     '<div class="rij" style="margin-top:.3rem;">'+
     (m.verbonden ? '<button class="knop stil2 mlos" data-id="'+esc(m.id)+'">Ontkoppel</button>'

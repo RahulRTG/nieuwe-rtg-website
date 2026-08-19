@@ -21,7 +21,7 @@
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:960px;margin:0 auto;}
@@ -47,19 +47,19 @@
   .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
   .genre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
   .genre:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .genre .gi{font-size:1.3rem;line-height:1;color:var(--gold);}
+  .genre .gi{font-size:1.3rem;line-height:1;color:var(--rtg-leesgoud,var(--gold));}
   .genre .gi .rtg-glyf{width:1.35rem;height:1.35rem;display:block;}
   .genre b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;display:block;}
   .genre .gn{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   .genre .gl{font-size:.8rem;color:var(--muted);line-height:1.45;display:block;margin-top:.25rem;}
-  .genre .ga{font-size:.72rem;color:var(--gold);display:block;margin-top:.3rem;}
+  .genre .ga{font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));display:block;margin-top:.3rem;}
   /* boutiek-blad */
   .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
   .blad.open{display:block;}
   .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   .art{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;padding:1.1rem;max-width:960px;margin:0 auto;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
-  .kaart .cat{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+  .kaart .cat{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .kaart h3{font-size:1rem;}
   .kaart .mat{font-size:.78rem;color:var(--soft);}
   .kaart .oms{font-size:.82rem;color:var(--muted);line-height:1.5;}
@@ -71,7 +71,7 @@
   .knop.aan{background:var(--gold);color:#000;border-color:var(--gold);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   /* ---- de vindlaag: zoeken en de plek waar je staat ---- */
   .vind{margin:.4rem 0 0;}
@@ -92,7 +92,7 @@
   .treffers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.8rem;}
   .tref{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
   .tref .band{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
-  .tref .soort{color:var(--gold);}
+  .tref .soort{color:var(--rtg-leesgoud,var(--gold));}
   .tref .wie{border:1px solid var(--line);border-radius:999px;padding:.1rem .45rem;color:var(--soft);}
   /* De partnermerker: de RAND blijft bordeaux, want dat is waar het accent voor
      is. De TEKST erin was ook bordeaux (#C23A5E) en haalde op deze grond 3,58:1
@@ -114,7 +114,7 @@
   .knoprij{margin-top:.5rem;}
   .bladtel{font-size:.78rem;color:var(--muted);}
   .reisnoot{color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;}
-  .goudlink{color:var(--gold);}
+  .goudlink{color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/adresvoorstel.js"></script>
@@ -181,7 +181,7 @@
 <section class="blad" id="blad" aria-label="Boutique">
   <div class="blad-kop">
     <button class="terug" id="bladTerug">← Mall</button>
-    <div><div class="ey" id="bladStad" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey" id="bladStad" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="bladNaam" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
   </div>
   <div class="art" id="bladArt"></div>
 </section>
@@ -189,7 +189,7 @@
 <section class="blad" id="lezer" aria-label="Reisgids lezen">
   <div class="blad-kop">
     <button class="terug" id="lezerTerug">← Bibliotheek</button>
-    <div><div class="ey" id="lezerMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);"></div><h1 id="lezerTitel" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
+    <div><div class="ey" id="lezerMeta" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));"></div><h1 id="lezerTitel" style="font-family:'Bodoni Moda',serif;font-size:1.3rem;"></h1></div>
   </div>
   <div id="lezerTekst" style="max-width:38rem;margin:0 auto;padding:1.6rem 1.2rem 4rem;font-size:.95rem;line-height:1.8;color:var(--muted);"></div>
 </section>
@@ -441,7 +441,7 @@ function rtfKaart(a, geinstalleerd){
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
     (a.doelgroepLabel?'<span style="font-size:.72rem;color:var(--soft);display:block;">voor '+esc(a.doelgroepLabel)+'</span>':'')+
     '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--gold);font-size:.8rem;">Gratis</b>'+
+      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Gratis</b>'+
       '<span style="flex:1;"></span>'+ open +
       (geinstalleerd
         ? '<button class="knop stil rfweg" data-id="'+esc(a.id)+'">Verwijder</button>'
@@ -515,13 +515,13 @@ function appKaart(a, geinstalleerd){
   // een echte app: open de bestaande pagina, of zet hem op je startscherm
   const open = a.url
     ? '<a class="knop stil" href="'+esc(a.url)+'" style="text-decoration:none;">Openen</a>'
-    : (a.plankLabel ? '<span style="font-size:.74rem;color:var(--gold);">'+esc(a.plankLabel)+'</span>' : '');
+    : (a.plankLabel ? '<span style="font-size:.74rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(a.plankLabel)+'</span>' : '');
   return '<div class="boutiek" style="cursor:default;">'+
     '<span class="stad">'+(window.RTGGlyf?RTGGlyf.svgHTML(a.icon,{klasse:'stad-glyf'}):'')+esc(a.categorieLabel)+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
     '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Inbegrepen</b>'+
       '<span style="flex:1;"></span>'+ open +
       (geinstalleerd
         ? '<button class="knop stil abweg" data-id="'+esc(a.id)+'">Van startscherm</button>'
@@ -594,7 +594,7 @@ function reisKaart(a, geinstalleerd){
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
     (a.uitleg?'<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>':'')+
     '<div class="rij" style="margin-top:.5rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>'+
+      '<b style="color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;">Inbegrepen</b>'+
       '<span style="flex:1;"></span>'+
       '<button class="knop stil rblees" data-id="'+esc(a.id)+'">Lezen</button>'+
       (geinstalleerd
@@ -709,7 +709,7 @@ function tekenThuis(t){
             ' · '+h.maxGasten+' gasten'+(h.btwPct?' · incl. '+h.btwPct+'% logies-btw':'')+(h.opFactuur?' · op factuur':'')+'</span>'+
         '</a>').join('')+'</div>').join('')+
     '<p style="color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;">'+esc(t.opmerking)+
-    ' <a href="'+esc(t.pagina)+'" style="color:var(--gold);">Naar RTG Thuis</a></p></div>';
+    ' <a href="'+esc(t.pagina)+'" style="color:var(--rtg-leesgoud,var(--gold));">Naar RTG Thuis</a></p></div>';
 }
 
 /* ---------- Het Dienstenplein: de dienstverlenende zaken (zelfstandigen,
@@ -731,7 +731,7 @@ function tekenDiensten(genres){
           '<span class="stad">'+esc(z.stad||'RTG')+'</span>'+
           '<h3>'+esc(z.naam)+'</h3>'+
           (z.vak?'<span class="tag">'+esc(z.vak)+'</span>':(z.tagline?'<span class="tag">'+esc(z.tagline)+'</span>':''))+
-          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span style="color:var(--gold);">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
+          '<span class="meta">'+z.diensten.length+' dienst'+(z.diensten.length===1?'':'en')+(z.vanaf!=null?' · vanaf '+euro(z.vanaf):'')+(z.beoordeling?' · <span style="color:var(--rtg-leesgoud,var(--gold));">✶ '+z.beoordeling.score+'</span> ('+z.beoordeling.aantal+')':'')+'</span>'+
         '</button>').join('')+'</div>';
     }).join('')+'</div>';
   w.querySelectorAll('.dpz').forEach(b => b.addEventListener('click', () => openDienstZaak(b.dataset.code)));
@@ -838,7 +838,7 @@ function vraagOfferte(code){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="ofTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">Offerte aanvragen</h1></div></div>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">Offerte aanvragen</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
       '<textarea class="veld" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen" style="margin-bottom:.5rem;resize:vertical;"></textarea>'+
@@ -861,7 +861,7 @@ function boekDienst(code, dienstId){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties" for="dbDatum">Datum</label><input class="veld" id="dbDatum" type="date" style="margin-bottom:.5rem;">'+
       '<label class="opties" for="dbTijd">Tijd</label><select class="veld" id="dbTijd" style="margin-bottom:.5rem;"><option value="">Kies eerst een datum</option></select>'+
@@ -957,7 +957,7 @@ function koopFarm(code, productId, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">Van het land</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Van het land</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld" id="kfNaam" maxlength="60" style="margin-bottom:.5rem;">'+
       '<label class="opties">E-mail</label><input class="veld" id="kfMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
@@ -992,7 +992,7 @@ function koopEigen(slug, naam){
   const wrap = document.createElement('div');
   wrap.className = 'blad open'; wrap.style.zIndex = '40';
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug">← Terug</button>'+
-    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);">Bestellen</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
+    '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Bestellen</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties">Naam voor de levering</label><input class="veld" id="koopNaam" maxlength="60" style="margin-bottom:.5rem;">'+
       '<label class="opties">E-mail</label><input class="veld" id="koopMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
@@ -1022,7 +1022,7 @@ function tekenArt(arts){
       (a.omschrijving?'<span class="oms">'+esc(a.omschrijving)+'</span>':'')+
       '<span class="prijs">'+euro(prijs)+'</span>'+
       ((a.kleuren&&a.kleuren.length)||(a.maten&&a.maten.length)?'<span class="opties">'+esc((a.kleuren||[]).join(', '))+(a.maten&&a.maten.length?' · maten '+esc(a.maten.join('/')):'')+'</span>':'')+
-      (a.drop?'<span class="opties" style="color:var(--gold);">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
+      (a.drop?'<span class="opties" style="color:var(--rtg-leesgoud,var(--gold));">Drop op '+esc(a.drop.datum)+' om '+esc(a.drop.tijd||'')+'</span>':'')+
       '<div class="rij">'+
         '<button class="knop stil wl'+(a.opWishlist?' aan':'')+'" data-id="'+esc(a.id)+'">'+(a.opWishlist?'Op verlanglijst':'Verlanglijst')+'</button>'+
       '</div></div>';

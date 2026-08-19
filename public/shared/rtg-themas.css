@@ -26,7 +26,13 @@
   --rtg-card:rgba(255,255,255,0.42);
   --rtg-card2:rgba(255,255,255,0.70);
   --rtg-goud:var(--gold-tekst);
-  --rtg-leesgoud:var(--gold-basis);  /* op licht mag de logotoon zelf lezen */
+  /* DE LOGOTOON HAALT HET NIET, en dat is nagerekend en niet aangenomen. Hier
+     stond --gold-basis (#857007) met de opmerking "op licht mag de logotoon zelf
+     lezen". Gemeten op parelmoer: 4,28:1, en op een lichte kaart 3,94 -- allebei
+     onder de 4,5 die WCAG voor kleine tekst vraagt. Net eronder is eronder.
+     --gold-diep is het bestaande huistoken voor goud in de schaduw en haalt 7,12
+     op parelmoer en 6,55 op een lichte kaart. Zelfde goud, in de schaduw. */
+  --rtg-leesgoud:var(--gold-diep);
   --rtg-dagsterkte:0.16;
 }
 /* ---- Onyx: pianolak, de vertrouwde stand ---- */

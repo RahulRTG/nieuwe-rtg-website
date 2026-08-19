@@ -79,7 +79,7 @@
   .doc .acties{display:flex;gap:.3rem;justify-content:flex-end;}
   .mini{background:none;border:1px solid var(--line);border-radius:7px;color:var(--soft);font-size:.7rem;padding:.2rem .45rem;}
   .mini:hover{border-color:var(--line2);color:var(--txt);}
-  .mini.ster.aan{color:var(--gold);border-color:rgba(201,162,75,.5);}
+  .mini.ster.aan{color:var(--rtg-leesgoud,var(--gold));border-color:rgba(201,162,75,.5);}
   .mini.weg:hover{color:var(--rood);border-color:rgba(222,110,146,.5);}
   .stil{color:var(--soft);font-size:.84rem;padding:.7rem 0;}
 
@@ -132,7 +132,7 @@
   #blad td.rijkop{background:var(--rail);color:var(--zacht);text-align:center;font-weight:600;font-size:.7rem;
     position:sticky;left:0;z-index:1;min-width:44px;}
   #blad th:first-child{left:0;z-index:3;min-width:44px;}
-  #blad td[data-berekend]{color:var(--gold);}
+  #blad td[data-berekend]{color:var(--rtg-leesgoud,var(--gold));}
   #blad td.getal,#blad td.geld,#blad td.procent{text-align:right;}
   #blad td.kopcel{background:rgba(255,255,255,.04);font-weight:600;color:var(--txt);}
   #blad td.actief{box-shadow:inset 0 0 0 2px var(--acc);}
@@ -281,7 +281,7 @@
   #toonDia.t-bordeaux h3{color:#FFFFFF;}
   #toonDia.t-bordeaux p{color:rgba(255,255,255,.85);}
   #toonDia.t-bordeaux.i-citaat p{color:#FFFFFF;border-left-color:rgba(255,255,255,.6);}
-  #toonDia.t-goud h3{color:var(--gold);}
+  #toonDia.t-goud h3{color:var(--rtg-leesgoud,var(--gold));}
   #tdNotitie{position:fixed;left:0;right:0;bottom:3.6rem;padding:0 6vw;color:var(--zacht);font-size:.85rem;
     white-space:pre-wrap;max-width:60rem;}
   #toonDia .voet{position:fixed;left:0;right:0;bottom:1rem;display:flex;justify-content:center;gap:.5rem;

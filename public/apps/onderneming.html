@@ -23,18 +23,18 @@
   header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));
     backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
     display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
-  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.05rem;}
   .sp{flex:1 1 auto;}
   main{max-width:56rem;margin:0 auto;padding:1.3rem 1rem;display:flex;flex-direction:column;gap:1.4rem;}
   .vak{background:var(--card);border:1px solid var(--line);border-radius:var(--rtg-rond,14px);padding:1.1rem 1.15rem;}
-  .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));
     font-family:'Inter',sans-serif;font-weight:700;margin-bottom:.8rem;}
   .groet{font-size:1.35rem;line-height:1.3;margin-bottom:.35rem;}
   .subtxt{color:var(--soft);font-size:.85rem;line-height:1.5;}
   .ladder{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.9rem;}
   .stap{font-size:.68rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
-  .stap.bereikt{border-color:var(--gold);color:var(--gold);}
+  .stap.bereikt{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .stap.nu{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:700;}
   .cijfers{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.7rem;}
   .cijfer{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
@@ -65,7 +65,7 @@
   .bevinding .bw{color:var(--soft);font-size:.82rem;margin-top:.25rem;line-height:1.5;}
   .oordeel{font-size:1.05rem;font-weight:650;}
   .oordeel.niet{color:var(--burgundy);}
-  .oordeel.pas{color:var(--gold);}
+  .oordeel.pas{color:var(--rtg-leesgoud,var(--gold));}
   .oordeel.ga{color:var(--green);}
   .bron{display:flex;justify-content:space-between;gap:.8rem;padding:.45rem 0;border-top:1px solid var(--line);font-size:.82rem;}
   .bron:first-of-type{border-top:0;}

@@ -26,7 +26,7 @@
     }
     const meta = chats.find(c => c.key === gchatKey);
     el.innerHTML = '<button class="sp-back" id="gcBack">← ' + T('gc.back','Alle gesprekken') + '</button>' +
-      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--gold);">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') +
+      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--rtg-leesgoud,var(--gold));">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') +
         ' <button class="gc-salon-btn" id="gcSalonBtn">' + T('gc.salon','Bekijk Salon') + '</button></div>' +
       '<div id="gcSalon"></div>' +
       '<div class="tt-chat" id="gcThread"></div>' +

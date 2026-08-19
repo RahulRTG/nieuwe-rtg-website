@@ -17,7 +17,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
   main{padding:1.1rem;max-width:860px;margin:0 auto;}
   .stil{color:var(--muted);font-size:.88rem;line-height:1.6;}
@@ -39,7 +39,7 @@
   .tel span{font-size:.72rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
   .journaal{margin-top:.6rem;font-size:.84rem;line-height:1.7;}
   .journaal div{border-top:1px solid rgba(255,255,255,.06);padding:.4rem 0;color:var(--muted);}
-  .journaal .klaar{color:var(--gold);}
+  .journaal .klaar{color:var(--rtg-leesgoud,var(--gold));}
   .journaal .roer{color:#9CCB9C;}
   .regel{font-size:.8rem;color:var(--soft);border-left:2px solid var(--gold);padding-left:.7rem;line-height:1.6;margin-top:.8rem;}
   /* markering voor het deelmenu; met het menu erbij is hij weg, zonder menu
@@ -73,7 +73,7 @@
         <span class="stil" id="sinds"></span>
       </div>
       <div style="margin-top:.8rem;">
-        <div class="rij" style="justify-content:space-between;"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--gold);font-variant-numeric:tabular-nums;"></b></div>
+        <div class="rij" style="justify-content:space-between;"><b style="font-size:.9rem;">Gereedheid</b><b id="pct" style="color:var(--rtg-leesgoud,var(--gold));font-variant-numeric:tabular-nums;"></b></div>
         <div class="meter"><i id="meter" style="width:0%;"></i></div>
         <span class="stil" id="meterUit"></span>
       </div>
@@ -182,7 +182,7 @@ async function verversO(){
   $('#oBouwUit').textContent = klaar ? 'af: alle ' + O.bouwplan + ' bouwstappen gedaan' : 'bouwstap ' + O.bouwstappen + ' van ' + O.bouwplan;
   $('#oGo').disabled = !klaar;
   $('#oLog').innerHTML = (O.rapporten || []).map(r =>
-    '<div><button class="oOpen" data-id="'+esc(r.id)+'" style="background:none;border:none;color:var(--gold);cursor:pointer;font:inherit;padding:0;">'+new Date(r.gestart).toLocaleTimeString('nl-NL')+' · '+esc(r.vraag)+'</button> <span style="color:var(--soft);">('+r.stappen+' stappen)</span></div>').join('') +
+    '<div><button class="oOpen" data-id="'+esc(r.id)+'" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;font:inherit;padding:0;">'+new Date(r.gestart).toLocaleTimeString('nl-NL')+' · '+esc(r.vraag)+'</button> <span style="color:var(--soft);">('+r.stappen+' stappen)</span></div>').join('') +
     (O.logboek || []).map(j => '<div class="'+esc(j.soort)+'"><span style="color:var(--soft);">'+new Date(j.at).toLocaleTimeString('nl-NL')+'</span> · '+esc(j.tekst)+'</div>').join('') || '<div>De Onderzoeker wacht op zijn eerste bouwstap.</div>';
   document.querySelectorAll('.oOpen').forEach(b => b.addEventListener('click', async () => {
     try { const r = await api('onderzoeker/rapport', { id: b.dataset.id }); toonRapport(r.rapport); } catch(e){ alert(e.message); }

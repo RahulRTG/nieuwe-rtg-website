@@ -19,7 +19,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
@@ -48,16 +48,16 @@
   .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:10px;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
   .band svg{width:1rem;height:1rem;flex:0 0 auto;}
   .band.ok{color:#8FD6A6;background:rgba(70,150,95,.1);border-color:rgba(120,200,150,.28);}
-  .band.sys{color:var(--gold);background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
+  .band.sys{color:var(--rtg-leesgoud,var(--gold));background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
   .band.no{color:#E78AA0;background:rgba(194,58,94,.12);border-color:rgba(194,58,94,.35);}
   .lk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;}
   .lk.no{color:var(--soft);text-decoration:line-through;text-decoration-color:rgba(194,58,94,.6);}
   .lk.no .lkb{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#E78AA0;text-decoration:none;margin-left:.25rem;}
-  a.lk.ok{color:var(--gold);text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  a.lk.ok{color:var(--rtg-leesgoud,var(--gold));text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
   .rij .lt .ongev{color:#E78AA0;font-weight:600;}
   .bijlaag-noot{font-size:.72rem;color:var(--soft);margin-top:.9rem;border-top:1px solid var(--line);padding-top:.7rem;line-height:1.5;}
   .ai{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.85rem .9rem;margin-bottom:.9rem;}
-  .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+  .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.4rem;}
   .ai .tx{font-size:.86rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
   .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
   .ai-knop:hover{border-color:var(--gold);}
@@ -65,7 +65,7 @@
   .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;max-width:420px;width:100%;}
   .modal h2{font-size:1.1rem;margin-bottom:.5rem;}
   .modal p{font-size:.85rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;word-break:break-word;}
-  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--gold);background:var(--card2);border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
+  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
   .modal .rij2{display:flex;gap:.5rem;margin-top:.8rem;}
   .modal button{flex:1;border-radius:10px;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
   .modal button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
@@ -206,7 +206,7 @@ async function wmInbox(adres){
   const lijst=d.berichten||[];
   LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
-    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
+    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
     :'<div class="leeg">Dit postvak is nog leeg.</div>');
   $('#terug').addEventListener('click', wmLaad);

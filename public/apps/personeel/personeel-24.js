@@ -58,7 +58,7 @@
     for (let i = 0; i < 7; i++){
       const dt = new Date(Date.now() + i * 86400000).toISOString().slice(0, 10);
       const aan = dt === zbData.datum;
-      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--gold);':'')+'"'+(aan?' aria-current="date"':'')+'>'+
+      dagen.push('<button class="abtn ghost" data-zbdag="'+dt+'" style="padding:0.4rem 0.7rem;'+(aan?'border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));':'')+'"'+(aan?' aria-current="date"':'')+'>'+
         (i===0 ? T('pd.zb.vandaag','vandaag') : dt.slice(8)+'/'+dt.slice(5,7))+'</button>');
     }
     const perBehandelaar = (zbData.behandelaars || []).map(b => {

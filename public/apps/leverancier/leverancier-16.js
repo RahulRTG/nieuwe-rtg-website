@@ -40,7 +40,7 @@
       html += '<div class="tkc"><h3>\ud83c\udf9f '+T('kt.openinv','Open kassacodes')+(openInv.length?' ('+openInv.length+')':'')+'</h3>'+
         (invData
           ? (openInv.length ? openInv.map(i =>
-              '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--gold);">'+escT(i.kassacode)+'</span>'+
+              '<div class="st-row"><span><span style="font-family:monospace;letter-spacing:0.14em;color:var(--rtg-leesgoud,var(--gold));">'+escT(i.kassacode)+'</span>'+
               '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
               '<span class="acts"><button class="obtn warn" data-kinv="'+escT(i.kassacode)+'">'+T('kt.intrek','Trek in')+'</button></span></div>').join('')
             : '<div class="tkc-who">'+T('kt.geeninv','Geen open uitnodigingen.')+'</div>')

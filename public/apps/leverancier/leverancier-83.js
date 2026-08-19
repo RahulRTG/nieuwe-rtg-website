@@ -52,7 +52,7 @@
         const p = await API.call('/supplier/keuken/menu-advies', {});
         uit.innerHTML = '<div class="sub h-mt50">'+esc(p.samenvatting)+'</div>'+
           (p.acties||[]).map(x => '<div style="border-top:1px solid var(--line);padding:0.35rem 0;font-size:0.82rem;">'+
-            (x.impact?'<b style="color:var(--gold);">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
+            (x.impact?'<b style="color:var(--rtg-leesgoud,var(--gold));">'+geld(x.impact)+'</b> · ':'')+esc(x.tekst)+'</div>').join('');
       } catch(e){ uit.innerHTML = ''; toast(e.message); }
     });
     el.querySelectorAll('[data-vtel]').forEach(b => b.addEventListener('click', () => {

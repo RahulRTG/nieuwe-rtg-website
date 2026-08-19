@@ -15,7 +15,12 @@
     --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  /* body.rtg-stijl en niet body: de gedeelde UI-kit zet `body.rtg-stijl` en die
+   is specifieker, dus de verklaring hieronder verloor de GROND maar hield de
+   INKT -- bijna zwarte tekst op een bijna zwarte grond, 1,08:1. Een juridisch
+   stuk is een document en geen appvlak; het schildert zijn eigen vlak, en dan
+   allebei de kanten ervan. Zie data-rtg-eigenvlak op de body hierboven. */
+  body.rtg-stijl{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}
@@ -35,7 +40,7 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body data-rtg-eigenvlak class="rtg-stijl">
 <header>
   <div class="wrap">
     <a href="/apps/juridisch.html">← Juridisch</a>

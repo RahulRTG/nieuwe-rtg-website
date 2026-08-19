@@ -84,7 +84,20 @@
    De grond zelf, plus de levende kleur die eroverheen ademt. Twee lagen: de
    dagkleur bovenop, met de sterkte die het thema toestaat, en daaronder het
    materiaal. Zo verandert de tint continu zonder dat het materiaal verdwijnt. */
-:root[data-rtg-thema] body{
+/* EEN SCHERM MAG ZIJN EIGEN VLAK HOUDEN, en dat is geen uitzondering maar een
+   reparatie van iets dat stuk was. De drie juridische pagina's verklaren zichzelf
+   licht (`body{background:var(--white);color:var(--black)}`) omdat een juridisch
+   stuk een DOCUMENT is en geen appvlak. De regel hieronder is specifieker en nam
+   alleen de GROND over -- de inkt van die pagina's bleef zwart. Gevolg: bijna
+   zwarte tekst op een bijna zwarte grond, 1,08:1, op de partnervoorwaarden, de
+   voorwaarden en de privacyverklaring. Samen 156 van de bevindingen die de
+   contrastronde vond zodra hij verlopen kon lezen (zie TOEGANKELIJK.md).
+
+   Wie `data-rtg-eigenvlak` op zijn body zet, zegt: ik schilder mijn eigen grond
+   EN mijn eigen inkt. Allebei, of geen van beide -- half meedoen is precies wat
+   dit stukmaakte. */
+:root[data-rtg-thema] body[data-rtg-eigenvlak]{ background-attachment:initial; }
+:root[data-rtg-thema] body:not([data-rtg-eigenvlak]){
   background:
     linear-gradient(180deg,
       color-mix(in srgb, var(--dag-kleur,#C23A5E) calc(var(--rtg-dagsterkte,.1) * 100%), transparent) 0%,

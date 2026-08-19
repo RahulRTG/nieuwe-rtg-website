@@ -187,7 +187,14 @@
 .ios-groot{
   font-family:'Bodoni Moda',serif; font-weight:500;
   font-size:34px; line-height:1.15; letter-spacing:-0.01em;
-  color:var(--ios-inkt);
+  /* DE PAGINA-INKT EN NIET DE BALK-INKT. Dit is de enige plek waar --ios-inkt
+     op de PAGINA stond in plaats van in de balk of een blad, en die drie zijn
+     altijd donker terwijl de pagina dat niet is. Op het champagne-thema gaf dat
+     lichte letters op een lichte grond: gemeten 104 keer, 1,06:1, op vrijwel elk
+     scherm de grootste kop die er staat. Dezelfde scheiding als bij --ios-label
+     hierboven, alleen de andere kant op: de schil beslist in de balk, de pagina
+     beslist op de pagina. */
+  color:var(--rtg-txt, var(--ios-inkt));
   padding:0.3rem max(1rem, env(safe-area-inset-left,0px)) 0.6rem;
   margin:0;
 }

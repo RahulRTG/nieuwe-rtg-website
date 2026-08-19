@@ -1,13 +1,13 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Sinds 17 augustus 2026 staan alle drie op nul. Dit bestand is daarmee geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
-  "gemeten": "2026-08-17",
+  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Structuur en raakvlak staan op nul en zijn hard. CONTRAST NIET, en sinds 19 augustus 2026 staat daar een eerlijk getal in plaats van een nul die nooit waar was: de keuring gaf tot die dag op zodra er een verloop in de keten stond, en de themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's: 1884 tekstelementen gewogen, 3042 overgeslagen -- alle 3042 om die ene reden. De poort mat dus 38% van de tekst en meldde daarover nul. Nu rekent hij verlopen en doorzichtige lagen uit (scripts/a11ykeuring.js, gronden()) en weegt hij 83%. Wat er sindsdien uitkomt staat hieronder als BOVENGRENS die alleen omlaag mag, precies zoals het raakvlak dat ooit deed.",
+  "gemeten": "2026-08-19",
   "uitgelogd": {
     "structureel": 0,
-    "contrast": 0
+    "contrast": 26
   },
   "ingelogd": {
     "structureel": 0,
-    "contrast": 0
+    "contrast": 34
   },
   "raakvlak": {
     "onder24": 0,
@@ -60,5 +60,15 @@
     "2. de focus terugzetten is nu de taak van de laag die hem wegnam": "Zelfs zonder dat frame lukt het de pagina niet: zij sluit en focust in EEN tik, terwijl inert pas daarna weggaat. De gedeelde laag houdt daarom bij waar de focus vandaan kwam (een focusin-luisteraar; achteraf vragen is te laat, want de pagina zet de focus zelf al in het venster) en geeft hem terug als hij bij het loslaten nergens meer staat. \"Nergens\" is meer dan body: de focus blijft eerst nog even staan op de knop in het zojuist verborgen venster, een element zonder afmetingen.",
     "3. de laatste modaal wint, niet de eerste": "Op app.html staat de onboardingpoort in de markup en wordt een later venster aan het eind van body gehangen. De laag nam de EERSTE aria-modal en sloot alles daarbuiten af -- inclusief het nieuwere venster van pin-herstel, dat bovenop stond, in beeld was en onaanklikbaar werd; de tik viel door naar het veld eronder. Later in de boom is bovenop, dus telt de laatste.",
     "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
+  },
+  "contrast": {
+    "waarom deze getallen geen nul zijn": "Ze waren nooit nul; ze waren ongemeten. De vorige nul ging over 38% van de tekst. Deze 26 en 34 zijn wat er overblijft nadat drie systeemfouten die de nieuwe meting blootlegde zijn gerepareerd -- zie hieronder. Ze horen te krimpen, en de poort zakt zodra er een bijkomt.",
+    "de drie systeemfouten die de nieuwe meting blootlegde": [
+      "de drie juridische pagina's (voorwaarden, privacy, partnervoorwaarden) verklaren zichzelf licht, maar de gedeelde `body.rtg-stijl` en de themalaag zijn specifieker en namen alleen de GROND over: bijna zwarte tekst op een bijna zwarte grond, 1,08:1, op een juridisch stuk. 156 bevindingen. Ze dragen nu data-rtg-eigenvlak en schilderen hun eigen grond EN inkt.",
+      "de grote iOS-titel (.ios-groot) stond op --ios-inkt, en dat is de inkt van de BALK, die altijd donker is. Op het champagne-thema gaf dat lichte letters op een lichte grond op vrijwel elk scherm: 104 bevindingen, 1,06:1. Hij draagt nu de inkt van de PAGINA.",
+      "de gedeelde tabbalk (.rtgdeel-balk) gebruikte --muted en --txt: een vaste grijstoon en een vaste lichte, allebei blind voor het thema. Niet-actief haalde 4,07:1 waar 4,5 moet, en actief stond op champagne licht op licht. 70 bevindingen. Hij gebruikt nu --rtg-muted en --rtg-txt."
+    ],
+    "wat er nog open staat": "De 26 en 34 hierboven, met als grootste groepen een gedempte grijstoon op donkere kaarten (16x) en --burgundy-on-dark als KLEINE tekst (8x) -- dat laatste verbiedt CLAUDE.md met zoveel woorden, en de poort kon het tot nu toe niet zien.",
+    "wat de poort nog steeds niet meet": "830 van de 4927 tekstelementen (17%): een `url()` als achtergrond -- daar valt zonder de pixels niets van te rekenen -- en een keten die tot de wortel doorzichtig blijft, waar het doek van de browser zelf de grond is. Allebei geven ze null, en dat is eerlijker dan gokken."
   }
 }

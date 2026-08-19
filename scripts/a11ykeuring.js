@@ -18,13 +18,35 @@
 'use strict';
 
 /* ---------- pure helpers (ook in Node testbaar) ---------- */
+/* TWEE SCHRIJFWIJZEN, EN DE TWEEDE KOSTTE EEN HALVE MEETRONDE.
+
+   getComputedStyle geeft kleuren normaal terug als `rgb()` of `rgba()`. Maar
+   zodra er een `color-mix(in srgb, ...)` in het spel is -- en dit huis gebruikt
+   die veel -- serialiseert Chrome hem als `color(srgb 0.90 0.78 0.29 / 0.16)`.
+   Die vorm werd hier niet herkend, en dat was erger dan hem niet ondersteunen:
+   een verloop met zulke stops leverde een HALVE stoplijst op, en daarmee een
+   grond die nergens op sloeg. Gemeten gevolg: 104 koppen die als
+   licht-op-licht werden gemeld terwijl ze gewoon leesbaar zijn.
+
+   Een meter mag iets niet kunnen. Hij mag het niet half kunnen. */
 function kleur(s) {
   if (!s) return null;
-  const m = String(s).match(/rgba?\(([^)]+)\)/i);
-  if (!m) return null;
-  const d = m[1].split(',').map(x => parseFloat(x.trim()));
-  if (d.length < 3 || d.some((n, i) => i < 3 && isNaN(n))) return null;
-  return [d[0], d[1], d[2], d.length >= 4 ? d[3] : 1];
+  const t = String(s);
+  const m = t.match(/rgba?\(([^)]+)\)/i);
+  if (m) {
+    const d = m[1].split(',').map(x => parseFloat(x.trim()));
+    if (d.length < 3 || d.some((n, i) => i < 3 && isNaN(n))) return null;
+    return [d[0], d[1], d[2], d.length >= 4 ? d[3] : 1];
+  }
+  /* color(srgb r g b / a): kanalen lopen van 0 tot 1. Alleen srgb -- een andere
+     ruimte omrekenen is een eigen wetenschap en hoort niet stilzwijgend te
+     gebeuren. */
+  const c = t.match(/color\(\s*srgb\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s*(?:\/\s*([0-9.]+%?))?\s*\)/i);
+  if (c) {
+    const a = c[4] == null ? 1 : (String(c[4]).endsWith('%') ? parseFloat(c[4]) / 100 : parseFloat(c[4]));
+    return [Math.round(c[1] * 255), Math.round(c[2] * 255), Math.round(c[3] * 255), isNaN(a) ? 1 : a];
+  }
+  return null;
 }
 function luminantie(rgb) {
   const a = rgb.slice(0, 3).map(v => {
@@ -98,16 +120,130 @@ function zichtbaar(el) {
   while (p) { if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return false; p = p.parentElement; }
   return true;
 }
-function achtergrond(el) {
-  let p = el;
+/* ---------- de grond onder de tekst ----------
+
+   HIER STOND EEN POORT DIE 38% VAN DE TEKST MAT, en dat wist niemand.
+
+   De vorige versie gaf op zodra er ergens in de keten een verloop stond:
+   "gradient: niet te berekenen -> overslaan". Dat was voorzichtig en het klonk
+   verstandig. Gemeten over alle 258 schermen in twee thema's: 1884
+   tekstelementen werden gewogen en 3042 werden overgeslagen -- alle 3042 om
+   diezelfde reden. En de oorzaak was er maar EEN: de themalaag geeft `body` een
+   verloop (--onyx-glans en broers), dus vrijwel elke tekst op elk scherm viel
+   erbuiten. "Contrast: 0 van 259" ging daarmee over een minderheid van de
+   tekst, en niemand die dat getal las kon dat weten.
+
+   Wat er nu staat REKENT DE GROND UIT in plaats van op te geven:
+
+   1. LAGEN. Van het element omhoog, per element eerst de achtergrondkleur en
+      daarboven de achtergrondafbeelding (dat is de schildervolgorde). Zodra een
+      laag dekt, is alles eronder onzichtbaar en stopt het.
+   2. VERLOPEN worden hun kleurstops. Een verloop is geen kleur maar een reeks,
+      dus levert het meer dan een kandidaat.
+   3. DOORZICHTIGE LAGEN worden over elkaar gemengd, met dezelfde som die de
+      browser gebruikt.
+   4. HET OORDEEL VALT OP DE ONGUNSTIGSTE. Tekst over een verloop staat op elke
+      toon ervan; hij hoort dus overal leesbaar te zijn, niet gemiddeld.
+
+   WAT ER NOG STEEDS WORDT OVERGESLAGEN, en dat blijft eerlijk: een `url()` als
+   achtergrond (een foto -- daar valt niets van te rekenen zonder de pixels), en
+   een keten die tot de wortel doorzichtig blijft. Die twee geven null, precies
+   zoals vroeger. Alleen zijn het er nu een handvol in plaats van drieduizend. */
+
+function mengOver(voor, achter) {
+  const a = voor[3] == null ? 1 : voor[3];
+  if (a >= 1) return [voor[0], voor[1], voor[2]];
+  return [0, 1, 2].map(i => Math.round(a * voor[i] + (1 - a) * achter[i]));
+}
+/* EEN ACHTERGRONDAFBEELDING KAN MEER DAN EEN LAAG ZIJN, en die staan op elkaar.
+   `background-image` mag een rij zijn, gescheiden door komma's BUITEN de
+   haakjes, en de eerste ligt bovenop. Dat onderscheid is geen muggenzifterij:
+   de eerste versie hiervan gooide alle kleurstops van alle lagen op een hoop, en
+   meldde daardoor de hero van bestellen.html als wit-op-bijna-wit. Die hero is
+   een lichte glans OVER een dekkend bordeauxverloop; de glans dekt niets, het
+   verloop eronder dekt alles, en samengeklonterd zag het er onleesbaar uit
+   terwijl er niets mis was. Een meter die vals alarm slaat is erger dan geen
+   meter -- dan leert iedereen hem negeren. */
+function laagStukken(bi) {
+  const uit = []; let diep = 0, start = 0;
+  for (let i = 0; i < bi.length; i++) {
+    const c = bi[i];
+    if (c === '(') diep++;
+    else if (c === ')') diep--;
+    else if (c === ',' && diep === 0) { uit.push(bi.slice(start, i)); start = i + 1; }
+  }
+  uit.push(bi.slice(start));
+  return uit.map(x => x.trim()).filter(Boolean);
+}
+function verloopStops(laag) {
+  if (!laag || laag === 'none') return null;
+  if (!/gradient\(/.test(laag)) return null;          // url(): niet te berekenen
+  /* Een kleurruimte die deze lezer niet kent, maakt de hele laag onmeetbaar.
+     Half lezen levert een grond op die nergens op slaat -- zie de kop bij
+     kleur(). Liever niets weten dan iets verzinnen. */
+  if (/\b(hsla?|hwb|lab|lch|oklab|oklch)\s*\(/i.test(laag)) return null;
+  if (/color\(\s*(?!srgb\b)/i.test(laag)) return null;
+  const m = laag.match(/rgba?\([^)]+\)|color\([^)]+\)|\btransparent\b/gi) || [];
+  /* `transparent` blijft buiten kleur(): die functie weigert met opzet alles wat
+     geen rgb is (zie test/a11ykeuring.test.js), en die afspraak is meer waard
+     dan dit ene gemak. Hier is het gewoon zwart met alfa nul. */
+  const k = m.map((x) => (/^transparent$/i.test(x) ? [0, 0, 0, 0] : kleur(x))).filter(Boolean);
+  if (k.length !== m.length) return null;             // een stop die niet te lezen was
+  return k.length ? k : null;
+}
+const dektHelemaal = (stops) => stops.every(k => (k[3] == null ? 1 : k[3]) >= 1);
+/* Alleen de uitersten. Wat tussen de lichtste en de donkerste toon ligt kan
+   nooit ongunstiger zijn dan een van die twee, dus meer kandidaten dragen niets
+   bij -- en houden de combinaties klein als er lagen op elkaar staan. */
+function uitersten(kleuren) {
+  if (!kleuren || kleuren.length <= 1) return kleuren || [];
+  let licht = kleuren[0], donker = kleuren[0];
+  for (const k of kleuren) {
+    if (luminantie(k) > luminantie(licht)) licht = k;
+    if (luminantie(k) < luminantie(donker)) donker = k;
+  }
+  return licht === donker ? [licht] : [licht, donker];
+}
+function gronden(el) {
+  const lagen = [];                  // van boven (het element) naar beneden
+  let p = el, dekt = false;
   while (p && p.nodeType === 1) {
     const s = getComputedStyle(p);
-    if (s.backgroundImage && s.backgroundImage !== 'none') return null; // gradient/afbeelding: niet te berekenen -> overslaan
+    const bi = s.backgroundImage;
+    if (bi && bi !== 'none') {
+      /* Van boven naar beneden door de lagen van dit element. Zodra er een dekt,
+         is alles eronder onzichtbaar -- ook de achtergrondkleur van hetzelfde
+         element en alles bij de ouders. */
+      for (const laag of laagStukken(bi)) {
+        const st = verloopStops(laag);
+        if (!st) return null;        // een afbeelding: hier stopt de meting eerlijk
+        lagen.push(uitersten(st));
+        if (dektHelemaal(st)) { dekt = true; break; }
+      }
+      if (dekt) break;
+    }
     const c = kleur(s.backgroundColor);
-    if (c && c[3] === 1) return c;
+    if (c && c[3] > 0) {
+      lagen.push([c]);
+      if (c[3] >= 1) { dekt = true; break; }
+    }
     p = p.parentElement;
   }
-  return null;
+  if (!dekt || !lagen.length) return null;
+  let uit = lagen[lagen.length - 1].map(k => [k[0], k[1], k[2]]);
+  for (let i = lagen.length - 2; i >= 0; i--) {
+    const nieuw = [];
+    for (const basis of uit) for (const k of lagen[i]) nieuw.push(mengOver(k, basis));
+    uit = uitersten(nieuw.map(k => [k[0], k[1], k[2], 1])).map(k => [k[0], k[1], k[2]]);
+  }
+  return uit.length ? uit : null;
+}
+/* De oude naam blijft bestaan voor wie een enkele kleur wil: de ongunstigste
+   kandidaat kan hij niet kiezen zonder de voorgrond te kennen, dus hij geeft de
+   eerste. Binnen de keuring wordt gronden() gebruikt, niet dit. */
+function achtergrond(el) {
+  const g = gronden(el);
+  return g && g.length ? g[0] : null;
 }
 /* WAAR staat het? Een contrastmelding zonder plaats is niet te repareren: je
    weet dat er ergens op de pagina iets te bleek is, en dan begint het zoeken.
@@ -214,7 +350,11 @@ function keurInPagina() {
     const s = getComputedStyle(el);
     if (parseFloat(s.opacity) < 1) return;                 // half-transparante intro-tekst: overslaan
     const fg = kleur(s.color); if (!fg || fg[3] < 1) return;
-    const bg = achtergrond(el); if (!bg) return;
+    /* De ONGUNSTIGSTE grond telt. Tekst over een verloop staat op elke toon
+       ervan, dus hij hoort overal leesbaar te zijn en niet gemiddeld. */
+    const kandidaten = gronden(el); if (!kandidaten || !kandidaten.length) return;
+    let bg = kandidaten[0];
+    for (const k of kandidaten) if (ratio(fg, k) < ratio(fg, bg)) bg = k;
     const drempel = grootTekst(parseFloat(s.fontSize), s.fontWeight) ? 3 : 4.5;
     if (ratio(fg, bg) < drempel - 0.05) {
       tel(contrast, 'contrast', 'Te laag kleurcontrast (' + Math.round(ratio(fg, bg) * 100) / 100 + ':1)');
@@ -228,8 +368,12 @@ function keurInPagina() {
   return { overtredingen: Object.values(structureel), contrast: Object.values(contrast) };
 }
 
-const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar, achtergrond, adres, keurInPagina]
-  .map(f => f.toString()).join('\n\n') + '\nwindow.__a11yKeur = keurInPagina;\n';
+const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar,
+  mengOver, laagStukken, verloopStops, uitersten, gronden, achtergrond, adres, keurInPagina]
+  .concat([]) // dektHelemaal is een pijlfunctie en gaat als tekst mee, hieronder
+  .map(f => f.toString()).join('\n\n') +
+  '\nconst dektHelemaal = ' + dektHelemaal.toString() + ';\n' +
+  '\nwindow.__a11yKeur = keurInPagina;\n';
 
 /* HET OORDEEL, apart en puur, zodat het toetsbaar is zonder browser.
 
@@ -247,4 +391,5 @@ function velt(structureel, contrast) {
   return { faalt: structureel > 0 || contrast > 0, melding };
 }
 
-module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, velt };
+module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, velt,
+  mengOver, laagStukken, verloopStops, uitersten, dektHelemaal };

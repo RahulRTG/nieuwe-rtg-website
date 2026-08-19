@@ -17,11 +17,26 @@ op telefoonformaat (390x844).
 
 | poort | staat | wat hij tegenhoudt |
 |---|---|---|
-| contrast, beide staten | **0** van 259 | tekst die te bleek is om te lezen |
+| contrast, beide staten | **26 / 34**, en dat is een eerlijk getal | tekst die te bleek is om te lezen |
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+
+**DE NUL BIJ CONTRAST WAS NOOIT WAAR, EN DAT IS OP 19 AUGUSTUS 2026 GEBLEKEN.**
+De keuring gaf op zodra er ergens in de keten een verloop stond -- en de themalaag
+geeft `body` er een. Gemeten over alle 258 schermen in twee thema's: **1884
+tekstelementen werden gewogen en 3042 werden overgeslagen**, alle 3042 om die ene
+reden. De poort mat dus 38% van de tekst en meldde daarover nul. Hij rekent
+verlopen en doorzichtige lagen nu uit (`gronden()` in `scripts/a11ykeuring.js`)
+en weegt 83%; de rest is een `url()` als achtergrond of een keten die tot de
+wortel doorzichtig blijft, en daar blijft hij eerlijk zwijgen.
+
+Wat daarmee zichtbaar werd waren drie systeemfouten -- de juridische pagina's met
+zwart op zwart, de grote iOS-titel licht op licht, en de gedeelde tabbalk die het
+thema niet volgde -- samen 330 gevallen. Die zijn gerepareerd. Wat overblijft
+staat als **bovengrens die alleen omlaag mag** in `A11Y-INGELOGD.json`, met de
+grootste groepen erbij. Structuur en raakvlak blijven hard nul.
 
 Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het

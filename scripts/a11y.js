@@ -109,7 +109,10 @@ function startEchteServer() {
 
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    /* RTG_CHROMIUM wijst een browser aan die niet op de plek staat die het
+       pakket verwacht (een ontwikkelbak met een eigen chromium). Leeg is
+       undefined en dus precies het gedrag van hiervoor. */
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: process.env.RTG_CHROMIUM || undefined });
   } catch (e) {
     console.log('[a11y] Kon Chromium niet starten; scan overgeslagen:', e.message);
     server.stop();
@@ -284,7 +287,13 @@ function startEchteServer() {
   if (raakOordeel.melding) console.log(raakOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
+  /* De slotregel noemde het contrast uitgelogd altijd "nul", omdat het dat een
+     tijd lang was. Toen de meting op 19 augustus 2026 verlopen leerde lezen was
+     het dat niet meer, en stond er een getal boven deze regel dat hem tegensprak.
+     Een samenvatting die een ander getal noemt dan de meting eronder, is erger
+     dan geen samenvatting: hij is precies wat mensen overnemen. */
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
-    `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}. ` +
+    `contrast uitgelogd ${uitgelogd.contr} (grens ${grens.uitgelogd.contrast}), ` +
+    `ingelogd ${ingelogd.contr} (grens ${grens.ingelogd.contrast}). ` +
     `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

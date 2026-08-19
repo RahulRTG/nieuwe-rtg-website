@@ -102,3 +102,48 @@ test('BRON is syntactisch geldige browsercode en bevat de instap', () => {
   // parse-check zonder uitvoeren: new Function gooit bij een syntaxfout
   assert.doesNotThrow(() => new Function('window', 'document', 'getComputedStyle', 'CSS', k.BRON));
 });
+
+/* ---------- de grond onder de tekst ----------
+   Deze drie toetsen bestaan omdat de keuring tot 19 augustus 2026 maar 38% van
+   de tekst woog: hij gaf op zodra er een verloop in de keten stond, en de
+   themalaag geeft `body` er een. Gemeten over 258 schermen in twee thema's:
+   1884 elementen gewogen, 3042 overgeslagen, alle 3042 om die ene reden. */
+
+test('lagen van een achtergrond worden gesplitst op de komma BUITEN de haakjes', () => {
+  /* DE MUTATIE: splits gewoon op ','. Dan valt `rgba(255,211,135,.32)` in
+     stukken en klopt er niets meer van de kleuren. Dit is precies de fout die
+     de hero van bestellen.html als wit-op-bijna-wit meldde. */
+  const lagen = k.laagStukken(
+    'radial-gradient(circle at 88% 25%,rgba(255,211,135,.32),transparent 32%), linear-gradient(135deg,rgb(58,17,29),rgb(120,27,53))');
+  assert.equal(lagen.length, 2, 'twee lagen, niet zes brokstukken');
+  assert.match(lagen[0], /^radial-gradient/);
+  assert.match(lagen[1], /^linear-gradient/);
+});
+
+test('een dekkende laag verbergt alles eronder', () => {
+  /* Zonder dit onderscheid telt een lichte glans OVER een dekkend donker
+     verloop mee als mogelijke grond, en dan lijkt witte tekst onleesbaar
+     terwijl er niets mis is.
+     DE MUTATIE: laat dektHelemaal altijd false teruggeven. */
+  assert.equal(k.dektHelemaal([[58, 17, 29, 1], [120, 27, 53, 1]]), true);
+  assert.equal(k.dektHelemaal([[255, 211, 135, 0.32], [0, 0, 0, 0]]), false);
+});
+
+test('doorzichtige lagen mengen zoals de browser dat doet', () => {
+  /* DE MUTATIE: laat mengOver de alfa negeren en de bovenste kleur teruggeven.
+     Dan wordt een wash van 20% opeens de hele grond. */
+  assert.deepEqual(k.mengOver([255, 255, 255, 0.5], [0, 0, 0]), [128, 128, 128]);
+  assert.deepEqual(k.mengOver([10, 20, 30, 1], [200, 200, 200]), [10, 20, 30]);
+  assert.deepEqual(k.mengOver([255, 0, 0, 0], [12, 12, 11]), [12, 12, 11]);
+});
+
+test('van een verloop tellen alleen de uitersten', () => {
+  /* Wat tussen de lichtste en de donkerste toon ligt kan nooit ongunstiger zijn
+     dan een van die twee. Zonder deze inperking groeit het aantal kandidaten
+     met elke laag erop.
+     DE MUTATIE: geef alle stops terug. De toets hieronder telt er dan drie. */
+  const uit = k.uitersten([[58, 17, 29, 1], [120, 27, 53, 1], [173, 91, 59, 1]]);
+  assert.equal(uit.length, 2, 'lichtste en donkerste, meer niet');
+  assert.deepEqual(uit[0], [173, 91, 59, 1]);
+  assert.deepEqual(uit[1], [58, 17, 29, 1]);
+});

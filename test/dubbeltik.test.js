@@ -17,6 +17,8 @@
      -> "een mislukte poging mag opnieuw" ZAKT (RAAK)
    - de afdruk niet vergelijken (elk lijf onder dezelfde sleutel als herhaling)
      -> "een ander lijf onder dezelfde sleutel wordt doorgelaten" ZAKT (RAAK)
+   - de bytegrens niet handhaven (alleen op aantal vegen)
+     -> "de kast heeft ook een grens in bytes" ZAKT (RAAK)
 
    Los: node --test test/dubbeltik.test.js
    ========================================================================== */
@@ -42,7 +44,18 @@ function maakServer(handler, dubbeltik) {
       req.get = (naam) => req.headers[String(naam).toLowerCase()];
       res.set = (naam, waarde) => { res.setHeader(naam, waarde); return res; };
       res.status = (code) => { res.statusCode = code; return res; };
-      res.json = (data) => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(data)); return res; };
+      /* Express zet zelf een content-length op een JSON-antwoord, en de
+         dubbeltik gebruikt precies dat getal om zijn kast in bytes te begrenzen
+         (in plaats van het antwoord nog een keer te serialiseren). Dit
+         serviertje doet dat dus ook, anders zou de bytegrens hier alleen in de
+         toets niet werken. */
+      res.json = (data) => {
+        const lijf = Buffer.from(JSON.stringify(data));
+        res.setHeader('content-type', 'application/json');
+        res.setHeader('content-length', String(lijf.length));
+        res.end(lijf);
+        return res;
+      };
       mw(req, res, () => handler(req, res));
     });
   });
@@ -231,6 +244,28 @@ test('de kast loopt niet vol en houdt niets langer vast dan de termijn', async (
        ook zo: een sleutel van gisteren mag geen antwoord van gisteren geven. */
     const na = await post(poort, '/api/notitie', { idem: 'sleutel-vol-4' });
     assert.strictEqual(na.data.herhaald, undefined);
+  } finally { srv.close(); }
+});
+
+test('de kast heeft ook een grens in bytes, niet alleen in aantal', async () => {
+  /* Vijfduizend bewaarde antwoorden van honderd kilobyte is een half gigabyte.
+     Een grens op AANTAL is dus geen grens; deze toets zet de bytegrens laag en
+     kijkt of de kast hem aanhoudt en of de oudste eruit valt. */
+  const dubbeltik = maakDubbeltik({ maxBytes: 3000 });
+  const groot = { tekst: 'x'.repeat(1500) };
+  let n = 0;
+  const { srv, poort } = await maakServer((req, res) => { n++; res.status(200).json(Object.assign({ n }, groot)); }, dubbeltik);
+  try {
+    for (let i = 0; i < 6; i++) await post(poort, '/api/groot', { idem: 'bytes-sleutel-' + i });
+    const st = dubbeltik.staat();
+    assert.ok(st.bytes <= 3000, 'de kast blijft binnen zijn bytegrens: ' + st.bytes);
+    assert.ok(st.uitgevallen > 0, 'en er is werkelijk iets uitgevallen');
+    assert.ok(st.inKast < 6, 'dus niet alle zes staan er nog: ' + st.inKast);
+    /* De oudste is eruit, dus die doet het werk gewoon opnieuw -- dat is de
+       eerlijke degradatie: geen bescherming meer, wel een werkend verzoek. */
+    const werkVoor = n;
+    await post(poort, '/api/groot', { idem: 'bytes-sleutel-0' });
+    assert.strictEqual(n, werkVoor + 1, 'de oudste sleutel is vergeten en wordt gewoon uitgevoerd');
   } finally { srv.close(); }
 });
 

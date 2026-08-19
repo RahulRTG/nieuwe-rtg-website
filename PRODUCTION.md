@@ -373,7 +373,11 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   zonder sleutel (twee keer hetzelfde toevoegen zonder sleutel MAG twee items
   zijn), hij leeft in het geheugen van één proces (voor geld blijft
   `server/lib/idem.js` staan, mét duurzame commit), en een ander lijf onder
-  dezelfde sleutel wordt doorgelaten in plaats van geweigerd.
+  dezelfde sleutel wordt doorgelaten in plaats van geweigerd. De kast is
+  begrensd op aantal (5000) én op omvang (32 MB, gemeten aan de content-length
+  die de server toch al berekent): loopt hij vol, dan valt de oudste eraf, zodat
+  bescherming geleidelijk aan de achterkant verdwijnt in plaats van dat het
+  geheugen oploopt.
 - **Security** — https-redirect + HSTS, strikte CSP (met per-antwoord nonce voor
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).

@@ -3,57 +3,53 @@
 
    WAT DIT REPAREERT, GEMETEN EN NIET GEVOELD. `npm run idemproef` stuurt elke
    schrijfroute drie keer: twee keer met dezelfde sleutel en één keer met een
-   verse, en kijkt of de herhaling iets nieuws deed. De stand op 18 augustus
-   2026: 15 routes beschermd, **100 onbeschermd**, de rest ongemeten. Die honderd
-   zijn geen randgevallen -- er staan `POST /api/concern/nieuw`,
-   `POST /api/agenda/toevoegen` en `POST /api/meet/maak` tussen. Een load
-   balancer die één keer opnieuw probeert, of een telefoon die tijdens het
-   verzenden van netwerk wisselt, maakt daar twee bedrijven van.
+   verse. De stand op 18 augustus 2026: 15 routes beschermd, 100 ONBESCHERMD.
+   Daar staan `POST /api/concern/nieuw` en `POST /api/agenda/toevoegen` tussen:
+   een load balancer die één keer opnieuw probeert, maakt daar twee bedrijven
+   van.
 
-   WAT ER AL WAS EN WAAROM DAT NIET GENOEG WAS. server/lib/idem.js doet dit voor
-   geld, DUURZAAM (de sleutel gaat mee in dezelfde commit als de boeking) en met
-   een afdruk van de geld-bepalende velden. Dat is de zwaarste variant en die
-   hoort daar ook. Maar hij hangt aan een opslaglaag met een eigen naam
-   ('payIdem', 'bankIdem') en aan het werk dat eromheen staat; hem honderd keer
-   aansluiten zou honderd routes en honderd sleutelnamen betekenen. Deze laag
-   staat daarom vóór de routes, kent geen enkele route, en doet één ding: hij
-   herkent een herhaling.
+   WAAROM server/lib/idem.js DAT NIET DEED. Die doet dit voor geld, DUURZAAM en
+   met een afdruk van de geld-bepalende velden -- de zwaarste variant, en die
+   hoort daar. Maar hij hangt aan een opslaglaag met een eigen naam ('payIdem')
+   en aan het werk eromheen; hem honderd keer aansluiten is honderd routes
+   aanraken. Deze laag staat vóór de routes, kent geen enkele route, en doet één
+   ding: hij herkent een herhaling.
 
    DRIE GRENZEN, EN ZE STAAN HIER OMDAT ZE ANDERS ONZICHTBAAR ZIJN.
 
-   1. HIJ WERKT ALLEEN ALS DE AANROEPER EEN SLEUTEL MEEGEEFT (`idem` of
-      `idempotentieSleutel` in het lijf, of de kop `Idempotency-Key`). Zonder
-      sleutel verandert er niets -- en dat is met opzet. Twee identieke verzoeken
-      zonder sleutel MOGEN twee notities zijn; wie dat blind zou samenvouwen,
-      breekt "voeg tweemaal hetzelfde item toe" voor iedereen. De belofte van
-      deze kolom is dan ook precies dat: dezelfde SLEUTEL doet het werk één keer.
+   1. ALLEEN MET EEN SLEUTEL van de aanroeper (`idem` of `idempotentieSleutel`
+      in het lijf, of de kop `Idempotency-Key`). Zonder sleutel verandert er
+      niets, en dat is met opzet: twee identieke verzoeken zonder sleutel MOGEN
+      twee notities zijn. Wie dat blind samenvouwt, breekt "voeg tweemaal
+      hetzelfde toe" voor iedereen.
 
-   2. HIJ LEEFT IN HET GEHEUGEN VAN ÉÉN PROCES. Na een herstart is de kast leeg,
-      en bij meerdere instances kent instance B de sleutel van instance A niet.
-      Voor geld is dat niet goed genoeg -- daarom blijft idem.js daar staan, mét
-      duurzame commit. Voor "maak een agenda-item" is het de juiste maat: het
-      venster van een dubbeltik of een retry is seconden, geen dagen.
+   2. IN HET GEHEUGEN VAN ÉÉN PROCES. Na een herstart is de kast leeg, en
+      instance B kent de sleutel van instance A niet. Voor geld is dat niet goed
+      genoeg -- daarom blijft idem.js daar staan, mét duurzame commit. Voor "maak
+      een agenda-item" is het de juiste maat: het venster van een dubbeltik is
+      seconden.
 
    3. EEN ANDER LIJF ONDER DEZELFDE SLEUTEL WORDT DOORGELATEN, niet geweigerd.
       Verleidelijk om daar 409 op te geven (idem.js doet dat), maar die laag weet
       WELKE velden het verzoek bepalen; deze niet. Een geldroute mag een andere
       omschrijving bij dezelfde betaling krijgen, en een 409 daarop zou werkende
-      apps breken. Doorlaten betekent hier: precies wat er vandaag ook gebeurt.
-      De geldroutes houden hun eigen, strengere oordeel.
+      apps breken. Doorlaten is hier precies wat er vandaag ook gebeurt.
 
-   WAT ER NIET WORDT BEWAARD. Alleen antwoorden met een 2xx. Een mislukte poging
-   hoort herhaalbaar te zijn -- dat is het hele punt van opnieuw proberen. En
-   alleen JSON: deze laag hangt aan res.json, want een bestandsdownload of een
-   stream laat zich niet in een kast leggen.
+   WAT ER NIET WORDT BEWAARD: alles wat geen 2xx is (een mislukte poging hoort
+   herhaalbaar te zijn) en alles wat niet via res.json gaat. Zie
+   server/opzet/poortwachters.js voor waarom deze laag NA de compressie hangt --
+   dat kostte negentien stil onbeschermde routes.
    ========================================================================== */
 'use strict';
 
 const crypto = require('crypto');
 const klok = require('./klok');
+/* De kast met zijn drie grenzen (tijd, aantal, bytes) staat in
+   ./dubbeltikkast.js: dat is geheugenbeheer en niet verzoekafhandeling, en het
+   is daar los te toetsen zonder server. */
+const { maakKast } = require('./dubbeltikkast');
 
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
-const STANDAARD_TTL = 10 * 60 * 1000;   // een retry-venster is seconden; tien minuten is ruim
-const STANDAARD_MAX = 5000;
 
 /* De sleutelvelden gaan NIET mee in de afdruk: ze zijn de sleutel, niet het
    verzoek. Zonder deze uitzondering zou elke afdruk per definitie kloppen en
@@ -99,23 +95,13 @@ function wieHash(req) {
 
 function maakDubbeltik(opties) {
   const o = opties || {};
-  const ttl = o.ttlMs || STANDAARD_TTL;
-  const max = o.max || STANDAARD_MAX;
   const nu = o.nu || klok.nu;
   const overslaan = o.overslaan || (() => false);
   const log = o.log || null;
 
-  const kast = new Map();   // id -> { afdruk, klaar, status, data, at, wachters[] }
+  const kast = maakKast({ ttlMs: o.ttlMs, max: o.max, maxBytes: o.maxBytes, nu });
   const gemist = new Set();  // paden die al een keer gemeld zijn (zie res.on('finish'))
   const staat = { gezien: 0, herhaald: 0, doorgelaten: 0, bewaard: 0, gemist: 0 };
-
-  function veeg() {
-    const grens = nu() - ttl;
-    for (const [id, rij] of kast) if (rij.at && rij.at < grens) kast.delete(id);
-    /* Blijft hij dan nog te groot, dan valt de oudste eraf. Een kast die
-       ongelimiteerd groeit is een geheugenlek met een nette naam. */
-    while (kast.size > max) kast.delete(kast.keys().next().value);
-  }
 
   function wek(rij, uitslag) {
     const wachters = rij.wachters;
@@ -146,7 +132,7 @@ function maakDubbeltik(opties) {
       const afdruk = hash(canoniek(req.body));
       staat.gezien++;
 
-      const bestaand = kast.get(id);
+      const bestaand = kast.haal(id);
       if (bestaand) {
         if (bestaand.afdruk !== afdruk) { staat.doorgelaten++; return next(); }   // grens 3
         if (bestaand.klaar) return herhaal(res, bestaand);
@@ -160,9 +146,7 @@ function maakDubbeltik(opties) {
         });
       }
 
-      const rij = { afdruk, klaar: false, status: 200, data: null, at: nu(), wachters: [] };
-      kast.set(id, rij);
-      if (kast.size > max) veeg();
+      const rij = kast.zet(id, { afdruk, klaar: false, status: 200, data: null, at: nu(), wachters: [] });
 
       const echteJson = res.json.bind(res);
       res.json = (data) => {
@@ -171,7 +155,7 @@ function maakDubbeltik(opties) {
           staat.bewaard++;
           wek(rij, rij);
         } else {
-          kast.delete(id);
+          kast.verwijder(id);
           wek(rij, null);
         }
         return echteJson(data);
@@ -180,8 +164,8 @@ function maakDubbeltik(opties) {
          verbinding die afbreekt: dan is er niets om te herhalen, en een rij die
          voor eeuwig "in vlucht" staat zou elke volgende poging laten hangen. */
       res.on('finish', () => {
-        if (rij.klaar) return;
-        kast.delete(id);
+        if (rij.klaar) { kast.meet(id, res.getHeader && res.getHeader('content-length')); return; }
+        kast.verwijder(id);
         wek(rij, null);
         /* EN ALS ER WEL EEN GESLAAGD ANTWOORD WAS, ZEG HET DAN. Dit is de fout
            die deze laag bijna stil om zeep hielp: jsonGzip() verving res.json NA
@@ -198,12 +182,12 @@ function maakDubbeltik(opties) {
           if (log && typeof log.warn === 'function') log.warn(zin); else console.warn(zin);
         }
       });
-      res.on('close', () => { if (!rij.klaar) { kast.delete(id); wek(rij, null); } });
+      res.on('close', () => { if (!rij.klaar) { kast.verwijder(id); wek(rij, null); } });
       next();
     };
   }
 
-  return { middleware, staat: () => Object.assign({ inKast: kast.size }, staat), veeg, kast };
+  return { middleware, staat: () => Object.assign({}, kast.stand(), staat), veeg: kast.veeg, kast };
 }
 
 module.exports = { maakDubbeltik, canoniek, sleutelUit, SCHRIJFT };

@@ -149,6 +149,16 @@ jobs:
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
       # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
       # De vloer staat in NORM.json (dekkingWaargenomenPct).
+      #
+      # DIT CIJFER MIST DE SCHERMSUITE, en dat is geen slordigheid maar een knip
+      # in de opzet: `npm run e2e` draait in de job "a11y" hieronder en schrijft
+      # daar zijn eigen .schermjournaal, in een andere werkmap. Endpoints die
+      # alleen vanuit de BROWSER worden aangeroepen -- /api/fout/client is de
+      # bekende -- staan hier dus als "nooit aangeraakt" terwijl er wel degelijk
+      # een toets voor is. scripts/dekking.js KAN sinds 19 augustus 2026 meer dan
+      # een journaal lezen (--lees mag herhaald) en meldt bovenaan welke suites
+      # meetelden; wat er nog moet gebeuren is de artefact-sprong tussen deze twee
+      # jobs, met een derde job die op allebei wacht. Zie TAKEN.md 6.8 (b).
       - name: Waargenomen endpoint-dekking (uit het routejournaal)
         run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)

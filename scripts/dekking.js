@@ -18,10 +18,25 @@
    dat journaal staat is aangeroepen; wat er niet in staat, niet. Daar valt
    niets aan te praten en het is met geen enkele opmaaktruc te beinvloeden.
 
+   DE TWEE JOURNALEN, en waarom dit script ze allebei leest.
+
+   `npm test` schrijft .routejournaal en `npm run e2e` schrijft .schermjournaal.
+   Dit script las er lang maar EEN, en dat gaf een cijfer met een voetnoot:
+   /api/fout/client wordt alleen vanuit de BROWSER aangeroepen
+   (public/shared/foutmelder.js), dus `npm test` raakt hem per definitie niet en
+   hij stond als "nooit aangeraakt" terwijl de schermsuite hem wel degelijk
+   aanroept. Dat is TAKEN.md 6.8 (b): het cijfer gold voor een journaal dat de
+   schermsuite miste.
+
+   Nu telt de UNIE van alle journalen die er zijn, en het rapport zegt per
+   journaal of hij is meegeteld en waarom niet. Dat laatste is het halve punt:
+   een dekkingscijfer dat stilzwijgend een hele suite overslaat, leest als een
+   uitspraak over alles.
+
    DRAAIEN
 
      node --experimental-sqlite scripts/dekking.js              (draait de suite zelf)
-     node --experimental-sqlite scripts/dekking.js --lees <bestand>
+     node --experimental-sqlite scripts/dekking.js --lees <a> --lees <b>
      node --experimental-sqlite scripts/dekking.js --json
      node --experimental-sqlite scripts/dekking.js --vastleggen
 
@@ -50,7 +65,12 @@ const METER = 'dekkingWaargenomenPct';
 const METER_N = 'endpointsNooitAangeraakt';
 const jsonUit = process.argv.includes('--json');
 const vastleggen = process.argv.includes('--vastleggen');
-const leesIdx = process.argv.indexOf('--lees');
+/* `--lees` mag MEER DAN EEN KEER. De suite en de schermsuite schrijven elk hun
+   eigen journaal (.routejournaal en .schermjournaal), en een dekkingscijfer dat
+   er maar een van leest, meldt endpoints als nooit aangeraakt terwijl er een
+   toets voor is. Zie de kop bij DE TWEE JOURNALEN. */
+const leesPaden = [];
+for (let i = 0; i < process.argv.length; i++) if (process.argv[i] === '--lees') leesPaden.push(process.argv[i + 1]);
 
 /* Het journaal van een suite die hier zelf gedraaid wordt. Zonder --lees
    draaien we de tests alsnog: lokaal wil je een cijfer kunnen halen zonder
@@ -110,27 +130,52 @@ function jongerDanDeCode(journaal) {
   return { ok: true };
 }
 
+/* De twee journalen die dit huis vanzelf achterlaat, met de suite die ze
+   schrijft erbij -- zodat het rapport kan zeggen WELKE suite ontbreekt en niet
+   alleen welk bestand. */
+const JOURNALEN = [
+  { pad: '.routejournaal', suite: 'npm test' },
+  { pad: '.schermjournaal', suite: 'npm run e2e' }
+];
+
 function main() {
-  let journaal, suite = null;
-  const staand = path.join(WORTEL, '.routejournaal');
-  if (leesIdx !== -1) {
-    journaal = process.argv[leesIdx + 1];
-    if (!journaal || !fs.existsSync(journaal)) {
-      console.error('Het routejournaal "' + journaal + '" bestaat niet. Draaide de suite met RTG_ROUTELOG gezet?');
-      return 2;
+  let journalen = [], suite = null;
+  const herkomst = [];   // per journaal: is hij meegeteld, en zo niet waarom
+  if (leesPaden.length) {
+    for (const j of leesPaden) {
+      if (!j || !fs.existsSync(j)) {
+        console.error('Het routejournaal "' + j + '" bestaat niet. Draaide de suite met RTG_ROUTELOG gezet?');
+        return 2;
+      }
+      journalen.push(j);
+      herkomst.push({ pad: j, geteld: true, reden: 'meegegeven met --lees' });
     }
-  } else if (!process.argv.includes('--vers') && (() => { const v = jongerDanDeCode(staand); if (!v.ok && !jsonUit && fs.existsSync(staand)) console.log('Het staande journaal is niet bruikbaar: ' + v.reden + '.\n'); return v.ok; })()) {
-    journaal = staand;
-    if (!jsonUit) console.log('Het journaal van de laatste `npm test` is nog vers; die gebruiken we.\n\x1b[2m(--vers dwingt een nieuwe suite af)\x1b[0m\n');
-  } else {
-    journaal = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dekking-')), 'routes.log');
-    fs.writeFileSync(journaal, '');
+  } else if (!process.argv.includes('--vers')) {
+    /* DE STAANDE JOURNALEN, elk apart beoordeeld. Een journaal dat ouder is dan
+       de code meet code die er niet meer zo staat; dan telt hij niet mee, maar
+       dat hoort ZICHTBAAR te zijn in plaats van stil. */
+    for (const j of JOURNALEN) {
+      const vol = path.join(WORTEL, j.pad);
+      if (!fs.existsSync(vol)) { herkomst.push({ pad: j.pad, geteld: false, reden: 'bestaat niet -- draai ' + j.suite }); continue; }
+      const v = jongerDanDeCode(vol);
+      if (!v.ok) { herkomst.push({ pad: j.pad, geteld: false, reden: v.reden + ' -- draai ' + j.suite + ' opnieuw' }); continue; }
+      journalen.push(vol);
+      herkomst.push({ pad: j.pad, geteld: true, reden: 'vers' });
+    }
+  }
+  if (!journalen.length) {
+    const tijdelijk = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dekking-')), 'routes.log');
+    fs.writeFileSync(tijdelijk, '');
     if (!jsonUit) console.log('De suite draait met het routejournaal aan; dit duurt zolang de suite duurt.\n');
-    suite = draaiSuite(journaal);
+    suite = draaiSuite(tijdelijk);
+    journalen = [tijdelijk];
+    herkomst.push({ pad: tijdelijk, geteld: true, reden: 'hier gedraaid' });
+    herkomst.push({ pad: '.schermjournaal', geteld: false, reden: 'de schermsuite is hier niet gedraaid -- dit cijfer mist hem' });
   }
 
-  const geraakt = require(path.join(WORTEL, 'server', 'routelog')).lees(journaal);
-  const paden = new Set([...geraakt].map(r => r.slice(r.indexOf(' ') + 1)));
+  const routelog = require(path.join(WORTEL, 'server', 'routelog'));
+  const paden = new Set();
+  for (const j of journalen) for (const r of routelog.lees(j)) paden.add(r.slice(r.indexOf(' ') + 1));
   const routes = routekaart();
 
   /* EEN LEEG JOURNAAL IS EEN KAPOTTE METING, GEEN NUL PROCENT.
@@ -170,9 +215,15 @@ function main() {
     process.stdout.write(JSON.stringify({ routes: routes.length, geraakt: routes.length - ongeraakt.length,
       pct, vloer: vloer === undefined ? null : vloer,
       nooitAangeraakt: ongeraakt.length, plafond: plafond === undefined ? null : plafond, ongeraakt, vreemd,
-      suiteStatus: suite ? suite.status : null }) + '\n');
+      journalen: herkomst, suiteStatus: suite ? suite.status : null }) + '\n');
   } else {
-    console.log('\n\x1b[1mWAARGENOMEN DEKKING\x1b[0m \x1b[2m(uit het routejournaal, niet uit de tekst van de tests)\x1b[0m\n');
+    console.log('\n\x1b[1mWAARGENOMEN DEKKING\x1b[0m \x1b[2m(uit de routejournalen, niet uit de tekst van de tests)\x1b[0m\n');
+    /* WELKE JOURNALEN ERIN ZITTEN, bovenaan en niet in een voetnoot. Een cijfer
+       dat de schermsuite mist, is een ander cijfer -- en dat hoort te blijken
+       voordat iemand het percentage leest (TAKEN.md 6.8 b). */
+    for (const h of herkomst)
+      console.log('  ' + (h.geteld ? '\x1b[32m+\x1b[0m' : '\x1b[33m-\x1b[0m') + ' ' + h.pad.padEnd(18) + ' \x1b[2m' + h.reden + '\x1b[0m');
+    console.log('');
     console.log('  endpoints op de routekaart : ' + routes.length);
     console.log('  daarvan echt aangeroepen   : ' + (routes.length - ongeraakt.length) + '  (' + pct + '%)');
     console.log('  nooit aangeraakt           : ' + ongeraakt.length);

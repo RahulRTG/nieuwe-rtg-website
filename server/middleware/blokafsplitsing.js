@@ -56,22 +56,23 @@ const GOED_PAGINA = /^\/(?!\/)[A-Za-z0-9_\-/.]+\.html$/;
 const vinger = (tekst) => crypto.createHash('sha1').update(tekst).digest('base64url').slice(0, 12);
 
 /* Deze controle staat er twee keer, en dat is met opzet -- lees dit voordat je
-   hem "opruimt" tot een gedeelde hulpfunctie.
+   hem "opruimt" tot een enkele gedeelde hulpfunctie.
 
    Bij de uitlevering hieronder gaat het paginapad de padexpressie in
    (path.join). De invoer komt uit een QUERYPARAMETER, base64url-gedecodeerd, en
    is dus volledig door de aanvrager te bepalen -- anders dan req.path, dat de
-   routelaag al genormaliseerd heeft. De controle die dat afvangt moet dan ook
-   VLAK VOOR die padexpressie staan.
+   routelaag al genormaliseerd heeft. Een controle die zo'n pad afvangt hoort
+   VLAK VOOR die padexpressie te staan en niet een functie verderop: dat is waar
+   een lezer hem zoekt, en het is ook de vorm die ../web/bestanden.js en
+   ./compressie.js hier al aanhouden.
 
-   Toen hij hier eenmalig als goedePagina() stond, sloeg js/path-injection aan
-   op precies dat pad. Niet omdat de bescherming ontbrak, maar omdat de analyse
-   een sanitizer niet over een functiegrens volgt -- exact het gedrag dat in
-   .github/codeql/codeql-config.yml al beschreven staat bij eigenVeld(). Daar is
-   het opgelost met een uitzondering omdat de helper daar echt gedeeld MOET
-   zijn; hier hoeft dat niet, dus hier hoort geen uitzondering maar de controle
-   op zijn plek. Een uitzondering die je niet nodig hebt, verzwakt de query voor
-   het geval dat je hem later wel nodig had. */
+   (De ene keer dat ik dacht dat een scanner hierover klaagde, klopte dat niet;
+   die melding ging over de sluittag-regex in ./scriptafsplitsing.js. De reden
+   dat de controle inline staat is dus niet een scanner maar de leesbaarheid en
+   de gelijkvormigheid met de twee lagen ernaast.)
+
+   De helper hieronder blijft bestaan voor de PAGINA-kant, waar geen bestand
+   wordt geopend en er dus niets naast een padexpressie hoeft te staan. */
 const goedePagina = (p) => GOED_PAGINA.test(p) && p.indexOf('..') === -1;
 
 /* ---------------------------------------------------------------------------

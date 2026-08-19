@@ -53,8 +53,23 @@ const PAD = '/scriptblok.js';
 
 /* Alleen een KAAL blok: geen src (dan is het al een bestand), en geen type,
    defer, async of wat dan ook. Een type="module" of een importmap heeft ander
-   gedrag dat een gewone <script src> niet nadoet. */
-const SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script>/i;
+   gedrag dat een gewone <script src> niet nadoet.
+
+   DE SLUITTAG IS RUIMER DAN </script>, EN DAT IS GEEN DETAIL. Hier stond
+   `<\/script>` en dat is te streng: de HTML-ontleder beeindigt een script ook
+   op `</script >` en zelfs op `</script foo>` -- witruimte en attributen in een
+   sluittag zijn een ontleedfout die elke browser gewoon negeert.
+
+   Wat er dan misging is erger dan een gemist blok. De luie `[\s\S]*?` liep door
+   tot de VOLGENDE `</script>`, dus het "blok" liep van het ene script tot het
+   sluiten van een volgend script -- inclusief alle HTML ertussen. Die HTML
+   verdween daarmee uit de pagina EN werd als JavaScript uitgeleverd. Gemeten op
+   een nagemaakte pagina: een <main> met een kop ertussen was weg, en het
+   uitgeleverde .js-bestand bevatte markup.
+
+   CodeQL wees hier ook op (js/bad-html-filtering-regexp). ../middleware/versieadres.js
+   had het al goed (`<\/\2\s*>`); dit bestand niet. */
+const SCRIPT = /<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/i;
 
 function magVerhuizen(js) {
   if (/document\s*\.\s*write/.test(js)) return false;

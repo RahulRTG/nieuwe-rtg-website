@@ -102,7 +102,11 @@ const PAD = '/stijlblok.css';
    hangt gedrag aan het blok, en dat kun je niet naar een los blad verplaatsen
    zonder het te veranderen -- <link> kent dat gedrag anders. Zelfde strengheid
    als de rij-controle in ./stijlbundel-rij.js. */
-const STYLE = /<style\b([^>]*)>([\s\S]*?)<\/style>/i;
+/* Zelfde ruimere sluittag als bij ./scriptafsplitsing.js, en om dezelfde
+   reden: `</style >` beeindigt een stijlblok ook. Stond hij te streng, dan liep
+   het blok door tot het sluiten van een VOLGEND stijlblok en verdween de HTML
+   ertussen uit de pagina. Zie de uitleg daar. */
+const STYLE = /<style\b([^>]*)>([\s\S]*?)<\/style\b[^>]*>/i;
 
 /* Twee dingen die bij verhuizing stuk zouden gaan, allebei beschreven in
    ./stijlbundel.js:

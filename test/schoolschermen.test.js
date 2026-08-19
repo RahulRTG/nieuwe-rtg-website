@@ -338,3 +338,28 @@ test('het dagplan staat op drie schermen, zonder teller en zonder tijdsdruk', ()
   assert.ok(rtgschool.includes('id="dagLijst"') && leerpaspoort.includes('id="dagLijst"'));
   assert.ok(school.includes('school-dag.js'), 'School laadt school-dag.js niet');
 });
+
+test('de werkbank draagt een lijst in drie bakken en rondt niets vanzelf af', () => {
+  const bron = lees('apps', 'schoolpartner', 'aandacht.js');
+  const code = codeVan(bron);
+
+  assert.match(code, /\/school\/aandacht/);
+  assert.match(code, /\/school\/les\/concept/);
+  assert.match(code, /\/school\/les\/rond-af/);
+  // Teaching Memory staat er VOOR het afronden, want dan heeft het nut
+  assert.match(code, /\/school\/les\/geheugen/);
+  assert.match(code, /Wat we van deze stof weten/);
+  for (const bak of ['nu', 'vandaag', 'kanWachten'])
+    assert.match(code, new RegExp("'" + bak + "'"), 'de bak ' + bak + ' staat niet op het scherm');
+
+  // afronden gaat met bevestiging en met een naam, net als bij een rapport
+  assert.match(code, /bevestigd: true/);
+  assert.match(code, /zonder eigenaar is van niemand/i, 'het scherm laat afronden zonder naam toe');
+
+  /* Geen teller over de tijd heen: werkdruk is hulp en geen beoordeling, dus
+     er hoort geen doorlooptijd of "opgelost binnen" op dit scherm te staan. */
+  assert.doesNotMatch(code, /doorlooptijd|binnen \d|opgelost|streak|score/i, 'er sluipt een prestatiemeter in de werklijst');
+
+  assert.ok(partner.includes('/apps/schoolpartner/aandacht.js'), 'School Partner laadt aandacht.js niet');
+  assert.ok(partner.includes('id="aandachtVorm"') && partner.includes('id="lesVorm"'));
+});

@@ -55,6 +55,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Memory Engine | herhaalmoment per behaald doel; drie vragen, reeks 2/7/21/60/180 dagen | `kern/onderwijs-geheugen.js`, `kern/leerstof-herhalen.js` |
 | Misconception Graph | 18 denkpatronen uit het feit van de opgave; klasbeeld zonder wie | `kern/leerstof-denkfout.js`, `school/denkfout.js` |
 | Daily Learning Guarantee | dagplan uit huiswerk, herhalingen en leerlijn; vijf stukken, niets bewaard | `kern/leerstof-dag.js`, `school/dag.js` |
+| Attention OS en Teacher Flow | een lijst in drie bakken, les afronden in een handeling, lesgeheugen | `school/aandacht.js`, `school/les.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
@@ -351,6 +352,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een ingeschreven leerling weet elke dag wat er klaarstaat | dagplan levert minstens een stuk zolang er iets open is | **ja** (`test/dagplan.test.js`) |
 | Een dagplan telt nooit over dagen heen | de module krijgt geen db en geen save | **ja**, met mutatie beproefd |
 | Een dagplan is hoogstens vijf stukken | harde bovengrens in de toets, niet de constante zelf | **ja**, met mutatie beproefd |
+| De werklijst van een leraar noemt geen kind | geen naam, geen sleutel, geen tekst van een melding | **ja**, met mutatie beproefd |
+| Niemands tempo wordt gemeten | de aandachtslijst schrijft niets weg | **ja** (`test/teacherflow.test.js`) |
+| Een les rondt zichzelf niet af | bevestiging en naam verplicht, anders 400 | **ja**, met mutatie beproefd |
+| Een lesverslag draagt alleen de telling | vaste lijst velden, op de opslag getoetst | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -399,6 +404,11 @@ Daaraan vast twee dingen:
 
 ## 9. Teacher Flow -- bijna geen administratie tijdens een les
 
+> **Gebouwd op 19 augustus 2026.** Het Attention OS (een lijst in drie bakken),
+> de les afronden in een handeling, en het lesgeheugen dat terugkomt bij
+> dezelfde leerstof. Substitute Teacher Mode en New Teacher Autopilot staan er
+> nog niet.
+
 Doelstelling, hard: **een docent voert tijdens een normale les vrijwel niets in.**
 De les opent zichzelf, de klas staat aanwezig, hij tikt alleen de afwijkingen.
 Leerdoelen en oefeningen staan klaar, werk stroomt binnen, foutpatronen worden
@@ -422,6 +432,45 @@ Daaromheen:
   vijfhonderd. De rest komt als hij eraan toe is.
 - **Attention OS.** Eén lijst per dag: nu / voor het eind van de dag / kan
   wachten. Geen 57 meldingen uit vijf hoeken van hetzelfde systeem.
+
+### Wat er van deze paragraaf staat, en onder welke grenzen
+
+**De indeling komt uit een regel en niet uit een gevoel.** Wat in *nu* staat,
+staat daar omdat een kind de hulplijn heeft gebruikt en zei dat het niet kan
+wachten, of omdat de klas vandaag nog niet is afgetekend. Niet omdat iets rood
+mag kleuren.
+
+**Eén regel per soort, met het aantal erbij.** Twaalf niet-becijferde toetsen
+zijn één taak en geen twaalf taken. Dat is het verschil tussen een lijst en een
+inbox.
+
+**Er staat niets over een kind in.** Een regel zegt wát er wacht en hoevéél, en
+wijst naar het scherm waar het hoort -- geen namen, geen tekst van een melding.
+Een aandachtslijst die de noodkreet van een kind citeert, wordt gelezen door
+iedereen die over een schouder meekijkt. De hulpvraag zelf staat achter de knop,
+op het scherm dat ervoor is.
+
+**Er wordt niets bewaard.** `school/aandacht.js` schrijft niet; de lijst wordt
+telkens uitgerekend. Er is dus geen geschiedenis van hoe snel een leraar zijn
+lijst leegwerkt, en die kan er later ook niet stilletjes bij komen -- grens 8:
+werkdruk is hulp, geen beoordeling.
+
+**Het afronden is één handeling, door een mens.** Het concept komt uit wat er
+vandaag toch al gebeurde: de presentie, de leerdoelen die aan de orde waren, de
+denkpatronen van vandaag. Zonder bevestiging én een naam gebeurt er niets --
+dezelfde regel als bij het rapport.
+
+**Een lesverslag gaat over de les en niet over kinderen.** Van de presentie gaat
+alleen de *telling* mee; er komt geen leerlingsleutel en geen naam in. Wie er
+was, staat in de presentielijst en hoort niet in een verslag dat jaren blijft
+liggen. De vorm van dat verslag staat als lijst velden in de code en wordt op de
+**opslag** getoetst, niet op wat een scherm ervan terugkrijgt.
+
+**Teaching Memory staat vóór het afronden, niet erna.** Wie deze stof gaat
+geven, ziet wat eerdere lessen erover hebben opgeschreven -- wat werkte, waar
+het vastliep, door wie en wanneer. Daar heb je iets aan vóór de les, niet na
+afloop. En het staat op de school en niet in een kladblok dat vertrekt als de
+docent vertrekt: dat is het punt van Institutional Memory.
 
 ---
 
@@ -576,7 +625,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 5. **Daily Learning Guarantee.** Gedaan: het dagplan dat uit 1 t/m 4 volgt --
    huiswerk vooraan, dan wat terugkomt, dan waar je gebleven bent; begrensd op
    vijf en met niets dat over dagen heen telt (zie §5b).
-6. **Teacher Flow en Attention OS.** Administratie als bijproduct.
+6. **Teacher Flow en Attention OS.** Gedaan: de lijst in drie bakken, de les
+   afronden in een handeling, en het lesgeheugen (zie §9). Substitute Teacher
+   Mode en New Teacher Autopilot staan nog open.
 7. **Taallaag en Family Bridge.** Meaning preservation vóór massale uitrol.
 8. **No-Lost-Child opvolgbewaking.**
 9. **Assessment Compiler, Fairness Engine, Fingerprint.**

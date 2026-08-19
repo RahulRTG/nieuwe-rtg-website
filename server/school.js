@@ -157,4 +157,10 @@ module.exports = (ctx) => {
   require('./school/koppelingen')(sctx); // integraties, webhooks, export
   Object.assign(sctx, require('./school/ouderportaal')(sctx)); // toestemming en afspraken
   require('./school/ouderportaal-mijn')(sctx); // het ene overzicht van het gezin
+
+  /* Teacher Flow. Deze twee staan met opzet ONDERAAN: ze kijken over de andere
+     lagen heen (presentie, toetsen, huiswerk, rapporten, denkpatronen) en
+     hebben dus nodig wat die lagen aan sctx hebben toegevoegd. */
+  require('./school/aandacht')(sctx); // Attention OS: een lijst per dag, in drie bakken
+  require('./school/les')(sctx); // de les afronden in een handeling, en het lesgeheugen
 };

@@ -61,6 +61,7 @@
     if (window.SPart.verlof) window.SPart.verlof();
     if (window.SPart.bewijs) window.SPart.bewijs();
     if (window.SPart.denkfout) window.SPart.denkfout();
+    if (window.SPart.aandacht) window.SPart.aandacht();
     if (window.SPart.hulplijn) window.SPart.hulplijn();
     if (window.SPart.excursie) window.SPart.excursie(KLAS);
     if (!BIEB) kl('/school/toets/bibliotheek').then(function (r) {

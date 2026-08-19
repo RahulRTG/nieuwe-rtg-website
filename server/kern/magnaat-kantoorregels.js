@@ -62,7 +62,12 @@ const REGELS = [
 
   /* Platform, onderzoek en creatie. */
   [/asset|site|auth|webauthn|rtgid|verify|sleutel|passkeys|\/sso|\/account|\/bestanden|\/agenda|\/kantoorpakket|\/werkplek|\/browser|\/code\b|\/scanner|\/veilig\.html|\/rtgcode|\/table\.html|\/state\b|\/klok/, 'intern', 'Intern & IT'],
-  [/\/rtgone|\/comm\b|\/gegevens|\/notifications|\/meldingen|\/push|\/stream|\/vertaal|\/translate|\/talen|\/nav\b|\/mail\b/, 'integraties', 'Integratiekamer'],
+  /* `/plaats` staat bij zijn naaste buur `/nav`: de plaatslaag (PLAATS.md) is
+     net als navigatie, comm en push een gedeelde platformvoorziening waar
+     andere domeinen op leunen -- de prikklok, de arrival-pass en de voorspeller
+     vragen hem alle drie iets. Hij hoort dus in de Integratiekamer en niet bij
+     een van zijn afnemers. */
+  [/\/rtgone|\/comm\b|\/gegevens|\/notifications|\/meldingen|\/push|\/stream|\/vertaal|\/translate|\/talen|\/nav\b|\/plaats\b|\/mail\b/, 'integraties', 'Integratiekamer'],
   [/foundation|rtf|labfonds|\/lab\b|\/onderzoek|\/onderwijs|\/leerstof|\/leren|\/meet\b|\/metrics|\/voorspel|\/projectie|\/sonde|\/sat\b/, 'onderzoek', 'Onderzoek & data'],
   [/podium|theater|clips|flits|creatief|\/mediaos|\/muziek|\/sport|\/avond|\/uitgaan|\/boeken|\/galerij/, 'creatief', 'Creatief'],
 

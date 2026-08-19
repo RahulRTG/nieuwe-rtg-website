@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3995 |
-| servermodules (`server/**/*.js`) | 2186 |
-| routebestanden (`server/routes/**`) | 455 |
+| servermodules (`server/**/*.js`) | 2187 |
+| routebestanden (`server/routes/**`) | 456 |
 | kernmodules (`server/kern/**`) | 1341 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 222 |
-| toetsbestanden (`test/*.test.js`) | 897 |
+| toetsbestanden (`test/*.test.js`) | 898 |
 | schermtoetsen (`test/*.e2e.js`) | 127 |
 
 ## 2. De weg van een verzoek
@@ -97,7 +97,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 192 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -105,7 +105,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 | `member` | 641 | 57 | 10 | 398 |
 | `supplier` | 562 | 102 | 10 | 295 |
 | `office` | 40 | 7 | 5 | 64 |
-| `staff` | 26 | 7 | 1 | 40 |
+| `staff` | 26 | 8 | 1 | 42 |
 | `social` | 71 | 9 | 39 | 60 |
 | `techniek` | 57 | 14 | 1 | 51 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
@@ -125,8 +125,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1414 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 191 |
-| daarvan door precies één domein | 1223 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 192 |
+| daarvan door precies één domein | 1222 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -139,7 +139,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(170) auth(104) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(26)
-accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
+accounts(23) schoon(20) managerOnly(16) codenaamVan(16) rtf(15) save(14)
 boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) findSupplier(10)
 express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8)
 noteFailedTry(7) kern(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6) talen(6)
@@ -156,8 +156,8 @@ loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
+| 38 | `server/routes/staff.js` |
 | 36 | `server/routes/auth.js` |
-| 36 | `server/routes/staff.js` |
 | 35 | `server/routes/auth/account.js` |
 | 34 | `server/routes/auth/herstel.js` |
 

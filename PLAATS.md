@@ -197,11 +197,44 @@ Waar een functie hiermee botst, vervalt de functie.
 
 | Fase | Wat | Status |
 |---|---|---|
-| **1** | De laag: hekken, waarnemingen, vensters, actielog, bewaarbeleid, en de hek-motor op het toestel (`shared/plaats.js`) | in aanbouw |
-| **2** | Aanwezigheid: prikklok, patrouille, dispatch-SLA, bezorgvolg en werkorder-nabijheid op één motor | open |
+| **1** | De laag: hekken, waarnemingen, vensters, actielog, bewaarbeleid, en de hek-motor op het toestel (`shared/plaats.js`) | **af** |
+| **2a** | Aanwezigheid, de motor + de eerste klant: `plaatsBijZaak()` met drie uitkomsten, stabiele hek-id's op zaakcode, en de prikklok (`/api/staff/clock`) die de bevestiging vastlegt | **af** |
+| **2b** | Eigen hekken: een zaak tekent haar eigen terrein. Dat ontsluit de posten van een beveiligingsteam, de depots van dispatch, de bezorgketen en werkorder-nabijheid — alle vier hangen daarop | open |
+| **2c** | De aanzet vanaf het toestel: een lopende dienst hoort zelf een `dienst`-venster te openen in de app van het lid | open |
 | **3** | Plaats als bron voor `kern/voorspel/`, met de regel in het algoritmeregister erbij | open |
 | **4** | Nadering: arrival, mall, hoteldorp, avond/plan — klaarzetten vóór aankomst | open |
 
 De volgorde is niet vrij. Fase 2, 3 en 4 bouwen alle drie op fase 1; ze eerder
 beginnen levert de vijfde positie-opslag op, en dan is dit document een verhaal
 in plaats van een ontwerp.
+
+### Wat fase 2a opleverde, en waar het op wacht
+
+**De architectuur is de opbrengst: je telefoon neemt waar, de kassa vraagt.** Het
+toestel draait de hek-motor onder het eigen LEDENaccount van de medewerker
+(codenaam); de prikklok draait op een ZAAK-inlog en stelt alleen een vraag. De
+twee sessies raken elkaar nooit en er gaat geen coördinaat over de lijn. Wat de
+werkgever ziet is binnen of buiten met een tijd — grens 4, afgedwongen door
+`plaatsBijZaak()` als enige ingang.
+
+**Drie uitkomsten, nooit twee.** *Bevestigd* (het toestel keek en je stond er),
+*niet bevestigd* (het keek en je stond er niet) en *niet gemeten* (er keek
+niemand: geen venster, geen gekoppeld ledenaccount, of een toestel dat niets
+afgaf). Die laatste twee samenvoegen maakt van elke ongemeten inklok een
+verdachte inklok, en dan is dit geen aanwezigheidslaag meer maar een
+beschuldigingslaag. `test/plaatsprikklok.test.js` houdt ze uit elkaar.
+
+**Wat er onderweg wegging.** `kern/beveiliging/pda/patrouille.js` bewaarde bij
+het inklokken de positie van de bewaker op zijn dienst. Niemand las hem ooit:
+`dienstPubliek()` geeft hem niet terug, geen scherm toont hem, geen rapportage
+rekent ermee. Een coördinaat die niemand leest is geen functie maar alleen een
+risico — en juist bij een bewaker, wiens werkgever daarmee precies wist waar hij
+op welk moment stond. Weg, tot fase 2b de hek-bevestiging bij de post kan geven.
+
+**Waar 2b op wacht.** De posten van een beveiligingsteam, de depots van dispatch
+en de werkorders van het weefsel staan niet in de plekken van `kern/navigatie`,
+dus er is voor die vier consumenten nog geen hek. De verleiding is om de
+plaatslaag in elk van die domeinen te laten lezen; dat is precies de tweede
+waarheid die dit ontwerp vermijdt. De uitweg is een registratie: een zaak zet
+haar eigen hek, de plaatslaag houdt het en het domein dat de plek bezit houdt het
+bij. Dat is één API en het ontsluit alle vier tegelijk.

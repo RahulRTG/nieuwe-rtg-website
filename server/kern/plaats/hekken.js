@@ -73,7 +73,12 @@ module.exports = ({ db, weefsel, navPoi }) => {
     for (const laag of lagen) {
       for (const p of (r.lagen[laag] || [])) {
         if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;
-        uit.push({ id: laag + ':' + p.naam, naam: p.naam, bron: 'navigatie',
+        /* Het id draagt de CODE als die er is, en anders de naam. Een zaak heeft
+           een code die niet verandert; een halte of een loket heeft alleen een
+           naam. Een hek-id dat meebeweegt met een hernoeming laat elke lopende
+           waarneming in het niets wijzen -- en juist bij aanwezigheid op het
+           werk is dat het verschil tussen "hij was er" en "onbekend". */
+        uit.push({ id: laag + ':' + (p.code || p.naam), naam: p.naam, bron: 'navigatie',
           soort: 'punt', punten: [{ lat: p.lat, lng: p.lng }], straalM });
       }
     }
@@ -121,5 +126,10 @@ module.exports = ({ db, weefsel, navPoi }) => {
     return r.status === 200 && r.hekken.some(h => h.id === String(id || ''));
   }
 
-  return { DOELEN, DOEL, hekkenVoor, kentHek };
+  /* HET ID VAN EEN ZAAK, OP EEN PLEK. Elk domein dat wil weten of iemand op zijn
+     werk staat, heeft dit id nodig; zou elk domein het zelf samenstellen, dan
+     staat de vorm ervan op vijf plaatsen en verandert hij op vier. */
+  const hekVoorZaak = (code) => 'leverancier:' + String(code || '');
+
+  return { DOELEN, DOEL, hekkenVoor, kentHek, hekVoorZaak };
 };

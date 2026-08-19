@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1024 bestanden en 6803 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1025 bestanden en 6808 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1024 |
-| losse beweringen (`test(...)`) | 6803 |
+| toetsbestanden | 1025 |
+| losse beweringen (`test(...)`) | 6808 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 96 |
+| niets van beide | 97 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-897 bestanden, 6579 beweringen.
+898 bestanden, 6584 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -579,6 +579,7 @@ toets omvalt.
 | `pgwire.test.js` | 6 | gezakt op `+->-#0` | Eigen PostgreSQL-client (server/pgwire.js), die het pakket `pg` verving. De ECHTE end-to-end-borging staat in de *.pg.test.js-integratietests (tegen een draaiende Postgres, met DATABASE_URL). |
 | `pinvergeten.test.js` | 2 | gezakt op `liegpoort /api/` | Pin vergeten: de weg terug die er niet was. WAAROM DEZE TOETS BESTAAT. |
 | `plaats.test.js` | 10 | genoemd | DE PLAATSLAAG (kern/plaats/, zie PLAATS.md). Deze toets bewaakt de belofte die de hele laag draagt: RTG weet wát je nodig hebt zonder te weten wáár je bent geweest. |
+| `plaatsprikklok.test.js` | 5 | -- | AANWEZIGHEID BIJ DE PRIKKLOK -- ZONDER VOLGEN (PLAATS.md fase 2). De architectuur die hier bewezen wordt, is de hele truc: JE TELEFOON NEEMT WAAR, DE KASSA VRAAGT. |
 | `planners.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Planners & Advies: weddings en prive-events (Aurelia), de professionele praktijk (LexNova) en verzekeringsadvies (Segur). Bewaakt de locatie-botsing per dag, de regel dat een dag pas gedraaid is als alle taken... |
 | `podium.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Podium: het eigen live-kanaal. Strikt 18+ met geverifieerd paspoort (makers en kijkers), een kanaal gaat pas open na menselijke goedkeuring door kantoor, kijken/chatten/cadeautjes/abonnementen via RTG Pay, en de... |
 | `podiumhandel.test.js` | 6 | gezakt op `liegpoort /api/` | DE VERKOOPWERELD VAN HET PODIUM -- de kraam naast de uitzending. Zone 'handel' (kern/podium/zones.js) laat een maker productkaarten klaarzetten -- naam, prijs, voorraad -- waar een kijker tijdens de uitzending op... |

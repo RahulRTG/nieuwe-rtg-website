@@ -74,6 +74,16 @@ module.exports = function maakPlaats({ db, save, crypto, weefsel, navPoi }) {
          het enige dat een domein (en dus een werkgever) krijgt -- grens 4 uit
          PLAATS.md. Geen coördinaat, en ook niet hoe ver erbuiten. */
       plaatsAanwezig: (codenaam, doel, hekId) => wrn.aanwezig(codenaam, doel, hekId),
+      /* DE INGANG VOOR DE DOMEINEN, en er is er één. Een prikklok, een
+         patrouille, een dispatch-SLA en een bezorging stellen allemaal dezelfde
+         vraag: stond deze mens op deze plek. Zou elk domein dat zelf uitrekenen,
+         dan staat de vorm van het hek-id op vijf plaatsen en verandert hij op
+         vier -- en dan is "één motor" een tekening en geen eigenschap.
+
+         Drie uitkomsten, nooit twee: bevestigd, niet bevestigd, of niet gemeten.
+         Zie ./waarnemen.js voor waarom die derde er moet zijn. */
+      plaatsBijZaak: (codenaam, zaakcode, doel) =>
+        wrn.bevestig(codenaam, doel || 'dienst', hek.hekVoorZaak(zaakcode)),
       plaatsRuim: () => opslag.ruim()
     }
   };

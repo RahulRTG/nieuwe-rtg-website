@@ -18,13 +18,28 @@ module.exports = (ctx) => {
     const ronde = rondes().find(r => r.supplierCode === s.code && r.guardId === gid && !r.klaar) || null;
     return { diensten: lijst, ronde: ronde ? rondePubliek(s, ronde) : null, walkie: functieAan(s, 'walkie') };
   }
-  function inklok(supplierCode, gid, dienstId, lat, lng) {
+  /* GEEN COORDINAAT MEER OP DE DIENST (PLAATS.md, grens 2: geen plaats zonder
+     doel). Hier stond `if (Number.isFinite(Number(lat))) { d.lat = ...; d.lng =
+     ...; }`: de positie van de bewaker bij het inklokken werd opgeslagen op zijn
+     dienst en bleef daar staan. Niemand las hem ooit -- dienstPubliek() geeft
+     hem niet terug, geen scherm toont hem, geen rapportage rekent ermee. Een
+     coordinaat die niemand leest is geen functie maar alleen een risico, en juist
+     bij een bewaker: dat is een mens wiens werkgever precies weet waar hij op
+     welk moment stond, zonder dat iemand daar iets mee doet.
+
+     Wat er WEL hoort te komen is de hek-bevestiging bij de POST waar de dienst
+     op staat, net als bij de prikklok in routes/staff/dienst.js -- binnen of
+     buiten, met een tijd. Dat wacht op eigen hekken (PLAATS.md fase 2b), want de
+     posten van een beveiligingsteam staan niet in de plekken van kern/navigatie.
+     Tot die er zijn is niets vastleggen beter dan te veel vastleggen.
+
+     De aanroeper (routes/supplier/beveiliging.js) stuurt lat/lng niet meer mee. */
+  function inklok(supplierCode, gid, dienstId) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { status: 404, error: 'Team niet gevonden.' };
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code && x.guardId === gid);
     if (!d) return { status: 404, error: 'Dienst niet gevonden.' };
     if (d.status === 'afgerond') return { status: 409, error: 'Deze dienst is al afgerond.' };
     d.status = 'ingeklokt'; d.inklokAt = nu();
-    if (Number.isFinite(Number(lat))) { d.lat = Number(lat); d.lng = Number(lng); }
     save();
     logActivity(s.code, { name: d.guardNaam || 'Bewaker' }, 'klokte in op ' + ((postVan(s, d.postId) || {}).naam || 'post'));
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });

@@ -83,5 +83,29 @@ module.exports = ({ db, save, opslag, kentHek }) => {
     return { binnen: w.wat === 'binnen', sinds: w.at, bekend: true };
   }
 
-  return { waarneem, stand, aanwezig };
+  /* DE BEVESTIGING: het antwoord dat elk domein krijgt, en het is er ÉÉN.
+
+     Aanwezigheid heeft DRIE uitkomsten en geen twee, en dat verschil is het hele
+     punt. "Niet bevestigd" en "niet gemeten" zijn niet hetzelfde: het eerste
+     betekent dat het toestel keek en je stond er niet, het tweede dat er
+     niemand heeft gekeken -- geen venster, geen gekoppeld account, of een
+     toestel dat niets afgaf. Wie die twee op één hoop gooit, maakt van elke
+     ongemeten inklok een verdachte inklok, en dan is dit geen aanwezigheidslaag
+     meer maar een beschuldigingslaag.
+
+     WAT ER NIET UIT KOMT is een oordeel. Er staat geen score op, geen
+     percentage, geen "vaak buiten het hek". Grens 3 van PLAATS.md: het weefsel
+     vormt geen oordeel over een persoon en plaats verandert daar niets aan. Een
+     domein dat hierop wil handelen, doet dat zelf en zichtbaar. */
+  function bevestig(codenaam, doel, hek) {
+    if (!codenaam) return { bevestigd: false, gemeten: false, sinds: null, reden: 'geen codenaam' };
+    ruim();
+    const venster = vensters().find(x => x.codenaam === codenaam && x.doel === String(doel || '') && open(x));
+    if (!venster) return { bevestigd: false, gemeten: false, sinds: null, reden: 'geen venster' };
+    const a = aanwezig(codenaam, doel, hek);
+    if (!a.bekend) return { bevestigd: false, gemeten: false, sinds: null, reden: 'niets waargenomen' };
+    return { bevestigd: a.binnen, gemeten: true, sinds: a.sinds, reden: null };
+  }
+
+  return { waarneem, stand, aanwezig, bevestig };
 };

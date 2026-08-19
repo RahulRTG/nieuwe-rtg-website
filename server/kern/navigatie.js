@@ -63,7 +63,12 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
       }
       const loc = s.loc || (s.geo && { lat: s.geo.lat, lng: s.geo.lng });
       if (!loc || loc.lat == null) continue;
-      uit.push({ naam: s.name, soort: 'leverancier', laag: 'leverancier', lat: loc.lat, lng: loc.lng, extra: ((db.data.supplierTypes || {})[s.type] || {}).label || s.type });
+      /* De CODE gaat mee, niet alleen de naam. Een naam is wat een zaak zichzelf
+         vandaag noemt; de code is waar de rest van het huis haar aan kent. De
+         plaatslaag maakt hier hek-id's van (kern/plaats/hekken.js), en een hek
+         dat van id verandert omdat iemand zijn zaak hernoemt, laat elke lopende
+         waarneming in het niets wijzen. */
+      uit.push({ naam: s.name, code: s.code, soort: 'leverancier', laag: 'leverancier', lat: loc.lat, lng: loc.lng, extra: ((db.data.supplierTypes || {})[s.type] || {}).label || s.type });
     }
     for (const p of POI.tank) uit.push({ naam: p.naam, soort: 'tankstation', laag: 'tank', lat: p.lat, lng: p.lng });
     for (const p of POI.laad) uit.push({ naam: p.naam, soort: 'laadpaal', laag: 'laad', lat: p.lat, lng: p.lng, extra: p.kw + ' kW' });

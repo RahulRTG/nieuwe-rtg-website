@@ -1,7 +1,7 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht,
+  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht, plaats, codenaamVan,
     // payrollOS gaat door naar staff/dienst.js: een ziekmelding raakt ook de
     // loondoorbetaling. Hij mag ontbreken (een kaal testproces mount de
     // loonlaag niet), dus de aanroepen daar controleren dat.
@@ -24,7 +24,12 @@ module.exports = (kern) => {
        Die tweede stond klaar en werd door niets aangeroepen -- de loonrun wist
        niet dat iemand ziek was. Hij mag ontbreken (een kaal testproces mount de
        payrolllaag niet), dus elke aanroep hieronder checkt dat. */
-    payrollOS };
+    payrollOS,
+    /* De plaatslaag (kern/plaats, PLAATS.md fase 2): de prikklok in
+       ./staff/dienst.js vraagt hem of het toestel van deze mens binnen het hek
+       van de zaak stond. Hij mag ontbreken -- dan is "niet gemeten" het
+       antwoord, en dat is iets anders dan "niet bevestigd". */
+    plaats, codenaamVan };
   require('./staff/collega')(actx);
   require('./staff/dienst')(actx);
   require('./staff/inzetbaarheid')(actx);

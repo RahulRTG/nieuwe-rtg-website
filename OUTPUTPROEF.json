@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-19T17:08:59.178Z",
-  "commit": "ed1d05d",
+  "op": "2026-08-19T17:37:56.452Z",
+  "commit": "c178f6f",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3062,
-  "onbeslist": 979,
-  "blind": 146,
+  "bewezen": 3070,
+  "onbeslist": 969,
+  "blind": 148,
   "ongemeten": 8
  },
  "routes": 4195,
@@ -24230,18 +24230,20 @@
    "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtf/kantoorpakket/uitslag": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/leren/lijst-weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/school/mijn": {
    "staat": "bewezen",
@@ -24252,64 +24254,68 @@
    "reden": "er is over DEZE route gelogen en rtfschool.test.js zakte daarop"
   },
   "POST /api/rtf/school/weg": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/spel/sneek-score": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js",
-    "spelpoort.test.js"
+    "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/spel/sneek-bord": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js",
-    "spelpoort.test.js"
+    "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtf/spel/arcade-score": {
-   "staat": "onbeslist",
+   "staat": "blind",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js",
-    "spelpoort.test.js"
+    "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/rtf/spel/arcade-bord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js",
-    "spelpoort.test.js"
+    "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/geloof/ai": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/apply/chat": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/apply/chat/send": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "rtf-veilig.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 37); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/foundation/gezin/agenda/wijzig": {
    "staat": "bewezen",
@@ -49587,6 +49593,56 @@
    "toets": "rtf-veilig.test.js",
    "merkt": false,
    "op": "2026-08-19T17:08:59.100Z"
+  },
+  "POST /api/rtf/school/weg": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:30.779Z"
+  },
+  "POST /api/rtf/spel/sneek-score": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:30.856Z"
+  },
+  "POST /api/rtf/leren/lijst-weg": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:30.995Z"
+  },
+  "POST /api/rtf/kantoorpakket/uitslag": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:31.151Z"
+  },
+  "POST /api/rtf/spel/arcade-bord": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:43.323Z"
+  },
+  "POST /api/rtf/spel/arcade-score": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:37:43.513Z"
+  },
+  "POST /api/rtf/spel/sneek-bord": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": false,
+   "op": "2026-08-19T17:37:43.606Z"
+  },
+  "POST /api/rtf/geloof/ai": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:43.663Z"
+  },
+  "POST /api/rtf/apply/chat/send": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:56.153Z"
+  },
+  "POST /api/rtf/apply/chat": {
+   "toets": "rtf-veilig.test.js",
+   "merkt": true,
+   "op": "2026-08-19T17:37:56.310Z"
   }
  },
  "basislijn": {

@@ -526,3 +526,23 @@ test('de overdrachtskaart toont "nooit", de restlijst en wat een standaard niet 
   assert.ok(partner.includes('/apps/schoolpartner/overdracht.js'), 'School Partner laadt overdracht.js niet');
   assert.ok(partner.includes('id="overdrachtKaart"') && partner.includes('id="overdrachtPakket"'));
 });
+
+test('de taalvergelijking trekt geen conclusie en bewaart niets', () => {
+  const code = codeVan(lees('apps', 'schoolpartner', 'taalcheck.js'));
+
+  assert.match(code, /\/school\/taalcheck\/start/);
+  assert.match(code, /\/school\/taalcheck\/antwoord/);
+  assert.match(code, /d\.uitkomst\.zin/, 'de uitkomst hoort in woorden op het scherm');
+  assert.match(code, /d\.uitkomst\.watNu/, 'en wat ermee te doen');
+  assert.match(code, /d\.ronde/, 'welke ronde loopt hoort zichtbaar te zijn');
+
+  /* Geen etiket en geen niveau: de server stuurt het niet, en dit scherm
+     verzint het er niet bij. */
+  assert.doesNotMatch(code, /taalniveau|taalachterstand|NT2|score/i, 'er sluipt een etiket in de taalvergelijking');
+
+  // een weigering hoort met de uitleg van de server te komen, niet stil
+  assert.match(code, /r\.body\.error/, 'een weigering wordt niet getoond');
+
+  assert.ok(partner.includes('/apps/schoolpartner/taalcheck.js'), 'School Partner laadt taalcheck.js niet');
+  assert.ok(partner.includes('id="taalcheckVorm"'));
+});

@@ -58,6 +58,7 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | Attention OS en Teacher Flow | een lijst in drie bakken, les afronden in een handeling, lesgeheugen | `school/aandacht.js`, `school/les.js` |
 | Vervanger en nieuwe docent | briefing zonder zorgdossier, waarneming met einddatum, vijf stappen | `school/instap.js`, `school/waarneming.js` |
 | Taallaag en Family Bridge | vakbeleid met een harde regel, terugvertaling met betekeniscontrole, bon | `kern/taalbeleid.js`, `kern/betekenis.js`, `school/taalpoort.js` |
+| Language Independence Test | dezelfde vraag opnieuw gesteld uit het feit; aanwijzing, geen label, niets bewaard | `kern/leerstof-taalvorm.js`, `kern/taalcheck.js`, `school/taalcheck.js` |
 | No-Lost-Child | de keten na de hulplijn, escalatie zonder naam of tekst, twee keuzes na de knop | `kern/opvolging.js`, `school/opvolging.js` |
 | Toets als meetinstrument | keuring vooraf op echte opgaven, spiegel achteraf met een ondergrens van vijf | `kern/toetsbouw.js`, `kern/toetsspiegel.js`, `school/toetskeuring.js` |
 | Belasting | de dag van de leerling over klassen heen, de week van de docent, niets bewaard | `kern/belasting.js`, `school/belasting.js` |
@@ -384,6 +385,10 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een pakket zegt wat er niet in zit | weggelaten-lijst met een reden per gegeven | **ja**, met mutatie beproefd |
 | Ons model groeit niet mee met een koppelvlak | onbekend veld van buiten wordt geweigerd en gemeld | **ja**, met mutatie beproefd |
 | Elke standaard zegt wat hij niet kan | kanNiet-lijst per standaard, ook op het scherm | **ja**, met mutatie beproefd |
+| Een vertaalde opgave houdt hetzelfde antwoord | de vraag wordt opnieuw gesteld uit het feit | **ja** (`test/taalcheck.test.js`) |
+| De taalvergelijking draait niet bij een taalvak | poort uit het taalbeleid, met uitleg | **ja**, met mutatie beproefd |
+| Bij dezelfde zin trekt de test zich terug | een kale som heeft geen taal om over te struikelen | **ja**, met mutatie beproefd |
+| Er komt geen etiket uit | woord "lijkt", geen niveau, niets opgeslagen | **ja**, met mutatie beproefd |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -467,13 +472,36 @@ genoeg: dan zegt de docent apart dat hij het gezien heeft. En is er geen
 vertaling te maken, dan gebeurt er niets stils: het bericht gaat niet "maar toch
 even" in het Nederlands de deur uit.
 
-**De Language Independence Test staat er nog niet, en dat is een keuze.** Hij
-vraagt om dezelfde conceptuele vraag in een tweede taal, en de opgaven komen
-hier uit generatoren die Nederlandse zinnen bouwen. Een vraag half vertalen
-levert een andere vraag op, en dan meet de test iets anders dan hij belooft. Wat
-er eerst moet komen is een taalvorm voor de opgavesjablonen zelf; tot die er is,
-zou de uitkomst een aanwijzing zijn die op niets stoelt -- en juist bij deze
-functie is dat gevaarlijk, want ze gaat over hoe je naar een kind kijkt.
+**De Language Independence Test, gebouwd op 19 augustus 2026.** Hij vraagt om
+dezelfde conceptuele vraag in een tweede taal, en dat kan niet met een vertaler:
+een half vertaalde som is een andere som. Het kan wel met het **feit** dat een
+opgave sinds §5 al draagt -- de bouwstenen waaruit hij is gemaakt. Daaruit wordt
+de vraag in de andere taal **opnieuw gesteld**, en het antwoord verandert niet,
+want dat volgt uit de bouwstenen en niet uit de zin.
+
+Drie vragen in het Nederlands, dezelfde drie opnieuw gesteld in de thuistaal.
+Gaat het dan wel goed, dan luidt de uitkomst: *"in de eigen taal ging het beter;
+taalondersteuning lijkt hier relevanter dan extra instructie op de stof zelf."*
+
+**En daar houdt het op.** Het is een aanwijzing voor een gesprek: een zin met
+"lijkt" erin, zonder taalniveau, zonder score en zonder etiket. Er wordt niets
+opgeslagen -- `kern/taalcheck.js` en `school/taalcheck.js` schrijven niet -- want
+wat je niet kunt bewaren, kan later niet aan een kind blijven plakken. Bij een
+taalvak draait de test niet: daar zou hij de meting weghalen.
+
+**En er is een geval waarin hij zich terugtrekt terwijl het technisch wél kan:
+als de vraag in beide talen dezelfde is.** "7 x 7 =" heeft geen taal, dus een
+kind dat daarop struikelt struikelt niet over de zin. De vergelijking zou dan
+twee keer hetzelfde meten en er tóch een conclusie uit trekken -- precies de
+schijnzekerheid waar deze paragraaf tegen bedoeld is. Dat maakt de test smal:
+hij werkt bij opgaven die iets vertellen (procenten, eenheden, afronden,
+temperatuur, delen met rest) en niet bij kale sommen. Acht leerdoelen, gemeten,
+en dat aantal groeit met elke opgavevorm die een zin heeft.
+
+**Nederlands en Engels zijn nagelopen; andere talen niet.** Voor een taal die er
+niet staat komt er null uit en geen half werk. Die horen erbij te komen met
+iemand die ze spreekt, niet met een gok -- dezelfde regel als bij de leerlijnen:
+liever een lege plek dan een lege belofte.
   De docent corrigeert vóór verzending. Een vertaal-API zonder terugblik is bij
   leerplicht en zorg te gevaarlijk.
 - **Family Bridge.** Een ouder die geen Nederlands spreekt moet vanaf dag één
@@ -866,10 +894,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 6. **Teacher Flow en Attention OS.** Gedaan: de lijst in drie bakken, de les
    afronden in een handeling, het lesgeheugen, en de instap van de vervanger en
    de nieuwe docent (zie §9).
-7. **Taallaag en Family Bridge.** Gedaan: het vakbeleid met de harde regel en
-   de poort naar het gezin met terugvertaling, betekeniscontrole en bon (zie
-   §8). De Language Independence Test staat bewust nog open: die vraagt eerst
-   om een taalvorm voor de opgavesjablonen.
+7. **Taallaag en Family Bridge.** Gedaan: het vakbeleid met de harde regel, de
+   poort naar het gezin met terugvertaling, betekeniscontrole en bon, en de
+   Language Independence Test -- dezelfde vraag opnieuw gesteld uit het feit
+   (zie §8).
 8. **No-Lost-Child opvolgbewaking.** Gedaan: de keten van gevraagd tot
    afgerond, de escalatie naar de directie zonder naam of tekst, en de twee
    keuzes van het kind na de knop (zie §12).

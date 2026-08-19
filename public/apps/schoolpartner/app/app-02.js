@@ -64,6 +64,7 @@
     if (window.SPart.aandacht) window.SPart.aandacht();
     if (window.SPart.instap) window.SPart.instap();
     if (window.SPart.taal) window.SPart.taal();
+    if (window.SPart.taalcheck) window.SPart.taalcheck();
     if (window.SPart.opvolging) window.SPart.opvolging();
     if (window.SPart.toetskeuring) window.SPart.toetskeuring();
     if (window.SPart.belasting) window.SPart.belasting();

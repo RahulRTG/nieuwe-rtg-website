@@ -93,7 +93,9 @@ const GEN = {
   metriek() {
     const C = [['1 meter', '100', 'centimeter'], ['1 kilometer', '1000', 'meter'], ['1 liter', '10', 'deciliter'], ['1 kilogram', '1000', 'gram'], ['1 centimeter', '10', 'millimeter']];
     const [van, a, naar] = kies(C);
-    return { v: van + ' = hoeveel ' + naar + '?', a, feit: { soort: 'metriek', factor: Number(a) } };
+    /* van/naar reizen mee in het feit, zodat dezelfde vraag ook in een andere
+       taal te stellen is (kern/leerstof-taalvorm.js). */
+    return { v: van + ' = hoeveel ' + naar + '?', a, feit: { soort: 'metriek', factor: Number(a), van, naar } };
   },
   letter(g) { const w = kies(g.woorden); return { v: 'Met welke letter begint "' + w + '"?', a: w[0] }; },
   rijm(g) {

@@ -121,4 +121,5 @@ module.exports = (ctx) => {
   require('./school/toetskeuring')(sctx); // de toets als meetinstrument: keuring vooraf, spiegel achteraf
   require('./school/belasting')(sctx); // de donderdag van de leerling en de week van de docent
   require('./school/overdracht')(sctx); // Transition Continuity en de adapters: wat gaat mee, en in welke vorm
+  require('./school/taalcheck')(sctx); // Language Independence Test: dezelfde vraag opnieuw gesteld in de thuistaal
 };

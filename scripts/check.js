@@ -430,7 +430,12 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
-    'server/kern/pay/index.js',
+    /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
+       eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
+       zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
+       beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
+       WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
+       zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
     /* RTMAIL bevat de bestaande mailboxroutes plus de nieuwe Smart Action Dock.
        De workflowroutes krijgen in een volgende onderhoudssnede een eigen
        router; tot die veilige bedrading blijft dit een zichtbare waarschuwing. */

@@ -29,27 +29,11 @@
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
-  const betalingenUit = process.env.RTG_BETALEN_UIT === '1';
-  const uitFout = () => ({ status: 503,
-    error: 'Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.', code: 'betalingen-uit' });
-
-  // Schaduw-modus: spiegelt elke boeking naar de Rust-motor (RTG_MOTOR_SHADOW).
-  // Uit = een no-op; JS blijft altijd de baas.
-  const schaduw = require('./schaduw')();
-
-  // CUTOVER-modus (RTG_MOTOR_GELD=motor): de Rust-motor wordt het ENIGE
-  // autoritatieve grootboek. Standaard uit -> geldModus 'schaduw' = JS blijft de
-  // baas, exact als voorheen. In 'motor' loopt elke boeking eerst geguard langs
-  // de motor en past de JS-engine daarna dezelfde bevestigde regel toe (spiegel).
-  const motorklant = require('./motorklant')();
-  const geldModus = motorklant.aan ? 'motor' : motorklant.modus;
-
-  const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
-  const MAX_CENTEN = 500000;         // tot 5000 euro per boeking
-  const OPLAAD_MIN = 100;            // opladen vanaf 1 euro
-  const AUTOLAAD_STAP = 1000;        // zelf bijladen in stappen van 10 euro
-  const KASCODE_MS = 5 * 60 * 1000;  // een kassacode leeft vijf minuten
-  const KASCODE_MAX = 50000;         // standaardplafond kassacode: 500 euro
+  /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
+     bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
+     daarna onveranderlijk; alles hieronder werkt per boeking. */
+  const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
+    MIN_CENTEN, MAX_CENTEN, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
 
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
   function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
@@ -121,26 +105,6 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     pasToe(rij);
     return { ok: true, boeking: rij };
   }
-  // de sluitcontrole: som van alle saldi is nul, en niemand staat rood
-  function sluitcontrole() {
-    let som = 0;
-    const rood = [];
-    for (const [rek, c] of Object.entries(saldi())) {
-      som += c;
-      if (!rek.startsWith('extern:') && c < 0) rood.push(rek);
-    }
-    return { klopt: som === 0 && !rood.length, som, rood };
-  }
-
-  // een zachte melding naar het lid (best effort; de app pollt sowieso)
-  function seintje(codenaam) {
-    try {
-      Promise.resolve(keyVanCodenaam(codenaam))
-        .then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'pay' }); })
-        .catch(() => {});
-    } catch (e) {}
-  }
-
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
@@ -149,6 +113,13 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     motorklant, geldModus, keyVanCodenaam,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
+
+  /* Alles wat uit deze laag komt zonder dat er geld beweegt -- de twee vragen
+     aan het grootboek, het seintje naar het lid en de schaduwstand voor het
+     statusbord -- staat in ./kijken.js. Daar komen save noch boek binnen: wie
+     er iets verandert kan per definitie geen geld verplaatsen. */
+  const { sluitcontrole, boekingenVan, seintje, schaduwStand } =
+    require('./kijken')({ saldi, grootboek, keyVanCodenaam, sseToCustomer, schaduw });
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
@@ -159,35 +130,12 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  /* Alleen-lezen: de boekingen van EEN rekening, nieuwste eerst, als kopieen.
-     Toegevoegd voor de geldgraaf (kern/geldgraaf), om dezelfde reden als
-     rekLid hieronder: de vorm van het grootboek is een regel van dit domein,
-     en wie hem elders nableest, leest hem morgen verkeerd (LAT.md regel 4).
-     Kopieen en geen verwijzingen, want wie meekijkt mag het grootboek niet
-     kunnen verbouwen; en een harde cap, want een projectielaag heeft aan de
-     recente geschiedenis genoeg en mag het warme geldpad niet vertragen. */
-  function boekingenVan(rek, tot) {
-    const max = Math.max(1, Math.min(1000, Math.round(Number(tot) || 200)));
-    const uit = [];
-    for (const b of grootboek()) {
-      if (b.van !== rek && b.naar !== rek) continue;
-      uit.push({ id: b.id, van: b.van, naar: b.naar, centen: b.centen, soort: b.soort, oms: b.oms, ref: b.ref, at: b.at });
-      if (uit.length >= max) break;
-    }
-    return uit;
-  }
   /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
   const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
-  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
-  // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
-  // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk
-  // wordt alleen hier berekend (statusbord-poll), niet in het warme geld-pad.
-  // `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
-  const { vingerafdruk } = require('./vingerafdruk');
-  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som, vingerafdruk(saldi())) };
+  api.schaduw = schaduwStand;
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   return { pay: api };

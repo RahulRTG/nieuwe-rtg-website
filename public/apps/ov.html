@@ -295,6 +295,12 @@
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<!-- plek.js VOOR de inline code hieronder: die vraagt via RTGPlek om je
+     positie, maar het script werd nergens geladen. window.RTGPlek was dus
+     altijd undefined en de vraag verscheen nooit -- de app bleef op het
+     demo-startpunt staan en toonde haltes die niets met jou te maken
+     hebben. -->
+<script src="/shared/plek.js" defer></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
@@ -320,8 +326,13 @@
      staan en vraagt hij deze sessie niet opnieuw. */
   let gpsUit = false;
   try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-  if (gpsUit && window.RTGPlek) {
+  /* De toets op window.RTGPlek stond BUITEN deze haak, en deze code draait
+     tijdens het parsen: een defer-script bestaat dan nog niet, dus de toets was
+     altijd onwaar en de haak werd nooit eens gezet. Nu binnen, waar plek.js
+     gegarandeerd geladen is. */
+  if (gpsUit) {
     document.addEventListener('DOMContentLoaded', () => {
+      if (!window.RTGPlek) return;
       RTGPlek.vraag({ waarom: 'Om de haltes en ritten bij jou in de buurt te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
         .then(plek => { if (plek) location.reload(); });
     });

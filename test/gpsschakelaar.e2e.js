@@ -11,7 +11,10 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stop, letOpFouten } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -61,5 +64,158 @@ test('GPS-schakelaar: uit is uit, aan is aan',
   } finally {
     if (browser) await browser.close();
     child.kill();
+  }
+});
+
+
+/* ---------------------------------------------------------------------------
+   TWEE GATEN DIE DE TOETS HIERBOVEN NIET ZAG.
+
+   De toets hierboven meet de POORT: staat de schakelaar op uit, dan blijft de
+   API onaangeraakt. Die kant klopte. Wat hij niet meet, is of de schakelaar
+   ooit OPEN kan. En dat kon hij niet:
+
+   1. `rtg_os_gps` werd door zeven plekken gelezen en door niemand gezet. De
+      tegel in het bedieningspaneel bestond niet, en shared/osmenu.js -- waar
+      elk commentaar naar verwijst -- bestaat evenmin. Voor elk vers profiel
+      stond de schakelaar dus voor altijd op uit.
+   2. flits.html, ov.html en ovdienst.html roepen RTGPlek aan om het in dat
+      geval te VRAGEN, maar geen van drieën laadde /shared/plek.js. window
+      .RTGPlek was er nooit, de vraag verscheen nooit, en alle drie vielen stil
+      terug op "uit is uit". Alleen navigatie.html laadde het script wel.
+
+   Samen: de gps deed het nergens, en niets legde uit waarom. Deze twee toetsen
+   leggen de andere helft van het contract vast -- dat de deur ook opengaat.
+   --------------------------------------------------------------------------- */
+
+const APPS_MET_VRAAG = ['/apps/navigatie.html', '/apps/flits.html', '/apps/ov.html', '/apps/ovdienst.html'];
+
+test('Locatie: de vier apps die een positie nodig hebben, vragen erom',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+
+    for (const app of APPS_MET_VRAAG) {
+      // een vers profiel: de sleutel is er niet, en dat leest als uit
+      await page.goto(base + app, { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => { localStorage.removeItem('rtg_os_gps'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
+      await page.goto(base + app, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(600);
+      const uit = await page.evaluate(() => ({
+        plek: typeof window.RTGPlek,
+        vraag: !!document.querySelector('.rtgplek')
+      }));
+      assert.equal(uit.plek, 'object', app + ' laadt /shared/plek.js niet: window.RTGPlek is ' + uit.plek);
+      assert.ok(uit.vraag, app + ' vraagt niet om je locatie, hij zwijgt erover');
+    }
+
+    assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+  }
+});
+
+/* Een geolocation die ALTIJD lukt, resp. altijd weigert. De tegel hoort het
+   verschil te laten zien: bij een weigering staat er geen "aan" op een
+   schakelaar die niets oplevert. */
+const GPS_STUB = (lukt) => `(function () {
+  const teller = {
+    getCurrentPosition: function (ok, fout) {
+      if (${lukt}) ok({ coords: { latitude: 52.37, longitude: 4.9, accuracy: 10 } });
+      else if (fout) fout({ code: 1, message: 'geweigerd' });
+    },
+    watchPosition: function (ok) { if (${lukt}) ok({ coords: { latitude: 52.37, longitude: 4.9, accuracy: 10 } }); return 1; },
+    clearWatch: function () {}
+  };
+  Object.defineProperty(navigator, 'geolocation', { get: function () { return teller; } });
+})();`;
+
+test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gps-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const reg = await (await fetch(base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Gps Lid', email: 'gps' + process.pid + '@x.nl', phone: '0612345788',
+        password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
+    })).json();
+    assert.ok(reg.token, 'lid-registratie geeft een token');
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const fouten = [];
+
+    // de intake staat anders over de werktafel heen; zie appmenu.e2e.js
+    const open = async (lukt) => {
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
+      await ctx.addInitScript(GPS_STUB(lukt));
+      await ctx.addInitScript((t) => {
+        try {
+          localStorage.setItem('rtg_member_token', t);
+          localStorage.setItem('rtg_lang', 'nl');
+          localStorage.setItem('rtg_cookieinfo_v1', '1');
+          localStorage.removeItem('rtg_os_gps');
+        } catch (e) {}
+      }, reg.token);
+      const page = await ctx.newPage();
+      letOpFouten(page, fouten);
+      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+      // de tegel staat in de HTML maar is pas te zien als het paneel open is
+      await page.waitForSelector('#osCcGps', { state: 'attached', timeout: 15000 });
+      /* Blijven proberen tot het paneel echt opengaat: de knop staat in de HTML,
+         maar zijn luisteraar hangt er pas als app-main geladen is, en een klik
+         die daarvoor valt doet niets. Zodra de scrim open is, klikken we niet
+         meer -- anders zou hij weer dichtgaan. */
+      await page.waitForFunction(() => {
+        const scrim = document.querySelector('#osCcScrim'), knop = document.querySelector('#osCcBtn');
+        if (!scrim || !knop) return false;
+        if (scrim.classList.contains('open')) return true;
+        knop.click();
+        return scrim.classList.contains('open');
+      }, null, { timeout: 20000 });
+      await page.waitForSelector('#osCcGps', { state: 'visible', timeout: 15000 });
+      return page;
+    };
+
+    // het toestel geeft een plek: de tegel gaat aan en blijft aan
+    const p1 = await open(true);
+    assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), null,
+      'een vers profiel hoort geen schakelaar te hebben');
+    await p1.click('#osCcGps');
+    await p1.waitForTimeout(400);
+    assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), '1',
+      'de tegel zette de schakelaar niet aan');
+    assert.ok(await p1.evaluate(() => document.querySelector('#osCcGps').classList.contains('aan')),
+      'de tegel toont niet dat hij aan staat');
+    await p1.click('#osCcGps');                       // en weer uit
+    await p1.waitForTimeout(300);
+    assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), '0',
+      'de tegel kon niet meer uit');
+
+    /* En de andere kant: weigert het toestel, dan mag de tegel niet "aan"
+       blijven staan. Anders belooft het bedieningspaneel iets wat er nooit
+       komt -- precies de stille storing die dit hele geval was. */
+    const p2 = await open(false);
+    await p2.click('#osCcGps');
+    await p2.waitForTimeout(400);
+    assert.equal(await p2.evaluate(() => localStorage.getItem('rtg_os_gps')), '0',
+      'het toestel weigerde, maar de schakelaar bleef aan staan');
+    assert.equal(await p2.evaluate(() => document.querySelector('#osCcGps').classList.contains('aan')), false,
+      'het toestel weigerde, maar de tegel toont "aan"');
+
+    assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

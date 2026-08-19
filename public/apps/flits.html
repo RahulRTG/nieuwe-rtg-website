@@ -109,6 +109,12 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- plek.js VOOR de inline code: gpsStart() hieronder vraagt via RTGPlek om
+     je positie, maar dit script werd nergens geladen. window.RTGPlek was dus
+     altijd undefined, de vraag verscheen nooit en de tak eronder viel terug op
+     "schakelaar uit -> stil overslaan". De snelheidsmeter stond stil en niets
+     legde uit waarom. Defer mag: gpsStart draait op DOMContentLoaded. -->
+<script src="/shared/plek.js" defer></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {

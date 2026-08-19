@@ -44,20 +44,26 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 | schermen | leraar, directie, gezin, campus, bibliotheek | `public/apps/schoolpartner*`, `public/apps/foundation/school*` |
 | dekking | **168 van 168** endpoints vanuit een scherm bereikbaar | `test/schoolschermen.test.js` |
 | rollen en rechten | 15 rollen, recht per handeling, inzagejournaal met verplichte reden | `school/rollen.js` |
-| leerstofmotor | **114 leerdoelen**, 37 opgavengeneratoren, referentieniveaus 1F-4F | `kern/leerstof*.js` |
-| de Fabric | voorkennisgraaf, meerdere uitlegvormen en een eigen meting per doel, gekeurd bij het opstarten | `kern/leerstof.js` |
-| rekenen po (de proef) | **47 doelen** groep 1-8, 43 met voorkennis, **99 uitlegvarianten**, doorlopend tot in het mbo | `kern/leerstof-data/rekenen-g*.js` |
+| leerstofmotor | **127 leerdoelen**, 48 opgavengeneratoren, referentieniveaus 1F-4F | `kern/leerstof*.js` |
+| de Fabric | voorkennisgraaf, meerdere uitlegvormen en een eigen meting per doel, gekeurd bij het opstarten | `kern/leerstof-fabric.js` |
+| rekenen po | **45 doelen** groep 1-8, met voorkennis en 99 uitlegvarianten, doorlopend tot in het mbo | `kern/leerstof-data/rekenen-g*.js` |
+| taal po | **30 doelen** groep 1-8, spelling uit woordbanken met een regel in plaats van vaste woordparen | `kern/leerstof-data/taal-g*.js` |
 | onderwijsladder | 25 fasen po t/m wo, doorstroomkaart, leerpaspoort | `kern/onderwijs-ladder.js` |
 | toetsmotor | verse opgaven per leerling, uitslag per leerdoel, cijfer = advies | `school/toets.js` |
 | toetsen (bewijs) | 100 tests groen over 19 bestanden | `test/school*.test.js` |
 
-En hier is het eerlijke deel: **de motor is er, de brandstof deels.** Rekenen
-po is nu een echte leerlijn -- 47 doelen met hun voorkennis, twee of drie
-uitlegvormen per doel, en een graaf die van "tellen tot 10" doorloopt tot
-"rekenen op de werkvloer" in het mbo. Dat is het bewijs dat de structuur
-draagt, en tegelijk de maat van wat er nog moet: taal, wereldorientatie,
-natuur en het hele voortgezet en vervolgonderwijs staan nog op het oude niveau,
-met voor vo t/m wo samen 167 vaste meerkeuzevragen.
+En hier is het eerlijke deel: **de motor is er, de brandstof voor twee vakken.**
+Rekenen en taal in het po zijn nu echte leerlijnen: samen 75 doelen met hun
+voorkennis, 166 uitlegvarianten, en een graaf die van "tellen tot 10"
+doorloopt tot "rekenen op de werkvloer" in het mbo. Bij taal maakt de motor de
+spelfout bovendien zelf uit de REGEL ('cht' wordt fout 'gt'), zodat een
+woordbank van veertig woorden veertig verse opgaven is in plaats van vijf
+vaste woordparen.
+
+Wat er nog staat op het oude niveau: wereldorientatie (aardrijkskunde 5,
+geschiedenis 5), natuur (5), verkeer (3) en Engels (3) in het po, en het hele
+voortgezet, middelbaar en hoger onderwijs met samen 167 vaste
+meerkeuzevragen.
 
 > **De volgorde van dit document is daarom niet "wat bouwen we erbij" maar "wat
 > moet er onder".** Elk hoofdstuk hierna hangt aan hoofdstuk 2. Zonder die laag
@@ -192,7 +198,8 @@ worden -- door de school, door ons, door een toezichthouder.
 
 | Belofte | Meting | Vandaag |
 |---|---|---|
-| Elke leerling kan elke schooldag elk actief vak oefenen | dekkingsmeter: vakken met minstens één oefenbaar leerdoel per fase | **deels** -- rekenen po wel, de rest nog niet |
+| Elke leerling kan elke schooldag elk actief vak oefenen | dekkingsmeter: vakken met minstens één oefenbaar leerdoel per fase | **deels** -- rekenen en taal po wel, de rest nog niet |
+| Een oefening is nooit na drie keer een geheugenspel | woordbank per spellingregel, minimaal tien woorden | **ja** voor taal po (`test/leerfabric.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
@@ -402,8 +409,9 @@ Er is één juiste eerste stap, en het is niet de spannendste.
 
 1. **De Fabric en de brandstof.** Structuur: gedaan (`vereist`, `uitleg[]`,
    `meting`, plus de keuring die bij het opstarten gooit). Brandstof: rekenen
-   po gedaan als proef; taal, wereldorientatie, natuur en het hele vo/mbo/hbo/wo
-   staan nog open. Zonder die vulling blijft de rest een demo.
+   en taal po gedaan; wereldorientatie, natuur, verkeer en Engels in het po en
+   het hele vo/mbo/hbo/wo staan nog open. Zonder die vulling blijft de rest
+   een demo.
 2. **Proof of Learning.** Bewijs onder elke beheersing, en het scherm dat de
    vraag "waarom denkt RTG dat ik dit kan?" beantwoordt.
 3. **Memory Engine.** Retentiestand per node en de drie herhaalvragen.

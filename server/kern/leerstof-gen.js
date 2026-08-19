@@ -47,7 +47,15 @@ const GEN = {
     const min = g.stap * (1 + r(Math.floor(55 / g.stap)));
     return { v: 'Wat is ' + min + ' minuten na ' + uur + ':00?', a: uur + ':' + String(min).padStart(2, '0') };
   },
-  geld(g) { const prijs = 1 + r(g.max - 1), bet = g.max; return { v: 'Iets kost ' + prijs + ' euro en je betaalt met ' + bet + ' euro. Hoeveel euro krijg je terug?', a: String(bet - prijs) }; },
+  /* Het biljet waarmee je betaalt wisselt mee. Stond hier eerst vast op g.max,
+     en dan is elke opgave "je betaalt met 20 euro" -- dat oefent het aftrekken
+     wel, maar niet het kiezen van een passend biljet. */
+  geld(g) {
+    const BILJETTEN = [5, 10, 20, 50, 100].filter(b => b <= (g.max || 20));
+    const prijs = 1 + r((g.max || 20) - 1);
+    const bet = BILJETTEN.filter(b => b > prijs)[0] || (g.max || 20);
+    return { v: 'Iets kost ' + prijs + ' euro en je betaalt met ' + bet + ' euro. Hoeveel euro krijg je terug?', a: String(bet - prijs) };
+  },
   'breuk-benoem'() {
     const n = kies([2, 3, 4, 5, 6, 8, 10]);
     return { v: 'Een taart is in ' + n + ' gelijke stukken verdeeld en je pakt er een. Welk deel van de taart heb je?', a: '1/' + n, opties: schud(['1/' + n, '1/' + (n + 1), n + '/1']) };
@@ -122,9 +130,12 @@ function gcd(a, b) { return b ? gcd(b, a % b) : a; }
    terecht. Een generator hoort maar op EEN plek te bestaan, en de beller mag
    niet hoeven weten in welk bestand hij staat. */
 const { GEN2, MEERKEUZE2 } = require('./leerstof-gen-meer');
-for (const naam of Object.keys(GEN2)) {
-  if (GEN[naam]) throw new Error('leerstof-gen: de soort "' + naam + '" bestaat twee keer');
-  GEN[naam] = GEN2[naam];
+const { GENT, MEERKEUZE_TAAL } = require('./leerstof-gen-taal');
+for (const reeks of [GEN2, GENT]) {
+  for (const naam of Object.keys(reeks)) {
+    if (GEN[naam]) throw new Error('leerstof-gen: de soort "' + naam + '" bestaat twee keer');
+    GEN[naam] = reeks[naam];
+  }
 }
 
 /* Een opgave voor dit leerdoel; onbekende soorten vallen luid om (test bewaakt dekking). */
@@ -146,6 +157,7 @@ function opgave(gen) {
    elders loopt daar stil op achter. `test/leerstof.test.js` legt hem naast wat
    de generatoren werkelijk doen, dus een soort die van vorm verandert zonder
    deze lijst bij te werken zakt. */
-const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm'].concat(MEERKEUZE2).sort();
+const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm']
+  .concat(MEERKEUZE2, MEERKEUZE_TAAL).sort();
 
 module.exports = { opgave, SOORTEN: Object.keys(GEN), MEERKEUZE };

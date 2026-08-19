@@ -126,28 +126,53 @@ test('de standaardmeting geldt waar een doel er zelf geen heeft', () => {
    oefening maar een leesopdracht. */
 const { opgave, SOORTEN, MEERKEUZE } = require('../server/kern/leerstof-gen');
 
-test('geen enkele generator zet zijn eigen antwoord in de vraag', () => {
+test('geen vaste tekst in een vraag is ooit het antwoord', () => {
+  /* De scherpe versie van "verklap je antwoord niet". Dat een antwoord soms
+     samenvalt met een getal uit de som is geen lek maar rekenen: bij "1 x 7 ="
+     staat de 7 er nu eenmaal. Het echte lek is een VASTE tekst in de vraag die
+     het antwoord kan zijn -- zoals het voorbeeld dat "delen met rest" ooit
+     meegaf ("schrijf als 3 rest 2"), dat bij 17 : 5 letterlijk de oplossing
+     was. Vandaar de meting: staat het antwoord in de vraag EN staat diezelfde
+     tekst in vrijwel elke andere vraag van dit leerdoel, dan hoort hij bij het
+     sjabloon en niet bij de som. */
+  const TREKKINGEN = 150;
   const lek = [];
+  /* Op woordgrens en niet op substring: in "je betaalt met 20 euro" zit de
+     tekst "2", en dat is geen antwoord dat verklapt wordt maar een toevallig
+     stukje van een ander getal. */
+  const staatIn = (vraag, a) => new RegExp('(^|[^0-9A-Za-z,])' +
+    a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^0-9A-Za-z,]|$)').test(vraag);
   for (const d of Object.values(DOELEN)) {
-    /* Meerkeuzevragen noemen hun opties met opzet in de vraag ("meer, minder
-       of evenveel?"); daar IS het antwoord een van de genoemde woorden. De
-       regel geldt voor de vragen waar je zelf een antwoord moet intikken. */
-    if (MEERKEUZE.includes(d.gen.soort)) continue;
-    /* Werkwoordspelling is de ene echte uitzondering: bij "ik ___ (vinden)"
-       staat de stam per definitie in het hele werkwoord. Dat IS de opgave --
-       de stam eruit halen -- en niet een verklapt antwoord. */
-    if (d.gen.soort === 'dt') continue;
-    for (let i = 0; i < 25; i++) {
+    // meerkeuzevragen noemen hun opties met opzet; werkwoordspelling toont het
+    // hele werkwoord waar de stam in zit (zie de toets hieronder)
+    if (MEERKEUZE.includes(d.gen.soort) || d.gen.soort === 'dt') continue;
+    const vragen = [], antwoorden = [];
+    for (let i = 0; i < TREKKINGEN; i++) {
       const o = opgave(d.gen);
-      const a = String(o.a).trim();
-      /* Korte antwoorden (een cijfer, "meer", "1/2") komen vanzelf in een
-         vraagtekst voor -- "Tel de stippen" bevat geen getal, maar
-         "17 : 5" bevat wel de 5. Daarom alleen alarm bij antwoorden van
-         minstens vier tekens die letterlijk in de vraag staan. */
-      if (a.length >= 4 && String(o.v).includes(a)) lek.push(d.id + ': ' + o.v + ' -> ' + a);
+      vragen.push(String(o.v));
+      antwoorden.push(String(o.a).trim());
+    }
+    for (let i = 0; i < TREKKINGEN; i++) {
+      const a = antwoorden[i];
+      if (!a || !staatIn(vragen[i], a)) continue;
+      const vast = vragen.filter(v => staatIn(v, a)).length / TREKKINGEN;
+      if (vast >= 0.9) { lek.push(d.id + ': "' + a + '" staat in ' + Math.round(vast * 100) + '% van de vragen'); break; }
     }
   }
-  assert.deepEqual(lek.slice(0, 3), [], 'deze opgaven verklappen hun eigen antwoord');
+  assert.deepEqual(lek, [], 'deze leerdoelen dragen hun antwoord in de vaste vraagtekst');
+});
+
+test('een opgave die al af is, is geen opgave', () => {
+  /* Afronden gaf ooit getallen die al rond waren ("rond 3300 af op
+     honderdtallen"). Dat is geen makkelijke som maar helemaal geen som, en
+     het antwoord staat er dan bovendien bij. Zelfde soort fout, andere vorm
+     dan hierboven -- vandaar een eigen toets. */
+  for (let i = 0; i < 500; i++) {
+    const o = opgave({ soort: 'afronden', stappen: [10, 100, 1000] });
+    const getal = o.v.match(/\d+/);
+    assert.ok(getal, 'de afrondvraag noemt een getal');
+    assert.notEqual(getal[0], String(o.a), 'dit getal was al afgerond: ' + o.v);
+  }
 });
 
 test('elke generatorsoort maakt een opgave met een vraag en een antwoord', () => {
@@ -160,6 +185,20 @@ test('elke generatorsoort maakt een opgave met een vraag en een antwoord', () =>
     // wie opties teruggeeft, staat op de meerkeuzelijst -- en andersom
     if (o.opties) assert.ok(MEERKEUZE.includes(d.gen.soort), d.gen.soort + ' geeft opties maar staat niet op de meerkeuzelijst');
   }
+});
+
+test('taal draait op regels en niet op vijf vaste woordparen', () => {
+  const taal = Object.values(DOELEN).filter(d => d.vak === 'taal' && d.groep != null);
+  assert.ok(taal.length >= 28, 'de leerlijn taal po telt ' + taal.length + ' doelen');
+  for (let g = 1; g <= 8; g++)
+    assert.ok(taal.filter(d => d.groep === g).length >= 3, 'groep ' + g + ' heeft te weinig taaldoelen');
+  assert.deepEqual(taal.filter(d => !(d.uitleg || []).length).map(d => d.id), [], 'elk taaldoel hoort meer dan een uitleg te hebben');
+
+  /* De spellingdoelen draaien op een woordbank plus een regel; de motor maakt
+     de foute variant zelf. Een bank van vijf woorden is geen bank maar een
+     rijtje, en dat is precies wat deze leerlijn eerst was. */
+  for (const d of taal.filter(x => x.gen.soort === 'spel'))
+    assert.ok(d.gen.woorden.length >= 10, d.id + ' heeft een woordbank van ' + d.gen.woorden.length + ' woorden');
 });
 
 test('rekenen is de proef op de som: een leerlijn met voorkennis en meer dan een uitleg', () => {

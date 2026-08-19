@@ -52,7 +52,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtOpNetstilte } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
@@ -133,10 +133,23 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         let probe = null;
         try {
           await page.goto(base + p, { waitUntil: 'load' });
-          // ruim laten uitlopen: de meeste schermen doen hun eerste api-aanroep
-          // pas na de load, en juist daar sneuvelt er iets. Bij 300ms miste hij
-          // apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
-          await new Promise(r => setTimeout(r, 900));
+          /* LATEN UITPRATEN, niet 900 ms aftellen.
+
+             De meeste schermen doen hun eerste api-aanroep pas NA de load, en
+             juist daar sneuvelt er iets: bij 300 ms miste deze scan
+             apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
+             Het antwoord daarop was 900 ms, en dat is dezelfde gok een maat
+             groter -- onder belasting nog steeds te kort, en 258 keer 900 ms is
+             bijna vier minuten die er meestal niet nodig zijn.
+
+             wachtOpNetstilte wacht op het GEDRAG: zolang het scherm verzoeken
+             blijft afvuren is het bezig, en zodra er 400 ms geen nieuw verzoek
+             meer begint is het uitgepraat. Zie test/helper.js voor waarom dit
+             niet Playwrights networkidle is (de SSE-lijn).
+
+             Gemeten op 19 augustus 2026: de hele scan duurt hierna 63 s. Alleen
+             al de vaste wachten die eruit gingen waren er samen meer dan 230. */
+          await wachtOpNetstilte(page);
           /* NA EEN META-REFRESH MEET JE DE BESTEMMING, NIET DEZE PAGINA.
 
              Drie paden zijn een briefje met `<meta http-equiv="refresh"

@@ -58,7 +58,7 @@ test('Belastingkantoor: de aansluiting toont hetzelfde getal als de zaak zelf zi
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, rijk);
-    await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
 
     await page.click('.tab[data-t="aansl"]');

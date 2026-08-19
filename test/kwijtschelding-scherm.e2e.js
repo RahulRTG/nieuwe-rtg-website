@@ -43,7 +43,7 @@ async function open(pw, base, token, fouten) {
   const page = await (await pw.chromium.launch({ args: ['--no-sandbox'] })).newPage();
   letOpFouten(page, fouten);
   await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, token);
-  await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'load' });
+  await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
   await page.click('.tab[data-t="aan"]');
   await page.waitForSelector('#aanLijst .item', { timeout: 15000 });

@@ -51,7 +51,7 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'zorg', t: Date.now() }));
     }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     /* HIER STOND EEN KLIK OP .cmd-klok. Die knop vouwde de werktafel op en gaf
        de schil terug; hij bestaat niet meer, want het scherm waar hij heen

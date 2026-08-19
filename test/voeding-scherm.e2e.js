@@ -55,7 +55,7 @@ test('Voeding: een plan in je eigen woorden, zonder cijfer en zonder oordeel',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/voeding.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/voeding.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('week');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

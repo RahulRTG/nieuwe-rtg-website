@@ -57,7 +57,7 @@ test('de communicatie-app: de lijst komt op, het gesprek opent in de app en zoek
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, a);
     // via het oude pad, zodat de omleiding meteen meegetoetst is
-    await page.goto(base + '/apps/berichten.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/berichten.html', { waitUntil: 'domcontentloaded' });
     await page.waitForURL(/\/apps\/comm\.html/, { timeout: 10000 });
 
     // 1. de lijst komt op, met het prive-gesprek erin

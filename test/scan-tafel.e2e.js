@@ -50,7 +50,7 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [reg.token]);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
 
     // 4) de eigen QR-onderdelen zijn geladen en scannen is bereikbaar. Sinds
     //    het OS-beginscherm staat scannen in het bedieningspaneel en niet meer

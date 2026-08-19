@@ -63,7 +63,7 @@ test('de drie bureau-PDA\'s komen op, elk met hun eigen bureau, op één werking
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, login.token);
 
-      await page.goto(base + b.pad, { waitUntil: 'load' });
+      await page.goto(base + b.pad, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => {
         const e = document.querySelector('#pLijst');
         return e && !/Laden/.test(e.textContent);

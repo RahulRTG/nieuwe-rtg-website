@@ -52,7 +52,7 @@ test('Training: je eigen schema, en het beweegcijfer dat er echt van komt',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/training.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/training.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('vandaag');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

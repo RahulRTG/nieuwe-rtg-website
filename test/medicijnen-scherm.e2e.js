@@ -48,7 +48,7 @@ test('Medicijnen: uw eigen lijst, en nergens een dosering van RTG',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/medicijnen.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/medicijnen.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('vandaag');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

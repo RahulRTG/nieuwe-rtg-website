@@ -61,7 +61,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, a);
-    await page.goto(base + '/apps/wereld.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
 
     // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
@@ -103,7 +103,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
 
     // 5. het profiel: de lagen staan er, en de zichtbaarheid die je in het
     //    scherm kiest komt ECHT op de server terecht (niet alleen in de select)
-    await page.goto(base + '/apps/wereld.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.click('#profielTab');
     await page.waitForSelector('.laag .veld select', { timeout: 15000 });
@@ -158,7 +158,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, b);
-    await page2.goto(base + '/apps/wereld.html', { waitUntil: 'load' });
+    await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page2.waitForSelector('#werelden button', { timeout: 15000 });
     await page2.click('#ontdekTab');
     await page2.waitForSelector('#zoekform', { timeout: 10000 });

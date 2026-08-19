@@ -51,7 +51,7 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
       localStorage.setItem('rtg_pda_code', code);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); // taalkeuze-modal overslaan
     }, [login.token, 'KIKUNOI']);
-    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
 
     // 3) naar de Hulp-tab; de trainingskaart moet verschijnen
     // het Werk-OS verbergt de tabbar; de Hulp-app opent via het dock
@@ -112,7 +112,7 @@ test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets and
       localStorage.setItem('rtg_pda_code', code);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [login.token, 'KIKUNOI']);
-    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
 
     // uitgeklokt is er geen pauze te nemen: de knop hoort er dan niet te staan
     await page.waitForSelector('#klokBtn', { timeout: 12000 });
@@ -181,7 +181,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
       localStorage.setItem('rtg_pda_code', code);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [login.token, 'KIKUNOI']);
-    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
 
     await page.waitForSelector('#todayWrap [data-aankl]', { timeout: 12000 });
     const tekst = await page.textContent('#todayWrap');

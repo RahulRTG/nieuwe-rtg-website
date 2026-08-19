@@ -47,7 +47,7 @@ test('Gedachtenboek: wat je opschrijft blijft staan, ook op je zwaarste moment',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/gedachten.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/gedachten.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

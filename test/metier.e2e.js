@@ -42,7 +42,7 @@ test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
-    await page.goto(base + '/apps/geld.html#metier', { waitUntil: 'load' });
+    await page.goto(base + '/apps/geld.html#metier', { waitUntil: 'domcontentloaded' });
 
     // 1. de app opent op je eigen profiel, en toont je codenaam -- niet je naam
     await page.waitForSelector('#mtFkop', { timeout: 15000 });

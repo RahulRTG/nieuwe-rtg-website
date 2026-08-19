@@ -46,7 +46,7 @@ test('een lid maakt een lijst en zet er een stuk in',
     const page = await ctx.newPage();
     const fouten = letOpFouten(page, []);
 
-    await page.goto(base + '/apps/media.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/media.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.stuk .t', { timeout: 20000 });
     const eersteTitel = await page.$eval('.stuk .t', e => e.textContent);
     assert.ok(eersteTitel, 'er staat werk in de wereld');

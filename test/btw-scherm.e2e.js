@@ -55,7 +55,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, login.token);
-    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 20000 });
 
     await page.waitForSelector('[data-ksec="fin"]', { state: 'visible', timeout: 15000 });

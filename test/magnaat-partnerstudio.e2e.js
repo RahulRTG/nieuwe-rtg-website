@@ -52,7 +52,7 @@ test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantda
     const fouten = [];
     letOpFouten(page, fouten);
 
-    await page.goto(base + '/apps/magnaat-partnerstudio.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/magnaat-partnerstudio.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#kpis .kpi:nth-child(5)', { timeout: 15000 });
     assert.equal(new URL(page.url()).pathname, '/apps/magnaat-partnerstudio.html',
       'de ingelogde partner blijft in zijn Partnerstudio');

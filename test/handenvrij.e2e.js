@@ -57,7 +57,7 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     await page.route('**/api/onboarding/status', r => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true })
     }));
-    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
     /* De landing is de Command-werktafel, en de balk van Rahul hangt aan <body>
        en niet aan een scherm -- hij werkt daar dus gewoon. Hier stonden twee
@@ -111,12 +111,27 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     assert.equal(tabRaak, 1, 'de plek uit de DOM hoort echt een klik te geven, kreeg ' + tabRaak);
 
     // 6. de vaste bewegingen raken de pagina, niet de server
-    const gescrold = await page.evaluate(() => {
+    await page.evaluate(() => {
       document.body.style.minHeight = '4000px';
       window.scrollTo(0, 0);
       window.Handenvrij.zeg('omlaag');
-      return new Promise(r => setTimeout(() => r(window.scrollY), 700));
     });
+    /* WACHTEN TOT DE SCROLL IS UITGEROLD, niet 700 ms gokken.
+
+       'omlaag' doet scrollBy met behavior:'smooth', en die animatie duurt zo
+       lang als de browser wil. Hier stond een setTimeout van 700 ms die de
+       gemeten waarde pakte waar hij op dat moment stond -- op een trage machine
+       midden in de beweging, of nog op nul. Het teken is de beweging zelf: als
+       scrollY drie opeenvolgende frames gelijk blijft, staat hij stil. Pas dan
+       lezen we hem, en dan zegt `> 50` weer iets. */
+    await page.waitForFunction(() => {
+      const y = window.scrollY;
+      const zelfde = window.__hvVorigeY === y;
+      window.__hvVorigeY = y;
+      window.__hvStilY = zelfde ? (window.__hvStilY || 0) + 1 : 0;
+      return window.__hvStilY >= 3;
+    }, null, { timeout: 10000 });
+    const gescrold = await page.evaluate(() => window.scrollY);
     assert.ok(gescrold > 50, 'omlaag hoort echt te scrollen, kreeg ' + gescrold);
 
     /* 7. het voelt als een gesprek: jouw zin staat er meteen als eigen bubbel,
@@ -151,7 +166,17 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
 
     // gesproken (hardop=true) betaalopdracht, met de standaardinstelling
     await page.evaluate(() => { window.__handenvrijKamer.doe('boek een taxi naar huis', true); });
-    await new Promise(r => setTimeout(r, 900));
+    /* EEN AFWEZIGHEID METEN DOOR OP DE AANWEZIGHEID TE WACHTEN.
+
+       Hier stond `setTimeout(900)` en daarna de telling. Zo'n wacht is de
+       zwakste vorm die er is: je kunt niet wachten op iets dat niet gebeurt, en
+       900 ms zegt alleen "binnen 900 ms was er niets". Maar deze weg heeft wel
+       een ZICHTBAAR eindpunt: de zin wordt klaargezet in de balk. Dat is het
+       laatste wat de code op dit pad doet. Zodra die er staat is het pad
+       afgelopen, en dan is `naarRahul === 0` een uitspraak over een AFGEMAAKTE
+       weg in plaats van over een halve. */
+    await page.waitForFunction(() => /taxi/.test(document.querySelector('.hv-balk input').value),
+      null, { timeout: 10000 });
     assert.equal(naarRahul, 0, 'een gesproken boeking mag Rahul niet eens bereiken');
     const klaarGezet = await page.evaluate(() => document.querySelector('.hv-balk input').value);
     assert.match(klaarGezet, /taxi/, 'de zin hoort klaargezet te staan om zelf te versturen');
@@ -163,7 +188,7 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
 
     // met de mond aan: eerst een bevestiging, en pas daarna gaat het uit
     await page.evaluate(() => { sessionStorage.setItem('rtg_handenvrij_geldmond', '1'); });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     // na het herladen hangt de balk weer weg; roep Rahul opnieuw
     await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 15000 });
     await page.evaluate(() => window.RTGRahul.open());
@@ -177,8 +202,15 @@ test('de muisvrije balk werkt in een echte pagina', { skip: pw ? false : 'geen b
     await page.waitForSelector('.hv-kaart', { state: 'visible', timeout: 5000 });
     assert.equal(naarRahul2, 0, 'ook met de mond aan gaat er eerst niets uit');
     await page.click('.hv-kaart button.ja');
-    await page.waitForFunction(() => window.__hvTeller === undefined || true, { timeout: 1000 }).catch(() => {});
-    await new Promise(r => setTimeout(r, 800));
+    /* WACHTEN OP HET ANTWOORD, niet op 800 ms.
+
+       Hier stonden er twee: een waitForFunction op `undefined || true` (die is
+       altijd meteen waar en meet dus niets) en daarnaast een setTimeout van
+       800 ms. Het teken is het antwoord zelf: onze eigen route vult
+       `{antwoord:'geregeld'}` in, dus zodra die tekst als beurt van Rahul op het
+       scherm staat, IS het verzoek de deur uit geweest. Dan telt de teller. */
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.hv-beurt.hij .hv-bel'))
+      .some(b => /geregeld/.test(b.textContent)), null, { timeout: 15000 });
     assert.equal(naarRahul2, 1, 'pas na de extra bevestiging gaat het door');
 
     // 9. en dit alles zonder onopgevangen JS-fouten

@@ -403,10 +403,17 @@ async function korteStand(page) {
 async function wachtTot(page, fn, arg, opties) {
   const ms = (opties && opties.ms) || WACHT_MS;
   const wat = (opties && opties.wat) || 'de verwachte toestand';
+  /* `polling` gaat door naar Playwright. Standaard kijkt die per ANIMATIEFRAME,
+     en dat is te fijn voor een vraag als "ligt dit stil": twee frames vlak na
+     elkaar kunnen dezelfde afgeronde plaats geven terwijl de overgang nog loopt.
+     Wie op stilstand wacht, geeft hier een tempo mee dat grover is dan de
+     beweging -- en telt meerdere gelijke lezingen. */
+  const polling = opties && opties.polling;
   try {
-    await page.waitForFunction(fn, arg, { timeout: ms });
+    await page.waitForFunction(fn, arg, polling ? { timeout: ms, polling } : { timeout: ms });
   } catch (e) {
-    throw new Error('wachtte ' + ms + 'ms op ' + wat + ', en die kwam niet. ' + (await korteStand(page)));
+    throw new Error('wachtte ' + ms + 'ms op ' + wat + ', en die kwam niet. ' + (await korteStand(page)) +
+      '\n  onderliggend: ' + String((e && e.message) || e).split('\n')[0]);
   }
 }
 
@@ -530,6 +537,48 @@ async function wachtOpRust(page, selector, opties) {
       (await watHieldHemBezig(page)) + ' ' + (await korteStand(page)) +
       '\n  onderliggend: ' + String((e && e.message) || e).split('\n')[0]);
   }
+}
+
+/* WACHTEN TOT DE PAGINA UITGEPRAAT IS -- geen nieuw verzoek meer.
+
+   Dit is de tegenhanger van wachtOpRust voor het geval waarin je NIET weet
+   waarop je wacht: een scan die elk scherm opent en alleen wil weten of er
+   onderweg iets omvalt. Zo'n scan heeft geen enkel teken om op te wachten, want
+   elk scherm heeft een ander teken. Daar stond dan ook jarenlang een vaste
+   `setTimeout(900)`: lang genoeg voor de meeste, en op een trage machine
+   precies te kort voor de schermen waar het om gaat.
+
+   Het teken dat er wel is, is het GEDRAG van de pagina: zolang hij nog verzoeken
+   afvuurt is hij bezig, en zodra er `stilMs` lang geen NIEUW verzoek meer
+   begint, is hij uitgepraat. Dat is een toestand en geen duur -- op een trage
+   machine wacht hij vanzelf langer, en op een snelle is hij eerder klaar dan de
+   900 ms die er stond.
+
+   Waarom "geen nieuw verzoek BEGINT" en niet "geen verzoek meer OPEN"
+   (Playwrights networkidle): de apps houden een SSE-lijn open, en die telt bij
+   networkidle voor altijd mee als lopend verkeer. Dan wacht je bij elk scherm de
+   volle kap uit en is de scan tien keer trager zonder iets extra's te zien.
+
+   `maxMs` is een kap en geen wacht: een pagina die blijft pollen (een tikker die
+   elke seconde iets ophaalt) wordt anders nooit stil. Hij komt dan gewoon terug;
+   de scan doet zijn beweringen daarna. */
+function wachtOpNetstilte(page, opties) {
+  const stilMs = (opties && opties.stilMs) || 400;
+  const maxMs = (opties && opties.maxMs) || 6000;
+  return new Promise((klaar) => {
+    let af = false, stilte = null;
+    const eind = () => {
+      if (af) return;
+      af = true;
+      clearTimeout(stilte); clearTimeout(kap);
+      try { page.off('request', tik); } catch (e) { /* pagina al dicht */ }
+      klaar();
+    };
+    const tik = () => { clearTimeout(stilte); stilte = setTimeout(eind, stilMs); };
+    const kap = setTimeout(eind, maxMs);
+    page.on('request', tik);
+    tik();
+  });
 }
 
 /* Klik, en wacht op het ANTWOORD VAN DE SERVER in plaats van op een geschatte
@@ -688,7 +737,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { vrijePoort, startServer, opstartGeduld, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
-  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, wachtOpNetstilte, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

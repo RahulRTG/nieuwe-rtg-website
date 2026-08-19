@@ -58,7 +58,7 @@ test('Toestemming: de lijst toont wie wat mag, en intrekken raakt de bron',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/toestemming.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/toestemming.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

@@ -54,7 +54,7 @@ test('Doelen: een doel neerzetten, meten, en de datum verzetten',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/doelen.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/doelen.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);

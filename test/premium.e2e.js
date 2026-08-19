@@ -352,7 +352,7 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
     await page.setViewportSize({ width: 390, height: 844 });
     const buiten = [];
     for (const pad of ['/apps/navigatie.html', '/apps/ov.html', '/apps/balans.html', '/apps/home.html']) {
-      await page.goto(base + pad, { waitUntil: 'load' });
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
       // een bron aanmelden zoals een ingelogde app dat doet; zonder bron is er
       // geen knop, en dan meet deze toets niets

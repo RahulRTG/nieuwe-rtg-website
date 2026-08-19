@@ -60,7 +60,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/life.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/life.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -153,7 +153,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       body: JSON.stringify({ onderwerp: 'beweging', waarde: 45 })
     }).then(r => r.json());
     assert.equal(gemeten.bron, 'apparaat');
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && /uw toestel mat/i.test(e.textContent);
@@ -196,7 +196,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     /* En de harde kant ervan: haal hem uit het profiel, en hij is ook van de
        kaart. Bij een kopie zou hij hier blijven staan. */
     await api('zorgprofiel/zet', { allergenen: [], dieet: '', medisch: '', delen: false });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Als u het zelf niet kunt vertellen');
     await page.waitForSelector('#nood .nkaart', { timeout: 10000 });
     const naProfiel = await page.textContent('#nood .nkaart');
@@ -218,7 +218,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
        zonder tijd, en elke regel wijst naar de app die hem bezit -- want hier
        valt niets af te vinken, en dat hoort zichtbaar te zijn. */
     await api('gewoonten/maak', { naam: 'Even buiten', waarom: 'hoofd leeg' });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Uw dag');
     await page.waitForFunction(() => /Metoprolol/.test(document.getElementById('dag').textContent),
       { timeout: 15000 });

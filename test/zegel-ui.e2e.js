@@ -38,6 +38,18 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [reg.token]);
+    /* HIER BLIJFT `load` STAAN, en dat is gemeten en geen verzuim.
+
+       In de ronde van TAKEN.md 4.39 is dit bestand omgezet naar
+       `domcontentloaded`, zoals de dertig andere. Daar zakte hij op vier van de
+       vijf rondes: de bank van de werktafel (`#rtgCommand .cmd-bank`) was er dan
+       binnen de tien seconden van openBank() nog niet. Die bank hangt aan een
+       script achteraan een keten (de taalrail laadt zichzelf bij), en met `load`
+       gaat die tijd VOOR de eerste bewering zitten in plaats van erin.
+
+       Het alternatief -- omzetten en er een ruimere wacht naast leggen -- is een
+       groter venster om een race mee toe te dekken, en dat is precies wat deze
+       ronde overal juist weghaalt. Liever een navigatie-eis die hier klopt. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
     // Sinds het OS-beginscherm zit "Toon je Zegel" in het bedieningspaneel en
     // niet meer als los knopje in de statusbalk; de knop zelf blijft het model.

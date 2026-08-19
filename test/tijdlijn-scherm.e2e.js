@@ -49,7 +49,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
     }, reg.token);
 
     /* 1. leeg is leeg, en zegt dat ook: geen lege lijst zonder uitleg. */
-    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -61,7 +61,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
        zijn herkomst -- zonder dat het hier is ingetikt. */
     await api('doelen/maak', { titel: '10 kilometer hardlopen', reden: 'ik wil het kunnen',
       eenheid: 'km', nulmeting: 2, streef: 10, streefOp: overDagen(60) });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /10 kilometer/.test(document.getElementById('lijst').textContent),
       { timeout: 15000 });
 
@@ -86,7 +86,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
       body: JSON.stringify({ ok: true, vandaag: overDagen(0), maanden: [], aantal: 0, leeg: true,
         uitleg: 'x', storingen: ['De laag Zorg gaf een fout.'] })
     }));
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /De laag Zorg/.test(document.getElementById('storingen').textContent),
       { timeout: 10000 });
     assert.match(await page.textContent('#storingen'), /niet compleet/i,

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1028 bestanden en 6858 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1028 bestanden en 6859 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1028 |
-| losse beweringen (`test(...)`) | 6858 |
+| losse beweringen (`test(...)`) | 6859 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 855 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-902 bestanden, 6638 beweringen.
+902 bestanden, 6639 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -353,7 +353,7 @@ toets omvalt.
 | `kleine-grendels.test.js` | 5 | gezakt op `liegpoort /api/` | DE KLEINE GRENDELS. Vier losse bevindingen uit de laatste doorlichting die geen van alle een eigen testbestand rechtvaardigen, maar samen wel. |
 | `klets.test.js` | 4 | gezakt op `return-weg#0` | Het salongesprek: twee Rahuls die over de dag van hun mens kletsen. De leuke kant toetst zich vanzelf; het gaat hier om de drie sloten, want die maken het verschil tussen een gimmick en een lek: 1. |
 | `klok.test.js` | 18 | gezakt op `===->!==#0` | DE KLOK (server/lib/klok.js) en de klokschuld (scripts/klok.js). WAT HIER OP HET SPEL STAAT. |
-| `klokwacht.test.js` | 4 | geen bronmutatie mogelijk | DE WACHTSCHULD MAG ALLEEN KRIMPEN (scripts/klokwacht.js, KLOKWACHT.json). WAAROM DEZE RATEL ER IS. |
+| `klokwacht.test.js` | 5 | geen bronmutatie mogelijk | DE WACHTSCHULD MAG ALLEEN KRIMPEN (scripts/klokwacht.js, KLOKWACHT.json). WAAROM DEZE RATEL ER IS. |
 | `kluis-binding.test.js` | 8 | gezakt op `return-weg#0` | De identiteitskluis met CONTEXT-BINDING (server/accounts/gebonden.js). De kluis versleutelde de inhoud van naam/e-mail/telefoon al, maar zei niets over waar die inhoud thuishoorde. |
 | `kluis-rotatie.test.js` | 7 | gezakt op `return-weg#0` | Sleutelrotatie van de identiteitskluis (server/accounts/onderhoud.js). Een gecompromitteerde kluissleutel moet te vervangen zijn zonder de gegevens te verliezen en zonder downtime. |
 | `koppels.test.js` | 4 | gezakt op `liegpoort /api/` | Gekoppelde schakelaars (tegenhangers): twee functies die samen een dienst vormen volgen elkaar automatisch als de boardroom er een omzet, zodat er nooit een halve dienst overblijft (vacatures zonder sollicitanten,... |

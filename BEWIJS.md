@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1024 bestanden en 6802 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1024 bestanden en 6804 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1024 |
-| losse beweringen (`test(...)`) | 6802 |
+| losse beweringen (`test(...)`) | 6804 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-897 bestanden, 6580 beweringen.
+897 bestanden, 6582 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -242,7 +242,7 @@ toets omvalt.
 | `gastroomservice.test.js` | 7 | gezakt op `liegpoort /api/` | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
 | `gastverzoek.test.js` | 12 | gezakt op `liegpoort /api/` | WAT EEN GAST VRAAGT IN PLAATS VAN BESTELT. De gastkant kon bestellen en afrekenen, maar niet zeggen "kunt u even komen". |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
-| `gebaar.test.js` | 11 | genoemd | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
+| `gebaar.test.js` | 13 | genoemd | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
 | `gebouw.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren). Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de receptie, badges, facilitaire meldingen, valet, de jetset-laag en de... |
 | `gebouwplus.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Enterprise (gebouwplus): de plus-laag van het kantoorgebouw. Getoetst: de manager van de demo-toren legt een huurcontract vast, verlengt en beeindigt het; leads schuiven door de fasen; energie-weken worden... |
 | `gedachten.test.js` | 7 | gezakt op `liegpoort /api/` | Het gedachtenboek (kern/gedachten.js). De belofte is dat dit GEEN materiaal is, en die wordt hier op drie manieren vastgezet: er is geen deur die de tekst ergens anders heen stuurt, niemand anders kan erbij, en... |

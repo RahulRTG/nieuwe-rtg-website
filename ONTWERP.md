@@ -201,9 +201,21 @@ lade zelf is aria-hidden en is er voor de hand; de actielade is er voor de toets
 en de schermlezer. Wat niet terug te draaien is, gaat op vasthouden en nooit op
 een veeg.
 
+**Een veeg die de server raakt, is optimistisch.** De regel verdwijnt meteen en
+de server volgt; komt er een fout terug, dan komt de regel terug met een melding.
+Snelheid is wat een veeg beter maakt dan een knop, en die weggeven maakt hem
+zinloos. De prijs is dat elke server-actie een tegenactie moet hebben — zonder
+weg terug hoort hij niet op een veeg maar op vasthouden.
+
+*Dit is een besluit en nog geen handhaver.* Vandaag raakt geen enkele veeg de
+server (openen, delen, kopiëren), dus er is niets om af te dwingen. Zodra de
+eerste er wel een raakt, hoort hier een toets onder te staan die zakt op een
+actie zonder tegenactie. Het staat er als richting, niet als gedane zaak.
+
 *Handhaving:* `test/gebaar.test.js` bewaakt wat je niet ziet (de laag raakt in
-rust geen enkel element aan, de lade draagt geen knop-in-een-link, het gebaar is
-nooit de enige weg), `test/gebaar.e2e.js` veegt in een echte browser.
+rust alleen aan wat met naam geleend is, de lade draagt geen knop-in-een-link,
+het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer),
+`test/gebaar.e2e.js` veegt in een echte browser.
 
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon

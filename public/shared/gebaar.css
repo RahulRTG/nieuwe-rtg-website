@@ -180,14 +180,24 @@
    richting en glitter heeft er tien. Alleen op een fijne aanwijzer: op een
    telefoon is er geen hand boven het glas, en dan is dit alleen batterij. */
 @media (hover:hover) and (pointer:fine){
-  .rtg-knop,.gb-rij{position:relative;}
-  .rtg-knop::after,.gb-rij::after{
+  /* :where() ZET DE SPECIFICITEIT OP NUL, en dat is hier het hele punt. Deze
+     regel ligt over 176 schermen met 1402 knoppen die dit blad niet kennen; een
+     pagina die morgen zelf iets over de positie van zijn knop zegt, hoort dat
+     te winnen zonder dat iemand hier hoeft te kijken. Nagerekend voor het
+     aanzetten: vandaag zet geen enkele pagina position op .knop, en geen enkele
+     pagina gebruikt .knop::after -- maar dat is een meting van vandaag en geen
+     garantie van morgen. Vandaar :where(). */
+  :where(.rtg-knop,.knop,.gb-rij){position:relative;}
+  :where(.rtg-knop,.knop,.gb-rij)::after{
     content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
     opacity:0;transition:opacity var(--rtg-tijd-paneel,180ms) ease;
     background:radial-gradient(20rem 20rem at var(--gb-lx,50%) var(--gb-ly,50%),
       rgba(192,165,68,.10) 0%,rgba(192,165,68,0) 62%);
   }
-  .rtg-knop:hover::after,.gb-rij:hover::after{opacity:1;}
+  :where(.rtg-knop,.knop,.gb-rij):hover::after{opacity:1;}
+  /* Een uitgeschakelde knop reageert nergens op, ook niet op licht. */
+  :where(.rtg-knop,.knop)[disabled]:hover::after,
+  :where(.rtg-knop,.knop)[aria-disabled="true"]:hover::after{opacity:0;}
 }
 
 /* ------------------------------------------------------------ de terugweg -- */
@@ -217,4 +227,4 @@
   .gb-lade,.gb-rij[data-gb] > *,.gb-doe{transition:none;}
 }
 html.rtg-stil .gb-lade,html.rtg-stil .gb-rij[data-gb] > *,html.rtg-stil .gb-doe{transition:none;}
-html.rtg-stil .rtg-knop::after,html.rtg-stil .gb-rij::after{display:none;}
+html.rtg-stil :where(.rtg-knop,.knop,.gb-rij)::after{display:none;}

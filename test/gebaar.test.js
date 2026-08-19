@@ -25,21 +25,65 @@ const JS = lees('public/shared/gebaar.js');
 const CSSKAAL = CSS.replace(/\/\*[\s\S]*?\*\//g, '');
 const JSKAAL = JS.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-test('in rust raakt het blad geen enkel element van een scherm aan', () => {
-  /* DE MUTATIE: verander `.gb-rij{touch-action:pan-y}` in `a{touch-action:pan-y}`.
-     Dan legt deze laag zich over tweehonderdvijftig schermen heen die er niets
-     om gevraagd hebben -- precies de fout die een gedeelde laag onbruikbaar
-     maakt. Elke kiezer hier hoort te beginnen bij iets dat de laag ZELF maakt
-     (.gb-...) of bij een klasse van de UI-kit die hij bewust oplicht. */
-  const TOEGESTAAN = /^(\.gb-|html\.rtg-stil|:root|@|\.rtg-knop)/;
-  const kiezers = CSSKAAL.split('}').map((brok) => {
+test('in rust raakt het blad alleen aan wat met naam is toegestaan', () => {
+  /* DE MUTATIE: verander `:where(.rtg-knop,.knop,.gb-rij)` in `:where(button)`,
+     of zet er een `a` bij. Dan legt deze laag zich over tweehonderdvijftig
+     schermen heen die er niets om gevraagd hebben -- precies de fout die een
+     gedeelde laag onbruikbaar maakt.
+
+     De lijst hieronder is met opzet EEN LIJST MET NAMEN en geen patroon. Alles
+     wat met .gb- begint maakt de laag zelf; daarnaast staan er precies twee
+     klassen van het huis op, en elke uitbreiding daarvan is een besluit dat
+     hier zichtbaar wordt in plaats van in een diff van een blad.
+
+     WAAROM .knop EROP STAAT. De UI-kit heet .rtg-knop maar wordt op 3 schermen
+     gebruikt; de knop van dit huis heet gewoon .knop en staat 1402 keer op 176
+     schermen. Gemeten voor het aanzetten: geen enkele pagina gebruikt
+     .knop::after en geen enkele zet er position op. Daarom mag hij mee, en
+     daarom staat hij in een :where() -- op nul specificiteit, zodat een pagina
+     die er morgen wel iets over zegt gewoon wint. */
+  const EIGEN = /^\.gb-/;                                  // van de laag zelf
+  const GELEEND = new Set(['rtg-knop', 'knop']);           // van het huis, met naam
+  const OMHULSEL = /^(html\.rtg-stil|:root|@)/;
+
+  /* DE @MEDIA-OMHULSELS ERAF VOOR HET SPLITSEN, EN DAT IS GEEN DETAIL. Deze
+     toets liet eerst een mutatie door die `button` aan de leenlijst toevoegde,
+     en dat kwam hier: `@media (...){` maakte van het HELE blok een kiezer die
+     met @ begon, waarna de regels erin nooit werden bekeken. Precies de regels
+     die over honderdzesenzeventig schermen liggen (het licht) staan in zo'n
+     blok. Een toets die het gevaarlijkste deel van zijn onderwerp niet leest,
+     keurt niets (LAT.md regel 10) -- en dat is hoe hij gevonden werd: door de
+     mutatie te draaien en te zien dat hij NIET beet. */
+  const PLAT = CSSKAAL.replace(/@[a-z-]+[^{]*\{/g, '');
+  const kiezers = PLAT.split('}').map((brok) => {
     const i = brok.indexOf('{');
-    return i < 0 ? [] : brok.slice(0, i).split(',').map((s) => s.trim()).filter(Boolean);
+    return i < 0 ? [] : brok.slice(0, i).split(/,(?![^(]*\))/).map((s) => s.trim()).filter(Boolean);
   }).flat();
   assert.ok(kiezers.length > 20, 'het blad hoort echt gelezen te zijn');
+  assert.ok(kiezers.some((k) => k.includes(':where(')),
+    'de kiezers uit de @media-blokken horen meegelezen te zijn -- daar woont het licht');
+
   for (const k of kiezers) {
-    assert.match(k, TOEGESTAAN,
-      'kiezer "' + k + '" pakt iets wat niet van de gebarenlaag is; in rust hoort dit blad niets te veranderen');
+    if (OMHULSEL.test(k.replace(/^html\.rtg-stil\s*/, 'html.rtg-stil'))) {
+      // een omhulsel telt niet zelf mee, maar wat erin staat wel
+    }
+    const kaal = k.replace(/^html\.rtg-stil\s+/, '').trim();
+    if (OMHULSEL.test(kaal) || !kaal) continue;
+    /* Alleen het ANKER telt: het meest linkse stuk van de kiezer. Wat daarbinnen
+       staat (`.gb-doe svg`, `.gb-blad menu button`) leeft in een tak die de laag
+       zelf heeft neergezet, en daar mag hij alles. Zodra het anker iets is dat
+       van een scherm is, ligt de laag eroverheen -- en dat is wat hier niet mag.
+
+       Een :where(...) wordt eerst opengevouwen: de reden dat hij er staat is de
+       specificiteit, niet het verbergen van wat erin zit. */
+    const anker = kaal.replace(/:where\(([^)]*)\)/, '$1').split(/[\s>+~]+/)[0];
+    for (const stuk of anker.split(',')) {
+      const naam = stuk.replace(/::?[a-z-]+(\([^)]*\))?/g, '').replace(/\[[^\]]*\]/g, '').trim();
+      if (!naam || naam === '*') continue;
+      assert.ok(EIGEN.test(naam) || GELEEND.has(naam.replace(/^\./, '')),
+        'kiezer "' + k + '" begint bij "' + naam + '", en dat is niet van de gebarenlaag en staat niet ' +
+        'met naam op de leenlijst; in rust hoort dit blad alleen te raken wat het zelf maakt');
+    }
   }
 });
 
@@ -160,4 +204,56 @@ test('de terugdraai-melding wordt voorgelezen', () => {
      DE MUTATIE: haal role="status" weg. */
   assert.match(JSKAAL, /gb-terug[\s\S]{0,160}setAttribute\('role', 'status'\)/,
     'de terugdraai-melding draagt geen role=status meer');
+});
+
+test('het licht landt op de knop die dit huis echt gebruikt', () => {
+  /* DE MUTATIE: haal .knop uit de kiezer van het licht. Alles blijft groen en
+     het licht valt terug op .rtg-knop -- drie schermen. Dat is precies de fout
+     die hier gemaakt is en pas bij het NATELLEN bleek: de UI-kit ligt op 233
+     pagina's, maar zijn knopklasse wordt op 3 gebruikt. De knop van dit huis
+     heet gewoon .knop, 1402 keer op 176 schermen.
+
+     DEZE TOETS IS TWEE KEER AANGESCHERPT omdat de mutatie hem twee keer NIET
+     liet zakken, en allebei die keren zeggen iets. Eerst las hij de rauwe tekst
+     mee, en zijn eigen toelichting noemt .knop. Daarna zocht hij .knop ergens
+     in het blad -- en vond hem in de uitgeschakeld-regel, terwijl het LICHT hem
+     kwijt was. Nu wijst hij precies de regels aan die het licht maken. */
+  const rules = CSSKAAL.replace(/@[a-z-]+[^{]*\{/g, '').split('}')
+    .map((brok) => {
+      const i = brok.indexOf('{');
+      return i < 0 ? null : { kiezer: brok.slice(0, i).trim(), inhoud: brok.slice(i + 1) };
+    }).filter(Boolean);
+
+  const licht = rules.filter((r) => /radial-gradient/.test(r.inhoud));
+  assert.equal(licht.length, 1, 'er hoort precies EEN regel te zijn die het lichtpunt tekent');
+  assert.match(licht[0].kiezer, /:where\([^)]*\.knop[,)]/,
+    'de lichtregel leent .knop niet; dan bereikt het licht 3 schermen in plaats van 176');
+
+  const aan = rules.filter((r) => /::after/.test(r.kiezer) && /opacity:\s*1/.test(r.inhoud));
+  assert.ok(aan.length && aan.every((r) => /\.knop[,)]/.test(r.kiezer)),
+    'het licht gaat op hover nergens AAN voor .knop; de regel staat er dan wel maar doet niets');
+
+  /* En hij hoort in een :where() te staan. Zonder die nul-specificiteit wint
+     dit blad -- dat op het laatst aan de <head> wordt gehangen -- van elke
+     pagina die zelf iets over de positie van zijn knop zegt. */
+  assert.ok(!/(^|[^:(\w-])\.knop\s*[,{]/m.test(CSSKAAL.replace(/:where\([^)]*\)/g, 'W')),
+    '.knop wordt buiten een :where() gepakt; dan wint dit blad van de pagina in plaats van andersom');
+});
+
+test('de drie wereldregisters delen EEN bouwer', () => {
+  /* Kantoor, Sociaal en Reizen tekenen dezelfde .reis-regel. De eerste versie
+     had de actiebouwer in kantoor.html staan; bij het tweede scherm was dat al
+     een kopie, en bij het derde een patroon.
+     DE MUTATIE: schrijf in sociaal.html weer een eigen RTGGebaar.lijst met een
+     eigen actielijst. Beide schermen blijven werken -- tot iemand er in EEN van
+     de twee een actie bij zet (LAT.md regel 4). */
+  for (const scherm of ['kantoor', 'sociaal', 'reizen']) {
+    const bron = lees('public/apps/' + scherm + '.html');
+    assert.match(bron, /RTGGebaar\.wereldregister\(/,
+      scherm + '.html hangt zijn register niet meer aan de gedeelde bouwer');
+    assert.ok(!/RTGGebaar\.lijst\([^)]*\.reis/.test(bron),
+      scherm + '.html bouwt zijn .reis-acties weer zelf; dat hoort in de laag te staan');
+  }
+  assert.match(JSKAAL, /function wereldregister\(wortel\)/,
+    'de gedeelde bouwer is uit de laag verdwenen');
 });

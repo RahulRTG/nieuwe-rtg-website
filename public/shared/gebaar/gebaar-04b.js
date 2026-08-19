@@ -86,6 +86,49 @@
     }
   };
 
+  /* ------------------------------------------------- het wereldregister --
+     DRIE SCHERMEN, EEN BOUWER. Kantoor, Sociaal en Reizen tekenen alledrie
+     dezelfde regel: .reis met een stip, een datumkolom, een titel, een status,
+     een kenmerk en een bron. Die vorm woont in shared/rtg-wereld.css en niet in
+     een van de drie schermen -- dus hoort ook de vraag "welke acties draagt zo'n
+     regel" op EEN plek te staan. De eerste versie hiervan stond in kantoor.html;
+     dat was na twee schermen al twee kopieen (LAT.md regel 4).
+
+     .reis is met naam GELEEND, net als .knop in het blad. Deze laag mag geen
+     klassen van schermen gaan raden; wat hij leent, leent hij zichtbaar.
+
+     De acties komen uit de REGEL zelf en niet uit een tweede kopie van de data:
+     het register wordt opnieuw getekend zodra er iets binnenkomt, en een tweede
+     lijst die dan niet meeloopt is precies de dubbele waarheid waar dit tegen
+     beschermt. Staat er geen kenmerk, dan valt die actie vanzelf weg. */
+  function tekstVan(el) { return el ? el.textContent.trim().replace(/\s+/g, ' ') : ''; }
+
+  function wereldregister(wortel) {
+    if (!wortel) return false;
+    return window.RTGGebaar.lijst(wortel, '.reis[href]', function (rij) {
+      var h = rij.querySelector('h3');
+      /* De bestemming staat IN de h3 als eigen span (Reizen). textContent plakt
+         die aan de titel vast -- "Ibiza-weekIbiza" -- dus hij wordt er hier
+         afgehaald en als eigen deel behandeld. */
+      var plaatsEl = h && h.querySelector('.rtg-plaats');
+      var plaats = tekstVan(plaatsEl);
+      var titel = tekstVan(h);
+      if (plaats && titel.slice(-plaats.length) === plaats) titel = titel.slice(0, -plaats.length).trim();
+      var refEl = rij.querySelector('.rtg-ref');
+      var ref = refEl ? refEl.getAttribute('data-ref') : '';
+      var href = rij.getAttribute('href');
+      return {
+        titel: titel + (plaats ? ' \u00b7 ' + plaats : ''),
+        rechts: [KLAAR.openen(href), KLAAR.delen({ titel: titel, url: location.origin + href })],
+        links: [
+          KLAAR.kenmerk(ref),
+          KLAAR.overnemen([titel, plaats, tekstVan(rij.querySelector('.dag')), ref,
+            tekstVan(rij.querySelector('.bron'))].filter(Boolean).join(' \u00b7 '))
+        ]
+      };
+    });
+  }
+
   /* ------------------------------------------------------------- de deur -- */
   window.RTGGebaar = {
     /* Een regel met eigen acties. Geeft false terug als er niets bruikbaars in
@@ -132,6 +175,7 @@
     open: opendActielade,
     melding: melding,
     klaar: KLAAR,
+    wereldregister: wereldregister,
     sluit: function () { sluitAlles(true); sluitBlad(); }
   };
 

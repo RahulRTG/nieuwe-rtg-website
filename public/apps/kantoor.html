@@ -300,34 +300,12 @@
      of delen. Veeg naar rechts: het kenmerk of de hele regel overnemen. Veeg
      door en de eerste van die kant gebeurt meteen.
 
-     De acties worden uit de REGEL zelf gelezen en niet uit een tweede kopie van
-     d.regels. Dat is geen luiheid maar de reden dat dit blijft kloppen: het
-     register wordt opnieuw getekend zodra er iets binnenkomt, en een tweede
-     lijst die dan niet meeloopt is precies de dubbele waarheid uit LAT.md
-     regel 4. Staat er geen kenmerk, dan valt die actie vanzelf weg -- de laag
-     gooit lege acties eruit.
-
-     GEDELEGEERD, dus dit hoeft maar EEN keer te gebeuren en niet bij elke
-     hertekening. De laag laadt zonder haast mee via shared/basis.js; tot hij er
-     is verandert er niets aan het scherm. */
-  function gebaren() {
-    const K = window.RTGGebaar.klaar;
-    window.RTGGebaar.lijst($('#werkdag'), '.reis', (rij) => {
-      const pak = (k) => { const x = rij.querySelector(k); return x ? x.textContent.trim() : ''; };
-      const titel = pak('h3');
-      const ref = rij.querySelector('.rtg-ref');
-      const dag = pak('.dag').replace(/\s+/g, ' ');
-      const url = location.origin + rij.getAttribute('href');
-      return {
-        titel: titel,
-        rechts: [K.openen(rij.getAttribute('href')), K.delen({ titel: titel, url: url })],
-        links: [
-          K.kenmerk(ref ? ref.dataset.ref : ''),
-          K.overnemen([titel, dag, ref ? ref.dataset.ref : '', pak('.bron')].filter(Boolean).join(' \u00b7 '))
-        ]
-      };
-    });
-  }
+     De bouwer staat in de LAAG en niet hier: Sociaal en Reizen tekenen exact
+     dezelfde .reis-regel, en drie kopieen van dezelfde vraag lopen binnen een
+     maand uiteen (LAT.md regel 4). Gedelegeerd, dus dit hoeft maar een keer en
+     niet bij elke hertekening. De laag laadt zonder haast mee via
+     shared/basis.js; tot hij er is verandert er niets aan het scherm. */
+  function gebaren() { window.RTGGebaar.wereldregister($('#werkdag')); }
   if (window.RTGGebaar) gebaren();
   else document.addEventListener('rtg-gebaar', gebaren, { once: true });
 

@@ -140,7 +140,7 @@
       requestAnimationFrame(function () {
         wacht = false;
         var t = laatst && laatst.target;
-        var el = t && t.closest && t.closest('.rtg-knop,.gb-rij');
+        var el = t && t.closest && t.closest('.rtg-knop,.knop,.gb-rij');
         if (!el) return;
         var r = el.getBoundingClientRect();
         if (!r.width || !r.height) return;

@@ -129,35 +129,9 @@ if (rvTimer.unref) rvTimer.unref();
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
-/* Cutover-reconcile: draait de wallet in motor-modus (RTG_MOTOR_GELD=motor), dan
-   is de Rust-motor de autoriteit -- neem bij het opstarten de saldi-spiegel over
-   uit de motor-snapshot, zodat we altijd in lockstep starten (ook na een crash of
-   nadat de motor los is bijgewerkt). No-op in de standaard schaduw-modus. */
-if (kern.pay.geldModus === 'motor') {
-  Promise.resolve(kern.pay.reconcileVanMotor())
-    .then(r => {
-      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile', { rekeningen: r.rekeningen, som: r.som });
-      else if (r && r.error) log.warn('motor-reconcile mislukt', { fout: r.error });
-    })
-    .catch(e => log.warn('motor-reconcile uitzondering', { fout: e.message }));
-}
-// Zelfde herstart-reconcile voor het BANK-grootboek (tweede motor-ledger).
-if (kern.bank.geldModus === 'motor') {
-  Promise.resolve(kern.bank.reconcileVanMotor())
-    .then(r => {
-      if (r && r.ok && !r.overgeslagen) log.info('motor-reconcile bank', { rekeningen: r.rekeningen, som: r.som });
-      else if (r && r.error) log.warn('motor-reconcile bank mislukt', { fout: r.error });
-    })
-    .catch(e => log.warn('motor-reconcile bank uitzondering', { fout: e.message }));
-}
-/* De RTFoundation-afdracht over de eigen rails: staat de knop effectief op
-   "eigen" (en niet in nood), dan boekt de 30% als grootboekboeking van de
-   reserve naar de foundation-tegenrekening. Anders geeft de naad null terug
-   en volgt fonds.js gewoon de bestaande betaal-naad. Late binding, want het
-   fonds is eerder gemount dan de bank. */
-fonds.koppelBank(async ({ centen, referentie, oms }) => {
-  const c = bankregie.bankClearing();
-  if (c.modus !== 'eigen') return null;
-  return kern.bank.boekAsync({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
-});
+/* De geldnaden (cutover-reconcile en de late binding van het fonds aan de bank)
+   staan in ./kern-geldnaden.js: dit deel liep over de 10 kB-grens. Ze horen
+   achteraan, want ze kunnen pas als alles hierboven er is. bankregie gaat mee
+   omdat hij hier wordt gemaakt en niet in hulp zit. */
+require('./kern-geldnaden')(kern, hulp, { bankregie });
 };

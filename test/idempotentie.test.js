@@ -33,14 +33,78 @@ async function metApp(doe) {
   finally { server.close(); }
 }
 
-test('dezelfde sleutel: een uitvoering, hetzelfde antwoord, en de kop zegt het', () => metApp(async ({ post, telling }) => {
+test('dezelfde sleutel: een uitvoering, het eerste antwoord, en het staat IN het lijf', () => metApp(async ({ post, telling }) => {
   const een = await post('/api/tel', { idem: 'a1', w: 'eerste' });
   const twee = await post('/api/tel', { idem: 'a1', w: 'tweede' });
   assert.equal(telling(), 1, 'de handler draait een keer');
-  assert.deepEqual(twee.data, een.data, 'de herhaling krijgt het EERSTE antwoord, ook al is het lijf anders');
-  assert.equal(twee.herhaald, 'herhaald');
+  /* HET EERSTE ANTWOORD, PLUS DE HUISMARKERING. Eerst stond hier alleen
+     `deepEqual(twee.data, een.data)` en zat de melding uitsluitend in een KOP.
+     Die las niemand: de geldkant markeert een herhaling al jaren in het LIJF
+     (server/betaal.js: `Object.assign({}, bestaand, { herhaald: true })`), en
+     zestien toetsen elders zakten omdat deze laag die taal niet sprak. */
+  assert.deepEqual(twee.data, { ...een.data, herhaald: true },
+    'de herhaling krijgt het EERSTE antwoord met herhaald erbij, ook al is het lijf anders');
+  assert.equal(een.data.herhaald, undefined, 'de eerste uitvoering is geen herhaling');
+  assert.equal(twee.herhaald, 'herhaald', 'de kop blijft er ook, voor wie hem wel leest');
   assert.equal(een.herhaald, null, 'de eerste uitvoering draagt geen herhaald-kop');
 }));
+
+test('EN HIJ GAAT NIET VOOR EEN SPECIALIST STAAN', async () => {
+  /* De duurste les van deze laag, en hij is met de suite geleerd. De geldkant
+     doet idempotentie zelf, en rijker dan een kas met eerste antwoorden ooit
+     kan: /api/pakket/koop meldt `alBetaald`, /api/wbw/verreken geeft bij een
+     tweede tik een 409 omdat er geen schuld meer is, en /api/pay/stuur geeft
+     409 als dezelfde sleutel met een ANDER bedrag terugkomt. Die antwoorden
+     hangen af van de toestand NA de eerste aanroep en kunnen dus onmogelijk in
+     een bewaard eerste antwoord zitten.
+
+     EEN LIJST IS GEVAARLIJK GEREEDSCHAP (LAT.md regel 4), dus hij wordt hier
+     tegen de BRONCODE gehouden en niet op zijn woord geloofd: elke route die
+     zelf `idem` uit het lijf haalt, moet gedekt zijn -- en elke regel in de
+     lijst moet op minstens een echte route slaan. Vergeet iemand het bij een
+     nieuwe geldroute, dan zakt dit voordat de kas een specialist overstemt. */
+  const fs = require('fs');
+  const path = require('path');
+  const { EIGEN, doetHetZelf } = require('../server/middleware/idempotentie');
+
+  const wortel = path.join(__dirname, '..', 'server', 'routes');
+  const bestanden = [];
+  (function loop(map) {
+    for (const n of fs.readdirSync(map, { withFileTypes: true })) {
+      const vol = path.join(map, n.name);
+      if (n.isDirectory()) loop(vol);
+      else if (n.name.endsWith('.js')) bestanden.push(vol);
+    }
+  })(wortel);
+
+  /* Per bestand: elke `app.post('<pad>'` onthouden, en elke plek waar de
+     handler zelf een idem-sleutel uit het lijf leest toerekenen aan de
+     DICHTSTBIJZIJNDE route erboven. Grof maar eerlijk: een misser levert een
+     extra eis op, geen ontbrekende. */
+  const zelfdoeners = new Set();
+  for (const b of bestanden) {
+    const tekst = fs.readFileSync(b, 'utf8');
+    const routes = [...tekst.matchAll(/app\.post\(\s*'([^']+)'/g)].map(m => ({ i: m.index, pad: m[1] }));
+    if (!routes.length) continue;
+    for (const m of tekst.matchAll(/\b(?:req\.body|b)\.idem\b|\bidempotentieSleutel:\s*(?:req\.body|b)\./g)) {
+      let bij = null;
+      for (const r of routes) { if (r.i < m.index) bij = r; else break; }
+      if (bij && bij.pad.startsWith('/api/')) zelfdoeners.add(bij.pad);
+    }
+  }
+
+  assert.ok(zelfdoeners.size >= 10, 'de scan hoort de geldroutes te vinden; gevonden: ' + zelfdoeners.size);
+  const ongedekt = [...zelfdoeners].filter(p => !doetHetZelf(p)).sort();
+  assert.deepEqual(ongedekt, [],
+    'deze routes halen ZELF een idem-sleutel uit het lijf, maar de centrale laag gaat er nog voor ' +
+    'staan en overstemt hun eigen antwoord. Zet ze in EIGEN (server/middleware/idempotentie.js): ' +
+    ongedekt.join(', '));
+
+  const leeg = EIGEN.filter(p => ![...zelfdoeners].some(z => z.startsWith(p)));
+  assert.deepEqual(leeg, [],
+    'deze regels in EIGEN slaan op geen enkele route die zelf een idem-sleutel leest; een lijst die ' +
+    'stil veroudert zet de centrale bescherming uit zonder dat er iets voor terugkomt: ' + leeg.join(', '));
+});
 
 test('zonder sleutel bemoeit de laag zich nergens mee', () => metApp(async ({ post, telling }) => {
   await post('/api/tel', { w: 'x' });

@@ -71,8 +71,8 @@ test('de uitkomsten dragen hun klasse', () => {
   assert.equal(zek.zekerheid('btw.cadeaukaart').klasse, 'uitlegbaar');
 });
 
-test('wat RTG niet zelf mag, staat als voorbehouden in het register', () => {
-  for (const sleutel of ['btw.indienen', 'naheffing.vaststellen', 'naheffing.boete', 'toegang.pas']) {
+test('wat niet vanzelf gaat, staat als voorbehouden -- en de rest niet', () => {
+  for (const sleutel of ['btw.verzenden', 'naheffing.vaststellen', 'naheffing.boete', 'toegang.pas']) {
     const u = zek.zekerheid(sleutel);
     assert.equal(u.klasse, 'voorbehouden', sleutel);
     assert.equal(u.term, 'PROHIBITED_AUTOMATION');
@@ -80,8 +80,16 @@ test('wat RTG niet zelf mag, staat als voorbehouden in het register', () => {
   /* De zin eronder mag geen advies-slotje krijgen: "raadpleeg een fiscalist"
      onder "RTG verzendt geen aangiften" leest als een aanbeveling in plaats van
      een grens. */
-  assert.ok(!/fiscalist/i.test(zek.zin('btw.indienen')));
-  assert.match(zek.zin('btw.indienen'), /buiten RTG om/i);
+  assert.ok(!/fiscalist/i.test(zek.zin('btw.verzenden')));
+  assert.match(zek.zin('btw.verzenden'), /nooit namens/i);
+
+  /* EN DE KEERZIJDE, want die was eerst fout. Vastleggen DAT er is ingediend is
+     administratie die een manager doet -- geen grens. Die twee deelden een
+     klasse, en daardoor blokkeerde de pre-flight de handeling die juist wel
+     mag. Zie test/fiscaal-preflight.test.js. */
+  const indienen = zek.zekerheid('btw.indienen');
+  assert.equal(indienen.klasse, 'bepaald');
+  assert.match(indienen.mits, /verzendt niet/i, 'met de grens ernaast, niet erop');
 });
 
 test('de vlakke zin is weg uit wat een gebruiker te zien krijgt', () => {

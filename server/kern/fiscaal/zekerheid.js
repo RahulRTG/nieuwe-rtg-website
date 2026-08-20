@@ -66,8 +66,16 @@ const REGISTER = {
   'btw.cadeaukaart': { klasse: 'uitlegbaar',
     waarom: 'Bij een meervoudig inwisselbare kaart is het btw-moment de inwisseling en niet de verkoop. Voor kaarten die maar een ding kunnen kopen ligt dat anders.',
     keuze: 'Wij behandelen alle kaarten als meervoudig inwisselbaar.' },
-  'btw.indienen': { klasse: 'voorbehouden',
-    waarom: 'De ondernemer is de belastingplichtige. RTG legt vast DAT er is ingediend, met welk kenmerk; het verzenden loopt buiten RTG om.' },
+  /* TWEE DINGEN DIE EERST EEN KLASSE DEELDEN, en dat was fout. Vastleggen DAT
+     er is ingediend is gewoon administratie die een manager doet -- daar is
+     niets aan voorbehouden. VERZENDEN is wat RTG nooit doet. Ze op een hoop
+     gooien maakte de pre-flight onbruikbaar: die blokkeerde de handeling die
+     juist wel mag. Gevonden door test/fiscaal-preflight.test.js. */
+  'btw.indienen': { klasse: 'bepaald',
+    waarom: 'Vastleggen dat er is ingediend, met het kenmerk dat de Belastingdienst teruggaf.',
+    mits: 'Dit legt vast en verzendt niet; de verzending loopt buiten RTG om.' },
+  'btw.verzenden': { klasse: 'voorbehouden',
+    waarom: 'De ondernemer is de belastingplichtige; RTG dient nooit namens hem in en verzendt niets.' },
   'loon.aangifte': { klasse: 'bepaald',
     waarom: 'Opgemaakt uit EEN definitieve loonrun; het nominatieve deel komt regel voor regel van de loonstroken en er wordt niets opnieuw gerekend.',
     mits: 'Vastleggen dat er is ingediend is iets anders dan verzenden; de verzending loopt via een koppeling buiten deze laag.' },

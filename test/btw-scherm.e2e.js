@@ -26,6 +26,24 @@ function laadPlaywright() {
   return null;
 }
 const pw = laadPlaywright();
+
+/* DE BROWSER STARTEN, OOK ALS DE GEPINDE BUILD ER NIET IS. Playwright zoekt de
+   build die bij zijn eigen versie hoort; een omgeving die een andere klaarzet
+   laat launch() stuklopen op een pad dat niet bestaat, en dan wordt deze toets
+   overgeslagen. Een overgeslagen schermtoets bewijst niets. Zelfde terugval als
+   in ./btw-waarom-scherm.e2e.js: dezelfde browser, op zijn echte pad. */
+const PADEN = ['/opt/pw-browsers/chromium', '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'];
+async function startBrowser() {
+  try { return await pw.chromium.launch({ args: ['--no-sandbox'] }); }
+  catch (e) {
+    if (!/Executable doesn't exist/.test(String(e.message))) throw e;
+    for (const executablePath of PADEN) {
+      try { return await pw.chromium.launch({ executablePath, args: ['--no-sandbox'] }); }
+      catch (e2) { /* volgende pad */ }
+    }
+    throw e;
+  }
+}
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
@@ -43,7 +61,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
     assert.ok(f.factuur && f.factuur.btwBedrag > 0, 'er staat een factuur met btw in het register');
     const btwOpFactuur = f.factuur.btwBedrag.toFixed(2).replace('.', ',');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await startBrowser();
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

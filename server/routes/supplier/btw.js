@@ -19,7 +19,7 @@
    (kern/automatisering.js): Rahul zet klaar en herinnert, en dient nooit voor
    iemand in. Er is hier dus bewust GEEN kantoorroute die dat overneemt. */
 module.exports = (kern) => {
-  const { app, btwAangifte, overheid, herkomst, supplierAuth, schoon } = kern;
+  const { app, btwAangifte, overheid, herkomst, aansluiting, preflight, supplierAuth, schoon } = kern;
   if (!btwAangifte) return;
 
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
@@ -120,6 +120,31 @@ module.exports = (kern) => {
     const door = managerOf(req, res); if (!door) return;
     if (!herkomst) return res.status(503).json({ error: 'De bewijsketen draait niet.' });
     antwoord(res, herkomst.verklaar(req.supplier, schoon((req.body || {}).periode, 10)));
+  });
+
+  /* WAT GEBEURT ER ALS IK INDIEN. Dezelfde vragen die `indienen` straks stelt,
+     maar voor de klik -- zodat de ondernemer niet eerst een kenmerk intikt om
+     daarna te horen dat de cijfers zijn veranderd. De uitslag komt uit dezelfde
+     routines; dit scherm controleert niets zelf. */
+  app.post('/api/supplier/btw/preflight', supplierAuth, (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    if (!preflight) return res.status(503).json({ error: 'De pre-flight draait niet.' });
+    const b = req.body || {};
+    const a = btwAangifte.haal(String(b.id || ''));
+    if (!a || a.code !== String(req.supplier.code).toUpperCase())
+      return res.status(404).json({ error: 'Deze aangifte kennen we niet.' });
+    res.json(preflight.keur('btw.indienen',
+      { aangifte: a, kenmerk: schoon(b.kenmerk, 60), getekendDoor: [door] }));
+  });
+
+  /* De afsluiting van een periode: hoeveel van dit geld is bewezen, hoeveel
+     wijkt af, en hoeveel valt onder geen enkele controle. Die laatste is de
+     reden dat dit scherm bestaat -- ontbrekende dekking ziet er in elk
+     dashboard uit als nul. */
+  app.post('/api/supplier/btw/afsluiting', supplierAuth, (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    if (!aansluiting) return res.status(503).json({ error: 'De afsluiting draait niet.' });
+    antwoord(res, aansluiting.sluiting(req.supplier, schoon((req.body || {}).periode, 10)));
   });
 
   app.post('/api/supplier/btw/herbouw', supplierAuth, (req, res) => {

@@ -1177,6 +1177,77 @@ De schijventabel wordt als geheel vervangen en nooit samengevoegd: schijf 1 van
 2026 met schijf 3 van 2024 eronder telt gewoon door en ziet er volstrekt normaal
 uit.
 
+### De afsluiting van een periode (`kern/fiscaal/aansluiting.js`)
+
+Dit huis had controles genoeg — de aangifte weigert op een register dat zichzelf
+tegenspreekt, het toezicht legt facturatie naast wat er is aangegeven, de
+bewijsketen herbouwt een bedrag. Wat er niet was, is het antwoord op de vraag die
+een controller aan het eind van een kwartaal stelt: **is dit af, en waar zit de
+rest?**
+
+De dekking wordt in **centen** gemeten en niet in aantal controles. Drie
+controles waarvan er één faalt is 67%, of die ene nu over twee euro of over twee
+ton gaat.
+
+| | Betekenis |
+|---|---|
+| `bewezen` | centen onder een controle die is uitgevoerd en klopt |
+| `uitzondering` | centen waar een controle is uitgevoerd en níét klopt |
+| `ontbrekend` | centen waar geen controle overheen ligt |
+
+Die derde is de gevaarlijkste, want ontbrekende dekking ziet er in elk dashboard
+uit als nul. Een periode zonder aangifte staat dus niet op 100% maar op 0%
+bewezen.
+
+**Het telt per geldstroom en niet per controle.** Meerdere controles lopen over
+hetzelfde geld; die elk hun centen laten optellen was de eerste opzet hier en gaf
+200% dekking op een kwartaal met één factuur erin — de toets ving dat. Per pot
+bepaalt de zwaarste uitslag wat ermee gebeurt: wijkt er één af, dan is dat
+verschil uitzondering; is er één niet uitgevoerd, dan is de rest ontbrekend en
+niet bewezen.
+
+> Bewezen betekent dat twee onafhankelijke wegen op hetzelfde bedrag uitkomen —
+> niet dat het bedrag juist is. Een factuur met een verkeerd tarief die netjes in
+> de aangifte staat telt hier als bewezen; daar is de vreemd-tarief-controle
+> voor. Dit meet **dekking, geen correctheid**, en dat staat in het antwoord.
+
+`POST /api/supplier/btw/afsluiting` `{periode}`.
+
+### De pre-flight (`kern/fiscaal/preflight.js`)
+
+De controles staan op het juiste moment — een weigering die pas komt als het al
+is gebeurd, is geen weigering. Maar de gebruiker hoort het dus pas ná de klik:
+kenmerk invullen, indienen, en dán te horen krijgen dat de cijfers zijn
+veranderd. Niet fout, wel laat.
+
+`keur(handeling, context)` stelt dezelfde vragen vóór de klik en geeft **GO**,
+**REVIEW** of **BLOCK**, met alle redenen — niet alleen de zwaarste, want wie het
+eerste oplost hoort niet tegen het tweede aan te lopen.
+
+**De harde regel: deze laag controleert niets zelf.** Er staat geen enkele `if`
+over een fiscale regel in. Elke uitslag komt uit een routine die de handeling
+straks ook aanroept — de zekerheidsklassen, het ogenregister, de btw-telling. Een
+pre-flight met eigen controles is een tweede waarheid naast de echte, en die twee
+lopen uiteen op precies het moment dat het ertoe doet: dan zegt het scherm GO en
+weigert de server.
+
+Twee dingen die het bouwen ervan aan het licht bracht:
+
+- **`voorbehouden` betekent niet vanzelf, niet nooit.** De klasse heet
+  PROHIBITED_AUTOMATION en gaat over de software, niet over de mens. Een
+  inspecteur die een naheffing vaststelt doet precies wat de bedoeling is; wat
+  niet mag is een knop die het zonder hem doet. Zonder mens erop is het BLOCK,
+  met een mens REVIEW.
+- **`btw.indienen` en `btw.verzenden` deelden ten onrechte een klasse.**
+  Vastleggen dát er is ingediend is administratie die een manager doet;
+  verzenden is wat RTG nooit doet. Op één hoop maakte dat de pre-flight
+  onbruikbaar — hij blokkeerde de handeling die juist wel mag. Nu gesplitst.
+
+Een handeling zonder droogloop krijgt **nooit** GO: anders leest "wij hebben
+niets nagekeken" op het scherm hetzelfde als "alles is in orde".
+
+`POST /api/supplier/btw/preflight` `{id, kenmerk?}`.
+
 ### De ogenregel op één plek (`kern/ogen.js`)
 
 "Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en
@@ -1196,11 +1267,12 @@ Wat er nu bij komt is het **register**: per handeling hoeveel ogen die vraagt
 (4 = twee mensen, 6 = drie), wat er nog omkeerbaar is, en een haak voor
 bedrag-drempels.
 
-> **Die drempels staan er en staan leeg.** Welk bedrag zwaarder toezicht
-> verdient, is een bestuurlijk besluit en geen technische keuze. Een verzonnen
-> grens die stilzwijgend gaat gelden is erger dan geen grens, want dan denkt
-> iedereen dat er over is nagedacht. De haak bestaat, de grens niet — en `eist()`
-> zegt dat er ook bij.
+> **Er staat één drempel, en die is door een mens gezet:** een naheffing boven
+> €25.000 vraagt een derde inspecteur. Hoog genoeg dat het dagelijkse werk niet
+> vastloopt, laag genoeg dat de zware gevallen een extra paar ogen krijgen.
+> Verschuift die grens, dan verschuift hij op die ene plek en nergens anders.
+> Voor alle andere handelingen staat de lijst leeg, en dan zegt `eist()` dat er
+> ook bij in plaats van een grens te suggereren die niemand heeft vastgesteld.
 
 Dit is **geen derde rechtenmodel**. Het beslist niet wie mag inloggen, wat een
 beheerder heeft uitgezet of wat RTG zelf mag — dat zijn de twee assen die er al

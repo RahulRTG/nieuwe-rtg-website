@@ -33,6 +33,15 @@ Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db,
    het herbouwd op de cent uit, en wat raakt een regelwijziging. Hij hoort NA de
    Regelwacht, want hij leest de jaargangen die daar ontstaan. */
 Object.assign(kern, require('../kern/fiscaal/herkomst').maakHerkomst({ db, jaargangen: kern.regelwacht.jaargangen }));
+/* De afsluiting van een periode (kern/fiscaal/aansluiting.js): de controles die
+   er al waren bij elkaar opgeteld, per geldstroom, met wat er NIET onder een
+   controle valt erbij. payrollOS staat er al sinds kernlaag2. */
+Object.assign(kern, require('../kern/fiscaal/aansluiting').maakAansluiting({ db,
+  btwAangifte: kern.btwAangifte, payrollOS: kern.payrollOS }));
+/* De pre-flight (kern/fiscaal/preflight.js): GO/REVIEW/BLOCK voor de klik, en
+   met opzet zonder eigen controles -- elke uitslag komt uit de routine die de
+   handeling straks ook aanroept. */
+Object.assign(kern, require('../kern/fiscaal/preflight').maakPreflight({ db, btwAangifte: kern.btwAangifte }));
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 

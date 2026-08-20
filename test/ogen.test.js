@@ -58,15 +58,24 @@ test('het register zegt wat een handeling vraagt, en dat er geen bedrag-grens is
   assert.equal(nh.bekend, true);
   assert.equal(nh.ogen, 4, 'twee mensen');
   assert.equal(nh.wat, 'inspecteur');
-  assert.equal(nh.drempelsVastgesteld, false);
-  assert.match(nh.let, /geen bedrag-grens vastgesteld/i);
+  assert.equal(nh.drempelsVastgesteld, true, 'voor de naheffing IS er een grens gezet');
 
   // het bezwaar vraagt er meer: de opmaker en de vaststeller beslissen niet mee
   assert.equal(ogen.eist('naheffing.bezwaar').ogen, 6);
 
-  /* Een bedrag meegeven verandert niets zolang er geen drempel staat. Dat is
-     de kern: de haak bestaat, de grens niet. */
-  assert.equal(ogen.eist('naheffing.vaststellen', { bedragCenten: 500000000 }).ogen, 4);
+  /* DE GRENS DIE EEN MENS HEEFT GEZET: boven 25.000 euro tekent er een derde
+     inspecteur mee. Op de cent van de grens telt hij al mee -- een grens die
+     pas een cent later ingaat, is een grens waar niemand op rekent. */
+  assert.equal(ogen.eist('naheffing.vaststellen', { bedragCenten: 2499999 }).ogen, 4);
+  assert.equal(ogen.eist('naheffing.vaststellen', { bedragCenten: 2500000 }).ogen, 6);
+  assert.match(ogen.eist('naheffing.vaststellen', { bedragCenten: 2500000 }).grond, /25000 euro/);
+
+  /* En waar GEEN grens is gezet, verandert een bedrag niets en wordt er ook
+     niets gesuggereerd. Dat onderscheid is het punt van dit register. */
+  const dw = ogen.eist('naheffing.dwangbevel', { bedragCenten: 500000000 });
+  assert.equal(dw.ogen, 4);
+  assert.equal(dw.drempelsVastgesteld, false);
+  assert.match(dw.let, /geen bedrag-grens vastgesteld/i);
 
   // de uitgifte kent geen vast getal: de aanvrager kiest 4 of 6
   const ug = ogen.eist('uitgifte.vrijgeven');

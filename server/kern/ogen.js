@@ -31,11 +31,12 @@
    met zoveel woorden) maar de telling van handtekeningen die die assen al
    veronderstelden en nergens opschreven.
 
-   DE DREMPELS STAAN ER, MAAR STAAN LEEG. `drempels` is de plek waar "boven dit
-   bedrag zes ogen" komt te staan. Er staat vandaag niets in, en dat is met
-   opzet: welk bedrag zwaarder toezicht verdient, is een bestuurlijk besluit en
-   geen technische keuze. Een verzonnen grens die stilzwijgend gaat gelden is
-   erger dan geen grens, want dan denkt iedereen dat er over is nagedacht. */
+   DE DREMPELS. `drempels` is de plek waar "boven dit bedrag zes ogen" staat.
+   Er staat er EEN: een naheffing boven 25.000 euro vraagt een derde inspecteur.
+   Dat is een bestuurlijk besluit en geen technische keuze -- het is gezet door
+   een mens, op die ene plek, en het verschuift daar of nergens. Voor alle
+   andere handelingen staat de lijst leeg, en dan zegt `eist()` dat er ook bij
+   in plaats van een grens te suggereren die niemand heeft vastgesteld. */
 'use strict';
 
 /* DE ENE VERGELIJKING. Trimt en negeert hoofdletters: "A. Bakker" en
@@ -67,7 +68,15 @@ function magMeetekenen(alGetekend, wie, wat) {
 const HANDELINGEN = {
   'naheffing.vaststellen': { ogen: 4, wat: 'inspecteur',
     omschrijving: 'Een naheffingsaanslag vaststellen',
-    omkeerbaar: 'intrekbaar zolang hij niet is betaald', drempels: [] },
+    omkeerbaar: 'intrekbaar zolang hij niet is betaald',
+    /* DE ENIGE VASTGESTELDE GRENS IN DIT BESTAND, en hij staat hier omdat een
+       mens hem heeft gezet en niet omdat een som hem opleverde. Boven de
+       25.000 euro tekent er een derde inspecteur mee.
+
+       Waarom juist daar: hoog genoeg dat het dagelijkse werk niet vastloopt,
+       laag genoeg dat de zware gevallen een extra paar ogen krijgen. Verschuift
+       die grens, dan verschuift hij HIER en nergens anders. */
+    drempels: [{ bovenCenten: 2500000, ogen: 6 }] },
   'naheffing.bezwaar': { ogen: 6, wat: 'inspecteur',
     omschrijving: 'Beslissen op een bezwaar',
     omkeerbaar: 'nee -- een besluit op bezwaar staat', drempels: [],

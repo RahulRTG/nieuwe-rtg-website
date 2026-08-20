@@ -43,14 +43,19 @@ concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
 **`COMMERCIE.md` is de Commercial Core** — het commerciële subsysteem onder de
-prijslijst: zeven lagen (catalogus, pricing, contract, verbruik, ledger, btw,
-claims), drie prijsmechanismen (free, fixed, contract) en het onderscheid dat
-alles bij elkaar houdt: **catalogusprijs ≠ contractprijs ≠ factuurbedrag**. Twee
-regels die er hard staan: de partnervergoeding over omzet is **nul** en dat is
-geen instelling (wat RTG wél rekent valt onder vier benoemde diensten, en geen
-ervan gaat over omzet), en het ledenvoordeel heeft **vier** bedragen met de
-invariant `lid + RTG === bruto === zaak`. Lees COMMERCIE.md als je aan de
-structuur werkt, PRIJZEN.md als je een bedrag zoekt.
+prijslijst, in `server/kern/commercie/`: catalogus (`../pasladder.js`), pricing
+(`../pasprijs.js`), contract, verbruik (`tegoed.js`), vergoedingen, subsidie,
+fee, allocatie, btw en claims. Drie prijsmechanismen (free, fixed, contract) en
+het onderscheid dat alles bij elkaar houdt: **catalogusprijs ≠ contractprijs ≠
+factuurbedrag**. Vijf regels die er hard staan: de partnervergoeding over omzet
+is **nul** en dat is geen instelling; een **bodem is geen prijs** en mag nooit op
+een factuur belanden; het ledenvoordeel heeft **vier** bedragen met de invariant
+`lid + RTG === bruto === zaak`; een **prijswijziging raakt geen lopend contract**;
+en er ontstaan **nooit ongemerkt** variabele kosten (AI boven het tegoed vraagt
+altijd een keuze vooraf, en automatisch aanvullen vraagt een maandmaximum).
+`claims.poort()` is de release-gate: een bewering die zich AFGEDWONGEN noemt
+zonder toets, komt er niet door. Lees COMMERCIE.md als je aan de structuur werkt,
+PRIJZEN.md als je een bedrag zoekt.
 
 **`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass
 65, Business Lite 150, Business vanaf 5.000, Lifestyle vanaf 20.000) en de

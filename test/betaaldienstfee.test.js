@@ -140,3 +140,73 @@ test('9. openstaand telt per zaak, en over alle zaken', () => {
   assert.equal(fees.openstaand('B').centen, 25);
   assert.equal(fees.openstaand().centen, 43, 'en zonder zaak: het hele huis');
 });
+
+/* DE HERKANSINGSRONDE. Tot nu toe bleef een HERKANSING staan tot iemand keek:
+   zichtbaar, maar niemand pakte hem op. Dat stond zo als open punt in
+   PRIJZEN.md 4.3 -- en een openstaand punt dat je kunt sluiten, hoor je te
+   sluiten. */
+test('10. de herkansingsronde boekt alsnog wat eerder mislukte', async () => {
+  const { fees } = verse();
+  const a = fees.incasseer({ supplierCode: 'A', centen: 32, transactieCenten: 2200 });
+  const b = fees.incasseer({ supplierCode: 'B', centen: 18, transactieCenten: 900 });
+  fees.mislukt(a, 'motor weg');
+  fees.mislukt(b, 'motor weg');
+  assert.equal(fees.openstaand().centen, 50);
+
+  const r = await fees.herkans(async () => ({ boeking: { id: 'b-nieuw' } }));
+  assert.equal(r.geprobeerd, 2);
+  assert.equal(r.gelukt, 2);
+  assert.equal(fees.openstaand().centen, 0, 'na een geslaagde ronde staat er niets meer open');
+  assert.equal(a.status, STATUS.GEBOEKT);
+});
+
+test('11. een ronde die weer mislukt telt door en geeft niet op', async () => {
+  const { fees } = verse();
+  const a = fees.incasseer({ supplierCode: 'A', centen: 32, transactieCenten: 2200 });
+  fees.mislukt(a, 'eerste keer');
+
+  const r = await fees.herkans(async () => ({ error: 'nog steeds weg' }));
+  assert.equal(r.mislukt, 1);
+  assert.equal(a.pogingen, 2, 'de poging is geteld');
+  assert.equal(a.status, STATUS.HERKANSING, 'en hij blijft verschuldigd');
+  assert.equal(fees.openstaand().centen, 32, 'opgeven is geen optie: de vordering bestaat nog');
+  assert.match(a.laatsteFout, /nog steeds weg/);
+});
+
+/* Na een aantal keer is het geen hapering maar een defect. De rij blijft staan
+   -- maar hij valt buiten de ronde, en dan hoort dat GETELD te worden: een rij
+   die stil buiten de ronde valt is net zo onzichtbaar als de nul die we hebben
+   weggehaald. */
+test('12. na te veel pogingen stopt de ronde ermee, zichtbaar', async () => {
+  const { fees } = verse();
+  const a = fees.incasseer({ supplierCode: 'A', centen: 32, transactieCenten: 2200 });
+  for (let i = 0; i < 5; i++) fees.mislukt(a, 'blijft stuk');
+  assert.equal(a.pogingen, 5);
+
+  const r = await fees.herkans(async () => ({ boeking: { id: 'x' } }), { maxPogingen: 5 });
+  assert.equal(r.geprobeerd, 0, 'deze wordt niet meer geprobeerd');
+  assert.equal(r.vastgelopen, 1, 'maar hij wordt wel geteld');
+  assert.equal(r.vastgelopenCenten, 32, 'met het bedrag erbij, zodat het op een bord kan');
+  assert.equal(fees.openstaand().centen, 32, 'en hij staat nog steeds open');
+});
+
+test('13. een ronde pakt niet meer dan haar maximum in een keer', async () => {
+  const { fees } = verse();
+  for (let i = 0; i < 10; i++) {
+    const f = fees.incasseer({ supplierCode: 'A', centen: 10, transactieCenten: 100 });
+    fees.mislukt(f, 'weg');
+  }
+  const r = await fees.herkans(async () => ({ boeking: { id: 'x' } }), { maxPerRonde: 3 });
+  assert.equal(r.geprobeerd, 3, 'een ronde van duizend boekingen legt de motor om als hij al moeite heeft');
+  assert.equal(fees.openstaand().aantal, 7);
+});
+
+test('14. een boekfunctie die gooit, laat de ronde niet omvallen', async () => {
+  const { fees } = verse();
+  const a = fees.incasseer({ supplierCode: 'A', centen: 32, transactieCenten: 2200 });
+  fees.mislukt(a, 'eerste');
+  const r = await fees.herkans(async () => { throw new Error('motor crasht'); });
+  assert.equal(r.ok, true, 'de ronde loopt af');
+  assert.equal(r.mislukt, 1);
+  assert.match(a.laatsteFout, /motor crasht/, 'en de reden wordt bewaard');
+});

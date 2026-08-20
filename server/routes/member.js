@@ -108,6 +108,11 @@ module.exports = (kern) => {
   require('./member/betalen')(kern);
   // Het partner- en bedrijvenkanaal: niet-leden-boekingen, partner-aanvraag, winkel.
   require('./member/partnerkanaal')(kern);
+  /* De meldknop van de ledenprijsgarantie. De voorwaarden beloofden "meld het
+     via de app en het verschil wordt rechtgezet"; het plafond was gebouwd, deze
+     knop niet (PRIJZEN.md 4.11). Drie kanten in een bestand: het lid meldt, de
+     zaak erkent of betwist, het kantoor komt erbij als het vastloopt. */
+  require('./member/prijsgarantie')(kern);
   // Ter plaatse: gastsleutel, aandacht vragen, gastchat, event-RSVP.
   require('./member/terplaatse')(kern);
   // Onderweg: de live reis en ritten aanvragen/betalen.

@@ -177,7 +177,45 @@ function maakFees({ db, save, nu }) {
       (!filter.status || f.status === filter.status)).slice(0, 200).map(publiek);
   }
 
-  return { STATUS, OPEN, AF, incasseer, geboekt, mislukt, stemAf, openstaand, lijst, publiek, magOvergaan };
+  /* DE HERKANSINGSRONDE. Een HERKANSING bleef staan tot iemand keek -- zichtbaar
+     in `openstaand`, maar niemand pakte hem op. Deze ronde probeert ze opnieuw.
+
+     `boekFn` komt van de aanroeper omdat deze module geen grootboek kent (zie de
+     kop). Hij krijgt de rij mee en geeft een boeking of een fout terug.
+
+     TWEE GRENZEN, allebei uit een echte overweging:
+     - `maxPogingen`: na een aantal keer is het geen hapering maar een defect, en
+       dan hoort er een mens naar te kijken in plaats van dat de rij elke ronde
+       dezelfde fout herhaalt. De rij blijft staan -- opgeven is hier geen
+       optie, want de vordering bestaat nog steeds.
+     - `maxPerRonde`: een ronde die duizend boekingen in een keer probeert, legt
+       de motor om op precies het moment dat hij al moeite heeft. */
+  async function herkans(boekFn, opties) {
+    const o = opties || {};
+    const maxPogingen = Number.isFinite(o.maxPogingen) ? o.maxPogingen : 5;
+    const maxPerRonde = Number.isFinite(o.maxPerRonde) ? o.maxPerRonde : 50;
+    if (typeof boekFn !== 'function') return { ok: false, error: 'geen boekfunctie' };
+
+    const kandidaten = rij()
+      .filter(f => f.status === STATUS.HERKANSING && (f.pogingen || 0) < maxPogingen)
+      .slice(0, maxPerRonde);
+
+    let gelukt = 0, mislukking = 0;
+    for (const f of kandidaten) {
+      let r;
+      try { r = await boekFn(f); } catch (e) { r = { error: String((e && e.message) || e) }; }
+      if (r && !r.error) { geboekt(f, (r.boeking || {}).id || r.ref || null); gelukt++; }
+      else { mislukt(f, r); mislukking++; }
+    }
+    const vast = rij().filter(f => f.status === STATUS.HERKANSING && (f.pogingen || 0) >= maxPogingen);
+    return { ok: true, geprobeerd: kandidaten.length, gelukt, mislukt: mislukking,
+      /* Wat de ronde NIET meer probeert. Dit getal hoort op een bord, want een
+         rij die stil buiten de ronde valt is net zo onzichtbaar als de nul die
+         we hebben weggehaald. */
+      vastgelopen: vast.length, vastgelopenCenten: vast.reduce((s, f) => s + f.centen, 0) };
+  }
+
+  return { STATUS, OPEN, AF, incasseer, geboekt, mislukt, stemAf, openstaand, lijst, publiek, magOvergaan, herkans };
 }
 
 module.exports = { maakFees, STATUS, OVERGANG, OPEN, AF, magOvergaan };

@@ -16,21 +16,33 @@
 
 const crypto = require('crypto');
 
+const btw = require('./commercie/btw');
+
 const AANDEEL = 0.30;   // 30% van de abonnementsbijdrage
-const BTW = 1.21;       // afdracht rekent over het bedrag ex btw
+/* Het btw-tarief kwam hier als constante `1.21` binnen, terwijl dit platform
+   landen kent (kern/commercie/btw.js). Een lid buiten Nederland kreeg zo 21%
+   Nederlandse btw van zijn bijdrage afgehaald voordat de 30% werd gerekend --
+   en bij een Lifestyle Pass van 20.000 euro per maand is dat geen
+   afrondingsfout. Het profiel komt van het contract; zonder profiel geldt de
+   standaard, en dat is nog steeds NL 21%. */
 
 // Herkent een abonnements-/lidmaatschapsfactuur (alleen die dragen af).
 function isAbonnement(desc) {
   return /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(String(desc || ''));
 }
 
-// 30% ex btw van een incl-btw bijdrage, in hele centen (afgerond).
-function aandeelCenten(bijdrageInclBtw) {
-  return Math.round((Number(bijdrageInclBtw) || 0) / BTW * AANDEEL * 100);
+/* 30% ex btw van een incl-btw bijdrage, in hele centen (afgerond).
+   `btwProfiel` komt van het contract van het lid; laat je hem weg, dan geldt
+   NL 21% -- hetzelfde antwoord als vroeger, maar nu als expliciete standaard in
+   plaats van als enige mogelijkheid. */
+function aandeelCenten(bijdrageInclBtw, btwProfiel) {
+  const centenIncl = Math.round((Number(bijdrageInclBtw) || 0) * 100);
+  const o = btw.overBruto(centenIncl, btwProfiel);
+  return Math.round(o.nettoCenten * AANDEEL);
 }
 // Zelfde bedrag in euro's (voor tonen).
-function aandeelEuro(bijdrageInclBtw) {
-  return aandeelCenten(bijdrageInclBtw) / 100;
+function aandeelEuro(bijdrageInclBtw, btwProfiel) {
+  return aandeelCenten(bijdrageInclBtw, btwProfiel) / 100;
 }
 
 function maakFonds(state) {
@@ -82,9 +94,9 @@ function maakFonds(state) {
   // Boek de 30%-afdracht voor een zojuist betaalde abonnementsfactuur. Idempotent
   // op (wie, invoiceId): dezelfde betaalde factuur levert nooit twee afdrachten.
   // Geeft de afdracht terug, of null als de factuur niet afdraagt.
-  async function boekAfdracht({ invoiceId, wie, bijdrage, betaalId, omschrijving }) {
+  async function boekAfdracht({ invoiceId, wie, bijdrage, betaalId, omschrijving, btwProfiel }) {
     if (!isAbonnement(omschrijving)) return null;
-    const centen = aandeelCenten(bijdrage);
+    const centen = aandeelCenten(bijdrage, btwProfiel);
     if (centen <= 0) return null;
 
     const rijen = lijst();

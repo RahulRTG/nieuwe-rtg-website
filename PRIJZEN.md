@@ -71,12 +71,15 @@ zaak zelf bezorgt en 25 tot 35% met bezorging (MARKT.md, met bronnen). Bij
 | 2 | Business Lite kost minimaal **€ 150** p/m | `bodemCenten`; toets 3 |
 | 3 | Business kost minimaal **€ 5.000** p/m | `bodemCenten`; toets 3 |
 | 4 | Lifestyle kost minimaal **€ 20.000** p/m | `bodemCenten`; toets 3 |
-| 5 | AI boven de inbegrepen capaciteit vraagt een bundel, expliciete toestemming of een vooraf ingestelde aanvulling | **nergens — de laag bestaat nog niet** (§5) |
-| 6 | Geen abonnement veroorzaakt ooit **ongemerkt** variabele kosten | **nergens — de laag bestaat nog niet** (§5) |
+| 5 | AI boven de inbegrepen capaciteit vraagt een bundel, expliciete toestemming of een vooraf ingestelde aanvulling | `kern/commercie/tegoed.js`; `test/tegoed.test.js` 4–7 |
+| 6 | Geen abonnement veroorzaakt ooit **ongemerkt** variabele kosten | idem; automatisch aanvullen zónder maandmaximum wordt geweigerd (toets 6) |
 
-Regel 5 en 6 staan er eerlijk als onafgedwongen. Een regel die nergens wordt
-afgedwongen is een belofte en geen regel (LAT.md); ze opschrijven alsof ze
-gebouwd zijn zou het gat onzichtbaar maken.
+Regel 5 en 6 stonden hier tot 20 augustus 2026 als **niet afgedwongen**, en dat
+was eerlijk: de laag bestond niet. Nu bestaat hij. "Ongemerkt" is het sleutelwoord
+van regel 6 — het gaat er niet om *dat* er kosten zijn, maar dat een klant ze
+nooit ontdekt nadat ze zijn gemaakt. Vandaar dat `mag()` vooraf antwoordt en niet
+achteraf meldt, en dat het antwoord bij een plafond niet "nee" is maar "nee, en
+dit kun je doen".
 
 ### Een bodem is geen prijs
 
@@ -212,7 +215,13 @@ bovendien `subtotaal + fooi` — de korting gaat er aan geen van beide kanten af
 `order.total` 22 blijft en dat `regieKorting` 2,20 is — precies de twee velden
 die ook kloppen als er niets gebeurt.
 
-### 4.5 Er is geen maand 13
+### 4.5 ~~Er is geen maand 13~~ — GESLOTEN
+
+*Opgelost: `kern/commercie/contract.js`. De billing engine vraagt per datum of er
+een geldige betalingsverplichting is, in plaats van twaalf termijnen klaar te
+zetten. Maand 13 bestaat als het contract verlengd is en niet als het is
+opgezegd. `price_lock_until` maakt het besluit hard: een prijswijziging raakt een
+lopend contract niet. Wat er was:*
 
 `kern/aanmeldingen/betaalschema.js` zet twaalf termijnen en stopt. De voorwaarden
 zeggen "minimaal 12 maanden (jaarcontract)". Er is geen verlenging, geen
@@ -237,7 +246,11 @@ code — nul treffers buiten het voorwaardendocument. LAUNCH.md noemt dit zelf a
 openstaand punt, inclusief de waarschuwing dat een open kostenclausule b2b wel
 mag maar gespecificeerd moet zijn om afdwingbaar te blijven.
 
-### 4.7 De omzetstaat telt de contractprijzen niet mee
+### 4.7 De omzetstaat telt de contractprijzen niet mee — **deels**
+
+*Het contractbedrag heeft nu een huis (`kern/commercie/contract.js`) en het
+betaalschema rekent ermee. Wat nog niet kan: de omzetstaat leest de accountlaag
+en niet de contracten, dus optellen zou daar een schatting worden. Blijft open.*
 
 Sinds deze ladder zijn Business én Lifestyle contractueel, dus `ledenregister.js`
 laat ze uit `totaalOmzet` en toont ze als `opMaat` met hun aantal. Dat is het
@@ -247,27 +260,52 @@ betekent dat RTG's belangrijkste omzetgetal per definitie onvolledig is.
 **Wat er eerst nodig is:** het contractbedrag van een lid bereikbaar maken vanuit
 de accountlaag, niet alleen vanuit de aanmelding waar het besluit viel.
 
-### 4.8 De 20/10-splitsing is nergens onderbouwd, behalve in een spel
+### 4.8 ~~De 20/10-splitsing is nergens onderbouwd~~ — GESLOTEN
+
+*Opgelost: `kern/commercie/allocatie.js`. Elk deel draagt een `waarom`,
+`regelKlopt()` weigert een deel zonder uitleg of een verdeling die niet optelt,
+en elk bedrag draagt de regelversie waarmee het is gerekend. Publiek te lezen op
+`/api/sociaalbeleid`. Wat er was:*
 
 De 30% splitst in 20% lokaal en 10% de stichting zelf. De enige plek waar
 *waarom* staat is `GAMEHALL.md` §12.5 — over de spelwereld. De publieke
 voorwaarden noemen alleen de 30%. Wie "lokaal" is en waar dat geld landt, staat
 nergens; `RTF_IBAN` is één rekening.
 
-### 4.9 De 30% wordt geboekt maar niet betaald
+### 4.9 De 30% wordt geboekt maar niet betaald — **spoor gebouwd, uitbetaling wacht**
+
+*Elke afdracht draagt nu bron, verdeling, regelversie, bestemmingen en vier
+tijdstempels, en een teruggedraaide bijdrage laat geen afdracht achter. Daarmee
+is de 30% aantoonbaar — wat MARKT.md eist zodra hij in marketing staat. De
+uitbetaling zelf wacht nog steeds op `RTF_IBAN`; de claim staat daarom als
+GEBOUWD en niet als AFGEDWONGEN (`/api/claims`).*
 
 Zonder `RTF_IBAN` blijft de afdracht op `te_storten` (TAKEN.md 2.6). MARKT.md
 waarschuwt dat de 30% een handelspraktijk wordt zodra hij in marketing staat —
 aantoonbaar te maken, ANBI te overwegen, jaarlijks te verantwoorden. Hij staat nu
 in de publieke voorwaarden.
 
-### 4.10 Btw is overal 21%, hard
+### 4.10 ~~Btw is overal 21%, hard~~ — GESLOTEN
+
+*Opgelost: `kern/commercie/btw.js` met profielen (NL 21/9, EU verlegd, buiten de
+EU, ES 21/10). `fonds.js` en `lid/facturen.js` rekenen er nu mee; zonder profiel
+geldt NL 21% — hetzelfde antwoord als vroeger, maar als expliciete standaard in
+plaats van als enige mogelijkheid. Een contract draagt een `btwProfiel` dat
+iemand heeft gekozen; deze laag leidt het niet af uit een landcode, want waar een
+dienst belastbaar is, is een juridische vraag. Wat er was:*
 
 `* 1.21` staat vast in `kern/fonds.js` en `kern/lid/facturen.js`, terwijl het
 platform landen kent (`LANDEN`, `logiesBtw` per land) en leden internationaal
 zijn. Een Lifestyle-lid buiten Nederland krijgt nu 21% Nederlandse btw.
 
-### 4.11 De ledenprijsgarantie kapt af, maar zet niets recht
+### 4.11 ~~De ledenprijsgarantie kapt af, maar zet niets recht~~ — GESLOTEN
+
+*Opgelost: `kern/commercie/prijsmelding.js` plus de routes. Het lid meldt, de
+zaak erkent of betwist, het kantoor komt erbij als het vastloopt. Het bedrag ligt
+vast op het moment van melden — wie het bij het rechtzetten mag meegeven, kan een
+verschil van 3 euro voor 999 euro rechtzetten. Er wordt niets automatisch
+beoordeeld en niets automatisch overgemaakt; dat is een besluit, geen omissie.
+Wat er was:*
 
 Het plafond is echt gebouwd: de ledenprijs wordt server-side afgekapt op de
 publieke prijs, zowel bij het opslaan van de menukaart als bij het bestellen

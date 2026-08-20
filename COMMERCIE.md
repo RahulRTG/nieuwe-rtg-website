@@ -176,9 +176,40 @@ naast een commissieknop kon blijven bestaan.
 
 Zie §11.
 
-## 4. Wat hierna komt, op volgorde
+## 4. De volgorde, en waar hij staat
 
-De eigenaar heeft de volgorde bepaald. 1, 2 en 3 zijn af.
+De eigenaar bepaalde de volgorde. Alle tien zijn gebouwd; wat er per punt níét
+in zit, staat erbij.
+
+| # | Onderwerp | Staat |
+|---|---|---|
+| 1 | Commissieconflict weg | af — `commercie/vergoeding.js` |
+| 2 | Ledenkorting financieel echt | af (rekenkundig) — `commercie/subsidie.js`; de uitbetaling wacht op de betaal-naad |
+| 3 | Betaaldienst met ledger en recovery | af — `commercie/fee.js`, inclusief herkansingsronde |
+| 4 | Contract Engine + price snapshots | af — `commercie/contract.js` |
+| 5 | Business Lite via capabilities | af — `commercie/capaciteiten.js`; de trede is uitgerold |
+| 6 | AI Entitlement + bundels + cap | af — `commercie/tegoed.js`; bundelprijzen nog niet (zie hieronder) |
+| 7 | Tax Engine | af — `commercie/btw.js` |
+| 8 | Social allocation settlement | af — `commercie/allocatie.js`; uitbetaling wacht op `RTF_IBAN` |
+| 9 | Claims uit de kern | af — `commercie/claims.js` + `/api/claims` |
+| 10 | Release-gate | af — `claims.poort()` + `/api/office/claims/poort` |
+
+### Wat er bewust NIET in zit
+
+- **De verkoopprijs van een AI-bundel.** Die wordt gerekend uit de inkoopkant
+  (`inkoopkosten → veiligheidsmarge → platformmarge → verkoopprijs`), en die
+  laag bestaat niet. Een bedrag verzinnen zou precies de fout van PRIJZEN.md
+  §4.12 zijn. De bundels dragen daarom capaciteit en een naam, geen prijs.
+- **De uitbetaalkant van de subsidie en de sociale afdracht.** Beide staan als
+  verplichting met een bedrag en een status; het overmaken loopt via de
+  betaal-naad en wacht op een rekening.
+- **De omzetstaat over contractprijzen** (PRIJZEN.md §4.7): die leest de
+  accountlaag en niet de contracten.
+- **De entree van € 10.000** (§4.6): te herzien, niet te bouwen.
+
+## 4b. Wat hierna komt
+
+De eigenaar heeft de volgorde bepaald. 1 tot en met 10 zijn af.
 
 1. ~~Commissieconflict definitief verwijderen~~ — **af**
 2. ~~Ledenkorting financieel echt maken~~ — **af** (rekenkundig; de uitbetaalkant

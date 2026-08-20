@@ -4,6 +4,7 @@
    meteen overal het geldende bedrag. Afgesplitst uit ./regie zodat elk deel
    onder de 10 KB blijft; de bedrading komt via dezelfde context binnen. */
 const allocatie = require('../../kern/commercie/allocatie');
+const claims = require('../../kern/commercie/claims');
 
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern,
@@ -45,6 +46,19 @@ module.exports = (ctx) => {
       delen: r.delen.map(d => ({ id: d.id, deel: d.deel, label: d.label, waarom: d.waarom })) })) });
   app.get('/api/sociaalbeleid', (req, res) => stuur(res, socialeRegels()));
   app.post('/api/sociaalbeleid', (req, res) => stuur(res, socialeRegels()));
+
+  /* DE COMMERCIELE CLAIMS. Wat RTG publiek beweert, met per bewering de waarde,
+     de bron en hoe hard hij is. Publiek, want dit is precies wat een
+     voorwaardenpagina hoort op te halen in plaats van zelf op te schrijven --
+     dat was de oorzaak van "0% commissie naast een knop op 12%".
+
+     De release-poort zit achter de kantoorpoort: die zegt of er een bewering
+     tussen zit die zich sterker voordoet dan hij is, en dat is intern werk. */
+  const claimLijst = () => ({ status: 200, claims: claims.publiek() });
+  app.get('/api/claims', (req, res) => stuur(res, claimLijst()));
+  app.post('/api/claims', (req, res) => stuur(res, claimLijst()));
+  app.post('/api/office/claims/poort', officeAuth, (req, res) => veilig(res, () =>
+    ({ status: 200, ...claims.poort() })));
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});

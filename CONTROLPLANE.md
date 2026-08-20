@@ -60,6 +60,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Bevoegdheid + grenzen | `commercie/bevoegdheid.js` | **af** — vier dimensies, delegatie versmalt |
 | Policy + decision | `commercie/besluit.js` | **af** — acht uitkomsten |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
+| Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
 | Action | de bestaande domeinen | bestond |
 | Value movement | `pay`, `bank` | bestond |
@@ -152,18 +153,58 @@ CLAIM → CAPABILITY → ENFORCEMENT → TEST → EVIDENCE → BILLING → UI
 ```
 
 Wat er nu machinaal in zit: claim → bron (bestaat) → toets (bestaat) →
-dekking-klopt-met-toets. Wat er nog niet in zit: enforcement (is er een caller?),
+dekking-klopt-met-toets, en sinds §6.1 ook enforcement. Wat er nog niet in zit:
 billing en UI. Zie §7.
+
+### 5.1 De caller-meting (was §6.1, nu gebouwd)
+
+`scripts/capabilities.js` telt per capability of er een caller is buiten de eigen
+module. Bij de eerste run: **vijf van de acht stil** — kassa, Werk OS, personeel,
+governance en de vaste contactpersoon werden nergens gevraagd. Ze waren
+beschreven in het productprofiel, nagepraat door drie toetsen, en in vier
+bestanden in commentaar uitgelegd. Niemand werd ooit tegengehouden.
+
+Wat wél en niet als caller telt, is het hele punt:
+
+| Soort | Telt | Waarom |
+|---|---|---|
+| `mag(pas, 'can_use_pos')` in `server/` | **ja** | hier wordt iemand tegengehouden |
+| een regel in de routetabel die aantoonbaar weigert | **ja** | gedragsbewijs, zie hieronder |
+| `tredenMet('…')` voor een zin op een scherm | nee | vertellen wat je nodig hebt is geen slot |
+| dezelfde aanroep in `test/` | nee | een toets bewijst dat de tabel klopt, niet dat er iets mee gebeurt |
+| de naam in commentaar | nee | dit is de gevaarlijkste soort: het leest als bewijs |
+
+**De reparatie werd een tabel, en toen bleef de meter rood.** Een controle in elk
+kassabestand zou de zevenenzeventigste pas-id-controle in een ander jasje zijn,
+dus de vijf gaten werden gedicht met één tabel aan het keelgat waar elke
+leveranciersroute doorheen moet (`routepoort.js` in `leverancierpoort.js`, naast
+de persoonseis die daar al staat en om dezelfde reden). Daarmee stond de
+capability in een tabel en niet in een `mag()`-aanroep.
+
+De meter kreeg daarvoor **geen uitzondering** — dan meet hij zijn eigen oplossing
+goed en de volgende niet. Hij kreeg **gedragsbewijs**: voor elke tabelregel zoekt
+hij een trede die de capability niet heeft, roept `beoordeel()` aan, en telt de
+regel alleen als hij werkelijk weigert. En de tabel zelf moet een aanroeper
+hebben, want anders verplaatst de stille belofte zich één laag omhoog.
+
+**Twee dingen die de meting eerlijk houden.** De poort valt hier *terug* waar de
+persoonseis ernaast *dicht*valt: die beschermt kinderen, deze bewaakt een
+productgrens, en een migratie die rechten intrekt is een storing met een nette
+naam. En het rapport zegt per capability of hij vandaag iemand raakt: kassa, Werk
+OS en personeel zitten in béide zakelijke treden, dus die grens is aangelegd maar
+bijt nog niet. Alleen governance doet dat, tegen Business Lite.
+
+De bekende grens van de meter staat in zijn eigen kop: hij leest tekst en volgt
+geen aanroepgraaf. Een `beoordeel(...)` in een functie die zelf nergens wordt
+aangeroepen telt mee. Dat is bij een mutatie aangetoond en niet weggeredeneerd;
+wat die laatste schakel vasthoudt is een gedragstoets op de deur zelf.
 
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
 vastligt en niemand halverwege iets anders bouwt.
 
-1. **Enforcement in de Promise Gate.** Meet per capability of er een caller is
-   buiten de eigen module. Dat is precies de meting die de zes stille
-   capabilities vond, en zij hoort automatisch te draaien in plaats van met de
-   hand. *Dit is de goedkoopste en waardevolste volgende stap.*
+1. ~~**Enforcement in de Promise Gate.**~~ **Gebouwd** — zie §5.1.
 2. **Capability tokens** — kortlevende, ondertekende autorisatie
    (*proof-carrying authorization*): actor, capability, resource, limiet,
    vervaltijd, beleidsversie, nonce, handtekening. Minder databasecalls per
@@ -206,7 +247,14 @@ vastligt en niemand halverwege iets anders bouwt.
 > Geen belofte zonder afdwingbare capability. Geen capability zonder caller.
 > Geen bevoegdheid zonder oorsprong. Geen economische actie zonder bewijs.
 
-Zolang die vier niet allemaal machinaal gemeten worden, is dit een ambitie. Twee
-zijn dat nu (belofte, oorsprong), één deels (bewijs), één nog niet (caller — §6.1).
-Dat verschil eerlijk houden is de hele reden dat dit document een tabel bevat en
-geen manifest.
+Zolang die vier niet allemaal machinaal gemeten worden, is dit een ambitie. Drie
+zijn dat nu — belofte (`claims.poort`), oorsprong (`bevoegdheid.herkomst`) en
+caller (`scripts/capabilities.js`) — en één deels: bewijs. Dat verschil eerlijk
+houden is de hele reden dat dit document een tabel bevat en geen manifest.
+
+En één eerlijkheid hoort erbij: van de vijf gaten die de caller-meting vond, is
+er vandaag maar één die werkelijk iemand tegenhoudt. De andere vier zijn
+bedrading die klaarligt voor de eerste trede die het onderdeel níet bevat. Dat is
+geen fout — een grens die niemand raakt is nog steeds een grens die er is — maar
+het is iets anders dan een grens die bijt, en het rapport zegt per capability wat
+het van de twee is.

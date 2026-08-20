@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:52:59.273Z",
-  "commit": "6c6e966",
+  "op": "2026-08-20T10:04:16.594Z",
+  "commit": "024e612",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 12,
-  "meetwerk": 107,
+  "meetwerk": 102,
   "instrument": 817,
   "grens": 604
  },
@@ -66,7 +66,7 @@
    "id": "output-blind",
    "soort": "meetwerk",
    "wat": "routes waarover gelogen is zonder dat een toets het merkte",
-   "aantal": 10,
+   "aantal": 5,
    "waarom": "de liegpoort heeft het antwoord van precies deze route vervalst en de toetsen die hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan stilletjes leeg of fout zijn zonder dat iets zakt.",
    "sluit": "per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel (die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om."
   },
@@ -92,7 +92,7 @@
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
    "aantal": 711,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
-   "sluit": "per domein een keten van twee stappen, zoals scripts/lib/ketens die al kent: maak het object met de rol die het mag, bedien het daarna. Dat is per domein werk en geen generieke truc -- een id raden uit een ander domein levert dezelfde 404 op."
+   "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },
   {
    "id": "proefruis",
@@ -108,7 +108,7 @@
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
    "aantal": 4,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
-   "sluit": "ze een voor een omzetten. Bewust niet in een keer: deze tien vullen de registers waar dit huis op leunt, en ze tegelijk verbouwen is precies de verandering die je niet in een keer moet doen."
+   "sluit": "ze een voor een omzetten; keten-, verraadronde en duurzaamheidskosten zijn om (met magSterven en eigen-datamap in de lib). De vier die resten (beproeving, hersteltijd, ladder, tot-crash) willen eigen vlaggen (--expose-gc, gc-hook) of een hergebruikte datamap over een herstart heen; dat vraagt een lib-uitbreiding per geval, een voor een."
   }
  ],
  "groei": [

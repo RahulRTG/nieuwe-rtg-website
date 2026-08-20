@@ -101,12 +101,8 @@ function noteerToets(methode, patroon) {
    en dat is juist: dan hangt het ergens van af. */
 function noteerAudit(methode, patroon, sporen, status) {
   if (!bestand || !patroon) return;
-  /* De uitkomstklasse erbij (2xx/4xx/5xx): zonder wist niemand of een 'geen'
-     bij een weigering hoorde -- en precies die dubbelzinnigheid hield 92
-     routes op 'wisselend' (de post audit-wisselend). Een route die bij elke
-     GESLAAGDE aanroep journaalt en bij een weigering niet, is niet
-     wispelturig; dat onderscheid kan alleen de meting maken. De oude vorm
-     zonder klasse blijft leesbaar voor de proef (scripts/auditproef.js). */
+  /* Uitkomstklasse (2xx/4xx/5xx): zonder wist niemand of een 'geen' bij een
+     weigering hoorde (92 routes 'wisselend'). Oude vorm blijft leesbaar. */
   const klasse = Number.isFinite(status)
     ? (status < 300 ? '2xx' : status >= 500 ? '5xx' : '4xx') + ' '
     : '';

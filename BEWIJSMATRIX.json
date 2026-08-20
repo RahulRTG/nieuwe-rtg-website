@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-08-20T09:33:53.900Z",
-    "commit": "12b71c7",
-    "boomVuil": false,
+    "op": "2026-08-20T10:04:16.446Z",
+    "commit": "024e612",
+    "boomVuil": true,
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
@@ -12,10 +12,10 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20863,
+    "bewezen": 20859,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 24900,
+    "ongemeten": 24904,
     "gezakt": 0
   },
   "perSchakel": {
@@ -48,17 +48,17 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 250,
+      "bewezen": 251,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3867,
+      "ongemeten": 3866,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 250,
+      "bewezen": 251,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3867,
+      "ongemeten": 3866,
       "gezakt": 0
     },
     "AUDIT": {
@@ -69,10 +69,10 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 266,
+      "bewezen": 267,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3851,
+      "ongemeten": 3850,
       "gezakt": 0
     },
     "FAILURE": {
@@ -83,10 +83,10 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2460,
+      "bewezen": 2453,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 1657,
+      "ongemeten": 1664,
       "gezakt": 0
     },
     "PRIVACY": {
@@ -97,5 +97,5 @@
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Met de hand vastgelegd over de ratel heen: zeven ROLLBACK-cellen waren bewezen op een WEIGERING (404 op een verzonnen id), en sinds de objectpool die routes met echte id-s bereikt weigeren ze niet meer -- het weigeringsbewijs vervalt eerlijk terwijl STATE/SIDE_EFFECT/IDEMPOTENCY er drie cellen bij kregen. Bereikt worden is meetwinst; het rollback-bewijs voor deze zeven vraagt een aparte geweigerde variant."
 }

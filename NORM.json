@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 905,
+    "testbestanden": 906,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 128,
@@ -25,12 +25,12 @@
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 150,
+    "toetsenNietGemeten": 151,
     "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "bewijsCellenBewezen": 20863,
-    "bewijsAchterstand": 1244
+    "bewijsCellenBewezen": 20859,
+    "bewijsAchterstand": 919
   },
   "notities": [
     {
@@ -480,6 +480,16 @@
       "datum": "2026-08-20",
       "meter": "bewijsCellenBewezen 20827 -> 20826",
       "reden": "Een OUTPUT-cel op een deur stond op bewezen via toerekening, maar elke lie-run spaart de deuren (RTG_LIEG_NIET): dat bewijs kon nooit echt geleverd zijn. Vals bewijs inleveren is geen verslechtering; de deur draagt nu de grens-post output-deuren."
+    },
+    {
+      "datum": "2026-08-20",
+      "meter": "bewijsCellenBewezen 20863 -> 20859",
+      "reden": "Zeven ROLLBACK-cellen waren bewezen op een weigering (404 op een verzonnen id); de objectpool bereikt die routes nu met echte id-s, dus het weigeringsbewijs vervalt eerlijk. STATE/SIDE_EFFECT/IDEMPOTENCY kregen er drie cellen bij; bereikt worden is meetwinst, geen verlies van gedrag."
+    },
+    {
+      "datum": "2026-08-20",
+      "meter": "toetsenNietGemeten 150 -> 151",
+      "reden": "test/objectpool.test.js is nieuw en nog niet door de mutatiemotor gezien; hij loopt mee in de eerstvolgende mutatieronde."
     }
   ],
   "prestatie": {

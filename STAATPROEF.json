@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T07:33:20.257Z",
-  "commit": "7f3ac37",
+  "op": "2026-08-20T10:00:56.267Z",
+  "commit": "024e612",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -68,21 +68,21 @@
  "routesGevonden": 4101,
  "gemeten": {
   "routesMetRol": 3255,
-  "beoordeeld": 2709,
-  "versGemeten": 170,
-  "oproepen": 340,
-  "state": 250,
-  "sideEffect": 250,
-  "rollback": 2459,
+  "beoordeeld": 2703,
+  "versGemeten": 400,
+  "oproepen": 800,
+  "state": 251,
+  "sideEffect": 251,
+  "rollback": 2452,
   "rollbackGezakt": 0,
-  "idemBewezen": 250,
+  "idemBewezen": 251,
   "idemGezakt": 0,
-  "ongemeten": 655,
+  "ongemeten": 661,
   "tokensHernieuwd": 0,
   "blindeRondes": 0,
   "collectiesInVingerafdruk": 144,
   "ruisCollecties": 2,
-  "begrenzing": 170
+  "begrenzing": 400
  },
  "omgevingsruis": [
   "doorgeefjournaal",
@@ -1806,7 +1806,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1822,7 +1822,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1838,7 +1838,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1854,7 +1854,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1870,7 +1870,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1886,7 +1886,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1902,7 +1902,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1918,7 +1918,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -1937,7 +1937,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2229,23 +2229,23 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/boeken/boek",
    "rol": "member",
    "statussen": [
-    404,
-    404
+    200,
+    200
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
-   "rollback": "bewezen",
+   "rollback": "ongemeten",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2261,7 +2261,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2280,7 +2280,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2296,7 +2296,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2312,7 +2312,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2328,7 +2328,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2344,7 +2344,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2362,7 +2362,7 @@
     "ledenSites"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in ledenSites was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2378,7 +2378,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2394,7 +2394,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2410,7 +2410,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2429,7 +2429,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2445,7 +2445,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2461,7 +2461,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2477,7 +2477,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2493,7 +2493,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2509,7 +2509,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2525,7 +2525,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2543,7 +2543,7 @@
     "carePakketten"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in carePakketten was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2559,7 +2559,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2575,7 +2575,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2591,7 +2591,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2607,7 +2607,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2623,7 +2623,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2639,7 +2639,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2655,7 +2655,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2671,7 +2671,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2687,7 +2687,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2703,7 +2703,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2719,7 +2719,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2735,7 +2735,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2751,7 +2751,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2767,7 +2767,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2783,7 +2783,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2799,7 +2799,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2815,7 +2815,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2831,7 +2831,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2847,7 +2847,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2863,7 +2863,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2879,7 +2879,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2895,7 +2895,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2911,7 +2911,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2927,7 +2927,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2943,7 +2943,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2959,7 +2959,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2975,7 +2975,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -2991,7 +2991,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3007,7 +3007,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3023,7 +3023,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3039,7 +3039,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3055,7 +3055,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3071,7 +3071,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3087,7 +3087,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3103,7 +3103,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3119,7 +3119,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3135,7 +3135,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3151,7 +3151,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3167,7 +3167,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3183,7 +3183,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3199,7 +3199,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3215,7 +3215,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3231,7 +3231,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3310,7 +3310,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3347,7 +3347,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3366,7 +3366,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3382,7 +3382,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3398,7 +3398,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3414,7 +3414,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3430,11 +3430,30 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/command/beleid",
+   "rol": "office",
+   "statussen": [
+    200,
+    200
+   ],
+   "state": "bewezen",
+   "sideEffect": "bewezen",
+   "rollback": "ongemeten",
+   "idempotentie": "bewezen",
+   "collecties": [
+    "commandBeleid"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T10:00:56.245Z"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid/geschiedenis",
    "rol": "office",
    "statussen": [
     200,
@@ -3446,23 +3465,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/command/beleid/geschiedenis",
-   "rol": "office",
-   "statussen": [
-    404,
-    404
-   ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
-   "rollback": "bewezen",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3478,39 +3481,39 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/command/beleid/terug",
    "rol": "office",
    "statussen": [
-    404,
-    404
+    409,
+    409
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "geweigerd (status 409) en er bleef niets staan",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/command/beleid/zet",
    "rol": "office",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "geweigerd (status 400) en er bleef niets staan",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3526,7 +3529,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3542,7 +3545,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3558,7 +3561,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3574,7 +3577,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3590,7 +3593,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3606,7 +3609,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3622,7 +3625,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3638,7 +3641,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3654,7 +3657,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3670,7 +3673,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3686,7 +3689,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3702,7 +3705,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3718,7 +3721,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3734,7 +3737,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3750,7 +3753,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3766,7 +3769,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3782,7 +3785,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3798,7 +3801,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3814,7 +3817,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3830,7 +3833,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3846,7 +3849,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3881,7 +3884,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3897,7 +3900,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3913,7 +3916,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3929,7 +3932,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3945,7 +3948,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3961,7 +3964,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3977,7 +3980,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -3993,7 +3996,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4009,7 +4012,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4025,7 +4028,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4041,7 +4044,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4057,7 +4060,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4073,7 +4076,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4089,7 +4092,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4105,7 +4108,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4121,7 +4124,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4137,7 +4140,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4153,7 +4156,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4169,7 +4172,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4185,7 +4188,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4201,7 +4204,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4217,7 +4220,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4254,7 +4257,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4270,7 +4273,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 409) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4286,7 +4289,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4321,7 +4324,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4337,7 +4340,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4353,7 +4356,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4390,7 +4393,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4406,7 +4409,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4422,7 +4425,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4430,7 +4433,7 @@
    "rol": "office",
    "statussen": [
     200,
-    409
+    200
    ],
    "state": "bewezen",
    "sideEffect": "bewezen",
@@ -4441,23 +4444,26 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/command/zandbak/runbook",
    "rol": "office",
    "statussen": [
-    404,
-    404
+    200,
+    200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
-   "rollback": "bewezen",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "state": "bewezen",
+   "sideEffect": "bewezen",
+   "rollback": "ongemeten",
+   "idempotentie": "bewezen",
+   "collecties": [
+    "zandbakken"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4465,7 +4471,7 @@
    "rol": "office",
    "statussen": [
     200,
-    404
+    200
    ],
    "state": "bewezen",
    "sideEffect": "bewezen",
@@ -4476,7 +4482,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4492,7 +4498,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4508,7 +4514,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4524,7 +4530,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4542,7 +4548,7 @@
     "concern"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in concern was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4558,7 +4564,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4574,7 +4580,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4590,7 +4596,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4606,7 +4612,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4622,7 +4628,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4638,7 +4644,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4654,7 +4660,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4670,7 +4676,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4705,7 +4711,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4721,7 +4727,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4737,7 +4743,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4753,7 +4759,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4769,7 +4775,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4785,7 +4791,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4801,7 +4807,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4817,7 +4823,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4833,7 +4839,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4849,7 +4855,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4859,16 +4865,13 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "concern"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4884,7 +4887,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4900,7 +4903,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4916,7 +4919,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4932,7 +4935,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4948,7 +4951,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4962,9 +4965,11 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "collecties": [
+    "concern"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in concern was inrichting -- de herhaling liet alles met rust",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4980,7 +4985,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -4996,7 +5001,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5012,7 +5017,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5047,7 +5052,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5065,7 +5070,7 @@
     "concern"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in concern was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5100,7 +5105,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5116,7 +5121,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5132,7 +5137,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5142,16 +5147,13 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "concern"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5167,7 +5169,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5183,7 +5185,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5199,7 +5201,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5215,7 +5217,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5231,7 +5233,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5247,7 +5249,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5261,9 +5263,11 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "collecties": [
+    "concern"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in concern was inrichting -- de herhaling liet alles met rust",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5279,7 +5283,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5295,7 +5299,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5311,7 +5315,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5327,7 +5331,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5341,9 +5345,11 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "collecties": [
+    "concern"
+   ],
+   "reden": "geweigerd (status 404); de eenmalige wijziging in concern was inrichting -- de herhaling liet alles met rust",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5359,7 +5365,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5375,7 +5381,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5391,7 +5397,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5407,7 +5413,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5423,7 +5429,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5439,7 +5445,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5455,7 +5461,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5471,7 +5477,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5493,7 +5499,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (4)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5509,7 +5515,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5525,7 +5531,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5541,7 +5547,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5557,7 +5563,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5573,7 +5579,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5589,7 +5595,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5599,16 +5605,13 @@
     200,
     200
    ],
-   "state": "bewezen",
-   "sideEffect": "bewezen",
+   "state": "ongemeten",
+   "sideEffect": "ongemeten",
    "rollback": "ongemeten",
-   "idempotentie": "bewezen",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "idempotentie": "ongemeten",
+   "collecties": [],
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5624,7 +5627,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5659,7 +5662,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5675,7 +5678,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5694,7 +5697,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5710,7 +5713,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5726,7 +5729,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5742,7 +5745,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5758,7 +5761,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5774,7 +5777,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5790,7 +5793,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5806,7 +5809,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5822,7 +5825,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5838,7 +5841,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5854,7 +5857,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5870,7 +5873,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5889,7 +5892,7 @@
     "veilig"
    ],
    "reden": "geweigerd (status 400); de eenmalige wijziging in rahulRespect, veilig was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5908,7 +5911,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5927,7 +5930,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5946,7 +5949,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5962,7 +5965,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -5981,23 +5984,23 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/foodcourt/tijden",
    "rol": "member",
    "statussen": [
-    404,
-    404
+    200,
+    200
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
-   "rollback": "bewezen",
+   "rollback": "ongemeten",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6015,7 +6018,7 @@
     "galerij"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in galerij was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6031,7 +6034,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6047,7 +6050,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6063,7 +6066,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6079,7 +6082,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6095,7 +6098,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6111,7 +6114,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6127,7 +6130,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6143,7 +6146,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6159,7 +6162,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6175,7 +6178,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6191,7 +6194,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6207,7 +6210,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6223,7 +6226,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6239,7 +6242,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6255,7 +6258,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6271,7 +6274,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6287,7 +6290,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6322,7 +6325,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6338,7 +6341,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6354,7 +6357,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6373,7 +6376,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6389,7 +6392,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6407,7 +6410,7 @@
     "geldbeleid"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in geldbeleid was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6423,7 +6426,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6443,7 +6446,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6459,7 +6462,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6475,7 +6478,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6491,7 +6494,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6507,7 +6510,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6523,7 +6526,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6539,7 +6542,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6555,7 +6558,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6571,7 +6574,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6587,7 +6590,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6603,7 +6606,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6619,7 +6622,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6635,7 +6638,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6654,7 +6657,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6670,23 +6673,23 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/gemeente/burgerzaken/slots",
    "rol": "member",
    "statussen": [
-    400,
-    400
+    200,
+    200
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
-   "rollback": "bewezen",
+   "rollback": "ongemeten",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6702,7 +6705,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6739,7 +6742,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6755,7 +6758,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6771,7 +6774,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6787,7 +6790,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6803,7 +6806,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6819,7 +6822,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6835,7 +6838,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6851,7 +6854,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6867,7 +6870,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6883,7 +6886,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6899,7 +6902,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6915,23 +6918,26 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/gemoed/zet",
    "rol": "member",
    "statussen": [
-    400,
-    400
+    200,
+    200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
-   "rollback": "bewezen",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "state": "bewezen",
+   "sideEffect": "bewezen",
+   "rollback": "ongemeten",
+   "idempotentie": "bewezen",
+   "collecties": [
+    "gemoed"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6949,7 +6955,7 @@
     "genootschap"
    ],
    "reden": "geweigerd (status 400); de eenmalige wijziging in genootschap was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6965,7 +6971,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6981,7 +6987,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -6997,7 +7003,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7013,7 +7019,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7029,7 +7035,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7045,7 +7051,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7061,7 +7067,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7077,7 +7083,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7093,7 +7099,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7109,7 +7115,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7125,7 +7131,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7141,7 +7147,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7157,7 +7163,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7173,7 +7179,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7189,7 +7195,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7205,7 +7211,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7221,7 +7227,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7237,7 +7243,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7253,7 +7259,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7269,7 +7275,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7304,7 +7310,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7320,7 +7326,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7336,7 +7342,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7352,7 +7358,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7368,7 +7374,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7384,7 +7390,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7400,7 +7406,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7435,7 +7441,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7451,7 +7457,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7467,7 +7473,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7483,7 +7489,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7499,7 +7505,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7515,7 +7521,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7531,7 +7537,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7550,7 +7556,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7566,7 +7572,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7585,7 +7591,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7604,7 +7610,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7620,7 +7626,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7638,7 +7644,7 @@
     "homeMerken"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in homeMerken was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7654,7 +7660,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7670,7 +7676,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7686,7 +7692,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7702,7 +7708,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7718,23 +7724,23 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
    "pad": "/api/home/zet",
    "rol": "member",
    "statussen": [
-    404,
-    404
+    200,
+    200
    ],
    "state": "ongemeten",
    "sideEffect": "ongemeten",
-   "rollback": "bewezen",
+   "rollback": "ongemeten",
    "idempotentie": "ongemeten",
    "collecties": [],
-   "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7750,7 +7756,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7766,7 +7772,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7782,7 +7788,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7798,7 +7804,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7814,7 +7820,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7830,7 +7836,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7846,7 +7852,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7862,7 +7868,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7878,7 +7884,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7894,7 +7900,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7910,7 +7916,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7926,7 +7932,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7945,7 +7951,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7961,7 +7967,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7977,7 +7983,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -7987,13 +7993,17 @@
     200,
     200
    ],
-   "state": "ongemeten",
-   "sideEffect": "ongemeten",
+   "state": "bewezen",
+   "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "ongemeten",
-   "collecties": [],
-   "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "idempotentie": "bewezen",
+   "collecties": [
+    "agendas",
+    "bestanden"
+   ],
+   "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8009,7 +8019,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8025,7 +8035,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8041,7 +8051,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8057,7 +8067,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8073,7 +8083,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8089,7 +8099,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8124,7 +8134,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8140,7 +8150,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8156,7 +8166,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8172,7 +8182,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8188,7 +8198,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8204,7 +8214,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8220,7 +8230,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8236,7 +8246,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8252,7 +8262,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8268,7 +8278,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8287,7 +8297,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8303,7 +8313,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8319,7 +8329,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8335,7 +8345,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8354,7 +8364,7 @@
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
    "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8370,7 +8380,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8386,7 +8396,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8402,7 +8412,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8418,7 +8428,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8434,7 +8444,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8450,7 +8460,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8466,7 +8476,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8482,7 +8492,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8498,7 +8508,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8514,7 +8524,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8530,7 +8540,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8546,7 +8556,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8562,7 +8572,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8578,7 +8588,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8594,7 +8604,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8610,7 +8620,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8626,7 +8636,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8640,11 +8650,9 @@
    "sideEffect": "ongemeten",
    "rollback": "bewezen",
    "idempotentie": "ongemeten",
-   "collecties": [
-    "wacht"
-   ],
-   "reden": "geweigerd (status 404); de eenmalige wijziging in wacht was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "collecties": [],
+   "reden": "geweigerd (status 404) en er bleef niets staan",
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8660,7 +8668,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8676,7 +8684,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8692,7 +8700,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8708,7 +8716,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8724,7 +8732,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8740,7 +8748,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8756,7 +8764,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8772,7 +8780,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8788,7 +8796,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8804,7 +8812,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8820,7 +8828,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8836,7 +8844,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8852,7 +8860,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8868,7 +8876,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8884,7 +8892,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",
@@ -8900,7 +8908,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T10:00:56.245Z"
   },
   {
    "methode": "POST",

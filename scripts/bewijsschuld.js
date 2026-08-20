@@ -188,9 +188,10 @@ const POSTEN = [
       'het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft ' +
       'nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle ' +
       '166 hetzelfde zeggen.',
-    sluit: 'per domein een keten van twee stappen, zoals scripts/lib/ketens die al kent: maak ' +
-      'het object met de rol die het mag, bedien het daarna. Dat is per domein werk en geen ' +
-      'generieke truc -- een id raden uit een ander domein levert dezelfde 404 op.' },
+    sluit: 'de objectpool (scripts/lib/objectpool.js) oogst echte id\'s uit antwoorden die de ' +
+      'ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. ' +
+      'Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); ' +
+      'daarvoor blijft de tweestapsketen per domein het antwoord.' },
 
   { id: 'proefruis', soort: 'meetwerk',
     wat: 'de vier proeven meten op dezelfde code niet twee keer hetzelfde',
@@ -228,9 +229,10 @@ const POSTEN = [
     waarom: 'scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande ' +
       'instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server ' +
       'start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.',
-    sluit: 'ze een voor een omzetten. Bewust niet in een keer: deze tien vullen de registers ' +
-      'waar dit huis op leunt, en ze tegelijk verbouwen is precies de verandering die je niet ' +
-      'in een keer moet doen.' }
+    sluit: 'ze een voor een omzetten; keten-, verraadronde en duurzaamheidskosten zijn om (met ' +
+      'magSterven en eigen-datamap in de lib). De vier die resten (beproeving, hersteltijd, ' +
+      'ladder, tot-crash) willen eigen vlaggen (--expose-gc, gc-hook) of een hergebruikte ' +
+      'datamap over een herstart heen; dat vraagt een lib-uitbreiding per geval, een voor een.' }
 ];
 
 function reden(register, voorvoegsel) {

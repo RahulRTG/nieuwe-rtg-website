@@ -108,10 +108,14 @@ test('3. de elf schakels komen uit de motor, met hun uitleg', async () => {
 });
 
 test('4. GEEN INSTRUMENT is iets anders dan NIET GEMETEN, en het antwoord zegt dat', async () => {
+  /* Toen deze toets werd geschreven stonden OUTPUT en AUDIT zonder instrument,
+     en hield hij vast dat het antwoord dat gemis benoemde. Sindsdien hebben
+     alle elf assen een meter (outputproef en auditproef waren de laatste twee);
+     de toets is dus gekanteld: elke schakel hoort nu een bron te dragen. Het
+     onderscheid zelf blijft bewaakt -- verliest een as zijn bron, dan gelden
+     de oude eisen weer en zakt dit op de eigenschappen hieronder, niet stil. */
   const d = (await vraag({ limiet: 1 })).body;
   const zonder = d.schakels.filter(s => !s.bron);
-  assert.ok(zonder.length >= 1,
-    'zolang er een as zonder instrument is, hoort die als zodanig herkenbaar te zijn');
   for (const s of zonder) {
     assert.ok(s.nodig && s.nodig.length > 20,
       s.id + ' heeft geen instrument en hoort te zeggen WAT er nodig is, niet alleen dat het ontbreekt');
@@ -121,6 +125,11 @@ test('4. GEEN INSTRUMENT is iets anders dan NIET GEMETEN, en het antwoord zegt d
       s.id + ' heeft geen instrument maar meldt ' + d.perSchakel[s.id].bewezen + ' bewezen cellen');
     assert.equal(d.perSchakel[s.id].ongemeten, d.routes,
       s.id + ' hoort voor ELKE route ongemeten te zijn');
+  }
+  for (const s of d.schakels) {
+    assert.ok(s.bron,
+      s.id + ' had een instrument (alle elf assen hebben er sinds de OUTPUT-band een); ' +
+      'is de bron uit scripts/bewijsmatrix.js gevallen?');
   }
 });
 

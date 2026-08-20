@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1028 bestanden en 6780 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1028 bestanden en 6785 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1028 |
-| losse beweringen (`test(...)`) | 6780 |
+| losse beweringen (`test(...)`) | 6785 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 855 |
 | **overleefd**: geen mutatie kreeg hem rood | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-900 bestanden, 6549 beweringen.
+900 bestanden, 6554 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -534,7 +534,7 @@ toets omvalt.
 | `opslag-voorcheck.test.js` | 6 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 5 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |
 | `opslagpoort.test.js` | 6 | gezakt op `true->false#0` | GEEN GROOTBOEK, GEEN PRODUCTIE. Zonder rij-voor-rij grootboek is er maar een vangnet voor een collectie die haar grens raakt: db/tx/index.js schrijft de staart naar archief/ en kapt pas als dat gelukt is. |
-| `outputaudit.test.js` | 4 | gezakt op `===->!==#0` | DE TWEE ASSEN DIE NOOIT EEN INSTRUMENT HADDEN. OUTPUT en AUDIT stonden voor ALLE 4185 routes op ongemeten -- samen 8370 cellen, ruim een kwart van de hele matrix. |
+| `outputaudit.test.js` | 9 | gezakt op `===->!==#0` | DE TWEE ASSEN DIE NOOIT EEN INSTRUMENT HADDEN. OUTPUT en AUDIT stonden voor ALLE 4185 routes op ongemeten -- samen 8370 cellen, ruim een kwart van de hele matrix. |
 | `ov-operatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-regie.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov.test.js` | 8 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |

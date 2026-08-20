@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T07:37:12.825Z",
-    "commit": "7f3ac37",
+    "op": "2026-08-20T07:40:13.544Z",
+    "commit": "2c611af",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,11 +12,11 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20685,
+    "bewezen": 20700,
     "verklaard": 0,
     "nvt": 272,
     "ongemeten": 25063,
-    "gezakt": 15
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
@@ -69,11 +69,11 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 251,
+      "bewezen": 266,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 3851,
-      "gezakt": 15
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 2,

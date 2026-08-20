@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T07:23:20.621Z",
-  "commit": "8f28f47",
+  "op": "2026-08-20T07:41:12.081Z",
+  "commit": "2c611af",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -23,11 +23,11 @@
    "dagen": 2
   },
   "IDEMPROEF.json": {
-   "op": "2026-08-18T11:43:42.914Z",
-   "dagen": 1.8
+   "op": "2026-08-20T07:39:12.644Z",
+   "dagen": 0
   },
   "STAATPROEF.json": {
-   "op": "2026-08-20T07:11:59.889Z",
+   "op": "2026-08-20T07:33:20.257Z",
    "dagen": 0
   },
   "OUTPUTPROEF.json": {
@@ -36,15 +36,15 @@
   },
   "AUDITPROEF.json": {
    "op": "2026-08-18T08:40:37.320Z",
-   "dagen": 1.9
+   "dagen": 2
   }
  },
  "routes": 4185,
  "telling": {
   "bewezen": 0,
   "verschaald": 0,
-  "verzwakt": 4009,
-  "geschorst": 130,
+  "verzwakt": 4139,
+  "geschorst": 0,
   "ongemeten": 46
  },
  "perRoute": {
@@ -169,9 +169,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/agenda/toevoegen": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/agenda/uitnodig": {
    "staat": "verzwakt",
@@ -1109,9 +1109,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/bestanden/upstart": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/bestanden/versies": {
    "staat": "verzwakt",
@@ -1194,9 +1194,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/bijles/vraag": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/boardroom/ai": {
    "staat": "verzwakt",
@@ -1614,19 +1614,19 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/agent/hervat": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/agent/rechten": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/agent/stop": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/agents": {
    "staat": "verzwakt",
@@ -1634,9 +1634,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/alarm": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/alarm/stil": {
    "staat": "verzwakt",
@@ -1799,9 +1799,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/operator/plan": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/operator/recent": {
    "staat": "verzwakt",
@@ -1849,9 +1849,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/puls": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/recht/geef": {
    "staat": "verzwakt",
@@ -1904,9 +1904,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/slo": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/sonde": {
    "staat": "verzwakt",
@@ -1914,9 +1914,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/sonde/draai": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/stad": {
    "staat": "verzwakt",
@@ -1934,9 +1934,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/start": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/werk": {
    "staat": "verzwakt",
@@ -1954,9 +1954,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/zaak/open": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/command/zaken": {
    "staat": "verzwakt",
@@ -2049,9 +2049,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/entiteit/nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/entiteit/onderneming": {
    "staat": "verzwakt",
@@ -2154,9 +2154,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/opdatum": {
    "staat": "verzwakt",
@@ -2169,9 +2169,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/opname/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/concern/opnames": {
    "staat": "verzwakt",
@@ -2379,9 +2379,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/drm/report": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/event/rsvp": {
    "staat": "verzwakt",
@@ -4079,9 +4079,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gedachten/zet": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gegevens/nodig": {
    "staat": "verzwakt",
@@ -4204,9 +4204,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gemeente/meld": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gemeente/melding/zet": {
    "staat": "verzwakt",
@@ -4379,9 +4379,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/genootschap/richt-op": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/genootschap/roep-bijeen": {
    "staat": "verzwakt",
@@ -4419,9 +4419,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gewoonten/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/gewoonten/reeks": {
    "staat": "verzwakt",
@@ -4654,9 +4654,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/kantoorpakket/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/kantoorpakket/mijn": {
    "staat": "verzwakt",
@@ -5414,9 +5414,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/live/start": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/live/state": {
    "staat": "verzwakt",
@@ -5674,9 +5674,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mall/lijst/nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mall/lijst/regel-weg": {
    "staat": "verzwakt",
@@ -5804,9 +5804,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mediaos/lijst/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mediaos/lijst/stuk": {
    "staat": "verzwakt",
@@ -5849,9 +5849,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mediaos/samen/start": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/mediaos/samen/uit": {
    "staat": "verzwakt",
@@ -5919,9 +5919,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/meet/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/meet/mijn": {
    "staat": "verzwakt",
@@ -6519,9 +6519,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/leren/project-maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/leren/project-staat": {
    "staat": "verzwakt",
@@ -6544,9 +6544,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/leren/schrijf-bewaar": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/leren/schrijf-feedback": {
    "staat": "verzwakt",
@@ -6709,9 +6709,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/magnaat/economie/beslis": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/magnaat/economie/schok": {
    "staat": "verzwakt",
@@ -7309,9 +7309,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/bewaartermijn": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/bewaring": {
    "staat": "verzwakt",
@@ -7379,9 +7379,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/export": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/gesprekken": {
    "staat": "verzwakt",
@@ -7404,9 +7404,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/imap/sleutel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/rtmail/imap/sleutels": {
    "staat": "verzwakt",
@@ -7734,9 +7734,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/spel/sudoku-nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/spel/team-antwoord": {
    "staat": "verzwakt",
@@ -7749,9 +7749,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/spel/team-nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/member/spel/team-nodig": {
    "staat": "verzwakt",
@@ -7994,9 +7994,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/metier/kaart": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/metier/lid": {
    "staat": "verzwakt",
@@ -8214,9 +8214,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/muziek/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/muziek/mijn": {
    "staat": "verzwakt",
@@ -8229,9 +8229,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/muziek/rahul": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/muziek/samen": {
    "staat": "verzwakt",
@@ -8359,9 +8359,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/notities/bewaar": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/notities/deel": {
    "staat": "verzwakt",
@@ -8434,9 +8434,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/architect/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/architect/portfolio": {
    "staat": "verzwakt",
@@ -8444,9 +8444,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/architect/project": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/architect/verwijder": {
    "staat": "verzwakt",
@@ -8484,9 +8484,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelier/collectie": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelier/concept": {
    "staat": "verzwakt",
@@ -8499,9 +8499,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelier/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelier/techpack": {
    "staat": "verzwakt",
@@ -8519,9 +8519,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelierweb/bewaar": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/atelierweb/etalage": {
    "staat": "verzwakt",
@@ -8639,9 +8639,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/herstel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/incasso": {
    "staat": "verzwakt",
@@ -8649,9 +8649,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/instellingen": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/krediet": {
    "staat": "verzwakt",
@@ -8664,14 +8664,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/leden": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/mislukking": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/modus": {
    "staat": "verzwakt",
@@ -8679,9 +8679,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/nood": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/opdrachten": {
    "staat": "verzwakt",
@@ -8714,9 +8714,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/regels/check": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/bank/regels/update": {
    "staat": "verzwakt",
@@ -8969,9 +8969,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/hardware/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/hardware/productblad": {
    "staat": "verzwakt",
@@ -8979,9 +8979,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/hardware/serie": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/hardware/stuklijst": {
    "staat": "verzwakt",
@@ -9014,9 +9014,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/ideeen/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/ideeen/reactie": {
    "staat": "verzwakt",
@@ -9089,9 +9089,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/kamer/taak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/kamer/taak-zet": {
    "staat": "verzwakt",
@@ -9144,9 +9144,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/kantoorpakket/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/kantoorpakket/mijn": {
    "staat": "verzwakt",
@@ -9339,9 +9339,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/merk/sjabloon": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/merk/uitrol": {
    "staat": "verzwakt",
@@ -9424,9 +9424,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/onderzoeker/ontwikkel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/onderzoeker/rapport": {
    "staat": "verzwakt",
@@ -9639,9 +9639,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/payroll/regels/haal": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/payroll/regels/keur": {
    "staat": "verzwakt",
@@ -9719,9 +9719,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rampbeeld/evaluatie": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rampbeeld/schaal": {
    "staat": "verzwakt",
@@ -9734,9 +9734,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rechtsvormwacht/check": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rechtsvormwacht/zet": {
    "staat": "verzwakt",
@@ -9759,9 +9759,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/redactie/artikel/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/redactie/artikel/status": {
    "staat": "verzwakt",
@@ -9799,9 +9799,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/regering": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/regering/besluit": {
    "staat": "verzwakt",
@@ -9814,9 +9814,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/regering/briefing": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/regering/teken": {
    "staat": "verzwakt",
@@ -9844,9 +9844,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rtgai": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/rtgai/roer/geef": {
    "staat": "verzwakt",
@@ -9994,9 +9994,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/studio/collectie": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/studio/concept": {
    "staat": "verzwakt",
@@ -10009,14 +10009,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/studio/lookbook": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/studio/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/studio/specsheet": {
    "staat": "verzwakt",
@@ -10239,9 +10239,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/indicatoren": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/jaarbeeld": {
    "staat": "verzwakt",
@@ -10404,9 +10404,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/reeks/veeg": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/relatie/maak": {
    "staat": "verzwakt",
@@ -10509,9 +10509,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/werk/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/werk/zet": {
    "staat": "verzwakt",
@@ -10519,9 +10519,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/wijken": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/weefsel/zaak": {
    "staat": "verzwakt",
@@ -10564,9 +10564,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/werkplaats/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/werkplaats/publiceer": {
    "staat": "verzwakt",
@@ -10594,24 +10594,24 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/zelfzorg/bescherm": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/zelfzorg/herstel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/zelfzorg/opruim": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/office/zelfzorg/upgrade": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onboarding/config": {
    "staat": "verzwakt",
@@ -10634,9 +10634,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onboarding/paspoort": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onboarding/status": {
    "staat": "verzwakt",
@@ -10644,9 +10644,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onboarding/teken": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onderneming/aandeel/weg": {
    "staat": "verzwakt",
@@ -10764,9 +10764,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onderneming/nieuw": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/onderneming/ontwerp": {
    "staat": "verzwakt",
@@ -10934,9 +10934,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/ov/code": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/ov/hier": {
    "staat": "verzwakt",
@@ -10984,9 +10984,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/ov/regie/zet": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/ov/uit": {
    "staat": "verzwakt",
@@ -11324,9 +11324,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/overheid/rijbewijs/verleng": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/overheid/stem": {
    "staat": "verzwakt",
@@ -11444,9 +11444,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/overheid/water/meld": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/overheid/water/melding/zet": {
    "staat": "verzwakt",
@@ -11559,14 +11559,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/kascode": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/oplaad": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 1 schakel(s) nooit gemeten (AUDIT)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/overzicht": {
    "staat": "verzwakt",
@@ -11589,9 +11589,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/tikcode": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/pay/tiks": {
    "staat": "verzwakt",
@@ -11854,14 +11854,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/residentie/betreed": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/residentie/emote": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/residentie/gids": {
    "staat": "verzwakt",
@@ -11899,9 +11899,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/residentie/pols": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/residentie/spel/antwoord": {
    "staat": "verzwakt",
@@ -13904,9 +13904,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtgid/intrek": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtgid/inzage": {
    "staat": "verzwakt",
@@ -13969,9 +13969,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtgone/frictie": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtgone/goedkeuring": {
    "staat": "verzwakt",
@@ -14044,9 +14044,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/salon/bio": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/salon/deal/claim": {
    "staat": "verzwakt",
@@ -14079,9 +14079,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/salon/plaats": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/salon/poll/stem": {
    "staat": "verzwakt",
@@ -14149,9 +14149,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/samen/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/samen/mee": {
    "staat": "verzwakt",
@@ -14234,9 +14234,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/site/bewaar": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/site/cijfers": {
    "staat": "verzwakt",
@@ -14874,9 +14874,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/aanwezig/leeg": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/aanwezig/pas": {
    "staat": "verzwakt",
@@ -14934,9 +14934,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/agenda/toevoegen": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/agenda/verwijder": {
    "staat": "verzwakt",
@@ -15099,9 +15099,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/betaalverzoek": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/betaalverzoek/intrek": {
    "staat": "verzwakt",
@@ -15264,9 +15264,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/bezorg/terug": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/bod/beslis": {
    "staat": "verzwakt",
@@ -15549,9 +15549,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/command/operator/plan": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/command/operator/uitvoeren": {
    "staat": "verzwakt",
@@ -15594,9 +15594,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/command/start": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/command/werk": {
    "staat": "verzwakt",
@@ -15874,9 +15874,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/facturen/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/facturen/mijn": {
    "staat": "verzwakt",
@@ -16019,9 +16019,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/gebouwpand/bhv": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/gebouwpand/installatie": {
    "staat": "verzwakt",
@@ -16069,9 +16069,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/gebouwplus/lead": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/gebouwplus/lead/fase": {
    "staat": "verzwakt",
@@ -16109,9 +16109,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/giftcard/sell": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/golf": {
    "staat": "verzwakt",
@@ -16289,9 +16289,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/bon/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/club/band": {
    "staat": "verzwakt",
@@ -16409,9 +16409,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/folio/nacht": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/folio/open": {
    "staat": "verzwakt",
@@ -16629,9 +16629,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/rekening/open": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/rekening/regel": {
    "staat": "verzwakt",
@@ -16669,9 +16669,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/simulatie/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/simulatie/voorstellen": {
    "staat": "verzwakt",
@@ -16684,9 +16684,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/venue/concept": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/venue/publiceer": {
    "staat": "verzwakt",
@@ -16709,9 +16709,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/wave/voorstel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/hr/certificaat": {
    "staat": "verzwakt",
@@ -16924,9 +16924,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/kantoorpakket/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/kantoorpakket/mijn": {
    "staat": "verzwakt",
@@ -17249,9 +17249,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/mall/sync": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/marina": {
    "staat": "verzwakt",
@@ -17379,9 +17379,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/mep/daily": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/mep/daily/done": {
    "staat": "verzwakt",
@@ -17624,9 +17624,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/onboarding/zet": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/ontvangsten": {
    "staat": "verzwakt",
@@ -17899,9 +17899,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/poort/online": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/poort/rondleiding": {
    "staat": "verzwakt",
@@ -18194,9 +18194,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rooster/voorstel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/roster": {
    "staat": "verzwakt",
@@ -18229,9 +18229,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/bewaartermijn": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/bewaring": {
    "staat": "verzwakt",
@@ -18294,9 +18294,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/export": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/gesprekken": {
    "staat": "verzwakt",
@@ -18319,9 +18319,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/imap/sleutel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/rtmail/imap/sleutels": {
    "staat": "verzwakt",
@@ -18429,9 +18429,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/salon/bio": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/salon/deal": {
    "staat": "verzwakt",
@@ -18494,9 +18494,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/samenwerking/oproep": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/samenwerking/oproep/sluit": {
    "staat": "verzwakt",
@@ -18519,9 +18519,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/security": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/service": {
    "staat": "verzwakt",
@@ -18544,9 +18544,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/site/bewaar": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/site/cijfers": {
    "staat": "verzwakt",
@@ -18624,9 +18624,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/staff/invite": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/staff/invite/intrek": {
    "staat": "verzwakt",
@@ -18714,9 +18714,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/team/buzz": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/team/message": {
    "staat": "verzwakt",
@@ -19119,9 +19119,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/werkbeleid/zet": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/werkmail/inbox": {
    "staat": "verzwakt",
@@ -19189,9 +19189,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/zegel/check": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/zorg/afspraak/maak": {
    "staat": "verzwakt",
@@ -19769,9 +19769,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/toestellen/koppel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/toestemming": {
    "staat": "verzwakt",
@@ -20229,9 +20229,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/wallet/voeg": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op IDEMPOTENCY",
-   "heropent": "repareer de oorzaak en laat de proef op IDEMPOTENCY opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/wallet/weg": {
    "staat": "verzwakt",

@@ -2018,7 +2018,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
-      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/middleware/idempotentie.js|const wie = (req.get('authorization') || '') + '|' + String(req.ip || '');",
+      'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
+      'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
+      'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {

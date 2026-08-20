@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1030 bestanden en 6800 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1031 bestanden en 6807 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1030 |
-| losse beweringen (`test(...)`) | 6800 |
+| toetsbestanden | 1031 |
+| losse beweringen (`test(...)`) | 6807 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 855 |
 | **overleefd**: geen mutatie kreeg hem rood | 22 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 20 |
-| niets van beide | 95 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-902 bestanden, 6569 beweringen.
+903 bestanden, 6576 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -120,7 +120,7 @@ toets omvalt.
 | `bewaarwacht.test.js` | 7 | gezakt op `===->!==` | DE BEWAARWACHT -- kijkt vanzelf, en houdt zich in. Een bewaarbeleid faalt op twee manieren die allebei stil zijn: niemand kijkt ooit -> de termijn staat op papier en nergens anders de wacht wist zelf -> data... |
 | `bewakers.test.js` | 10 | gezakt op `return-weg#0` | DE BEWAKERSKAART MOET UITPUTTEND BLIJVEN. scripts/lib/bewakers.js zegt van elke bewakerslaag in dit huis wat voor SOORT deur het is. |
 | `bewakersketen.test.js` | 2 | gezakt op `===->!==#0` | DE BEWAKERSKETEN: elke deur van een domein draagt het slot van dat domein. WAT DIT BEWAAKT, EN WAAROM HET PAS SINDS VANDAAG KAN Een route is in deze router een LAAG PER MIDDLEWARE (server/web/routing.js); de laatste... |
-| `bewijsmatrix.test.js` | 18 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
+| `bewijsmatrix.test.js` | 19 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
 | `bewijsschuld.test.js` | 4 | gezakt op `===->!==#2` | DE BEWIJSSCHULD MAG ALLEEN KRIMPEN. WAAROM DIT BESTAAT. |
 | `bezorg.test.js` | 5 | gezakt op `liegpoort /api/` | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |
 | `bezorging.test.js` | 1 | gezakt op `liegpoort /api/` | DE BEZORGING -- van assortiment tot voordeur, met GPS. WAAROM DIT ER IS De bezorgketen raakt vier mensen achter elkaar: de manager richt de dienst in, een lid bestelt en betaalt, een bezorger neemt de rit aan, en de... |
@@ -312,6 +312,7 @@ toets omvalt.
 | `human-reality.test.js` | 9 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `i18n-auto.test.js` | 6 | overleefd | Het universele 114-talige vangnet. De browserlaag is bewust dependency-vrij; met een klein DOM-dubbel bewijzen we de selectie en RTL-richting, en met de paginascan dat ieder blijvend appscherm de gedeelde taalrail... |
 | `ideeen.test.js` | 4 | gezakt op `liegpoort /api/` | De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier ontwerpbureaus. Een idee met bureau-tags, reacties, AI-uitwerking per bureau en een spin-off die echt een concept in het gekozen bureau aanmaakt. |
+| `idempotentie.test.js` | 6 | -- | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
 | `idemproef.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `identiteit-opvraag.test.js` | 6 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |

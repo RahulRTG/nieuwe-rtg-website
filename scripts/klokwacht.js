@@ -204,6 +204,26 @@ function meet() {
   return schift(perBestand);
 }
 
+/* WELKE WACHTEN ZIJN GEEN SCHULD MAAR EEN ECHTE KLOK.
+
+   De serverkant is geen boodschappenlijst van luie toetsen. Een deel wacht daar
+   op iets dat in het PRODUCT met tijd werkt, en dan IS de tijd de toestand. Die
+   staan hier met een reden, zodat het verschil tussen "nog niet nagelopen" en
+   "nagelopen en terecht" niet in iemands hoofd zit. Wie een naam hier neerzet,
+   zegt: ik heb dit bestand gelezen en dit is de reden.
+
+   Een naam hier haalt de wacht NIET uit de telling -- de ratel blijft hem
+   vasthouden. Hij zegt alleen dat er niet meer naar gekeken hoeft te worden. */
+const VERANTWOORD = {
+  'eventloop.test.js': 'de toets BLOKKEERT de event-loop een aantal ms en wacht tot de meter dat ziet; ' +
+    'de tijd is hier de meting zelf en niet een gok erover',
+  'journaalschrijf.test.js': 'het journaal spoelt per venster van een seconde; de bewering gaat over dat venster',
+  'sloophamer.pg.test.js': 'chaosproef: redis en postgres gaan met opzet neer en weer aan, met verkeer ertussen. ' +
+    'De duur van de storing is wat er getoetst wordt',
+  'bugjacht.test.js': 'de sleeps zitten in NEPDIENSTEN die trage I/O nabootsen (Postgres, de motor, Stripe); ' +
+    'de toets wacht daar niet op de klok, hij bouwt er een fixture mee'
+};
+
 function leesVastgelegd() {
   try { return JSON.parse(fs.readFileSync(DOEL, 'utf8')); } catch (e) { return null; }
 }
@@ -238,6 +258,14 @@ for (const [naam, n] of Object.entries(nu.server.perBestand).sort((a, b) => b[1]
 }
 if (nu.server.bestanden > 10) console.log('    ... en nog ' + (nu.server.bestanden - 10) + ' bestanden');
 
+const verantwoordNu = Object.keys(VERANTWOORD).filter(n => nu.server.perBestand[n]);
+const verantwoordTot = verantwoordNu.reduce((n, k) => n + nu.server.perBestand[k], 0);
+if (verantwoordNu.length) {
+  console.log('\n    waarvan NAGELOPEN en terecht: ' + verantwoordTot + ' in ' + verantwoordNu.length + ' bestanden');
+  for (const naam of verantwoordNu) console.log('      ' + naam + ' -- ' + VERANTWOORD[naam]);
+  console.log('    nog na te lopen: ' + (nu.server.totaal - verantwoordTot));
+}
+
 if (VASTLEGGEN) {
   const g = (oud && oud.gemeten) || {};
   const gestegen = (Number.isFinite(g.scherm) && nu.scherm.totaal > g.scherm) ||
@@ -261,9 +289,10 @@ if (VASTLEGGEN) {
       server: nu.server.totaal, serverBestanden: nu.server.bestanden,
       totaal: nu.totaal, bestanden: nu.bestanden
     },
-    schuld: nu.perBestand
+    schuld: nu.perBestand,
+    verantwoord: VERANTWOORD
   }, null, 1) + '\n');
   console.log('\n  vastgelegd in KLOKWACHT.json');
 }
 
-module.exports = { meet, telIn, schift };
+module.exports = { meet, telIn, schift, VERANTWOORD };

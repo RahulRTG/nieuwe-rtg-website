@@ -4,10 +4,10 @@
  "gemeten": {
   "scherm": 0,
   "schermBestanden": 0,
-  "server": 71,
-  "serverBestanden": 40,
-  "totaal": 71,
-  "bestanden": 40
+  "server": 67,
+  "serverBestanden": 39,
+  "totaal": 67,
+  "bestanden": 39
  },
  "schuld": {
   "alarmweg.test.js": 2,
@@ -45,10 +45,15 @@
   "sloophamer.pg.test.js": 5,
   "speldag.test.js": 1,
   "spelsudoku.test.js": 1,
-  "vergeten.test.js": 4,
   "vloot.test.js": 1,
   "webplatform.test.js": 1,
   "wereldlaag.test.js": 1,
   "zaakdoos.test.js": 1
+ },
+ "verantwoord": {
+  "eventloop.test.js": "de toets BLOKKEERT de event-loop een aantal ms en wacht tot de meter dat ziet; de tijd is hier de meting zelf en niet een gok erover",
+  "journaalschrijf.test.js": "het journaal spoelt per venster van een seconde; de bewering gaat over dat venster",
+  "sloophamer.pg.test.js": "chaosproef: redis en postgres gaan met opzet neer en weer aan, met verkeer ertussen. De duur van de storing is wat er getoetst wordt",
+  "bugjacht.test.js": "de sleeps zitten in NEPDIENSTEN die trage I/O nabootsen (Postgres, de motor, Stripe); de toets wacht daar niet op de klok, hij bouwt er een fixture mee"
  }
 }

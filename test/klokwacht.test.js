@@ -22,7 +22,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { meet, telIn, schift } = require('../scripts/klokwacht');
+const { meet, telIn, schift, VERANTWOORD } = require('../scripts/klokwacht');
 
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'KLOKWACHT.json');
@@ -111,6 +111,22 @@ test('de meter schift schermtoetsen van servertoetsen', () => {
   for (const naam of Object.keys(nu.scherm.perBestand)) assert.match(naam, /\.e2e\.js$/);
   for (const naam of Object.keys(nu.server.perBestand)) assert.match(naam, /(?<!\.e2e)\.test\.js$/);
   assert.ok(nu.server.totaal > 0, 'de serverkant is niet leeg; anders zegt de schifting niets');
+});
+
+/* EEN VERANTWOORDING DIE NIET MEER KLOPT, IS EEN LEUGEN MET EEN REDEN ERBIJ.
+
+   VERANTWOORD noemt de bestanden waarvan iemand heeft nagelopen dat hun wachten
+   een ECHTE klok in het product zijn. Verdwijnt zo'n bestand, of gaan de wachten
+   eruit, dan blijft de regel staan en leest hij als "nagekeken en in orde" over
+   iets dat er niet meer is -- precies hoe registers stil vollopen. */
+test('de verantwoorde bestanden bestaan nog en hebben nog wachten', () => {
+  const nu = meet();
+  for (const naam of Object.keys(VERANTWOORD)) {
+    assert.ok(nu.server.perBestand[naam],
+      naam + ' staat verantwoord in scripts/klokwacht.js maar heeft daar geen wachten meer; ' +
+      'haal de regel weg in plaats van hem te laten staan');
+    assert.ok(String(VERANTWOORD[naam]).length > 30, naam + ' heeft een reden nodig en geen etiket');
+  }
 });
 
 /* DE TELLER ZELF, GEVOERD MET EEN BEKENDE INVOER.

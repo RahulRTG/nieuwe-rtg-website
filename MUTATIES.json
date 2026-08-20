@@ -2573,6 +2573,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "linkgezin.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "linkkaart.test.js": {
       "soort": "puur",
       "staat": "overleefd",

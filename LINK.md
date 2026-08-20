@@ -313,11 +313,38 @@ paden verhuizen er per stuk naartoe.
    bijkomt die het scherm niet kent — anders staat er een knop die "dit kan hier
    nog niet" zegt.
 
-   **Wat hier bewust NIET is meegegaan:** de scanner op het vriendenscherm
-   (`app-main-09a.js`). Die is gespecialiseerd — hij toont je eigen pin, je QR,
-   je live code en de treffer in één blok — en leunt onderhuids al op dezelfde
-   laag (dezelfde rem, hetzelfde `pinKijk`). Een tweede weg naar hetzelfde
-   antwoord is dat niet; een tweede *uitvoering* zou het wel zijn.
+   **Wat hier bewust NIET is meegegaan:** de scanner op het vriendenscherm van de
+   leden-app (`app-main-09a.js`). Die is gespecialiseerd — hij toont je eigen pin,
+   je QR, je live code en de treffer in één blok — en leunt onderhuids al op
+   dezelfde laag (dezelfde rem, hetzelfde `pinKijk`). Een tweede weg naar
+   hetzelfde antwoord is dat niet; een tweede *uitvoering* zou het wel zijn.
+
+   **De gezinskant kwam er op 20 augustus 2026 bij** (`routes/social/gezinnen/link.js`).
+   Een eigen deur, want een gezinslid heeft een andere geloofsbrief: een
+   gezinscode met een profieltoken in het lijf, niet de Bearer-sessie waar
+   `routes/link.js` op staat. Daarmee mochten de `gezin:`-wegen terug in
+   `intenties.js` — ze stonden er niet, omdat een regel voor een scanner die de
+   deur niet kan bereiken een belofte zonder weg is.
+
+   Drie dingen die daarbij hoorden. **Voor een kind van 15 of jonger staat ook
+   deze deur dicht**, met exact dezelfde zin als bij elk pinloket: scannen hoort
+   daar geen uitzondering op te zijn, anders leest een kind twee verhalen over
+   hetzelfde. **Capabilities gingen niet mee** — een gezinsprofiel heeft geen
+   portemonnee, dus geen enkele handeling noemt `gezin` als aanvaarder; de kaart
+   is er wel, de knop niet. En **de weg terug volgt de wereld van de scanner**:
+   "verzoek intrekken" wees naar `/api/member/connect/intrek`, en dat is een deur
+   die een gezinslid niet opent — `/api/rtf/social/connect/intrek` bestaat sinds
+   deze stap.
+
+   Twee gaten die het bouwen zichtbaar maakte: de gezinskant **schreef geen bon**
+   bij het verbinden (dus "mijn koppelingen" vertelde daar niets over wat je zelf
+   deed), en de gezinspoort stond in twee bestanden op het punt een derde kopie te
+   worden — hij staat nu één keer in `routes/social/gezinnen.js`.
+
+   **Wat NIET is nagelopen:** het foundation-scherm zelf in een browser. De
+   server, de poorten en de intentie-dekking zijn getoetst; dat `vrienden.html`
+   het bedoelingsscherm ook echt toont, is hier niet met een browser bevestigd —
+   de proefopstelling kreeg de gezinssessie in deze omgeving niet aan de praat.
 
    De weg is getoetst in een echte browser (`test/linkscan.e2e.js`): scannen met
    de handinvoer van de scanoverlay, de kaart lezen, bevestigen, en dan pas is er

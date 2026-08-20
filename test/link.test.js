@@ -232,8 +232,18 @@ function routetabel() {
       if (fs.statSync(p).isDirectory()) { loop(p); continue; }
       if (!naam.endsWith('.js')) continue;
       const bron = fs.readFileSync(p, 'utf8');
-      for (const m of bron.matchAll(/app\.(?:get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]\s*,([^)]{0,120})/g))
-        paden.set(m[1], (paden.get(m[1]) || '') + ' ' + m[2]);
+      /* HET VENSTER STOPT BIJ DE VOLGENDE ROUTE, en het loopt tot IN de handler.
+         Het keek eerst tot de eerste haakjessluiting, en dan zie je alleen
+         `(req, res` -- terwijl de gezinskant zijn poort juist in de handler
+         aanroept. Zonder dit venster keurde deze toets een weg af die prima
+         bereikbaar is. En zonder de knip bij de volgende route zou hij de poort
+         van de BUURMAN meetellen; dat is dezelfde val als in scripts/check.js
+         regel 28, en die kant is de gevaarlijke. */
+      for (const m of bron.matchAll(/app\.(?:get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]/g)) {
+        const na = bron.slice(m.index + m[0].length, m.index + m[0].length + 400);
+        const volgende = na.search(/app\.(?:get|post|put|delete|patch)\(\s*['"]/);
+        paden.set(m[1], (paden.get(m[1]) || '') + ' ' + (volgende > 0 ? na.slice(0, volgende) : na));
+      }
     }
   })(path.join(WORTEL, 'server'));
   return paden;
@@ -260,20 +270,28 @@ test('en die weg staat achter de poort die bij DIE scanner hoort', () => {
      De regel is eenvoudig: een weg voor een lid staat achter `auth`, een weg voor
      een zaak achter `supplierAuth`. Wie een rol toevoegt waarvoor dat niet opgaat,
      moet hier langs. */
-  const POORT = { lid: 'auth', supplier: 'supplierAuth' };
+  /* Per rol: waaraan je ziet dat die scanner er langs KAN. Voor een lid en een
+     zaak is dat een middleware met een naam; aan de gezinskant komt de sessie uit
+     het LIJF (een gezinscode met een profieltoken), en die controle staat daar in
+     twee vormen. `gezinsPoort` is de vorm die je bij de route ziet staan -- en de
+     enige die scripts/check.js regel 28 als poort herkent -- maar de oudere
+     routes in gezinnen/vrienden.js roepen `rtfSociaal` in de handler aan. Allebei
+     controleren ze dezelfde sessie, dus allebei tellen ze hier: deze toets vraagt
+     of de scanner erlangs kan, niet in welke vorm dat is opgeschreven. */
+  const POORT = { lid: ['auth'], supplier: ['supplierAuth'], gezin: ['gezinsPoort', 'rtfSociaal'] };
   const paden = routetabel();
   let gekeken = 0;
   for (const c of intenties.CATALOGUS) {
     for (const [sleutel, weg] of Object.entries(c.wegen)) {
       const rol = sleutel.split(':')[0];
-      const poort = POORT[rol];
-      assert.ok(poort, 'de rol "' + rol + '" heeft geen bekende poort; vul POORT aan of denk na');
+      const poorten = POORT[rol];
+      assert.ok(poorten, 'de rol "' + rol + '" heeft geen bekende poort; vul POORT aan of denk na');
       const mw = paden.get(weg) || '';
       /* supplierAuth bevat 'auth' als deeltekst, dus voor een lid kijken we naar
          het hele woord -- anders keurt deze toets een zaakdeur goed voor een lid. */
-      const heeft = poort === 'auth' ? /\bauth\b/.test(mw) : mw.includes(poort);
+      const heeft = poorten.some(p => (p === 'auth' ? /\bauth\b/.test(mw) : mw.includes(p)));
       assert.ok(heeft, 'intentie ' + c.id + ' geeft ' + rol + ' de weg ' + weg +
-        ', maar daar staat geen ' + poort + ' voor (wel: "' + mw.trim() + '")');
+        ', maar daar staat geen ' + poorten.join(' of ') + ' voor (wel: "' + mw.trim() + '")');
       gekeken++;
     }
   }
@@ -295,6 +313,24 @@ test('elke intentie die een LID kan krijgen, heeft ook een handeling in de app',
   assert.ok(voorLid.length >= 3, 'er horen meerdere leden-intenties te zijn, anders meet dit niets');
   for (const c of voorLid)
     assert.ok(blok.includes("'" + c.id + "'"), 'RTG Scan kent geen handeling voor ' + c.id);
+});
+
+test('en elke intentie die een GEZINSLID kan krijgen, heeft er een in de foundation', () => {
+  /* Dezelfde regel, andere wereld. De foundation heeft zijn eigen scanweg
+     (apps/foundation/vrienden.html) omdat zijn sessie een andere is; wat hij
+     NIET mag hebben is een eigen idee over welke intenties bestaan. Komt er een
+     gezins-intentie bij zonder handeling daar, dan toont dat scherm een kaart
+     met een knop die "dit kan hier nog niet" zegt. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'public/apps/foundation/vrienden.html'), 'utf8');
+  const blok = bron.slice(bron.indexOf('const LINK_ACTIES'), bron.indexOf('async function scanRoute'));
+  assert.ok(blok.length > 100, 'de actietabel van de foundation is niet gevonden');
+  const voorGezin = intenties.CATALOGUS.filter(c => Object.keys(c.wegen).some(k => k.startsWith('gezin:')));
+  assert.ok(voorGezin.length >= 2, 'er horen meerdere gezins-intenties te zijn, anders meet dit niets');
+  for (const c of voorGezin)
+    assert.ok(blok.includes("'" + c.id + "'"), 'de foundation kent geen handeling voor ' + c.id);
+  // en het scherm haalt de twee gedeelde schermen ook echt binnen
+  for (const script of ['/shared/linkkaart.js', '/shared/linkkoppelingen.js'])
+    assert.ok(bron.includes(script), 'vrienden.html laadt ' + script + ' niet');
 });
 
 test('een zaak scant geen mens, en een lid int geen betaalcode', async () => {

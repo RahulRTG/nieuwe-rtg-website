@@ -123,6 +123,7 @@
       <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
       <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
       <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
+      <button class="knop grijs mini" id="pinKoppelKnop">Mijn koppelingen</button>
     </div>
     <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
     <div id="pinLiveDoek" hidden></div>
@@ -255,6 +256,10 @@
 <script src="/shared/qrteken.js" defer></script>
 <script src="/shared/qrscan.js" defer></script>
 <script src="/shared/scanner.js" defer></script>
+<!-- RTG Link: het bedoelingsscherm en mijn koppelingen (LINK.md). Dezelfde twee
+     schermen als in de leden-app; de gezinskant heeft zijn eigen deur ervoor. -->
+<script src="/shared/linkkaart.js" defer></script>
+<script src="/shared/linkkoppelingen.js" defer></script>
 <script src="/shared/rtgcode.js" defer></script>
 <script src="/shared/dyncode.js" defer></script>
 <script>
@@ -465,6 +470,13 @@ async function kindContacten(kindHandle, cn){
    en een RTG-lid voegen elkaar er dus gewoon mee toe. Zoeken en versturen staan
    met opzet uit elkaar: eerst zien WIE het is, dan pas een knop. Een gescande
    code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
+/* RTG Link loopt langs een eigen deur (/api/rtf/link), met dezelfde
+   gezinssessie in het lijf als /api/rtf/social. Twee loketten, een laag. */
+function lnk(pad, body){
+  return fetch('/api/rtf/link'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
+    .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
+}
+
 let mijnPin = null, pinScanner = null;
 let pinLive = null;
 /* De trefferregel voor allebei de pin-wegen. Stond twee keer -- de vaste pin en
@@ -566,14 +578,8 @@ function pinScanWissel(){
   if (!window.RTGScanner){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
   $('#pinCam').hidden = false;
   pinScanner = new RTGScanner.Scanner({ video: $('#pinCam'), onCode: c=>{
-    const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort:'tekst' };
-    // twee soorten: de vaste pin staat leesbaar in de code, de levende is een
-    // ondertekend token dat alleen de server kan duiden. Zelfde gebaar.
-    if (g.soort === 'rtg1'){ pinScanUit(); pinLiveKijken(g.token); return; }
-    if (g.soort !== 'pin') return;
     pinScanUit();
-    $('#pinIn').value = g.pin;
-    pinOpzoeken(g.pin);
+    scanRoute(c.tekst);
   } });
   pinScanner.start().catch(()=>{ alert('Geen toegang tot de camera.'); pinScanUit(); });
   $('#pinScanBtn').textContent = 'Stop';
@@ -583,6 +589,52 @@ function pinScanUit(){
   $('#pinCam').hidden = true;
   $('#pinScanBtn').textContent = 'Scan';
 }
+
+/* RTG SCAN, GEZINSKANT (LINK.md par. 2). Hier stond een kleine keten van
+   als-dans: is het een vaste pin, dan opzoeken; is het een levende code, dan een
+   ander scherm; anders niets. Nu vraagt de app EEN keer wat het is en wat je
+   ermee kunt, en toont het bedoelingsscherm -- wie, wat, welke gegevens, hoe
+   lang -- voordat er iets gebeurt.
+
+   Typen blijft wat het was: wie een pin overtypt, doet een opzoeking en ziet de
+   treffer in de lijst eronder. Dat is dezelfde twee-staps-weg, alleen zonder
+   camera. */
+const LINK_ACTIES = {
+  'contact.verbinden': async (kaart, tekst, intentie) => {
+    const g = window.RTGCode ? RTGCode.lees(tekst) : { soort:'tekst' };
+    const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+    const r = await soc(String(intentie.weg).replace('/api/rtf/social',''), lijf);
+    alert(r.status === 'wacht-op-ouder'
+      ? 'Verzoek verstuurd. Een ouder moet het nog goedkeuren.'
+      : 'Verzoek verstuurd naar ' + (kaart.onderwerp.codename || ''));
+    laden();
+  },
+  'contact.gesprek': async (kaart) => {
+    alert('Jullie zijn al verbonden. Open het gesprek in je vriendenlijst.');
+  }
+};
+async function scanRoute(tekst){
+  if (!window.RTGLinkKaart){ alert('Dit scherm is nog niet geladen.'); return; }
+  let kaart;
+  try { kaart = await lnk('/los', { tekst }); }
+  catch(e){ alert(e.message); return; }
+  const keuze = await RTGLinkKaart.toon(kaart, {});
+  if (!keuze) return;
+  const doen = LINK_ACTIES[keuze.id];
+  if (!doen){ alert('Dit kan hier nog niet.'); return; }
+  try { await doen(kaart, tekst, keuze); } catch(e){ alert(e.message); }
+}
+
+/* Mijn koppelingen (LINK.md stap 6): wat er van je openstaat, wat je met een
+   code in gang zette, en wat je daar nog aan kunt doen. */
+const _pinKoppel = $('#pinKoppelKnop');
+if (_pinKoppel) _pinKoppel.addEventListener('click', () => {
+  if (!window.RTGKoppelingen){ alert('Dit scherm is nog niet geladen.'); return; }
+  RTGKoppelingen.toon(() => lnk('/koppelingen', {}), {
+    doe: (weg, lijf) => soc(String(weg).replace('/api/rtf/social', ''), lijf),
+    melden: (m) => alert(m)
+  });
+});
 // stap 1: wie is dit?
 async function pinOpzoeken(ruw){
   const pin = String(ruw||'').trim(); if (!pin) return;

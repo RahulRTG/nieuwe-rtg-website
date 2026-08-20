@@ -31,12 +31,16 @@
    staan in LINK.md als bouwvolgorde en dus NIET hier. Deze catalogus beschrijft
    wat het huis vandaag kan.
 
-   OOK DE GEZINSKANT STAAT ER NOG NIET IN, en dat is met opzet geen halve regel.
-   De RTFoundation heeft dezelfde pinloketten (/api/rtf/social/pin/*), maar zijn
-   sessie is een gezinscode met een profieltoken en niet de Bearer-sessie waar de
-   linkdeur op staat. Een menu-regel voor een scanner die deze deur niet kan
-   bereiken, is een belofte zonder weg -- die komt erbij wanneer de gezinsdeur
-   erbij komt, en geen dag eerder. */
+   DE GEZINSKANT STAAT ER SINDS 20 AUGUSTUS 2026 IN, en pas sinds de deur er is.
+   Zolang die er niet was, zou een regel voor een 'gezin'-scanner een belofte
+   zonder weg zijn geweest: de RTFoundation heeft dezelfde pinloketten, maar zijn
+   sessie is een gezinscode met een profieltoken en niet de Bearer-sessie waar
+   server/routes/link.js op staat. Die deur staat nu in
+   server/routes/social/gezinnen/link.js -- en daarmee mogen deze regels erbij.
+
+   Wat NIET meekwam: capabilities. Een gezinsprofiel heeft geen portemonnee, dus
+   geen enkele handeling noemt 'gezin' als aanvaarder. Het scherm toont daar dan
+   geen knop, en dat klopt. */
 'use strict';
 
 /* De sleutel van `wegen` is `<scanner>:<vorm>` -- wie er scant en of het de vaste
@@ -52,7 +56,9 @@ const CATALOGUS = [
     methode: 'POST',
     wegen: {
       'lid:vast': '/api/member/pin/connect',
-      'lid:levend': '/api/member/pin/live/verbind'
+      'lid:levend': '/api/member/pin/live/verbind',
+      'gezin:vast': '/api/rtf/social/pin/connect',
+      'gezin:levend': '/api/rtf/social/pin/live/verbind'
     }
   },
   {
@@ -62,7 +68,8 @@ const CATALOGUS = [
     tekst: 'Gesprek openen',
     uitleg: 'Jullie zijn al verbonden.',
     methode: 'POST',
-    wegen: { 'lid:vast': '/api/member/dm', 'lid:levend': '/api/member/dm' }
+    wegen: { 'lid:vast': '/api/member/dm', 'lid:levend': '/api/member/dm',
+             'gezin:vast': '/api/rtf/social/dm', 'gezin:levend': '/api/rtf/social/dm' }
   },
   {
     id: 'plaats.bestellen',

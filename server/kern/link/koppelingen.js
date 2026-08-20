@@ -25,12 +25,18 @@ module.exports = ({ bonnenVan, capOpenVan, bandStand, naamVan }) => {
 
 /* Wat er per bon nog kan. Geeft `terug` (de weg die het scherm mag aanbieden) of
    `reden` (waarom er niets is). Nooit allebei leeg: dan zegt dit bestand niets. */
-function watNog(mij, bon) {
+/* De weg terug ligt in de WERELD VAN DE SCANNER, en dat is geen opmaakdetail:
+   een gezinslid komt niet door de ledendeur. Dezelfde handeling (socialIntrek),
+   twee poorten -- en wie hier een vaste weg zou neerzetten, geeft de helft van
+   de mensen een knop die weigert. */
+const INTREKWEG = { gezin: '/api/rtf/social/connect/intrek', lid: '/api/member/connect/intrek' };
+
+function watNog(mij, bon, soort) {
   if (bon.intentie === 'contact.verbinden') {
     if (!bon.naar) return { reden: 'Dit ging via een levende code; wie het was, staat bij je contacten.' };
     const stand = typeof bandStand === 'function' ? bandStand(mij, bon.naar) : null;
     if (stand === 'aangevraagd' || stand === 'wacht-op-ouder')
-      return { terug: { weg: '/api/member/connect/intrek', veld: 'key', waarde: bon.naar, tekst: 'Verzoek intrekken' } };
+      return { terug: { weg: INTREKWEG[soort] || INTREKWEG.lid, veld: 'key', waarde: bon.naar, tekst: 'Verzoek intrekken' } };
     if (stand === 'verbonden') return { reden: 'Jullie zijn verbonden; dat beheer je bij je contacten.' };
     return { reden: 'Dit verzoek staat niet meer open.' };
   }
@@ -62,10 +68,11 @@ function partijenVan(bonnen) {
    zou het scherm in twee standen kunnen zetten die niet bij elkaar horen. */
 function koppelingen(mij, alsScanner) {
   const b = bonnenVan(mij);
-  const bonnen = b.bonnen.map(x => ({ ...x, naarNaam: x.naar ? naamVan(x.naar) : null, ...watNog(mij, x) }));
+  const soort = (alsScanner && alsScanner.soort) || 'lid';
+  const bonnen = b.bonnen.map(x => ({ ...x, naarNaam: x.naar ? naamVan(x.naar) : null, ...watNog(mij, x, soort) }));
   return { open: capOpenVan(alsScanner || { key: mij }), bonnen,
     partijen: partijenVan(b.bonnen), nietBewaard: b.nietBewaard, max: b.max };
 }
 
-return { koppelingen, watNog, partijenVan };
+return { koppelingen, watNog, partijenVan, INTREKWEG };
 };

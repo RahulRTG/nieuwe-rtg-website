@@ -10,7 +10,7 @@
 
    Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern } = sctx;
+  const { kern, linkBon: bon } = sctx;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
 
@@ -20,23 +20,9 @@ module.exports = (sctx) => {
    ooit tegenkwam (LINK.md par. 3.8), en niet bij socialVerbind, want die wordt
    ook langs het gewone zoeken op codenaam bereikt en dat is geen link-handeling.
 
-   Zodra handelingen op de laag zelf komen te staan, verhuist deze aanroep mee:
-   de bon hoort naast de daad. */
-function bon(wie, vorm, naar) {
-  /* linkBon wordt OP AANROEPMOMENT uit de kern gehaald en niet hierboven
-     uitgelezen. De sociale routes hangen eerder dan RTG Link (opzet/aanbouw2.js),
-     dus een `const { linkBon } = kern` bovenaan is voor altijd undefined -- de
-     stille breuk waar de domeingrens over gaat, en precies wat deze toets zag
-     zakken voordat dit hier stond.
-
-     De bon mag het verzoek nooit omgooien -- dat is al gelukt als we hier zijn --
-     maar hij mag ook niet stil mislukken (LAT.md regel 5): een lege bonnenlijst
-     leest als "ik heb niets gedaan", en dat is dan niet waar. */
-  try {
-    if (typeof kern.linkBon !== 'function') throw new Error('de linklaag draait hier niet');
-    kern.linkBon({ wie, type: 'persoon', intentie: 'contact.verbinden', vorm, naar });
-  } catch (e) { console.warn('[link] bon niet geschreven voor ' + vorm + '-verbinding: ' + (e && e.message)); }
-}
+   De schrijver zelf staat in ../social.js, want de gezinskant doet hetzelfde bij
+   dezelfde handeling; twee kopieen zouden betekenen dat "mijn koppelingen" aan
+   de ene kant wel en aan de andere kant niet vertelt wat je gedaan hebt. */
 
 // mijn eigen pin (wordt bij de eerste keer opvragen gemaakt)
 app.post('/api/member/pin', auth, (req, res) => {

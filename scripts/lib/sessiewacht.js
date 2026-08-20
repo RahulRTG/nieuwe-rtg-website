@@ -32,6 +32,15 @@
                      haal een VERS token en doe de route over. Een 401 met een
                      gegarandeerd verse sessie is een echte weigering.
 
+   WIE HEM GEBRUIKT, EN WIE NIET. De IDOR-proef, de rolproef en scripts/waarom.js
+   draaien hierop. Drie andere instrumenten hadden hun eigen herstel al
+   (invoerproef 15 hernieuwingen in de laatste ronde, idemproef 22, staatproef
+   met een eigen reden) en houden dat: de staatproef mag alleen bij de EERSTE
+   aanroep hernieuwen, want een login schrijft zelf in securityLog en sessions
+   en zou binnen zijn meetvenster vallen. Die uitzondering past niet in deze
+   wacht en hoort dus ook niet verstopt te worden in een gedeelde functie die
+   hem stilzwijgend anders doet.
+
    WAT DEZE WACHT NIET DOET: hij raakt 403 en 404 niet aan. Die zeggen "u mag
    dit niet" en "dit bestaat niet", en dat zijn antwoorden van een server die
    je wel degelijk herkent. Alleen 401 is de statuscode die "wie bent u?"

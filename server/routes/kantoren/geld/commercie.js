@@ -54,6 +54,41 @@ module.exports = (ctx) => {
      Het tegenfeit (kern/commercie/tegenfeit.js) rekent voor wat aanzetten doet,
      en zegt het NIET als er te weinig is meegelopen -- een precies ogend getal
      uit een lege week is hier de duurste verleiding. */
+  /* DE VOORNEMENS. Het getal dat ertoe doet staat vooraan: wat is er HALVERWEGE
+     blijven steken? Een voornemen op BEZIG is een economische handeling die
+     niemand heeft afgemaakt -- drie van de vijf hotels geboekt -- en dat is
+     precies het geval waarvoor deze laag bestaat. Zichtbaar houden, niet
+     wegstoppen. */
+  app.post('/api/office/voornemens', officeAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.voornemens) return { status: 503, error: 'De voornemenslaag is niet gemount.' };
+    const b = req.body || {};
+    return { status: 200, ok: true,
+      halverwege: kern.voornemens.halverwege(),
+      ...kern.voornemens.lijst({ stand: b.stand, limit: b.limit }) };
+  }));
+  /* Aftekenen is een MENSENHANDELING en staat daarom achter de boardroom-poort,
+     met een naam die in het journaal komt. De laag zelf weigert een handtekening
+     van dezelfde persoon die het voornemen opstelde; hier komt daar de vraag
+     bij WIE er tekent. */
+  app.post('/api/office/voornemen/teken', boardroomAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.voornemens) return { status: 503, error: 'De voornemenslaag is niet gemount.' };
+    const b = req.body || {};
+    const wie = String(b.naam || '').slice(0, 60);
+    if (!wie) return { status: 400, error: 'Een tweede handtekening hoort een naam te dragen.' };
+    const r = kern.voornemens.tekenAf(b.id, { door: wie });
+    if (r.ok) afdelingen.audit(wie, 'Voornemen ' + b.id + ' afgetekend (' +
+      ((r.voornemen && r.voornemen.totaalCenten) / 100).toFixed(2) + ' euro)');
+    return r;
+  }));
+  app.post('/api/office/voornemen/staak', boardroomAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.voornemens) return { status: 503, error: 'De voornemenslaag is niet gemount.' };
+    const b = req.body || {};
+    const wie = String(b.naam || 'boardroom').slice(0, 60);
+    const r = kern.voornemens.staak(b.id, b.reden || 'gestaakt vanuit de boardroom', wie);
+    if (r.ok) afdelingen.audit(wie, 'Voornemen ' + b.id + ' gestaakt');
+    return r;
+  }));
+
   app.post('/api/office/handhaving', officeAuth, (req, res) => veilig(res, () => {
     if (!kern || !kern.handhavingSchaduw) return { status: 503, error: 'De schaduwlaag is niet gemount.' };
     const regels = kern.handhavingSchaduw.lijst().map(r => ({ ...r, tegenfeit: tegenfeit.vanSchaduw(r) }));

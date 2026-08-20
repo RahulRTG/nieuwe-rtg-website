@@ -97,7 +97,29 @@ Object.assign(kern, (() => {
     }
   }
 
-  return { commercieRonde: ronde, commercieVerrekening: verrekening,
+  /* DE VOORNEMENS: van een plan naar een gecontroleerde uitvoering, met de
+     blokkade VOOR de eerste stap. Zie kern/commercie/voornemen.js -- met name
+     waarom de keuring over het TOTAAL gaat en niet per stap: vijf boekingen waar
+     de vierde sneuvelt, laten drie boekingen en een puinhoop achter.
+
+     Hier komen de drie lagen van het controlevlak bij elkaar: het BESLUIT weegt,
+     het BEWIJSTOKEN draagt dat besluit mee, en de UITVOERING levert het in. De
+     ondertekensleutel komt uit de identiteitskluis en wordt daar met een eigen
+     label uit afgeleid (zie kern/commercie/bewijstoken/zegel.js), zodat een
+     handtekening onder een bewijstoken nooit een sessietoken kan worden. */
+  const bewijs = require('../kern/commercie/bewijstoken');
+  const token = bewijs.maakBewijstoken({
+    sleutel: (hulp.accounts && hulp.accounts.sleutelVoor) ? hulp.accounts.sleutelVoor('bewijstoken') : null,
+    gezien: bewijs.geheugenGezien() });
+  const voornemens = require('../kern/commercie/voornemen').maakVoornemens({
+    db, save, verbruikToken: token.verbruik,
+    /* `beslis` komt LAAT: de bevoegdhedenbron hangt aan het huis en niet aan
+       deze mount. Zolang er geen is, zegt keur() dat met zoveel woorden in
+       plaats van stilzwijgend ja. */
+    beslis: (vraag) => (kern.beslis ? kern.beslis(vraag) : null) });
+
+  return { commercieBewijstoken: token, voornemens,
+    commercieRonde: ronde, commercieVerrekening: verrekening,
     commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement,
     handhavingSchaduw: schaduw };
 })());

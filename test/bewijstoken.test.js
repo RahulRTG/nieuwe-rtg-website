@@ -302,3 +302,41 @@ test('10. het noncegeheugen groeit niet met alles wat ooit is gebruikt', () => {
   assert.equal(g.aantal(), 0, 'en hij wordt ook opgeruimd');
   T0 = was;
 });
+
+/* ============================================================================
+   DE SLEUTEL KOMT UIT DE KLUIS, EN DE RUWE VERLAAT HAAR NOOIT.
+
+   In par. 5.2 stond dit als open punt: het bewijstoken had een producent en een
+   verbruiker in de laag zelf, maar de sleutel kwam nog nergens vandaan. Sinds de
+   voornemenslaag is gemount komt hij uit server/accounts (kluis.sleutelVoor),
+   en die geeft een AFGELEIDE en niet S.SECRET zelf.
+   ========================================================================== */
+test('11. de kluis leidt per doel een eigen sleutel af, en geeft de ruwe nooit terug', () => {
+  const kluis = require('../server/accounts/kluis');
+  const accounts = require('../server/accounts');
+  assert.equal(typeof accounts.sleutelVoor, 'function', 'de kern komt er via accounts bij');
+
+  /* De AFLEIDING wordt hier los getoetst en niet via S.SECRET. Dat was de vorige
+     versie, en die sloeg zichzelf stil over: in een toetsproces is de kluis niet
+     geinitialiseerd, dus gaf sleutelVoor() null en liep elke mutatie er dwars
+     doorheen. Een zuivere functie is te toetsen; een die op modulestaat leunt,
+     doet alsof. */
+  const ruw = crypto.randomBytes(32);
+  const a = kluis.afleidSleutel(ruw, 'bewijstoken');
+  const b = kluis.afleidSleutel(ruw, 'iets-anders');
+
+  assert.equal(a.length, 32);
+  assert.notEqual(a.toString('hex'), ruw.toString('hex'),
+    'de ruwe sessiesleutel verlaat de kluis nooit');
+  assert.notEqual(a.toString('hex'), b.toString('hex'),
+    'twee doelen horen twee sleutels te geven, anders is de scheiding een naam');
+  assert.equal(kluis.afleidSleutel(ruw, 'bewijstoken').toString('hex'), a.toString('hex'), 'wel stabiel');
+
+  /* EEN LEEG DOEL GEEFT NIETS. Anders is sleutelVoor() zonder argument
+     stilzwijgend een vaste sleutel voor alles, en dan is de scheiding weg zonder
+     dat iemand het merkt. */
+  assert.equal(kluis.afleidSleutel(ruw, ''), null);
+  assert.equal(kluis.afleidSleutel(ruw, null), null);
+  assert.equal(kluis.afleidSleutel(ruw, '   '), null);
+  assert.equal(kluis.afleidSleutel(null, 'bewijstoken'), null, 'en zonder bron ook niets');
+});

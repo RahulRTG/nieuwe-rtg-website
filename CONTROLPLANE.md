@@ -63,6 +63,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Schaduwstand | `commercie/schaduw.js` | **af** — aan de leverancierspoort, met één regel die vandaag meeloopt (§5.3) |
 | Tegenfeit | `commercie/tegenfeit.js` | **af** — met de boardroom als beslisser (§5.4) |
 | Economische idempotentie | `kern/betaalopdracht/rij.js` | **af** voor uitbetalingen; nog niet over de hele keten (§5.5) |
+| Intent (voornemen) | `commercie/voornemen.js` + `/plan`, `/keuring`, `/uitvoeren` | **af** — de keuring gaat over het totaal (§5.6) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -369,6 +370,64 @@ opdracht wordt bovendien niet opnieuw ingediend.
 refund loopt, vraagt de intent-laag van §6.6. Wat er nu staat is de plek waar het
 geld het huis verlaat — de duurste plek om het níet te hebben.
 
+### 5.6 Het voornemen (was §6.6, nu gebouwd)
+
+Een agent die vijf boekingen doet, vraagt vandaag vijf keer los "mag dit". Bij de
+vierde is het budget op. Er staan dan drie boekingen, een boze klant en een
+half-uitgevoerde handeling die niemand heeft besloten. **Het beleid heeft
+gewerkt en het resultaat is een puinhoop.**
+
+Dus: eerst het hele plan wegen, dan pas beginnen.
+
+```
+"boek vijf hotels in Parijs onder € 180"
+  → vijf stappen van € 184,40 → € 922,00 totaal
+  → beleid: vanaf € 500 een verse bevestiging → WACHT
+  → een tweede persoon tekent → GEKEURD → uitvoeren
+```
+
+Die zin komt vóór de eerste boeking, niet halverwege. Vijf dingen zijn hard:
+
+1. **De keuring gaat over het totaal.** Niet over de duurste stap en niet over
+   het gemiddelde. Vijf keer € 190 is geen vijf kleine besluiten maar één van
+   € 950.
+2. **Een goedgekeurd plan kan niet meer veranderen.** Een vingerafdruk over de
+   stappen, hun bedragen en hun *volgorde* wordt bij elke uitvoering opnieuw
+   gerekend. Zonder dat is "goedgekeurd" een stempel op iets dat daarna nog kan
+   groeien: keur € 900 goed, voer € 9.000 uit. Wijkt hij af, dan is de
+   goedkeuring vervállen — niet "bijna geldig".
+3. **Elke uitvoering levert het bewijs in.** Hiermee krijgt het bewijstoken van
+   §5.2 eindelijk zijn verbruiker: een stap draait niet op "de keuring stond
+   hierboven toch".
+4. **Elke stap draagt een eigen economische sleutel** — die van het voornemen
+   met het stapnummer erachter. Dat is wat een herhaling onschadelijk maakt tot
+   in de betaalrij van §5.5: nu over een hele keten in plaats van over één
+   betaling.
+5. **Een nee wordt geen ja door het nog eens te vragen.** Er is geen overgang van
+   AFGEWEZEN naar GEKEURD.
+
+En twee keuzes die makkelijk de andere kant op hadden gekund: **BEPERKT is voor
+een plan geen ja** — een plan van vijf stappen kun je niet voor zestig procent
+uitvoeren zonder te weten welke stappen sneuvelen, en dat is een keuze van de
+aanvrager, niet van het systeem. **ONBEKEND wordt hier wél een afwijzing**, en
+dat spreekt §4 niet tegen: dáár is het verschil tussen "mag niet" en "weten we
+niet" belangrijk, híer beweegt waarde en dan valt het dicht.
+
+**Wat halverwege blijft steken, is telbaar.** Een voornemen op `BEZIG` is een
+economische handeling die niemand heeft afgemaakt; `/api/office/voornemens` zet
+dat getal vooraan.
+
+**De sleutel komt nu ergens vandaan.** `accounts.sleutelVoor('bewijstoken')`
+geeft een met HKDF afgeleide sleutel per doel; de ruwe sessiesleutel verlaat de
+kluis nooit. Dat was in §5.2 nog een open eind.
+
+Zeven mutaties op de laag, alle zeven gevangen — twee pas na een aanscherping.
+De overgangstabel bleek een *tweede* slot dat geen enkele toets raakte (`keur()`
+ving alles eerder af), en de sleutelafleiding stond eerst rechtstreeks op de
+kluisstaat, waardoor de toets zichzelf in elk toetsproces stil oversloeg en drie
+mutaties er dwars doorheen liepen. Een zuivere functie is te toetsen; een die op
+modulestaat leunt, doet alsof.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -381,9 +440,9 @@ vastligt en niemand halverwege iets anders bouwt.
 4. ~~**Counterfactual testing**~~ **Gebouwd** — zie §5.4.
 5. ~~**Economic idempotency**~~ **Gebouwd voor de uitbetaalkant** — zie §5.5. De
    ene sleutel door de hele keten hoort bij de intent-laag hieronder.
-6. **Intent layer + compiler** — van *"boek vijf hotels in Parijs onder € 180"*
-   naar een gecontroleerd plan, met de blokkade vóór uitvoering: *"€ 922 totaal;
-   beleid staat € 900 toe → goedkeuring nodig."*
+6. ~~**Intent layer + compiler**~~ **Gebouwd** — zie §5.6. Wat er nog niet is:
+   een *compiler* die van vrije tekst een plan maakt. De laag die het plan
+   controleert staat er; wie het plan opstelt is nu nog de aanroeper.
 7. **Effective rights** — één bord: wat mag deze partij nu écht, uit product,
    contract, rol, delegatie, beleid, uitzonderingen en risicostand.
 8. **Self-healing fallback** — de zaken op `voor-de-ladder` automatisch
@@ -402,8 +461,9 @@ vastligt en niemand halverwege iets anders bouwt.
   aangehouden: eerst de caller-meting (§5.1), toen het token (§5.2). Een
   ondertekend token dat een recht draagt dat nergens wordt gevraagd, zou een
   handtekening onder een lege belofte zijn geweest.
-- **De digital twin en economic sagas.** Prachtige ideeën, maar ze leunen op een
-  intent-laag die er niet is. Ze staan op de lijst en niet in de code.
+- **De digital twin en economic sagas.** De intent-laag waar ze op leunen bestaat
+  sinds §5.6; deze twee staan nog steeds op de lijst en niet in de code, nu
+  omdat een saga zonder compensatie-pad erger is dan geen saga.
 - **Outcome-aware prijsstelling.** Vraagt gemeten waarde per capability; die
   meting bestaat nog niet, en een verzonnen besparing is erger dan geen.
 

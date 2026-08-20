@@ -204,10 +204,23 @@ Klein en omkeerbaar, en elke stap laat de bestaande wegen werken. Niets van wat
 er nu draait wordt gesloopt; de nieuwe laag komt eronder te liggen en de oude
 paden verhuizen er per stuk naartoe.
 
-1. **Register + resolver + bon.** `server/kern/link/`: een typeregister, één
-   `los(code, context)` die type + onderwerp + toegestane intenties teruggeeft
-   (met paragraaf 3.1 als harde regel), en een bonnenlijst. Nieuwe deur naast
-   `/api/code/scan`, die blijft werken.
+1. **Register + resolver + bon.** ✅ *gebouwd op 20 augustus 2026.*
+   `server/kern/link/`: het typeregister (`register.js`), de gedeelde deurrem
+   (`rem.js`), de intentiecatalogus (`intenties.js`), de bonnen (`bonnen.js`),
+   wie er scant (`wie.js`) en `los()` die ze samenbrengt (`index.js`). De deur
+   is `POST /api/link/los` en `POST /api/link/bonnen` (`server/routes/link.js`);
+   `/api/code/scan` en alle pinloketten blijven werken.
+
+   Wat er in dezelfde ronde uit de contactpin is verhuisd: de huisbrede rem staat
+   niet meer in `kern/sociaal/pin-deur.js` maar in `kern/link/rem.js`, en de twee
+   deuren delen hem — inclusief de dertig-pogingen-per-uur per lid, die anders
+   langs het nieuwe loket te omzeilen was. `test/link.test.js` legt de twee deuren
+   naast elkaar en zakt zodra ze uit elkaar lopen.
+
+   Nog niet: de gezinskant (die draait op een profieltoken en niet op de
+   Bearer-sessie waar deze deur op staat) en de intenties voor `pas`, `zegel` en
+   `deur` — die codesoorten worden herkend en zeggen eerlijk dat deze laag er nog
+   niets mee doet.
 2. **Capabilities.** Uitgeven en inwisselen: handeling, bron, reikwijdte,
    vervaltijd, eenmalig, publiek. Bovenop `dyncode.js` -- dezelfde ondertekening,
    want een tweede plek waar een HMAC wordt gezet is een tweede plek waar hij

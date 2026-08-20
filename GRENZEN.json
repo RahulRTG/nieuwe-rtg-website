@@ -542,6 +542,12 @@
     "life": [
       "lifeVoor"
     ],
+    "link": [
+      "linkBonnen",
+      "linkLos",
+      "resolveSession",
+      "sessionFor"
+    ],
     "livinglab": [
       "id",
       "livinglab",
@@ -1399,6 +1405,7 @@
       "lidBoardZet",
       "lidBoardZetVeel",
       "lidboard",
+      "linkBon",
       "liveKijk",
       "liveMaak",
       "liveVerbind",

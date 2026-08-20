@@ -75,6 +75,26 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
   require('../routes/doos')(grens('doos'));
   require('../routes/code')(grens('code'));
+  /* RTG LINK (kern/link/, LINK.md): de adres- en capabilitylaag. Een gescande
+     code -> welk TYPE ding is dit -> wie of wat is het -> wat mag DEZE scanner
+     hier vragen. Staat NA routes/code.js omdat hij dezelfde ondertekening leest,
+     en hij haalt zijn oplossers op bij de deuren die er al zijn: de contactpin
+     (kern/sociaal/pin*.js) en de zakenlijst. Niets ervan wordt hier herbouwd --
+     de laag schikt bestaande stappen, en de rem die ze delen woont sinds deze
+     ronde in kern/link/rem.js. */
+  Object.assign(kern, require('../kern/link')({
+    db: kern.db, save: kern.save,
+    dyncodeGeef: () => kern.dyncode,
+    handleVanPin: (pin) => kern.handleVanPin(pin),
+    pinNormaliseer: (ruw) => kern.pinNormaliseer(ruw),
+    pinKijk: (mij, doel) => kern.pinKijk(mij, doel),
+    liveKijk: (mij, token) => kern.liveKijk(mij, token),
+    /* Dezelfde teller als de pindeur, met dezelfde sleutel: dertig pogingen per
+       uur per lid, hoe je ze ook verdeelt over de twee loketten. */
+    persoonRate: (mij) => kern.sociaalRate(mij, 'pinzoek', 30, 60 * 60 * 1000),
+    zaakVan: (code) => kern.findSupplier(code)
+  }));
+  require('../routes/link')(grens('link'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));
   require('../routes/instant-reality')(grens('instant-reality'));

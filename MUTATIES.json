@@ -2559,6 +2559,13 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "link.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "livegang-pakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",

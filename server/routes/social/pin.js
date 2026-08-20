@@ -14,6 +14,30 @@ module.exports = (sctx) => {
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
 
+/* DE BON WORDT GESCHREVEN WAAR DE HANDELING WORDT BEVESTIGD, en dat is hier:
+   deze twee loketten zijn de plek waar een verzoek echt de deur uitgaat. Niet
+   bij het opzoeken -- een bon per scan zou een register zijn van iedereen die je
+   ooit tegenkwam (LINK.md par. 3.8), en niet bij socialVerbind, want die wordt
+   ook langs het gewone zoeken op codenaam bereikt en dat is geen link-handeling.
+
+   Zodra handelingen op de laag zelf komen te staan, verhuist deze aanroep mee:
+   de bon hoort naast de daad. */
+function bon(wie, vorm, naar) {
+  /* linkBon wordt OP AANROEPMOMENT uit de kern gehaald en niet hierboven
+     uitgelezen. De sociale routes hangen eerder dan RTG Link (opzet/aanbouw2.js),
+     dus een `const { linkBon } = kern` bovenaan is voor altijd undefined -- de
+     stille breuk waar de domeingrens over gaat, en precies wat deze toets zag
+     zakken voordat dit hier stond.
+
+     De bon mag het verzoek nooit omgooien -- dat is al gelukt als we hier zijn --
+     maar hij mag ook niet stil mislukken (LAT.md regel 5): een lege bonnenlijst
+     leest als "ik heb niets gedaan", en dat is dan niet waar. */
+  try {
+    if (typeof kern.linkBon !== 'function') throw new Error('de linklaag draait hier niet');
+    kern.linkBon({ wie, type: 'persoon', intentie: 'contact.verbinden', vorm, naar });
+  } catch (e) { console.warn('[link] bon niet geschreven voor ' + vorm + '-verbinding: ' + (e && e.message)); }
+}
+
 // mijn eigen pin (wordt bij de eerste keer opvragen gemaakt)
 app.post('/api/member/pin', auth, (req, res) => {
   if (geenGast(req, res)) return;
@@ -54,6 +78,7 @@ app.post('/api/member/pin/connect', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const r = await pinVerbind(req.session.key, req.body.pin);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  bon(req.session.key, 'vast', r.key);
   res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
 });
 
@@ -89,6 +114,12 @@ app.post('/api/member/pin/live/verbind', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const r = await liveVerbind(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  /* Zonder `naar`, en dat is geen vergeten veld. De levende weg geeft met opzet
+     geen sleutel terug (zie kern/sociaal/pin-live.js: het scherm hoeft niet te
+     weten hoe iemand in de database heet), en een bon is geen reden om die
+     keuze alsnog te omzeilen. WIE het was staat in de verbinding zelf; de bon
+     zegt DAT er via een levende code een verzoek uitging, en wanneer. */
+  bon(req.session.key, 'levend', null);
   res.json({ ok: true, status: r.st, codename: r.codename });
 });
 };

@@ -16,11 +16,13 @@
 <style>
   body{height:100vh;overflow:hidden;}
   .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
-  .top{grid-column:1/3;display:flex;align-items:center;gap:1rem;}
+  /* wrap, want deze rij (merk + knop + lescode) is samen breder dan een
+     telefoon; zonder afbreken duwde de lescode de hele pagina naar 510px */
+  .top{grid-column:1/3;display:flex;flex-wrap:wrap;align-items:center;gap:1rem;}
   .brand{font-family:var(--serif);font-weight:500;font-size:1.1rem;}
   .brand b{color:var(--goud);}
   .code{margin-left:auto;display:flex;align-items:center;gap:.7rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem .8rem;}
-  .code b{letter-spacing:.32em;font-size:1.25rem;color:var(--goud);}
+  .code b{letter-spacing:.32em;font-size:1.25rem;color:var(--accent-tekst);}
   .online{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--zacht);}
   .mini{font-size:.72rem;color:var(--zacht);}
   .board-wrap{position:relative;background:var(--bord);border:1px solid var(--lijn);border-radius:var(--radius);overflow:hidden;}
@@ -41,7 +43,7 @@
   .ll .n{flex:1;}
   textarea.veld{min-height:3.2rem;resize:vertical;margin-bottom:.5rem;}
   .ag{display:flex;gap:.4rem;align-items:flex-start;padding:.4rem 0;border-bottom:1px solid var(--lijn);font-size:.85rem;}
-  .ag time{color:var(--goud);font-size:.72rem;display:block;}
+  .ag time{color:var(--accent-tekst);font-size:.72rem;display:block;}
   .ag button{margin-left:auto;background:none;color:var(--zacht);font-size:1rem;}
   .verberg-zij .zij{display:none;}
   .verberg-zij .app{grid-template-columns:1fr;}

@@ -25,7 +25,7 @@
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
   .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
-  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
+  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--accent-tekst);}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
@@ -81,7 +81,7 @@
   .stkleur.aan{border-color:#fff;transform:scale(1.12);}
   .stemoji{font-size:1.2rem;background:#26221d;border-radius:9px;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
   .stemoji.aan{border-color:var(--goud);}
-  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
+  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-tekst);cursor:pointer;opacity:.75;}
   /* bellen */
   .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
   .belwrap{position:relative;width:100%;height:70vh;max-height:70vh;display:flex;align-items:center;justify-content:center;background:#000;}
@@ -304,7 +304,7 @@ if (belModus){
   if (intro){
     const h = document.createElement('div');
     h.className = 'kaart';
-    h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--goud);font-size:.9rem;';
+    h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--accent-tekst);font-size:.9rem;';
     h.textContent = belModus === 'bel' ? '✆ Tik op een vriend om te bellen.'
       : belModus === 'video' ? '⌲ Tik op een vriend om te videobellen.'
       : '◨ Tik op een vriend om een snap te sturen.';

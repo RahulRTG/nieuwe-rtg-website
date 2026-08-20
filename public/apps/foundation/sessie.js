@@ -74,6 +74,25 @@
         return d;
       }).catch(function () { toegangSlot('De toegangscontrole is nu niet bereikbaar. Uit veiligheid blijft deze ruimte dicht; probeer het zo opnieuw.', false); return null; });
   }
+/* WELKE LETTER PAST OP DEZE CIRKEL. De avatar krijgt de kleur die het lid
+   zelf koos, en de letter stond vast op de tekstkleur van het huis -- wit.
+   Wit op het standaardgoud #C9A24B haalt 2,2:1, en dat is geen initiaal maar
+   een vlek; over de zeventig Foundation-schermen was dit in zijn eentje goed
+   voor 43 contrastovertredingen. Een VASTE letterkleur is hier per definitie
+   soms fout, want de achtergrond is van de gebruiker. Dus rekent hij het uit:
+   wit of bijna zwart, wat van de twee het verst van deze kleur af staat. Zo
+   klopt hij ook voor een kleur die vandaag nog niet bestaat. */
+function opKleur(hex) {
+  var h = String(hex == null ? '' : hex).trim().replace(/^#/, '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '#0C0C0B';
+  function k(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+  var L = 0.2126 * k(parseInt(h.slice(0, 2), 16)) +
+          0.7152 * k(parseInt(h.slice(2, 4), 16)) +
+          0.0722 * k(parseInt(h.slice(4, 6), 16));
+  return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.05) ? '#FFFFFF' : '#0C0C0B';
+}
+
 /* de sessie van de hulppas: lezen, actief en bewaren */
   var Sessie = {
     huidig: lees,
@@ -165,7 +184,7 @@
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
         '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +

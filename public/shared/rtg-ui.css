@@ -323,8 +323,19 @@ body.rtg-stijl .kpi{
   flex:1;min-width:4.5rem;background:var(--rtg-card2);border:1px solid var(--rtg-line);
   border-radius:var(--rtg-rond-klein);padding:.7rem .8rem;
 }
+/* HET CIJFER STAAT IN INTER, NIET IN BODONI, en dat is geen smaakkwestie.
+   Bodoni is een didone: dikke stammen, haarfijne verbindingen. Op een
+   ceremoniële titel van 40px is dat de handtekening van het merk; op een
+   getal van 21px verdwijnen de haarlijnen en leest een 0 als "()" -- wat op
+   foundation/school.html vier keer naast elkaar stond, in tegels die
+   Klassen, Lessen vandaag, Open werk en Cijfers heten. ONTWERP.md zegt het
+   al: Bodoni mag op EEN dominante KPI, en Inter draagt het werk met
+   tabulaire cijfers. Vier statistiektegels zijn geen dominante KPI.
+   tabular-nums erbij, zodat een rij getallen onder elkaar uitlijnt. */
 body.rtg-stijl .kpi .v,body.rtg-stijl .kpi b{
-  display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.1;}
+  display:block;font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;font-size:1.35rem;font-weight:600;
+  letter-spacing:-.01em;line-height:1.1;}
 body.rtg-stijl .kpi .l,body.rtg-stijl .kpi small{
   display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-soft);margin-top:.25rem;}
 

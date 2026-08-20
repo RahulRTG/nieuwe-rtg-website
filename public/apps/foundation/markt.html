@@ -38,7 +38,7 @@
   .ad .foto{aspect-ratio:1;background:var(--paneel2) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#4a453c;}
   .ad .body{padding:.6rem .7rem .8rem;display:flex;flex-direction:column;gap:.2rem;}
   .ad .titel{font-size:.9rem;font-weight:600;line-height:1.25;}
-  .ad .prijs{font-family:var(--serif);font-size:1.05rem;color:var(--goud2);}
+  .ad .prijs{font-family:var(--serif);font-size:1.05rem;color:var(--accent-tekst);}
   .ad .plaats{font-size:.76rem;color:var(--zacht);}
   .mini-badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.68rem;font-weight:700;border-radius:999px;padding:.08rem .45rem;width:fit-content;}
   .mini-badge.gezin{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
@@ -68,7 +68,7 @@
   .chips{display:flex;gap:.4rem;flex-wrap:wrap;}
   .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.4rem .8rem;font-size:.84rem;}
   .chip.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);}
-  .aihint{font-size:.8rem;color:var(--goud2);margin-top:.3rem;line-height:1.45;}
+  .aihint{font-size:.8rem;color:var(--accent-tekst);margin-top:.3rem;line-height:1.45;}
   .fotorij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem;}
   .fotorij .mini{width:4rem;height:4rem;border-radius:10px;object-fit:cover;border:1px solid var(--lijn);}
   .akkoord{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;color:var(--zacht);line-height:1.45;margin:.8rem 0;}
@@ -435,7 +435,7 @@
     const verkoper = c.rol === 'verkoper';
     if (!d) {
       // nog geen deal: prijs afspreken
-      return '<div class="paneel" style="border-color:var(--goud);"><b>Veilig samen betalen</b>' +
+      return '<div class="paneel" style="border-color:var(--accent-tekst);"><b>Veilig samen betalen</b>' +
         '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
         '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
     }

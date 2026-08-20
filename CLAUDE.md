@@ -80,6 +80,15 @@ grenzen: bewijs is nooit een verhaal, degraderen is nooit stil, en niemand zet
 een vervalstaat met de hand op bewezen. `scripts/vertrouwen.js` meet de
 vervalstaten per route.
 
+**`FABRIC.md` is het richtingsdocument van de laag BOVEN PROOF** -- de AI
+Execution Fabric: van software bedienen naar een doel uitspreken. De zin die de
+architectuur draagt: **een onbewezen handeling staat niet in de lijst waaruit de
+AI kiest** (proof-aware routing; de bewijspoort in `server/kern/stuur/beleid.js`
+laat een geschorste capability uit `toegestanePaden` vallen). Lees vooral
+paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt,
+geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
+mens, en autonomie wordt gepromoveerd en nooit geslopen.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

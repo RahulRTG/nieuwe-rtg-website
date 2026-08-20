@@ -12,6 +12,16 @@
       vscript.src = '/shared/verbinding.js';
       (document.head || document.documentElement).appendChild(vscript);
     }
+    /* De balk hieronder draagt pictogrammen (data-glyf). Dit bestand zit op elk
+       Foundation-scherm en shared/glyf.js op vier; zonder deze regel zou de
+       berichtenknop op zevenenzestig schermen een leeg vakje zijn -- precies de
+       fout die op de hub al zesenvijftig keer stond. Zelfde patroon als de
+       verbindingslaag hierboven: de component brengt mee wat hij nodig heeft. */
+    if (!document.querySelector('script[src="/shared/glyf.js"]')) {
+      var gscript = document.createElement('script');
+      gscript.src = '/shared/glyf.js';
+      (document.head || document.documentElement).appendChild(gscript);
+    }
   } catch (e) {}
   function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function api(p, b) {
@@ -183,7 +193,7 @@ function opKleur(hex) {
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span data-glyf="berichten" aria-hidden="true"></span><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
         '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
@@ -193,6 +203,9 @@ function opKleur(hex) {
         '</div>' +
         '<div class="sb-berichten" id="sbBerichten" hidden></div>';
       injectCss();
+      /* De balk wordt NA het laden getekend, dus de vuller van glyf.js is al
+         langsgeweest. Hier nog een keer, alleen over dit stukje DOM. */
+      try { if (window.RTGGlyf) RTGGlyf.vul(el); } catch (e) {}
       var menu = el.querySelector('#sbMenu'), ber = el.querySelector('#sbBerichten');
       el.querySelector('#sbProf').onclick = function () { ber.hidden = true; menu.hidden = !menu.hidden; };
       el.querySelector('#sbWissel').onclick = function () { Sessie.wisProfiel(); };
@@ -235,6 +248,7 @@ function opKleur(hex) {
       '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:4px;}.sb-brand b{color:#F4E9C8;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
       '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
+      '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
       '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +

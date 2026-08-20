@@ -79,8 +79,27 @@
       acties.appendChild(terug[i]);
     }
 
+    /* HET BUDGET. Meten op overloop alleen is niet genoeg, en dat bleek pas op
+       een echte telefoon. De balk van vrienden.html liep namelijk NIET over:
+       de kolommen kregen 82 + 11 + 264 op 390 en pasten precies. Maar die 11
+       is de titelkolom, tot een streep geknepen, en de acties namen 68% van de
+       balk. Technisch klopte alles; het zag eruit alsof er zes dingen over
+       elkaar heen stonden, en dat was de melding.
+
+       Een navigatiebalk is navigatie en geen werkbalk. Meer dan 45% aan acties
+       betekent dat er geen balk meer is maar een rij knoppen met een pijl
+       ervoor. Vandaar twee voorwaarden: hij wijkt uit als het NIET PAST, en
+       ook als het wel past maar te vol staat. */
+    var BUDGET = 0.45;
+    var rij = acties.parentElement;
+    function teVol() {
+      if (acties.scrollWidth > acties.clientWidth + 1) return true;
+      if (!rij || !rij.clientWidth) return false;
+      return acties.getBoundingClientRect().width > rij.clientWidth * BUDGET;
+    }
+
     var vak = null, rem = 40;
-    while (acties.scrollWidth > acties.clientWidth + 1 && rem--) {
+    while (teVol() && rem--) {
       var kandidaat = null;
       for (var j = acties.children.length - 1; j >= 0; j--) {
         var k = acties.children[j];

@@ -107,7 +107,7 @@ function opKleur(hex) {
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span data-glyf="berichten" aria-hidden="true"></span><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
         '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
@@ -117,6 +117,9 @@ function opKleur(hex) {
         '</div>' +
         '<div class="sb-berichten" id="sbBerichten" hidden></div>';
       injectCss();
+      /* De balk wordt NA het laden getekend, dus de vuller van glyf.js is al
+         langsgeweest. Hier nog een keer, alleen over dit stukje DOM. */
+      try { if (window.RTGGlyf) RTGGlyf.vul(el); } catch (e) {}
       var menu = el.querySelector('#sbMenu'), ber = el.querySelector('#sbBerichten');
       el.querySelector('#sbProf').onclick = function () { ber.hidden = true; menu.hidden = !menu.hidden; };
       el.querySelector('#sbWissel').onclick = function () { Sessie.wisProfiel(); };

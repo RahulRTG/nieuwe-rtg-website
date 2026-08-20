@@ -28,7 +28,20 @@
   --ios-inkt:#F4F1EC;
   --ios-grijs:rgba(244,241,236,0.60);
   --ios-lijn:rgba(255,255,255,0.10);
-  --ios-accent:var(--dag-kleur,#C23A5E);
+  /* DE BEDIENING VERKLEURT NIET MEE MET HET SEIZOEN.
+
+     Hier stond var(--dag-kleur). Die kleur komt uit shared/dagkleur.css en is
+     bedoeld om GRONDEN te wassen -- stijl.css mengt hem op 8 tot 25% door de
+     achtergrond, zodat een scherm 's ochtends anders ademt dan 's avonds. Op
+     volle sterkte als kleur van een knop betekende het dat elke actie in de
+     balk meeverkleurde met dag en seizoen, en op een winteravond komt daar een
+     helderblauw uit. Blauwe knoppen in een bordeaux-gouden huis: dat is de
+     iOS-standaardkleur die per ongeluk is blijven staan.
+
+     Goud is wel van dit merk en haalt op zwart ruim 7:1, waar de bordeaux op
+     17px met 3,78 tekortkomt (CLAUDE.md rekent dat voor). De bediening is dus
+     goud, altijd dezelfde, het hele jaar door. */
+  --ios-accent:var(--gold-tekst,#C0A544);
   --ios-materiaal:rgba(12,12,11,0.72);
 
   --ios-balk:44px;                                  /* de vaste hoogte van iOS */

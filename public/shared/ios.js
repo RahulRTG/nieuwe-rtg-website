@@ -166,11 +166,42 @@
      overslaat, ziet een kop zonder bediening, gooit hem weg -- en gooit het
      zoekveld mee weg. De app zoekt daarna naar #zoekveld, vindt niets, en
      Berichten heeft geen zoekfunctie meer zonder dat er iets rood wordt. */
+  /* MAAR EEN KNOP IN ANDERMANS DICHTE PANEEL IS GEEN BALKACTIE, en dat is iets
+     anders dan de regel hierboven.
+
+     Het verschil zit in WIE er verborgen is. Berichten heeft een zoekveld dat
+     zelf `hidden` is tot je inlogt: dat veld is een balkactie die nog moet
+     verschijnen, en die moet meetellen. Maar de RTFoundation-balk heeft een
+     profielmenu -- een dropdown met `hidden` erop -- en daarin staan Gezin
+     beheren, Ander profiel en Gezin uitloggen. Die drie zijn geen balkacties;
+     ze horen bij de knop die dat menu opent, en die knop staat er al.
+
+     Zonder dit onderscheid tilde bouwBalk() ze uit hun eigen menu de balk in,
+     waar ze hun opmaak kwijtraakten (het menu styleert zijn eigen links) en
+     als drie blauwe onderstreepte links over de titel heen kwamen te staan. Op
+     een telefoon liepen ze gewoon van het scherm af. Dat is precies hoe het
+     eruitzag op de foto waarmee dit gemeld werd.
+
+     De regel is dus: het element zelf verborgen -> meetellen. Een VOOROUDER
+     onder de kop dicht -> overslaan, want dan zit het in een paneel dat zijn
+     eigen opener heeft. Een <dialog> die niet open is en een <details> die
+     dicht is zijn hetzelfde geval met een andere spelling. */
+  function inGeslotenPaneel(node, kop) {
+    for (var p = node.parentElement; p && p !== kop; p = p.parentElement) {
+      if (p.hasAttribute && p.hasAttribute('hidden')) return true;
+      if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return true;
+      if (p.tagName === 'DIALOG' && !p.open) return true;
+      if (p.tagName === 'DETAILS' && !p.hasAttribute('open')) return true;
+    }
+    return false;
+  }
+
   function bedienbaar(kop) {
     var kandidaten = kop.querySelectorAll('button, a[href], input, select, textarea, [role="button"], [role="tab"]');
     var uit = [];
     for (var i = 0; i < kandidaten.length; i++) {
       if (isTerug(kandidaten[i])) continue;
+      if (inGeslotenPaneel(kandidaten[i], kop)) continue;
       uit.push(kandidaten[i]);
     }
     return uit;
@@ -277,8 +308,27 @@
       acties.appendChild(terug[i]);
     }
 
+    /* HET BUDGET. Meten op overloop alleen is niet genoeg, en dat bleek pas op
+       een echte telefoon. De balk van vrienden.html liep namelijk NIET over:
+       de kolommen kregen 82 + 11 + 264 op 390 en pasten precies. Maar die 11
+       is de titelkolom, tot een streep geknepen, en de acties namen 68% van de
+       balk. Technisch klopte alles; het zag eruit alsof er zes dingen over
+       elkaar heen stonden, en dat was de melding.
+
+       Een navigatiebalk is navigatie en geen werkbalk. Meer dan 45% aan acties
+       betekent dat er geen balk meer is maar een rij knoppen met een pijl
+       ervoor. Vandaar twee voorwaarden: hij wijkt uit als het NIET PAST, en
+       ook als het wel past maar te vol staat. */
+    var BUDGET = 0.45;
+    var rij = acties.parentElement;
+    function teVol() {
+      if (acties.scrollWidth > acties.clientWidth + 1) return true;
+      if (!rij || !rij.clientWidth) return false;
+      return acties.getBoundingClientRect().width > rij.clientWidth * BUDGET;
+    }
+
     var vak = null, rem = 40;
-    while (acties.scrollWidth > acties.clientWidth + 1 && rem--) {
+    while (teVol() && rem--) {
       var kandidaat = null;
       for (var j = acties.children.length - 1; j >= 0; j--) {
         var k = acties.children[j];

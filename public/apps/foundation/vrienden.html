@@ -25,7 +25,12 @@
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
   .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
-  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--accent-tekst);}
+    /* EEN PIN IS GEEN CEREMONIE. Hij stond in Bodoni, en die letter is gemaakt
+     om groot en zeldzaam te zijn: dikke stammen, haarfijne verbindingen. Een
+     code die je overtypt of voorleest wil het omgekeerde -- gelijke breedte,
+     duidelijk verschil tussen 8 en B, tussen 0 en O. ONTWERP.md zet Bodoni
+     ook niet op codes: die horen bij Reference, tabulair. */
+  .pinrij .pincode{font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;font-size:1.05rem;letter-spacing:.18em;color:var(--accent-tekst);}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
@@ -245,6 +250,7 @@
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
 
 <script src="/apps/util.js"></script>
+<script src="/shared/glyf.js" defer></script>
 <script src="sessie.js"></script>
 <script src="/apps/translate.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
@@ -266,6 +272,14 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 const esc = Util.escapeHTML;
 const initcn = Util.initialen;
 const E = Util.el, vervang = Util.vervang; // veilige component-bouwer
+/* De server stuurt PICTOGRAMNAMEN mee ('emo-hart', 'taal', 'ster'), geen
+   emoji: sinds shared/glyf.js de set draagt is dat een sleutel en geen teken.
+   Dit scherm zette die sleutel rechtstreeks in de tekst, en dus stond er
+   letterlijk "emo-hart" in een letter van 1,6rem naast de dag-opdracht.
+   RTGGlyf.tekst() maakt er het pictogram van, en laat een onbekende naam
+   ontsmet staan -- zodat een echte emoji uit oudere data gewoon blijft. */
+function glyfSpan(klasse, naam){ const sp=document.createElement("span"); sp.className=klasse; sp.innerHTML=ico(naam); return sp; }
+function ico(naam){ return (window.RTGGlyf ? RTGGlyf.tekst(naam) : esc(String(naam==null?"":naam))); }
 // social-endpoints lopen via /api/rtf/social met het gezin-token
 function soc(pad, body){
   return fetch('/api/rtf/social'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
@@ -693,7 +707,7 @@ function stChips(){
   $('#stFilters').querySelectorAll('[data-f]').forEach(b=> b.addEventListener('click', ()=>{ ST.filter=b.dataset.f; stChips(); stTeken(); }));
   $('#stKleuren').innerHTML = ST_KLEUREN.map(k=> '<button type="button" class="stkleur'+(ST.modus==='pen'&&ST.pen===k?' aan':'')+'" data-k="'+k+'" style="background:'+k+'" aria-label="Penkleur"></button>').join('');
   $('#stKleuren').querySelectorAll('[data-k]').forEach(b=> b.addEventListener('click', ()=>{ ST.pen=b.dataset.k; ST.modus='pen'; ST.emoji=null; stChips(); }));
-  $('#stEmojis').innerHTML = ST_EMOJIS.map(em=> '<button type="button" class="stemoji'+(ST.modus==='sticker'&&ST.emoji===em?' aan':'')+'" data-e="'+em+'">'+em+'</button>').join('');
+  $('#stEmojis').innerHTML = ST_EMOJIS.map(em=> '<button type="button" class="stemoji'+(ST.modus==='sticker'&&ST.emoji===em?' aan':'')+'" data-e="'+em+'" aria-label="'+esc(em)+'">'+ico(em)+'</button>').join('');
   $('#stEmojis').querySelectorAll('[data-e]').forEach(b=> b.addEventListener('click', ()=>{ ST.emoji=b.dataset.e; ST.modus='sticker'; stChips(); }));
 }
 function stOpen(dataUrl){
@@ -749,7 +763,7 @@ async function laadOpdracht(){
   const el=$('#opdrachtKaart');
   el.innerHTML='';
   const kaart=E('div',{class:'opkaart'},
-    E('span',{class:'em'}, opdrachtVandaag.emoji),
+    glyfSpan('em', opdrachtVandaag.emoji),
     E('div',{class:'tx'}, E('b', null, 'Dag-opdracht: '), 'snap '+opdrachtVandaag.tekst,
       E('small', null, 'Elke dag een nieuwe, voor iedereen dezelfde. Jouw inzending staat 24 uur in je verhaal.')),
     E('button',{class:'knop mini', onclick:()=>kiesStory(true)}, 'Doe mee'));

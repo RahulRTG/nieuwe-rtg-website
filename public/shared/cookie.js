@@ -39,7 +39,9 @@
     ':root[data-rtg-thema="champagne"] #rtg-cookie span{color:rgba(26,23,19,0.58);}' +
     ':root[data-rtg-thema="champagne"] #rtg-cookie a,' +
     ':root[data-rtg-thema="champagne"] #rtg-cookie button{color:rgba(26,23,19,0.86);' +
-      'border-bottom-color:rgba(26,23,19,0.3);}';
+      'border-bottom-color:rgba(26,23,19,0.3);}' +
+    /* de ruimte die de balk zelf inneemt, onder de inhoud gelegd */
+    'body{padding-bottom:calc(var(--rtg-eigen-voet,0px) + var(--rtg-cookieruimte,0px));}';
   document.head.appendChild(stijl);
 
   var el = document.createElement('div');
@@ -54,11 +56,41 @@
   var knop = document.createElement('button');
   knop.type = 'button';
   knop.textContent = T.ok;
+  /* EEN VASTE BALK MOET ZIJN EIGEN RUIMTE RESERVEREN.
+
+     Deze melding staat position:fixed onderaan en nam nergens ruimte in. Op
+     elke pagina van het huis lag hij daarmee over de laatste regels heen:
+     op foundation/vrienden.html stond "Functional storage only · Privacy ·
+     Fine" dwars door de laatste zin van een verhaal, en op een telefoon is
+     dat precies de plek waar de inhoud ophoudt. Niemand merkt dat, want de
+     pagina scrollt gewoon door -- de onderste regels zijn alleen nooit
+     helemaal te lezen.
+
+     De hoogte staat niet vast (de tekst breekt op smalle schermen), dus hij
+     wordt gemeten en als variabele op <html> gezet. Weg is weg: bij het
+     wegklikken gaat de ruimte mee, anders staat er een lege strook onderaan
+     die niemand meer kan verklaren. */
+  var RUIMTE = '--rtg-cookieruimte';
+  function meetRuimte() {
+    if (!el.isConnected) return;
+    var h = Math.ceil(el.getBoundingClientRect().height) + 12;
+    document.documentElement.style.setProperty(RUIMTE, h + 'px');
+  }
+  function geefRuimteTerug() {
+    document.documentElement.style.removeProperty(RUIMTE);
+  }
+
   knop.addEventListener('click', function () {
     try { localStorage.setItem(SLEUTEL, new Date().toISOString()); } catch (e) {}
     el.remove();
+    geefRuimteTerug();
   });
   el.appendChild(p); el.appendChild(a); el.appendChild(knop);
-  var plaats = function () { document.body.appendChild(el); };
+  var plaats = function () {
+    document.body.appendChild(el);
+    meetRuimte();
+    if (window.requestAnimationFrame) window.requestAnimationFrame(meetRuimte);
+    window.addEventListener('resize', meetRuimte);
+  };
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);
 })();

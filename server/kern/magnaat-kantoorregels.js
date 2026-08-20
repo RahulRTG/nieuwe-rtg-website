@@ -45,7 +45,13 @@ const REGELS = [
   [/\/techniek|\/wacht|\/incident|\/storing/, 'techniek', 'Techniek & De Wacht'],
 
   /* Geld, handel en groei. */
-  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen/, 'financien', 'Financiën'],
+  /* De commerciele kern hoort bij Financien, net als de pasprijzen: het gaat
+     over wat RTG vraagt en waarvoor. `claims` en `sociaalbeleid` staan er
+     expliciet bij -- zonder die twee vielen ze terug op "Onderzoek & data", en
+     een terugval telt in het Controleregister als dekkingsgat. `sociaalbeleid`
+     moet bovendien HIER matchen en niet verderop op `/sociaal`: de sociale
+     afdracht is geld, geen klantenservice. */
+  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen|\/claims|sociaalbeleid|commercie|prijsgarantie/, 'financien', 'Financiën'],
   [/marketing|campagne|analytics|\/merk/, 'marketing', 'Marketing'],
   [/\/pr\/|communicatie|persbericht/, 'pr', 'PR & communicatie'],
   [/\/sales|acquisitie|lead/, 'sales', 'Sales'],

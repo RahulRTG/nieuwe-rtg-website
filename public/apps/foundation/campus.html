@@ -175,7 +175,7 @@
   }
   async function laadEco(){
     const s=window.Sessie&&Sessie.huidig&&Sessie.huidig();
-    if(!s||!s.code||!s.token){document.getElementById('ecoStatus').textContent='Kies eerst je gezinsprofiel; daarna toont de Campus automatisch alles wat bij jouw leeftijd past.';document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg"><a href="index.html" style="color:var(--goud)">Kies een profiel om de hele Foundation te openen →</a></div>';return;}
+    if(!s||!s.code||!s.token){document.getElementById('ecoStatus').textContent='Kies eerst je gezinsprofiel; daarna toont de Campus automatisch alles wat bij jouw leeftijd past.';document.getElementById('ecoGrid').innerHTML='<div class="eco-leeg"><a href="index.html" style="color:var(--accent-tekst)">Kies een profiel om de hele Foundation te openen →</a></div>';return;}
     try{
       toegang=await Sessie.toegang('campus'); if(!toegang||!toegang.toegestaan)return;
       const mag=new Set(toegang.apps||[]);

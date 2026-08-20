@@ -9,6 +9,11 @@
      KLEINE TEKST wordt. Bij goud (#C9A24B op zwart, ~7:1) is dat hetzelfde
      ding; bij de bordeaux hieronder niet, en juist daar ging het mis. */
   --accent-tekst:#C9A24B;
+  /* En dezelfde splitsing voor rood. --rood (#B4574E) is de kleur van een
+     waarschuwing op een vlak; als TEKST haalt hij op zwart 4,11 en dat is net
+     te weinig. Deze tint is dezelfde kleur, alleen licht genoeg om te lezen
+     (4,99) -- geen nieuwe merkkleur maar een leesbare stand van dezelfde. */
+  --rood-tekst:#C2665C;
   --radius:16px; --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
   --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
 }
@@ -117,6 +122,11 @@ input,textarea,select{font-family:inherit;}
    (8:1), maar op bordeaux 4,06 en dus te weinig. Zelfde omslag als de knop
    hierboven, en om dezelfde reden op dezelfde plek. */
 :root[data-rtf-groep="tiener"] .rsm-rahul, :root[data-rtf-groep="jong"] .rsm-rahul, :root[data-rtf-groep="volw"] .rsm-rahul{ color:#fff; }
+/* Alles wat OP het accent staat en donkere letters zette: hetzelfde verhaal.
+   Op goud haalt #1a1710 een 8:1, op bordeaux 3,46. Een cijfer in een bolletje
+   en een gekozen keuzeknop zijn geen uitzondering op leesbaarheid. */
+:root[data-rtf-groep="tiener"] .stap .n, :root[data-rtf-groep="jong"] .stap .n, :root[data-rtf-groep="volw"] .stap .n,
+:root[data-rtf-groep="tiener"] .kies button.aan, :root[data-rtf-groep="jong"] .kies button.aan, :root[data-rtf-groep="volw"] .kies button.aan{ color:#fff; }
 :root[data-rtf-groep="tiener"] .knop.grijs, :root[data-rtf-groep="jong"] .knop.grijs, :root[data-rtf-groep="volw"] .knop.grijs{ color:var(--txt); }
 :root[data-rtf-groep="tiener"] .chat .b.ik, :root[data-rtf-groep="jong"] .chat .b.ik, :root[data-rtf-groep="volw"] .chat .b.ik{ color:#fff; }
 :root[data-rtf-groep="tiener"] .badge, :root[data-rtf-groep="jong"] .badge, :root[data-rtf-groep="volw"] .badge{

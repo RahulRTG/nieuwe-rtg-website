@@ -18,7 +18,7 @@
   .stuur{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;
     border-bottom:1px solid var(--lijn);}
   .stuur .knop{padding:.4rem .75rem;font-size:.82rem;}
-  .stuur .knop.aan{border-color:var(--goud);color:var(--goud);}
+  .stuur .knop.aan{border-color:var(--goud);color:var(--accent-tekst);}
   /* De gezinsagenda houdt zijn eigen weergave-schakelaar (maand / week / lijst),
      maar draagt hem in de stijl van het deelmenu: geen randje om een knop, maar
      een rustige tab met kleine kapitalen en een gouden streep onder de actieve.
@@ -33,7 +33,7 @@
   .stuur .knop[data-zicht]:hover{color:var(--txt);border-bottom-color:transparent;}
   .stuur .knop[data-zicht].aan{color:var(--txt);background:none;border-bottom-color:var(--goud);}
   #periode{font-family:var(--serif);font-size:1.05rem;margin:0 .3rem;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
 
   /* het maandraster en de week: dezelfde taal als de ledenagenda */
   .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
@@ -46,10 +46,10 @@
   .mdag.buiten{opacity:.4;}
   .mdag.vandaag{border-color:var(--goud);}
   .mdag .dnr{font-size:.68rem;color:var(--zacht);}
-  .mdag.vandaag .dnr{color:var(--goud);font-weight:700;}
+  .mdag.vandaag .dnr{color:var(--accent-tekst);font-weight:700;}
   .chip{display:block;border:1px solid var(--lijn);border-left-width:3px;border-radius:6px;
     font-size:.62rem;padding:.1rem .3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .chip b{color:var(--goud2);}
+  .chip b{color:var(--accent-tekst);}
   .meer{font-size:.6rem;color:var(--zacht);}
   .wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
   .wdag{display:flex;flex-direction:column;gap:3px;}

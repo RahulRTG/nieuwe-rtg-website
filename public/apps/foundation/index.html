@@ -65,7 +65,7 @@
   /* het pictogram: dunne lijnen in de tekstkleur van de tegel (glyf.js),
      goud zodra de tegel wordt aangeraakt -- zelfde beweging als de rand */
   .tile .ic .rtg-glyf{width:26px;height:26px;}
-  .tile:hover .ic{color:var(--goud);}
+  .tile:hover .ic{color:var(--accent-tekst);}
   .tile h2{font-family:var(--sans,inherit);font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3;color:var(--zacht);width:100%;overflow-wrap:break-word;}
   /* width:100%, niet max-width. De tegel is een kolom-flexbox met
      align-items:center, en daardoor krimpt het label tot fit-content: het
@@ -114,7 +114,7 @@
   .klkies{display:flex;gap:.4rem;margin-bottom:.9rem;}
   .klkies button{width:1.8rem;height:1.8rem;border-radius:50%;border:2px solid transparent;}
   .klkies button.aan{border-color:var(--txt);transform:scale(1.12);}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
   .codebig{text-transform:uppercase;letter-spacing:.3em;text-align:center;font-size:1.25rem;font-weight:700;}
   .mini{text-align:center;margin-top:1.4rem;font-size:.82rem;color:var(--zacht);}
@@ -132,7 +132,7 @@
   .passband[hidden]{display:none;}
   .passband{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;background:#241f16;border:1px solid var(--goud);color:var(--accent-tekst);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;font-weight:600;}
   .wisbanner{background:#2a1512;border:1px solid var(--rood);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:.6rem;line-height:1.5;font-size:.9rem;}
-  .wisbanner a{color:var(--goud2);font-weight:700;text-decoration:none;}
+  .wisbanner a{color:var(--accent-tekst);font-weight:700;text-decoration:none;}
   /* Toegankelijkheid: sla-over-link, alleen zichtbaar bij toetsenbordfocus */
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud);color:#0C0C0B;
     padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;

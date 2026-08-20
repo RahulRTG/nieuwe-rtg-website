@@ -308,7 +308,7 @@ function opKleur(hex) {
   'use strict';
   if (w.RTGWereld) return;
 
-  w.RTGWereld = {
+  var KAART = {
     sleutel: 'rtf',
     naam: 'RTFoundation',
     bestemmingen: [
@@ -337,6 +337,29 @@ function opKleur(hex) {
         schermen: ['beheer'] }
     ]
   };
+
+  /* EEN WERELD CLAIMT ALLEEN ZIJN EIGEN SCHERMEN.
+
+     Deze bundel zit op elk scherm in de Foundation-map dat een gezinssessie
+     draagt -- en dat zijn er een paar die geen gezinsscherm ZIJN. Het
+     Clubportaal is het duidelijkste geval: het vraagt om een clubcode, spreekt
+     de bezoeker met u aan, en hoort bij de kantoorset in schil-os.js. Zonder
+     deze controle zette dit bestand daar toch de gezinswereld neer, en omdat
+     schil-os.js netjes afhaakt zodra er al een wereld staat, won de verkeerde
+     van de twee -- met zes tabs die niet over zijn werk gaan en geen enkele
+     die oplicht.
+
+     De regel is dus dezelfde als in schil-os.js: staat dit scherm niet in mijn
+     eigen kaart, dan is het niet van mij, en laat ik het aan de volgende. Een
+     scherm dat in geen enkele kaart staat krijgt geen balk, en dat is eerlijker
+     dan de verkeerde. */
+  var m = /\/([^\/?#]+)\.html?$/.exec(w.location.pathname);
+  var nu = m ? m[1].toLowerCase() : '';
+  var vanMij = KAART.bestemmingen.some(function (b) {
+    return (b.schermen || []).indexOf(nu) >= 0;
+  });
+  if (!vanMij) return;
+  w.RTGWereld = KAART;
 
   /* Het blad en het gedrag erbij halen. Zelfde patroon als de verbindingslaag
      en de glyfen in sessie-00: de component brengt mee wat hij nodig heeft,

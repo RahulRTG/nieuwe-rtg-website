@@ -41,7 +41,7 @@
     ':root[data-rtg-thema="champagne"] #rtg-cookie button{color:rgba(26,23,19,0.86);' +
       'border-bottom-color:rgba(26,23,19,0.3);}' +
     /* de ruimte die de balk zelf inneemt, onder de inhoud gelegd */
-    'body{padding-bottom:calc(var(--rtg-eigen-voet,0px) + var(--rtg-cookieruimte,0px));}';
+    'body{padding-bottom:calc(var(--rtg-eigen-voet,0px) + var(--rtg-cookieruimte,0px) + var(--ws-ruimte,0px));}';
   document.head.appendChild(stijl);
 
   var el = document.createElement('div');

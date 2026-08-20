@@ -231,7 +231,7 @@
    specificiteit -- waardoor de melding weer over de laatste regels lag. Twee
    regels die om dezelfde padding vechten heeft altijd een verliezer; optellen
    niet. Wie er niet is telt als nul. */
-body[data-ios]{padding-bottom:calc(var(--ios-thuis-ruimte, 0px) + var(--rtg-cookieruimte, 0px));}
+body[data-ios]{padding-bottom:calc(var(--ios-thuis-ruimte, 0px) + var(--rtg-cookieruimte, 0px) + var(--ws-ruimte, 0px));}
 
 /* ----------------------------------------- openen, sluiten, terugveren */
 @media (prefers-reduced-motion: no-preference){

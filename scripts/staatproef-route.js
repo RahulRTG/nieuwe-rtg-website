@@ -24,55 +24,51 @@
    ========================================================================== */
 'use strict';
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
-const { draaiStaatproef, ruisUit } = require('./lib/staatproef');
+const { start } = require('./lib/wegwerpserver');
+const { draaiStaatproef, stapelRijen, zonderRuis } = require('./lib/staatproef');
+const { maakPool } = require('./lib/objectpool');
 const { plausibelLijf } = require('./lib/rolproef');
-const { alleRoutes, isSchakel } = require('./lib/routes');
+const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'STAATPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
 
-function rolVan(bewakers) {
-  const b = bewakers.join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
-}
+/* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
+   te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
+   eens -- vier kopieen van dezelfde afleiding (LAT.md regel 4). */
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer(); s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
-async function wacht(basis, ms) {
-  const eind = Date.now() + ms;
-  while (Date.now() < eind) {
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return true; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return false;
-}
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een
+   VOLLEDIGE meetronde zodra iets dit bestand require't -- een toets, de keuring,
+   of iemand die alleen even wil kijken of het laadt. Dat is hier echt gebeurd:
+   een onschuldige laadcontrole draaide de rolproef met de STANDAARDbegrenzing en
+   schreef ROLPROEF.json van 3377 beproefde routes terug naar 292. Het register
+   zag er daarna volkomen normaal uit.
+
+   scripts/bewijsmatrix.js heeft deze wacht al sinds hij ooit de hele testrunner
+   meenam. Dezelfde wacht hoort op elk instrument dat bij het draaien een register
+   OVERSCHRIJFT. */
+if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
-  const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-staatproef-'));
-  const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
-  });
-  const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
-  process.on('exit', klaar);
-  if (!await wacht(basis, 60000)) { console.error('de server kwam niet op'); klaar(); process.exit(2); }
+  /* DE GEDEELDE WEGWERPSERVER. Hier stond de eigen kopie die de kop al een
+     maand ontkende ('ze delen de wegwerpserver') -- de tekst beloofde wat de
+     code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
+     (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
+     BEWIJSSCHULD.json). */
+  const server = await start({ naam: 'staatproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const { basis, klaar } = server;
 
+  /* De objectpool oogst in de post-wikkel: elk geslaagd antwoord op DEZE
+     server draagt echte id's, en lijfVoor verrijkt er de volgende lijven mee
+     (scripts/lib/objectpool.js). Zo bereikt de proef ook de routes die een
+     bestaand object willen -- de grootste ongemeten groep. */
+  const pool = maakPool();
   const post = async (pad, lijf, tok) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
@@ -80,6 +76,7 @@ async function wacht(basis, ms) {
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      if (r.status >= 200 && r.status < 300 && data && typeof data === 'object') pool.leer(data, pad);
       return { status: r.status, data };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
@@ -127,15 +124,52 @@ async function wacht(basis, ms) {
      eerste ronde negentien loze 'geweigerd en toch veranderd' op rij.
      Empirisch en niet met de hand: een geschreven lijst loopt achter zodra er
      een journaal bijkomt, en dan komen de valse bevindingen terug. */
-  const routes = alleRoutes()
+  const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
     .filter(r => !r.pad.includes(':'))
     /* De vingerafdruk-routes zelf niet bestoken: een proef die zijn eigen
        meetinstrument als proefkonijn gebruikt, meet zichzelf. */
-    .filter(r => !r.pad.startsWith('/api/techniek/vingerafdruk'))
-    .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
-    .filter(r => r.rol);
+    .filter(r => !r.pad.startsWith('/api/techniek/vingerafdruk'));
+  /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
+     honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
+     komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
+  /* ALLEEN ROLLEN WAARVOOR DIT INSTRUMENT EEN TOKEN HEEFT. Sinds de
+     bewakerskaart ook eigenrollen kent (boardroom, techniek, scim,
+     werkplekbaas) kwamen 123 routes hier binnen als "met rol" terwijl er
+     geen sleutel voor bestaat: de staatproef roept aan MET de rol van de route; zonder token voor die rol
+     klopt hij zonder sleutel aan en meet hij niets.
+     Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
+  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  /* DE RONDE STAPELT, NET ALS DE OUTPUT-BAND. Een volle ronde duurt uren en
+     een container haalt dat niet; met --max=N mat hij vroeger telkens DEZELFDE
+     eerste N routes en gooide de rest van het register weg. Nu: wat er al
+     staat blijft staan (met zijn eigen op-stempel), de rij begint bij routes
+     ZONDER rij en daarna bij de oudste meting, en de uitslag hieronder is de
+     samenvoeging. Zo bereikt een reeks begrensde rondes de hele populatie,
+     over herstarts heen -- en de normtand bewijsCellenBewezen kan niet meer
+     zakken doordat een kleine ronde een groot register overschrijft. */
+  let oudeRijen = [], oudOp = '1970-01-01T00:00:00Z';
+  try {
+    const oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
+    oudOp = (oud.stempel && oud.stempel.op) || oudOp;
+    oudeRijen = oud.perRoute || [];
+  } catch (e) {}
+  const eerder = new Map(oudeRijen.map(rij => [rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp }]));
+  /* De rij: eerst wat geen rij heeft, dan wat GESCHORST staat (een gezakte
+     cel sluit alleen door hermeting, PROOF.md par. 2), dan de oudste meting. */
+  const zakte = (r) => r && (r.rollback === 'GEZAKT' || r.idempotentie === 'GEZAKT') ? 0 : 1;
+  const routes = verdeling.metRol.slice().sort((x, y) => {
+    const a = eerder.get(x.methode + ' ' + x.pad), b = eerder.get(y.methode + ' ' + y.pad);
+    if (!a && !b) return 0;
+    if (!a) return -1;
+    if (!b) return 1;
+    return (zakte(a) - zakte(b)) || String(a.op).localeCompare(String(b.op));
+  });
+  console.log('  routes gevonden                      : ' + kandidaten.length);
+  console.log('  routes met een herkenbare rol        : ' + routes.length);
+  console.log('  waarvan al een rij in het register   : ' + routes.filter(r => eerder.has(r.methode + ' ' + r.pad)).length);
+  meldZonderRol(verdeling);
 
   const ruwRoutes = routes;
 
@@ -165,7 +199,7 @@ async function wacht(basis, ms) {
      raakt elke poort die er is, zonder dat er ergens een lijst met namen komt. */
   const steek = ruwRoutes.filter((_, i) => i % 120 === 0).slice(0, 30);
   for (const r of steek) await ijk(() => post(r.pad, {}, 'dit-token-bestaat-niet'));
-  const aanvraagRuis = ruisUit(geteld, RONDES);
+  const aanvraagRuis = zonderRuis(geteld, RONDES);
   const eenmalig = [...geteld].filter(([, n]) => n < RONDES).map(([c]) => c);
 
   /* DE DERDE IJKING: RUIS DIE VAN DE KLOK KOMT, niet van een verzoek.
@@ -202,7 +236,7 @@ async function wacht(basis, ms) {
     const v1 = await vingerafdruk();
     for (const c of (await verschilVan(v0, v1)).collecties || []) stilGeteld.set(c, (stilGeteld.get(c) || 0) + 1);
   }
-  const tijdruis = ruisUit(stilGeteld, STIL_RONDES);
+  const tijdruis = zonderRuis(stilGeteld, STIL_RONDES);
 
   /* EN EEN LANGE STILTE, voor de schakelaars die TRAGER lopen dan het venster
      hierboven. kern/command/alarm.js weegt eens per zestig seconden; die tik
@@ -243,21 +277,26 @@ async function wacht(basis, ms) {
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: async (rol) => { try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {} return false; },
-    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, stilOoit, maxRoutes: MAX });
+    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 
-  const t = uit.telling;
-  const rijen = Object.values(uit.perRoute);
+  /* De samenvoeging: vers wint, en wat niet is hermeten houdt zijn oude rij en
+     zijn eigen op-stempel. De telling gaat over de SAMENVOEGING; die van
+     draaiStaatproef gaat alleen over deze ronde. Regel en toets wonen in
+     scripts/lib/staatproef.js (stapelRijen). */
+  const { rijen, telling: t, versGemeten } =
+    stapelRijen(oudeRijen, oudOp, uit.perRoute, new Date().toISOString());
   const beoordeeld = rijen.filter(r => r.state === 'bewezen' || r.rollback !== 'ongemeten').length;
+  console.log('  vers gemeten deze ronde              : ' + versGemeten);
   console.log('  oproepen                             : ' + uit.oproepen);
   console.log('  BEOORDEELD                           : ' + beoordeeld + ' / ' + routes.length);
   /* GEEN STILLE AFKAPPING. Draait de ronde met een begrenzing, dan hoort er te
      staan wat er NIET is beproefd -- anders leest 'geen bevindingen' als een
      uitspraak over alle routes terwijl hij er een deel heeft gezien. */
   if (MAX && rijen.length < routes.length) {
-    console.log('  NIET BEPROEFD (begrenzing ' + MAX + ')      : ' + (routes.length - rijen.length) +
-      '   <- geen bevinding is hier geen uitspraak');
+    console.log('  NOG GEEN RIJ (begrenzing ' + MAX + ')       : ' + (routes.length - rijen.length) +
+      '   <- geen bevinding is hier geen uitspraak; de volgende ronde begint daar');
   }
   console.log('      STATE bewezen                    : ' + t.state);
   console.log('      SIDE_EFFECT bewezen              : ' + t.sideEffect);
@@ -272,10 +311,19 @@ async function wacht(basis, ms) {
   }
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: ' +
       'bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. ' +
-      'Een route die hier NIET in staat is niet beproefd. Zie scripts/lib/staatproef.js voor de grens.',
-    gemeten: { routesMetRol: routes.length, beoordeeld, oproepen: uit.oproepen,
+      'Een route die hier NIET in staat is niet beproefd. De rijen STAPELEN over rondes heen: elke rij ' +
+      'draagt zijn eigen op-stempel, een nieuwe ronde hermeet eerst wat geen rij heeft en dan de oudste. ' +
+      'Zie scripts/lib/staatproef.js voor de grens.',
+    /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
+       routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
+       bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
+    nietBeproefbaar: verdeling.zonderRol.length,
+    redenenNietBeproefbaar: verdeling.redenen,
+    routesGevonden: kandidaten.length,
+    gemeten: { routesMetRol: routes.length, beoordeeld, versGemeten, oproepen: uit.oproepen,
       state: t.state, sideEffect: t.sideEffect, rollback: t.rollback, rollbackGezakt: t.rollbackGezakt,
       idemBewezen: t.idemBewezen, idemGezakt: t.idemGezakt, ongemeten: t.ongemeten,
       tokensHernieuwd: uit.hernieuwd, blindeRondes: uit.meterStuk ? 1 : 0,

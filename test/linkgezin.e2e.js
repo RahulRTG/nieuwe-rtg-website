@@ -19,17 +19,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
 const pw = laadPlaywright();
 
 async function api(base, pad, body, token) {
@@ -57,7 +51,7 @@ async function metGezin(fn) {
   try {
     const g = (await api(base, '/api/foundation/gezin/maak',
       { gezinsnaam: 'Scanhuis', naam: 'Ouder Scanhuis', pin: '1234' })).body;
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.addInitScript((s) => {
       try { localStorage.setItem('rtf_sessie', s); localStorage.setItem('rtg_lang', 'nl'); } catch (e) {}
@@ -99,7 +93,7 @@ async function typ(pg, tekst) {
 }
 
 test('een gezinslid plakt een RTG-code en krijgt eerst de kaart, dan pas het verzoek',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metGezin(async ({ pg, base, gezegd }) => {
     const lid = await nieuwLid(base, 'Kaart Lid');
     const pin = (await api(base, '/api/member/pin', {}, lid.token)).body.toon;
@@ -148,7 +142,7 @@ test('een gezinslid plakt een RTG-code en krijgt eerst de kaart, dan pas het ver
 });
 
 test('een vraagcode toont de kaart en GEEN knop: een gezinsprofiel heeft geen portemonnee',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metGezin(async ({ pg, base }) => {
     const lid = await nieuwLid(base, 'Vraag Lid');
     const cap = (await api(base, '/api/link/cap/maak',

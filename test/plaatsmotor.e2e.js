@@ -22,7 +22,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -48,7 +48,7 @@ async function api(base, pad, body, token) {
 }
 
 test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over de lijn',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -65,7 +65,7 @@ test('plaats: een hek passeren levert een waarneming op, en geen coordinaat over
     const midden = zone.punten.reduce((a, p) => ({ lat: a.lat + p.lat / zone.punten.length,
       lng: a.lng + p.lng / zone.punten.length }), { lat: 0, lng: 0 });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.addInitScript(GPS(midden.lat, midden.lng));
     await ctx.addInitScript((t) => {

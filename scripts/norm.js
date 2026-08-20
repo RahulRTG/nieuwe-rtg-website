@@ -50,6 +50,11 @@ const METERS = [
   { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
+  /* De 100%-richting: bewijs mag alleen groeien en schuld mag alleen krimpen.
+     Niet als ambitie maar als tand -- een gezakte cel of een gegroeide post
+     gaat vanaf nu langs een mens met een reden in NORM.json. */
+  { sleutel: 'bewijsCellenBewezen', richting: 'omhoog', wat: 'cellen (route x schakel) in de bewijsmatrix met bewijs' },
+  { sleutel: 'bewijsAchterstand', richting: 'omlaag', wat: 'openstaande bewijsschuld (meetwerk + instrument; de grens telt niet mee)' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
   { sleutel: 'keuringScheef', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "scheef"' },
   /* keuringBeter WAS EEN GEBLENDE TELLER, en daarmee de enige meter in deze
@@ -438,6 +443,37 @@ const { zonderTekst } = require('./lib/bron');
    schoonvegen voordat er skips geteld worden -- doet de poort dat anders dan de
    ratel, dan houdt hij iets tegen wat de meter niet ziet, of andersom. */
 function schoon(bron) { return zonderTekst(zonderBlokCommentaar(bron)); }
+/* DE 100%-RICHTING, MECHANISCH. Twee tanden op de bewijslaag zelf: het aantal
+   bewezen cellen in de matrix mag alleen stijgen (richting omhoog), en de
+   openstaande bewijsschuld mag alleen dalen (richting omlaag). De soort
+   `grens` telt niet mee in de achterstand: dat is de rand van de methode, en
+   wie die als achterstand telt jaagt op een getal dat niet bestaat (zie de kop
+   van scripts/bewijsschuld.js).
+
+   Losse functie met de lezer als invoer, zodat de ijking hem nep-registers kan
+   voeren en hem echt ziet uitslaan -- zelfde snit als telSkips en
+   telInlineStijl, en om dezelfde reden (LAT.md regel 10). Kapotte of
+   ontbrekende invoer is een gezakte meting, geen nul (regel 3). */
+function telBewijslaag(lees) {
+  let matrix, schuld;
+  try { matrix = JSON.parse(lees('BEWIJSMATRIX.json')); } catch (e) {
+    throw new Error('BEWIJSMATRIX.json is niet leesbaar (' + e.message + '); draai npm run ' +
+      'bewijsmatrix:vast -- een meter zonder invoer is geen meter');
+  }
+  try { schuld = JSON.parse(lees('BEWIJSSCHULD.json')); } catch (e) {
+    throw new Error('BEWIJSSCHULD.json is niet leesbaar (' + e.message + '); draai node ' +
+      'scripts/bewijsschuld.js --vastleggen -- een meter zonder invoer is geen meter');
+  }
+  const bewezen = matrix.telling && matrix.telling.bewezen;
+  if (typeof bewezen !== 'number') {
+    throw new Error('BEWIJSMATRIX.json draagt geen telling.bewezen; dan is bewijsCellenBewezen niet gemeten');
+  }
+  const t = schuld.telling || {};
+  if (typeof t.meetwerk !== 'number' || typeof t.instrument !== 'number') {
+    throw new Error('BEWIJSSCHULD.json draagt geen telling.meetwerk/instrument; dan is bewijsAchterstand niet gemeten');
+  }
+  return { bewijsCellenBewezen: bewezen, bewijsAchterstand: t.meetwerk + t.instrument };
+}
 
 function telSkips(bestanden, lees) {
   const uit = { dienst: 0, browser: 0 };
@@ -713,7 +749,12 @@ function meet(bronnen) {
       '(draai: node scripts/routekaart.js --json)');
   }
 
+  /* De bewijslaag zelf aan de ratel; het hele verhaal staat bij telBewijslaag. */
+  const { bewijsCellenBewezen, bewijsAchterstand } = telBewijslaag(
+    (naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
+
   return {
+    bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
@@ -776,7 +817,8 @@ function leesPrestatie(bestand) {
   /* Een GEZAKTE ronde levert geen grondwaarde. De cijfers van een run die zijn
      eigen drempels niet haalde zijn geen norm om aan vast te houden. */
   if (c.oordeel !== 'PASS') return { reden: 'de laatste beproeving is GEZAKT (' + c.gezakteDrempels + ' drempel(s)); die cijfers zijn geen lat' };
-  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid };
+  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid,
+    kalibratie: c.machine && c.machine.kalibratieBasisMs || null };
 }
 
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
@@ -912,6 +954,29 @@ function main() {
     console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze ronde draaide op ' + pres.bron
       + ', de lat staat op ' + norm.prestatieBron + '.');
     console.log('  \x1b[2mEen p99 van een andere machine of modus is geen betere of slechtere p99, maar een andere.\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && pres.kalibratie &&
+      (pres.kalibratie / norm.prestatieKalibratie > 1.4 || norm.prestatieKalibratie / pres.kalibratie > 1.4)) {
+    /* DEZELFDE VORM IS NOG NIET DEZELFDE MACHINE. Twee cloudcontainers met
+       "4k/17g/linux/sqlite" bleken op ander silicium te draaien: de een
+       haalde p99 144, de ander consistent 233 -- en de kalibratie (dezelfde
+       vaste spin-werklast, in rust) verschilde navenant. Latenties vergelijken
+       tussen die twee is dezelfde fout als darwin met linux vergelijken,
+       alleen onzichtbaarder. De vorm-sleutel hierboven vangt dat niet; deze
+       gemeten snelheid wel. Factor 1,4 en niet strakker: de kalibratie zelf
+       heeft ruis (gemeten ruisfactor ~1,1-1,2 op een rustige machine). */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: zelfde vorm (' + pres.bron + '), andere snelheid -- ' +
+      'kalibratie nu ' + pres.kalibratie + ' ms, bij de lat ' + norm.prestatieKalibratie + ' ms.');
+    console.log('  \x1b[2mEen p99 van trager silicium is geen slechtere p99, maar een andere. De lat verzet\x1b[0m');
+    console.log('  \x1b[2malleen wie op vergelijkbare snelheid meet, of met de hand (met reden, in de historie).\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && !pres.kalibratie) {
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze BEPROEVING.json draagt geen kalibratie; draai npm run beproeving opnieuw.');
+  } else if (heeftGrond && pres.kalibratie && !norm.prestatieKalibratie) {
+    /* De lat komt uit een tijd dat de snelheid niet werd meegemeten. Tegen
+       zo'n lat is elke vergelijking een gok -- misschien zelfde silicium,
+       misschien niet, en dat verschil is precies wat hier fout ging. */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: de lat draagt geen kalibratie (hij is gezet voordat de snelheid werd meegemeten).');
+    console.log('  \x1b[2mZet de lat met de hand op de cijfers van een ronde MET kalibratie (met reden, in de historie);\x1b[0m');
+    console.log('  \x1b[2mvanaf dan vergelijkt hij alleen nog metingen van vergelijkbaar silicium.\x1b[0m');
   } else {
     for (const m of PRESTATIEMETERS) {
       const v = pres.cijfers[m.sleutel];
@@ -993,6 +1058,7 @@ function main() {
       for (const b of presBeter) uit.prestatie[b.m.sleutel] = b.nu;
       for (const n of presNieuw) uit.prestatie[n.m.sleutel] = n.nu;
       uit.prestatieBron = pres.bron;
+      if (pres.kalibratie) uit.prestatieKalibratie = pres.kalibratie;
       uit.prestatieGemeten = pres.gedraaid;
     }
     fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');
@@ -1022,3 +1088,4 @@ function main() {
 
 if (require.main === module) process.exit(main());
 module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips, telBewijslaag };

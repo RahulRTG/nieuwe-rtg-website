@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -57,7 +57,7 @@ async function api(base, pad, body, token) {
 function morgen() { return new Date(Date.now() + 86400000).toISOString().slice(0, 10); }
 
 test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nader-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -85,7 +85,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
     assert.ok(hek, 'de zaak staat als naderingshek in de lijst');
     assert.equal(h.straalM, 900, 'nadering is ruim: een bericht dat komt als je al binnen staat, helpt niemand');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.addInitScript(GPS(hek.punten[0].lat, hek.punten[0].lng));
     await ctx.addInitScript((d) => {
@@ -173,7 +173,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
 });
 
 test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De regel die dit bewaakt staat in shared/plaatsnadering.js: alleen het hek
      van DEZE zaak, en alleen naar binnen. Zonder die regel zou elke zaak waar je
      toevallig langs komt jouw aankomstpuls afvuren -- en dan vertelt de puls de
@@ -207,7 +207,7 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
       x.soort === 'punt' && m(mijn.punten[0], x.punten[0]) > 2500);
     assert.ok(elders, 'er is een zaak ver genoeg hiervandaan om langs te lopen');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.addInitScript(GPS(elders.punten[0].lat, elders.punten[0].lng));
     await ctx.addInitScript((d) => {

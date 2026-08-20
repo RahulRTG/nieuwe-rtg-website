@@ -19,14 +19,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
 
@@ -62,7 +56,7 @@ async function doosVan(locator, wat) {
 
 
 test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en laat hem staan',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gb-salon-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -93,7 +87,7 @@ test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en 
       return null;
     };
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: BROWSER });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 1200 } });
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);

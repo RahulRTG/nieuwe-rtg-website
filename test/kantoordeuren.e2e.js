@@ -33,13 +33,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoordeur-'));
 
 /* De acht die wegstuurden. kantoorpda.html staat er bewust NIET bij: dat is
@@ -51,11 +47,11 @@ const APPS = [
 ];
 
 test('de acht kantoor-apps tonen hun eigen deur en sturen niemand weg',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof

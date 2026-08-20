@@ -11,7 +11,7 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De elf regels
+## De twaalf regels
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -304,6 +304,52 @@ vellen. Zolang die twee kanten elkaars uitkomst niet kunnen zien, kan de een de
 ander niet groen praten. Voor de mens die ze naast elkaar legt bestaat geen
 handhaver; daarvoor staat deze regel hier.
 
+
+### 12. Een meting die niet heeft gedraaid is geen slechte uitslag
+
+Regel 3 gaat over een meter die groen blijft zonder invoer. Dit is de omkering,
+en die is gemener: een meter die zonder invoer een NETJES OPGEMAAKT SLECHT CIJFER
+geeft. Groen zonder invoer valt op zodra iemand het nakijkt. Een slecht cijfer
+valt niet op -- het ziet eruit als diligentie, en iemand gaat eraan werken.
+
+De vraag die elke meter moet kunnen beantwoorden is dus niet alleen "wat is de
+uitslag" maar eerst "heeft de meting plaatsgevonden". Zolang die twee in een
+getal zitten, kun je ze niet uit elkaar houden.
+
+*Het geval, 18 augustus 2026:* de e2e-ronde viel om op alle 122 browsertoetsen --
+de omgeving had chromium 1194 staan en playwright vroeg om bouw 1234. Het
+schermjournaal van die ronde bevatte 294 TOETS-regels, 296 AUDIT-regels en nul
+SCHERM-regels. Precies hetzelfde bestand als een geslaagde ronde oplevert waarin
+geen enkel scherm wordt geopend. Het platformregister zou daar "262 schermen
+nooit geopend" van hebben gemaakt: een hard oordeel over 262 apps op grond van
+een storing in de meetopstelling.
+
+*En de twee wachten die dit hadden moeten zien, keken naar de verpakking:*
+`test/skipwacht.test.js` en `test/browserpoort.e2e.js` controleerden allebei of
+de MODULE playwright te vinden was. Die lag er die dag ook. Een aanwezige functie
+is geen startende browser.
+
+*Dezelfde fout, een laag hoger:* `scripts/meetkeuring.js` keurde het REGISTER en
+trok daaruit een conclusie over het INSTRUMENT. Een instrument dat de regel nooit
+heeft geleerd en een instrument dat hem vanmorgen leerde maar sindsdien niet
+heeft gedraaid, zien er in het register identiek uit -- en ze vragen om twee
+verschillende reparaties. Er is nu een derde uitslag, `oud register`, met de
+herstelopdracht erbij.
+
+*En het positieve spiegelbeeld:* waar een route niet te bewijzen valt, hoort er
+te staan WAT eraan ontbreekt. 3112 keer "ongemeten" is eerlijk en onbruikbaar;
+`scripts/waarom.js` maakt er negen soorten van met per soort wat eraan te doen
+is. Dat is hetzelfde onderscheid van de andere kant: niet de uitslag maar de
+voorwaarde.
+
+**Handhaver:** `scripts/schermen.js` `rondeVerslag()` (nul geopende schermen uit
+een ronde met browsertoetsen is een storing, geen uitslag; `--vastleggen` weigert
+dan), `test/schermronde.test.js`, `test/meetkeuring.test.js` toets 7, en
+`scripts/check.js` regel 50 (een browser start op EEN plek, zodat er iets te
+repareren valt als hij niet start). Voor de mens die een slecht cijfer leest en
+zich niet afvraagt of er wel gemeten is, bestaat geen handhaver; daarvoor staat
+deze regel hier.
+
 ---
 
 ## Wat de lat betekent per tijdvak
@@ -415,7 +461,11 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
-| een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
+| een omgeving die schermtoetsen belooft, heeft ook een browser die START | `test/browserpoort.e2e.js` + `test/skipwacht.test.js` |
+| een ronde die niet heeft gedraaid, telt niet als uitslag | `scripts/schermen.js` `rondeVerslag()` |
+| de instrumenten gemeten langs hun eigen regels | `scripts/meetkeuring.js` + `test/meetkeuring.test.js` |
+| waarom een route niet te bewijzen valt, in zijn eigen woorden | `scripts/waarom.js` + `WAAROM.json` |
+| een browser start op EEN plek | `test/helper.js` + `scripts/check.js` regel 50 |
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
 | dertien treden van kleuter tot aanvaller tegen een ECHTE server | `scripts/ladder.js` + `LADDER.json` + `ci.yml` |
 | welke rol waar binnenkomt, gevraagd aan de server en niet aan de bron | `scripts/rolronde.js` + `ROLRONDE.json` + `ci.yml` |

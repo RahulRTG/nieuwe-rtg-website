@@ -3,23 +3,19 @@
    en de prullenbak met herstel. Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 })).json();
 
 test('Bestanden: uploaden, delen, een versie van de ander en de prullenbak',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bestanden-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -32,7 +28,7 @@ test('Bestanden: uploaden, delen, een versie van de ander en de prullenbak',
     const stB = await api(base, '/api/state', {}, regB.token);
     const codeB = stB.state.user.codename;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

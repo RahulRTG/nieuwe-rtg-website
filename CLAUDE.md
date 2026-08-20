@@ -201,6 +201,24 @@ Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
 juridische oordeel blijft bij een mens.
 
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
+**`PROOF.md` is het diepte-document van de vertrouwenslaag** (werknaam RTG
+ProofOS): vertrouwen als levende uitkomst in plaats van instelling. De
+hoofdregel staat in paragraaf 0 en is mechanisch: **altijd voor de 100%, nooit
+minder** -- bewijs mag alleen groeien en schuld alleen krimpen (normtanden
+`bewijsCellenBewezen` en `bewijsAchterstand`), en elke afwijking heeft een naam,
+een reden en een sluitweg in BEWIJSSCHULD.json. Lees vooral paragraaf 9, de
+grenzen: bewijs is nooit een verhaal, degraderen is nooit stil, en niemand zet
+een vervalstaat met de hand op bewezen. `scripts/vertrouwen.js` meet de
+vervalstaten per route.
+
+**`FABRIC.md` is het richtingsdocument van de laag BOVEN PROOF** -- de AI
+Execution Fabric: van software bedienen naar een doel uitspreken. De zin die de
+architectuur draagt: **een onbewezen handeling staat niet in de lijst waaruit de
+AI kiest** (proof-aware routing; de bewijspoort in `server/kern/stuur/beleid.js`
+laat een geschorste capability uit `toegestanePaden` vallen). Lees vooral
+paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt,
+geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
+mens, en autonomie wordt gepromoveerd en nooit geslopen.
 
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

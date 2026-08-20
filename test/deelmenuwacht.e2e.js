@@ -33,13 +33,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-deelwacht-'));
 
 /* De kale pagina. main > #laag, en #laag is bij het laden LEEG -- dan telt
@@ -61,11 +57,11 @@ const DRIE_KAARTEN =
   '<div class="kaart"><h2>Derde deel</h2><p>drie</p></div>';
 
 test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zijn kinderen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     await volgVerzoeken(page);
@@ -113,7 +109,7 @@ test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zij
 });
 
 test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De andere kant van dezelfde belofte. Zonder deze helft zou de toets
      hierboven ook slagen als de wacht bij ELKE verandering een balk plakt, en
      dan is "een menu bij drie delen" geen regel maar toeval. De kop van
@@ -122,7 +118,7 @@ test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     await volgVerzoeken(page);

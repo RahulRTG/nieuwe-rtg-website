@@ -809,6 +809,54 @@ Regel voor dit bestand: vind je een nieuw soort stille fout, dan komt er een
 scanner bij. En een scanner die roept bij dingen die kloppen is erger dan geen
 scanner -- dus liever iets milder dan valse alarmen.
 
+### De routedekking (`npm run dekking`, en het kantoorscherm ernaast)
+
+**De eis is 100% van álle routes, en er is geen norm om die eis te verlagen.**
+
+Wat er gemeten wordt komt niet uit de tekst van de toetsen maar uit de server
+zelf: met `RTG_ROUTELOG` gezet schrijft `server/routelog.js` elk routepatroon weg
+dat hij werkelijk heeft afgehandeld (`npm test` doet dat standaard naar
+`.routejournaal`, `npm run e2e` naar `.schermjournaal`). Wat in zo'n journaal
+staat is aangeroepen; wat er niet in staat, niet.
+
+```bash
+npm run dekking        # leest de staande journalen, of draait de suite alsnog
+npm run dekking:vast   # en schrijft het bewijsstuk DEKKING.json
+node --experimental-sqlite scripts/dekking.js --lees a.log --lees b.log
+```
+
+Twee versimpelingen zijn eruit, en samen kostten ze twintig routes die het cijfer
+niet kende:
+
+- **de eenheid is METHODE + PATROON**, niet het pad. Op
+  `/api/scim/v2/Users/:id` hangen DELETE, GET, PATCH en PUT; een toets op één
+  daarvan zette alle vier op groen. Elf paden hadden zo een tweede methode die
+  meeliftte.
+- **alle routes tellen mee**, niet alleen die onder `/api/`. De zeven
+  pagina-routes -- waaronder `/scriptbundel.js` en `/stijlbundel.css`, die op
+  élke pagina van dit huis staan -- vielen buiten de meting. Niet als ongedekt:
+  ze bestonden niet voor het cijfer. `test/paginaroutes.test.js` dekt ze nu, en
+  vond daarbij meteen twee kapotte routes (`/apps` gaf 404 terwijl de routekaart
+  hem meldde, en `/werken/:code` herschreef naar een laag die er niet meer was).
+
+Het rekenwerk staat op **één** plek, `server/kern/routedekking.js`, en zowel de
+poort (`scripts/dekking.js`) als het kantoorscherm rekenen met diezelfde functie.
+Twee optellingen voor één waarheid lopen uiteen, en juist bij een cijfer dat 100%
+moet zijn is dat het laatste wat je wil (LAT.md regel 4).
+
+**Het personeel kan het nakijken: `/apps/routedekking.html`**, in de wereld RTG
+Kantoor, achter de gewone kantoor-inlog. Dat scherm toont geen bewaard
+percentage maar een **vergelijking**: het bewijsstuk `DEKKING.json` naast de
+routes die deze server op dít moment registreert. Een route die er na de meting
+bij komt staat er dus meteen als ongedekt bij, zonder dat er eerst een testronde
+hoeft te draaien -- en is er geen bewijsstuk, dan zegt het scherm "niet gemeten"
+in plaats van 0% of 100% (LAT.md regel 3). Doorzoekbaar per domein, met een
+filter op alleen de gaten.
+
+Gehandhaafd door `test/routedekking.test.js`: die houdt de levende routekaart
+naast `DEKKING.json` en zakt op elk gat. Wie een route toevoegt zonder toets ziet
+dat in de gewone suite, niet pas in CI.
+
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 
 De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*

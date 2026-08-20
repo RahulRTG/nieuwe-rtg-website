@@ -1,4 +1,12 @@
 {
+  "stempel": {
+    "op": "2026-08-20T13:18:14.401Z",
+    "commit": "6266540",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
+  "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
+  "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -617,6 +625,22 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "bewakers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/routes.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "bewakersketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/routedekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "bewijsmatrix.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -624,6 +648,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "bewijsschuld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsschuld.js",
+      "operator": "===->!==#2",
+      "gezakt": 1,
+      "geprobeerd": 10
     },
     "bezorg.test.js": {
       "soort": "server",
@@ -1501,6 +1533,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "foutisolatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/foutisolatie.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "foutmelder.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1563,6 +1603,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "gastscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "gastverzoek.test.js": {
@@ -2090,6 +2137,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "idempotentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/idempotentie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2135,6 +2190,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "inhoudswacht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 98,
+      "scherp": "gezakt"
     },
     "inkoopketen.test.js": {
       "soort": "server",
@@ -2214,6 +2276,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "scherp": "gezakt"
+    },
+    "kantoorregisters.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "kantoorwereld.test.js": {
@@ -2415,6 +2484,13 @@
       "operator": "===->!==#0",
       "gezakt": 6,
       "geprobeerd": 1
+    },
+    "kycspoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "laatste-negen.test.js": {
       "soort": "server",
@@ -3181,6 +3257,22 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "meetketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "meetkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/meetkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "memo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3858,6 +3950,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "outputaudit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/routedekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ov-operatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3902,6 +4002,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "paginaroutes.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
     },
     "paginascripts.test.js": {
       "soort": "puur",
@@ -4186,6 +4291,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "platformregister.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "podium.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4225,6 +4337,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
+    },
+    "poortwacht-oordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/poortwacht.js",
+      "operator": ">=->>#0",
+      "gezakt": 4,
+      "geprobeerd": 3
     },
     "poortwacht.test.js": {
       "soort": "puur",
@@ -4612,6 +4732,20 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "routedekking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "routedossier.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "routelog.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4998,12 +5132,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
-    "schakelaar-zwijgt.test.js": {
-      "soort": "server",
+    "schakelaarsdekking.test.js": {
+      "soort": "puur",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
+      "module": "server/functies/toegang.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 3
     },
     "schakelkast-dekking.test.js": {
       "soort": "server",
@@ -5026,6 +5161,14 @@
       "operator": "&&->||#0",
       "gezakt": 10,
       "geprobeerd": 1
+    },
+    "schermronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/platformregister/samenstellen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 7
     },
     "schild.test.js": {
       "soort": "server",
@@ -5143,6 +5286,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "schorspoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "scim.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5212,6 +5363,14 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "sessiewacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/sessiewacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "skipwacht.test.js": {
       "soort": "puur",
@@ -6250,6 +6409,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "vertrouwen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/vertrouwen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verzadiging.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6358,6 +6525,14 @@
       ],
       "posities": 1
     },
+    "waarom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/waarom.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "wacht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6446,6 +6621,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "weigering-laat-niets-achter.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "wereld.test.js": {
       "soort": "server",

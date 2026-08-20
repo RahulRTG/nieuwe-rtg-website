@@ -35,13 +35,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkscherm-'));
 
 const ZAAK_EN_REDACTIE = [
@@ -90,7 +86,7 @@ async function toon(page, base, app, token) {
 }
 
 async function opstelling() {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
   await volgVerzoeken(page);
@@ -100,7 +96,7 @@ async function opstelling() {
 }
 
 test('zes werkschermen zeggen bij welke zaak of welk kantoor ze horen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -124,7 +120,7 @@ test('zes werkschermen zeggen bij welke zaak of welk kantoor ze horen',
 });
 
 test('de lokale werkbanken zijn meteen bruikbaar, ook zonder zaak',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -151,7 +147,7 @@ test('de lokale werkbanken zijn meteen bruikbaar, ook zonder zaak',
 });
 
 test('techniek en boardroom laten een gewoon lid niets schakelen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -215,7 +211,7 @@ test('techniek en boardroom laten een gewoon lid niets schakelen',
 });
 
 test('het RTF-kantoor en de Societeit tonen hun eigen deur, en sturen niemand weg',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {

@@ -7,7 +7,7 @@
    Draai: npm run e2e  (of node --test test/pda-ui.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -17,20 +17,14 @@ const path = require('path');
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
 
 // Playwright staat globaal geinstalleerd (zoals scripts/a11y.js hem vindt).
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function api(base, pad, body) {
   return (await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })).json();
 }
 
 test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voortgang werkt',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -42,7 +36,7 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
     assert.ok(login.token, 'staf-login geeft een token');
 
     // 2) browser openen, token in localStorage, PDA herstelt de sessie
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -94,7 +88,7 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
    nog steeds geen pauze. Wat deze test ook vastlegt: op dat scherm staat een
    MINUTENteller en geen woord over wat er in die minuten gebeurde. */
 test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets anders',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -103,7 +97,7 @@ test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets and
     const staff = roster.staff.find(x => x.role !== 'manager');
     const login = await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: staff.id, pin: '5678' });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -151,7 +145,7 @@ test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets and
 });
 
 test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Vandaag en handelt het af',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -172,7 +166,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
     assert.equal(aandacht.status, 200, 'het aandacht-verzoek is geplaatst');
 
     // 3) personeel opent de PDA; het Vandaag-scherm toont het verzoek
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);

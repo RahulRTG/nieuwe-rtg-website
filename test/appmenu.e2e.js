@@ -37,7 +37,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,13 +45,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright({ eigenDriver: false });
 
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   for (const naam of fs.readdirSync(dir)) {
@@ -83,7 +77,7 @@ async function metLid(fn) {
   let browser;
   try {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
 
@@ -204,7 +198,7 @@ async function openLade(page) {
 }
 
 test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   await metLid(async ({ base, ctx }) => {
     /* Alle vier de ingangen van de homescreen (zie voordeur.js) plus een paar
        gewone app-pagina's, want daar hoort de balk van metgezel.js juist WEL te
@@ -259,7 +253,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
        veilige uitweg. Eén pagina tegelijk houdt samen met de tweede fileworker
        de totale browserparalleliteit op twee. */
     await t.test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
-      { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+      { skip: geenBrowser(pw) }, async () => {
       const menuFouten = [];
       let gemeten = 0;
       for (const pad of appPaden()) {
@@ -298,7 +292,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
 });
 
 test('het menu opent en brengt je terug naar het beginscherm',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await volgVerzoeken(page);
@@ -338,7 +332,7 @@ test('het menu opent en brengt je terug naar het beginscherm',
 });
 
 test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank en van de bovenrand',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await volgVerzoeken(page);
@@ -456,7 +450,7 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
 });
 
 test('de bank zet de vier werelden bovenaan, en het springboard is weg',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
 
      Hij mat de voordeur: drie wereldtegels (er zijn er nu vier) als één
@@ -522,7 +516,7 @@ test('de bank zet de vier werelden bovenaan, en het springboard is weg',
 });
 
 test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
      dezelfde vier volledige huizen (WERELDEN.md). Daarom toetst dit pad bewust
@@ -570,7 +564,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 });
 
 test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
      Een deur die er goed uitziet en niets doet komt door elke telling heen. Dat

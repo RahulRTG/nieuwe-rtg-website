@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop } = require('./helper');
+const { laadScherm, startServer, stop, browserOpties, geenBrowser } = require('./helper');
 
 /* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
    kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
@@ -39,16 +39,6 @@ const pw = laadBrowser();
 /* Een browser die bij DEZE playwright hoort is er niet overal; op een machine
    met een eigen Chrome/Chromium wijzen we hem gewoon aan. Zelfde patroon en
    dezelfde omgevingsvariabele als test/office-suite.e2e.js. */
-function browserOpties() {
-  const opties = { args: ['--no-sandbox'] };
-  const kandidaten = [process.env.RTG_BROWSER_PATH,
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    '/usr/bin/google-chrome', '/usr/bin/chromium'].filter(Boolean);
-  const gevonden = kandidaten.find(p => fs.existsSync(p));
-  if (gevonden) opties.executablePath = gevonden;
-  return opties;
-}
 
 async function api(base, pad, body, tok) {
   const r = await fetch(base + pad, { method: 'POST',
@@ -105,7 +95,7 @@ async function salonPaneel(ctx, base) {
 }
 
 test('de sociale balk toont je eigen pin en tekent er een echte QR van',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metTweeLeden(async ({ base, ctx, A }) => {
     const page = await salonPaneel(ctx, base);
 
@@ -136,7 +126,7 @@ test('de sociale balk toont je eigen pin en tekent er een echte QR van',
 });
 
 test('een pin invullen laat eerst zien wie het is; pas de tweede knop verstuurt',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metTweeLeden(async ({ base, ctx, B }) => {
     const page = await salonPaneel(ctx, base);
     const zijnPin = (await api(base, '/api/member/pin', {}, B.token)).toon;
@@ -163,7 +153,7 @@ test('een pin invullen laat eerst zien wie het is; pas de tweede knop verstuurt'
 });
 
 test('de scanknop opent de HUISOVERLAY, met de handinvoer als uitweg',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* Dit scherm had een eigen camerablad -- een <video> in het vriendenblok met
      een RTGScanner eromheen -- en dus geen handinvoer. Dat was de laatste tweede
      uitvoering van iets dat het huis al heeft (shared/scanknop.js), en de reden
@@ -203,7 +193,7 @@ test('de scanknop opent de HUISOVERLAY, met de handinvoer als uitweg',
 });
 
 test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvindbaar',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metTweeLeden(async ({ base, ctx, A, B }) => {
     const page = await salonPaneel(ctx, base);
     await page.waitForFunction(() => /-/.test((document.getElementById('scPinCode') || {}).textContent || ''),

@@ -28,19 +28,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schuif-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 /* De smalste stand die we serieus nemen. 390 is een iPhone 14/15; alles

@@ -19,8 +19,8 @@
    niet opvragen, dan bestaat het voor hem niet, en dan hoort deze proef daar
    over te vallen in plaats van in het bestand op schijf gelijk te krijgen.
 
-   Draai:  node --experimental-sqlite scripts/auditproef-route.js
-           node --experimental-sqlite scripts/auditproef-route.js --max=200
+   Draai:  node scripts/auditproef-route.js
+           node scripts/auditproef-route.js --max=200
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -67,7 +67,7 @@ async function wachtOpServer(basis, ms) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-auditproef-'));
   const basis = 'http://127.0.0.1:' + poort;
 
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
       RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }

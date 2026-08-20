@@ -18,13 +18,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtTot, wachtOpTekst, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, geenBrowser, browserOpties } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecascherm-'));
 
 async function zaakToken(base) {
@@ -39,13 +35,13 @@ async function zaakToken(base) {
 }
 
 test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const browserApi = pw.chromium ? pw : null;
     assert.ok(browserApi, 'er is een browser-API');
-    browser = await browserApi.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await browserApi.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

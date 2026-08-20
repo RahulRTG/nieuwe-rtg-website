@@ -109,6 +109,8 @@
     "zekerheid": "node scripts/zekerheid.js",
     "bewijsmatrix": "node scripts/bewijsmatrix.js",
     "bewijsmatrix:vast": "node scripts/bewijsmatrix.js --vastleggen",
+    "vertrouwen": "node scripts/vertrouwen.js",
+    "vertrouwen:vast": "node scripts/vertrouwen.js --vastleggen",
     "klok": "node scripts/klok.js",
     "klokwacht": "node scripts/klokwacht.js",
     "klokwacht:vast": "node scripts/klokwacht.js --vastleggen",
@@ -147,7 +149,11 @@
     "prestaties": "node scripts/prestaties.js",
     "idemschuld": "node scripts/idemschuld.js",
     "idemschuld:vast": "node scripts/idemschuld.js --vastleggen",
-    "handelingproef": "node scripts/handelingproef-route.js"
+    "handelingproef": "node scripts/handelingproef-route.js",
+    "meetronde": "node scripts/meetronde.js",
+    "meetronde:snel": "node scripts/meetronde.js --snel",
+    "versheid": "node scripts/versheid.js",
+    "waarom": "node scripts/waarom.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

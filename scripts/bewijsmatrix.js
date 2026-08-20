@@ -65,6 +65,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
 
+const { stempel } = require('./lib/stempel');
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 
@@ -106,12 +107,17 @@ const inWortel = (naam) => { const p = path.join(WORTEL, naam); return fs.exists
 const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13) || inWortel('POORTWACHT.json');
 const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) || inWortel('ROLPROEF.json');
 const HANDELINGPROEF = (argv.find(a => a.startsWith('--handelingproef=')) || '').slice(17) || inWortel('HANDELINGPROEF.json');
+const UITVOERPROEF = (argv.find(a => a.startsWith('--uitvoerproef=')) || '').slice(15) || inWortel('UITVOERPROEF.json');
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
 const AUDIT = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
 const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
-const UITVOER = (argv.find(a => a.startsWith('--uitvoer=')) || '').slice(10) || inWortel('UITVOERPROEF.json');
+/* De twee assen die tot voor kort geen instrument hadden. Ze lezen allebei uit
+   het routejournaal van de gewone suite; zie scripts/outputproef.js en
+   scripts/auditproef.js voor wat hun oordelen betekenen en waar ze ophouden. */
+const OUTPUT = (argv.find(a => a.startsWith('--output=')) || '').slice(9) || inWortel('OUTPUTPROEF.json');
+const AUDITP = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -134,31 +140,17 @@ const SCHAKELS = [
   { id: 'INPUT', uitleg: 'wordt rommel geweigerd zonder 5xx',
     bron: 'scripts/invoerproef-route.js (rommel MET de juiste rol; anoniem meet je alleen de voordeur)' },
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
-    bron: 'scripts/uitvoerproef-route.js (kanaries van een ANDER account in een 2xx-antwoord)',
-    nodig: 'de HELFT die hier nog niet in zit: de liegpoort per ROUTE i.p.v. per toetsbestand ' +
-      '(RTG_LIEG neemt nu /api/ in een keer). De uitvoerproef toont aan dat een antwoord geen ANDERMANS ' +
-      'gegevens bevat; de liegpoort zou aantonen dat het antwoord uit de ECHTE bron komt. Beide horen in OUTPUT.' },
+    bron: 'scripts/outputproef.js (de liegpoort per toetsbestand, gekoppeld aan de routes die dat bestand raakt)' },
   { id: 'STATE', uitleg: 'staat de toestand na afloop zoals beloofd',
     bron: 'scripts/staatproef-route.js (vingerafdruk voor en na, per route geijkt)', nvtBijLezen: true },
   { id: 'SIDE_EFFECT', uitleg: 'gebeurt er buiten het antwoord om iets (mail, push, betaling)',
     bron: 'scripts/staatproef-route.js (welke COLLECTIES bewogen)', nvtBijLezen: true,
     nodig: 'de uitgaande kanalen (mail, push, betaling bij een derde) staan buiten de database en dus buiten deze meting' },
-    { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: 'scripts/handelingproef-route.js (klopt aan met de JUISTE rol en kijkt of er een geketende regel verscheen)',
-    nodig: 'de voorziening is server/lib/handelingsspoor.js; wat deze kolom NIET zegt is dat het spoor ' +
-      'volledig is -- hij kijkt of er een regel verscheen, niet of alles wat erin staat klopt. En het ' +
-      'wegknippen van de NIEUWSTE regels valt hier niet op; daarvoor is het anker nodig' },
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
-    bron: 'scripts/auditproef-route.js (roept de route aan en vraagt daarna aan het spoor of er een regel bij kwam)',
-    nvtBijLezen: true,
-    /* HIER STOND "een hashketen over het auditlog; die bestaat nog niet als
-       algemene voorziening", en dat klopte maar voor de helft. De hashketen
-       bestond wel (kern/command/journaal.js); wat ontbrak was BEREIK -- alleen
-       RTG Command schreef erin. server/opzet/auditspoor.js geeft nu elke
-       schrijfroute een regel in dezelfde vorm. */
-    nodig: 'het kopzegel buiten deze database vastleggen. De keten betrapt een gewijzigde of ' +
-      'weggeknipte regel, maar wie de NIEUWSTE regels weggooit houdt een kloppende keten over; ' +
-      'alleen een anker bij een derde ziet dat (server/lib/keten-anker.js, bewust niet in bedrijf).' },
+    bron: 'scripts/handelingproef-route.js (klopt aan met de JUISTE rol en kijkt of er een geketende regel ' +
+      'verscheen) + scripts/auditproef.js en server/lib/keten.js (het anker, tegen stil wegknippen)',
+    nodig: 'de voorziening is server/lib/handelingsspoor.js; wat deze kolom NIET zegt is dat het spoor ' +
+      'volledig is -- hij kijkt of er een regel verscheen, niet of alles wat erin staat klopt' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -213,6 +205,20 @@ function routetabel() {
 /* De bewakers staan alleen in de BRON: daar staat de middleware naast de route.
    Sleutel op METHODE + pad, want dezelfde weg kan met GET open en met POST
    dicht staan. */
+/* Een register met `perRoute` als OBJECT (route -> oordeel) inlezen. De vier
+   oudere proeven gebruiken een array; deze twee een object, omdat ze per route
+   precies een uitspraak hebben en geen lijst pogingen. Een plek die beide
+   vormen aankan zou hier de verkeerde soort netheid zijn: dan verdwijnt het
+   verschil dat de registers zelf maken. */
+function objectRegister(pad) {
+  if (!pad) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
+    if (!j || !j.perRoute || Array.isArray(j.perRoute)) return null;
+    return new Map(Object.entries(j.perRoute));
+  } catch (e) { return null; }
+}
+
 function bewakersPerRoute() {
   const kaart = new Map();
   for (const r of alleRoutes()) {
@@ -281,49 +287,36 @@ function perRouteKaart(bestand) {
 /* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
    beoordeeld. Alleen scenario's die de zevenstappenlat halen tellen -- een
    scenario dat niet zichtbaar of niet herhaalbaar was, is geen bewijs. */
-/* DE KETENUITSLAG PER ROUTE -- en drie vlaggen in plaats van een oordeel.
-
-   Hier stond "de STRENGSTE uitkomst telt" in het commentaar, en dat deed de code
-   niet: hij OVERSCHREEF bij elk volgend scenario. Voor GELD en NOTITIE betekende
-   dat het volgende. Twee sabotages halen de lat: `schrijf-verloren`, waar de
-   terugdraaiing werkelijk is aangetoond (PROVEN), en `sterf-na-commit`, waar er
-   niets terug te draaien VALT (de commit was al rond) en het veld dus NVT is. De
-   laatste won, en zo stonden /api/notities/bewaar en /api/pay/oplaad als GEZAKT
-   met "rollback niet bewezen" -- terwijl hij juist wel bewezen was, in het
-   scenario waar de vraag van toepassing was.
-
-   NVT IS NIET GEZAKT. Dat is dezelfde regel die deze matrix overal aanhoudt:
-   ongemeten en gezakt zijn twee dingen. Vandaar drie vlaggen die OPTELLEN over
-   de scenario's, zodat het oordeel pas aan het eind valt:
-
-     proven      ergens is de terugdraaiing echt aangetoond
-     beoordeeld  ergens kon er uberhaupt iets over gezegd worden (niet NVT)
-     stil        ergens ging er stil iets verloren -- en dat is besmettelijk,
-                 want een keten die onder een sabotage stil verlies gaf is niet
-                 bewezen omdat een andere sabotage netjes verliep. */
-function ketenKaartUit(scenarios) {
-  const kaart = new Map();
-  for (const sc of scenarios || []) {
-    if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
-    for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
-      const oud = kaart.get(pad);
-      kaart.set(pad, {
-        failure: sc.clientAntwoord === 'FAIL' || !!(oud && oud.failure),
-        proven: sc.rollback === 'PROVEN' || !!(oud && oud.proven),
-        beoordeeld: sc.rollback !== 'NVT' || !!(oud && oud.beoordeeld),
-        stil: !!sc.stilVerlies || !!(oud && oud.stil)
-      });
-    }
-  }
-  return kaart;
-}
-
-function ketenUitslag() {
-  if (!KETENS) return null;
+function ketenUitslag(bestand) {
+  const pad = bestand || KETENS;
+  if (!pad) return null;
   try {
-    const j = JSON.parse(fs.readFileSync(KETENS, 'utf8'));
+    const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
     if (!Array.isArray(j.scenarios)) return null;
-    return ketenKaartUit(j.scenarios);
+    const kaart = new Map();
+    for (const sc of j.scenarios) {
+      if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
+      for (const routePad of (ROUTES_PER_KETEN[sc.keten] || [])) {
+        /* Een keten kan meerdere verraden hebben; de STRENGSTE uitkomst telt.
+           Maar streng gaat over GIF, niet over volgorde: een sabotage die stil
+           verlies of een geweigerde-maar-blijvende wijziging liet zien (NIET)
+           vergiftigt het oordeel, en een sabotage waar niets terug te draaien
+           VIEL (NVT, zoals sterf-na-commit) zegt niets en wist dus ook niets
+           uit. De oude vorm liet het LAATSTE scenario winnen, zodat een NVT na
+           een PROVEN de route op 'rollback niet bewezen' zette -- twee cellen
+           stonden daardoor gezakt op een volgorde-effect in plaats van op een
+           waarneming. */
+        const oud = kaart.get(routePad) || { failure: false, proven: false, niet: false, stil: false };
+        kaart.set(routePad, {
+          failure: sc.clientAntwoord === 'FAIL' || oud.failure,
+          proven: sc.rollback === 'PROVEN' || oud.proven,
+          niet: sc.rollback === 'NIET' || oud.niet,
+          stil: sc.stilVerlies || oud.stil
+        });
+      }
+    }
+    for (const k of kaart.values()) k.rollbackBewezen = k.proven && !k.niet && !k.stil;
+    return kaart;
   } catch (e) { return null; }
 }
 
@@ -372,8 +365,14 @@ function bouw(invoer) {
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
   const auditKaart = inv.audit !== undefined ? inv.audit : perRouteKaart(AUDIT);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
-  const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOER);
-  const handeling = inv.handeling !== undefined ? inv.handeling : handelingproefUitslag();
+  const output = inv.output !== undefined ? inv.output : objectRegister(OUTPUT);
+  const auditp = inv.auditp !== undefined ? inv.auditp : objectRegister(AUDITP);
+  /* De handelingproef en de uitvoerproef, op dezelfde manier als de buren
+     hierboven: uit hun eigen register, en overschrijfbaar via inv voor de
+     toets. Ze werden gebruikt zonder gebouwd te worden -- een vrije naam,
+     die undefined is en de kolom dus stil leeg laat. */
+  const handeling = inv.handeling !== undefined ? inv.handeling : perRouteKaart(HANDELINGPROEF);
+  const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOERPROEF);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -393,17 +392,68 @@ function bouw(invoer) {
              'open' -- een route waar een vreemde zonder token binnenkwam. Dan
              telt precies de bevinding waar deze kolom voor bestaat, mee als
              dekking. ACL en PRIVACY hieronder deden het al goed; AUTH niet.
-             'onbereikbaar' is evenmin een meting: daar kwam geen antwoord. */
+             'onbereikbaar' is evenmin een meting: daar kwam geen antwoord.
+
+             EN 'STIL' WAS DE DERDE, EN DIE STOND ER NOG. De poortwacht klopt aan
+             met een LEEG lichaam ({}), en noemt alleen 401 en 403 'dicht'. Alles
+             wat daar niet onder valt en geen 2xx is, heet 'stil' -- en dat waren
+             294 cellen, waarvan 272 een 404 en 20 een 400.
+
+             Een 404 op een leeg verzoek betekent: de handler heeft iets opgezocht
+             dat er niet was. Een 400 betekent: de validatie was eerder aan de
+             beurt dan de autorisatie. Geen van beide zegt IETS over de vraag of
+             deze route een sleutel eist -- ze zeggen alleen dat hij niet
+             opengevallen is op een leeg verzoek. Dat als 'bewezen' tellen is
+             precies dezelfde fout als bij 'open', een slag zachter: een
+             ONBESLIST antwoord dat als dekking meetelt.
+
+             Ze worden nu 'ongemeten' met de status erbij, zodat te zien is
+             waarom. Dat kost 294 cellen dekking en levert een eerlijker matrix
+             op. De echte reparatie ligt een laag dieper en staat nog open: de
+             poortwacht zou bij een 400/404 een TWEEDE keer moeten aankloppen met
+             een plausibel lichaam (scripts/lib/rolproef.js plausibelLijf), want
+             dan valt het onderscheid alsnog -- 401/403 is dicht, 2xx is een
+             bevinding. Tot die tijd is 'onbeslist' het eerlijke woord. */
           cellen[s.id] = gemeten.oordeel === 'open'
             ? { staat: 'gezakt', bron: 'poortwacht', reden: 'zonder token binnengekomen (status ' + gemeten.status + ')' }
             : gemeten.oordeel === 'onbereikbaar'
               ? { staat: 'ongemeten', bron: 'poortwacht', reden: 'geen antwoord tijdens de ronde' }
-              : { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
+              : gemeten.oordeel === 'stil'
+                ? { staat: 'ongemeten', bron: 'poortwacht',
+                    reden: 'onbeslist: status ' + gemeten.status + ' op een leeg verzoek zegt niets over een slot' }
+                : { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
         } else if (bron && bron.bewakers.length) {
           cellen[s.id] = { staat: 'verklaard', bron: bron.bewakers.join('+'), waar: bron.waar };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
+        continue;
+      }
+
+      if (s.id === 'OUTPUT') {
+        const o = output && output.get(sleutel);
+        /* Alleen 'bewezen' telt als bewijs. 'onbeslist' betekent dat er wel
+           inhoudgevoelige toetsen op deze route zitten, maar dat ze er meer
+           raken -- dan is niet te zeggen op WELKE inhoud ze zakken, en dat als
+           dekking tellen is precies de fout die de AUTH-as 294 cellen kostte. */
+        cellen[s.id] = !o ? { staat: 'ongemeten' }
+          : o.staat === 'bewezen' ? { staat: 'bewezen', bron: 'outputproef', reden: o.reden }
+            : { staat: 'ongemeten', bron: 'outputproef', reden: o.reden };
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        const a = auditp && auditp.get(sleutel);
+        /* 'wisselend' is een BEVINDING en geen bewijs: soms wel en soms geen
+           spoor betekent dat het ergens van afhangt. 'geen spoor' is voor een
+           leesroute juist en voor een schrijfroute een vraag -- maar in beide
+           gevallen geen bewijs dat er iets wordt vastgelegd. En 'verklaard'
+           evenmin: dat is dezelfde wisselende waarneming met een uitgezochte
+           reden eronder, en een reden is geen meting. Alleen 'bewezen' passeert
+           hier, zodat een verklaring nooit een cel kan vullen. */
+        cellen[s.id] = !a ? { staat: 'ongemeten' }
+          : a.staat === 'bewezen' ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
+            : { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
         continue;
       }
 
@@ -604,7 +654,13 @@ function vorige() {
    onleesbaar. De rijen zijn met --json altijd op te vragen. */
 function zonderRijen(m) {
   const { rijen, ...rest } = m;
-  return { ...rest, uitleg: 'Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN.' };
+  /* HET STEMPEL VOOROP. Deze matrix is samengesteld uit vijf andere registers;
+     als een daarvan achterloopt, loopt deze mee achter zonder dat de getallen
+     dat verraden. Zonder stempel is dat pas te zien nadat iemand het vermoedt --
+     en dat kostte hier al een keer een halve sessie (de poortwacht liep 196
+     routes achter). Zie scripts/lib/stempel.js. */
+  return { stempel: stempel(), ...rest,
+    uitleg: 'Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN.' };
 }
 
 /* WELKE SCHAKEL IS ACHTERUIT GEGAAN. Zonder dit meldt de ratel alleen een
@@ -651,7 +707,7 @@ const CONTROL = {
     'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
 };
 
-module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN, ketenKaartUit, CONTROL };
+module.exports = { bouw, achteruit, ketenUitslag, SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen
@@ -660,7 +716,10 @@ if (require.main !== module) return;
 
 const matrix = bouw();
 
-if (JSONUIT) { console.log(JSON.stringify(matrix, null, 1)); process.exit(0); }
+/* exitCode en geen exit(): deze uitvoer is megabytes groot en process.exit()
+   kapt een PIPE af zonder iets te melden (zie scripts/poortwacht.js voor het
+   geval waarin dat echt misging). */
+if (JSONUIT) { console.log(JSON.stringify(matrix, null, 1)); process.exitCode = 0; return; }
 
 const oud = vorige();
 console.log('\n=== DE ENDPOINT-BEWIJSMATRIX ===\n');

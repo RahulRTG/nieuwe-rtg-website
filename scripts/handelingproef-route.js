@@ -40,7 +40,7 @@
    het spoor leest is het ruis, en dat staat als bekende beperking in
    server/lib/handelingsspoor.js.
 
-   Draaien: node --experimental-sqlite scripts/handelingproef-route.js [--max=N]
+   Draaien: node scripts/handelingproef-route.js [--max=N]
    ========================================================================== */
 'use strict';
 
@@ -91,7 +91,7 @@ async function wacht(basis, ms) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-handelingproef-'));
   const basis = 'http://127.0.0.1:' + poort;
 
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
+  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna worden beproefd
        zijn de echte, met hun echte bewakers ervoor. Zelfde afweging als in

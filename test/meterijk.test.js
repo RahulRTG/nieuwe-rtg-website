@@ -72,9 +72,13 @@ function metAanbouw(relPad, extra, doe) {
 
    HONDERD ROUTES EN NIET EEN. endpointsZonderTest slaat al bij een uit, maar
    dekkingPct is een AFGEROND percentage over ruim tweeduizend routes -- een
-   enkele erbij verdwijnt in de afronding, precies zoals bij
-   dekkingWaargenomenPct. Met honderd zakt hij zichtbaar. Dat is geen ruimere
-   proef maar dezelfde eigenschap, twee keer aangetoond.
+   enkele erbij verdwijnt in de afronding. Met honderd zakt hij zichtbaar. Dat
+   is geen ruimere proef maar dezelfde eigenschap, twee keer aangetoond.
+
+   Hier stond "precies zoals bij dekkingWaargenomenPct", en dat is sinds de
+   dekkingsronde niet meer waar: die rondt naar BENEDEN af en slaat wel bij een
+   uit (zie zijn ijking onderaan). dekkingPct doet dat nog niet -- dus staat de
+   grofheid nu bij de meter die hem heeft, en niet meer bij twee.
 
    HET PAD MAG HIER NERGENS LETTERLIJK STAAN. scripts/keuring.js noemt een route
    gedekt zodra zijn pad ergens in de code van een testbestand voorkomt -- dit
@@ -113,14 +117,26 @@ function journaalMetGat(weglaten) {
   const kaart = JSON.parse(execFileSync(process.execPath,
     [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 }));
-  const routes = (kaart.routes || []).filter(r => r && r.pad && r.pad.startsWith('/api/'));
+  /* EEN ROUTE IS EEN METHODE PLUS EEN PATROON, en het journaal noteert hem ook
+     zo. Hier stond `(r.methode || 'POST')`, en dat veld bestaat niet in de JSON
+     van routekaart.js -- daar heet het `methoden` en is het een lijst. Elke
+     regel kreeg dus POST, ook de vijfenzeventig GET-routes. Zolang de meting op
+     PADEN telde viel dat niet op; sinds ze op methode+pad telt zou het journaal
+     vijfenzeventig valse gaten opleveren en zou deze ijking meten hoe kapot
+     hijzelf is. Ook het /api/-filter is weg: de meting kent dat onderscheid
+     niet meer, en een ijking die een deelverzameling voedt ijkt de helft. */
+  const routes = [];
+  for (const r of (kaart.routes || [])) {
+    if (!r || !r.pad) continue;
+    for (const mth of (r.methoden || [])) routes.push({ pad: r.pad, methode: String(mth).toUpperCase() });
+  }
   assert.ok(routes.length > 100, 'de routekaart geeft routes (' + routes.length + ')');
 
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ijk-journaal-'));
   const bestand = path.join(map, 'journaal.txt');
   try {
     // alles behalve de laatste n; die horen straks als "nooit aangeraakt" te tellen
-    const regels = routes.slice(0, routes.length - n).map(r => (r.methode || 'POST').toUpperCase() + ' ' + r.pad);
+    const regels = routes.slice(0, routes.length - n).map(r => r.methode + ' ' + r.pad);
     fs.writeFileSync(bestand, regels.join('\n') + '\n');
     const r = spawnSync(process.execPath,
       [path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
@@ -141,6 +157,43 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  bewijsCellenBewezen: {
+    /* De 100%-tand op het bewijs zelf. De teller krijgt een nep-register
+       gevoerd (zelfde snit als telSkips): eerst een matrix met zeven bewezen
+       cellen, dan een zonder telling, dan een die geen JSON is. De laatste
+       twee horen te GOOIEN en niet nul te geven -- een register dat wegvalt is
+       een gezakte meting, en nul zou hier de allerslechtste stand belonen. */
+    proef: () => {
+      const schuld = JSON.stringify({ telling: { meetwerk: 0, instrument: 0, grens: 9 } });
+      const lees = (matrixTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrixTekst : schuld;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { bewezen: 7 } })));
+      assert.equal(uit.bewijsCellenBewezen, 7, 'zeven bewezen cellen worden er zeven geteld');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: {} }))),
+        /bewijsCellenBewezen niet gemeten/, 'een matrix zonder telling is een gezakte meting, geen nul');
+      assert.throws(() => norm.telBewijslaag(lees('{ kapot')),
+        /BEWIJSMATRIX\.json is niet leesbaar/, 'een onleesbare matrix is een gezakte meting, geen nul');
+      return uit.bewijsCellenBewezen;
+    }
+  },
+  bewijsAchterstand: {
+    /* De andere kant van dezelfde tand: meetwerk en instrument tellen mee,
+       de soort `grens` niet -- die sluit nooit en is geen achterstand. Telde
+       hij wel mee, dan zou de ratel eeuwig 586 punten eisen die per definitie
+       niet te leveren zijn, en dan draait iemand hem stilletjes los. */
+    proef: () => {
+      const matrix = JSON.stringify({ telling: { bewezen: 1 } });
+      const lees = (schuldTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrix : schuldTekst;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3, instrument: 4, grens: 500 } })));
+      assert.equal(uit.bewijsAchterstand, 7, 'meetwerk en instrument tellen; de grens van 500 niet');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3 } }))),
+        /bewijsAchterstand niet gemeten/, 'een schuldregister zonder instrument-telling is een gezakte meting');
+      assert.throws(() => norm.telBewijslaag(lees('nee')),
+        /BEWIJSSCHULD\.json is niet leesbaar/, 'een onleesbaar schuldregister is een gezakte meting, geen nul');
+      return uit.bewijsAchterstand;
+    }
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
@@ -771,8 +824,9 @@ const IJKINGEN = {
     /* HET JOURNAAL MET EEN GAT ERIN. De reden die hier stond ("komt uit het
        routejournaal van een hele testronde") klopte half: het cijfer komt
        daaruit, maar scripts/dekking.js leest met --lees elk journaal dat je
-       hem geeft. Dus bouwen we er zelf een: alle routes van de routekaart,
-       precies EEN weggelaten. De meter hoort die ene te missen.
+       hem geeft. Dus bouwen we er zelf een: alle routes van de routekaart --
+       elke METHODE van elk pad, ook buiten /api/ -- precies EEN weggelaten. De
+       meter hoort die ene te missen.
 
        Een kleiner journaal kan niet: dekking.js weigert er zelf een met te
        weinig patronen, met de melding dat dat geen meting is maar een kapotte
@@ -781,15 +835,19 @@ const IJKINGEN = {
     proef: () => journaalMetGat(1).nooit
   },
   dekkingWaargenomenPct: {
-    /* HET PERCENTAGE IS GROVER DAN ZIJN BUURMAN, en dat is hier zwart op wit te
-       zien: met EEN weggelaten route van ruim tweeduizend rondt hij nog gewoon
-       op honderd af. Precies wat de kop van scripts/dekking.js waarschuwt --
-       "een afgerond percentage dekt bij 2530 routes tot een stuk of twaalf
-       endpoints die nooit zijn aangeraakt". Deze proef laat er daarom vijftig
-       weg. Dat hij dan pas uitslaat is geen tekortkoming van de ijking maar de
-       eigenschap van de meter, en de reden dat endpointsNooitAangeraakt
-       ernaast staat als de scherpe van de twee. */
-    proef: () => 100 - journaalMetGat(50).pct
+    /* HET PERCENTAGE WAS GROVER DAN ZIJN BUURMAN, EN DAT IS GEREPAREERD.
+
+       Hier stond dat deze meter met EEN weggelaten route van ruim tweeduizend
+       nog gewoon op honderd afrondt, en daarom liet deze proef er vijftig weg.
+       Dat was eerlijk opgeschreven en het bleef een meter die een gat kon
+       verzwijgen -- precies wat de kop van scripts/dekking.js waarschuwde.
+
+       Sinds kern/routedekking.js naar BENEDEN afrondt kan dat niet meer: één gat
+       van 4189 geeft 99 en geen 100. De proef laat er daarom weer één weg, met
+       hetzelfde journaal als zijn buurman (dus ook één routekaart-start in
+       plaats van twee). Slaat hij daar niet op uit, dan is de afronding terug en
+       is het cijfer weer op te poetsen. */
+    proef: () => 100 - journaalMetGat(1).pct
   },
   /* DE ZES PRESTATIEMETERS. Hier stond bij alle zes een reden: "prestatiecijfer
      uit een echte beproeving op een echte machine". Dat leek onvermijdelijk --

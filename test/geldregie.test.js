@@ -56,6 +56,16 @@ test('1. pasprijzen: gratis blijft gratis, RTG en Lifestyle stelt de boardroom i
   const na = await api('/api/pasprijzen', {});
   assert.equal(na.body.passen.rtg.maandCenten, 7000);
   assert.equal(na.body.passen.rtg.rtfCenten, 2100);
+  /* EN DE PRIJSLIJST IS OOK MET EEN GEWONE GET OP TE HALEN, want dit is het
+     publieke endpoint: een browser, een prijsvergelijker of een link haalt hem
+     met GET op en niet met POST + JSON. Die GET stond wel geregistreerd
+     (routes/kantoren/geld.js hangt beide werkwoorden op) maar was nooit
+     aangeroepen -- de dekkingsmeting telde per PAD, dus de POST hierboven zette
+     hem gratis op groen. Haal de GET-regel weg en elke publieke beller krijgt
+     404, terwijl de suite groen blijft. */
+  const viaGet = await fetch(base + '/api/pasprijzen').then(async r => ({ status: r.status, body: await r.json() }));
+  assert.equal(viaGet.status, 200, 'de publieke prijslijst antwoordt op GET');
+  assert.deepEqual(viaGet.body, na.body, 'en geeft exact dezelfde prijzen als de POST');
   // de vaste afspraken zijn niet te verzetten
   assert.equal((await api('/api/office/geld/pasprijs', { pas: 'gratis', euro: 5 }, office)).status, 400);
   assert.equal((await api('/api/office/geld/pasprijs', { pas: 'business', euro: 500 }, office)).status, 400);

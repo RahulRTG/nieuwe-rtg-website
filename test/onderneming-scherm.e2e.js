@@ -17,16 +17,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
-const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
+const pw = laadPlaywright();
+const skip = geenBrowser(pw);
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -44,7 +38,7 @@ async function open(opts) {
   });
   assert.ok(reg.token, 'registratie geeft een sessietoken');
 
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const page = await browser.newPage();
   await volgVerzoeken(page);
   const fouten = [];

@@ -41,8 +41,7 @@ const fs = require('node:fs');
    het werk (hij probeert te STARTEN, niet te laden), laadScherm is de naam
    waaronder drieendertig toetsen hem al aanroepen. scripts/lib/scherm.js blijft
    bestaan voor scripts/a11y.js, dat buiten test/ draait. */
-const { laadBrowser } = require('./browser');
-const laadScherm = (opties) => laadBrowser(opties);
+const laadScherm = (opties) => laadPlaywright(opties);
 
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.
@@ -740,6 +739,149 @@ async function binnenEenDag(werk) {
 /* Chromium levert met deze schakelaars een echt MediaStream-videotrack zonder
    camera of toestemmingsvenster. Recente macOS-versies proberen voor AUDIO
    soms alsnog de systeemingang te openen; dat vangen we hieronder af. */
+/* ============================================================================
+   HOE START HIER EEN BROWSER -- EEN PLEK, NIET HONDERDDRIEENTWINTIG.
+
+   WAAROM DIT ER IS. Deze suite laadde playwright op 123 plekken met dezelfde
+   zesregelige functie onder twee namen (laadBrowser en laadPlaywright), en
+   startte hem op 163 plekken met dezelfde letterlijke opties. Dat is EEN
+   waarheid in bijna driehonderd kopieen (LAT.md regel 4), en de rekening kwam
+   op een dag dat de omgeving niet meer klopte:
+
+     browserType.launch: Executable doesn't exist at
+     /opt/pw-browsers/chromium_headless_shell-1234/...
+
+   De omgeving had chromium 1194 staan, playwright 1.62 vroeg om 1234. Alle 123
+   browsertoetsen vielen om -- niet met een reden, maar met een installatiebanner
+   van playwright. En dat is niet het ergste. Het schermjournaal van die ronde
+   zag er daarna precies zo uit als het journaal van een ronde waarin de browsers
+   wel draaiden en geen enkel scherm werd geopend: 294 TOETS-regels, 0
+   SCHERM-regels. Een mislukte meting die zich voordoet als een gelukte meting
+   met een slechte uitslag -- de gevaarlijkste vorm die er is.
+
+   WAT DIT DOET. Een browser starten is EEN vraag met EEN antwoord, en het
+   antwoord staat hier. Wie een browsertoets schrijft, vraagt hier om opties en
+   krijgt er een die werkt, of hij krijgt te horen dat er geen browser is.
+
+   DE VOLGORDE IS NIET WILLEKEURIG:
+
+     1. RTG_BROWSER_PATH  -- wie het zelf zegt, heeft gelijk. Geen raadwerk
+                             overheen.
+     2. playwright zelf   -- staat de vastgepinde bouw er, dan kiest playwright.
+                             Dat is de bedoelde situatie en die blijft de norm.
+     3. de omgeving       -- een ANDERE bouw onder PLAYWRIGHT_BROWSERS_PATH.
+                             Hier komt de reparatie vandaan: chromium 1194 start
+                             prima onder playwright 1.62 voor wat deze suite doet
+                             (een pagina openen, klikken, tekst lezen).
+     4. het systeem       -- een geinstalleerde Chrome of Chromium.
+
+   WAT HET NIET DOET: doen alsof. Vindt hij niets, dan geeft browserOpties()
+   null terug en hoort de toets zich over te slaan MET DIE REDEN. Een toets die
+   omvalt op een installatiebanner leert niemand iets; een toets die zegt "er is
+   hier geen browser" is een waarneming.
+   ========================================================================== */
+
+/* De module. Vier plekken, want een globaal geinstalleerde playwright is op
+   sommige machines de enige.
+
+   `eigenDriver: false` sluit server/lib/browser uit. Vijf toetsen deden dat al
+   in hun eigen kopie, en met reden: die wikkel kent geen aparte browsercontexten
+   en geen nepmedia, dus een toets die twee losse sessies naast elkaar zet heeft
+   er niets aan. Dat verschil hoort een KEUZE te zijn met een naam, niet een
+   regel die per ongeluk in de ene kopie ontbreekt. */
+function laadPlaywright(opties) {
+  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
+    try {
+      const mod = require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright');
+      /* NIET ALLEEN OF HET PAKKET LAADT, MAAR OF DE BROWSER ER IS. require()
+         lukt ook als de bijbehorende Chromium ontbreekt; dan zakt pas de launch
+         met "Executable doesn't exist", en dat is rood dat niets over de code
+         zegt. Deze controle komt uit scripts/lib/scherm.js en staat sinds de
+         samenvoeging van 20 augustus 2026 hier, op de ene plek. */
+      if (mod && mod.chromium && fs.existsSync(mod.chromium.executablePath())) return mod;
+    } catch (e) { /* volgende */ }
+  }
+  if (opties && opties.eigenDriver === false) return null;
+  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
+  return null;
+}
+
+/* Alle uitvoerbare chromiums onder PLAYWRIGHT_BROWSERS_PATH, nieuwste bouw
+   eerst. De headless shell komt voor de volle browser: deze suite draait
+   headless en de shell is daarvoor gemaakt. */
+function bouwenInDeOmgeving() {
+  const wortel = process.env.PLAYWRIGHT_BROWSERS_PATH;
+  if (!wortel || wortel === '0') return [];
+  let namen = [];
+  try { namen = fs.readdirSync(wortel); } catch (e) { return []; }
+  const nummer = (n) => Number((n.match(/-(\d+)$/) || [0, 0])[1]);
+  const uit = [];
+  for (const groep of [/^chromium_headless_shell-\d+$/, /^chromium-\d+$/]) {
+    for (const naam of namen.filter(n => groep.test(n)).sort((a, b) => nummer(b) - nummer(a))) {
+      for (const staart of ['chrome-linux/headless_shell', 'chrome-linux/chrome',
+        'chrome-linux64/chrome', 'chrome-mac/Chromium.app/Contents/MacOS/Chromium']) {
+        uit.push(path.join(wortel, naam, staart));
+      }
+    }
+  }
+  return uit;
+}
+
+let gekozenPad;   // eenmaal zoeken per proces; de schijf verandert niet halverwege
+function browserPad(pw) {
+  if (gekozenPad !== undefined) return gekozenPad;
+  /* WIE HET ZELF ZEGT, HEEFT GELIJK -- OOK ALS HIJ ONGELIJK HEEFT. Staat er een
+     RTG_BROWSER_PATH die niet bestaat, dan is dat geen reden om zelf maar iets
+     te zoeken: dan draait de suite op een andere browser dan waarop iemand hem
+     wilde draaien, en dat is stil substitueren. Precies wat deze module moet
+     uitbannen. Een verkeerde aanwijzing is een fout, geen aanleiding tot raden. */
+  const eigen = process.env.RTG_BROWSER_PATH;
+  if (eigen) return (gekozenPad = fs.existsSync(eigen) ? eigen : false);
+
+  /* Staat de vastgepinde bouw er, dan laat playwright hem zelf kiezen: null
+     betekent hier "geen executablePath meegeven", en dat is iets anders dan
+     "niets gevonden" (dat is false). Die twee door elkaar halen zou een
+     werkende omgeving stilletjes op een vreemde bouw zetten. */
+  try {
+    const p = pw && pw.chromium && typeof pw.chromium.executablePath === 'function'
+      ? pw.chromium.executablePath() : null;
+    if (p && fs.existsSync(p)) return (gekozenPad = null);
+  } catch (e) { /* een wikkel zonder executablePath: door naar het zoeken */ }
+
+  for (const p of bouwenInDeOmgeving()) if (fs.existsSync(p)) return (gekozenPad = p);
+  for (const p of ['/opt/pw-browsers/chromium',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+    '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser']) {
+    if (fs.existsSync(p)) return (gekozenPad = p);
+  }
+  return (gekozenPad = false);
+}
+
+/* De opties waarmee een browsertoets hem start. `extra` is wat DEZE toets nodig
+   heeft (nepmedia, autoplay); --no-sandbox staat er altijd bij want als root is
+   er geen andere manier. Geeft null als er geen browser is. */
+function browserOpties(pw, extra) {
+  const pad = browserPad(pw);
+  if (pad === false) return null;
+  const e = extra || {};
+  const args = ['--no-sandbox'].concat(e.args || []).filter((a, i, r) => r.indexOf(a) === i);
+  const opties = Object.assign({}, e, { args });
+  if (pad) opties.executablePath = pad;
+  return opties;
+}
+
+/* De reden om over te slaan, in woorden. Drie gevallen en drie zinnen: geen
+   module, wel een module maar geen browser, en niets aan de hand. */
+function geenBrowser(pw) {
+  if (!pw) return 'playwright niet beschikbaar in deze omgeving';
+  if (browserPad(pw) === false) {
+    return 'playwright is er, maar geen enkele chromium start hier -- zet ' +
+      'RTG_BROWSER_PATH of installeer de bouw die playwright vraagt';
+  }
+  return false;
+}
+
 function nepMediaArgs() {
   return ['--no-sandbox', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
 }
@@ -776,57 +918,116 @@ async function installeerNepMicrofoon(context) {
   });
 }
 
-/* DE BANK OPENEN, WAT VOOR SCHERM HET OOK IS.
 
-   De bank van de werktafel heeft twee vormen, en dat is ontwerp: op een smal
-   scherm ligt hij als lade onder de rand en haal je hem met de greep
-   (.cmd-lade); vanaf 1000px staat hij als vaste rail altijd open en is die
-   greep er niet (shared/command.css: "de greep heeft hier geen werk").
+async function keurLidGoed(base, token, codenaam, geboortedatum) {
+  const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  if (!office) throw new Error('kantoor-inlog mislukt; is RTG_DEMO aan?');
+  await post('/api/verify/upload', { image: KEUR_PNG }, token);
+  await post('/api/verify/selfie', { image: KEUR_PNG }, token);
+  const pend = await post('/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === codenaam);
+  if (!mij) throw new Error('lid ' + codenaam + ' staat niet in de keuringsrij');
+  const r = await post('/api/office/verify', Object.assign({ userId: mij.id, decision: 'approve',
+    faceMatch: true }, geboortedatum ? { geboortedatum } : {}), office);
+  if (r.status !== 200) throw new Error('keuring mislukt: ' + JSON.stringify(r.body).slice(0, 160));
+  return mij.id;
+}
 
-   Een toets die een deur in de bank nodig heeft, gaat niet over die twee
-   vormen. Toch stond in twee toetsen letterlijk `waitForSelector('.cmd-lade',
-   {state:'visible'})` -- op de standaardbreedte van Playwright (1280) wacht
-   die tien seconden op een knop die daar met opzet niet bestaat, en de
-   foutmelding ("resolved to hidden") wijst naar de knop en niet naar de
-   aanname eronder. Vandaar dit hulpje: het opent de bank en laat het aan de
-   pagina welke van de twee vormen dat is.
+/* DOORVEGEN OVER EEN REGEL, EN WAAROM DIT HIER STAAT EN NIET VIER KEER.
 
-   Het GOKT niet. Is de bank er niet, dan gooit het, want dan is er geen
-   werktafel en hoort de toets daarop te zakken en niet stil door te lopen. */
-async function openBank(page, opties) {
-  const t = (opties && opties.timeout) || 10000;
-  await page.waitForSelector('#rtgCommand .cmd-bank', { state: 'attached', timeout: t });
-  const greep = page.locator('#rtgCommand .cmd-lade');
-  if (await greep.isVisible()) {
-    await greep.click();
-    await page.waitForSelector('#rtgCommand.bank-open', { timeout: t });
-    return 'lade';
+   Dit stond als vier identieke kopieen in de vier gebaar-schermtoetsen, en de
+   fout die erin zat, zat er dus ook vier keer in (LAT.md regel 4).
+
+   DE DOBBELSTEEN DIE ERIN ZAT, MET DE METING ERBIJ. test/gebaar-bestanden.e2e.js
+   zakte tegen een KOUD gestarte server ongeveer een op de vijf keer, altijd op
+   dezelfde plek: de regel droeg zijn klasse, beide globals stonden er, en er kwam
+   geen lade en geen data-gb -- het gebaar begon niet eens. Dat is op 20 augustus
+   2026 nagerekend en het is geen fout in de laag maar een RACE MET EEN TIMER DIE
+   ER HOORT TE ZIJN: shared/gebaar/gebaar-03b.js opent na 520 ms de actielade
+   (lang drukken), en zet daarbij het lopende gebaar op nul. Tussen mouse.down()
+   en de eerste mouse.move() zit een aparte CDP-ronde; op een pagina die nog
+   bezig is met opstarten kan die de 520 ms overschrijden. Dan heeft de toets in
+   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden.
+
+   Bewezen door het met opzet te forceren: 600 ms wachten na down() geeft precies
+   dezelfde eindstand, plus een open dialog.gb-blad die de oude aantekening nooit
+   had gecontroleerd.
+
+   Wat hier nu staat maakt dat zichtbaar in plaats van dodelijk: na de eerste
+   beweging wordt gecontroleerd of het gebaar echt begonnen is. Zo niet, dan is
+   het deze race, en dan gaat de lade dicht en volgt EEN nieuwe poging. Gebeurt
+   het twee keer, dan zakt de toets met de reden erbij -- want twee keer is geen
+   traagheid meer. Geen langere wachttijden: die maken een dobbelsteen stiller,
+   niet eerlijker. */
+async function veegDoor(page, doos, opties) {
+  const o = opties || {};
+  const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
+  const x0 = doos.x + doos.width * 0.8;
+  const px = -(doos.width * 0.62 + 90);
+  for (let poging = 1; poging <= 2; poging++) {
+    await page.mouse.move(x0, y);
+    await page.mouse.down();
+    await page.mouse.move(x0 + px / 22, y);
+    const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
+    if (!begonnen) {
+      await page.mouse.up();
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(250);
+      if (poging === 2) {
+        throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
+          'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
+      }
+      continue;
+    }
+    for (let i = 2; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
+    await page.mouse.up();
+    return;
   }
-  // brede stand: de rail staat er al. Even nagaan dat hij ook echt in beeld is.
-  await page.waitForSelector('#rtgCommand .cmd-bank', { state: 'visible', timeout: t });
-  return 'rail';
 }
 
-/* EEN DEUR IN DE VOET VAN DE BANK, OP NAAM.
 
-   Hier stond `click('.cmd-bankvoet [data-systeem]')` -- de EERSTE systeemdeur.
-   Dat werkte zolang er één was. Er staan er nu twee (Rahul boven het
-   bedieningspaneel), en toen opende diezelfde regel opeens het vraagveld van
-   Rahul. De toets faalde daarna een stap verderop, op een scrim die nooit zou
-   komen, en de melding wees naar het paneel in plaats van naar de klik.
+/* GEDULD DAT MEESCHAALT MET DE MACHINE.
 
-   Op naam en niet op positie: welke deuren er staan en in welke volgorde is een
-   ontwerpkeuze die mag bewegen; WELKE deur deze toets nodig heeft niet. */
-async function bankDeur(page, naam, opties) {
-  const t = (opties && opties.timeout) || 10000;
-  await openBank(page, opties);
-  const knop = page.locator('#rtgCommand .cmd-bankvoet button', { hasText: naam });
-  await knop.first().waitFor({ state: 'visible', timeout: t });
-  await knop.first().click();
+   Een vaste tijdslimiet in een toets meet twee dingen tegelijk: of de code
+   antwoordt, en of de machine vrij was. Op een lege laptop is dat hetzelfde;
+   op een volle CI-runner niet, en dan is rood geen bevinding maar drukte.
+
+   Dit huis wist dat al voor het opstarten van een server (zie de kop van
+   startEens hieronder, waar dezelfde les twee keer is geleerd). Het gold alleen
+   niet voor de losse deadlines in de toetsen zelf. Vandaar deze ene plek: geef
+   een basis in milliseconden, krijg er de tijd voor terug die bij de huidige
+   belasting hoort. Op een rustige machine verandert er niets.
+
+   Nooit ONBEPERKT: een aanroep die nooit antwoordt hoort een toets te laten
+   zakken en niet te laten hangen. Het plafond is vijf keer de basis. */
+function geduld(basisMs) {
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  return Math.round(basisMs * Math.min(5, Math.max(1, 1 + druk)));
 }
 
-module.exports = { vrijePoort, startServer, opstartGeduld, stop, stopNet, stopHard, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
-  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, wachtOpNetstilte, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
-  binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
-  // testhaken om de strenge poort zelf te kunnen verifiëren
+/* HOE DRUK STAAT DEZE MACHINE, als vermenigvuldiger voor geduld.
+
+   Dit stond als twee regels middenin startEens(), en daardoor had
+   test/domeinalleen.test.js -- dat zijn eigen server start en dus zijn eigen
+   wachtlus heeft -- een harde 25 seconden die nooit meeschaalde. Die toets zakte
+   daarop in een volle testronde en slaagde er los naast, wat precies het beeld
+   geeft waar de kop hierboven voor waarschuwt: "server werd niet gezond" terwijl
+   er niets stuk was.
+
+   Eén plek dus, en geen derde kopie (LAT.md regel 4). */
+function drukte() {
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  return { kernen, druk, extra: Math.min(5, Math.max(1, Math.ceil(1 + druk))) };
+}
+
+module.exports = { bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser,
+  installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
+  nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
+  wachtOpRust,
+  // testhaken om de strenge poort zelf te kunnen verifieren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

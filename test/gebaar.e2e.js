@@ -13,14 +13,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
 const pw = laadPlaywright();
 /* Waar de browser NIET op de plek staat die het pakket verwacht (een
    ontwikkelbak met een eigen chromium), wijst deze omgevingsvariabele hem aan.
@@ -58,7 +52,7 @@ const laden = (page) => page.evaluate(() => {
 });
 
 test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -70,7 +64,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     })).json();
     assert.ok(reg.token, 'de proef heeft een ingelogd lid nodig');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: BROWSER });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -161,12 +155,12 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
    eerste die hem gebruikt, en dat is precies hoe dode code ontstaat. Hier wordt
    hij daarom op zijn eigen contract (RTGGebaar.zet) nagerekend. */
 test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar2-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: BROWSER });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -252,7 +246,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
    Deze proef meet de enige vraag die dat had gevangen: ligt de lade IN de
    regel? Niet of hij mooi is, niet of hij opengaat -- of hij op zijn plek zit. */
 test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gebaar-tel-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -264,7 +258,7 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
     })).json();
     assert.ok(reg.token, 'de proef heeft een ingelogd lid nodig');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: BROWSER });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* isMobile + hasTouch zet in Chromium de apparaatemulatie aan, en daarmee
        ook `pointer:coarse` en `hover:none` -- precies de stand waarin de fout
        zat. Zonder deze twee vlaggen meet deze proef hetzelfde als de andere. */

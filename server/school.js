@@ -19,7 +19,8 @@ const { eigenVeld } = require('./kern/util'); // veilige objecttoegang (geen pro
 const { maakPoorten } = require('./school/poorten');
 
 module.exports = (ctx) => {
-  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic } = ctx;
+  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+    teVaak, misluktePoging, ipVan } = ctx;
 
   function K() {
     const f = F();
@@ -58,7 +59,8 @@ module.exports = (ctx) => {
   /* De drie lagen (beheer, klas, gezin) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten; de klaslaag
      levert gemiddelde() aan de gezinslaag via die context. */
-  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, onderwijs: ctx.onderwijs, rtfHandle: ctx.rtfHandle, leerstof: ctx.leerstof,
+  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+    teVaak, misluktePoging, ipVan,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));

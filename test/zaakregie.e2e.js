@@ -12,18 +12,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -47,7 +41,7 @@ async function metScherm(opts) {
   let browser;
   try {
     const token = await managerToken(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage(opts.viewport ? { viewport: opts.viewport } : {});
     const fouten = [];
     letOpFouten(page, fouten);
@@ -71,7 +65,7 @@ async function metScherm(opts) {
 }
 
 test('Zaak-app: de Regie komt op en elke werkplek tekent',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metScherm({
     pad: '/apps/leverancier.html',
     sleutels: (t) => ({ rtg_sup_token: t }),
@@ -106,7 +100,7 @@ test('Zaak-app: de Regie komt op en elke werkplek tekent',
 });
 
 test('Personeels-PDA: dezelfde Regie in duimstand, met drie werkplekken',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metScherm({
     pad: '/apps/personeel.html',
     viewport: { width: 390, height: 844 },

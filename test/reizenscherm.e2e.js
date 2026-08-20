@@ -22,30 +22,13 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser, laadPlaywright } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
-function browserOpties() {
-  const opties = { args: ['--no-sandbox'] };
-  const kandidaten = [process.env.RTG_BROWSER_PATH,
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    '/usr/bin/google-chrome', '/usr/bin/chromium'].filter(Boolean);
-  const gevonden = kandidaten.find(p => fs.existsSync(p));
-  if (gevonden) opties.executablePath = gevonden;
-  return opties;
-}
+const pw = laadPlaywright();
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 
 test('het reisscherm groepeert per reis, en de kop zegt hetzelfde als de regels eronder',
-  { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reizenscherm-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;

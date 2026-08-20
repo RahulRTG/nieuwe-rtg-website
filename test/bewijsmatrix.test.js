@@ -144,11 +144,35 @@ test('een route waar de poortwacht ZONDER TOKEN binnenkwam is gezakt, niet bewez
 test('een dichte en een bewust publieke route zijn wel bewezen', () => {
   assert.equal(metPoort('dicht').staat, 'bewezen');
   assert.equal(metPoort('publiek').staat, 'bewezen');
-  assert.equal(metPoort('stil').staat, 'bewezen');
 });
 
 test('onbereikbaar is ongemeten: daar kwam geen antwoord', () => {
   assert.equal(metPoort('onbereikbaar').staat, 'ongemeten');
+});
+
+test('STIL is ONBESLIST en dus geen bewijs van authenticatie', () => {
+  /* Deze bewering stond hier omgekeerd: `metPoort('stil').staat === 'bewezen'`.
+     De toets legde daarmee vast wat er fout was.
+
+     De poortwacht klopt aan met een LEEG lichaam en noemt alleen 401 en 403
+     dicht; al het andere dat geen 2xx is heet stil. Dat waren 294 cellen -- 272
+     met status 404, 20 met 400, 2 met 503 -- en die telden allemaal als
+     aangetoonde authenticatie. Een 404 op een leeg verzoek betekent dat de
+     handler iets opzocht dat er niet was, een 400 dat de validatie eerder aan de
+     beurt was dan de autorisatie. Geen van beide zegt of deze route een sleutel
+     eist.
+
+     Nagetrokken op veertien van die 294: opnieuw aankloppen met een onzin-token
+     in de Authorization-kop geeft EXACT dezelfde status. Er is van buitenaf dus
+     geen authenticatie aan te tonen; mogelijk is er een ander mechanisme (een
+     opzoeking op een ongeraden code is zelf een controle), maar dat is geen
+     AUTH-dekking.
+
+     De reden hoort erbij, anders is dit niet te onderscheiden van een route waar
+     nooit op geklopt is. */
+  const c = metPoort('stil');
+  assert.equal(c.staat, 'ongemeten', 'een onbeslist antwoord is geen dekking');
+  assert.match(c.reden, /onbeslist/, 'en zegt waarom het onbeslist is');
 });
 
 /* ---------- de twee nieuwe kolommen ---------- */
@@ -185,58 +209,37 @@ test('een leesroute houdt IDEMPOTENCY op nvt, ook met een register ernaast', () 
   assert.equal(m.rijen.find(r => r.pad === '/api/proef/lees').cellen.IDEMPOTENCY.staat, 'nvt');
 });
 
-/* ============================================================================
-   NVT IS NIET GEZAKT -- de ketenronde telt op in plaats van te overschrijven.
-
-   Twee sabotages op dezelfde keten halen de lat: bij `schrijf-verloren` wordt de
-   terugdraaiing echt aangetoond (PROVEN), bij `sterf-na-commit` valt er niets
-   terug te draaien (de commit was al rond) en is het veld NVT. De kaart
-   overschreef, dus de LAATSTE won -- en zo stonden /api/notities/bewaar en
-   /api/pay/oplaad als GEZAKT met "rollback niet bewezen", terwijl hij bewezen
-   was in het scenario waar de vraag van toepassing was.
-   ========================================================================== */
-const scen = (keten, verraad, rollback, extra) => Object.assign(
-  { keten, verraad, rollback, lat: { voldoet: true }, stilVerlies: false, clientAntwoord: 'FAIL' }, extra || {});
-
-test('een aangetoonde terugdraaiing blijft staan als een LATER scenario NVT is', () => {
-  const k = ketenKaartUit([scen('NOTITIE', 'schrijf-verloren', 'PROVEN'),
-                           scen('NOTITIE', 'sterf-na-commit', 'NVT')]);
-  const r = k.get('POST /api/notities/bewaar');
-  assert.equal(r.proven, true, 'PROVEN uit het eerste scenario telt op');
-  assert.equal(r.beoordeeld, true);
-  assert.equal(r.stil, false);
-});
-
-test('stil verlies is wel besmettelijk: een nette sabotage maakt dat niet ongedaan', () => {
-  const k = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN'),
-                           scen('GELD', 'sterf-na-commit', 'NVT', { stilVerlies: true })]);
-  assert.equal(k.get('POST /api/pay/oplaad').stil, true);
-});
-
-test('alleen NVT is NIET beoordeeld -- en dat mag geen bevinding worden', () => {
-  const k = ketenKaartUit([scen('GELD', 'sterf-na-commit', 'NVT')]);
-  const r = k.get('POST /api/pay/oplaad');
-  assert.equal(r.proven, false);
-  assert.equal(r.beoordeeld, false, 'er valt niets te beoordelen, dus is er niets gemeten');
-});
-
-test('een scenario dat de zevenstappenlat niet haalt telt helemaal niet mee', () => {
-  const k = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN', { lat: { voldoet: false } })]);
-  assert.equal(k.size, 0, 'geen bewijs zonder lat');
-});
-
-test('en in de matrix wordt NVT ongemeten, geen gezakt', () => {
-  const TABEL = { routes: [{ methode: 'POST', pad: '/api/pay/oplaad' }], herkomst: 'proef' };
-  const BEW = new Map([['POST /api/pay/oplaad', { bewakers: ['auth'], waar: 'proef.js:1' }]]);
-  const alleenNvt = ketenKaartUit([scen('GELD', 'sterf-na-commit', 'NVT')]);
-  const m = bouw({ tabel: TABEL, bewakers: BEW, journaal: null, poort: null, rol: null,
-    keten: alleenNvt, invoer: null, idem: null, audit: null, staat: null, uitvoer: null });
-  const cel = m.rijen[0].cellen.ROLLBACK;
-  assert.notEqual(cel.staat, 'gezakt', 'niet te beoordelen is geen bevinding: ' + JSON.stringify(cel));
-
-  const metProof = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN'),
-                                  scen('GELD', 'sterf-na-commit', 'NVT')]);
-  const m2 = bouw({ tabel: TABEL, bewakers: BEW, journaal: null, poort: null, rol: null,
-    keten: metProof, invoer: null, idem: null, audit: null, staat: null, uitvoer: null });
-  assert.equal(m2.rijen[0].cellen.ROLLBACK.staat, 'bewezen', 'en met een PROVEN erbij is hij bewezen');
+test('de ketensamenvoeging kent gif en geen volgorde: NVT wist een PROVEN nooit uit', () => {
+  /* Twee cellen stonden op 'rollback niet bewezen' door een volgorde-effect:
+     het LAATSTE scenario won, dus een sterf-na-commit (rollback NVT -- er viel
+     niets terug te draaien) wiste het eerdere PROVEN uit. Streng hoort over
+     GIF te gaan (stil verlies, of NIET: geweigerd en toch blijvend), niet over
+     de toevallige volgorde in het register. */
+  const { ketenUitslag } = require('../scripts/bewijsmatrix');
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-keten-'));
+  const schrijf = (scenarios) => {
+    const p = path.join(map, 'k.json');
+    fs.writeFileSync(p, JSON.stringify({ scenarios }));
+    return p;
+  };
+  const sc = (rollback, extra) => ({ keten: 'GELD', verraad: 'x', rollback,
+    stilVerlies: false, clientAntwoord: 'FAIL', lat: { voldoet: true }, ...extra });
+  const pad = 'POST /api/pay/oplaad';
+  try {
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT')])).get(pad).rollbackBewezen, true,
+      'een NVT na een PROVEN wist niets uit');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('PROVEN')])).get(pad).rollbackBewezen, true,
+      'en andersom ook niet: volgorde is geen oordeel');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NIET')])).get(pad).rollbackBewezen, false,
+      'NIET (geweigerd en toch blijvend) is gif, in elke volgorde');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT', { stilVerlies: true })])).get(pad).rollbackBewezen, false,
+      'stil verlies is gif, ook naast een PROVEN');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('NVT')])).get(pad).rollbackBewezen, false,
+      'alleen NVT is geen bewijs: er is nooit een terugdraai waargenomen');
+  } finally {
+    try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
+  }
 });

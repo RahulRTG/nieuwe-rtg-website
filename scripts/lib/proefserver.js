@@ -27,7 +27,7 @@ const WORTEL = path.join(__dirname, '..', '..');
 
 function start({ poort, merk }) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-' + (merk || 'proef') + '-'));
-  const child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
+  const child = spawn(process.execPath, ['server/server.js'], {
     cwd: WORTEL,
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: TMP, NODE_ENV: 'test',
       SMTP_URL: '', ANTHROPIC_API_KEY: '', RTG_DEMO: '1' },

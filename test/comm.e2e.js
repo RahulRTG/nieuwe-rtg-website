@@ -33,18 +33,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright({ eigenDriver: false });
 
 async function post(base, pad, body, tok) {
   const r = await fetch(base + pad, { method: 'POST',
@@ -192,11 +186,11 @@ test('de AI stelt op en verstuurt nooit zelf', async () => {
 });
 
 test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen staat niet meer los',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metServer(async (base) => {
     const A = await post(base, '/api/login', { tier: 'rtg', pasApp: 'rtg' });
     assert.ok(A.token, 'demo-inlog');
-    const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const browser = await pw.chromium.launch(browserOpties(pw));
     try {
       const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
       await ctx.addInitScript((t) => {

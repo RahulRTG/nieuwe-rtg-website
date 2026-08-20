@@ -59,8 +59,12 @@ module.exports = [
      zetten -- terwijl juist een uitnodigingslink iets is dat je wilt kunnen
      dichtdraaien als er misbruik van wordt gemaakt. Geen recht en geen
      infrastructuur, dus geen plaats op de BUITEN-lijst. */
-  { id: 'tg-werving', categorie: 'Toegang en identiteit', naam: 'Wervingslink van een werkgever', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.', paden: ['/api/werving'] },
+  /* HIER STOND 'tg-werving' MET PAD /api/werving, en die deed niets. De functie
+     'werving' (cat-partners) claimt datzelfde pad en staat eerder in de
+     catalogus; bij een gelijk lange prefix wint de eerste, dus deze schakelaar
+     stond wel op het bord en schakelde geen enkele route. Weggehaald: dat
+     verandert niets aan het gedrag en scheelt een knop die loog. De fail-fast in
+     ./index.js maakt een tweede claim op hetzelfde pad voortaan onmogelijk. */
 
   // ---------- de kern van de app ----------
   { id: 'kern-state', categorie: 'Leden (RTG-app)', naam: 'De app-staat', standaard: true, doelgroepen: ALLE,

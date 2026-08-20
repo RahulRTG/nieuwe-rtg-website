@@ -1,4 +1,10 @@
 {
+  "stempel": {
+    "op": "2026-08-20T15:47:51.090Z",
+    "commit": "fcba02e",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": ".routejournaal",
@@ -17,7 +23,7 @@
       "bewezen": 4187,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 0,
+      "ongemeten": 297,
       "gezakt": 0
     },
     "ACL": {
@@ -35,7 +41,7 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 0,
+      "bewezen": 4157,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 4188,

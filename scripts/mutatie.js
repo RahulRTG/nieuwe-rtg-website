@@ -65,6 +65,9 @@ const { spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
+/* Wanneer gemeten en waartegen; zonder stempel is een register niet na te
+   lopen (scripts/lib/stempel.js). */
+const { stempel } = require('./lib/stempel');
 const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
 /* DE VOORTGANG STAAT BUITEN DE REPO, en dat is geen detail.
 
@@ -1087,7 +1090,14 @@ if (require.main === module) {
     const op = {};
     for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
     fs.mkdirSync(path.dirname(doel), { recursive: true });
-    fs.writeFileSync(doel, JSON.stringify({ toetsen: op }, null, 2) + '\n');
+    fs.writeFileSync(doel, JSON.stringify({ stempel: stempel(),
+      uitleg: 'Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de ' +
+        'module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren ' +
+        'bleven open, dus hij zakte op de INHOUD en niet op de inlog.',
+      grens: 'een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de ' +
+        'verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de ' +
+        'operatoren zijn mechanisch en er zijn fouten die ze niet maken.',
+      toetsen: op }, null, 2) + '\n');
   };
   const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo
@@ -1197,7 +1207,13 @@ if (require.main === module) {
 }
 
 module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
-  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
+  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
+  /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in
+     plaats van namaken. Hij weet dingen die je niet twee keer wilt leren: de
+     reporter moet op TAP staan (anders leest niemand de uitslag op Node 24), en
+     een time-out krijgt SIGKILL en geen SIGTERM (anders blijven er wezen achter
+     die poorten vasthouden en latere metingen vervuilen). */
+  draaiToets,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

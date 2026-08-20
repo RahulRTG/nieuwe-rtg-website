@@ -24,16 +24,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('een clip reist van toestel naar toestel en speelt in de Media OS en in Clips',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-clipdeler-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -55,7 +51,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     assert.equal(gemaakt.status, 200);
     const clipId = gemaakt.body.id;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const metToken = async (token) => {
       const ctx = await browser.newContext({ viewport: { width: 900, height: 800 }, serviceWorkers: 'block' });
       await ctx.addInitScript((tok) => {

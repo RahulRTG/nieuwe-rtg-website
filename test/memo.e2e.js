@@ -5,19 +5,15 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het transcript',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-memo-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, ANTHROPIC_API_KEY: '' } });
   let browser;
@@ -37,7 +33,7 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
       dataUrl: 'data:audio/webm;base64,' + Buffer.from('demo-audio').toString('base64') });
     assert.ok(up.id, 'de memo is opgeslagen: ' + JSON.stringify(up).slice(0, 160));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -98,7 +94,7 @@ test('Memo: de lijst leest de kluis en de samenvatting is eerlijk over het trans
    De vertraging op het opzoeken van de map maakt van de wedloop een zekerheid,
    zoals ook in test/scanner.e2e.js. Zonder de wachtende zoekMap() zakt hij. */
 test('Memo: opnemen en stoppen bewaart in de map Memo\'s, ook als het opzoeken traag is',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-memo-opname-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, ANTHROPIC_API_KEY: '' } });
   let browser;
@@ -113,7 +109,7 @@ test('Memo: opnemen en stoppen bewaart in de map Memo\'s, ook als het opzoeken t
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify(body || {}) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

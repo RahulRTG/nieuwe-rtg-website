@@ -4,19 +4,15 @@
    Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk leeg',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfcurve-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const post = async (p, b) => (await fetch(base + p, { method: 'POST',
@@ -31,7 +27,7 @@ test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk le
       paren: [{ v: 'de hond', a: 'le chien' }, { v: 'de kat', a: 'le chat' }] });
     const GOED = { 'de hond': 'le chien', 'de kat': 'le chat' };
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

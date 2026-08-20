@@ -52,7 +52,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, wachtOpNetstilte } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
@@ -67,11 +67,7 @@ const BEWUSTE_STOP = /(^|: )geen sessie$/;
    luisteraar staat nu waar de andere twaalf al stonden. */
 const MAG_STUK = {};
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 function alleHtml(map) {
   const uit = [];
@@ -84,7 +80,7 @@ function alleHtml(map) {
 }
 
 test('elke pagina in public/ opent zonder onafgevangen fout',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const paginas = alleHtml(PUB).sort();
   assert.ok(paginas.length > 150, 'de scan vindt de pagina\'s (' + paginas.length + ')');
 
@@ -96,7 +92,7 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
   const kaal = [];       // pagina's zonder titel, taal of inhoud
   const ontbreekt = [];  // pagina's die een eigen bestand niet kunnen ophalen
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* Vier tabbladen naast elkaar. Bijna alle tijd is wachten (900 ms per
        pagina om late aanroepen te laten binnenkomen), dus serieel duurde dit
        ruim drie minuten en zo een kleine minuut. Elk tabblad heeft zijn eigen

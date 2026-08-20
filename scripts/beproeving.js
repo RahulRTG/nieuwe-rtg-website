@@ -63,7 +63,8 @@
                   STRENG (=1: de lat 10x scherper -- dekking 30, lek-vloer 4,
                   latentie-SLO 200 ms, meer werkers, extra lek-ronde).
    ============================================================================ */
-const { spawn, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
 /* De goede verhalen (scripts/verhalen.js). De gauntlet bewijst dat er niets
@@ -78,6 +79,8 @@ const belasting = require('./lib/belasting');
 /* De hardere rol-scheidingsproef: lekkende weigeringen en half uitgevoerde
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
+/* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
+const { stempel } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -261,31 +264,24 @@ async function poortVrij() {
     throw new Error('poort ' + PORT + ' is al bezet (waarschijnlijk een achtergebleven server van een eerdere run). Ruim die eerst op, bijv.: pkill -f "gc-hook.js"');
   }
 }
-function boot() {
-  return new Promise((resolve, reject) => {
-    const logfd = fs.openSync(SRVLOG, 'a');
-    /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
-       opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De
-       toetshelper (test/helper.js) kreeg de vlag toen wel; dit harnas heeft
-       zijn eigen boot en bleef achter. Gevolg: tokens() haalde nul sessies op,
-       de schakelkast bleef dicht, en elke fase draaide tegen de standaardstand
-       terwijl het rapport anders suggereerde. De personas en demozaken zijn de
-       meetinstrumenten van deze beproeving; zonder hen meet ze niets. */
-    const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
-      NODE_OPTIONS: '--max-old-space-size=8192' };
-    if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), 'server/server.js'],
-      { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
-    child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
-    (async () => {
-      // wachten op READINESS, niet op liveness: pas als de duurzame opslag echt
-      // geladen is (Postgres: gedeelde data + RAM-venster) mag de test erin --
-      // anders toets je de verouderde lokale snapshot in plaats van de waarheid
-      for (let i = 0; i < 300; i++) { const r = await verzoek('GET', '/api/ready', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
-      reject(new Error('server niet gereed (opslag laadt niet)'));
-    })();
+async function boot() {
+  const logfd = fs.openSync(SRVLOG, 'a');
+  /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
+     opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De personas en
+     demozaken zijn de meetinstrumenten van deze beproeving; zonder hen meet ze
+     niets. RTG_STORE=postgres in de megamodus. De gedeelde wegwerpserver draait
+     met --expose-gc + gc-hook (heap lezen), wacht op READINESS (pas als de
+     duurzame opslag echt geladen is, niet op liveness), en schrijft naar de
+     log-fd waar nieuweFouten() uit leest. De datamap (TMP) is van dit script. */
+  const env = { NODE_ENV: 'test', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI',
+    RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT, NODE_OPTIONS: '--max-old-space-size=8192' };
+  if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
+  const bundel = await wegwerp({
+    naam: 'beproeving', poort: PORT, datamap: TMP, gereed: 'ready', logFd: logfd,
+    nodeArgs: ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js')], env, wachtMs: 90000
   });
+  child = bundel.kind;
+  child.on('exit', c => { if (c) console.error('[beproeving] server stopte, code ' + c); });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); child.kill('SIGKILL'); child = null; }); }
 // Nette (geplande) stop: SIGTERM laat de server zijn write-behind flushen
@@ -478,39 +474,27 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  /* 2. De AI beweegt GEEN geld zonder menselijke goedkeuring.
-
-     Het contract is sinds de stuurgoedkeuring een eenmalig SERVERVOORSTEL:
-     /doe geeft 428 met een goedkeuring.id, en alleen /doe/bevestig met precies
-     dat id voert uit (server/routes/stuur.js, server/kern/stuur/bevestiging.js).
-
-     DEZE PROEF WAS OOIT VERLOPEN en zakte daardoor op iets goeds: hij stuurde
-     `bevestigd: true` mee in de body van /doe en verwachtte dat de 428 dan weg
-     was. Zo werkte het ooit. Een vlaggetje in de body doet nu niets meer -- en
-     dat hoort ook zo: een client die zijn eigen bevestiging mag zetten is geen
-     bevestiging.
-
-     De lat is daarom viervoudig: zonder akkoord 428 met een voorstel erbij, een
-     zelf gezet akkoord blijft 428, een verzonnen id komt er niet door, en het
-     echte akkoord werkt precies EEN keer (de herhaling is 404). */
+  // 2. De AI beweegt GEEN geld zonder MENSELIJKE bevestiging. Het ontwerp is een
+  //    tweestapsstroom (server/routes/stuur.js): /doe geeft een eenmalig
+  //    servervoorstel (428 met een goedkeuring), en alleen /doe/bevestig met
+  //    precies dat voorstel voert uit. Een in-band vlaggetje (`bevestigd: true`)
+  //    werkt met opzet NIET meer -- anders kan de tool-lus zichzelf bevestigen,
+  //    en dan is de bevestiging theater. Deze sonde toetste dat oude vlaggetje
+  //    en zakte daardoor op een systeem dat het juist GOED deed: beide kloppen
+  //    gaven 428, en dat is hier de veiligheid en niet de fout.
   {
-    const geld = { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } };
-    const zonder = await post('/api/member/doe', geld, lid);
-    const zelf = await post('/api/member/doe', Object.assign({ bevestigd: true }, geld), lid);
-    const id = zonder.data && zonder.data.goedkeuring && zonder.data.goedkeuring.id;
-    const verzonnen = await post('/api/member/doe/bevestig', { goedkeuringId: 'bestaat-niet', akkoord: true }, lid);
-    const met = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
-    const nogEens = id ? await post('/api/member/doe/bevestig', { goedkeuringId: id, akkoord: true }, lid) : { status: 0 };
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && !!id
-      && zelf.status === 428
-      && !(verzonnen.status >= 200 && verzonnen.status < 300)
-      && met.status !== 428 && met.status !== 0
-      && nogEens.status === 404;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok,
-      detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') +
-        ', zelfbevestigd=' + zelf.status + ', voorstel=' + (id ? 'ja' : 'GEEN') +
-        ', verzonnen-id=' + verzonnen.status + ', echt akkoord=' + met.status +
-        ', herhaald akkoord=' + (nogEens.status || '-') });
+    const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
+    const voorstel = zonder.data && zonder.data.goedkeuring;
+    const inBand = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const met = voorstel
+      ? await post('/api/member/doe/bevestig', { goedkeuringId: voorstel.id, akkoord: true }, lid)
+      : { status: 0 };
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true &&
+      !!voorstel && inBand.status === 428 && met.status !== 428;
+    uit.push({ naam: 'AI vraagt MENSELIJKE bevestiging voor geld', ok,
+      detail: 'zonder=' + zonder.status + (voorstel ? ' (voorstel)' : ' (GEEN voorstel)') +
+        ', zelfbevestigd=' + inBand.status + (inBand.status === 428 ? ' (geweigerd, goed)' : ' (LEK)') +
+        ', via /doe/bevestig=' + met.status });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
@@ -565,11 +549,20 @@ async function misbruikBeproeving(tok) {
 
 /* ============================================================================
    HOOFDLOOP
+
+   DE WACHT. Alles hieronder draait een echte beproeving en OVERSCHRIJFT
+   BEPROEVING.json. Zonder deze regel gebeurde dat ook bij een gewone
+   `require('./beproeving')` -- en dat is niet theoretisch: bij de vier
+   rolproeven zette een enkele laadcontrole (`node -e "require(...)"`)
+   ROLPROEF.json van 3377 beproefde routes terug op 292, zonder dat het register
+   er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
+   je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
+if (require.main !== module) { module.exports = {}; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
-  const dekking = new Map(routes.map(r => [r.method + ' ' + r.pad, 0]));
+  const dekking = new Map(routes.map(r => [r.methode + ' ' + r.pad, 0]));
   rij('endpoints uit de bron', nl(routes.length));
   if (MODE === 'postgres') rij('psql', PSQL);
   await poortVrij(); // nooit per ongeluk een oude, achtergebleven server toetsen
@@ -756,14 +749,14 @@ async function misbruikBeproeving(tok) {
     const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
     // de platformbrede schakelkast krijgt een benigne body: fuzzen mag, maar niet
     // de hele kast uitzetten en zo elke andere endpoint-meting vergiftigen.
-    const body = r.method === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
-    const st = await verzoek(r.method, r.pad, tk, body);
+    const body = r.methode === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
+    const st = await verzoek(r.methode, r.pad, tk, body);
     totaal++; noteerLat(st.ms);
     const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 };
     pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
     const pr = rolTel(kruis ? r.rol + ' (verkeerde rol)' : r.rol); pr.n++;
     pr.codes.set(st.status, (pr.codes.get(st.status) || 0) + 1);
-    if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
+    if (rol === r.rol) dekking.set(r.methode + ' ' + r.pad, (dekking.get(r.methode + ' ' + r.pad) || 0) + 1);
     const s = st.status;
     if (s === 0) { buckets.stuk++; pe.stuk++; pr.stuk++; }
     else if (s === 503) { buckets.r503++; pe.r503++; pr.r503++; }
@@ -776,7 +769,7 @@ async function misbruikBeproeving(tok) {
          en verversen we niets -- dan zouden we de rol-scheiding wegpoetsen. */
       if (s === 401 && !kruis && rol !== 'open') versNu(rol);
     }
-    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
+    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.methode + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
     await new Promise(res => setTimeout(res, 1 + rint(4)));
   }
   async function werker(ix) {
@@ -1205,8 +1198,26 @@ async function misbruikBeproeving(tok) {
      vraag welke stand er toevallig draaide. */
   const cijfers = {
     gedraaid: new Date().toISOString(),
+    stempel: stempel(),
+    uitleg: 'Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder ' +
+      'belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en ' +
+      'herstel (komt de gewone aanroep terug binnen zijn grens na de storm).',
+    /* DE GRENS. Zonder dit veld leest elk getal hier als een garantie, en dat is
+       het niet: dit is EEN machine, EEN seed en EEN duur. */
+    grens: 'Dit zegt niets over gedrag op andere hardware, over een langere duur dan ' +
+      'deze ronde, of over endpoints die niet zijn bestookt (zie meters.endpointsOnbereikt). ' +
+      '"0% verkeerde-rol-2xx" is een ondergrens en geen bewijs van rolscheiding -- daarvoor ' +
+      'is scripts/rolproef-route.js er. Een groene beproeving betekent: onder DEZE last, op ' +
+      'DEZE machine, is er niets omgevallen.',
     modus: MODE,
-    machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version },
+    machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version,
+      /* DE GEMETEN SNELHEID VAN DEZE MACHINE, niet alleen zijn vorm. Twee cloud-
+         containers met dezelfde kernen en hetzelfde geheugen kunnen op ander
+         silicium draaien; "4k/17g/linux/sqlite" zag er identiek uit terwijl de
+         een een p99 van 144 haalde en de ander consistent 233. scripts/norm.js
+         vergelijkt latenties alleen tussen machines waarvan deze kalibratie
+         (dezelfde vaste spin-werklast, in rust gemeten) dicht bij elkaar ligt. */
+      kalibratieBasisMs: Number(kal.basis.toFixed(1)) },
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
     gezakteDrempels: gezakt,
     meters: {

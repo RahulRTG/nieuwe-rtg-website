@@ -21,17 +21,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, wachtTot, wachtOpTekst, wachtOpVerandering, wachtOpRust,
-  volgVerzoeken, klikEnWacht, tekstVan } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -39,7 +34,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
 })).json();
 
 test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder account',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'LIVINGLAB-E2E-1' } });
   const base = srv.base;
@@ -50,7 +45,7 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     const lab = await api(base, '/api/lab2/lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, login.token);
     assert.ok(lab.lab, 'er is een lab');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     /* ---------- het kantoorscherm ---------- */
     const page = await browser.newPage();
@@ -195,14 +190,14 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
    toets doet ALLES met de muis en het toetsenbord, van het lege lab tot de
    pilot die eruit rolt. Zakt hij, dan is er ergens weer een knop verdwenen. */
 test('Living Lab: een mens loopt de hele cyclus af in de app zelf',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-livinglab-heel-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'LIVINGLAB-E2E-2' } });
   const base = srv.base;
   let browser;
   try {
     const login = await api(base, '/api/office/login', { code: 'LIVINGLAB-E2E-2' });
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

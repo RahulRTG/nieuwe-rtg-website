@@ -37,13 +37,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtTot, wachtOpTekst, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMPS = [];
 const versDir = () => { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecaschermen-')); TMPS.push(d); return d; };
 
@@ -78,12 +74,12 @@ async function open(page, base, token, pad) {
 const lees = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
 test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = versDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -204,12 +200,12 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
 });
 
 test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, en een nacalculatie zonder kosten blijft leeg',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = versDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -312,12 +308,12 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
 });
 
 test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en een afwijking vraagt een actie',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = versDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

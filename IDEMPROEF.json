@@ -1,5 +1,71 @@
 {
+ "stempel": {
+  "op": "2026-08-20T07:39:12.644Z",
+  "commit": "2c611af",
+  "boomVuil": false,
+  "node": "v22.22.2"
+ },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
+ "nietBeproefbaar": 848,
+ "redenenNietBeproefbaar": [
+  {
+   "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
+   "aantal": 522
+  },
+  {
+   "reden": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
+   "aantal": 62
+  },
+  {
+   "reden": "rol \"boardroom\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 55
+  },
+  {
+   "reden": "rol \"techniek\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 52
+  },
+  {
+   "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
+   "aantal": 44
+  },
+  {
+   "reden": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 28
+  },
+  {
+   "reden": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache",
+   "aantal": 23
+  },
+  {
+   "reden": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache",
+   "aantal": 22
+  },
+  {
+   "reden": "lichaamssleutel: rtfPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 17
+  },
+  {
+   "reden": "lichaamssleutel: gastAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 16
+  },
+  {
+   "reden": "rol \"werkplekbaas\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 3
+  },
+  {
+   "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 2
+  },
+  {
+   "reden": "rol \"scim\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
+   "aantal": 1
+  },
+  {
+   "reden": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker",
+   "aantal": 1
+  }
+ ],
+ "routesGevonden": 4103,
  "gemeten": {
   "routesMetRol": 3092,
   "beoordeeld": 845,
@@ -3988,6 +4054,18 @@
    "methode": "POST",
    "pad": "/api/facturen/mijn",
    "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/mijn",
+   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -5608,8 +5686,32 @@
    "methode": "POST",
    "pad": "/api/instant-reality",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/event",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/partner",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -5631,6 +5733,210 @@
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/aanwezig",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ai",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/beheer",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/bewaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/deel",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/fase",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/maak",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/open",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/opmerking",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/samen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ster",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/terug",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/uitslag",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/versies",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/vul",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/weg",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets",
    "rol": "member",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -9472,6 +9778,18 @@
    "methode": "POST",
    "pad": "/api/member/doe/kaart",
    "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/doe/kaart",
+   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -10095,6 +10413,294 @@
   {
    "methode": "POST",
    "pad": "/api/member/magnaat/controle/taak/maak",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/taak/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/zelftest",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/analyse",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/beslis",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/schok",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/volgende-dag",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/kantoor/kies",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/overzicht",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/partner/stap",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/partner/start",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/actie",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/antwoord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/handeling",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/start",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/actie",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/bedien",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/deelnemen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/maak",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/rol",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/start",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/werkproces/start",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/naam/lijst",
    "rol": "member",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -11630,6 +12236,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/afwezig",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/alias",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/antwoord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/assist",
    "rol": "member",
    "idempotentie": "beschermd",
@@ -11666,10 +12308,298 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/bewaarbeleid",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaartermijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaring",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlage",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlagen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/classificeer",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/bewaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/verstuur",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/weg",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concepten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegatie/weg",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegeer",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/documenten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/draad",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/etiket",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/export",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/gesprekken",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/handtekening",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/hulp",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/intrekken",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutel",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutels",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/inbox",
    "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/instellingen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/journaal",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -11686,6 +12616,102 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/opruimen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/rechten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/maak",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/weg",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regels",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/sluimer",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/ster",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
    ]
   },
   {
@@ -11882,7 +12908,67 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/vak",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/vernietigingen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/verplaats",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/workflow",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/zoek",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snap/opdracht",
    "rol": "member",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -11942,7 +13028,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/spel/",
+   "pad": "/api/member/spel/antwoord",
    "rol": "member",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -11950,6 +13036,510 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-bord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-score",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-klaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-start",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/kijk",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/klasgenoten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nabespreking",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/naspelen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nieuw",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/online",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/opgeven",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat-stuur",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/prestaties",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-open",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-sluit",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/rahul",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/random",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/replay",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-bord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-score",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/staat",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/stand",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-klaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-nieuw",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-antwoord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nieuw",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nodig",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-verlaat",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-antwoord",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-nieuw",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-staat",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toewijzen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/uitslagen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/varianten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar-zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
    ]
   },
   {
@@ -15758,6 +17348,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/platformregister",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/podium",
    "rol": "office",
    "idempotentie": "beschermd",
@@ -16078,6 +17680,30 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedekking",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedossier",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
    ]
   },
   {
@@ -18722,6 +20348,90 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/ov/operatie/annuleer",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/bevestig",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/concept",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/segment",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operaties",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/regie",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/regie/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/ov/uit",
    "rol": "member",
    "idempotentie": "ongemeten",
@@ -20033,7 +21743,7 @@
    "pad": "/api/pay/oplaad",
    "rol": "member",
    "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
    "statussen": [
     200,
     200,
@@ -21507,18 +23217,6 @@
   {
    "methode": "POST",
    "pad": "/api/rtfkantoor/stadsraad/stem",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/",
    "rol": "office",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -24148,6 +25846,90 @@
    "methode": "POST",
    "pad": "/api/sociaal/command",
    "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/graaf",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/lijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/object",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/rahul",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/voorstel/bevestig",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/wereld",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sociaal/command",
+   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -25298,6 +27080,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/advies",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/afspraak",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier/status",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/agenda/ai",
    "rol": "supplier",
    "idempotentie": "beschermd",
@@ -25611,6 +27441,78 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/bank/zakelijk",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/boek",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/status",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/uren",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin/status",
    "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
@@ -27244,6 +29146,18 @@
    "methode": "POST",
    "pad": "/api/supplier/doe/kaart",
    "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/doe/kaart",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -27267,6 +29181,18 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/door/zet",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/dorp",
    "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -27550,6 +29476,102 @@
     200,
     200,
     200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/baan",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkin",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkout",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/les/in",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/lid",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt/status",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
    ]
   },
   {
@@ -27970,6 +29992,90 @@
     200,
     200,
     200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/baan",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les/klaar",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee/weg",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/wedstrijd/in",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
    ]
   },
   {
@@ -28466,6 +30572,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/dish-twin/concept",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/dish-twin/publiceer",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/dish-twins",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/event/aanbetaling",
    "rol": "supplier",
    "idempotentie": "ongemeten",
@@ -28888,6 +31030,30 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/instel",
    "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/handover/start",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/instel",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -28902,6 +31068,18 @@
    "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/journey",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -29235,6 +31413,54 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/simulatie/voorstellen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/spatial",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/venue/concept",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/venue/publiceer",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de ijkoproep met een verse sleutel kwam niet door; zonder die vergelijking zegt een gelijk antwoord niets",
+   "statussen": [
+    200,
+    200,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/verzoeken",
    "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -30436,6 +32662,126 @@
    "methode": "POST",
    "pad": "/api/supplier/magnaat/studio/importeer",
    "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de ijkoproep met een verse sleutel kwam niet door; zonder die vergelijking zegt een gelijk antwoord niets",
+   "statussen": [
+    200,
+    200,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/indienen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/indienen/intrekken",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/proef/stap",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/proef/start",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/profiel",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/relatie",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/relatie/beslis",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/mall",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/bouwsteen/weg",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/magnaat/studio/importeer",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -31526,6 +33872,78 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/opvang",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind/ophaal",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny/zet",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/verslag",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/order/sectie",
    "rol": "supplier",
    "idempotentie": "ongemeten",
@@ -31910,6 +34328,114 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/petcare",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkin",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkuit",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/notitie",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/hond",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/klaar",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim/klaar",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/photo/add",
    "rol": "supplier",
    "idempotentie": "ongemeten",
@@ -31930,6 +34456,42 @@
     200,
     200,
     200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/vraag",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/zet",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
    ]
   },
   {
@@ -32666,6 +35228,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/afwezig",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/alias",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/antwoord",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/assist",
    "rol": "supplier",
    "idempotentie": "beschermd",
@@ -32678,10 +35276,250 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaarbeleid",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaartermijn",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaring",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlage",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlagen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/btw-herinner",
    "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/bewaar",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/verstuur",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/weg",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concepten",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegatie/weg",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegeer",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/draad",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/etiket",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/export",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/gesprekken",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/handtekening",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/hulp",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/intrekken",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutel",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling gaf hetzelfde antwoord terwijl een verse sleutel een ander gaf",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutels",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
     200,
@@ -32714,6 +35552,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/instellingen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/journaal",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/lees",
    "rol": "supplier",
    "idempotentie": "ongemeten",
@@ -32738,7 +35600,139 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/opruimen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/rechten",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/maak",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/weg",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/zet",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regels",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/sluimer",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/ster",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/stuur",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vak",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vernietigingen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/verplaats",
    "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
@@ -32758,6 +35752,18 @@
     200,
     200,
     200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/zoek",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
    ]
   },
   {
@@ -34282,6 +37288,66 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event/status",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak/klaar",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
    ]
   },
   {

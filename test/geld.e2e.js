@@ -12,16 +12,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
@@ -37,7 +33,7 @@ const OUDE_PADEN = {
 };
 
 test('RTG Geld: tien standen openen, wisselen schoon, en de oude paden leiden om',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldapp-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -47,7 +43,7 @@ test('RTG Geld: tien standen openen, wisselen schoon, en de oude paden leiden om
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-03-03', tier: 'rtg' });
     assert.ok(reg.token, 'registreren hoort een token te geven');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });
     await ctx.addInitScript((tok) => {
       try {

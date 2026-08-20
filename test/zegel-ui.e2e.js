@@ -6,22 +6,18 @@
    browser. Draai: node --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' }; if (token) h.Authorization = 'Bearer ' + token;
   return (await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })).json();
 }
 
 test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -30,7 +26,7 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
       password: 'geheim123', geboortedatum: '1990-03-03', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid geregistreerd');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

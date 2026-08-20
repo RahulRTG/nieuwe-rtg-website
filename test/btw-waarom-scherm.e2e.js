@@ -14,7 +14,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 /* DE BROWSER KOMT UIT ./browser.js, en niet uit een eigen loader hier. Dat
    bestand probeert te STARTEN in plaats van te laden: een Playwright zonder
    bijbehorende Chromium laat de require lukken en pas de launch zakken, en dan
@@ -32,7 +32,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, { method:
   body: JSON.stringify(body || {}) })).json();
 
 test('Kantoor: "Waarom dit bedrag?" vouwt de aangifte open tot op de factuur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-waarom-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -45,7 +45,7 @@ test('Kantoor: "Waarom dit bedrag?" vouwt de aangifte open tot op de factuur',
     const btwOpFactuur = f.factuur.btwBedrag.toFixed(2).replace('.', ',');
     const nummer = String(f.factuur.nummer);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

@@ -27,20 +27,14 @@
    RTG_CHROMIUM=... node --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pinh-')); }
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
-const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
+const pw = laadPlaywright();
+const skip = geenBrowser(pw);
 
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -67,7 +61,7 @@ async function omgeving(fn) {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEV_LINKS: '1' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     await fn({ base, browser });
   } finally {
     if (browser) await browser.close();

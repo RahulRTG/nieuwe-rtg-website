@@ -16,7 +16,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,7 +45,7 @@ async function metLid(fn) {
       email: 'gram' + process.pid + merk + '@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
@@ -123,7 +123,7 @@ async function trek(page, hoogte) {
   await page.waitForTimeout(600);
 }
 
-test('de grammatica', { skip: pw ? false : 'playwright ontbreekt', concurrency: false }, async (t) => {
+test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
 
   await t.test('de Trust Rail staat boven het dock en is een ingang, geen mededeling', async () => {
     /* DE MUTATIE: laat rail.js het onderdeel als <span> tekenen in plaats van als

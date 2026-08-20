@@ -92,7 +92,7 @@ const nepPost = (antwoorden) => {
 test('een route achter een grendel is ONGEMETEN en niet dicht', async () => {
   const uit = await draaiInvoerproef({
     post: nepPost([{ status: 403, data: { error: 'nee' } }, { status: 400, data: { error: 'rommel' } }]),
-    routes: [{ method: 'POST', pad: '/api/dicht', rol: 'member' }, { method: 'POST', pad: '/api/open', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/dicht', rol: 'member' }, { methode: 'POST', pad: '/api/open', rol: 'member' }],
     tokenVoor: () => 't', rommelVoor: () => ({ x: 1 }), perRoute: 1
   });
   assert.equal(uit.perRoute['POST /api/dicht'].invoer, 'poort');
@@ -106,7 +106,7 @@ test('de ronde oordeelt NIET als niets voorbij een poort kwam', async () => {
      -- exact de fout waar deze proef voor bestaat. */
   const uit = await draaiInvoerproef({
     post: nepPost([{ status: 401, data: {} }]),
-    routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }, { method: 'POST', pad: '/api/b', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }, { methode: 'POST', pad: '/api/b', rol: 'member' }],
     tokenVoor: () => 't', rommelVoor: () => ({}), perRoute: 1
   });
   assert.ok(uit.meterStuk, 'nul bereikte routes hoort een blinde ronde te zijn');
@@ -120,7 +120,7 @@ test('een dood token wordt hernieuwd in plaats van als bevinding geteld', async 
   let beurt = 0;
   const post = async () => (++beurt === 1 ? { status: 401, data: {} } : { status: 400, data: { error: 'rommel' } });
   const uit = await draaiInvoerproef({
-    post, routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }],
+    post, routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }],
     tokenVoor: () => 't', rommelVoor: () => ({}), hernieuw: async () => true, perRoute: 1
   });
   assert.equal(uit.hernieuwd, 1);
@@ -131,7 +131,7 @@ test('een dood token wordt hernieuwd in plaats van als bevinding geteld', async 
 test('een breuk stopt die route en komt met de rommel erbij in het register', async () => {
   const uit = await draaiInvoerproef({
     post: nepPost([{ status: 500, data: { error: 'Interne fout.' } }]),
-    routes: [{ method: 'POST', pad: '/api/stuk', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/stuk', rol: 'member' }],
     tokenVoor: () => 't', rommelVoor: () => ({ gemeen: '😀'.repeat(3) }), perRoute: 3
   });
   const rij = uit.perRoute['POST /api/stuk'];

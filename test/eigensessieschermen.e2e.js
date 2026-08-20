@@ -36,13 +36,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eigensessie-'));
 
 /* Per scherm: welke sleutel het mist, en dus wat het hoort te zeggen. De eis is
@@ -116,7 +112,7 @@ async function toon(page, base, app) {
 }
 
 async function opstelling() {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   /* De service worker MOET uit. Anders haalt hij tientallen schermen vooruit op
      en telt deze toets als VEEGTOETS -- en dan tellen zijn eigen schermen niet
      mee in scripts/schermen.js. Dat is hier eerder misgegaan. */
@@ -132,7 +128,7 @@ async function opstelling() {
    het er negen waren, en bij de tiende zou die kop stil hebben gelogen -- precies
    de soort verkeerde bewering die dit huis met een handhaver bewaakt. */
 test('elk scherm met een eigen sleutel zegt WELKE sleutel het mist (' + EIGEN_SLEUTEL.length + ')',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -154,7 +150,7 @@ test('elk scherm met een eigen sleutel zegt WELKE sleutel het mist (' + EIGEN_SL
 });
 
 test('het clubswerk-kantoor toont zijn eigen deur en stuurt niemand meer weg',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -190,7 +186,7 @@ test('het clubswerk-kantoor toont zijn eigen deur en stuurt niemand meer weg',
 });
 
 test('de twee doorverwijsstubs komen echt op de personeelsinlog uit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {

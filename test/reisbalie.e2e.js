@@ -23,32 +23,15 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, browserOpties, geenBrowser } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadBrowser();
+const pw = laadPlaywright();
 /* Dezelfde browserkeuze als test/office-suite.e2e.js: een meegeleverde Chromium
    staat niet overal op de plek die playwright zelf verwacht, en dan is een
    overgeslagen schermtoets het stilste dat er is (LAT-regel 3). */
-function browserOpties() {
-  const opties = { args: ['--no-sandbox'] };
-  const kandidaten = [process.env.RTG_BROWSER_PATH,
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    '/usr/bin/google-chrome', '/usr/bin/chromium'].filter(Boolean);
-  const gevonden = kandidaten.find(p => fs.existsSync(p));
-  if (gevonden) opties.executablePath = gevonden;
-  return opties;
-}
 
 test('de reisbalie bevestigt echt: wat het kantoor hier besluit, ziet het lid',
-  { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisbalie-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-BALIE-1' } });
   let browser;

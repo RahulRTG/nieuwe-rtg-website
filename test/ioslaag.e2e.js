@@ -35,7 +35,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,13 +43,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright({ eigenDriver: false });
 
 /* Alle app-pagina's onder public/apps, als webpad. */
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
@@ -73,12 +67,12 @@ function kopIds(webpad) {
 }
 
 test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 
     /* Alles wat JavaScript oplevert gaat eruit -- op resourceType, niet op
@@ -138,12 +132,12 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
 });
 
 test('een app-pagina draagt geen woordmerk meer in zijn chrome',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
     const steek = ['/apps/vluchten.html', '/apps/agenda.html', '/apps/berichten.html', '/apps/rtgschool.html'];
 
@@ -169,7 +163,7 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
 });
 
 test('een knoppengroep in de kop blijft een groep',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const CODE = 'KANTOOR-IOSGROEP-1';
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
@@ -180,7 +174,7 @@ test('een knoppengroep in de kop blijft een groep',
     const tok = (await (await fetch(base + '/api/office/login', { method: 'POST',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: CODE }) })).json()).token;
     assert.ok(tok, 'kantoorsessie');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1100, height: 900 } });
     await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) {} }, tok);
     const page = await ctx.newPage();

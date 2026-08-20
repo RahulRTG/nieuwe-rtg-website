@@ -110,7 +110,7 @@ async function gezond(url, seconden) {
                '  voordat de Node-major omhoog gaat.');
     }
   }
-  /* ONVOORWAARDELIJK sinds de vlag-opruiming: --experimental-sqlite staat
+  /* ONVOORWAARDELIJK sinds de vlag-opruiming: staat
      nergens meer (node:sqlite laadt sinds 22.13 zonder vlag), maar de
      accountsdatabase hangt er nog net zo hard aan. Deze proef aan de vlag
      ophangen zou hem stil laten wegvallen precies nu hij het belangrijkst

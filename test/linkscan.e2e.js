@@ -15,17 +15,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
 const pw = laadPlaywright();
 const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
@@ -54,7 +48,7 @@ async function metApp(fn) {
     const a = await lid(base, 'Scan Anna');
     const b = await lid(base, 'Scan Boris');
     await api(base, '/api/pay/oplaad', { centen: 50000, idem: 'scan-op-' + Date.now() }, a.token);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
@@ -86,7 +80,7 @@ async function scan(pg, tekst) {
 }
 
 test('een gescande vraagcode wordt eerst een kaart en pas na een druk een betaling',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metApp(async ({ pg, base, a, b }) => {
     // Boris vraagt 18,50 voor diner; Anna scant dat in haar app
     const cap = (await api(base, '/api/link/cap/maak',
@@ -123,7 +117,7 @@ test('een gescande vraagcode wordt eerst een kaart en pas na een druk een betali
 });
 
 test('een QR die niet van ons is geeft geen kaart en geen fout, maar wat er stond',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metApp(async ({ pg }) => {
     await scan(pg, 'https://bushalte.example/dienstregeling');
     await pg.waitForTimeout(900);
@@ -132,7 +126,7 @@ test('een QR die niet van ons is geeft geen kaart en geen fout, maar wat er ston
   });
 });
 
-test('een pin van een ander wordt een kaart met een verbindknop', { skip: pw ? false : 'geen Playwright' }, async () => {
+test('een pin van een ander wordt een kaart met een verbindknop', { skip: geenBrowser(pw) }, async () => {
   await metApp(async ({ pg, base, a, b }) => {
     const pin = (await api(base, '/api/member/pin', {}, b.token)).body;
     await scan(pg, 'rtg:pin:' + pin.pin);
@@ -149,7 +143,7 @@ test('een pin van een ander wordt een kaart met een verbindknop', { skip: pw ? f
 });
 
 test('mijn koppelingen: wat openstaat is er weg te halen, wat gebeurd is blijft staan',
-  { skip: pw ? false : 'geen Playwright' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De knop uit LINK.md par. 3.6, in een echte browser: intrekken sluit een
      deur, en de regel over wat er wel is gebeurd blijft er gewoon staan. */
   await metApp(async ({ pg, base, a, b }) => {

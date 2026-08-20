@@ -34,7 +34,7 @@
    Draai: node scripts/tot-crash.js   (env: TOTCRASH_RONDES, TOTCRASH_RONDE_MS,
    TOTCRASH_WERKERS, TOTCRASH_MAX_WERKERS, TOTCRASH_SEED, TOTCRASH_PORT). */
 'use strict';
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
 const { beoordeelRonde } = require('./lib/verzadiging');
@@ -147,20 +147,23 @@ function body(d, sch) {
 
 /* ---------- de server ---------- */
 let child = null, gestopt = null, logOffset = 0;
-function boot() {
-  return new Promise((resolve, reject) => {
-    const logfd = fs.openSync(SRVLOG, 'a');
-    const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
-      NODE_OPTIONS: '--max-old-space-size=2048' }; // bewust krap: een lek slaat sneller toe (dat is de bedoeling)
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), 'server/server.js'],
-      { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
-    child.on('exit', (c, s) => { gestopt = { code: c, signal: s }; });
-    (async () => {
-      for (let i = 0; i < 300; i++) { if (gestopt) return reject(new Error('server stopte bij het opstarten (code ' + gestopt.code + ')')); const r = await verzoek('GET', '/api/ready', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
-      reject(new Error('server niet gereed'));
-    })();
+/* De gedeelde wegwerpserver (scripts/lib/wegwerpserver.js), met de eigen
+   vlaggen van deze beproeving: --expose-gc + gc-hook om de heap te lezen, de
+   krappe heap-grens (een lek slaat sneller toe -- de bedoeling), readiness in
+   plaats van liveness, en de log-fd waar nieuweFouten()/rssMB() uit lezen. De
+   datamap is van dit script (TMP), dus de lib ruimt hem niet op. */
+async function boot() {
+  const logfd = fs.openSync(SRVLOG, 'a');
+  gestopt = null;
+  const bundel = await wegwerp({
+    naam: 'totcrash', poort: PORT, datamap: TMP, gereed: 'ready', logFd: logfd,
+    nodeArgs: ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js')],
+    env: { NODE_ENV: 'test', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI',
+      LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT, NODE_OPTIONS: '--max-old-space-size=2048' },
+    wachtMs: 75000
   });
+  child = bundel.kind;
+  child.on('exit', (c, s) => { gestopt = { code: c, signal: s }; });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); try { child.kill('SIGKILL'); } catch (e) {} child = null; }); }
 function rssMB() { try { const m = fs.readFileSync('/proc/' + child.pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
@@ -226,6 +229,12 @@ async function geldKlopt(office) {
 }
 async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('GET', '/api/ready', null, null, 4000); if (r.status === 200) return true; await new Promise(r => setTimeout(r, 500)); } return false; }
 
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een volle
+   crash-jacht (een server opzetten en bestoken) zodra iets dit bestand
+   require't -- een laadcontrole deed precies dat en liet een server achter.
+   Zelfde wacht als de andere instrumenten. */
+if (require.main !== module) { module.exports = {}; return; }
+
 (async () => {
   kop('TOT CRASH -- escalerende bug-jager (sqlite, seeded)');
   rij('rondes', RONDES + ' x ' + (RONDE_MS / 1000) + ' s'); rij('start-werkers', BASIS + ' (verdubbelt per ronde, cap ' + nl(MAX_WERKERS) + ')');
@@ -259,8 +268,8 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
         // juiste rol + soms bewust de verkeerde rol (rol-scheiding onder druk)
         const rolPool = rng() < 0.75 ? T[rt.rol] : rkeuze([T.member, T.supplier, T.office, T.open]);
         const tk = rkeuze(rolPool.length ? rolPool : T.open);
-        const b = rt.schakel ? { aan: true } : (rt.method === 'GET' ? null : body(0, r));
-        const st = await verzoek(rt.method, rt.pad, tk, b);
+        const b = rt.schakel ? { aan: true } : (rt.methode === 'GET' ? null : body(0, r));
+        const st = await verzoek(rt.methode, rt.pad, tk, b);
         req++;
         // 503 = De Wacht die onder de flood bewust load afwerpt ("kom zo terug") --
         // dat is JUIST gedrag (zelfbescherming), geen bug. Alleen 500/502/504 zijn

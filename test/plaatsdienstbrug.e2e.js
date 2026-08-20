@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -52,7 +52,7 @@ async function api(base, pad, body, token) {
 }
 
 test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets aan',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-brug-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -78,7 +78,7 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
     const hek = (h.hekken || []).find(x => x.id === 'leverancier:' + ZAAK);
     assert.ok(hek, 'de werkplek staat als hek in de lijst');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));

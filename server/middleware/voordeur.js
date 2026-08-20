@@ -60,7 +60,19 @@ function bureaublad(app) {
   app.get('/', naarHome);
   app.get('/apps/bureau.html', naarHome);
   app.get('/apps/index.html', naarHome);
-  app.get('/apps/', naarHome);
+  /* ZONDER SCHUINE STREEP GEREGISTREERD, en dat is geen smaak.
+
+     Hier stond '/apps/'. De routematcher accepteert een pad EN datzelfde pad met
+     een streep erachter (web/routing.js, padMatch), dus '/apps/' matchte op
+     /apps/ en /apps// -- maar niet op /apps. Wie dat intypte kreeg 404, terwijl
+     de routekaart '/apps' meldde: leesLagen knipt de sluitstreep eraf. De kaart
+     beweerde dus een route die de router niet had.
+
+     Dat is precies het soort stille afwijking waar de dekkingsmeting op stuit
+     zodra ze ALLE routes meet in plaats van alleen /api/: de route was niet
+     ongedekt, hij was onbereikbaar. Zonder streep geregistreerd dekt hij beide
+     vormen, en dan is de kaart weer waar. */
+  app.get('/apps', naarHome);
 }
 
 /* ---------- meekijken welke SCHERMEN er geopend worden ----------

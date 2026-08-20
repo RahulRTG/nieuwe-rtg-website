@@ -3,14 +3,21 @@
    server/school.js. */
 module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
+    teVaak, misluktePoging, ipVan,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
   const { FASEN, TRAPPEN } = require('../kern/onderwijs-ladder');
   // "mijn klas" = ik heb hem gemaakt OF ik sta vast op het lerarenteam
   const vanLeraar = (k, p) => k.leraarId === p.id || (k.leraren || []).some(x => x.id === p.id);
   router.post('/school/school/maak', (req, res) => {
+    /* Bewust open (scripts/poortwacht.js, PUBLIEK): een school heeft hier nog
+       geen enkele login. Maar open en scheppend vraagt een rem per afzender;
+       vijf aanmeldingen per tien minuten is voor een echte school ruim. */
+    const bucket = 'schoolmaak:' + ipVan(req);
+    if (teVaak(res, bucket)) return;
     const naam = schoon(req.body.naam, 80);
     const plaats = schoon(req.body.plaats, 60);
     if (!naam) return res.status(400).json({ error: 'Vul de naam van de school in.' });
+    misluktePoging(bucket, 5, 10);
     const code = schoolCode();
     S()[code] = { code, naam, plaats: plaats || null, token: rid(16), at: nu(), status: 'wacht', personeel: {} };
     save();

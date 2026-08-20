@@ -1,0 +1,144 @@
+{
+ "stempel": {
+  "op": "2026-08-20T15:47:59.691Z",
+  "commit": "fcba02e",
+  "boomVuil": true,
+  "node": "v22.22.2"
+ },
+ "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
+ "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
+ "telling": {
+  "posten": 14,
+  "meetwerk": 53,
+  "instrument": 932,
+  "grens": 619
+ },
+ "posten": [
+  {
+   "id": "auth-onbeslist",
+   "soort": "meetwerk",
+   "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
+   "aantal": 0,
+   "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
+   "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
+  },
+  {
+   "id": "capability-in-handler",
+   "soort": "grens",
+   "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
+   "aantal": 523,
+   "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
+   "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
+  },
+  {
+   "id": "objectpoort",
+   "soort": "meetwerk",
+   "wat": "routes die eigenaarschap toetsen van een object uit het lichaam, en die nog geen enkel instrument heeft beslist",
+   "aantal": 52,
+   "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een bedrijfscode in het lijf.",
+   "sluit": "GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id's uit zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend instrument, maar werk per domein."
+  },
+  {
+   "id": "output-deuren",
+   "soort": "grens",
+   "wat": "deuren (login, register, webauthn) waarvan het antwoord niet met de liegpoort te meten is",
+   "aantal": 18,
+   "waarom": "RTG_LIEG_NIET spaart de deuren in elke lie-run; over een deur is dus per constructie nooit gelogen, en een oordeel van een instrument dat er niet kan komen is geen oordeel.",
+   "sluit": "niets in deze proef; een inhoudseis op een deur hoort in een gewone toets op het echte antwoord (token-vorm, foutmelding), niet in een leugenmeting die de deur zou breken."
+  },
+  {
+   "id": "lichaamssleutel",
+   "soort": "grens",
+   "wat": "routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop",
+   "aantal": 63,
+   "waarom": "gastAuth leest req.body.sleutel, gezinsPoort en rtfPoort lezen code+token uit het lichaam. Een member-, supplier- of officetoken is voor zo n deur niet fout maar IRRELEVANT: hij kijkt er niet naar. Alle drie krijgen dezelfde 401.",
+   "sluit": "niets in deze proef; die 401 als bewijs tellen zou dezelfde fout zijn die de AUTH-as al 294 cellen kostte. Een proef op sessiesleutels is een andere vraag."
+  },
+  {
+   "id": "output-niet-toerekenbaar",
+   "soort": "meetwerk",
+   "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
+   "aantal": 0,
+   "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
+   "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
+  },
+  {
+   "id": "output-blind",
+   "soort": "meetwerk",
+   "wat": "routes waarover gelogen is zonder dat een toets het merkte",
+   "aantal": 0,
+   "waarom": "de liegpoort heeft het antwoord van precies deze route vervalst en de toetsen die hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan stilletjes leeg of fout zijn zonder dat iets zakt.",
+   "sluit": "per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel (die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om. De laatste vijf zijn zo nagelopen: de boekhoud-export kreeg een echte inhoudseis in test/eigenaar.test.js (acht kolommen, de BOM, nooit JSON) en merkt de leugen nu; de andere vier bleken onmeetbaar en staan onder output-onwaarneembaar."
+  },
+  {
+   "id": "output-onwaarneembaar",
+   "soort": "grens",
+   "wat": "routes waarvan het ware antwoord zelf 200 {ok:true} is, precies wat de liegpoort ervan maakt",
+   "aantal": 4,
+   "waarom": "over deze routes IS gelogen en geen toets zakte -- maar dat zegt niets over de toetsen, want er viel niets te merken. De inhoudskaart heeft het ware antwoord opgehaald van een eerlijke wegwerpserver en vastgesteld dat het niet van de leugen te onderscheiden is (grond: gelijk-aan-leugen). Sommige daarvan zijn zo BEDOELD: het codewoord-alarm antwoordt met opzet altijd hetzelfde, want een verschil zou aan degene die over je schouder meekijkt verraden dat er een codewoord bestaat.",
+   "sluit": "niets op deze as, en dat is de eerlijke rand: wat deze routes waard zijn zit in hun UITWERKING en hoort op STATE en SIDE_EFFECT thuis. Voor drm/report en fluister/focus staat die daar ook bewezen; site/verwijder en codewoord/check staan er ongemeten, en DAT is de echte openstaande vraag over deze twee -- niet of iemand naar hun antwoord kijkt. Let op de grond: een CSV-export die de sonde niet kan lezen (grond geen-json) hoort hier NIET in en krijgt gewoon een inhoudstoets."
+  },
+  {
+   "id": "audit-wisselend",
+   "soort": "meetwerk",
+   "wat": "routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom",
+   "aantal": 0,
+   "waarom": "het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is \"laat een spoor na\" geen eigenschap van de route.",
+   "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap. De veertien van de vorige ronde zijn zo nagelopen: drie bleken een echt defect (auth/login, supplier/login, office/verify) en zijn gerepareerd, elf hadden een reden en staan nu onder audit-verklaard."
+  },
+  {
+   "id": "audit-verklaard",
+   "soort": "grens",
+   "wat": "routes die wisselen, en waarvan met de hand is opgeschreven waarvan het afhangt",
+   "aantal": 11,
+   "waarom": "de kaart in scripts/auditproef.js zegt per route wat het verschil maakt. Er loopt een regel doorheen: een journaal schrijft GEBEURTENISSEN op en geen aanroepen. Een knop die niets omzette, een ronde die niets boekte, een wachtrij die leeg was -- dan is er niets gebeurd, en een regel die zegt van wel maakt het boek juist minder waard.",
+   "sluit": "niets, en daarom is dit een GRENS en geen achterstand: voor deze routes is \"laat hij altijd een spoor na\" de verkeerde vraag, want het juiste antwoord is nee. De post is wel begrensd gehouden: verklaard telt NOOIT als bewijs (de bewijsmatrix zet er ongemeten neer, niet bewezen), de kaart raakt \"geen spoor\" niet aan, en een verklaring die nergens meer op slaat wordt gemeld. Deze post staat er dus om zichtbaar te blijven, niet om weggewerkt te worden."
+  },
+  {
+   "id": "rollback-gezakt",
+   "soort": "meetwerk",
+   "wat": "routes die weigeren en toch de toestand veranderen",
+   "aantal": 0,
+   "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
+   "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
+  },
+  {
+   "id": "object-vooraf",
+   "soort": "instrument",
+   "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
+   "aantal": 932,
+   "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
+   "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
+  },
+  {
+   "id": "proefruis",
+   "soort": "meetwerk",
+   "wat": "de vier proeven meten op dezelfde code niet twee keer hetzelfde",
+   "aantal": 1,
+   "waarom": "twee rondes op dezelfde commit gaven vijf cellen verschil (INPUT vier omlaag, AUTH en ACL twee omhoog). Op 46.035 cellen is dat 0,01%, maar een ratel op een ruisende meter weigert op ruis, en dat leert mensen om met de hand vast te leggen. Zo verslapt een ratel.",
+   "sluit": "de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
+  },
+  {
+   "id": "wegwerpserver-kopieen",
+   "soort": "meetwerk",
+   "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
+   "aantal": 0,
+   "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
+   "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
+  }
+ ],
+ "groei": [
+  {
+   "op": "2026-08-18",
+   "van": 4688,
+   "naar": 5416,
+   "reden": "scripts/waarom.js gaf 1025 routes een naam die daarvoor anoniem in de 3112 ongemeten van de staatproef zaten; en auth-onbeslist telde 294 routes die al onder capability-in-handler en objectpoort stonden, dus die daalde van 300 naar 3"
+  },
+  {
+   "op": "2026-08-20",
+   "van": 691,
+   "naar": 988,
+   "reden": "De waarom-ronde liep tot nu toe halverwege zonder sessie: scripts/waarom.js loopt langs alle schrijfroutes en dus ook langs /api/logout, en vanaf dat punt kreeg elke member-route een 401. Die routes werden ingedeeld als geen-sessie -- een uitspraak over de proef en niet over de route. Met de sessiewacht erin (scripts/lib/sessiewacht.js) zakt geen-sessie van 687 naar 19, en de 668 die vrijkomen verdelen zich over de echte redenen: 297 naar object-ontbreekt, 191 naar bereikt, 117 naar veld-ontbreekt, 47 naar rol-te-laag, 10 naar niet-van-jou en 6 naar conflict. Geen enkele route ging de andere kant op (eraf: 0). De achterstand groeit dus van 691 naar 988 omdat er 297 routes ZICHTBAAR werden die er al waren, niet omdat er iets kapot is: bereikt ging tegelijk van 880 naar 1071 en de objectpool oogstte 1073 velden in plaats van 943."
+  }
+ ]
+}

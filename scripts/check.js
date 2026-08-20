@@ -1782,7 +1782,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        Wat hem beschermt staat er wel: drie remmen (per adres+account, per
        adres, per doelwit), een vertraging bij een belaagd account, en een regel
        in het beveiligingsjournaal bij elke mislukte poging. */
-    ['/api/auth/login', 'dit IS de deur: wie inlogt heeft nog geen sessie. Beschermd met drie remmen (adres+account, adres, doelwit), een vertraging bij een belaagd account en een regel in het beveiligingsjournaal'],
+    /* /api/auth/login STOND HIER, met de reden "dit IS de deur: wie inlogt heeft
+       nog geen sessie". Die uitzondering is op 20 augustus 2026 vervallen omdat
+       de route sinds deze ronde zelf een 401 geeft bij verkeerde gegevens, en
+       deze regel dat als een poort in de handler telt. De bescherming is niet
+       minder geworden maar meer: drie remmen (adres, account, doelwit), een
+       vertraging bij een belaagd account, en een regel in het
+       beveiligingsjournaal bij elke mislukte poging. */
     /* Dezelfde deur, andere sleutel. /api/webauthn/opties staat hierboven al op
        de lijst met "het bewijs volgt bij /login" -- dit is dat /login. Het
        bewijs zit in het verzoek: een handtekening over de uitdaging die de
@@ -2128,7 +2134,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
       'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.'],
     ["server/lib/dubbeltik.js|const kop = req.get('authorization') || '';",
-      'de dubbeltik VERSLEUTELT de kop tot een hash en kijkt er nooit in. Hij beslist niets over toegang -- de hash bepaalt alleen in welke la het bewaarde antwoord komt, zodat twee bellers met dezelfde idem-sleutel nooit elkaars antwoord krijgen. Een verzonnen kop levert dus hooguit een eigen lege la op; of het verzoek mag, beslist de echte auth verderop in de keten.']
+      'de dubbeltik VERSLEUTELT de kop tot een hash en kijkt er nooit in. Hij beslist niets over toegang -- de hash bepaalt alleen in welke la het bewaarde antwoord komt, zodat twee bellers met dezelfde idem-sleutel nooit elkaars antwoord krijgen. Een verzonnen kop levert dus hooguit een eigen lege la op; of het verzoek mag, beslist de echte auth verderop in de keten.'],
+    ["server/middleware/idempotentie.js|const wie = (req.get('authorization') || '') + '|' + String(req.ip || '');",
+      'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
+      'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
+      'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -3835,12 +3845,179 @@ console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
     'server/lib/cache.js': 'antwoordcache; alleen op leesroutes (GET), en een cachetreffer doet per definitie geen werk',
     'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
     'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
+    'server/middleware/idempotentie.js': "de opt-in idempotentielaag. NAGEKEKEN op 20 augustus 2026: gemount in opzet/poortwachters.js r.114, dus NA de dubbeltik (r.96) -- hij is de buitenste wikkel. Dat is hier juist: hij grijpt alleen in als de client ZELF een idem-sleutel meestuurde, en dan is de herhaling een bewuste retry en geen dubbeltik. Elk ander antwoord gaat ongewijzigd door naar de dubbeltik.",
   };
   const nieuw = wikkelaars.filter(w => !BEKEND[w]);
   if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +
     ' -- staat de dubbeltik daar nog achter? Zet hem op de lijst in check.js regel 51 zodra dat is nagekeken');
   if (klachten.length) klachten.forEach(fout);
   else ok(wikkelaars.length + ' plekken vervangen res.json, en de dubbeltik komt na jsonGzip()');
+}
+
+/* ============================================================================
+   56) GEEN NIEUWE PRIVE-ROUTELIJST
+
+   WAAROM DEZE REGEL BESTAAT. "Welke routes heeft deze server" werd op ACHT
+   plekken los uitgezocht, en elke plek kwam op een ander getal:
+
+     scripts/lib/routes.js            2934   (regex over de bron)
+     magnaat-capabilities-bronnen.js  3679   (regex over de bron)
+     POORTWACHT-ronde                 3987
+     scripts/routekaart.js            4191   (de levende router)
+     plus prive-scanners in beproeving.js, tot-crash.js en schakelbaar.js
+
+   Geen van die verschillen was ergens te zien. De vier bewijsproeven leunden op
+   de eerste en misten daardoor alle vier dezelfde 1257 routes -- waaronder de
+   hele RTFoundation. Dat is niet "een scanner die iets mist": dat is een huis
+   waarvan niemand weet hoe groot het is.
+
+   Er is nu EEN antwoord: scripts/routekaart.js vraagt het aan de router
+   (app._routes(), server/web/routing.js), en scripts/lib/routes.js verdeelt dat
+   onder de afnemers. Deze regel houdt dat zo. Wie een nieuwe eigen scanner
+   schrijft, ziet hem hier zakken -- met de reden erbij, want de verleiding is
+   begrijpelijk: een regex is in vijf regels klaar en een routekaart kost een
+   kindproces.
+
+   WAT HIJ MEET. Een bestand in scripts/ dat zelf een `app.post('/pad'`-achtige
+   uitdrukking over de BRON legt, terwijl het de routekaart of lib/routes niet
+   gebruikt. De drie bekende gevallen staan met naam op de lijst en mogen blijven
+   staan tot ze zijn omgezet; ze mogen alleen niet met een vierde vermeerderen.
+
+   WAT HIJ NIET MEET. Of de routekaart zelf klopt -- dat doet
+   test/routedekking.test.js, en de achterstand van de bronscanner van de
+   Capability Graph staat als ratel in test/magnaat-capabilities.test.js. */
+console.log('\n56) geen nieuwe prive-routelijst: EEN plek bepaalt welke routes er zijn');
+{
+  /* De drie die er al zijn, met wat er nodig is om ze op te ruimen. Deze lijst
+     MAG ALLEEN KRIMPEN -- zelfde afspraak als BEKEND hierboven en als de
+     schuldlijst in BEREIK.json. */
+  const BEKENDE_SCANNERS = new Map([
+    ['scripts/beproeving.js', 'eigen alleRoutes(); draait zelf een server en kan de routekaart lenen'],
+    ['scripts/tot-crash.js', 'eigen alleRoutes(); zelfde omzetting als beproeving.js'],
+    ['scripts/schakelbaar.js', 'leest paden voluit om ze te kunnen tellen (keuringsregel 45); een eigen soort']
+  ]);
+  /* HET KENMERK VAN EEN EIGEN SCANNER, en dat is niet te verzinnen: een
+     reguliere uitdrukking met `\.(` gevolgd door een HTTP-methode-alternatie.
+     Alle vier de bestaande scanners hebben precies die vorm --
+
+       /\b(app|router)\.(post|get|put|delete|patch)\(     lib/routes.js
+       /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(  capabilities-bronnen
+       /app\.(get|post|put|delete)\(\s*'(\/api\/...        beproeving, tot-crash
+       /app\.(get|post|put|delete|patch|all)\(             schakelbaar
+
+     Plus de eis dat het bestand ook echt de servermap afloopt; anders vlagt
+     deze regel elke toevallige `/x\.(get|set)/` in een script dat met routes
+     niets te maken heeft. Twee kenmerken samen, want een van de twee is te
+     grof -- en een keuring die roept bij dingen die kloppen, leert je hem te
+     negeren (zie de kop van test/blindevlek.test.js). */
+  const METHODE_ALTERNATIE = /\\\.\s*\(\??:?\s*(?:get|post|put|delete|patch|all)\s*\|/i;
+  const LOOPT_SERVER_AF = /(?:readdirSync|readFileSync)[\s\S]{0,400}?['"]server['"]|['"]server['"][\s\S]{0,400}?(?:readdirSync|readFileSync)/;
+  const eigenScanner = (bron) => METHODE_ALTERNATIE.test(bron) && LOOPT_SERVER_AF.test(bron);
+
+  const nieuw = [];
+  let bekeken = 0;
+  const scanMap = (d) => {
+    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, f.name);
+      if (f.isDirectory()) { scanMap(p); continue; }
+      if (!f.name.endsWith('.js')) continue;
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      /* Drie bestanden horen hier niet in: de twee die de ENE routelijst maken,
+         en deze keuring zelf -- die draagt het patroon in zijn eigen detectie en
+         zou zichzelf aanwijzen. Dat is precies wat er gebeurde bij het schrijven. */
+      if (rel === 'scripts/lib/routes.js' || rel === 'scripts/routekaart.js' ||
+          rel === 'scripts/check.js') continue;
+      bekeken++;
+      const bron = fs.readFileSync(p, 'utf8');
+      const bouwtRegex = eigenScanner(bron);
+      /* DE OVERTREDING IS DE EIGEN UITDRUKKING, niet het ontbreken van een
+         require. Hier stond eerst "gebruikt hij lib/routes? dan is het goed", en
+         dat gaf meteen een valse vrijspraak: scripts/beproeving.js importeert
+         `isSchakel` uit lib/routes EN heeft daarnaast zijn eigen alleRoutes().
+         Een module lenen voor iets anders is geen bewijs dat je haar routelijst
+         gebruikt. Wie zijn eigen scanner niet meer heeft, is klaar -- dat is de
+         enige toets die niet te omzeilen is met een import erbij. */
+      if (!bouwtRegex) continue;
+      if (BEKENDE_SCANNERS.has(rel)) continue;
+      nieuw.push(rel);
+    }
+  };
+  scanMap(path.join(ROOT, 'scripts'));
+
+  /* De lijst mag alleen krimpen: een naam die zijn eigen scanner kwijt is, hoort
+     eraf. Anders slijt hij tot namen die niets meer zeggen. */
+  const opgelost = [...BEKENDE_SCANNERS.keys()].filter(rel => {
+    const p = path.join(ROOT, rel);
+    if (!fs.existsSync(p)) return true;
+    return !eigenScanner(fs.readFileSync(p, 'utf8'));
+  });
+
+  if (nieuw.length) {
+    for (const rel of nieuw) {
+      fout(rel + ' leidt zijn eigen routelijst uit de brontekst af. Gebruik ' +
+        'scripts/lib/routes.js (die vraagt het aan de router) -- een tweede lijst ' +
+        'komt op een ander getal en niemand ziet het verschil.');
+    }
+  } else if (opgelost.length) {
+    for (const rel of opgelost) {
+      fout(rel + ' gebruikt de gedeelde routelijst nu wel; haal hem van BEKENDE_SCANNERS ' +
+        'in keuringsregel 49 (die lijst mag alleen krimpen).');
+    }
+  } else {
+    ok(bekeken + ' scripts bekeken; geen nieuwe eigen routelijst, ' + BEKENDE_SCANNERS.size +
+      ' erkend op de lijst (die alleen mag krimpen)');
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   57) EEN BROWSER START OP EEN PLEK
+
+   WAT ER GEBEURDE. Deze suite laadde playwright op 123 plekken met dezelfde
+   zesregelige functie onder twee namen (laadBrowser en laadPlaywright), startte
+   hem op 164 plekken met dezelfde letterlijke opties, en sloeg zich over met
+   vijf verschillende zinnen. Op de dag dat de omgeving een andere chromium had
+   dan playwright vroeg, vielen alle 122 browsertoetsen om -- en er was geen plek
+   waar dat te repareren viel. Een waarheid in bijna driehonderd kopieen is geen
+   waarheid maar een gerucht (LAT.md regel 4).
+
+   Erger dan de storing was wat de storing NALIET: het schermjournaal van die
+   ronde zag er identiek uit aan dat van een geslaagde ronde waarin geen enkel
+   scherm werd geopend. Zie test/schermronde.test.js.
+
+   WAT HIJ MEET. Een toetsbestand dat zelf playwright opzoekt of zelf
+   launch-opties samenstelt, in plaats van het aan test/helper.js te vragen.
+
+   WAT HIJ NIET MEET. Of de browser het DOET -- dat merk je vanzelf. Deze regel
+   gaat alleen over waar het antwoord op "hoe start hier een browser" staat. */
+console.log('\n57) een browser start op EEN plek: test/helper.js');
+{
+  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+  const EIGEN_LADER = /function\s+laad(?:Browser|Playwright)\s*\(/;
+  const EIGEN_OPTIES = /\.launch\(\s*\{/;
+  const EIGEN_REDEN = /skip:\s*\w+\s*\?\s*false\s*:/;
+  const overtreders = [];
+  let bekeken = 0;
+  for (const f of fs.readdirSync(path.join(ROOT, 'test'))) {
+    if (!f.endsWith('.js') || f === 'helper.js') continue;
+    /* ZONDER COMMENTAAR. De eerste versie las de hele bron en wees
+       test/skipwacht.test.js aan, die de oude schrijfwijze in zijn KOPTEKST
+       aanhaalt om uit te leggen wat er mis mee was. Een keuring die een
+       toelichting voor een overtreding aanziet, leert je hem te negeren. */
+    const bron = zonderCommentaar(fs.readFileSync(path.join(ROOT, 'test', f), 'utf8'));
+    if (!/chromium/.test(bron)) continue;
+    bekeken++;
+    const wat = [];
+    if (EIGEN_LADER.test(bron)) wat.push('zoekt zelf playwright op');
+    if (EIGEN_OPTIES.test(bron)) wat.push('stelt zelf launch-opties samen');
+    if (EIGEN_REDEN.test(bron)) wat.push('verzint zijn eigen overslaan-reden');
+    if (wat.length) overtreders.push('test/' + f + ': ' + wat.join(', '));
+  }
+  if (overtreders.length) {
+    for (const r of overtreders) fout(r);
+    fout('Vraag het aan test/helper.js: laadPlaywright(), browserOpties(pw) en geenBrowser(pw).');
+  } else {
+    ok(bekeken + ' browsertoetsen halen hun browser bij test/helper.js');
+  }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

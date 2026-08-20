@@ -22,10 +22,10 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadBrowser } = require('./browser');
+const { laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const mob = require('../scripts/mobielkeuring');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const MEET = '(function(){' + mob.BRON + '\nreturn window.__mobielKeur(' + JSON.stringify({
   hand: 'rechts', maat: mob.MAAT, onder: mob.ONDER, smal: mob.SMAL, kwart: mob.ANKERKWART }) + ')})()';
 
@@ -34,8 +34,8 @@ const BLAD = (inhoud) => '<!doctype html><html lang="nl"><head><meta charset="ut
   '<main>' + inhoud + '</main></body></html>';
 
 test('de leegte-meting telt tekst, ook als er een <br> in staat',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  { skip: geenBrowser(pw) }, async () => {
+  const browser = await pw.chromium.launch(browserOpties(pw));
   try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 

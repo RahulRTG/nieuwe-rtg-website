@@ -11,16 +11,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { startServer, stop, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 // telt elke aanraking van de geolocation-API voordat de pagina zelf laadt
 const STUB = `(function () {
@@ -41,11 +34,11 @@ async function aanrakingen(page, base, stand) {
 }
 
 test('GPS-schakelaar: uit is uit, aan is aan',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await volgVerzoeken(page);
     const fouten = [];
@@ -93,11 +86,11 @@ test('GPS-schakelaar: uit is uit, aan is aan',
 const APPS_MET_VRAAG = ['/apps/navigatie.html', '/apps/flits.html', '/apps/ov.html', '/apps/ovdienst.html'];
 
 test('Locatie: de vier apps die een positie nodig hebben, vragen erom',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -139,7 +132,7 @@ const GPS_STUB = (lukt) => `(function () {
 })();`;
 
 test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gps-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -151,7 +144,7 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
     })).json();
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const fouten = [];
 
     // de intake staat anders over de werktafel heen; zie appmenu.e2e.js
@@ -234,11 +227,11 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
    --------------------------------------------------------------------------- */
 
 test('Locatie: geo.js luistert naar dezelfde schakelaar',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

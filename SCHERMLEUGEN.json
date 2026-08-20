@@ -9,5 +9,11 @@
   "waarnemingen": [
     "/apps/berichten.html rendert met een leeg antwoord maar 43 tekens zichtbare tekst, tegen 330-829 bij de andere vijf. Dat is geen leugen -- een leeg gesprekkenoverzicht is de waarheid -- maar het is wel het scherm dat het minst uitlegt wat er aan de hand is. Geen bevinding, wel een aandachtspunt voor wie daar iets aan wil doen."
   ],
-  "schuld": {}
+  "schuld": {},
+  "stempel": {
+    "op": "2026-08-18T11:32:05.411Z",
+    "commit": "b2abfde",
+    "boomVuil": false,
+    "node": "v22.22.2"
+  }
 }

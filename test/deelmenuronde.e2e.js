@@ -38,14 +38,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, wachtTot, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { bundel } = require('../scripts/bundel');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-deelronde-'));
 
 const PROEFPAD = '/apps/zz-deelmenu-ronde-proef.html';
@@ -83,7 +79,7 @@ function telLuisteraars() {
    geen menu te staan en wachten we op de module in plaats van op de balk. */
 async function opstelling(inhoud) {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -114,7 +110,7 @@ function stand() {
 }
 
 test('een deep-link komt ook NA een hertekening op het juiste deel uit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     const ronde1 = await page.evaluate(stand);
@@ -155,7 +151,7 @@ test('een deep-link komt ook NA een hertekening op het juiste deel uit',
 });
 
 test('een MISLUKTE hertekening laat geen menu achter dat kaarten kan verbergen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* De app houdt na zijn hertekening nog maar twee delen over. Dan hoort er
@@ -188,7 +184,7 @@ test('een MISLUKTE hertekening laat geen menu achter dat kaarten kan verbergen',
 });
 
 test('een teruggezette KOPIE van de balk telt niet als menu: de knoppen moeten werken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* Een app die zijn scherm uit een eigen momentopname terugzet, zet de balk
@@ -216,7 +212,7 @@ test('een teruggezette KOPIE van de balk telt niet als menu: de knoppen moeten w
 });
 
 test('een vreemde balk voor de onze wordt opgeruimd, niet eindeloos herbouwd',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* De gevaarlijke vorm: een dode kopie van de balk STAAT VOOR de onze in
@@ -263,7 +259,7 @@ test('een vreemde balk voor de onze wordt opgeruimd, niet eindeloos herbouwd',
 });
 
 test('een pagina die blijft muteren zonder ooit drie delen te krijgen laat de wacht los',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De belofte boven de vergeefs-teller: een chat die berichten blijft
      aanvullen krijgt geen menu EN betaalt geen eeuwige wacht. Dat er een
      grens IS staat hier vast; welk getal die grens is, staat in de code en in

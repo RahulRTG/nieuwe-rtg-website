@@ -16,19 +16,13 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-handel-')); }
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function api(base, pad, body) {
   const r = await fetch(base + '/api' + pad, {
@@ -63,7 +57,7 @@ async function zaakPagina(browser, base, token, fouten) {
 }
 
 test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de wasserij ziet hem staan',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -73,7 +67,7 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     const was = await beheerToken(base, 'LAVANDA');
     assert.ok(club && was, 'beide demozaken horen een beheerder met PIN 1234 te hebben');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     /* ---- de koper: een aanvraag uitzetten, helemaal vanaf het scherm ---- */
     const clubPagina = await zaakPagina(browser, base, club, fouten);

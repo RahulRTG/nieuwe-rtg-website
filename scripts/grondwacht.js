@@ -182,7 +182,7 @@ function versiebronnen(wortel) {
 
 /* ---------- meten, niet aannemen: de experimentele vlaggen --------------- */
 
-/* Een vlag als --experimental-sqlite is een tijdelijke afspraak met de
+/* Een vlag als is een tijdelijke afspraak met de
    runtime, en beide kanten van die afspraak kunnen wegvallen: de vlag kan
    verdwijnen (dan start niets meer) of overbodig worden (dan staat hij voor
    niets in dertig scripts en suggereert hij instabiliteit die er niet is).

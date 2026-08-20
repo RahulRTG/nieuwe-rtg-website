@@ -7,19 +7,13 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -53,7 +47,7 @@ async function bootTest(opts) {
   let browser;
   try {
     const keys = await opts.tokens(base); // { rtg_sup_token: '...', ... }
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     /* DE INTAKE STAAT BUITEN DIT STRAMIEN. Een vers geregistreerd lid is niet
        `klaar`, dus opent app-main het onboardinggesprek en gaat #onbGate open
@@ -88,7 +82,7 @@ async function bootTest(opts) {
 }
 
 test('Leverancier-app: de zaak-backoffice komt beveiligd op',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/leverancier.html',
     tokens: async (base) => {
@@ -102,7 +96,7 @@ test('Leverancier-app: de zaak-backoffice komt beveiligd op',
 });
 
 test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/app.html?pas=business',
     tokens: async (base) => {
@@ -168,7 +162,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
 });
 
 test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DEZE TOETS WEES NAAR EEN PAGINA DIE VERHUISD IS.
 
      Hij opende /apps/wallet.html en zocht #ledenpas .ledenpas .cn. Dat pad is
@@ -197,7 +191,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
     await ctx.addInitScript(t => {
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
@@ -246,7 +240,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
 });
 
 test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -254,7 +248,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     const reg = await api(base, '/api/auth/register', { name: 'Lid EN', email: 'appen@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -282,7 +276,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
 });
 
 test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt doorgezet',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -308,7 +302,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     const ref = ord.order.ref;
 
     // de leverancier opent de app en gaat via Meer naar Orders
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -345,7 +339,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
 });
 
 test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -354,7 +348,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
@@ -441,7 +435,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
 });
 
 test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De balk onderaan was een doorgeefluik naar zijn app; nu is het een gesprek
      dat op het beginscherm staat. Twee dingen die echt moeten kloppen: hij
      BEGINT uit zichzelf (anders is hij niet proactief, alleen aanwezig), en een
@@ -455,7 +449,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
@@ -540,12 +534,12 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
 });
 
 test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwijnt weer',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
@@ -576,7 +570,7 @@ test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwij
 });
 
 test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/backoffice.html',
     tokens: async (base) => {
@@ -610,12 +604,12 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
    toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
    vak alsnog scheef wordt getrokken. */
 test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     // een smalle, hoge telefoon: juist daar knijpt max-width de breedte af
     const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
     await ctx.addInitScript(() => {
@@ -644,7 +638,7 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
 });
 
 test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DIT IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT, en allebei de keren
      zag je het pas op een afdruk. Eerst zweefde de mond tientallen pixels onder
      de klok; daarna werd hij opgetrokken tot hij "aansloot", en toen begon de
@@ -664,7 +658,7 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     // twee maten: de verhouding hoort op allebei dezelfde te zijn
     for (const maat of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
       const ctx = await browser.newContext({ viewport: maat });
@@ -735,7 +729,7 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
    De toets meet allebei de kanten, want een reparatie die alleen de ene kant
    vastlegt kan de andere stilletjes weer stukmaken. */
 test('Leden-app: een verse start begint thuis, een onderbreking van seconden niet',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -744,7 +738,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const actieveView = async (page) => page.evaluate(() => {
       const v = document.querySelector('.view.active');
       return v ? v.getAttribute('data-view') : null;

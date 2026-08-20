@@ -102,10 +102,7 @@ function setOnderwijs(o, l) { onderwijsKern = o; if (l) leerstofKern = l; }
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-  /* Allebei als FUNCTIE en niet als waarde: deze module wordt bij het
-     opstarten een keer opgebouwd, en dan bestaan de kernen nog niet. Een
-     getter helpt niet -- die wordt bij het doorgeven al uitgelezen. */
-  onderwijs: () => onderwijsKern, leerstof: () => leerstofKern, rtfHandle });
+  teVaak, misluktePoging, ipVan });
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 

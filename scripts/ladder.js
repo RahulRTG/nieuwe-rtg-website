@@ -32,6 +32,7 @@
    Env: LADDER_SEED (deterministische rommel), LADDER_PORT.
    ============================================================================ */
 'use strict';
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -212,7 +213,7 @@ async function main() {
   console.log('\n' + K.vet + 'DE LADDER' + K.reset + K.grijs + '  van een onhandige kleuter tot de slimste aanvaller' + K.reset);
 
   if (!BASIS_EXTERN) {
-    srv = bootEigen(); base = srv.base;
+    srv = await bootEigen(); base = srv.base;
     const gezond = await wachtGezond(maakVraag('127.0.0.1', PORT));
     if (!gezond) { console.log('\n  ' + K.rood + 'de server werd niet gezond op ' + base + K.reset + '\n'); try { srv.child.kill('SIGKILL'); } catch (e) {} return 1; }
   }

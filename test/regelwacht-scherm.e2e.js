@@ -15,14 +15,14 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
 const CODE = 'KANTOOR-REGELWACHT-1';
 
 test('de Regelwacht laat zien wat er veranderde, en wat het verving',
-  { skip: pw ? false : 'geen browser beschikbaar' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rwscherm-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   let browser;
@@ -49,7 +49,7 @@ test('de Regelwacht laat zien wat er veranderde, en wat het verving',
     await post('/api/office/bank/regels/update',
       { landen: { NL: { tarieven: { eten: 11 } } }, versie: 'toets-2' }, kantoor);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1200 } });
     await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) {} }, kantoor);
     const page = await ctx.newPage();

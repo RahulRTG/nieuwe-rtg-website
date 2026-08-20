@@ -23,7 +23,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken, browserOpties } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -53,7 +53,7 @@ const KANDIDATEN = kandidaten();
 async function start() {
   let laatste = null;
   for (const k of KANDIDATEN) {
-    try { return await k.chromium.launch({ args: ['--no-sandbox'] }); } catch (e) { laatste = e; }
+    try { return await k.chromium.launch(browserOpties(pw)); } catch (e) { laatste = e; }
   }
   throw laatste || new Error('geen browser');
 }

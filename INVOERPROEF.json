@@ -1,6 +1,56 @@
 {
+ "stempel": {
+  "op": "2026-08-18T07:23:23.509Z",
+  "commit": "65b7a77",
+  "boomVuil": true,
+  "node": "v22.22.2"
+ },
  "uitleg": "Per route: rommel met de JUISTE rol, en of er een 5xx of een intern spoor uit kwam. Een route die hier NIET in staat is niet beproefd. Een route met invoer:\"poort\" stond achter een tweede grendel en is ONGEMETEN, geen groen. Zie scripts/lib/invoerproef.js voor de grens.",
  "seed": 20260812,
+ "nietBeproefbaar": 737,
+ "redenenNietBeproefbaar": [
+  {
+   "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
+   "aantal": 522
+  },
+  {
+   "reden": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
+   "aantal": 62
+  },
+  {
+   "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
+   "aantal": 44
+  },
+  {
+   "reden": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 28
+  },
+  {
+   "reden": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache",
+   "aantal": 23
+  },
+  {
+   "reden": "geenBewaker: mw+mw -- geen autorisatielaag -- alleen een rem of cache",
+   "aantal": 22
+  },
+  {
+   "reden": "lichaamssleutel: rtfPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 17
+  },
+  {
+   "reden": "lichaamssleutel: gastAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 16
+  },
+  {
+   "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 2
+  },
+  {
+   "reden": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker",
+   "aantal": 1
+  }
+ ],
+ "routesGevonden": 4103,
  "gemeten": {
   "routesMetRol": 3080,
   "bereikt": 2634,
@@ -420,7 +470,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -429,23 +479,23 @@
    "pad": "/api/auth/password",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
-   "statussen": [
-    400,
-    403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/auth/resend",
-   "rol": "member",
-   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/auth/resend",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
   },
   {
    "methode": "POST",
@@ -509,7 +559,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -554,12 +604,24 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/bank/advies",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/afschrift",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -585,12 +647,11 @@
    "pad": "/api/bank/afschrift.csv",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -645,10 +706,9 @@
    "pogingen": 2,
    "invoer": "poort",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -702,12 +762,11 @@
    "pad": "/api/bank/overboek",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -736,12 +795,11 @@
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -772,6 +830,18 @@
    "pad": "/api/bank/pas/uitgeven",
    "rol": "member",
    "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/passen",
+   "rol": "member",
+   "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     403,
@@ -791,7 +861,19 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/bank/rekening",
+   "pad": "/api/bank/rekening/open",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/rente-voorbeeld",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -829,6 +911,17 @@
    "pad": "/api/bank/salaris",
    "rol": "member",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/sepa",
+   "rol": "member",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -838,7 +931,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/bank/sepa",
+   "pad": "/api/bank/spaardoel",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -864,12 +957,11 @@
    "pad": "/api/bank/storten",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -915,6 +1007,29 @@
     400,
     403
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/terugkerend/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/van-wallet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -1016,8 +1131,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -1094,7 +1209,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -1292,7 +1407,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -1327,6 +1442,194 @@
     400,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/ai",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/keuze",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/proef",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/stap",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/betalingen/status",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/onboarding",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/onboarding/ai",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/persoon",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/reset",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/status",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/storing",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/taal",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/talen",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/toepassen",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/wachter",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boardroom/zet",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -1445,7 +1748,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -1479,7 +1782,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -1544,7 +1847,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -1567,7 +1870,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -1677,7 +1980,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -1729,11 +2032,12 @@
    "pad": "/api/chat/send",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -1764,7 +2068,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -1820,7 +2124,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -2215,7 +2519,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -2238,7 +2542,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -2314,7 +2618,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -2347,7 +2651,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -2359,7 +2663,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -2402,7 +2706,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -2413,7 +2717,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -2458,7 +2762,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -2501,7 +2805,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -2523,7 +2827,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -2557,7 +2861,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -2612,7 +2916,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -2688,7 +2992,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -2721,7 +3025,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    409,
     400
    ]
   },
@@ -2920,7 +3224,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -2997,7 +3301,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -3007,7 +3311,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -3118,7 +3422,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -3194,7 +3498,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -3216,7 +3520,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -3271,7 +3575,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -3513,7 +3817,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -3535,7 +3839,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -3591,7 +3895,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -3646,7 +3950,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -3690,7 +3994,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -3723,7 +4027,18 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/classificeer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
    ]
   },
   {
@@ -3844,7 +4159,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -3876,7 +4191,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     400
    ]
   },
@@ -4047,6 +4362,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/gast/bezorg/kaart",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/gast/bezorg/mijn",
    "rol": "member",
    "pogingen": 2,
@@ -4097,7 +4423,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -4107,7 +4433,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -4174,7 +4500,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -4311,7 +4637,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/gemeente/afval",
+   "pad": "/api/gemeente/afspraken/mijn",
    "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
@@ -4322,14 +4648,26 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/gemeente/bekendmaking",
-   "rol": "supplier",
+   "pad": "/api/gemeente/afval",
+   "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    403,
-    400
+    200,
+    200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/bekendmaking",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -4405,7 +4743,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    200
    ]
   },
   {
@@ -4457,12 +4795,11 @@
    "pad": "/api/gemeente/regie",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -4491,12 +4828,11 @@
    "pad": "/api/gemeente/vergunning/beslis",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -4592,11 +4928,24 @@
    "pad": "/api/genootschap/ai/aankondiging",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/ai/datum",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -5091,7 +5440,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -5112,7 +5461,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -5157,7 +5506,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -5246,12 +5595,44 @@
    "pad": "/api/ik/zet",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/event",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/instant-reality/partner",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -5266,7 +5647,194 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/kantoor/wereld",
+   "pad": "/api/kantoorpakket/aanwezig",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ai",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/beheer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/bewaar",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/deel",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/fase",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/maak",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/mijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/open",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/opmerking",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/samen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/ster",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/terug",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/uitslag",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/versies",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/vul",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoorpakket/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets",
    "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
@@ -5359,7 +5927,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -5412,11 +5980,12 @@
    "pad": "/api/kmar/cockpit",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -5473,8 +6042,9 @@
    "invoer": "dicht",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -5518,7 +6088,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -5606,8 +6176,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -5761,7 +6331,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -5772,7 +6342,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -5827,7 +6397,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -5837,7 +6407,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -5859,7 +6429,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -5947,7 +6517,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -6080,7 +6650,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -6090,8 +6660,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -6124,7 +6694,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -6233,7 +6803,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -6354,7 +6924,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -6387,8 +6957,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -6431,7 +7001,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -6464,8 +7034,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -6486,7 +7056,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -6564,7 +7134,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -6585,8 +7155,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -6651,7 +7221,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -6662,8 +7232,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
-    400
+    400,
+    409
    ]
   },
   {
@@ -6684,7 +7254,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -6726,12 +7296,11 @@
    "pad": "/api/lucht/bagage",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -6796,12 +7365,11 @@
    "pad": "/api/lucht/charters",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -6878,11 +7446,12 @@
    "pad": "/api/lucht/security/zet",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -6927,7 +7496,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    403
    ]
   },
   {
@@ -7029,7 +7598,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -7051,7 +7620,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -7095,7 +7664,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -7393,7 +7962,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -7404,7 +7973,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -7436,8 +8005,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -7492,7 +8061,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -7514,7 +8083,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -7601,8 +8170,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -7700,7 +8269,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -7744,7 +8313,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -7756,7 +8325,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    200
    ]
   },
   {
@@ -7821,7 +8390,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -7918,11 +8487,12 @@
    "pad": "/api/member/berichten/afspraken",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
-    400
-   ]
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -7941,12 +8511,11 @@
    "pad": "/api/member/berichten/samenvatting",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -8075,12 +8644,11 @@
    "pad": "/api/member/bureau/beveiliging",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -8111,12 +8679,11 @@
    "pad": "/api/member/bureau/beveiliging/incident",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -8134,11 +8701,12 @@
    "pad": "/api/member/bureau/beveiliging/incident",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -8179,12 +8747,11 @@
    "pad": "/api/member/bureau/beveiliging/risico/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -8196,6 +8763,18 @@
     403,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -8273,11 +8852,12 @@
    "pad": "/api/member/bureau/collectie/taxatie",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -8364,22 +8944,24 @@
    "pad": "/api/member/bureau/dieren/dier",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/dier/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -8398,11 +8980,12 @@
    "pad": "/api/member/bureau/dieren/document/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -8553,8 +9136,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    403
+    403,
+    400
    ]
   },
   {
@@ -8667,12 +9250,11 @@
    "pad": "/api/member/bureau/relaties/band/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -8722,6 +9304,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/bureau/reputatie",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/bureau/reputatie/lijn",
    "rol": "member",
    "pogingen": 2,
@@ -8754,6 +9347,17 @@
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/optreden",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -8820,12 +9424,11 @@
    "pad": "/api/member/bureau/termijnen",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -8843,12 +9446,11 @@
    "pad": "/api/member/bureau/twin",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -8916,8 +9518,9 @@
    "invoer": "dicht",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -9074,8 +9677,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    400
+    400,
+    200
    ]
   },
   {
@@ -9263,7 +9866,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -9328,7 +9931,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -9450,7 +10053,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -9458,12 +10061,11 @@
    "pad": "/api/member/lifestyle/ai",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -9589,6 +10191,18 @@
    "pad": "/api/member/lifestyle/gezondheid/dossier/weg",
    "rol": "member",
    "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid/dossier/weg",
+   "rol": "member",
+   "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     403,
@@ -9612,12 +10226,11 @@
    "pad": "/api/member/lifestyle/voorkeuren",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -9638,9 +10251,10 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -9942,6 +10556,281 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/magnaat/controle/taak/maak",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/taak/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/zelftest",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/controle/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/analyse",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/beslis",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/schok",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/economie/volgende-dag",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/kantoor/kies",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/overzicht",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/partner/stap",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/partner/start",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/actie",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/handeling",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/taak/start",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/actie",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/bedien",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/deelnemen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/maak",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/mijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/rol",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/teamkamer/start",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/magnaat/werkproces/start",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/naam/lijst",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/naam/wie",
    "rol": "member",
    "pogingen": 2,
@@ -9980,7 +10869,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -10135,7 +11024,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -10220,12 +11109,11 @@
    "pad": "/api/member/rechterhand/ai",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -10254,11 +11142,12 @@
    "pad": "/api/member/rechterhand/attenties/gift",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -10279,9 +11168,10 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -10300,11 +11190,12 @@
    "pad": "/api/member/rechterhand/cellier",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -10333,11 +11224,12 @@
    "pad": "/api/member/rechterhand/cellier",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -10366,18 +11258,6 @@
    "pad": "/api/member/rechterhand/cellier/zet",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
-   "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/member/rechterhand/cercle",
-   "rol": "member",
-   "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     403,
@@ -10398,6 +11278,18 @@
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/club",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/club/weg",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -10459,12 +11351,11 @@
    "pad": "/api/member/rechterhand/cercle/waarheen",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -10620,12 +11511,11 @@
    "pad": "/api/member/rechterhand/hangar",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -10666,6 +11556,18 @@
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar/vlucht/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -10738,6 +11640,17 @@
    "pad": "/api/member/rechterhand/maison",
    "rol": "member",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/log",
+   "rol": "member",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -10798,24 +11711,22 @@
    "pad": "/api/member/rechterhand/maison/taak",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/taak/klaar",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -10854,6 +11765,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rechterhand/mecenaat/betaald",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rechterhand/mecenaat/gift",
    "rol": "member",
    "pogingen": 2,
@@ -10880,12 +11802,11 @@
    "pad": "/api/member/rechterhand/nalatenschap",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -10903,33 +11824,36 @@
    "pad": "/api/member/rechterhand/nalatenschap/contact/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/doc",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/doc/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -10985,8 +11909,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    403
+    403,
+    400
    ]
   },
   {
@@ -11078,6 +12002,17 @@
    "invoer": "poort",
    "statussen": [
     403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/menu",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
@@ -11130,14 +12065,27 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rendezvous/date",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rendezvous/kandidaten",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -11243,6 +12191,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/afwezig",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/alias",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/assist",
    "rol": "member",
    "pogingen": 2,
@@ -11276,7 +12257,273 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/bewaarbeleid",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaartermijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bewaring",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlage",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/bijlagen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/classificeer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/bewaar",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/verstuur",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concept/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/concepten",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegatie/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/delegeer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/documenten",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/draad",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/etiket",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/export",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/gesprekken",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/handtekening",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/hulp",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/intrekken",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutel",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/imap/sleutels",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/rtmail/inbox",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/instellingen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/journaal",
    "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
@@ -11292,8 +12539,96 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/opruimen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/rechten",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/maak",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regel/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/regels",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/sluimer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/ster",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
    ]
   },
   {
@@ -11496,6 +12831,61 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/rtmail/vernietigingen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/verplaats",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/workflow",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/zoek",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snap/opdracht",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/snap/send",
    "rol": "member",
    "pogingen": 2,
@@ -11529,13 +12919,475 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/member/spel/",
+   "pad": "/api/member/spel/antwoord",
    "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     400,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-bord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/arcade-score",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-klaar",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/dag-start",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/kijk",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/klasgenoten",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/mijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nabespreking",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/naspelen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/nieuw",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/online",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/opgeven",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/praat-stuur",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/prestaties",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-open",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/projectie-sluit",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/rahul",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/random",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/replay",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-bord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sneek-score",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/staat",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/stand",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-klaar",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    409,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/sudoku-nieuw",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-mijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nieuw",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-nodig",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/team-verlaat",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-mijn",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-nieuw",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toernooi-staat",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/toewijzen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/uitslagen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/varianten",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/zichtbaar-zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
    ]
   },
   {
@@ -11567,7 +13419,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -11655,7 +13507,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -11710,7 +13562,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -11722,7 +13574,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -11974,7 +13826,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -12084,7 +13936,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -12117,7 +13969,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -12260,7 +14112,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -12357,12 +14209,11 @@
    "pad": "/api/munt/verzoek",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
+    400,
     503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -12481,7 +14332,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -12547,7 +14398,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -12569,7 +14420,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -12669,7 +14520,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -12800,9 +14651,21 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/aidata/export",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -12845,7 +14708,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -12910,7 +14773,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -12988,7 +14851,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -13032,7 +14895,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -13043,7 +14906,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -13086,7 +14949,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -13186,33 +15049,48 @@
    "pad": "/api/office/balie/klacht/status",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/balie/zetel",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/balie/zetels",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/office/balie/zoek",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/balie/zoek",
-   "rol": "office",
-   "pogingen": 2,
-   "invoer": "dicht",
-   "statussen": [
-    400,
-    403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -13238,7 +15116,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/autoriseer/annuleer",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/autoriseer/bevestig",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/bevoegdheid",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/draai",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/gezond",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
@@ -13249,23 +15174,12 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/office/bank/gezond",
-   "rol": "office",
-   "pogingen": 2,
-   "invoer": "dicht",
-   "statussen": [
-    400,
-    200
-   ]
-  },
-  {
-   "methode": "POST",
    "pad": "/api/office/bank/herstel",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -13287,7 +15201,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -13337,13 +15251,25 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/modus",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/bank/nood",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -13354,7 +15280,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    200
+    400
    ]
   },
   {
@@ -13378,6 +15304,18 @@
     200,
     200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/operationeel",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -13452,8 +15390,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -13491,6 +15429,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/bank/vergunning",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/betalingen/status",
    "rol": "office",
    "pogingen": 2,
@@ -13509,6 +15459,157 @@
    "statussen": [
     403,
     403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/ai",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/genre",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/magnaat/besluit",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/magnaat/leren",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/rahul",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/rahul/zet",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/schakel",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/schakel-fijn",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang/geef",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/toegang/weg",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/boardroom/verbeter",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
@@ -13619,7 +15720,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    404
    ]
   },
   {
@@ -13932,6 +16033,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/journaal",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/journaal/beeld",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/kachat",
    "rol": "office",
    "pogingen": 2,
@@ -13970,7 +16095,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -13981,7 +16106,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     400
    ]
   },
@@ -14064,6 +16189,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/kantoorpakket/beheer",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/kantoorpakket/bewaar",
    "rol": "office",
    "pogingen": 2,
@@ -14087,6 +16223,17 @@
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/fase",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/maak",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
@@ -14126,6 +16273,28 @@
    "statussen": [
     404,
     400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/opmerking",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/kantoorpakket/samen",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
    ]
   },
   {
@@ -14226,6 +16395,148 @@
     200,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/ledenregister",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/beslis",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/gaten/plan",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/overzicht",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/taak/maak",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/taak/zet",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/zelftest",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/controle/zet",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/partner/beslis",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/partners",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/scan",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/magnaat/status",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -14339,13 +16650,25 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/mall/zet",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/merk/haal",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -14388,7 +16711,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -14422,7 +16745,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -14487,7 +16810,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -14499,7 +16822,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -14510,7 +16833,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -14608,7 +16931,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -14663,7 +16986,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -14713,14 +17036,94 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/paniek/besluit",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/paniek/stel",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/antwoord",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/document",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/papieren/documenten",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/partner/decide",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/partner/status",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -14752,7 +17155,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -14796,7 +17199,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -14872,8 +17275,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -14961,7 +17364,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -14982,7 +17385,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -15016,7 +17419,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -15054,6 +17457,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/platformregister",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/podium",
    "rol": "office",
    "pogingen": 2,
@@ -15071,7 +17485,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -15148,7 +17562,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -15258,7 +17672,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -15351,6 +17765,28 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/routedekking",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/routedossier",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/rtgai",
    "rol": "office",
    "pogingen": 2,
@@ -15403,6 +17839,30 @@
     200,
     200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/belang",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/belang/beoordeel",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -15488,8 +17948,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -15565,7 +18025,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -15676,7 +18136,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -15736,6 +18196,100 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/techniek",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/besluit",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/noodstop",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/schakel",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/test",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/integraties/verantwoordelijke",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/techniek/lastafworp",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/theater",
    "rol": "office",
    "pogingen": 2,
@@ -15763,7 +18317,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -15907,7 +18461,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -15940,7 +18494,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -15973,7 +18527,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -16160,7 +18714,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -16203,7 +18757,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -16215,7 +18769,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -16247,8 +18801,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -16258,7 +18812,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -16270,7 +18824,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -16347,7 +18901,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -16423,7 +18977,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -16489,7 +19043,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -16599,8 +19153,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    400
+    400,
+    200
    ]
   },
   {
@@ -16643,7 +19197,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -16688,7 +19242,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -16811,6 +19365,18 @@
     200,
     200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/wereld/actie",
+   "rol": "boardroom",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -17053,7 +19619,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -17108,7 +19674,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -17173,7 +19739,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -17206,7 +19772,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -17306,7 +19872,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -17371,7 +19937,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -17437,7 +20003,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -17503,7 +20069,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -17514,7 +20080,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -17543,6 +20109,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/ontmoeten/hier",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/ontmoeten/hier-date",
    "rol": "member",
    "pogingen": 2,
@@ -17558,24 +20135,22 @@
    "pad": "/api/ontmoeten/kies",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/ontmoeten/signaal",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -17593,12 +20168,11 @@
    "pad": "/api/ontmoeten/state",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -17616,12 +20190,11 @@
    "pad": "/api/ontmoeten/teken",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -17653,7 +20226,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -17782,6 +20355,87 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/ov/operatie/annuleer",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/bevestig",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/concept",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operatie/segment",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/operaties",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/regie",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ov/regie/zet",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/ov/uit",
    "rol": "member",
    "pogingen": 2,
@@ -17888,12 +20542,11 @@
    "pad": "/api/overheid/bd/btw/aansluiting",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -17946,12 +20599,11 @@
    "pad": "/api/overheid/bd/naheffing/aanmaning",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -18025,7 +20677,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/regeling",
+   "pad": "/api/overheid/bd/naheffing/maak",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "poort",
@@ -18034,30 +20686,39 @@
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/regeling",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/stelvast",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/stop",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -18145,7 +20806,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -18199,11 +20860,12 @@
    "pad": "/api/overheid/bieb",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -18226,6 +20888,17 @@
    "statussen": [
     400,
     403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bieb/mijn",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
    ]
   },
   {
@@ -18290,11 +20963,12 @@
    "pad": "/api/overheid/pda/ai",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -18442,12 +21116,11 @@
    "pad": "/api/overheid/pda/taken",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -18487,11 +21160,12 @@
    "pad": "/api/overheid/rb/beroep",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -18568,12 +21242,11 @@
    "pad": "/api/overheid/rb/zitting",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -18647,12 +21320,11 @@
    "pad": "/api/overheid/subsidie/beslis",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -18774,6 +21446,18 @@
    "pad": "/api/overheid/uitgifte/teken",
    "rol": "supplier",
    "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/uitgifte/teken",
+   "rol": "supplier",
+   "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     400,
@@ -18842,12 +21526,11 @@
    "pad": "/api/overheid/verkiezing/sluit",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -18890,7 +21573,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    200
    ]
   },
   {
@@ -18898,12 +21581,11 @@
    "pad": "/api/overheid/water/melding/zet",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -18946,7 +21628,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -19023,7 +21705,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -19113,7 +21795,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -19244,12 +21926,11 @@
    "pad": "/api/pin/zet",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -19380,7 +22061,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -19480,7 +22161,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -19776,7 +22457,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -19876,7 +22557,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -19952,7 +22633,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -20026,6 +22707,159 @@
   {
    "methode": "POST",
    "pad": "/api/rtf/koppel",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/advies",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/bijles/gesprek",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/bijles/vraag",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/examen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/examen-antwoord",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/inschrijf",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/jaar-over",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/ladder",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/les",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/oefen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/paspoort",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leerling/vakken",
    "rol": "member",
    "pogingen": 2,
    "invoer": "poort",
@@ -20192,12 +23026,11 @@
    "pad": "/api/rtf/meldingen/gelezen",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -20215,11 +23048,24 @@
    "pad": "/api/rtf/overzicht",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/profielen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -20261,8 +23107,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -20294,7 +23140,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -20327,7 +23173,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -20437,8 +23283,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -20476,7 +23322,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/rtfos/",
+   "pad": "/api/rtfkantoor/stadsraad/stem",
    "rol": "office",
    "pogingen": 2,
    "invoer": "dicht",
@@ -20525,8 +23371,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -20569,7 +23415,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -20647,11 +23493,12 @@
    "pad": "/api/rtfos/benchmark",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -20715,7 +23562,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -20734,12 +23581,13 @@
    "methode": "POST",
    "pad": "/api/rtfos/blauwdrukken",
    "rol": "office",
-   "pogingen": 3,
-   "invoer": "dicht",
+   "pogingen": 4,
+   "invoer": "poort",
    "statussen": [
     401,
-    400
-   ]
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -20748,7 +23596,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -20770,7 +23618,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -20870,7 +23718,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -21011,12 +23859,11 @@
    "pad": "/api/rtfos/herkomst/beoordeel",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -21134,12 +23981,11 @@
    "pad": "/api/rtfos/jaarverslagen",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -21149,7 +23995,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -21162,6 +24008,18 @@
     400,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/koppelbord",
+   "rol": "office",
+   "pogingen": 4,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -21294,7 +24152,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -21316,7 +24174,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -21425,7 +24283,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -21448,7 +24306,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -21628,7 +24486,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -21738,8 +24596,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    404
+    404,
+    400
    ]
   },
   {
@@ -21783,7 +24641,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -21860,8 +24718,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -21992,7 +24850,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -22037,7 +24895,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -22137,6 +24995,17 @@
    "statussen": [
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtgone/automatisering/voer",
+   "rol": "office",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
    ]
   },
   {
@@ -22243,22 +25112,24 @@
    "pad": "/api/rtgone/rol/geef",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
-    400
-   ]
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/rtgone/rol/trek",
    "rol": "office",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -22345,7 +25216,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -22355,7 +25226,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -22443,7 +25314,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -22509,7 +25380,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -22531,8 +25402,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    400
+    400,
+    200
    ]
   },
   {
@@ -22586,7 +25457,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -22621,6 +25492,17 @@
    "statussen": [
     404,
     400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/scim/v2/Users",
+   "rol": "scim",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
    ]
   },
   {
@@ -22730,8 +25612,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    404
+    404,
+    400
    ]
   },
   {
@@ -22742,7 +25624,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -22774,7 +25656,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -22797,7 +25679,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -22867,6 +25749,17 @@
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sleutelwoorden/weg",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -22998,7 +25891,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -23052,7 +25945,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -23097,12 +25990,11 @@
    "pad": "/api/sport/kamp/vraag",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -23203,6 +26095,17 @@
    "pad": "/api/sport/sponsor/beslis",
    "rol": "supplier",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/sport/sponsor/maak",
+   "rol": "supplier",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -23273,11 +26176,12 @@
    "pad": "/api/sport/uitslag",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -23296,12 +26200,11 @@
    "pad": "/api/sport/velden",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -23323,7 +26226,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    200
    ]
   },
   {
@@ -23399,6 +26302,17 @@
    "pad": "/api/staff/dm/history",
    "rol": "supplier",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/dm/lijst",
+   "rol": "supplier",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -23422,6 +26336,17 @@
    "pad": "/api/staff/dm/send",
    "rol": "supplier",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/doe",
+   "rol": "supplier",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -23431,7 +26356,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/staff/doe",
+   "pad": "/api/staff/doe/bevestig",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "poort",
@@ -23504,24 +26429,22 @@
    "pad": "/api/staff/fluister/focus",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/staff/fluister/profiel",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -23589,6 +26512,17 @@
     403
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/mine",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
   },
   {
    "methode": "POST",
@@ -23667,11 +26601,12 @@
    "pad": "/api/staff/mob/mijn",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
-    400
-   ]
+    503,
+    503
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -23696,6 +26631,17 @@
     503
    ],
    "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/staff/mob/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    503
+   ]
   },
   {
    "methode": "POST",
@@ -23736,12 +26682,11 @@
    "pad": "/api/staff/oog/nulmeting/van",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -23783,12 +26728,11 @@
    "pad": "/api/staff/ov/checkin",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -23830,11 +26774,12 @@
    "pad": "/api/staff/ov/pos",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     503,
-    400
-   ]
+    503
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -24016,6 +26961,52 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/advies",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/afspraak",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/advies/dossier/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/agenda/ai",
    "rol": "supplier",
    "pogingen": 2,
@@ -24077,7 +27068,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -24109,7 +27100,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
+    400,
     409
    ]
   },
@@ -24120,7 +27111,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     400
    ]
   },
@@ -24199,12 +27190,11 @@
    "pad": "/api/supplier/alpine/lift",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -24213,8 +27203,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    403,
-    400
+    400,
+    403
    ]
   },
   {
@@ -24261,7 +27251,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -24318,6 +27308,76 @@
     403,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/boek",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/uren",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/beauty/walkin/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -24492,7 +27552,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -24557,8 +27617,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
-    409
+    400,
+    400
    ]
   },
   {
@@ -24580,7 +27640,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -24635,7 +27695,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    400
+    409
    ]
   },
   {
@@ -24887,7 +27947,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    409,
     409
    ]
   },
@@ -24920,7 +27980,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -24932,7 +27992,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -25240,7 +28300,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -25305,7 +28365,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -25338,8 +28398,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    404
+    404,
+    400
    ]
   },
   {
@@ -25426,7 +28486,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    200,
     200
    ]
   },
@@ -25437,7 +28497,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -25592,7 +28652,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -25668,7 +28728,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
+    400,
     409
    ]
   },
@@ -25679,7 +28739,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    409,
     409
    ]
   },
@@ -25839,6 +28899,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/door/zet",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/dorp",
    "rol": "supplier",
    "pogingen": 2,
@@ -25888,7 +28959,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -25922,7 +28993,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -25932,8 +29003,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    404
+    400,
+    400
    ]
   },
   {
@@ -26064,8 +29135,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -26089,6 +29160,99 @@
     200,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/baan",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkin",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/checkout",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/les/in",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/lid",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/fitclub/pt/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -26130,9 +29294,33 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    403
+    403,
+    400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gebouw/badge",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/gebouw/badge/zet",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -26243,12 +29431,11 @@
    "pad": "/api/supplier/gebouw/valet/status",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -26368,7 +29555,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -26391,7 +29578,7 @@
    "invoer": "dicht",
    "statussen": [
     400,
-    400
+    200
    ]
   },
   {
@@ -26467,7 +29654,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -26480,6 +29667,86 @@
    "statussen": [
     400,
     400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/baan",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/les/klaar",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/tee/weg",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/golf/wedstrijd/in",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
    ]
   },
   {
@@ -26512,7 +29779,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -26672,6 +29939,39 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/arrival/promise",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/arrivals",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/autopilot",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/betaal",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
@@ -26885,7 +30185,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -27204,7 +30504,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -27282,7 +30582,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -27355,6 +30655,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/horeca/keuken/bord",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/horeca/keuken/druk",
    "rol": "supplier",
    "pogingen": 2,
@@ -27383,7 +30694,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -27405,7 +30716,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -27415,7 +30726,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -27548,7 +30859,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -27592,7 +30903,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -27604,7 +30915,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -27654,6 +30965,72 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/spatial",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/venue/concept",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/venue/publiceer",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/verzoeken",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/simulatie/voorstellen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wave/activeer",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    409,
+    409
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/horeca/wave/voorstel",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
@@ -27779,8 +31156,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -27792,6 +31169,17 @@
    "statussen": [
     400,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/hr/inwerk/vink",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
    ]
   },
   {
@@ -27846,7 +31234,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -27878,7 +31266,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    409,
     409
    ]
   },
@@ -27989,7 +31377,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -28011,7 +31399,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -28077,7 +31465,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -28137,6 +31525,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/aanwezig",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/ai",
    "rol": "supplier",
    "pogingen": 2,
@@ -28154,6 +31553,17 @@
    "invoer": "dicht",
    "statussen": [
     404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/beheer",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
     404
    ]
   },
@@ -28247,6 +31657,28 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/opmerking",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/kantoorpakket/samen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/ster",
    "rol": "supplier",
    "pogingen": 2,
@@ -28308,7 +31740,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -28415,11 +31847,12 @@
    "pad": "/api/supplier/keten/bericht",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
-    400
-   ]
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -28437,11 +31870,12 @@
    "pad": "/api/supplier/keten/gesprek",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -28460,11 +31894,12 @@
    "pad": "/api/supplier/keten/groep/maak",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -28495,12 +31930,11 @@
    "pad": "/api/supplier/keten/rampbeeld/evaluatie",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -28564,7 +31998,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    409,
     409
    ]
   },
@@ -28586,7 +32020,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -28719,7 +32153,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -28917,7 +32351,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -28927,7 +32361,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -28936,12 +32370,11 @@
    "pad": "/api/supplier/marina",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -29113,7 +32546,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -29157,7 +32590,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -29212,7 +32645,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -29343,18 +32776,19 @@
    "pad": "/api/supplier/mob/beleid",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     503,
-    400
-   ]
+    503
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/mob/cdt",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     503,
     400
@@ -29411,11 +32845,12 @@
    "pad": "/api/supplier/mob/cdt/regime",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     503,
-    400
-   ]
+    503
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -29446,11 +32881,12 @@
    "pad": "/api/supplier/mob/overboeken",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    503,
     503
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -29480,12 +32916,11 @@
    "pad": "/api/supplier/mob/pendel/plan",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     503,
-    503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -29522,6 +32957,17 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/mob/plekken",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    503
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/mob/spoor",
    "rol": "supplier",
    "pogingen": 2,
@@ -29537,11 +32983,12 @@
    "pad": "/api/supplier/mob/telefoon",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    503,
     503
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -29572,12 +33019,11 @@
    "pad": "/api/supplier/mob/voertuig",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    503,
+    400,
     503
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -29607,11 +33053,12 @@
    "pad": "/api/supplier/mob/voorstel",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    503,
     503
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -29644,7 +33091,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -29678,7 +33125,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -29711,7 +33158,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -29719,11 +33166,12 @@
    "pad": "/api/supplier/net/bericht",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -29766,7 +33214,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -29776,7 +33224,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -29821,7 +33269,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -29838,12 +33286,83 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/order/sectie",
+   "pad": "/api/supplier/opvang",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/kind/ophaal",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/nanny/zet",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/opvang/verslag",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/order/sectie",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
     404
    ]
   },
@@ -29964,8 +33483,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
-    200
+    200,
+    400
    ]
   },
   {
@@ -29976,7 +33495,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -30191,6 +33710,111 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/petcare",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkin",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/checkuit",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/notitie",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/hond",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/ronde/klaar",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/petcare/trim/klaar",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/photo/add",
    "rol": "supplier",
    "pogingen": 2,
@@ -30210,6 +33834,42 @@
     200,
     400
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/vraag",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/polis/zet",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -30450,7 +34110,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    409
+    400
    ]
   },
   {
@@ -30494,7 +34154,7 @@
    "invoer": "dicht",
    "statussen": [
     409,
-    400
+    409
    ]
   },
   {
@@ -30548,7 +34208,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -30658,7 +34318,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
+    400,
     409
    ]
   },
@@ -30835,7 +34495,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -30857,7 +34517,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -30884,6 +34544,39 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/afwezig",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/alias",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/antwoord",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/assist",
    "rol": "supplier",
    "pogingen": 2,
@@ -30895,12 +34588,234 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaarbeleid",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaartermijn",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bewaring",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlage",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/bijlagen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/btw-herinner",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/bewaar",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/verstuur",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concept/weg",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/concepten",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegatie/weg",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/delegeer",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/draad",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/etiket",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/export",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/gesprekken",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/handtekening",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/hulp",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    404,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/intrekken",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutel",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/imap/sleutels",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
     200
    ]
   },
@@ -30928,13 +34843,35 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/instellingen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/journaal",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/lees",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
-    400
+    400,
+    404
    ]
   },
   {
@@ -30944,8 +34881,96 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/opruimen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/rechten",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
     200,
     200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/maak",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/weg",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regel/zet",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/regels",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/sluimer",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/ster",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
    ]
   },
   {
@@ -30961,12 +34986,56 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/supplier/rtmail/verzonden",
+   "pad": "/api/supplier/rtmail/vak",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
     200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/vernietigingen",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/verplaats",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/verzonden",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/zoek",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
     400
    ]
   },
@@ -31197,7 +35266,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -31529,7 +35598,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    400
+    200
    ]
   },
   {
@@ -31551,7 +35620,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -31649,7 +35718,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -31726,7 +35795,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -31911,12 +35980,11 @@
    "pad": "/api/supplier/vak/ai",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -31995,11 +36063,12 @@
    "pad": "/api/supplier/vak/onderhoud/herinner",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -32026,6 +36095,29 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/uren",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/vak/uren-zet",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    403,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/vak/wachtlijst/uitnodig",
    "rol": "supplier",
    "pogingen": 2,
    "invoer": "poort",
@@ -32077,7 +36169,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    409,
+    400,
     409
    ]
   },
@@ -32133,7 +36225,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -32306,24 +36398,22 @@
    "pad": "/api/supplier/vracht",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/afleveren",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -32353,12 +36443,11 @@
    "pad": "/api/supplier/vracht/maak",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
     403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -32382,6 +36471,66 @@
     404,
     404
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/event/status",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/weddings/taak/klaar",
+   "rol": "supplier",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -32412,7 +36561,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -32434,7 +36583,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -32443,11 +36592,12 @@
    "pad": "/api/supplier/werkmail/inbox",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -32490,8 +36640,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -32622,35 +36772,34 @@
    "pad": "/api/supplier/zorg/overzicht",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
     403,
-    400
-   ]
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/recept/maak",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/recept/zet",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -32681,7 +36830,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -32690,12 +36839,11 @@
    "pad": "/api/supplier/zorg/seh/binnen",
    "rol": "supplier",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -32810,9 +36958,432 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/ai",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/alarm/proef",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/archief",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/keuze",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/proef",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/betalingen/stap",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/beveiliging/afhandelen",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/beveiliging/auto",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/bewaren/veeg",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/controle/incident",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/controle/integriteit",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/eigenaar",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/fouten/wis",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie/ai",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/functie/besluit",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/moderniseer",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/antwoord",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/document",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/papieren/documenten",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/spelcijfers",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/proef",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/schakel",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/sso/scimsleutel",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/toegang",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/vingerafdruk",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/vingerafdruk/verschil",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/analyseer",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    401
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/av-test",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/beslis",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/lastafworp",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/opruimen",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/wacht/quarantaine",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    401,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/techniek/zekering",
+   "rol": "techniek",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    401,
+    401
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -32830,11 +37401,12 @@
    "pad": "/api/theater/huisstijl",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -32865,8 +37437,8 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
-    200
+    400,
+    400
    ]
   },
   {
@@ -32901,7 +37473,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -33021,7 +37593,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -33043,7 +37615,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -33077,7 +37649,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -33087,7 +37659,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -33263,7 +37835,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -33429,7 +38001,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -33472,7 +38044,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -33539,7 +38111,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -33661,7 +38233,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -33682,7 +38254,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    400,
+    404,
     404
    ]
   },
@@ -34002,7 +38574,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -34057,7 +38629,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34189,7 +38761,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34200,7 +38772,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34232,12 +38804,11 @@
    "pad": "/api/vonk/mijn",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
-    403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+    400,
+    400
+   ]
   },
   {
    "methode": "POST",
@@ -34270,7 +38841,7 @@
    "invoer": "dicht",
    "statussen": [
     200,
-    200
+    400
    ]
   },
   {
@@ -34346,7 +38917,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34402,7 +38973,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    404
+    400
    ]
   },
   {
@@ -34455,11 +39026,12 @@
    "pad": "/api/webauthn/weg",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "dicht",
+   "invoer": "poort",
    "statussen": [
-    400,
+    403,
     403
-   ]
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -34478,12 +39050,11 @@
    "pad": "/api/wereld/bereik",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",
@@ -34503,7 +39074,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    200,
+    400,
     200
    ]
   },
@@ -34624,6 +39195,41 @@
    "pad": "/api/wereld/zoek",
    "rol": "member",
    "pogingen": 2,
+   "invoer": "dicht",
+   "statussen": [
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang",
+   "rol": "werkplekbaas",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-geef",
+   "rol": "werkplekbaas",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/werkplek/toegang-weg",
+   "rol": "werkplekbaas",
+   "pogingen": 2,
    "invoer": "poort",
    "statussen": [
     403,
@@ -34638,7 +39244,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34749,7 +39355,7 @@
    "invoer": "dicht",
    "statussen": [
     404,
-    400
+    404
    ]
   },
   {
@@ -34759,7 +39365,7 @@
    "pogingen": 2,
    "invoer": "dicht",
    "statussen": [
-    404,
+    400,
     404
    ]
   },
@@ -34914,7 +39520,7 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/zakelijk/kansen",
+   "pad": "/api/zakelijk/kans/sluit",
    "rol": "member",
    "pogingen": 2,
    "invoer": "dicht",
@@ -34922,6 +39528,30 @@
     400,
     403
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/zakelijk/kansen",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/zakelijk/like",
+   "rol": "member",
+   "pogingen": 2,
+   "invoer": "poort",
+   "statussen": [
+    403,
+    403
+   ],
+   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
   },
   {
    "methode": "POST",
@@ -34963,12 +39593,11 @@
    "pad": "/api/zakelijk/profiel/zet",
    "rol": "member",
    "pogingen": 2,
-   "invoer": "poort",
+   "invoer": "dicht",
    "statussen": [
-    403,
+    400,
     403
-   ],
-   "reden": "elk antwoord was een grendel (401/403/503) -- de validatie is niet bereikt"
+   ]
   },
   {
    "methode": "POST",

@@ -57,6 +57,11 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-obj-'));
    EIGENSCHAP -- dezelfde afstand geeft dezelfde zichtbaarheid, op elke dag van
    de maand. */
 const STRAKS = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+/* Voor de momentlijn-toets: een datum die GEGARANDEERD in een vak valt. Veertien
+   dagen vooruit belandt vanaf de 18e van de maand in `later` (dat is per ontwerp
+   een telling, geen vak) -- daardoor was deze toets rood van de 18e tot het
+   maandeinde en groen daarbuiten. Morgen valt altijd in "Vandaag" of "Morgen". */
+const MORGEN = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
 
 
 async function api(pad, body, token) {
@@ -151,12 +156,17 @@ test('een codenaam waar niets mee gedeeld wordt, levert nul caps en geen fout', 
    de losse toets maakt het beeld van de graaf na, en kan dus niet zien of dat
    beeld nog op het echte lijkt. */
 test('een echte bijeenkomst belandt op de lijn, in een vak met een naam', async () => {
+  /* Een eigen bijeenkomst op MORGEN, want de Proefborrel (over twee weken) valt
+     aan het eind van een maand terecht in de telling `later` -- zie de uitleg
+     bij MORGEN bovenaan. De keten die hier bewezen wordt is dezelfde. */
+  await api('/api/genootschap/roep-bijeen',
+    { groep: groepId, wat: 'Lijnborrel', datum: MORGEN, tijd: '19:00' }, lidToken);
   const r = await api('/api/sociaal/lijn', {}, lidToken);
   assert.equal(r.status, 200);
   const d = await json(r);
   const alle = (d.vakken || []).flatMap(v => v.regels.map(x => x.titel));
-  assert.ok(alle.includes('Proefborrel'),
-    'de bijeenkomst van over twee weken hoort op de lijn te staan');
+  assert.ok(alle.includes('Lijnborrel'),
+    'de bijeenkomst van morgen hoort op de lijn te staan');
 
   for (const v of d.vakken) {
     assert.ok(v.label, 'elk vak draagt een naam');

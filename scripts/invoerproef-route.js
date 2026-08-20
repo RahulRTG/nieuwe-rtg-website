@@ -21,12 +21,14 @@
    ========================================================================== */
 'use strict';
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { start } = require('./lib/wegwerpserver');
 const { draaiInvoerproef } = require('./lib/invoerproef');
-const { alleRoutes, isSchakel } = require('./lib/routes');
+const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 const { maakTeller, maakRommel } = require('./lib/rommel');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INVOERPROEF.json');
@@ -35,53 +37,31 @@ const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0
 const SEED = Number((argv.find(a => a.startsWith('--seed=')) || '').slice(7)) || 20260812;
 const RONDES = Number((argv.find(a => a.startsWith('--rondes=')) || '').slice(9)) || 2;
 
-/* Dezelfde afleiding als in de rolproef: de rol uit de bewaker in de bron. Een
-   route waarvan we de rol niet kennen slaan we over -- met een gokrol kloppen
-   levert een 403 en dus een lege meting. */
-function rolVan(bewakers) {
-  const b = bewakers.join(' ');
-  if (/supplierAuth/.test(b)) return 'supplier';
-  if (/officeAuth|kantoorAuth|adminOnly/.test(b)) return 'office';
-  if (/\bauth\b|eisAccount|\blid\b/.test(b)) return 'member';
-  return null;
-}
+/* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
+   te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
+   eens -- vier kopieen van dezelfde afleiding (LAT.md regel 4). */
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer();
-    s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
 
-async function wacht(basis, ms) {
-  const eind = Date.now() + ms;
-  while (Date.now() < eind) {
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return true; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return false;
-}
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een
+   VOLLEDIGE meetronde zodra iets dit bestand require't -- een toets, de keuring,
+   of iemand die alleen even wil kijken of het laadt. Dat is hier echt gebeurd:
+   een onschuldige laadcontrole draaide de rolproef met de STANDAARDbegrenzing en
+   schreef ROLPROEF.json van 3377 beproefde routes terug naar 292. Het register
+   zag er daarna volkomen normaal uit.
+
+   scripts/bewijsmatrix.js heeft deze wacht al sinds hij ooit de hele testrunner
+   meenam. Dezelfde wacht hoort op elk instrument dat bij het draaien een register
+   OVERSCHRIJFT. */
+if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
-  const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-invoerproef-'));
-  const basis = 'http://127.0.0.1:' + poort;
-
-  const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna rommel krijgen zijn
-       de echte, met hun echte validatie ervoor. Zelfde afweging als in de
-       rolproef, en om dezelfde reden opgeschreven. */
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
-  });
-
-  const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
-  process.on('exit', klaar);
-
-  if (!await wacht(basis, 60000)) { console.error('de server kwam niet op'); klaar(); process.exit(2); }
+  /* DE GEDEELDE WEGWERPSERVER. Hier stond de eigen kopie die de kop al een
+     maand ontkende ('ze delen de wegwerpserver') -- de tekst beloofde wat de
+     code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
+     (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
+     BEWIJSSCHULD.json). */
+  const server = await start({ naam: 'invoerproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const { basis, klaar } = server;
 
   const post = async (pad, lijf, tok) => {
     try {
@@ -117,7 +97,7 @@ async function wacht(basis, ms) {
   const rng = maakTeller(SEED);
   const { chaosBody } = maakRommel(rng);
 
-  const routes = alleRoutes()
+  const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     /* De schakelkast krijgt geen rommel: die zou functies uitzetten en daarmee
        elke meting erna vergiftigen. Hij staat in lib/routes.js zodat de
@@ -125,13 +105,24 @@ async function wacht(basis, ms) {
     .filter(r => !isSchakel(r.pad))
     /* Een pad met :parameters bestaat als patroon en niet als adres; er letterlijk
        heen posten meet een 404 en geen validatie. */
-    .filter(r => !r.pad.includes(':'))
-    .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
-    .filter(r => r.rol);
+    .filter(r => !r.pad.includes(':'));
+  /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
+     honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
+     komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
+  /* ALLEEN ROLLEN WAARVOOR DIT INSTRUMENT EEN TOKEN HEEFT. Sinds de
+     bewakerskaart ook eigenrollen kent (boardroom, techniek, scim,
+     werkplekbaas) kwamen 123 routes hier binnen als "met rol" terwijl er
+     geen sleutel voor bestaat: de invoerproef stuurt rommel MET de juiste rol; zonder token voor die rol
+     meet hij de voordeur en niet de invoercontrole.
+     Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
+  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const routes = verdeling.metRol;
 
   console.log('\n=== DE INVOER-ROBUUSTHEID PER ROUTE ===\n');
   console.log('  seed                                 : ' + SEED);
+  console.log('  routes gevonden                      : ' + kandidaten.length);
   console.log('  routes met een herkenbare rol        : ' + routes.length);
+  meldZonderRol(verdeling);
   console.log('  rommelverzoeken per route            : ' + RONDES);
 
   const uit = await draaiInvoerproef({ post, routes, tokenVoor, hernieuw,
@@ -157,10 +148,17 @@ async function wacht(basis, ms) {
   for (const b of uit.bevindingen.sporen.slice(0, 15)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per route: rommel met de JUISTE rol, en of er een 5xx of een intern spoor uit kwam. ' +
       'Een route die hier NIET in staat is niet beproefd. Een route met invoer:"poort" stond achter ' +
       'een tweede grendel en is ONGEMETEN, geen groen. Zie scripts/lib/invoerproef.js voor de grens.',
     seed: SEED,
+    /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
+       routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
+       bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
+    nietBeproefbaar: verdeling.zonderRol.length,
+    redenenNietBeproefbaar: verdeling.redenen,
+    routesGevonden: kandidaten.length,
     gemeten: { routesMetRol: routes.length, bereikt: bereikt.length, pogingen: uit.pogingen,
       breuken: uit.bevindingen.breuken.length, sporen: uit.bevindingen.sporen.length,
       achterEenPoort: poortRijen.length, tokensHernieuwd: uit.hernieuwd,

@@ -13,30 +13,18 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
-/* DE BROWSER KOMT UIT ./browser.js, en niet uit een eigen loader hier. Dat
-   bestand probeert te STARTEN in plaats van te laden: een Playwright zonder
-   bijbehorende Chromium laat de require lukken en pas de launch zakken, en dan
-   valt de toets om op iets dat niets over de code zegt. Er stond hier eerst een
-   eigen terugval op vaste paden -- dat was een 95e kopie van precies het
-   probleem waarvoor ./browser.js is geschreven. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
 
 test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-btwscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -48,7 +36,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
     assert.ok(f.factuur && f.factuur.btwBedrag > 0, 'er staat een factuur met btw in het register');
     const btwOpFactuur = f.factuur.btwBedrag.toFixed(2).replace('.', ',');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

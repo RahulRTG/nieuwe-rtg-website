@@ -26,18 +26,12 @@
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
-   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
-   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
-   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
-   onderwerp zei. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 /* De vlaggenschepen, plus de voordeur zelf. Die laatste staat er met opzet bij:
    de kop van middleware/voordeur.js beschrijft hoe "/" ooit terugviel op de
@@ -51,12 +45,12 @@ const PAGINAS = ['/', '/apps/app.html', '/apps/index.html', '/apps/boardroom.htm
   '/apps/foundation/index.html', '/apps/foundation/school.html', '/site/404.html'];
 
 test('de CSP: geen unsafe-inline, en geen enkele blokkade van ons eigen werk',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-csp-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext();
     const alles = [];
     for (const pad of PAGINAS) {

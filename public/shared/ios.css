@@ -28,7 +28,20 @@
   --ios-inkt:#F4F1EC;
   --ios-grijs:rgba(244,241,236,0.60);
   --ios-lijn:rgba(255,255,255,0.10);
-  --ios-accent:var(--dag-kleur,#C23A5E);
+  /* DE BEDIENING VERKLEURT NIET MEE MET HET SEIZOEN.
+
+     Hier stond var(--dag-kleur). Die kleur komt uit shared/dagkleur.css en is
+     bedoeld om GRONDEN te wassen -- stijl.css mengt hem op 8 tot 25% door de
+     achtergrond, zodat een scherm 's ochtends anders ademt dan 's avonds. Op
+     volle sterkte als kleur van een knop betekende het dat elke actie in de
+     balk meeverkleurde met dag en seizoen, en op een winteravond komt daar een
+     helderblauw uit. Blauwe knoppen in een bordeaux-gouden huis: dat is de
+     iOS-standaardkleur die per ongeluk is blijven staan.
+
+     Goud is wel van dit merk en haalt op zwart ruim 7:1, waar de bordeaux op
+     17px met 3,78 tekortkomt (CLAUDE.md rekent dat voor). De bediening is dus
+     goud, altijd dezelfde, het hele jaar door. */
+  --ios-accent:var(--gold-tekst,#C0A544);
   --ios-materiaal:rgba(12,12,11,0.72);
 
   --ios-balk:44px;                                  /* de vaste hoogte van iOS */
@@ -61,18 +74,28 @@
   -webkit-backdrop-filter:saturate(180%) blur(20px);
   backdrop-filter:saturate(180%) blur(20px);
 }
+/* MATGLAS IS GEEN MATGLAS ZONDER BLUR. Het materiaal hierboven is 72% zwart en
+   rekent op backdrop-filter om de rest te doen. Waar die filter niet draait --
+   een oudere browser, een toestel dat hem uitzet om stroom te sparen, een
+   render zonder GPU -- blijft er 72% over, en dan scrolt de tekst van de pagina
+   LEESBAAR onder de balk door. Dat leest als twee schermen over elkaar. Waar de
+   filter er niet is, is de balk dus gewoon dicht. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .ios-nav{ background:#0C0C0B !important; }
+  :root[data-rtg-thema="champagne"] .ios-nav{ background:#F4F0E9 !important; }
+}
 /* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
    en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
    worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
    Afspraak" de balk uit en raakte de laatste knop de schermrand. */
 .ios-nav-rij{
-  /* DE DERDE KOLOM MOET KUNNEN KRIMPEN, en dat was hij niet.
-     `auto` zakt nooit onder zijn max-content, dus een volle actierij duwde het
-     hele raster open: op 390px liepen zeven schermen rechts buiten beeld
-     (sitemaker tot 1153px) en er was niet naartoe te scrollen, want de pagina
-     eromheen staat op overflow:hidden. minmax(0,auto) laat hem wel krimpen; de
-     rij zelf scrolt daarna in ZICHZELF (zie .ios-nav-acties hieronder). */
-  display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,auto); align-items:center;
+  /* minmax(0,auto) op de buitenste twee, niet auto. Een auto-kolom krimpt niet
+     onder zijn inhoud, dus een scherm met zeven acties rechts (Foundation
+     vrienden.html had er zoveel) maakte niet de balk te vol maar de PAGINA te
+     breed: 809px op een telefoon van 390, en alles schoof zijwaarts. Dit is de
+     garantie dat dat niet meer kan; wat er dan met de acties zelf gebeurt,
+     regelt pasActiesIn() in ios.js -- die zet ze op de tweede regel. */
+  display:grid; grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,auto); align-items:center;
   gap:0.4rem; min-height:var(--ios-balk);
   padding-inline:max(0.6rem, env(safe-area-inset-left,0px)) max(0.6rem, env(safe-area-inset-right,0px));
 }
@@ -104,7 +127,7 @@
 
 /* de acties rechts: iOS zet ze op 17 punten in de accentkleur, geen knopvlak */
 .ios-nav-acties{
-  grid-column:3; justify-self:end;
+  grid-column:3; justify-self:end; min-width:0;
   display:flex; align-items:center; gap:0.25rem;
   /* De rij scrolt in zichzelf in plaats van de pagina open te duwen -- precies
      zoals .cmd-tabs in de werktafel en .lo-top in Het Vooruitzicht dat doen. Zo
@@ -115,16 +138,22 @@
   overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   overscroll-behavior-x:contain;
 }
-.ios-nav-acties::-webkit-scrollbar{display:none;}
-.ios-nav-acties > *{
-  flex:0 0 auto;
+/* Acties die niet in de balk pasten. Een eigen wikkel, omdat .ios-nav-extra
+   een KOLOM is (zoekveld boven filterrij) en losse knoppen daarin elk een
+   eigen regel zouden krijgen. Ze houden hun balk-uiterlijk: verhuizen mag
+   niets aan hun vorm veranderen, anders ziet de gebruiker twee soorten
+   knoppen voor hetzelfde soort actie. */
+.ios-nav-overloop{display:flex; flex-wrap:wrap; align-items:center; gap:0.25rem;}
+.ios-nav-acties > *,
+.ios-nav-overloop > *{
   font:400 17px/1 'Inter',system-ui,sans-serif !important;
   color:var(--ios-accent) !important;
   background:none !important; border:none !important;
   padding:0.3rem 0.45rem !important; border-radius:8px;
   cursor:pointer; white-space:nowrap;
 }
-.ios-nav-acties > *:active{opacity:0.4;}
+.ios-nav-acties > *:active,
+.ios-nav-overloop > *:active{opacity:0.4;}
 /* één actie mag nadruk krijgen (Gereed/Bewaar): halfvet, verder niets */
 .ios-nav-acties > .ios-nadruk{font-weight:600 !important;}
 
@@ -204,7 +233,13 @@
 }
 .ios-thuis:focus-visible{outline:2px solid var(--ios-accent); outline-offset:3px;}
 /* de pil ligt over de inhoud: die houdt onderaan ruimte vrij */
-body[data-ios]{padding-bottom:var(--ios-thuis-ruimte);}
+/* TWEE VASTE DINGEN ONDERAAN, EEN PADDING. Naast de home-indicator kan ook de
+   cookiemelding onderaan staan (shared/cookie.js, die meet zichzelf en zet
+   --rtg-cookieruimte). Die schreef zijn eigen body-regel, en dit blad won op
+   specificiteit -- waardoor de melding weer over de laatste regels lag. Twee
+   regels die om dezelfde padding vechten heeft altijd een verliezer; optellen
+   niet. Wie er niet is telt als nul. */
+body[data-ios]{padding-bottom:calc(var(--ios-thuis-ruimte, 0px) + var(--rtg-cookieruimte, 0px) + var(--ws-ruimte, 0px));}
 
 /* ----------------------------------------- openen, sluiten, terugveren */
 @media (prefers-reduced-motion: no-preference){

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1109 bestanden en 7479 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1110 bestanden en 7480 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1109 |
-| losse beweringen (`test(...)`) | 7479 |
+| toetsbestanden | 1110 |
+| losse beweringen (`test(...)`) | 7480 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 908 |
 | **overleefd**: geen mutatie kreeg hem rood | 9 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 34 |
-| niets van beide | 121 |
+| niets van beide | 122 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1012,7 +1012,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-137 bestanden, 236 beweringen.
+138 bestanden, 237 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1127,6 +1127,7 @@ toets omvalt.
 | `salon-app.e2e.js` | 1 | -- | Scherm-test voor De Salon-app. De unit-toetsen (test/salon-app.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet: plaatsen vanaf het tabblad zelf, de post die daarna in je eigen profiel staat,... |
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
+| `schuif.e2e.js` | 1 | -- | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |
 | `spelpraat.e2e.js` | 1 | gezakt op `liegpoort /api/` | PRATEN IN HET POTJE, IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelpraat.test.js). |
 | `spelscherm.e2e.js` | 1 | genoemd | HET GEDEELDE SCHERM IN EEN ECHTE BROWSER. De serverkant is los nagemeten (test/spelprojectie.test.js): een scherm krijgt uitsluitend `zicht.publiek`, en bij 30 Seconden zit de kaart daar niet in. |
 | `spelsudoku.e2e.js` | 2 | gezakt op `liegpoort /api/` | SUDOKU IN EEN ECHTE BROWSER. De serverkant van dit spel is los nagemeten (test/spelsudoku.test.js) en de pagina is statisch nagekeken op wat er NIET meer in mag staan. |

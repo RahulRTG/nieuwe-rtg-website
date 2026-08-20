@@ -76,7 +76,15 @@
   merkWegPagina();
 
   var kop = d.querySelector('body > header');
-  if (kop && !isThuis) bouwBalk(kop);
+  if (kop && !isThuis) {
+    bouwBalk(kop);
+    /* Pas inmeten als de balk er echt staat -- en na deze tik, want de
+       menuknop van appmenu.js komt verderop in dit bestand pas binnen en
+       telt mee in de breedte. */
+    var meetIn = function () { try { pasActiesIn(kop); } catch (e) {} };
+    if (w.requestAnimationFrame) w.requestAnimationFrame(meetIn); else meetIn();
+    w.addEventListener('resize', meetIn);
+  }
 
   /* In een split-paneel (shared/split.js zet de app in een iframe naast een
      andere) hoort GEEN home-indicator: die van het scherm eromheen is de

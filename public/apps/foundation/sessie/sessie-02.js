@@ -37,13 +37,18 @@
       /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
          envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
          component en niet bij het toeval van zijn inhoud. */
-      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
         'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
+      '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
       '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
       '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
       '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+      /* Op een telefoon is je eigen naam naast je eigen avatar geen informatie
+         maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
+         duwde daarmee een andere actie naar de tweede rij. De avatar zegt
+         hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
+      '@media (max-width:640px){.sb-nm{display:none;}}' +
       '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
       '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:8px;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--goud);}' +

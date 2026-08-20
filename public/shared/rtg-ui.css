@@ -84,6 +84,16 @@
   /* het accent ademt mee met de levende dagkleur (shared/dagkleur.css); staat
      die niet aan, dan is het gewoon het bordeaux van het huis */
   --rtg-acc:var(--dag-kleur, #C23A5E);
+  /* HETZELFDE ACCENT, MAAR DAN LEESBAAR. --rtg-acc hierboven is de dagkleur:
+     die wast door vlakken, randen en actieve staten, en dat is precies wat een
+     accent hoort te doen. Als TEKSTKLEUR deugt hij niet -- hij verandert met
+     dag en seizoen, dus je weet nooit welk contrast je hebt, en in de
+     RTFoundation landde hij op #C23A5E dat op zwart 3,78 haalt waar 4,5 moet.
+     Een terug-link is geen decoratie; die moet je kunnen lezen, ook in
+     november. Goud is van dit merk en haalt ruim 7:1, het hele jaar door.
+     Zelfde splitsing als --ios-accent in shared/ios.css en --accent-tekst in
+     apps/foundation/stijl.css: het accent kleurt, de tekst leest. */
+  --rtg-acc-tekst:var(--gold-tekst,#C0A544);
   /* De inkt die OP het accent leesbaar is; zie shared/dagkleur.css. Zonder
      dagkleur valt hij terug op wit, dat op de bordeaux-terugval 5,17:1 haalt. */
   --rtg-acc-inkt:var(--dag-inkt, #FFFFFF);
@@ -97,7 +107,7 @@
 .rtg-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
 .rtg-intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
 /* de weg terug staat linksboven, in het accent, en is een gewone link */
-.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);text-decoration:none;font-size:.85rem;
+.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc-tekst);text-decoration:none;font-size:.85rem;
   /* Een terugweg is een knop en geen zin, dus 24x24 (WCAG 2.5.8) -- de breedte
      telt mee, want vaak is het alleen een pijl. Bewust min-* en geen padding:
      deze selector is specifieker dan de .terug van een pagina zelf, en met een
@@ -130,7 +140,7 @@
 /* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
 button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
   color:inherit;font:inherit;text-align:left;cursor:pointer;}
-button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
+button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc-tekst);}
 
 /* ------------------------------------------------------------- knoppen ----*/
 .rtg-knop{
@@ -177,7 +187,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    "altijd aan". Klein en in het accent, zodat het opvalt zonder te schreeuwen. */
 .rtg-merk{
   display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  font-weight:700;color:var(--rtg-acc);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
+  font-weight:700;color:var(--rtg-acc-tekst);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
   border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
 }
 .rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
@@ -245,7 +255,7 @@ body.rtg-stijl h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter
 body.rtg-stijl .kop h1{font-size:1.7rem;}
 body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
-body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);
+body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc-tekst);
   text-decoration:none;font-size:.85rem;min-height:24px;min-width:24px;}
 
 /* de sectiekaart: alles wat een blok inhoud omvat, krijgt dezelfde kaart */
@@ -479,8 +489,19 @@ body.rtg-stijl .kpi{
   flex:1;min-width:4.5rem;background:var(--rtg-card2);border:1px solid var(--rtg-line);
   border-radius:var(--rtg-rond-klein);padding:.7rem .8rem;
 }
+/* HET CIJFER STAAT IN INTER, NIET IN BODONI, en dat is geen smaakkwestie.
+   Bodoni is een didone: dikke stammen, haarfijne verbindingen. Op een
+   ceremoniële titel van 40px is dat de handtekening van het merk; op een
+   getal van 21px verdwijnen de haarlijnen en leest een 0 als "()" -- wat op
+   foundation/school.html vier keer naast elkaar stond, in tegels die
+   Klassen, Lessen vandaag, Open werk en Cijfers heten. ONTWERP.md zegt het
+   al: Bodoni mag op EEN dominante KPI, en Inter draagt het werk met
+   tabulaire cijfers. Vier statistiektegels zijn geen dominante KPI.
+   tabular-nums erbij, zodat een rij getallen onder elkaar uitlijnt. */
 body.rtg-stijl .kpi .v,body.rtg-stijl .kpi b{
-  display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.1;}
+  display:block;font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;font-size:1.35rem;font-weight:600;
+  letter-spacing:-.01em;line-height:1.1;}
 body.rtg-stijl .kpi .l,body.rtg-stijl .kpi small{
   display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-soft);margin-top:.25rem;}
 

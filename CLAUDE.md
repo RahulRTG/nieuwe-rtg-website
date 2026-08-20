@@ -42,6 +42,21 @@ systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
 grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
 bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
 wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
+Personal & Civic Operating System, op drie niveaus tegelijk: individu,
+professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat
+over de mens zelf) maar voegt de civiele helft toe: zaken over meerdere
+instanties, documenten die iets van iemand vragen, processen met een
+doorlooptijd, en het bewijs eronder. Lees vóór je hieraan werkt vooral
+paragraaf 2, het werkwoord: **de Foundation opent en zet klaar — bevestigen doet
+de mens**, en uitvoeren richting een instantie doet zij nooit zelf. Er is bewust
+geen `EXECUTE_LOW_RISK`: wie bouwt weet niet in wiens leven hij staat, en een
+grens die per geval anders had gemoeten is geen grens. Paragraaf 5 heeft zeven
+eigen grenzen bovenop die van LEVEN.md; de scherpste twee zijn dat een
+eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat de
+meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
+zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
+welke grens hem eerlijk houdt.
 
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht

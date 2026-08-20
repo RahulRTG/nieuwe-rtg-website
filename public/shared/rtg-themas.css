@@ -20,8 +20,8 @@
   --rtg-bg:var(--pearl-basis);
   --rtg-grond:var(--pearl-glans);
   --rtg-txt:var(--op-pearl);
-  --rtg-muted:rgba(26,23,19,0.72);
-  --rtg-soft:rgba(26,23,19,0.56);
+  --rtg-muted:#34322F;                 /* 8,24:1 op de ergste champagne-grond */
+  --rtg-soft:#555452;                  /* 4,88:1 -- zo zacht als de norm toelaat */
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
   --rtg-card2:rgba(255,255,255,0.70);
@@ -34,7 +34,7 @@
      op parelmoer en 6,55 op een lichte kaart. Zelfde goud, in de schaduw. */
   --rtg-leesgoud:var(--gold-diep);
   --rtg-leesgroen:#2E6B4E;
-  --rtg-leeszacht:#5E574D;
+  --rtg-leeszacht:var(--rtg-soft);   /* zie de toelichting onder de vier blokken */
   --rtg-leesrood:#A3234C;
   --rtg-dagsterkte:0.16;
 }
@@ -43,15 +43,15 @@
   --rtg-bg:var(--onyx-basis);
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
-  --rtg-muted:rgba(244,240,233,0.72);
-  --rtg-soft:rgba(244,240,233,0.56);
+  --rtg-muted:#CDC9C0;                 /* 8,92:1 */
+  --rtg-soft:#989489;                  /* 4,87:1 */
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-tekst);  /* op donker het hoogsel: 8,11:1 */
   --rtg-leesgroen:#4C9A75;
-  --rtg-leeszacht:#A79F92;
+  --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesrood:#DE6E92;
   --rtg-dagsterkte:0.10;
 }
@@ -60,8 +60,8 @@
   --rtg-bg:var(--bordeaux-diep);
   --rtg-grond:var(--bordeaux-glans);
   --rtg-txt:var(--op-bordeaux);
-  --rtg-muted:rgba(244,240,233,0.74);
-  --rtg-soft:rgba(244,240,233,0.58);
+  --rtg-muted:#EDE0DC;                 /* 5,64:1 -- fluweel laat niet meer toe */
+  --rtg-soft:#E6CECC;                  /* 4,87:1 */
   --rtg-line:var(--bordeaux-rand);
   --rtg-card:rgba(0,0,0,0.22);
   --rtg-card2:rgba(0,0,0,0.34);
@@ -69,7 +69,7 @@
   /* op fluweel haalt zelfs het hoogsel maar 4,21:1, dus lees je hier ivoor */
   --rtg-leesgoud:var(--op-bordeaux);
   --rtg-leesgroen:#7FD1A8;
-  --rtg-leeszacht:#D6D0C6;
+  --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesrood:#F8CAD8;
   --rtg-dagsterkte:0.06;
 }
@@ -78,15 +78,15 @@
   --rtg-bg:var(--royal-diep);
   --rtg-grond:var(--royal-glans);
   --rtg-txt:var(--op-royal);
-  --rtg-muted:rgba(240,242,247,0.74);
-  --rtg-soft:rgba(240,242,247,0.58);
+  --rtg-muted:#DADFE8;                 /* 6,11:1 */
+  --rtg-soft:#C0C8D7;                  /* 4,85:1 */
   --rtg-line:var(--royal-rand);
   --rtg-card:rgba(0,0,0,0.20);
   --rtg-card2:rgba(0,0,0,0.32);
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--op-royal);
   --rtg-leesgroen:#7FD1A8;
-  --rtg-leeszacht:#D6D0C6;
+  --rtg-leeszacht:var(--rtg-soft);
   --rtg-leesrood:#F8CAD8;
   --rtg-dagsterkte:0.07;
 }
@@ -100,7 +100,8 @@
      groen   #4C9A75  onyx 5,77 · licht 2,75 · bordeaux 2,96 · royal 3,22
              per thema: #4C9A75 / #2E6B4E / #7FD1A8 / #7FD1A8  -> 5,8 / 5,1 / 5,5 / 6,0
      zacht   #A79F92  onyx 7,47 · licht 1,80 · bordeaux 2,82 · royal 3,29
-             per thema: #A79F92 / #5E574D / #D6D0C6 / #D6D0C6  -> 7,5 / 4,9 / 4,8 / 5,6
+             per thema: was #A79F92 / #5E574D / #D6D0C6 / #D6D0C6
+             en heet sinds 20 augustus gewoon --rtg-soft; zie de alinea hieronder
      rood    #DE6E92  onyx 6,29 · licht 2,38 · bordeaux 2,37 · royal 2,77
              per thema: #DE6E92 / #A3234C / #F8CAD8 / #F8CAD8  -> 6,3 / 5,5 / 5,1 / 5,9
              (op fluweel kan een alarmkleur geen ROOD zijn -- rood op rood leest
@@ -108,12 +109,38 @@
              de betekenis blijft aan de vorm en de plek hangen: ONTWERP.md par. 5
              zegt niet voor niets dat status nooit op kleur alleen staat.)
 
-   EN ZE ZIJN DEKKEND, en dat is geen detail. --rtg-soft en --rtg-muted dragen een
-   alfa (0,56 en 0,72), en scripts/a11ykeuring.js slaat een voorgrond met alfa
-   over -- die kan hij niet betrouwbaar rekenen. Een zachte toon daarheen sturen
-   zou de bevinding laten VERDWIJNEN zonder hem op te lossen, en dat is het
-   tegenovergestelde van wat deze poort moet doen. Vandaar twee dekkende tinten
-   die je kunt narekenen. */
+   EN OP 20 AUGUSTUS 2026 BLEEK DAT --rtg-soft EN --rtg-muted ZELF HET ERGST
+   WAREN. Hierboven stond dat ze een alfa dragen (0,56 en 0,72) en dat de keuring
+   een voorgrond met alfa overslaat -- dus dat een zachte toon daarheen sturen de
+   bevinding zou laten VERDWIJNEN zonder hem op te lossen. Dat klopte, en het was
+   maar de helft. Zodra de keuring die alfa WEL kon rekenen (opGrond() in
+   scripts/a11ykeuring.js), stonden er 2844 bevindingen op de drie thema-ronden,
+   en 795 van de voorbeelden waren precies deze twee tokens.
+
+   DE OORZAAK IS DAT ALFA DE VERKEERDE KNOP IS. "56% van de inkt" is geen besluit
+   over leesbaarheid maar over sluier: wat het OPLEVERT hangt af van de grond, en
+   die verschilt per thema, per kaart, per stand van de dagkleur. Op onyx haalde
+   0,56 vlot 5,6:1; op parelmoer 3,5 en op fluweel 3,6 -- dezelfde regel, drie
+   uitkomsten, waarvan twee onleesbaar.
+
+   Ze zijn nu DEKKEND en per thema uitgerekend, met een regel die je kunt
+   nalopen: de zachte toon is ZO ZACHT ALS DE NORM TOELAAT (de lichtste tint die
+   op de ergste grond van dat thema nog 4,85:1 haalt), en de gedempte toon staat
+   HALVERWEGE tussen die vloer en de volle inkt. "De ergste grond" is daarbij
+   niet gegokt maar opgesomd: elke stop van het glansverloop, elk van de zestien
+   dagkleuren over die stops, en de twee kaartvlakken daar weer overheen.
+
+   Wat dat kost, staat er eerlijk bij: op FLUWEEL is er nauwelijks ruimte. De
+   lichtste stop van bordeaux (#9E1C40) haalt met de volle ivoren inkt maar
+   6,40:1, dus liggen de drie treden daar op 6,4 / 5,6 / 4,9 in plaats van op
+   11,5 / 8,2 / 4,9 zoals op parelmoer. Op velours draagt de hierarchie dus meer
+   op maat en gewicht dan op toon -- en dat is dezelfde uitkomst als bij
+   --rtg-leesgoud, dat op fluweel ook al ivoor werd.
+
+   EN --rtg-leeszacht IS GEEN APART TOKEN MEER. Dat bestond alleen omdat
+   --rtg-soft onleesbaar was; nu is het hetzelfde antwoord op dezelfde vraag, en
+   twee plekken met dezelfde waarheid is precies wat LAT.md regel 4 verbiedt. Het
+   wijst nu naar --rtg-soft, zodat de bestaande aanroepen blijven werken. */
 
 /* --rtg-card2 STOND HIER NIET, EN DAT WAS EEN GAT.
    Elk thema zette --rtg-card, geen enkel thema zette --rtg-card2, dus die
@@ -186,13 +213,16 @@
   --rtg-bg:var(--onyx-basis);
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
-  --rtg-muted:rgba(244,240,233,0.72);
-  --rtg-soft:rgba(244,240,233,0.56);
+  --rtg-muted:#CDC9C0;                 /* 8,92:1 */
+  --rtg-soft:#989489;                  /* 4,87:1 */
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-tekst);
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#4C9A75;
+  --rtg-leesrood:#DE6E92;
   --rtg-dagsterkte:0.10;
   color-scheme:dark;
 }

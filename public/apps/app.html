@@ -69,10 +69,19 @@
 
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
+  /* HET BUREAU IS ALTIJD ZWART, DUS DRAAGT HET ALTIJD LICHTE INKT. body schildert
+     hier zijn eigen grond (#000, en op een computerscherm het donkere bureaublad
+     eromheen) terwijl --txt de THEMAKEUZE van het lid volgt. Onder champagne, het
+     enige lichte thema, gaf dat bijna-zwarte letters op zwart voor alles wat
+     BUITEN de schil terechtkomt -- de gedeelde Meenemen-knop landt daar als hij
+     in de kop niet past, en die las 1,06:1. Dezelfde afspraak als
+     data-rtg-eigenvlak in rtg-themas.css: wie zijn eigen grond schildert,
+     schildert ook zijn eigen inkt. De schil zet de thema-inkt er meteen weer
+     overheen, dus binnen de app verandert er niets. */
   body{
     background:#000;
     font-family:'Inter',sans-serif;
-    color:var(--txt);
+    color:var(--op-onyx,#F4F0E9);
     display:flex;
     justify-content:center;
     -webkit-font-smoothing:antialiased;
@@ -91,6 +100,7 @@
     max-width:430px;
     min-height:100dvh;
     background:var(--bg);
+    color:var(--txt);            /* binnen de schil weer de inkt van het thema */
     display:flex;
     flex-direction:column;
     position:relative;

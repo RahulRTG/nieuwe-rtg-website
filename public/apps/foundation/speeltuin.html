@@ -28,8 +28,15 @@
   .menu::before{content:'';flex:1 0 .2rem;}
   .menu::after{content:'';flex:1 0 .2rem;}
   .menu.weg{display:none;}
-  .menu h1{font-family:var(--serif);font-weight:500;color:#FFF;font-size:2rem;margin:0 0 .2rem;}
-  .menu .sub{color:#C9D2F0;margin-bottom:.8rem;text-align:center;}
+  body.rtg-stijl .menu h1{font-family:var(--serif);font-weight:500;color:#FFF;font-size:2rem;margin:0 0 .2rem;}
+  /* DE SPEELTUIN SCHILDERT ZIJN EIGEN NACHT, DUS OOK ZIJN EIGEN INKT -- en dan
+     moet die inkt het wel WINNEN. Deze drie regels stonden op `.menu ...` en dat
+     is een graad minder specifiek dan `body.rtg-stijl .sub` uit rtg-ui.css, dat
+     bovendien later wordt ingeladen. Onder champagne kwam daar de lichte-thema
+     inkt uit: bijna zwart op het nachtblauw van dit scherm, 1,10:1. Niet slecht
+     leesbaar maar onzichtbaar, en pas te zien toen de keuring een voorgrond met
+     alfa kon rekenen. */
+  body.rtg-stijl .menu .sub{color:#C9D2F0;margin-bottom:.8rem;text-align:center;}
   .spelkaartje{width:min(26rem,92vw);border:0;border-radius:26px;padding:1.2rem 1.4rem;cursor:pointer;
     display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;color:#1C2440;}
   .spelkaartje b{font-size:1.35rem;display:block;}
@@ -41,7 +48,7 @@
   .k4{background:var(--s-koraal);color:#3A0F08;}
   .k5{background:var(--s-gras);color:#12300C;}
   .k6{background:var(--s-blauw);color:#0C2440;}
-  .menu .naarhuis{background:transparent;border:2px solid #C9D2F0;color:#C9D2F0;border-radius:999px;
+  body.rtg-stijl .menu .naarhuis{background:transparent;border:2px solid #C9D2F0;color:#C9D2F0;border-radius:999px;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.6rem;}
   .kwastrij{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));left:0;right:0;z-index:6;
     display:none;justify-content:center;}

@@ -3,6 +3,8 @@
    boardroom-poort, behalve de publieke pasprijzen -- wat de boardroom zet, is
    meteen overal het geldende bedrag. Afgesplitst uit ./regie zodat elk deel
    onder de 10 KB blijft; de bedrading komt via dezelfde context binnen. */
+const allocatie = require('../../kern/commercie/allocatie');
+
 module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = ctx;
@@ -26,6 +28,23 @@ module.exports = (ctx) => {
   };
   app.get('/api/betaaldiensttarief', (req, res) => stuur(res, tarief()));
   app.post('/api/betaaldiensttarief', (req, res) => stuur(res, tarief()));
+
+  /* DE SOCIALE VERANTWOORDING. Wat is gereserveerd, wat kan weg, wat is er uit
+     -- per deel en per regelversie. Achter de kantoorpoort: het gaat over
+     bedragen per bron, en die staan op codenaam maar horen niet publiek.
+
+     De REGELS zelf (30%, 20 lokaal, 10 foundation, met per deel waaróm) zijn
+     wel publiek: die staan in de voorwaarden en horen daar live vandaan te
+     komen in plaats van als los getal in een document (COMMERCIE.md par. 9). */
+  app.post('/api/office/sociaal', officeAuth, (req, res) => veilig(res, () =>
+    (ctx.fonds && ctx.fonds.socialeStand ? ctx.fonds.socialeStand(req.body || {})
+      : { status: 503, error: 'Het fonds is niet gemount.' })));
+  const socialeRegels = () => ({ status: 200, huidig: allocatie.HUIDIGE_VERSIE,
+    regels: Object.values(allocatie.REGELS).map(r => ({ versie: r.versie, vanaf: r.vanaf,
+      totaalDeel: r.totaalDeel, exBtw: r.exBtw,
+      delen: r.delen.map(d => ({ id: d.id, deel: d.deel, label: d.label, waarom: d.waarom })) })) });
+  app.get('/api/sociaalbeleid', (req, res) => stuur(res, socialeRegels()));
+  app.post('/api/sociaalbeleid', (req, res) => stuur(res, socialeRegels()));
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});

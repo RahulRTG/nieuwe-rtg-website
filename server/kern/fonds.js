@@ -36,6 +36,7 @@ function aandeelEuro(bijdrageInclBtw) {
 function maakFonds(state) {
   const db = state.db;
   const save = state.save || (() => {});
+  const allocatie = require('./commercie/allocatie').maakAllocatie({ db, save, nu: () => Date.now() });
   const log = state.log || null;
   const opdrachten = state.betaalOpdrachten || null;
   const env = state.env || process.env;
@@ -103,6 +104,25 @@ function maakFonds(state) {
       status: best.iban ? 'ingepland' : 'te_storten',
       at: new Date().toISOString()
     };
+
+    /* HET SPOOR PER EURO. Naast de afdracht zelf komt een rij in de sociale
+       allocatie (kern/commercie/allocatie.js): met de VERDELING erbij (20%
+       lokaal, 10% de stichting), de REGELVERSIE waarmee gerekend is, en de
+       tijdstempels van gereserveerd tot afgewikkeld.
+
+       Waarom naast en niet in plaats van: deze lijst gaat over de BETALING aan
+       de stichting (een rail, een IBAN, een opdracht), de allocatie over de
+       VERDELING en de verantwoording. Ze beantwoorden verschillende vragen, en
+       "waar ging deze euro heen" was er tot 20 augustus 2026 geen van beide.
+       MARKT.md waarschuwt dat de 30% aantoonbaar moet zijn zodra hij in
+       marketing staat; dit is dat bewijs. */
+    try {
+      const soc = allocatie.reserveer({
+        bronSoort: 'lidmaatschap', bronId: invoiceId || afdracht.id, codenaam: wie,
+        bedragCenten: Math.round(centen / AANDEEL)   // terug naar de basis ex btw
+      });
+      if (soc) afdracht.allocatieId = soc.id;
+    } catch (e) { /* de verantwoording mag de afdracht nooit tegenhouden */ }
     /* METEEN in de lijst, voordat er een opdracht bestaat. De teruggang zoekt de
        afdracht op ledgerRef; stond de push onderaan, dan kon een opdracht die
        zijn pogingen opmaakt de afdracht nog niet vinden en verdween de reden. */
@@ -184,7 +204,13 @@ function maakFonds(state) {
     };
   }
 
-  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht, overzicht, bestemming, koppelBank, AANDEEL };
+  /* De verantwoording: wat is gereserveerd, wat kan weg, wat is er uit -- per
+     deel, want "30% is afgedragen" zegt niets als het lokale deel al twee jaar
+     wacht. */
+  function socialeStand(filter) { return { ok: true, ...allocatie.stand(filter) }; }
+
+  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht, overzicht, bestemming,
+    koppelBank, socialeStand, allocatie, AANDEEL };
 }
 
 module.exports = { maakFonds, isAbonnement, aandeelCenten, aandeelEuro, AANDEEL };

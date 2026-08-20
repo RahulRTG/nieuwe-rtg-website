@@ -1,7 +1,6 @@
 /* Aanmeldingen-deel "betaalschema" (kern/aanmeldingen): na het menselijke akkoord
-   loopt de lidmaatschapsbetaling automatisch -- 12 maanden lang de maandbijdrage
-   (uit het contract van het lid als de pas contractueel is, anders uit de
-   prijslijst),
+   loopt de lidmaatschapsbetaling automatisch -- de maandbijdrage uit het contract
+   van het lid,
    met van elke termijn 30% naar de RTFoundation (20% lokaal, 10% de foundation
    zelf). Dit is een grootboek van geplande termijnen; er wordt nooit geclaimd dat
    een echte betaling is verwerkt -- een betaalprovider zou het schema uitvoeren.
@@ -10,6 +9,7 @@ module.exports = (ctx) => {
   const { B, geldPasprijzen, rid, nu, eur, PASSEN, db, save } = ctx;
   const { maandCentenUit } = require('../pasprijs');
   const contracten = require('../commercie/contract').maakContracten({ db, save, nu });
+  const allocatie = require('../commercie/allocatie');
 
   /* De maandbijdrage van DEZE aanmelding in centen.
 
@@ -81,10 +81,24 @@ module.exports = (ctx) => {
       .map(t => ({ id: rid(), aanmeldingId: a.id, contractId: c.id, pas: a.pas, naam: a.naam,
         maand: t.termijn, periode: t.periode, opMaat: false,
         centen: t.centen,
-        foundationCenten: Math.round(t.centen * 0.30),
-        lokaalCenten: Math.round(t.centen * 0.20),
-        rtfCenten: Math.round(t.centen * 0.10),
+        ...socialeSplit(t.centen),
         vervalt: t.vervalt, status: 'gepland', at: nu() }));
+  }
+
+  /* De 30%-split komt uit de REGEL en niet uit drie losse getallen. Hier stond
+     `* 0.30`, `* 0.20` en `* 0.10` op vier plekken in dit bestand -- en die
+     percentages stonden nergens onderbouwd behalve in GAMEHALL.md par. 12.5,
+     over de spelwereld (PRIJZEN.md 4.8). Nu draagt elke termijn ook de
+     regelversie, zodat een latere wijziging het verleden niet herschrijft. */
+  function socialeSplit(centen) {
+    const v = allocatie.verdeel(centen);
+    const deel = id => (v.delen.find(d => d.id === id) || {}).centen || 0;
+    return {
+      foundationCenten: v.totaalCenten,
+      lokaalCenten: deel('lokaal'),
+      rtfCenten: deel('foundation'),
+      socialeRegel: v.regelVersie
+    };
   }
 
   /* VERLENGEN: hier ontstaat maand 13. De volgende periode wordt uitgerekend uit
@@ -101,8 +115,7 @@ module.exports = (ctx) => {
     const extra = contracten.termijnenTussen(c, voor, contracten.eindeVerbintenis(c))
       .map(t => ({ id: rid(), aanmeldingId: rijtje.aanmeldingId, contractId: c.id, pas: rijtje.pas,
         naam: rijtje.naam, maand: t.termijn, periode: t.periode, opMaat: false, centen: t.centen,
-        foundationCenten: Math.round(t.centen * 0.30), lokaalCenten: Math.round(t.centen * 0.20),
-        rtfCenten: Math.round(t.centen * 0.10), vervalt: t.vervalt, status: 'gepland', at: nu() }));
+        ...socialeSplit(t.centen), vervalt: t.vervalt, status: 'gepland', at: nu() }));
     rijtje.termijnen = rijtje.termijnen.concat(extra);
     save();
     return { ok: true, contract: contracten.publiek(c), erbij: extra.length };

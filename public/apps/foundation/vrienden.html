@@ -20,7 +20,14 @@
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
-  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
+  /* EEN IDENTITEIT, EEN KAART. De codenaam en de pin zijn niet twee
+     onderwerpen maar twee antwoorden op dezelfde vraag: hoe vindt iemand jou.
+     Ze stonden in twee losse kaarten onder elkaar, en daardoor begon de
+     pin-kaart met een streep die nergens onder hing -- die rand was ooit de
+     scheiding BINNEN een kaart. Nu is het weer een kaart en doet de streep
+     weer waar hij voor is. */
+  .ident{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.85rem 1rem;margin-bottom:1.2rem;font-size:.9rem;}
+  .mijncn{font-size:.9rem;}
   .mijncn b{color:var(--goud);}
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
@@ -32,6 +39,13 @@
      ook niet op codes: die horen bij Reference, tabulair. */
   .pinrij .pincode{font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;font-size:1.05rem;letter-spacing:.18em;color:var(--accent-tekst);}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
+  .pinbeheer{margin-top:.5rem;}
+  .pinbeheer > summary{list-style:none;cursor:pointer;font-size:.78rem;color:var(--zacht);display:inline-flex;align-items:center;gap:.35rem;padding:.35rem 0;min-height:24px;}
+  .pinbeheer > summary::-webkit-details-marker{display:none;}
+  .pinbeheer > summary::before{content:"";width:.42rem;height:.42rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;}
+  .pinbeheer[open] > summary::before{transform:rotate(45deg);}
+  .pinbeheer > summary:hover{color:var(--accent-tekst);}
+  .uitlegrij{color:var(--zacht);font-size:.82rem;line-height:1.5;margin:0 0 .6rem;}
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
   #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
   /* een eigen display wint van de [hidden]-regel van de browser */
@@ -46,7 +60,9 @@
   .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
   .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
   .story.gezien .ring{border-color:var(--lijn);}
-  .story .nm{font-size:.65rem;color:var(--zacht);margin-top:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Twee regels in plaats van afkappen. "Jouw verhaal" werd "Jouw ..." en dat
+     is geen label meer maar een raadsel; de bel eronder is even breed. */
+  .story .nm{font-size:.65rem;color:var(--zacht);margin-top:.25rem;line-height:1.25;overflow-wrap:break-word;}
   .zoekrij{display:flex;gap:.5rem;margin-bottom:.6rem;}
   .zoekrij .veld{flex:1;}
   .lijst{display:flex;flex-direction:column;gap:.5rem;}
@@ -72,11 +88,23 @@
   .invoer .veld{flex:1;}
   .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
   /* de dag-opdracht */
-  .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
+  .opkaart{display:flex;align-items:center;gap:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.85rem 1rem;margin:.4rem 0 .8rem;}
+  .opkaart .em{flex:none;}
+  .leegregel{color:var(--zacht);font-size:.85rem;line-height:1.5;margin:.1rem 0 1rem;}
   .opkaart .em{font-size:1.6rem;}
   .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
   .opkaart .tx b{color:var(--goud);}
   .opkaart .tx small{display:block;color:var(--zacht);font-size:.72rem;margin-top:.15rem;}
+  /* Op een telefoon paste de knop niet naast de tekst: de zin brak in stukjes
+     van drie woorden en de kleine letter eronder werd vier regels. Stapelen is
+     hier geen concessie maar de goede volgorde -- eerst wat er gevraagd wordt,
+     dan de knop waarmee je meedoet. */
+  @media (max-width:560px){
+    .opkaart{flex-wrap:wrap;}
+    .opkaart .tx{flex:1 1 100%;order:2;}
+    .opkaart .em{order:1;}
+    .opkaart .knop{order:3;margin-left:auto;}
+  }
   /* snap-studio */
   .studio-cv{width:100%;border-radius:12px;display:block;touch-action:none;background:#111;}
   .strij{display:flex;gap:.4rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
@@ -116,23 +144,36 @@
 <header id="balk"></header>
 <main class="wrap" id="hoofd" tabindex="-1">
   <h1>Contacten</h1>
-  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam, of voeg hem toe met zijn pin: overtypen of de QR scannen.</div>
+  <div class="intro">Chat, bel en deel met wie je kent &mdash; in de RTFoundation of in de RTG-app. Iedereen vindt elkaar op codenaam.</div>
+  <!-- Codenaam en pin horen bij elkaar: allebei antwoorden ze op "hoe vindt
+       iemand mij". Vandaar een kaart. De pin staat niet bij een beschermd
+       profiel (15 of jonger): daar voegt de ouder toe. -->
+  <section class="ident">
   <div class="mijncn" id="mijncn"></div>
-  <!-- je eigen pin: voorlezen, kopieren of voorhouden. Staat niet bij een
-       beschermd profiel (15 of jonger): daar voegt de ouder toe. -->
   <div class="mijncn" id="mijnpin" hidden>
     <div class="pinrij"><span class="pinlabel">Jouw pin</span><b class="pincode" id="pinCode">····-····</b></div>
+    <!-- DELEN EN BEHEREN ZIJN NIET HETZELFDE. Er stonden vijf even zware
+         knoppen naast elkaar, waarvan je er twee dagelijks gebruikt en drie
+         hooguit een keer. Vijf gelijke knoppen betekent dat er geen belangrijk
+         is. Kopieer en Toon QR zijn delen; de rest is beheer en staat een tik
+         verderop -- weggestopt is het niet, het staat er gewoon niet bovenop. -->
     <div class="pinakt">
       <button class="knop grijs mini" id="pinKopie">Kopieer</button>
       <button class="knop grijs mini" id="pinQrKnop">Toon QR</button>
-      <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
-      <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
-      <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
     </div>
+    <details class="pinbeheer">
+      <summary>Pin beheren</summary>
+      <div class="pinakt">
+        <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
+        <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
+        <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
+      </div>
+    </details>
     <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
     <div id="pinLiveDoek" hidden></div>
     <div id="pinUitNoot" hidden>Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel, want die houd je bewust op.</div>
   </div>
+  </section>
 
   <div class="deel">Verhalen</div>
   <div id="opdrachtKaart"></div>
@@ -141,6 +182,7 @@
   <div class="deel">Toevoegen</div>
   <div id="zoekBlok">
     <div class="sec">Vriend toevoegen</div>
+    <p class="uitlegrij">Vind iemand op zijn codenaam, of voeg hem toe met zijn pin: overtypen of de QR scannen.</p>
     <div class="zoekrij">
       <input class="veld" id="zoek" placeholder="Zoek op codenaam (bijv. Gouden Vos)" maxlength="40">
       <button class="knop" id="zoekBtn">Zoek</button>
@@ -805,7 +847,19 @@ async function laadStories(){
   const st = d.stories||[];
   let html = '<div class="story" id="storyPlus"><div class="ring">＋</div><div class="nm">Jouw verhaal</div></div>';
   html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"'+(v.opdracht?' title="'+esc(v.opdracht)+'"':'')+'><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+(v.opdracht?'✶ ':'')+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
+  /* EEN LEGE RIJ IS GEEN LEGE RIJ MAAR EEN VRAAG. Stond hier alleen de
+     plus-bel, dan zag je een knop zonder context en niets wat vertelt of er
+     iets mis is of dat er gewoon nog niemand iets heeft geplaatst. Een regel
+     ernaast is het verschil tussen "leeg" en "stuk". */
   $('#stories').innerHTML = html;
+  const leegRij = $('#storiesLeeg');
+  if (leegRij) leegRij.remove();
+  if (!st.length) {
+    const p = document.createElement('p');
+    p.id = 'storiesLeeg'; p.className = 'leegregel';
+    p.textContent = 'Nog geen verhalen van anderen. Wat jij plaatst blijft 24 uur staan.';
+    $('#stories').insertAdjacentElement('afterend', p);
+  }
   $('#storyPlus').addEventListener('click', ()=>kiesStory(false));
   $('#stories').querySelectorAll('[data-story]').forEach(b=> b.addEventListener('click', ()=> openStory(b.dataset.story)));
 }

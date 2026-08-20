@@ -74,6 +74,16 @@
   -webkit-backdrop-filter:saturate(180%) blur(20px);
   backdrop-filter:saturate(180%) blur(20px);
 }
+/* MATGLAS IS GEEN MATGLAS ZONDER BLUR. Het materiaal hierboven is 72% zwart en
+   rekent op backdrop-filter om de rest te doen. Waar die filter niet draait --
+   een oudere browser, een toestel dat hem uitzet om stroom te sparen, een
+   render zonder GPU -- blijft er 72% over, en dan scrolt de tekst van de pagina
+   LEESBAAR onder de balk door. Dat leest als twee schermen over elkaar. Waar de
+   filter er niet is, is de balk dus gewoon dicht. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .ios-nav{ background:#0C0C0B !important; }
+  :root[data-rtg-thema="champagne"] .ios-nav{ background:#F4F0E9 !important; }
+}
 /* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
    en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
    worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
@@ -215,7 +225,13 @@
 }
 .ios-thuis:focus-visible{outline:2px solid var(--ios-accent); outline-offset:3px;}
 /* de pil ligt over de inhoud: die houdt onderaan ruimte vrij */
-body[data-ios]{padding-bottom:var(--ios-thuis-ruimte);}
+/* TWEE VASTE DINGEN ONDERAAN, EEN PADDING. Naast de home-indicator kan ook de
+   cookiemelding onderaan staan (shared/cookie.js, die meet zichzelf en zet
+   --rtg-cookieruimte). Die schreef zijn eigen body-regel, en dit blad won op
+   specificiteit -- waardoor de melding weer over de laatste regels lag. Twee
+   regels die om dezelfde padding vechten heeft altijd een verliezer; optellen
+   niet. Wie er niet is telt als nul. */
+body[data-ios]{padding-bottom:calc(var(--ios-thuis-ruimte, 0px) + var(--rtg-cookieruimte, 0px));}
 
 /* ----------------------------------------- openen, sluiten, terugveren */
 @media (prefers-reduced-motion: no-preference){

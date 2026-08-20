@@ -30,6 +30,7 @@
     5. De serverklok stempelt de scan; het lichaam mag hem niet zetten.
     6. De offline bundel mag zijn tijden wel meesturen, en vindt de dubbele.
     7. Deurpersoneel scant wel, maar geeft geen passen uit.
+   8. Welke dag er LOOPT komt van de server, en "geen" is een geldig antwoord.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -165,6 +166,28 @@ test('7. deurpersoneel scant wel, maar geeft geen passen uit', async () => {
   assert.ok(typeof stand.zin === 'string' && stand.zin.length > 0);
 });
 
+test('8. welke dag er loopt komt van de server, en geen is een geldig antwoord', async () => {
+  /* Een festivaldag loopt over middernacht heen, dus "vandaag" is niet de
+     kalenderdatum. Zou een scherm dat zelf uitrekenen, dan staat er een tweede
+     waarheid naast kern/festival/model.js -- en die twee lopen uit elkaar op
+     precies het uur waarop het ertoe doet. */
+  const nu = await post('/api/festival/dag/nu', { festival: fid, editie: eid }, deur);
+  assert.equal(nu.ok, true);
+  assert.ok(nu.dag, 'er loopt een dag: die van vandaag, 00:00-23:59');
+  assert.equal(nu.dag.id, vandaagId);
+
+  /* En een editie waarvan de dagen voorbij zijn, geeft niets terug in plaats
+     van de dichtstbijzijnde te raden. Een cockpit die buiten de openingstijden
+     een dag verzint, telt mensen die er niet zijn. */
+  const oud = await post('/api/festival/nieuw', { naam: 'Vorig jaar' }, manager);
+  const oudE = await post('/api/festival/editie', { festival: oud.festival.id, jaar: 2026 }, manager);
+  await post('/api/festival/dag', { festival: oud.festival.id, editie: oudE.editie.id,
+    datum: '2026-01-05', open: '12:00', sluit: '23:00' }, manager);
+  const leeg = await post('/api/festival/dag/nu', { festival: oud.festival.id, editie: oudE.editie.id }, manager);
+  assert.equal(leeg.ok, true);
+  assert.equal(leeg.dag, null);
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -194,4 +217,9 @@ test('7. deurpersoneel scant wel, maar geeft geen passen uit', async () => {
 
    5. In routes/festival.js magFestival() altijd true laten geven.
       -> toets 1 zakte.
+
+   6. In routes/festival/poort.js /api/festival/dag/nu de datum en tijd uit het
+      LICHAAM laten komen in plaats van uit nu().
+      -> toets 8 zakte: met een lege body viel er geen dag meer te vinden, en
+         het beeld zou dus buiten de openingstijden hetzelfde zeggen als erbinnen.
    ========================================================================== */

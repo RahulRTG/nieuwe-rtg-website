@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Festival</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/reizen-veilig.css" rel="stylesheet">
+<style>
+/* DE SCHIL IS NIET VAN DIT SCHERM. Bank, werkvlak en tabbalk komen uit
+   shared/reizen-veilig.css -- dezelfde schil als RTG Geld en RTG Leven. Op een
+   breed scherm staat de bank links (154px), onder de 760px klapt hij naar een
+   onderbalk van 68px. Dat is EEN element in twee standen, en daarom hoort er
+   hier niets van overgeschreven te worden.
+
+   Wat hieronder staat is alleen het instrument in het werkvlak. */
+.fp-poort{display:flex;flex-direction:column;height:100%;padding:var(--rtg-ruim);gap:var(--rtg-ruim);}
+.fp-poort *,.fp-poort *::before,.fp-poort *::after{box-sizing:border-box;}
+.fp-kop{display:flex;gap:var(--rtg-ruim-klein);align-items:center;flex-wrap:wrap;}
+.fp-kop select{min-height:44px;max-width:100%;padding:0 .6rem;font:inherit;}
+
+/* HET UITSLAGVLAK. Kleur is de DERDE laag: er staat altijd een woord en een
+   teken (ONTWERP.md par. 5), zodat het leesbaar blijft voor wie kleur niet ziet
+   en op een zwart-witte print. */
+#uitslag{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;border:1px solid var(--rtg-line);padding:var(--rtg-ruim);
+  min-height:32dvh;width:100%;min-width:0;}
+#uitslagWoord{font-size:clamp(1.9rem,9vw,4rem);line-height:1;letter-spacing:.04em;font-weight:600;
+  max-width:100%;overflow-wrap:anywhere;}
+#uitslagZin{margin-top:1rem;font-size:clamp(1rem,3.2vw,1.3rem);max-width:32ch;color:var(--rtg-txt);}
+#uitslagBij{margin-top:.6rem;font-size:.85rem;color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
+#uitslag[data-sig="gezond"]  {border-color:var(--rtg-sig-gezond);}
+#uitslag[data-sig="aandacht"]{border-color:var(--rtg-sig-aandacht);}
+#uitslag[data-sig="incident"]{border-color:var(--rtg-sig-incident);}
+#uitslag[data-sig="gezond"]   #uitslagWoord{color:var(--rtg-sig-gezond);}
+#uitslag[data-sig="aandacht"] #uitslagWoord{color:var(--rtg-sig-aandacht);}
+#uitslag[data-sig="incident"] #uitslagWoord{color:var(--rtg-sig-incident);}
+#uitslagWoord::after{content:attr(data-teken);margin-left:.4em;font-size:.8em;}
+
+.fp-invoer{display:flex;gap:var(--rtg-ruim-klein);width:100%;min-width:0;}
+/* min-width:0 op het veld: een flexkind mag standaard niet kleiner worden dan
+   zijn inhoud, en dan duwt een grote letter het hele scherm scheef. */
+#code{flex:1 1 auto;min-width:0;min-height:64px;padding:0 1rem;
+  font-size:clamp(1.1rem,4.5vw,1.7rem);letter-spacing:.16em;text-transform:uppercase;
+  font-variant-numeric:var(--rtg-cijfers);}
+/* De VORM van veld en knop komt uit de gedeelde stijl en wordt niet
+   overschreven; alleen de MAAT wordt gezet, want aan een hek moet een duim
+   raak zijn. Een eigen vorm zou dit het enige afwijkende scherm van 291 maken. */
+body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
+  padding:0 1.4rem;white-space:nowrap;cursor:pointer;}
+.fp-voet{display:flex;gap:var(--rtg-ruim);align-items:center;flex-wrap:wrap;width:100%;
+  border-top:1px solid var(--rtg-line);padding-top:var(--rtg-ruim-klein);font-size:.85rem;}
+.teller{font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-soft);}
+/* De standzin deelt de tabbalk met de tabs en met Rahul. Hij krijgt daarom een
+   eigen maat en kapt netjes af in plaats van de balk uit elkaar te duwen; de
+   volle zin staat op het blad Beeld. */
+#fpStand{align-self:center;max-width:min(46ch,42vw);padding:0 12px;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:760px){#fpStand{display:none;}}
+.teller b{color:var(--rtg-txt);font-weight:600;}
+
+/* Beeld en terrein: registers, geen kaartendashboards (ONTWERP.md par. 7). */
+.fp-blad{padding:clamp(18px,3vw,34px);max-width:900px;}
+.fp-blad h1{font:500 clamp(26px,3.4vw,40px)/1.05 'Bodoni Moda',serif;margin:14px 0 6px;}
+.fp-lijst{margin-top:22px;display:flex;flex-direction:column;}
+.fp-regel{display:flex;gap:14px;align-items:baseline;padding:12px 0 12px 14px;
+  border-bottom:1px solid var(--rtg-line);border-left:2px solid transparent;}
+.fp-regel[data-sig="kritiek"] {border-left-color:var(--rtg-sig-incident);}
+.fp-regel[data-sig="hoog"]    {border-left-color:var(--rtg-sig-aandacht);}
+.fp-regel[data-sig="aandacht"]{border-left-color:var(--rtg-sig-actief);}
+.fp-regel .rek{margin-left:auto;font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-soft);
+  white-space:nowrap;}
+.fp-stil{color:var(--rtg-soft);font-size:.85rem;margin-top:10px;}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="command">
+<div class="rv-app">
+
+  <aside class="rv-bank">
+    <nav aria-label="RTG Festival">
+      <button class="actief" data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
+      <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
+      <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
+    </nav>
+    <div class="rv-bankvoet">
+      <button data-blad="terrein"><span class="rv-icoon">≡</span><span>Editie</span></button>
+    </div>
+  </aside>
+
+  <main class="rv-werk" id="main">
+    <header class="rv-tabs">
+      <div id="fpTabs"><span class="rv-tab actief" id="fpWie"></span></div>
+      <span class="teller" id="fpStand"></span>
+    </header>
+
+    <section class="rv-panes" id="fpPanes">
+
+      <div class="rv-pane actief" id="bladPoort">
+        <div class="fp-poort">
+          <div class="fp-kop">
+            <select id="kiesPlek" aria-label="Bij welke poort staat u"></select>
+            <select id="kiesRichting" aria-label="Naar binnen of naar buiten">
+              <option value="in">Naar binnen</option>
+              <option value="uit">Naar buiten</option>
+            </select>
+          </div>
+
+          <div id="uitslag" role="status" aria-live="assertive" data-sig="stil">
+            <div id="uitslagWoord" data-teken="">GEREED</div>
+            <div id="uitslagZin">Scan een pas of typ de code.</div>
+            <div id="uitslagBij"></div>
+          </div>
+
+          <form class="fp-invoer" id="scanForm">
+            <input id="code" name="code" autocomplete="off" autocapitalize="characters"
+              spellcheck="false" maxlength="16" aria-label="Pascode" placeholder="PASCODE">
+            <button class="knop" type="submit">Scan</button>
+          </form>
+
+          <div class="fp-voet">
+            <span class="teller" id="binnen"></span>
+            <span class="teller" id="wachtrij"></span>
+            <button class="knop" id="synchroniseer" type="button" hidden>Wachtrij versturen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladBeeld" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">FESTIVAL COMMAND</div>
+          <h1 id="beeldZin">Nog niets gemeten.</h1>
+          <p class="fp-stil">Wat goed gaat komt hier niet in beeld. Wat er staat, vraagt aandacht.</p>
+          <div class="fp-lijst" id="beeldLijst"></div>
+          <p class="fp-stil" id="beeldOngemeten"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladTerrein" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">TERREIN</div>
+          <h1>De plekken en hun grenzen</h1>
+          <p class="fp-stil">De veilige capaciteit staat naast de vergunde. Het verschil tussen die twee is de tijd die u heeft.</p>
+          <div class="fp-lijst" id="terreinLijst"></div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script src="/apps/festival/schil.js" defer></script>
+<script src="/apps/festival/poort.js" defer></script>
+<script src="/apps/festival/beeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

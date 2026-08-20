@@ -39,6 +39,11 @@ module.exports = (ctx) => {
      hoe een cockpit zijn geloofwaardigheid verliest. */
   const HORIZON = 60;
 
+  /* EEN NEDERLANDS GETAL IN EEN NEDERLANDSE ZIN. Deze zinnen worden gelezen
+     door een productieleider op een terrein, niet door een parser; "0.67 per
+     minuut" is daar een tikfout en geen notatie. */
+  const komma = (n) => String(n).replace('.', ',');
+
   function uitzonderingen(fid, eid, vraag) {
     const e = editieVind(fid, eid);
     if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
@@ -84,7 +89,7 @@ module.exports = (ctx) => {
       if (over <= horizon) {
         uit.push({ plek: p.id, naam: p.naam, ernst: over <= 15 ? 'hoog' : 'aandacht', over,
           zin: p.naam + ' raakt over ' + over + ' minuten aan de veilige capaciteit ('
-            + p.veiligeCapaciteit + '), bij ' + perMinuut + ' per minuut.',
+            + p.veiligeCapaciteit + '), bij ' + komma(perMinuut) + ' per minuut.',
           bron: { aanwezig: p.aanwezig, veiligeCapaciteit: p.veiligeCapaciteit, perMinuut } });
       }
     }

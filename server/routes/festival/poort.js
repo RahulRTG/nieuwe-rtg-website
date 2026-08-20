@@ -34,6 +34,25 @@ module.exports = (kern, deur) => {
     return { datum: t.slice(0, 10), tijd: t.slice(11, 16) };
   };
 
+  /* WELKE DAG LOOPT ER NU? Een festivaldag loopt over middernacht heen, dus
+     "vandaag" is niet de kalenderdatum. Een scherm dat dat zelf uitrekent,
+     bouwt een tweede waarheid naast kern/festival/model.js (dagOpMoment) -- en
+     die twee lopen uit elkaar op precies het uur waarop het ertoe doet.
+
+     Deze ingang bestaat omdat het beeld anders pas iets kon tonen NADAT er
+     toevallig een geslaagde scan in dezelfde browsersessie was gedaan. Wie om
+     drie uur 's nachts het beeld opent, hoort niet eerst iemand te moeten
+     binnenlaten. Geen dag open is een geldig antwoord: dan staat er null. */
+  app.post('/api/festival/dag/nu', supplierAuth, (req, res) => {
+    const f = mijn(req);
+    if (!f) return stuur(res, geenFestival);
+    const e = festival.editieVind(f.id, editieVan(req));
+    if (!e) return stuur(res, { status: 404, error: 'Deze editie bestaat niet.' });
+    const t = nu();
+    const dag = festival.dagOpMoment(e, t.datum, t.tijd);
+    res.json({ ok: true, nu: t, dag: dag || null });
+  });
+
   /* ---- de poort ----
      Geen managerOnly: dit is het werk van de mens bij het hek. Wel supplierAuth,
      dus het personeelslid is ingelogd op deze zaak en zijn naam gaat mee de scan

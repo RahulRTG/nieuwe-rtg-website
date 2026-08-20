@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T08:59:00.462Z",
-  "commit": "6ea8268",
+  "op": "2026-08-20T09:34:42.819Z",
+  "commit": "12b71c7",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -31,7 +31,7 @@
    "dagen": 0.1
   },
   "OUTPUTPROEF.json": {
-   "op": "2026-08-20T08:56:46.991Z",
+   "op": "2026-08-20T09:06:13.509Z",
    "dagen": 0
   },
   "AUDITPROEF.json": {
@@ -43,9 +43,9 @@
  "telling": {
   "bewezen": 0,
   "verschaald": 0,
-  "verzwakt": 4159,
+  "verzwakt": 4180,
   "geschorst": 0,
-  "ongemeten": 26
+  "ongemeten": 5
  },
  "perRoute": {
   "POST /api/aandacht": {
@@ -1529,9 +1529,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/cluster/:actie": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/code/dyn": {
    "staat": "verzwakt",
@@ -2574,9 +2574,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "GET /api/foundation/gezin/:code/klussen": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (AUTH, ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "GET /api/foundation/gezin/:code/locaties": {
    "staat": "verzwakt",
@@ -2915,7 +2915,7 @@
   },
   "GET /api/foundation/health": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, AUDIT, FAILURE, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/foundation/hulp/ai": {
@@ -3325,7 +3325,7 @@
   },
   "POST /api/foundation/school/huiswerk/maak": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/foundation/school/huiswerk/oefen": {
@@ -3830,7 +3830,7 @@
   },
   "POST /api/foundation/school/webhook/lijst": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/foundation/school/webhook/proef": {
@@ -11499,9 +11499,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/partner": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/partner/apply": {
    "staat": "verzwakt",
@@ -11520,7 +11520,7 @@
   },
   "POST /api/partnertrips": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/paspoort/beslis": {
@@ -11755,7 +11755,7 @@
   },
   "GET /api/push/key": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, AUDIT, FAILURE, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/push/subscribe": {
@@ -12030,7 +12030,7 @@
   },
   "POST /api/rtf/baby/instellen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/baby/moment-ai": {
@@ -12170,7 +12170,7 @@
   },
   "POST /api/rtf/kantoorpakket/bewaar": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/kantoorpakket/fase": {
@@ -12230,7 +12230,7 @@
   },
   "POST /api/rtf/kantoorpakket/vul": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/kantoorpakket/weg": {
@@ -12635,7 +12635,7 @@
   },
   "POST /api/rtf/social/dm/send": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/social/find": {
@@ -12700,7 +12700,7 @@
   },
   "POST /api/rtf/social/snap/send": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/social/snap/view": {
@@ -12755,7 +12755,7 @@
   },
   "POST /api/rtf/spel/arcade-score": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/spel/dag": {
@@ -12810,7 +12810,7 @@
   },
   "POST /api/rtf/spel/opgeven": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/spel/praat": {
@@ -12855,7 +12855,7 @@
   },
   "POST /api/rtf/spel/sneek-bord": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtf/spel/sneek-score": {
@@ -14539,18 +14539,18 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "GET /api/sso/start": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (AUTH, ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "GET /api/sso/terug": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (AUTH, ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/sso/waarheen": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/sso/wissel": {
@@ -14560,7 +14560,7 @@
   },
   "GET /api/stad/algoritmes": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, AUDIT, FAILURE, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (ACL, INPUT, AUDIT, FAILURE, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/stad/algoritmes": {
@@ -19815,7 +19815,7 @@
   },
   "POST /api/translate": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (ACL, INPUT, OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/uitgaan": {
@@ -20384,9 +20384,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/bouwstaat": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/concept": {
    "staat": "verzwakt",
@@ -20394,9 +20394,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/kritiek": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/maak": {
    "staat": "verzwakt",
@@ -20409,14 +20409,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/project": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/verwijder": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/architect/zet": {
    "staat": "verzwakt",
@@ -20429,9 +20429,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/atelier/collectie": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/atelier/concept": {
    "staat": "verzwakt",
@@ -20449,14 +20449,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/atelier/techpack": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/atelier/verwijder": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/atelier/zet": {
    "staat": "verzwakt",
@@ -20474,9 +20474,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/hardware/kritiek": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/hardware/maak": {
    "staat": "verzwakt",
@@ -20499,14 +20499,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/hardware/serie": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/hardware/stuklijst": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/hardware/verwijder": {
    "staat": "verzwakt",
@@ -20564,9 +20564,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/redactie/ai/schrijf": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/redactie/artikel/maak": {
    "staat": "verzwakt",
@@ -20579,9 +20579,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/redactie/artikel/verwijder": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/redactie/artikel/zet": {
    "staat": "verzwakt",
@@ -20604,9 +20604,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/redactie/nieuwstips": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio": {
    "staat": "verzwakt",
@@ -20614,9 +20614,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/collectie": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/concept": {
    "staat": "verzwakt",
@@ -20624,9 +20624,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/kritiek": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/lookbook": {
    "staat": "verzwakt",
@@ -20639,9 +20639,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/specsheet": {
-   "staat": "ongemeten",
-   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
-   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkplek/bureau/studio/verwijder": {
    "staat": "verzwakt",

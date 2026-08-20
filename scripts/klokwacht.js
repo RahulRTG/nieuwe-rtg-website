@@ -221,7 +221,17 @@ const VERANTWOORD = {
   'sloophamer.pg.test.js': 'chaosproef: redis en postgres gaan met opzet neer en weer aan, met verkeer ertussen. ' +
     'De duur van de storing is wat er getoetst wordt',
   'bugjacht.test.js': 'de sleeps zitten in NEPDIENSTEN die trage I/O nabootsen (Postgres, de motor, Stripe); ' +
-    'de toets wacht daar niet op de klok, hij bouwt er een fixture mee'
+    'de toets wacht daar niet op de klok, hij bouwt er een fixture mee',
+  'dubbeltik.test.js': 'de sleeps zitten in de HANDLER van een nepserver die traag werk nabootst; ' +
+    'dat is een fixture, en de duur ervan is wat de dubbeltik moet overleven',
+  'duurzaamheid-kill.test.js': 'de kill valt met opzet MIDDEN in een burst betalingen; ' +
+    'er is geen toestand voor "we zijn nu halverwege de schrijfstroom", de duur is het onderwerp',
+  'alarmweg.test.js': 'bewaakt een AFWEZIGHEID: van vijfentwintig meldingen mag er maar EEN de deur uit, ' +
+    'en de wacht is de ruimte waarin een tweede zich zou verraden',
+  'pg-snapshot.test.js': 'bewaakt een AFWEZIGHEID: binnen het venster komt er geen tweede snapshot bij, ' +
+    'en de wacht is ruim voorbij de flush-cyclus van 150 ms waarin een losgeslagen luisteraar zich zou melden',
+  'pg-wachten.test.js': 'bewaakt een AFWEZIGHEID (de server sluit zichzelf NIET af) over een venster dat aan ' +
+    'het product hangt: PG_HERKANS_MS staat op 300, dus 1500 ms is een stuk of vijf herkansingen'
 };
 
 function leesVastgelegd() {

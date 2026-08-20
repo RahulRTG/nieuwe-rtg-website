@@ -34,7 +34,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
 const HEEFT_REDIS = !!process.env.REDIS_URL;
@@ -307,7 +307,12 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
       // Y opent zijn live-kanaal; X belt (WebRTC-ring). De server is enkel signalering.
       const yStream = await openSSE(A.base + '/api/stream?token=' + encodeURIComponent(Y.token));
       streams.push(yStream);
-      await sleep(150);
+      /* WACHTEN OP `hello`, en niet 150 ms gokken. /api/stream zet de client in
+         sseClients en stuurt daarna meteen een `hello` (server.js). Dat event is
+         dus het bewijs dat de server deze luisteraar KENT -- en dat is precies de
+         voorwaarde voor de ring hieronder. Belt X eerder, dan gaat de ring naar
+         niemand en zakt de toets acht seconden later op iets dat niet stuk is. */
+      await yStream.wachtOp(e => e.event === 'hello', 15000);
       const bel = await api(A.base, '/api/member/call', { toKey: Ytreffer.key, kind: 'ring', video: true }, X.token);
       assert.equal(bel.status, 200, 'X stuurt een videobel-ring');
       const ev = await yStream.wachtOp(e => e.event === 'call' && e.data && e.data.kind === 'ring', 8000);
@@ -316,8 +321,10 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
 
   } finally {
     for (const s of streams) s.close();
-    await sleep(100);
-    stop(A.child); stop(B.child);
+    /* stopNet en niet stop() met 100 ms ernaast: SIGTERM laat de servers hun
+       laatste staat wegschrijven, en `exit` is het teken dat ze van hun datamap
+       af zijn -- die twee mappen worden hieronder verwijderd. */
+    await stopNet(A.child); await stopNet(B.child);
     try { fs.rmSync(dirA, { recursive: true, force: true }); } catch (e) {}
     try { fs.rmSync(dirB, { recursive: true, force: true }); } catch (e) {}
   }

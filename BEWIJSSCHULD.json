@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-08-20T11:55:35.454Z",
-  "commit": "e101061",
+  "op": "2026-08-20T12:29:40.872Z",
+  "commit": "568b9ac",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
-  "posten": 12,
-  "meetwerk": 126,
-  "instrument": 711,
-  "grens": 604
+  "posten": 13,
+  "meetwerk": 115,
+  "instrument": 635,
+  "grens": 615
  },
  "posten": [
   {
@@ -73,10 +73,18 @@
   {
    "id": "audit-wisselend",
    "soort": "meetwerk",
-   "wat": "routes die soms wel en soms geen spoor nalaten",
-   "aantal": 14,
+   "wat": "routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom",
+   "aantal": 3,
    "waarom": "het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is \"laat een spoor na\" geen eigenschap van de route.",
-   "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap."
+   "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap. De veertien van de vorige ronde zijn zo nagelopen: drie bleken een echt defect (auth/login, supplier/login, office/verify) en zijn gerepareerd, elf hadden een reden en staan nu onder audit-verklaard."
+  },
+  {
+   "id": "audit-verklaard",
+   "soort": "grens",
+   "wat": "routes die wisselen, en waarvan met de hand is opgeschreven waarvan het afhangt",
+   "aantal": 11,
+   "waarom": "de kaart in scripts/auditproef.js zegt per route wat het verschil maakt. Er loopt een regel doorheen: een journaal schrijft GEBEURTENISSEN op en geen aanroepen. Een knop die niets omzette, een ronde die niets boekte, een wachtrij die leeg was -- dan is er niets gebeurd, en een regel die zegt van wel maakt het boek juist minder waard.",
+   "sluit": "niets, en daarom is dit een GRENS en geen achterstand: voor deze routes is \"laat hij altijd een spoor na\" de verkeerde vraag, want het juiste antwoord is nee. De post is wel begrensd gehouden: verklaard telt NOOIT als bewijs (de bewijsmatrix zet er ongemeten neer, niet bewezen), de kaart raakt \"geen spoor\" niet aan, en een verklaring die nergens meer op slaat wordt gemeld. Deze post staat er dus om zichtbaar te blijven, niet om weggewerkt te worden."
   },
   {
    "id": "rollback-gezakt",
@@ -90,7 +98,7 @@
    "id": "object-vooraf",
    "soort": "instrument",
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
-   "aantal": 711,
+   "aantal": 635,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
    "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-20T11:53:30.519Z",
-  "commit": "e101061",
-  "boomVuil": false,
+  "op": "2026-08-20T12:28:39.105Z",
+  "commit": "568b9ac",
+  "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
  },
@@ -40,10 +40,12 @@
  ],
  "gemeten": {
   "bewezen": 109,
-  "wisselend": 14,
+  "verklaard": 11,
+  "wisselend": 3,
   "geen spoor": 4056
  },
  "routes": 4179,
+ "ongebruikteVerklaringen": [],
  "perRoute": {
   "GET /api/health": {
    "staat": "geen spoor",
@@ -331,8 +333,9 @@
    "waarnemingen": 2
   },
   "POST /api/login": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (securityLog), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de demo-inlog met wachtwoord logt (gelukt en mislukt); een GASTsessie niet. Een gast heeft geen inloggegevens en probeert nergens binnen te komen waar hij niet hoort, dus valt er geen poging te noteren. En het veiligheidsbord is een ringbuffer van 5000 regels: elke gastsessie erin zetten duwt de echte aanvalssporen eruit. In productie staat RTG_DEMO uit en is de gast de enige tak die hier zonder wachtwoord doorheen komt.",
    "waarnemingen": 4
   },
   "POST /api/office/kachat/stuur": {
@@ -7511,8 +7514,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/bank/draai": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de knop journaalt de SCHAKELING. Staat de bank al in de stand die u vraagt, dan komt er `ongewijzigd` terug en is er niets geschakeld. De belofte bovenaan routes/kantoren/bank.js is \"elke schakeling komt in het auditlog\", en die blijft staan.",
    "waarnemingen": 3
   },
   "POST /api/office/bank/autoriseer/bevestig": {
@@ -7531,8 +7535,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/bank/mislukking": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de melding van een mislukte clearing telt op tot de drempel; het journaal legt de GEBEURTENIS vast, namelijk dat de bank daardoor automatisch in nood ging. De tussenstanden staan in het bankoverzicht, dat de teller gewoon toont.",
    "waarnemingen": 3
   },
   "POST /api/office/bank/modus": {
@@ -7541,8 +7546,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/bank/rente": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de renteronde journaalt wat zij BIJSCHREEF. Een ronde die op nul rekeningen uitkwam (geen spaarrekening, of vandaag al gedraaid) heeft geen cent verplaatst; daar hoort geen regel bij die suggereert van wel.",
    "waarnemingen": 3
   },
   "POST /api/office/bank/krediet": {
@@ -7556,8 +7562,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/bank/incasso": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "zelfde vorm: de ronde journaalt de uitgevoerde vaste betalingen. Nul uitgevoerd is nul regels. Wat er wel gebeurde -- er is gekeken -- staat in de uitslag die de aanroeper terugkrijgt.",
    "waarnemingen": 3
   },
   "POST /api/office/bank/gezond": {
@@ -7646,8 +7653,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/bank/operationeel": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "zelfde knop, zelfde regel: aan zetten wat al aan staat is geen schakeling. Het opschalen loopt bovendien via vier ogen, en de AANVRAAG journaalt wel (relais() schrijft \"AANGEVRAAGD -- wacht op een tweede persoon\").",
    "waarnemingen": 3
   },
   "POST /api/office/bank": {
@@ -8476,8 +8484,9 @@
    "waarnemingen": 1
   },
   "POST /api/office/verifications": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (inzageLog), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de wachtrij noteert de INZAGE in de dossiers die hij toont (inzagelog.noteerVeel). Is de rij leeg, dan is er niets ingezien en staat er niets in het boek. Dat is precies goed: een inzagejournaal dat inzage noteert die niet heeft plaatsgevonden, is geen journaal maar een verhaal.",
    "waarnemingen": 2
   },
   "POST /api/office/verify": {
@@ -9201,8 +9210,9 @@
    "waarnemingen": 2
   },
   "POST /api/command/alarm": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (commandJournaal, commandJournaalTotaal), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de alarmstand WEEGT bij het opvragen, en het journaal krijgt alleen een regel bij een aan- of afmelding. Dat staat er met zoveel woorden bij in het antwoord zelf: \"het alarm piept op verandering en niet elke ronde: een melding die elke dertig seconden terugkomt, leert mensen om hem weg te klikken.\"",
    "waarnemingen": 3
   },
   "POST /api/command/herkomst": {
@@ -10076,8 +10086,9 @@
    "waarnemingen": 1
   },
   "POST /api/doos/meting": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de meting zelf landt altijd in doosMetingen, maar dat is een gegevensbak en geen journaal. De auditregel hoort bij iets anders: de doos die een klaarstaande opdracht (reset, hulp, update) OPHAALT. Staat er geen opdracht klaar, dan is er niets opgehaald.",
    "waarnemingen": 3
   },
   "GET /api/doos/update": {
@@ -12311,8 +12322,9 @@
    "waarnemingen": 2
   },
   "POST /api/kantoor/gesprek/zeg": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (securityLog), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "het inloggesprek van het kantoor loopt in stappen (code, dan de tweede factor). De TUSSENSTAP -- code klopt, vertel me nu uw authenticator-code -- is geen afgeronde inlogpoging en journaalt niet. De poging zelf eindigt altijd in binnen() of mis(), en die loggen allebei, gelukt en mislukt.",
    "waarnemingen": 3
   },
   "POST /api/office/dienst": {
@@ -17061,8 +17073,9 @@
    "waarnemingen": 2
   },
   "POST /api/office/salon/belang/beoordeel": {
-   "staat": "wisselend",
+   "staat": "verklaard",
    "reden": "soms wel een spoor (kantoorAudit), soms geen, ook binnen de geslaagde aanroepen. Het hangt dus ergens van af, en dan is \"laat een spoor na\" geen eigenschap van deze route.",
+   "verklaring": "de curatieronde journaalt hoeveel posts zij beoordeelde. Waren er geen nieuwe posts, dan is er niets beoordeeld en dus niets te melden.",
    "waarnemingen": 2
   },
   "POST /api/supplier/salon/status": {

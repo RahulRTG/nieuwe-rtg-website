@@ -167,12 +167,28 @@ const POSTEN = [
       '(die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om.' },
 
   { id: 'audit-wisselend', soort: 'meetwerk',
-    wat: 'routes die soms wel en soms geen spoor nalaten',
+    wat: 'routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom',
     uit: (r) => (r.audit && r.audit.gemeten || {}).wisselend,
     waarom: 'het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is ' +
       '"laat een spoor na" geen eigenschap van de route.',
     sluit: 'uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; ' +
-      'echte achterstand, geen ontbrekend gereedschap.' },
+      'echte achterstand, geen ontbrekend gereedschap. De veertien van de vorige ronde zijn zo ' +
+      'nagelopen: drie bleken een echt defect (auth/login, supplier/login, office/verify) en zijn ' +
+      'gerepareerd, elf hadden een reden en staan nu onder audit-verklaard.' },
+
+  { id: 'audit-verklaard', soort: 'grens',
+    wat: 'routes die wisselen, en waarvan met de hand is opgeschreven waarvan het afhangt',
+    uit: (r) => (r.audit && r.audit.gemeten || {}).verklaard,
+    waarom: 'de kaart in scripts/auditproef.js zegt per route wat het verschil maakt. Er loopt een ' +
+      'regel doorheen: een journaal schrijft GEBEURTENISSEN op en geen aanroepen. Een knop die niets ' +
+      'omzette, een ronde die niets boekte, een wachtrij die leeg was -- dan is er niets gebeurd, en ' +
+      'een regel die zegt van wel maakt het boek juist minder waard.',
+    sluit: 'niets, en daarom is dit een GRENS en geen achterstand: voor deze routes is "laat hij ' +
+      'altijd een spoor na" de verkeerde vraag, want het juiste antwoord is nee. De post is wel ' +
+      'begrensd gehouden: verklaard telt NOOIT als bewijs (de ' +
+      'bewijsmatrix zet er ongemeten neer, niet bewezen), de kaart raakt "geen spoor" niet aan, en ' +
+      'een verklaring die nergens meer op slaat wordt gemeld. Deze post staat er dus om zichtbaar ' +
+      'te blijven, niet om weggewerkt te worden.' },
 
   { id: 'rollback-gezakt', soort: 'meetwerk',
     wat: 'routes die weigeren en toch de toestand veranderen',

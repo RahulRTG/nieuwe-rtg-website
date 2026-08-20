@@ -399,7 +399,10 @@ function bouw(invoer) {
         /* 'wisselend' is een BEVINDING en geen bewijs: soms wel en soms geen
            spoor betekent dat het ergens van afhangt. 'geen spoor' is voor een
            leesroute juist en voor een schrijfroute een vraag -- maar in beide
-           gevallen geen bewijs dat er iets wordt vastgelegd. */
+           gevallen geen bewijs dat er iets wordt vastgelegd. En 'verklaard'
+           evenmin: dat is dezelfde wisselende waarneming met een uitgezochte
+           reden eronder, en een reden is geen meting. Alleen 'bewezen' passeert
+           hier, zodat een verklaring nooit een cel kan vullen. */
         cellen[s.id] = !a ? { staat: 'ongemeten' }
           : a.staat === 'bewezen' ? { staat: 'bewezen', bron: 'auditproef', reden: a.reden }
             : { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };

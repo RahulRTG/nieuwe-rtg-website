@@ -15,6 +15,7 @@ module.exports = (octx, gedeeld) => {
   const { kern } = octx;
   const { UPLOAD_DIR, accounts, app, mail, notify, officeAuth, pendingVerifications } = kern;
   const { wieKijkt } = gedeeld;
+  const inzagelog = require('../../inzagelog');  // dezelfde als kern/kantoor: een boek, geen kopie
 
   app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
 
@@ -23,6 +24,23 @@ module.exports = (octx, gedeeld) => {
     if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
     const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
     accounts.setVerification(user.id, status);
+    /* HET BESLUIT ZELF LIET GEEN SPOOR NA, en dat is de zwaarste handeling die
+       dit kantoor kent: iemand kijkt naar een paspoortscan en een selfie, legt
+       nationaliteit en geslacht vast, of wist het bewijs. De enige regel die
+       hier ontstond kwam per ongeluk mee met pendingVerifications() hieronder,
+       die de wachtrij voor het antwoord opnieuw opbouwt -- en die zwijgt bij
+       een lege rij (noteerVeel geeft null zonder id's). Was dit de laatste
+       verificatie in de rij, dan verdween het besluit spoorloos.
+
+       Het inzagejournaal is hier het juiste boek en niet het kantooraudit: dit
+       gaat over EEN persoon, met een reden, en er ligt een hashketen onder
+       (server/lib/keten.js), dus de regel is achteraf niet stil te wijzigen.
+       Gemeten op de AUDIT-as, vastgehouden door test/kycspoor.test.js. */
+    try {
+      inzagelog.noteer({ door: wieKijkt(req), over: { id: user.id },
+        waarom: 'KYC-besluit: identiteit ' + (status === 'verified' ? 'goedgekeurd' : 'afgewezen, bewijs gewist'),
+        bron: 'backoffice/verificaties' });
+    } catch (e) {}
     // gezichtscontrole (selfie x paspoort) en nationaliteit vastleggen bij goedkeuren:
     // zo weten we dat het paspoort bij de codenaam en de persoon hoort (eis 5)
     if (status === 'verified') {

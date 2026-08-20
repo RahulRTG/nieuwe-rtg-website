@@ -15,6 +15,14 @@
    Deze toets houdt de belofte vast op alle drie de uitkomsten die ertoe doen:
    een geslaagde inlog, een mislukte inlog, en een onbekend account.
 
+   DEZELFDE FOUT STOND OP DE ZAKEN-INGANG. /api/supplier/login logde netjes in
+   de personeelstak (pincode) en NIETS in de tak van het bedrijfsaccount --
+   gelukt noch mislukt. En de personeelstak zette zijn `ok: true` neer VOOR twee
+   weigeringen die nog konden volgen, dus wie bij een gesloten partnerwerkplek
+   de juiste pincode intikte kwam als geslaagde inlog op het bord terwijl er
+   nooit een sessie ontstond. Een auditlog met een regel die niet is gebeurd, is
+   erger dan een ontbrekende regel.
+
    Draai los: node --experimental-sqlite --test test/inlogspoor.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -42,12 +50,14 @@ const post = async (pad, lijf, tok) => {
    RTG_STORE=json hieronder -- de opslagmotor doet niets aan de vraag die deze
    toets stelt, hij maakt het antwoord alleen zichtbaar zonder een tweede lezer
    die zelf weer stuk kan (LAT.md regel 4). */
-const bord = () => {
+const bordVan = (kanaal) => {
   try {
     const d = JSON.parse(fs.readFileSync(path.join(TMP, 'db.json'), 'utf8'));
-    return (d.securityLog || []).filter(r => r && r.kanaal === 'account');
+    return (d.securityLog || []).filter(r => r && r.kanaal === kanaal);
   } catch (e) { return []; }
 };
+const bord = () => bordVan('account');
+const zaakBord = () => bordVan('zaak');
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, RTG_DEMO: '1', SMTP_URL: '', RTG_STORE: 'json' } }));
@@ -93,8 +103,29 @@ test('een poging op een ONBEKEND account laat ook een spoor na', async () => {
   assert.equal(bord().length, voor + 1);
 });
 
+test('de ZAKEN-ingang logt het bedrijfsaccount, gelukt en mislukt', async () => {
+  /* De tak die niets logde. Het demo-bedrijfsaccount (gebruikersnaam +
+     wachtwoord) is de enige tak die zonder personeelsdossier te bereiken is;
+     de pincode-tak eronder logde al en blijft dat doen. */
+  const voor = zaakBord().length;
+  const mis = await post('/api/supplier/login', { username: 'rahul', password: 'fout-wachtwoord' });
+  assert.equal(mis.status, 401);
+  await new Promise(z => setTimeout(z, 400));
+  const naMis = zaakBord();
+  assert.equal(naMis.length, voor + 1, 'een mislukte zaak-inlog hoort een regel op te leveren');
+  assert.equal(naMis[0].ok, false);
+
+  const goed = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  assert.equal(goed.status, 200, 'de demo-inlog van de zaak hoort te slagen');
+  assert.ok(goed.data && goed.data.token);
+  await new Promise(z => setTimeout(z, 400));
+  const naGoed = zaakBord();
+  assert.equal(naGoed.length, voor + 2, 'een geslaagde zaak-inlog hoort ook een regel op te leveren');
+  assert.equal(naGoed[0].ok, true);
+});
+
 test('het spoor draagt geen wachtwoord', async () => {
   /* Een auditlog dat het ingetikte wachtwoord bewaart, is zelf het lek. */
-  const alles = JSON.stringify(bord());
+  const alles = JSON.stringify(bord()) + JSON.stringify(zaakBord());
   assert.ok(!/geheim123|fout-wachtwoord/.test(alles), 'nooit een wachtwoord in het log');
 });

@@ -170,7 +170,50 @@ test('3. AUDIT: de sporenlijst is benoemd, en groei is de enige maat', () => {
   assert.equal(verfijnd.perRoute['POST /api/oud-en-nieuw'].staat, 'bewezen',
     'de klasse-vorm wint van een oude waarneming zonder klasse');
   assert.equal(uit.perRoute['GET /api/nooit'].staat, 'geen spoor');
-  assert.deepEqual(uit.telling, { bewezen: 1, wisselend: 1, 'geen spoor': 1 });
+  assert.deepEqual(uit.telling, { bewezen: 1, verklaard: 0, wisselend: 1, 'geen spoor': 1 });
+});
+
+test('4b. de VERKLAARD-kaart verplaatst wel, maar bewijst nooit', () => {
+  /* De sluitweg van de schuldpost audit-wisselend was "uitzoeken WAARVAN het
+     afhangt". Wat daaruit kwam staat als kaart in de bron van de auditproef.
+     Zo'n kaart is gevaarlijk gereedschap -- hij kan een tapijt worden om een
+     echt defect onder te vegen -- dus liggen de grenzen ervan hier vast en
+     niet alleen in een commentaarblok. */
+  const { oordeelUit, VERKLAARD } = require('../scripts/auditproef');
+  const echt = Object.keys(VERKLAARD)[0];
+
+  const uit = oordeelUit(new Map([
+    [echt, new Set(['2xx|kantoorAudit', '2xx|geen'])],
+    ['POST /api/onverklaard', new Set(['2xx|kantoorAudit', '2xx|geen'])]
+  ]));
+  assert.equal(uit.perRoute[echt].staat, 'verklaard');
+  assert.ok(uit.perRoute[echt].verklaring, 'de verklaring staat NAAST de gemeten reden, niet in plaats van');
+  assert.match(uit.perRoute[echt].reden, /hangt dus ergens van af/, 'de meting blijft leesbaar');
+  assert.equal(uit.perRoute['POST /api/onverklaard'].staat, 'wisselend',
+    'zonder verklaring blijft het gewoon een bevinding');
+
+  /* GRENS 1: verklaard is geen bewijs. Zou dit ooit 'bewezen' worden, dan zou de
+     bewijsmatrix er cellen op zetten die niemand heeft gemeten. */
+  assert.notEqual(uit.perRoute[echt].staat, 'bewezen');
+  assert.equal(uit.telling.bewezen, 0, 'een verklaring telt nooit mee als bewijs');
+  assert.equal(uit.telling.verklaard, 1);
+
+  /* GRENS 2: de kaart raakt 'geen spoor' niet aan. Zakt een verklaarde route af
+     naar helemaal geen spoor, dan valt hij door en is dat zichtbaar. */
+  const afgezakt = oordeelUit(new Map([[echt, new Set(['2xx|geen', '4xx|geen'])]]));
+  assert.equal(afgezakt.perRoute[echt].staat, 'geen spoor',
+    'een verklaring voor wisselend dekt geen route die helemaal stil is geworden');
+
+  /* GRENS 3: een verklaring die nergens meer op slaat, wordt gemeld. */
+  assert.ok(afgezakt.ongebruikteVerklaringen.includes(echt),
+    'de afgezakte route hoort in de lijst met ongebruikte verklaringen te staan');
+  assert.equal(uit.ongebruikteVerklaringen.includes(echt), false);
+
+  /* En de kaart zelf: elke verklaring zegt iets, en zegt het over een route. */
+  for (const [route, reden] of Object.entries(VERKLAARD)) {
+    assert.match(route, /^(GET|POST|PUT|PATCH|DELETE) \/api\//, route + ' is geen route');
+    assert.ok(String(reden).length > 80, route + ': "waarvan hangt het af" vraagt om meer dan een zin');
+  }
 });
 
 test('5. een verse gerichte ronde telt METEEN mee, niet pas de volgende batch', () => {

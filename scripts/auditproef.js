@@ -30,6 +30,9 @@
                  het betekent dat het ergens van afhangt (geslaagd of geweigerd,
                  welke rol, welke invoer) en dan is "laat een spoor na" niet waar
                  als eigenschap van de route.
+     verklaard   wisselend, en NAGETROKKEN: er staat hieronder met de hand bij
+                 WAARVAN het afhangt. Telt nooit als bewijs -- het is dezelfde
+                 waarneming, met een naam eronder in plaats van een vraagteken.
      geen spoor  bij elke waarneming niets. Voor een leesroute is dat gewoon
                  juist; voor een schrijfroute is het een vraag.
      ongemeten   geen enkele waarneming.
@@ -58,9 +61,90 @@ const UITSLAG = path.join(WORTEL, 'AUDITPROEF.json');
    dit binnen meet() zat, kon een toets hem alleen NABOUWEN, en zo'n toets zakt
    niet als het instrument verandert. De mutatieproef ving dat -- 'wisselend' als
    bewezen laten tellen liet de suite groen. */
+/* ============================================================================
+   NAGETROKKEN: WAARVAN HING HET AF?
+
+   De schuldpost audit-wisselend schreef zijn eigen sluitweg voor: "uitzoeken
+   WAARVAN het afhangt. Per route na te lopen met het journaal erbij". Dat is
+   gedaan voor alle veertien. Er kwamen DRIE ECHTE DEFECTEN uit, en die zijn
+   gerepareerd in plaats van verklaard:
+
+     /api/auth/login       de hoofdingang voor accounts logde niets (102 van de
+                           106 geslaagde aanroepen zonder spoor)
+     /api/supplier/login   de tak van het bedrijfsaccount logde niets, en de
+                           personeelstak zette zijn `ok: true` neer voor twee
+                           weigeringen die nog konden volgen
+     /api/office/verify    het KYC-besluit zelf journaalde niet; de enige regel
+                           die ontstond, liftte mee met de wachtrij in het
+                           antwoord en bleef weg zodra die rij leeg was
+
+   Wat hieronder staat is de rest: routes waar het verschil ECHT ergens van
+   afhangt en waar dat terecht is. Eén regel loopt er als een draad doorheen:
+
+     EEN JOURNAAL SCHRIJFT GEBEURTENISSEN OP, GEEN AANROEPEN.
+
+   Een knop die niets omzette, een ronde die niets boekte, een wachtrij die leeg
+   was: dan is er niets gebeurd, en een regel die zegt van wel maakt het boek
+   juist minder waard. Een auditlog dat elke aanroep noteert, verdrinkt zijn
+   eigen signaal -- en deze journalen zijn ringbuffers (5000 regels), dus ruis
+   duwt echte sporen eruit.
+
+   DE GRENZEN VAN DEZE KAART, zodat hij geen tapijt wordt om iets onder te
+   vegen:
+
+     1. hij verplaatst een route alleen van 'wisselend' naar 'verklaard', nooit
+        naar 'bewezen'. Verklaard bewijs bestaat niet;
+     2. hij raakt 'geen spoor' niet aan. Zakt een route hierheen af, dan valt
+        hij dus gewoon door;
+     3. een verklaring die op geen enkele wisselende route slaat, wordt gemeld
+        (`ongebruikteVerklaringen` in de uitslag) -- een kaart die stil veroudert
+        is erger dan geen kaart;
+     4. hij staat in de BRON en niet in een register, zodat een verklaring in de
+        diff van een pull request langskomt en niet in een gegenereerd bestand.
+   ========================================================================== */
+const VERKLAARD = {
+  'POST /api/login': 'de demo-inlog met wachtwoord logt (gelukt en mislukt); een GASTsessie niet. ' +
+    'Een gast heeft geen inloggegevens en probeert nergens binnen te komen waar hij niet hoort, ' +
+    'dus valt er geen poging te noteren. En het veiligheidsbord is een ringbuffer van 5000 regels: ' +
+    'elke gastsessie erin zetten duwt de echte aanvalssporen eruit. In productie staat RTG_DEMO uit ' +
+    'en is de gast de enige tak die hier zonder wachtwoord doorheen komt.',
+  'POST /api/kantoor/gesprek/zeg': 'het inloggesprek van het kantoor loopt in stappen (code, dan de ' +
+    'tweede factor). De TUSSENSTAP -- code klopt, vertel me nu uw authenticator-code -- is geen ' +
+    'afgeronde inlogpoging en journaalt niet. De poging zelf eindigt altijd in binnen() of mis(), ' +
+    'en die loggen allebei, gelukt en mislukt.',
+  'POST /api/office/verifications': 'de wachtrij noteert de INZAGE in de dossiers die hij toont ' +
+    '(inzagelog.noteerVeel). Is de rij leeg, dan is er niets ingezien en staat er niets in het boek. ' +
+    'Dat is precies goed: een inzagejournaal dat inzage noteert die niet heeft plaatsgevonden, ' +
+    'is geen journaal maar een verhaal.',
+  'POST /api/office/bank/draai': 'de knop journaalt de SCHAKELING. Staat de bank al in de stand ' +
+    'die u vraagt, dan komt er `ongewijzigd` terug en is er niets geschakeld. De belofte bovenaan ' +
+    'routes/kantoren/bank.js is "elke schakeling komt in het auditlog", en die blijft staan.',
+  'POST /api/office/bank/operationeel': 'zelfde knop, zelfde regel: aan zetten wat al aan staat is ' +
+    'geen schakeling. Het opschalen loopt bovendien via vier ogen, en de AANVRAAG journaalt wel ' +
+    '(relais() schrijft "AANGEVRAAGD -- wacht op een tweede persoon").',
+  'POST /api/office/bank/rente': 'de renteronde journaalt wat zij BIJSCHREEF. Een ronde die op nul ' +
+    'rekeningen uitkwam (geen spaarrekening, of vandaag al gedraaid) heeft geen cent verplaatst; ' +
+    'daar hoort geen regel bij die suggereert van wel.',
+  'POST /api/office/bank/incasso': 'zelfde vorm: de ronde journaalt de uitgevoerde vaste betalingen. ' +
+    'Nul uitgevoerd is nul regels. Wat er wel gebeurde -- er is gekeken -- staat in de uitslag die ' +
+    'de aanroeper terugkrijgt.',
+  'POST /api/office/bank/mislukking': 'de melding van een mislukte clearing telt op tot de drempel; ' +
+    'het journaal legt de GEBEURTENIS vast, namelijk dat de bank daardoor automatisch in nood ging. ' +
+    'De tussenstanden staan in het bankoverzicht, dat de teller gewoon toont.',
+  'POST /api/office/salon/belang/beoordeel': 'de curatieronde journaalt hoeveel posts zij beoordeelde. ' +
+    'Waren er geen nieuwe posts, dan is er niets beoordeeld en dus niets te melden.',
+  'POST /api/command/alarm': 'de alarmstand WEEGT bij het opvragen, en het journaal krijgt alleen een ' +
+    'regel bij een aan- of afmelding. Dat staat er met zoveel woorden bij in het antwoord zelf: ' +
+    '"het alarm piept op verandering en niet elke ronde: een melding die elke dertig seconden ' +
+    'terugkomt, leert mensen om hem weg te klikken."',
+  'POST /api/doos/meting': 'de meting zelf landt altijd in doosMetingen, maar dat is een gegevensbak ' +
+    'en geen journaal. De auditregel hoort bij iets anders: de doos die een klaarstaande opdracht ' +
+    '(reset, hulp, update) OPHAALT. Staat er geen opdracht klaar, dan is er niets opgehaald.'
+};
+
 function oordeelUit(perRoute) {
   const uitslag = {};
-  const telling = { bewezen: 0, wisselend: 0, 'geen spoor': 0 };
+  const telling = { bewezen: 0, verklaard: 0, wisselend: 0, 'geen spoor': 0 };
   for (const [route, waarnemingen] of perRoute) {
     const alle = [...waarnemingen];
     /* DE KLASSE-VORM WINT. Sinds de meting de uitkomstklasse meeschrijft
@@ -103,10 +187,24 @@ function oordeelUit(perRoute) {
       staat = 'geen spoor';
       reden = 'bij elke waarneming groeide geen enkel journaal';
     }
+    /* De kaart hierboven grijpt ALLEEN op wisselend in, en verplaatst nooit
+       iets naar bewezen. De gemeten reden blijft staan; de verklaring komt er
+       als apart veld naast, zodat zichtbaar blijft wat gemeten is en wat een
+       mens erbij heeft opgeschreven. */
+    if (staat === 'wisselend' && VERKLAARD[route]) {
+      staat = 'verklaard';
+      uitslag[route] = { staat, reden, verklaring: VERKLAARD[route], waarnemingen: alle.length };
+      telling.verklaard++;
+      continue;
+    }
     uitslag[route] = { staat, reden, waarnemingen: alle.length };
     telling[staat]++;
   }
-  return { telling, perRoute: uitslag };
+  /* Een verklaring die nergens meer op slaat, is een verklaring die stil is
+     verouderd -- bijvoorbeeld omdat de route is gerepareerd (mooi) of omdat hij
+     naar 'geen spoor' is afgezakt (niet mooi). Beide horen zichtbaar te zijn. */
+  const ongebruikt = Object.keys(VERKLAARD).filter(r => !uitslag[r] || uitslag[r].staat !== 'verklaard');
+  return { telling, perRoute: uitslag, ongebruikteVerklaringen: ongebruikt };
 }
 
 function meet() {
@@ -150,10 +248,11 @@ function meet() {
       'of een route die geen spoor nalaat dat terecht doet. Of het spoor onuitwisbaar is, ' +
       'meet server/lib/keten.js.',
     sporen: sporen.SPOREN.map(([naam, wat]) => ({ naam, wat })),
-    gemeten: telling, routes: Object.keys(uitslag).length, perRoute: uitslag };
+    gemeten: telling, routes: Object.keys(uitslag).length,
+    ongebruikteVerklaringen: o.ongebruikteVerklaringen, perRoute: uitslag };
 }
 
-module.exports = { meet, oordeelUit };
+module.exports = { meet, oordeelUit, VERKLAARD };
 
 if (require.main !== module) return;
 
@@ -167,7 +266,12 @@ console.log('  journaal                : ' + path.relative(WORTEL, JOURNAAL));
 console.log('  routes met waarnemingen : ' + uit.routes);
 console.log('');
 console.log('  BEWEZEN (elke keer een spoor)     : ' + uit.gemeten.bewezen);
+console.log('  verklaard (wisselend, nagetrokken): ' + uit.gemeten.verklaard);
 console.log('  wisselend (soms wel, soms niet)   : ' + uit.gemeten.wisselend);
 console.log('  geen spoor                        : ' + uit.gemeten['geen spoor']);
+if (uit.ongebruikteVerklaringen.length) {
+  console.log('\n  LET OP -- verklaringen die nergens meer op slaan:');
+  for (const r of uit.ongebruikteVerklaringen) console.log('    ' + r + ' (staat nu: ' + ((uit.perRoute[r] || {}).staat || 'ongemeten') + ')');
+}
 console.log('\n  weggeschreven in AUDITPROEF.json\n');
 process.exitCode = 0;

@@ -164,7 +164,26 @@ const POSTEN = [
       'hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan ' +
       'stilletjes leeg of fout zijn zonder dat iets zakt.',
     sluit: 'per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel ' +
-      '(die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om.' },
+      '(die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om. ' +
+      'De laatste vijf zijn zo nagelopen: de boekhoud-export kreeg een echte inhoudseis in ' +
+      'test/eigenaar.test.js (acht kolommen, de BOM, nooit JSON) en merkt de leugen nu; de andere ' +
+      'vier bleken onmeetbaar en staan onder output-onwaarneembaar.' },
+
+  { id: 'output-onwaarneembaar', soort: 'grens',
+    wat: 'routes waarvan het ware antwoord zelf 200 {ok:true} is, precies wat de liegpoort ervan maakt',
+    uit: (r) => (r.output && r.output.gemeten || {}).onwaarneembaar,
+    waarom: 'over deze routes IS gelogen en geen toets zakte -- maar dat zegt niets over de toetsen, ' +
+      'want er viel niets te merken. De inhoudskaart heeft het ware antwoord opgehaald van een ' +
+      'eerlijke wegwerpserver en vastgesteld dat het niet van de leugen te onderscheiden is ' +
+      '(grond: gelijk-aan-leugen). Sommige daarvan zijn zo BEDOELD: het codewoord-alarm antwoordt ' +
+      'met opzet altijd hetzelfde, want een verschil zou aan degene die over je schouder meekijkt ' +
+      'verraden dat er een codewoord bestaat.',
+    sluit: 'niets op deze as, en dat is de eerlijke rand: wat deze routes waard zijn zit in hun ' +
+      'UITWERKING en hoort op STATE en SIDE_EFFECT thuis. Voor drm/report en fluister/focus staat ' +
+      'die daar ook bewezen; site/verwijder en codewoord/check staan er ongemeten, en DAT is de ' +
+      'echte openstaande vraag over deze twee -- niet of iemand naar hun antwoord kijkt. Let op de ' +
+      'grond: een CSV-export die de sonde niet kan lezen (grond geen-json) hoort hier NIET in en ' +
+      'krijgt gewoon een inhoudstoets.' },
 
   { id: 'audit-wisselend', soort: 'meetwerk',
     wat: 'routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom',

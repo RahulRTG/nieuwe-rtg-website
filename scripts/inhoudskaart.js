@@ -16,6 +16,23 @@
    route waarvan het ware antwoord ZELF kaal {ok:true} is, is eerlijk
    onwaarneembaar en blijft blind met die reden in dit register.
 
+   TWEE GRONDEN OM ONWAARNEEMBAAR TE ZIJN, en ze verschillen wezenlijk. Ze
+   staan sinds kort als `grond` in de kaart, zodat een lezer ze uit elkaar kan
+   houden zonder een zin te moeten ontleden:
+
+     gelijk-aan-leugen   het ware antwoord IS 200 {ok:true}. De liegpoort
+                         verandert er dus niets aan, en geen enkele toets kan
+                         het verschil zien -- niet omdat er niemand kijkt, maar
+                         omdat er niets te zien is. Wat deze routes waard zijn,
+                         zit in hun UITWERKING en hoort op de STATE-as thuis.
+     geen-json           het antwoord is geen JSON-object (een CSV-export, een
+                         bundel). Een vormcontract op SLEUTELS kan daar niets,
+                         maar dat maakt het antwoord niet inhoudsloos: hier
+                         valt wel degelijk iets te bewaken, alleen niet met dit
+                         register. Zo'n route hoort een eigen inhoudstoets te
+                         krijgen (zoals de boekhoud-export er een kreeg in
+                         test/eigenaar.test.js), niet een vrijstelling.
+
    WAT EEN PROFIEL IS, en waarom niet meer dan dit:
 
      status     de statuscode van het ware antwoord op een plausibele aanroep
@@ -69,7 +86,20 @@ function onwaarneembaar(status, profiel) {
   return status === 200 && profiel.sleutels.every(k => k === 'ok');
 }
 
-module.exports = { profielVan, onwaarneembaar };
+/* DE GROND, als pure functie en niet als een zin in het register. Zie de kop:
+   'geen-json' en 'gelijk-aan-leugen' lijken op elkaar (allebei onwaarneembaar
+   voor DIT register) maar zijn tegengesteld van betekenis, en de outputproef
+   handelt er verschillend op. Zolang dit onderscheid alleen in de tekst van een
+   reden zat, moest een lezer een zin ontleden om het te zien -- en de enige
+   route waar het verschil uitmaakte (de boekhoud-export) stond aan de verkeerde
+   kant. Geeft null terug als het antwoord gewoon waarneembaar is. */
+function grondVan(status, profiel) {
+  if (profiel.vorm !== 'object' || !profiel.sleutels.length) return 'geen-json';
+  if (onwaarneembaar(status, profiel)) return 'gelijk-aan-leugen';
+  return null;
+}
+
+module.exports = { profielVan, onwaarneembaar, grondVan };
 if (require.main !== module) return;
 
 (async () => {
@@ -145,18 +175,19 @@ if (require.main !== module) return;
     /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
        bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
        wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
-    if (profiel.vorm !== 'object' || !profiel.sleutels.length) {
+    const grond = grondVan(uit.status, profiel);
+    if (grond === 'geen-json') {
       kaal++;
       vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-        onwaarneembaar: true, op: nuOp,
+        onwaarneembaar: true, grond: 'geen-json', op: nuOp,
         reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
           'op sleutels kan hier niets bewaken' };
       continue;
     }
-    if (onwaarneembaar(uit.status, profiel)) {
+    if (grond === 'gelijk-aan-leugen') {
       kaal++;
       vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-        onwaarneembaar: true, op: nuOp,
+        onwaarneembaar: true, grond: 'gelijk-aan-leugen', op: nuOp,
         reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
           'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
       continue;
@@ -174,9 +205,20 @@ if (require.main !== module) return;
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */
   const perRoute = {};
+  /* EN GEEN ONWAARNEEMBAAR-CLAIM OVER EEN ROUTE DIE INMIDDELS BEWEZEN IS. Dat
+     is een echt geval geweest: de boekhoud-export stond hier als
+     onwaarneembaar omdat de sonde `r.json()` op een CSV-lichaam doet en dan
+     niets ziet -- terwijl het antwoord juist boordevol inhoud zit. Zodra een
+     gerichte meting bewijst dat een toets de leugen wel degelijk merkt, is de
+     claim weerlegd, en een weerlegde claim laten staan is erger dan geen
+     claim: hij leest als een vrijstelling van het toetsen. */
+  const bewezenNu = new Set(Object.entries(reg.perRoute || {})
+    .filter(([, c]) => c.staat === 'bewezen').map(([k]) => k));
+  let weerlegd = 0;
   for (const [k, v] of Object.entries({ ...oud, ...vers })) {
     if (!k.split(' ')[1].startsWith('/api/')) continue;
     if (!v.onwaarneembaar && (!v.sleutels || !v.sleutels.length)) continue;
+    if (v.onwaarneembaar && bewezenNu.has(k)) { weerlegd++; continue; }
     perRoute[k] = v;
   }
 
@@ -192,9 +234,11 @@ if (require.main !== module) return;
     gemeten: { doelRoutes: doel.size, inKaart: Object.keys(perRoute).length,
       waarneembaar: Object.values(perRoute).filter(p => !p.onwaarneembaar).length,
       onwaarneembaar: Object.values(perRoute).filter(p => p.onwaarneembaar).length,
-      versDezeRun: Object.keys(vers).length, zonderRol: verdeling.zonderRol.length, dood },
+      versDezeRun: Object.keys(vers).length, zonderRol: verdeling.zonderRol.length, dood,
+      weerlegd },
     perRoute
   }, null, 1) + '\n');
+  if (weerlegd) console.log('  weerlegde onwaarneembaar-claims verwijderd: ' + weerlegd);
   console.log('  waarneembaar profiel         : ' + waarneembaar);
   console.log('  onwaarneembaar (kaal ok)     : ' + kaal);
   console.log('  zonder token voor de rol     : ' + verdeling.zonderRol.length);

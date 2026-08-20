@@ -120,11 +120,41 @@ function infrastructuur(perToets, deel) {
   return new Set([...tel].filter(([, c]) => c > grens).map(([r]) => r));
 }
 
+/* HET WARE ANTWOORD, GEMETEN DOOR EEN ANDER INSTRUMENT.
+
+   De inhoudskaart (scripts/inhoudskaart.js) heeft van elke blinde route het
+   ECHTE antwoord opgehaald van een eerlijke wegwerpserver. Voor sommige routes
+   kwam daar uit: het ware antwoord IS 200 {ok:true} -- precies wat de liegpoort
+   ervan maakt. Dan zegt "geen enkele toets merkte de leugen" niets over de
+   toetsen, want er viel niets te merken. Dat is geen dekkingsgat maar de rand
+   van dit instrument, en het hoort ook zo in het register te staan.
+
+   Alleen de grond `gelijk-aan-leugen` telt hier, en dat onderscheid is met
+   schade geleerd: de kaart noemt ook een CSV-export onwaarneembaar (grond
+   `geen-json`), want haar sonde doet `r.json()` op het lichaam en ziet dan
+   niets. Zo'n antwoord zit juist bomvol inhoud en verdient een echte
+   inhoudstoets -- de boekhoud-export kreeg er een in test/eigenaar.test.js.
+   Een route zonder grond in de kaart verandert hier niets: bij twijfel blijft
+   blind gewoon blind. */
+function onwaarneembareRoutes() {
+  try {
+    const k = JSON.parse(fs.readFileSync(path.join(WORTEL, 'INHOUDSKAART.json'), 'utf8')).perRoute || {};
+    return new Map(Object.entries(k)
+      .filter(([, v]) => v && v.onwaarneembaar && v.grond === 'gelijk-aan-leugen')
+      .map(([r, v]) => [r, v.reden]));
+  } catch (e) { return new Map(); }
+}
+
 function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
   const infra = infrastructuur(perToets);
   const perRouteUit = {};
   const telling = { bewezen: 0, onbeslist: 0, blind: 0, ongemeten: 0 };
+  /* Apart geteld en niet in `telling`: dit is een ONDERVERDELING van ongemeten
+     (waarom kon hier niets gemeten worden), geen vijfde uitkomst. In
+     BEWIJSSCHULD.json draagt de post output-onwaarneembaar hem als grens. */
+  let onwaarneembaar = 0;
   const deurLijst = require('./mutatie').DEUREN.split(',');
+  const stil = onwaarneembareRoutes();
   const isDeurPad = (p) => deurLijst.some(d => p === d || p.startsWith(d));
   for (const [route, toetsen] of perRoute) {
     /* DE DEUREN EERST, en voor ELKE tak. Elke lie-run -- de brede van de
@@ -190,9 +220,13 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
       perRouteUit[route] = direct.merkt
         ? { staat: 'bewezen', bron: 'outputproef (gericht)', toetsen: [direct.toets],
             reden: 'er is over DEZE route gelogen en ' + direct.toets + ' zakte daarop' }
-        : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
-            reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
-              'geen enkele toets kijkt naar deze inhoud' };
+        : stil.has(route)
+          ? (onwaarneembaar++, { staat: 'ongemeten', bron: 'inhoudskaart', toetsen: [direct.toets],
+              reden: 'er is over deze route gelogen en ' + direct.toets + ' bleef groen, maar dat zegt ' +
+                'niets over de toets: ' + stil.get(route) })
+          : { staat: 'blind', bron: 'outputproef (gericht)', toetsen: [direct.toets],
+              reden: 'er is over DEZE route gelogen en ' + direct.toets + ' bleef groen; ' +
+                'geen enkele toets kijkt naar deze inhoud' };
       telling[perRouteUit[route].staat]++;
       continue;
     }
@@ -213,7 +247,7 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
       telling.onbeslist++;
     }
   }
-  return { telling, perRoute: perRouteUit };
+  return { telling, onwaarneembaar, perRoute: perRouteUit };
 }
 
 /* De gerichte metingen uit een eerdere ronde. Ze STAPELEN: elke ronde meet er
@@ -269,7 +303,8 @@ function meet(versGericht) {
       'Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.',
     grens: 'zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de ' +
       'inhoud KLOPT -- alleen of iemand ernaar kijkt.',
-    gemeten: telling, routes: Object.keys(perRoute).length, perRoute };
+    gemeten: Object.assign({}, telling, { onwaarneembaar: o.onwaarneembaar }),
+    routes: Object.keys(perRoute).length, perRoute };
 }
 
 /* ---- GERICHT METEN: LIEG OVER EEN ROUTE EN KIJK WIE HET MERKT ----
@@ -418,7 +453,7 @@ function gerichteRonde(aantal) {
   return gericht;
 }
 
-module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen,
+module.exports = { meet, oordeel, koppeling, gevoeligheid, infrastructuur, eerderGemeten, metGeheugen, onwaarneembareRoutes,
   gerichteRonde, kiesKandidaten, meetEen, basislijnVan };
 
 if (require.main !== module) return;

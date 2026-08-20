@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T08:43:50.867Z",
-    "commit": "6ea8268",
+    "op": "2026-08-20T12:45:20.749Z",
+    "commit": "3c21bf3",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -2067,6 +2067,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "inlogspoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "overleefd"
+    },
     "instant-reality.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2334,6 +2341,13 @@
       "operator": "===->!==#0",
       "gezakt": 6,
       "geprobeerd": 1
+    },
+    "kycspoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "laatste-negen.test.js": {
       "soort": "server",

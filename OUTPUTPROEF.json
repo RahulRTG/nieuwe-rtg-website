@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T11:53:40.352Z",
-  "commit": "e101061",
+  "op": "2026-08-20T12:46:16.338Z",
+  "commit": "3c21bf3",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,10 +9,11 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 4153,
+  "bewezen": 4154,
   "onbeslist": 0,
-  "blind": 5,
-  "ongemeten": 32
+  "blind": 0,
+  "ongemeten": 36,
+  "onwaarneembaar": 4
  },
  "routes": 4190,
  "perRoute": {
@@ -750,12 +751,12 @@
    "reden": "geen enkele toets die deze route raakt is door de mutatiemotor gemeten"
   },
   "POST /api/office/export.csv": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
     "eigenaar.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en eigenaar.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en eigenaar.test.js zakte daarop"
   },
   "POST /api/techniek/inloggen": {
    "staat": "bewezen",
@@ -2515,12 +2516,12 @@
    "reden": "er is over DEZE route gelogen en drm.test.js zakte daarop"
   },
   "POST /api/drm/report": {
-   "staat": "blind",
-   "bron": "outputproef (gericht)",
+   "staat": "ongemeten",
+   "bron": "inhoudskaart",
    "toetsen": [
     "drm.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en drm.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over deze route gelogen en drm.test.js bleef groen, maar dat zegt niets over de toets: het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/facturen/mijn": {
    "staat": "bewezen",
@@ -6963,12 +6964,12 @@
    "reden": "er is over DEZE route gelogen en fluister.test.js zakte daarop"
   },
   "POST /api/fluister/focus": {
-   "staat": "blind",
-   "bron": "outputproef (gericht)",
+   "staat": "ongemeten",
+   "bron": "inhoudskaart",
    "toetsen": [
     "onnozel.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en onnozel.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over deze route gelogen en onnozel.test.js bleef groen, maar dat zegt niets over de toets: het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/spar/lijst": {
    "staat": "bewezen",
@@ -11027,12 +11028,12 @@
    "reden": "er is over DEZE route gelogen en veiligheid-kring-rust.test.js zakte daarop"
   },
   "POST /api/veiligheid/codewoord/check": {
-   "staat": "blind",
-   "bron": "outputproef (gericht)",
+   "staat": "ongemeten",
+   "bron": "inhoudskaart",
    "toetsen": [
     "veiligheid.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en veiligheid.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over deze route gelogen en veiligheid.test.js bleef groen, maar dat zegt niets over de toets: het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/veiligheid/codewoord/proef": {
    "staat": "bewezen",
@@ -11459,12 +11460,12 @@
    "reden": "er is over DEZE route gelogen en eigen-website.test.js zakte daarop"
   },
   "POST /api/site/verwijder": {
-   "staat": "blind",
-   "bron": "outputproef (gericht)",
+   "staat": "ongemeten",
+   "bron": "inhoudskaart",
    "toetsen": [
     "eigen-website.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en eigen-website.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over deze route gelogen en eigen-website.test.js bleef groen, maar dat zegt niets over de toets: het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/site/versies": {
    "staat": "bewezen",
@@ -33956,8 +33957,8 @@
   },
   "POST /api/office/export.csv": {
    "toets": "eigenaar.test.js",
-   "merkt": false,
-   "op": "2026-08-18T22:45:49.489Z"
+   "merkt": true,
+   "op": "2026-08-20T12:38:11.109Z"
   },
   "POST /api/techniek/inloggen": {
    "toets": "schakelkast-dekking.test.js",

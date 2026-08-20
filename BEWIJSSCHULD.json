@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-08-20T12:29:40.872Z",
-  "commit": "568b9ac",
+  "op": "2026-08-20T12:46:28.867Z",
+  "commit": "3c21bf3",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
-  "posten": 13,
-  "meetwerk": 115,
+  "posten": 14,
+  "meetwerk": 110,
   "instrument": 635,
-  "grens": 615
+  "grens": 619
  },
  "posten": [
   {
@@ -66,9 +66,17 @@
    "id": "output-blind",
    "soort": "meetwerk",
    "wat": "routes waarover gelogen is zonder dat een toets het merkte",
-   "aantal": 5,
+   "aantal": 0,
    "waarom": "de liegpoort heeft het antwoord van precies deze route vervalst en de toetsen die hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan stilletjes leeg of fout zijn zonder dat iets zakt.",
-   "sluit": "per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel (die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om."
+   "sluit": "per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel (die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om. De laatste vijf zijn zo nagelopen: de boekhoud-export kreeg een echte inhoudseis in test/eigenaar.test.js (acht kolommen, de BOM, nooit JSON) en merkt de leugen nu; de andere vier bleken onmeetbaar en staan onder output-onwaarneembaar."
+  },
+  {
+   "id": "output-onwaarneembaar",
+   "soort": "grens",
+   "wat": "routes waarvan het ware antwoord zelf 200 {ok:true} is, precies wat de liegpoort ervan maakt",
+   "aantal": 4,
+   "waarom": "over deze routes IS gelogen en geen toets zakte -- maar dat zegt niets over de toetsen, want er viel niets te merken. De inhoudskaart heeft het ware antwoord opgehaald van een eerlijke wegwerpserver en vastgesteld dat het niet van de leugen te onderscheiden is (grond: gelijk-aan-leugen). Sommige daarvan zijn zo BEDOELD: het codewoord-alarm antwoordt met opzet altijd hetzelfde, want een verschil zou aan degene die over je schouder meekijkt verraden dat er een codewoord bestaat.",
+   "sluit": "niets op deze as, en dat is de eerlijke rand: wat deze routes waard zijn zit in hun UITWERKING en hoort op STATE en SIDE_EFFECT thuis. Voor drm/report en fluister/focus staat die daar ook bewezen; site/verwijder en codewoord/check staan er ongemeten, en DAT is de echte openstaande vraag over deze twee -- niet of iemand naar hun antwoord kijkt. Let op de grond: een CSV-export die de sonde niet kan lezen (grond geen-json) hoort hier NIET in en krijgt gewoon een inhoudstoets."
   },
   {
    "id": "audit-wisselend",

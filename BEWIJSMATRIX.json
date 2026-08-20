@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T11:55:27.427Z",
-    "commit": "e101061",
+    "op": "2026-08-20T12:46:22.636Z",
+    "commit": "3c21bf3",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,10 +12,10 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20936,
+    "bewezen": 20937,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 24827,
+    "ongemeten": 24826,
     "gezakt": 0
   },
   "perSchakel": {
@@ -41,10 +41,10 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4153,
+      "bewezen": 4154,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 32,
+      "ongemeten": 31,
       "gezakt": 0
     },
     "STATE": {
@@ -97,5 +97,5 @@
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Met de hand vastgelegd over de ratel heen na een verse suite-ronde: het TOTAAL verbeterde fors (ongemeten 24904 -> 24827, bewezen 20859 -> 20936, vooral AUDIT dat van 29 naar 109 bewezen ging door de uitkomstklasse-regel). De ENIGE daling zit op OUTPUT (-3) en heeft een benoemde oorzaak: vijf /api/doos/*-routes bestaan alleen in zaakdoos-modus en kwamen niet in het journaal van deze ronde, dus drie van hun cellen verloren hun toerekening. Dat is een kleinere beproefde populatie, geen regressie in de code; de doos-toetsen zelf draaiden en slaagden."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

@@ -173,6 +173,55 @@ test('3. AUDIT: de sporenlijst is benoemd, en groei is de enige maat', () => {
   assert.deepEqual(uit.telling, { bewezen: 1, verklaard: 0, wisselend: 1, 'geen spoor': 1 });
 });
 
+test('2b. een antwoord dat GELIJK is aan de leugen is geen dekkingsgat', () => {
+  /* De laatste vijf blinde routes, nagelopen. Vier ervan antwoorden zelf al met
+     200 {ok:true} -- precies waar de liegpoort een antwoord in verandert. Dan
+     zegt "geen toets zakte" niets over de toetsen: er viel niets te merken. Dat
+     is de rand van dit instrument en geen ontbrekende dekking, en het hoort ook
+     zo in het register te staan (post output-onwaarneembaar in
+     BEWIJSSCHULD.json).
+
+     HET ONDERSCHEID DAT DEZE TOETS BEWAAKT is met schade geleerd. De vijfde was
+     de boekhoud-export, en die stond op dezelfde hoop -- niet omdat er niets te
+     zien viel, maar omdat de sonde van de inhoudskaart `r.json()` op een
+     CSV-lichaam doet en dan niets ziet. Dat antwoord zit juist bomvol inhoud.
+     Zou de outputproef alles wat de kaart onwaarneembaar noemt vrijstellen, dan
+     had een leeggelopen boekhoud-export voor altijd buiten beeld gestaan. */
+  const { grondVan, profielVan } = require('../scripts/inhoudskaart');
+  assert.equal(grondVan(200, profielVan({ ok: true })), 'gelijk-aan-leugen');
+  assert.equal(grondVan(200, profielVan({})), 'geen-json', 'een leeg profiel is geen kaal ok');
+  assert.equal(grondVan(200, profielVan(null)), 'geen-json', 'een CSV komt hier als null binnen');
+  assert.equal(grondVan(200, profielVan({ lijst: [1] })), null, 'gewoon waarneembaar');
+  assert.equal(grondVan(403, profielVan({ error: 'nee' })), null, 'een weigering draagt inhoud');
+
+  /* En de doorwerking in het oordeel, door het instrument zelf. De kaart op
+     schijf is de bron; een route die er niet in staat blijft gewoon blind. */
+  const { oordeel, onwaarneembareRoutes } = require('../scripts/outputproef');
+  const stil = onwaarneembareRoutes();
+  assert.ok(stil.size >= 1, 'de inhoudskaart draagt minstens een gemeten gelijk-aan-leugen-route');
+  const echt = [...stil.keys()][0];
+
+  const perToets = new Map([['t.test.js', new Set([echt, 'POST /api/verzonnen'])]]);
+  for (let i = 0; i < 8; i++) perToets.set('vul' + i + '.test.js', new Set(['GET /api/health']));
+  const perRoute = new Map([[echt, new Set(['t.test.js'])], ['POST /api/verzonnen', new Set(['t.test.js'])]]);
+  const gemeten = {
+    [echt]: { toets: 't.test.js', merkt: false },
+    'POST /api/verzonnen': { toets: 't.test.js', merkt: false }
+  };
+  const uit = oordeel(perRoute, perToets, new Set(['t.test.js']), new Set(), gemeten);
+
+  assert.equal(uit.perRoute[echt].staat, 'ongemeten', echt + ' is niet blind maar onmeetbaar');
+  assert.equal(uit.perRoute[echt].bron, 'inhoudskaart', 'en de reden komt uit een METING, niet uit een lijst');
+  assert.equal(uit.onwaarneembaar, 1, 'apart geteld, als onderverdeling van ongemeten');
+  assert.equal(uit.perRoute['POST /api/verzonnen'].staat, 'blind',
+    'een route die de kaart niet kent blijft blind: bij twijfel geen vrijstelling');
+
+  /* GRENS: onwaarneembaar levert NOOIT bewijs op. Zou dit bewezen worden, dan
+     kreeg de OUTPUT-as cellen waar niemand naar heeft gekeken. */
+  assert.notEqual(uit.perRoute[echt].staat, 'bewezen');
+  assert.equal(uit.telling.bewezen, 0);
+});
+
 test('4b. de VERKLAARD-kaart verplaatst wel, maar bewijst nooit', () => {
   /* De sluitweg van de schuldpost audit-wisselend was "uitzoeken WAARVAN het
      afhangt". Wat daaruit kwam staat als kaart in de bron van de auditproef.

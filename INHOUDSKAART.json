@@ -1,20 +1,21 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:03:01.793Z",
-  "commit": "ee9db81",
-  "boomVuil": false,
+  "op": "2026-08-20T12:39:32.705Z",
+  "commit": "3c21bf3",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Het ware antwoordprofiel per blinde route (status, sleutels, dragende velden), vastgelegd van een eerlijke run op een wegwerpserver. test/inhoudswacht.test.js dwingt deze profielen af; de liegpoort vervangt een antwoord door 200 {ok:true}, dus elk profiel met meer dan dat ziet de leugen. De kaart stapelt: een nieuwe run vervangt alleen wat hij zelf aanriep.",
  "grens": "Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.",
  "gemeten": {
-  "doelRoutes": 47,
-  "inKaart": 140,
+  "doelRoutes": 4,
+  "inKaart": 139,
   "waarneembaar": 135,
-  "onwaarneembaar": 5,
-  "versDezeRun": 47,
+  "onwaarneembaar": 4,
+  "versDezeRun": 4,
   "zonderRol": 0,
-  "dood": 0
+  "dood": 0,
+  "weerlegd": 1
  },
  "perRoute": {
   "POST /api/bank/pas/uitgeven": {
@@ -242,7 +243,8 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
+   "grond": "gelijk-aan-leugen",
+   "op": "2026-08-20T12:39:32.659Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/fluister/focus": {
@@ -251,7 +253,8 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
+   "grond": "gelijk-aan-leugen",
+   "op": "2026-08-20T12:39:32.659Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/fluister/onthoud": {
@@ -558,15 +561,6 @@
     "error"
    ],
    "op": "2026-08-20T08:10:40.999Z"
-  },
-  "POST /api/office/export.csv": {
-   "methode": "POST",
-   "pad": "/api/office/export.csv",
-   "rol": "office",
-   "status": 200,
-   "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
-   "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/office/hardware/serie": {
    "methode": "POST",
@@ -949,7 +943,8 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
+   "grond": "gelijk-aan-leugen",
+   "op": "2026-08-20T12:39:32.659Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/staff/flits/meld": {
@@ -1458,7 +1453,8 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
+   "grond": "gelijk-aan-leugen",
+   "op": "2026-08-20T12:39:32.659Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/verify/selfie": {

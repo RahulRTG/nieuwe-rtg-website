@@ -54,7 +54,11 @@
       : p.overTot + ' min tot de volgende, ' + over + ' min speling';
   }
 
-  function riderRegel(b, item) {
+  /* HET GETAL ONDERAAN HOORT BIJ DE LIJST ERBOVEN. Toen het afvinken alleen de
+     REGEL bijwerkte, bleef er "1 riderpunt staat open" staan onder een punt dat
+     net was afgevinkt -- twee waarheden over hetzelfde op een half scherm
+     afstand (LAT-regel 4). De teller zit daarom aan dezelfde handeling vast. */
+  function riderRegel(b, item, afgevinkt) {
     var knop = document.createElement('button');
     knop.type = 'button';
     knop.className = 'fp-regel';
@@ -74,6 +78,7 @@
         if (body.error) { r.textContent = body.error; knop.disabled = false; return; }
         r.textContent = 'af · ' + (body.item.door || '');
         knop.removeAttribute('data-sig');
+        afgevinkt();
       }).catch(function () { r.textContent = 'Geen verbinding'; knop.disabled = false; });
     });
     return knop;
@@ -118,16 +123,19 @@
         var boekingen = ((res.body || {}).boekingen || [])
           .filter(function (x) { return x.stand !== 'afgezegd'; });
         var open = 0;
+        function meldOpen() {
+          stil.textContent = open
+            ? open + (open === 1 ? ' riderpunt staat open.' : ' riderpunten staan open.')
+            : 'Alle riderpunten van vandaag staan af.';
+        }
         boekingen.forEach(function (b) {
           (b.rider || []).forEach(function (item) {
             if (item.klaar) return;
             open++;
-            rider.appendChild(riderRegel(b, item));
+            rider.appendChild(riderRegel(b, item, function () { open--; meldOpen(); }));
           });
         });
-        stil.textContent = open
-          ? open + (open === 1 ? ' riderpunt staat open.' : ' riderpunten staan open.')
-          : 'Alle riderpunten van vandaag staan af.';
+        meldOpen();
       })
       .catch(function () { kop.textContent = 'Geen verbinding.'; });
   });

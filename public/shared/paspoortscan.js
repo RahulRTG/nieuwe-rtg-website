@@ -16,19 +16,19 @@
     st.textContent =
       '.pscan{position:fixed;inset:0;z-index:200;background:#0C0C0B;display:flex;flex-direction:column;' +
         'align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1rem calc(env(safe-area-inset-bottom,0px) + 1.2rem);}' +
-      '.pscan-podium{position:relative;width:min(560px,94vw);aspect-ratio:1.42/1;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);}' +
+      '.pscan-podium{position:relative;width:min(560px,94vw);aspect-ratio:1.42/1;border-radius:0;overflow:hidden;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);}' +
       '.pscan-podium video,.pscan-podium img{width:100%;height:100%;object-fit:cover;display:block;}' +
-      '.pscan-kader{position:absolute;inset:7% 5%;border:2px solid rgba(201,162,75,.9);border-radius:12px;box-shadow:0 0 0 100vmax rgba(0,0,0,.32);pointer-events:none;}' +
+      '.pscan-kader{position:absolute;inset:7% 5%;border:2px solid rgba(201,162,75,.9);border-radius:0;box-shadow:0 0 0 100vmax rgba(0,0,0,.32);pointer-events:none;}' +
       '.pscan-hoek{position:absolute;width:22px;height:22px;border:3px solid var(--gold,#C9A24B);}' +
-      '.pscan-hoek.lb{left:-2px;top:-2px;border-right:none;border-bottom:none;border-radius:10px 0 0 0;}' +
-      '.pscan-hoek.rb{right:-2px;top:-2px;border-left:none;border-bottom:none;border-radius:0 10px 0 0;}' +
-      '.pscan-hoek.lo{left:-2px;bottom:-2px;border-right:none;border-top:none;border-radius:0 0 0 10px;}' +
-      '.pscan-hoek.ro{right:-2px;bottom:-2px;border-left:none;border-top:none;border-radius:0 0 10px 0;}' +
-      '.pscan-mrz{position:absolute;left:6%;right:6%;bottom:9%;height:15%;border:1px dashed rgba(237,231,218,.55);border-radius:5px;}' +
+      '.pscan-hoek.lb{left:-2px;top:-2px;border-right:none;border-bottom:none;border-radius:0;}' +
+      '.pscan-hoek.rb{right:-2px;top:-2px;border-left:none;border-bottom:none;border-radius:0;}' +
+      '.pscan-hoek.lo{left:-2px;bottom:-2px;border-right:none;border-top:none;border-radius:0;}' +
+      '.pscan-hoek.ro{right:-2px;bottom:-2px;border-left:none;border-top:none;border-radius:0;}' +
+      '.pscan-mrz{position:absolute;left:6%;right:6%;bottom:9%;height:15%;border:1px dashed rgba(237,231,218,.55);border-radius:0;}' +
       '.pscan-zin{color:var(--txt,#F4F1EC);font-family:"Bodoni Moda",serif;font-size:1.05rem;text-align:center;margin:1.1rem 0 .2rem;text-wrap:balance;}' +
       '.pscan-sub{color:var(--soft,#8A8680);font-size:.78rem;text-align:center;margin-bottom:1rem;min-height:1rem;}' +
       '.pscan-knoppen{display:flex;gap:.7rem;align-items:center;justify-content:center;flex-wrap:wrap;}' +
-      '.pscan-knoppen button{font-family:inherit;cursor:pointer;border-radius:999px;font-size:.85rem;padding:.7rem 1.3rem;border:1px solid var(--line,rgba(255,255,255,.16));background:none;color:var(--txt,#F4F1EC);}' +
+      '.pscan-knoppen button{font-family:inherit;cursor:pointer;border-radius:0;font-size:.85rem;padding:.7rem 1.3rem;border:1px solid var(--line,rgba(255,255,255,.16));background:none;color:var(--txt,#F4F1EC);}' +
       '.pscan-knoppen button.prim{background:var(--gold,#C9A24B);border-color:var(--gold,#C9A24B);color:#0C0C0B;font-weight:700;}' +
       '.pscan-sluiter{width:66px;height:66px;border-radius:50%;padding:0!important;border:3px solid var(--gold,#C9A24B)!important;background:rgba(201,162,75,.15)!important;position:relative;}' +
       '.pscan-sluiter::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--gold,#C9A24B);}';

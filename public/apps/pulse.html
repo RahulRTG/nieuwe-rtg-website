@@ -17,14 +17,14 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.35rem;}
-  header .negen{margin-left:auto;font-size:.66rem;border:1px solid var(--gold);color:var(--gold);border-radius:6px;padding:.12rem .45rem;}
+  header .negen{margin-left:auto;font-size:.66rem;border:1px solid var(--gold);color:var(--gold);border-radius:0;padding:.12rem .45rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .schrijf{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;margin-bottom:.9rem;}
-  .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
+  .schrijf{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-bottom:.9rem;}
+  .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
   .schrijf .voet{display:flex;align-items:center;gap:.6rem;margin-top:.5rem;}
   .teller{font-size:.75rem;color:var(--soft);margin-left:auto;}
   .teller.vol{color:var(--burgundy);}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:400;font-size:.78rem;padding:.3rem .7rem;}
   /* De feedkiezer (Volgend / Ontdek / Mijn plank) is de eigen schakelaar van
      Pulse: EEN stroom tegelijk, precies wat het deelmenu elders doet. Het
@@ -44,8 +44,8 @@
      hierboven -- alleen deze diepere selector wint er zeker van. */
   body.rtg-stijl .tabs > .tab.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   .trend{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;}
-  .trend span{font-size:.74rem;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.22rem .6rem;}
-  .post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;margin-bottom:.7rem;}
+  .trend span{font-size:.74rem;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:.22rem .6rem;}
+  .post{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem 1rem;margin-bottom:.7rem;}
   .post .kop{display:flex;align-items:baseline;gap:.5rem;}
   .post .wie{font-weight:600;font-size:.92rem;}
   .post .tijd{font-size:.72rem;color:var(--soft);margin-left:auto;}
@@ -57,9 +57,9 @@
   .reactie{font-size:.85rem;color:var(--muted);padding:.2rem 0;line-height:1.5;}
   .reactie b{color:var(--txt);font-weight:600;}
   .rrij{display:flex;gap:.4rem;margin-top:.4rem;}
-  .rrij input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .rrij input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2rem 1rem;line-height:1.6;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
   .klaar{color:var(--soft);font-size:.8rem;text-align:center;padding:1rem 0;}
 </style>

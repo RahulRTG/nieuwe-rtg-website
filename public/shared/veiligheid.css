@@ -15,8 +15,8 @@ h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--so
 p{line-height:1.6;}
 .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
 .lbl{display:block;margin:.7rem 0 .25rem;}
-.kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:.6rem 0;}
-.knop{background:transparent;border:1px solid var(--goldlicht);border-radius:10px;color:var(--goldlicht);
+.kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:.6rem 0;}
+.knop{background:transparent;border:1px solid var(--goldlicht);border-radius:0;color:var(--goldlicht);
   font:inherit;font-size:.85rem;padding:.6rem .95rem;cursor:pointer;}
 .knop:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
 .knop.groot{width:100%;padding:1rem;font-size:1rem;font-weight:600;}
@@ -25,7 +25,7 @@ p{line-height:1.6;}
 .knop.weg{color:var(--soft);border-color:var(--line);}
 .knop.stop{color:var(--bordeaux);border-color:var(--bordeaux);}
 .knop[disabled]{opacity:.45;cursor:default;}
-input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.9rem;padding:.6rem .8rem;width:100%;}
 input:focus-visible,select:focus-visible{outline:2px solid var(--goldlicht);outline-offset:1px;}
 .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.4rem 0;}
@@ -37,7 +37,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--goldlicht);outl
    van WCAG 2.5.8. Het label eromheen klikte al mee, het vakje zelf niet. */
 .mini input[type="checkbox"],.mini input[type="radio"]{width:24px;height:24px;flex:0 0 auto;}
 /* de eerlijke grens: gouden lijn, altijd zichtbaar, nooit weg te klikken */
-.grens{border:1px solid var(--gold);border-radius:12px;padding:.8rem .9rem;margin:1rem 0;
+.grens{border:1px solid var(--gold);border-radius:0;padding:.8rem .9rem;margin:1rem 0;
   font-size:.8rem;line-height:1.55;color:var(--soft);background:rgba(133,112,7,.07);}
 .grens strong{color:var(--txt);}
 /* de teller: het enige grote element op het scherm als er iets loopt */
@@ -54,7 +54,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--goldlicht);outl
 @media (max-width:360px){.keuzes{grid-template-columns:repeat(3,minmax(0,1fr));}}
 .keuzes button[aria-pressed="true"]{background:var(--goldlicht);color:#0C0C0B;font-weight:700;}
 .vmelding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%) translateY(1rem);
-  background:#151312;border:1px solid var(--goldlicht);border-radius:12px;padding:.7rem 1rem;
+  background:#151312;border:1px solid var(--goldlicht);border-radius:0;padding:.7rem 1rem;
   font-size:.85rem;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;}
 .vmelding.aan{opacity:1;transform:translateX(-50%) translateY(0);}
 @media (prefers-reduced-motion:reduce){.vmelding{transition:none;}}

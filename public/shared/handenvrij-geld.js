@@ -42,17 +42,17 @@
   var css =
     '.hv-regel{display:flex;gap:.5rem;align-items:center;justify-content:space-between;' +
     'padding:.35rem .1rem .1rem;font-size:.72rem;color:#8A8680;border-bottom:1px solid #2a2a28;margin-bottom:.2rem;}' +
-    '.hv-regel button{background:transparent;border:1px solid #444;border-radius:999px;color:#ddd;' +
+    '.hv-regel button{background:transparent;border:1px solid #444;border-radius:0;color:#ddd;' +
     'font:inherit;font-size:.7rem;padding:.2rem .55rem;cursor:pointer;white-space:nowrap;}' +
     '.hv-regel button[aria-pressed="true"]{background:#7F1634;border-color:#7F1634;color:#fff;font-weight:700;}' +
     /* de disclaimer: een kaart in het gesprek, niet een browservenster, zodat hij
        in dezelfde taal en dezelfde huisstijl staat als de rest */
-    '.hv-kaart{border:1px solid #857007;border-radius:14px;padding:.7rem .8rem;background:#151312;color:#e8e6e3;' +
+    '.hv-kaart{border:1px solid #857007;border-radius:0;padding:.7rem .8rem;background:#151312;color:#e8e6e3;' +
     'font-size:.83rem;line-height:1.55;}' +
     '.hv-kaart h4{margin:0 0 .35rem;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:#857007;}' +
     '.hv-kaart p{margin:0 0 .55rem;}' +
     '.hv-kaart .hv-rij{display:flex;gap:.5rem;flex-wrap:wrap;}' +
-    '.hv-kaart button{border-radius:10px;border:1px solid #444;background:transparent;color:#eee;' +
+    '.hv-kaart button{border-radius:0;border:1px solid #444;background:transparent;color:#eee;' +
     'font:inherit;font-size:.8rem;padding:.4rem .8rem;cursor:pointer;}' +
     '.hv-kaart button.ja{background:#7F1634;border-color:#7F1634;color:#fff;font-weight:700;}' +
     '.hv-kaart button:focus-visible{outline:2px solid #857007;outline-offset:2px;}';

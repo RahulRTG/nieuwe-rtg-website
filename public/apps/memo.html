@@ -28,14 +28,14 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:640px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .opneemkaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;text-align:center;}
+  .opneemkaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;text-align:center;}
   #opneem{font-size:.95rem;padding:.7rem 1.4rem;}
   #duur{font-family:'Bodoni Moda',serif;font-size:2rem;font-variant-numeric:tabular-nums;margin:.4rem 0;}
   #luisterWrap{margin-top:.6rem;font-size:.82rem;color:var(--muted);}
@@ -44,11 +44,11 @@
   #luister{width:24px;height:24px;vertical-align:-.4rem;margin-right:.2rem;}
   #luisterWrap.uit{opacity:.5;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
-  .memo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.55rem;}
+  .memo{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.75rem .9rem;margin-bottom:.55rem;}
   .memo .kop2{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;flex-wrap:wrap;margin-bottom:.4rem;}
   .memo audio{width:100%;height:2.2rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

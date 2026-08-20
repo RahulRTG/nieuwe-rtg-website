@@ -82,7 +82,7 @@
       el.id = 'geldMelding';
       el.setAttribute('role', 'status');
       el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:5rem;z-index:70;' +
-        'background:#151312;border:1px solid var(--gold-rand,rgba(192,165,68,.5));border-radius:12px;' +
+        'background:#151312;border:1px solid var(--gold-rand,rgba(192,165,68,.5));border-radius:0;' +
         'color:var(--rtg-txt,#F4F0E9);font:500 .84rem/1.4 var(--rtg-interface,Inter,system-ui,sans-serif);' +
         'padding:.55rem .95rem;max-width:92vw;display:none;';
       d.body.appendChild(el);

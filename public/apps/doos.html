@@ -15,21 +15,21 @@
     --groen:#3BA55D;--oranje:#D6A32E;--rood:#D6455F;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .wrap{max-width:860px;margin:0 auto;padding:1.6rem 1.2rem 4rem;}
   header.kop{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem;}
   .kop h1{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;}
   .kop .sub{font-size:.8rem;color:var(--soft);}
-  .knop{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:.5rem .85rem;font-weight:600;font-size:.82rem;cursor:pointer;font-family:inherit;}
-  .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.1rem;border-radius:14px;font-weight:700;font-size:1rem;border:1px solid var(--line);background:var(--card);margin-bottom:1.3rem;}
+  .knop{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:.5rem .85rem;font-weight:600;font-size:.82rem;cursor:pointer;font-family:inherit;}
+  .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.1rem;border-radius:0;font-weight:700;font-size:1rem;border:1px solid var(--line);background:var(--card);margin-bottom:1.3rem;}
   .badge .stip{width:.7rem;height:.7rem;border-radius:50%;background:var(--soft);flex:none;}
   .badge.cloud{border-color:rgba(59,165,93,.5);}.badge.cloud .stip{background:var(--groen);box-shadow:0 0 10px var(--groen);}
   .badge.lokaal{border-color:rgba(214,163,46,.5);}.badge.lokaal .stip{background:var(--oranje);box-shadow:0 0 10px var(--oranje);}
   .badge.uit{border-color:rgba(214,69,95,.5);}.badge.uit .stip{background:var(--rood);}
   .tegels{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.8rem;}
-  .tegel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;}
+  .tegel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;}
   .tegel .n{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
   .tegel .l{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.09em;margin-top:.15rem;}
   .tegel .x{font-size:.72rem;color:var(--muted);margin-top:.25rem;}

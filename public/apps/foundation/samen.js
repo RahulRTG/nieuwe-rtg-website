@@ -15,19 +15,19 @@
      als pil rechtsonder en dekte precies af waar je aan het lezen was; twee
      pillen boven elkaar (Samen en Rahul) namen een hoek van het scherm in
      beslag. In de balk is hij even goed te vinden en staat hij nergens voor. */
-  var css = '.rsm-knop{background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
-    '.rsm-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
+  var css = '.rsm-knop{background:var(--paneel,#151312);color:var(--txt,#eee);border:1px solid var(--goud,#857007);border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
+    '.rsm-sheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-sheet[hidden]{display:none;}.rsm-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;}' +
-    '.rsm-x{background:transparent;border:1px solid #444;border-radius:8px;color:inherit;padding:.15rem .5rem;cursor:pointer;}' +
+    '.rsm-x{background:transparent;border:1px solid #444;border-radius:0;color:inherit;padding:.15rem .5rem;cursor:pointer;}' +
     '.rsm-uit{font-size:.83rem;color:var(--zacht,#bbb);line-height:1.55;}' +
-    '.rsm-rij{display:flex;gap:.4rem;}.rsm-rij input{flex:1;background:var(--paneel2,#0C0C0B);border:1px solid #333;border-radius:10px;color:inherit;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
-    '.rsm-go{background:var(--goud,#857007);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +
-    '.rsm-stil{background:transparent;color:inherit;border:1px solid #444;border-radius:10px;padding:.5rem .8rem;font:inherit;font-size:.82rem;cursor:pointer;}' +
+    '.rsm-rij{display:flex;gap:.4rem;}.rsm-rij input{flex:1;background:var(--paneel2,#0C0C0B);border:1px solid #333;border-radius:0;color:inherit;font:inherit;font-size:.85rem;padding:.5rem .7rem;}' +
+    '.rsm-go{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font-weight:700;cursor:pointer;}' +
+    '.rsm-stil{background:transparent;color:inherit;border:1px solid #444;border-radius:0;padding:.5rem .8rem;font:inherit;font-size:.82rem;cursor:pointer;}' +
     '.rsm-chat{font-size:.82rem;color:var(--zacht,#bbb);max-height:24vh;overflow-y:auto;line-height:1.5;}' +
     '.rsm-code{font-family:ui-monospace,monospace;letter-spacing:.2em;color:var(--goud2,#c7ab2b);font-weight:700;}' +
     // de balk draagt er nu twee knoppen bij; op een smal scherm mag hij wikkelen
     '.sb-balk{flex-wrap:wrap;row-gap:.4rem;}' +
-    '.rsm-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:4rem;z-index:37;background:var(--paneel2,#0C0C0B);border:1px solid var(--goud,#857007);border-radius:12px;padding:.6rem .9rem;font:400 .84rem Inter,system-ui,sans-serif;color:var(--txt,#eee);display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}';
+    '.rsm-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:4rem;z-index:37;background:var(--paneel2,#0C0C0B);border:1px solid var(--goud,#857007);border-radius:0;padding:.6rem .9rem;font:400 .84rem Inter,system-ui,sans-serif;color:var(--txt,#eee);display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (h) { var d = document.createElement('div'); d.innerHTML = h; return d.firstChild; };
 
@@ -143,8 +143,8 @@
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol
      naar een vertrouwde grote. ---- */
   /* Ook Rahul staat in de balk, niet zwevend in de hoek. Zie samen-01.js. */
-  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
-    '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
+  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
+    '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
   var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✶ Rahul</button>');

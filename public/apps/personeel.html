@@ -30,7 +30,7 @@
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
   button{font-family:'Inter',sans-serif;cursor:pointer;color:inherit;}
   input,select{font-family:'Inter',sans-serif;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   #shell{width:100%;max-width:460px;min-height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;
@@ -48,7 +48,7 @@
      een ronde wijzerplaat scheef op het scherm: het is het enige beeld op deze
      pagina, dus hij hoort op de as. Het merkje erboven gaat mee. */
   #gate .gate-top{display:flex;flex-direction:column;align-items:center;gap:0.35rem;text-align:center;}
-  #gate .badge{align-self:center;background:#7F1634;border:1px solid #7F1634;border-radius:4px;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
+  #gate .badge{align-self:center;background:#7F1634;border:1px solid #7F1634;border-radius:0;padding:0.4rem 0.9rem;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;}
   .gate-klok{margin-top:1.1rem;font-size:3.9rem;font-weight:200;line-height:1;letter-spacing:0.01em;font-variant-numeric:tabular-nums;color:var(--txt);}
   .gate-datum{font-size:0.82rem;color:var(--soft);text-transform:capitalize;}
   /* In een Work OS-surface is de hoogte kleiner dan op een losse pagina. Het
@@ -65,9 +65,9 @@
   html[data-rtg-oppervlak="1"] #gateStep{margin-top:.65rem;}
   html[data-rtg-oppervlak="1"] #gate .lform{margin-top:1.3rem;}
   .lform{margin-top:1.9rem;display:flex;flex-direction:column;gap:0.7rem;}
-  .lform input{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.9rem 1rem;color:var(--txt);font-size:0.95rem;outline:none;color-scheme:dark;}
+  .lform input{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1rem;color:var(--txt);font-size:0.95rem;outline:none;color-scheme:dark;}
   .lform input:focus{border-color:var(--burgundy);}
-  .lform button.prim{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.95rem 1.2rem;font-size:0.9rem;font-weight:600;margin-top:0.2rem;}
+  .lform button.prim{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.95rem 1.2rem;font-size:0.9rem;font-weight:600;margin-top:0.2rem;}
   .lform .err{font-size:0.76rem;color:#ff8a8a;min-height:1rem;}
   .llinks{margin-top:1.3rem;display:flex;flex-direction:column;gap:0.7rem;}
   .llink{background:none;border:none;color:var(--muted);font-size:0.8rem;text-align:left;padding:0;text-decoration:underline;text-underline-offset:3px;}
@@ -77,7 +77,7 @@
   #gate .deck{margin-top:0.8rem;font-size:0.86rem;color:var(--muted);line-height:1.6;}
   .glist{margin-top:1.8rem;display:flex;flex-direction:column;gap:0.6rem;}
   .gbtn{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 90%, #fff), color-mix(in srgb, var(--card) 94%, #000));
-    border:1px solid var(--line);border-radius:12px;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;
+    border:1px solid var(--line);border-radius:0;padding:0.95rem 1.1rem;text-align:left;display:flex;align-items:center;gap:0.9rem;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1), transform 0.13s cubic-bezier(0.22,0.7,0.3,1);}
   @media (hover:hover){.gbtn:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));transform:translateY(-2px);}}
@@ -95,9 +95,9 @@
   /* min-width:0 is hier geen detail. Zonder die regel krimpt een invoerveld nooit
      onder zijn eigen min-content, en met letter-spacing 0.4em is dat breder dan
      een telefoon: de knop "Binnen" liep het scherm af en was half onzichtbaar. */
-  .pinrow input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;font-variant-numeric:tabular-nums;}
+  .pinrow input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1rem;color:var(--txt);font-size:1.1rem;letter-spacing:0.4em;text-align:center;outline:none;font-variant-numeric:tabular-nums;}
   .pinrow input:focus{border-color:var(--burgundy);}
-  .pinrow button{flex:0 0 auto;white-space:nowrap;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
+  .pinrow button{flex:0 0 auto;white-space:nowrap;background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0 1.4rem;font-size:0.86rem;font-weight:600;}
 
   /* app */
   #app{display:none;flex:1;flex-direction:column;min-height:0;}
@@ -105,14 +105,14 @@
   .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
   .topbar .who b{display:block;font-size:0.94rem;font-weight:600;}
   .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
-  .switch{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.7rem;color:var(--muted);}
+  .switch{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.4rem 0.85rem;font-size:0.7rem;color:var(--muted);}
   .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
   .view{display:none;}
   .view.active{display:block;}
   .view h2{font-size:1.5rem;}
   .view .sub{margin-top:0.35rem;font-size:0.82rem;color:var(--muted);}
   .card{background:linear-gradient(160deg, color-mix(in srgb, var(--card) 91%, #fff), color-mix(in srgb, var(--card) 95%, #000));
-    border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.2rem;margin-top:0.9rem;
+    border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;margin-top:0.9rem;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
   .k{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
 
@@ -123,19 +123,19 @@
   .task .t{flex:1;min-width:0;}
   .task .t b{display:block;font-size:0.86rem;font-weight:600;}
   .task .t span{font-size:0.7rem;color:var(--soft);}
-  .abtn{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;white-space:nowrap;
+  .abtn{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;white-space:nowrap;
     transition:transform 0.13s cubic-bezier(0.22,0.7,0.3,1), filter 0.13s cubic-bezier(0.22,0.7,0.3,1);}
   @media (hover:hover){.abtn:hover{filter:brightness(0.92);}}
   .abtn:active{transform:scale(0.96);}
   .abtn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
-  .pill{display:inline-block;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .pill{display:inline-block;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:0;border:1px solid var(--line);}
   .pill.g{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .pill.a{color:var(--amber);border-color:rgba(201,154,46,0.4);}
   .pill.b{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
 
   /* kamerbord (housekeeping in de PDA): status als kleurband, grote tikdoelen */
   .abtn.warn{background:none;border:1px solid rgba(229,72,77,0.5);color:#FF8589;}
-  .hin{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;
+  .hin{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.85rem;font-size:0.9rem;color:var(--txt);outline:none;
     transition:border-color 0.13s cubic-bezier(0.22,0.7,0.3,1);}
   .hin:focus{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   .row{display:flex;gap:0.5rem;margin-top:0.5rem;}
@@ -145,7 +145,7 @@
   .kamer.schoon{border-left-color:var(--green);}
   .kamer.defect{border-left-color:#E5484D;background:rgba(229,72,77,0.06);}
   .kamer.bezet{border-left-color:var(--line);opacity:0.75;}
-  .hkchip{display:inline-flex;align-items:center;gap:0.3rem;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .hkchip{display:inline-flex;align-items:center;gap:0.3rem;border:1px solid var(--line);border-radius:0;padding:0.2rem 0.6rem;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
   .hkchip.groen{color:#7BC79B;border-color:rgba(76,154,117,0.5);}
   .hkchip.rood{color:#FF8589;border-color:rgba(229,72,77,0.5);}
   .hkchip.amber{color:#E2B93B;border-color:rgba(201,154,46,0.5);}
@@ -158,20 +158,20 @@
 
   .rooster-day{margin-top:0.9rem;}
   .rooster-day .dh{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;}
-  .rrow{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border-radius:10px;font-size:0.84rem;}
+  .rrow{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border-radius:0;font-size:0.84rem;}
   .rrow.me{background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);}
   .rrow span{color:var(--muted);font-size:0.76rem;}
   .rrow.me span{color:var(--gold);}
 
   .chat{display:flex;flex-direction:column;gap:0.55rem;margin-top:0.6rem;}
-  .msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.45;}
+  .msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:0;font-size:0.85rem;line-height:1.45;}
   .msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
   .msg.other{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-top-left-radius:5px;}
   .msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
   .msg.me .who{color:rgba(255,255,255,0.65);}
   .compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
-  .compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
-  .compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
+  .compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
+  .compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
   .act{display:flex;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;}
   .act:last-child{border-bottom:none;}
   .act b{color:var(--gold);font-weight:600;white-space:nowrap;}
@@ -183,7 +183,7 @@
   .tabbar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .tabbar button.active{color:var(--txt);}
   .tabbar button.active svg{stroke:var(--burgundy);}
-  .sos{background:rgba(194,58,94,0.15);border:1px solid var(--burgundy);color:var(--burgundy);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:700;}
+  .sos{background:rgba(194,58,94,0.15);border:1px solid var(--burgundy);color:var(--burgundy);border-radius:0;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:700;}
   .sos:active{background:var(--burgundy);color:#fff;}
   #alarmOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(160,20,30,0.97);cursor:pointer;}
   #alarmOverlay.on{display:flex;animation:bzshake 0.4s ease-in-out 0s 6;}
@@ -201,8 +201,8 @@
   #buzzOverlay b{display:block;margin-top:0.8rem;font-family:'Bodoni Moda',serif;font-size:1.8rem;font-weight:500;}
   #buzzOverlay span{display:block;font-size:0.95rem;opacity:0.85;margin-top:0.2rem;}
   #buzzOverlay i{display:block;margin-top:2rem;font-style:normal;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;opacity:0.6;}
-  .vlin{background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.85rem;color-scheme:dark;outline:none;}
-  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
+  .vlin{background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.85rem;color-scheme:dark;outline:none;}
+  #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:0;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
   .glist.compact{margin-top:.8rem;}.pd-demo-hint{margin-top:.7rem;font-size:.72rem;color:var(--soft);}.pd-card-copy{font-size:.8rem;line-height:1.5;margin-top:.35rem;color:var(--soft);}.abtn.pd-block{display:block;text-align:center;margin-top:.65rem;text-decoration:none;}.pd-empty{color:var(--soft);font-size:.8rem;}.pd-chatrij{padding:.25rem 0;border-bottom:1px solid var(--line);}.pd-chatnaam{color:var(--gold);}
 </style>
@@ -355,7 +355,7 @@
         <div class="chatwissel" aria-hidden="true"><span id="cwWerk" class="aan">Werk</span><span id="cwPrive">Privé · swipe ←</span></div>
         <div class="chatswipe" id="chatSwipe">
           <section class="chatpaneel"><div id="teamWrap"></div></section>
-          <section class="chatpaneel"><iframe id="priveFrame" title="Privéberichten" loading="lazy" style="width:100%;height:min(70vh,560px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;background:#0C0C0B;"></iframe></section>
+          <section class="chatpaneel"><iframe id="priveFrame" title="Privéberichten" loading="lazy" style="width:100%;height:min(70vh,560px);border:1px solid rgba(255,255,255,0.1);border-radius:0;background:#0C0C0B;"></iframe></section>
         </div>
       </div>
       <style>
@@ -363,7 +363,7 @@
         .chatswipe::-webkit-scrollbar{display:none;}
         .chatpaneel{min-width:100%;scroll-snap-align:start;scroll-snap-stop:always;}
         .chatwissel{display:flex;gap:.5rem;margin:0 0 .6rem;font-size:.72rem;color:rgba(244,241,236,.5);}
-        .chatwissel span{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.2rem .6rem;}
+        .chatwissel span{border:1px solid rgba(255,255,255,.12);border-radius:0;padding:.2rem .6rem;}
         .chatwissel span.aan{border-color:#B99A5F;color:#B99A5F;}
       </style>
       <script>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Festival · uw weekend</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+/* DE GASTENKANT IS EEN PAGINA EN GEEN COCKPIT. Geen bank, geen bladen, geen
+   tabbalk: een gast heeft geen werkblad, hij heeft een kaartje en een dag. De
+   schil van reizen-veilig.css hoort hier dus niet, en dat is geen inconsistentie
+   maar het verschil tussen werken en er zijn. */
+.fg{width:min(760px,calc(100% - 32px));margin:0 auto;padding:7vh 0 12vh;}
+.fg h1{font:500 clamp(34px,7vw,60px)/1.02 'Bodoni Moda',serif;margin:16px 0 8px;}
+/* GEEN EIGEN KOPJESRECEPT. De huisstijl geeft een h2 onder main (en onder een
+   .sec) de kleine kapitalen van een sectiekop; dat overschrijven maakte hier
+   twee soorten kopjes op EEN pagina, want de kopjes binnen een section vielen
+   wel onder het eigen recept en die erbuiten niet. Het viel op in de proef en
+   niet in de code. De section draagt daarom `sec`, en verder staat er niets. */
+.fg p{color:var(--rtg-soft);line-height:1.65;}
+.fg-stil{color:var(--rtg-soft);font-size:.85rem;margin-top:10px;}
+
+/* DE PAS. Het enige element op deze pagina dat groot mag zijn, want het is het
+   enige dat je aan een poort moet kunnen laten zien -- desnoods met een
+   telefoon die bijna leeg is, in de regen, met iemand achter je in de rij. */
+.fg-pas{margin-top:18px;border:1px solid var(--rtg-line);padding:clamp(18px,4vw,30px);}
+.fg-code{font-size:clamp(2rem,11vw,3.6rem);line-height:1;letter-spacing:.22em;
+  margin:10px 0 6px;color:var(--rtg-goud);font-variant-numeric:var(--rtg-cijfers);
+  overflow-wrap:anywhere;}
+.fg-recht{display:flex;gap:14px;align-items:baseline;padding:9px 0;
+  border-top:1px solid var(--rtg-line);font-size:.9rem;}
+.fg-recht .rek{margin-left:auto;color:var(--rtg-soft);white-space:nowrap;}
+
+.fg-lijst{margin-top:16px;display:flex;flex-direction:column;}
+.fg-regel{display:flex;gap:14px;align-items:baseline;padding:12px 0;
+  border-bottom:1px solid var(--rtg-line);}
+.fg-regel{flex-wrap:wrap;}
+.fg-regel .rek{margin-left:auto;color:var(--rtg-soft);white-space:nowrap;
+  font-variant-numeric:var(--rtg-cijfers);}
+/* De knop in een regel: hij mag niet meekrimpen met de tekst ernaast, want dan
+   wordt "Uit de groep" een kolom van drie woorden. Breekt de regel af, dan gaat
+   hij mee naar de volgende. */
+.fg-regel .knop{flex:0 0 auto;margin-left:12px;min-height:44px;white-space:nowrap;cursor:pointer;}
+.fg-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 4px;}
+/* HIDDEN MOET WINNEN VAN DISPLAY:FLEX. Het [hidden]-attribuut zet display:none
+   in de browserstijl, en elke eigen regel met een display erin overrulet dat
+   stilletjes. Dat is precies wat hier gebeurde: het formulier "maak een groep"
+   bleef staan voor iemand die nog geen festival heeft, waar het alleen maar kon
+   mislukken. Het viel op in de browserproef en niet in de code. */
+[hidden]{display:none!important;}
+.fg-form .veld{flex:1 1 12rem;min-width:0;}
+.fg-form .knop{flex:0 0 auto;min-height:44px;cursor:pointer;}
+select#fgEditie{min-height:44px;max-width:100%;padding:0 .6rem;font:inherit;}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="world">
+<main class="fg" id="main">
+  <div class="rv-ey">RTG FESTIVAL</div>
+  <h1 id="fgKop">Uw weekend</h1>
+  <p id="fgIntro">Even kijken wat er van u is...</p>
+
+  <div class="fg-form">
+    <select id="fgEditie" aria-label="Welk festival"></select>
+  </div>
+
+  <section id="fgVol" class="sec">
+  <h2>Uw pas</h2>
+  <div id="fgPassen"></div>
+
+  <h2>Het programma</h2>
+  <div class="fg-form">
+    <select class="veld" id="fgDag" aria-label="Welke dag"></select>
+  </div>
+  <div class="fg-lijst" id="fgProgramma"></div>
+  <p class="fg-stil" id="fgProgStil"></p>
+
+  </section>
+
+  <section class="sec">
+  <h2>Uw groep</h2>
+  <div class="fg-lijst" id="fgGroepen"></div>
+  <div class="fg-form" id="fgMaakVak">
+    <input class="veld" id="fgGroepNaam" maxlength="60" placeholder="Naam van de groep" autocomplete="off">
+    <button class="knop" type="button" id="fgGroepMaak">Maak een groep</button>
+  </div>
+  <div class="fg-form">
+    <input class="veld" id="fgGroepCode" maxlength="12" placeholder="Groepscode" autocomplete="off">
+    <button class="knop" type="button" id="fgGroepMee">Doe mee</button>
+  </div>
+  <p class="fg-stil" id="fgGroepStil">Een groep is tussen u en de mensen met wie u gaat. RTG
+    stuurt niemand een uitnodiging: u geeft de code zelf aan wie u erbij wilt.</p>
+  </section>
+</main>
+<script src="/apps/festival-gast.js" defer></script>
+<script src="/apps/festival-gast-groep.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

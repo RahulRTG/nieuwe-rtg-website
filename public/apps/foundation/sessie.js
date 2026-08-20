@@ -31,7 +31,7 @@
     document.documentElement.classList.add('rtf-toegang-dicht');
     if (!document.getElementById('rtf-toegang-stijl')) {
       var stijl = document.createElement('style'); stijl.id = 'rtf-toegang-stijl';
-      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot){visibility:hidden!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none}';
+      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot){visibility:hidden!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
       (document.head || document.documentElement).appendChild(stijl);
     }
     if (!el) {
@@ -40,14 +40,14 @@
       (document.body || document.documentElement).appendChild(el);
     }
     var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:18px;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
+    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:0;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
       '<div style="font:600 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#c9a24b">RTF veilige toegang</div>' +
       '<h1 style="font:500 1.75rem/1.15 Georgia,serif;margin:.55rem 0">' + (laden ? 'Jouw passen worden gecontroleerd…' : 'Deze ruimte blijft nog dicht') + '</h1>' +
       '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:9px;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:10px;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
+      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
         '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
-        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
+        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
     if (wissel) wissel.onclick = function () {
       var ss = lees(); if (ss) { delete ss.token; delete ss.profiel; localStorage.setItem(KEY, JSON.stringify(ss)); }
@@ -213,26 +213,26 @@
   function injectCss() {
     if (cssGedaan) return; cssGedaan = true;
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:4px;}.sb-brand b{color:#F4E9C8;}' +
+      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:0;}.sb-brand b{color:#F4E9C8;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
       '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
-      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
+      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
       '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
       '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
       '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
+      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
-      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:8px;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--goud);}' +
-      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
+      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--goud);}' +
+      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +
-      '.sb-b{padding:.6rem .7rem;border-radius:10px;background:var(--paneel2);margin-bottom:.4rem;}' +
+      '.sb-b{padding:.6rem .7rem;border-radius:0;background:var(--paneel2);margin-bottom:.4rem;}' +
       '.sb-b.reis{border:1px solid var(--goud);}' +
       '.sb-b.hulp{border:1px solid var(--rood);background:#2a1512;}' +
       '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
       '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
       '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:8px;}';
+      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:0;}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   }
   w.Sessie = Sessie;

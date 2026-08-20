@@ -12,7 +12,7 @@
       '<div style="font-size:0.68rem;color:var(--soft);margin-top:0.25rem;">' + T('spar.d','Hij denkt mee om je idee beter te maken, niet om zijn gelijk te halen. Parkeer een gedachte; als je rustig thuis bent met een lege agenda komt hij er zelf op terug.') + '</div>' +
       ((sparLijst || []).length
         ? '<div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem;">' + sparLijst.map(s =>
-            '<div style="border:1px solid var(--line);border-radius:12px;padding:0.5rem 0.65rem;">' +
+            '<div style="border:1px solid var(--line);border-radius:0;padding:0.5rem 0.65rem;">' +
             '<div style="font-size:0.78rem;line-height:1.4;">' + esc(s.tekst) + '</div>' +
             '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;">' +
               '<button class="chip js-sparchat" data-t="' + esc(s.tekst) + '" style="font-size:0.68rem;">' + T('spar.nu','Spar nu') + '</button>' +
@@ -21,7 +21,7 @@
             '</div></div>').join('') + '</div>'
         : '') +
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">' +
-        '<input id="sparIn" placeholder="' + T('spar.plho','Waar wil je later over sparren?') + '" style="flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:0.45rem 0.65rem;font-size:0.76rem;color:var(--txt);outline:none;font-family:inherit;">' +
+        '<input id="sparIn" placeholder="' + T('spar.plho','Waar wil je later over sparren?') + '" style="flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:0.45rem 0.65rem;font-size:0.76rem;color:var(--txt);outline:none;font-family:inherit;">' +
         '<button class="chip" id="sparPark" style="flex-shrink:0;">' + T('spar.park','Parkeer') + '</button>' +
       '</div>' +
     '</div>';

@@ -29,7 +29,7 @@
 
   var css = '.hv-oog{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 .4rem;}' +
     '.hv-oog .hv-sk{flex:0 0 auto;}' +
-    '.hv-foto{max-width:min(220px,60%);border-radius:12px;border:1px solid #2f2c29;display:block;margin:.2rem 0;}';
+    '.hv-foto{max-width:min(220px,60%);border-radius:0;border:1px solid #2f2c29;display:block;margin:.2rem 0;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* Een foto ophalen via een verborgen bestandsveld. `camera` bepaalt of de

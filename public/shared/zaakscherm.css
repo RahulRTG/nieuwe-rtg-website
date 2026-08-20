@@ -22,13 +22,13 @@ header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:up
 header h1{font-size:1.15rem;}
 header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
 main{padding:1rem 1.1rem;max-width:920px;margin:0 auto;}
-.kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+.kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
 .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
 .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
 .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-.veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+.veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
-.knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+.knop{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
 .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
 a.knop{display:inline-block;text-decoration:none;}
@@ -39,7 +39,7 @@ a.knop{display:inline-block;text-decoration:none;}
 .tabs button[aria-selected="true"]{border-color:var(--gold);color:#fff;}
 .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
 .item:first-of-type{border-top:0;}
-.tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+.tag{font-size:.66rem;border:1px solid var(--line);border-radius:0;padding:.12rem .5rem;color:var(--muted);}
 .tag.aan{color:var(--goed);border-color:var(--goed);}
 .tag.laat{color:var(--laat);border-color:var(--laat);}
 /* Een verzoek dat te lang open staat. Het accent staat links en niet als
@@ -52,16 +52,16 @@ a.knop{display:inline-block;text-decoration:none;}
 .z-mt40{margin-top:.4rem;}
 .z-mt60{margin-top:.6rem;}
 .z-mt80{margin-top:.8rem;}
-.bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
+.bon{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;margin-bottom:.5rem;}
 .bon b{font-size:.95rem;}
-.allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;
+.allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:0;
   padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem;}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.55rem;margin-bottom:.8rem;}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
 .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:500;}
 .kpi span{font-size:.68rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
 .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-  border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+  border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
   opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
 .melding.zie{opacity:1;}
 [hidden]{display:none !important;}

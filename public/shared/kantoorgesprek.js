@@ -34,11 +34,11 @@
        dit mee met de dagkleur en het seizoen, net als de rest van de pagina.
        Met een eigen bordeaux knop stond hier een vreemde in het scherm. */
     '.kg-in{width:100%;background:var(--card2,var(--bg,#0C0C0B));border:1px solid var(--line,rgba(255,255,255,.18));' +
-    'border-radius:12px;color:var(--txt,#F4F1EC);font:inherit;font-size:.95rem;padding:.7rem .8rem;}' +
+    'border-radius:0;color:var(--txt,#F4F1EC);font:inherit;font-size:.95rem;padding:.7rem .8rem;}' +
     '.kg-in:focus{outline:none;border-color:var(--gold,#D0AC57);}' +
     '.kg-rij{display:flex;gap:.6rem;margin-top:.8rem;}' +
     '.kg-rij button{flex:1;border:none;cursor:pointer;font:inherit;font-weight:700;font-size:.95rem;' +
-    'border-radius:12px;padding:.7rem 1rem;background:var(--gold,#D0AC57);color:#000;}' +
+    'border-radius:0;padding:.7rem 1rem;background:var(--gold,#D0AC57);color:#000;}' +
     '.kg-rij button:disabled{opacity:.45;cursor:default;}' +
     '.kg-fout{font-size:.86rem;line-height:1.5;color:var(--burgundy-on-dark,#C23A5E);margin:.8rem 0 0;min-height:1.2rem;}';
 

@@ -23,18 +23,18 @@
     '.poort-band{position:fixed;left:50%;transform:translateX(-50%);' +
     'top:calc(env(safe-area-inset-top,0px) + 3.4rem);z-index:36;max-width:min(30rem,92vw);' +
     'display:flex;align-items:center;gap:.7rem;background:#0C0C0B;border:1px solid var(--burgundy-on-dark,#C23A5E);' +
-    'border-radius:999px;padding:.5rem .55rem .5rem .95rem;box-shadow:0 10px 30px rgba(0,0,0,.5);' +
+    'border-radius:0;padding:.5rem .55rem .5rem .95rem;box-shadow:0 10px 30px rgba(0,0,0,.5);' +
     'font-family:Inter,system-ui,sans-serif;color:#F4F1EC;font-size:.84rem;}' +
     '.poort-band[hidden]{display:none;}' +
     '.poort-band b{color:var(--burgundy-on-dark,#C23A5E);font-weight:600;}' +
     '.poort-band .p-open{flex:0 0 auto;border:none;cursor:pointer;background:var(--burgundy,#7F1634);color:#fff;' +
-    'font:inherit;font-weight:600;font-size:.8rem;border-radius:999px;padding:.4rem .85rem;}' +
+    'font:inherit;font-weight:600;font-size:.8rem;border-radius:0;padding:.4rem .85rem;}' +
     '.poort-band .p-open:hover{background:var(--burgundy-bright,#9E1C40);}' +
     '.poort-waas{position:fixed;inset:0;z-index:60;background:rgba(6,6,6,.72);backdrop-filter:blur(4px);' +
     'display:flex;align-items:center;justify-content:center;padding:1.2rem;}' +
     '.poort-waas[hidden]{display:none;}' +
     '.poort-kaart{width:min(34rem,100%);max-height:88vh;overflow-y:auto;background:#151312;' +
-    'border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1.4rem 1.4rem 1.2rem;' +
+    'border:1px solid rgba(255,255,255,.12);border-radius:0;padding:1.4rem 1.4rem 1.2rem;' +
     'font-family:Inter,system-ui,sans-serif;color:#F4F1EC;box-shadow:0 24px 60px rgba(0,0,0,.6);}' +
     '.poort-kaart h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:1.4rem;margin:0 0 .2rem;}' +
     '.poort-kaart .p-sub{color:#A79F92;font-size:.86rem;line-height:1.5;margin:0 0 1.1rem;}' +
@@ -46,13 +46,13 @@
     '.p-stap .p-tk b{display:block;font-weight:600;font-size:.92rem;}' +
     '.p-stap .p-tk span{display:block;color:#A79F92;font-size:.82rem;line-height:1.45;margin-top:.1rem;}' +
     '.p-stap .p-doe{flex:0 0 auto;align-self:center;border:1px solid var(--burgundy-on-dark,#C23A5E);background:transparent;' +
-    'color:var(--burgundy-on-dark,#C23A5E);font:inherit;font-size:.78rem;font-weight:600;border-radius:999px;padding:.3rem .7rem;cursor:pointer;}' +
+    'color:var(--burgundy-on-dark,#C23A5E);font:inherit;font-size:.78rem;font-weight:600;border-radius:0;padding:.3rem .7rem;cursor:pointer;}' +
     '.p-stap .p-doe:hover{background:rgba(194,58,94,.12);}' +
-    '.p-rond{margin:.5rem 0 0;background:#0C0C0B;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.8rem 1rem;}' +
+    '.p-rond{margin:.5rem 0 0;background:#0C0C0B;border:1px solid rgba(255,255,255,.1);border-radius:0;padding:.8rem 1rem;}' +
     '.p-rond h3{margin:0 0 .5rem;font-size:.95rem;font-weight:600;}' +
     '.p-rond ol{margin:0;padding-left:1.1rem;color:#CFC9BE;font-size:.85rem;line-height:1.6;}' +
     '.poort-knoprij{display:flex;gap:.6rem;margin-top:1.2rem;}' +
-    '.poort-knoprij button{flex:1;border:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;border-radius:12px;padding:.7rem;}' +
+    '.poort-knoprij button{flex:1;border:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;border-radius:0;padding:.7rem;}' +
     '.p-online{background:var(--burgundy,#7F1634);color:#fff;}' +
     '.p-online:hover{background:var(--burgundy-bright,#9E1C40);}' +
     '.p-online:disabled{background:#2a2724;color:#6b6862;cursor:not-allowed;}' +

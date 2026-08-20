@@ -20,20 +20,20 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.6rem 0.95rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .knop[disabled]{opacity:0.45;cursor:default;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
-  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
+  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);padding:0.55rem 0.7rem;width:100%;}
   select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
   label{display:block;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.3rem;}
@@ -50,7 +50,7 @@
   /* de twee snelle check-ins: twee grote rustige vlakken */
   .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
   .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:16px;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
+    border:1px solid var(--line);border-radius:0;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
   .snel button .i{display:block;width:1.9rem;height:1.9rem;}
   .snel button .sub{font-size:0.68rem;color:var(--soft);}
   .snel button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
@@ -68,7 +68,7 @@
   .rit{border-left:3px solid var(--groen);}
   /* de statusketen van een lopende rit */
   .keten{display:flex;gap:0.3rem;margin:0.7rem 0 0.2rem;}
-  .keten span{flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .keten span{flex:1;height:3px;border-radius:0;background:var(--line);}
   .keten span.af{background:var(--gold);}
   .prijs{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
   .rijtje{display:flex;justify-content:space-between;gap:0.7rem;border-top:1px solid var(--line);
@@ -78,21 +78,21 @@
     justify-content:center;gap:1.2rem;z-index:50;}
   .codeScherm.zien{display:flex;}
   .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
-    color:#0C0C0B;background:var(--gold);border-radius:16px;padding:1rem 1.4rem;
+    color:#0C0C0B;background:var(--gold);border-radius:0;padding:1rem 1.4rem;
     box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
-  .moveHero{--accent:#5EE7F7;position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:26px;
+  .moveHero{--accent:#5EE7F7;position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:0;
     border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}
   .moveHero.private{--accent:#D8C8A0;background:linear-gradient(145deg,#24231e,#0c1015 72%)}.moveHero.lifestyle{--accent:#E8C98B;background:linear-gradient(145deg,#34251f,#17110f 72%)}
   .moveHero .eyebrow{font-size:.59rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}.moveHero h2{font:500 clamp(2rem,7vw,3.1rem)/1.02 'Bodoni Moda',serif;letter-spacing:0;text-transform:none;color:var(--txt);margin:.55rem 0;max-width:58%}.moveHero>p{max-width:48%}
   .moveOrb{position:absolute;right:9%;top:33px;width:158px;height:158px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:inset 0 0 38px color-mix(in srgb,var(--accent) 13%,transparent),0 0 75px color-mix(in srgb,var(--accent) 14%,transparent);display:grid;place-items:center;animation:moveAdem 5s ease-in-out infinite}
   .moveOrb:before,.moveOrb:after{content:'';position:absolute;inset:13px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-left-color:transparent;animation:moveDraai 13s linear infinite}.moveOrb:after{inset:29px;animation-direction:reverse;animation-duration:9s}.moveOrb b{font:500 .95rem 'Bodoni Moda',serif;text-align:center;max-width:9ch;z-index:1}.moveOrb i{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:moveBaan 7s linear infinite}
   .moveRail{position:absolute;left:1.5rem;right:1.5rem;bottom:2.9rem;display:flex;align-items:center}.moveStop{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent) 44%,var(--line));background:var(--card2);font-size:.7rem;color:var(--accent)}.moveLine{height:1px;flex:1;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 17%,var(--line)));position:relative}.moveLine span{position:absolute;top:.45rem;left:.25rem;color:var(--soft);font-size:.57rem;white-space:nowrap}.moveStatus{position:absolute;bottom:1rem;left:1.5rem;font-size:.62rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase}.moveStatus:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);box-shadow:0 0 12px var(--groen);margin-right:.45rem}
-  .privateForm{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.privateModes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}.privateModes button{border:1px solid var(--line);border-radius:99px;background:var(--card2);color:var(--soft);padding:.42rem .62rem;font-size:.68rem}.privateModes button[aria-pressed=true]{border-color:var(--gold);color:var(--txt)}
+  .privateForm{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.privateModes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}.privateModes button{border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--soft);padding:.42rem .62rem;font-size:.68rem}.privateModes button[aria-pressed=true]{border-color:var(--gold);color:var(--txt)}
   @keyframes moveAdem{50%{transform:scale(1.035);filter:brightness(1.14)}}@keyframes moveDraai{to{transform:rotate(360deg)}}@keyframes moveBaan{from{transform:rotate(0) translateX(79px)}to{transform:rotate(360deg) translateX(79px)}}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
   @media(max-width:560px){.moveHero{margin:.3rem 1.1rem 1rem;min-height:430px;padding:1.2rem}.moveHero h2,.moveHero>p{max-width:100%}.moveOrb{right:50%;top:150px;transform:translateX(50%);width:135px;height:135px}.moveRail{left:1.2rem;right:1.2rem}.privateForm{grid-template-columns:1fr}}
@@ -288,7 +288,7 @@
 </div>
 <div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
   <p class="stil" id="qrTitel"></p>
-  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:12px;background:#fff;padding:0.6rem;">
+  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;">
   <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
   <button class="knop" id="qrDicht" type="button">Sluiten</button>
 </div>

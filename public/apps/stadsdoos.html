@@ -21,10 +21,10 @@
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
   main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
-  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
   select.veld{color-scheme:dark;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
@@ -34,7 +34,7 @@
   .dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;flex:0 0 auto;}
   .klus{border-bottom:1px solid var(--line);padding:.6rem 0;display:flex;gap:.6rem;align-items:flex-start;}
   .klus:last-child{border-bottom:0;}
-  .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+  .melding{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -183,7 +183,7 @@ $('#aMeld').addEventListener('click', async () => {
   try {
     const r = await api('stad/node/aanmeld', { doosNaam: $('#aNaam').value, zone: $('#aZone').value,
       sensoren: $('#aSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: wie() });
-    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+    $('#aUit').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong><br>sleutel: <code style="word-break:break-all;">' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
     $('#tSerial').value = r.serial; $('#tSleutel').value = r.sleutel; // klaar voor de verbindingstest
     $('#aNaam').value = ''; $('#aSens').value = '';
     laad();

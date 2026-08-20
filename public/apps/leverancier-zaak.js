@@ -112,7 +112,7 @@
       '#zaakPresOverlay{position:fixed;inset:0;z-index:9000;background:#0C0C0B;color:#F4F1EC;display:flex;flex-direction:column;font-family:"Inter",system-ui,sans-serif;}' +
       '#zaakPresOverlay .zp-kop{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.6rem;border-bottom:1px solid rgba(244,241,236,.14);}' +
       '#zaakPresOverlay .zp-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.15rem;letter-spacing:.02em;}' +
-      '#zaakPresOverlay .zp-kop button{background:none;border:1px solid rgba(244,241,236,.3);color:#F4F1EC;border-radius:999px;padding:.35rem 1rem;font:inherit;font-size:.8rem;cursor:pointer;}' +
+      '#zaakPresOverlay .zp-kop button{background:none;border:1px solid rgba(244,241,236,.3);color:#F4F1EC;border-radius:0;padding:.35rem 1rem;font:inherit;font-size:.8rem;cursor:pointer;}' +
       '#zaakPresVlak{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1.2rem;padding:2rem;text-align:center;}' +
       '#zaakPresVlak h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:clamp(1.4rem,3.5vw,2.4rem);}' +
       '#zaakPresOverlay .zp-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1.2rem;width:min(60rem,90%);}' +
@@ -120,7 +120,7 @@
       '#zaakPresOverlay .zp-kpis span{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,241,236,.62);}' +
       '#zaakPresOverlay .zp-staaf{display:flex;align-items:flex-end;gap:1rem;height:38vh;width:min(56rem,88%);}' +
       '#zaakPresOverlay .zp-staaf>div{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:.4rem;font-size:.75rem;color:rgba(244,241,236,.62);}' +
-      '#zaakPresOverlay .zp-staaf i{display:block;width:100%;max-width:70px;margin:0 auto;background:#A98F1C;border-radius:6px 6px 3px 3px;}' +
+      '#zaakPresOverlay .zp-staaf i{display:block;width:100%;max-width:70px;margin:0 auto;background:#A98F1C;border-radius:0;}' +
       '#zaakPresOverlay .zp-staaf>div:last-child i{background:#7F1634;}' +
       '#zaakPresOverlay .zp-rij{display:flex;justify-content:space-between;gap:2rem;width:min(34rem,86%);font-size:1.05rem;padding:.5rem 0;border-bottom:1px solid rgba(244,241,236,.14);}' +
       '#zaakPresOverlay .zp-tekst{max-width:44rem;font-size:1.05rem;line-height:1.7;color:rgba(244,241,236,.78);}' +

@@ -6,7 +6,7 @@
    een container: de blokken buigen mee met de DOEK-breedte (de gekozen versie),
    niet met het venster -- zo klopt de telefoon-, tablet- en desktopversie. */
 .doek{
-  width:100%;max-width:1080px;margin:0 auto;border-radius:16px;overflow:hidden;
+  width:100%;max-width:1080px;margin:0 auto;border-radius:0;overflow:hidden;
   container-type:inline-size;transition:max-width .28s ease;
 }
 .doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:rgba(244,241,236,.66); --dline:rgba(255,255,255,.12); --dcard:#151312; }
@@ -17,19 +17,19 @@
 .b-hero{padding:clamp(2.4rem,7cqw,5rem) clamp(1.4rem,5cqw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
 .b-hero h1{font-size:clamp(1.9rem,5cqw,3.4rem);}
 .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
-.b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:999px;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
+.b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:0;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
 .b-kop{padding:1.6rem clamp(1.4rem,5cqw,3.4rem) .3rem;}
 .b-kop h2{font-size:clamp(1.4rem,3cqw,2rem);}
 .b-tekst{padding:.6rem clamp(1.4rem,5cqw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
 .b-knoprij{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
 .b-beeld{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
-.b-beeld img{width:100%;border-radius:12px;display:block;}
+.b-beeld img{width:100%;border-radius:0;display:block;}
 .b-beeld .bij{font-size:.78rem;color:var(--dmut);margin-top:.4rem;text-align:center;}
 .b-kol{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
 .b-kol h3{font-size:1.15rem;margin-bottom:.4rem;}
 .b-kol .kt{color:var(--dmut);line-height:1.6;font-size:.95rem;}
 .b-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
-.b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block;}
+.b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:0;display:block;}
 .b-citaat{padding:2rem clamp(1.4rem,5cqw,3.4rem);text-align:center;}
 .b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3cqw,1.9rem);line-height:1.35;color:var(--dtxt);}
 .b-citaat .bron{color:var(--acc);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;}

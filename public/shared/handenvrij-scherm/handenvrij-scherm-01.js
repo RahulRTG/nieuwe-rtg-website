@@ -55,8 +55,8 @@
     '.hv-greep{position:sticky;top:-.7rem;margin:-.7rem -.8rem .3rem;padding:.45rem .8rem .5rem;' +
     'background:#0C0C0B;border-bottom:1px solid #201e1c;display:flex;align-items:center;gap:.4rem;' +
     'z-index:2;touch-action:none;cursor:ns-resize;}' +
-    '.hv-lijn{width:2.2rem;height:.22rem;border-radius:999px;background:#3a3733;margin-right:auto;}' +
-    '.hv-sk{background:transparent;border:1px solid #3a3733;border-radius:9px;color:#cfccc7;' +
+    '.hv-lijn{width:2.2rem;height:.22rem;border-radius:0;background:#3a3733;margin-right:auto;}' +
+    '.hv-sk{background:transparent;border:1px solid #3a3733;border-radius:0;color:#cfccc7;' +
     'font:inherit;font-size:.72rem;line-height:1;padding:.32rem .45rem;cursor:pointer;flex:0 0 auto;}' +
     '.hv-sk:hover{border-color:var(--gold,#857007);color:#fff;}' +
     '.hv-sk:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +

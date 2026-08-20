@@ -25,7 +25,7 @@
   if (window.RTGDeur) return;
 
   var css = '.rtgdeur{max-width:34rem;margin:2rem auto;padding:1.6rem 1.5rem;text-align:left;' +
-      'border:1px solid var(--line,var(--lijn,#2A2724));border-radius:var(--radius,14px);' +
+      'border:1px solid var(--line,var(--lijn,#2A2724));border-radius:0;' +
       'background:var(--paneel,rgba(255,255,255,.02));}' +
     '.rtgdeur h2{font-family:var(--serif),Georgia,serif;font-size:1.35rem;font-weight:500;margin:0 0 .4rem;}' +
     '.rtgdeur .rtgdeur-wat{color:var(--muted,var(--zacht,#8A8680));line-height:1.6;font-size:.92rem;margin-bottom:1.1rem;}' +

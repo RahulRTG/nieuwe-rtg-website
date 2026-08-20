@@ -3471,5 +3471,54 @@ console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet
   }
 }
 
+/* 51) geen ronde hoeken -- de merkregel, nu ook in code.
+
+   CLAUDE.md ontwerpprincipe 3 zegt het al sinds het begin: "geen ronde hoeken".
+   De vormtaal deed intussen het tegenovergestelde -- 18px op kaarten, 12px op
+   velden, 999px op knoppen, plus 195 losse pixelwaarden die zich aan geen van
+   beide hielden. Een merkregel die alleen in een document staat, is over een
+   half jaar weer weg; deze regel is de reden dat hij blijft.
+
+   EEN CIRKEL IS GEEN HOEK, en dat is het enige wat er WEL mag. Een stip van
+   9x9 die de status aangeeft, een monogram, een avatar: dat zijn vormen en geen
+   afgeronde rechthoeken -- er zit niets aan om af te ronden. `border-radius:50%`
+   blijft daarom toegestaan; alles wat een hoek AFROND niet.
+
+   Gemeten over public/: elke .css, .html en .js, want de vormtaal staat op alle
+   drie de plekken (stylesheet, inline style, en CSS die een script neerzet). */
+console.log('\n51) geen ronde hoeken: elke border-radius is 0, behalve een echte cirkel');
+{
+  const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
+  const mag = (v) => {
+    const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
+    return k === '0' || k === '0!important' || k === '50%' || k === '50%!important';
+  };
+  const kapot = [];
+  let gekeken = 0, cirkels = 0;
+  loop(path.join(ROOT, 'public'), /\.(css|html|js)$/, f => {
+    const rel = path.relative(ROOT, f);
+    if (rel.endsWith('.min.js')) return;
+    let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+    if (!bron.includes('border-radius')) return;
+    gekeken++;
+    let m;
+    RE.lastIndex = 0;
+    while ((m = RE.exec(bron))) {
+      const v = m[1].trim();
+      if (mag(v)) { if (v.toLowerCase().startsWith('50%')) cirkels++; continue; }
+      kapot.push(rel + ' regel ' + bron.slice(0, m.index).split('\n').length + ': ' + v.slice(0, 40));
+    }
+  });
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 12)) {
+      fout('ronde hoek: ' + k + ' -- zet hem op 0 (CLAUDE.md ontwerpprincipe 3);' +
+        ' een echte cirkel mag, en die schrijf je als border-radius:50%');
+    }
+    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');
+  } else {
+    ok(gekeken + ' bestanden met een radius: allemaal 0, plus ' + cirkels + ' echte cirkels');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

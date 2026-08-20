@@ -46,9 +46,9 @@
         'border-top:1px solid var(--rtg-line);padding:.55rem 0;font-size:.9rem;}' +
       '#paneel .lb-item:first-child{border-top:0;}' +
       '#paneel .lb-item .b{flex:1;min-width:0;}' +
-      '#paneel .lb-soort{font-size:.66rem;border:1px solid var(--rtg-line);border-radius:999px;' +
+      '#paneel .lb-soort{font-size:.66rem;border:1px solid var(--rtg-line);border-radius:0;' +
         'padding:.1rem .5rem;color:var(--rtg-soft);text-transform:capitalize;white-space:nowrap;}' +
-      '#paneel .lb-weg{width:1.8rem;height:1.8rem;padding:0;border-radius:8px;flex-shrink:0;}' +
+      '#paneel .lb-weg{width:1.8rem;height:1.8rem;padding:0;border-radius:0;flex-shrink:0;}' +
       '#paneel .lb-hint{font-size:.72rem;color:var(--rtg-soft);margin-top:.35rem;}';
     d.head.appendChild(st);
   }

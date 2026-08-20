@@ -20,15 +20,15 @@
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
-  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
+  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
   .mijncn b{color:var(--goud);}
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
   .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
   .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
-  #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
-  #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
+  #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:0;}
+  #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:0;background:#000;object-fit:cover;}
   /* een eigen display wint van de [hidden]-regel van de browser */
   #pinUitNoot{margin-top:.55rem;font-size:.75rem;line-height:1.45;color:var(--zacht);}
   .pinlabel{color:var(--zacht);font-size:.8rem;}
@@ -45,48 +45,48 @@
   .zoekrij{display:flex;gap:.5rem;margin-bottom:.6rem;}
   .zoekrij .veld{flex:1;}
   .lijst{display:flex;flex-direction:column;gap:.5rem;}
-  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;}
   .rij .av{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--paneel);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;}
   .rij .nm{flex:1;min-width:0;font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;}
   .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
-  .mini{padding:.3rem .6rem;font-size:.78rem;border-radius:999px;}
+  .mini{padding:.3rem .6rem;font-size:.78rem;border-radius:0;}
   .sec{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--zacht);margin:1.2rem 0 .5rem;}
   .leeg{color:var(--zacht);font-size:.85rem;padding:.4rem 0;}
-  .badge{background:var(--rood);color:#fff;border-radius:999px;font-size:.62rem;font-weight:700;padding:.05rem .4rem;margin-left:.3rem;}
+  .badge{background:var(--rood);color:#fff;border-radius:0;font-size:.62rem;font-weight:700;padding:.05rem .4rem;margin-left:.3rem;}
   /* overlays */
   .ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;}
   .ov.open{display:flex;}
-  .ovkaart{background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px;width:min(100%,40rem);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .ovkaart{background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:0;width:min(100%,40rem);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
   .ovkop{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--lijn);}
   .ovkop b{flex:1;}
   .ovx{background:none;border:none;color:var(--zacht);font-size:1.3rem;cursor:pointer;}
   .msgs{flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;min-height:12rem;}
-  .bel{align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:12px;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap;}
+  .bel{align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:0;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap;}
   .bel.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
   .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
   .invoer .veld{flex:1;}
-  .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
+  .snapfull{max-width:100%;max-height:70vh;border-radius:0;}
   /* de dag-opdracht */
-  .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
+  .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:0;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
   .opkaart .em{font-size:1.6rem;}
   .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
   .opkaart .tx b{color:var(--goud);}
   .opkaart .tx small{display:block;color:var(--zacht);font-size:.72rem;margin-top:.15rem;}
   /* snap-studio */
-  .studio-cv{width:100%;border-radius:12px;display:block;touch-action:none;background:#111;}
+  .studio-cv{width:100%;border-radius:0;display:block;touch-action:none;background:#111;}
   .strij{display:flex;gap:.4rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
-  .stchip{background:#26221d;color:#fff;border-radius:999px;padding:.3rem .7rem;font-size:.78rem;border:2px solid transparent;cursor:pointer;}
+  .stchip{background:#26221d;color:#fff;border-radius:0;padding:.3rem .7rem;font-size:.78rem;border:2px solid transparent;cursor:pointer;}
   .stchip.aan{border-color:var(--goud);color:var(--goud2);}
   .stkleur{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;}
   .stkleur.aan{border-color:#fff;transform:scale(1.12);}
-  .stemoji{font-size:1.2rem;background:#26221d;border-radius:9px;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
+  .stemoji{font-size:1.2rem;background:#26221d;border-radius:0;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
   .stemoji.aan{border-color:var(--goud);}
   .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
   /* bellen */
   .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
   .belwrap{position:relative;width:100%;height:70vh;max-height:70vh;display:flex;align-items:center;justify-content:center;background:#000;}
   #belRemote{width:100%;height:100%;object-fit:cover;background:#000;}
-  #belLocal{position:absolute;right:.7rem;bottom:5.4rem;width:6.5rem;border-radius:8px;border:1px solid #333;object-fit:cover;background:#111;}
+  #belLocal{position:absolute;right:.7rem;bottom:5.4rem;width:6.5rem;border-radius:0;border:1px solid #333;object-fit:cover;background:#111;}
   .belaudio{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
   .belav{width:5.5rem;height:5.5rem;border-radius:50%;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:2px solid var(--goud);}
   .belinfo{position:absolute;top:1rem;left:0;right:0;text-align:center;color:#fff;}
@@ -94,9 +94,9 @@
   .belknoppen{position:absolute;bottom:1.1rem;left:0;right:0;display:flex;gap:1.2rem;justify-content:center;}
   .belk{width:3.2rem;height:3.2rem;border-radius:50%;border:none;font-size:1.2rem;cursor:pointer;background:#333;color:#fff;}
   .belk.op{background:var(--rood,#d33);}
-  #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
+  #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:0;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud,#C9A24B);color:#0C0C0B;padding:.5rem .9rem;
-    border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+    border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}

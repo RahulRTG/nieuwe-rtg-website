@@ -63,10 +63,10 @@
     background:linear-gradient(transparent,rgba(12,12,11,0.78));}
   .standen{display:flex;justify-content:center;gap:0.4rem;}
   .standen button{background:none;border:1px solid transparent;color:var(--soft);font:inherit;font-size:0.72rem;
-    letter-spacing:0.14em;text-transform:uppercase;padding:0.35rem 0.8rem;border-radius:999px;cursor:pointer;}
+    letter-spacing:0.14em;text-transform:uppercase;padding:0.35rem 0.8rem;border-radius:0;cursor:pointer;}
   .standen button[aria-pressed="true"]{color:var(--gold);border-color:var(--gold);}
   .rij{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;}
-  .duimpje{width:52px;height:52px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+  .duimpje{width:52px;height:52px;border-radius:0;border:1px solid var(--line);background:var(--card);
     overflow:hidden;padding:0;cursor:pointer;}
   .duimpje img{width:100%;height:100%;object-fit:cover;display:block;}
   .sluiter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.15);
@@ -75,7 +75,7 @@
   .sluiter:focus-visible{outline:2px solid var(--gold);outline-offset:4px;}
 
   /* Rahul kijkt mee: de tipstrook boven de sluiter */
-  .rahul{margin:0 0.2rem;background:rgba(21,19,18,0.82);border:1px solid var(--line);border-radius:12px;
+  .rahul{margin:0 0.2rem;background:rgba(21,19,18,0.82);border:1px solid var(--line);border-radius:0;
     padding:0.55rem 0.8rem;font-size:0.8rem;line-height:1.45;color:var(--txt);
     display:flex;gap:0.55rem;align-items:flex-start;}
   .rahul b{color:var(--gold);font-weight:600;}
@@ -100,7 +100,7 @@
   .chips{display:flex;gap:0.4rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
   .chips::-webkit-scrollbar{display:none;}
   .chips button{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--txt);
-    font:inherit;font-size:0.72rem;padding:0.4rem 0.75rem;border-radius:999px;cursor:pointer;}
+    font:inherit;font-size:0.72rem;padding:0.4rem 0.75rem;border-radius:0;cursor:pointer;}
   .chips button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
   .chips button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .regelaars{display:none;flex-direction:column;gap:0.3rem;max-height:31vh;overflow-y:auto;}
@@ -112,7 +112,7 @@
   .studio-acties{display:flex;gap:0.5rem;align-items:center;}
   .studio-acties .rek{flex:1;}
   .aknop{background:var(--card);border:1px solid var(--line);color:var(--txt);font:inherit;
-    font-size:0.78rem;padding:0.55rem 0.9rem;border-radius:10px;cursor:pointer;}
+    font-size:0.78rem;padding:0.55rem 0.9rem;border-radius:0;cursor:pointer;}
   .aknop.goud{border-color:var(--gold);color:var(--gold);}
   .aknop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 </style>

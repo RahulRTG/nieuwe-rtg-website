@@ -30,7 +30,7 @@
     st.textContent =
       '#paneel .bl-week{display:flex;gap:.4rem;align-items:flex-end;margin-top:.5rem;}' +
       '#paneel .bl-dag{flex:1;text-align:center;}' +
-      '#paneel .bl-staaf{margin:0 auto;width:.9rem;border-radius:4px 4px 0 0;background:var(--rtg-goud,#C9A24B);min-height:4px;}' +
+      '#paneel .bl-staaf{margin:0 auto;width:.9rem;border-radius:0;background:var(--rtg-goud,#C9A24B);min-height:4px;}' +
       '#paneel .bl-staaf.leeg{background:var(--rtg-groen,#69B891);height:4px;}' +
       '#paneel .bl-lbl{font-size:.6rem;color:var(--rtg-soft);margin-top:.3rem;}' +
       '#paneel .bl-advies{display:flex;gap:.6rem;align-items:flex-start;margin-top:.6rem;font-size:.84rem;line-height:1.55;}' +

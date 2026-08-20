@@ -24,10 +24,10 @@
     display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
   header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.05rem;}
-  header .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;}
-  .titelin{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.85rem;border-radius:10px;padding:.4rem .6rem;min-width:12rem;}
+  header .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.35rem .6rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;}
+  .titelin{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.85rem;border-radius:0;padding:.4rem .6rem;min-width:12rem;}
   .sp{flex:1 1 auto;}
-  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.8rem;font-weight:600;border-radius:10px;padding:.45rem .8rem;cursor:pointer;white-space:nowrap;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.8rem;font-weight:600;border-radius:0;padding:.45rem .8rem;cursor:pointer;white-space:nowrap;}
   .knop:hover{border-color:var(--gold);}
   .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .knop.aan{border-color:var(--gold);color:var(--gold);}
@@ -36,7 +36,7 @@
   .swatch.actief{border-color:#fff;}
   .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
-  .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:6px;background:none;padding:0;cursor:pointer;}
+  .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:0;background:none;padding:0;cursor:pointer;}
   .kleurbalk .knop{padding:.3rem .55rem;font-size:.7rem;}
   /* toestelkiezer: telefoon / tablet / desktop -- schaalt het doek naar die
      versie. Het schakelen blijft van zetApparaat(); de rij draagt alleen de
@@ -53,8 +53,8 @@
   /* het doek (de website die je bouwt) -- een container, zodat de blokken
      meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
   main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
-  .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
-  .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .doek{width:100%;max-width:1080px;border-radius:0;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
+  .doek.mobielkader{border-radius:0;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* thema-tokens op het doek zelf */
   .doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:rgba(244,241,236,.66); --dline:rgba(255,255,255,.12); --dcard:#151312; }
   .doek[data-thema="licht"]{ --dbg:#F5F1EA; --dtxt:#20160F; --dmut:rgba(32,22,15,.66); --dline:rgba(32,22,15,.14); --dcard:#FBF8F2; }
@@ -64,19 +64,19 @@
   .b-hero{padding:clamp(2.4rem,7cqw,5rem) clamp(1.4rem,5cqw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
   .b-hero h1{font-size:clamp(1.9rem,5cqw,3.4rem);}
   .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
-  .b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:999px;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
+  .b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:0;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
   .b-kop{padding:1.6rem clamp(1.4rem,5cqw,3.4rem) .3rem;}
   .b-kop h2{font-size:clamp(1.4rem,3cqw,2rem);}
   .b-tekst{padding:.6rem clamp(1.4rem,5cqw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
   .b-knoprij{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
   .b-beeld{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
-  .b-beeld img{width:100%;border-radius:12px;display:block;}
+  .b-beeld img{width:100%;border-radius:0;display:block;}
   .b-beeld .bij{font-size:.78rem;color:var(--dmut);margin-top:.4rem;text-align:center;}
   .b-kol{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
   .b-kol h3{font-size:1.15rem;margin-bottom:.4rem;}
   .b-kol .kt{color:var(--dmut);line-height:1.6;font-size:.95rem;}
   .b-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
-  .b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block;}
+  .b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:0;display:block;}
   .b-citaat{padding:2rem clamp(1.4rem,5cqw,3.4rem);text-align:center;}
   .b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3cqw,1.9rem);line-height:1.35;color:var(--dtxt);}
   .b-citaat .bron{color:var(--acc);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;}
@@ -90,12 +90,12 @@
   /* bewerk-affordances (alleen in bewerk-modus) */
   .bewerk .blok{outline:1px dashed transparent;transition:outline-color .15s;}
   .bewerk .blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
-  .bew{outline:none;border-radius:4px;cursor:text;}
+  .bew{outline:none;border-radius:0;cursor:text;}
   .bewerk .bew:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent);}
   .bewerk .b-beeld img,.bewerk .b-gal img{cursor:pointer;}
-  .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:10px;padding:.2rem;}
+  .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:0;padding:.2rem;}
   .bewerk .blok:hover>.bwbalk{display:flex;}
-  .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
+  .bwbalk button{width:26px;height:26px;border-radius:0;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
   .bwbalk button.aan{border-color:var(--gold);color:var(--gold);}
   .bwbalk button svg{display:block;}
@@ -104,29 +104,29 @@
   .blok.sleep{opacity:.5;}
   /* blok dat op de HUIDIGE versie verborgen is: tijdens bewerken vaag met een label */
   .bewerk .blok.dim{opacity:.4;}
-  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--gold);font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
+  .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--gold);font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:0;}
   .vlabel.var{border-color:var(--green,#4C9A75);color:var(--green,#4C9A75);}
   .vnoot{padding:.5rem 1rem;background:var(--card);border-bottom:1px solid var(--line);font-size:.82rem;color:var(--green,#4C9A75);}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
   /* sheets */
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:40;padding:1.2rem;}
   .sheet.open{display:grid;}
-  .sheet .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem;max-width:520px;width:100%;max-height:82vh;overflow:auto;}
+  .sheet .box{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem;max-width:520px;width:100%;max-height:82vh;overflow:auto;}
   .sheet h2{font-size:1.15rem;margin-bottom:.2rem;}
   .sheet .sub{font-size:.8rem;color:var(--soft);margin-bottom:.9rem;}
   .blokkies{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
-  .blokkies button{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:.7rem .5rem;font:inherit;font-size:.82rem;cursor:pointer;text-align:left;}
+  .blokkies button{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.7rem .5rem;font:inherit;font-size:.82rem;cursor:pointer;text-align:left;}
   .blokkies button:hover{border-color:var(--gold);}
   .blokkies .k{display:block;font-size:.66rem;color:var(--soft);margin-top:.2rem;}
   .beeldgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;}
-  .beeldgrid button{padding:0;border:2px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;background:none;}
+  .beeldgrid button{padding:0;border:2px solid var(--line);border-radius:0;overflow:hidden;cursor:pointer;background:none;}
   .beeldgrid button:hover{border-color:var(--gold);}
   .beeldgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
-  .lijstrij{display:flex;align-items:center;gap:.6rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.55rem .7rem;margin-bottom:.4rem;}
+  .lijstrij{display:flex;align-items:center;gap:.6rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.55rem .7rem;margin-bottom:.4rem;}
   .lijstrij .nm{flex:1;font-size:.9rem;font-weight:600;}
   .lijstrij .mt{font-size:.72rem;color:var(--soft);}
-  .lijstrij button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
+  .lijstrij button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
   .inlog{max-width:440px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);}
 </style>

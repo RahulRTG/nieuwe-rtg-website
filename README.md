@@ -1115,6 +1115,21 @@ dat het misgaat ook niet meer op. `test/btw-waarom-scherm.e2e.js` toetst dus
 beide kanten: dat de eigen factuur eronder verschijnt, én dat er géén bevinding
 staat als er niets aan de hand is.
 
+#### "Wat veranderde?" bij de Regelwacht
+
+De landenlijst in de bankkamer zei *dát* een land was bijgewerkt; nu zegt hij
+wat er is gebeurd, wanneer het inging en **wat het verving** — dat laatste is
+waar de jaargangen voor zijn. Bij een tariefwijziging staat er een knop "Wat
+raakt dit?" naast: hoeveel facturen dragen ná de ingangsdatum nog het vervangen
+percentage, bij hoeveel zaken.
+
+Die knop staat er alleen bij een tariefwijziging; bij een minimumloon-wijziging
+valt er geen factuur van behandeling te veranderen, en de schermtoets eist dat er
+dan ook geen knop is. En het scherm neemt de zin van de server letterlijk over:
+bij een lijst om na te lopen staat er dat het niet fout hoeft te zijn, bij nul
+geraakte facturen staat er dat er niets is. Het schrijft daar niets stelligers
+overheen.
+
 #### En dezelfde keten voor het loon (`kern/payroll/herkomst.js`)
 
 De loonkant is de tweede grote geldstroom, en had al iets: `dossier.js`
@@ -1146,6 +1161,12 @@ verdwijnen.
 |---|---|
 | `POST /api/office/payroll/verklaar` `{id}` | Het collectieve bedrag open naar de nominatieve regels, met de verwijzing naar het dossier |
 | `POST /api/office/payroll/herbouw` `{id}` | De aangifte herbouwen uit de run en rubriek voor rubriek vergelijken |
+
+Beide staan als knop bij de loonaangifte in `apps/payroll.html`
+("Waarom dit bedrag?" en "Herbouw uit de run"). Uitzonderingsgestuurd: sluit
+alles aan, dan staat er één regel dat het aansluit; alleen bevindingen krijgen
+een pil. Het detail per medewerker staat in het dossier eronder en wordt hier
+niet overgetikt — twee ingangen op dezelfde keten, geen twee ketens.
 
 Bij het **kantoor** en niet bij de zaak: dit legt de loonheffing per werknemer
 open, en de werkgever leest zijn aangifte al mee via zijn eigen route. Een

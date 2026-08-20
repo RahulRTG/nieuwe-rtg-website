@@ -15,41 +15,18 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten } = require('./helper');
+/* DE BROWSER KOMT UIT ./browser.js, en niet uit een eigen loader hier. Dat
+   bestand probeert te STARTEN in plaats van te laden: een Playwright zonder
+   bijbehorende Chromium laat de require lukken en pas de launch zakken, en dan
+   valt de toets om op iets dat niets over de code zegt. Er stond hier eerst een
+   eigen terugval op vaste paden -- dat was een 95e kopie van precies het
+   probleem waarvoor ./browser.js is geschreven. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadPlaywright();
-
-/* DE BROWSER STARTEN, OOK ALS DE GEPINDE BUILD ER NIET IS. Playwright zoekt de
-   build die bij zijn eigen versie hoort; een omgeving die een andere build
-   klaarzet (een container met chromium-1194 terwijl de pin 1234 zegt) laat
-   `launch()` stuklopen op een pad dat niet bestaat. Dan zou deze toets
-   overgeslagen worden, en een overgeslagen schermtoets bewijst niets -- precies
-   wat scripts/schermen.js probeert te voorkomen.
-
-   Dus: eerst de gewone weg, en pas als die op het ontbrekende bestand stukloopt
-   de browser die er WEL staat. Geen van beide is een omweg om de poort heen; het
-   is dezelfde browser, alleen op zijn echte pad. */
-const PADEN = ['/opt/pw-browsers/chromium', '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'];
-async function startBrowser() {
-  try { return await pw.chromium.launch({ args: ['--no-sandbox'] }); }
-  catch (e) {
-    if (!/Executable doesn't exist/.test(String(e.message))) throw e;
-    for (const executablePath of PADEN) {
-      try { return await pw.chromium.launch({ executablePath, args: ['--no-sandbox'] }); }
-      catch (e2) { /* volgende pad */ }
-    }
-    throw e;
-  }
-}
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
@@ -68,7 +45,7 @@ test('Kantoor: "Waarom dit bedrag?" vouwt de aangifte open tot op de factuur',
     const btwOpFactuur = f.factuur.btwBedrag.toFixed(2).replace('.', ',');
     const nummer = String(f.factuur.nummer);
 
-    browser = await startBrowser();
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

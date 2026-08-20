@@ -2606,7 +2606,9 @@ function bankRenderRegels(s){
       '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
       '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
       '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
-      '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>';
+      '<button class="knop stil" id="rwGesch" type="button">Wat veranderde?</button>' +
+      '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>' +
+    '<div id="rwUit"></div>';
   $('#rwZoek').addEventListener('input', () => {
     const q = $('#rwZoek').value.trim().toLowerCase();
     // inline display:flex wint van [hidden], dus schakel display zelf
@@ -2619,6 +2621,50 @@ function bankRenderRegels(s){
       bankVervers();
     } catch (e) { meld(e.message); }
   });
+  /* WAT VERANDERDE ER, EN WAT RAAKT DAT (server: kern/fiscaal/jaargangen.js en
+     kern/fiscaal/herkomst.js).
+
+     De lijst hierboven zegt DAT een land is bijgewerkt; dit zegt wat er is
+     gebeurd, wanneer het inging en wat het verving. En bij een tariefwijziging
+     de tweede vraag, die tot nu toe alleen met de hand te beantwoorden was:
+     welke facturen dragen na de ingangsdatum nog het oude percentage.
+
+     Dat is bewust een LIJST OM NA TE LOPEN en geen lijst met fouten -- een
+     levering van voor de wijziging mag het oude tarief dragen. De zin van de
+     server zegt dat, en hij wordt hier niet vervangen door iets stelligers. */
+  $('#rwGesch').addEventListener('click', async () => {
+    const land = $('#rwLand').value;
+    let g;
+    try { g = await api('bank/regels/geschiedenis', { land }); }
+    catch (e) { return meld(e.message); }
+    if (!g.wijzigingen.length) {
+      $('#rwUit').innerHTML = '<p class="stil">Voor ' + esc(land) + ' is niets doorgevoerd; hier geldt het ingebouwde peiljaar.</p>';
+      return;
+    }
+    const veldjes = (w) => Object.entries(w || {}).map(([k, v]) =>
+      esc(k) + ': ' + esc(typeof v === 'object' ? Object.entries(v).map(([a, b]) => a + ' ' + b).join(', ') : String(v))).join(' · ');
+    $('#rwUit').innerHTML = g.wijzigingen.map(w =>
+      '<div data-rwj="' + esc(w.id) + '" style="padding:.45rem 0;' + bkLijn + 'font-size:.82rem;">' +
+      '<strong>' + esc(w.geldigVanaf) + '</strong> · ' + veldjes(w.wijzigingen) +
+      '<span style="color:var(--soft);"> (was ' + veldjes(w.vorige) + ')</span>' +
+      '<span style="color:var(--soft);"> · ' + esc(w.stand) + ' · bron ' + esc((w.bron && (w.bron.naam || w.bron.soort)) || 'onbekend') + '</span>' +
+      (w.wijzigingen && w.wijzigingen.tarieven
+        ? ' <button class="knop stil" type="button" data-raak="' + esc(w.id) + '">Wat raakt dit?</button>' : '') +
+      '</div>').join('');
+    $('#rwUit').querySelectorAll('[data-raak]').forEach(b => b.addEventListener('click', async () => {
+      let r;
+      try { r = await api('bank/regels/geraakt', { land, jaargang: b.dataset.raak }); }
+      catch (e) { return meld(e.message); }
+      const rij = $('#rwUit').querySelector('[data-rwj="' + b.dataset.raak + '"]');
+      const uit = document.createElement('p');
+      uit.className = 'stil';
+      uit.textContent = r.facturen + ' factuur/facturen (' + r.regels + ' regels) bij ' + r.zaken.length +
+        ' zaak/zaken dragen na ' + r.geldigVanaf + ' nog een vervangen percentage. ' + r.let;
+      rij.appendChild(uit);
+      b.remove();
+    }));
+  });
+
   $('#rwCheck').addEventListener('click', async () => {
     try { const d = await api('bank/regels/check'); meld(d.ok ? (d.bron ? 'Bron gecontroleerd: ' + (d.bijgewerkt || 0) + ' land(en) bijgewerkt.' : 'Geen externe bron gekoppeld; het peiljaar plus doorgevoerde updates geldt.') : d.fout); bankVervers(); }
     catch (e) { meld(e.message); }

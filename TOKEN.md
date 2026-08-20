@@ -136,8 +136,21 @@ En klaarzetten is van de **manager**, om dezelfde reden als uitbetalen — het
 haalt geld uit de kas op een moment dat de eigenaar niet koos. Kijken blijft van
 iedereen; dat is het werk.
 
-Getoetst in `test/paytegoed.test.js` en `test/zorgwallet.test.js`, elke
-bewering met een mutatie die is zien zakken. Eén grendel staat er bewust
+**Tegoed op het scherm** (`public/apps/pay.html`). Een eigen deel "Tegoed voor
+een ander" met drie kaarten: klaarzetten (met de code die je doorgeeft),
+verzilveren, en wat jij hebt klaargezet en nog niet is opgehaald. Wat er voor
+JOU klaarstaat is één knop — een tegoed op naam hoef je niet over te tikken.
+Uitzonderingsgestuurd: de twee lijstvakken bestaan alleen zolang ze iets te
+zeggen hebben.
+
+**De zaakkant heeft géén scherm, en dat is ouder dan deze ronde.** Heel
+`/api/supplier/pay/*` — innen, saldo, uitbetalen — heeft nooit een eigen scherm
+gehad; de kassa gebruikt alleen de betaalcode van het lid. Een tegoedpaneel voor
+een zaak zou dus het eerste stuk van een scherm zijn dat er niet is, en dat is
+eigen werk en geen bijvangst hier.
+
+Getoetst in `test/paytegoed.test.js`, `test/paytegoed.e2e.js` en
+`test/zorgwallet.test.js`, elke bewering met een mutatie die is zien zakken. Eén grendel staat er bewust
 zonder toets bij: `vanSoort` op de bon, dat een zaakcode scheidt van een
 codenaam. Het geval waarvoor hij bestaat (een zaakcode die toevallig gelijk is
 aan een codenaam) is met de proefinlog niet na te bootsen, en dat staat in de
@@ -160,7 +173,8 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 | Fase | Wat | Status |
 |---|---|---|
 | 1 | Walletplafond, feestmunt via Pay, tegoed voor een ander en vanuit een zaak (kopen, verzilveren, vervallen, terugnemen) | gebouwd |
-| 2 | Tegoed in de schermen: de wallet van het lid en de kassa-kant van de zaak. Nu bestaan alleen de routes | — |
+| 2 | Tegoed op het scherm van het lid (`apps/pay.html`) | gebouwd |
+| 2b | De zaakkant op een scherm. Dat vraagt eerst een RTG Pay-scherm voor een zaak, want dat bestaat helemaal niet — zie par. 4 | — |
 | 3 | Punten zonder geldwaarde, achter `progressieMag`, met de anti-engagement-regel als ontwerpkader | — |
 | 4 | Het besluit over de bank-uitgang (par. 7) en, als dat valt, de vergunningsroute | — |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |
@@ -169,7 +183,7 @@ Geen fase begint voordat de vorige zijn toetsen heeft (LAT.md).
 
 ## 7. De besluiten die openstaan
 
-Drie dingen kan software niet voor Rahul beslissen. Ze staan hier zodat ze niet
+Vier dingen kan software niet voor Rahul beslissen. Ze staan hier zodat ze niet
 als weglating in de code zitten.
 
 1. **De bank-uitgang raakt de grond onder `WALLET_SALDO`.** Het besluit zegt dat
@@ -184,7 +198,15 @@ als weglating in de code zitten.
    route is die we openhouden, hoort dat in `kern/bevoegdheid/lijst.js` te
    staan — dat bestand is een besluit, geen implementatiedetail, dus het is niet
    stilzwijgend aangepast.
-3. **Het bedrag van het plafond.** € 10.000 per wallet is een verdedigbare
+3. **De gouden tekst op `apps/pay.html` leest niet in elk thema.** Dat scherm
+   zet zijn eigen `--gold:#A98F1C` en gebruikt die ook als tekstkleur. Op het
+   champagne-thema haalt die toon **2,76:1** op een lichte kaart — onder de 4,5
+   die kleine tekst vraagt en onder de 3,0 voor grote. `rtg-themas.css` houdt
+   daar `--rtg-leesgoud` voor bij; het nieuwe tegoed-deel gebruikt die, de
+   oudere gouden teksten op dat scherm (de kascode, de statuslabels, het
+   woordmerk) nog niet. Dat is een ronde over dat hele scherm, en die hoort
+   bewust genomen te worden in plaats van als bijvangst.
+4. **Het bedrag van het plafond.** € 10.000 per wallet is een verdedigbare
    keuze, geen wettelijk getal. Wie hem verhoogt, verzwakt de grond onder het
    besluit; wie hem verlaagt onder € 5.000 breekt het autolaadpad (zie de
    toelichting in `kern/pay/stand.js`).

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1032 bestanden en 6877 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1033 bestanden en 6879 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1032 |
-| losse beweringen (`test(...)`) | 6877 |
+| toetsbestanden | 1033 |
+| losse beweringen (`test(...)`) | 6879 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 23 |
+| alleen in de kop *genoemd*, nog niet gemeten | 24 |
 | niets van beide | 95 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -946,7 +946,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-126 bestanden, 220 beweringen.
+127 bestanden, 222 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1025,6 +1025,7 @@ toets omvalt.
 | `overheidschermen.e2e.js` | 2 | -- | DE OVERHEIDSSCHERMEN: DE BURGER EN DE AMBTENAAR. Acht schermen uit de lijst van TAKEN 4.9, en ze vallen in twee soorten die precies tegenover elkaar staan: DE BURGERKANT (gemeente, overheid) is voor het lid zelf. |
 | `paginas.e2e.js` | 1 | -- | DE PAGINASCAN -- elke pagina in public/ wordt echt geopend in een browser. WAAROM DIT ER IS De schermtests hiernaast (test/*.e2e.js) beproeven allemaal EEN scherm dat iemand belangrijk vond. |
 | `payrollkeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op het AANMERKEN van een regelpakket (payroll.html, tab "Loonrun (OS)"). WAAROM DIT BESTAND ER IS, en het is een onaangename reden. |
+| `paytegoed.e2e.js` | 2 | genoemd | Schermtoets voor het tegoed op RTG Pay (public/apps/pay.html). Waarom dit náást test/paytegoed.test.js staat, dat de routes al afloopt: een scherm dat 200 geeft en netjes rendert kan nog steeds dood zijn. |
 | `pda-ui.e2e.js` | 3 | -- | Scherm-test: de PDA draait in een echte browser (Playwright). Zo valt de frontend-logica ook onder de suite, en is een refactor van een scherm net zo veilig als de backend. |
 | `pinherstel.e2e.js` | 2 | -- | DE PIN-HERSTELSTROOM, IN EEN ECHTE BROWSER, VAN LINK TOT NIEUWE PIN. WAAROM DEZE TOETS BESTAAT. |
 | `poortgesprek.e2e.js` | 1 | -- | Scherm-test voor het gegevensgesprek: de client-kant van de gegevenspoort. De server houdt een handeling met een derde partij tegen met 428 en zegt wat er mist. |

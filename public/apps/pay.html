@@ -20,7 +20,7 @@
   /* --burgundy volgt nu de levende dagkleur uit de machines (dagkleur.css),
      met de bordeaux-op-zwart als vaste terugval; --merk (wijn) en --gold
      blijven vast, precies zoals de merkregels voorschrijven. */
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--merk:#7F1634;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--merk:#7F1634;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;/* LEZEN IS IETS ANDERS DAN ACCENTEREN. --gold hierboven is de vaste accenttoon en die is prima voor een rand of een randje licht, maar als TEKST haalt hij op het champagne-thema 2,76:1 op een lichte kaart -- onder de 4,5 die kleine tekst vraagt, en zelfs onder de 3,0 voor grote. rtg-themas.css houdt daarvoor --rtg-leesgoud bij: per thema de goudtoon die daar wel leest (op donker het hoogsel, op licht de logotoon zelf, op fluweel ivoor). Nieuwe tekst pakt die. De oudere gouden teksten op dit scherm staan nog op de vaste toon; dat is een aparte ronde over dit hele scherm en geen bijvangst hier. */--leesgoud:var(--rtg-leesgoud,#A98F1C);}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
@@ -71,6 +71,13 @@
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
   .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
+  /* De tegoedcode is 24 tekens en moet met de hand overgetikt kunnen worden.
+     Dus met opzet GEEN .kascode hierboven: die is Bodoni op 2,6rem met 0,35em
+     letterruimte -- gemaakt voor zes tekens die je van een afstand voorleest, en
+     bij vierentwintig loopt hij dwars door een telefoonscherm. En het is ook de
+     verkeerde rol: Bodoni is ceremonieel (ONTWERP.md par. 1) en een code die je
+     overtikt is werk. Inter, tabulair, en hij mag afbreken. */
+  .boncode{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.08em;font-size:1.1rem;color:var(--leesgoud);text-align:center;padding:.6rem 0 .2rem;word-break:break-all;}
   .tik-qr{display:block;width:min(220px,62vw);height:auto;margin:.5rem auto .1rem;background:#fff;padding:.55rem;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);}
   .leeg{color:var(--soft);font-size:.85rem;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
@@ -158,6 +165,37 @@
         <button class="knop" id="sStuur">Stuur</button>
       </div>
     </div>
+
+    <h3 class="sec">Tegoed voor een ander</h3>
+    <!-- Wat er voor JOU klaarstaat komt bovenaan, en alleen als het er is. Een
+         vak dat elke dag "geen tegoed" zegt, is ruis: uitzonderingsgestuurd
+         (ONTWERP.md). Dezelfde reden waarom "klaargezet door jou" onderaan
+         alleen verschijnt zodra er iets openstaat. -->
+    <div class="kaart" id="gVoorMij" hidden></div>
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="gBedrag" inputmode="decimal" placeholder="Euro" style="max-width:7rem;" aria-label="Bedrag in euro">
+        <input class="veld" id="gAan" placeholder="Voor wie? Codenaam (mag leeg)" style="flex:1;min-width:10rem;" maxlength="40" aria-label="Codenaam van de ontvanger, mag leeg">
+      </div>
+      <div class="rij h-mt60">
+        <input class="veld" id="gOms" placeholder="Waarvoor? (mag leeg)" style="flex:1;min-width:10rem;" maxlength="80" aria-label="Waarvoor is het tegoed">
+      </div>
+      <button class="knop hoofd h-mt70" id="gZet">Zet tegoed klaar</button>
+      <p class="leeg h-mt60">Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. Een tegoed verloopt na een jaar; daarna haal je het zelf terug.</p>
+      <div id="gNieuw" hidden>
+        <div class="boncode" id="gCode" aria-live="polite"></div>
+        <div class="rij" style="justify-content:center;"><button class="knop stil" id="gKopieer">Kopieer de code</button></div>
+      </div>
+    </div>
+
+    <div class="kaart">
+      <div class="rij">
+        <input class="veld" id="gIn" placeholder="Kreeg je een tegoedcode?" style="flex:1;min-width:10rem;" maxlength="40" autocomplete="off" aria-label="Tegoedcode om te verzilveren">
+        <button class="knop" id="gVerzilver">Verzilver</button>
+      </div>
+    </div>
+
+    <div class="kaart" id="gGekocht" hidden></div>
 
     <h3 class="sec">Betalen aan de kassa</h3>
     <div class="kaart">
@@ -389,6 +427,90 @@ $('#xBetaal').addEventListener('click', () => {
   if (c) tikBetaalMet(c, centen);
 });
 
+/* ---------- tegoed voor een ander ----------
+   Kopen zet geld vast op een escrow-rekening en levert een code op; verzilveren
+   haalt het naar de wallet van wie hem heeft. Wat op dit scherm staat is met
+   opzet ALLEEN wat nog wat vraagt: tegoed dat voor jou klaarstaat, en tegoed
+   dat jij hebt klaargezet en dat nog niet is opgehaald. Verzilverde bonnen zijn
+   geschiedenis, en die staat al in de bewegingen onderaan -- twee keer hetzelfde
+   tonen maakt van een overzicht een archief. */
+async function verversTegoed(){
+  let d;
+  try { d = await api('pay/tegoed'); } catch (e) { return; }
+
+  const voor = d.voorMij || [];
+  const el = $('#gVoorMij');
+  el.hidden = !voor.length;
+  if (voor.length) {
+    /* Wie het tegoed op zijn naam kreeg, hoeft niets over te tikken: de code
+       staat al in zijn eigen overzicht, dus dit is EEN knop. */
+    el.innerHTML = voor.map(t =>
+      '<div class="tikkie"><div class="wie"><b>'+esc(t.van)+'</b><small>'+esc(t.oms)+'</small></div>'+
+      '<button class="knop hoofd" data-in="'+esc(t.code)+'" style="width:auto;flex:1;min-width:9rem;">Zet '+esc(euro(t.centen))+' eur op mijn saldo</button></div>').join('');
+    el.querySelectorAll('[data-in]').forEach(b => b.addEventListener('click', () => verzilverCode(b.dataset.in, b)));
+  }
+
+  const open = (d.gekocht || []).filter(t => t.status === 'open');
+  const g = $('#gGekocht');
+  g.hidden = !open.length;
+  if (open.length) {
+    g.innerHTML = '<div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem;">Klaargezet door jou</div>' +
+      open.map(t =>
+      '<div class="tikkie"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
+        '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+' · '+esc(t.code || '')+'</small></div>'+
+        (t.verlopen
+          ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
+          : '<span style="color:var(--leesgoud);font-size:.82rem;">wacht op ophalen</span>')+
+      '</div>').join('');
+    g.querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try {
+        const r = await api('pay/tegoed/terug', { id: b.dataset.terug, idem: idem() });
+        meld(euro(r.centen) + ' eur is terug op je saldo.');
+        ververs(); verversTegoed();
+      } catch (e) { meld(e.message); b.disabled = false; }
+    }));
+  }
+}
+
+async function verzilverCode(code, knop){
+  if (knop) knop.disabled = true;
+  try {
+    const r = await api('pay/tegoed/verzilver', { code, idem: idem() });
+    meld(euro(r.centen) + ' eur staat op je saldo.');
+    $('#gIn').value = '';
+    ververs(); verversTegoed();
+  } catch (e) { meld(e.message); if (knop) knop.disabled = false; }
+}
+
+$('#gZet').addEventListener('click', async () => {
+  const centen = Math.round(Number(String($('#gBedrag').value).replace(',', '.')) * 100);
+  if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
+  try {
+    const r = await api('pay/tegoed/koop', {
+      centen, aan: $('#gAan').value.trim(), oms: $('#gOms').value.trim(), idem: idem()
+    });
+    $('#gNieuw').hidden = false;
+    $('#gCode').textContent = r.tegoed.code;
+    meld(r.bijgeladen ? 'Tegoed staat klaar. Er is ' + euro(r.bijgeladen) + ' eur bijgeladen.' : 'Tegoed staat klaar.');
+    $('#gBedrag').value = ''; $('#gAan').value = ''; $('#gOms').value = '';
+    ververs(); verversTegoed();
+  } catch (e) { meld(e.message); }
+});
+$('#gKopieer').addEventListener('click', async () => {
+  const code = $('#gCode').textContent;
+  /* Het klembord kan geweigerd worden (geen https, geen toestemming). Dan is de
+     code nog gewoon leesbaar op het scherm, dus dit hoort een melding te zijn
+     en geen fout die de knop stukmaakt. */
+  try { await navigator.clipboard.writeText(code); meld('Code gekopieerd.'); }
+  catch (e) { meld('Kopiëren lukte niet; de code staat hierboven.'); }
+});
+$('#gVerzilver').addEventListener('click', () => {
+  const code = $('#gIn').value.trim();
+  if (!code) { meld('Vul de tegoedcode in.'); return; }
+  verzilverCode(code, null);
+});
+
 /* de kassacode */
 let kasTimer = null;
 $('#kMaak').addEventListener('click', async () => {
@@ -415,9 +537,19 @@ $('#kMaak').addEventListener('click', async () => {
 });
 
 function start(){
-  ververs().then(laadVrienden).then(laadTiks).catch(() => toon('vGate'));
+  ververs().then(laadVrienden).then(laadTiks).then(verversTegoed).catch(() => toon('vGate'));
 }
-setInterval(() => { if (!$('#vPay').hidden && !document.hidden) { ververs().catch(() => {}); laadTiks(); } }, 8000);
+/* Het saldo en de tiks lopen elke acht seconden mee; het tegoed niet. Een bon
+   die iemand voor je klaarzet is geen moment dat je live wilt zien, en een derde
+   verzoek per acht seconden per open scherm is echt verkeer. Elke vierde ronde
+   is ruim genoeg om hem vanzelf te laten verschijnen zonder te verversen. */
+let tegoedTik = 0;
+setInterval(() => {
+  if ($('#vPay').hidden || document.hidden) return;
+  ververs().catch(() => {});
+  laadTiks();
+  if (++tegoedTik % 4 === 0) verversTegoed();
+}, 8000);
 if (TOKEN) start(); else toon('vGate');
 </script>
 <script src="/shared/seizoen.js" defer></script>

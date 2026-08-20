@@ -183,3 +183,39 @@ test('9. de bekende gaten staan als gat te boek, met een kanttekening', () => {
   assert.ok(ronde, 'er hoort een claim te staan over wat er met een verplichting gebeurt');
   assert.equal(ronde.dekking, claims.DEKKING.AFGEDWONGEN);
 });
+
+/* ============================================================================
+   DE PROMISE GATE, uitgebreid: een claim moet naar iets WIJZEN DAT BESTAAT.
+
+   De poort keurde eerst alleen of een claim loog over zijn hardheid. Maar een
+   claim die naar `kern/commercie/verzonnen.js` wijst ziet er net zo degelijk uit
+   als een die klopt -- en dat is erger dan geen bron, want hij nodigt uit om
+   niet te kijken. Dezelfde klasse als de zes capabilities zonder beller: het
+   staat er, dus niemand controleert het.
+   ========================================================================== */
+test('10. de poort weigert een claim die naar een niet-bestaande bron wijst', () => {
+  const echt = claims.poort();
+  assert.equal(echt.ok, true, echt.problemen.join('; '));
+
+  /* De controle zelf, met een geveinsd bestandssysteem: zo toetsen we de REGEL
+     en niet welke bestanden er vandaag toevallig staan. */
+  const nep = claims.poort({ bestaat: (p) => !p.includes('pasladder') });
+  assert.equal(nep.ok, false, 'een verdwenen bron hoort de poort te laten zakken');
+  assert.ok(nep.problemen.some(p => /bron die niet bestaat/.test(p)));
+
+  const geenToets = claims.poort({ bestaat: (p) => !p.startsWith('test/') });
+  assert.equal(geenToets.ok, false, 'en een toets die niet bestaat ook');
+  assert.ok(geenToets.problemen.some(p => /toets die niet bestaat/.test(p)));
+});
+
+test('11. de padherkenning pakt paden uit proza, en niets anders', () => {
+  assert.deepEqual(claims.paden('kern/pasladder.js'), ['kern/pasladder.js']);
+  assert.deepEqual(claims.paden('test/a.test.js + test/b.test.js'),
+    ['test/a.test.js', 'test/b.test.js']);
+  assert.deepEqual(claims.paden('kern/commercie/allocatie.js (v1-2026)'),
+    ['kern/commercie/allocatie.js']);
+  assert.deepEqual(claims.paden('alleen partnervoorwaarden.html'), ['partnervoorwaarden.html'],
+    'een bron die geen module is, levert wel een naam maar geen modulepad op');
+  assert.deepEqual(claims.paden(''), []);
+  assert.deepEqual(claims.paden(null), []);
+});

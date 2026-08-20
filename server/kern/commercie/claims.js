@@ -254,7 +254,7 @@ function claims() {
    Dit is met opzet streng op EEN ding: liegen over de hardheid. Een gat dat
    eerlijk "BELOFTE" heet, is geen probleem; een gat dat zich "AFGEDWONGEN"
    noemt, is er twee. */
-function poort() {
+function poort(opties) {
   const problemen = [];
   for (const c of claims()) {
     if (!c.bron) problemen.push(c.id + ' heeft geen bron: waar komt deze waarde vandaan?');
@@ -264,8 +264,42 @@ function poort() {
     if (c.dekking === DEKKING.BELOFTE && !c.kanttekening)
       problemen.push(c.id + ' is een belofte zonder kanttekening: er hoort te staan wat eraan ontbreekt');
     if (!DEKKING[c.dekking]) problemen.push(c.id + ' heeft een onbekende dekking: ' + c.dekking);
+
+    /* DE BRON MOET BESTAAN. Een claim die naar `kern/commercie/verzonnen.js`
+       wijst, ziet er net zo degelijk uit als een die klopt -- en dat is erger
+       dan geen bron, want hij nodigt uit om niet te kijken. */
+    for (const pad of bronbestanden(c)) {
+      if (!bestaat(pad, opties)) problemen.push(c.id + ' wijst naar een bron die niet bestaat: ' + pad);
+    }
+    for (const pad of toetsbestanden(c)) {
+      if (!bestaat(pad, opties)) problemen.push(c.id + ' wijst naar een toets die niet bestaat: ' + pad);
+    }
   }
   return { ok: problemen.length === 0, problemen, aantal: claims().length };
+}
+
+/* De bestandsnamen uit een bron- of toetsveld. Die velden zijn proza met paden
+   erin ("kern/pasladder.js", "test/a.js + test/b.js"), dus we halen eruit wat op
+   een pad lijkt en laten de rest staan. Een veld zonder enig pad levert niets
+   op en wordt niet gecontroleerd -- dat is het geval van "alleen
+   partnervoorwaarden.html", waar de bron geen module is. */
+function paden(tekst) {
+  return String(tekst || '').match(/[A-Za-z0-9_./-]+\.(?:js|html|md)/g) || [];
+}
+const bronbestanden = c => paden(c.bron).filter(p => /^(kern|server|test)\//.test(p) || p.startsWith('kern/'));
+const toetsbestanden = c => paden(c.toets).filter(p => p.startsWith('test/'));
+
+function bestaat(pad, opties) {
+  const o = opties || {};
+  if (typeof o.bestaat === 'function') return o.bestaat(pad);
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const wortel = path.join(__dirname, '..', '..', '..');
+    // een bronpad begint bij server/ als het met kern/ begint
+    const kandidaten = [path.join(wortel, pad), path.join(wortel, 'server', pad)];
+    return kandidaten.some(k => fs.existsSync(k));
+  } catch (e) { return true; }   // kan het niet nakijken: dan niet vals alarm slaan
 }
 
 function publiek() {
@@ -273,4 +307,4 @@ function publiek() {
     dekking: c.dekking, bron: c.bron, kanttekening: c.kanttekening || null }));
 }
 
-module.exports = { claims, publiek, poort, DEKKING };
+module.exports = { claims, publiek, poort, paden, DEKKING };

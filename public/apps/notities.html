@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -33,14 +33,14 @@
   .knop:focus-visible,input:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
 
   /* het bord: kolommen die zelf hun plek zoeken; vastgepind eerst */
   #bord,#gedeeldBord{columns:16rem;column-gap:.7rem;}
   .nkaart{display:inline-block;width:100%;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:.75rem .85rem;margin:0 0 .7rem;cursor:pointer;break-inside:avoid;}
+    border-radius:0;padding:.75rem .85rem;margin:0 0 .7rem;cursor:pointer;break-inside:avoid;}
   .nkaart:hover{border-color:var(--gold);}
   .nkaart.vast{border-color:var(--gold);}
   .nkaart h3{font-size:.92rem;font-weight:600;margin-bottom:.3rem;font-family:'Inter',sans-serif;}
@@ -54,11 +54,11 @@
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
     align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
   .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;
+  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
     width:min(560px,100%);margin:auto 0;}
   .paneel input.titel{width:100%;background:none;border:none;border-bottom:1px solid var(--line);
     color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.25rem;padding:.2rem 0 .5rem;outline:none;}
-  .paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;
+  .paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:.9rem;line-height:1.6;padding:.6rem .75rem;margin-top:.7rem;resize:vertical;}
   .taakrij{display:flex;gap:.5rem;align-items:center;padding:.25rem 0;border-bottom:1px solid var(--line);}
   .taakrij input[type="checkbox"]{width:1.05rem;height:1.05rem;accent-color:#A98F1C;}
@@ -69,9 +69,9 @@
     color:var(--soft);margin:.7rem 0 .2rem;}
   .paneel .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
   .paneel input[type="date"],.paneel input[type="time"],.paneel input.gewoon{width:100%;background:var(--card2);
-    border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
+    border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

@@ -29,32 +29,32 @@
   header h1{font-size:1.25rem;}
   main{padding:1rem;max-width:560px;margin:0 auto;}
   .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.5rem;margin-bottom:.9rem;}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;}
   .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.2rem;display:block;}
   .kpi span{font-size:.64rem;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;}
   .keuze{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.6rem 0 1rem;}
-  .keuze button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem .7rem;color:var(--txt);font:inherit;cursor:pointer;text-align:left;}
+  .keuze button{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem .7rem;color:var(--txt);font:inherit;cursor:pointer;text-align:left;}
   .keuze button .ic{font-size:1.3rem;display:block;margin-bottom:.3rem;}
   .keuze button .sub{display:block;font-size:.7rem;color:var(--soft);margin-top:.15rem;line-height:1.35;}
   .keuze button.aan{border-color:var(--gold);}
-  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card);}
+  .item{border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:.98rem;}
   .item .meta{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
-  .veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.42rem .6rem;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.84rem;padding:.42rem .6rem;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
-  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
+  .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
   .status.open{border-color:var(--burgundy);color:var(--burgundy);}
   .status.ok{border-color:var(--green);color:var(--green);}
   .status.goud{border-color:var(--gold);color:var(--gold);}
   .badge{font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.08em;}
   .leeg{color:var(--muted);font-size:.86rem;padding:.9rem 0;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .login{max-width:340px;margin:2.5rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
-  .ai{border:1px solid rgba(169,143,7,.4);border-radius:14px;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
+  .ai{border:1px solid rgba(169,143,7,.4);border-radius:0;background:linear-gradient(135deg,rgba(169,143,7,.08),transparent);padding:.8rem .9rem;margin:1rem 0;}
   .ai .uit{font-size:.84rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.45rem;}
   .terug{background:none;border:none;color:var(--soft);font:inherit;font-size:.8rem;cursor:pointer;padding:0 0 .6rem;}
 </style>
@@ -111,7 +111,7 @@ function wisselToon(){
     if (!h) return;
     w = document.createElement('button');
     w.id = 'wissel'; w.textContent = 'Wissel';
-    w.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.10);border-radius:9px;color:rgba(244,241,236,0.68);font:inherit;font-size:.8rem;padding:.35rem .7rem;cursor:pointer;margin-left:.4rem;';
+    w.style.cssText = 'background:none;border:1px solid rgba(255,255,255,0.10);border-radius:0;color:rgba(244,241,236,0.68);font:inherit;font-size:.8rem;padding:.35rem .7rem;cursor:pointer;margin-left:.4rem;';
     w.addEventListener('click', () => { afgemeld(); meld('Afgemeld; kies wie je bent.'); });
     h.appendChild(w);
   }

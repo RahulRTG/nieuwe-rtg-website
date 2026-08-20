@@ -38,7 +38,7 @@
     function kaartHtml(l, k) {
       var kleur = (LABELS.find(function (x) { return x[0] === k.label; }) || LABELS[0])[1];
       var isOpen = open && open.kaartId === k.id;
-      var h = '<div class="bordkaart" data-bkaart="' + l.id + ':' + k.id + '" style="border:1px solid var(--line);border-left:3px solid ' + kleur + ';border-radius:10px;padding:0.5rem 0.65rem;margin-top:0.45rem;cursor:pointer;' + (k.klaar ? 'opacity:0.55;' : '') + '">' +
+      var h = '<div class="bordkaart" data-bkaart="' + l.id + ':' + k.id + '" style="border:1px solid var(--line);border-left:3px solid ' + kleur + ';border-radius:0;padding:0.5rem 0.65rem;margin-top:0.45rem;cursor:pointer;' + (k.klaar ? 'opacity:0.55;' : '') + '">' +
         '<div style="font-size:0.84rem;line-height:1.4;' + (k.klaar ? 'text-decoration:line-through;' : '') + '">' + (k.klaar ? '✓ ' : '') + esc(k.titel || '(zonder titel)') + '</div>' +
         ((k.wie || k.voor) ? '<div style="font-size:0.68rem;color:var(--soft,#8A8680);margin-top:0.2rem;">' + esc(k.wie) + (k.wie && k.voor ? ' · ' : '') + esc(k.voor) + '</div>' : '');
       if (isOpen && window.RTGOfficeBordPaneel) h += RTGOfficeBordPaneel.html(k, LABELS);
@@ -48,15 +48,15 @@
     function teken() {
       wortel.innerHTML = '<div style="display:flex;gap:0.7rem;align-items:flex-start;overflow-x:auto;padding-bottom:0.8rem;">' +
         data.lijsten.map(function (l) {
-          return '<div style="flex:0 0 250px;border:1px solid var(--line);border-radius:14px;padding:0.65rem 0.75rem;">' +
+          return '<div style="flex:0 0 250px;border:1px solid var(--line);border-radius:0;padding:0.65rem 0.75rem;">' +
             '<div style="display:flex;gap:0.3rem;align-items:center;"><input data-blijstnaam="' + l.id + '" value="' + esc(l.titel) + '" style="flex:1;min-width:0;font:inherit;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold,#A98F1C);border:none;background:transparent;outline:none;">' +
             '<button data-blschuif="' + l.id + ':-1" title="Naar links" style="border:none;background:transparent;color:var(--soft,#8A8680);cursor:pointer;font:inherit;">←</button>' +
             '<button data-blschuif="' + l.id + ':1" title="Naar rechts" style="border:none;background:transparent;color:var(--soft,#8A8680);cursor:pointer;font:inherit;">→</button>' +
             '<button data-blweg="' + l.id + '" title="Lijst weg" style="border:none;background:transparent;color:var(--soft,#8A8680);cursor:pointer;font:inherit;">✕</button></div>' +
             l.kaarten.map(function (k) { return kaartHtml(l, k); }).join('') +
-            '<button data-bnieuw="' + l.id + '" style="width:100%;margin-top:0.5rem;font:inherit;font-size:0.76rem;padding:0.4rem;border:1px dashed var(--line);border-radius:10px;background:transparent;color:var(--soft,#8A8680);cursor:pointer;">+ kaart</button></div>';
+            '<button data-bnieuw="' + l.id + '" style="width:100%;margin-top:0.5rem;font:inherit;font-size:0.76rem;padding:0.4rem;border:1px dashed var(--line);border-radius:0;background:transparent;color:var(--soft,#8A8680);cursor:pointer;">+ kaart</button></div>';
         }).join('') +
-        '<button data-bnieuwlijst="1" style="flex:0 0 190px;font:inherit;font-size:0.78rem;padding:0.7rem;border:1px dashed var(--line);border-radius:14px;background:transparent;color:var(--soft,#8A8680);cursor:pointer;">+ lijst</button></div>';
+        '<button data-bnieuwlijst="1" style="flex:0 0 190px;font:inherit;font-size:0.78rem;padding:0.7rem;border:1px dashed var(--line);border-radius:0;background:transparent;color:var(--soft,#8A8680);cursor:pointer;">+ lijst</button></div>';
     }
 
     wortel.addEventListener('click', function (e) {

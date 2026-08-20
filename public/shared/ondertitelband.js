@@ -34,7 +34,7 @@
   var STIJL = '.ondert{position:absolute;left:0;right:0;bottom:1rem;text-align:center;' +
     'padding:0 1.2rem;pointer-events:none;z-index:3;}' +
     '.ondert span{display:inline-block;background:rgba(12,12,11,0.78);color:#F4F1EC;' +
-    'font:500 0.95rem/1.35 Inter,system-ui,sans-serif;padding:0.15rem 0.5rem;border-radius:4px;}';
+    'font:500 0.95rem/1.35 Inter,system-ui,sans-serif;padding:0.15rem 0.5rem;border-radius:0;}';
 
   function stijlEenmalig() {
     if (d.getElementById('rtg-ondert-stijl')) return;

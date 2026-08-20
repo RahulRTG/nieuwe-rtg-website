@@ -34,16 +34,16 @@
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
-      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
+      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
       '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
       '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
       // de kassa aan de deur: kaartje verkopen, contant of met RTG Pay, VIP kan
       (slots.length ? '<div class="card"><div class="k">'+T('pd.e.verkoop','Deurverkoop')+'</div>'+
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
-      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
+      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
         slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
-      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
-      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
+      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
+      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
       '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
       '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+

@@ -9,8 +9,8 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   };
-  var IN = 'font:inherit;padding:0.35rem 0.5rem;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;';
-  var KNOP = 'font:inherit;font-size:0.72rem;padding:0.3rem 0.55rem;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;cursor:pointer;';
+  var IN = 'font:inherit;padding:0.35rem 0.5rem;border:1px solid var(--line);border-radius:0;background:transparent;color:inherit;';
+  var KNOP = 'font:inherit;font-size:0.72rem;padding:0.3rem 0.55rem;border:1px solid var(--line);border-radius:0;background:transparent;color:inherit;cursor:pointer;';
 
   function html(k, LABELS) {
     return '<div data-bpaneel="1" style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.5rem;display:flex;flex-direction:column;gap:0.35rem;cursor:default;">' +
@@ -25,7 +25,7 @@
           (k.label === x[0] ? 'var(--txt,#F4F1EC)' : 'var(--line)') + ';background:' + (x[1] === 'transparent' ? 'transparent' : x[1]) + ';cursor:pointer;"></button>';
       }).join('') +
       '<span class="h-flex1"></span>' +
-      '<button data-bklaar="1" style="border-radius:999px;' + KNOP + '">' + (k.klaar ? 'Heropen' : '✓ Klaar') + '</button></div>' +
+      '<button data-bklaar="1" style="border-radius:0;' + KNOP + '">' + (k.klaar ? 'Heropen' : '✓ Klaar') + '</button></div>' +
       '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">' +
       '<button data-bschuif="-1" style="' + KNOP + '">← lijst</button>' +
       '<button data-bschuif="1" style="' + KNOP + '">lijst →</button>' +

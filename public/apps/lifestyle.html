@@ -19,7 +19,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
   body.rtg-stijl .chips{display:flex;flex-wrap:nowrap;gap:.15rem;overflow-x:auto;margin:0 0 1.1rem;
     padding:0 0 .1rem;border-bottom:1px solid var(--line);}
@@ -28,7 +28,7 @@
     font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
   body.rtg-stijl .chips > button.chip:hover{color:var(--txt);border-color:transparent;}
   body.rtg-stijl .chips > button.chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;}
   .kaart h2{font-size:1.12rem;margin-bottom:.2rem;}
   .kaart h2 + .sub{color:var(--soft);font-size:.85rem;margin-bottom:.8rem;}
   /* ---- De kop van de Situation Room. Dit is het enige echt grote element op
@@ -41,20 +41,20 @@
   .kop .telling{color:var(--soft);font-size:.85rem;margin-top:.6rem;line-height:1.6;}
   .regel{display:flex;gap:.8rem;align-items:flex-start;border-top:1px solid var(--line);padding:.85rem 0;}
   .regel:first-child{border-top:0;}
-  .regel .streep{width:2px;align-self:stretch;background:var(--line);flex-shrink:0;border-radius:2px;}
+  .regel .streep{width:2px;align-self:stretch;background:var(--line);flex-shrink:0;border-radius:0;}
   .regel.e3 .streep{background:var(--burgundy);}
   .regel.e2 .streep{background:var(--gold);}
   .regel .body{flex:1;min-width:0;}
   .regel b{display:block;font-weight:600;font-size:.94rem;}
   .regel .meta{font-size:.8rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;margin-bottom:1rem;}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}
   .stat .n{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
   .stat .l{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
-  .veld,select.veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .veld,select.veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
   textarea.veld{min-height:4rem;resize:vertical;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.88rem;padding:.55rem 1rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.88rem;padding:.55rem 1rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .knop.klein{padding:.3rem .6rem;font-size:.78rem;}
   .rij{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;}
@@ -64,28 +64,28 @@
   .item .body{flex:1;min-width:0;}
   .item .body b{display:block;}
   .item .meta{font-size:.78rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
-  .status{font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+  .status{font-size:.72rem;padding:.15rem .55rem;border-radius:0;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
   .status.wacht{border-color:var(--gold);color:var(--gold);}
   .status.loopt{border-color:var(--green);color:var(--green);}
   .status.klaar,.status.weg{opacity:.55;}
   .leeg{color:var(--soft);font-size:.88rem;padding:.4rem 0;}
   /* de plattegrond: twintig werelden, de nog-niet-gebouwde ingetogen maar zichtbaar */
   .kamers{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.7rem;}
-  .kamer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;display:block;text-decoration:none;}
+  .kamer{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;display:block;text-decoration:none;}
   .kamer h3{font-size:1rem;}
   .kamer .wat{font-size:.78rem;color:var(--soft);margin-top:.3rem;line-height:1.5;}
   .kamer .tel{font-size:.72rem;color:var(--muted);margin-top:.55rem;letter-spacing:.04em;}
   .kamer.aanbouw{opacity:.5;}
   .kamer .apps{margin-top:.5rem;display:flex;gap:.35rem;flex-wrap:wrap;}
-  .kamer .apps a{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem;color:var(--muted);text-decoration:none;}
+  .kamer .apps a{font-size:.72rem;border:1px solid var(--line);border-radius:0;padding:.14rem .5rem;color:var(--muted);text-decoration:none;}
   .kamer .apps a:hover{border-color:var(--gold);color:var(--txt);}
   /* de mandaatschuif */
   .niv{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem;}
-  .niv button{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font:inherit;font-size:.72rem;padding:.25rem .55rem;cursor:pointer;}
+  .niv button{background:none;border:1px solid var(--line);border-radius:0;color:var(--muted);font:inherit;font-size:.72rem;padding:.25rem .55rem;cursor:pointer;}
   .niv button.aan{border-color:var(--gold);color:var(--gold);}
   .niv button:disabled{opacity:.3;cursor:not-allowed;}
-  .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:0;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
   /* Kleine hulpklassen in plaats van style="..."-attributen: elk zo'n attribuut
      houdt style-src-attr open in de CSP, en de meter telt ze. Vandaar hier en

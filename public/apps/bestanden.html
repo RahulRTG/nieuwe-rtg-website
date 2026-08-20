@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -33,12 +33,12 @@
   .knop:focus-visible,input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld,select.veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .veld,select.veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
 
   /* het quotum: een dunne eerlijke meter */
-  .meter{height:4px;background:var(--card2);border-radius:2px;overflow:hidden;margin:.3rem 0 .9rem;}
+  .meter{height:4px;background:var(--card2);border-radius:0;overflow:hidden;margin:.3rem 0 .9rem;}
   .meter i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s;}
 
   /* het pad en de mappen */
@@ -48,16 +48,16 @@
   #pad button:hover{color:var(--gold);}
   #pad .hier{color:var(--txt);font-weight:600;}
   .mapkaart{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);border:1px solid var(--line);
-    border-radius:10px;padding:.5rem .75rem;margin:0 .5rem .5rem 0;cursor:pointer;font-size:.84rem;}
+    border-radius:0;padding:.5rem .75rem;margin:0 .5rem .5rem 0;cursor:pointer;font-size:.84rem;}
   .mapkaart:hover{border-color:var(--gold);}
-  .mapkaart .mp{width:.95rem;height:.75rem;border:1.5px solid var(--gold);border-radius:2px 4px 3px 3px;
+  .mapkaart .mp{width:.95rem;height:.75rem;border:1.5px solid var(--gold);border-radius:0;
     border-top-width:4px;opacity:.85;}
 
   /* de bestandenlijst */
   .item{display:flex;align-items:center;gap:.7rem;background:var(--card);border:1px solid var(--line);
-    border-radius:11px;padding:.55rem .7rem;margin-bottom:.45rem;cursor:pointer;}
+    border-radius:0;padding:.55rem .7rem;margin-bottom:.45rem;cursor:pointer;}
   .item:hover{border-color:var(--gold);}
-  .item .ext{flex:0 0 auto;width:2.3rem;height:2.3rem;border:1px solid var(--line);border-radius:8px;
+  .item .ext{flex:0 0 auto;width:2.3rem;height:2.3rem;border:1px solid var(--line);border-radius:0;
     display:flex;align-items:center;justify-content:center;font-size:.56rem;font-weight:700;
     letter-spacing:.06em;color:var(--gold);background:var(--card2);text-transform:uppercase;}
   .item .wat{flex:1;min-width:0;}
@@ -65,7 +65,7 @@
   .item .wat span{font-size:.68rem;color:var(--soft);display:flex;gap:.55rem;flex-wrap:wrap;}
   .item .wat .goud{color:var(--gold);}
   .item.weg .wat b{text-decoration:line-through;color:var(--muted);}
-  .sleep{border:2px dashed var(--gold);border-radius:14px;padding:2rem 1rem;text-align:center;color:var(--gold);
+  .sleep{border:2px dashed var(--gold);border-radius:0;padding:2rem 1rem;text-align:center;color:var(--gold);
     display:none;margin-bottom:.7rem;}
   body.sleept .sleep{display:block;}
 
@@ -73,20 +73,20 @@
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
     align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
   .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;
+  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
     width:min(560px,100%);margin:auto 0;}
   .paneel input.titel{width:100%;background:none;border:none;border-bottom:1px solid var(--line);
     color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.15rem;padding:.2rem 0 .5rem;outline:none;}
   .paneel label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
     color:var(--soft);margin:.7rem 0 .2rem;}
-  #bkKijk{margin-top:.8rem;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card2);}
+  #bkKijk{margin-top:.8rem;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--card2);}
   #bkKijk img{display:block;max-width:100%;max-height:320px;margin:0 auto;}
   #bkKijk pre{padding:.7rem .8rem;font-size:.78rem;line-height:1.5;color:var(--muted);max-height:280px;
     overflow:auto;white-space:pre-wrap;font-family:ui-monospace,monospace;}
   .versierij{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.8rem;color:var(--muted);}
   .versierij .knop{padding:.25rem .55rem;font-size:.7rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

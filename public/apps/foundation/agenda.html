@@ -39,7 +39,7 @@
   .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
   .mkop{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--goud);
     text-align:center;padding:.25rem 0;}
-  .mdag{background:var(--paneel2);border:1px solid var(--lijn);border-radius:9px;min-height:5.2rem;
+  .mdag{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;min-height:5.2rem;
     padding:.3rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;
     color:inherit;font:inherit;overflow:hidden;}
   .mdag:hover{border-color:var(--goud);}
@@ -47,7 +47,7 @@
   .mdag.vandaag{border-color:var(--goud);}
   .mdag .dnr{font-size:.68rem;color:var(--zacht);}
   .mdag.vandaag .dnr{color:var(--goud);font-weight:700;}
-  .chip{display:block;border:1px solid var(--lijn);border-left-width:3px;border-radius:6px;
+  .chip{display:block;border:1px solid var(--lijn);border-left-width:3px;border-radius:0;
     font-size:.62rem;padding:.1rem .3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .chip b{color:var(--goud2);}
   .meer{font-size:.6rem;color:var(--zacht);}
@@ -55,7 +55,7 @@
   .wdag{display:flex;flex-direction:column;gap:3px;}
   .ldag h3{font-family:var(--serif);font-weight:500;font-size:1rem;margin:.9rem 0 .35rem;}
   .litem{display:flex;gap:.7rem;align-items:center;background:var(--paneel2);border:1px solid var(--lijn);
-    border-radius:11px;padding:.55rem .8rem;margin-bottom:.35rem;cursor:pointer;}
+    border-radius:0;padding:.55rem .8rem;margin-bottom:.35rem;cursor:pointer;}
   .litem:hover{border-color:var(--goud);}
   .litem .tijd{font-weight:700;color:var(--goud2);min-width:4.5rem;font-size:.85rem;}
   .litem .wat b{display:block;font-size:.9rem;}
@@ -66,7 +66,7 @@
   .scrim{position:fixed;inset:0;z-index:30;background:rgba(8,8,7,.86);display:none;
     align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
   .scrim.open{display:flex;}
-  .paneel{background:var(--paneel);border:1px solid var(--lijn);border-radius:14px;padding:1.2rem;
+  .paneel{background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:1.2rem;
     width:min(480px,100%);margin:auto 0;}
   .paneel h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.7rem;}
   .paneel label{display:block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;

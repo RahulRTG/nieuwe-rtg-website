@@ -83,7 +83,7 @@
   a{color:inherit;text-decoration:none;}
 
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold,#C9A24B);color:#0C0C0B;
-    padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+    padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold,#C9A24B);outline-offset:2px;}
   #shell{
@@ -129,7 +129,7 @@
       max-width:min(820px, calc(100% - 3rem));
       min-height:0;
       border:1px solid rgba(255,255,255,0.13);
-      border-radius:26px;
+      border-radius:0;
       overflow:hidden;
       box-shadow:0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
     }
@@ -178,17 +178,17 @@
     gap:0;
   }
   .login-form{margin-top:2.25rem;display:flex;flex-direction:column;gap:0.65rem;}
-  .login-form input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
+  .login-form input{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.95rem 1.1rem;color:var(--txt);font-size:0.95rem;font-family:inherit;outline:none;}
   .login-form input:focus{border-color:var(--burgundy);}
-  .login-form button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
+  .login-form button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:1rem;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;margin-top:0.15rem;}
   .login-form button:active{opacity:0.85;}
   .gate-switch{display:block;width:100%;background:none;border:none;margin-top:0.85rem;color:var(--gold);font-size:0.76rem;cursor:pointer;font-family:inherit;text-align:center;}
   .gate-switch:hover{text-decoration:underline;}
-  .vbanner{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.4rem;}
+  .vbanner{background:var(--card);border:1px solid var(--gold);border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.4rem;}
   .vbanner.pending{border-color:var(--line);}
   .vbanner b{font-size:0.95rem;}
   .vbanner span{font-size:0.8rem;color:var(--muted);line-height:1.5;}
-  .vbtn{align-self:flex-start;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .vbtn{align-self:flex-start;background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:0.6rem 1.15rem;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .vbtn:active{opacity:0.85;}
   .vbanner .vbtn{margin-top:0.55rem;}
   /* De regels in de vakbewijs-banner: een dunne lijn per stuk, verder niets --
@@ -301,7 +301,7 @@
     gap:0.45rem;
     border:1px solid var(--line);
     background:var(--card);
-    border-radius:999px;
+    border-radius:0;
     padding:0.4rem 0.85rem;
     font-size:0.68rem;
     letter-spacing:0.1em;
@@ -322,7 +322,7 @@
     position:absolute;top:-2px;right:-2px;
     min-width:16px;height:16px;padding:0 4px;
     background:var(--burgundy);color:#fff;
-    border-radius:999px;font-size:0.6rem;font-weight:700;
+    border-radius:0;font-size:0.6rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;
   }
   .notif-scrim{
@@ -354,7 +354,7 @@
   .notif-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;font-weight:500;}
   .notif-push{
     background:var(--card);border:1px solid var(--line);color:var(--muted);
-    border-radius:999px;padding:0.4rem 0.85rem;font-size:0.68rem;
+    border-radius:0;padding:0.4rem 0.85rem;font-size:0.68rem;
   }
   .notif-push.on{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .notif-list{flex:1;overflow-y:auto;padding:0.5rem 0;}
@@ -390,7 +390,7 @@
       var(--card) 50%,
       color-mix(in srgb,var(--card) 90%,black) 100%);
     border:1px solid color-mix(in srgb,var(--line) 78%,white);
-    border-radius:18px;
+    border-radius:0;
     padding:1.3rem 1.35rem;
     margin-top:1rem;
     box-shadow:0 1px 0 rgba(255,255,255,.045) inset,
@@ -439,7 +439,7 @@
     text-transform:uppercase;
     font-weight:600;
     padding:0.28rem 0.65rem;
-    border-radius:999px;
+    border-radius:0;
     border:1px solid var(--line);
     white-space:nowrap;
   }
@@ -454,7 +454,7 @@
     background:var(--knop);
     color:var(--knop-txt);
     border:none;
-    border-radius:999px;
+    border-radius:0;
     padding:0.65rem 1.2rem;
     font-size:0.78rem;
     font-weight:600;
@@ -477,7 +477,7 @@
     font-size:0.86rem;
     line-height:1.5;
     white-space:pre-line;
-    border-radius:16px;
+    border-radius:0;
   }
   .bubble.ai{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
   .bubble.user{background:var(--burgundy-deep);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
@@ -486,20 +486,20 @@
   .chips{display:flex;gap:0.5rem;overflow-x:auto;margin-top:1rem;padding-bottom:0.3rem;scrollbar-width:none;}
   .chips::-webkit-scrollbar{display:none;}
   /* bestellen (ophaal/bezorgdienst) */
-  .bz-btn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;font-family:inherit;}
+  .bz-btn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:0;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;font-family:inherit;}
   .bz-btn.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
   .bz-btn:disabled{opacity:0.5;}
   .bz-veld{margin-top:0.8rem;}
   .bz-veld label{display:block;font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-bottom:0.35rem;}
-  .bz-veld input{width:100%;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.9rem;color:var(--txt);outline:none;font-family:inherit;}
-  .bz-groot{display:block;width:100%;background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.85rem 1rem;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .bz-veld input{width:100%;background:var(--card2,var(--card));border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;font-size:0.9rem;color:var(--txt);outline:none;font-family:inherit;}
+  .bz-groot{display:block;width:100%;background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:0.85rem 1rem;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .bz-groot:disabled{opacity:0.45;}
   .chip{
     flex-shrink:0;
     border:1px solid var(--line);
     background:var(--card);
     color:var(--muted);
-    border-radius:999px;
+    border-radius:0;
     padding:0.5rem 0.95rem;
     font-size:0.74rem;
   }
@@ -512,7 +512,7 @@
     flex:1;
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:999px;
+    border-radius:0;
     padding:0.8rem 1.1rem;
     font-family:'Inter',sans-serif;
     font-size:0.85rem;
@@ -520,7 +520,7 @@
     outline:none;
   }
   .askrow button{
-    background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;
+    background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;
     padding:0 1.2rem;font-size:0.75rem;font-weight:600;
   }
 
@@ -532,7 +532,7 @@
       var(--card) 52%,
       color-mix(in srgb,var(--card) 90%,black));
     border:1px solid color-mix(in srgb,var(--line) 78%,white);
-    border-radius:18px;
+    border-radius:0;
     overflow:hidden;
     box-shadow:0 1px 0 rgba(255,255,255,.045) inset,
       0 14px 34px rgba(0,0,0,.25);
@@ -566,7 +566,7 @@
   .post .visual .salon-reden{
     position:absolute;top:0.85rem;left:1.15rem;
     font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;
-    padding:0.16rem 0.55rem;border-radius:999px;
+    padding:0.16rem 0.55rem;border-radius:0;
     background:rgba(12,12,11,0.55);color:#fff;
     -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     border:1px solid rgba(255,255,255,0.28);
@@ -609,10 +609,10 @@
   .msg-toggle:hover{text-decoration:underline;}
   .cform{display:flex;gap:0.5rem;margin-top:0.6rem;}
   .cform input{
-    flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+    flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;
     padding:0.55rem 0.95rem;font-size:0.78rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;
   }
-  .cform button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
+  .cform button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0 0.95rem;font-size:0.68rem;font-weight:600;}
 
   /* tabbalk */
   .tabbar{
@@ -644,7 +644,7 @@
   #paywait.open{display:flex;}
   .paycard{
     background:#fff;color:#0C0C0B;width:260px;
-    padding:2rem 1.8rem;text-align:center;border-radius:22px;
+    padding:2rem 1.8rem;text-align:center;border-radius:0;
   }
   .paycard .amt{font-family:'Bodoni Moda',serif;font-size:1.4rem;margin-bottom:0.9rem;}
   .paycard .icon{width:52px;height:52px;margin:0 auto 0.8rem;}
@@ -655,7 +655,7 @@
   .paycard.done .lbl{color:#2E6B4F;font-weight:600;}
 
   /* ter plaatse: leveranciers, orders, menu-overlay */
-  .sup-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.15rem;margin-top:0.8rem;display:flex;align-items:center;gap:0.9rem;}
+  .sup-card{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.15rem;margin-top:0.8rem;display:flex;align-items:center;gap:0.9rem;}
   .sup-card .ic{font-size:1.6rem;flex-shrink:0;}
   .sup-card .ic svg{width:1.5rem;height:1.5rem;display:block;}
   .sup-card .chatb svg{width:1.1rem;height:1.1rem;vertical-align:-0.12em;}
@@ -667,59 +667,59 @@
   .sup-card .t{flex:1;min-width:0;}
   .sup-card .t b{display:block;font-size:0.92rem;font-weight:600;}
   .sup-card .t span{font-size:0.72rem;color:var(--soft);}
-  .sup-card .go{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
+  .sup-card .go{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.55rem 1rem;font-size:0.74rem;font-weight:600;white-space:nowrap;}
   .sup-card .go.ghost{background:none;color:var(--muted);border:1px solid var(--line);}
   .sec-label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 0.2rem;}
-  .myorder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
+  .myorder{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.05rem;margin-top:0.7rem;}
   .myorder .r1{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;}
   .myorder .nm{font-weight:600;font-size:0.86rem;}
   .myorder .sub2{font-size:0.7rem;color:var(--soft);margin-top:0.1rem;}
   .myorder .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
-  .mo-pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .mo-pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:0;border:1px solid var(--line);}
   .mo-pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .mo-pill.bereiding{color:#C99A2E;border-color:rgba(201,154,46,0.4);}
   .mo-pill.klaar,.mo-pill.geserveerd{color:var(--green);border-color:rgba(76,154,117,0.4);}
   .myorder .acts{margin-top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
-  .mo-pay{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+  .mo-pay{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
   .mo-pay svg{width:12px;height:12px;}
   .mo-paid{font-size:0.68rem;color:var(--green);font-weight:600;}
   /* De rekening (betalen na het eten) */
-  .rek-card{background:var(--card);border:1px solid var(--burgundy);border-radius:14px;padding:0.9rem 1.05rem;margin-top:0.7rem;}
+  .rek-card{background:var(--card);border:1px solid var(--burgundy);border-radius:0;padding:0.9rem 1.05rem;margin-top:0.7rem;}
   .rek-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.6rem;}
   .rek-top b{font-weight:600;font-size:0.86rem;}
   .rek-top .amt{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
-  .rek-pay{margin-top:0.75rem;width:100%;background:var(--burgundy);color:#fff;border:none;border-radius:999px;padding:0.6rem 0.9rem;font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .rek-pay{margin-top:0.75rem;width:100%;background:var(--burgundy);color:#fff;border:none;border-radius:0;padding:0.6rem 0.9rem;font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;}
   .rek-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:flex-end;justify-content:center;}
-  .rek-sheet{width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom,0));color:var(--txt);max-height:82vh;overflow-y:auto;}
+  .rek-sheet{width:100%;max-width:480px;background:var(--card);border-radius:0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom,0));color:var(--txt);max-height:82vh;overflow-y:auto;}
   .rek-sheet h3{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.25rem;margin:0 0 0.1rem;}
   .rek-reg{display:flex;justify-content:space-between;gap:0.8rem;padding:0.5rem 0;border-top:1px solid var(--line);font-size:0.84rem;}
   .rek-reg .q{color:var(--soft);}
   .rek-sub{display:flex;justify-content:space-between;gap:0.8rem;padding:0.7rem 0 0.2rem;font-weight:600;font-size:0.95rem;border-top:1px solid var(--line);}
-  .rek-fooi{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);margin-top:0.7rem;font-family:inherit;}
+  .rek-fooi{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);margin-top:0.7rem;font-family:inherit;}
 
   /* ---- Onderweg (live reis) ---- */
-  .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;}
+  .live-start{background:linear-gradient(150deg,#1a1413,#151312);border:1px solid var(--line);border-radius:0;padding:1.15rem 1.2rem;margin-top:0.4rem;}
   .live-start .lh{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
   .live-start .ld{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;}
   .live-dest-row{display:flex;gap:0.5rem;margin-top:0.85rem;}
-  .live-dest-row select{flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.84rem;color:var(--txt);outline:none;font-family:inherit;}
+  .live-dest-row select{flex:1;min-width:0;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;font-size:0.84rem;color:var(--txt);outline:none;font-family:inherit;}
   .live-mode{display:flex;gap:0.4rem;margin-top:0.6rem;}
-  .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
+  .live-mode button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.5rem;font-size:0.72rem;font-family:inherit;}
   .live-mode button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
-  .live-go{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
+  .live-go{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.85rem;font-size:0.84rem;font-weight:600;font-family:inherit;}
 
-  .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:18px;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
+  .live-panel{background:linear-gradient(150deg,#1c1414,#151312);border:1px solid rgba(194,58,94,0.35);border-radius:0;padding:1.15rem 1.2rem;margin-top:0.4rem;overflow:hidden;}
   .live-top{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;}
   .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);font-weight:700;}
   .live-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--burgundy);animation:livepulse 2.4s ease-in-out infinite;}
   @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.4);}70%{box-shadow:0 0 0 5px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
-  .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
+  .live-stop{background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.35rem 0.8rem;font-size:0.68rem;font-family:inherit;}
   .live-headline{margin-top:0.7rem;font-family:'Bodoni Moda',serif;font-size:1.35rem;line-height:1.15;}
   .live-headline em{font-style:normal;color:var(--gold);}
   .live-sub{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
-  .live-map{position:relative;height:130px;margin:0.9rem 0 0.2rem;border-radius:14px;border:1px solid var(--line);background:radial-gradient(circle at 30% 30%,rgba(194,58,94,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
+  .live-map{position:relative;height:130px;margin:0.9rem 0 0.2rem;border-radius:0;border:1px solid var(--line);background:radial-gradient(circle at 30% 30%,rgba(194,58,94,0.08),transparent 60%),repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0 1px,transparent 1px 22px),#100e0d;overflow:hidden;}
   .live-map .mk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.9rem;transition:left 0.9s ease,top 0.9s ease;}
-  .live-map .mk .lbl{font-size:0.52rem;letter-spacing:0.04em;color:var(--muted);background:rgba(0,0,0,0.5);padding:1px 4px;border-radius:4px;white-space:nowrap;}
+  .live-map .mk .lbl{font-size:0.52rem;letter-spacing:0.04em;color:var(--muted);background:rgba(0,0,0,0.5);padding:1px 4px;border-radius:0;white-space:nowrap;}
   .live-map .mk.me{z-index:3;}
   .live-map .mk.me .pin{width:14px;height:14px;border-radius:50%;background:var(--burgundy);box-shadow:0 0 0 5px rgba(194,58,94,0.25);}
   .live-partner{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
@@ -733,21 +733,21 @@
   .live-partner .eta .u{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);}
   .live-partner .eta.arr .n{color:var(--green);font-size:0.9rem;}
   .live-acts{display:flex;gap:0.5rem;margin-top:0.9rem;flex-wrap:wrap;}
-  .live-acts button{flex:1;min-width:120px;border-radius:999px;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
+  .live-acts button{flex:1;min-width:120px;border-radius:0;padding:0.7rem;font-size:0.76rem;font-weight:600;font-family:inherit;border:1px solid var(--line);}
   .live-acts .prim{background:var(--knop);color:var(--knop-txt);border-color:#fff;}
   .live-acts .sec{background:var(--card2,#1B1817);color:var(--txt);}
   .live-acts .glowbtn{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border-color:#D9B96A;animation:doorglow 3s ease-in-out infinite;}
   @keyframes doorglow{0%,100%{box-shadow:0 0 0 0 rgba(217,185,106,0.3);}50%{box-shadow:0 0 13px 1px rgba(217,185,106,0.4);}}
-  .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:12px;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
-  .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
+  .live-preorder{margin-top:0.75rem;background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);border-radius:0;padding:0.75rem 0.9rem;font-size:0.78rem;color:var(--txt);display:flex;align-items:center;gap:0.6rem;justify-content:space-between;}
+  .live-preorder button{background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;white-space:nowrap;}
 
   /* ---- gastchat met een partner ---- */
   .pc-depts{display:flex;gap:0.4rem;overflow-x:auto;padding:0.7rem 1.25rem 0;scrollbar-width:none;}
   .pc-depts::-webkit-scrollbar{display:none;}
-  .pc-depts button{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-family:inherit;}
+  .pc-depts button{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:0.4rem 0.85rem;font-size:0.72rem;font-family:inherit;}
   .pc-depts button.on{background:var(--burgundy-deep);border-color:var(--burgundy);color:#fff;}
   .pc-body{display:flex;flex-direction:column;gap:0.55rem;padding-top:0.9rem;min-height:200px;}
-  .pc-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;}
+  .pc-msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:0;font-size:0.86rem;line-height:1.45;}
   .pc-msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
   .pc-msg.them{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-top-left-radius:5px;}
   .pc-msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
@@ -755,9 +755,9 @@
   .pc-msg time{display:block;margin-top:0.25rem;font-size:0.58rem;color:var(--soft);}
   .pc-empty{padding:1.6rem 0.5rem;text-align:center;color:var(--soft);font-size:0.82rem;line-height:1.6;}
   .pc-foot{display:flex;gap:0.5rem;padding:0.8rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);border-top:1px solid var(--line);}
-  .pc-foot input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
-  .pc-foot button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.84rem;font-weight:600;}
-  .sup-card .chatb{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;width:36px;height:36px;font-size:0.95rem;flex-shrink:0;margin-right:0.4rem;}
+  .pc-foot input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.75rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;}
+  .pc-foot button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0 1.2rem;font-size:0.84rem;font-weight:600;}
+  .sup-card .chatb{background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;width:36px;height:36px;font-size:0.95rem;flex-shrink:0;margin-right:0.4rem;}
 
   /* ---- oplichtend ophaalcode-scherm ---- */
   #glowCode{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;cursor:pointer;
@@ -771,12 +771,12 @@
   @keyframes gcpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.02);}}
   .gc-hint{font-size:0.92rem;font-weight:500;}
   .gc-close{margin-top:2.2rem;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.55;}
-  .mo-code{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border:none;border-radius:999px;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:700;}
+  .mo-code{background:linear-gradient(120deg,#D9B96A,#F3E3B8);color:#1c1508;border:none;border-radius:0;padding:0.5rem 0.9rem;font-size:0.72rem;font-weight:700;}
 
   /* fotostrip + kamers in de partner-sheet */
   .ms-photos{display:flex;gap:0.5rem;overflow-x:auto;padding:0.8rem 0 0.2rem;scrollbar-width:none;}
   .ms-photos::-webkit-scrollbar{display:none;}
-  .ms-photos img{height:110px;border-radius:12px;flex-shrink:0;object-fit:cover;border:1px solid var(--line);}
+  .ms-photos img{height:110px;border-radius:0;flex-shrink:0;object-fit:cover;border:1px solid var(--line);}
   .ms-room{display:flex;justify-content:space-between;align-items:center;gap:0.7rem;padding:0.75rem 0;border-bottom:1px solid var(--line);}
   .ms-room:last-child{border-bottom:none;}
   .ms-room .rt b{display:block;font-size:0.88rem;font-weight:600;}
@@ -786,21 +786,21 @@
   /* partner-post in De Salon */
   .post .visual img{width:100%;height:100%;object-fit:cover;display:block;}
   .a-partner{background:linear-gradient(140deg,#A98F1C,#6E5B10)!important;}
-  .partner-badge{display:inline-block;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--gold);border:1px solid rgba(169,143,28,0.45);border-radius:999px;padding:0.14rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
+  .partner-badge{display:inline-block;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--gold);border:1px solid rgba(169,143,28,0.45);border-radius:0;padding:0.14rem 0.5rem;margin-left:0.4rem;vertical-align:middle;}
   .v-partner{background:linear-gradient(160deg,#2a2415 0%,#6E5B10 70%,#A98F1C 100%);}
 
   .menu-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:80;display:none;}
   .menu-scrim.open{display:block;}
-  .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:88%;display:none;flex-direction:column;}
+  .menu-sheet{position:absolute;left:0;right:0;bottom:0;z-index:81;background:var(--bg);border-top:1px solid var(--line);border-radius:0;max-height:88%;display:none;flex-direction:column;}
   .menu-sheet.open{display:flex;}
   /* RTG Zakelijk (Business Pass) */
-  .zak-tab{background:none;border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.85rem;color:var(--muted);font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
+  .zak-tab{background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.85rem;color:var(--muted);font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
   .zak-tab.active{background:var(--gold);border-color:var(--gold);color:#000;}
-  .zak-kaart{border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-top:0.7rem;}
-  .zak-chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.66rem;color:var(--muted);margin:0.25rem 0.25rem 0 0;}
+  .zak-kaart{border:1px solid var(--line);border-radius:0;padding:0.85rem 1rem;margin-top:0.7rem;}
+  .zak-chip{display:inline-block;border:1px solid var(--line);border-radius:0;padding:0.2rem 0.6rem;font-size:0.66rem;color:var(--muted);margin:0.25rem 0.25rem 0 0;}
   .zak-chip.klik{cursor:pointer;}
   .zak-chip.mijn{border-color:var(--gold);color:var(--gold);}
-  .zak-open{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7EE0A3;border:1px solid #2a5c3f;border-radius:999px;padding:0.15rem 0.5rem;}
+  .zak-open{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7EE0A3;border:1px solid #2a5c3f;border-radius:0;padding:0.15rem 0.5rem;}
 
   /* ---- Salon-connecties: vrienden, dm en bellen ---- */
   .sc-bar{margin:0 0 1.1rem;}
@@ -810,35 +810,35 @@
   .sc-av{position:relative;width:52px;height:52px;margin:0 auto;border-radius:50%;background:var(--card);border:1px solid var(--line);
     display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;color:var(--txt);}
   .sc-p.add .sc-av{border-style:dashed;color:var(--soft);font-size:1.3rem;}
-  .sc-badge{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;background:var(--burgundy);color:#fff;
+  .sc-badge{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:0;background:var(--burgundy);color:#fff;
     font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;}
   .sc-p span{display:block;margin-top:0.3rem;font-size:0.58rem;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .sc-req{background:var(--card);border:1px solid rgba(169,143,28,0.4);border-radius:14px;padding:0.7rem 0.9rem;margin-bottom:0.6rem;
+  .sc-req{background:var(--card);border:1px solid rgba(169,143,28,0.4);border-radius:0;padding:0.7rem 0.9rem;margin-bottom:0.6rem;
     display:flex;align-items:center;gap:0.6rem;font-size:0.82rem;}
   .sc-req b{flex:1;}
-  .sc-req button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.74rem;}
+  .sc-req button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:0;padding:0.35rem 0.8rem;font-size:0.74rem;}
   .sc-req button.ja{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .sc-zoek{display:none;gap:0.5rem;margin-top:0.5rem;}
   .sc-zoek.open{display:flex;}
-  .sc-zoek input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.9rem;font-size:0.85rem;color:var(--txt);outline:none;}
-  .sc-zoek button{background:var(--burgundy);border:none;color:#fff;border-radius:12px;padding:0 1rem;font-size:0.8rem;}
+  .sc-zoek input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.9rem;font-size:0.85rem;color:var(--txt);outline:none;}
+  .sc-zoek button{background:var(--burgundy);border:none;color:#fff;border-radius:0;padding:0 1rem;font-size:0.8rem;}
   .sc-res{margin-top:0.5rem;display:flex;flex-direction:column;gap:0.4rem;}
-  .sc-hit{display:flex;align-items:center;gap:0.6rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.8rem;font-size:0.82rem;}
+  .sc-hit{display:flex;align-items:center;gap:0.6rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.8rem;font-size:0.82rem;}
   .sc-hit b{flex:1;}
-  .sc-hit button{border:1px solid var(--gold);background:none;color:var(--gold);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.72rem;}
+  .sc-hit button{border:1px solid var(--gold);background:none;color:var(--gold);border-radius:0;padding:0.3rem 0.8rem;font-size:0.72rem;}
   /* De contactpin: je eigen code als tekst en als QR, plus het vak om die van
      een ander in te typen of te scannen. Ligt onder het zoekvak in dezelfde la,
      en gaat met dezelfde knop open en dicht. */
   .sc-pin{display:none;margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;}
   .sc-pin.open{display:block;}
-  .sc-pin-mijn{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.7rem 0.9rem;}
+  .sc-pin-mijn{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;}
   .sc-pin-kop{display:flex;align-items:baseline;gap:0.6rem;}
   .sc-pin-kop span{font-size:0.68rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.08em;}
   .sc-pin-kop b{font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;letter-spacing:0.14em;}
   .sc-pin-akt{display:flex;gap:0.4rem;margin-top:0.55rem;flex-wrap:wrap;}
-  .sc-pin-akt button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.72rem;}
-  #scPinQrBeeld{display:block;margin:0.7rem auto 0;width:min(190px,60%);height:auto;border-radius:10px;}
-  #scPinCam{display:block;width:100%;max-height:220px;margin-top:0.5rem;border-radius:12px;background:#000;object-fit:cover;}
+  .sc-pin-akt button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:0;padding:0.3rem 0.8rem;font-size:0.72rem;}
+  #scPinQrBeeld{display:block;margin:0.7rem auto 0;width:min(190px,60%);height:auto;border-radius:0;}
+  #scPinCam{display:block;width:100%;max-height:220px;margin-top:0.5rem;border-radius:0;background:#000;object-fit:cover;}
   /* En ze gaan ook echt weg als ze dicht staan: een eigen `display` wint van de
      `[hidden]`-regel van de browser -- dezelfde val als bij .os-nu hieronder. */
   #scPinQrBeeld[hidden],#scPinCam[hidden]{display:none;}
@@ -857,10 +857,10 @@
   .sc-pin .sc-zoek button.grijs{background:var(--card);border:1px solid var(--line);color:var(--txt);}
 
   .dm-body{flex:1;overflow-y:auto;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.5rem;min-height:220px;}
-  .dm-m{max-width:82%;padding:0.55rem 0.85rem;border-radius:14px;font-size:0.86rem;line-height:1.45;background:var(--card);border:1px solid var(--line);align-self:flex-start;}
+  .dm-m{max-width:82%;padding:0.55rem 0.85rem;border-radius:0;font-size:0.86rem;line-height:1.45;background:var(--card);border:1px solid var(--line);align-self:flex-start;}
   .dm-m.mine{align-self:flex-end;background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .dm-m .tijd{display:block;font-size:0.6rem;opacity:0.6;margin-top:0.2rem;}
-  .dm-post{margin-top:0.35rem;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:0.45rem 0.6rem;font-size:0.74rem;}
+  .dm-post{margin-top:0.35rem;border:1px solid rgba(255,255,255,0.25);border-radius:0;padding:0.45rem 0.6rem;font-size:0.74rem;}
   .dm-m:not(.mine) .dm-post{border-color:var(--line);}
   .dm-post b{display:block;font-size:0.7rem;}
   .dm-call{display:flex;gap:0.5rem;}
@@ -878,7 +878,7 @@
   #callScreen{position:absolute;inset:0;z-index:121;background:#000;display:none;flex-direction:column;}
   #callScreen.open{display:flex;}
   #csRemote{flex:1;width:100%;object-fit:cover;background:#0C0C0B;}
-  #csLocal{position:absolute;right:14px;top:64px;width:104px;height:140px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:#111;z-index:2;}
+  #csLocal{position:absolute;right:14px;top:64px;width:104px;height:140px;object-fit:cover;border-radius:0;border:1px solid rgba(255,255,255,0.3);background:#111;z-index:2;}
   .cs-top{position:absolute;top:0;left:0;right:0;padding:0.9rem 1.1rem;display:flex;justify-content:space-between;align-items:center;
     background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0));color:#fff;z-index:2;font-size:0.9rem;}
   .cs-foot{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 0 calc(1.4rem + env(safe-area-inset-bottom,0));display:flex;justify-content:center;gap:1.4rem;
@@ -890,7 +890,7 @@
   .ms-head b{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
   .ms-head span{display:block;font-size:0.68rem;color:var(--soft);margin-top:0.15rem;}
   .ms-close{background:none;border:none;color:var(--muted);font-size:1rem;}
-  .pc-salon{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:0.25rem 0.7rem;font-size:0.72rem;font-weight:600;margin-left:auto;margin-right:0.5rem;white-space:nowrap;}
+  .pc-salon{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:0;padding:0.25rem 0.7rem;font-size:0.72rem;font-weight:600;margin-left:auto;margin-right:0.5rem;white-space:nowrap;}
   .ms-body{flex:1;overflow-y:auto;padding:0.5rem 1.25rem 1rem;}
   .ms-cat{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin:1rem 0 0.4rem;}
   .ms-item{padding:0.8rem 0;border-bottom:1px solid var(--line);display:flex;gap:0.8rem;align-items:flex-start;}
@@ -898,7 +898,7 @@
   .ms-item .nm{font-weight:600;font-size:0.86rem;}
   .ms-item .ds{font-size:0.74rem;color:var(--muted);margin-top:0.2rem;}
   .ms-item .alg{margin-top:0.35rem;display:flex;gap:0.3rem;flex-wrap:wrap;}
-  .ms-item .alg span{font-size:0.58rem;color:#C99A2E;border:1px solid rgba(201,154,46,0.3);border-radius:999px;padding:0.12rem 0.45rem;}
+  .ms-item .alg span{font-size:0.58rem;color:#C99A2E;border:1px solid rgba(201,154,46,0.3);border-radius:0;padding:0.12rem 0.45rem;}
   .ms-item .side{text-align:right;flex-shrink:0;}
   .ms-item .pr{font-family:'Bodoni Moda',serif;font-size:0.95rem;}
   .ms-item.ms-allergie{border-left:2px solid var(--burgundy);padding-left:0.7rem;background:color-mix(in srgb, var(--burgundy) 7%, transparent);}
@@ -907,10 +907,10 @@
   .qty button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:0.9rem;line-height:1;}
   .qty b{min-width:14px;text-align:center;font-size:0.85rem;}
   .ms-foot{border-top:1px solid var(--line);padding:1rem 1.25rem calc(1rem + env(safe-area-inset-bottom,0px));}
-  .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
+  .ms-note{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;font-size:0.82rem;color:var(--txt);outline:none;font-family:'Inter',sans-serif;}
   .ms-tag{display:flex;align-items:center;gap:0.5rem;margin-top:0.7rem;font-size:0.8rem;color:var(--muted);}
   .ms-tag input{width:18px;height:18px;accent-color:var(--burgundy);}
-  .ms-order{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .ms-order{margin-top:0.8rem;width:100%;background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.9rem;font-size:0.86rem;font-weight:600;}
   .ms-order:disabled{opacity:0.4;}
 
   #toast{
@@ -919,7 +919,7 @@
     left:50%;transform:translate(-50%, 16px);
     background:var(--knop);color:var(--knop-txt);
     font-size:0.78rem;font-weight:500;
-    padding:0.75rem 1.25rem;border-radius:999px;
+    padding:0.75rem 1.25rem;border-radius:0;
     opacity:0;pointer-events:none;
     transition:opacity var(--rtg-tempo) var(--rtg-ease), transform var(--rtg-tempo) var(--rtg-ease);
     z-index:70;max-width:86%;text-align:center;
@@ -945,11 +945,11 @@
   /* de pijl is 22px BREED en dus onder de 24 van WCAG 2.5.8; de hoogte was al goed */
   .onb-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#857007);font-size:1.15rem;padding:.4rem .2rem;font-family:inherit;min-width:24px;}
   .onb-acties{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1rem;}
-  .onb-acties button{background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.72rem;color:var(--txt);font-family:inherit;cursor:pointer;letter-spacing:.02em;}
+  .onb-acties button{background:none;border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.72rem;color:var(--txt);font-family:inherit;cursor:pointer;letter-spacing:.02em;}
   .onb-acties button.prim{background:var(--gold,#857007);color:#0C0C0B;border-color:var(--gold,#857007);font-weight:700;}
-  .onb-lees{max-height:14rem;overflow-y:auto;margin-top:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card,#151312);font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;text-align:left;}
+  .onb-lees{max-height:14rem;overflow-y:auto;margin-top:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:0;background:var(--card,#151312);font-size:.8rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;text-align:left;}
   .onb-fout{color:#F4B8C6;font-size:.78rem;min-height:1rem;margin:.6rem 0 0;}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
   /* ============================== RTG OS ==============================
      De leden-app als telefoon-besturingssysteem: statusbalk met klok, het
      home-scherm als springboard (paswidget + app-grid), een frosted dock
@@ -1023,7 +1023,7 @@
     min-width:0;position:relative;
   }
   .os-app .os-tegel{
-    width:calc(var(--e) * 3.87);height:calc(var(--e) * 3.87);border-radius:calc(var(--e) * 1.2);
+    width:calc(var(--e) * 3.87);height:calc(var(--e) * 3.87);border-radius:0;
     display:flex;align-items:center;justify-content:center;position:relative;
     background:linear-gradient(160deg, var(--card2), var(--card));
     border:1px solid var(--line);
@@ -1131,7 +1131,7 @@
     touch-action:none; /* de veeg omhoog blijft bij de pill, niet bij het scrollen */
   }
   .os-pill::after{
-    content:"";width:110px;height:5px;border-radius:3px;
+    content:"";width:110px;height:5px;border-radius:0;
     background:color-mix(in srgb, var(--txt) 55%, transparent);
   }
   #app.os-open .os-pill{display:flex;}
@@ -1262,7 +1262,7 @@
   .os-aidraad[hidden]{display:none;}
   .os-bel{
     max-width:86%;padding:calc(var(--e) * 0.5) calc(var(--e) * 0.75);
-    border-radius:calc(var(--e) * 0.85);font-size:calc(var(--e) * 0.8);line-height:1.5;
+    border-radius:0;font-size:calc(var(--e) * 0.8);line-height:1.5;
     white-space:pre-wrap;
   }
   .os-bel.van-rahul{
@@ -1282,7 +1282,7 @@
   }
   .os-aitips[hidden]{display:none;}
   .os-aitips button{
-    background:none;border:1px solid var(--line);border-radius:999px;color:var(--txt);
+    background:none;border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-family:'Inter',sans-serif;font-size:calc(var(--e) * 0.72);
     padding:calc(var(--e) * 0.28) calc(var(--e) * 0.7);cursor:pointer;
     /* Op telefoonformaat mat deze chip 20px hoog en dat is onder de 24 van WCAG
@@ -1316,7 +1316,7 @@
     flex-shrink:0;margin-top:calc(var(--e) * 2.8);
     display:flex;align-items:center;gap:calc(var(--e) * 0.5);
     padding:calc(var(--e) * 0.4) calc(var(--e) * 0.45) calc(var(--e) * 0.4) calc(var(--e) * 0.55);
-    border-radius:999px;
+    border-radius:0;
     background:color-mix(in srgb, var(--card) 62%, transparent);
     backdrop-filter:blur(26px) saturate(1.5);
     -webkit-backdrop-filter:blur(26px) saturate(1.5);
@@ -1365,7 +1365,7 @@
   .os-map-paneel{
     margin-top:18vh;width:min(320px, 86%);
     background:color-mix(in srgb, var(--card) 72%, transparent);
-    border:1px solid var(--line);border-radius:18px;
+    border:1px solid var(--line);border-radius:0;
     padding:1.2rem 1.2rem 1.4rem;
     box-shadow:0 24px 60px rgba(0,0,0,0.5);
   }
@@ -1397,7 +1397,7 @@
     background:color-mix(in srgb, var(--card2) 70%, transparent);
     display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:6px;
   }
-  .os-map-mini{border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.5rem;overflow:hidden;}
+  .os-map-mini{border-radius:0;display:flex;align-items:center;justify-content:center;font-size:0.5rem;overflow:hidden;}
   .os-map-mini svg{width:9px;height:9px;stroke:#fff;}
   /* een app zonder eigen glyf valt terug op een Bodoni-monogram; in het
      3x3-voorproefje van een map moet dat mee krimpen, anders duwt één letter
@@ -1407,14 +1407,14 @@
   /* map hernoemen (wiebel-modus): klein paneel met een naamveld */
   .os-hernoem{width:min(300px,86%);}
   .os-hernoem input{
-    width:100%;padding:0.75rem 1rem;border-radius:12px;
+    width:100%;padding:0.75rem 1rem;border-radius:0;
     border:1px solid var(--line);
     background:color-mix(in srgb, var(--card2) 85%, transparent);
     color:var(--txt);font-size:0.95rem;outline:none;text-align:center;
   }
   .os-hernoem-rij{display:flex;gap:0.5rem;margin-top:0.8rem;}
   .os-hernoem-rij button{
-    flex:1;padding:0.6rem 0;border-radius:10px;border:1px solid var(--line);
+    flex:1;padding:0.6rem 0;border-radius:0;border:1px solid var(--line);
     background:var(--card2);color:var(--txt);font-size:0.78rem;
   }
   .os-hernoem-rij button#osHernoemOk{background:var(--gold);border-color:var(--gold);color:#1C1608;font-weight:650;}
@@ -1423,13 +1423,13 @@
   .os-bat{display:inline-flex;align-items:center;gap:5px;}
   .os-bat i{
     width:21px;height:11px;border:1px solid color-mix(in srgb, var(--txt) 55%, transparent);
-    border-radius:3.5px;padding:1.5px;display:block;position:relative;
+    border-radius:0;padding:1.5px;display:block;position:relative;
   }
   .os-bat i::after{
     content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:4px;
-    border-radius:0 2px 2px 0;background:color-mix(in srgb, var(--txt) 55%, transparent);
+    border-radius:0;background:color-mix(in srgb, var(--txt) 55%, transparent);
   }
-  .os-bat b{display:block;height:100%;border-radius:2px;background:var(--txt);min-width:2px;}
+  .os-bat b{display:block;height:100%;border-radius:0;background:var(--txt);min-width:2px;}
   .os-bat.laag b{background:var(--burgundy);}
   .os-bat em{font-style:normal;font-size:0.66rem;color:var(--soft);font-variant-numeric:tabular-nums;}
 
@@ -1441,7 +1441,7 @@
 
   .os-zoek-paneel{margin-top:12vh;width:min(360px, 88%);}
   .os-zoek-paneel input{
-    width:100%;padding:0.85rem 1.1rem;border-radius:12px;
+    width:100%;padding:0.85rem 1.1rem;border-radius:0;
     border:1px solid var(--line);
     background:color-mix(in srgb, var(--card) 80%, transparent);
     color:var(--txt);font-size:0.95rem;outline:none;
@@ -1449,12 +1449,12 @@
   #osZoekLijst,#osBelLijst{margin-top:0.7rem;display:flex;flex-direction:column;gap:0.35rem;}
   #osZoekLijst button,#osBelLijst button{
     display:flex;align-items:center;gap:0.7rem;text-align:left;
-    padding:0.6rem 0.8rem;border-radius:12px;border:1px solid var(--line);
+    padding:0.6rem 0.8rem;border-radius:0;border:1px solid var(--line);
     background:color-mix(in srgb, var(--card) 70%, transparent);color:var(--txt);font-size:0.85rem;
     transition:border-color var(--rtg-vlot) var(--rtg-ease);
   }
   @media (hover:hover){#osZoekLijst button:hover,#osBelLijst button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}}
-  #osZoekLijst .zi,#osBelLijst .zi{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
+  #osZoekLijst .zi,#osBelLijst .zi{width:30px;height:30px;border-radius:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--card2);}
   #osZoekLijst .zi svg,#osBelLijst .zi svg{width:16px;height:16px;stroke:#fff;}
   #osZoekLijst .zm,#osBelLijst .zm{color:var(--soft);font-size:0.68rem;margin-left:auto;}
   .os-bel-titel{
@@ -1462,7 +1462,7 @@
     font-size:0.85rem;letter-spacing:0.08em;color:var(--txt);
   }
   .os-bel-leeg{
-    padding:0.9rem;border:1px dashed var(--line);border-radius:12px;
+    padding:0.9rem;border:1px dashed var(--line);border-radius:0;
     color:var(--soft);font-size:0.8rem;text-align:center;line-height:1.5;
   }
 
@@ -1489,7 +1489,7 @@
     backdrop-filter:blur(30px) saturate(1.08);
     -webkit-backdrop-filter:blur(30px) saturate(1.08);
     border:1px solid color-mix(in srgb, var(--gold-tekst,#C0A544) 24%, rgba(255,255,255,0.1));
-    border-radius:22px;
+    border-radius:0;
     padding:1.05rem;
     box-shadow:0 1px 0 rgba(255,255,255,0.16) inset,
                0 -1px 0 rgba(192,165,68,0.09) inset,
@@ -1500,7 +1500,7 @@
   /* -------- Now Playing: je muziek bedienen vanaf de ROS -------- */
   .os-nu{display:flex;align-items:center;gap:0.6rem;
     background:rgba(255,255,255,0.035);border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
-    border-radius:16px;padding:0.55rem 0.65rem;}
+    border-radius:0;padding:0.55rem 0.65rem;}
   /* EN HIJ GAAT OOK ECHT WEG ALS ER NIETS SPEELT.
 
      app-main-31.js zet `hidden` op deze kaart zodra er geen titel is -- maar
@@ -1511,7 +1511,7 @@
      rustig vlak eromheen is het het eerste wat je ziet. */
   .os-nu[hidden]{display:none;}
   .os-nu-open{display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0;background:none;border:none;text-align:left;cursor:pointer;padding:0;color:var(--txt);}
-  .os-nu-hoes{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  .os-nu-hoes{width:40px;height:40px;border-radius:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;
     background:linear-gradient(140deg, rgba(192,165,68,0.20), rgba(255,255,255,0.03));
     font-size:1.25rem;color:var(--gold-tekst,#C0A544);}
   .os-nu-hoes svg{display:block;}
@@ -1519,7 +1519,7 @@
   .os-nu-tekst b{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .os-nu-tekst small{font-size:0.66rem;color:var(--rtg-soft,rgba(244,240,233,0.56));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .os-nu-knoppen{display:flex;align-items:center;gap:0.15rem;flex-shrink:0;}
-  .os-nu-knoppen button{background:none;border:none;color:var(--rtg-muted,rgba(244,240,233,0.72));font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:8px;}
+  .os-nu-knoppen button{background:none;border:none;color:var(--rtg-muted,rgba(244,240,233,0.72));font-size:1.05rem;line-height:1;padding:0.35rem 0.3rem;cursor:pointer;border-radius:0;}
   .os-nu-knoppen button:hover{color:var(--gold-tekst,#C0A544);background:rgba(255,255,255,0.04);}
   #osNuSpeel{font-size:1.3rem;}
 
@@ -1531,7 +1531,7 @@
     letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-soft,rgba(244,240,233,0.56));}
   .os-cc-knoppen{display:flex;gap:0.4rem;}
   .os-cc-knoppen button{
-    flex:1;padding:0.6rem 0;border-radius:999px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    flex:1;padding:0.6rem 0;border-radius:0;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
     background:transparent;color:var(--rtg-muted,rgba(244,240,233,0.72));
     font:500 0.72rem/1 var(--rtg-interface,'Inter',system-ui,sans-serif);
     transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
@@ -1552,7 +1552,7 @@
   .os-cc-tegels{display:grid;grid-template-columns:repeat(4,1fr);gap:0.45rem;}
   .os-cc-tegels button{
     display:flex;flex-direction:column;align-items:center;gap:0.35rem;
-    padding:0.7rem 0.2rem;border-radius:14px;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
+    padding:0.7rem 0.2rem;border-radius:0;border:1px solid var(--rtg-line,rgba(255,255,255,0.09));
     background:rgba(255,255,255,0.035);color:var(--rtg-muted,rgba(244,240,233,0.72));
     font:500 0.6rem/1.25 var(--rtg-interface,'Inter',system-ui,sans-serif);text-align:center;
     transition:border-color var(--rtg-vlot) var(--rtg-ease), color var(--rtg-vlot) var(--rtg-ease), background var(--rtg-vlot) var(--rtg-ease);
@@ -1566,7 +1566,7 @@
   .os-cc-tegels button{position:relative;}
   .os-cc-tel{
     position:absolute;top:5px;right:6px;min-width:15px;height:15px;padding:0 4px;
-    background:var(--burgundy);color:#fff;border-radius:999px;
+    background:var(--burgundy);color:#fff;border-radius:0;
     font-style:normal;font-size:0.56rem;font-weight:700;
     display:flex;align-items:center;justify-content:center;
   }
@@ -1583,7 +1583,7 @@
 
   /* -------- wiebel-modus: iconen herschikken met een lange druk -------- */
   .os-klaar{
-    border:none;border-radius:999px;padding:0.35rem 0.85rem;
+    border:none;border-radius:0;padding:0.35rem 0.85rem;
     background:var(--gold);color:#000;font-size:0.72rem;font-weight:600;
   }
   @media (prefers-reduced-motion: no-preference){
@@ -1608,7 +1608,7 @@
     font-size:4.2rem;font-weight:200;letter-spacing:0.01em;line-height:1;
     font-variant-numeric:tabular-nums;color:var(--txt);justify-content:center;
   }
-  .os-merk-logo{width:18px;height:18px;border-radius:4px;vertical-align:middle;}
+  .os-merk-logo{width:18px;height:18px;border-radius:0;vertical-align:middle;}
 
   /* Hier stond een tweede indeling voor "de tablet": zes kolommen, grotere
      tegels, een royaler dock. Dat maakte de computer een ander scherm dan de
@@ -1621,7 +1621,7 @@
     top:calc(env(safe-area-inset-top, 0px) + 0.55rem);
     z-index:70;width:min(370px, 92%);
     display:flex;align-items:flex-start;gap:0.7rem;
-    padding:0.75rem 0.9rem;border-radius:14px;
+    padding:0.75rem 0.9rem;border-radius:0;
     background:color-mix(in srgb, var(--card) 78%, transparent);
     backdrop-filter:blur(24px) saturate(1.5);
     -webkit-backdrop-filter:blur(24px) saturate(1.5);
@@ -1758,10 +1758,10 @@
       </div>
       <div class="notif-list" id="notifList"></div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
-        <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+        <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
         <div style="display:flex;gap:0.5rem;">
-          <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
-          <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
+          <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:0;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
+          <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:0;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
         </div>
         <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
       </div>
@@ -2280,7 +2280,7 @@
     <div class="gc-inner">
       <div class="gc-sup" id="gcSup"></div>
       <div class="gc-code" id="gcCode"></div>
-      <div id="gcQr" style="background:#fff;padding:12px;border-radius:14px;margin:0.9rem auto 0.4rem;display:none;"></div>
+      <div id="gcQr" style="background:#fff;padding:12px;border-radius:0;margin:0.9rem auto 0.4rem;display:none;"></div>
       <div class="gc-hint" data-i18n="app.gc.hint">Laat dit scherm zien bij het ophalen</div>
       <div class="gc-close" data-i18n="app.gc.close">Tik om te sluiten</div>
     </div>

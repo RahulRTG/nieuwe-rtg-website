@@ -28,7 +28,7 @@
     const el = $('#swWrap'); if (!el) return;
     if (!sw){ el.innerHTML = '<div class="empty">…</div>'; laadSamenwerking(); return; }
     const canEdit = actor().manager, mk = sw.isCreator;
-    const st = 'style="background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.6rem;color:var(--txt);"';
+    const st = 'style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.5rem 0.6rem;color:var(--txt);"';
     const kaartAnder = a => a.niche != null || a.bereik != null
       ? '<b>'+esc(a.name)+'</b>'+(a.niche?' · '+esc(a.niche):'')+(a.bereik?' · '+kortN(a.bereik)+' '+T('sw.bereik','bereik'):'')
       : (a.icon||'')+' <b>'+esc(a.name)+'</b>'+(a.typeLabel?' · '+esc(a.typeLabel):'');

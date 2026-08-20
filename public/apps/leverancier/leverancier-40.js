@@ -19,11 +19,11 @@
         (inh.voldoetLeeftijd!=null?'<br>'+(inh.voldoetLeeftijd?''+T('pn.voldoet','voldoet aan de leeftijdseis'):''+T('pn.voldoetniet','voldoet NIET aan de leeftijdseis')):'')+'</div>';
     } else {
       body = '<div style="display:flex;gap:0.8rem;">'+
-        (inh.foto?'<img src="'+esc(inh.foto)+'" alt="'+T('pn.pasfoto','Pasfoto')+'" style="width:80px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;">':'')+
+        (inh.foto?'<img src="'+esc(inh.foto)+'" alt="'+T('pn.pasfoto','Pasfoto')+'" style="width:80px;height:100px;object-fit:cover;border-radius:0;flex-shrink:0;">':'')+
         '<div><div style="font-weight:700;font-size:0.95rem;">'+esc(inh.naam||'')+'</div>'+
         '<div class="ds">'+(inh.nationaliteit?esc(inh.nationaliteit)+' · ':'')+(inh.geboortedatum?esc(inh.geboortedatum):'')+(inh.leeftijd!=null?' ('+inh.leeftijd+')':'')+'</div>'+
         '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
-        (inh.scan?'<div class="h-mt60"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.4rem;"></div>':'');
+        (inh.scan?'<div class="h-mt60"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:0;margin-top:0.4rem;"></div>':'');
     }
     return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div class="h-mt50">'+body+'</div>'+
       '<button class="obtn h-mt70" id="pnSluit">'+T('pn.sluit','Sluiten')+'</button></div>';
@@ -39,11 +39,11 @@
         const uit = $('#pnUitslag');
         if (r.niveau === 'bevestiging'){
           const be = r.bevestiging;
-          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.88rem;">'+
+          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:0;font-size:0.88rem;">'+
             (be.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):''+T('pn.nietgeverifieerd','niet geverifieerd'))+
             (be.voldoetLeeftijd!=null?' · '+(be.voldoetLeeftijd?''+be.minLeeftijd+'+':''+T('pn.voldoetniet','voldoet niet')):'')+'</div>';
         } else {
-          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:12px;font-size:0.85rem;color:var(--amber);">'+T('pn.verstuurd','Verzoek verstuurd. De gast krijgt een melding en kan het goedkeuren of weigeren.')+'</div>';
+          uit.innerHTML = '<div style="padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:0;font-size:0.85rem;color:var(--amber);">'+T('pn.verstuurd','Verzoek verstuurd. De gast krijgt een melding en kan het goedkeuren of weigeren.')+'</div>';
           await laadPaspoort();
         }
       } catch(e){ toast(e.message); }
@@ -72,7 +72,7 @@
     const cats = d.categorieen || [];
     // functie-schakelaars
     const ghChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">' +
-      (d.functies||[]).map(f => '<button class="js-ghf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--line)')+';background:'+(f.aan?'#12321f':'var(--card2)')+';color:'+(f.aan?'#7EE0A3':'var(--soft)')+';border-radius:999px;padding:0.32rem 0.7rem;font-size:0.72rem;font-weight:600;font-family:inherit;">'+esc(f.naam)+'</button>').join('') +
+      (d.functies||[]).map(f => '<button class="js-ghf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--line)')+';background:'+(f.aan?'#12321f':'var(--card2)')+';color:'+(f.aan?'#7EE0A3':'var(--soft)')+';border-radius:0;padding:0.32rem 0.7rem;font-size:0.72rem;font-weight:600;font-family:inherit;">'+esc(f.naam)+'</button>').join('') +
       '</div>';
     let h = funcBlok(T('gh.functies','Uw functies (aan/uit)'), d.functies||[], ghChips);
     // binnenkomende orders
@@ -81,12 +81,12 @@
     h += ink.open.length ? ink.open.map(o => ghOrderKaart(o, true)).join('') : '<p class="sub">'+T('gh.geenorders','Geen openstaande bestellingen.')+'</p>';
     if (ink.afgerond.length) h += '<details class="h-mt60"><summary class="sub" style="cursor:pointer;">'+T('gh.afgerond','Afgerond')+' ('+ink.afgerond.length+')</summary>'+ink.afgerond.map(o=>ghOrderKaart(o,false)).join('')+'</details>';
     // assortiment
-    h += '<div class="st-sec h-mt100">'+T('gh.assortiment','Assortiment')+' <button class="js-ghnew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('gh.nieuw','Nieuw product')+'</button></div>';
+    h += '<div class="st-sec h-mt100">'+T('gh.assortiment','Assortiment')+' <button class="js-ghnew" style="float:right;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.25rem 0.6rem;font-size:0.72rem;font-weight:600;font-family:inherit;">+ '+T('gh.nieuw','Nieuw product')+'</button></div>';
     h += '<div id="ghForm"></div>';
     h += '<div class="h-mt50">'+(d.producten||[]).map(p =>
       '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);">'+
       '<div class="h-flex1"><b style="font-size:0.85rem;">'+esc(p.naam)+'</b><span class="sub"> · '+esc(p.categorie)+' · '+T('gh.per','per')+' '+esc(p.eenheid)+'</span>'+
       '<div class="sub">'+T('gh.inkoop','inkoop')+' '+eur(p.inkoopPrijs)+' · '+T('gh.consument','consument')+' '+eur(p.consumentPrijs)+' · '+T('gh.voorraad','voorraad')+' '+p.voorraad+(p.actief?'':' · <span style="color:var(--gold);">'+T('gh.uit','uit')+'</span>')+'</div></div>'+
-      '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
+      '<button class="js-ghedit" data-id="'+p.id+'" style="background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.3rem 0.6rem;color:var(--txt);font-size:0.72rem;font-family:inherit;">'+T('gh.bewerk','Bewerk')+'</button></div>').join('');
     el.innerHTML = h;
     wireFuncBlok(el);

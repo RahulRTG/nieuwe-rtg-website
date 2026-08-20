@@ -1,13 +1,13 @@
 /* RTG Office: de gedeelde enterprise-laag rond ieder product. */
 .office-signalen{grid-template-columns:repeat(4,minmax(5.5rem,1fr));}
 .office-presence{display:flex;align-items:center;gap:.42rem;min-width:6.4rem;background:transparent;border:1px solid var(--line);
-  color:var(--soft);border-radius:999px;padding:.38rem .62rem;font-size:.68rem;white-space:nowrap;}
+  color:var(--soft);border-radius:0;padding:.38rem .62rem;font-size:.68rem;white-space:nowrap;}
 .office-presence:hover{border-color:rgba(201,162,75,.38);color:var(--txt);}
 .office-presence>span:first-child{width:.43rem;height:.43rem;border-radius:50%;background:var(--groen);
   box-shadow:0 0 9px rgba(105,184,145,.45);flex:none;}
 .office-presence[data-typt="1"]>span:first-child{background:var(--gold);box-shadow:0 0 10px rgba(201,162,75,.55);}
 .office-docmeta{display:inline-flex;gap:.3rem;margin-left:.4rem;vertical-align:middle;}
-.office-docmeta i{font-style:normal;border:1px solid var(--line);border-radius:999px;padding:.08rem .34rem;
+.office-docmeta i{font-style:normal;border:1px solid var(--line);border-radius:0;padding:.08rem .34rem;
   font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--zacht);}
 .office-docmeta i[data-klasse="vertrouwelijk"]{border-color:rgba(201,162,75,.28);color:#D8BF80;}
 .office-docmeta i[data-klasse="strikt"]{border-color:rgba(222,110,146,.35);color:#E8A1B7;}
@@ -22,7 +22,7 @@
 .office-samenstand>div{padding:1rem 1.4rem;min-height:4.6rem;}.office-samenstand>div+div{border-left:1px solid var(--line);}
 .office-lab{display:block;color:var(--zacht);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.4rem;}
 #samenAanwezig,#samenBeleid{display:flex;flex-wrap:wrap;gap:.35rem;color:var(--soft);font-size:.75rem;}
-.office-persoon,.office-policychip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--line);padding:.28rem .5rem;border-radius:999px;}
+.office-persoon,.office-policychip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--line);padding:.28rem .5rem;border-radius:0;}
 .office-persoon:before{content:"";width:.36rem;height:.36rem;border-radius:50%;background:var(--groen);}
 .office-persoon[data-stand="typt"]:before{background:var(--gold);box-shadow:0 0 7px rgba(201,162,75,.45);}
 .office-opmerkingen,.office-beheer{padding:1.15rem 1.4rem 1.35rem;}.office-beheer{border-top:1px solid var(--line);}
@@ -32,7 +32,7 @@
 .office-anker{width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid var(--acc);
   color:var(--soft);padding-left:.5rem;font-size:.7rem;}
 #opmerkingForm textarea,#opmerkingForm input,.office-beheervelden input,.office-beheervelden select{width:100%;background:var(--veld);
-  border:1px solid var(--line);border-radius:3px;color:var(--txt);font:inherit;font-size:.78rem;padding:.52rem .6rem;}
+  border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.78rem;padding:.52rem .6rem;}
 .office-opmerkingmeta{display:grid;grid-template-columns:1fr 12rem auto;gap:.5rem;align-items:end;}
 .office-opmerkingmeta label,.office-beheervelden label{display:grid;gap:.3rem;color:var(--zacht);font-size:.64rem;}
 .office-opmerkinglijst{display:grid;margin-top:.65rem;}.office-opmerking{display:grid;grid-template-columns:1fr auto;gap:.7rem;padding:.8rem 0;border-bottom:1px solid var(--line);}

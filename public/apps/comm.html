@@ -50,7 +50,7 @@
   .lijst-kop h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.35rem;letter-spacing:-.01em;}
   .zoekrij{display:flex;gap:.5rem;margin-top:.7rem;}
   .zoekrij input{flex:1;min-width:0;background:var(--rtg-card);border:1px solid var(--rtg-line);
-    border-radius:999px;padding:.5rem .9rem;color:var(--rtg-txt);font:inherit;font-size:.85rem;outline:none;}
+    border-radius:0;padding:.5rem .9rem;color:var(--rtg-txt);font:inherit;font-size:.85rem;outline:none;}
   .zoekrij input:focus{border-color:var(--rtg-goud);}
   .nieuwknop{flex-shrink:0;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--rtg-line);
     background:var(--rtg-card);color:var(--rtg-txt);font-size:1.1rem;cursor:pointer;line-height:1;}
@@ -81,7 +81,7 @@
     text-overflow:ellipsis;white-space:nowrap;}
   .gsp .rechts{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;}
   .gsp time{font-size:.66rem;color:var(--rtg-muted);font-variant-numeric:tabular-nums;}
-  .telbol{min-width:1.15rem;height:1.15rem;padding:0 .3rem;border-radius:999px;background:var(--rtg-rood,#7F1634);
+  .telbol{min-width:1.15rem;height:1.15rem;padding:0 .3rem;border-radius:0;background:var(--rtg-rood,#7F1634);
     color:#fff;font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
   .merkje{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-goud);}
   .leeg{padding:2.5rem 1.2rem;text-align:center;color:var(--rtg-muted);font-size:.85rem;line-height:1.6;}
@@ -104,14 +104,14 @@
   .draad-kop .wie{min-width:0;flex:1;}
   .draad-kop .wie b{display:block;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .draad-kop .wie span{display:block;font-size:.72rem;color:var(--rtg-muted);}
-  .kopknop{background:none;border:1px solid var(--rtg-line);border-radius:999px;width:2.1rem;height:2.1rem;
+  .kopknop{background:none;border:1px solid var(--rtg-line);border-radius:0;width:2.1rem;height:2.1rem;
     display:flex;align-items:center;justify-content:center;color:var(--rtg-txt);cursor:pointer;flex-shrink:0;}
   .kopknop:hover{border-color:var(--rtg-goud);color:var(--rtg-goud);}
   .kopknop svg{width:1.05rem;height:1.05rem;stroke:currentColor;fill:none;stroke-width:1.7;
     stroke-linecap:round;stroke-linejoin:round;}
 
   .bubbels{flex:1;min-height:0;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.45rem;}
-  .bub{max-width:min(34rem,82%);padding:.5rem .8rem;border-radius:1rem;font-size:.88rem;line-height:1.5;
+  .bub{max-width:min(34rem,82%);padding:.5rem .8rem;border-radius:0;font-size:.88rem;line-height:1.5;
     white-space:pre-wrap;word-wrap:break-word;position:relative;}
   .bub.van-ander{align-self:flex-start;background:var(--rtg-card);border:1px solid var(--rtg-line);
     border-bottom-left-radius:.3rem;}
@@ -124,7 +124,7 @@
   .bub .onder{display:flex;align-items:center;gap:.4rem;margin-top:.25rem;
     font-size:.62rem;color:var(--rtg-muted);}
   .bub .reacties{display:flex;gap:.25rem;margin-top:.3rem;flex-wrap:wrap;}
-  .bub .reacties button{background:rgba(255,255,255,.06);border:1px solid var(--rtg-line);border-radius:999px;
+  .bub .reacties button{background:rgba(255,255,255,.06);border:1px solid var(--rtg-line);border-radius:0;
     padding:.05rem .38rem;font:inherit;font-size:.7rem;color:inherit;cursor:pointer;}
   .bub .reacties button.mijne{border-color:var(--rtg-goud);}
   /* De acties horen bij het bericht waar je op staat, niet bij alle vijftig.
@@ -152,7 +152,7 @@
   .antwoordop button{margin-left:auto;background:none;border:0;color:var(--rtg-muted);cursor:pointer;font-size:.9rem;}
   .invoerrij{display:flex;align-items:flex-end;gap:.5rem;}
   .invoerrij textarea{flex:1;min-width:0;resize:none;max-height:8rem;background:var(--rtg-card);
-    border:1px solid var(--rtg-line);border-radius:1.1rem;padding:.55rem .9rem;color:var(--rtg-txt);
+    border:1px solid var(--rtg-line);border-radius:0;padding:.55rem .9rem;color:var(--rtg-txt);
     font:inherit;font-size:.88rem;line-height:1.45;outline:none;}
   .invoerrij textarea:focus{border-color:var(--rtg-goud);}
   .stuurknop{flex-shrink:0;width:2.3rem;height:2.3rem;border-radius:50%;border:0;background:var(--rtg-goud);
@@ -160,7 +160,7 @@
   .stuurknop svg{width:1.1rem;height:1.1rem;stroke:#1C1608;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .stuurknop:disabled{opacity:.45;cursor:default;}
   .hulprij{display:flex;gap:.4rem;flex-wrap:wrap;padding:.5rem .1rem 0;}
-  .hulprij button{background:none;border:1px solid var(--rtg-line);border-radius:999px;padding:.2rem .6rem;
+  .hulprij button{background:none;border:1px solid var(--rtg-line);border-radius:0;padding:.2rem .6rem;
     font:inherit;font-size:.7rem;color:var(--rtg-muted);cursor:pointer;}
   .hulprij button:hover{border-color:var(--rtg-goud);color:var(--rtg-txt);}
   .wetregel{font-size:.62rem;color:var(--rtg-muted);text-align:center;padding-top:.45rem;}
@@ -170,16 +170,16 @@
     display:none;align-items:flex-end;justify-content:center;z-index:60;}
   .blad-waas.open{display:flex;}
   .blad{width:min(28rem,100%);max-height:80vh;overflow-y:auto;background:linear-gradient(180deg,#151312,#0C0C0B);
-    border:1px solid var(--rtg-line);border-radius:1.2rem 1.2rem 0 0;
+    border:1px solid var(--rtg-line);border-radius:0;
     padding:1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);}
-  @media (min-width:640px){ .blad-waas{align-items:center;} .blad{border-radius:1.2rem;} }
+  @media (min-width:640px){ .blad-waas{align-items:center;} .blad{border-radius:0;} }
   .blad h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blad p.uit{color:var(--rtg-muted);font-size:.78rem;line-height:1.55;margin-bottom:.8rem;}
   .blad .contact{display:flex;align-items:center;gap:.6rem;width:100%;background:none;border:0;
     border-top:1px solid var(--rtg-line);padding:.7rem .1rem;color:inherit;font:inherit;text-align:left;cursor:pointer;}
   .blad .contact:hover{color:var(--rtg-goud);}
   .blad pre{white-space:pre-wrap;font:inherit;font-size:.85rem;line-height:1.6;color:var(--rtg-txt);}
-  .blad .sluit{background:none;border:1px solid var(--rtg-line);border-radius:999px;padding:.4rem .9rem;
+  .blad .sluit{background:none;border:1px solid var(--rtg-line);border-radius:0;padding:.4rem .9rem;
     font:inherit;font-size:.78rem;color:var(--rtg-txt);cursor:pointer;margin-top:.9rem;}
 </style>
 </head>

@@ -9,15 +9,15 @@
   var stijl = document.createElement('style');
   stijl.textContent =
     '.labkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.6rem;}' +
-    '.labkpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .85rem;}' +
+    '.labkpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;}' +
     '.labkpi b{display:block;font-family:"Bodoni Moda",serif;font-weight:500;font-size:1.5rem;line-height:1.1;}' +
     '.labkpi span{font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}' +
     '.labkpi.let b{color:var(--gold);}' +
     '.faseband{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin:.3rem 0 .1rem;}' +
-    '.faseband .fs{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;color:var(--soft,rgba(244,241,236,0.55));}' +
+    '.faseband .fs{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.1rem .5rem;color:var(--soft,rgba(244,241,236,0.55));}' +
     '.faseband .fs.was{color:var(--gold);border-color:var(--gold);}' +
     '.faseband .fs.nu{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}' +
-    '.labmeld{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%) translateY(1rem);background:#000;color:var(--txt,#F4F1EC);border:1px solid var(--gold);border-radius:12px;padding:.6rem 1.1rem;font-size:.86rem;z-index:80;opacity:0;transition:opacity .25s,transform .25s;max-width:min(92vw,30rem);text-align:center;}' +
+    '.labmeld{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%) translateY(1rem);background:#000;color:var(--txt,#F4F1EC);border:1px solid var(--gold);border-radius:0;padding:.6rem 1.1rem;font-size:.86rem;z-index:80;opacity:0;transition:opacity .25s,transform .25s;max-width:min(92vw,30rem);text-align:center;}' +
     '.labmeld.aan{opacity:1;transform:translateX(-50%) translateY(0);}';
   document.head.appendChild(stijl);
 

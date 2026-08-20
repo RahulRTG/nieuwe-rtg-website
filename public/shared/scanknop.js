@@ -14,18 +14,18 @@
       '.rtg-scan-ov{position:fixed;inset:0;z-index:99999;background:#0C0C0B;display:flex;flex-direction:column;color:#fff;font-family:Inter,system-ui,sans-serif;}',
       '.rtg-scan-top{display:flex;align-items:center;gap:.6rem;padding:1rem 1.1rem;padding-top:calc(1rem + env(safe-area-inset-top,0));}',
       '.rtg-scan-top h3{font-size:1rem;margin:0;font-weight:600;flex:1;}',
-      '.rtg-scan-x{background:rgba(255,255,255,.12);border:none;color:#fff;width:38px;height:38px;border-radius:999px;font-size:1.2rem;cursor:pointer;line-height:1;}',
+      '.rtg-scan-x{background:rgba(255,255,255,.12);border:none;color:#fff;width:38px;height:38px;border-radius:0;font-size:1.2rem;cursor:pointer;line-height:1;}',
       '.rtg-scan-stage{position:relative;flex:1;overflow:hidden;background:#000;}',
       '.rtg-scan-stage video{width:100%;height:100%;object-fit:cover;}',
       '.rtg-scan-frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}',
-      '.rtg-scan-frame div{width:min(66vw,320px);aspect-ratio:1;border:2px solid rgba(255,255,255,.85);border-radius:22px;box-shadow:0 0 0 100vmax rgba(0,0,0,.45);}',
+      '.rtg-scan-frame div{width:min(66vw,320px);aspect-ratio:1;border:2px solid rgba(255,255,255,.85);border-radius:0;box-shadow:0 0 0 100vmax rgba(0,0,0,.45);}',
       '.rtg-scan-hint{padding:.9rem 1.2rem .3rem;text-align:center;font-size:.86rem;color:#DEDBD5;}',
       '.rtg-scan-hint a{color:#C23A5E;cursor:pointer;text-decoration:underline;}',
       '.rtg-scan-status{padding:0 1.2rem;text-align:center;font-size:.78rem;color:#C23A5E;min-height:1em;}',
       '.rtg-scan-hand{padding:.7rem 1.1rem 1.4rem;padding-bottom:calc(1.4rem + env(safe-area-inset-bottom,0));display:none;gap:.5rem;}',
       '.rtg-scan-hand.aan{display:flex;}',
-      '.rtg-scan-hand input{flex:1;background:#161615;border:1px solid #3a3a38;border-radius:12px;padding:.7rem .8rem;color:#fff;font-size:.9rem;font-family:inherit;}',
-      '.rtg-scan-hand button{background:#7F1634;border:none;color:#fff;border-radius:12px;padding:.7rem 1.1rem;font-weight:600;font-family:inherit;cursor:pointer;}'
+      '.rtg-scan-hand input{flex:1;background:#161615;border:1px solid #3a3a38;border-radius:0;padding:.7rem .8rem;color:#fff;font-size:.9rem;font-family:inherit;}',
+      '.rtg-scan-hand button{background:#7F1634;border:none;color:#fff;border-radius:0;padding:.7rem 1.1rem;font-weight:600;font-family:inherit;cursor:pointer;}'
     ].join('');
     doc.head.appendChild(st);
   }

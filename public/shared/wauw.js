@@ -52,7 +52,7 @@
   function meld(tekst) {
     var d = document.createElement('div');
     d.style.cssText = 'position:fixed;left:50%;bottom:4.5rem;transform:translateX(-50%);background:#0C0C0B;color:#FFF;' +
-      'padding:0.55rem 1rem;border-radius:999px;font-size:0.78rem;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,0.35);';
+      'padding:0.55rem 1rem;border-radius:0;font-size:0.78rem;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,0.35);';
     d.textContent = tekst;
     document.body.appendChild(d);
     setTimeout(function () { d.remove(); }, 2200);

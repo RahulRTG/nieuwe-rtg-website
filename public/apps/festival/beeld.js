@@ -67,8 +67,9 @@
         var stukjes = [b.gemeten + (b.gemeten === 1 ? ' plek gemeten' : ' plekken gemeten')];
         if ((b.ongemeten || []).length) {
           var n = (b.ongemeten || []).length;
-          stukjes.push(n + (n === 1 ? ' plek met een drempel' : ' plekken met een drempel')
-            + ' worden niet gemeten: ' + b.ongemeten.map(function (x) { return x.naam; }).join(', '));
+          stukjes.push(n + (n === 1 ? ' plek met een drempel wordt niet gemeten: '
+            : ' plekken met een drempel worden niet gemeten: ')
+            + b.ongemeten.map(function (x) { return x.naam; }).join(', '));
         }
         onge.textContent = stukjes.join(' · ') + '.';
         F.zetStand();

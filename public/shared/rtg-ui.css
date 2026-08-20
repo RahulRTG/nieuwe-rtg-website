@@ -85,8 +85,8 @@
   /* De inkt die OP het accent leesbaar is; zie shared/dagkleur.css. Zonder
      dagkleur valt hij terug op wit, dat op de bordeaux-terugval 5,17:1 haalt. */
   --rtg-acc-inkt:var(--dag-inkt, #FFFFFF);
-  --rtg-rond:18px;      /* kaarten */
-  --rtg-rond-klein:12px; /* velden en meldingen */
+  --rtg-rond:0;      /* kaarten */
+  --rtg-rond-klein:0; /* velden en meldingen */
 }
 
 /* ------------------------------------------------------------ de pagina ---*/
@@ -108,7 +108,7 @@
 /* ------------------------------------------------------- de sectiekaart ---*/
 .rtg-groep{
   background:var(--rtg-card);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;
+  border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;
 }
 .rtg-groep > h2{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
@@ -132,7 +132,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
 
 /* ------------------------------------------------------------- knoppen ----*/
 .rtg-knop{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
   transition:border-color .15s, background .15s;
 }
@@ -147,7 +147,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
 
 /* --------------------------------------------------------------- velden ---*/
 .rtg-veld{
-  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;width:100%;
   transition:border-color .15s;
 }
@@ -162,12 +162,12 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    dan kondigt een schermlezer hem als schakelaar aan en leest hij de stand. */
 .rtg-sw{position:relative;flex:none;width:3.1rem;height:1.8rem;background:none;border:none;padding:0;cursor:pointer;}
 .rtg-sw .track{position:absolute;inset:0;background:var(--rtg-card2);border:1px solid var(--rtg-line);
-  border-radius:999px;transition:background .15s,border-color .15s;}
+  border-radius:0;transition:background .15s,border-color .15s;}
 .rtg-sw .dot{position:absolute;top:.22rem;left:.24rem;width:1.28rem;height:1.28rem;border-radius:50%;
   background:var(--rtg-soft);transition:transform .15s,background .15s;}
 .rtg-sw[aria-checked="true"] .track{background:color-mix(in srgb,var(--rtg-acc) 34%,transparent);border-color:var(--rtg-acc);}
 .rtg-sw[aria-checked="true"] .dot{transform:translateX(1.28rem);background:var(--rtg-acc);}
-.rtg-sw:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;border-radius:999px;}
+.rtg-sw:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;border-radius:0;}
 .rtg-sw:disabled{cursor:not-allowed;opacity:.45;}
 
 /* ---------------------------------------------------------------- merk -----
@@ -176,7 +176,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
 .rtg-merk{
   display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
   font-weight:700;color:var(--rtg-acc);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
-  border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
+  border-radius:0;padding:.08rem .45rem;vertical-align:middle;
 }
 .rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
 .rtg-merk.goed{color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
@@ -186,7 +186,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    niet, dan hoort daar een zin te staan: een knop die stil terugspringt is
    erger dan een foutmelding. */
 .rtg-melder{
-  min-height:0;overflow:hidden;font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+  min-height:0;overflow:hidden;font-size:.85rem;line-height:1.5;border-radius:0;
   padding:0 .9rem;margin-bottom:0;border:1px solid transparent;transition:opacity .2s;opacity:0;
 }
 .rtg-melder.zien{min-height:auto;padding:.65rem .9rem;margin-bottom:1rem;opacity:1;}
@@ -251,7 +251,7 @@ body.rtg-stijl .kaart,body.rtg-stijl .sec,body.rtg-stijl .item,
 body.rtg-stijl .paneel,body.rtg-stijl .groep,body.rtg-stijl .art,
 body.rtg-stijl .doc,body.rtg-stijl .blok,body.rtg-stijl .vak{
   background:var(--rtg-card);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;}
 body.rtg-stijl .kaart > h2,body.rtg-stijl .sec > h2,body.rtg-stijl .groep > h2,
 body.rtg-stijl main > h2{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
@@ -269,7 +269,7 @@ body.rtg-stijl .lbl{display:block;font-size:.72rem;letter-spacing:.1em;text-tran
   color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
 
 /* knoppen: pillen, met goud voor de primaire actie */
-body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
   transition:border-color .15s, background .15s;}
 body.rtg-stijl .knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
@@ -297,7 +297,7 @@ body.rtg-stijl .knop.klein{font-size:.72rem;padding:.28rem .7rem;}
 /* velden */
 body.rtg-stijl .veld,body.rtg-stijl input:not([type=range]):not([type=checkbox]):not([type=radio]),
 body.rtg-stijl select,body.rtg-stijl textarea{
-  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;transition:border-color .15s;}
 body.rtg-stijl .veld:focus,body.rtg-stijl input:focus,body.rtg-stijl select:focus,body.rtg-stijl textarea:focus{
   outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
@@ -305,7 +305,7 @@ body.rtg-stijl input::placeholder,body.rtg-stijl textarea::placeholder{color:var
 
 /* leegte en meldingen */
 body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
-body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:0;
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
 body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
@@ -321,7 +321,7 @@ body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,tr
 body.rtg-stijl .kpis{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
 body.rtg-stijl .kpi{
   flex:1;min-width:4.5rem;background:var(--rtg-card2);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond-klein);padding:.7rem .8rem;
+  border-radius:0;padding:.7rem .8rem;
 }
 body.rtg-stijl .kpi .v,body.rtg-stijl .kpi b{
   display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.1;}
@@ -334,7 +334,7 @@ body.rtg-stijl .tabs,body.rtg-stijl .chips{display:flex;gap:.45rem;flex-wrap:wra
    dezelfde rij en hoort er dus ook hetzelfde uit te zien */
 body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil,
 body.rtg-stijl .tabs > button,body.rtg-stijl .chips > button{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.78rem;padding:.42rem .95rem;cursor:pointer;
   transition:border-color .15s, background .15s;
 }
@@ -347,7 +347,7 @@ body.rtg-stijl .tabs > button.aan,body.rtg-stijl .chips > button.aan{
 /* een klein statuslabel achter een naam */
 body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
   display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-  color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:999px;padding:.08rem .45rem;
+  color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:0;padding:.08rem .45rem;
   vertical-align:middle;}
 body.rtg-stijl .status.ok,body.rtg-stijl .status.goed,body.rtg-stijl .badge.ok{
   color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
@@ -359,7 +359,7 @@ body.rtg-stijl .titel,body.rtg-stijl .sectiekop,body.rtg-stijl .st-sec{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;margin:1.2rem 0 .4rem;}
 body.rtg-stijl .inlog,body.rtg-stijl .login{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond);
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   padding:1.4rem 1.3rem;max-width:26rem;margin:2.5rem auto;}
 body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-bottom:.4rem;}
 
@@ -372,7 +372,7 @@ body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-botto
 body.rtg-stijl .skip{
   position:absolute;left:.6rem;top:-3rem;z-index:120;
   background:var(--rtg-goud);color:#1C1608;padding:.5rem .9rem;
-  border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
+  border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;
   transition:top .15s;}
 body.rtg-stijl .skip:focus{top:0;}
 

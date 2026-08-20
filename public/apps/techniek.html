@@ -16,25 +16,25 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:var(--gold);}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .wrap{max-width:960px;margin:0 auto;padding:1.6rem 1.2rem 4rem;}
   header.kop{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;}
   .kop h1{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;}
   .kop .sub{font-size:.8rem;color:var(--soft);}
-  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:.55rem .9rem;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit;}
   .knop.grijs{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .knop.rood{background:#3a1420;color:#F4B8C6;border:1px solid var(--rood);}
   .knop.klein{padding:.35rem .6rem;font-size:.75rem;}
-  .veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;color:var(--txt);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;}
+  .veld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;color:var(--txt);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;}
   .login{max-width:22rem;margin:6vh auto 0;}
   .login h1{font-size:1.3rem;margin-bottom:.3rem;}
   .login p{color:var(--soft);font-size:.85rem;margin-bottom:1.1rem;}
   .fout{color:var(--rood);font-size:.82rem;min-height:1.1rem;margin-top:.2rem;}
   /* de motorkap-band: grootboek/motor/bank op een oogopslag, boven de tellers */
-  .motorkap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--card);}
+  .motorkap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;padding:.7rem 1rem;border:1px solid var(--line);border-radius:0;background:var(--card);}
   .motorkap .mk-titel{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;}
   .motorkap .mk-pil{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);}
   .motorkap .mk-stip{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
@@ -42,7 +42,7 @@
   .motorkap .mk-stip.waarschuwing{background:var(--oranje);box-shadow:0 0 6px var(--oranje);}
   .motorkap .mk-stip.fout{background:var(--rood);box-shadow:0 0 6px var(--rood);}
   .telrij{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap;}
-  .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .tel{flex:1;min-width:7rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}
   .tel .n{font-size:1.5rem;font-weight:700;}
   .tel .l{font-size:.72rem;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;}
   .sec{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.6rem 0 .7rem;}
@@ -56,15 +56,15 @@
   .rij .code{font-size:.68rem;color:var(--soft);font-family:ui-monospace,monospace;margin-left:.5rem;}
   .rij .detail{font-size:.82rem;color:var(--muted);margin-top:.15rem;}
   .rij .mid{flex:1;min-width:0;}
-  .advies{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem;margin-top:.5rem;font-size:.82rem;white-space:pre-wrap;color:var(--txt);}
+  .advies{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;margin-top:.5rem;font-size:.82rem;white-space:pre-wrap;color:var(--txt);}
   .zeker{display:flex;align-items:center;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line);}
   .zeker:first-child{border-top:none;}
   .zeker .mid{flex:1;}
-  .badge{font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;}
+  .badge{font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:0;}
   .badge.aan{background:#12321f;color:#7EE0A3;}
   .badge.uit{background:#3a1420;color:#F4B8C6;}
   .muted{color:var(--soft);font-size:.8rem;}
-  .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+  .toast{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
   /* Techniek houdt zijn eigen schakelaar (Statusbord / De Wacht / Controlekamer),
      maar draagt hem in de stijl van het deelmenu: een rustige balk met kleine
      kapitalen en een gouden streep onder het deel waar u staat. Zo is het huis
@@ -93,16 +93,16 @@
   .fn{display:flex;align-items:flex-start;gap:.8rem;padding:.75rem 0;border-top:1px solid var(--line);}
   .fn:first-child{border-top:none;}
   .fn .mid{flex:1;min-width:0;}
-  .schakel{border:1px solid var(--line);border-radius:999px;padding:.3rem .8rem;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit;flex-shrink:0;min-width:5.4rem;}
+  .schakel{border:1px solid var(--line);border-radius:0;padding:.3rem .8rem;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit;flex-shrink:0;min-width:5.4rem;}
   .schakel.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
   .schakel.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
   .schakel:disabled{opacity:.5;cursor:default;}
   .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:0 0 1rem;}
-  .chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.4rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.4rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;}
   .chip[aria-pressed="true"]{color:#0C0C0B;background:var(--gold);border-color:var(--gold);}
   .chip .dot{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;}
   .pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
-  .pill{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--line);border-radius:999px;padding:.22rem .55rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--muted);}
+  .pill{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--line);border-radius:0;padding:.22rem .55rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--muted);}
   .pill.aan{background:#12321f;color:#7EE0A3;border-color:#1f5637;}
   .pill.uit{background:#3a1420;color:#F4B8C6;border-color:var(--rood);}
   .pill:disabled{opacity:.5;cursor:default;}
@@ -110,13 +110,13 @@
   .aibox textarea{min-height:3.2rem;resize:vertical;}
   .voorstelrij{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.82rem;}
   .voorstelrij:first-child{border-top:none;}
-  .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);}
+  .voorstelrij .tag{font-size:.68rem;font-weight:700;padding:.12rem .45rem;border-radius:0;background:var(--card2);border:1px solid var(--line);}
   .bp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;}
-  .bp-kaart{border:1px solid var(--line);border-radius:14px;padding:.9rem;background:var(--card);}
+  .bp-kaart{border:1px solid var(--line);border-radius:0;padding:.9rem;background:var(--card);}
   .bp-kaart h3{margin:0 0 .25rem;font-size:1rem;}.bp-regel{font-size:.75rem;color:var(--muted);padding:.14rem 0;}
   .bp-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}.bp-fout{border-left:3px solid #C9A24B;padding:.45rem .65rem;margin:.4rem 0;font-size:.78rem;background:var(--card);}
   @media(max-width:760px){.bp-grid{grid-template-columns:1fr;}}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
   .incident-label{display:block;margin-top:.8rem;}.tech-inline-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}.tech-inline-row.spaced{margin-top:.9rem;}.incident-functie{width:auto;max-width:18rem;margin:0;}.controle-zoek{flex:1;min-width:12rem;margin:0;}.controle-resultaat{max-height:24rem;overflow:auto;}.controle-audit{margin-top:.8rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

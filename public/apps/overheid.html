@@ -21,7 +21,7 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
   /* het tabmenu van het loket houdt zijn eigen werking, maar draagt de stijl
      van het deelmenu: een balk met een gouden streep onder het open deel.
@@ -37,20 +37,20 @@
   body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;}
   section.paneel.aan{display:block;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-bottom:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-bottom:.8rem;}
   .lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;}
-  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
   textarea.veld{resize:vertical;min-height:3rem;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0;}
-  .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
+  .chip{background:var(--bg);border:1px solid var(--line);border-radius:0;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
   .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
-  .item{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card2);}
+  .item{border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;margin-bottom:.55rem;background:var(--card2);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
   .item .meta{font-size:.76rem;color:var(--soft);margin-top:.15rem;}
   .item.onge{border-color:var(--gold);}
-  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);margin-top:.3rem;text-transform:capitalize;}
+  .status{display:inline-block;font-size:.72rem;padding:.12rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);margin-top:.3rem;text-transform:capitalize;}
   .status.op{border-color:var(--green);color:var(--green);}
   .status.af{border-color:var(--burgundy);color:var(--burgundy);}
   .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
@@ -58,12 +58,12 @@
   .rij .veld{flex:1;min-width:8rem;}
   .bedrag{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-variant-numeric:tabular-nums;}
   .bedrag.terug{color:var(--green);} .bedrag.bij{color:var(--burgundy);}
-  .stemopt{display:flex;justify-content:space-between;align-items:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-bottom:.5rem;background:var(--card2);}
-  .balk{height:6px;border-radius:3px;background:var(--gold);margin-top:.35rem;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .stemopt{display:flex;justify-content:space-between;align-items:center;gap:.6rem;border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;margin-bottom:.5rem;background:var(--card2);}
+  .balk{height:6px;border-radius:0;background:var(--gold);margin-top:.35rem;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
-  .bad{display:inline-block;min-width:1.1rem;text-align:center;background:var(--burgundy);color:#fff;border-radius:999px;font-size:.68rem;padding:.02rem .35rem;margin-left:.3rem;}
+  .bad{display:inline-block;min-width:1.1rem;text-align:center;background:var(--burgundy);color:#fff;border-radius:0;font-size:.68rem;padding:.02rem .35rem;margin-left:.3rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -239,7 +239,7 @@ if (!TOKEN) {
   // Phishing-bestendig: de code leeft twee minuten en werkt maar een keer.
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Inloggen met RTG iD</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Geen wachtwoord, geen sms. MijnOverheid vraagt alleen uw codenaam en een bewijs 18-plus; meer krijgt het loket niet.</p>'+
-    '<p class="h-mt100"><button id="idStart" style="background:var(--goud,#C9A24B);color:#0C0C0B;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;">Toon koppelcode</button></p>'+
+    '<p class="h-mt100"><button id="idStart" style="background:var(--goud,#C9A24B);color:#0C0C0B;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;">Toon koppelcode</button></p>'+
     '<div id="idFlow" style="display:none;margin-top:1rem;">'+
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:2rem;letter-spacing:.15em;" id="idCode"></div>'+
       '<p style="color:var(--muted);margin-top:.5rem;line-height:1.6;">Open <b>RTG iD</b> in de leden-app en voer deze code in; u ziet daar dat <b>MijnOverheid</b> de aanvrager is. De code leeft twee minuten.</p>'+
@@ -559,18 +559,18 @@ if (TOKEN) start();
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. doe mijn aangifte met inkomen 48000" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
 </section>
 <style>
-.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
-.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:0;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
 .rahulsheet[hidden]{display:none;}
 .rahulkop{display:flex;align-items:center;justify-content:space-between;}
 .rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
 .rahulkop .terug{padding:.2rem .55rem;}
 .rahuluit{font-size:.86rem;color:var(--muted,#bbb);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
 .rahulrij{display:flex;gap:.4rem;}
-.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
-.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:0;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
 .rahulsug{display:flex;gap:.35rem;flex-wrap:wrap;}
-.rahulsug button{background:var(--bg,#0C0C0B);border:1px solid var(--gold);color:var(--txt,#eee);border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
+.rahulsug button{background:var(--bg,#0C0C0B);border:1px solid var(--gold);color:var(--txt,#eee);border-radius:0;padding:.3rem .7rem;font:inherit;font-size:.76rem;cursor:pointer;}
 </style>
 <script>(function(){
   var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}

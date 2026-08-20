@@ -17,13 +17,13 @@
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
   .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
   .keuzelijst{display:grid;gap:.7rem;}
-  .titelknop{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.85rem 1rem;
+  .titelknop{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.85rem 1rem;
     cursor:pointer;text-align:left;color:var(--txt);display:flex;gap:.9rem;align-items:center;}
   .titelknop:hover{border-color:var(--goud);}
   .titelknop svg{width:2.2rem;height:2.2rem;flex:0 0 auto;color:var(--goud);}
   .titelknop b{display:block;font-family:var(--serif);font-weight:500;font-size:1.05rem;}
   .titelknop span{color:var(--zacht);font-size:.85rem;}
-  .plaat{background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+  .plaat{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:1rem;margin-bottom:1rem;}
   .plaat svg{width:100%;height:9rem;display:block;color:var(--goud);}
   .tekst{font-family:var(--serif);font-size:1.35rem;line-height:1.7;margin:.4rem 0 1rem;}
   .onderrij{display:flex;gap:.6rem;justify-content:space-between;align-items:center;flex-wrap:wrap;}
@@ -46,7 +46,7 @@
   <div class="kaart blok" id="leesblok" hidden>
     <div class="plaat" id="plaat"></div>
     <div class="tekst" id="tekst" aria-live="polite"></div>
-    <div class="doen" id="napraat" hidden style="background:var(--paneel2);border:1px solid var(--lijn);border-radius:14px;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55;"></div>
+    <div class="doen" id="napraat" hidden style="background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1rem;margin-bottom:1rem;color:var(--zacht);font-size:.88rem;line-height:1.55;"></div>
     <div class="onderrij">
       <button class="knop grijs klein" id="terug" type="button">Vorige</button>
       <div class="paginaatje" id="paginaatje"></div>

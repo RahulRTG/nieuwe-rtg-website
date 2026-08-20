@@ -99,10 +99,10 @@ body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bo
 #rtgCommand.bank-open .cmd-bank{transform:none}
 /* de greep: een lade hoort te laten zien dat hij een lade is */
 .cmd-bank::before{content:"";position:sticky;top:0;align-self:center;width:38px;height:4px;flex:none;
-  margin:-0.55rem 0 .7rem;border-radius:4px;background:var(--rtg-line);}
+  margin:-0.55rem 0 .7rem;border-radius:0;background:var(--rtg-line);}
 .cmd-adem{height:1.2rem;flex:none;display:none}
 .cmd-nav{display:flex;flex-direction:column;gap:.22rem;flex:1}
-.cmd-nav button,.cmd-bankvoet button{width:100%;min-height:48px;border:0;border-left:2px solid transparent;border-radius:8px;
+.cmd-nav button,.cmd-bankvoet button{width:100%;min-height:48px;border:0;border-left:2px solid transparent;border-radius:0;
   color:var(--rtg-muted);background:transparent;text-align:left;padding:.55rem .72rem;font:500 .76rem/1.2 var(--rtg-interface);cursor:pointer;
   display:flex;align-items:center;gap:.7rem;transition:background 140ms,color 140ms,border-color 140ms;}
 .cmd-nav button:hover,.cmd-bankvoet button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}
@@ -274,7 +274,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-split{flex:0 0 9px;cursor:col-resize;position:relative;background:var(--onyx-diep,#050505);touch-action:none;z-index:4}
 .cmd-split::after{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--gold-tekst,#C0A544) 28%,var(--rtg-line));transition:background 160ms}
 .cmd-split:hover::after,.cmd-split.sleept::after{background:var(--gold-tekst,#C0A544)}
-.cmd-split i{position:absolute;left:50%;top:50%;width:5px;height:32px;transform:translate(-50%,-50%);border-radius:5px;background:var(--gold-tekst,#C0A544);opacity:.35}
+.cmd-split i{position:absolute;left:50%;top:50%;width:5px;height:32px;transform:translate(-50%,-50%);border-radius:0;background:var(--gold-tekst,#C0A544);opacity:.35}
 /* De lege werkvloer. `flex:1` staat er omdat .cmd-panes een flexrij is: zonder
    dat neemt dit vak alleen de breedte van zijn tekst en staat de uitnodiging
    tegen de linkerrand in plaats van in het midden van de ruimte. */
@@ -287,7 +287,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
    thuisindicator; op een breed scherm ligt hij als een los paneel linksonder. */
 .cmd-console{position:absolute;z-index:20;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:none;
   width:calc(100% - 24px);height:58px;
-  border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));border-radius:22px;
+  border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));border-radius:0;
   background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.018));
   backdrop-filter:blur(30px) saturate(1.08);-webkit-backdrop-filter:blur(30px) saturate(1.08);
   box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 -1px 0 rgba(192,165,68,.09) inset,0 14px 38px rgba(0,0,0,.24);
@@ -302,7 +302,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-console[data-blad="2"] .cmd-console-bladen{transform:translateX(-50%)}
 .cmd-console[data-blad="3"] .cmd-console-bladen{transform:translateX(-75%)}
 .cmd-blad{width:25%;flex:none;display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.4rem .65rem}
-.cmd-blad button{height:42px;min-width:44px;border:0;border-radius:14px;background:transparent;color:var(--rtg-muted);cursor:pointer;font:500 .76rem var(--rtg-interface)}
+.cmd-blad button{height:42px;min-width:44px;border:0;border-radius:0;background:transparent;color:var(--rtg-muted);cursor:pointer;font:500 .76rem var(--rtg-interface)}
 .cmd-blad button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.045)}
 .cmd-blad svg{width:20px;height:20px;stroke:currentColor;fill:none}
 .cmd-mond{width:56px!important}.cmd-mond canvas{display:block!important;width:45px!important;height:auto!important;margin:auto;pointer-events:none}
@@ -310,7 +310,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-console.scroll .cmd-blad{padding:0;gap:0}
 .cmd-console.scroll .cmd-mond{height:36px!important;width:72px!important}
 .cmd-console.scroll .cmd-mond canvas{width:34px!important}
-.cmd-ai-in{flex:1;min-width:0;height:42px!important;border:1px solid var(--rtg-line)!important;background:rgba(5,5,5,.42)!important;color:var(--rtg-txt)!important;border-radius:13px!important;padding:0 .9rem!important;font:400 .84rem var(--rtg-interface)!important;box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important}
+.cmd-ai-in{flex:1;min-width:0;height:42px!important;border:1px solid var(--rtg-line)!important;background:rgba(5,5,5,.42)!important;color:var(--rtg-txt)!important;border-radius:0!important;padding:0 .9rem!important;font:400 .84rem var(--rtg-interface)!important;box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important}
 .cmd-media-tekst{flex:1;min-width:0;text-align:center}
 .cmd-media-tekst b,.cmd-media-tekst small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmd-media-tekst b{font:400 1rem var(--rtg-display)}.cmd-media-tekst small{color:var(--rtg-soft);font-size:.65rem}
@@ -324,11 +324,11 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
 .cmd-chatregel{font-size:.82rem;line-height:1.5;padding:.65rem .8rem;border-left:2px solid var(--rtg-line)}
 .cmd-chatregel.mij{border-left-color:#7F1634;color:var(--rtg-txt)}
 .cmd-instellingen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
-.cmd-instellingen button{border:1px solid var(--rtg-line);background:var(--rtg-card);color:var(--rtg-muted);border-radius:10px;padding:.75rem;text-align:left;cursor:pointer}
-.cmd-kiezer{position:absolute;z-index:30;right:.75rem;top:58px;width:230px;padding:.55rem;border:1px solid var(--rtg-line);border-radius:14px;
+.cmd-instellingen button{border:1px solid var(--rtg-line);background:var(--rtg-card);color:var(--rtg-muted);border-radius:0;padding:.75rem;text-align:left;cursor:pointer}
+.cmd-kiezer{position:absolute;z-index:30;right:.75rem;top:58px;width:230px;padding:.55rem;border:1px solid var(--rtg-line);border-radius:0;
   background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 92%,transparent);backdrop-filter:blur(22px);box-shadow:0 20px 55px rgba(0,0,0,.5)}
 .cmd-kiezer[hidden]{display:none}
-.cmd-kiezer button{width:100%;border:0;border-radius:9px;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
+.cmd-kiezer button{width:100%;border:0;border-radius:0;background:transparent;color:var(--rtg-muted);padding:.7rem .75rem;text-align:left;font:500 .78rem var(--rtg-interface);cursor:pointer}
 .cmd-kiezer button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.05)}
 
 /* ------------------------------------ een blad op een telefoon: geen tabstrip --

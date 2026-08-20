@@ -31,7 +31,7 @@
       '<div class="tkc-who">' + T('hr2.inwerk.s', 'Elke nieuwe collega een vaste route: dag 1, week 1, maand 1. De medewerker vinkt mee vanuit de eigen app.') + '</div>';
     for (const t of open){
       const n = t.stappen.filter(s => s.klaar).length;
-      h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">' +
+      h += '<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">' +
         '<div class="st-row" style="padding:0;"><b>' + esc(t.name) + '</b><span class="sub">' + n + '/' + t.stappen.length + '</span></div>';
       for (const fase of ['dag1', 'week1', 'maand1']){
         const st2 = t.stappen.filter(s => s.fase === fase);

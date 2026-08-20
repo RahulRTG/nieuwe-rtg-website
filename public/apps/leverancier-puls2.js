@@ -5,8 +5,8 @@
    aangeroepen vanuit leverancier-puls.js met dezelfde ctx. */
 (function () {
   'use strict';
-  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
-  var STIL = 'background:none;border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
+  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
+  var STIL = 'background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
   var PRIO = { 1: ['NU', 'var(--gold)'], 2: ['VANDAAG', 'var(--soft)'], 3: ['WEEK', 'var(--soft)'] };
 
   function bind(el, ctx) {
@@ -26,7 +26,7 @@
     h += '<div class="sub" style="border-left:2px solid var(--gold);padding:0.3rem 0 0.3rem 0.7rem;margin-bottom:0.55rem;">' + esc(plan.advies) + '</div>';
     h += plan.taken.map(function (t2) {
       var p = PRIO[t2.prio] || PRIO[3];
-      return '<div style="display:flex;align-items:center;gap:0.55rem;border:1px solid var(--line);border-radius:12px;padding:0.45rem 0.6rem;margin-top:0.4rem;' + (t2.klaar ? 'opacity:0.45;' : '') + '">' +
+      return '<div style="display:flex;align-items:center;gap:0.55rem;border:1px solid var(--line);border-radius:0;padding:0.45rem 0.6rem;margin-top:0.4rem;' + (t2.klaar ? 'opacity:0.45;' : '') + '">' +
         '<button data-dpklaar="' + esc(t2.id) + '" aria-label="' + T('dp.vink', 'Afvinken') + '" style="' + STIL + 'min-width:2rem;' + (t2.klaar ? 'color:var(--gold);border-color:var(--gold);' : '') + '">' + (t2.klaar ? '✓' : '○') + '</button>' +
         '<span style="font-size:0.8rem;line-height:1.45;flex:1;' + (t2.klaar ? 'text-decoration:line-through;' : '') + '">' + esc(t2.tekst) + '</span>' +
         '<span class="sub" style="font-size:0.6rem;letter-spacing:0.1em;color:' + p[1] + ';">' + T('dp.p' + t2.prio, p[0]) + '</span></div>';
@@ -34,7 +34,7 @@
     if (blik && blik.dagen) {
       h += '<div class="st-sec h-mt110">' + T('dp.week', 'De week vooruit') + '</div>';
       h += '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.3rem;">' + blik.dagen.map(function (d2) {
-        return '<div style="border:1px solid var(--line);border-radius:10px;padding:0.4rem 0.2rem;text-align:center;' + (d2.n ? '' : 'opacity:0.45;') + '">' +
+        return '<div style="border:1px solid var(--line);border-radius:0;padding:0.4rem 0.2rem;text-align:center;' + (d2.n ? '' : 'opacity:0.45;') + '">' +
           '<span class="sub" style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;">' + esc(d2.dag) + '</span>' +
           '<b style="display:block;font-size:0.95rem;">' + d2.n + '</b></div>';
       }).join('') + '</div>';

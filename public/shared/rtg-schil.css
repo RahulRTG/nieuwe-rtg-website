@@ -41,7 +41,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   display:flex;flex-direction:column;
   background:var(--rtg-card);
   border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond-klein);
+  border-radius:0;
   overflow:hidden;
   box-shadow:0 1px 2px rgba(0,0,0,.4);
   transition:left var(--rtg-tijd-paneel) var(--rtg-veer),
@@ -67,7 +67,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 /* de dunne gouden streep: het signatuurelement van een actieve surface */
 .rtg-handle::before{
   content:"";position:absolute;left:.7rem;right:.7rem;top:0;height:2px;
-  background:transparent;border-radius:0 0 2px 2px;
+  background:transparent;border-radius:0;
   transition:background var(--rtg-tijd-kort) var(--rtg-veer);
 }
 .rtg-surface[data-actief] .rtg-handle::before{background:var(--rtg-goud);}
@@ -80,7 +80,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 .rtg-handle .rek{margin-left:auto;}
 .rtg-handle button{
   background:none;border:0;color:var(--rtg-soft);cursor:pointer;
-  padding:.1rem .3rem;border-radius:6px;font:inherit;font-size:.8rem;line-height:1;
+  padding:.1rem .3rem;border-radius:0;font:inherit;font-size:.8rem;line-height:1;
 }
 .rtg-handle button:hover,.rtg-handle button:focus-visible{color:var(--rtg-goud);}
 
@@ -102,7 +102,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   position:absolute;pointer-events:none;box-sizing:border-box;
   border:1px dashed rgba(201,162,75,.55);
   background:rgba(201,162,75,.07);
-  border-radius:var(--rtg-rond-klein);
+  border-radius:0;
   opacity:0;transition:opacity var(--rtg-tijd-kort) var(--rtg-veer);
 }
 .rtg-dok[data-aan]{opacity:1;}
@@ -114,7 +114,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   padding:1rem;
   background:var(--rtg-card);
   border:1px solid rgba(201,162,75,.28);
-  border-radius:var(--rtg-rond-klein);
+  border-radius:0;
   overflow:auto;
   transition:left var(--rtg-tijd-paneel) var(--rtg-veer),
              top var(--rtg-tijd-paneel) var(--rtg-veer),
@@ -129,12 +129,12 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   color:var(--rtg-soft);margin-bottom:.4rem;}
 .rtg-console .zoek{
   width:100%;background:rgba(255,255,255,.04);border:1px solid var(--rtg-line);
-  border-radius:8px;padding:.5rem .6rem;color:var(--rtg-txt);font:inherit;font-size:.84rem;
+  border-radius:0;padding:.5rem .6rem;color:var(--rtg-txt);font:inherit;font-size:.84rem;
 }
 .rtg-console .zoek::placeholder{color:var(--rtg-soft);}
 .rtg-console .rijtje{display:flex;flex-wrap:wrap;gap:.35rem;}
 .rtg-console .rijtje button{
-  background:none;border:1px solid var(--rtg-line);border-radius:99px;
+  background:none;border:1px solid var(--rtg-line);border-radius:0;
   padding:.25rem .6rem;color:var(--rtg-muted);font:inherit;font-size:.76rem;cursor:pointer;
 }
 .rtg-console .rijtje button:hover,.rtg-console .rijtje button:focus-visible{
@@ -159,7 +159,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .palet[hidden]{display:none;}
 .paletdoos{width:min(560px,92vw);background:var(--rtg-card,#151312);
-  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:0;
   overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);}
 .paletdoos input{width:100%;box-sizing:border-box;background:none;border:0;
   border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));
@@ -204,7 +204,7 @@ body[data-rtg-schil="standaard"] .console-werelden .bloknaam{display:none;}
 body[data-rtg-schil="standaard"] .console-werelden .rijtje{display:flex;flex-direction:column;gap:3px;}
 body[data-rtg-schil="standaard"] .console-werelden .rijtje button{
   position:relative;width:100%;min-height:48px;display:flex;align-items:center;text-align:left;
-  border:1px solid transparent;border-bottom-color:rgba(255,255,255,.045);border-radius:7px;
+  border:1px solid transparent;border-bottom-color:rgba(255,255,255,.045);border-radius:0;
   padding:.6rem .7rem .6rem 2.45rem;color:var(--rtg-muted);font-size:.78rem;white-space:nowrap;
 }
 body[data-rtg-schil="standaard"] .console-werelden .rijtje button::before{
@@ -236,7 +236,7 @@ body[data-rtg-schil="standaard"] .console-ruimtes .bloknaam{
 }
 body[data-rtg-schil="standaard"] .console-ruimtes .rijtje{display:flex;flex-direction:column;gap:3px;}
 body[data-rtg-schil="standaard"] .console-ruimtes .rijtje button{
-  width:100%;border-color:transparent;border-radius:6px;text-align:left;padding:.42rem .55rem;
+  width:100%;border-color:transparent;border-radius:0;text-align:left;padding:.42rem .55rem;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 body[data-rtg-schil="standaard"] .console-ruimtes .bewaar{
@@ -301,14 +301,14 @@ body[data-rtg-schil="standaard"] .rtg-tab[data-vangt]::after{
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .rtg-voorstel[data-aan]{display:flex;}
 .rtg-voorstel .doos{width:min(420px,92%);background:var(--rtg-card,#151312);
-  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:0;
   padding:1.2rem 1.3rem;box-shadow:0 24px 60px rgba(0,0,0,.5);
   font-family:var(--rtg-interface,Inter,system-ui,sans-serif);}
 .rtg-voorstel .wat{margin:0 0 .4rem;font-size:1rem;line-height:1.35;color:var(--rtg-txt,#F4F0E9);}
 .rtg-voorstel .wie{margin:0 0 1.1rem;font-size:.78rem;line-height:1.45;color:var(--rtg-soft,rgba(244,240,233,.56));}
 .rtg-voorstel .knoppen{display:flex;gap:.6rem;justify-content:flex-end;}
 .rtg-voorstel button{background:none;border:1px solid var(--rtg-line,rgba(255,255,255,.09));
-  border-radius:999px;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
+  border-radius:0;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
   color:var(--rtg-txt,#F4F0E9);}
 .rtg-voorstel button.vol{background:var(--rtg-goud,#C0A544);border-color:var(--rtg-goud,#C0A544);
   color:#1C1608;font-weight:600;}

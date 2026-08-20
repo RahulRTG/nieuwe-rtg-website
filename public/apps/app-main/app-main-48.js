@@ -2,12 +2,12 @@
     $('#payAllWrap').innerHTML = (open.length
       ? '<button class="btn-pay payall" id="payAll">' + FID + T('app.payall','Betaal alles') + ', ' + eur(openSum) + '</button>'
       : '') +
-      (open.length ? '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.1rem;font-size:0.74rem;color:var(--muted);line-height:1.6;">' +
+      (open.length ? '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.1rem;font-size:0.74rem;color:var(--muted);line-height:1.6;">' +
         '<b style="color:var(--txt);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;">'+T('app.bank.h','Liever overboeken?')+'</b><br>' +
         T('app.bank.to','Maak het bedrag over naar')+' <b style="color:var(--txt);" id="rtgIban">' + RTG_IBAN + '</b> ' +
         T('app.bank.name','t.n.v. RTG, o.v.v. uw codenaam')+' (<b style="color:var(--gold);">' + user.codename + '</b>) ' +
         T('app.bank.ref','en het factuurnummer. Na ontvangst zetten wij de factuur op betaald.') +
-        ' <button id="ibanCopy" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.7rem;font-size:0.66rem;color:var(--muted);margin-left:0.2rem;">'+T('app.bank.copy','Kopieer IBAN')+'</button></div>' : '');
+        ' <button id="ibanCopy" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.25rem 0.7rem;font-size:0.66rem;color:var(--muted);margin-left:0.2rem;">'+T('app.bank.copy','Kopieer IBAN')+'</button></div>' : '');
     document.querySelectorAll('.js-pay').forEach(b =>
       b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), () => executePay(b.dataset.inv))));
     const pa = $('#payAll');
@@ -39,7 +39,7 @@
         API.call('/meldingen/voorkeur').then(d => d.voorkeur).catch(() => null)
       ]);
     } catch(e){ return; }
-    const kaart = inhoud => '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.1rem;">' + inhoud + '</div>';
+    const kaart = inhoud => '<div style="margin-top:1rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.1rem;">' + inhoud + '</div>';
     let html = '';
     // punten: saldo, tegoed en verzilveren
     if (p) html += kaart(
@@ -95,7 +95,7 @@
       try { suppliers = (await API.call('/suppliers')).suppliers || []; } catch(e){}
     }
     const opties = suppliers.map(s => '<option value="' + s.code + '">' + s.name + '</option>').join('');
-    wrap.innerHTML = '<div style="margin-top:1.6rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;">' +
+    wrap.innerHTML = '<div style="margin-top:1.6rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;">' +
       '<div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);">' + T('gc.h','Cadeaukaarten') + '</div>' +
       '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;line-height:1.5;">' + T('gc.s','Koop een cadeaukaart van een partner en geef de code cadeau. Inwisselen gaat bij de zaak.') + '</div>' +
       (kaarten.length ? kaarten.map(k =>
@@ -103,9 +103,9 @@
         '<span>' + k.supplierName + '<span style="display:block;font-size:0.66rem;color:var(--gold);letter-spacing:0.06em;">' + k.code + '</span></span>' +
         '<b>' + eur(k.saldo) + '</b></div>').join('') : '') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;">' +
-      '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
-      '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
-      '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
+      '<select id="gcSup" style="flex:2;min-width:120px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' + opties + '</select>' +
+      '<input id="gcAmt" type="number" placeholder="€ 50" style="flex:1;min-width:70px;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;">' +
+      '<button id="gcBuy" style="background:var(--knop);color:var(--knop-txt);border:none;border-radius:0;padding:0.6rem 1rem;font-size:0.74rem;font-weight:600;font-family:inherit;">' + T('gc.koop','Koop') + '</button></div></div>';
     const kb = $('#gcBuy');
     if (kb) kb.addEventListener('click', () => {
       const bedrag = Math.round(Number($('#gcAmt').value));

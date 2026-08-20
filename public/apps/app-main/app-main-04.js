@@ -70,7 +70,7 @@
       // De passkey is de voordeur: groot genoeg als eerste handeling, maar nog
       // steeds in de stille horlogetaal van het huis.
       '.ag-passkey{margin:0.95rem auto 0;background:color-mix(in srgb,var(--gold,#857007) 10%,transparent);' +
-        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:999px;color:var(--gold,#857007);' +
+        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:0;color:var(--gold,#857007);' +
         'font-family:inherit;font-size:0.82rem;letter-spacing:0.03em;cursor:pointer;min-height:44px;padding:0.65rem 1.15rem;' +
         'display:flex;align-items:center;justify-content:center;gap:0.48rem;min-width:min(18rem,82vw);}' +
       '.ag-passkey[hidden]{display:none;}' +

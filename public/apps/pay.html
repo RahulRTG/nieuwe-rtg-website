@@ -24,7 +24,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .wrap{max-width:560px;margin:0 auto;padding:0 1.1rem;}
@@ -35,10 +35,10 @@
   main{padding:1.4rem 0 4rem;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.6rem;margin:.3rem 0 .2rem;}
   .deck{color:var(--muted);font-size:.92rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-top:1rem;}
-  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;margin-top:1rem;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:0;padding:.75rem .9rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
   .veld:focus{border-color:var(--burgundy);}
-  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.75rem 1.4rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.75rem 1.4rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;}
   .knop:hover{background:var(--merk);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600;}
   .knop.pay{background:#000;color:#fff;border:1px solid #333;width:100%;font-size:1rem;padding:.9rem;}
@@ -58,7 +58,7 @@
   .saldo{font-family:'Bodoni Moda',serif;font-size:3rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1;}
   .saldo small{font-size:1.2rem;color:var(--soft);}
   .chiprij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;}
-  .chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;font-weight:600;}
+  .chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:0;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;font-weight:600;}
   .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
   .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .tikkie{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
@@ -71,12 +71,12 @@
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
   .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
-  .tik-qr{display:block;width:min(220px,62vw);height:auto;margin:.5rem auto .1rem;background:#fff;padding:.55rem;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);}
+  .tik-qr{display:block;width:min(220px,62vw);height:auto;margin:.5rem auto .1rem;background:#fff;padding:.55rem;border-radius:0;box-shadow:0 8px 24px rgba(0,0,0,.35);}
   .leeg{color:var(--soft);font-size:.85rem;}
-  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
   .schakel{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted);cursor:pointer;}
   .schakel input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>

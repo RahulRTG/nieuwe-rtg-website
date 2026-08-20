@@ -6,7 +6,7 @@ body.rtg-stijl{background:
   radial-gradient(65% 45% at 100% 100%,rgba(127,22,52,.08),transparent 60%),
   var(--onyx-glans,#0c0c0b);}
 .sociaal-bank{position:fixed;z-index:40;inset:0 auto 0 0;width:156px;display:flex;flex-direction:column;padding:2.55rem .55rem 1rem;border-right:1px solid var(--rtg-line);background:linear-gradient(180deg,#11100f,#080808 75%);}
-.sociaal-bank nav{display:flex;flex-direction:column;gap:.22rem;flex:1}.sociaal-bank a{min-height:48px;display:flex;align-items:center;gap:.7rem;padding:.55rem .72rem;border-left:2px solid transparent;border-radius:8px;color:var(--rtg-muted);text-decoration:none;font:500 .76rem/1.2 var(--rtg-interface)}.sociaal-bank a span{width:19px;text-align:center;color:inherit;font-size:1rem}.sociaal-bank a b{font-weight:500}.sociaal-bank a:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}.sociaal-bank a.actief{color:var(--rtg-txt);border-left-color:#7f1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08))}.sociaal-bank-instel{border-top:1px solid var(--rtg-line);border-radius:0!important}.sociaal-in-werktafel .sociaal-bank{display:none;}
+.sociaal-bank nav{display:flex;flex-direction:column;gap:.22rem;flex:1}.sociaal-bank a{min-height:48px;display:flex;align-items:center;gap:.7rem;padding:.55rem .72rem;border-left:2px solid transparent;border-radius:0;color:var(--rtg-muted);text-decoration:none;font:500 .76rem/1.2 var(--rtg-interface)}.sociaal-bank a span{width:19px;text-align:center;color:inherit;font-size:1rem}.sociaal-bank a b{font-weight:500}.sociaal-bank a:hover{color:var(--rtg-txt);background:rgba(255,255,255,.035)}.sociaal-bank a.actief{color:var(--rtg-txt);border-left-color:#7f1634;background:linear-gradient(90deg,rgba(127,22,52,.42),rgba(127,22,52,.08))}.sociaal-bank-instel{border-top:1px solid var(--rtg-line);border-radius:0!important}.sociaal-in-werktafel .sociaal-bank{display:none;}
 body.rtg-stijl main#inhoud{box-sizing:border-box;width:min(1280px,calc(100% - 156px));max-width:none;padding:0 clamp(1.25rem,4vw,4.5rem) 7rem;margin:0 auto 0 156px;}
 body.sociaal-in-werktafel main#inhoud{width:min(1280px,100%);margin-inline:auto;}
 .wereldapps{display:none;}
@@ -14,7 +14,7 @@ body.sociaal-in-werktafel main#inhoud{width:min(1280px,100%);margin-inline:auto;
 .merkkop h1{font-size:clamp(2rem,4vw,3.3rem);max-width:16ch;font-weight:400;}
 .sociaal-boven{display:block;margin-bottom:.75rem;color:var(--rtg-soft);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;}
 .sociaal-inleiding{max-width:56ch;margin:.8rem 0 0;color:var(--rtg-muted);font:400 clamp(.9rem,1.5vw,1.05rem)/1.65 var(--rtg-interface);}
-.sociaal-filter{margin-left:auto;margin-bottom:.35rem;border:1px solid var(--rtg-line);border-radius:999px;background:rgba(5,5,5,.36);color:var(--rtg-muted);padding:.55rem .9rem;font:500 .72rem var(--rtg-interface);cursor:pointer;}
+.sociaal-filter{margin-left:auto;margin-bottom:.35rem;border:1px solid var(--rtg-line);border-radius:0;background:rgba(5,5,5,.36);color:var(--rtg-muted);padding:.55rem .9rem;font:500 .72rem var(--rtg-interface);cursor:pointer;}
 .sociaal-filter:hover,.sociaal-filter:focus-visible{border-color:var(--gold-rand);color:var(--rtg-txt);}
 .sociaal-ruimtes{display:flex;min-width:0;overflow-x:auto;border-bottom:1px solid var(--rtg-line);scrollbar-width:none;}
 .sociaal-ruimtes a{position:relative;flex:1 0 150px;padding:1rem .8rem;color:var(--rtg-muted);text-decoration:none;border-right:1px solid var(--rtg-line);font:500 .76rem var(--rtg-interface);}
@@ -49,7 +49,7 @@ body.sociaal-in-werktafel main#inhoud{width:min(1280px,100%);margin-inline:auto;
 .reis:hover .doos,.reis:focus-visible .doos{background:linear-gradient(90deg,rgba(127,22,52,.09),transparent);}
 .vak{margin:0}.vak>h3{margin-top:1.1rem}.vak .mom{padding:.78rem 0;}
 .vst{border:0;border-left:2px solid #7f1634;padding:.75rem 0 .75rem 1rem;}
-.vst .keuzes button{border-radius:999px;}
+.vst .keuzes button{border-radius:0;}
 .poorten{grid-template-columns:1fr;gap:0}.poort{display:grid;grid-template-columns:34px 1fr;column-gap:.75rem;text-align:left;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;padding:.85rem 0;}.poort .ic{grid-row:1/3;margin:0;color:var(--gold-tekst)}.poort b,.poort span{margin:0}.poort:hover{border-color:var(--rtg-line);background:linear-gradient(90deg,rgba(127,22,52,.09),transparent);}
 #objpaneel{background:color-mix(in srgb,var(--onyx-basis,#0c0c0b) 94%,transparent);backdrop-filter:blur(28px);border-color:var(--gold-rand);box-shadow:0 30px 90px rgba(0,0,0,.6);}
 @media(max-width:999px){.sociaal-bank{width:70px}.sociaal-bank a{justify-content:center}.sociaal-bank a b{display:none}body.rtg-stijl main#inhoud{width:calc(100% - 70px);margin-left:70px}}

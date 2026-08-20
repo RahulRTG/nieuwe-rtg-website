@@ -28,6 +28,25 @@ Contract → Capability → Delegation → Intent → Decision → Value → Set
 Niet omdat de losse stukken uniek zijn — banken, kaartnetwerken en clouds bouwen
 ze allemaal — maar omdat ze bij RTG in één huis staan en elkaar kunnen bewijzen.
 
+**Waar die lijn vandaag staat**, na §5.1–§5.10. Eén rij, met per schakel het
+enige dat er echt toe doet: is hij aangesloten, of staat hij er alleen?
+
+| | | staat er | wordt gebruikt |
+|---|---|---|---|
+| Contract | `commercie/contract.js` | ja | ja |
+| Capability | `capaciteiten` + `routepoort` | ja | ja — 8 van 8 hebben een caller (§5.1) |
+| Delegation | `bevoegdheid.js` | ja | nog niet: geen route delegeert |
+| Intent | `voornemen.js` | ja | ja — binnen het huis; nog geen compiler (§6.1) |
+| Decision | `besluit.js` | ja | ja — via de voornemens |
+| Value | `pay`, `bank`, `betaalopdracht` | ja | ja |
+| Settlement | `verrekening` + `ronde` | ja | ja |
+| Evidence | `bewijstoken` + `veiligheidskern` | ja | ja — 1 van de 5 soorten (§5.10) |
+
+Drie schakels staan er dus vóór op hun gebruik uit. Dat is geen schande — je kunt
+niet bouwen wat niemand nog aanroept — maar het is wel het verschil tussen een
+lijn die *bestaat* en een lijn die *draagt*, en dit document telt liever het
+tweede.
+
 ## 1. De vier regels
 
 Dit is de kern, en alle drie de fouten van 20 augustus 2026 waren een schending
@@ -588,10 +607,12 @@ vermelden waard is: de toets liep met `for (const soort of EIST_BESLUIT)` over
 de tabel die hij moest controleren, en toetste dus zichzelf. De drie soorten
 staan er nu voluit in.
 
-## 6. Wat hierna komt, op volgorde
+## 6. De routekaart, en wat er van elk punt terechtkwam
 
-Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
-vastligt en niemand halverwege iets anders bouwt.
+Dit stond hier op 20 augustus 2026 als **ontwerp en geen code**, zodat de
+volgorde vastlag en niemand halverwege iets anders zou bouwen. Alle tien zijn
+gebouwd. Belangrijker dan dat vinkje is wat er per punt *niet* gelukt is; dat
+staat erbij, want een routekaart die alleen afvinkt, is een routekaart die liegt.
 
 1. ~~**Enforcement in de Promise Gate.**~~ **Gebouwd** — zie §5.1.
 2. ~~**Capability tokens**~~ **Gebouwd** — zie §5.2. De laag staat er; de eerste
@@ -616,6 +637,26 @@ vastligt en niemand halverwege iets anders bouwt.
 10. ~~**Safety kernel**~~ **Gebouwd** — zie §5.10. De kern staat er en is klein;
     "doorheen moeten" geldt vandaag voor één van de vijf soorten. Dat getal
     staat in het kantoor, zodat het zichtbaar is en niet aangenomen.
+
+### 6.1 Wat er na deze tien openstaat
+
+Uit de aantekeningen hierboven, op volgorde van waarde:
+
+1. **De intent-compiler** (§5.6) — van vrije tekst naar een plan. De laag die het
+   plan controleert staat er; wie het plan *opstelt* is nu nog de aanroeper. Dit
+   is het stuk waar de eigenaar mee begon ("boek vijf hotels in Parijs") en het
+   enige dat nog tussen ontwerp en gebruik in staat.
+2. **De vier andere soorten door de veiligheidskern** (§5.10). Vandaag gaat er
+   één van de vijf doorheen. Identiteit en rechten zijn de volgende twee, en ze
+   zijn allebei goed af te bakenen.
+3. **De capability-failover** (§5.9) — een gequarantainede capability die de
+   geldstroom werkelijk tegenhoudt. Eerst laten meelopen (§5.3), dan afdwingen.
+4. **De governance-regel uit de schaduw halen** (§5.3). Over een week staat er
+   een getal; `/api/office/handhaving` zegt dan of hij aan kan.
+5. **Meer meten voor het terugval-voorstel** (§5.8). Zolang de adapter twee
+   dingen ziet, valt er zelden een lagere trede voor te stellen.
+6. **`claim.social.share`** wacht nog steeds op `RTF_IBAN`. Dat is een
+   bankrekening en geen code.
 
 ## 7. Wat we bewust nog niet doen
 

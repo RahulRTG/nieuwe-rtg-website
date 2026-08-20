@@ -41,24 +41,35 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. pasprijzen: gratis blijft gratis, RTG en Lifestyle stelt de boardroom in, publiek zichtbaar', async () => {
+test('1. pasprijzen: de ladder publiek zichtbaar, met bodems die houden', async () => {
   const p = await api('/api/pasprijzen', {});
   assert.equal(p.status, 200);
   assert.equal(p.body.passen.gratis.maandCenten, 0, 'de gratis app kost niets');
   assert.equal(p.body.passen.gratis.vast, true, 'en dat staat vast');
   assert.equal(p.body.passen.rtg.maandCenten, 6500, 'RTG Pass 65 euro ex btw');
   assert.equal(p.body.passen.rtg.rtfCenten, 1950, '30% naar de RTFoundation');
-  assert.equal(p.body.passen.lifestyle.maandCenten, 2000000, 'Lifestyle Pass 20.000 euro');
-  assert.equal(p.body.passen.business.opMaat, true, 'Business is prijs op maat');
+  /* De twee bovenste treden zijn CONTRACTUEEL: een vanaf, geen prijs. Stond hier
+     een maandbedrag, dan zou de voorwaardenpagina een bedrag publiceren dat voor
+     geen enkele klant het afgesproken bedrag hoeft te zijn. */
+  assert.equal(p.body.passen.business.vanafCenten, 500000, 'Business vanaf 5.000 euro');
+  assert.equal(p.body.passen.business.maandCenten, undefined, 'en dus geen maandbedrag');
+  assert.equal(p.body.passen.lifestyle.vanafCenten, 2000000, 'Lifestyle vanaf 20.000 euro');
+  assert.equal(p.body.passen.lifestyle.maandCenten, undefined, 'en dus geen maandbedrag');
+
   // de boardroom zet een nieuwe RTG-prijs en het publieke endpoint volgt meteen
   const zet = await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 70 }, office);
   assert.equal(zet.status, 200);
   const na = await api('/api/pasprijzen', {});
   assert.equal(na.body.passen.rtg.maandCenten, 7000);
   assert.equal(na.body.passen.rtg.rtfCenten, 2100);
+
   // de vaste afspraken zijn niet te verzetten
   assert.equal((await api('/api/office/geld/pasprijs', { pas: 'gratis', euro: 5 }, office)).status, 400);
-  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'business', euro: 500 }, office)).status, 400);
+  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'business', euro: 5000 }, office)).status, 400,
+    'ook een bedrag BOVEN de bodem gaat niet in de prijslijst: het hoort op het contract');
+  // en de bodem van de trede zelf houdt, ook via de API
+  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 40 }, office)).status, 400,
+    'onder de bodem van 65 euro kan de RTG Pass niet');
   await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 65 }, office);
 });
 

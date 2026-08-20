@@ -4,9 +4,13 @@
    in de kluis (privacy by design); de codenaam-gids is de enige plek waar leden
    herkenbaar zijn.
 
-   Bij elke pas hoort een maandbijdrage: de gratis app is 0, de RTG Pass en de
-   Lifestyle Pass staan in de geld-regie (standaard 65 en 20.000 ex btw), de
-   Business Pass is prijs op maat. Van elke bijdrage gaat 30% naar de
+   Bij elke pas hoort een maandbijdrage: de gratis app is 0, de RTG Pass (en
+   straks Business Lite) staat in de geld-regie, en de Business Pass en de
+   Lifestyle Pass zijn CONTRACTUEEL -- die dragen geen bedrag in de prijslijst,
+   dus ze tellen hier niet mee in de omzet. Dat is geen omissie maar het enige
+   eerlijke antwoord: RTG kent hun bedrag pas als het contract er is (zie
+   PRIJZEN.md, het gat "de contractprijs heeft geen huis"). Van elke bijdrage
+   gaat 30% naar de
    RTFoundation: 20% blijft LOKAAL (de omgeving van het lid) en 10% gaat naar de
    RTFoundation zelf. Dit is een RAPPORTAGE, berekend uit ledental x prijs; er
    wordt nooit geclaimd dat een echte betaling is verwerkt.
@@ -14,11 +18,16 @@
    Schaalvast: de rijen komen begrensd uit de accountlaag (een venster, geen
    miljoenen); bij een echt grootboek zou dit aggregatie-per-facet worden. */
 
-const PAS_VOLGORDE = ['gratis', 'rtg', 'lifestyle', 'business'];
-const PAS_NAAM = { gratis: 'Gratis app', rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+/* De volgorde en de namen komen uit de ladder (kern/pasladder.js) en staan hier
+   niet nog eens: een trede erbij hoort in EEN lijst te landen, niet in twee.
+   Alleen beschikbare treden -- een pas die nog niet bestaat, heeft geen leden en
+   zou hier als lege regel met nul euro staan. */
+const ladder = require('./pasladder');
+const PAS_VOLGORDE = ladder.treden().filter(t => t.beschikbaar).map(t => t.id);
+const PAS_NAAM = Object.fromEntries(ladder.treden().map(t => [t.id, t.naam]));
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
-const { maandCentenVoor } = require('./pasprijs');
+const { maandCentenVoor, contractueel } = require('./pasprijs');
 
 module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
   const eur = c => Math.round(c) / 100;
@@ -94,12 +103,14 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
        NUL euro per lid, terwijl het betaalschema wel 65 euro in rekening bracht.
        Twee kopieen, twee antwoorden op dezelfde vraag. */
     const prijslijst = (() => { try { const p = geldPasprijzen && geldPasprijzen(); return (p && p.passen) || null; } catch (e) { return null; } })();
-    const maandCenten = { gratis: 0,
-      rtg: maandCentenVoor(prijslijst, 'rtg'), lifestyle: maandCentenVoor(prijslijst, 'lifestyle') };
     const omzet = PAS_VOLGORDE.map(pas => {
       const aantal = passen[pas] || 0;
-      const opMaat = pas === 'business';
-      const centenPP = maandCenten[pas] || 0;
+      /* `opMaat` volgt de ladder en niet de naam 'business'. Sinds Lifestyle
+         ook contractueel is, zou een vaste vergelijking op 'business' voor
+         Lifestyle NUL euro tonen in plaats van "geen bedrag" -- precies de
+         `|| 0`-val die drie regels hoger beschreven staat. */
+      const opMaat = contractueel(pas);
+      const centenPP = maandCentenVoor(prijslijst, pas) || 0;
       const maandCentenTot = opMaat ? null : centenPP * aantal;
       return { pas, pasNaam: PAS_NAAM[pas], aantal, opMaat,
         prijsPP: opMaat ? null : eur(centenPP), maandOmzet: opMaat ? null : eur(maandCentenTot) };
@@ -111,7 +122,19 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
       foundation30: eur(Math.round(totaalCenten * 0.30)),
       lokaal20: eur(Math.round(totaalCenten * 0.20)),
       rtf10: eur(Math.round(totaalCenten * 0.10)),
-      businessOpMaat: (passen.business || 0)
+      /* Het aantal leden op een CONTRACTUELE trede (Business, Lifestyle): hun
+         bijdrage staat op hun contract en niet in de prijslijst, dus ze zitten
+         niet in `totaalOmzet` hierboven. De oude naam blijft staan omdat het
+         kantoorscherm hem zo kent; hij telt nu alleen niet langer alleen
+         Business, want sinds de ladder is Lifestyle het net zo goed.
+
+         WAT HIER NOG ONTBREEKT en bewust niet wordt geraden: de afgesproken
+         bedragen zelf. Die staan op de aanmelding (kern/aanmeldingen/besluit.js
+         -> a.contract) en deze staat leest de accountlaag, niet de
+         aanmeldingen. Optellen zou hier dus een schatting worden, en een
+         omzetstaat met een geschat getal erin is erger dan een die eerlijk zegt
+         dat het er niet in zit. Zie PRIJZEN.md. */
+      businessOpMaat: PAS_VOLGORDE.filter(p => contractueel(p)).reduce((n, p) => n + (passen[p] || 0), 0)
     };
 
     return { ok: true,

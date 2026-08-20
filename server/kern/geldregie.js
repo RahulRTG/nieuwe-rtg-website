@@ -1,11 +1,13 @@
 /* Kern-module "geldregie": RTG bepaalt de geldkant van het platform, vanuit
    de boardroom en binnen het model van de voorwaarden.
 
-   - PASPRIJZEN: de maandbijdragen van de passen. De gratis app is en blijft
-     gratis (vast 0), de Business Pass is prijs op maat; RTG stelt de RTG Pass
-     en de Lifestyle Pass in. De bedragen zijn ex btw en 30% gaat naar de
-     RTFoundation; het publieke endpoint voedt o.a. de voorwaardenpagina, dus
-     wat de boardroom zet is meteen overal het geldende bedrag.
+   - PASPRIJZEN: de maandbijdragen van de passen, volgens de ladder in
+     kern/pasladder.js. De gratis app is en blijft gratis (vast 0); RTG stelt de
+     RTG Pass en Business Lite in, maar nooit onder de bodem van hun trede; de
+     Business Pass en de Lifestyle Pass zijn contractueel en dragen alleen een
+     "vanaf". De bedragen zijn ex btw en 30% gaat naar de RTFoundation; het
+     publieke endpoint voedt o.a. de voorwaardenpagina, dus wat de boardroom zet
+     is meteen overal het geldende bedrag.
    - COMMISSIES: de interne partnervergoeding (s.rate). Leden reizen op
      nettoprijzen (voorwaarden), dus dit raakt het lid nooit; het is de
      afspraak tussen RTG en de zaak. Standaard per genre, met per zaak een
@@ -15,6 +17,8 @@
      bedrag; zo blijft de nettoprijzen-belofte intact.
 
    maakGeldregie(state) volgt het vaste kern-patroon. */
+
+const ladder = require('./pasladder');
 
 const PCT_COMMISSIE_MAX = 30;   // partnervergoeding, in procenten
 const PCT_KORTING_MAX = 50;     // ledenvoordeel, in procenten
@@ -34,28 +38,50 @@ function maakGeldregie({ db, save }) {
     return g;
   }
 
-  /* ---- pasprijzen: gratis vast, business op maat, de rest stelt RTG in ---- */
+  /* ---- pasprijzen: de ladder, met per trede een bodem ----
+     De lijst zelf staat in kern/pasladder.js; hier wordt hij alleen gevuld met
+     wat de boardroom heeft gezet. Zo kan er geen tweede lijst treden ontstaan,
+     en kan een bodem niet op de ene plek 150 en op de andere 15000 zijn.
+
+     Een CONTRACTUELE trede (Business, Lifestyle) krijgt geen `maandCenten` maar
+     een `vanafCenten`. Dat onderscheid is het hele punt: `maandCenten` is een
+     bedrag dat afgerekend wordt, `vanafCenten` is een ondergrens die getoond
+     wordt. Wie ze door elkaar haalt, zet een niet-afgesproken bedrag op een
+     factuur -- zie de kop van kern/pasprijs.js. */
   function pasprijzen() {
     const g = d();
-    const rtg = Number.isFinite(g.pasprijzen.rtg) ? g.pasprijzen.rtg : 6500;
-    const lifestyle = Number.isFinite(g.pasprijzen.lifestyle) ? g.pasprijzen.lifestyle : 2000000;
-    const rij = pas => ({ maandCenten: pas, exBtw: true, rtfCenten: Math.round(pas * 0.30) });
-    return { status: 200,
-      passen: {
-        gratis: { naam: 'Gratis app', maandCenten: 0, vast: true },
-        rtg: { naam: 'RTG Pass', ...rij(rtg) },
-        lifestyle: { naam: 'Lifestyle Pass', ...rij(lifestyle) },
-        business: { naam: 'Business Pass', opMaat: true, rtfDeel: 0.30 }
-      } };
+    const passen = {};
+    for (const t of ladder.treden()) {
+      const gezet = g.pasprijzen[t.id];
+      const rij = { naam: t.naam, voor: t.voor, beschikbaar: t.beschikbaar, exBtw: true };
+      if (t.vast) { rij.maandCenten = t.bodemCenten; rij.vast = true; }
+      else if (t.contractueel) {
+        rij.contractueel = true;
+        rij.opMaat = true;                       // de oude naam; schermen kennen hem zo
+        rij.vanafCenten = t.bodemCenten;
+        rij.rtfDeel = 0.30;
+        rij.rtfVanafCenten = Math.round(t.bodemCenten * 0.30);
+      } else {
+        const centen = Number.isFinite(gezet) ? gezet : t.standaardCenten;
+        rij.maandCenten = centen;
+        rij.bodemCenten = t.bodemCenten;
+        rij.rtfCenten = Math.round(centen * 0.30);
+      }
+      passen[t.id] = rij;
+    }
+    return { status: 200, passen };
   }
   function pasprijsZet(data) {
     const pas = String(data.pas || '');
-    if (pas === 'gratis') return { status: 400, error: 'De gratis app blijft gratis; dat bedrag staat vast.' };
-    if (pas === 'business') return { status: 400, error: 'De Business Pass is prijs op maat; dat spreekt u per klant af.' };
-    if (pas !== 'rtg' && pas !== 'lifestyle') return { status: 400, error: 'Kies de RTG Pass of de Lifestyle Pass.' };
     const centen = Math.round(Number(data.euro) * 100);
-    if (!Number.isFinite(centen) || centen < 0 || centen > PAS_MAX_CENTEN)
-      return { status: 400, error: 'Geef een bedrag tussen 0 en 100.000 euro per maand.' };
+    /* De keuring staat in de ladder, niet hier: de boardroom, de API en een
+       latere zelfbedieningspagina horen dezelfde zin te geven. Alles wat een
+       bedrag afwijst -- vast, contractueel, onbekend, onder de bodem -- komt
+       daar vandaan. */
+    const bezwaar = ladder.keurCenten(pas, centen);
+    if (bezwaar) return { status: 400, error: bezwaar };
+    if (centen > PAS_MAX_CENTEN)
+      return { status: 400, error: 'Geef een bedrag van hoogstens 100.000 euro per maand.' };
     d().pasprijzen[pas] = centen;
     save();
     return { status: 200, ok: true, pas, maandCenten: centen };

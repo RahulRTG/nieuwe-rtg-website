@@ -42,13 +42,29 @@ test('omzet per pas en de 30%-split (20% lokaal, 10% RTF)', () => {
   const r = lr.register();
   const omzet = Object.fromEntries(r.omzet.map(o => [o.pas, o]));
   assert.equal(omzet.rtg.maandOmzet, 130);       // 2 x 65
-  assert.equal(omzet.lifestyle.maandOmzet, 20000); // 1 x 20000
-  assert.equal(omzet.business.opMaat, true);     // Business is prijs op maat
-  // totaal over de bekende prijzen = 130 + 20000 = 20130
-  assert.equal(r.split.totaalOmzet, 20130);
-  assert.equal(r.split.foundation30, Math.round(20130 * 0.30 * 100) / 100);
-  assert.equal(r.split.lokaal20, Math.round(20130 * 0.20 * 100) / 100);
-  assert.equal(r.split.rtf10, Math.round(20130 * 0.10 * 100) / 100);
+
+  /* SINDS DE LADDER (20 augustus 2026) zijn Business EN Lifestyle contractueel:
+     hun bijdrage staat op het contract van het lid en niet in de prijslijst.
+     Deze staat telt ze daarom niet mee, en dat is de bedoeling -- hij rekende
+     Lifestyle voorheen op de lijstprijs van 20.000, wat voor elk lid met een
+     andere afspraak een verzonnen omzetregel opleverde.
+
+     De val die hier bewaakt wordt: NIET stilzwijgend nul. Een contractuele
+     trede hoort `opMaat` te zijn en geen maandomzet van 0,00 -- dat is dezelfde
+     `|| 0`-fout die deze module eerder al eens maakte. */
+  for (const pas of ['lifestyle', 'business']) {
+    assert.equal(omzet[pas].opMaat, true, pas + ' is contractueel');
+    assert.equal(omzet[pas].maandOmzet, null, pas + ': geen bedrag, en nadrukkelijk niet nul');
+    assert.equal(omzet[pas].prijsPP, null, pas + ': ook geen prijs per lid');
+  }
+  // het totaal loopt dus alleen over de treden met een lijstprijs
+  assert.equal(r.split.totaalOmzet, 130);
+  assert.equal(r.split.foundation30, Math.round(130 * 0.30 * 100) / 100);
+  assert.equal(r.split.lokaal20, Math.round(130 * 0.20 * 100) / 100);
+  assert.equal(r.split.rtf10, Math.round(130 * 0.10 * 100) / 100);
+  // en de leden die er niet in zitten, worden wel geteld: 1 Lifestyle + 1 Business
+  assert.equal(r.split.businessOpMaat, 2,
+    'een lid buiten het totaal hoort zichtbaar te blijven, anders lijkt het totaal compleet');
 });
 
 test('de alfabetische lijst is te filteren per pas en stad', () => {

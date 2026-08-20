@@ -1,5 +1,7 @@
 /* Aanmeldingen-deel "betaalschema" (kern/aanmeldingen): na het menselijke akkoord
-   loopt de lidmaatschapsbetaling automatisch -- 12 maanden lang de maandbijdrage,
+   loopt de lidmaatschapsbetaling automatisch -- 12 maanden lang de maandbijdrage
+   (uit het contract van het lid als de pas contractueel is, anders uit de
+   prijslijst),
    met van elke termijn 30% naar de RTFoundation (20% lokaal, 10% de foundation
    zelf). Dit is een grootboek van geplande termijnen; er wordt nooit geclaimd dat
    een echte betaling is verwerkt -- een betaalprovider zou het schema uitvoeren.
@@ -8,19 +10,31 @@ module.exports = (ctx) => {
   const { B, geldPasprijzen, rid, nu, eur, PASSEN } = ctx;
   const { maandCentenUit } = require('../pasprijs');
 
-  // de maandbijdrage van een pas in centen, uit de geld-regie. Business is op maat
-  // (null: het bedrag spreekt RTG per klant af); gratis is 0.
-  function maandCentenVan(pas) {
-    // Een antwoord, uit ../pasprijs.js. Hier stond een eigen kopie met eigen
-    // terugvalwaarden; ledenregister.js had er nog een, en lid.js had er geen
-    // en verzon zijn eigen bedragen. Zie de kop van dat bestand.
-    return maandCentenUit(geldPasprijzen, pas);
+  /* De maandbijdrage van DEZE aanmelding in centen.
+
+     Twee bronnen, in deze volgorde, en de volgorde is het punt:
+
+     1. HET CONTRACT van het lid zelf. Business en Lifestyle staan niet in de
+        prijslijst (kern/pasladder.js): hun bedrag is per klant afgesproken en
+        vastgelegd bij het besluit. Dat bedrag wint dus altijd -- een lijstprijs
+        die over een afspraak heen valt, is precies hoe een factuur een bedrag
+        gaat noemen dat niemand heeft afgesproken.
+     2. DE PRIJSLIJST uit de geld-regie, via ../pasprijs.js. Hier stond een eigen
+        kopie met eigen terugvalwaarden; ledenregister.js had er nog een, en
+        lid.js had er geen en verzon zijn eigen bedragen.
+
+     Is er geen van beide, dan null: geen bedrag is een antwoord, nul zou
+     "gratis" betekenen. */
+  function maandCentenVan(a) {
+    const c = a && a.contract && a.contract.maandCenten;
+    if (Number.isFinite(c)) return c;
+    return maandCentenUit(geldPasprijzen, a && a.pas);
   }
   // een maand erbij op een ISO-datum (voor het 12-maands-schema)
   function plusMaanden(iso, n) { const d = new Date(iso); d.setMonth(d.getMonth() + n); return d.toISOString(); }
 
   function startBetalingen(a) {
-    const centen = maandCentenVan(a.pas);
+    const centen = maandCentenVan(a);
     const termijnen = [];
     for (let m = 1; m <= 12; m++) {
       const bedrag = centen; // null bij Business (op maat)

@@ -44,8 +44,13 @@ module.exports = (kern) => {
   // de wachtrij en het besluit: alleen RTG-personeel
   app.post('/api/aanmelding/lijst', officeAuth, (req, res) => veilig(res, () => aanmeldingen.lijst((req.body || {}).status)));
   app.post('/api/aanmelding/een', officeAuth, (req, res) => veilig(res, () => aanmeldingen.een(String((req.body || {}).id || ''))));
+  /* `contractEuro` gaat mee omdat een contractuele pas (Business, Lifestyle)
+     geen lijstprijs heeft: de kern weigert een akkoord zonder afgesproken
+     maandbedrag. Hier wordt niets gekeurd -- niet de bodem, niet of het veld
+     hoort -- want dan zou dezelfde regel op twee plekken staan. */
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>
-    aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie)));
+    aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie,
+      { contractEuro: (req.body || {}).contractEuro })));
   // het betaalschema: na een akkoord loopt de bijdrage 12 maanden automatisch,
   // met de 30%-foundationsplit. Alleen voor het personeel.
   app.post('/api/aanmelding/betalingen', officeAuth, (req, res) => veilig(res, () => aanmeldingen.betalingen(req.body || {})));

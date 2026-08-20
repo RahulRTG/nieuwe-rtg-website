@@ -42,6 +42,18 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass
+65, Business Lite 150, Business vanaf 5.000, Lifestyle vanaf 20.000) en de
+prijsformule waar alles aan hangt: **prijs = toegang + verbruik +
+verantwoordelijkheid**. Lees die vóór je aan een prijs, een bundel of een
+factuurregel werkt. De harde regel daar: **een bodem is geen prijs** — een
+ondergrens weigert invoer en toont "vanaf", en mag nooit op een factuur belanden
+(dat is de € 9.075-fout uit `kern/pasprijs.js`, met een nieuw getal). De ladder
+staat op één plek, `kern/pasladder.js`; `test/pasladder.test.js` handhaaft de vier
+regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
+gaten — waaronder drie plekken waar de code iets anders doet dan de
+partnervoorwaarden beloven.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

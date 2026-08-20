@@ -53,40 +53,9 @@
    De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
    is de klok en niet Date.now(). */
 const klok = require('../../lib/klok');
-
-const STATUS = {
-  GEINCASSEERD: 'GEINCASSEERD',
-  OPENSTAAND: 'OPENSTAAND',
-  GEBOEKT: 'GEBOEKT',
-  HERKANSING: 'HERKANSING',
-  AFGESTEMD: 'AFGESTEMD'
-};
-
-/* Welke stap na welke mag. Een overgang die hier niet staat is een
-   programmeerfout en wordt geweigerd -- niet stil doorgevoerd, want een status
-   die achteruit kan lopen maakt elk getal eronder waardeloos. Zelfde regel als
-   in kern/betaalopdracht/index.js, en met opzet dezelfde vorm.
-
-   HERKANSING -> HERKANSING mag: een tweede mislukking is geen fout in de
-   machine maar een feit dat geteld hoort te worden. */
-const OVERGANG = {
-  [STATUS.GEINCASSEERD]: [STATUS.OPENSTAAND],
-  [STATUS.OPENSTAAND]: [STATUS.GEBOEKT, STATUS.HERKANSING],
-  [STATUS.HERKANSING]: [STATUS.GEBOEKT, STATUS.HERKANSING],
-  [STATUS.GEBOEKT]: [STATUS.AFGESTEMD],
-  [STATUS.AFGESTEMD]: []
-};
-
-// nog verschuldigd: deze standen tellen mee in wat de zaak nog moet
-const OPEN = new Set([STATUS.GEINCASSEERD, STATUS.OPENSTAAND, STATUS.HERKANSING]);
-// klaar: hier hoeft niets meer
-const AF = new Set([STATUS.AFGESTEMD]);
-
-const RIJ_MAX = 5000;
-
-function magOvergaan(van, naar) {
-  return Array.isArray(OVERGANG[van]) && OVERGANG[van].includes(naar);
-}
+/* De standen en de overgangstabel staan apart: dit bestand is de administratie.
+   Zie ./fee/vorm.js. */
+const { STATUS, OVERGANG, OPEN, AF, RIJ_MAX, magOvergaan } = require('./fee/vorm');
 
 function maakFees({ db, save, nu }) {
   const tijd = nu || klok.nu;

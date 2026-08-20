@@ -50,40 +50,14 @@
    De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
    is de klok en niet Date.now(). */
 const klok = require('../../lib/klok');
+/* Het PRODUCT staat apart van de administratie: welke trede wat bevat en welke
+   bundels er zijn, staat in ./tegoed/inhoud.js. */
+const { INBEGREPEN, BUNDELS, BELEID, WAARSCHUWING, inbegrepenVoor } = require('./tegoed/inhoud');
+/* De plafondbeslissing staat apart: dat is een besluit en geen boekhouding.
+   Zie ./tegoed/plafond.js. */
+const { magVerbruiken } = require('./tegoed/plafond');
 
 const caps = require('./capaciteiten');
-
-/* Het inbegrepen tegoed per trede, in credits per maand. Nul betekent: deze
-   trede heeft geen AI-tegoed, en dan is `mag()` altijd nee -- niet "onbeperkt".
-   `null` betekent contractueel: de hoogte staat op het contract. */
-const INBEGREPEN = {
-  gratis: 0,
-  rtg: 2000,
-  'business-lite': 20000,
-  business: null,        // contractueel
-  lifestyle: null        // contractueel
-};
-
-/* De bundels. Alleen capaciteit en een naam -- geen model, geen tokens. De
-   prijs ontbreekt met opzet: die wordt gerekend uit de inkoopkant, en die laag
-   bestaat nog niet. Een verzonnen bedrag hier zou precies de fout zijn die
-   PRIJZEN.md par. 4.12 beschrijft. */
-const BUNDELS = {
-  'ai-s': { id: 'ai-s', naam: 'AI Extra S', credits: 5000, wat: 'een kleine aanvulling' },
-  'ai-m': { id: 'ai-m', naam: 'AI Extra M', credits: 20000, wat: 'een normale zakelijke aanvulling' },
-  'ai-l': { id: 'ai-l', naam: 'AI Extra L', credits: 100000, wat: 'zwaar gebruik' },
-  'ai-xl': { id: 'ai-xl', naam: 'AI Enterprise', credits: null, wat: 'overeengekomen capaciteit' }
-};
-
-const BELEID = { STOP: 'STOP', VRAAG_MIJ: 'VRAAG_MIJ', AUTO_AANVULLEN: 'AUTO_AANVULLEN', CONTRACT: 'CONTRACT' };
-
-// bij welk deel van het tegoed er gewaarschuwd wordt
-const WAARSCHUWING = 0.8;
-
-function inbegrepenVoor(pas) {
-  const v = INBEGREPEN[String(pas || '')];
-  return v === undefined ? 0 : v;
-}
 
 function maakTegoed({ db, save, nu }) {
   const tijd = nu || klok.nu;
@@ -117,58 +91,10 @@ function maakTegoed({ db, save, nu }) {
     return r;
   }
 
-  /* DE VRAAG DIE VOORAF WORDT GESTELD. Geeft altijd een antwoord met een reden
-     en, als het nee is, met wat de klant kan doen -- want "nee" zonder uitweg is
-     precies het moment waarop een restaurant op vrijdagavond vastloopt. */
-  function mag(houder, pas, kosten, opties) {
-    const c = Math.max(0, Math.round(Number(kosten) || 1));
-    const r = rijVan(houder, pas, (opties || {}).contractCredits);
-
-    if (!caps.mag(r.pas, 'can_use_ai'))
-      return { mag: false, reden: 'geen-ai', uitleg: 'Dit abonnement bevat geen AI-assistent.', bundels: [] };
-
-    // contractueel: de hoogte staat op het contract, en zonder contractwaarde is
-    // er geen plafond dat deze laag kent
-    if (r.inbegrepen === null)
-      return { mag: true, reden: 'contract', uitleg: 'De capaciteit staat op het contract.', rest: null };
-
-    const beschikbaar = r.inbegrepen + r.bijgekocht - r.verbruikt;
-    if (c <= beschikbaar) {
-      const na = beschikbaar - c;
-      const deel = r.inbegrepen + r.bijgekocht > 0 ? 1 - na / (r.inbegrepen + r.bijgekocht) : 1;
-      return { mag: true, reden: 'binnen-tegoed', rest: na, gebruiktDeel: Math.min(1, Math.max(0, deel)),
-        waarschuwing: deel >= WAARSCHUWING };
-    }
-
-    /* Over het plafond. Wat er nu gebeurt, is de KEUZE van de klant en niet van
-       ons -- dat is regel 6. */
-    const bundelsUit = Object.values(BUNDELS).filter(b => b.credits).map(b => ({ ...b }));
-    if (r.beleid === BELEID.AUTO_AANVULLEN && r.autoBundel && BUNDELS[r.autoBundel]) {
-      /* De prijs van de bundel telt mee in het maandmaximum. Stond hier nul
-         zolang de inkoopkant niet bestond -- en een maximum waar niets tegenaan
-         telt, is geen maximum. `prijsVan` komt via opties mee, want deze module
-         kent de boardroom-instelling niet. */
-      const kosten2 = Number.isFinite(((opties || {}).bundelPrijs || {}).centen) ? opties.bundelPrijs.centen : 0;
-      const overMax = Number.isFinite(r.maandMaxCenten) &&
-        (r.autoDezeMaandCenten + kosten2) > r.maandMaxCenten;
-      if (overMax)
-        return { mag: false, reden: 'maandmaximum', tekort: c - beschikbaar,
-          uitleg: 'Het maandmaximum voor automatisch bijkopen is bereikt. Koop handmatig bij of verhoog het maximum.',
-          bundels: bundelsUit };
-      return { mag: true, reden: 'auto-aangevuld', bundel: r.autoBundel, tekort: c - beschikbaar,
-        uitleg: 'Het tegoed is aangevuld met ' + BUNDELS[r.autoBundel].naam + '.' };
-    }
-    if (r.beleid === BELEID.CONTRACT)
-      return { mag: true, reden: 'contract-overschot',
-        uitleg: 'Het overschot loopt op het contract en wordt achteraf verrekend.' };
-
-    return { mag: false, reden: r.beleid === BELEID.STOP ? 'gestopt' : 'plafond',
-      tekort: c - beschikbaar,
-      uitleg: r.beleid === BELEID.STOP
-        ? 'Het tegoed is op en dit abonnement staat op "stoppen bij de limiet"; er worden geen extra kosten gemaakt.'
-        : 'Het tegoed is op. Koop een bundel bij of zet automatisch aanvullen aan.',
-      bundels: bundelsUit };
-  }
+  /* DE VRAAG DIE VOORAF WORDT GESTELD, en het antwoord komt uit
+     ./tegoed/plafond.js -- zie daar waarom dat een eigen bestand is. */
+  const mag = (houder, pas, kosten, opties) =>
+    magVerbruiken(rijVan(houder, pas, (opties || {}).contractCredits), kosten, opties);
 
   /* Verbruik boeken. Gebeurt NA `mag()` en niet in plaats daarvan: wie hier
      rechtstreeks binnenkomt, boekt verbruik dat niemand heeft toegestaan. Dat is

@@ -3568,7 +3568,7 @@ async function laadGeld(){
     const v = d.partnervergoeding || {};
     $('#gVergoeding').innerHTML = '<b>' + ((v.overOmzet || 0) * 100).toFixed(0) + '%</b> over de omzet van een partner. ' +
       esc(v.uitleg || '') + '<br><span style="color:var(--soft);">' +
-      (d.vergoedingssoorten || []).map(x => '<b>' + esc(x.label) + '</b> — ' + esc(x.grondslag)).join('<br>') + '</span>';
+      (d.vergoedingssoorten || []).map(x => '<b>' + esc(x.label) + '</b>: ' + esc(x.grondslag)).join('<br>') + '</span>';
   } catch (e) { $('#gStand').textContent = e.message; }
 }
 $('#gPasZet').addEventListener('click', async () => {

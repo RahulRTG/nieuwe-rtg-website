@@ -2009,6 +2009,7 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
+require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
 require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);

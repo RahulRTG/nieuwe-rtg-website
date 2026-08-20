@@ -53,91 +53,11 @@
    De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
    is de klok en niet Date.now(). */
 const klok = require('../../lib/klok');
-
-const STATUS = {
-  CONCEPT: 'CONCEPT', AANGEBODEN: 'AANGEBODEN', GEACCEPTEERD: 'GEACCEPTEERD',
-  ACTIEF: 'ACTIEF', VERLENGBAAR: 'VERLENGBAAR', VERLENGD: 'VERLENGD',
-  OPZEGGEND: 'OPZEGGEND', GEEINDIGD: 'GEEINDIGD'
-};
-
-/* Een overgang die hier niet staat is een programmeerfout en wordt geweigerd.
-   VERLENGD is met opzet een doorgangsstand en geen eindstand: verlengen zet het
-   contract terug op ACTIEF met een nieuwe periode, en dat blijft zichtbaar in
-   het verloop. */
-const OVERGANG = {
-  [STATUS.CONCEPT]: [STATUS.AANGEBODEN, STATUS.GEEINDIGD],
-  [STATUS.AANGEBODEN]: [STATUS.GEACCEPTEERD, STATUS.GEEINDIGD],
-  [STATUS.GEACCEPTEERD]: [STATUS.ACTIEF, STATUS.GEEINDIGD],
-  [STATUS.ACTIEF]: [STATUS.VERLENGBAAR, STATUS.OPZEGGEND, STATUS.GEEINDIGD],
-  [STATUS.VERLENGBAAR]: [STATUS.VERLENGD, STATUS.OPZEGGEND, STATUS.GEEINDIGD],
-  [STATUS.VERLENGD]: [STATUS.ACTIEF],
-  [STATUS.OPZEGGEND]: [STATUS.GEEINDIGD],
-  [STATUS.GEEINDIGD]: []
-};
-
-// standen waarin een contract verplichtingen kan voortbrengen
-const LOPEND = new Set([STATUS.ACTIEF, STATUS.VERLENGBAAR, STATUS.OPZEGGEND]);
-
-const VERLENGING = { STILZWIJGEND: 'stilzwijgend', OPZEGBAAR: 'opzegbaar', GEEN: 'geen' };
-
-function magOvergaan(van, naar) {
-  return Array.isArray(OVERGANG[van]) && OVERGANG[van].includes(naar);
-}
-
-/* Datumrekenen op maandbasis. Bewust met Date en niet met "30 dagen": een
-   maandbijdrage die op de 31e begint, hoort in februari niet op de 3e maart te
-   vallen. `plusMaanden` klemt op de laatste dag van de doelmaand. */
-function plusMaanden(iso, n) {
-  const d = new Date(iso);
-  const dag = d.getUTCDate();
-  const doel = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1));
-  const laatste = new Date(Date.UTC(doel.getUTCFullYear(), doel.getUTCMonth() + 1, 0)).getUTCDate();
-  doel.setUTCDate(Math.min(dag, laatste));
-  doel.setUTCHours(d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
-  return doel.toISOString();
-}
-const perMaand = f => (f === 'jaar' ? 12 : f === 'kwartaal' ? 3 : 1);
-
-/* Het contract zelf. `afgesprokenCenten` mag null zijn zolang er nog niets is
-   getekend (CONCEPT), maar niet meer zodra het ACTIEF wordt -- dat wordt
-   hieronder afgedwongen. */
-/* GEEN NAAM IN EEN CONTRACT. Hier stond `naam`, overgenomen uit de aanmelding, en
-   dat brak het recht op vergetelheid: verwijderde een lid zijn gegevens, dan
-   bleef zijn naam in de contractentabel staan (test/vergeten-gezelschap.test.js
-   vond het). Operationele data van dit huis draait op codenamen -- de echte naam
-   staat in de identiteitskluis, en een tweede kopie ergens anders maakt die
-   scheiding waardeloos.
-
-   Een contract heeft die naam ook niet nodig: `aanmeldingId` wijst naar het
-   dossier waar hij hoort, en die laag kent de vergeetregels al. Wie een naam op
-   een scherm wil, haalt hem daar op -- en krijgt hem dus niet meer als het lid
-   is vergeten. Dat is precies de bedoeling. */
-function maakContract({ id, pas, aanmeldingId, startAt, afgesprokenCenten,
-  minimumMaanden = 12, frequentie = 'maand', verlenging = VERLENGING.OPZEGBAAR,
-  opzegMaanden = 1, btwProfiel = 'nl-21', serviceNiveau = null, door = null, nu }) {
-  const at = nu ? nu() : klok.nu();
-  const start = startAt || new Date(at).toISOString();
-  return {
-    id, pas, aanmeldingId: aanmeldingId || null,
-    status: STATUS.CONCEPT,
-    startAt: start,
-    minimumMaanden: Math.max(1, Math.round(minimumMaanden)),
-    frequentie,
-    verlenging,
-    opzegMaanden: Math.max(0, Math.round(opzegMaanden)),
-    /* DE MOMENTOPNAME. Nooit opnieuw uit de catalogus halen. */
-    afgesprokenCenten: Number.isFinite(afgesprokenCenten) ? Math.round(afgesprokenCenten) : null,
-    prijsVastTot: plusMaanden(start, Math.max(1, Math.round(minimumMaanden))),
-    indexatie: null,
-    btwProfiel,
-    serviceNiveau,
-    eindigtOp: null,
-    periode: 1,
-    door,
-    at,
-    verloop: [{ naar: STATUS.CONCEPT, at }]
-  };
-}
+/* Twee onderwerpen staan apart, en allebei om dezelfde reden: dit bestand is de
+   WINKEL. ./contract/vorm.js zegt wat een contract is en welke stap daarna mag;
+   ./contract/verplichting.js rekent uit wat er verschuldigd is. */
+const { STATUS, OVERGANG, LOPEND, VERLENGING, magOvergaan, maakContract } = require('./contract/vorm');
+const { plusMaanden, maakVerplichting } = require('./contract/verplichting');
 
 function maakContracten({ db, save, nu }) {
   const tijd = nu || klok.nu;
@@ -227,78 +147,8 @@ function maakContracten({ db, save, nu }) {
 
   function beeindig(c) { return c ? zet(c, STATUS.GEEINDIGD, { eindigtOp: c.eindigtOp || new Date(tijd()).toISOString() }) : { error: 'geen contract' }; }
 
-  /* ---------- de billing engine ----------
-     De vraag die per periode gesteld wordt. Geeft de verplichting terug, of null
-     met de reden erbij -- "er is niets" en "we weten het niet" zijn niet
-     hetzelfde. */
-  function verplichtingOp(c, datumIso) {
-    if (!c) return { verschuldigd: false, reden: 'geen contract' };
-    if (!LOPEND.has(c.status)) return { verschuldigd: false, reden: 'contract staat op ' + c.status };
-    if (!Number.isFinite(c.afgesprokenCenten)) return { verschuldigd: false, reden: 'geen afgesproken bedrag' };
-    const d = new Date(datumIso);
-    if (d < new Date(c.startAt)) return { verschuldigd: false, reden: 'voor de startdatum' };
-    if (c.eindigtOp && d >= new Date(c.eindigtOp)) return { verschuldigd: false, reden: 'na de einddatum' };
-
-    /* DE GRENS VAN DE VERBINTENIS. Zonder deze regel zegt de billing engine ook
-       ja tegen maand 13 van een contract dat nooit is verlengd -- en dan is dit
-       bestand alsnog "genereer oneindig veel termijnen", alleen met meer stappen
-       ertussen. Precies het probleem dat het moest oplossen.
-
-       Bij STILZWIJGENDE verlenging loopt het door zonder dat iemand iets doet;
-       dat is de betekenis van stilzwijgend. Bij OPZEGBAAR moet er een besluit
-       zijn (verleng()), en dat besluit verhoogt `periode`, waardoor
-       eindeVerbintenis vanzelf opschuift. */
-    if (c.verlenging !== VERLENGING.STILZWIJGEND && d >= new Date(eindeVerbintenis(c)))
-      return { verschuldigd: false, reden: 'na het einde van de verbintenis; nog niet verlengd' };
-
-    // valt deze datum op een termijngrens?
-    const stap = perMaand(c.frequentie);
-    let n = 0, wanneer = c.startAt;
-    while (new Date(wanneer) < d) { n += stap; wanneer = plusMaanden(c.startAt, n); }
-    if (new Date(wanneer).getTime() !== d.getTime())
-      return { verschuldigd: false, reden: 'geen termijndatum' };
-
-    return { verschuldigd: true, centen: c.afgesprokenCenten * stap,
-      maandCenten: c.afgesprokenCenten, termijn: n / stap + 1, vervalt: wanneer };
-  }
-
-  /* De termijnen tussen twee datums. Dit is wat het betaalschema gebruikt in
-     plaats van "maak er twaalf". Loopt het contract door, dan komen er vanzelf
-     meer; is het opgezegd, dan houdt het op de einddatum op. */
-  function termijnenTussen(c, vanIso, totIso) {
-    const uit = [];
-    if (!c || !Number.isFinite(c.afgesprokenCenten)) return uit;
-    const stap = perMaand(c.frequentie);
-    const grens = new Date(totIso);
-    for (let n = 0, i = 1; i <= 600; n += stap, i++) {
-      const wanneer = plusMaanden(c.startAt, n);
-      const d = new Date(wanneer);
-      /* `>=` en niet `>`: de einddatum van een verbintenis is de eerste dag NA
-         de termijn (start + 12 maanden is het begin van maand 13). Met `>` komt
-         die dag er als dertiende termijn bij -- en dan telt een jaarcontract
-         dertien maanden. */
-      if (d >= grens) break;
-      if (vanIso && d < new Date(vanIso)) continue;
-      if (c.eindigtOp && d >= new Date(c.eindigtOp)) break;
-      uit.push({ termijn: i, vervalt: wanneer, centen: c.afgesprokenCenten * stap, periode: c.periode });
-    }
-    return uit;
-  }
-
-  /* Het einde van de huidige verbintenis: startdatum plus minimumtermijn maal
-     het aantal doorlopen periodes. */
-  function eindeVerbintenis(c) {
-    return c ? plusMaanden(c.startAt, c.minimumMaanden * (c.periode || 1)) : null;
-  }
-
-  /* Loopt de minimumtermijn af binnen `dagen`? Dit is wat een ronde zou vragen
-     om VERLENGBAAR te zetten. De ronde zelf bestaat nog niet; de vraag wel. */
-  function verlooptBinnen(dagen, nuIso) {
-    const nuT = new Date(nuIso || new Date(tijd()).toISOString()).getTime();
-    const grens = nuT + Math.max(0, dagen) * 86400000;
-    return rij().filter(c => c.status === STATUS.ACTIEF)
-      .filter(c => { const e = new Date(eindeVerbintenis(c)).getTime(); return e >= nuT && e <= grens; });
-  }
+  const { verplichtingOp, termijnenTussen, eindeVerbintenis, verlooptBinnen } =
+    maakVerplichting({ LOPEND, VERLENGING, STATUS, rij, tijd });
 
   function publiek(c) {
     if (!c) return null;

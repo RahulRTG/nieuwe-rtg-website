@@ -34,6 +34,11 @@ const vergoeding = require('./vergoeding');
 const allocatie = require('./allocatie');
 const tegoed = require('./tegoed');
 const caps = require('./capaciteiten');
+/* Twee onderwerpen staan apart. ./claims/poort.js keurt de VORM van een claim en
+   kent geen enkel bedrag; ./claims/open.js draagt wat er is besloten en nog niet
+   gebouwd. Zo blijft dit bestand de lijst van wat wel gedekt is. */
+const { poort: keurClaims, paden, DEKKING } = require('./claims/poort');
+const { openBeloften } = require('./claims/open');
 
 /* De dekking van een claim: hoe hard is hij?
 
@@ -42,7 +47,6 @@ const caps = require('./capaciteiten');
      GEBOUWD      er is code, maar de bewering leunt op iets buiten dit huis
      BELOFTE      er is een besluit en geen code -- zichtbaar als gat
 */
-const DEKKING = { AFGEDWONGEN: 'AFGEDWONGEN', GEBOUWD: 'GEBOUWD', BELOFTE: 'BELOFTE' };
 
 function bedrag(centen) {
   return '€ ' + (centen / 100).toLocaleString('nl-NL',
@@ -163,148 +167,18 @@ function claims() {
     toets: 'test/contract.test.js'
   });
 
-  // --- wat nog een belofte is ---
-  uit.push({
-    id: 'claim.partner.entry_fee',
-    onderwerp: 'Partner-entree',
-    waarde: 'GEEN',
-    tekst: 'een partnerplek hoort bij een zakelijk abonnement (' +
-      caps.tredenMet('can_be_partner').map(t => (ladder.trede(t) || {}).naam || t).join(' of ') +
-      '); er is geen entree, geen aparte contributie en geen doorbelasting van onderhoudskosten',
-    bron: 'kern/commercie/capaciteiten.js + kern/pasladder.js',
-    /* Stond hier als BELOFTE met waarde TE_HERZIEN: de partnervoorwaarden
-       noemden een entree van 10.000 euro plus 500 per jaar, naast een Business
-       Lite van 150 per maand. Twee toegangsprijzen naast elkaar is onuitlegbaar,
-       en 10.000 euro sluit precies de kleine zaak buiten voor wie die trede
-       bedoeld is. De entree is ingetrokken; wat overblijft is het abonnement, en
-       dat komt uit de ladder. */
-    dekking: DEKKING.AFGEDWONGEN,
-    toets: 'test/commercie.test.js'
-  });
-  uit.push({
-    id: 'claim.member.price_guarantee',
-    onderwerp: 'Ledenprijsgarantie',
-    waarde: 'PLAFOND_EN_RECHTZETTING',
-    tekst: 'een lid betaalt nooit meer dan de publieke prijs van de partner',
-    bron: 'kern/util.js + routes/supplier/menukaart.js',
-    /* Stond op GEBOUWD met "geen meldknop en geen terugbetaalstroom". Allebei
-       bestaan ze nu: kern/commercie/prijsmelding.js met zijn routes, en de
-       commerciele ronde die het verschil ook echt boekt. */
-    dekking: DEKKING.AFGEDWONGEN,
-    toets: 'test/partner.test.js + test/prijsmelding.test.js + test/ronde.test.js'
-  });
-
-  /* WAT ER MET EEN VASTGELEGDE VERPLICHTING GEBEURT. Deze claim bestond niet, en
-     dat was precies het gat: drie lagen legden bedragen vast en niets pakte ze
-     op. Een functie zonder beller is stiller dan een ontbrekende functie. */
-  uit.push({
-    id: 'claim.settlement.rounds',
-    onderwerp: 'Vastgelegde verplichtingen worden opgepakt',
-    waarde: 'RONDE_ELKE_5_MIN',
-    tekst: 'een vastgelegde verplichting blijft niet liggen: een terugkerende ronde boekt het ' +
-      'ledenvoordeel aan de zaak, zet een rechtgezet prijsverschil bij het lid terug, herkanst ' +
-      'mislukte betaaldienstboekingen en zet aflopende contracten op verlengbaar',
-    bron: 'kern/commercie/ronde.js + kern/commercie/verrekening.js',
-    dekking: DEKKING.AFGEDWONGEN,
-    toets: 'test/ronde.test.js + test/commercie-ronde.e2e.js'
-  });
-
-  /* De bundelprijs. Stond in COMMERCIE.md als "bewust niet gebouwd" omdat de
-     inkoopkant ontbrak -- en dat was eerlijk, maar geen eindstand: de klant
-     krijgt te horen dat hij een bundel kan kopen, en dan hoort er te staan wat
-     die kost. De som bestaat nu; of er een PRIJS uitkomt hangt aan een
-     boardroom-instelling, en zonder die instelling is de bundel niet te koop. */
-  uit.push({
-    id: 'claim.ai.bundle_price',
-    onderwerp: 'Prijs van een AI-bundel',
-    waarde: 'GEREKEND_NIET_GEKOZEN',
-    tekst: 'de verkoopprijs van een bundel volgt uit inkoopkosten, veiligheidsmarge en ' +
-      'platformmarge; zonder ingestelde inkoopkosten is er geen prijs en is de bundel niet te koop',
-    bron: 'kern/commercie/bundelprijs.js',
-    dekking: DEKKING.AFGEDWONGEN,
-    toets: 'test/bundelprijs.test.js'
-  });
-
-  /* WAT EEN ABONNEMENT BEVAT, en dat het ook echt wordt afgedwongen. Dit was tot
-     20 augustus 2026 een folder: het profiel stond er en zes van de acht
-     capabilities werden nergens gevraagd -- omdat een zaak helemaal geen
-     abonnement droeg. */
-  uit.push({
-    id: 'claim.subscription.capabilities',
-    onderwerp: 'Wat een abonnement bevat',
-    waarde: Object.keys(caps.CAPS).length + '_CAPABILITIES',
-    tekst: 'elke trede heeft een productprofiel dat zegt wat het abonnement bevat, en een zaak ' +
-      'draagt de trede waarop zij is toegelaten; de vraag "mag deze klant dit" wordt op een plek ' +
-      'beantwoord en niet per bestand opnieuw',
-    bron: 'kern/commercie/capaciteiten.js + kern/commercie/zaakabonnement.js',
-    dekking: DEKKING.AFGEDWONGEN,
-    toets: 'test/zaakabonnement.test.js + test/commercie.test.js'
-  });
+  uit.push(...openBeloften());
 
   return uit;
-}
-
-/* DE RELEASE-GATE. Geen financiele claim zonder bewijs.
-
-   Faalt als een claim zich AFGEDWONGEN noemt zonder toets, of als een claim geen
-   bron heeft. Een BELOFTE mag bestaan -- die is per definitie nog niet gedekt --
-   maar hij moet wel als belofte te boek staan en een kanttekening dragen die
-   zegt wat eraan ontbreekt.
-
-   Dit is met opzet streng op EEN ding: liegen over de hardheid. Een gat dat
-   eerlijk "BELOFTE" heet, is geen probleem; een gat dat zich "AFGEDWONGEN"
-   noemt, is er twee. */
-function poort(opties) {
-  const problemen = [];
-  for (const c of claims()) {
-    if (!c.bron) problemen.push(c.id + ' heeft geen bron: waar komt deze waarde vandaan?');
-    if (!c.waarde) problemen.push(c.id + ' heeft geen waarde');
-    if (c.dekking === DEKKING.AFGEDWONGEN && !c.toets)
-      problemen.push(c.id + ' noemt zich AFGEDWONGEN maar wijst geen toets aan; dan is het een belofte');
-    if (c.dekking === DEKKING.BELOFTE && !c.kanttekening)
-      problemen.push(c.id + ' is een belofte zonder kanttekening: er hoort te staan wat eraan ontbreekt');
-    if (!DEKKING[c.dekking]) problemen.push(c.id + ' heeft een onbekende dekking: ' + c.dekking);
-
-    /* DE BRON MOET BESTAAN. Een claim die naar `kern/commercie/verzonnen.js`
-       wijst, ziet er net zo degelijk uit als een die klopt -- en dat is erger
-       dan geen bron, want hij nodigt uit om niet te kijken. */
-    for (const pad of bronbestanden(c)) {
-      if (!bestaat(pad, opties)) problemen.push(c.id + ' wijst naar een bron die niet bestaat: ' + pad);
-    }
-    for (const pad of toetsbestanden(c)) {
-      if (!bestaat(pad, opties)) problemen.push(c.id + ' wijst naar een toets die niet bestaat: ' + pad);
-    }
-  }
-  return { ok: problemen.length === 0, problemen, aantal: claims().length };
-}
-
-/* De bestandsnamen uit een bron- of toetsveld. Die velden zijn proza met paden
-   erin ("kern/pasladder.js", "test/a.js + test/b.js"), dus we halen eruit wat op
-   een pad lijkt en laten de rest staan. Een veld zonder enig pad levert niets
-   op en wordt niet gecontroleerd -- dat is het geval van "alleen
-   partnervoorwaarden.html", waar de bron geen module is. */
-function paden(tekst) {
-  return String(tekst || '').match(/[A-Za-z0-9_./-]+\.(?:js|html|md)/g) || [];
-}
-const bronbestanden = c => paden(c.bron).filter(p => /^(kern|server|test)\//.test(p) || p.startsWith('kern/'));
-const toetsbestanden = c => paden(c.toets).filter(p => p.startsWith('test/'));
-
-function bestaat(pad, opties) {
-  const o = opties || {};
-  if (typeof o.bestaat === 'function') return o.bestaat(pad);
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    const wortel = path.join(__dirname, '..', '..', '..');
-    // een bronpad begint bij server/ als het met kern/ begint
-    const kandidaten = [path.join(wortel, pad), path.join(wortel, 'server', pad)];
-    return kandidaten.some(k => fs.existsSync(k));
-  } catch (e) { return true; }   // kan het niet nakijken: dan niet vals alarm slaan
 }
 
 function publiek() {
   return claims().map(c => ({ id: c.id, onderwerp: c.onderwerp, waarde: c.waarde, tekst: c.tekst,
     dekking: c.dekking, bron: c.bron, kanttekening: c.kanttekening || null }));
 }
+
+/* De poort krijgt de lijst MEE in plaats van hem zelf op te halen: zo kan een
+   toets hem een verzonnen claim voorleggen zonder deze module te bewerken. */
+const poort = (opties) => keurClaims(claims(), opties);
 
 module.exports = { claims, publiek, poort, paden, DEKKING };

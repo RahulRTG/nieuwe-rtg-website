@@ -62,6 +62,11 @@ function maakFonds(state) {
   let bankAfdracht = null;
   function koppelBank(fn) { if (typeof fn === 'function') bankAfdracht = fn; }
 
+  /* De rails staan apart: dit bestand beslist DAT er 30% afgaat en HOEVEEL, dat
+     brengt het bedrag naar buiten. Zie ./fonds/uitbetalen.js. */
+  const { verstuur } = require('./fonds/uitbetalen').maakUitbetaling({
+    opdrachten, save, log, lijst: () => lijst(), bankGeef: () => bankAfdracht });
+
   function bestemming() {
     return {
       iban: (env.RTF_IBAN || '').trim(),
@@ -74,22 +79,6 @@ function maakFonds(state) {
     if (!Array.isArray(db.data.fondsAfdrachten)) db.data.fondsAfdrachten = [];
     return db.data.fondsAfdrachten;
   }
-
-  /* De teruggang van een afdracht, en die is met opzet anders dan die van de
-     bank en van Pay: hier is GEEN dubbele boeking om terug te draaien. De
-     afdracht is zelf de administratie, en het geld stond nog bij RTG. "Terug"
-     betekent hier dus: zet hem op te_storten, met de reden erbij, zodat hij
-     opnieuw kan worden ingepland zodra de rail het weer doet. Dat blijft
-     zichtbaar in het fondsoverzicht in plaats van weg te vallen. */
-  if (opdrachten) opdrachten.registreerTeruggang('rtf-afdracht', async (o) => {
-    const a = lijst().find(x => x.id === o.ledgerRef);
-    if (!a) return { error: 'De afdracht bij deze opdracht bestaat niet meer.' };
-    a.status = 'te_storten';
-    a.fout = o.laatsteFout || 'de uitbetaling is niet gelukt';
-    save();
-    if (log && log.warn) log.warn('rtf-afdracht terug op te_storten na een mislukte rail', { id: a.id, fout: a.fout });
-    return { ok: true };
-  });
 
   // Boek de 30%-afdracht voor een zojuist betaalde abonnementsfactuur. Idempotent
   // op (wie, invoiceId): dezelfde betaalde factuur levert nooit twee afdrachten.
@@ -141,53 +130,7 @@ function maakFonds(state) {
     rijen.push(afdracht);
     if (rijen.length > 100000) rijen.splice(0, rijen.length - 100000);
 
-    // In de eigen-stand loopt de afdracht over de eigen rails: een boeking van
-    // de reserve naar de foundation-tegenrekening, per direct afgewikkeld.
-    if (bankAfdracht) {
-      try {
-        const eigen = bankAfdracht({ centen, referentie: afdracht.id, oms: 'RTFoundation-afdracht ' + (invoiceId || '') });
-        if (eigen && eigen.ok) {
-          afdracht.status = 'gestort';
-          afdracht.via = 'eigen-bank';
-          afdracht.boekingId = eigen.boeking ? eigen.boeking.id : null;
-          save();
-          return afdracht;
-        }
-      } catch (e) {
-        if (log && log.warn) log.warn('rtf-afdracht: eigen-bank-boeking mislukt', { invoiceId, fout: e.message });
-      }
-    }
-
-    /* Met een bekend IBAN gaat de afdracht de opdrachtenrij in, dezelfde als de
-       bank-SEPA en de partneruitbetaling van Pay (kern/betaalopdracht/).
-
-       Hier stond een rechtstreekse aanroep met een catch die de afdracht op
-       'te_storten' zette en logde. Dat was niet stil, maar er kwam ook nooit
-       iemand op terug: 'te_storten' wachtte op een mens die het opmerkte, en het
-       foundation-deel bleef zolang liggen. Nu wordt hij herhaald, telt hij mee in
-       hetzelfde reconciliatiegetal als de andere twee rails, en is 'te_storten'
-       weer wat het hoort te zijn -- geen bestemming bekend -- in plaats van een
-       verzamelbak voor mislukte inzendingen. */
-    if (best.iban && opdrachten) {
-      const op = opdrachten.maak({
-        soort: 'rtf-afdracht', rail: 'betaalnaad', centen, bestemming: best.iban,
-        begunstigde: best.begunstigde, oms: 'RTFoundation-afdracht ' + (invoiceId || ''),
-        ledgerRef: afdracht.id,
-        idemSleutel: 'rtf:' + (wie || '') + ':' + invoiceId
-      });
-      afdracht.opdrachtId = op.id;
-      const na = await opdrachten.dienIn(op);
-      afdracht.uitbetaalId = na.settlementRef || null;
-      /* Alle vijf de standen uitschrijven en niet "afgewikkeld of anders
-         ingepland". Geeft de rij het al bij deze eerste poging op, dan heeft de
-         teruggang hierboven de afdracht al op te_storten gezet -- een binaire
-         regel schreef daar 'ingepland' overheen en maakte van een mislukking
-         weer een belofte. */
-      if (na.status === 'AFGEWIKKELD') afdracht.status = 'gestort';
-      else if (na.status === 'MISLUKT' || na.status === 'TERUGGEBOEKT') afdracht.status = 'te_storten';
-      else afdracht.status = 'ingepland';
-      if (na.laatsteFout) afdracht.fout = na.laatsteFout;
-    }
+    await verstuur(afdracht, { centen, invoiceId, wie, best });
 
     save();
     return afdracht;

@@ -63,6 +63,15 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 @media(max-width:760px){#fpStand{display:none;}}
 .teller b{color:var(--rtg-txt);font-weight:600;}
 
+/* De stand van de gereedheid: een woord en een teken, nooit kleur alleen. */
+.fp-stand{display:inline-flex;align-items:baseline;gap:.5em;margin:6px 0 0;
+  font-size:clamp(1rem,2.4vw,1.25rem);letter-spacing:.06em;font-weight:600;}
+.fp-stand::after{content:attr(data-teken);font-size:.9em;}
+.fp-stand[data-sig="gezond"]  {color:var(--rtg-sig-gezond);}
+.fp-stand[data-sig="incident"]{color:var(--rtg-sig-incident);}
+.fp-cijfer{display:block;margin-top:6px;color:var(--rtg-soft);font-size:.9rem;
+  letter-spacing:0;font-variant-numeric:var(--rtg-cijfers);}
+
 /* Beeld en terrein: registers, geen kaartendashboards (ONTWERP.md par. 7). */
 .fp-blad{padding:clamp(18px,3vw,34px);max-width:900px;}
 .fp-blad h1{font:500 clamp(26px,3.4vw,40px)/1.05 'Bodoni Moda',serif;margin:14px 0 6px;}
@@ -85,6 +94,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
       <button class="actief" data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
       <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
       <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
+      <button data-blad="gereed"><span class="rv-icoon">⌸</span><span>Gereed</span></button>
     </nav>
     <div class="rv-bankvoet">
       <button data-blad="terrein"><span class="rv-icoon">≡</span><span>Editie</span></button>
@@ -148,6 +158,18 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
         </div>
       </div>
 
+      <div class="rv-pane" id="bladGereed" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">GEREEDHEID</div>
+          <h1 id="gereedZin">Nog niet gekeurd.</h1>
+          <p class="fp-stil">Elk procent komt uit een control met bewijs. Een stuk dat niemand
+            zag telt nul, en een ontbrekende kritieke control zet alles op niet gereed,
+            ongeacht wat de rest doet.</p>
+          <div class="fp-lijst" id="gereedLijst"></div>
+          <p class="fp-stil" id="gereedGroepen"></p>
+        </div>
+      </div>
+
     </section>
   </main>
 </div>
@@ -155,6 +177,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 <script src="/apps/festival/schil.js" defer></script>
 <script src="/apps/festival/poort.js" defer></script>
 <script src="/apps/festival/beeld.js" defer></script>
+<script src="/apps/festival/gereed.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

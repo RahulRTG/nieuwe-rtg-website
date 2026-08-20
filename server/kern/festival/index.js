@@ -11,6 +11,8 @@
      ./toegang.js       handelen   de scan, dubbelgebruik, de offline bundel
      ./bezetting.js     tellen     hoeveel mensen waar, en hoe snel erbij
      ./uitzondering.js  vooruit    wat er over dertig minuten misgaat
+     ./gereed.js        keuren     controls met bewijs; alleen afgetekend telt
+     ./gereedheid.js    de uitslag het ene getal waar een terrein op opengaat
 
    DE VOLGORDE VAN OPBOUW IS NIET VRIJ, en het is dezelfde reden als bij
    kern/concern/index.js: elk deel leest wat het vorige heeft neergezet. ./model
@@ -45,6 +47,10 @@ module.exports = (ctx) => {
   Object.assign(k, require('./toegang')(k));
   Object.assign(k, require('./bezetting')(k));
   Object.assign(k, require('./uitzondering')(k));
+  /* De gereedheid als laatste twee: ./gereedheid.js leest standVanControl uit
+     ./gereed.js, dus die volgorde is gedrag en geen smaak. */
+  Object.assign(k, require('./gereed')(k));
+  Object.assign(k, require('./gereedheid')(k));
 
   /* ---------- de samenvatting ----------
 

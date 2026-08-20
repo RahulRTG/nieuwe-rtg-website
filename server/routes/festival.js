@@ -148,4 +148,5 @@ module.exports = (kern) => {
      een eigen kopie: twee plekken die "is dit festival van jou" beantwoorden,
      is precies hoe zo'n controle uit de pas gaat lopen (LAT-regel 4). */
   require('./festival/poort')(kern, { mijn, editieVan, geenFestival, stuur });
+  require('./festival/gereed')(kern, { mijn, editieVan, geenFestival, stuur });
 };

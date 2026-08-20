@@ -31,6 +31,10 @@
     6. De offline bundel mag zijn tijden wel meesturen, en vindt de dubbele.
     7. Deurpersoneel scant wel, maar geeft geen passen uit.
    8. Welke dag er LOOPT komt van de server, en "geen" is een geldig antwoord.
+   9. Wie een stuk indient komt uit de SESSIE, niet uit het lichaam -- anders is
+      de functiescheiding een formaliteit.
+  10. De peildatum van de gereedheid komt van de server.
+  11. Indienen mag het personeel; zaaien en aftekenen alleen de manager.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -188,6 +192,59 @@ test('8. welke dag er loopt komt van de server, en geen is een geldig antwoord',
   assert.equal(leeg.dag, null);
 });
 
+test('9. wie indient komt uit de sessie, niet uit het lichaam', async () => {
+  await post('/api/festival/controls/seed', { festival: fid, editie: eid }, manager);
+  const stand = await post('/api/festival/gereed', { festival: fid, editie: eid }, deur);
+  const eerste = stand.controls[0];
+
+  /* De MANAGER dient in, maar zet een VREEMDE naam in het lichaam. Wordt die
+     overgenomen, dan staat het stuk op naam van een verzinsel en mag de manager
+     het straks gewoon zelf aftekenen -- en dan is de functiescheiding uit
+     kern/festival/gereed.js een formulier dat zichzelf invult.
+
+     De naam hieronder is met opzet een die in dit huis niet bestaat. Hij was
+     eerst 'Marta Salas', en dat is toevallig de manager van ESVEDRA zelf: de
+     mutatie sloeg daardoor af en de toets bewees niets. Zie mutatie 7. */
+  const ingediend = await post('/api/festival/bewijs',
+    { festival: fid, editie: eid, control: eerste.id, soort: 'besluit', nummer: 'A-1', door: 'Iemand Die Niet Bestaat' }, manager);
+  assert.equal(ingediend.ok, true);
+
+  const zelf = await api('/api/festival/bewijs/teken', { festival: fid, editie: eid, control: eerste.id }, manager);
+  assert.equal(zelf.status, 409, 'de server kent de indiener als de manager zelf, dus dit mag niet');
+  assert.match((await zelf.json()).error, /tekent het niet zelf af/);
+});
+
+test('10. de peildatum van de gereedheid komt van de server', async () => {
+  const stand = await post('/api/festival/gereed', { festival: fid, editie: eid }, deur);
+  const c = stand.controls.find(x => x.stand === 'ontbreekt');
+
+  // een stuk dat LANG geleden verliep: het personeelslid dient in, de manager tekent af
+  await post('/api/festival/bewijs', { festival: fid, editie: eid, control: c.id,
+    soort: 'keuring', nummer: 'K-9', geldigTot: '2020-06-01' }, deur);
+  await post('/api/festival/bewijs/teken', { festival: fid, editie: eid, control: c.id }, manager);
+
+  /* Een peildatum meesturen waarop het stuk nog geldig WAS. Wordt hij
+     overgenomen, dan keurt de organisatie zichzelf goed op een datum die haar
+     uitkomt. */
+  const na = await post('/api/festival/gereed', { festival: fid, editie: eid, op: '2020-01-01' }, deur);
+  assert.notEqual(na.op, '2020-01-01');
+  assert.equal(na.controls.find(x => x.id === c.id).stand, 'verlopen');
+});
+
+test('11. indienen mag het personeel; zaaien en aftekenen alleen de manager', async () => {
+  const eigen = await post('/api/festival/nieuw', { naam: 'Tweede' }, manager);
+  const e2 = await post('/api/festival/editie', { festival: eigen.festival.id, jaar: 2028 }, manager);
+  assert.equal((await api('/api/festival/controls/seed', { festival: eigen.festival.id, editie: e2.editie.id }, deur)).status, 403);
+  assert.equal((await post('/api/festival/controls/seed', { festival: eigen.festival.id, editie: e2.editie.id }, manager)).ok, true);
+
+  const st = await post('/api/festival/gereed', { festival: eigen.festival.id, editie: e2.editie.id }, deur);
+  const c = st.controls[0];
+  assert.equal((await post('/api/festival/bewijs', { festival: eigen.festival.id, editie: e2.editie.id,
+    control: c.id, soort: 'besluit' }, deur)).ok, true, 'wie het stuk heeft, levert het aan');
+  assert.equal((await api('/api/festival/bewijs/teken', { festival: eigen.festival.id, editie: e2.editie.id,
+    control: c.id }, deur)).status, 403, 'maar aftekenen is managerwerk');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -222,4 +279,20 @@ test('8. welke dag er loopt komt van de server, en geen is een geldig antwoord',
       LICHAAM laten komen in plaats van uit nu().
       -> toets 8 zakte: met een lege body viel er geen dag meer te vinden, en
          het beeld zou dus buiten de openingstijden hetzelfde zeggen als erbinnen.
+
+   7. In routes/festival/gereed.js bij /api/festival/bewijs `door` uit de body
+      laten komen in plaats van uit req.actor.
+      -> toets 9 zakte: de manager diende in op andermans naam en mocht daarna
+         zijn eigen stuk aftekenen. De KERN is hier ongewijzigd en volstrekt in
+         orde; de functiescheiding stond alleen op de route.
+      LET OP -- deze mutatie sloeg de EERSTE keer af, en dat lag aan de toets.
+         Die stuurde 'Marta Salas' mee als vreemde naam, en dat is toevallig de
+         manager van ESVEDRA zelf; de wacht sloeg dus alsnog aan en de toets
+         bewees niets. Nu staat er een naam die in dit huis niet bestaat. Dit is
+         de tweede keer deze ronde dat een mutatie een gat in de TOETS aanwijst
+         in plaats van in de code (zie ook mutatie 11 in test/festival.test.js),
+         en dat is precies waar de discipline voor bestaat.
+
+   8. In routes/festival/gereed.js de peildatum uit de body laten komen.
+      -> toets 10 zakte: een stuk dat in 2020 verliep telde weer mee.
    ========================================================================== */

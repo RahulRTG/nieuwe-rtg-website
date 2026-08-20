@@ -357,12 +357,20 @@ en niet met een festivalkopie.
 Elke fase is los bruikbaar; niets hieronder vraagt de volgende fase om waarde te
 hebben.
 
-1. **Terrein en pas.** De boom van plekken, de rechten, de scan met
+1. **Terrein en pas.** ✅ De boom van plekken, de rechten, de scan met
    dubbelgebruik-slot en de leesbare weigering. *Hiermee kan een festival zijn
-   poorten draaien.*
-2. **Command en uitzonderingen.** Bezetting, drempels, vooruitblik, de
-   gerangschikte lijst. *Hiermee ziet de leiding wat over dertig minuten misgaat.*
-3. **Gereedheid.** Controls met bewijs, NOT READY die niet weg te praten is.
+   poorten draaien.* `kern/festival/{model,terrein,soorten,rechten,poort,toegang}.js`
+2. **Command en uitzonderingen.** ✅ *voor wat er gemeten wordt* — bezetting,
+   drempels, vooruitblik, de gerangschikte lijst, en de ongemeten plekken als
+   eigen bevinding. `kern/festival/{bezetting,uitzondering}.js`. Wat er nog
+   ontbreekt is de KOPPELING: voorraad, rooster, vervoer en storingen zijn echte
+   uitzonderingsbronnen en worden nog niet gelezen (zie fase 7).
+3. **Gereedheid.** ✅ Controls met bewijs, NIET GEREED die niet weg te praten
+   is. `kern/festival/{gereed,gereedheid}.js`. Vier wegen naar vals groen staan
+   dicht: een stuk dat niemand zag telt nul, een verlopen stuk telt nul, wie
+   indient tekent niet af, en honderd procent van nul bestaat niet. Afzwakken
+   van een kritieke control mag — RTG is hier geen juridische autoriteit — maar
+   het staat in de uitslag.
 4. **Crew.** Zero-search: dienst openen, route, briefing, één knop. Bovenop het
    bestaande rooster, niet ernaast.
 5. **Commerce.** Producten als verzamelingen rechten, bundels met voorraadgrenzen,

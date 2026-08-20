@@ -65,6 +65,38 @@ test('het IDOR-register draagt geen onverklaarde WERKPLEK-doorbraak', () => {
     'als ijking; vond ' + JSON.stringify(reg.gemeten.werkplek));
 });
 
+test('de proef overleeft zijn eigen ronde: een 401 van een DODE sessie telt niet', () => {
+  /* DE FOUT DIE DIT VASTHOUDT, en hij maakte de uitslag beter dan de waarheid.
+     De proef loopt alle member-schrijfroutes langs, en /api/logout hoort daarbij.
+     Vanaf dat punt was het token ongeldig, en dan gebeurde er dit: de objectpool
+     stopte met vullen (120 velden in plaats van 428), en elke volgende 401 werd
+     door oordeelIdor gelezen als "bewezen gescheiden" terwijl er alleen maar geen
+     sessie was. Honderden routes stonden als bewijs in een register zonder dat
+     iemand iets had geweigerd.
+
+     De reparatie is niet "logout overslaan" maar een 401 niet geloven voordat is
+     vastgesteld dat de sessie nog leeft; is hij dood, dan wordt hij vernieuwd en
+     gaat de route over. Deze toets houdt vast DAT dat gebeurt: de proef loopt nog
+     steeds langs een route die zijn eigen sessie beeindigt, dus hij hoort minstens
+     een keer te hebben moeten herstellen. Zakt dit, kijk dan eerst of /api/logout
+     nog in de rij zit -- verdwijnt die, dan is nul juist goed en hoort deze toets
+     mee te veranderen. */
+  const fs = require('fs');
+  const path = require('path');
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
+  catch (e) { return; }
+  assert.ok((reg.gemeten || {}).sessieHernieuwd >= 1,
+    'de proef raakt /api/logout aan en hoort zijn sessie te herstellen; gemeten: ' +
+    JSON.stringify((reg.gemeten || {}).sessieHernieuwd));
+  /* En het gevolg dat ertoe doet: met een levende sessie oogst de pool ruim, en
+     dat is wat de meting scherp maakt. Blijft dit getal laag, dan meet de proef
+     vooral zijn eigen onbereikbaarheid. */
+  assert.ok((reg.gemeten.poolVelden || 0) >= 300,
+    'een pool die halverwege stopt met vullen laat de proef vooral onbereikbaar meten; velden: ' +
+    reg.gemeten.poolVelden);
+});
+
 test('een weigering die een persoonsveld lekt is gescheiden EN een lek', () => {
   const lek = oordeelIdor(403, '{"error":"verboden","naam":"Noor de Vries"}');
   assert.equal(lek.staat, 'gescheiden');

@@ -42,8 +42,15 @@ module.exports = [
     uitleg: 'Een rekening samen delen en ieders deel betalen.', paden: ['/api/splits', '/api/splitsen'] },
   { id: 'gld-cadeau', categorie: 'Geld', naam: 'Cadeaukaarten', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Cadeaukaarten kopen en de eigen kaarten bekijken.', paden: ['/api/giftcard', '/api/giftcards'] },
+  /* HET VERMOGEN HOORT ERBIJ, en het ontbrak. Punten zelf zijn geen geld, maar
+     VERZILVERDE punten zijn een bedrag in euro's dat het lid van RTG tegoed
+     heeft tegen een vaste koers -- dezelfde soort aanspraak als het
+     walletsaldo, en dus hetzelfde vastgelegde besluit (gesloten circuit, niet
+     uitbetaald aan het lid, met een plafond). Zonder deze regel hing een
+     geldhandeling aan geen enkele bevoegdheid. Zie kern/ervaring/leden/punten.js. */
   { id: 'gld-punten', categorie: 'Geld', naam: 'Punten en verzilveren', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Gespaarde punten en het verzilveren daarvan.', paden: ['/api/punten'] },
+    uitleg: 'Gespaarde punten en het verzilveren daarvan naar tegoed.', paden: ['/api/punten'],
+    vermogen: 'WALLET_SALDO' },
   { id: 'gld-prijzen', categorie: 'Geld', naam: 'Pasprijzen en balans', standaard: true, doelgroepen: ALLE,
     uitleg: 'De publieke prijslijst van de passen en het balansoverzicht van een lid.', paden: ['/api/pasprijzen', '/api/balans'] },
 

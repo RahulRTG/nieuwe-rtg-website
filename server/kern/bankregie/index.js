@@ -35,6 +35,20 @@ function maakBankregie({ db, save }) {
     if (!Number.isFinite(b.spaarrenteBp)) b.spaarrenteBp = 150;
     if (!Number.isFinite(b.roodLimietCenten)) b.roodLimietCenten = 0;
     if (!b.tarieven || typeof b.tarieven !== 'object') b.tarieven = { sepaUitCenten: 0, spoedCenten: 0, passenCenten: 0 };
+    /* DE TWEE PLAFONDS ONDER HET BESLUIT. kern/bevoegdheid/lijst.js staat het
+       aanhouden van ledengeld toe op grond van een BESLUIT en niet van een
+       vergunning, en dat besluit rust op drie voorwaarden -- waarvan "harde
+       plafonds" er een is. Die twee getallen stonden als constante in de code
+       (kern/pay/stand.js en kern/ervaring/leden/punten.js), en daarmee was de
+       grond onder het besluit alleen te verzetten door een programmeur.
+
+       Ze horen hier omdat dit de kamer is waar ook de VERGUNNING wordt
+       vastgelegd (./vergunning.js): wie het plafond verzet, verzet de grond
+       onder datzelfde besluit, en die twee horen op een tafel te liggen. De
+       code leest ze via een koppeling (kern/pay/index.js koppelPlafond), zodat
+       er geen tweede waarheid ontstaat. */
+    if (!Number.isFinite(b.walletPlafondCenten)) b.walletPlafondCenten = 1000000;      // 10.000 euro per wallet
+    if (!Number.isFinite(b.puntenTegoedMaxCenten)) b.puntenTegoedMaxCenten = 50000;    // 500 euro punten-tegoed
     if (!b.iban || typeof b.iban !== 'object') b.iban = { landcode: 'NL', bankcode: 'RTGB', bic: 'RTGBNL2A' };
     if (!b.nood || typeof b.nood !== 'object') b.nood = { actief: false, sinds: null, reden: '', door: '' };
     if (!Number.isFinite(b.mislukt)) b.mislukt = 0;
@@ -57,6 +71,8 @@ function maakBankregie({ db, save }) {
   const tarief = naam => Math.max(0, Math.round(Number(d().tarieven[naam]) || 0));
   const kenmerk = () => 'AUT' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const ledenAan = () => d().ledenAan === true;
+  /* De twee plafonds als EEN antwoord. Wie ze los opvraagt, vergeet er een. */
+  const plafonds = () => ({ walletCenten: d().walletPlafondCenten, puntenCenten: d().puntenTegoedMaxCenten });
 
   // de INGESTELDE clearing (los van nood): wat de gekozen stand zou doen
   function clearingConfig() {
@@ -121,6 +137,7 @@ function maakBankregie({ db, save }) {
       clearing: clearing(), clearingConfig: clearingConfig(), nood: { ...b.nood }, mislukt: b.mislukt,
       autorisatie: aut.pub(b.autorisatie), spaarrenteBp: b.spaarrenteBp, spaarrentePct: b.spaarrenteBp / 100,
       roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven }, iban: { ...b.iban },
+      plafonds: plafonds(),
       vergunning: vergunning(), partnerRails: partnerRails() };
   }
 
@@ -140,6 +157,7 @@ function maakBankregie({ db, save }) {
     bankNoodMeld: nood.noodMeld, bankNoodHerstel: nood.noodHerstel, bankClearingMislukt: nood.clearingMislukt, bankClearingGelukt: nood.clearingGelukt,
     // leden-bank live
     bankLedenAan: ledenAan, bankLedenZet: ledenZet,
+    bankPlafonds: plafonds,
     bankInstellingenZet: inst.instellingenZet, bankregieOverzicht: overzicht
   };
 }

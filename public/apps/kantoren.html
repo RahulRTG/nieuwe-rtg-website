@@ -2579,9 +2579,20 @@ function bankRenderInstel(r){
     '<div class="bk-velden">' +
     '<span><label for="bankRente" class="bk-lab">Spaarrente per jaar (%)</label><input id="bankRente" class="bk-w7" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '"></span>' +
     '<span><label for="bankRood" class="bk-lab">Standaard rood staan (€)</label><input id="bankRood" class="bk-w8" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '"></span>' +
-    '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
+    /* De twee plafonds staan hier en niet bij de tarieven, want dit zijn geen
+       getallen waarmee de bank REKENT: het zijn de harde grenzen waarop het
+       besluit onder WALLET_SALDO rust (kern/bevoegdheid/lijst.js). Wie ze
+       verzet, verzet de grond onder dat besluit -- vandaar de zin eronder. */
+    '<span><label for="bankWalletMax" class="bk-lab">Plafond per wallet (€)</label><input id="bankWalletMax" class="bk-w8" type="number" min="5000" max="100000" step="500" value="' + ((r.plafonds ? r.plafonds.walletCenten : 0) / 100) + '"></span>' +
+    '<span><label for="bankPuntenMax" class="bk-lab">Plafond punten-tegoed (€)</label><input id="bankPuntenMax" class="bk-w8" type="number" min="0" max="5000" step="50" value="' + ((r.plafonds ? r.plafonds.puntenCenten : 0) / 100) + '"></span>' +
+    '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button>' +
+    '<p class="bk-lab" style="flex-basis:100%;margin:.4rem 0 0;">De twee plafonds zijn de grond onder het besluit dat RTG ledengeld mag aanhouden zonder vergunning. Hoger zetten verzwakt die grond; het walletplafond kan niet onder de € 5.000 per boeking, want dan kan een lid een betaling niet meer bijladen.</p></div>';
   $('#bankInstelZet').addEventListener('click', async () => {
-    try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
+    try {
+      await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value),
+        walletPlafondEuro: Number($('#bankWalletMax').value), puntenPlafondEuro: Number($('#bankPuntenMax').value) });
+      meld('Instellingen bewaard.'); bankVervers();
+    } catch (e) { meld(e.message); }
   });
 }
 /* De Regelwacht: de belasting- en regeltabellen waarmee het hele systeem

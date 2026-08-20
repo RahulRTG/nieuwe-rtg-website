@@ -2,13 +2,17 @@
    professionals (met vooraf/achteraf betalen), de eigen boekingen- en
    bestelhistorie (RAM-venster + grootboek), cadeaukaarten kopen, de
    partnerlijst per stad en bestellingen plaatsen/betalen.
-   Gemount vanuit routes/member.js. */
+
+   DE CADEAUKAART STAAT IN ./cadeaukaart.js. Die hoorde hier eigenlijk nooit --
+   een kaart met saldo bij een zaak is geen boeking en geen bestelling -- en
+   sinds hij ECHT betaald wordt (met een pay-boeking en een herhaalgrendel) is
+   het ook geen paar regels meer. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, schoon, leeftijdVan, geborenVan,
     optieAan, zorgVoor, boekingenVoegToe, boekingenVanKlant, betaalBoekingVoor,
-    notifySupplier, sseToSupplier, sseToOffice, gcCode, PERSONAS, publicSupplier,
+    notifySupplier, sseToSupplier, sseToOffice, PERSONAS, publicSupplier,
     isFavoriet, salonZichtbaar, plaatsOrderVoor, betaalOrderVoor, rekeningVoor, betaalRekeningVoor, ordersVanKlant,
-    txLedgerActief, txLedgerVanKlant, txLedgerTel , gegevensStop} = kern;
+    txLedgerActief, txLedgerVanKlant, txLedgerTel, gegevensStop } = kern;
 
   app.post('/api/booking/request', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -77,27 +81,6 @@ module.exports = (kern) => {
     res.json({ boekingen, total });
   });
 
-  app.post('/api/giftcard/buy', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-    const s = findSupplier(req.body.supplierCode);
-    if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
-    const bedrag = Math.round(Number(req.body.bedrag));
-    if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-    const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-    const kaart = { code: gcCode(), supplierCode: s.code, supplierName: s.name, bedrag, saldo: bedrag,
-      kocht: codename, customerKey: req.session.key, at: new Date().toISOString(), verzilveringen: [] };
-    db.data.giftcards.unshift(kaart);
-    db.data.giftcards = db.data.giftcards.slice(0, 20000);
-    save();
-    notifySupplier(s.code, { icon: 'attenties', title: 'Cadeaukaart verkocht', body: codename + ' kocht via de app een cadeaukaart van € ' + bedrag + '.' });
-    sseToSupplier(s.code, 'sync', { scope: 'pos' });
-    res.json({ ok: true, kaart });
-  });
-
-  app.post('/api/giftcards/mine', auth, (req, res) => {
-    res.json({ kaarten: (db.data.giftcards || []).filter(g => g.customerKey === req.session.key).slice(0, 20) });
-  });
-
   app.post('/api/suppliers', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const city = req.body.city;
@@ -119,8 +102,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json(r.allergieBotsing ? { error: r.error, allergieBotsing: r.allergieBotsing } : { error: r.error });
     res.json(r);
   });
-  app.post('/api/order/pay', auth, (req, res) => {
-    const r = betaalOrderVoor(req.session, req.body);
+  app.post('/api/order/pay', auth, async (req, res) => {
+    const r = await betaalOrderVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
@@ -131,8 +114,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
-  app.post('/api/rekening/betaal', auth, (req, res) => {
-    const r = betaalRekeningVoor(req.session, req.body);
+  app.post('/api/rekening/betaal', auth, async (req, res) => {
+    const r = await betaalRekeningVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

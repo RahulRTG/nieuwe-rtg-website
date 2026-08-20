@@ -13,10 +13,30 @@ const RENTE_BP_MAX = 2000;         // spaarrente tot 20% (basispunten); ruim, RT
 const ROOD_MAX_CENTEN = 5000000;   // rood staan tot 50.000 euro als bovengrens
 const FOOI_MAX_CENTEN = 100000;    // een tarief is nooit meer dan 1000 euro
 
+/* DE GRENZEN OM DE TWEE PLAFONDS, en die zijn hier scherper dan bij de andere
+   getallen -- want dit zijn niet de getallen waarmee de bank REKENT maar de
+   getallen waar een BESLUIT op rust (kern/bevoegdheid/lijst.js, WALLET_SALDO).
+
+   De ondergrens van het walletplafond is geen smaak. Twee plekken rekenen erop
+   dat een tekort altijd bij te laden is (het autolaad-pad in kern/pay/opladen.js),
+   en dat klopt alleen zolang het plafond boven de grootste toegestane boeking
+   ligt. Zakt hij daaronder, dan bestaat er een betaling die een lid niet meer
+   kan dekken en faalt "EEN knop" -- stil, en alleen voor wie toevallig veel op
+   zijn wallet heeft staan. Vandaar dat de ondergrens gelijk is aan MAX_CENTEN
+   uit kern/pay/stand.js; die staat hier als eigen getal omdat de bankregie niets
+   uit de betaallaag hoort te importeren, met een toets die de twee vergelijkt.
+
+   De bovengrens is wel een keuze: hoe hoger het plafond, hoe zwakker de grond
+   onder het besluit. Honderdduizend euro is ruim genoeg om nooit in de weg te
+   zitten en laag genoeg om nog "een beperkt netwerk" te heten. */
+const WALLET_PLAFOND_MIN = 500000;      // gelijk aan MAX_CENTEN: 5.000 euro per boeking
+const WALLET_PLAFOND_MAX = 10000000;    // 100.000 euro per wallet
+const PUNTEN_PLAFOND_MAX = 500000;      // 5.000 euro aan punten-tegoed
+
 module.exports = (ctx) => {
   const { d, save } = ctx;
 
-  function instellingenZet({ spaarrenteBp: rente, roodLimietEuro, tarieven }) {
+  function instellingenZet({ spaarrenteBp: rente, roodLimietEuro, tarieven, walletPlafondEuro, puntenPlafondEuro }) {
     const b = d();
     if (rente != null) {
       const bp = Math.round(Number(rente));
@@ -36,9 +56,25 @@ module.exports = (ctx) => {
         b.tarieven[naam] = c;
       }
     }
+    if (walletPlafondEuro != null) {
+      const centen = Math.round(Number(walletPlafondEuro) * 100);
+      if (!Number.isFinite(centen) || centen < WALLET_PLAFOND_MIN || centen > WALLET_PLAFOND_MAX)
+        return { status: 400, error: 'Het walletplafond moet tussen ' + (WALLET_PLAFOND_MIN / 100) +
+          ' en ' + (WALLET_PLAFOND_MAX / 100) + ' euro liggen. Lager breekt het automatisch bijladen.' };
+      b.walletPlafondCenten = centen;
+    }
+    if (puntenPlafondEuro != null) {
+      const centen = Math.round(Number(puntenPlafondEuro) * 100);
+      if (!Number.isFinite(centen) || centen < 0 || centen > PUNTEN_PLAFOND_MAX)
+        return { status: 400, error: 'Het punten-tegoedplafond moet tussen 0 en ' + (PUNTEN_PLAFOND_MAX / 100) + ' euro liggen.' };
+      b.puntenTegoedMaxCenten = centen;
+    }
     save();
-    return { ok: true, spaarrenteBp: b.spaarrenteBp, roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven } };
+    return { ok: true, spaarrenteBp: b.spaarrenteBp, roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven },
+      walletPlafondCenten: b.walletPlafondCenten, puntenTegoedMaxCenten: b.puntenTegoedMaxCenten };
   }
 
   return { instellingenZet };
 };
+
+module.exports.GRENZEN = { WALLET_PLAFOND_MIN, WALLET_PLAFOND_MAX, PUNTEN_PLAFOND_MAX };

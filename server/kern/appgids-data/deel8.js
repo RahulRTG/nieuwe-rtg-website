@@ -1,4 +1,4 @@
-/* App-gids data, deel8 (18 pagina's). Zie ../appgids.js voor de uitleg;
+/* App-gids data, deel8 (22 pagina's). Zie ../appgids.js voor de uitleg;
    nieuwe pagina's krijgen hier (of in het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
@@ -60,6 +60,11 @@ module.exports = {
   '/apps/thuis.html': G('RTG Thuis: logeren bij leden, wereldwijd -- met alle premium functies gratis.',
     ['Zoek een huis op plaats en datums; superhosts en toppers staan bovenaan', 'Boek met 0% servicekosten; bij keyless krijg je een deurcode voor self check-in', 'Zet je eigen huis live als host: kortingen, borg, co-hosts en gratis AI-prijsadvies'],
     'Bij elke boeking krijg je automatisch alle reisregels van het land mee -- visum, verkeer, alarmnummer en meer.'),
+  '/apps/zaakpay.html': G('RTG Pay voor de zaak: het saldo van de kas, innen, uitbetalen en tegoed klaarzetten.',
+    ['Inn een bedrag met de betaalcode die het lid in zijn app toont',
+      'Zet tegoed klaar voor personeel of een klant; het geld gaat meteen uit de kas en staat vast tot iemand het ophaalt',
+      'Betaal het saldo uit naar de rekening van de zaak -- dat is een handeling van de manager'],
+    'Een zaak laadt niet bij zoals een lid: is de kas te laag, dan gaat het gewoon niet door. En verlopen tegoed haalt u zelf terug; het vervalt nooit stilzwijgend aan RTG.'),
   '/apps/kassa.html': G('De Kassa: een kassa-app voor elke zaak, met een modus per sector.',
     ['Kies de modus die bij de zaak past (bakker, restaurant, discotheek, sportkantine, personeelskantine, groenteboer)', 'Tik artikelen op de bon; weeg-artikelen rekenen per kilo', 'Reken af met contant, een RTG Pay-code of parkeer de bon op een tafel'],
     'Een kassamodus is een werkvorm, geen keurslijf: wissel gerust als de avond anders loopt dan de ochtend.'),

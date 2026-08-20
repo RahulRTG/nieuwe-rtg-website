@@ -12,9 +12,9 @@ const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoeg
 
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
-  fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+  fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-  ledenvoordeelVoor, facturatie }) => {
+  ledenvoordeelVoor, facturatie, pay }) => {
 
   /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
      waarom het op EEN plek staat: zie de kop van ./lidacties/factuur.js. */
@@ -101,7 +101,7 @@ function betaalBoekingVoor(session, body) {
      kan geen van de vier er zijn eigen variant naast zetten. */
   const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
-    fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+    fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive, pay,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
   const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);

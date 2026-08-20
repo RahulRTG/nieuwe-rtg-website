@@ -64,6 +64,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Tegenfeit | `commercie/tegenfeit.js` | **af** — met de boardroom als beslisser (§5.4) |
 | Economische idempotentie | `kern/betaalopdracht/rij.js` | **af** voor uitbetalingen; nog niet over de hele keten (§5.5) |
 | Intent (voornemen) | `commercie/voornemen.js` + `/plan`, `/keuring`, `/uitvoeren` | **af** — de keuring gaat over het totaal (§5.6) |
+| Effectieve rechten | `commercie/rechten.js` | **af** — nominaal naast effectief (§5.7) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -428,6 +429,50 @@ kluisstaat, waardoor de toets zichzelf in elk toetsproces stil oversloeg en drie
 mutaties er dwars doorheen liepen. Een zuivere functie is te toetsen; een die op
 modulestaat leunt, doet alsof.
 
+### 5.7 Het rechtenbord (was §6.7, nu gebouwd)
+
+Het antwoord op "wat mag deze partij nu écht" lag na §5.1–§5.6 op zes plekken:
+de trede, wat die trede bevat, welk abonnement de zaak wérkelijk draagt, wat het
+contract zegt, welke regels vandaag afdwingen en welke nog meelopen, en wat er
+aan AI-tegoed over is. Wie dat met de hand samenstelt, doet het één keer goed.
+
+Het bord zet twee kolommen naast elkaar, en dáár zit de waarde:
+
+| | betekenis |
+|---|---|
+| **nominaal** | wat het productprofiel zegt |
+| **effectief** | wat er vandaag werkelijk gebeurt |
+
+Die lopen uiteen zodra een handhavingsregel in de schaduw staat. Een zaak op
+Business Lite heeft nominaal geen governance — en krijgt het vandaag tóch, omdat
+die regel nog meeloopt. Dat is geen fout maar een besluit (§5.3); het moet alleen
+te zien zijn, want anders staat er in de verkooppraatjes iets anders dan in de
+deur. **Precies dat gat is waar dit hele traject mee begon.**
+
+Twee dingen die het bord bruikbaar houden in plaats van alarmerend:
+
+- **"Elders bewaakt" is geen gat.** Vier van de acht capabilities hebben hun
+  poort buiten de abonnementspoort — `can_use_ai` in `tegoed.js`,
+  `can_be_partner` in `zaakabonnement.js` en `partnerkanaal.js`,
+  `can_use_lifestyle_service` in `routes/member/lifestyle.js`,
+  `can_use_dedicated_support` in `routes/supplier/abonnement.js`. Wie die
+  "onbewaakt" noemt, laat vier keer per bord een vals alarm afgaan, en dan leert
+  iedereen de kolom te negeren. Het register van wie waar wordt gevraagd is
+  `scripts/capabilities.js` (§5.1), niet dit bord.
+- **Zonder schaduwlaag zegt het bord "onbekend", niet "afgedwongen".** Doen alsof
+  een regel bijt terwijl je het niet kunt nakijken, is precies de soort zekerheid
+  die dit document nergens wil.
+
+En het **verandert niets**: geen `save`, geen knop om een regel om te zetten, met
+een toets die dat vasthoudt. Een bord dat ook knoppen heeft wordt gebruikt om te
+sturen, en dan is er een zevende plek waar rechten vandaan komen in plaats van
+één die ze samenvat.
+
+`/api/office/rechten` geeft het bord van één zaak, van één trede, of — zonder
+argument — de **scheuren** over alle zaken heen. Loopt een scheur over álle
+zaken, dan is het geen zaakprobleem maar een regel die nog niet afdwingt, en dat
+staat er apart bij.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -443,8 +488,9 @@ vastligt en niemand halverwege iets anders bouwt.
 6. ~~**Intent layer + compiler**~~ **Gebouwd** — zie §5.6. Wat er nog niet is:
    een *compiler* die van vrije tekst een plan maakt. De laag die het plan
    controleert staat er; wie het plan opstelt is nu nog de aanroeper.
-7. **Effective rights** — één bord: wat mag deze partij nu écht, uit product,
-   contract, rol, delegatie, beleid, uitzonderingen en risicostand.
+7. ~~**Effective rights**~~ **Gebouwd** — zie §5.7. Rol, delegatie en risicostand
+   staan er nog niet in: die wonen in CONCERN.md respectievelijk `bevoegdheid.js`,
+   en een bord dat ze half toont is misleidender dan één dat ze weglaat.
 8. **Self-healing fallback** — de zaken op `voor-de-ladder` automatisch
    voorstellen op basis van hun historie, en pas na menselijke bevestiging
    verplaatsen.

@@ -118,7 +118,15 @@ Object.assign(kern, (() => {
        plaats van stilzwijgend ja. */
     beslis: (vraag) => (kern.beslis ? kern.beslis(vraag) : null) });
 
-  return { commercieBewijstoken: token, voornemens,
+  /* HET RECHTENBORD. Alles wat hierboven is opgehangen, in EEN antwoord: wat
+     het productprofiel zegt, en wat er vandaag werkelijk gebeurt. Die twee lopen
+     uiteen zodra een handhavingsregel nog meeloopt, en dat gat -- de belofte
+     tegenover de handhaving -- is waar dit hele traject mee begon. Zie
+     kern/commercie/rechten.js; die laag LEEST alleen. */
+  const rechten = require('../kern/commercie/rechten').maakRechten({
+    zaakAbonnement, schaduw, tegoed, contracten: kern.contracten || null });
+
+  return { commercieBewijstoken: token, voornemens, commercieRechten: rechten,
     commercieRonde: ronde, commercieVerrekening: verrekening,
     commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement,
     handhavingSchaduw: schaduw };

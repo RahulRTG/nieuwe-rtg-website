@@ -89,6 +89,22 @@ module.exports = (ctx) => {
     return r;
   }));
 
+  /* HET RECHTENBORD VAN EEN ZAAK. Drie kolommen naast elkaar: wat het
+     productprofiel zegt, wat er vandaag werkelijk gebeurt, en of er iets is dat
+     het bewaakt. `afwijkend` staat vooraan -- dat is het gat tussen de belofte
+     en de handhaving, en daar begon dit hele traject mee. */
+  app.post('/api/office/rechten', officeAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.commercieRechten) return { status: 503, error: 'Het rechtenbord is niet gemount.' };
+    const b = req.body || {};
+    if (b.code) return { status: 200, ok: true, bord: kern.commercieRechten.voorZaak(b.code) };
+    if (b.pas) return { status: 200, ok: true, bord: kern.commercieRechten.voorLid(b.pas) };
+    /* Zonder code of pas: het overzicht over alle zaken. Een scheur die over
+       ALLE zaken loopt is geen zaakprobleem maar een regel die nog niet
+       afdwingt, en dat staat er dan ook apart bij. */
+    const codes = (db && db.data && db.data.suppliers || []).map(s => s.code);
+    return { status: 200, ok: true, scheuren: kern.commercieRechten.scheuren(codes), zaken: codes.length };
+  }));
+
   app.post('/api/office/handhaving', officeAuth, (req, res) => veilig(res, () => {
     if (!kern || !kern.handhavingSchaduw) return { status: 503, error: 'De schaduwlaag is niet gemount.' };
     const regels = kern.handhavingSchaduw.lijst().map(r => ({ ...r, tegenfeit: tegenfeit.vanSchaduw(r) }));

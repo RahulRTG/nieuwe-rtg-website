@@ -1,3 +1,4 @@
+/* het personeelsdossier: openen met een reden, en wat de school daarvan ziet */
   function dossier(id, reden) {
     A('/school/hr/dossier', sleutels({ personeelId: id, reden: reden })).then(function (r) {
       if (r.body.error) { OPEN = null; return meld(r.body.error); }

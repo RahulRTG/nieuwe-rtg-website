@@ -9,15 +9,16 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 401 delen, 0 zonder onderwerp.**
+**57 bundels, 434 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 86 delen, 8962 regels in de delen
+`public/apps/app-main/` -- 92 delen, 9424 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `app-main-01.js` | de bouwstempel: HTML en script moeten van dezelfde bouw zijn |
+| `app-main-01.js` | de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw |
+| `app-main-01b.js` | de inhoud van de expliciete demostand |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
 | `app-main-02a.js` | de demomelding: een demo is een toestand, geen terugval na een storing |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
@@ -31,6 +32,8 @@ omlaag.
 | `app-main-06.js` | het gesprek met Rahul: versturen, wachten en het antwoord tonen |
 | `app-main-07.js` | het contactenblok op het beginscherm, met de lege staat |
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
+| `app-main-08a.js` | Vervolg van app-main-08: het meebouwen aan het eind van de onboarding |
+| `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |
 | `app-main-09.js` | de storyrij bovenaan De Salon |
 | `app-main-09a.js` | de contactpin: je eigen code, als tekst en als QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
@@ -55,11 +58,13 @@ omlaag.
 | `app-main-23.js` | de lopende rekening bij een partner opvragen |
 | `app-main-24.js` | Veiligheid en verbinding |
 | `app-main-24a2.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging |
+| `app-main-24a3.js` | Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging |
 | `app-main-24b.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon" erbij kwam |
 | `app-main-25.js` | de algemene pin: zetten of vragen |
 | `app-main-25b.js` | Mappen, gebruik en het bouwen van de tegels |
 | `app-main-26.js` | de taakbalk: welke knop welk tabblad opent |
 | `app-main-26b.js` | Rahuls signatuurmond in de balk onderaan het beginscherm |
+| `app-main-26c.js` | Afgesplitst van app-main-26b.js toen dat over de 10 KB ging (regel 13) |
 | `app-main-27.js` | een map hernoemen op het springboard |
 | `app-main-27b.js` | Afgesplitst van app-main-27.js, dat over de 10 KB ging |
 | `app-main-28.js` | het springboard verslepen, met vinger en met muis |
@@ -87,7 +92,8 @@ omlaag.
 | `app-main-47.js` | de zakelijke specificatie op een factuur |
 | `app-main-48.js` | alles in een keer betalen |
 | `app-main-49.js` | het boekland van een zakelijk lid |
-| `app-main-50.js` | de antwoorden van Rahul op een bevestiging of een paklijst |
+| `app-main-49b.js` | De AI-kant van de app: de opener van Rahul en zijn regelantwoorden zonder backend |
+| `app-main-50.js` | de chatbellen van het Rahul-gesprek: een bericht als element, met wie het zei |
 | `app-main-51.js` | een betaalpartner kiezen |
 | `app-main-52.js` | het zakelijke blad: feed en lijsten |
 | `app-main-52b.js` | de reactieteller onder een bericht |
@@ -106,7 +112,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 6 delen, 670 regels in de delen
+`public/apps/backoffice/` -- 8 delen, 932 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -115,7 +121,9 @@ omlaag.
 | `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE VAKBEWIJZEN |
 | `backoffice-02.js` | paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt |
 | `backoffice-03.js` | Live meekijken bij een SOS: het lid stuurt een WebRTC-aanbod via de office- stream ('ontmoeting-signaal'); wij openen... |
+| `backoffice-03c.js` | DE REISBALIE EN DE INSTELLINGEN -- twee kantoorschermen voor twee deuren die er wel waren maar nergens op uitkwamen |
 | `backoffice-04.js` | De tijdlijn is schaalvast: de server bladert en zoekt door de volledige historie; het scherm toont altijd 25 regels p... |
+| `backoffice-05.js` | de backoffice: RENDEZ-VOUS -- THE TABLE |
 
 ## `apps/boardroom.js`
 
@@ -178,17 +186,18 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 3 delen, 242 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 385 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `sessie-00.js` | Sessie: het gezin-account en het gekozen profiel, net als bij een streamingdienst |
-| `sessie-01.js` | de sessie van de hulppas: lezen, actief en bewaren |
+| `sessie-01.js` | WELKE LETTER PAST OP DEZE CIRKEL |
 | `sessie-02.js` | de ongelezen-teller |
+| `sessie-03.js` | De wereldschil van de RTFoundation: welke bestemmingen er zijn, en welk scherm onder welke valt |
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 106 delen, 9096 regels in de delen
+`public/apps/leverancier/` -- 108 delen, 9357 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -210,6 +219,8 @@ omlaag.
 | `leverancier-12.js` | de tafelstatus en het inchecken van gasten |
 | `leverancier-12a.js` | de btw-aangifte van de zaak (server: kern/fiscaal/btwaangifte.js) |
 | `leverancier-12a1.js` | de btw-aangifte, deel 2: HET DETAIL van een aangifte |
+| `leverancier-12a2.js` | "Waarom?" -- de bewijsketen op het scherm (server: kern/fiscaal/herkomst.js) |
+| `leverancier-12a3.js` | de afsluiting van de periode en de pre-flight |
 | `leverancier-12b.js` | het vakwerk-dashboard (dienstverlenende genres): vandaag-bord, aanvragen, KPI's en AI |
 | `leverancier-13.js` | de secties van een taxi- of jetzaak |
 | `leverancier-14.js` | de eigen backoffice van de zaak |
@@ -312,7 +323,7 @@ omlaag.
 
 ## `apps/notities/app.js`
 
-`public/apps/notities/app/` -- 2 delen, 208 regels in de delen
+`public/apps/notities/app/` -- 2 delen, 218 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -345,7 +356,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 31 delen, 3056 regels in de delen
+`public/apps/personeel/` -- 31 delen, 3057 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -415,21 +426,69 @@ omlaag.
 
 ## `apps/rtgschool/leer.js`
 
-`public/apps/rtgschool/leer/` -- 2 delen, 227 regels in de delen
+`public/apps/rtgschool/leer/` -- 4 delen, 383 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `leer-01.js` | RTG School (leden), deel 1: het leerpaspoort op de officiële ladder, de leerlijn per groep of fase, de les in gewone... |
 | `leer-02.js` | de leerlijn: vakken en doelen, met wat je al behaald hebt |
+| `leer-03.js` | oefenen: vijf opgaven, een tegelijk |
+| `leer-04.js` | het leerpaspoort van de leerling: ophalen en tonen wat hij al kan |
 
 ## `apps/schoolpartner/app.js`
 
-`public/apps/schoolpartner/app/` -- 2 delen, 220 regels in de delen
+`public/apps/schoolpartner/app/` -- 3 delen, 281 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-01.js` | RTG School Partner, het scherm: een werkbank voor directie en lerarenteam op de bestaande school-API's |
 | `app-02.js` | leraar |
+| `app-03.js` | de doelgroepkiezer: welke groep of klas een bericht of taak krijgt |
+
+## `apps/schoolpartner/dossier.js`
+
+`public/apps/schoolpartner/dossier/` -- 2 delen, 236 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `dossier-01.js` | RTG School Partner: het leerlingdossier |
+| `dossier-02.js` | het leerlingdossier openen: wie er wordt gekozen en wat er dan wordt geladen |
+
+## `apps/schoolpartner/enterprise-beheer.js`
+
+`public/apps/schoolpartner/enterprise-beheer/` -- 2 delen, 180 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `enterprise-beheer-01.js` | RTG School Partner (los deel): rollen, koppelingen en het inzagejournaal |
+| `enterprise-beheer-02.js` | de export van de school: alles plat en leesbaar, met het zorgdeel als aparte keuze |
+
+## `apps/schoolpartner/geld.js`
+
+`public/apps/schoolpartner/geld/` -- 2 delen, 203 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `geld-01.js` | RTG School Partner: geld |
+| `geld-02.js` | de kantinekaart: het saldo per leerling en wat de school erover mag zetten |
+
+## `apps/schoolpartner/hr.js`
+
+`public/apps/schoolpartner/hr/` -- 2 delen, 195 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `hr-01.js` | RTG School Partner: personeelszaken |
+| `hr-02.js` | het personeelsdossier: openen met een reden, en wat de school daarvan ziet |
+
+## `apps/schoolpartner/veiligheid.js`
+
+`public/apps/schoolpartner/veiligheid/` -- 2 delen, 181 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `veiligheid-01.js` | RTG School Partner: gebouw en veiligheid -- toegangspassen, bezoekers en incidenten |
+| `veiligheid-02.js` | de incidentenkaart: wat er is gemeld, met de laatste vijfentwintig bovenaan |
 
 ## `apps/techniek.js`
 
@@ -471,7 +530,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 545 regels in de delen
+`public/shared/basis/` -- 4 delen, 562 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -518,7 +577,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 358 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 365 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -535,6 +594,21 @@ omlaag.
 | `drie-01.js` | Drie: de kleine, huiseigen 3D-laag van RTG |
 | `drie-02.js` | de buffers van een mesh naar de GPU |
 
+## `shared/gebaar.js`
+
+`public/shared/gebaar/` -- 8 delen, 1044 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `gebaar-01.js` | RTG Gebaren -- deel 1: de kern, de tekens en het licht |
+| `gebaar-02.js` | Vervolg van gebaar-01: WAT ER ONDER EEN REGEL LIGT -- de lade zelf, het openen en sluiten, het uitvoeren en de weg terug |
+| `gebaar-02b.js` | Vervolg van gebaar-02: HET SLEPEN ZELF |
+| `gebaar-03.js` | Vervolg van gebaar-02: DE TIK, DE GREEP EN DE TOETSEN -- alle wegen naar dezelfde acties die geen veeg zijn |
+| `gebaar-03b.js` | Vervolg van gebaar-03: VASTHOUDEN, in zijn twee betekenissen |
+| `gebaar-04.js` | Slot van de gebarenlaag: DE ACTIELADE en de deur naar buiten |
+| `gebaar-04b.js` | Slot van de gebarenlaag, deel twee: WAT EEN SCHERM ERVAN ZIET |
+| `gebaar-04c.js` | Slot van de gebarenlaag, deel drie: DE VEEG DIE DE SERVER RAAKT |
+
 ## `shared/geluid.js`
 
 `public/shared/geluid/` -- 2 delen, 212 regels in de delen
@@ -546,7 +620,7 @@ omlaag.
 
 ## `shared/glyf.js`
 
-`public/shared/glyf/` -- 3 delen, 206 regels in de delen
+`public/shared/glyf/` -- 3 delen, 240 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -595,11 +669,12 @@ omlaag.
 
 ## `shared/ios.js`
 
-`public/shared/ios/` -- 4 delen, 629 regels in de delen
+`public/shared/ios/` -- 5 delen, 777 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `ios-01.js` | De iOS-laag, het gedrag |
+| `ios-01b.js` | De iOS-laag, deel 1b: DE BALK |
 | `ios-02.js` | Zoekvelden en filterrijen horen niet op de balk zelf maar eronder -- dat is waar Mail en Berichten ze zetten |
 | `ios-02b.js` | Afgesplitst van ios-02.js, dat over de 10 KB ging toen de bijregels van de kop meeverhuisden |
 | `ios-03.js` | de randveeg: vanaf de schermrand naar binnen vegen |
@@ -678,7 +753,7 @@ omlaag.
 
 ## `shared/rahulpoort.js`
 
-`public/shared/rahulpoort/` -- 2 delen, 257 regels in de delen
+`public/shared/rahulpoort/` -- 2 delen, 269 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -732,7 +807,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 270 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 274 regels in de delen
 
 | deel | onderwerp |
 |---|---|

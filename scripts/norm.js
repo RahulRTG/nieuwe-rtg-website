@@ -259,6 +259,8 @@ const METERS = [
      een ratel bij te zetten -- niet door er een regel bij te schrijven; zie de
      kop van scripts/lib/metingen.js. */
   { sleutel: 'ratelTanden', richting: 'omhoog', wat: 'meters die aan een ratel hangen (de ratel mag niet krimpen)' },
+  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
+  { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
   { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' }
 ];
 
@@ -757,6 +759,8 @@ function meet(bronnen) {
     bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
+    bronBlindeBestanden,
+    delenZonderOnderwerp,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,

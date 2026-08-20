@@ -94,6 +94,7 @@ window.RTGSchoolVeiligheid = (function () {
       '<button class="knop p" id="vgBez" type="button">Meld aan</button></div></div>';
   }
 
+/* de incidentenkaart: wat er is gemeld, met de laatste vijfentwintig bovenaan */
   function incidentKaart(d) {
     var rijen = (d.incidenten || []).slice(0, 25).map(function (i) {
       return '<div class="item" style="align-items:flex-start;"><span style="flex:1;min-width:14rem;">' +

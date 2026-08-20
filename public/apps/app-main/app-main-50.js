@@ -1,3 +1,4 @@
+/* de chatbellen van het Rahul-gesprek: een bericht als element, met wie het zei */
   function bubble(text, who){
     const el = document.createElement('div');
     el.className = 'bubble ' + who;

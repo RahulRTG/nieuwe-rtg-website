@@ -97,6 +97,7 @@
       h += kaart('Export',
         '<div class="rij"><button class="knop" id="enExport" type="button">Exporteer de school</button>' +
         '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;">' +
+/* de export van de school: alles plat en leesbaar, met het zorgdeel als aparte keuze */
         '<input type="checkbox" id="enExportZorg"> met het zorgdeel</label></div>' +
         '<div id="enExportUit" class="stil" style="margin-top:.4rem;"></div>',
         'Alles wat de school van zichzelf heeft, plat en leesbaar. Vraagt u het zorgdeel erbij, dan staat dat als zodanig in het journaal.');

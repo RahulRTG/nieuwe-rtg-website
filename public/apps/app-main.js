@@ -1,3 +1,4 @@
+/* de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw */
 (function(){
 /* HTML EN SCRIPT MOETEN VAN DEZELFDE BOUW ZIJN.
 
@@ -12,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '79614c80';
+var RTG_BOUW = '39d4c0f0';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7954,6 +7955,7 @@ var RTG_BOUW = '79614c80';
         : T('ai.a.restleeg','Een tafel regel ik via ons netwerk, tegen de normale prijs. Waar bent u, of waar gaat u heen, en met hoeveel personen?');
     return T('ai.a.default','Daar kom ik vandaag nog op terug. Ik kan alvast helpen met de paklijst, documenten, het weer of een dagplan, zeg het maar.');
   }
+/* de chatbellen van het Rahul-gesprek: een bericht als element, met wie het zei */
   function bubble(text, who){
     const el = document.createElement('div');
     el.className = 'bubble ' + who;

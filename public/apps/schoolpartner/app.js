@@ -199,6 +199,7 @@
       doelkies();
     });
   }
+/* de doelgroepkiezer: welke groep of klas een bericht of taak krijgt */
   function doelkies() {
     var v = $('#tGroep').value;
     var bak = /^\d+$/.test(v)

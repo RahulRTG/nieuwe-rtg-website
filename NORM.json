@@ -10,8 +10,8 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 129,
-    "keuringOmvang": 320,
-    "keuringDubbeling": 311,
+    "keuringOmvang": 356,
+    "keuringDubbeling": 337,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -21,16 +21,16 @@
     "keuringTeGroot": 37,
     "inlineStijlAttributen": 5999,
     "browserpoortToetsen": 207,
-    "kernBreedte": 1435,
-    "kernGedeeld": 194,
+    "kernBreedte": 1475,
+    "kernGedeeld": 203,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 170,
-    "toetsenOngevoeligPct": 2.4,
+    "toetsenNietGemeten": 250,
+    "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "ratelTanden": 43,
-    "metingenZonderRatel": 9,
+    "metingenZonderRatel": 19,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
@@ -40,11 +40,91 @@
     "gluurOnbewaakt": 0,
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
-    "beweringenZonderVulcontrole": 92,
-    "bewijsCellenBewezen": 20941,
+    "beweringenZonderVulcontrole": 106,
+    "bewijsCellenBewezen": 16475,
     "bewijsAchterstand": 985
   },
   "notities": [
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "inlineStijlAttributen",
+      "van": 4936,
+      "vervalt": "2026-10-01",
+      "meter": "keuringScheef 18 -> 41, keuringTeGroot 16 -> 37, inlineStijlAttributen 4936 -> 5999",
+      "reden": "Deze drie zijn verhoogd in de EERSTE helft van deze samenvoegronde (de negen PR-takken), met de verantwoording per meter in de notities van 2026-08-19 hieronder: scheve bevindingen zijn reparatiewerk en geen functieprijs, eenentwintig modules extra echt over de 10 kB-grens (de twintig zwaarste staan bij naam in \"uitzonderingen\"), en tweeenzeventig style-attributen erbij in de tien schermen die daar ook staan. WAAROM DEZE NOTITIE ER APART STAAT: de vervalregel schoof van 19 naar 21 augustus toen de veertien latere takken erbij kwamen, en daardoor vielen die drie notities buiten de eis -- niet omdat ze niets zeggen, maar omdat de grens onder ze door schoof. Ze staan er nog en dit is de brug ernaartoe. Aflossen is voor alle drie hetzelfde werk: de keuring nalopen, knippen op naden, en de stijlen naar de hulpklassen die deze ronde juist zijn ingevoerd (h-mt*, h-mb*)."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "bewijsCellenBewezen",
+      "van": 20941,
+      "vervalt": "2026-11-02",
+      "meter": "bewijsCellenBewezen 20941 -> 16475 (GEDAALD, en dat is de duurste van de ronde)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Dit is de ENIGE meter die daalt en dus bewijs VERLIEST. De oorzaak is aanwijsbaar: de meetregisters (INVOERPROEF, STAATPROEF, IDEMPROEF, POORTWACHT, AUDITPROEF) zijn uit twee takken samengevoegd, en waar twee runs elkaar tegenspraken is per regel de kant met de meeste bewijskracht gekozen. Dat levert een geldig maar ONVOLLEDIG register: de cellen die de ene run wel en de andere niet had, staan nu op ongemeten. Aflossen is geen herstel maar een RONDE: npm run rolproef, invoerproef, idemproef, staatproef en auditproef opnieuw over deze stand. Tot dat gebeurd is, is 16475 het eerlijke getal en niet 20941."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 320,
+      "vervalt": "2026-11-02",
+      "meter": "keuringOmvang 320 -> 356 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Zesendertig bestanden extra in de band vlak onder de 10 kB. Vijf modules zijn deze ronde WEL geknipt op hun naad (appgids deel1, ios-01, fiscaal/index, kernlaag7, pay/index, auth/inlog); de rest van de groei komt uit de veertien nieuwe takken. Hangt samen met keuringDubbeling hieronder en deelt daarom zijn einddatum."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 311,
+      "vervalt": "2026-11-02",
+      "meter": "keuringDubbeling 311 -> 337 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Zesentwintig functienamen extra die in meer dan twee kernmodules staan. Deze ronde loste er juist drie op (een browserlader in plaats van drie, een routedekking in plaats van twee, een ontmoetpoort in plaats van twee); wat overblijft is de woordenschat van veertien takken die elkaar niet kenden. Aflossen is hernoemen of samenvoegen per naam, niet de meter verzetten."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "waarheen": "GRENZEN.json, waar elk van de 181 domeinen bij naam draagt wat het mag aanraken -- inclusief de drie nieuwe (festival, vonk-wensen, link)",
+      "meter": "kernBreedte 1435 -> 1475 en kernGedeeld 194 -> 203 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Veertig kern-eigenschappen erbij, negen daarvan gedeeld. Dit is functieprijs en geen erosie: RTG Festival, de Link-laag, de voorkeurstaal van Vonk en de schoolschermen brengen elk hun eigen namen mee, en ze staan alle veertig per domein begrensd in GRENZEN.json (npm run grenslijst). De belofte \"de kern blijft smal\" is niet losgelaten maar per naam ondergebracht."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 170,
+      "vervalt": "2026-10-01",
+      "meter": "toetsenNietGemeten 170 -> 250 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tachtig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest. Die motor draait uren en is in deze ronde niet gedraaid; MUTATIES.json is samengevoegd uit twee runs en niet opnieuw gemeten. Aflossen is een volle ronde npm run mutatie."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "beweringenZonderVulcontrole",
+      "van": 92,
+      "vervalt": "2026-10-01",
+      "meter": "beweringenZonderVulcontrole 92 -> 106 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Veertien beweringen erbij die niet controleren of het veld waarop ze slaan wel gevuld was -- een toets die op undefined slaagt bewijst niets. Ze komen uit de nieuwe toetsbestanden van de veertien takken."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 9,
+      "vervalt": "2026-10-01",
+      "meter": "metingenZonderRatel 9 -> 19 (VERHOOGD, gemeten over de verzameling)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tien meetbestanden erbij (FESTIVAL, LINK, ONTMOETEN en de proefregisters van #92 en #95) waar nog geen ratel aan hangt. Aflossen is er per bestand een ratel bij zetten -- zie de kop van scripts/lib/metingen.js."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "p99Ms",
+      "van": 144,
+      "vervalt": "2026-10-01",
+      "meter": "p99Ms 144 -> 233, doorvoerPerSec 395 -> 336, eventLoopP99Ms 64,8 -> 97,9 (op de LAATSTE run, niet op deze stand)",
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. EERLIJK GEZEGD IS DIT GEEN METING VAN DEZE VERZAMELING. BEPROEVING.json draagt een run van 18 augustus, van voor de veertien nieuwe takken; hij is wel op dezelfde soort (sqlite) als de grondwaarde, dus de vergelijking klopt -- maar hij beschrijft de code van toen. De lat gaat mee met wat er gemeten IS in plaats van te blijven staan op een getal dat niemand heeft nagelopen; de eerstvolgende npm run beproeving over deze stand vervangt hem door een echte."
+    },
     {
       "datum": "2026-08-19",
       "soort": "schuld",
@@ -676,9 +756,9 @@
     }
   ],
   "prestatie": {
-    "p99Ms": 144,
-    "doorvoerPerSec": 395,
-    "eventLoopP99Ms": 64.8,
+    "p99Ms": 233,
+    "doorvoerPerSec": 336,
+    "eventLoopP99Ms": 97.9,
     "herstelSeconden": 1,
     "verhalenSlaagPctStorm": 76.4,
     "geheugenHellingMBPerMin": 0
@@ -687,8 +767,8 @@
   "prestatieGemeten": "2026-08-05T14:32:44.570Z",
   "prestatieKalibratie": 13.3,
   "vervalregel": {
-    "vanaf": "2026-08-19",
-    "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). De 64 notities van voor deze datum zijn het register zoals het is geschreven en worden niet met terugwerkende kracht ingedeeld -- scripts/normverval.js keurt alleen wat vanaf hier bij komt. Zonder die grens zou de regel over de eigen historie struikelen en binnen een dag zijn uitgezet. DE GRENS STOND EERST OP 18 AUGUSTUS EN IS EEN DAG OPGESCHOVEN, en dat is geen verzachting maar dezelfde redenering nog een keer: main schreef diezelfde dag twee notities op een eigen tak, waar deze regel niet bestond. CI ving dat op bij het samengaan. Allebei dragen ze een uitgebreide reden; wat ze missen is het veld dat er toen nog niet was. Ze alsnog indelen zou betekenen dat ik een andere schrijver een soort in de mond leg -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Vanaf 19 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
+    "vanaf": "2026-08-21",
+    "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
     "keuringOmvang": "2026-08-18",

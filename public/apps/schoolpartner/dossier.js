@@ -100,6 +100,7 @@ window.RTGSchoolDossier = (function () {
     });
   }
 
+/* het leerlingdossier openen: wie er wordt gekozen en wat er dan wordt geladen */
   function toon(id) {
     GEKOZEN = id;
     A('/school/dossier', sleutels({ leerlingId: id })).then(function (r) {

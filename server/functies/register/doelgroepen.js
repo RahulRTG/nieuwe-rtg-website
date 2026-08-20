@@ -16,6 +16,7 @@ const CATEGORIEEN = [
   'Diensten (leden)',
   'Toegang en identiteit',
   'Genres & diensten',
+  'Festival',
   'Cultuur en gezelschap',
   'Sociaal (De Salon)',
   'Eigen apps',

@@ -117,6 +117,7 @@ window.RTGSchoolGeld = (function () {
       '<button class="knop" id="glSubsidie" type="button">Noteer</button></div></div>';
   }
 
+/* de kantinekaart: het saldo per leerling en wat de school erover mag zetten */
   function kantineKaart(kies) {
     return '<div class="kaart"><div class="kop">Kantinesaldo</div>' +
       '<div class="rij"><select class="veld" id="glKLeerling" aria-label="Voor welke leerling">' + kies + '</select>' +

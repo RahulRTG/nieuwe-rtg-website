@@ -311,6 +311,7 @@
       }
     } catch (e) { meld(e.message); }
   }
+/* het leerpaspoort van de leerling: ophalen en tonen wat hij al kan */
   async function laadPaspoort() {
     MIJN = await api('/api/onderwijs/mijn');
     toonPaspoort();

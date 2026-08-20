@@ -42,6 +42,13 @@ Object.assign(kern, require('../kern/fiscaal/aansluiting').maakAansluiting({ db,
    met opzet zonder eigen controles -- elke uitslag komt uit de routine die de
    handeling straks ook aanroept. */
 Object.assign(kern, require('../kern/fiscaal/preflight').maakPreflight({ db, btwAangifte: kern.btwAangifte }));
+/* De aangiftegateway (kern/fiscaal/gateway/): mandaten, verzegelde zendingen,
+   idempotentie en een keten die een wijziging achteraf verraadt. KLAARGEZET EN
+   NIET AANGEZET -- het kanaal is inert en het zekerheidsregister houdt het
+   verzenden tegen; zie de kop van gateway/index.js. */
+Object.assign(kern, require('../kern/fiscaal/gateway/mandaat').maakMandaat({ db, save }));
+Object.assign(kern, require('../kern/fiscaal/gateway').maakGateway({ db, save, crypto,
+  mandaat: kern.mandaat, kanalen: { sbr: require('../kern/fiscaal/gateway/sbr').kanaal } }));
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 

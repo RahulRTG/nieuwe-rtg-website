@@ -74,6 +74,7 @@ module.exports = function hangRoutesOp(kern) {
      om dezelfde reden als concern -- het stuk is van het LID, RTG tekent het af
      in het kantoor, en de zaak wil weten of haar ploeg erdoor komt. */
   require('../routes/vakbewijs')(grens('vakbewijs'));
+  require('../routes/gateway')(grens('gateway'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

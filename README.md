@@ -1283,6 +1283,49 @@ De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?
 — en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
 ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
 
+### De aangiftegateway (`kern/fiscaal/gateway/`) — klaargezet, niet aangezet
+
+RTG dient geen aangiften in. Dat is een productgrens en hij staat in het
+zekerheidsregister (`btw.verzenden` en `loon.verzenden` zijn `voorbehouden`).
+Deze laag verandert daar niets aan — hij bouwt de machinerie eromheen, zodat die
+grens ooit een **besluit** kan zijn in plaats van een verbouwing.
+
+| Onderdeel | Waarom het nu al moet staan |
+|---|---|
+| **Verzegeling** | Een zending draagt de sha256 van zijn eigen inhoud, canoniek geserialiseerd. Zonder dat is "wij hebben dit verstuurd" later een bewering |
+| **Idempotentie** | Dezelfde inhoud → dezelfde sleutel. Bij een instantie die traag antwoordt is dat het verschil tussen één aangifte en twee |
+| **Staatmachine** | Eén kant op, met `AANGEBODEN` en `BEVESTIGD` apart — een toestand die "verzonden" heet laat die twee samenvallen |
+| **Keten** | Elke overgang draagt de zegel van de vorige; een record dat achteraf is bijgewerkt verraadt zichzelf |
+| **Mandaat** | Zonder toestemming wordt er niet eens iets klaargezet — andermans cijfers klaarzetten is al een verwerking |
+| **Retry** | Begrensd, en alleen op dezelfde verzegelde inhoud |
+
+**Er is geen weg naar buiten, en dat is getoetst met een kanaal dat wél actief
+is en wél zou versturen.** `biedAan` kijkt eerst naar het zekerheidsregister en
+pas daarna naar het kanaal; vandaag zegt het eerste nee. Geen vlag, geen
+omgevingsvariabele, geen `force`. Wie dit ooit aanzet, verandert het register en
+vervangt `actief` in de adapter — twee bewuste handelingen met een naam eronder.
+
+Er is ook **geen route om iets aan te bieden**. Niet vergeten maar weggelaten:
+een knop die altijd afketst is een knop die niet had moeten staan.
+
+**De richting:** generieke kern, SBR/Digipoort als eerste adapter (`sbr.js`).
+Die beschrijft wat het kanaal *vraagt* — dat is nu al te controleren, zodat een
+zending die vandaag wordt klaargezet straks niet ineens onvolledig blijkt — en
+weigert te versturen. De XML-signature met PKIoverheid-certificaat is
+**niet** nagebouwd met een eigen sleutel: een zelfgemaakte handtekening die er
+officieel uitziet is erger dan geen. De inhoud is wel verzegeld; dat is intern
+bewijs en doet niet alsof het meer is.
+
+De zaak verleent het mandaat, het kantoor leest en rekent de keten na. De naam
+van de gever komt uit het token en nooit uit het verzoek — anders is "verleend
+door" een tekstveld.
+
+Eén ding dat het bouwen opleverde: zolang de gateway inert is, is de hele
+bevestigingstak (`BEVESTIGD` / `AFGEWEZEN`) langs de gewone weg **onbereikbaar**
+— een ontvangstbewijs voor iets dat nooit is weggegaan hoort niet te kunnen, en
+de staatmachine zegt dat zelf. Die overgangen liggen wel vast en zijn puur
+getoetst.
+
 ### De ogenregel op één plek (`kern/ogen.js`)
 
 "Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en

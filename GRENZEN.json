@@ -305,6 +305,10 @@
       "verzoeklaag",
       "zaakVan"
     ],
+    "gateway": [
+      "gateway",
+      "mandaat"
+    ],
     "gebouw": [
       "gebouw",
       "status"

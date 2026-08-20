@@ -76,6 +76,11 @@ const REGISTER = {
     mits: 'Dit legt vast en verzendt niet; de verzending loopt buiten RTG om.' },
   'btw.verzenden': { klasse: 'voorbehouden',
     waarom: 'De ondernemer is de belastingplichtige; RTG dient nooit namens hem in en verzendt niets.' },
+  /* De loonkant apart, want daar is de rolverdeling anders: RTG voert die
+     administratie wel. Ook daar geldt dat het VERZENDEN buiten deze laag loopt
+     -- de koppeling is voorbereid (kern/fiscaal/gateway/) en niet aangesloten. */
+  'loon.verzenden': { klasse: 'voorbehouden',
+    waarom: 'De loonaangifte wordt bij een instantie ingediend via een koppeling die is voorbereid maar niet aangesloten; RTG verstuurt vandaag niets.' },
   'loon.aangifte': { klasse: 'bepaald',
     waarom: 'Opgemaakt uit EEN definitieve loonrun; het nominatieve deel komt regel voor regel van de loonstroken en er wordt niets opnieuw gerekend.',
     mits: 'Vastleggen dat er is ingediend is iets anders dan verzenden; de verzending loopt via een koppeling buiten deze laag.' },

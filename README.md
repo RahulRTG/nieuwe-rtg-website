@@ -1177,6 +1177,37 @@ De schijventabel wordt als geheel vervangen en nooit samengevoegd: schijf 1 van
 2026 met schijf 3 van 2024 eronder telt gewoon door en ziet er volstrekt normaal
 uit.
 
+### De ogenregel op één plek (`kern/ogen.js`)
+
+"Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en
+werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het
+bezwaar, het dwangbevel en de kwijtschelding. Drie schreven het met een trim, de
+vierde zonder.
+
+**Eerlijk over wat dat wel en niet betekende:** in `kern/uitgifte.js` was dat
+niet uit te buiten, want de naam gaat daar eerst door `schoon()` en die trimt al
+— aan beide kanten van de vergelijking. Er is dus geen gat gedicht. Wat het wél
+is: dezelfde waarheid op vier plekken, in formuleringen die nu al niet letterlijk
+gelijk zijn. LAT-regel 4 bestaat niet omdat het vandaag misgaat maar omdat het
+morgen misgaat — iemand haalt `schoon()` weg, of voegt een vijfde plek toe met
+weer een eigen variant.
+
+Wat er nu bij komt is het **register**: per handeling hoeveel ogen die vraagt
+(4 = twee mensen, 6 = drie), wat er nog omkeerbaar is, en een haak voor
+bedrag-drempels.
+
+> **Die drempels staan er en staan leeg.** Welk bedrag zwaarder toezicht
+> verdient, is een bestuurlijk besluit en geen technische keuze. Een verzonnen
+> grens die stilzwijgend gaat gelden is erger dan geen grens, want dan denkt
+> iedereen dat er over is nagedacht. De haak bestaat, de grens niet — en `eist()`
+> zegt dat er ook bij.
+
+Dit is **geen derde rechtenmodel**. Het beslist niet wie mag inloggen, wat een
+beheerder heeft uitgezet of wat RTG zelf mag — dat zijn de twee assen die er al
+zijn (`middleware/functieschakelaars.js` en `kern/bevoegdheid/`). Het is de
+telling van handtekeningen die die assen al veronderstelden en nergens
+opschreven. CONCERN.md's grens blijft dus staan.
+
 ### De vier zekerheidsklassen (`kern/fiscaal/zekerheid.js`)
 
 Elke fiscale uitkomst droeg dezelfde zin — "voorlichting, geen bindend fiscaal

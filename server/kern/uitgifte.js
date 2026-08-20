@@ -77,7 +77,11 @@ function maakUitgifte({ db, save, crypto }) {
     if (u.status !== 'wacht-op-ogen') return { status: 409, error: 'Deze uitgifte is al ' + u.status + '.' };
     const wie = schoon(actor, 60);
     if (wie.length < 2) return { status: 400, error: 'Een handtekening staat altijd op naam.' };
-    if (u.handtekeningen.some(h => h.door.toLowerCase() === wie.toLowerCase()))
+    /* De ogenregel komt uit kern/ogen.js. Hij stond hier zonder trim en aan de
+       overheidskant met -- wat hier niets uitmaakte, want `schoon()` hierboven
+       trimt al aan beide kanten. Het gaat dus niet om een gat maar om de vier
+       plekken zelf; zie de kop daar. */
+    if (require('./ogen').magMeetekenen(u.handtekeningen, wie).error)
       return { status: 409, error: 'Dezelfde ogen tellen niet dubbel; een ANDERE collega moet meetekenen.' };
     u.handtekeningen.push({ door: wie, at: nu() });
     if (u.handtekeningen.length >= nodig(u)) u.status = 'vrijgegeven';

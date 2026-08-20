@@ -141,6 +141,12 @@
     </div>
     <div id="dPlus"></div>
     <div id="dEnterprise"></div>
+    <div id="dDossier"></div>
+    <div id="dVeiligheid"></div>
+    <div id="dHR"></div>
+    <div id="dGeld"></div>
+    <div id="dOrganisatie"></div>
+    <div id="dOmroep"></div>
     <div id="dBeheer"></div>
   </div>
 
@@ -176,6 +182,10 @@
             <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
             <button class="knop" id="overnameStop" type="button">Overname stoppen</button>
           </div>
+          <div class="rij" style="margin-top:.4rem;">
+            <input class="veld" id="overneemCode" placeholder="Klascode van een collega" aria-label="Klascode om waar te nemen">
+            <button class="knop" id="overneem" type="button">Neem waar</button>
+          </div>
         </div>
       </div>
       <div class="deel">Toetsen</div>
@@ -200,11 +210,89 @@
         <div class="kop">Toetsen en uitslagen</div>
         <div id="tLijst"></div>
       </div>
+      <div class="kaart">
+        <div class="kop">Thuistaal per vak</div>
+        <p class="stil">Niet overal een vertaalknop. Bij een taalvak is de taal zelf wat u meet, dus staat "volledig" daar niet als keuze; bij rekenen en de zaakvakken mag de thuistaal er volledig naast.</p>
+        <div id="taalbeleidVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Ligt het aan de taal of aan de stof</div>
+        <p class="stil">Dezelfde drie vragen, eerst in het Nederlands en daarna opnieuw gesteld in de eigen taal. Gaat het dan wel goed, dan zit de taal in de weg. Dit is een aanwijzing voor een gesprek; er wordt niets vastgelegd.</p>
+        <div id="taalcheckVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Bericht aan een gezin</div>
+        <p class="stil">U ziet de vertaling en de terugvertaling, met wat er in betekenis is verschoven. Er gaat niets weg zonder uw naam, en elk bericht draagt een bon.</p>
+        <div id="berichtVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De eerste dag</div>
+        <p class="stil">Hoogstens vijf dingen, afgeleid uit hoe het er nu voor staat. Wat af is valt weg; er wordt niet bijgehouden hoe ver u bent.</p>
+        <div id="startVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Deze klas waarnemen</div>
+        <p class="stil">De klas, wat er vandaag speelt, het materiaal met een tweede uitleg, en wat eerdere lessen erover schreven. Wat u bewust niet ziet, staat er zelf bij.</p>
+        <div id="vervangVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Waar het vandaag om vraagt</div>
+        <p class="stil">Een lijst in plaats van meldingen uit vijf hoeken: nu, voor het eind van de dag, en wat kan wachten. Er staat niets over een kind in en er wordt niet bijgehouden hoe snel u hem leeg heeft.</p>
+        <div id="aandachtVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De les afronden</div>
+        <p class="stil">Het concept is al opgemaakt uit wat er vandaag gebeurde. U hoeft alleen te bevestigen -- en wat u noteert komt terug bij dezelfde leerstof.</p>
+        <div id="lesVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Denkpatronen in deze klas</div>
+        <p class="stil">Niet welke antwoorden fout waren, maar welk denken erachter zat -- geteld over de hele klas, zonder wie. Een patroon dat vaak langskomt vraagt om een korte klassikale uitleg.</p>
+        <div id="denkfoutVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat gaat er mee bij een overstap</div>
+        <p class="stil">Geen dossier maar een pakket per doel. Wat op "nooit" staat gaat ook met toestemming niet mee, en elke standaard zegt wat hij niet kan dragen. Er wordt hier niets verstuurd.</p>
+        <div id="overdrachtKaart"></div>
+        <div id="overdrachtPakket" style="margin-top:.6rem;"></div>
+        <div id="overdrachtInlezen" style="margin-top:.6rem;"></div>
+        <div id="overdrachtOverstap" style="margin-top:.6rem;"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De week van deze klas</div>
+        <p class="stil">Wat er op deze kinderen afkomt, ook uit andere klassen waar ze in zitten. Van elders telt alleen het aantal. Loopt een dag vol, dan scheelt verplaatsen meer dan doorwerken.</p>
+        <div id="belastingKlas"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Uw eigen week</div>
+        <p class="stil">Nakijkwerk, deadlines en toetsdagen bij elkaar, zodat u kunt schuiven. Er wordt niet bijgehouden hoe snel u het wegwerkt.</p>
+        <div id="belastingMij"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat meet deze toets</div>
+        <p class="stil">Kies leerdoelen en een aantal vragen; u ziet dekking, vraagvorm, overlap, tijd en taalbelasting. Er wordt niets aan uw toets veranderd -- dit is een keuring, u beslist.</p>
+        <div id="keurVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Hoe deed de toets het</div>
+        <p class="stil">Na afname krijgt de toets zelf een uitslag: per leerdoel hoe het ging en of het onderscheid maakte. Over de groep geteld, zonder leerlingen -- en onder de vijf gemaakte toetsen staat er niets.</p>
+        <div id="spiegelVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Bewijs van beheersing</div>
+        <p class="stil">Een becijferde toets landt vanzelf in het leerpaspoort. Wat u ziet -- een leerling die het uitlegt of voordoet -- legt u hier vast; dat is bewijs dat geen oefensessie kan meten.</p>
+        <div id="bewijsVorm"></div>
+      </div>
       <div class="deel">Hulplijn</div>
       <div class="kaart">
         <div class="kop">De hulplijn</div>
         <p class="stil">De ene knop van het kind zelf. Acuut staat bovenaan; vertrouwelijke meldingen ziet alleen jij (de vertrouwenspersoon-route), gewone meldingen lezen de ouders mee. Pak op met een korte notitie; het kind ziet dat het gezien is.</p>
         <div id="hulpLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat er met een hulpvraag gebeurt</div>
+        <p class="stil">De keten: toegewezen, gezien, afspraak, afgerond. Wat te lang blijft staan gaat vanzelf naar de directie -- die ziet dat er iets ligt, niet wat of van wie.</p>
+        <div id="opvolgVorm"></div>
       </div>
       <div class="deel">Excursies</div>
       <div class="kaart">
@@ -239,6 +327,56 @@
         </div>
         <div id="boomLijst"></div>
       </div>
+      <div class="deel">Aanwezigheid</div>
+      <div class="kaart">
+        <div class="kop">Presentie van deze les</div>
+        <p class="stil">Een registratie is een waarneming, geen oordeel. Zet u dezelfde les nog eens, dan vervangt dat de vorige: verzuim uit een typefout is een van de vervelendste fouten die een school kan maken.</p>
+        <div id="presLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Verzuimbeeld van de klas</div>
+        <p class="stil">Op naam, nooit op &quot;meeste verzuim eerst&quot;.</p>
+        <div id="presBeeld"></div>
+      </div>
+      <div class="deel">Verlof en oudergesprek</div>
+      <div class="kaart">
+        <div class="kop">Verlofaanvragen</div>
+        <p class="stil">Een besluit gaat altijd met een reden naar het gezin. Een afwijzing zonder reden is bij leerplicht het begin van een conflict dat niemand wil.</p>
+        <div id="verlofLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Momenten voor het oudergesprek</div>
+        <p class="stil">Zet een avond in een keer klaar; de tijden lopen vanzelf door. Ouders kiezen zelf een moment: wie het eerst komt.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="afspraakDatum" type="date" aria-label="Datum" style="flex:0 1 10rem;">
+          <input class="veld" id="afspraakTijd" type="time" aria-label="Begintijd" style="flex:0 1 8rem;">
+          <input class="veld" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakPlek" maxlength="60" placeholder="Lokaal" aria-label="Plek">
+          <button class="knop p" id="afspraakZet" type="button">Zet klaar</button>
+        </div>
+        <div id="afspraakLijst"></div>
+      </div>
+      <div class="deel">Mijn zaken</div>
+      <div class="kaart">
+        <div class="kop">Mijn personeelsdossier</div>
+        <p class="stil">Dit is jouw eigen dossier: wat hier staat, staat er ook voor HR. Ziek melden vraagt geen reden, uren boek je zelf, en je reactie bij een gesprek blijft staan.</p>
+        <div id="mijnHR"></div>
+      </div>
+      <div class="deel">Rapporten</div>
+      <div class="kaart">
+        <div class="kop">Rapport klaarzetten</div>
+        <p class="stil">De cijfers en de aanwezigheid staan er meteen in. Het blijft een concept tot u het vaststelt; zolang ziet geen enkel gezin het.</p>
+        <div class="rij" style="margin:.5rem 0;">
+          <input class="veld" id="rapPeriode" maxlength="30" placeholder="Periode (bijv. Periode 2)" aria-label="Periode van het rapport">
+          <button class="knop p" id="rapMaak" type="button">Zet het rapport klaar</button>
+        </div>
+        <div id="rapLijst"></div>
+      </div>
+      <div class="kaart" id="rapDetailKaart">
+        <div class="kop">Het rapport</div>
+        <div id="rapDetail"><p class="stil">Open hierboven een rapport om de teksten te schrijven en het vast te stellen.</p></div>
+      </div>
       <div class="deel">Cijferboek</div>
       <div class="kaart">
         <div class="kop">Cijferboek</div>
@@ -254,11 +392,33 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
 <script src="/apps/schoolpartner/toetsen.js"></script>
+<script src="/apps/schoolpartner/presentie.js"></script>
+<script src="/apps/schoolpartner/rapport.js"></script>
+<script src="/apps/schoolpartner/mijnhr.js"></script>
+<script src="/apps/schoolpartner/verlof.js"></script>
+<script src="/apps/schoolpartner/bewijs.js"></script>
+<script src="/apps/schoolpartner/denkfout.js"></script>
+<script src="/apps/schoolpartner/aandacht.js"></script>
+<script src="/apps/schoolpartner/instap.js"></script>
+<script src="/apps/schoolpartner/taal.js"></script>
+<script src="/apps/schoolpartner/taalcheck.js"></script>
+<script src="/apps/schoolpartner/opvolging.js"></script>
+<script src="/apps/schoolpartner/toetskeuring.js"></script>
+<script src="/apps/schoolpartner/belasting.js"></script>
+<script src="/apps/schoolpartner/overdracht.js"></script>
+<script src="/apps/schoolpartner/overstap.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
 <script src="/apps/schoolpartner/enterprise.js"></script>
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
+<script src="/apps/schoolpartner/dossier-zorg.js"></script>
+<script src="/apps/schoolpartner/dossier.js"></script>
+<script src="/apps/schoolpartner/veiligheid.js"></script>
+<script src="/apps/schoolpartner/hr.js"></script>
+<script src="/apps/schoolpartner/geld.js"></script>
+<script src="/apps/schoolpartner/organisatie.js"></script>
+<script src="/apps/schoolpartner/omroep.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>

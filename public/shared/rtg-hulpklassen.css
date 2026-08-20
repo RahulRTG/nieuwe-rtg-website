@@ -67,6 +67,10 @@
 .h-mt120 { margin-top: 1.2rem !important; }
 .h-mt140 { margin-top: 1.4rem !important; }
 .h-mt150 { margin-top: 1.5rem !important; }
+/* margin-bottom, dezelfde schaal. Kwam met de schoolschermen (PR #90),
+   die als eerste een ondermarge als los attribuut neerzetten. */
+.h-mb0 { margin-bottom: 0 !important; }
+.h-mb50 { margin-bottom: .5rem !important; }
 
 /* DAT ZIJN ZEVENTIEN STAPPEN, EN DAT IS EEN SYMPTOOM. Deze reeks komt niet uit
    een ontwerp maar uit de bron: .3, .35, .4, .45, .5, .55, .6, .65, .7, .8, .9,

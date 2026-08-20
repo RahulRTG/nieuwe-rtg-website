@@ -44,12 +44,34 @@
       }).join('') || '<p class="stil">Geen koppelingen aan.</p>',
       'Nooit mee, in geen enkele koppeling: ' + (kop.nooit || []).map(esc).join(', ') + '.');
 
+      /* Een koppeling aanzetten betekent VELDEN kiezen. Zonder velden gaat hij
+         niet aan -- dat weigert de server, en dit scherm vraagt ze daarom in
+         dezelfde handeling in plaats van erachteraan. */
+      h += kaart('Koppeling aanzetten',
+        '<div class="rij"><select class="veld" id="enKSoort" aria-label="Welke koppeling">' +
+        (kop.beschikbaar || []).map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.naam) + '</option>'; }).join('') +
+        '</select><input class="veld" id="enKUrl" maxlength="200" placeholder="URL of naam van de partij" aria-label="URL of naam"></div>' +
+        '<div class="doelkies" data-koppelvelden>' + (kop.velden || []).map(function (v) {
+          return '<label><input type="checkbox" value="' + esc(v.id) + '">' + esc(v.uitleg) + '</label>';
+        }).join('') + '</div>' +
+        '<div class="rij"><button class="knop p" id="enKZet" type="button">Zet de koppeling aan</button></div>',
+        'Wat u hier niet aanvinkt, gaat er ook niet doorheen -- ook niet "voor het gemak".');
+
+      h += kaart('Webhook toevoegen',
+        '<div class="rij"><input class="veld" id="enWUrl" maxlength="200" placeholder="https://..." aria-label="Webhook-URL">' +
+        '<button class="knop" id="enWZet" type="button">Zet aan</button></div>' +
+        '<div class="doelkies" data-webhookgeb>' + (haken.gebeurtenissen || []).map(function (g) {
+          return '<label><input type="checkbox" value="' + esc(g) + '">' + esc(g) + '</label>';
+        }).join('') + '</div>',
+        'Een webhook naar een intern adres wordt geweigerd: dat is een aanvaller die onze server laat bellen.');
+
       h += kaart('Webhooks', (haken.webhooks || []).map(function (w) {
         return '<div class="item"><span>' + esc(w.url) + ' <span class="stil">· ' + (w.gebeurtenissen || []).map(esc).join(', ') + '</span></span>' +
           '<span class="rij"><span class="stil">' + esc(w.status) + ' · ' + (w.geleverd || 0) + ' geleverd' +
           (w.mislukt ? ' · ' + w.mislukt + ' mislukt' : '') + '</span>' +
           '<button class="knop" data-haak="proef" data-id="' + esc(w.id) + '">Proef</button>' +
-          (w.status === 'stil' ? '<button class="knop" data-haak="wek" data-id="' + esc(w.id) + '">Wek</button>' : '') + '</span></div>';
+          (w.status === 'stil' ? '<button class="knop" data-haak="wek" data-id="' + esc(w.id) + '">Wek</button>' : '') +
+          '<button class="knop" data-haakweg="' + esc(w.id) + '">Weg</button></span></div>';
       }).join('') || '<p class="stil">Geen webhooks ingesteld.</p>',
       'Elke levering draagt een handtekening (X-RTG-Handtekening) en meldt alleen DAT er iets gebeurde, met ids -- geen namen. Na tien mislukkingen op rij valt een webhook stil.');
 
@@ -61,10 +83,23 @@
         '<option value="ouders">Ouders</option><option value="leerlingen">Leerlingen</option><option value="personeel">Personeel</option></select>' +
         '<button class="knop p" id="enPMaak" type="button">Zet uit</button></div>' +
         (peilingen.peilingen || []).map(function (p) {
-          return rij(esc(p.titel) + ' <span class="stil">· ' + esc(p.doelgroep) + '</span>',
-            p.antwoorden + ' antwoorden' + (p.genoeg ? '' : ' · nog geen uitslag'));
+          return '<div class="item"><span>' + esc(p.titel) + ' <span class="stil">· ' + esc(p.doelgroep) + '</span></span>' +
+            '<span class="rij"><span class="stil">' + p.antwoorden + ' antwoorden' +
+            (p.genoeg ? '' : ' · nog geen uitslag') + '</span>' +
+            (p.open === false ? '<span class="tag">gesloten</span>'
+              : '<button class="knop" data-peilsluit="' + esc(p.id) + '">Sluit</button>') + '</span></div>';
         }).join(''),
         'Alleen scores, geen vrije tekst, geen cijfer per medewerker, en pas vanaf vijf antwoorden een uitslag.');
+
+      /* De export is een AVG-recht en een enterprise-eis. Het zorgdeel gaat
+         alleen mee als iemand er expliciet om vraagt -- met een regel in het
+         journaal, en dat staat er ook bij. */
+      h += kaart('Export',
+        '<div class="rij"><button class="knop" id="enExport" type="button">Exporteer de school</button>' +
+        '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;">' +
+        '<input type="checkbox" id="enExportZorg"> met het zorgdeel</label></div>' +
+        '<div id="enExportUit" class="stil" style="margin-top:.4rem;"></div>',
+        'Alles wat de school van zichzelf heeft, plat en leesbaar. Vraagt u het zorgdeel erbij, dan staat dat als zodanig in het journaal.');
 
       h += kaart('Laatste inzage', (journaal.rijen || []).map(function (j) {
         return rij(esc(j.wat) + ' <span class="stil">· ' + esc(j.rol) + '</span>',
@@ -90,6 +125,43 @@
             meld(r2.body.error || (r2.body.ok ? 'Afgeleverd (' + (r2.body.status || 'ok') + ').' : 'Niet afgeleverd: ' + (r2.body.fout || 'onbekend')));
             teken();
           });
+        });
+      });
+      document.getElementById('enExport').addEventListener('click', function () {
+        var metZorg = document.getElementById('enExportZorg').checked;
+        A('/school/export', sleutels({ metZorg: metZorg })).then(function (r2) {
+          if (r2.body.error) return meld(r2.body.error);
+          var d = r2.body;
+          document.getElementById('enExportUit').textContent = d.leerlingen.length + ' leerlingen, ' +
+            d.personeel.length + ' personeelsleden, ' + d.facturen.length + ' facturen. ' + d.uitleg;
+          if (window.RTGUitvoer) RTGUitvoer.bron(function () {
+            return { naam: 'school-export', kolommen: ['id', 'naam', 'status', 'klas', 'opleiding'],
+              rijen: d.leerlingen.map(function (l) { return [l.id, l.naam, l.status, l.klasCode || '', l.opleiding || '']; }) };
+          });
+        });
+      });
+      document.getElementById('enKZet').addEventListener('click', function () {
+        var velden = Array.prototype.map.call(wortel.querySelectorAll('[data-koppelvelden] input:checked'), function (i) { return i.value; });
+        if (!velden.length) return meld('Kies welke velden deze koppeling mag ontvangen; zonder dat gaat hij niet aan.');
+        A('/school/koppeling/zet', sleutels({ soort: document.getElementById('enKSoort').value,
+          url: document.getElementById('enKUrl').value, velden: velden }))
+          .then(function (r2) { meld(r2.body.error || 'De koppeling staat aan met de gekozen velden.'); if (!r2.body.error) teken(); });
+      });
+      document.getElementById('enWZet').addEventListener('click', function () {
+        var geb = Array.prototype.map.call(wortel.querySelectorAll('[data-webhookgeb] input:checked'), function (i) { return i.value; });
+        A('/school/webhook/zet', sleutels({ url: document.getElementById('enWUrl').value, gebeurtenissen: geb }))
+          .then(function (r2) { meld(r2.body.error || 'Webhook staat aan.'); if (!r2.body.error) teken(); });
+      });
+      Array.prototype.forEach.call(wortel.querySelectorAll('[data-haakweg]'), function (b) {
+        b.addEventListener('click', function () {
+          A('/school/webhook/weg', sleutels({ webhookId: b.dataset.haakweg }))
+            .then(function (r2) { meld(r2.body.error || 'Webhook weggehaald.'); if (!r2.body.error) teken(); });
+        });
+      });
+      Array.prototype.forEach.call(wortel.querySelectorAll('[data-peilsluit]'), function (b) {
+        b.addEventListener('click', function () {
+          A('/school/peiling/sluit', sleutels({ peilingId: b.dataset.peilsluit }))
+            .then(function (r2) { meld(r2.body.error || 'De peiling is gesloten.'); if (!r2.body.error) teken(); });
         });
       });
       Array.prototype.forEach.call(wortel.querySelectorAll('[data-rol]'), function (b) {

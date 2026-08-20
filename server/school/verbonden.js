@@ -8,10 +8,19 @@
    - HUISWERK dat aan een leerdoel uit de leerlijn hangt: het kind oefent
      rechtstreeks vanuit de klas (met feedback, want oefenen mag verklikken)
      en bij vier van de vijf goed vinkt het huiswerk zichzelf af. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { nu: klokNu } = require('../lib/klok');
 const { DOELEN } = require('../kern/leerstof');
 const { opgave } = require('../kern/leerstof-gen');
+/* De Misconception Graph: een fout antwoord bij huiswerk wordt geduid en voor
+   de KLAS geteld -- zonder wie. Zie ./denkfout.js voor die grens. */
+const { duiding, andersUitgelegd } = require('../kern/leerstof-denkfout');
+const { tel } = require('./denkfout');
 
 const MAX_LERAREN = 3;
+const { totWanneer } = require('./waarneming');
 const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 
 module.exports = (sctx) => {
@@ -63,9 +72,14 @@ module.exports = (sctx) => {
     if (!k || k.schoolCode !== sch.code) return res.status(404).json({ error: 'Deze klas hoort niet bij jouw school.' });
     if (p.status !== 'actief') return res.status(403).json({ error: 'Je aanmelding is nog niet goedgekeurd.' });
     if (lerarenVan(k).some(x => x.id === p.id)) return res.status(400).json({ error: 'Je staat al vast op deze klas; overnemen hoeft niet.' });
-    k.waarnemer = { id: p.id, naam: p.naam, at: nu() };
+    /* Een waarneming VERLOOPT. Zonder einddatum is een overname een tweede
+       vaste leraar via de achterdeur: hij begint als "even invallen bij ziekte"
+       en staat er over een half jaar nog. Veertien dagen als de aanvrager
+       niets zegt, negentig als maximum. */
+    k.waarnemer = { id: p.id, naam: p.naam, at: nu(), tot: totWanneer(req.body.dagen, klokNu()) };
     save();
-    res.json({ ok: true, waarnemer: k.waarnemer });
+    res.json({ ok: true, waarnemer: k.waarnemer,
+      uitleg: 'De waarneming loopt tot ' + k.waarnemer.tot.slice(0, 10) + ' en stopt dan vanzelf. Eerder stoppen kan altijd.' });
   });
 
   router.post('/school/klas/overname-stop', (req, res) => {
@@ -103,7 +117,9 @@ module.exports = (sctx) => {
     const d = h && h.doel ? eigenVeld(DOELEN, h.doel) : null;
     if (!d) return res.status(404).json({ error: 'Dit huiswerk heeft geen oefenbaar leerdoel.' });
     const vragen = [];
-    for (let i = 0; i < 5; i++) { const o = opgave(d.gen); vragen.push({ v: o.v, a: o.a, opties: o.opties || null }); }
+    /* Het feit (de bouwstenen van de opgave) reist mee de sessie in en blijft
+       op de server: daarmee is een fout antwoord narekenbaar te duiden. */
+    for (let i = 0; i < 5; i++) { const o = opgave(d.gen); vragen.push({ v: o.v, a: o.a, opties: o.opties || null, feit: o.feit || null }); }
     oefenwerk(k)[l.sleutel] = { huiswerkId: h.id, vragen, ix: 0, goed: 0 };
     save();
     res.json({ ok: true, doel: h.doel, les: d.les, nr: 1, totaal: 5, vraag: vragen[0].v, opties: vragen[0].opties });
@@ -122,6 +138,15 @@ module.exports = (sctx) => {
     const klaar = w.ix >= w.vragen.length;
     // oefenen is leren: hier WEL meteen goed/fout en het juiste antwoord
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: w.ix, totaal: w.vragen.length, klaar };
+    if (!goed) {
+      const df = duiding(vraag.feit, vraag.a, req.body.antwoord);
+      if (df) {
+        uit.denkfout = { id: df.id, naam: df.naam, uitleg: df.uitleg };
+        const hw = (k.huiswerk || []).find(x => x.id === w.huiswerkId);
+        uit.anders = andersUitgelegd(DOELEN[(hw && hw.doel) || ''], df);
+        tel(k, (hw && hw.doel) || '', df.id, nu());
+      }
+    }
     if (klaar) {
       uit.aantalGoed = w.goed;
       uit.afgevinkt = false;

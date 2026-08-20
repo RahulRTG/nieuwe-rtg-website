@@ -8,6 +8,8 @@
    ranglijsten, geen reeksen, en een overgang wordt geadviseerd door het
    systeem maar besloten door een mens. */
 const { FASEN, TRAPPEN, REFERENTIE, DOORSTROOM, EERLIJK } = require('./onderwijs-ladder');
+const { maakBewijs, beheersingVan, BEWIJSSOORTEN } = require('./onderwijs-bewijs');
+const { maakGeheugen } = require('./onderwijs-geheugen');
 
 function maakOnderwijs({ db, save, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
@@ -53,8 +55,15 @@ function maakOnderwijs({ db, save, schoon }) {
     const kaart = p.fase ? (DOORSTROOM.find(d => d.van === p.fase) || null) : null;
     const ix = p.fase ? faseIx(p.fase) : -1;
     const volgende = ix >= 0 && ix + 1 < FASEN.length && FASEN[ix + 1].trap === FASEN[ix].trap ? FASEN[ix + 1].id : null;
+    /* Bij elk doel het WOORD van de beheersing, niet het hele bewijs: dat
+       laatste is een eigen vraag (bewijsVan) en hoort niet in elk antwoord
+       mee te reizen. Het woord komt uit het bewijs en wordt niet opgeslagen. */
+    const doelen = {};
+    for (const [id, rij] of Object.entries(p.doelen))
+      doelen[id] = Object.assign({}, rij, { bewijs: undefined, stukken: (rij.bewijs || []).length,
+        beheersing: beheersingVan(rij).woord });
     return { ok: true, fase: f, jaar: p.jaar, historie: p.historie.slice(-100),
-      doelen: p.doelen, verder: { volgende, doorstroom: kaart ? kaart.naar : [], via: (kaart && kaart.via) || null },
+      doelen, verder: { volgende, doorstroom: kaart ? kaart.naar : [], via: (kaart && kaart.via) || null },
       eerlijk: EERLIJK };
   }
 
@@ -85,22 +94,16 @@ function maakOnderwijs({ db, save, schoon }) {
     return mijn(key);
   }
 
-  /* ---- leerdoelen: de bouwstenen die de leerstof-motor (golf 2) afvinkt.
-     Alleen 'op' en 'fase' per doel -- geen scores of vergelijkingen; wat je
-     kunt is geen wedstrijd. ---- */
-  function doelBehaald(key, d) {
-    d = d || {};
-    // valideer de RAUWE invoer: rommel wordt geweigerd, niet stilletjes verbouwd
-    const doel = String(d.doel == null ? '' : d.doel).trim();
-    if (!/^[a-z0-9][a-z0-9.-]{1,79}$/.test(doel)) return { status: 400, error: 'Geef een geldig leerdoel-id.' };
-    const p = paspoort(key);
-    if (!p.fase) return { status: 400, error: 'Schrijf eerst in op een fase.' };
-    if (Object.keys(p.doelen).length >= 20000 && !p.doelen[doel]) return { status: 400, error: 'Het paspoort zit vol; dat is een record -- vraag RTG om ruimte.' };
-    if (!p.doelen[doel]) { p.doelen[doel] = { fase: p.fase, op: nu() }; p.at = nu(); save(); }
-    return { ok: true, doel, behaald: p.doelen[doel] };
-  }
+  /* ---- leerdoelen en hun bewijs ----
+     Proof of Learning woont in een eigen module: het paspoort weet WAT je
+     kunt, die laag weet WAAROM we dat denken. Zelfde opslag, andere vraag. */
+  const { doelBehaald, bewijsVan } = maakBewijs({ paspoort, save, nu, scho });
+  /* De Memory Engine: wanneer komt een behaald doel terug. Ook hier geldt dat
+     het bij het leerdoel in het paspoort hoort en niet in een lijst ernaast. */
+  const { herhalingen, noteerOphaling, staatOpen } = maakGeheugen({ paspoort, save, nu });
 
-  return { ladder, mijn, inschrijf, jaarOver, doelBehaald, magNaar, FASEN };
+  return { ladder, mijn, inschrijf, jaarOver, doelBehaald, bewijsVan, beheersingVan,
+    herhalingen, noteerOphaling, staatOpen, magNaar, FASEN, BEWIJSSOORTEN };
 }
 
 module.exports = { maakOnderwijs };

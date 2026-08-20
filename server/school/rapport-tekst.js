@@ -6,9 +6,16 @@
    geen route die een tekst publiceert -- publiceren gebeurt alleen door het
    rapport vast te stellen, en dat vraagt een mens die bevestigt dat hij de
    teksten heeft gelezen. Zonder AI-sleutel komt er geen verzonnen tekst maar
-   een feitelijke opzet uit de cijfers zelf. */
+   een feitelijke opzet uit de cijfers zelf.
+
+   EN DE TEKST WORDT GEKEURD. Een AI die over een kind schrijft, kan een zin
+   opleveren die iets VASTSTELT ("gaat over", "moet doubleren"). Dat wordt hier
+   niet stil weggepoetst maar gemeld, met het zinsdeel erbij, zodat de mentor
+   die het rapport vaststelt het ziet staan. De keuring en het bijschrift komen
+   uit kern/schooladvies.js -- een plek voor de hele grens. */
 const { maakAI } = require('../ai');
 const { tekst: aiTekst } = require('../ai-kort');
+const { uitspraak } = require('../kern/schooladvies');
 
 module.exports = (sctx) => {
   const { router, save, nu, schoon, K, S, eigenVeld, poort, log, gezinSessie,
@@ -49,9 +56,12 @@ module.exports = (sctx) => {
         + ' Aanwezigheid: ' + rij.aanwezigheid.gemist + ' gemiste lessen van ' + rij.aanwezigheid.lessen + '.'
         + ' (Vul aan in eigen woorden.)';
     }
+    const u = uitspraak('rapporttekst', voorstel);
     rij.tekst = voorstel; rij.tekstBron = bron; rij.tekstConcept = true;
     save();
     res.json({ ok: true, sleutel: rij.sleutel, tekst: voorstel, bron, concept: true,
+      besluitDoorMens: u.besluitDoorMens, beslist: u.beslist, bijschrift: u.bijschrift,
+      besluitend: u.besluitend, waarschuwing: u.waarschuwing,
       uitleg: 'Dit is een voorstel. Pas het aan en stel het rapport daarna vast; ongelezen gaat er niets naar het gezin.' });
   });
 

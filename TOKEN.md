@@ -235,10 +235,10 @@ Geen fase begint voordat de vorige zijn toetsen heeft (LAT.md).
 
 ## 7. De besluiten die openstaan
 
-Van de vijf dingen die software niet voor Rahul kon beslissen, zijn er drie
-genomen (1, 2 en 3). Ze blijven staan met hun uitkomst, want een besluit
+Van de vijf dingen die software niet voor Rahul kon beslissen, zijn er vier
+genomen (1, 2, 3 en 5). Ze blijven staan met hun uitkomst, want een besluit
 waarvan de reden verdwijnt, wordt over een jaar opnieuw gevoerd. Wat nog open
-staat is 4 en 5.
+staat is 4 — en dat is geen besluit maar een verbouwing.
 
 1. ~~De bank-uitgang~~ — **besloten op 20 augustus 2026: de walletbrug wordt
    eenrichtingsverkeer.** Geld mag van een eigen bankrekening naar de wallet,
@@ -280,9 +280,23 @@ staat is 4 en 5.
    de hele handelslaag, met eigen keuzes (wat gebeurt er bij een zaak zonder
    RTG Pay, wat met achteraf betalen, wat met terugbetalen). **Aanbeveling: niet
    nu**, en niet als bijvangst van het geldwerk — het is een eigen project.
-5. **De bedragen van de twee plafonds.** € 10.000 per wallet en € 500 aan
-   punten-tegoed zijn verdedigbare keuzes, geen wettelijke getallen. Wie het
-   walletplafond verhoogt, verzwakt de grond onder het besluit; wie het verlaagt
-   onder € 5.000 breekt het autolaadpad (zie `kern/pay/stand.js`). Het
+5. ~~De bedragen van de twee plafonds~~ — **gedaan: ze zijn van de boardroom.**
+   Ze stonden als constante in de code (`kern/pay/stand.js` en
+   `kern/ervaring/leden/punten.js`) en waren daarmee alleen te verzetten door
+   een programmeur, terwijl het juist het soort getal is dat een bestuurder
+   hoort te kiezen. Ze wonen nu in `kern/bankregie` — dezelfde kamer waar de
+   vergunning wordt vastgelegd, want wie het plafond verzet, verzet de grond
+   onder hetzelfde besluit — en staan in de bankkamer met de zin erbij wat het
+   kost. Drie dingen zijn eraan vastgelegd: een wijziging telt **meteen**
+   (per boeking gelezen, niet bij het opstarten), de ondergrens van het
+   walletplafond is **gelijk aan de grootste toegestane boeking** (lager en een
+   lid kan een betaling niet meer bijladen — een toets legt die twee getallen
+   naast elkaar), en een kapotte koppeling **sluit** het plafond in plaats van
+   het te openen. Wat de bedragen zijn blijft een keuze:
+
+   € 10.000 per wallet en € 500 aan punten-tegoed blijven de standaard, en het
+   blijven verdedigbare keuzes en geen wettelijke getallen. Wie het
+   walletplafond verhoogt, verzwakt de grond onder het besluit. Het
    puntenplafond hoort bij een besteding van € 50.000 en is dus ruim; lager
-   zetten raakt echte leden eerder dan je denkt.
+   zetten raakt echte leden eerder dan je denkt. Het verschil met hiervoor is
+   dat dat nu een besluit van de boardroom is en niet van een commit.

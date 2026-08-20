@@ -87,7 +87,11 @@ module.exports = (ctx) => {
   }));
   app.post('/api/office/bank/instellingen', officeAuth, (req, res) => veilig(res, () => {
     const r = kern.bankInstellingenZet(req.body || {});
-    if (r.ok) { afdelingen.audit(naam(req), 'RTG Bank-instellingen gewijzigd (spaarrente ' + (r.spaarrenteBp / 100) + '%)'); sync(); }
+    /* De plafonds staan APART in het auditspoor en niet samengevat als
+       "instellingen gewijzigd": ze zijn de grond onder een besluit, en wie
+       later vraagt wanneer die grond is verzet, hoort dat te kunnen lezen. */
+    if (r.ok) { afdelingen.audit(naam(req), 'RTG Bank-instellingen gewijzigd (spaarrente ' + (r.spaarrenteBp / 100) +
+      '%, walletplafond EUR ' + (r.walletPlafondCenten / 100) + ', punten-tegoedplafond EUR ' + (r.puntenTegoedMaxCenten / 100) + ')'); sync(); }
     return r;
   }));
 

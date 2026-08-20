@@ -5,7 +5,10 @@
    binnen RTG besteedbaar, niet uitbetaald aan het lid, en "een maximum per
    wallet en per boeking" -- en van die drie bestond alleen de laatste helft:
    MAX_CENTEN begrensde de BOEKING, het maximum per WALLET stond nergens. Het
-   bedrag zelf (WALLET_MAX) en het waarom van zijn hoogte staan in ./stand.js.
+   STANDAARDbedrag en het waarom van zijn hoogte staan in ./stand.js; wat er
+   werkelijk geldt zet de BOARDROOM (kern/bankregie/instellingen.js) en komt
+   hier binnen als functie, zodat een wijziging meteen telt in plaats van na
+   een herstart.
 
    HIJ GELDT ALLEEN VOOR LEDEN-REKENINGEN. Een partnerrekening is de omzet van
    een zaak die naar de bank wordt uitbetaald, en een extern:-rekening is per
@@ -27,7 +30,29 @@
    bestandsnaam. */
 'use strict';
 
-module.exports = ({ saldoVan, rekLid, WALLET_MAX }) => {
+module.exports = ({ saldoVan, rekLid, standaard, walletMax }) => {
+  /* DE BRON VAN HET BEDRAG WOONT HIER, en niet bij de aanroeper. De boardroom
+     zet het plafond (kern/bankregie/instellingen.js), maar RTG Pay wordt in
+     kernlaag3 gebouwd en de bankregie pas in 4b -- dus die koppeling komt LATER
+     binnen, net als die van de bank. Tot dat moment geldt de standaard uit
+     ./stand.js.
+
+     Twee redenen dat dit hier staat en niet in ./index.js: dit bestand gaat
+     over het plafond, dus de vraag "waar komt het getal vandaan" hoort erbij --
+     en index.js liep er met deze uitleg erin over de grens uit keuringsregel 13.
+
+     PER BOEKING GELEZEN en niet eenmalig: een waarde die bij het opstarten is
+     vastgeklikt zou een wijziging pas na een herstart volgen, met een scherm
+     dat een ander getal toont dan de grendel gebruikt (LAT.md regel 4). */
+  let bron = typeof walletMax === 'function' ? walletMax : () => standaard;
+  const koppelPlafond = fn => { if (typeof fn === 'function') bron = fn; };
+  const max = () => {
+    const v = Math.round(Number(bron()));
+    /* Een kapotte of ontbrekende instelling mag het plafond nooit OPENEN. Valt
+       de koppeling weg, dan is er geen ruimte in plaats van oneindig ruimte:
+       fail-closed, net als de lege vergunningslijst. */
+    return Number.isFinite(v) && v > 0 ? v : 0;
+  };
   /* Geeft een foutobject als deze boeking de ontvangende wallet over het
      plafond zou tillen, en anders null. Bewust een FOUT terug en geen boolean:
      de aanroepers geven hem rechtstreeks door aan de client, en dan staat de
@@ -40,13 +65,13 @@ module.exports = ({ saldoVan, rekLid, WALLET_MAX }) => {
        onwaar) en krijgt een kapot verzoek in motor-modus een 409 "de wallet zit
        vol" te horen -- een foutmelding die naar de verkeerde plek wijst. */
     if (!Number.isFinite(centen)) return null;
-    if (saldoVan(naar) + centen <= WALLET_MAX) return null;
+    if (saldoVan(naar) + centen <= max()) return null;
     return { status: 409, code: 'wallet-plafond',
-      error: 'Dit past niet in de wallet: er kan maximaal ' + Math.round(WALLET_MAX / 100) + ' euro op staan.' };
+      error: 'Dit past niet in de wallet: er kan maximaal ' + Math.round(max() / 100) + ' euro op staan.' };
   }
   // Wat er nu nog bij kan. Voor het scherm, zodat het lid een grens ziet
   // aankomen in plaats van hem te raken.
-  const walletRuimte = codenaam => Math.max(0, WALLET_MAX - saldoVan(rekLid(codenaam)));
+  const walletRuimte = codenaam => Math.max(0, max() - saldoVan(rekLid(codenaam)));
 
-  return { plafondFout, walletRuimte };
+  return { plafondFout, walletRuimte, koppelPlafond, walletMax: max };
 };

@@ -5,7 +5,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan, walletRuimte,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, WALLET_MAX, KASCODE_MS } = ctx;
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -142,7 +142,7 @@ module.exports = (ctx) => {
        een grens die je niet kende: de wallet kan tonen hoeveel er nog bij kan
        voordat het opladen weigert. Uitzonderingsgestuurd blijft het aan het
        scherm (ONTWERP.md) -- hier staan de twee getallen, niet het oordeel. */
-    return { ok: true, codenaam, saldo: saldoVan(rek), plafond: WALLET_MAX, ruimte: walletRuimte(codenaam),
+    return { ok: true, codenaam, saldo: saldoVan(rek), plafond: walletMax(), ruimte: walletRuimte(codenaam),
       geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 

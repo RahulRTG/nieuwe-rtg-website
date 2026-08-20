@@ -21,7 +21,8 @@
       het hier om tientallen euro's gaat maakt dat niet minder waar. `tegoed`
       blijft in het ANTWOORD staan, in euro's, want daar rekent app-main.js mee
       -- de omrekening gebeurt aan de rand en niet in de opslag.
-   2. Er is een PLAFOND (TEGOED_MAX). Zonder plafond is dit een onbegrensde
+   2. Er is een PLAFOND (de boardroom zet het; zie hieronder). Zonder plafond
+      is dit een onbegrensde
       aanspraak op RTG, en begrensd zijn is nu juist een van de drie
       voorwaarden waarop het besluit onder WALLET_SALDO in
       kern/bevoegdheid/lijst.js rust.
@@ -48,7 +49,20 @@ module.exports = ({ db, save, nu }) => {
      euro aan besteding bij -- ruim buiten bereik van een gewoon lid, en toch
      een grens, zodat de aanspraak begrensd is in plaats van open. Het BEDRAG is
      een keuze en geen wet; zie TOKEN.md par. 7. */
-  const TEGOED_MAX = 50000;   // 500 euro aan verzilverd tegoed
+  /* HET PLAFOND KOMT VAN DE BOARDROOM, met dit getal als standaard tot die
+     koppeling er is (kern/bankregie/instellingen.js). Het stond hier als vaste
+     constante, en daarmee was de grond onder het besluit in
+     kern/bevoegdheid/lijst.js alleen te verzetten door een programmeur -- terwijl
+     het WEL het soort getal is dat een bestuurder hoort te kunnen kiezen.
+
+     Per verzilvering gelezen en niet eenmalig: een plafond dat pas na een
+     herstart meetelt, is een scherm dat een ander getal toont dan de grendel. */
+  const STANDAARD_TEGOED_MAX = 50000;   // 500 euro aan verzilverd tegoed
+  let plafondBron = () => STANDAARD_TEGOED_MAX;
+  const puntenKoppelPlafond = fn => { if (typeof fn === 'function') plafondBron = fn; };
+  /* Fail-closed, net als bij het walletplafond: valt de koppeling weg of levert
+     hij onzin, dan is er GEEN ruimte in plaats van oneindig ruimte. */
+  const tegoedMax = () => { const v = Math.round(Number(plafondBron())); return Number.isFinite(v) && v >= 0 ? v : 0; };
 
   function puntenRek(key) {
     const p = db.data.punten[key] = db.data.punten[key] || { saldo: 0, tegoedCenten: 0, historie: [] };
@@ -70,7 +84,7 @@ module.exports = ({ db, save, nu }) => {
     /* `tegoed` in euro's blijft in het antwoord staan: app-main.js rendert dat
        veld rechtstreeks. De opslag is centen, de rand is euro's. */
     return { saldo: p.saldo, tegoedCenten: p.tegoedCenten, tegoed: p.tegoedCenten / 100,
-      plafondCenten: TEGOED_MAX, historie: p.historie.slice(0, 20) };
+      plafondCenten: tegoedMax(), historie: p.historie.slice(0, 20) };
   }
   function verdienPunten(key, euro, reden) {
     const n = Math.floor((Number(euro) || 0) / 10);
@@ -89,8 +103,8 @@ module.exports = ({ db, save, nu }) => {
     const centen = (n / 100) * 1000;
     /* Het plafond valt VOOR de punten worden afgeschreven: anders zijn de
        punten weg en is het tegoed er niet. */
-    if (p.tegoedCenten + centen > TEGOED_MAX) {
-      return { status: 409, error: 'Uw tegoed zit aan het maximum van € ' + (TEGOED_MAX / 100) +
+    if (p.tegoedCenten + centen > tegoedMax()) {
+      return { status: 409, error: 'Uw tegoed zit aan het maximum van € ' + (tegoedMax() / 100) +
         '. Besteed eerst wat u heeft; uw punten blijven gewoon staan.' };
     }
     p.saldo -= n;
@@ -115,5 +129,5 @@ module.exports = ({ db, save, nu }) => {
   }
 
 
-  return { puntenVan, verdienPunten, verzilverPunten, pasTegoedToe };
+  return { puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, puntenKoppelPlafond };
 };

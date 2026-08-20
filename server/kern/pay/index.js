@@ -25,7 +25,8 @@
    de waarheid over wie wat heeft. De naad (server/betaal.js) is er al. Dit is
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa,
-   en het tegoed dat een lid voor een ander koopt in ./tegoed. */
+   het tegoed dat een lid voor een ander koopt in ./tegoed, en het afrekenen
+   met een zaak in ./zaakbetaling. */
 
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
@@ -72,9 +73,10 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     save();
   }
   /* Het plafond per wallet -- de tweede helft van de voorwaarde waarop
-     kern/bevoegdheid/lijst.js het walletsaldo toestaat -- staat in ./plafond.js;
-     daar staat ook waarom hij vóór de motor valt en niet erna. */
-  const { plafondFout, walletRuimte } = require('./plafond')({ saldoVan, rekLid, WALLET_MAX });
+     kern/bevoegdheid/lijst.js het walletsaldo toestaat -- staat in ./plafond.js,
+     inclusief waar het bedrag vandaan komt en waarom hij vóór de motor valt. */
+  const { plafondFout, walletRuimte, koppelPlafond, walletMax } =
+    require('./plafond')({ saldoVan, rekLid, standaard: WALLET_MAX });
 
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
@@ -139,16 +141,18 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     rekLid, rekPartner, saldoVan, walletRuimte, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     opdrachten: betaalOpdrachten,
-    MIN_CENTEN, MAX_CENTEN, WALLET_MAX, KASCODE_MS, KASCODE_MAX
+    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,
+    walletMax
   };
   /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
-  const api = { MIN_CENTEN, MAX_CENTEN, WALLET_MAX, walletRuimte, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, zorgSaldo };
+  const api = { MIN_CENTEN, MAX_CENTEN, WALLET_MAX, walletMax, koppelPlafond, walletRuimte, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, zorgSaldo };
   api.schaduw = schaduwStand;
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
   Object.assign(api, require('./tegoed')(ctx));
+  Object.assign(api, require('./zaakbetaling')(ctx));
   return { pay: api };
 };

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1049 bestanden en 7055 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1048 bestanden en 7060 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1049 |
-| losse beweringen (`test(...)`) | 7055 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 47 |
+| toetsbestanden | 1048 |
+| losse beweringen (`test(...)`) | 7060 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
-| niets van beide | 109 |
+| niets van beide | 108 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-921 bestanden, 6830 beweringen.
+920 bestanden, 6835 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -111,7 +111,7 @@ toets omvalt.
 | `bestanden.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam, de prullenbak als zichtbare la en de stukken-upload voor grote bestanden. |
 | `betaaldienst.test.js` | 4 | gezakt op `liegpoort /api/` | De betaaldienstkosten gaan DIRECT naar de ondernemer: per kassabetaling meteen verrekend op de partnerrekening (eigen grootboekregel), transparant op de bon en in het partneroverzicht -- geen verzamelfactuur... |
 | `betaaldienstfee.test.js` | 14 | -- | DE BETAALDIENSTVERGOEDING: verschuldigd is iets anders dan geboekt. In kern/pay/kassa.js stond: if (kb.error) kosten = 0; Mislukte de kostenboeking, dan werden de kosten NUL -- in de teruggave aan de kassa en dus op... |
-| `betaalopdracht.test.js` | 17 | gezakt op `true->false#0` | De betaalopdracht (kern/betaalopdracht/): het verschil tussen "geboekt" en "echt weg". Getest met een NEPRAIL die we naar believen laten mislukken, want dat is precies het geval dat er in productie niet uit te lokken... |
+| `betaalopdracht.test.js` | 23 | gezakt op `true->false#0` | De betaalopdracht (kern/betaalopdracht/): het verschil tussen "geboekt" en "echt weg". Getest met een NEPRAIL die we naar believen laten mislukken, want dat is precies het geval dat er in productie niet uit te lokken... |
 | `betaalproviders.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `betaalregie.test.js` | 6 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `betaalstore.test.js` | 2 | gezakt op `===->!==` | De betaal-naad met een geïnjecteerde, durable idempotentie-store (zoals server.js hem nu koppelt aan de database): dezelfde sleutel geeft hetzelfde resultaat terug, het resultaat staat echt in de store (en overleeft... |
@@ -957,7 +957,6 @@ toets omvalt.
 | `zorgniveau.test.js` | 9 | gezakt op `liegpoort /api/` | De grens (kern/zorgniveau.js) en de dagcheck-in die erop staat (kern/gemoed.js). Wat hier bewezen wordt is bijna allemaal een NEGATIEF: dat er GEEN tip komt, GEEN geruststelling en GEEN oefening zodra de grens aanslaat. |
 | `zorgwallet.test.js` | 7 | gezakt op `liegpoort /api/` | De zorgpas en de RTG Wallet: Segur (de verzekeraar) schrijft een lid in op codenaam en de zorgpas ligt direct in de wallet van het lid; de declaratieketen (een mens beslist, afwijzen alleen met reden); de... |
 | `zware-bundels.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `zz-ijk-tijdelijk.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 

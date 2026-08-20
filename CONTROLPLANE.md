@@ -62,6 +62,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Bewijstoken | `commercie/bewijstoken.js` + `/zegel.js` | **af** als laag; nog geen route levert er een in (§5.2) |
 | Schaduwstand | `commercie/schaduw.js` | **af** — aan de leverancierspoort, met één regel die vandaag meeloopt (§5.3) |
 | Tegenfeit | `commercie/tegenfeit.js` | **af** — met de boardroom als beslisser (§5.4) |
+| Economische idempotentie | `kern/betaalopdracht/rij.js` | **af** voor uitbetalingen; nog niet over de hele keten (§5.5) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -330,6 +331,44 @@ schaduwstand mét het tegenfeit; `/api/office/handhaving/zet` zet hem om, met ee
 regel in het auditjournaal. Daarmee heeft de keten van §5.3 en §5.4 een
 aanroeper aan beide kanten: de poort meldt, de boardroom beslist.
 
+### 5.5 Economische idempotentie (was §6.5) — en de fout die er al zat
+
+Bij het bouwen hiervan bleek het niet om een nieuwe laag te gaan maar om een
+reparatie. Elke betaalopdracht in dit huis droeg al een idempotentiesleutel:
+
+```
+rtf:<lid>:<factuur>          de foundation-afdracht
+pay-uit:<zaak>:<boeking>     de partneruitbetaling
+bank-sepa:<iban>:<boeking>   de SEPA-overboeking
+```
+
+Die sleutel ging keurig mee naar de rail. **Alleen keek RTG er zelf nooit naar.**
+Zes plekken schreven hem, geen enkele las hem. Twee aanroepen met dezelfde
+sleutel leverden twee opdrachten van samen het dubbele bedrag, en of dat geld ook
+echt twee keer wegging hing af van de goede wil van een externe partij.
+
+Dat is dezelfde fout als "0% commissie" naast een commissieknop, alleen duurder:
+een veld dat eruitziet als een grendel en er geen is. Het staat hier omdat het de
+derde keer is dat deze vorm opduikt — na de zes stille capabilities en de vier
+gebouwde-maar-nooit-aangeroepen functies — en dat is geen toeval meer maar een
+patroon om op te letten.
+
+**De sleutel identificeert de economische handeling, niet een poging.** Bestaat
+hij al, dan krijgt de aanroeper de bestaande opdracht terug, mét `hergebruikt` en
+mét een klacht in het log — stil ontdubbelen zou een tweede stil gedrag zijn op
+de plek waar we er net één weghalen. Opnieuw proberen is `dienIn` of de ronde;
+wie werkelijk een nieuwe betaling wil, heeft een nieuwe sleutel.
+
+Dat het veilig kon, is nagegaan en niet aangenomen: alle drie de rails maken een
+verse boeking per uitbetaling, dus de terugvalsleutel is per definitie uniek en
+er bestaat geen legitieme tweede uitbetaling op één boeking. Een reeds afgeronde
+opdracht wordt bovendien niet opnieuw ingediend.
+
+**Wat er nog niet is:** dit dekt de uitbetaalkant. De ene wereldwijde
+`economic_intent` die door order, betaling, grootboek, leverancier, settlement én
+refund loopt, vraagt de intent-laag van §6.6. Wat er nu staat is de plek waar het
+geld het huis verlaat — de duurste plek om het níet te hebben.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -340,9 +379,8 @@ vastligt en niemand halverwege iets anders bouwt.
    route die er een inlevert nog niet.
 3. ~~**Shadow enforcement**~~ **Gebouwd** — zie §5.3.
 4. ~~**Counterfactual testing**~~ **Gebouwd** — zie §5.4.
-5. **Economic idempotency** — één wereldwijde `economic_intent` die door order,
-   betaling, grootboek, leverancier, settlement en refund loopt. Zeventien
-   retries, één economische handeling. Dit voorkomt de duurste klasse bugs.
+5. ~~**Economic idempotency**~~ **Gebouwd voor de uitbetaalkant** — zie §5.5. De
+   ene sleutel door de hele keten hoort bij de intent-laag hieronder.
 6. **Intent layer + compiler** — van *"boek vijf hotels in Parijs onder € 180"*
    naar een gecontroleerd plan, met de blokkade vóór uitvoering: *"€ 922 totaal;
    beleid staat € 900 toe → goedkeuring nodig."*

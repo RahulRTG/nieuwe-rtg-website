@@ -83,6 +83,72 @@ app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
 bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
 voorgekookt werkblad) vóór je er iets bij zet.
 
+**`WERELDEN.md` is de kaart** — vier werelden, een kern eronder, en de pas die er
+dwars op staat. **LivingOS** (mijn dagelijks leven), **WorkOS** (mijn werk en
+organisaties), **TravelOS** (mijn reizen) en **FoundationOS** (RTFoundation en
+haar maatschappelijke werk), met de domeinen een niveau lager. Het document trekt
+vier begrippen uit elkaar die steeds door elkaar liepen: **World** (waar ben ik),
+**Capability** (wat kan het systeem), **Access** (wat mag ik) en **Pass** (waar
+betaal ik voor) — *Core ondersteunt Worlds, Worlds organiseren Experiences,
+Access bepaalt wat zichtbaar is, Passes bepalen commerciële rechten.* Bij twijfel
+is er één vraag: **in welke context denkt de mens dat hij zich bevindt wanneer hij
+dit gebruikt?** Daaruit volgt dat de bouwer van een capability niet bepaalt in
+welke wereld hij hoort — RTFoundation mag eigenaar zijn van iets dat in LivingOS
+verschijnt. Twee harde regels: **een wereld draagt nooit de naam van een pas, ook
+niet de stam ervan** (`LifeOS` sneuvelde daarop tegenover Lifestyle Pass), en
+**RTG Core is geen wereld** — 24 functies zitten in élke doelgroep en reizen met
+de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
+vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
+laat zakken in plaats van stil verkeerd te blijven staan.
+
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — zeventig
+onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
+bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
+laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten
+staat nergens in de code, en dat is een ontwerpbesluit en geen afleiding.
+
+**De ladder van de drie passen staat daar ook**, en hij is na te rekenen met
+`npm run groepen` (dat schrijft `GROEPEN.md` uit de bron): **RTG Pass** is het
+hele platform voor één mens (140 functies), **Lifestyle** is hetzelfde platform
+maar er doet iemand het vóór je (143, met De Rechterhand, RTG Zakelijk en het
+Privékantoor als verschil — je koopt uitvoering, geen functies), en **Business**
+krijgt daarbovenop een hele wereld (157, waarvan twaalf van de veertien
+exclusieve functies WorkOS zijn). Lifestyle is een strikte deelverzameling van
+Business; er is geen enkele functie die alleen Lifestyle heeft, en dat is een
+vorm en geen gat. **Waar de prijs aan hangt is wel besloten en staat in
+WERELDEN.md:** RTG betaalt voor het platform, Lifestyle voor **uitvoering** (er
+doet iemand het vóór je) en Business voor **schaal** (per organisatie, per
+vestiging, per medewerker). Niet op functies — drie functies verschil dragen geen
+factor driehonderd, en functies weghalen bij RTG Pass botst met "premium, ook aan
+de onderkant". Het bedrag zelf staat nergens in de code.
+
+**`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
+gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
+context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen
+bereik, en de capability zelf verandert niet — alleen zijn vorm.** Geen mobiele
+versie en geen responsive-ronde: een capability declareert per vorm zijn
+presentatie (werkbalk, contextmenu, selectiebalk, lade, paneel, taakmodus), en de
+harde grens is dat **verbergen niet bestaat** — een handeling die op bureau
+bestaat en op telefoon geen vorm heeft, is een gebrek en laat de toets zakken.
+De schilbalk onderin is het eerste instrument: zijn middenzone draagt de werelden,
+de bladacties of de selectieacties, met links altijd de bank en rechts altijd
+Rahul. Lees die vóór je iets mobiel "even responsive" maakt.
+
+**`GRAMMATICA.md` is de RTG Mobile Interaction Grammar** — de vaste manier waarop
+álle RTG-software op een telefoon reageert, in zeven zinnen: *ik wil iets doen →
+mijn duim vindt het onderaan; ik wil meer → ik trek de interface naar me toe; ik
+selecteer iets → RTG begrijpt mijn context; ik wil weten wat er gebeurt → RTG toont
+de toestand zonder mij te storen; ik doe iets gevoeligs → RTG vertraagt precies
+genoeg; ik maak een fout → ik kan bijna altijd terug; ik wissel van RTG-product →
+de bediening voelt bekend.* Vijf gebaren met elk één betekenis (tik doet, lang
+drukken legt uit, omhoog trekken geeft meer, selectie verandert de acties, de orb
+stelt voor), vijf gewichten van `licht` tot `plechtig`, en drie grenzen die niet
+mogen sneuvelen: **ongedaan vóór bevestigen** (twintig "weet u het zeker?"-vragen
+leren mensen op ja drukken), **een verhindering draagt altijd een reden** (er komt
+geen grijze knop zonder uitleg bij), en **de orb stelt voor maar beslist nooit** —
+wat er gebeurt loopt langs capability, verhindering en gewicht, en `plechtig` wordt
+door een mens afgemaakt. Lees die vóór je een handeling toevoegt aan een scherm.
+
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
@@ -100,7 +166,7 @@ juridische oordeel blijft bij een mens.
 
 ## Structuur en starten (kort)
 
-- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
+- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 182 schermen), `apps/foundation/` (de RTFoundation, 71), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
 - Starten: `npm start` (vereist Node 22.13+; `node:sqlite` laadt sinds die versie zonder vlag, dus `--experimental-sqlite` is overal weg) → http://localhost:3000
 - AI is optioneel en lokaal-eerst: regelwerk en controleerbare extractie gebruiken geen model; vrije verrijking loopt bij voorkeur via `LOCAL_AI_URL`. `RTG_EXTERNE_AI_UIT=1` sluit externe modellen hard af. Zonder model blijven alle kernprocessen in handmatige werkmodus beschikbaar. Sleutels nooit in de repo of client-side JS zetten.

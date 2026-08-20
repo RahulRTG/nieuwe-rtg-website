@@ -62,7 +62,10 @@
   #rkToetsen button:hover{border-color:var(--gold);}
   #rkToetsen .op{color:var(--gold);}
   #rkToetsen .gelijk{background:var(--gold);border-color:var(--gold);color:#0C0C0B;grid-column:span 2;}
-  .zaak{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.8rem;}
+  /* minmax(0,1fr) en niet 1fr: een rasterkolom zakt anders nooit onder de
+   breedte van zijn inhoud, en dan duwt een lange regel het hele scherm open
+   (op 390px liep dit tot 605px, buiten beeld). */
+.zaak{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;margin-top:.8rem;}
   .zaak .vak{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
   .zaak .vak b{display:block;font-size:.72rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;}
   .zaak .uitkomst{font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.5;}

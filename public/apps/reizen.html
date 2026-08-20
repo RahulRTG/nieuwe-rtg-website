@@ -144,14 +144,33 @@
     pand: '<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
     bed:  '<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20"/><circle cx="7" cy="12" r="2"/>',
     vlieg:'<path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7L9 11l-2 3H4l-1 2 3.5 1L8 21l2-1v-3l3-2 3.1 5.1a1 1 0 0 0 1.7-.9Z"/>',
-    kaart:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/>'
+    kaart:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/>',
+    bus:  '<rect x="4.5" y="4.5" width="15" height="12.5" rx="2.2"/><path d="M4.5 12h15"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/>',
+    pijl: '<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+    weg:  '<path d="M8.5 20 11 4M15.5 20 13 4M12 6.5v1.6M12 11.2v1.6M12 15.9v1.6"/>',
+    stad: '<path d="M4 20h16M7 20V6.2l5-2v15.8M12 20V9l6 2.6V20"/>',
+    koffer:'<rect x="5" y="7.5" width="14" height="12" rx="2.2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"/>'
   };
 
+  /* DE ONDERDELEN VAN TRAVELOS, en dit is de plek waar ze horen te staan.
+     WERELDEN.md maakte reizen een eigen wereld met dit scherm als huis; de bank
+     van de werktafel geeft alleen een deur door en geen inhoud (app-main-29c),
+     dus een wereld die zijn onderdelen niet op zijn eigen huis draagt, heeft ze
+     nergens. Ze stonden tot dan onder "Alle diensten" op /apps/rtg.html, het
+     huis van LivingOS -- die rij staat daar nog, en dat is een schermbesluit
+     dat in WERELDEN.md als open stap staat. */
   const WERELD = [
-    ['Het Huis', 'Reserveren en bestellen', '/apps/rtg.html', ICO.pand],
-    ['Verblijven', 'Hotels, appart. en villa’s', '/apps/hotels.html', ICO.bed],
+    ['Reizen & Veilig', 'Planning, vervoer en Live Circle', '/apps/reizen-veilig.html', ICO.pijl],
+    ['Vluchten', 'Boeken, beheren, inchecken', '/apps/vluchten.html', ICO.kaart],
     ['Reisbureau', 'Reizen met ledenprijzen', '/apps/reisbureau.html', ICO.vlieg],
-    ['Vluchten', 'Boeken, beheren, inchecken', '/apps/vluchten.html', ICO.kaart]
+    ['Verblijven', 'Hotels, appart. en villa’s', '/apps/hotels.html', ICO.bed],
+    ['Residentie', 'Uw eigen adressen onderweg', '/apps/residentie.html', ICO.pand],
+    ['OV', 'Openbaar en prive vervoer', '/apps/ov.html', ICO.bus],
+    ['Navigatie', 'De route, tot aan de deur', '/apps/navigatie.html', ICO.pijl],
+    ['Verkeer', 'Wat er onderweg speelt', '/apps/flits.html', ICO.weg],
+    ['Stad', 'Wat er is waar u bent', '/apps/stad.html', ICO.stad],
+    ['Reisboek', 'Uw reizen, bij elkaar', '/apps/reisboek.html', ICO.koffer],
+    ['Hangar', 'Charter en eigen toestel', '/apps/hangar.html', ICO.vlieg]
   ];
 
   const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];

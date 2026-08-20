@@ -25,19 +25,14 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) {}
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) {}
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
+   hier tweeendertig keer misging. */
+const pw = laadScherm();
 
 async function opzet() {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werktafel-'));
@@ -111,7 +106,7 @@ const stand = () => {
        werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
        leeft door in de voet van de bank. */
     paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-      .some(b => /Bedieningspaneel/i.test(b.textContent)),
+      .some(b => /^Instellingen$/i.test(b.textContent.trim())),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
@@ -250,11 +245,22 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        De bank is hier geen rail maar een lade, en er staat een blad tegelijk in
        beeld. Wat NIET verandert: het beginscherm blijft de klok, een app wordt
        een blad in plaats van een paginasprong, en het laatste blad sluiten
-       brengt je thuis. */
+       brengt je thuis.
+
+       HET GEHEUGEN GAAT HIER EERST WEG, en dat is geen kunstgreep om een toets
+       groen te krijgen. Stap 5 hierboven opende Vandaag en liet daarna de
+       intake weer opengaan; sinds de werktafel je laatste bladen hervat
+       (shared/command/geheugen.js) staat Vandaag dus nog in het geheugen, en
+       "begint leeg" is dan niet meer waar -- hij begint waar je gebleven was.
+       De bewering die hier hoort is de oorspronkelijke: een lid ZONDER
+       voorgeschiedenis krijgt geen apps die het huis voor hem koos. Dat het
+       hervatten zelf werkt staat in "na inloggen landt een lid rechtstreeks op
+       de lege wereldkiezer", met de mutatie erbij. */
+    await page.evaluate(() => { try { localStorage.removeItem('rtg_cmd_bladen'); } catch (e) {} });
     await page.evaluate(() => { document.getElementById('onbGate').hidden = true; });
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalThuis = await page.evaluate(stand);
-    assert.equal(smalThuis.bladen, 0, 'ook op een telefoon begint de werktafel leeg');
+    assert.equal(smalThuis.bladen, 0, 'een lid zonder onthouden bladen begint ook op een telefoon leeg');
     assert.equal(smalThuis.schilVangt, false, 'en de schil vangt hem ook op een telefoon niet af');
 
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
@@ -286,13 +292,17 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
-    // de lade halen: dezelfde vijftien deuren als in de rail op een computer
-    // (drie werelden boven, twaalf stukken software eronder)
+    /* de lade halen: dezelfde vier deuren als in de rail op een computer.
+       Hier stond vijftien -- drie werelden plus twaalf stukken software -- en
+       die software-rij is weg (WERELDEN.md, "Er is geen lijst ernaast"); er is
+       ook een vierde wereld bij gekomen. Wat de bewering doet is onveranderd:
+       de LADE en de RAIL horen hetzelfde aanbod te dragen, want anders krijgt
+       een telefoon minder deuren dan een computer. */
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
-    assert.equal(laOpen.lade.werelden, 15, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(laOpen.lade.werelden, 4, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'true', 'en dat hoort een schermlezer ook te horen');
 
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
@@ -371,7 +381,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
         paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
-          .some(b => /Bedieningspaneel/i.test(b.textContent)),
+          .some(b => /^Instellingen$/i.test(b.textContent.trim())),
         tabs: tabs ? getComputedStyle(tabs).display : null,
       };
     });
@@ -382,11 +392,12 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     assert.equal(uit.veldZichtbaar, false, 'maar vraagt niet eerst om informatie van de bezoeker');
     assert.equal(uit.passkeyZichtbaar, true, 'de passkey hoort de zichtbare eerste deur te zijn');
     assert.equal(uit.andereManier, true, 'met een veilige terugval voor bestaande accounts');
-    /* Twaalf stukken software plus de drie werelden die er sinds WERELD.md
-       bovenaan staan. Het getal is geen doel op zich -- wat het bewaakt is dat
-       de bank in de gesloten stand LAAT ZIEN wat er achter de deur zit, en dus
-       niet stilletjes leegloopt. */
-    assert.equal(uit.werelden, 15, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    /* DE VIER WERELDEN. Hier stond 15: twaalf stukken software plus drie
+       werelden. Die software-rij is weg (WERELDEN.md, "Er is geen lijst
+       ernaast") en er is een vierde wereld bij gekomen. Het getal is geen doel
+       op zich -- wat het bewaakt is dat de bank in de gesloten stand LAAT ZIEN
+       wat er achter de deur zit, en dus niet stilletjes leegloopt. */
+    assert.equal(uit.werelden, 4, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
     assert.equal(uit.paneelIngang, false, 'voor het inloggen valt er niets te bedienen: geen systeemdeur in de bank');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
 
@@ -498,9 +509,19 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
 
    De algemene MutationObserver is hieronder expres inert. Zonder die ingreep
    zou een indirecte class-mutatie dezelfde uitkomst tekenen en kon deze toets
-   groen blijven terwijl de inlogroute zelf niets deed. Dit is dus het scherm
-   uit de productbeslissing: een terugkerend lid, op telefoonformaat, nul
-   geopende bladen en alleen de uitnodiging om zelf een wereld te kiezen. */
+   groen blijven terwijl de inlogroute zelf niets deed.
+
+   EN LANDEN IS SINDS 19 AUGUSTUS 2026 TWEE DINGEN GEWORDEN. WERELD.md beloofde
+   dat inloggen altijd op een lege keuze uitkwam; dat is omgedraaid naar "je komt
+   terug waar je gebleven was" (shared/command/geheugen.js). Deze toets meet nu
+   allebei, want de oude helft is nog steeds waar en de nieuwe helft was het
+   hele punt:
+
+     zonder geheugen -> lege keuze, nul bladen (dit is nog steeds de eerste keer)
+     met geheugen    -> die bladen staan er weer
+
+   Wie alleen de eerste helft laat staan, kan `hervat()` slopen zonder dat er
+   iets rood wordt. */
 test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
   { skip: pw ? false : 'geen Playwright' }, async () => {
   const { srv, token, dataDir } = await opzet();
@@ -533,6 +554,43 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
     assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
     assert.equal(geland.balk, 48, 'onderaan hoort alleen de wereldbalk te staan');
     assert.match(geland.uitnodiging, /Kies een wereld/);
+
+    /* DE TWEEDE HELFT: hetzelfde lid, nu met twee bladen in zijn geheugen.
+       Dezelfde inlogroute hoort ze terug te zetten in plaats van te wissen.
+
+       DE MUTATIE: zet t.wis() terug in land() (shared/command.js). Dan is de
+       eerste helft hierboven nog groen en zakt deze. */
+    await page.evaluate(() => {
+      localStorage.setItem('rtg_cmd_bladen', JSON.stringify({
+        bladen: [{ url: '/apps/geld-command.html', titel: 'Geld' },
+          { url: '/apps/media.html', titel: 'Media' }], actief: 1 }));
+    });
+    await page.reload({ waitUntil: 'load', timeout: 45000 });
+    /* Op .cmd-pane.actief en niet op .cmd-pane: er komen er twee terug en het
+       geheugen zegt dat het TWEEDE actief is, dus blad 0 staat verborgen.
+       Wachten op de eerste treffer wacht dan op iets wat nooit zichtbaar wordt
+       -- en dat is een toets die op zijn eigen wachtvoorwaarde struikelt in
+       plaats van op de code die hij meet. */
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-pane.actief', { timeout: 20000 });
+    const hervat = await page.evaluate(() => ({
+      bladen: [...document.querySelectorAll('.cmd-panes iframe')].map((f) => f.getAttribute('src')),
+      leeg: !!document.querySelector('.cmd-leeg')
+    }));
+    assert.deepEqual(hervat.bladen, ['/apps/geld-command.html', '/apps/media.html'],
+      'de inlogroute zet de onthouden werkbladen niet terug');
+    assert.equal(hervat.leeg, false, 'de lege keuze blijft staan terwijl er bladen zijn');
+
+    /* EN DE WEG TERUG NAAR EEN SCHONE TAFEL MOET BLIJVEN BESTAAN. Zonder deze
+       helft is hervatten geen gemak maar een gevangenis. */
+    await page.evaluate(() => { document.querySelector('.cmd-console [data-nav=home]').click(); });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    const thuis = await page.evaluate(() => ({
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      geheugen: localStorage.getItem('rtg_cmd_bladen')
+    }));
+    assert.equal(thuis.bladen, 0, 'Home hoort de tafel leeg te maken');
+    assert.equal(thuis.geheugen, null, 'Home hoort het geheugen mee te wissen');
+
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();

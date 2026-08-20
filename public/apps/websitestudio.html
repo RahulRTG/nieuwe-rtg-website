@@ -34,7 +34,7 @@
   .swatches{display:flex;gap:.35rem;align-items:center;}
   .swatch{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;}
   .swatch.actief{border-color:#fff;}
-  .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .kleurbalk{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;flex-wrap:wrap;min-width:0;}
   .kleurbalk label{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.52rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);cursor:pointer;}
   .kleurbalk input[type=color]{width:1.7rem;height:1.4rem;border:1px solid var(--line);border-radius:6px;background:none;padding:0;cursor:pointer;}
   .kleurbalk .knop{padding:.3rem .55rem;font-size:.7rem;}
@@ -52,7 +52,11 @@
   .apparaten button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   /* het doek (de website die je bouwt) -- een container, zodat de blokken
      meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
-  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
+  /* min-width:0 op de flexrij en zijn kind: zonder dat zakt een flexitem
+   nooit onder de breedte van zijn inhoud, en dan steekt het doek er aan de
+   rechterkant uit. Op 390px liep dit scherm 9px buiten beeld. */
+  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;min-width:0;overflow-x:hidden;}
+  main>*{min-width:0;max-width:100%;}
   .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
   .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* thema-tokens op het doek zelf */
@@ -156,8 +160,14 @@
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Openen</button>
   <button class="knop" id="exportKnop">Exporteer</button>
-  <button class="knop prim" id="bewaarKnop">Opslaan</button>
 </header>
+<!-- Opslaan stond in de werkbalk hierboven, en die scrolt op een telefoon in
+     zichzelf: gemeten op 19 augustus 2026 lag de knop op x 831 van een venster
+     van 390 -- buiten beeld, achter vier andere knoppen. GRAMMATICA.md zegt
+     "ik wil iets doen -> mijn duim vindt het onderaan", dus hij staat nu in de
+     vaste strook (shared/rtg-ui.css, .rtg-duimbalk). Boven telefoonmaat is dat
+     gewoon een rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop prim hoofd" id="bewaarKnop" data-hoofdactie>Opslaan</button></div>
 <div class="vnoot" id="versienoot" hidden></div>
 <main id="hoofd"><div class="doek" id="doek" data-thema="donker"></div></main>
 
@@ -441,7 +451,7 @@ function exporteer(){
 }
 
 // bediening
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p class="h-mt100"><a href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in via de Kantoren</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-studio hoort bij het RTG Atelier. Open de Kantoren en log in met je kantoor-account.</p><p class="h-mt100"><a class="h-raak24" href="/apps/kantoren.html">Naar de Kantoren →</a></p></div>'; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);

@@ -239,7 +239,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 30000 });
-    await bankDeur(page, 'Bedieningspaneel', { timeout: 20000 });
+    await bankDeur(page, 'Instellingen', { timeout: 20000 });
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'adc9f42a';
+var RTG_BOUW = '4174fbc6';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -546,6 +546,10 @@ var RTG_BOUW = 'adc9f42a';
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
+    /* En zijn werktafel staat leeg. Sinds WERELD.md hervat de werktafel je
+       laatste bladen (shared/command/geheugen.js); zonder deze regel zou de
+       volgende mens op een gedeeld toestel de titels van de vorige zien. */
+    try { localStorage.removeItem('rtg_cmd_bladen'); } catch(e){}
     location.reload();
   }
 
@@ -3638,7 +3642,11 @@ var RTG_BOUW = 'adc9f42a';
       } catch(e){ toast(e.message); }
     }));
     // eenmalig de locatie ophalen zodat partners op afstand worden getoond en gesorteerd
-    if (window.Geo && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
+    /* `Geo.mag()` erbij: staat de locatieschakelaar uit, dan geeft Geo.positie()
+       meteen null, en zonder deze toets zou de grendel hieronder wel gezet zijn.
+       Wie de schakelaar daarna aanzet, kreeg dan de rest van de sessie nog steeds
+       geen afstanden te zien. Nu grendelen we alleen als we het echt gevraagd hebben. */
+    if (window.Geo && Geo.mag() && !mijnPlek && !renderTerPlaatse._gps){ renderTerPlaatse._gps = true; Geo.positie().then(p => { if (p) renderTerPlaatse(); }); }
     renderAfspraken();
   }
 
@@ -3861,6 +3869,54 @@ var RTG_BOUW = 'adc9f42a';
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
     ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    /* De cockpit van LivingOS (WERELDEN.md). Het bestand heet nog living-os,
+       want een bestandsnaam is geen merknaam; de APP heette dat ook, en dat
+       botste vier regels ver in de bank met de WERELD LivingOS. */
+    vooruitzicht:{ naam: 'Het Vooruitzicht', url: '/apps/living-os.html' },
+    /* De STICHTING, en niet het gezin eromheen. Onder /apps/foundation/ staan
+       71 schermen; negen daarvan gaan over RTFoundation als organisatie en de
+       rest over het leven van een kind (WERELDEN.md). Deze twee zijn de deuren
+       naar die negen: het portaal (donateur, vrijwilliger, deelnemer) en de
+       publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
+       een kantoortoken en is geen deur voor een lid. */
+    rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
+       De bank had onder de werelden een tweede kopje, Software, met twaalf apps
+       die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
+       wil afschaffen: 'staat dit in een wereld of in de lijst ernaast?' Een app
+       hoort in de context waarin een mens hem gebruikt, en anders nergens.
+       Negen kregen hier een sleutel; Reizen & Veilig, Gastdossier en Het
+       Vooruitzicht hingen al ergens. shared/command/catalog.js houdt zijn lijst
+       -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
+       geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
+       uit die catalogus ook echt in een wereld hangt. */
+    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
+    sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
+       contexten met een schakelaar Alles / Lifestyle / Business / Communities /
+       Prive. Hij bezit die domeinen niet en plaatsen loopt er nooit langs; wie
+       in Lifestyle plaatst, plaatst in De Salon.
+
+       Hij stond hier niet, en niets in het huis linkte ernaar: een scherm van
+       23 KB dat gebouwd, gedocumenteerd en onbereikbaar was (gevonden met
+       scripts/lib/bereik.js op 19 augustus 2026). Hij hangt in LivingOS en niet
+       in een van de vijf werelden die hij toont, want de contextvraag van
+       WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
+       met zijn dagelijks leven. */
+    wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
+       samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
+       paren"). Instant Reality en Het Vooruitzicht (link:vooruitzicht) beloofden
+       allebei een intentie in drie werelden met twee beslissingen; Private
+       Office en het Privekantoor (link:rechterhand) allebei een directietafel.
+       Vier ingangen naar twee dingen. Wie de oude sleutel nog gebruikt, komt
+       niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
+       bestaan niet meer. */
+    horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
@@ -3924,6 +3980,7 @@ var RTG_BOUW = 'adc9f42a';
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
     loonstrook:  { naam: 'Loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'Privekantoor', url: '/apps/lifestyle.html' },
+    werkos:      { naam: 'RTG Werk OS', url: '/apps/werk.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
     table:       { naam: 'Table',         url: '/apps/table.html' },
@@ -3964,14 +4021,26 @@ var RTG_BOUW = 'adc9f42a';
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
     rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
     // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
-    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' }
+    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' },
+    /* Bank ONTBRAK, en dat was stil. `link:bank` stond wel in MAPPEN, maar
+       zonder deze regel geeft itemDef() undefined, wordt itemZichtbaar() false
+       en tekent RTG zich gewoon een tegel kleiner -- zonder fout, zonder lege
+       plek. De stand zelf bestond al die tijd (apps/geld/bankc.js, id 'bank').
+       test/wereldregister.test.js vangt dit soort gaten nu. */
+    bank:        { naam: 'Bank',          url: '/apps/geld.html#bank' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
      sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam).
      RTFoundation is EEN app: een tik toont de leeftijdskeuze en opent dan
      de hub in de passende jas (?groep= zet de bril op). */
+  /* WERK STOND ER WEL EN BESTOND ER NIET. `os:werk` staat in RTG Kantoor en
+     openOsApp() heeft er een eigen tak voor (openWerkKiezer), maar de wacht
+     bovenaan die functie -- `const app = OSAPPS[naam]; if (!app) return;` --
+     kwam daarvoor. Zonder deze regel was de werkplekkiezer dus onbereikbaar EN
+     was de tegel onzichtbaar: twee gaten die elkaar verborgen. */
   const OSAPPS = {
+    werk:        { naam: 'Werk' },
     bellen:      { naam: 'Bellen' },
     videobellen: { naam: 'Videobellen' },
     snaps:       { naam: 'Snaps' },
@@ -4021,16 +4090,29 @@ var RTG_BOUW = 'adc9f42a';
      langs een echte grens: hierboven staat de registry van alle apps en de
      vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
      welke ervan bij welke pas horen. */
-  /* ---------- de hoofdwerelden, boven de klok ----------
-     Drie duidelijke huizen vervangen de losse domeinmappen: RTG voor het
-     persoonlijke leven en onderweg, RTG Kantoor voor werk en onderneming, en
-     RTFoundation voor de stichting en het gezin eromheen. De pas bepaalt wat
-     binnen zo'n huis beschikbaar is, nooit of de voordeur er armer uitziet.
+  /* ---------- de hoofdwerelden ----------
+     VIER MENSELIJKE CONTEXTEN, en dat is het enige criterium. WERELDEN.md stelt
+     de vraag waar een onderdeel bij hoort niet als "van wie is dit" maar als:
+     in welke context denkt de mens dat hij zich bevindt terwijl hij dit
+     gebruikt? Dezelfde persoon opent zijn rooster in WorkOS, bestelt eten in
+     LivingOS, vliegt naar Ibiza in TravelOS en doet vrijwilligerswerk in
+     FoundationOS. De pas bepaalt wat binnen zo'n huis beschikbaar is, nooit of
+     de voordeur er armer uitziet.
 
-     Daarom bewaart deze lijst alleen de drie vaste hoofdwerelden. Alle apps
-     blijven in precies één wereld ingedeeld en premiumrechten worden pas op
-     onderdeelniveau toegepast. Zo blijft RTG voor elke pas compleet ogen,
-     terwijl Lifestyle en Business aantoonbaar meer mogelijkheden ontsluiten.
+     Een wereld hoeft niet even groot te zijn als de andere; dat is geen
+     scheefheid maar het verschil tussen een reis en een dagelijks leven. Wat
+     wel voor alle vier geldt: een app staat in precies EEN wereld en
+     premiumrechten gelden pas op onderdeelniveau.
+
+     EN ER IS GEEN LIJST ERNAAST MEER. De bank had onder de werelden een tweede
+     kopje (Software) met twaalf apps die nergens in hingen; die twaalf staan nu
+     in de wereld waar ze horen. Wie hier iets niet kwijt kan, heeft niet een
+     lijst nodig maar het antwoord op de contextvraag hierboven.
+
+     WAT HIER NIET STAAT is RTG Core: RTG iD, inloggen, de gegevenspoort,
+     meldingen, taal, Rahul, betalen. Vierentwintig functies zitten in ELKE
+     doelgroep (zie GROEPEN.md) en reizen met de mens mee. Een laag die overal
+     geldt is geen tegel op een beginscherm.
 
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
@@ -4038,15 +4120,33 @@ var RTG_BOUW = 'adc9f42a';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- één gecentreerde rij --- */
-    { sleutel: 'map-rtg', naam: 'RTG', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
+    /* LIVINGOS EN NIET RTG, EN OOK NIET LIFEOS. Twee besluiten in een naam.
+       `rtg` is de naam van de INSTAPPAS, en pas en wereld zijn twee loodrechte
+       assen: vielen die woorden samen, dan las een lid een plek als een prijs.
+       En `LifeOS` -- de eerste kandidaat -- haalde de toets alleen op een
+       technische woordvergelijking: `life` is niet `lifestyle`, terwijl een lid
+       wel "Life" ziet staan naast een pas die "Lifestyle" heet. Een regel die je
+       op de letter volgt en niet op de bedoeling, is geen regel; de toets kijkt
+       nu ook naar de stam. Het huis (/apps/rtg.html) en de glyf houden hun naam:
+       een huis is een merk, een wereld is een context. */
+    { sleutel: 'map-rtg', naam: 'LivingOS', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
+      'link:vooruitzicht', 'link:vandaag', 'link:leven', 'link:sociaal',
+      'link:geldcommand', 'link:mediaos',
+    /* HET GEZIN KOMT UIT FOUNDATIONOS HIERHEEN, en dat is het eigendomsprincipe
+       van WERELDEN.md in de praktijk: de bouwer van een capability bepaalt niet
+       in welke wereld hij hoort, de gebruikerscontext doet dat. RTF Mini, Kids,
+       Tiener, Jong en Volwassen gaan over babyboek, dromen, gevoel, gezondheid,
+       ochtend, rust, opvoeden, school en club -- dat is iemands dagelijks leven
+       en geen stichtingswerk. Gemeten: 62 van de 71 schermen onder
+       /apps/foundation/ zijn zo. De stichting houdt de andere negen.
+       Er verhuist geen bestand: alleen de deur staat nu in de juiste wereld. */
+      'os:rtf',
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+      'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
@@ -4061,11 +4161,35 @@ var RTG_BOUW = 'adc9f42a';
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport',
+      'link:nieuws', 'link:krant', 'link:sport'] },
+    /* INSTELLINGEN, EN MET OPZET ZONDER `wereld`. Een wereld is een context waar
+       je in leeft; deze vier gaan niet over een dag maar over het systeem. Ze
+       zijn RTG Core, en Core heeft in de bank een gezicht: het bedieningspaneel
+       in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
+       instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
+    { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
       'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
-    { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker'] },
+    /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
+       "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
+       dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:
+       een werknemer krijgt de werkvloer VIA zijn werkgever, een werkgever KOOPT
+       de werkruimte. In het functieregister staat dat vandaag nog als twee
+       losse dingen ('Werk OS (werkruimtes)' draagt intern+business, 'De
+       werkvloer' draagt leverancier+personeel). Een wereld eroverheen ontkent
+       dat verschil niet -- de commerciele verpakking zit BINNEN de wereld.
+       Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
+    { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
+      'link:werkos', 'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
+    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
+       wereld is geen categorie in een spreadsheet maar een bestemming in het
+       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
+       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
+       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
+       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
+    { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
@@ -4093,12 +4217,41 @@ var RTG_BOUW = 'adc9f42a';
        nooit in beeld komen (openMap navigeert, zie 26.js). Het
        levens-command-center staat daarom als tegel OP de hub zelf, in de
        oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
-    { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
+    /* FOUNDATIONOS IS DE WERELD, RTFOUNDATION IS HET MERK ERIN. Van de 71
+       schermen onder /apps/foundation/ gaan er acht over de stichting; de rest
+       is het leven van een kind en hoort in LivingOS. Want de bouwer van een
+       capability bepaalt niet in welke wereld hij hoort, de gebruikerscontext
+       doet dat (WERELDEN.md). Die verhuizing staat daar als genoemde stap. */
+    /* HET HUIS IS os-publiek EN NIET os-portaal, en dat scheelde een deur die naar
+       het verkeerde publiek leidt. os.html is een kantoorconsole achter een
+       kantoortoken ("KANTOORCODE"), os-portaal.html heet met zoveel woorden
+       "Portaal voor partners, gemeenten en ondernemers", en os-publiek.html zegt
+       "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
+       een lid; de andere twee zijn deuren BINNEN de wereld. */
+    { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
+      'link:rtfbuurt', 'link:rtfportaal'] }
   ];
+  /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
+     langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:
+     hierboven staat WAAR iets is (de werelden), hier staat WIE het mag zien (de
+     pas). Wereld en pas zijn twee loodrechte assen; ze horen niet in hetzelfde
+     bestand omdat ze toevallig allebei over tegels gaan. */
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
      Business. De registry kent de apps voor iedereen; hier staat wie ze mag
-     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
+     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt.
+
+     DIT IS DE TWEEDE PLEK WAAR STAAT WAT EEN PAS KRIJGT, en sinds vandaag
+     weten die twee van elkaar. De server weigert /api/member/rechterhand aan
+     wie geen Lifestyle of Business heeft; dezelfde veertien sleutels staan als
+     `apps` op de functie `rechterhand` in het register, en
+     test/wereldregister.test.js legt ze naast deze set. Wie er een vijftiende
+     bij zet, zet hem op beide plekken of de bouw zakt.
+
+     De korrel blijft wel verschillen, en dat is geen slordigheid: de server
+     schakelt op FUNCTIE en per doelgroep, deze set verbergt APPS en kent geen
+     verschil tussen Lifestyle en Business. Wat ze nu delen is de inhoud, niet
+     de vorm. */
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
@@ -4615,6 +4768,10 @@ var RTG_BOUW = 'adc9f42a';
     // en om dezelfde reden de deuren naar het systeem (app-main-29c.js)
     if (typeof systeemBij === 'function') systeemBij();
   }
+  /* Afgesplitst van app-main-26b.js toen dat over de 10 KB ging (regel 13).
+     De snede loopt langs een echte grens: hierboven wordt het beginscherm
+     GETEKEND (tegels, mappen, functies, bouw()), hier wordt er iets mee GEDAAN
+     -- een map openen en een map hernoemen. */
 
   /* ---------- mappen openen ---------- */
   const mapScrim = $('#osMapScrim'), mapGrid = $('#osMapGrid'), mapTitel = $('#osMapTitel');
@@ -4647,6 +4804,16 @@ var RTG_BOUW = 'adc9f42a';
        alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
        lijst vanzelf leeg. */
     if (map.wereld) { location.href = map.wereld; return; }
+    /* INSTELLINGEN IS GEEN WERELD MAAR OOK GEEN TEGELVELD (WERELDEN.md): het is
+       het zichtbare gezicht van RTG Core, en dat gezicht bestaat al -- het
+       bedieningspaneel in de voet van de bank. Een map met `paneel` opent die
+       knop in plaats van een eigen scherm.
+
+       EN DAAROM IS HET GEEN TWEEDE INGANG. De vier identiteits-apps horen niet
+       in LivingOS, maar ze los uit MAPPEN halen zou ze uit Spotlight halen, en
+       dat is verbergen (ADAPTIEF.md). Ze staan nu in een eigen map: Spotlight
+       indexeert ze, en de map zelf gaat naar de ENE plek waar ze wonen. */
+    if (map.paneel) { const knop = $(map.paneel); if (knop) { knop.click(); return; } }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);
@@ -4820,6 +4987,12 @@ var RTG_BOUW = 'adc9f42a';
     if (T) document.querySelectorAll('#osCcThema button').forEach(b => b.classList.toggle('actief', b.dataset.thema === T.huidig()));
     const push = $('#osCcPush');
     if (push && window.RTGRealtime) push.classList.toggle('aan', RTGRealtime.pushOn && RTGRealtime.pushOn());
+    const gps = $('#osCcGps');
+    if (gps) {
+      const g = window.RTGPlek ? RTGPlek.aan() : false;
+      gps.classList.toggle('aan', g);
+      gps.setAttribute('aria-pressed', String(g));
+    }
   }
   document.querySelectorAll('#osCcThema button').forEach(b => b.addEventListener('click', () => {
     if (window.RTGOSThema) { RTGOSThema.zet(b.dataset.thema); ccSync(); }
@@ -4828,6 +5001,26 @@ var RTG_BOUW = 'adc9f42a';
   if (ccTaal) ccTaal.addEventListener('click', () => { sluitScrims(); if (window.RTGi18n) RTGi18n.openModal(); });
   const ccPush = $('#osCcPush');
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
+  /* DE LOCATIESCHAKELAAR, DIE ER NIET WAS.
+
+     Zeven plekken (navigatie, flits, ov, ovdienst, de sterrenhemel, het
+     levensteken van RTG Veilig en de ontmoet-lus) lezen `rtg_os_gps` en
+     behandelen hem als de waarheid: alleen een uitdrukkelijke '1' geeft je
+     positie vrij. Terecht -- maar niemand zette hem ooit op '1', want deze
+     tegel bestond niet en shared/osmenu.js, waar de commentaren naar
+     verwijzen, bestaat evenmin. De schakelaar stond dus voor iedereen, voor
+     altijd, op uit. Dat is geen instelling maar een dode functie: "de gps doet
+     het niet", en gelijk heeft wie dat zegt.
+
+     shared/plek.js houdt de sleutel; hier staat alleen de knop. Aanzetten
+     vraagt meteen een positie op, zodat de tegel niet "aan" zegt terwijl het
+     toestel weigert -- dan springt hij zichtbaar terug op uit. */
+  const ccGps = $('#osCcGps');
+  if (ccGps) ccGps.addEventListener('click', async () => {
+    if (!window.RTGPlek) return;
+    await RTGPlek.zetAan(!RTGPlek.aan());
+    ccSync();
+  });
   const ccPin = $('#osCcPin');
   if (ccPin) ccPin.addEventListener('click', () => { sluitScrims(); metAlgPin(() => {}); });
   const ccZoek = $('#osCcZoek');
@@ -4846,6 +5039,16 @@ var RTG_BOUW = 'adc9f42a';
     const t = $(tegel), k = $(knop);
     if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
     else if (t) t.hidden = true;
+  });
+  /* De vier van Instellingen: identiteit, bescherming, sleutels en akkoorden.
+     Ze staan hier als tegel en in MAPPEN als map zonder `wereld` -- twee
+     weergaven van EEN lijst, want de tegel leest zijn item uit het attribuut en
+     opent hem met dezelfde openItem als overal. Wie er een vijfde bij zet, zet
+     hem op beide plekken of nergens; dat is de prijs van een paneel dat in HTML
+     staat en een register dat in JS staat, en hij hoort hier genoemd te worden
+     in plaats van pas op te vallen als er een mist. */
+  document.querySelectorAll('[data-cc-open]').forEach((t) => {
+    t.addEventListener('click', () => { sluitScrims(); openItem(t.dataset.ccOpen); });
   });
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
@@ -5399,7 +5602,18 @@ var RTG_BOUW = 'adc9f42a';
        levert zijn eigen deur, want zijn plek is de mond in de schilbalk. Hier
        riep hij RTGRahul.open() aan -- de zwevende handenvrij-balk -- en dat zou
        een tweede Rahul zijn naast die in de balk. */
-    RTGCommand.systeem(knop ? [{ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+    /* DIT HEET INSTELLINGEN EN NIET MEER BEDIENINGSPANEEL, en dat is geen
+       cosmetiek maar het opruimen van een botsing. In de voet van de bank
+       stonden twee knoppen: "Bedieningspaneel" (dit paneel: thema, taal, push,
+       Zegel, uitloggen en sinds WERELDEN.md ook wie je bent, RTG Veilig,
+       Passkeys en Juridisch) en "Instellingen" -- dat laatste is blad 3 van de
+       console en gaat over de ACTIEVE PAGINA. Twee keer hetzelfde woord voor
+       twee verschillende dingen, naast elkaar.
+
+       Het paneel is wat een lid instellingen noemt, dus krijgt het die naam.
+       De ander heet nu Pagina-instellingen, precies zoals zijn eigen blad zich
+       al noemde (shared/command/werktafel.js). */
+    RTGCommand.systeem(knop ? [{ naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }
 /* de app-regie van de boardroom: uitgezette apps verdwijnen van het springboard */
@@ -6468,7 +6682,8 @@ var RTG_BOUW = 'adc9f42a';
       vacs = d.vacatures || []; vacLanden = d.landen || [];
       renderVacatures();
       // locatie ophalen zodat vacatures op afstand komen (eenmalig)
-      if (window.Geo && !Geo.laatste() && !loadVacatures._gps){ loadVacatures._gps = true; Geo.positie().then(p => { if (p) renderVacatures(); }); }
+      // Geo.mag(): zie app-main-21.js -- niet grendelen op een vraag die nooit gesteld is
+      if (window.Geo && Geo.mag() && !Geo.laatste() && !loadVacatures._gps){ loadVacatures._gps = true; Geo.positie().then(p => { if (p) renderVacatures(); }); }
     } catch(e){ $('#homeVacatures').hidden = true; }
   }
   function renderVacatures(){

@@ -8,6 +8,35 @@ const os = require('node:os');
 const path = require('node:path');
 const fs = require('node:fs');
 
+/* DE BROWSER VOOR EEN SCHERMTOETS, en waarom dit hier staat en niet 32 keer.
+
+   EEN GEVONDEN PAKKET IS NIET HETZELFDE ALS EEN WERKENDE BROWSER, en dat is
+   precies waar dit op stukliep. Tweeendertig e2e-bestanden droegen elk een eigen
+   `laadPlaywright()` -- in zes verschillende varianten -- die zo begon:
+
+       try { return require('playwright') } catch (e) {}
+       try { const eigen = require('../server/lib/browser'); ... } catch (e) {}
+
+   Het pakket staat er, dus de eerste regel slaagt altijd en de tweede werd nooit
+   bereikt. Alleen: het pakket wijst naar een chromium-build die er niet staat
+   (`chromium-1234` terwijl 1194 geinstalleerd is). Elke toets in die 32
+   bestanden viel daardoor om op een INSTALLATIEBANNER van Playwright, en die
+   ziet eruit als een omgevingsmelding en niet als een rode toets.
+
+   Wat dat kostte: de zes bestanden die de werktafel bewaken konden niet meer
+   zakken. Een hernoeming in de bank (Bedieningspaneel -> Instellingen) stond
+   twee commits lang stuk zonder dat iets rood werd -- LAT.md regel 2, een toets
+   die je niet hebt zien zakken is geen toets.
+
+   De reparatie is een regel: neem het pakket alleen als zijn binary er ECHT
+   staat, en val anders terug op onze eigen driver (server/lib/browser, CDP over
+   een pipe, geen dependency). Waar Playwright netjes geinstalleerd is verandert
+   er niets. */
+/* De vindwijze staat in scripts/lib/scherm.js, want scripts/a11y.js heeft hem
+   ook nodig en twee laders van dezelfde browser lopen uiteen (LAT.md regel 4).
+   Daar staat ook wat er hier tweeendertig keer misging. */
+const { laadScherm } = require('../scripts/lib/scherm');
+
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.
 function vrijePoort() {
@@ -521,7 +550,7 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
   return mij.id;
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld, drukte, keurLidGoed,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld, drukte, keurLidGoed, laadScherm,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

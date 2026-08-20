@@ -387,7 +387,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 53 codeafspraken, binair | `scripts/check.js` |
+| 55 codeafspraken, binair | `scripts/check.js` |
 | de INVOER van elke bronkeuring: commentaar eruit, maar geen code opeten | `scripts/lib/bron.js` + `test/bron.test.js` |
 | toegankelijkheid van elk scherm, uitgelogd EN ingelogd, hard op nul | `scripts/a11y.js` + `A11Y-INGELOGD.json` |
 | elk media-element een besluit over ondertiteling, met een reden | `scripts/check.js` regel 49 |
@@ -395,6 +395,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elk raakvlak 24x24 op telefoonformaat, en de uitzonderingen niet te ruim | `scripts/raakvlakkeuring.js` + `test/raakvlak.test.js` |
 | geen geheim uit `Math.random()`, geen handtekening met `!==` vergeleken | `scripts/check.js` regel 50 |
 | geen bestand plukt een naam uit een bereik dat het niet heeft | `scripts/check.js` regel 51 |
+| WERELDLIJST.md loopt niet achter op het wereldregister | `scripts/check.js` regel 52 |
+| elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
 | een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |

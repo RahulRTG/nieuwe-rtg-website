@@ -28,6 +28,15 @@
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.6rem;}
   .kaart h3{font-size:1.05rem;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.5rem;}
+  /* Vier velden en dan "Plaatsen": op een telefoon breekt die knop toch af naar
+     zijn eigen regel, en dan stond hij daar links -- x 81 van 390, in de hoek
+     waar de duim van een rechtshandige niet komt. Staat hij op zijn eigen regel,
+     dan is de hele regel de knop; dat kent geen kant. De veld-uitzondering in
+     shared/rtg-ui.css houdt hem anders smal, vandaar deze regel hier.
+
+     De :not() erbij om dezelfde reden als in shared/rtg-ui.css: de veldregel
+     daar weegt (0,2,1) en `.rij > [data-hoofdactie]` maar (0,2,0). */
+  @media(max-width:760px){ .rij > [data-hoofdactie]:not([data-inbalk]){flex:1 1 100%;width:100%;max-width:100%;} }
   .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop.aan{background:var(--gold);color:#000;}
@@ -106,7 +115,7 @@
       <input id="aPlek" class="veld smal" placeholder="Plaats" maxlength="40">
       <input id="aWanneer" class="veld" type="date" aria-label="Wanneer">
       <input id="aBudget" class="veld smaller" type="number" min="0" placeholder="Budget" aria-label="Budget in euro">
-      <button class="knop" id="aPlaats" type="button">Plaatsen</button>
+      <button class="knop" id="aPlaats" type="button" data-hoofdactie>Plaatsen</button>
     </div>
   </div>
   <div id="aanvragen"></div>

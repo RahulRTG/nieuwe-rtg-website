@@ -16,7 +16,12 @@
 <style>
   body{height:100vh;overflow:hidden;}
   .app{display:grid;grid-template-columns:1fr 20rem;grid-template-rows:auto 1fr;height:100vh;gap:.7rem;padding:.7rem;}
-  .top{grid-column:1/3;display:flex;align-items:center;gap:1rem;}
+  /* min-width:0 en wikkelen: deze rij groeide op 390px door tot 510px in een
+   vak van 368, en body staat op overflow:hidden -- de rechterkant was dus
+   gewoon weg en er was niet naartoe te scrollen. Een flexitem zakt zonder
+   min-width:0 nooit onder zijn inhoud. */
+.top{grid-column:1/3;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;min-width:0;}
+.top>*{min-width:0;}
   .brand{font-family:var(--serif);font-weight:500;font-size:1.1rem;}
   .brand b{color:var(--goud);}
   .code{margin-left:auto;display:flex;align-items:center;gap:.7rem;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem .8rem;}
@@ -32,7 +37,16 @@
   .tbtn.aan{background:var(--goud);color:#1a1710;}
   .kleur{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
   .kleur.aan{border-color:#fff;transform:scale(1.15);}
-  input[type=range]{width:6rem;accent-color:var(--goud);}
+  /* Een schuifregelaar is standaard 16 hoog, en WCAG 2.5.8 vraagt 24. Dit is de
+     dikte van het krijt op een digitaal schoolbord -- een juf of meester pakt
+     hem tussen het lesgeven door, staand voor een klas. Alleen het raakvlak
+     groeit; de balk zelf blijft even fijn.
+
+     Gevonden op 19 augustus 2026, de eerste keer dat dit scherm uberhaupt in de
+     keuring openging: het hangt achter een tijdelijke schoolpas, en die maakt de
+     ronde sinds vandaag zelf aan. Twee schermen die aan hun deur gemeten werden
+     worden nu aan hun inhoud gemeten, en meteen lag er een gebrek. */
+  input[type=range]{width:6rem;accent-color:var(--goud);min-height:24px;}
   .zij{display:flex;flex-direction:column;gap:.7rem;overflow-y:auto;}
   .paneel{padding:.9rem;}
   .paneel h3{font-size:.95rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem;font-family:var(--serif);font-weight:500;}

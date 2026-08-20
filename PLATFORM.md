@@ -124,15 +124,34 @@ verkocht heeft, met soort en herkomst als twee verschillende dingen). Het
 werkwoord van die vierde: **vóór zijn** -- opmerken en klaarzetten voordat de
 reiziger het merkt, en uitvoeren alleen waar het domein dat al mocht.
 
-**Een open beslissing over deze kaart.** De eigenaar heeft op 11 augustus 2026
-een tweede indeling in acht genoemd — Life, Business, Money, Mobility,
-Hospitality, Media, Foundation, Identity — en dat is niet de acht hierboven:
-Reizen en Kantoor verdwijnen daarin als eigen wereld, Hospitality en Business
-komen erbij. Dat raakt werkende software en de omleidingen die er al liggen, dus
-het hoort een eigen beslissing te zijn en geen bijvangst. Zolang die niet
-genomen is, geldt de tabel hierboven. Het staat hier opgeschreven zodat niemand
-het later voor vergeten aanziet (LAT-regel 6); de uitwerking staat in LIFE.md
-par. 8.
+**Die beslissing is genomen op 19 augustus 2026, en staat in `WERELDEN.md`.**
+
+Hij is geen van beide kaarten geworden. De acht van 11 augustus (Life, Business,
+Money, Mobility, Hospitality, Media, Foundation, Identity) botsten op iets wat
+geen van beide lijsten zag: **`Business` en `Life` zijn geen werelden maar
+pasnamen.** `rtg`, `lifestyle` en `business` zijn de drie passen, en `?pas=`
+herbouwt daarop de hele ledenapp. Pas en wereld zijn dus twee loodrechte assen —
+wie is dit, tegenover waar ben ik — en een wereld die heet zoals een pas laat een
+lid een plek lezen als een prijs.
+
+Wat er wél is besloten: **vier werelden — LivingOS, WorkOS, TravelOS en
+FoundationOS** — met de domeinen een niveau lager, en **RTG Core** als
+horizontale laag die geen wereld is. Er hoefde dus niets te sneuvelen; de acht
+zijn gezakt in plaats van geschrapt.
+
+De eerste versie van dat besluit had er drie (ROS, Concern, Fundament) en hield
+één dag stand. Wat hem omgooide was een telling: 24 functies zitten in élke
+doelgroep, en dus hoorde de horizontale laag nergens in een wereld thuis; en de
+bestuurskant van RTG had geen eigen wereld nodig zodra WorkOS twee
+toegangsmodellen mag dragen — RTG is gewoon één werkgever daarin. De volledige
+kaart, de regel dat een wereld nooit de naam van een pas draagt (noch de stam
+ervan), en wat er bewust open bleef staan in `WERELDEN.md`;
+`test/wereldregister.test.js` handhaaft wat machinaal te handhaven is, inclusief
+of de kaart en de code nog hetzelfde zeggen.
+
+De tabel hierboven blijft geldig als **volgorde van bouwen** — hij zegt welke
+domeinen samengevoegd zijn en welke nog niet. Hij zegt sinds dit besluit niet
+meer welke wereld iets is.
 
 ---
 

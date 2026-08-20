@@ -127,8 +127,14 @@
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Mijn sites</button>
   <button class="knop" id="bewaarKnop">Bewaren</button>
-  <button class="knop prim" id="onlineKnop">Ga online</button>
 </header>
+<!-- "Ga online" stond in de werkbalk hierboven, en die scrolt op een telefoon in
+     zichzelf: gemeten lag de knop op x 1125 van een venster van 390 -- ruim
+     buiten beeld, achter zeven andere knoppen. Zelfde verhuizing als bij
+     /apps/websitestudio.html: de vaste strook onderaan (shared/rtg-ui.css,
+     .rtg-duimbalk), boven telefoonmaat gewoon een rij onder de kop.
+     GRAMMATICA.md: "ik wil iets doen -> mijn duim vindt het onderaan". -->
+<div class="rtg-duimbalk"><button class="knop prim" id="onlineKnop" data-hoofdactie>Ga online</button></div>
 <div class="lint" id="lint" hidden>
   <span class="stip" id="lintStip"></span>
   <span id="lintTekst">Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.</span>

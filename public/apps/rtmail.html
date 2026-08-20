@@ -29,7 +29,11 @@
   .rij .b{flex:1;min-width:0;}
   .rij .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
   .rij.ongelezen .nm::before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy);flex:0 0 auto;}
-  .rij .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rij /* display:block, want dit is een SPAN: op een inline-element doet overflow
+   niets en werkt text-overflow dus ook niet. De regel stond er al, alleen
+   deed hij niets -- de voorregel groeide door tot 1216px en duwde het scherm
+   op een telefoon tot 1289px open, buiten beeld en niet te bereiken. */
+.lt{display:block;font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rij .lt .ongev{color:#E78AA0;font-weight:600;}
   .rij .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
   .terug{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:.8rem;padding:.2rem 0;}

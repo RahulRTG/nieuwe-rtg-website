@@ -87,9 +87,13 @@
   <span class="rij" style="margin-left:auto;">
     <button class="knop" id="toonArchief" type="button">Archief</button>
     <button class="knop" id="nieuwLijst" type="button">+ Lijst</button>
-    <button class="knop vol" id="nieuwNotitie" type="button">+ Notitie</button>
   </span>
 </header>
+<!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
+     "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
+     een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
+     rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwNotitie" type="button" data-hoofdactie>+ Notitie</button></div>
 <main>
   <input class="veld" id="zoek" type="search" placeholder="Zoek op het bord" aria-label="Zoeken"
     style="width:100%;margin-bottom:.9rem;">

@@ -99,10 +99,40 @@ function cspNonce(publicDir, aan) {
          <head>. Hij moet voor elk ander script staan, anders is er al een blok
          gemaakt voordat hij er is. Geen <head>? Dan vooraan het document; een
          browser hangt hem daar alsnog in de head die hij zelf aanmaakt. */
-      const stempel = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>';
+      /* De stempelaar eerst, dan de hand. STIJLSTEMPEL moet voor elk ander
+         script staan (zie hierboven); shared/hand.js maakt geen stijlblokken en
+         mag er dus achter. Hij staat wel VOOR de rest van de pagina, want hij
+         corrigeert het attribuut hieronder als de cookie achterliep -- en dat
+         moet gebeurd zijn voordat er iets getekend wordt. Zo hoeven er geen 257
+         losse scripttags voor. */
+      const stempel = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>'
+        + '<script src="/shared/hand.js" nonce="' + nonce + '"></script>';
       html = /<head[^>]*>/i.test(html)
         ? html.replace(/<head[^>]*>/i, (m) => m + stempel)
         : stempel + html;
+      /* LINKS- OF RECHTSHANDIG, voordat er iets getekend is.
+
+         De duimboog van een linkshandige is het spiegelbeeld van die van een
+         rechtshandige, en het huis beweegt daarin mee (shared/hand.js). Zou dat
+         pas in de browser gebeuren, dan klapt het scherm van een linkshandige
+         bij elke start zichtbaar om -- dus zet deze laag het attribuut er hier
+         al in, uit de cookie die shared/hand.js bijhoudt.
+
+         DE COOKIE IS NIET DE WAARHEID, alleen het transport naar deze kant.
+         localStorage is de waarheid; shared/hand.js trekt de twee bij elk laden
+         gelijk. Loopt de cookie achter (een blad uit de servicewerker-cache),
+         dan corrigeert dat script het attribuut alsnog -- dan flikkert het een
+         keer, in plaats van altijd.
+
+         Alleen twee woorden komen erdoor. Wat er verder in die cookie staat is
+         van buiten en hoort nooit in een attribuut te belanden. */
+      const hand = /(?:^|;\s*)rtg_hand=(links|rechts)(?:;|$)/.exec(String(req.headers.cookie || ''));
+      if (hand && /<html[^>]*>/i.test(html)) {
+        html = html.replace(/<html(?![^>]*\bdata-hand=)/i, '<html data-hand="' + hand[1] + '"');
+        /* Anders serveert een tussenliggende cache het blad van de een aan de
+           ander. Vary staat verderop al voor Accept-Encoding; dit hoort ernaast. */
+        res.setHeader('Vary', 'Cookie, Accept-Encoding');
+      }
       res.set('Content-Security-Policy', CSP(nonce, magnaat));
       res.type('html');
       /* Ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag

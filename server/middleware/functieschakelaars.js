@@ -78,10 +78,13 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
         let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        /* De sessie ZELF gaat mee en niet alleen zijn tier -- waarom, staat bij
-           bekendeBeller() in schakelaar-antwoord.js. */
-        if (tok && !gebruiker) { try { sessie = sessionFor(tok) || null; if (sessie && sessie.tier) tier = sessie.tier; } catch (e) {} }
-        const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
+        /* De sessie hoort er ALTIJD bij te worden gehaald en niet alleen als het
+           accounttoken faalt: op de werkpaden van WorkOS leest
+           doelgroepVanVerzoek de relatie tot de organisatie uit de sessie, en
+           een medewerker die met zijn RTG-account binnenkwam heeft ALLEBEI. */
+        if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+        if (tok && !gebruiker && sessie && sessie.tier) tier = sessie.tier;
+        const doel = functies.doelgroepVanVerzoek(p, gebruiker, sessie) ||
           (tier ? functies.tierNaarDoelgroep(tier) : null);
         const raakt = doel && Array.isArray(f.doelgroepen) && f.doelgroepen.includes(doel);
         if (raakt) {
@@ -133,10 +136,9 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
     // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
     // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
     let sessie = null;
-    if (tok && !user) {
-      try { sessie = sessionFor(tok) || null; if (sessie && sessie.tier) sessieTier = sessie.tier; } catch (e) {}
-    }
-    const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
+    if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+    if (tok && !user && sessie && sessie.tier) sessieTier = sessie.tier;
+    const doelgroep = functies.doelgroepVanVerzoek(p, user, sessie) ||
       (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
 
     // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als

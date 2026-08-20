@@ -89,9 +89,13 @@
   <span class="rij" style="margin-left:auto;">
     <button class="knop" id="toonFav" type="button">Favorieten</button>
     <button class="knop" id="toonAlbums" type="button">Albums</button>
-    <button class="knop vol" id="nieuwAlbum" type="button">+ Album</button>
   </span>
 </header>
+<!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
+     "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
+     een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
+     rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwAlbum" type="button" data-hoofdactie>+ Album</button></div>
 <main>
   <div id="terugblikWrap" style="display:none;">
     <div class="kop">Dezelfde maand, eerdere jaren</div>

@@ -291,7 +291,7 @@
            geen keuze en krijgt van de server hetzelfde antwoord terug. */
         (zone === 'zaak' ? '<label for="mZaak">Namens welke zaak?</label><select id="mZaak">' +
           (zaal.zaken || []).map(z => '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('') + '</select>' : '') +
-        '<div class="rij"><button class="knop vol" id="mStart" type="button">Kanaal aanmelden</button></div>';
+        '<div class="rij"><button class="knop vol hoofd" id="mStart" type="button" data-hoofdactie>Kanaal aanmelden</button></div>';
       el.appendChild(kaart);
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
       kaart.querySelector('#mStart').addEventListener('click', async () => {

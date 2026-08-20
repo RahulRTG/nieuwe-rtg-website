@@ -10,7 +10,7 @@
 (function(w,d){
   'use strict';
   w.RTGCommandBank=function(o){
-    var root=o.root, svg=o.svg, APPS=o.apps, dicht=o.stand==='gesloten';
+    var root=o.root, svg=o.svg, dicht=o.stand==='gesloten';
 
     function sluit(){if(!root)return;root.classList.remove('bank-open');
       var k=root.querySelector('.cmd-lade');if(k)k.setAttribute('aria-expanded','false')}
@@ -89,8 +89,25 @@
        pas die verandert niet een bank achterlaat die van gisteren is.
 
        Nul werelden is een geldige stand, geen storing: een gast, of een pagina
-       die de lijst niet aanreikt. Dan staat er geen kopje en geen lege rij, en
-       houdt de bank gewoon zijn software. */
+       die de lijst niet aanreikt. Dan is de bank leeg op zijn voet na.
+
+       ER STOND HIER EEN TWEEDE KOPJE, "SOFTWARE", en dat is 19 augustus 2026
+       weggehaald. Daaronder hingen twaalf apps uit shared/command/catalog.js die
+       in geen enkele wereld stonden -- Vandaag, Het Vooruitzicht, Partner
+       Network, Leven, Geld, Sociaal, Media, Horeca en de rest. Een lid
+       moest daardoor bij elk ding twee vragen beantwoorden: in welke wereld
+       hoort dit, en zo niet, staat het dan in de lijst ernaast? Dat is precies
+       de vraag die WERELDEN.md afschaft: een app hoort in de context waarin een
+       mens hem gebruikt, of nergens.
+
+       Ze zijn niet verdwenen maar verhuisd; ze hangen nu in MAPPEN in de wereld
+       waar ze horen, en op het huis van die wereld.
+       test/wereldregister.test.js zakt als er ooit weer een app in de catalogus
+       staat die in geen wereld hangt.
+
+       DE CATALOGUS ZELF BLIJFT. Hij is ook Rahuls routeertabel (appUit) en de
+       bron van werkbladtitels (titelVan): wie hem leeghaalt, sloopt "open het
+       gastdossier". Hij tekent alleen geen bank-sectie meer. */
     function vul(){
       var nav=root&&root.querySelector('.cmd-nav');if(!nav)return;
       var werelden=[];
@@ -100,15 +117,13 @@
       if(werelden.length){
         nav.appendChild(kopje('Werelden'));
         werelden.forEach(function(x){nav.appendChild(deur(x.naam,x.url,x.teken))});
-        nav.appendChild(kopje('Software'));
       }
-      APPS.forEach(function(a){nav.appendChild(deur(a[0],a[1],null,a[2]))});
       vulVoet();
       // de kiezer achter de plus: hetzelfde aanbod, alleen op een breed scherm
       var kz=root.querySelector('.cmd-kiezer');
       if(!kz)return;
       kz.textContent='';
-      werelden.map(function(x){return[x.naam,x.url]}).concat(APPS.map(function(a){return[a[0],a[1]]}))
+      werelden.map(function(x){return[x.naam,x.url]})
         .forEach(function(p){var b=d.createElement('button');b.textContent=p[0];
           b.onclick=function(){kz.hidden=true;o.open(p[1],p[0])};kz.appendChild(b)});
     }

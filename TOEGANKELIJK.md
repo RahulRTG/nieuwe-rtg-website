@@ -21,12 +21,36 @@ op telefoonformaat (390x844).
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
-| raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| raakvlak (24x24) | **0**, op telefoon- EN tabletformaat | een knop die een trillende hand niet raakt |
+| past op een telefoon | **0** te breed, **0** leeg | een scherm waarvan de rechterhelft weg is, of dat niets toont |
+| duimbereik | **0** buiten bereik, per hand gemeten over 89 aangewezen hoofdhandelingen | de belangrijkste knop op de plek waar jouw duim niet komt |
 
-Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
+Die zeven zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in twee staten, het
 raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd; wie iets
-vindt, meet nog een keer). `check.js` regel 49 doet het ondertitelregister.
+vindt, meet nog een keer), en breedte plus duimbereik in een vierde die TWEE
+keer draait: een keer rechtshandig en een keer linkshandig, want de duimboog van
+een linkshandige is het spiegelbeeld (`ADAPTIEF.md`). `check.js` regel 49 doet
+het ondertitelregister.
+
+### Een nul die niemand gemeten had
+
+Dit hoort erbij, want het raakt hoe je de tabel hierboven moet lezen. Tot 19
+augustus 2026 zocht `scripts/a11y.js` zijn browser met een eigen lader, en die
+kwam uit op een Playwright waarvan de chromium **niet bestond** (1234, terwijl er
+1194 stond). Het pakket laadt in dat geval gewoon; alleen de browser ontbreekt.
+De scan doet dan wat hij hoort te doen op een kale CI — *"geen browser, scan
+overgeslagen"*, met exitcode 0.
+
+Gevolg: hier draaide hij niet, terwijl dit document en `A11Y-INGELOGD.json` een
+**nul** meldden. Die nul was per ongeluk waar — de scan is op 19 augustus voor
+het eerst met een echte browser gedraaid en kwam op precies dezelfde uitkomst —
+maar dat wisten we niet toen we hem opschreven, en dat is het verschil tussen
+een meting en een aanname (`LAT.md` regel 9).
+
+Wat er is veranderd: de vindwijze staat nu op één plek (`scripts/lib/scherm.js`,
+gedeeld met `test/helper.js`) en de scan **drukt af waarmee hij gemeten heeft**,
+zodat "overgeslagen" nooit meer op stilte lijkt.
 
 ## De instellingen die een lid zelf zet
 
@@ -108,6 +132,93 @@ werkt.** Alleen de gewone schermtoetsen zagen dit.
 **Werkt ook: elk raakvlak is minstens 24x24** (WCAG 2.5.8), gemeten op
 telefoonformaat. De meting begon op 267 stuks over 188 schermen en staat nu op
 nul, met een poort eronder die zakt zodra er een bijkomt.
+
+**En werkt ook: het scherm past, en de belangrijkste knop ligt onder je duim.**
+Dat is een tweede laag boven 24x24, en het onderscheid is de moeite waard:
+24 pixels is de ondergrens om iets te kunnen RAKEN met een hand die trilt, 44 is
+wat een duim in beweging nodig heeft — in een trein, lopend, met één hand.
+`GRAMMATICA.md` belooft het eerste van die twee met zoveel woorden: *"ik wil iets
+doen → mijn duim vindt het onderaan."*
+
+De ronde begon op elf schermen die op 390px rechts buiten beeld liepen (tot
+1289px, zonder mogelijkheid ernaartoe te scrollen) en negentien met de
+hoofdhandeling te klein of buiten bereik. Beide staan nu op nul.
+
+Eén ding daaraan is nieuw en niet vanzelfsprekend: **het bereik wordt per hand
+gemeten**. Acht schermen hadden hun hoofdhandeling in het kwart waar de duim
+niet komt — en *welke* acht dat waren, verschilde tussen een linkshandige en een
+rechtshandige. Een scherm dat alleen voor rechtshandigen klopt, is niet af.
+
+**Wat hier NOG NIET staat**, en het is de grootste post: van de 254 schermen
+wijzen er **89** hun hoofdhandeling aan (bij het openen van deze ronde waren het
+er 18). De conventie bestaat (`data-hoofdactie`, `GRAMMATICA.md`) en de poort
+meet wat gedeclareerd is; de overige 165 zijn niet gemeten op duimbereik omdat
+er niets te meten valt — een lijst, een cockpit of een dagbriefing heeft niet
+één handeling die eruit springt. Dat is geen fout die verborgen wordt — het
+getal staat in `A11Y-INGELOGD.json` — maar het is wel de eerlijke maat van hoe
+ver dit is.
+
+**En één blinde vlek is er tussenuit gekomen die geen enkele teller liet zien.**
+De keuring logde in met een RTG-lidmaatschap, en de RTF-leerling- en
+gezinsschermen hangen achter een tweede deur die daar los van staat
+(`apps/foundation/sessie.js`). Vijfenvijftig schermen — 22% van dit huis — zijn
+dus rondenlang gemeten als "gaat open, past, geen hoofdhandeling", terwijl er in
+werkelijkheid een slot in beeld stond. De keuring maakt nu ook een gezin met een
+profiel aan. Meteen daarna kwam er een echt gebrek achter vandaan dat er al die
+tijd stond: het tegelraster van `/apps/foundation/index.html` liep 353 pixels
+buiten beeld. **Een scherm dat je nooit open hebt zien gaan, heb je niet
+gemeten** — en het stond wel als gemeten in dit document.
+
+Na die reparatie blijven er **drie** dicht, en die staan hier met naam in plaats
+van weggewerkt:
+
+| scherm | wat de deur vraagt | staat het nu |
+|---|---|---|
+| `/apps/foundation/campus.html` | een leerlingprofiel mét geboortedatum, niet het gezinsprofiel | **open** — de ronde maakt er een aan en zet dat token alleen voor dit scherm klaar |
+| `/apps/foundation/bord.html` | een tijdelijke schoolpas: een klassleutel die alleen in de tab van een lopende les bestaat en na dertig minuten vervalt | **dicht** |
+| `/apps/foundation/schrift.html` | dezelfde schoolpas, aan de leerlingkant | **dicht** |
+
+Die laatste twee zijn niet aan te maken zonder een les te starten, en dat vraagt
+een model achter `/api/les/maak`. Ze worden dus aan hun deur gemeten. Dat is
+geen nul en geen groen: **het is één regel, en die staat er.**
+
+**En één soort gebrek zag geen enkele ronde, omdat een browservenster geen
+telefoon is.** Er zit geen statusbalk boven en geen thuisstreep onder, dus
+`env(safe-area-inset-*)` is nul en een scherm dat die zone negeert ziet er in de
+keuring perfect uit. Vijf schermen deden dat — de Command-modus-familie
+(`partner-network`, `reizen-veilig`, `living-os`, en via dat blad ook
+`geld-command` en `leven`) — en dat kwam boven met een **schermafdruk van een
+echt toestel**, niet met een meting. De bovenste strook liep onder de klok door
+en de menuknop lag op de eerste tab.
+
+Dat hoeft niet zo te blijven: Chromium kán een inkeping nabootsen
+(`Emulation.setSafeAreaInsetsOverride`), en dat is gebruikt om deze reparatie in
+beide richtingen te meten — mét de reparatie begint de kop op 59 en houdt de
+balk 39 pixels vrij, zonder op 0 en 5. **De ronde zelf draagt die inkeping nog
+niet.** Zolang dat zo is, geldt voor de veilige zone wat voor dit hele document
+geldt: gemeten met een browser, niet met een toestel.
+
+**Sinds 19 augustus 2026 draagt de telefoonronde die inkeping wel**, en de
+uitkomst was rustig: over 254 schermen met een statusbalk van 59 en een
+thuisstreep van 34 kwam er **geen enkel nieuw gebrek** bij. De rest van dit huis
+deed de veilige zone dus al goed; alleen de Command-modus-familie deed het niet.
+
+**En de tabletband wordt nu ook gemeten** — 834x1112, ingelogd. Die band was
+nooit door een browser getekend, en dat was geen detail: twee gebreken bestonden
+alleen daar. Op `/apps/rtg.html` is een dossierregel een link naar een
+betaalpagina die op 390 afbreekt en 74 hoog meet, en op 700 en 834 op één regel
+past en 20 meet; op `/apps/salon.html` geldt hetzelfde voor de naam boven een
+post. **Onzichtbaar voor de raakvlakronde, want die meet 390 — waar het
+toevallig goed gaat.**
+
+**Twee deuren die dicht stonden, staan nu open.** `bord.html` en `schrift.html`
+hangen achter een tijdelijke schoolpas, en hier stond dat die niet te maken was
+zonder een model. Dat was verkeerd gemeten: `/api/les/maak` heeft een handmatige
+werkmodus. De keuring maakt nu zelf een les aan — en de eerste keer dat
+`bord.html` werkelijk openging lag er meteen een gebrek (de dikte-schuifregelaar
+op 96x16). Dat is nu twee keer hetzelfde patroon, na de RTF-gezinsdeur:
+**elke deur die dicht blijft in een keuring is een stuk huis waarvan niemand
+weet wat er staat.**
 
 Twee oorzaken droegen het leeuwendeel. De home-indicator van de iOS-schil stond
 op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146

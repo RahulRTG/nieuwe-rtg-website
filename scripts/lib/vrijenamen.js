@@ -56,7 +56,7 @@ const GLOBAAL = new Set([
   'window', 'document', 'navigator', 'location', 'history', 'screen', 'localStorage',
   'sessionStorage', 'fetch', 'Headers', 'Request', 'Response', 'FormData', 'Blob', 'File',
   'FileReader', 'Image', 'Audio', 'Worker', 'MutationObserver', 'IntersectionObserver',
-  'ResizeObserver', 'CustomEvent', 'Event', 'Node', 'Element', 'HTMLElement', 'DOMParser',
+  'ResizeObserver', 'CustomEvent', 'Event', 'Node', 'NodeFilter', 'Element', 'HTMLElement', 'DOMParser',
   'XMLHttpRequest', 'WebSocket', 'RTCPeerConnection', 'SpeechRecognition',
   'webkitSpeechRecognition', 'AudioContext', 'webkitAudioContext', 'getComputedStyle',
   'requestAnimationFrame', 'cancelAnimationFrame', 'matchMedia', 'alert', 'confirm', 'prompt',

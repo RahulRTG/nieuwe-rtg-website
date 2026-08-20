@@ -67,6 +67,16 @@
     if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
     else if (t) t.hidden = true;
   });
+  /* De vier van Instellingen: identiteit, bescherming, sleutels en akkoorden.
+     Ze staan hier als tegel en in MAPPEN als map zonder `wereld` -- twee
+     weergaven van EEN lijst, want de tegel leest zijn item uit het attribuut en
+     opent hem met dezelfde openItem als overal. Wie er een vijfde bij zet, zet
+     hem op beide plekken of nergens; dat is de prijs van een paneel dat in HTML
+     staat en een register dat in JS staat, en hij hoort hier genoemd te worden
+     in plaats van pas op te vallen als er een mist. */
+  document.querySelectorAll('[data-cc-open]').forEach((t) => {
+    t.addEventListener('click', () => { sluitScrims(); openItem(t.dataset.ccOpen); });
+  });
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });

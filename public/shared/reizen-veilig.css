@@ -21,3 +21,52 @@ body.rtg-stijl main.rv-werk{width:auto;max-width:none;margin:0;padding:0}
 .rv-specialisten a:hover{border-color:rgba(192,165,68,.45);color:#f4f1ec}
 .rv-specialisten-hoek{position:fixed;z-index:45;top:9px;right:58px;margin:0;max-width:min(520px,calc(100vw - 90px));box-shadow:0 18px 50px rgba(0,0,0,.4)}
 @media(max-width:760px){.rv-specialisten-hoek{top:5px;right:52px}.rv-specialisten-hoek summary{padding:9px 11px;font-size:9px}}
+
+/* ====================================================================
+   DE BOVENKANT VAN EEN TELEFOON IS NIET VAN ONS, EN DE LINKERBOVENHOEK OOK NIET.
+
+   Twee gebreken die alleen op een ECHT toestel te zien zijn, gemeld met een
+   schermafdruk op 19 augustus 2026 en hier nagemeten:
+
+   1. DE KLOK EN DE BATTERIJ. Deze schil is een app van 100dvh en zette zijn
+      bovenste strook op y=0. Op een toestel met een inkeping loopt die strook
+      dus onder de statusbalk door en is de bovenste regel niet te lezen. Van de
+      schermen in dit huis doen er eenenzeventig `env(safe-area-inset-top)`;
+      deze familie deed er nul. (shared/reizen-veilig.css had de ONDERkant al
+      wel goed -- dat is het idioom dat hier gevolgd wordt.)
+
+   2. DE ZWEVENDE MENUKNOP. shared/appmenu.js hangt hem linksboven op zodra een
+      pagina geen kopbalk heeft die hij herkent (`header.kop`, `header.merkkop`,
+      `body > header`) -- en deze schil heeft die niet: zijn kop staat in <main>
+      en heet anders. Gemeten op 390 EN op 1280: de knop landt op 11,9 en ligt
+      precies op de eerste tab, respectievelijk op de eerste railknop. In de
+      afdruk las "Grand Hotel Amsterdam" als "Gr~and Hotel Amsterdam".
+
+      Waarom MARGIN en geen padding: de tabstrook scrolt in zichzelf
+      (overflow-x:auto), dus padding schuift gewoon mee weg en na twee tabs ligt
+      er weer een naam onder de knop. Een marge staat buiten de scroller.
+
+      body.amn-zwevend zet appmenu.js zelf, precies hiervoor -- zie de opmerking
+      daar over de apprij van de RTFoundation die als "ving Lab" las. Die vlag
+      werd tot nu toe op een enkele plek gebruikt (canvas.css); hier is de
+      tweede. 3.6rem is dezelfde reservering als daar.
+
+   Wat hier NIET gebeurt: de knop verplaatsen of appmenu.js leren deze koppen te
+   herkennen. Dat raakt elk scherm in het huis, en dit gaat over vijf. ==== */
+.rv-app{padding-top:env(safe-area-inset-top,0px)}
+body.amn-zwevend .rv-bank{padding-top:56px}
+@media(max-width:760px){
+  body.amn-zwevend .rv-tabs{margin-left:3.6rem}
+  body.amn-zwevend .rv-bank{padding-top:6px}
+}
+/* EN DE RIJ MOET MEEGROEIEN, ANDERS KNIJPT DE VEILIGE ZONE DE LABELS ERUIT.
+
+   Eerste poging zette alleen opvulling ONDERIN de balk. Die balk is een
+   rasterrij van vaste hoogte (68px), dus 34 pixels reservering at 34 pixels
+   van de inhoud op: op een toestel met een thuisstreep bleven de iconen staan en
+   verdwenen de woorden eronder. Gemeten met een nagebootste inkeping.
+
+   De rij groeit nu mee. Dat gold ook al voor de balk die de onderkant WEL goed
+   had -- die knelde net zo hard, alleen had niemand er ooit met een inkeping
+   naar gekeken. */
+@media(max-width:760px){.rv-app{grid-template-rows:minmax(0,1fr) calc(68px + env(safe-area-inset-bottom,0px))}}

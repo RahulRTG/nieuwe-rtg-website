@@ -66,10 +66,12 @@
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Scanner</h1></span>
 </header>
-<main>
-  <div class="vangkaart">
-    <div class="rij">
-      <button class="knop vol" id="cameraKnop" type="button">Open de camera</button>
+<!-- De hoofdhandeling van een scanner is de camera openen; bewaren komt
+     daarna. Hij stond bovenin een kaart op y=233 met 633 pixels pagina
+     eronder, en dat is buiten duimbereik (GRAMMATICA.md). Open en dicht
+     verhuizen als PAAR, want ze horen bij elkaar. -->
+<div class="rtg-duimbalk">
+      <button class="knop vol" id="cameraKnop" type="button" data-hoofdactie>Open de camera</button>
       <button class="knop" id="cameraStop" type="button" style="display:none;">Camera dicht</button>
       <label class="knop kieslabel">Kies foto's<input type="file" id="kies" accept="image/*" multiple></label>
     </div>
@@ -86,6 +88,9 @@
     <button class="knop vol" id="bewaarPdf" type="button">Bewaar als PDF</button>
     <button class="knop" id="bewaarFotos" type="button">Bewaar als losse foto's</button>
   </div>
+<main>
+  <div class="vangkaart">
+    
 
   <p class="stil h-mt80">Alles gebeurt op je toestel: de documentmodus en de PDF worden
     hier gemaakt, en het resultaat gaat als gewoon bestand naar je RTG Bestanden-kluis (map Scans) -- zelfde

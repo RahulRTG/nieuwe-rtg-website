@@ -66,7 +66,13 @@
    worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
    Afspraak" de balk uit en raakte de laatste knop de schermrand. */
 .ios-nav-rij{
-  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  /* DE DERDE KOLOM MOET KUNNEN KRIMPEN, en dat was hij niet.
+     `auto` zakt nooit onder zijn max-content, dus een volle actierij duwde het
+     hele raster open: op 390px liepen zeven schermen rechts buiten beeld
+     (sitemaker tot 1153px) en er was niet naartoe te scrollen, want de pagina
+     eromheen staat op overflow:hidden. minmax(0,auto) laat hem wel krimpen; de
+     rij zelf scrolt daarna in ZICHZELF (zie .ios-nav-acties hieronder). */
+  display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,auto); align-items:center;
   gap:0.4rem; min-height:var(--ios-balk);
   padding-inline:max(0.6rem, env(safe-area-inset-left,0px)) max(0.6rem, env(safe-area-inset-right,0px));
 }
@@ -100,8 +106,18 @@
 .ios-nav-acties{
   grid-column:3; justify-self:end;
   display:flex; align-items:center; gap:0.25rem;
+  /* De rij scrolt in zichzelf in plaats van de pagina open te duwen -- precies
+     zoals .cmd-tabs in de werktafel en .lo-top in Het Vooruitzicht dat doen. Zo
+     blijven de labels leesbaar in plaats van afgekapt, en houdt de pagina zijn
+     eigen breedte. VERBERGEN IS GEEN OPTIE (ADAPTIEF.md): een handeling die niet
+     meer te bereiken is, is een gebrek en geen opgeruimde balk. */
+  min-width:0; max-width:100%;
+  overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+  overscroll-behavior-x:contain;
 }
+.ios-nav-acties::-webkit-scrollbar{display:none;}
 .ios-nav-acties > *{
+  flex:0 0 auto;
   font:400 17px/1 'Inter',system-ui,sans-serif !important;
   color:var(--ios-accent) !important;
   background:none !important; border:none !important;

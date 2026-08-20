@@ -44,17 +44,15 @@ const { alleSchermen } = require('./schermen');
    public. */
 const PAGINAS = alleSchermen().concat(['/site/404.html']);
 
-function laadPlaywright() {
-  const paden = [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules'];
-  for (const p of paden) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); }
-    catch (e) { /* volgende pad */ }
-  }
-  // Geen Playwright-pakket? Val terug op onze eigen browser-driver (CDP over de
-  // pipe-transport), maar alleen als er echt een Chromium-binary staat.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* DE BROWSER KOMT UIT scripts/lib/scherm.js EN NIET UIT EEN EIGEN LADER.
+
+   Hier stond een laadPlaywright() met een terugval die nooit draaide, want
+   `require('playwright')` slaagt ook als de browser erachter ontbreekt. Op deze
+   machine wees de standaard Playwright naar chromium-1234 terwijl er 1194
+   stond: deze scan meldde zich dus af met "geen browser" terwijl er een was --
+   en dan staat er in TOEGANKELIJK.md een nul die niemand gemeten heeft. Zie de
+   kop van die module voor de hele vindwijze. */
+const { laadScherm: laadPlaywright, herkomst: browserHerkomst } = require('./lib/scherm');
 
 /* DE ECHTE SERVER, NIET EEN STATISCHE MAP.
 
@@ -98,12 +96,14 @@ function startEchteServer() {
 
 (async () => {
   const pw = laadPlaywright();
+  console.log('[a11y] browser: ' + browserHerkomst());
   if (!pw) {
     console.log('[a11y] Playwright niet beschikbaar; scan overgeslagen (statische a11y-regels draaien in check.js).');
     process.exit(STRICT ? 1 : 0);
   }
   const { BRON, velt } = require('./a11ykeuring'); // eigen keuring (verving axe-core)
   const raakvlak = require('./raakvlakkeuring');   // WCAG 2.5.8, derde ronde op telefoonformaat
+  const mobiel = require('./mobielkeuring');       // past het, en is het met een duim te doen (GRAMMATICA.md)
   const server = await startEchteServer();
   const basis = server.basis;
 
@@ -127,6 +127,90 @@ function startEchteServer() {
   if (!lid || !lid.token) {
     console.error('[a11y] MISLUKT: geen proeflid, dus de ingelogde ronde zou stil worden overgeslagen.');
     await browser.close(); server.stop(); process.exit(1);
+  }
+
+  /* EN EEN GEZIN, WANT ANDERS MEET DE TELEFOONRONDE VIJFENVIJFTIG KEER EEN DEUR.
+
+     Dit is de duurste meetfout van de hele ronde geweest. De RTF-leerling- en
+     gezinsschermen hangen achter een tweede deur (apps/foundation/sessie.js:
+     "Deze ruimte blijft nog dicht -- kies eerst jouw eigen profiel"), en die
+     deur staat LOS van het RTG-lidmaatschap. Met alleen `lid` opende geen enkel
+     van die schermen: de keuring mat vijfenvijftig keer hetzelfde slot en
+     rapporteerde ze alle vijfenvijftig als "geen hoofdhandeling". Dat is geen
+     bevinding maar een blinde vlek met een getal eromheen -- 22% van het
+     platform stond in het register als gemeten terwijl het nooit open is
+     geweest.
+
+     Een gezin plus een profiel kost twee POSTs. De e2e-toetsen deden dit al
+     (test/rtfagenda.e2e.js); de keuring niet. */
+  const gezin = await fetch(basis + '/api/foundation/gezin/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gezinsnaam: 'Keurgezin', naam: 'Papa', pin: '1234' })
+  }).then(r => r.json()).catch(() => ({}));
+  if (!gezin || !gezin.token) {
+    console.error('[a11y] MISLUKT: geen proefgezin, dus de RTF-schermen zouden achter hun deur blijven staan.');
+    await browser.close(); server.stop(); process.exit(1);
+  }
+  const RTF_SESSIE = { code: gezin.code, token: gezin.token, profiel: { naam: 'Papa', beheerder: true } };
+
+  /* EN EEN LEERLINGPROFIEL VOOR DE CAMPUS. Dat is het ene RTF-scherm dat een
+     gezinstoken NIET opent: "De Campus is de persoonlijke werkplek van een
+     leerlingprofiel". Een profieltoken opent hem wel, maar sluit de blokken die
+     alleen een beheerder ziet (het maakblok van klusjes, beheer.html), dus het
+     gezinsprofiel blijft de standaard en dit token wordt alleen voor campus
+     ingezet. De geboortedatum moet erbij: zonder leeftijd komt de leeftijdspoort
+     ervoor ("Vul eerst de geboortedatum in"). */
+  const kind = await fetch(basis + '/api/foundation/gezin/profiel/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: gezin.code, token: gezin.token, naam: 'Milan', rol: 'kind',
+      groep: 'kind', kleur: '#3A7BD5', geboortedatum: '2015-04-04' })
+  }).then(r => r.json()).catch(() => ({}));
+  const kiesKind = (kind && kind.profiel) ? await fetch(basis + '/api/foundation/gezin/profiel/kies', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: gezin.code, token: gezin.token, profielId: kind.profiel.id })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  const RTF_KIND = (kiesKind && kiesKind.token)
+    ? { code: gezin.code, token: kiesKind.token, profiel: kiesKind.profiel } : null;
+  if (!RTF_KIND) console.error('[a11y] LET OP: geen leerlingprofiel -- /apps/foundation/campus.html wordt aan zijn deur gemeten.');
+  /* Wat hier NIET lukt, en dat staat er liever dan een stil gat: bord.html en
+     schrift.html hangen achter een TIJDELIJKE SCHOOLPAS -- een klassleutel die
+     alleen in de tab van een lopende les bestaat en na dertig minuten vervalt.
+     Die is niet aan te maken zonder een les te starten (/api/les/maak, met een
+     model erachter). Die twee worden dus aan hun deur gemeten; zie
+     TOEGANKELIJK.md. */
+  const EIGEN_SESSIE = { '/apps/foundation/campus.html': RTF_KIND };
+
+  /* EN EEN LES, WANT DAARMEE GAAN DE LAATSTE TWEE DEUREN OPEN.
+
+     /apps/foundation/bord.html en schrift.html hangen achter een TIJDELIJKE
+     SCHOOLPAS (shared/rtg-school-session.js): een klassleutel die alleen in
+     sessionStorage van die tab staat en na dertig minuten vervalt. Ik had die
+     twee opgeschreven als "niet aan te maken zonder een model achter
+     /api/les/maak" -- en dat was verkeerd gemeten. Die route heeft een
+     handmatige werkmodus (CLAUDE.md: zonder model blijven de kernprocessen
+     beschikbaar) en levert gewoon een les met een code.
+
+     Allebei de schermen nemen code en sleutel uit de URL over. Twee schermen
+     die aan hun deur gemeten werden, worden nu aan hun inhoud gemeten. */
+  const les = await fetch(basis + '/api/les/maak', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ onderwerp: 'breuken', groep: 'groep 6', aantal: 3 })
+  }).then(r => r.json()).catch(() => ({}));
+  const mee = (les && les.code) ? await fetch(basis + '/api/les/mee', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: les.code, naam: 'Milan' })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  const EIGEN_PAD = {};
+  if (les && les.code && les.leraarToken) {
+    EIGEN_PAD['/apps/foundation/bord.html'] =
+      '/apps/foundation/bord.html?code=' + les.code + '&t=' + les.leraarToken;
+  }
+  if (les && les.code && mee && mee.deelnemerToken) {
+    EIGEN_PAD['/apps/foundation/schrift.html'] =
+      '/apps/foundation/schrift.html?code=' + les.code + '&t=' + mee.deelnemerToken;
+  }
+  if (Object.keys(EIGEN_PAD).length < 2) {
+    console.error('[a11y] LET OP: geen schoolpas -- bord.html en/of schrift.html worden aan hun deur gemeten.');
   }
 
   /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
@@ -196,17 +280,114 @@ function startEchteServer() {
      precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Zie de
      opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
      alle animaties is geworden. */
-  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-  await telefoon.addInitScript((t) => {
-    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-  }, lid.token);
-  const tel = await telefoon.newPage();
   const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
+  const MOB = (hand) => '(function(){' + mobiel.BRON + '\nreturn window.__mobielKeur(' + JSON.stringify({
+    hand, maat: mobiel.MAAT, onder: mobiel.ONDER, smal: mobiel.SMAL, kwart: mobiel.ANKERKWART
+  }) + ')})()';
   let raakTotaal = 0;
-  console.log(`\n[a11y] ===== ronde RAAKVLAK (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
+  /* TWEE HANDEN, EN DAAROM STAAT ER EEN LUS OMHEEN.
+
+     Sinds shared/hand.js legt het huis de dingen aan de kant van de duim, en
+     welke kant dat is verschilt per mens (ADAPTIEF.md, ankerzijde/duimzijde).
+     Een scherm dat alleen voor rechtshandigen klopt is niet af, en dat is
+     alleen te zien door het twee keer te meten.
+
+     Het RAAKVLAK draait maar een keer: die maat hangt niet van de hand af, en
+     twee keer meten zou hem dubbel tellen. */
+  const mobiu = { breed: [], leeg: [], balk: [], duim: [], geenHoofd: [], gemeten: 0 };
+  for (const hand of ['rechts', 'links']) {
+  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await telefoon.addInitScript((z) => {
+    try {
+      localStorage.setItem('rtg_member_token', z.token);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.setItem('rtg_lang', 'nl');
+      /* zie de opmerking bij RTF_SESSIE: zonder dit staat een kwart van de
+         schermen achter zijn eigen deur en meet deze ronde die deur */
+      localStorage.setItem('rtf_sessie', JSON.stringify(z.rtf));
+    } catch (e) {}
+  }, { token: lid.token, rtf: RTF_SESSIE });
+  await telefoon.addCookies([{ name: 'rtg_hand', value: hand, url: basis }]);
+  const tel = await telefoon.newPage();
+  /* DE RONDE DRAAGT NU EEN INKEPING, EN DAT MISTE HIJ VANAF HET BEGIN.
+
+     Een browservenster heeft geen statusbalk en geen thuisstreep, dus
+     env(safe-area-inset-*) is er nul -- en een scherm dat die zone negeert ziet
+     er in de keuring perfect uit. Vijf schermen deden dat en dat kwam boven met
+     een SCHERMAFDRUK VAN EEN ECHT TOESTEL, niet met een meting: de bovenste
+     strook liep onder de klok door en de menuknop lag op de eerste tab.
+
+     59 boven en 34 onder zijn de maten van een iPhone met Dynamic Island. Ze
+     staan hier als getal en niet als toestelnaam: wat we meten is "er is een
+     zone die niet van ons is", niet "dit ene toestel". */
+  try {
+    const cdp = await telefoon.newCDPSession(tel);
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: { top: 59, bottom: 34, left: 0, right: 0 } });
+  } catch (e) {
+    console.error('[a11y] LET OP: deze browser kent Emulation.setSafeAreaInsetsOverride niet -- '
+      + 'de telefoonronde meet ZONDER inkeping en ziet dus geen enkel gebrek in de veilige zone.');
+  }
+  console.log(`\n[a11y] ===== ronde TELEFOON, ${hand}handig (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
   for (const pad of PAGINAS) {
-    await tel.goto(basis + pad, { waitUntil: 'load' });
+    /* Een scherm met een eigen sessie krijgt die na het eerste bezoek en dan een
+       herlading -- addInitScript() STAPELT en geldt voor elke volgende pagina,
+       dus daarmee zou het leerlingprofiel de rest van de ronde meelopen. Zetten
+       en terugzetten in localStorage blijft bij dit ene scherm. */
+    const eigen = EIGEN_SESSIE[pad];
+    await tel.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
+    if (eigen) {
+      try {
+        await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, eigen);
+        await tel.reload({ waitUntil: 'load' });
+      } catch (e) { /* dan meten we hem zoals hij staat */ }
+    }
     await tel.waitForTimeout(600);
+    /* De mobiele meting eerst, want die is goedkoop en hangt niet af van de
+       tweede meetronde die het raakvlak soms nodig heeft. */
+    try {
+      let m = await tel.evaluate(MOB(hand));
+      /* WIE IETS VINDT, MEET NOG EEN KEER -- zelfde reden als bij het raakvlak
+         hieronder, en het is hier precies zo misgegaan. /apps/kantoorpda.html
+         stuurt door naar de personeels-app, en die kaart komt binnen met een
+         schaal-animatie: 600ms na load stond een knop met min-height:44px op
+         43,67 hoog. Dat is een moment en geen maat. Een scherm dat PERMANENT te
+         klein of te hoog staat, meldt zich in de tweede meting gewoon weer.
+
+         Alleen bij een gebrek, want dat kost alleen iets op de schermen die iets
+         vinden -- en dat zijn er hopelijk nul. */
+      /* Elke bevinding krijgt een tweede meting, niet alleen een duimgebrek --
+         dat was de eerste versie en die was te smal. /apps/wereld.html meldde
+         zich als LEEG in de volle ronde en niet als hij alleen draait: dat
+         scherm haalt zijn inhoud op en 600ms is onder belasting soms te kort.
+         Een scherm dat ECHT niets toont, meldt zich in de tweede meting gewoon
+         weer -- dat is precies waarom het een tweede meting is en geen
+         uitzondering. */
+      if (m.leeg || m.balkenBuiten.length || m.inhoud > m.venster + 2 || (m.hoofd && m.gebreken.length)) {
+        try {
+          await tel.waitForFunction(
+            () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+            null, { timeout: 1500 });
+        } catch (e) { /* een scherm dat blijft bewegen meten we zoals het staat */ }
+        await tel.waitForTimeout(300);
+        try { m = await tel.evaluate(MOB(hand)); } catch (e) { /* de eerste meting blijft staan */ }
+      }
+      mobiu.gemeten++;
+      const waar = pad + ' [' + hand + ']';
+      if (m.venster !== 390) mobiu.breed.push(waar + ': het venster is ' + m.venster + ' en niet 390 -- deze meting zegt niets');
+      else if (m.inhoud > m.venster + 2) mobiu.breed.push(waar + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
+      if (m.leeg) mobiu.leeg.push(waar + ': het werkvlak draagt ' + m.tekens + ' tekens en ' + m.beelden + ' beelden'
+        + '\n      werkvlak: "' + (m.werkvlak || '') + '"'
+        + '\n      main:     "' + (m.hoofdHTML || '') + '"');
+      for (const b of m.balkenBuiten) mobiu.balk.push(waar + ': ' + b);
+      if (!m.hoofd) mobiu.geenHoofd.push(waar);
+      else if (m.gebreken.length) mobiu.duim.push(waar + ' \u2014 ' + m.hoofd.naam + ' (' + m.hoofd.merk + '): ' + m.gebreken.join('; '));
+    } catch (e) {
+      mobiu.breed.push(pad + ' [' + hand + ']: de mobiele meting kon niet draaien -- ' + e.message.split('\n')[0]);
+    }
+    if (eigen) {
+      try { await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, RTF_SESSIE); } catch (e) {}
+    }
+    if (hand !== 'rechts') continue;   // het raakvlak hangt niet van de hand af
     let res;
     try { res = await tel.evaluate(RAAK); }
     catch (e) {
@@ -241,7 +422,86 @@ function startEchteServer() {
     }
   }
   await telefoon.close();
+  }
+  /* ===== VIJFDE RONDE: DE TABLETBAND =========================================
+
+     ADAPTIEF.md kent telefoon (<640), tablet (640-999) en bureau (>=1000). De
+     rondes hierboven meten 390 en het bureaubladvenster; alles ertussen was tot
+     vandaag NOOIT door een browser getekend, en dat is geen detail: een gebrek
+     kan precies daar zitten en nergens anders.
+
+     Dat bleek ook. Op /apps/rtg.html is een dossierregel een link naar een
+     betaalpagina: op 390 breekt hij af en meet 74 hoog, op 700 en 834 past hij
+     op een regel en meet 20. Op /apps/salon.html geldt hetzelfde voor de naam
+     boven een post (23). Allebei onzichtbaar voor de raakvlakronde, want die
+     meet 390 -- waar het toevallig goed gaat.
+
+     EEN BREEDTE EN NIET TWEE. De eerste meting draaide 700 en 834 naast elkaar
+     en gaf op allebei exact dezelfde twee vondsten; een tweede venster kost dan
+     een ronde en levert niets. 834 is een iPad staand -- ruim boven de 760 waar
+     de duimregels van rtg-ui.css ophouden, dus dit meet de ECHTE tabletvorm en
+     niet nog een keer de telefoonvorm.
+
+     WAT HIER NIET GEMETEN WORDT: leegte en duimbereik. Die twee gaan over een
+     hand aan een telefoon (GRAMMATICA.md), en een tablet ligt op tafel. Breedte
+     en raakvlak gaan wel over elk toestel dat je aanraakt. */
+  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, serviceWorkers: 'block' });
+  await tabletC.addInitScript((z) => {
+    try {
+      localStorage.setItem('rtg_member_token', z.token);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtf_sessie', JSON.stringify(z.rtf));
+    } catch (e) {}
+  }, { token: lid.token, rtf: RTF_SESSIE });
+  const tab = await tabletC.newPage();
+  console.log(`\n[a11y] ===== ronde TABLET (${PAGINAS.length} schermen, 834x1112, ingelogd) =====`);
+  const tabu = { breed: [], klein: [], gemeten: 0 };
+  for (const pad of PAGINAS) {
+    await tab.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
+    await tab.waitForTimeout(600);
+    try {
+      const m = await tab.evaluate(MOB('rechts'));
+      tabu.gemeten++;
+      if (m.venster === 834 && m.inhoud > m.venster + 2) {
+        tabu.breed.push(pad + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
+      }
+    } catch (e) { /* dit scherm meet niet; de breedte-teller blijft eerlijk */ }
+    let res;
+    try { res = await tab.evaluate(RAAK); } catch (e) { continue; }
+    if (res.klein.length) {
+      /* wie iets vindt, meet nog een keer -- zelfde reden als hierboven */
+      try {
+        await tab.waitForFunction(
+          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+          null, { timeout: 1500 });
+      } catch (e) {}
+      await tab.waitForTimeout(300);
+      try { res = await tab.evaluate(RAAK); } catch (e) {}
+      if (res.klein.length) {
+        tabu.klein.push(pad + ': ' + res.klein.slice(0, 4).join(' | '));
+        console.log(`\n[a11y] ${pad} (tablet): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+        for (const w of res.klein.slice(0, 6)) console.log(`  \u00b7 ${w}`);
+      }
+    }
+  }
+  await tabletC.close();
+  console.log(`[a11y] ronde tablet: ${tabu.gemeten} schermen op 834 \u2014 ` +
+    `${tabu.breed.length} te breed, ${tabu.klein.length} met een te klein raakvlak`);
+  for (const x of tabu.breed) console.log(`  \u00b7 te breed: ${x}`);
+
   console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+  const mobielTotaal = mobiu.breed.length + mobiu.leeg.length + mobiu.balk.length + mobiu.duim.length;
+  console.log(`[a11y] ronde telefoon: ${mobiu.gemeten} metingen over twee handen \u2014 ` +
+    `${mobiu.breed.length} te breed, ${mobiu.leeg.length} leeg, ${mobiu.balk.length} balk buiten beeld, ` +
+    `${mobiu.duim.length} buiten duimbereik, ${mobiu.geenHoofd.length} zonder aangewezen hoofdhandeling`);
+  for (const [kop, lijst] of [['te breed', mobiu.breed], ['leeg', mobiu.leeg],
+    ['balk buiten beeld', mobiu.balk], ['buiten duimbereik', mobiu.duim]]) {
+    if (!lijst.length) continue;
+    console.log(`\n[a11y] telefoon \u2014 ${kop} (${lijst.length}):`);
+    for (const r of lijst.slice(0, 40)) console.log('  \u00b7 ' + r);
+    if (lijst.length > 40) console.log(`  \u00b7 ... en nog ${lijst.length - 40}`);
+  }
 
   await browser.close();
   server.stop();
@@ -276,15 +536,41 @@ function startEchteServer() {
      zonder browser laten zakken. */
   const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
   if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
+  /* En de telefoonronde velt op dezelfde manier: het oordeel staat puur in
+     mobielkeuring.veltMobiel, zodat test/mobiel.test.js de poort kan laten
+     dichtgaan zonder een browser. Het aantal schermen ZONDER aangewezen
+     hoofdhandeling doet hier niet mee -- dat is werkvoorraad en geen gebrek
+     (GRAMMATICA.md). */
+  const mobielOordeel = mobiel.veltMobiel(
+    { breed: mobiu.breed.length, leeg: mobiu.leeg.length, balk: mobiu.balk.length, duim: mobiu.duim.length },
+    grens.telefoon || {});
+  if (mobielOordeel.faalt) fouten.push(mobielOordeel.melding.trim().replace(/^\[a11y\] MISLUKT op telefoonformaat:\s*/, 'op telefoonformaat: '));
+  /* De tabletband telt mee in het oordeel, anders is hij een rapport dat niemand
+     leest. Zelfde grens als de andere twee: nul. */
+  const tabGrens = (grens.tablet || {});
+  if (tabu.breed.length > (tabGrens.breed || 0)) {
+    fouten.push(`${tabu.breed.length} scherm(en) dat op 834 buiten beeld loopt, de grens is ${tabGrens.breed || 0}`);
+  }
+  if (tabu.klein.length > (tabGrens.klein || 0)) {
+    fouten.push(`${tabu.klein.length} scherm(en) met een raakvlak onder ${raakvlak.GRENS}x${raakvlak.GRENS} op tabletformaat, de grens is ${tabGrens.klein || 0}`);
+  }
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
     for (const f of fouten) console.error('  · ' + f);
     process.exit(1);
   }
   if (raakOordeel.melding) console.log(raakOordeel.melding);
+  if (mobielOordeel.melding) console.log(mobielOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
     `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}. ` +
-    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
+    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}. ` +
+    `Telefoonronde over twee handen: ${mobiu.breed.length} te breed, ${mobiu.leeg.length} leeg, ` +
+    `${mobiu.balk.length} balk buiten beeld, ${mobiu.duim.length} buiten duimbereik; ` +
+    `${mobiu.geenHoofd.length} metingen zonder aangewezen hoofdhandeling (werkvoorraad, geen gebrek). ` +
+    /* De tabletronde hoort in deze zin, anders staat hij nergens in het bewijs:
+       een ronde die je alleen ziet als hij iets vindt, is geen ronde maar een
+       alarm. */
+    `Tabletronde op 834: ${tabu.breed.length} te breed, ${tabu.klein.length} met een te klein raakvlak.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

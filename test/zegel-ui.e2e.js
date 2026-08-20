@@ -55,7 +55,7 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
        Via openBank() en niet via .cmd-lade: deze pagina draait op de
        standaardbreedte van Playwright, en daar is de bank een vaste rail
        zonder greep. Zie test/helper.js. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     await page.waitForSelector('#osCcZegel', { state: 'visible', timeout: 8000 });
     await page.click('#osCcZegel');

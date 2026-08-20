@@ -27,20 +27,15 @@
    RTG_CHROMIUM=... node --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten, bankDeur } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pinh-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
+   hier tweeendertig keer misging. */
+const pw = laadScherm();
 const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
 
 async function api(base, pad, body, token) {
@@ -158,7 +153,7 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
        Via openBank() en niet via .cmd-lade: deze pagina draait op de
        standaardbreedte van Playwright, en daar is de bank een vaste rail
        zonder greep. Zie test/helper.js. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcPin');
 

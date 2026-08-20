@@ -82,6 +82,11 @@
     <div class="kaart" id="toegankelijk"><p class="stil">Laden...</p></div>
   </section>
 
+  <section aria-label="Welke hand u gebruikt">
+    <h2>Welke hand u gebruikt</h2>
+    <div class="kaart" id="hand"></div>
+  </section>
+
   <section aria-label="Geloof of levensbeschouwing">
     <h2>Geloof of levensbeschouwing</h2>
     <div class="kaart" id="geloof"><p class="stil">Laden...</p></div>
@@ -220,6 +225,38 @@
     } catch (e) { host.innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
   }
 
+  /* WELKE HAND, EN WAAROM DIE NIET BIJ DE REST STAAT.
+
+     Alles in "hoe het scherm zich gedraagt" komt van de server en hangt aan een
+     account. Dit niet, en dat is opzet: welke hand iemand gebruikt is een
+     lichaamskenmerk en geen accountvoorkeur. Het moet dus al kloppen op het
+     INLOGSCHERM -- waar er nog geen account is om iets aan te hangen -- en het
+     moet gelezen zijn voordat er iets getekend wordt, anders klapt het scherm
+     van een linkshandige bij elke start zichtbaar om.
+
+     Vandaar shared/hand.js: localStorage als waarheid, een cookie zodat de
+     server het attribuut al in de HTML kan zetten. Zie de kop van dat bestand. */
+  function tekenHand() {
+    const host = $('#hand');
+    if (!window.RTGHand) { host.innerHTML = '<p class="stil">Deze instelling is hier nu niet beschikbaar.</p>'; return; }
+    const nu = RTGHand.is();
+    const OPTIES = [
+      ['rechts', 'Rechtshandig', 'De bank links, Rahul rechts \u2014 onder uw rechterduim.'],
+      ['links', 'Linkshandig', 'Gespiegeld: Rahul links, de bank rechts. Ook lades, menu\u2019s en de knop die bevestigt komen aan uw kant te liggen.']
+    ];
+    host.innerHTML =
+      '<p class="stil">Uw duim komt niet overal. RTG legt de dingen die u het vaakst aanraakt aan de kant ' +
+      'van de hand waarmee u uw telefoon vasthoudt \u2014 op elk scherm, ook voordat u inlogt.</p>' +
+      OPTIES.map(o => '<button class="keus" data-hand="' + o[0] + '" aria-pressed="' + (nu === o[0]) + '">' +
+        '<b>' + Veilig.esc(o[1]) + '</b><span>' + Veilig.esc(o[2]) + '</span></button>').join('') +
+      '<p class="stil" style="margin-top:.6rem;">Dit staat op dit toestel. Op een ander toestel zet u het opnieuw.</p>';
+    host.querySelectorAll('[data-hand]').forEach(b => b.addEventListener('click', () => {
+      RTGHand.zet(b.dataset.hand);
+      tekenHand();
+      Veilig.melding(b.dataset.hand === 'links' ? 'Gespiegeld voor uw linkerhand.' : 'Terug naar rechtshandig.');
+    }));
+  }
+
   /* Hoe het scherm zich gedraagt. De schakelaars komen uit de server-lijst
      (kern/toegankelijk.js), zodat een optie erbij daar een regel is en hier
      niets. Zetten gaat via RTGToegankelijk: dat past hem meteen toe op DEZE
@@ -250,7 +287,7 @@
     }));
   }
 
-  function teken(d) { tekenFase(d); tekenOmgang(d); tekenToegankelijk(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
+  function teken(d) { tekenFase(d); tekenOmgang(d); tekenToegankelijk(d); tekenHand(); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
 
   async function laad() {
     try { teken(await Veilig.api('/api/ik')); vandaag(); }

@@ -25,10 +25,16 @@
   .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   /* De hub in de RTG OS-look: de tegels zijn app-iconen op een hoofdscherm,
      squircles met een klein label eronder; de teksten en pijlen zwijgen. */
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem .5rem;}
-  @media(min-width:560px){.tiles{grid-template-columns:repeat(5,1fr);}}
-  @media(min-width:900px){.tiles{grid-template-columns:repeat(6,1fr);}}
-  @media(min-width:1400px){.tiles{grid-template-columns:repeat(8,1fr);}}
+  /* minmax(0,1fr) en niet 1fr, en dat scheelde 353 pixels. Een rasterkolom van
+     1fr is minmax(AUTO,1fr): hij mag niet smaller worden dan zijn inhoud. Een
+     tegel met een lang label duwde de eerste kolom naar 215px terwijl het raster
+     zelf 316 breed was, en de vierde tegel kwam op x 485 in een venster van 390.
+     Gemeten op 19 augustus 2026, en pas zichtbaar sinds de keuring een gezin
+     aanmaakt: hiervoor stond dit scherm altijd op zijn welkomsblad. */
+  .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem .5rem;}
+  @media(min-width:560px){.tiles{grid-template-columns:repeat(5,minmax(0,1fr));}}
+  @media(min-width:900px){.tiles{grid-template-columns:repeat(6,minmax(0,1fr));}}
+  @media(min-width:1400px){.tiles{grid-template-columns:repeat(8,minmax(0,1fr));}}
   .tile{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.4rem .1rem;text-decoration:none;color:var(--txt);transition:transform .13s cubic-bezier(.22,.7,.3,1);position:relative;overflow:visible;background:none;border:none;box-shadow:none;}
   .tile:hover{transform:translateY(-3px);border-color:transparent;}
   .tile:hover .ic{border-color:var(--goud);box-shadow:0 12px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.09);}
@@ -41,7 +47,11 @@
     box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
     transition:border-color .13s cubic-bezier(.22,.7,.3,1), box-shadow .13s cubic-bezier(.22,.7,.3,1), transform .13s cubic-bezier(.22,.7,.3,1);
   }
-  .tile h2{font-family:var(--sans,inherit);font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3;color:var(--zacht);}
+  /* Een label mag breken. Zolang de kolom 215px breed was viel dit niet op;
+     op 73px steekt "Voorleesverhaaltje" er als een woord dwars doorheen (123px
+     inhoud in een tegel van 73). Met een afbreekstreepje, want een woord
+     midden doorhakken zonder streepje leest als een fout. */
+  .tile h2{font-family:var(--sans,inherit);font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3;color:var(--zacht);max-width:100%;overflow-wrap:break-word;hyphens:auto;}
   .tile p{display:none;}
   .tile .cta{display:none;}
   .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
@@ -57,6 +67,9 @@
   /* rustige sectiekop voor de hulp-tools: aanwezig, maar niet pontificaal */
   .sec.stil{color:var(--zacht);font-weight:600;opacity:.85;margin-top:2.4rem;}
   .foot{text-align:center;margin-top:1.4rem;font-size:.8rem;}
+  /* Een link die in zijn eentje een alinea vult is een knop, geen woord in een
+     zin -- dus geen WCAG-uitzondering, en dus 24 hoog. Hij mat er 15. */
+  .foot a{display:inline-flex;align-items:center;justify-content:center;min-height:24px;}
   .foot a{color:var(--zacht);text-decoration:none;}
   /* welkom + profielkiezer */
   .knoprij{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.6rem;}
@@ -119,7 +132,13 @@
   .ronb-contract h2{font-family:var(--serif);font-weight:500;font-size:1.05rem;}
   .ronb-tekst{max-height:14rem;overflow-y:auto;margin-top:.4rem;white-space:pre-wrap;font-size:.82rem;line-height:1.6;color:var(--zacht);}
   .ronb-akk{display:flex;gap:.5rem;align-items:flex-start;margin:.9rem 0 .4rem;font-size:.86rem;}
-  .ronb-akk input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;}
+  /* 1,1rem is 17,6 pixels en WCAG 2.5.8 vraagt 24. Het LABEL klikte al mee, maar
+     wie het vakje zelf aanwijst -- en dat doet een mens met een trillende hand,
+     want dat is het ding dat aan of uit gaat -- mikt op 18x18. Zesde kale
+     aanvinkvakje van dit soort in dit huis; de vorige vijf staan in
+     A11Y-INGELOGD.json. De inkt blijft 1,1rem, alleen het raakvlak groeit. */
+  .ronb-akk input{margin-top:.15rem;width:1.1rem;height:1.1rem;flex-shrink:0;
+    min-width:24px;min-height:24px;}
   #rtfOnbFout{color:var(--rood,#E06A80);font-size:.8rem;min-height:1rem;margin:.3rem 0;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -139,8 +158,16 @@
   <div class="hero">
     <div class="kick">RTFoundation</div>
     <div class="logo">Alles om <b>vooruit</b> te komen</div>
-    <div class="knoprij">
-      <button class="knop" id="bMaak">Maak een gezin aan</button>
+    <!-- De twee ingangen staan hier als PAAR en niet als een hoofdknop met een
+         losse tweede: "Maak een gezin aan" is de hoofdhandeling (hij draagt
+         .hoofd, de ander .grijs -- het scherm wees hem zelf al aan), maar wie
+         al een gezin heeft moet ernaast kunnen inloggen. Ze verhuizen dus
+         samen. Op telefoonmaat is .rtg-duimbalk een vaste strook onderaan
+         (GRAMMATICA.md: de handeling hoort bij de duim; gemeten stond hij op
+         y 271 van 844, boven de duimlijn); daarboven blijft het de gecentreerde
+         rij in de hero, want .knoprij zet justify-content zelf. -->
+    <div class="knoprij rtg-duimbalk">
+      <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
     </div>
     <!-- MIJN LEVEN HOORT HIER, op het welkomscherm en niet tussen de tegels.

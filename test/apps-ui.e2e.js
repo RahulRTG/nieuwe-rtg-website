@@ -7,21 +7,15 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  // Geen Playwright-pakket? Onze eigen browser-driver (CDP over pipe), maar alleen als er een Chromium-binary is.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadPlaywright();
+/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
+   hier tweeendertig keer misging. */
+const pw = laadScherm();
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -139,17 +133,17 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         return {
           koppen: [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim()),
           werelden: [...nav.querySelectorAll('button[data-url]')].map((b) => b.dataset.url)
-            .filter((u) => /^\/apps\/(rtg|kantoor|foundation)/.test(u)),
+            .filter((u) => /^\/apps\/(rtg|kantoor|reizen|foundation)/.test(u)),
           leeg: (document.querySelector('#rtgCommand .cmd-leeg') || {}).textContent || '',
           springboard: zicht('.os-thuisscherm'),
           klok: !!document.getElementById('homeKlok')
         };
       });
-      assert.deepEqual(start.koppen, ['Werelden', 'Software'],
-        'de bank scheidt de werelden niet van de software: ' + start.koppen.join(', '));
+      assert.deepEqual(start.koppen, ['Werelden'],
+        'de bank hoort alleen werelden te dragen (WERELDEN.md): ' + start.koppen.join(', '));
       assert.deepEqual(start.werelden,
-        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-        'de drie werelden staan niet in de bank');
+        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+        'de vier werelden staan niet in de bank');
       assert.match(start.leeg, /Kies een wereld/i,
         'de werktafel begint niet op een lege keuze: "' + start.leeg + '"');
       assert.equal(start.springboard, false, 'het springboard staat weer in beeld');
@@ -374,7 +368,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
        daarin Zoeken -- dat is Spotlight, en die brengt je met "Laat Rahul dit
        doen" naar precies hetzelfde scherm. Wat er daarna gemeten wordt is
        ongewijzigd: #chat mag de payload nooit uitvoeren. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });

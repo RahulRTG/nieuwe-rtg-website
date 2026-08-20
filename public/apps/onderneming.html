@@ -155,7 +155,7 @@ function toonLeeg(){
     'een werktitel is genoeg, en alles daarna kan wijzigen.</p>'+
     '<div class="rij r10">'+
     '<label class="veld breed">Werktitel<input id="nieuwNaam" placeholder="Bijvoorbeeld: iets met ramen wassen"></label>'+
-    '</div><div class="rij r8"><button class="knop prim" id="nieuwKnop">Begin een onderneming</button></div></div>';
+    '</div><div class="rij r8"><button class="knop prim hoofd" id="nieuwKnop" data-hoofdactie>Begin een onderneming</button></div></div>';
   $('#nieuwKnop').addEventListener('click',async()=>{
     const naam=$('#nieuwNaam').value.trim();
     if(!naam){meld('Geef een werktitel.');return;}

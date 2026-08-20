@@ -81,7 +81,11 @@
   <div class="rij">
     <input class="veld" id="komCode" maxlength="6" placeholder="Bijv. XKPT47"
       style="flex:1;text-transform:uppercase;letter-spacing:.2em;font-family:ui-monospace,monospace;" aria-label="Kamercode">
-    <button class="knop vol" id="komBtn" type="button">Kom binnen</button>
+    <!-- BEWUST GEEN data-hoofdactie. Dit scherm heeft twee gelijkwaardige
+     ingangen: binnenkomen met een code, of zelf een kamer maken. Er een van
+     de twee tot hoofdhandeling verheffen maakt de meting mooier en het
+     scherm niet beter (GRAMMATICA.md). -->
+      <button class="knop vol" id="komBtn" type="button">Kom binnen</button>
   </div>
   <div class="kop">Een nieuwe kamer</div>
   <div class="rij">

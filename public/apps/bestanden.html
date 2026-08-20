@@ -94,6 +94,8 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/adaptief.css" rel="stylesheet">
+<link href="/shared/grammatica.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>
@@ -102,10 +104,14 @@
   <span class="rij" style="margin-left:auto;">
     <button class="knop" id="toonBak" type="button">Prullenbak</button>
     <button class="knop" id="nieuwMap" type="button">+ Map</button>
-    <button class="knop vol" id="kies" type="button">Upload</button>
     <input type="file" id="bestandkiezer" multiple hidden aria-label="Bestanden kiezen">
   </span>
 </header>
+<!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
+     "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
+     een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
+     rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop vol" id="kies" type="button" data-hoofdactie>Upload</button></div>
 <main>
   <div class="rij" style="justify-content:space-between;">
     <span class="stil" id="quotumTekst">&nbsp;</span>
@@ -166,6 +172,15 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/bestanden/app.js"></script>
 <script src="/apps/bestanden/paneel.js"></script>
+<!-- De adaptieve laag: de leer, de grammatica, het register, de tijdelijke lagen
+     en de brug naar het dock van RTG Command. De afnemer staat erachter, want die
+     leest het paneel uit. Zie ADAPTIEF.md en GRAMMATICA.md. -->
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/lagen.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
+<script src="/apps/bestanden/adaptief.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

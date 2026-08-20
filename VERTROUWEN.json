@@ -1,50 +1,50 @@
 {
  "stempel": {
-  "op": "2026-08-20T01:22:51.165Z",
-  "commit": "99df6e6",
+  "op": "2026-08-20T07:01:13.782Z",
+  "commit": "75cab54",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "De vervalstaat per route (PROOF.md par. 2): bewezen, verschaald, verzwakt, geschorst of ongemeten, met per route de reden en wat de staat zou veranderen. Berekend uit bouw() van scripts/bewijsmatrix.js en de stempels van de bronregisters. NIEMAND zet een staat met de hand omhoog; alleen een hermeting kan dat.",
  "grens": "De halfwaardetijd geldt in fase 1 per register (oudste stempel), niet per route; en een staat zegt wat de PROEVEN dragen, niet wat de code waard is. Een bewezen route met een gat dat geen proef bedacht heeft, staat hier gewoon op bewezen -- dit register is geen dekkingsbewijs.",
  "halfwaardetijdDagen": 30,
- "ouderdomDagen": 1.7,
+ "ouderdomDagen": 2,
  "bronnen": {
   "ROLPROEF.json": {
    "op": "2026-08-18T07:22:54.229Z",
-   "dagen": 1.7
+   "dagen": 2
   },
   "KETENS.json": {
    "op": "2026-08-18T11:44:05.051Z",
-   "dagen": 1.6
+   "dagen": 1.8
   },
   "INVOERPROEF.json": {
    "op": "2026-08-18T07:23:23.509Z",
-   "dagen": 1.7
+   "dagen": 2
   },
   "IDEMPROEF.json": {
    "op": "2026-08-18T11:43:42.914Z",
-   "dagen": 1.6
+   "dagen": 1.8
   },
   "STAATPROEF.json": {
    "op": "2026-08-18T07:32:18.967Z",
-   "dagen": 1.7
+   "dagen": 2
   },
   "OUTPUTPROEF.json": {
    "op": "2026-08-20T00:47:47.633Z",
-   "dagen": 0
+   "dagen": 0.3
   },
   "AUDITPROEF.json": {
    "op": "2026-08-18T08:40:37.320Z",
-   "dagen": 1.7
+   "dagen": 1.9
   }
  },
  "routes": 4185,
  "telling": {
   "bewezen": 0,
   "verschaald": 0,
-  "verzwakt": 3998,
-  "geschorst": 141,
+  "verzwakt": 4001,
+  "geschorst": 138,
   "ongemeten": 46
  },
  "perRoute": {
@@ -64,9 +64,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/aanmelding/aanvraag": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op AUTH",
-   "heropent": "repareer de oorzaak en laat de proef op AUTH opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/aanmelding/beslis": {
    "staat": "verzwakt",
@@ -1029,9 +1029,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/bedrijf/werkruimte/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op AUTH",
-   "heropent": "repareer de oorzaak en laat de proef op AUTH opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/bedrijf/zoek": {
    "staat": "verzwakt",
@@ -3659,9 +3659,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/foundation/school/school/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op AUTH",
-   "heropent": "repareer de oorzaak en laat de proef op AUTH opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/foundation/school/school/overzicht": {
    "staat": "verzwakt",

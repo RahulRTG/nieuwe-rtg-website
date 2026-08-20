@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-20",
   "meters": {
-    "endpointsZonderTest": 1192,
-    "dekkingPct": 71,
+    "endpointsZonderTest": 1189,
+    "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 900,
+    "testbestanden": 902,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 128,
@@ -21,15 +21,15 @@
     "keuringTeGroot": 16,
     "inlineStijlAttributen": 5866,
     "browserpoortToetsen": 207,
-    "kernBreedte": 1395,
+    "kernBreedte": 1396,
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 151,
+    "toetsenNietGemeten": 153,
     "toetsenOngevoeligPct": 2.5,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "bewijsCellenBewezen": 20563,
+    "bewijsCellenBewezen": 20566,
     "bewijsAchterstand": 1435
   },
   "notities": [
@@ -460,6 +460,11 @@
       "meter": "BEWIJSSCHULD achterstand 426 -> 4688 (met de hand vastgelegd; de ratel weigerde terecht). OUTPUT bewezen 0 -> 10 + 6 gericht gemeten; AUDIT 29 bewezen, 92 wisselend, 4063 geen spoor.",
       "reden": "DE TWEE ASSEN ZONDER INSTRUMENT HEBBEN ER NU EEN, EN DAT MAAKT DE SCHULD GROTER IN PLAATS VAN KLEINER. Dat is geen tegenslag maar wat meten doet: 8370 cellen die als een blok \"ongemeten\" golden, zijn nu 4170 meetbare-maar-nog-niet-gemeten, 4063 geen-spoor, 92 wisselend en een handvol bewezen. De post output-niet-toerekenbaar stond als GRENS ingedeeld -- de rand van de methode -- en dat klopte zolang de liegpoort alleen per toetsbestand kon. Sinds scripts/outputproef.js --meet over EEN route liegt en alleen de toetsen draait die hem raken, is het gewoon traag werk. Een post die meetbaar is geworden en toch grens blijft heten, verbergt achterstand achter een woord. Vandaar de herclassificatie naar meetwerk, en vandaar de sprong van 426 naar 4688.",
       "eerlijkheidshalve": "DRIE DINGEN. (1) De eerste toerekeningsregel van de outputproef kon NOOIT vuren. Hij eiste een inhoudgevoelige toets die geen andere route raakt, en elke toets raakt ook de gezondheidscontrole en de inlog: uitkomst nul bewezen op 4185 routes. Wat infrastructuur is, wordt nu gemeten (geraakt door meer dan de helft van alle toetsbestanden: /api/health 540/540, /api/ready 504/540, /api/auth/register 301/540) en telt niet mee in de toerekening. Bij drempels van 50, 30 en 20 procent komt er 7, 7 en 8 uit -- een cijfer dat nauwelijks van de grens afhangt is een cijfer over de suite en niet over de grens. (2) MIJN EERSTE DRIE GERICHTE METINGEN WAREN ARTEFACTEN. Ik mat /api/login, /api/office/login en /api/supplier/login en alle drie meldden MERKT. Natuurlijk: liegen over de inlog breekt elke toets die moet inloggen, en dat zegt niets over de inhoud van die route. De deuren blijven nu open (RTG_LIEG_NIET) en een deur zelf valt buiten deze meting -- hetzelfde onderscheid dat scripts/mutatie.js al in zijn scherpe ronde maakt. De drie zijn gewist en opnieuw gedaan. (3) AUDIT meldt 4063 routes zonder spoor. Voor een leesroute is dat juist; voor een schrijfroute is het een vraag. Die vraag is NIET beantwoord: deze proef telt of er een journaal groeide, hij leest niet of het spoor genoeg zegt. Dat staat als grens in het register en niet als groen."
+    },
+    {
+      "datum": "2026-08-20",
+      "meter": "kernBreedte 1395 -> 1396; toetsenNietGemeten 151 -> 153",
+      "reden": "Een weigering hoort niets achter te laten (PROOF.md par. 9): kern/horeca.js kreeg de leesvariant Hlees, zodat kijk- en weigerwegen geen doos meer scheppen. Dat is precies een extra kernnaam, en de veilige tegenhanger van H() en geen tweede waarheid. De twee nieuwe toetsbestanden (vertrouwen.test.js en weigering-laat-niets-achter.test.js) zijn nog niet door de mutatiemotor gezien; ze lopen mee in de eerstvolgende mutatieronde en deze tand hoort daarna terug naar beneden."
     }
   ],
   "prestatie": {

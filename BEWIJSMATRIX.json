@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T00:48:08.660Z",
-    "commit": "124d241",
+    "op": "2026-08-20T06:55:22.786Z",
+    "commit": "75cab54",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,19 +12,19 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20563,
+    "bewezen": 20566,
     "verklaard": 0,
     "nvt": 272,
     "ongemeten": 25059,
-    "gezakt": 141
+    "gezakt": 138
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 3885,
+      "bewezen": 3888,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 297,
-      "gezakt": 3
+      "gezakt": 0
     },
     "ACL": {
       "bewezen": 3379,

@@ -231,13 +231,19 @@ worden.
 
 De volgorde daarna, klein en omkeerbaar per stap:
 
-1. **Vervalstaten per route** (scripts/vertrouwen.js -> VERTROUWEN.json): de
-   staatmachine van paragraaf 2, berekend uit de stempels en uitkomsten van de
-   bestaande registers. Met een toets die de staat echt ziet omslaan.
+1. **Vervalstaten per route** -- GEBOUWD (scripts/vertrouwen.js ->
+   VERTROUWEN.json): de staatmachine van paragraaf 2, berekend uit de stempels
+   en uitkomsten van de bestaande registers, met toetsen die elke overgang
+   maken en mutaties die aantoonbaar zakten.
 2. **De vertrouwenspas** op capability-hoogte in Kantoor, als lezing bovenop
    het routedossier, met de universele vraag en de vervalvoorwaarden.
-3. **De eerste zelfterugtrekkende poort**, op een kleine kring met laag risico,
-   alleen-lezen als degradatie, luid in het actielog.
+3. **De eerste zelfterugtrekkende poort** -- GEBOUWD als de schorspoort
+   (server/middleware/schorspoort.js): schrijvende aanroepen op een route
+   waarvan de vervalstaat GESCHORST is krijgen een 503 met de reden en de kop
+   X-Vervalstaat; lezen blijft open, de poort kan alleen dichthouden en nooit
+   openen, en alleen een geslaagde hermeting die het register verandert
+   heropent. Sinds deze poort is een schorsing in het register GEDRAG, geen
+   dashboardkleur.
 4. **Slagveld vooraf** aan de hand van de bestaande koppeling route -> toets.
 5. Dan pas de compiler, de wet-keten, klantcontracten en het wat-als.
 

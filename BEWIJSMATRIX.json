@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T07:40:13.544Z",
-    "commit": "2c611af",
+    "op": "2026-08-20T08:35:21.952Z",
+    "commit": "6511c97",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,10 +12,10 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20700,
+    "bewezen": 20827,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 25063,
+    "ongemeten": 24936,
     "gezakt": 0
   },
   "perSchakel": {
@@ -41,10 +41,10 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 3993,
+      "bewezen": 4120,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 192,
+      "ongemeten": 65,
       "gezakt": 0
     },
     "STATE": {

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1031 bestanden en 6807 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1033 bestanden en 6817 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1031 |
-| losse beweringen (`test(...)`) | 6807 |
+| toetsbestanden | 1033 |
+| losse beweringen (`test(...)`) | 6817 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 855 |
 | **overleefd**: geen mutatie kreeg hem rood | 22 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 20 |
-| niets van beide | 96 |
+| niets van beide | 98 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-903 bestanden, 6576 beweringen.
+905 bestanden, 6586 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -318,6 +318,7 @@ toets omvalt.
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |
 | `incidentcontrole-route.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `inhoudswacht.test.js` | 2 | -- | DE INHOUDSWACHT -- elke blinde route krijgt zijn vormcontract terug. INHOUDSKAART.json draagt per (voorheen) blinde route het ware antwoordprofiel: status, sleutels, en welke velden dragend zijn. |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
 | `instant-reality.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `invoerproef.test.js` | 11 | geen bruikbare mutatie | HET OORDEEL VAN DE INVOERPROEF, los van een server. scripts/invoerproef-route.js heeft een echte server nodig en duurt minuten; daar komt niemand ooit met een mutatie bij. |
@@ -535,7 +536,7 @@ toets omvalt.
 | `opslag-voorcheck.test.js` | 6 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 5 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |
 | `opslagpoort.test.js` | 6 | gezakt op `true->false#0` | GEEN GROOTBOEK, GEEN PRODUCTIE. Zonder rij-voor-rij grootboek is er maar een vangnet voor een collectie die haar grens raakt: db/tx/index.js schrijft de staart naar archief/ en kapt pas als dat gelukt is. |
-| `outputaudit.test.js` | 9 | gezakt op `===->!==#0` | DE TWEE ASSEN DIE NOOIT EEN INSTRUMENT HADDEN. OUTPUT en AUDIT stonden voor ALLE 4185 routes op ongemeten -- samen 8370 cellen, ruim een kwart van de hele matrix. |
+| `outputaudit.test.js` | 10 | gezakt op `===->!==#0` | DE TWEE ASSEN DIE NOOIT EEN INSTRUMENT HADDEN. OUTPUT en AUDIT stonden voor ALLE 4185 routes op ongemeten -- samen 8370 cellen, ruim een kwart van de hele matrix. |
 | `ov-operatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov-regie.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ov.test.js` | 8 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |
@@ -717,6 +718,7 @@ toets omvalt.
 | `schooltaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de tweetalige klasgenoot: een kind uit het buitenland ziet de klas in de eigen taal EN in het Nederlands (de taal die het erbij leert). |
 | `schooltoets.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School x leerstof-motor: de leraar vinkt leerdoelen aan en heeft een SO/proefwerk/examen klaar (verse opgaven per leerling, server kijkt na, geen goed/fout-verklikker halverwege), een MO geeft de leraar de vragen... |
 | `schoolverbonden.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de verbonden klas: het lerarenteam (max drie vast), de waarnemer die een klas van een collega overneemt, de online les voor thuiswerken, en huiswerk dat aan een leerdoel hangt en zichzelf afvinkt als het... |
+| `schorspoort.test.js` | 7 | -- | DE SCHORSPOORT, NAGETROKKEN. Een route waarvan het register zegt "geschorst" trekt zich terug voor schrijven, en voor niets anders: lezen blijft open, andere routes blijven open, en de poort kan alleen dichthouden --... |
 | `scim.test.js` | 20 | gezakt op `return-weg#0` | SCIM: de IdP van een klant mag zelf accounts aanmaken en uitzetten. Dat is de gevaarlijkste bevoegdheid die we buiten de deur geven, want de sleutel ligt bij de klant. |
 | `scriptbundel.test.js` | 6 | overleefd | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `selfhost.test.js` | 5 | gezakt op `===->!==#0` | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |

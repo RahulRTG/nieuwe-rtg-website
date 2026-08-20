@@ -68,6 +68,12 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
      Na de body-ontleding (lijfpoort) en de ontsmetter, voor elke router. */
   app.use(require('../middleware/idempotentie')());
 
+  /* De schorspoort (PROOF.md fase 3): schrijvende aanroepen op routes waarvan
+     de vervalstaat GESCHORST is (VERTROUWEN.json) krijgen een 503 met de
+     reden; lezen blijft open, en alleen een geslaagde hermeting heropent.
+     Zie de kop van server/middleware/schorspoort.js voor de grenzen. */
+  app.use(require('../middleware/schorspoort')({ log }));
+
   // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
   // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,
   // draait mee op dezelfde database en failover.

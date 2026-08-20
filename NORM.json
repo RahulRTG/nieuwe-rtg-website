@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-20",
   "meters": {
-    "endpointsZonderTest": 1189,
+    "endpointsZonderTest": 1187,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 18,
     "dependencies": 0,
-    "testbestanden": 903,
+    "testbestanden": 905,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 128,
@@ -25,12 +25,12 @@
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 154,
+    "toetsenNietGemeten": 156,
     "toetsenOngevoeligPct": 2.5,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "bewijsCellenBewezen": 20700,
-    "bewijsAchterstand": 1427
+    "bewijsCellenBewezen": 20827,
+    "bewijsAchterstand": 1298
   },
   "notities": [
     {
@@ -470,6 +470,11 @@
       "datum": "2026-08-20",
       "meter": "toetsenNietGemeten 153 -> 154",
       "reden": "test/idempotentie.test.js is nieuw (de toetsen op de centrale idempotentielaag) en nog niet door de mutatiemotor gezien; loopt mee in de eerstvolgende mutatieronde, waarna deze tand terug omlaag hoort samen met de twee van vanochtend."
+    },
+    {
+      "datum": "2026-08-20",
+      "meter": "toetsenNietGemeten 154 -> 156",
+      "reden": "test/inhoudswacht.test.js en test/schorspoort.test.js zijn nieuw en nog niet door de mutatiemotor gezien. De mutatieband start direct na deze vastlegging en meet alle openstaande toetsen; deze tand hoort daarna fors omlaag (er staan er 156)."
     }
   ],
   "prestatie": {

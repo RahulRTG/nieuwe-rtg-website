@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T07:40:28.639Z",
-  "commit": "2c611af",
+  "op": "2026-08-20T08:35:22.078Z",
+  "commit": "6511c97",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 11,
-  "meetwerk": 296,
+  "meetwerk": 167,
   "instrument": 1131,
   "grens": 586
  },
@@ -58,7 +58,7 @@
    "id": "output-blind",
    "soort": "meetwerk",
    "wat": "routes waarover gelogen is zonder dat een toets het merkte",
-   "aantal": 178,
+   "aantal": 49,
    "waarom": "de liegpoort heeft het antwoord van precies deze route vervalst en de toetsen die hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan stilletjes leeg of fout zijn zonder dat iets zakt.",
    "sluit": "per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel (die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om."
   },

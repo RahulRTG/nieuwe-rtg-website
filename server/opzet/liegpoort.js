@@ -47,12 +47,12 @@ function maakPatroon(ruw) {
      leugen over zo'n route wel AAN maar nooit AF -- het letterlijke patroon
      matcht het echte verzoek (/api/gezin/ABC123/mij) niet, en drieendertig
      routes stonden daardoor op "blind" zonder dat er ooit over ze gelogen is.
-     Letterlijke patronen houden het oude voorvoegsel-gedrag. */
+     De vertaling zelf woont in server/lib/padvorm.js (de schorspoort stelt
+     dezelfde vraag); letterlijke patronen houden het oude voorvoegsel-gedrag. */
+  const { segmentPatroon } = require('../lib/padvorm');
   const vormen = delen.map(d => {
-    if (!d.includes('/:')) return { letterlijk: d };
-    const rx = new RegExp('^' + d.split('/').map(s =>
-      s.startsWith(':') ? '[^/]+' : s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('/') + '$');
-    return { rx };
+    const rx = segmentPatroon(d);
+    return rx ? { rx } : { letterlijk: d };
   });
   return (pad) => vormen.some(v => v.rx ? v.rx.test(pad) : (pad === v.letterlijk || pad.startsWith(v.letterlijk)));
 }

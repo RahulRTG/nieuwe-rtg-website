@@ -94,19 +94,25 @@ const POSTEN = [
     sluit: 'niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag ' +
       'stellen; die bestaat niet en is een project, geen achterstand.' },
 
-  { id: 'objectpoort', soort: 'instrument',
+  /* VAN 'instrument' NAAR 'meetwerk': het gereedschap bestaat sinds de
+     IDOR-proef. Wat rest is meten, geen bouwen -- en dat is precies het
+     verschil dat deze lijst bewaakt. Het aantal blijft 106 omdat de ROLPROEF
+     deze routes nog steeds niet kan wegen; de vraag is alleen verhuisd naar
+     een instrument dat hem wel stelt. */
+  { id: 'objectpoort', soort: 'meetwerk',
     wat: 'routes die eigenaarschap toetsen van een object uit het lichaam',
     uit: (r) => reden(r.rolproef, 'objectpoort'),
     waarom: 'huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de ' +
       'identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is ' +
       'de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een ' +
       'bedrijfscode in het lijf.',
-    sluit: 'de IDOR-proef (scripts/idorproef.js, IDOR.json) bestaat nu en beantwoordt de vraag ' +
-      'voor de MEMBER-laag: twee echte leden, A oogst objecten, B probeert ze te bedienen. ' +
-      'Uitkomst: 117 routes bewezen-gescheiden, 0 lekken (de member-routes halen de eigenaar ' +
-      'uit req.session en niet uit het lijf, wat de klasse uitsluit). De WERKPLEK-variant -- ' +
-      'twee werkruimtes met een bedrijfscode -- hergebruikt dat fundament maar vraagt de ' +
-      'werkplek-auth (beheer-/lid-token per werkruimte); dat is de resterende stap voor deze 78.' },
+    sluit: 'GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json), in twee gangen. Member-laag: ' +
+      '117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, ' +
+      'wat de klasse uitsluit). Werkplek-laag, geijkt op de eigenaar zodat een weigering iets bewijst: ' +
+      '20 routes bewezen-gescheiden, 0 doorbraken, 62 onbereikbaar omdat ook de rechtmatige eigenaar ' +
+      'er met alleen een bedrijfscode niet in kwam. Die 62 zijn de rest: ze vragen een lijf met meer ' +
+      'dan de code (een bestaand document, een klus), en dat is hetzelfde ketenwerk als object-vooraf ' +
+      'hieronder -- geen ontbrekend instrument meer, maar werk per domein.' },
 
   /* De deuren van het huis: elke lie-run spaart ze (RTG_LIEG_NIET), want een
      toets die niet meer kan inloggen zakt overal tegelijk en dan meet je de

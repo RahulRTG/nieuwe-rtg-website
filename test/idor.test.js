@@ -47,6 +47,24 @@ test('het IDOR-register draagt geen ONVERKLAARDE doorbraak', () => {
     'de proef hoort tientallen routes als bewezen-gescheiden te melden, vond ' + reg.gemeten.gescheiden);
 });
 
+test('het IDOR-register draagt geen onverklaarde WERKPLEK-doorbraak', () => {
+  /* De tweede gang: de objectpoort-routes (/api/werkplek/*), geijkt op de
+     eigenaar -- want een weigering voor B bewijst pas iets als de deur voor de
+     RECHTMATIGE persoon opengaat. Waar dat lukte, hoort B eruit te blijven. */
+  const fs = require('fs');
+  const path = require('path');
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDOR.json'), 'utf8')); }
+  catch (e) { return; }
+  const w = reg.werkplekPerRoute || {};
+  const open = Object.entries(w).filter(([, v]) => v.staat === 'doorbraak');
+  assert.deepEqual(open.map(([r]) => r), [],
+    'lid B kwam binnen op een werkplek waar hij geen toegang toe heeft: ' + open.map(([r]) => r).join(', '));
+  assert.ok((reg.gemeten.werkplek || {}).gescheiden >= 10,
+    'de werkplek-gang hoort tientallen routes als bewezen-gescheiden te melden, met een open deur ' +
+    'als ijking; vond ' + JSON.stringify(reg.gemeten.werkplek));
+});
+
 test('een weigering die een persoonsveld lekt is gescheiden EN een lek', () => {
   const lek = oordeelIdor(403, '{"error":"verboden","naam":"Noor de Vries"}');
   assert.equal(lek.staat, 'gescheiden');

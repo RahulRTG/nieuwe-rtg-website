@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T10:44:57.315Z",
-  "commit": "31a983f",
+  "op": "2026-08-20T11:15:13.215Z",
+  "commit": "358d285",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,8 +9,8 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 12,
-  "meetwerk": 98,
-  "instrument": 817,
+  "meetwerk": 204,
+  "instrument": 711,
   "grens": 604
  },
  "posten": [
@@ -32,11 +32,11 @@
   },
   {
    "id": "objectpoort",
-   "soort": "instrument",
+   "soort": "meetwerk",
    "wat": "routes die eigenaarschap toetsen van een object uit het lichaam",
    "aantal": 106,
    "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een bedrijfscode in het lijf.",
-   "sluit": "de IDOR-proef (scripts/idorproef.js, IDOR.json) bestaat nu en beantwoordt de vraag voor de MEMBER-laag: twee echte leden, A oogst objecten, B probeert ze te bedienen. Uitkomst: 117 routes bewezen-gescheiden, 0 lekken (de member-routes halen de eigenaar uit req.session en niet uit het lijf, wat de klasse uitsluit). De WERKPLEK-variant -- twee werkruimtes met een bedrijfscode -- hergebruikt dat fundament maar vraagt de werkplek-auth (beheer-/lid-token per werkruimte); dat is de resterende stap voor deze 78."
+   "sluit": "GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json), in twee gangen. Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-laag, geijkt op de eigenaar zodat een weigering iets bewijst: 20 routes bewezen-gescheiden, 0 doorbraken, 62 onbereikbaar omdat ook de rechtmatige eigenaar er met alleen een bedrijfscode niet in kwam. Die 62 zijn de rest: ze vragen een lijf met meer dan de code (een bestaand document, een klus), en dat is hetzelfde ketenwerk als object-vooraf hieronder -- geen ontbrekend instrument meer, maar werk per domein."
   },
   {
    "id": "output-deuren",

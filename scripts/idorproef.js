@@ -156,6 +156,84 @@ if (require.main !== module) { module.exports = {}; return; }
     telling[o.staat]++;
     if (o.lek) telling.lek++;
   }
+  /* ---- GANG 3: DE WERKPLEK-POORT (de 78 objectpoort-routes) ----
+
+     Een andere vorm van dezelfde vraag, en de reden dat de rolproef hier
+     niets kon: huisPoort doet werkplek.kent(req.body.bedrijf) VOOR het naar de
+     identiteit kijkt, dus een verzonnen bedrijfscode geeft 404 en de
+     eigenaarschapsvraag komt nooit aan de beurt. Met een ECHTE code komt hij
+     er wel aan toe, en dan is de vraag zuiver: mag een lid dat geen toegang
+     tot dit huis heeft er toch in?
+
+     DE IJKING IS ONMISBAAR. Een 403 voor B bewijst alleen iets als de deur
+     voor de RECHTMATIGE persoon opengaat -- anders meet je een deur die voor
+     iedereen dicht zit, en dat is geen scheiding maar een muur. De eigenaar
+     mag per definitie in elk huis (werkplek.magIn: baas -> true), dus die is
+     de ijking. Zonder open deur wordt de uitslag ONBEREIKBAAR en geen bewijs. */
+  const eig = (await post('/api/auth/login', {
+    login: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com',
+    password: process.env.DEMO_PASS || 'Imran' })).data.token;
+  const werkplekRoutes = alleRoutes()
+    .filter(r => r.methode === 'POST' && r.pad.startsWith('/api/werkplek/'))
+    .filter(r => !r.pad.includes(':'));
+  const huizen = eig
+    ? (((await post('/api/werkplek/mijn', {}, eig)).data || {}).bedrijven || []).map(b => b.code)
+    : [];
+  const werkplekTelling = { gescheiden: 0, doorbraak: 0, onbereikbaar: 0 };
+  const werkplekPerRoute = {};
+  for (const r of werkplekRoutes) {
+    const sleutel = r.methode + ' ' + r.pad;
+    if (!eig || !huizen.length) {
+      werkplekTelling.onbereikbaar++;
+      werkplekPerRoute[sleutel] = { staat: 'onbereikbaar',
+        reden: eig ? 'de eigenaar ziet geen enkel huis; geen open deur om tegen te ijken'
+          : 'geen eigenaarstoken; zonder ijking bewijst een weigering niets' };
+      continue;
+    }
+    const code = huizen[0];
+    const ijk = await post(r.pad, { bedrijf: code }, eig);
+    if (!(ijk.status >= 200 && ijk.status < 300)) {
+      werkplekTelling.onbereikbaar++;
+      werkplekPerRoute[sleutel] = { staat: 'onbereikbaar', status: ijk.status,
+        reden: 'ook de rechtmatige eigenaar kwam er niet in (' + ijk.status + '): deze deur is ' +
+          'voor iedereen dicht, dus een weigering voor B bewijst geen scheiding' };
+      continue;
+    }
+    const aanval = await post(r.pad, { bedrijf: code }, B);
+    const o = oordeelIdor(aanval.status, aanval.tekst);
+    /* EEN 2xx OP EEN GEFILTERDE LIJST IS GEEN DOORBRAAK, en dit huis heeft er
+       een: /api/werkplek/mijn antwoordt elk ingelogd lid met 200 en geeft
+       daarin ALLEEN de huizen waar hij in mag -- voor B dus een lege lijst.
+       Dat is geen lek maar precies de bedoeling. Het onderscheid is meetbaar:
+       draagt B's antwoord de code van het huis, dan kreeg hij de inhoud;
+       draagt het hem niet, dan is het gefilterd. Zonder deze scheiding meldt
+       de proef een lek dat er niet is, en na drie loze alarmen zet iemand hem
+       uit (dezelfde les als de ruisvloer van de staatproef). */
+    const draagtInhoud = new RegExp('\\b' + code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i')
+      .test(String(aanval.tekst || ''));
+    if (o.staat === 'doorbraak' && !draagtInhoud) {
+      werkplekTelling.gescheiden++;
+      werkplekPerRoute[sleutel] = { status: aanval.status, staat: 'gescheiden', bedrijf: code,
+        reden: 'B kreeg ' + aanval.status + ' maar zonder de inhoud van dit huis (gefilterde lijst): ' +
+          'de scheiding zit in het antwoord, niet in de statuscode' };
+      continue;
+    }
+    if (o.staat === 'doorbraak') {
+      werkplekTelling.doorbraak++;
+      werkplekPerRoute[sleutel] = { status: aanval.status, staat: 'doorbraak', bedrijf: code,
+        reden: 'de eigenaar kwam binnen (' + ijk.status + ') EN lid B ook (' + aanval.status +
+          '), terwijl B geen toegang tot dit huis heeft: de werkplek-poort scheidt hier niet' };
+    } else if (o.staat === 'gescheiden') {
+      werkplekTelling.gescheiden++;
+      werkplekPerRoute[sleutel] = { status: aanval.status, staat: 'gescheiden', bedrijf: code,
+        reden: 'de deur ging open voor de eigenaar (' + ijk.status + ') en bleef dicht voor B (' +
+          aanval.status + '): bewezen scheiding op de werkplek-poort' };
+    } else {
+      werkplekTelling.onbereikbaar++;
+      werkplekPerRoute[sleutel] = { status: aanval.status, staat: 'onbereikbaar', reden: o.reden };
+    }
+  }
+
   klaar();
 
   const doorbraken = Object.entries(perRoute).filter(([, v]) => v.staat === 'doorbraak');
@@ -167,9 +245,11 @@ if (require.main !== module) { module.exports = {}; return; }
       'validatie strandde eerder. Zie scripts/lib/idor.js voor het oordeel.',
     grens: 'een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet ' +
       'alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.',
-    gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden },
+    gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
+      werkplek: { routes: werkplekRoutes.length, ...werkplekTelling } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
-    perRoute
+    perRoute,
+    werkplekPerRoute
   };
 
   if (argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
@@ -179,7 +259,11 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  publiek (id maakt geen verschil): ' + telling.publiek);
   console.log('  onbereikbaar (geen id/validatie): ' + telling.onbereikbaar);
   console.log('  weigering die een persoonsveld lekt: ' + telling.lek);
-  console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden\n');
+  console.log('  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden');
+  console.log('\n  WERKPLEK-POORT (de objectpoort-routes), geijkt op de eigenaar:');
+  console.log('    gescheiden (eigenaar erin, B eruit): ' + werkplekTelling.gescheiden);
+  console.log('    doorbraak (B kwam ook binnen)       : ' + werkplekTelling.doorbraak);
+  console.log('    onbereikbaar (geen open deur)      : ' + werkplekTelling.onbereikbaar + '\n');
   for (const [route, v] of doorbraken.slice(0, 20)) console.log('   ? ' + route + ' -> ' + v.status + ' (via ' + (v.velden || []).join(',') + ')');
 
   if (VASTLEGGEN) {

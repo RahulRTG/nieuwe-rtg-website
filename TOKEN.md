@@ -143,14 +143,24 @@ JOU klaarstaat is één knop — een tegoed op naam hoef je niet over te tikken.
 Uitzonderingsgestuurd: de twee lijstvakken bestaan alleen zolang ze iets te
 zeggen hebben.
 
-**De zaakkant heeft géén scherm, en dat is ouder dan deze ronde.** Heel
-`/api/supplier/pay/*` — innen, saldo, uitbetalen — heeft nooit een eigen scherm
-gehad; de kassa gebruikt alleen de betaalcode van het lid. Een tegoedpaneel voor
-een zaak zou dus het eerste stuk van een scherm zijn dat er niet is, en dat is
-eigen werk en geen bijvangst hier.
+**De zaakkant heeft nu een scherm** (`public/apps/zaakpay.html`), en dat was
+ouder werk dan het tegoed: heel `/api/supplier/pay/*` — innen, saldo,
+uitbetalen — had er nooit een gehad; de kassa gebruikte alleen de betaalcode van
+het lid. Er staat nu één werkplek-scherm met vier dingen: het saldo van de kas
+als enige ceremoniële KPI, innen met de code van het lid, uitbetalen naar de
+bank, en tegoed klaarzetten en terugnemen. Bereikbaar vanaf `kantoor.html`.
 
-Getoetst in `test/paytegoed.test.js`, `test/paytegoed.e2e.js` en
-`test/zorgwallet.test.js`, elke bewering met een mutatie die is zien zakken. Eén grendel staat er bewust
+Twee keuzes daar zijn het opschrijven waard. De knoppen die alleen een manager
+mag gebruiken worden **getoond en niet verborgen**: wie ze niet mag gebruiken
+leest de weigering van de server, in plaats van te raden waar ze zijn — dezelfde
+lijn die de premium-standen in RTG Geld al volgen. En de **richting** van een
+boeking (plus of min) wordt uit de rekeningnaam afgeleid: `/api/supplier/pay/overzicht`
+geeft alleen rijen die deze partnerrekening raken, dus precies één van de twee
+kanten is een `partner:` — zo hoeft het scherm zijn eigen code niet te kennen.
+
+Getoetst in `test/paytegoed.test.js`, `test/paytegoed.e2e.js`,
+`test/zaakpay.e2e.js` en `test/zorgwallet.test.js`, elke bewering met een
+mutatie die is zien zakken. Eén grendel staat er bewust
 zonder toets bij: `vanSoort` op de bon, dat een zaakcode scheidt van een
 codenaam. Het geval waarvoor hij bestaat (een zaakcode die toevallig gelijk is
 aan een codenaam) is met de proefinlog niet na te bootsen, en dat staat in de
@@ -174,7 +184,7 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 |---|---|---|
 | 1 | Walletplafond, feestmunt via Pay, tegoed voor een ander en vanuit een zaak (kopen, verzilveren, vervallen, terugnemen) | gebouwd |
 | 2 | Tegoed op het scherm van het lid (`apps/pay.html`) | gebouwd |
-| 2b | De zaakkant op een scherm. Dat vraagt eerst een RTG Pay-scherm voor een zaak, want dat bestaat helemaal niet — zie par. 4 | — |
+| 2b | De zaakkant op een scherm (`apps/zaakpay.html`): saldo, innen, uitbetalen én tegoed | gebouwd |
 | 3 | Punten zonder geldwaarde, achter `progressieMag`, met de anti-engagement-regel als ontwerpkader | — |
 | 4 | Het besluit over de bank-uitgang (par. 7) en, als dat valt, de vergunningsroute | — |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |

@@ -46,6 +46,15 @@
   try { inFrame = w.self !== w.top; } catch (e) { inFrame = true; }
   if (inFrame) return;
 
+  /* EN EEN SCHERM MAG HEM WEIGEREN. `<body data-ws-uit>` -- dezelfde spelling
+     als data-ios-uit in shared/ios.js, want het is dezelfde soort uitzondering.
+     Nodig voor schermen die de sessielaag toevallig dragen maar niet voor het
+     gezin zijn: het Clubportaal vraagt om een clubcode en spreekt de bezoeker
+     met u aan; een tab "Elke dag" met de gezinsagenda erachter hoort daar niet
+     te staan. Liever een expliciet attribuut op dat ene scherm dan een lijst
+     uitzonderingen in de kaart, want die lijst leest niemand meer terug. */
+  if (d.body && d.body.hasAttribute('data-ws-uit')) return;
+
   /* ------------------------------------------------------------ handigheid */
   /* Links is de standaard, want een nieuwe gebruiker heeft geen instelling en
      de conventie is links. Wie wisselt, wisselt voor het hele huis: de sleutel

@@ -47,7 +47,7 @@
           'gezondheid', 'babyboek', 'oppasinfo', 'reis', 'zakgeld', 'budget', 'geld'] },
 
       { id: 'samen', naam: 'Samen', href: 'vrienden.html', glyf: 'vrienden',
-        schermen: ['vrienden', 'club', 'markt', 'contact', 'dromen', 'mijnbanden'] },
+        schermen: ['vrienden', 'markt', 'contact', 'dromen', 'mijnbanden'] },
 
       { id: 'steun', naam: 'Steun', href: 'kompas.html', glyf: 'hart',
         schermen: ['kompas', 'rust', 'gevoel', 'veilig', 'pesten', 'steun',

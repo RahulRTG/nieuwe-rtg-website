@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:04:19.058Z",
-  "commit": "ee9db81",
+  "op": "2026-08-20T09:06:13.509Z",
+  "commit": "62c91d1",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 4131,
+  "bewezen": 4156,
   "onbeslist": 0,
-  "blind": 35,
+  "blind": 10,
   "ongemeten": 29
  },
  "routes": 4195,
@@ -1085,12 +1085,12 @@
    "reden": "er is over DEZE route gelogen en assets.test.js zakte daarop"
   },
   "POST /api/rtf/spel/opgeven": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "arena.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en arena.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/spel/online": {
    "staat": "bewezen",
@@ -13171,20 +13171,20 @@
    "reden": "er is over DEZE route gelogen en beschermd.test.js zakte daarop"
   },
   "POST /api/rtf/social/dm/send": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "beschermd.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en beschermd.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/social/snap/send": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "beschermd.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en beschermd.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/social/goedkeuren": {
    "staat": "bewezen",
@@ -16934,12 +16934,12 @@
    "reden": "er is over DEZE route gelogen en foundation.test.js zakte daarop"
   },
   "POST /api/translate": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "server.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en server.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/supplier/vacature": {
    "staat": "bewezen",
@@ -19350,12 +19350,12 @@
    "reden": "er is over DEZE route gelogen en kantoorpakket-alle.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/bewaar": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "kantoorpakket-alle.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en kantoorpakket-alle.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/open": {
    "staat": "bewezen",
@@ -24695,12 +24695,12 @@
    "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/vul": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/kantoorpakket/uitslag": {
    "staat": "bewezen",
@@ -24743,20 +24743,20 @@
    "reden": "er is over DEZE route gelogen en rtf-veilig.test.js zakte daarop"
   },
   "POST /api/rtf/spel/sneek-bord": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/spel/arcade-score": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtf-veilig.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en rtf-veilig.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/spel/arcade-bord": {
    "staat": "bewezen",
@@ -30559,12 +30559,12 @@
    "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "POST /api/sso/waarheen": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "techniek-sso-scim.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "GET /api/sso/terug": {
    "staat": "bewezen",
@@ -32085,12 +32085,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/atelier/techpack": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/maak": {
    "staat": "bewezen",
@@ -32101,20 +32101,20 @@
    "reden": "er is over DEZE route gelogen en werkplek.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/studio/specsheet": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/serie": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/zet": {
    "staat": "bewezen",
@@ -32133,12 +32133,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/stuklijst": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/maak": {
    "staat": "bewezen",
@@ -32149,20 +32149,20 @@
    "reden": "er is over DEZE route gelogen en werkplek.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/bouwstaat": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/project": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/artikel/maak": {
    "staat": "bewezen",
@@ -32213,12 +32213,12 @@
    "reden": "er is over DEZE route gelogen en werkplek.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/studio/collectie": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect": {
    "staat": "bewezen",
@@ -32253,20 +32253,20 @@
    "reden": "er is over DEZE route gelogen en werkplek.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/atelier/collectie": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/verwijder": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/plank": {
    "staat": "bewezen",
@@ -32301,12 +32301,12 @@
    "reden": "er is over DEZE route gelogen en werkplek.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/atelier/verwijder": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/atelier/concept": {
    "staat": "bewezen",
@@ -32341,12 +32341,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/studio/kritiek": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/concept": {
    "staat": "bewezen",
@@ -32357,12 +32357,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/hardware/kritiek": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/concept": {
    "staat": "bewezen",
@@ -32373,12 +32373,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/architect/kritiek": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/artikel/zet": {
    "staat": "bewezen",
@@ -32397,12 +32397,12 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/artikel/verwijder": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/editie/maak": {
    "staat": "bewezen",
@@ -32429,20 +32429,20 @@
    "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/nieuwstips": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/ai/schrijf": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "werkplek-wijzigen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en werkplek-wijzigen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/werkplek/bureau/redactie/ai/redactie": {
    "staat": "bewezen",
@@ -38596,14 +38596,14 @@
    "op": "2026-08-19T08:18:01.955Z"
   },
   "POST /api/rtf/social/dm/send": {
-   "toets": "beschermd.test.js",
-   "merkt": false,
-   "op": "2026-08-19T08:17:49.989Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:31.948Z"
   },
   "POST /api/rtf/social/snap/send": {
-   "toets": "beschermd.test.js",
-   "merkt": false,
-   "op": "2026-08-19T08:17:51.803Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:44.380Z"
   },
   "POST /api/rtf/social/goedkeuren": {
    "toets": "beschermd.test.js",
@@ -40027,9 +40027,9 @@
    "op": "2026-08-18T20:55:23.959Z"
   },
   "POST /api/translate": {
-   "toets": "server.test.js",
-   "merkt": false,
-   "op": "2026-08-18T22:06:54.390Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:58.053Z"
   },
   "POST /api/supplier/vacature": {
    "toets": "payroll.test.js",
@@ -46017,9 +46017,9 @@
    "op": "2026-08-19T13:16:40.991Z"
   },
   "POST /api/rtf/spel/opgeven": {
-   "toets": "arena.test.js",
-   "merkt": false,
-   "op": "2026-08-19T13:16:41.854Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:45.049Z"
   },
   "GET /api/rtf/social/stream": {
    "toets": "arena.test.js",
@@ -48782,9 +48782,9 @@
    "op": "2026-08-19T15:29:35.890Z"
   },
   "POST /api/werkplek/bureau/atelier/techpack": {
-   "toets": "werkplek.test.js",
-   "merkt": false,
-   "op": "2026-08-19T15:29:36.190Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:24.295Z"
   },
   "POST /api/werkplek/bureau/hardware/maak": {
    "toets": "werkplek.test.js",
@@ -48797,19 +48797,19 @@
    "op": "2026-08-19T15:29:47.255Z"
   },
   "POST /api/werkplek/bureau/studio/specsheet": {
-   "toets": "werkplek.test.js",
-   "merkt": false,
-   "op": "2026-08-19T15:29:47.266Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:06:13.382Z"
   },
   "POST /api/werkplek/bureau/hardware/stuklijst": {
-   "toets": "werkplek.test.js",
-   "merkt": false,
-   "op": "2026-08-19T15:29:47.375Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:48.631Z"
   },
   "POST /api/werkplek/bureau/architect/bouwstaat": {
-   "toets": "werkplek.test.js",
-   "merkt": false,
-   "op": "2026-08-19T15:29:58.125Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:09.674Z"
   },
   "POST /api/werkplek/bureau/redactie": {
    "toets": "werkplek.test.js",
@@ -49237,9 +49237,9 @@
    "op": "2026-08-19T16:03:02.658Z"
   },
   "POST /api/rtf/kantoorpakket/bewaar": {
-   "toets": "kantoorpakket-alle.test.js",
-   "merkt": false,
-   "op": "2026-08-19T16:03:02.869Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:31.268Z"
   },
   "POST /api/rtf/kantoorpakket/open": {
    "toets": "kantoorpakket-alle.test.js",
@@ -50092,9 +50092,9 @@
    "op": "2026-08-19T17:07:45.663Z"
   },
   "POST /api/sso/waarheen": {
-   "toets": "techniek-sso-scim.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:08:07.721Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:57.301Z"
   },
   "POST /api/sso/wissel": {
    "toets": "techniek-sso-scim.test.js",
@@ -50167,9 +50167,9 @@
    "op": "2026-08-19T17:08:57.114Z"
   },
   "POST /api/rtf/kantoorpakket/vul": {
-   "toets": "rtf-veilig.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:08:59.100Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:31.812Z"
   },
   "POST /api/rtf/school/weg": {
    "toets": "rtf-veilig.test.js",
@@ -50197,14 +50197,14 @@
    "op": "2026-08-19T17:37:43.323Z"
   },
   "POST /api/rtf/spel/arcade-score": {
-   "toets": "rtf-veilig.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:37:43.513Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:44.550Z"
   },
   "POST /api/rtf/spel/sneek-bord": {
-   "toets": "rtf-veilig.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:37:43.606Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:57.123Z"
   },
   "POST /api/rtf/geloof/ai": {
    "toets": "rtf-veilig.test.js",
@@ -52262,9 +52262,9 @@
    "op": "2026-08-19T20:57:09.799Z"
   },
   "POST /api/werkplek/bureau/hardware/serie": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:57:20.866Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:37.247Z"
   },
   "POST /api/werkplek/bureau/atelier/zet": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52292,9 +52292,9 @@
    "op": "2026-08-19T20:57:41.596Z"
   },
   "POST /api/werkplek/bureau/architect/project": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:57:41.683Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:11.029Z"
   },
   "POST /api/werkplek/bureau/hardware/zet": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52307,9 +52307,9 @@
    "op": "2026-08-19T20:57:52.369Z"
   },
   "POST /api/werkplek/bureau/studio/collectie": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:57:52.821Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:06:02.465Z"
   },
   "POST /api/werkplek/bureau/studio/zet": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52322,9 +52322,9 @@
    "op": "2026-08-19T20:57:53.551Z"
   },
   "POST /api/werkplek/bureau/atelier/collectie": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:03.414Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:23.280Z"
   },
   "POST /api/werkplek/bureau/hardware": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52332,9 +52332,9 @@
    "op": "2026-08-19T20:58:03.835Z"
   },
   "POST /api/werkplek/bureau/architect/verwijder": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:03.843Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:22.831Z"
   },
   "POST /api/werkplek/bureau/hardware/verwijder": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52347,9 +52347,9 @@
    "op": "2026-08-19T20:58:14.436Z"
   },
   "POST /api/werkplek/bureau/atelier/verwijder": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:14.510Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:35.567Z"
   },
   "POST /api/werkplek/bureau/atelier/kritiek": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52367,14 +52367,14 @@
    "op": "2026-08-19T20:58:25.369Z"
   },
   "POST /api/werkplek/bureau/studio/kritiek": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:25.503Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:06:02.782Z"
   },
   "POST /api/werkplek/bureau/hardware/kritiek": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:25.597Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:36.649Z"
   },
   "POST /api/werkplek/bureau/architect/concept": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52382,9 +52382,9 @@
    "op": "2026-08-19T20:58:26.391Z"
   },
   "POST /api/werkplek/bureau/architect/kritiek": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:36.290Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:10.134Z"
   },
   "POST /api/werkplek/bureau/redactie/artikel/status": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52397,9 +52397,9 @@
    "op": "2026-08-19T20:58:36.621Z"
   },
   "POST /api/werkplek/bureau/redactie/artikel/verwijder": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:37.408Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:50.066Z"
   },
   "POST /api/werkplek/bureau/redactie/editie/maak": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52417,9 +52417,9 @@
    "op": "2026-08-19T20:58:47.952Z"
   },
   "POST /api/werkplek/bureau/redactie/nieuwstips": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:48.166Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:06:01.310Z"
   },
   "POST /api/werkplek/bureau/redactie/ai/redactie": {
    "toets": "werkplek-wijzigen.test.js",
@@ -52427,9 +52427,9 @@
    "op": "2026-08-19T20:58:58.388Z"
   },
   "POST /api/werkplek/bureau/redactie/ai/schrijf": {
-   "toets": "werkplek-wijzigen.test.js",
-   "merkt": false,
-   "op": "2026-08-19T20:58:58.455Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:05:49.581Z"
   },
   "POST /api/werkplek/bureau/ideeen/zet": {
    "toets": "werkplek-wijzigen.test.js",

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T11:14:24.653Z",
-  "commit": "358d285",
+  "op": "2026-08-20T12:50:49.111Z",
+  "commit": "f599046",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -15,13 +15,18 @@
   "publiek": 80,
   "onbereikbaar": 1277,
   "lek": 0,
-  "poolDomeinen": 25,
-  "poolVelden": 111,
+  "poolDomeinen": 30,
+  "poolVelden": 120,
   "werkplek": {
    "routes": 82,
-   "gescheiden": 20,
+   "gescheiden": 56,
    "doorbraak": 0,
-   "onbereikbaar": 62
+   "onbereikbaar": 26,
+   "herwonnen": 24,
+   "pool": {
+    "domeinen": 9,
+    "velden": 57
+   }
   }
  },
  "doorbraken": [],
@@ -1470,22 +1475,14 @@
    "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ]
   },
   "POST /api/concern/entiteit/nieuw": {
    "status": 200,
    "staat": "publiek",
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -1495,11 +1492,7 @@
    "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ]
   },
   "POST /api/concern/entiteit/registratie": {
@@ -1508,11 +1501,7 @@
    "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ]
   },
   "POST /api/concern/entiteit/verwijder": {
@@ -1521,11 +1510,7 @@
    "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ]
   },
   "POST /api/concern/entiteiten": {
@@ -1777,22 +1762,14 @@
    "reden": "B kreeg 404: het object is niet van B",
    "lek": false,
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ]
   },
   "POST /api/concern/opname/maak": {
    "status": 200,
    "staat": "publiek",
    "velden": [
-    "id",
-    "entiteit",
-    "entiteitid",
-    "opname",
-    "opnameid"
+    "id"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -2433,15 +2410,8 @@
    "lek": false,
    "velden": [
     "id",
-    "bekendmaking",
-    "bekendmakingid",
     "aanslag",
-    "aanslagid",
-    "soort",
-    "soortid",
-    "ref",
-    "melding",
-    "meldingid"
+    "aanslagid"
    ]
   },
   "POST /api/gemeente/belasting/mijn": {
@@ -2449,15 +2419,8 @@
    "staat": "publiek",
    "velden": [
     "id",
-    "bekendmaking",
-    "bekendmakingid",
     "aanslag",
-    "aanslagid",
-    "soort",
-    "soortid",
-    "ref",
-    "melding",
-    "meldingid"
+    "aanslagid"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -2533,13 +2496,6 @@
    "status": 200,
    "staat": "publiek",
    "velden": [
-    "id",
-    "bekendmaking",
-    "bekendmakingid",
-    "aanslag",
-    "aanslagid",
-    "soort",
-    "soortid",
     "ref",
     "melding",
     "meldingid"
@@ -3580,9 +3536,7 @@
    "status": 200,
    "staat": "publiek",
    "velden": [
-    "id",
-    "locatie",
-    "locatieid"
+    "id"
    ],
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
@@ -8060,34 +8014,40 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/bouwstaat": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/concept": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/kritiek": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/portfolio": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/project": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/verwijder": {
    "status": 403,
@@ -8096,9 +8056,10 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/architect/zet": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/atelier": {
    "status": 403,
@@ -8107,29 +8068,31 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/atelier/collectie": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/atelier/concept": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/atelier/kritiek": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/atelier/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/atelier/techpack": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/atelier/verwijder": {
    "status": 403,
@@ -8140,7 +8103,7 @@
   "POST /api/werkplek/bureau/atelier/zet": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/hardware": {
    "status": 403,
@@ -8149,44 +8112,51 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/concept": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/kritiek": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/plank": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/hardware/plank-af": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/productblad": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/serie": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/stuklijst": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/verwijder": {
    "status": 403,
@@ -8195,9 +8165,10 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/hardware/zet": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen": {
    "status": 403,
@@ -8206,24 +8177,28 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/reactie": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/spinoff": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/uitwerken": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/verwijder": {
    "status": 403,
@@ -8232,9 +8207,10 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/ideeen/zet": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/redactie": {
    "status": 403,
@@ -8245,22 +8221,23 @@
   "POST /api/werkplek/bureau/redactie/ai/redactie": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/ai/schrijf": {
    "staat": "onbereikbaar",
    "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (400), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/artikel/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/redactie/artikel/status": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/artikel/verwijder": {
    "status": 403,
@@ -8269,24 +8246,25 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/redactie/artikel/zet": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/redactie/drukproef": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/editie/maak": {
    "staat": "onbereikbaar",
    "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (400), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/editie/status": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/redactie/nieuwstips": {
    "status": 403,
@@ -8301,34 +8279,37 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/studio/collectie": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/studio/concept": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/studio/kritiek": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/studio/lookbook": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/studio/maak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/bureau/studio/specsheet": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureau/studio/verwijder": {
    "status": 403,
@@ -8339,7 +8320,7 @@
   "POST /api/werkplek/bureau/studio/zet": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/bureaus": {
    "status": 403,
@@ -8350,27 +8331,29 @@
   "POST /api/werkplek/kantoorpakket/aanwezig": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/ai": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/beheer": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/bewaar": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/fase": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/maak": {
    "status": 403,
@@ -8385,59 +8368,65 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/open": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/opmerking": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/samen": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/ster": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/terug": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/uitslag": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/versies": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/kantoorpakket/vul": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/kantoorpakket/weg": {
-   "staat": "onbereikbaar",
-   "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/mens": {
    "staat": "onbereikbaar",
    "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (400), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/mens-weg": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/mijn": {
    "status": 200,
@@ -8458,14 +8447,15 @@
    "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/taak": {
-   "staat": "onbereikbaar",
-   "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "status": 403,
+   "staat": "gescheiden",
+   "bedrijf": "rtg",
+   "reden": "de deur ging open voor de eigenaar (200) en bleef dicht voor B (403): bewezen scheiding op de werkplek-poort"
   },
   "POST /api/werkplek/taak-zet": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/toegang": {
    "status": 403,
@@ -8476,12 +8466,12 @@
   "POST /api/werkplek/toegang-geef": {
    "staat": "onbereikbaar",
    "status": 400,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (400): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (400), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   },
   "POST /api/werkplek/toegang-weg": {
    "staat": "onbereikbaar",
    "status": 404,
-   "reden": "ook de rechtmatige eigenaar kwam er niet in (404): deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
+   "reden": "ook de rechtmatige eigenaar kwam er niet in (404), ook niet met een lijf dat verrijkt was met echte id's uit zijn eigen huis: deze deur is voor iedereen dicht, dus een weigering voor B bewijst geen scheiding"
   }
  }
 }

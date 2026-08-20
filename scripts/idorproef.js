@@ -181,6 +181,49 @@ if (require.main !== module) { module.exports = {}; return; }
     : [];
   const werkplekTelling = { gescheiden: 0, doorbraak: 0, onbereikbaar: 0 };
   const werkplekPerRoute = {};
+  const code = huizen[0];
+
+  /* TWEE GANGEN VOOR DE IJKING, en dat is de reparatie van de grootste rest die
+     deze proef overhield: 62 routes bleven ONBEREIKBAAR omdat ook de eigenaar er
+     met alleen `{ bedrijf }` niet in kwam. Die routes willen meer -- een
+     bestaand document, een klus, een dienst -- en een verzonnen id geeft
+     dezelfde 404 als geen id. Dat is precies waar de objectpool voor is (zie
+     scripts/lib/objectpool.js): oogsten is geen raden.
+
+     GANG A laat de EIGENAAR elke route aanraken met een plausibel lijf, en
+     oogst alles wat er terugkomt. Dat werkt twee kanten op: de leesroutes
+     leveren de id's van wat er al is, en de maak-routes maken tijdens deze gang
+     zelf nieuwe objecten aan waarvan het antwoord het id draagt.
+     GANG B geeft iedereen die de eerste keer niet binnenkwam een tweede kans,
+     nu met een verrijkt lijf.
+
+     Wat B straks stuurt is LETTERLIJK HETZELFDE LIJF als waarmee de eigenaar
+     binnenkwam. Anders vergelijkt de proef twee verschillende vragen en zegt
+     een 404 voor B niets over de scheiding. */
+  const wpPool = maakPool();
+  const ijkUit = new Map();
+  if (eig && huizen.length) {
+    for (const r of werkplekRoutes) {
+      const lijf = { ...plausibelLijf(r.pad), bedrijf: code };
+      const ijk = await post(r.pad, lijf, eig);
+      if (ijk.status >= 200 && ijk.status < 300) wpPool.leer(ijk.data, r.pad);
+      ijkUit.set(r.pad, { ijk, lijf, verrijkt: false });
+    }
+    for (const r of werkplekRoutes) {
+      const v = ijkUit.get(r.pad);
+      if (v.ijk.status >= 200 && v.ijk.status < 300) continue;
+      /* `bedrijf` wordt NA het verrijken teruggezet: de pool overschrijft
+         id-achtige velden, en het huis waar we tegen ijken staat vast. */
+      const lijf = { ...wpPool.verrijk(v.lijf, r.pad).lijf, bedrijf: code };
+      const ijk = await post(r.pad, lijf, eig);
+      if (ijk.status >= 200 && ijk.status < 300) {
+        wpPool.leer(ijk.data, r.pad);
+        ijkUit.set(r.pad, { ijk, lijf, verrijkt: true });
+      }
+    }
+  }
+
+  let herwonnen = 0;
   for (const r of werkplekRoutes) {
     const sleutel = r.methode + ' ' + r.pad;
     if (!eig || !huizen.length) {
@@ -190,16 +233,18 @@ if (require.main !== module) { module.exports = {}; return; }
           : 'geen eigenaarstoken; zonder ijking bewijst een weigering niets' };
       continue;
     }
-    const code = huizen[0];
-    const ijk = await post(r.pad, { bedrijf: code }, eig);
+    const gang = ijkUit.get(r.pad);
+    const ijk = gang.ijk;
     if (!(ijk.status >= 200 && ijk.status < 300)) {
       werkplekTelling.onbereikbaar++;
       werkplekPerRoute[sleutel] = { staat: 'onbereikbaar', status: ijk.status,
-        reden: 'ook de rechtmatige eigenaar kwam er niet in (' + ijk.status + '): deze deur is ' +
-          'voor iedereen dicht, dus een weigering voor B bewijst geen scheiding' };
+        reden: 'ook de rechtmatige eigenaar kwam er niet in (' + ijk.status + '), ook niet met een ' +
+          'lijf dat verrijkt was met echte id\'s uit zijn eigen huis: deze deur is voor iedereen ' +
+          'dicht, dus een weigering voor B bewijst geen scheiding' };
       continue;
     }
-    const aanval = await post(r.pad, { bedrijf: code }, B);
+    if (gang.verrijkt) herwonnen++;
+    const aanval = await post(r.pad, gang.lijf, B);
     const o = oordeelIdor(aanval.status, aanval.tekst);
     /* EEN 2xx OP EEN GEFILTERDE LIJST IS GEEN DOORBRAAK, en dit huis heeft er
        een: /api/werkplek/mijn antwoordt elk ingelogd lid met 200 en geeft
@@ -246,7 +291,8 @@ if (require.main !== module) { module.exports = {}; return; }
     grens: 'een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet ' +
       'alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.',
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
-      werkplek: { routes: werkplekRoutes.length, ...werkplekTelling } },
+      werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
+        herwonnen, pool: wpPool.grootte() } },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute
@@ -263,7 +309,9 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('\n  WERKPLEK-POORT (de objectpoort-routes), geijkt op de eigenaar:');
   console.log('    gescheiden (eigenaar erin, B eruit): ' + werkplekTelling.gescheiden);
   console.log('    doorbraak (B kwam ook binnen)       : ' + werkplekTelling.doorbraak);
-  console.log('    onbereikbaar (geen open deur)      : ' + werkplekTelling.onbereikbaar + '\n');
+  console.log('    onbereikbaar (geen open deur)      : ' + werkplekTelling.onbereikbaar);
+  console.log('    herwonnen met een verrijkt lijf    : ' + herwonnen +
+    '  (pool: ' + wpPool.grootte().domeinen + ' naamruimtes, ' + wpPool.grootte().velden + ' velden)\n');
   for (const [route, v] of doorbraken.slice(0, 20)) console.log('   ? ' + route + ' -> ' + v.status + ' (via ' + (v.velden || []).join(',') + ')');
 
   if (VASTLEGGEN) {

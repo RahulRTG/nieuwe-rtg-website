@@ -3718,19 +3718,8 @@ console.log('\n52) WERELDLIJST.md loopt niet achter op het wereldregister');
    (een adres dat een script uit stukjes samenstelt), dus dit is een ondergrens. */
 console.log('\n53) elk scherm is vanaf de bank te bereiken');
 {
-  const MAG_LOS = new Map([
-    ['/apps/berichten.html', 'omleiding: Berichten is een stand van RTG Comm geworden; het pad blijft voor links van buiten'],
-    ['/apps/codewoord.html', 'omleiding: Codewoord is een stand van RTG Veilig geworden'],
-    ['/apps/thuisrust.html', 'omleiding: Thuisrust is een stand van RTG Veilig geworden'],
-    ['/apps/thuiswacht.html', 'omleiding: Thuiswacht is een stand van RTG Veilig geworden'],
-    ['/apps/vitaal.html', 'omleiding: Vitaal is een stand van RTG Veilig geworden'],
-    ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
-    ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link'],
-    ["/apps/festival-gast.html", "landingspagina: uw eigen kant van het festival. U komt hier met de pas die u al heeft (de code staat groot in beeld aan de poort) of via de link van uw groep -- niet via de bank. Het ORGANISATIEscherm /apps/festival.html hangt wel gewoon, bij de zaakschermen in de leverancier-app."],
-    ["/apps/reisuitnodiging.html", "landingspagina: je komt hier via de link die het reisbureau of een reisgenoot je stuurt. Hem aan de bank hangen zou hem juist verkeerd maken -- de pagina bestaat om een reis over te nemen die IEMAND ANDERS voor je klaarzette (REIZEN.md, kern/reisuitnodiging.js), en zonder die link valt er niets te openen"]
-  ]);
   try {
-    const { meet } = require('./lib/bereik');
+    const { meet, MAG_LOS } = require('./lib/bereik');
     const r = meet();
     const onbekend = r.wezen.filter((p) => !MAG_LOS.has(p));
     const verdwenen = [...MAG_LOS.keys()].filter((p) => !r.wezen.includes(p));

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-20T23:03:16.264Z",
-  "commit": "a732b304",
-  "boomVuil": true,
+  "op": "2026-08-20T23:34:02.662Z",
+  "commit": "a002e3de",
+  "boomVuil": false,
   "node": "v24.18.0"
  },
  "uitleg": "De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt net zo hard opvalt als een register dat achterloopt.",

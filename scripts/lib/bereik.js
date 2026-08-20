@@ -48,6 +48,28 @@ function bestanden(dir, uit) {
   return uit;
 }
 
+/* WIE MET OPZET LOS STAAT, EN WAAROM. Landingspagina's en omleidingen worden
+   niet aangetikt maar aangeleverd: met een QR-code op een tafel, met een link
+   uit een pas, of vanaf een oud adres dat nog moet blijven werken.
+
+   DIT REGISTER WOONT HIER EN NIET IN DE LEZERS. Het stond in scripts/check.js,
+   terwijl test/bereikbaar.test.js zijn eigen lijst in BEREIK.json las -- en die
+   twee liepen uit elkaar: festival-gast.html stond netjes hier ingeschreven en
+   zakte tegelijk bij de toets, omdat die toets dit register niet kende. Twee
+   registers voor een begrip is geen dubbele zekerheid maar een
+   meningsverschil. */
+const MAG_LOS = new Map([
+  ['/apps/berichten.html', 'omleiding: Berichten is een stand van RTG Comm geworden; het pad blijft voor links van buiten'],
+  ['/apps/codewoord.html', 'omleiding: Codewoord is een stand van RTG Veilig geworden'],
+  ['/apps/thuisrust.html', 'omleiding: Thuisrust is een stand van RTG Veilig geworden'],
+  ['/apps/thuiswacht.html', 'omleiding: Thuiswacht is een stand van RTG Veilig geworden'],
+  ['/apps/vitaal.html', 'omleiding: Vitaal is een stand van RTG Veilig geworden'],
+  ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
+  ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link'],
+  ["/apps/festival-gast.html", "landingspagina: uw eigen kant van het festival. U komt hier met de pas die u al heeft (de code staat groot in beeld aan de poort) of via de link van uw groep -- niet via de bank. Het ORGANISATIEscherm /apps/festival.html hangt wel gewoon, bij de zaakschermen in de leverancier-app."],
+  ["/apps/reisuitnodiging.html", "landingspagina: je komt hier via de link die het reisbureau of een reisgenoot je stuurt. Hem aan de bank hangen zou hem juist verkeerd maken -- de pagina bestaat om een reis over te nemen die IEMAND ANDERS voor je klaarzette (REIZEN.md, kern/reisuitnodiging.js), en zonder die link valt er niets te openen"]
+]);
+
 function meet() {
   const { alleSchermen } = require('../schermen');
   const reg = require('./wereldregister');
@@ -120,4 +142,4 @@ function meet() {
   return { totaal: ALLE.length, start: bereikbaar.size, wezen: ALLE.filter((p) => !bereikbaar.has(p)) };
 }
 
-module.exports = { meet, zonderCommentaar };
+module.exports = { meet, zonderCommentaar, MAG_LOS };

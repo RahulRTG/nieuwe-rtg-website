@@ -64,6 +64,16 @@ app.post('/api/auth/login', async (req, res) => {
   const user = accounts.findByLogin(login);
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
     noteFailedTry(bucket);
+    /* HET SPOOR OP DE HOOFDINGANG. logInlog belooft "elke inlogpoging (gelukt of
+       mislukt, op elk kanaal)", maar deze route -- de ECHTE accountingang, waar
+       een aanval op echte accounts binnenkomt -- liet 102 van de 106 geslaagde
+       aanroepen ongelogd. Gemeten op de AUDIT-as, vastgehouden door
+       test/inlogspoor.test.js. De mislukte tak is de belangrijkste: zonder deze
+       regel is credential stuffing achteraf niet te zien. Ook een onbekend
+       login-adres komt hier langs, en juist het aftasten van adressen die niet
+       bestaan is het patroon dat het kantoor wil kunnen terugzien. Wat er in
+       gaat is `login`, nooit het wachtwoord. */
+    logInlog('account', false, login, req);
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket);
@@ -71,11 +81,23 @@ app.post('/api/auth/login', async (req, res) => {
      niet meer naar binnen. verifyToken weigert de sessie toch al, dus zonder
      deze regel zou iemand een token krijgen dat meteen daarna nergens voor
      deugt: verwarrend, en het verbergt de echte reden. */
-  if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
+  if (!accounts.isActief(user)) {
+    /* Het wachtwoord klopte, de deur bleef dicht. Dat is een mislukte poging en
+       hoort op het bord: iemand probeert binnen te komen op een account dat uit
+       dienst is gemeld, en dat is precies iets om terug te kunnen zien. */
+    logInlog('account', false, login, req);
+    return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
+  }
   // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen. De
   // eigenaar mag in alle drie de apps; zie de uitleg bij pasAppOk hierboven.
-  if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
+  if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) {
+    logInlog('account', false, login, req);
+    return res.status(403).json({ error: PAS_FOUT });
+  }
   const token = accounts.issueToken(user.id);
+  /* Hier is de inlog een feit: er is een token. Loggen VOOR de werkplek-lus,
+     zodat een geslaagde inlog ook een spoor nalaat als daar iets misgaat. */
+  logInlog('account', true, login, req);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   /* Een account voor alles: heeft dit lid een werkplek, dan komt die hier meteen
      mee. Geen tweede inlog en geen pincode -- je bent al wie je bent. Het

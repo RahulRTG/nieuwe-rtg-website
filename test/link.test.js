@@ -167,6 +167,51 @@ test('missers op de linkdeur sluiten ook de pindeur: de rem is van het huis', as
   assert.equal(sociaal.pinZoek('nooit-eerder', '00000000').status, 404, 'na het terugzetten weer open');
 });
 
+test('de rem telt ook de missers van een ANDER proces, en zijn eigen echo niet', () => {
+  /* LINK.md par. 3.7 belooft een HUISBREDE rem. Hij woonde in het geheugen en
+     telde per proces, en bij een vloot (server/vloot.js) is dat vier budgetten
+     naast elkaar: precies de fout die deze rem bij de contactpin al had, tellen
+     op een plek die de aanvaller kan vermenigvuldigen.
+
+     Nu deelt hij zijn missers over de realtime-bus. Hier staat een NEPBUS die
+     doet wat Redis doet -- ook de afzender krijgt zijn eigen bericht terug --
+     zodat allebei de kanten meetbaar zijn: een vreemde misser telt mee, en de
+     eigen echo telt NIET dubbel. */
+  const rem = require('../server/kern/link/rem');
+  const abonnees = [];
+  const verzonden = [];
+  const nepbus = {
+    publish: (kanaal, bericht) => { verzonden.push([kanaal, bericht]); abonnees.forEach(fn => fn(bericht)); },
+    subscribe: (kanaal, fn) => { if (kanaal === rem.KANAAL) abonnees.push(fn); }
+  };
+  rem.remReset();
+  rem.remBus(nepbus);
+  try {
+    // de eigen misser: een keer geteld, en gemeld op het kanaal
+    for (let i = 0; i < rem.MIS_PER_MINUUT - 1; i++) rem.misserGeteld();
+    assert.equal(verzonden.length, rem.MIS_PER_MINUUT - 1, 'elke misser gaat de leiding op');
+    assert.equal(rem.deurDicht(), false, 'de eigen echo telt niet dubbel; anders was hij hier al dicht');
+
+    // en een misser van een ANDER proces telt hier gewoon mee
+    abonnees.forEach(fn => fn({ van: 'een-ander-proces' }));
+    assert.equal(rem.deurDicht(), true, 'de laatste misser kwam van elders en telt toch');
+  } finally { rem.remReset(); }
+});
+
+test('een tweede bus op dezelfde rem wordt geweigerd', () => {
+  /* Twee leidingen op een teller is elke misser dubbel tellen, en dan bijt de
+     rem twee keer zo vroeg als wat er is opgeschreven. */
+  const rem = require('../server/kern/link/rem');
+  const nep = () => ({ publish() {}, subscribe() {} });
+  rem.remReset();
+  const een = nep();
+  rem.remBus(een);
+  try {
+    rem.remBus(een);                       // dezelfde: stil goed
+    assert.throws(() => rem.remBus(nep()), /al een bus/);
+  } finally { rem.remReset(); }
+});
+
 test('de dertig-per-uur van de contactpin geldt over de twee deuren samen', async () => {
   const { sociaal, link } = maak();
   // vijftien missers via de pindeur, vijftien via de linkdeur: samen dertig
@@ -331,6 +376,54 @@ test('en elke intentie die een GEZINSLID kan krijgen, heeft er een in de foundat
   // en het scherm haalt de twee gedeelde schermen ook echt binnen
   for (const script of ['/shared/linkkaart.js', '/shared/linkkoppelingen.js'])
     assert.ok(bron.includes(script), 'vrienden.html laadt ' + script + ' niet');
+});
+
+test('elke rol die een HANDELING mag aanvaarden, heeft ook een weg naar binnen', () => {
+  /* DE OMGEKEERDE RICHTING, EN DIE WAS ONGEDEKT. De toetsen hierboven lopen van
+     de intentie naar de route: bestaat hij, en staat de goede poort ervoor. Deze
+     loopt terug -- van het HANDELINGENREGISTER naar de intentie.
+
+     Waarom dat een eigen gat is: `capability.aanvaarden` draagt `magVereist`, en
+     dat betekent dat de regel alleen verschijnt als de laag zegt dat DEZE
+     scanner deze handeling mag aanvaarden. Dat "mag" komt uit de rollenlijst van
+     de handeling zelf. Zet iemand daar een rol bij zonder een weg in
+     intenties.js, dan zegt de laag ja tegen een scanner die nergens naartoe kan:
+     de kaart komt, de knop niet, en niemand ziet waarom. Dat is precies de
+     belofte zonder weg uit LAT.md regel 6, alleen van de andere kant.
+
+     Dit is ook de reden dat een GEZINSLID vandaag geen capability aanvaardt: een
+     gezinsprofiel heeft geen portemonnee, en beide bestaande handelingen gaan
+     over geld. Die uitsluiting is een besluit (LINK.md stap 4) -- en zodra
+     iemand hem opheft, moet de gezinsdeur er zijn voordat de rol erin mag. */
+  const aanvaard = intenties.CATALOGUS.find(c => c.id === 'capability.aanvaarden');
+  assert.ok(aanvaard && aanvaard.magVereist, 'de capability-intentie draagt magVereist, anders meet dit niets');
+  const wegen = new Set(Object.keys(aanvaard.wegen).map(k => k.split(':')[0]));
+
+  /* De echte handelingen van het huis, en niet een lijstje hier. Ze worden bij
+     het opstarten aangemeld (server/opzet/aanbouw2.js), en elk domein schrijft
+     zijn eigen definitie -- dus we lezen wie er zijn uit de aanmelding en wat ze
+     aanvaarden uit hun bron. Zo groeit deze toets vanzelf mee met een handeling
+     die er morgen bijkomt; een vaste lijst hier zou over gisteren gaan. */
+  const opzet = fs.readFileSync(path.join(WORTEL, 'server/opzet/aanbouw2.js'), 'utf8');
+  const bronnen = [...opzet.matchAll(/linkHandeling\(require\('([^']+)'\)/g)].map(m => m[1]);
+  assert.ok(bronnen.length >= 2, 'er horen meerdere handelingen aangemeld te zijn, anders meet deze toets niets');
+  const rollenVan = (rel) => {
+    const bron = fs.readFileSync(path.join(WORTEL, 'server/opzet', rel + '.js'), 'utf8');
+    const m = /\n\s*aanvaarder:\s*\[([^\]]*)\]/.exec(bron);
+    assert.ok(m, 'geen aanvaarder-lijst gevonden in ' + rel);
+    return [...m[1].matchAll(/'([a-z]+)'/g)].map(x => x[1]);
+  };
+  const alle = bronnen.map(rel => ({ id: rel, aanvaarder: rollenVan(rel) }));
+  for (const def of alle)
+    for (const rol of def.aanvaarder)
+      assert.ok(wegen.has(rol), 'handeling ' + def.id + ' laat "' + rol +
+        '" aanvaarden, maar capability.aanvaarden heeft geen weg voor die rol');
+
+  // en andersom geen weg voor een rol die geen enkele handeling aanvaardt
+  const rollenMetHandeling = new Set(alle.flatMap(d => d.aanvaarder));
+  for (const rol of wegen)
+    assert.ok(rollenMetHandeling.has(rol), 'capability.aanvaarden biedt "' + rol +
+      '" een weg, maar geen enkele handeling laat die rol aanvaarden');
 });
 
 test('een zaak scant geen mens, en een lid int geen betaalcode', async () => {

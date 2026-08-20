@@ -118,6 +118,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   /* En de tweede: de kassacode, die al bestond en nu een capability IS in plaats
      van een leesbare code in een QR. De eerste die een ZAAK aanvaardt. */
   kern.linkHandeling(require('../kern/pay/kassacode')({ pay: kern.pay, schoon: kern.schoon }));
+  /* En de inner die daarbij hoort: vier kassa-ingangen, een manier waarop een
+     betaalcode binnenkomt. Hij hangt HIER omdat hij de linklaag nodig heeft, en
+     hij leest die pas bij de aanroep -- vandaar dat hij `kern` als geheel
+     meekrijgt (zie de kop van kern/pay/kasinnen.js). */
+  kern.kasInnen = require('../kern/pay/kasinnen')(kern);
   require('../routes/link')(grens('link'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));

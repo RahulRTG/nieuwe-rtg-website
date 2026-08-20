@@ -186,8 +186,24 @@ gratis accounts. Die rem hoort bij de LAAG, niet bij de contactpin.
 > Elke nieuwe ingang die een code oplost, gebruikt dezelfde rem. Wie er een eigen
 > teller naast zet, heeft de rem uitgezet zonder het op te schrijven.
 
-De bekende beperking blijft: hij woont in het geheugen en telt per proces (zie
-`server/pinslot.js`), en hoort bij de stap naar gedeelde opslag.
+**Sinds 20 augustus 2026 telt hij over processen heen.** Hij woonde in het
+geheugen en telde per proces, en bij een vloot (`server/vloot.js`) is dat vier
+budgetten naast elkaar — precies de fout die deze rem bij de contactpin al had:
+tellen op een plek die de aanvaller kan vermenigvuldigen. Hij deelt zijn missers
+nu over de realtime-bus (`server/bus.js`), de enige gedeelde leiding die dit huis
+heeft. Zonder `REDIS_URL` is die in-proces en verandert er niets; met `REDIS_URL`
+telt elk proces ook de missers van de andere.
+
+Drie dingen liggen daarbij vast, en alle drie getoetst: lokaal tellen gebeurt
+**altijd**, ook zonder bus of met een stukke bus (een rem die uitvalt als een
+leiding hapert, is weg precies wanneer je hem nodig hebt); de eigen echo telt
+niet dubbel; en een tweede bus op dezelfde rem wordt geweigerd.
+
+Het blijft bij benadering, en dat mag: dit is een budget over een minuut, geen
+harde teller. Een atomaire teller (Redis `INCR`) zou nauwkeuriger zijn en een
+tweede verbinding en een tweede faalwijze kosten, voor een precisie die dit
+budget niet vraagt. De andere remmen in dit huis (`server/pinslot.js`,
+`loginFails`) tellen nog wél per proces; dat blijft de gedeelde-opslag-stap.
 
 ### 3.8 Nabijheid is een signaal, geen bewijs
 
@@ -223,10 +239,27 @@ paden verhuizen er per stuk naartoe.
    langs het nieuwe loket te omzeilen was. `test/link.test.js` legt de twee deuren
    naast elkaar en zakt zodra ze uit elkaar lopen.
 
-   Nog niet: de gezinskant (die draait op een profieltoken en niet op de
-   Bearer-sessie waar deze deur op staat) en de intenties voor `pas`, `zegel` en
-   `deur` — die codesoorten worden herkend en zeggen eerlijk dat deze laag er nog
-   niets mee doet.
+   Nog niet: de gezinskant, die op een profieltoken draait en niet op de
+   Bearer-sessie waar deze deur op staat. (Die kwam er later dezelfde dag bij;
+   zie stap 4.)
+
+   **`pas`, `zegel` en `deur` krijgen geen intentie, en dat is een besluit.**
+   Hier stond dat de laag er "nog niets mee doet", en dat las als onaf werk. Op
+   20 augustus 2026 nagelopen wat ze werkelijk zijn: `deur` wordt door niemand
+   uitgegeven en door niemand gelezen. `pas` wordt wel getoond (de portemonnee
+   heeft er een levende QR van), maar de enige lezer is een technische
+   controleur die "geldig, soort: pas" afdrukt — en wat een zaak écht wil weten
+   (geldig lid? achttien?) doet het RTG Zegel, met selectieve claims en zonder
+   naam. Een intentie op `pas` zou daar een tweede, zwakkere identiteitscontrole
+   naast zetten. En `zegel` als codesoort geeft niemand uit: het echte Zegel is
+   een andere tokenfamilie (`server/lib/zegel.js`), met opzet offline te
+   controleren tegen de publieke sleutel. Die door deze deur halen plakt er een
+   serverreis aan vast, en een parser die tekst zónder voorvoegsel gaat gokken
+   is geen parser meer.
+
+   Dat het Zegel een eigen verificatie heeft, maakt hem geen tweede scanner: het
+   scherm dat hem leest gebruikt dezelfde huisoverlay (`shared/scanknop.js`).
+   Eén leesinstrument, twee tokenfamilies.
 2. **Capabilities.** ✅ *gebouwd op 20 augustus 2026.* `kern/link/cap.js` (de
    machinerie) en `kern/link/handelingen.js` (het register). Een capability
    draagt een gebonden opdracht: handeling, bron, vervaltijd, eenmalig. De deur
@@ -266,10 +299,27 @@ paden verhuizen er per stuk naartoe.
    Wat de verhuizing **niet** deed, en dat hoort er eerlijk bij: de code van zes
    tekens staat nog gewoon op het scherm (voor een kassa zonder camera lees je
    hem voor) en de contactloze afgifte draagt hem ook nog — dat is een handeling
-   van dichtbij, geen beeld dat je van een afstand fotografeert. En er is nog
-   **geen kassascherm** dat deze weg gebruikt: het loket staat open en is
-   getoetst, maar in `public/apps/` bestaat vandaag geen enkele knop die
-   `/api/supplier/pay/in` of de nieuwe deur aanroept. Die kant komt met stap 4.
+   van dichtbij, geen beeld dat je van een afstand fotografeert.
+
+   **En hij was maar half af, tot 20 augustus 2026.** Er zijn VIER kassa-ingangen,
+   en alleen `/api/supplier/pos/sale` was verhuisd. Uitchecken van een kamer of
+   tafel (`/api/supplier/pos/checkout`) en de winkelvloer
+   (`/api/supplier/retail/verkoop`) gingen rechtstreeks naar `pay.kasInt` en
+   kenden dus alleen de code van zes tekens: wie zijn QR ophield kon bij dezelfde
+   kassa aan de ene knop wel afrekenen en aan de andere niet. Dat is geen besluit,
+   dat is vergeten.
+
+   Ze lopen nu alle vier langs `kern/pay/kasinnen.js` — één plek die weet welke
+   dragers er zijn, in plaats van hetzelfde blok vier keer overgeschreven. En aan
+   de klantkant langs `payCodeMetKaart` (`leverancier-61.js`), zodat het
+   bedoelingsscherm bij alle vier vóór de bon komt: een belofte die op één van de
+   vier plekken geldt, is geen belofte.
+
+   Daarbij ging nog een vierde eigen uitvoering weg. De winkelvloer had zijn eigen
+   `window.prompt` met een onvoorwaardelijke `toUpperCase()` — en droeg daarmee de
+   fout die elders al gerepareerd was: een ondertekende RTG-code is
+   hoofdlettergevoelig, dus kapitalen slopen hem. Hij deed het alleen niet, omdat
+   die route nog geen token aannam.
 3. **Het bedoelingsscherm.** ✅ *gebouwd op 20 augustus 2026.*
    `public/shared/linkkaart.js` met zijn vormtaal in `shared/rtg-ontwerp.css`
    (`.rtg-bedoeling`), dus onder de poorten van ONTWERP.md. Eén component voor
@@ -319,13 +369,19 @@ paden verhuizen er per stuk naartoe.
    dezelfde laag (dezelfde rem, hetzelfde `pinKijk`). Een tweede weg naar
    hetzelfde antwoord is dat niet; een tweede *uitvoering* zou het wel zijn.
 
-   Eén ding blijft daar wél openstaan, en het is dezelfde soort kopie die aan de
-   gezinskant is opgeruimd (zie verderop): het camerablad van dat scherm is een
-   eigen `RTGScanner` en niet de huisoverlay `shared/scanknop.js`. Het is er geen
-   doodlopende weg — de scanknop van de app zelf draagt de handinvoer wél, dus
-   wie een code geplakt krijgt, kan altijd nog daarheen. Maar het is één
-   leesinstrument te veel, en het verandert de vorm van dat scherm om het weg te
-   halen. Dat is een besluit van de eigenaar, geen opruimklus onderweg.
+   Eén ding stond daar wél nog open, en het is dezelfde soort kopie die aan de
+   gezinskant is opgeruimd: het camerablad van dat scherm was een eigen
+   `RTGScanner` in plaats van de huisoverlay. **Op 20 augustus 2026 is dat de
+   laatste geworden die weg is.** Het was er geen doodlopende weg — de scanknop
+   van de app zelf droeg de handinvoer wél — maar het was één leesinstrument te
+   veel, en zonder werkende camera kwam je op dít scherm nergens.
+
+   De vorm van het scherm blijft: je eigen pin, je QR, je live code en de treffer
+   in één blok. Wat eraf ging is de `<video>` en de aan/uit-knop; wat erbij kwam
+   is de handinvoer en de uitleg waarom de camera niet start. Eén ding is er
+   bewust bij bedacht: een gescande code die géén RTG-pin is, houdt de overlay
+   nu OPEN. Eerst viel het venster dicht op een verkeerde QR en moest een mens
+   opnieuw beginnen (`test/contactpin.e2e.js`).
 
    **De gezinskant kwam er op 20 augustus 2026 bij** (`routes/social/gezinnen/link.js`).
    Een eigen deur, want een gezinslid heeft een andere geloofsbrief: een
@@ -387,6 +443,18 @@ paden verhuizen er per stuk naartoe.
    De weg is getoetst in een echte browser (`test/linkscan.e2e.js`): scannen met
    de handinvoer van de scanoverlay, de kaart lezen, bevestigen, en dan pas is er
    geld bewogen of een verzoek verstuurd.
+
+   **En de omgekeerde richting kreeg een poort** (`test/link.test.js`, 20 augustus
+   2026). De bestaande toetsen liepen van de intentie naar de route: bestaat hij,
+   en staat de goede poort ervoor. Terug was ongedekt. `capability.aanvaarden`
+   draagt `magVereist`, dus de regel verschijnt alleen als de LAAG zegt dat deze
+   scanner deze handeling mag aanvaarden — en dat "mag" komt uit de rollenlijst
+   van de handeling zelf. Zet iemand daar een rol bij zonder weg in
+   `intenties.js`, dan zegt de laag ja tegen een scanner die nergens naartoe kan:
+   kaart wel, knop niet, en niemand ziet waarom. Beide richtingen bijten nu, en
+   de toets leest de handelingen uit hun aanmelding in plaats van uit een lijstje
+   — zo groeit hij mee met wat er morgen bijkomt.
+
 5. **Twee echte intenties.** ✅ *gehaald onderweg.* Verbinden (kost niets) en
    betalen (vraagt alles) lopen allebei over de laag, aan beide uiteinden
    getoetst — inclusief de poorten van RTG Pay, die ook via deze deur gelden.
@@ -443,3 +511,31 @@ Drie woorden, en niet meer:
   rechtenmodel bij.
 - **Geen profiel achter de code.** De code wijst een mens aan; hij vertelt niets
   over hem.
+
+---
+
+## 7. Wat er nu nog open staat
+
+Bijgewerkt op 20 augustus 2026, na de ronde die de acht punten hierboven
+afwerkte. Wat hier staat is nagelopen in de code, niet uit het hoofd.
+
+- **Vier remmen tellen nog per proces.** Die van RTG Link niet meer (par. 3.7),
+  maar `server/pinslot.js` en `loginFails` wel. Bij één proces is er niets aan de
+  hand; bij een vloot zijn het net zoveel budgetten als processen. De weg is
+  dezelfde als hier gelopen: de realtime-bus, of een echte gedeelde teller.
+- **Drie voorraden, alle drie op de ratel.** 1192 endpoints zonder toets, 155
+  toetsen waar de mutatiemotor nog niet langs is, en 92 beweringen die op een
+  lege verzameling vanzelf slagen. Ze mogen niet groeien (`NORM.json`), maar ze
+  zijn niet afgebouwd. Van die laatste staan er **twaalf op HOOG** — de vorm "na
+  het weghalen is hij weg" of "de buurman ziet niets", de twee die echt een fout
+  kunnen verbergen. Die zijn niet nagelopen.
+- **De ratel staat op zes meters rood**, en dat komt van vóór deze ronde:
+  `keuringOmvang`, `kernBreedte`, `kernGedeeld`, `inlineStijlAttributen`,
+  `toetsenNietGemeten` en `toetsenOngevoeligPct` staan boven hun norm omdat
+  `npm run norm:vast` een aantal commits niet is gedraaid. De ratel doet precies
+  wat hij moet doen; er heeft alleen niemand naar gekeken. Herstellen of de norm
+  met reden verlagen is een besluit van de eigenaar, geen opruimklus onderweg.
+- **Het Zegel deelt de scanner maar niet de laag.** Dat is met opzet (par. 4,
+  stap 1) en geen open punt — maar het betekent wel dat "één scanner" vandaag
+  twee verificatiewegen achter zich heeft: de linkdeur voor RTG-codes, en de
+  offline sleutelcontrole voor een Zegel.

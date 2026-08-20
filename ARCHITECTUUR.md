@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4000 |
-| servermodules (`server/**/*.js`) | 2214 |
+| servermodules (`server/**/*.js`) | 2215 |
 | routebestanden (`server/routes/**`) | 458 |
-| kernmodules (`server/kern/**`) | 1353 |
+| kernmodules (`server/kern/**`) | 1354 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 225 |
 | toetsbestanden (`test/*.test.js`) | 912 |
@@ -98,7 +98,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 194 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 193 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1423 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 194 |
-| daarvan door precies één domein | 1229 |
+| kern-namen die routes aanraken | 1424 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 193 |
+| daarvan door precies één domein | 1231 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

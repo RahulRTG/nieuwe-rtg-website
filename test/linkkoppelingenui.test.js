@@ -83,11 +83,23 @@ test('een afgekapte staart wordt geteld en niet stilgezwegen', () => {
   assert.match(h, /7 oudere regels zijn niet bewaard/);
 });
 
-test('tekst uit het antwoord wordt ontsmet', () => {
+test('tekst uit het antwoord wordt ontsmet -- ook in een ATTRIBUUT', () => {
   const stout = { bonnen: [{ at: NU, intentie: 'contact.verbinden', naarNaam: '<img src=x onerror=alert(1)>' }] };
   const h = K.markeer(K.opbouw(stout));
   assert.ok(!h.includes('<img'), 'geen ruwe HTML uit een antwoord');
   assert.match(h, /&lt;img/);
+
+  /* DE TWEEDE SINK, EN DIE WAS ONGETOETST. Een openstaande code zet zijn id in
+     een attribuut: data-trek="<id>". Wat er tussen die aanhalingstekens komt,
+     komt van de server, dus wie daar een " in krijgt hangt er zijn eigen
+     attributen achter -- geen < of > nodig.
+
+     Deze toets stond er wel, maar keek alleen naar <. Het aanhalingsteken uit
+     de ontsmetter halen liet hem gewoon groen: gevoelig voor OF er ontsmet
+     wordt, niet voor WAT. Nu allebei. */
+  const attr = K.markeer(K.opbouw({ open: [{ id: 'x" onmouseover="alert(1)', wat: 'Vraagcode', tot: NU }] }));
+  assert.ok(!/data-trek="[^"]*"\s+onmouseover/.test(attr), 'een " uit het antwoord breekt niet uit het attribuut');
+  assert.match(attr, /data-trek="x&quot;/, 'hij staat er ontsmet in, en niet weggelaten');
 });
 
 test('de vormtaal komt uit de tokenlaag: register, rail en tijden', () => {

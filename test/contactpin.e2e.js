@@ -162,6 +162,46 @@ test('een pin invullen laat eerst zien wie het is; pas de tweede knop verstuurt'
   });
 });
 
+test('de scanknop opent de HUISOVERLAY, met de handinvoer als uitweg',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* Dit scherm had een eigen camerablad -- een <video> in het vriendenblok met
+     een RTGScanner eromheen -- en dus geen handinvoer. Dat was de laatste tweede
+     uitvoering van iets dat het huis al heeft (shared/scanknop.js), en de reden
+     dat het ertoe doet is geen netheid maar een uitweg: zonder werkende camera
+     kwam je hier nergens.
+
+     In een toets is dat meteen de enige begaanbare weg -- er is geen camera --
+     dus wat hier gebeurt is precies wat een mens doet van wie de camera het niet
+     doet: het venster openen, "of typ de code" kiezen, en plakken. */
+  await metTweeLeden(async ({ base, ctx, B }) => {
+    const page = await salonPaneel(ctx, base);
+    const zijnPin = (await api(base, '/api/member/pin', {}, B.token)).toon;
+    const zijnNaam = (await api(base, '/api/member/connections', {}, B.token)).codename;
+
+    await page.click('#scPinScan');
+    await page.waitForSelector('.rtg-scan-ov', { timeout: 30000 });
+    await page.click('.rtg-scan-ov [data-hand]');
+
+    // een code die niet van ons is: de overlay BLIJFT staan, zodat je opnieuw kunt
+    await page.fill('.rtg-scan-hand input', 'https://voorbeeld.test/iets');
+    await page.click('.rtg-scan-hand button[type=submit]');
+    await page.waitForTimeout(600);
+    assert.ok(await page.$('.rtg-scan-ov'), 'een vreemde QR gooit het venster niet dicht');
+
+    // en dan de echte pin
+    await page.fill('.rtg-scan-hand input', 'rtg:pin:' + zijnPin);
+    await page.click('.rtg-scan-hand button[type=submit]');
+    await page.waitForSelector('#scPinRes .sc-hit', { timeout: 30000 });
+    assert.match(await page.textContent('#scPinRes'), new RegExp(zijnNaam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+      'de gescande pin komt op dezelfde trefferregel uit als een getypte');
+
+    // en ook hier: scannen is geen versturen
+    const stil = await api(base, '/api/member/connections', {}, B.token);
+    assert.equal((stil.requests || []).length, 0, 'een scan stuurt nog niets');
+    await page.close();
+  });
+});
+
 test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvindbaar',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metTweeLeden(async ({ base, ctx, A, B }) => {

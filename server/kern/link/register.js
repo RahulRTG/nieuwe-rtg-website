@@ -50,7 +50,32 @@ const VAN_SOORT = {
   entree: 'zaak',
   kas: 'betaalcode',
   cap: 'capability',         // een gebonden handeling (kern/link/cap.js)
-  pas: null, zegel: null, deur: null   // bestaan, maar hebben hier nog geen onderwerp
+  /* DRIE GERESERVEERDE NAMEN, EN DAT BLIJFT ZO. Ze staan in de SOORTEN-lijst van
+     kern/dyncode.js en in de MAG-tabel van routes/code.js, dus het huis KAN ze
+     ondertekenen -- maar ze wijzen hier geen onderwerp aan, en dat is een
+     besluit en geen onaf werk. Per stuk, nagelopen op 20 augustus 2026:
+
+       deur   niets geeft hem uit en niets leest hem. Een naam zonder ding.
+       pas    de portemonnee toont hem wel als levende QR (apps/geld/rtgcode.js),
+              maar de enige lezer is een technische controleur die "geldig,
+              soort: pas" afdrukt. Wat een zaak echt wil weten -- is dit een
+              geldig lid, is deze mens 18 -- doet het RTG Zegel, met selectieve
+              claims en zonder naam. Hier een intentie op zetten bouwt een
+              TWEEDE, zwakkere identiteitscontrole naast een betere.
+       zegel  de dyncode-soort geeft niemand uit; het echte Zegel is een andere
+              tokenfamilie (server/lib/zegel.js: payload.handtekening, zonder
+              voorvoegsel) die met opzet OFFLINE tegen de publieke sleutel te
+              controleren is. Hem door deze deur halen zou daar een serverreis
+              aan vastplakken, en een parser die tekst zonder voorvoegsel gaat
+              gokken is geen parser meer.
+
+     Het Zegel is trouwens geen tweede scanner: het scherm dat hem leest gebruikt
+     dezelfde huisoverlay (shared/scanknop.js). Een leesinstrument, twee
+     tokenfamilies -- dat is wat LINK.md par. 2 vraagt.
+
+     Wat een scanner hier krijgt is dus geen stilte maar een eerlijk antwoord:
+     "dit is van ons, en deze laag doet er niets mee" (test/link.test.js). */
+  pas: null, zegel: null, deur: null
 };
 
 module.exports = ({ dyncodeGeef }) => {

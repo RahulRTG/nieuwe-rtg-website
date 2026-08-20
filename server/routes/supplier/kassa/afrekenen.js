@@ -18,10 +18,15 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   // eerst het geld (bij RTG Pay via de betaalcode), dan pas de lasten sluiten
   let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
-    const p = await pay.kasInt({
-      supplierCode: req.supplier.code, code: req.body.payCode,
-      centen: Math.round(total * 100), oms: 'Check-out ' + room + ', ' + req.supplier.name,
-      idem: req.body.idem
+    /* TWEE DRAGERS, EEN INNING (kern/pay/kasinnen.js). Hier stond `pay.kasInt`
+       rechtstreeks, en daarmee nam deze ingang alleen de code van zes tekens:
+       wie zijn QR ophield -- sinds RTG Link een ondertekende verwijzing -- kon
+       hier niet afrekenen, terwijl hij dat bij dezelfde kassa een knop verderop
+       wel kon. Dat is geen besluit maar een halve verhuizing. */
+    const p = await kern.kasInnen({
+      supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      code: req.body.payCode, centen: Math.round(total * 100),
+      oms: 'Check-out ' + room + ', ' + req.supplier.name, idem: req.body.idem
     });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;

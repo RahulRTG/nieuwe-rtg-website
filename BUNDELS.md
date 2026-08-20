@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 400 delen, 0 zonder onderwerp.**
+**51 bundels, 401 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 86 delen, 8957 regels in de delen
+`public/apps/app-main/` -- 86 delen, 8962 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -188,7 +188,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 105 delen, 9048 regels in de delen
+`public/apps/leverancier/` -- 106 delen, 9096 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -273,6 +273,7 @@ omlaag.
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
 | `leverancier-61.js` | een gerecht aan de menukaart toevoegen |
+| `leverancier-61b.js` | HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw |
 | `leverancier-62.js` | de shift-samenvatting: het avondbriefingmoment |
 | `leverancier-63.js` | afrekenen, of op de kamer laten schrijven |
 | `leverancier-64.js` | de bon van de kassa naar een bestelling |

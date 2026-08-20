@@ -2,7 +2,7 @@
    De merk-backoffice (manager) en de winkelvloer (elke medewerker) delen dezelfde
    supplierAuth. */
 module.exports = (kern) => {
-  const { app, express, db, supplierAuth, managerOnly, logActivity, sseToOffice, pay, facturatie,
+  const { app, express, db, supplierAuth, managerOnly, logActivity, sseToOffice, facturatie,
     retailState, RETAIL_MATEN, RETAIL_SEIZOENEN, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
     voorraadZoek, klantProfiel, zetKlantMaten, voegKlantnotitie, legApart, paskamerBreng, stuurStyling,
     retailVerkoop, retailVerkoopTerug } = kern;
@@ -94,9 +94,12 @@ app.post('/api/supplier/retail/verkoop', supplierAuth, async (req, res) => {
   // RTG Pay: het totaal staat pas na de verkoop vast (serverprijzen), dus
   // eerst boeken, dan innen; ketst de code af, dan draait de verkoop terug.
   if (r.sale.method === 'rtgpay') {
-    const p = await pay.kasInt({
-      supplierCode: req.supplier.code, code: req.body.payCode,
-      centen: Math.round(r.sale.total * 100), oms: req.supplier.name,
+    /* TWEE DRAGERS, EEN INNING (kern/pay/kasinnen.js) -- zie de kassa. De
+       winkelvloer nam alleen de code van zes tekens, en dat was geen besluit
+       maar de helft van een verhuizing. */
+    const p = await kern.kasInnen({
+      supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      code: req.body.payCode, centen: Math.round(r.sale.total * 100),
       idem: r.sale.id
     });
     if (p.error) { retailVerkoopTerug(req.supplier, r.sale); return res.status(p.status || 400).json({ error: p.error }); }

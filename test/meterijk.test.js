@@ -473,6 +473,19 @@ const IJKINGEN = {
       return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
+  beweringenZonderVulcontrole: {
+    /* De derde voorraad (scripts/tandeloos.js). De meting zelf staat daar; deze
+       proef vraagt of de meter hem ECHT overneemt en niet ergens een eigen getal
+       vasthoudt. Een verzonnen telling gaat er als functie in -- dezelfde naad
+       als `leesMutaties` hierboven, en om dezelfde reden: er wordt niets op
+       schijf veranderd, dus er is ook niets terug te zetten of te verliezen. */
+    proef: (voor) => {
+      const echt = require('../scripts/tandeloos').meet({ stil: true });
+      if (!echt.bekeken) throw new Error('tandeloos.js keek naar nul beweringen; dan wijst deze ijking niets aan');
+      const na = norm.meet({ meetTandeloos: () => ({ ...echt, meldingen: echt.meldingen + 1 }) });
+      return na.beweringenZonderVulcontrole - voor.beweringenZonderVulcontrole;
+    }
+  },
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet

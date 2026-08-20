@@ -2582,12 +2582,8 @@
     },
     "linkkaart.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/linkkaart.js"
-      ],
-      "geprobeerd": 3,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 3 mutaties in public/shared/linkkaart.js. Een opbouwmodule: geen rekenend gedrag dat een bronoperator raakt. Met de hand nagetrokken op de foutklassen die hij wel bewaakt (de knop-zonder-weg-rem, en \"welke gegevens\" stilzwijgend leeg): driemaal raak"
     },
     "linkkassa.test.js": {
       "soort": "server",
@@ -2605,12 +2601,8 @@
     },
     "linkkoppelingenui.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "public/shared/linkkoppelingen.js"
-      ],
-      "geprobeerd": 1,
-      "posities": 8
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 1 mutatie in public/shared/linkkoppelingen.js. Idem: opbouwmodule. Met de hand nagetrokken op het ontsmetten -- ruw teruggeven en alleen het aanhalingsteken weglaten laten hem allebei zakken; dat tweede pas sinds de toets ook de attribuut-sink beproeft"
     },
     "linkscan.e2e.js": {
       "soort": "server",

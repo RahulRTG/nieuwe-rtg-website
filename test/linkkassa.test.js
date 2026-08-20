@@ -215,6 +215,48 @@ test('de echte kassa (POS) neemt beide dragers, en int ze langs dezelfde weg', a
   assert.equal(await saldo(lid.token), voor - 2500, 'en er is niets extra afgeschreven');
 });
 
+test('ALLE VIER de kassa-ingangen nemen beide dragers, langs dezelfde inner', async () => {
+  /* DIT WAS EEN HALVE VERHUIZING. Alleen /api/supplier/pos/sale nam een
+     ondertekende RTG-code; de andere drie ingangen gingen rechtstreeks naar
+     `pay.kasInt` en kenden dus alleen de code van zes tekens. Wie zijn QR
+     ophield kon bij dezelfde kassa aan de ene knop wel afrekenen en aan de
+     andere niet -- en dat is geen besluit, dat is vergeten.
+
+     Hier staat het uitchecken (kamer of tafel). De winkelvloer heeft zijn eigen
+     partner nodig en staat daarom in test/retail.test.js. Wat ze delen is
+     kern/pay/kasinnen.js: een plek die weet welke dragers er zijn. */
+  const voor = await saldo(lid.token);
+
+  // een open rekening op de kamer, en die met een TOKEN uitchecken
+  await api('/api/supplier/pos/sale',
+    { method: 'kamer', room: '101', total: 9.00, items: [{ name: 'Ontbijt', qty: 1, price: 9.00 }] }, zaak);
+  const cap = await maakCap(lid.token, 5000);
+  const uit = await json(await api('/api/supplier/pos/checkout',
+    { room: '101', method: 'rtgpay', payCode: cap.token }, zaak));
+  assert.ok(uit.sale, 'er is een bon: ' + JSON.stringify(uit).slice(0, 140));
+  assert.equal(uit.sale.betaler, lid.codenaam, 'de bon weet wie er betaalde');
+  assert.equal(await saldo(lid.token), voor - 900, 'en het geld is echt bewogen');
+
+  // en dezelfde ingang neemt de voorgelezen code onveranderd
+  await api('/api/supplier/pos/sale',
+    { method: 'kamer', room: '102', total: 4.00, items: [{ name: 'Koffie', qty: 1, price: 4.00 }] }, zaak);
+  const k = await json(await api('/api/pay/kascode', { maxCenten: 5000 }, lid.token));
+  const oud = await json(await api('/api/supplier/pos/checkout',
+    { room: '102', method: 'rtgpay', payCode: k.code, idem: 'co-oud-' + Date.now() }, zaak));
+  assert.ok(oud.sale, 'de getypte code doet het onveranderd');
+  assert.equal(await saldo(lid.token), voor - 1300);
+
+  // een token dat al op is, levert geen bon op EN laat de rekening open
+  await api('/api/supplier/pos/sale',
+    { method: 'kamer', room: '103', total: 3.00, items: [{ name: 'Thee', qty: 1, price: 3.00 }] }, zaak);
+  const nog = await api('/api/supplier/pos/checkout',
+    { room: '103', method: 'rtgpay', payCode: cap.token }, zaak);
+  assert.equal(nog.status, 404);
+  assert.equal(await saldo(lid.token), voor - 1300, 'er is niets extra afgeschreven');
+  const weer = await api('/api/supplier/pos/checkout', { room: '103', method: 'contant' }, zaak);
+  assert.equal(weer.status, 200, 'en de rekening stond nog open, dus hij is niet stilletjes gesloten');
+});
+
 test('beide kanten houden hun bon, ook de zaak', async () => {
   const cap = await maakCap(lid.token, 4000);
   await api('/api/supplier/link/cap/aanvaard', { capcode: cap.token, centen: 1500 }, zaak);

@@ -3297,7 +3297,6 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
-    ['public/apps/app-main/app-main-09a.js#scPinCam', ['werktuig', 'de sociale balk leest een contactpin of een levende code van het scherm van een ander; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],

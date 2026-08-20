@@ -456,9 +456,9 @@
       "bankPartnerRailZet",
       "bankSalarisRekeningen",
       "bankVergunningZet",
+      "betaal",
       "betaalRegie",
       "bevoegd",
-      "betaal",
       "boardroomAuth",
       "boardroomLijst",
       "geldBetaaldienst",
@@ -471,8 +471,8 @@
       "hardware",
       "ideeen",
       "magnaatLeren",
-      "mall",
       "mail",
+      "mall",
       "naam",
       "pay",
       "payrollOS",
@@ -1356,6 +1356,11 @@
       "rtmailBewaar",
       "rtmailRecht"
     ],
+    "rtmail-lid": [
+      "agenda",
+      "facturatie",
+      "leren"
+    ],
     "rtmail-schrijf": [
       "mailSleutel",
       "rtmailRegels",
@@ -1394,6 +1399,7 @@
       "dagOpdracht",
       "deblokkeer",
       "dmSleutel",
+      "gezinsPoort",
       "isGeblokkeerd",
       "isKindVanGezin",
       "kindContacten",
@@ -1418,6 +1424,7 @@
       "mediaStuk",
       "meldMisbruik",
       "naamlaag",
+      "nietBeschermd",
       "onboarding",
       "ouderVerbind",
       "pinKaart",
@@ -1728,6 +1735,7 @@
       "isVastgoed",
       "isVerhuur",
       "kamerplanning",
+      "kasInnen",
       "kassaRetourGrens",
       "ketenchat",
       "keuken",
@@ -1973,6 +1981,35 @@
       "overheid",
       "uitgifte"
     ],
+    "vakbewijs": [
+      "accounts",
+      "app",
+      "auth",
+      "db",
+      "findSupplier",
+      "logActivity",
+      "notify",
+      "officeAuth",
+      "persoonseis",
+      "sendPushToUser",
+      "sleutelLid",
+      "supplierAuth",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijsZet",
+      "vakbewijzenVan",
+      "vakbewijzenVerlopend"
+    ],
+    "vakbewijs-kantoor": [
+      "persoonseis",
+      "sendPushToUser",
+      "stuur",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijzenVerlopend"
+    ],
     "veiligheid": [
       "alarmAfsluiten",
       "alarmSlaan",
@@ -2110,6 +2147,7 @@
       "werkplek"
     ],
     "werkplek-bureaus": [],
+    "werkplek-bureaus-b": [],
     "werkvloer": [
       "checklijst",
       "koppel",
@@ -2153,26 +2191,6 @@
       "status",
       "wallet",
       "zorgpolis"
-    ],
-    "vakbewijs": [
-      "accounts",
-      "app",
-      "auth",
-      "db",
-      "findSupplier",
-      "logActivity",
-      "notify",
-      "officeAuth",
-      "persoonseis",
-      "sendPushToUser",
-      "sleutelLid",
-      "supplierAuth",
-      "vakbewijsIntrek",
-      "vakbewijsNummer",
-      "vakbewijsTeken",
-      "vakbewijsZet",
-      "vakbewijzenVan",
-      "vakbewijzenVerlopend"
     ]
   }
 }

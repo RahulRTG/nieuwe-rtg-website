@@ -65,6 +65,12 @@ module.exports = function maakDiensten(deps) {
      bereiken. Elke sseTo*-functie publiceert; elk proces levert de events af aan
      zijn eigen open verbindingen. */
   const bus = require('../bus').maakBus();
+  /* De huisbrede deurrem van RTG Link deelt zijn missers over dezelfde leiding
+     (kern/link/rem.js, LINK.md par. 3.7). Hier en niet in de linklaag zelf: de
+     bus wordt hier gemaakt, en de rem is een singleton die maar EEN keer mag
+     worden aangesloten. Zonder REDIS_URL verandert er niets -- dan is deze bus
+     in-proces en telt hij precies zoals hij altijd telde. */
+  require('../kern/link/rem').remBus(bus);
 
   /* De realtime-afleverlaag (open verbindingen + terugspeelbuffer + id-teller)
      zit in een maak…(state)-fabriek; de fabriek abonneert leverSse zelf op de bus

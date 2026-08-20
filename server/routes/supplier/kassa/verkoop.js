@@ -4,7 +4,7 @@
    routes/supplier/kassa.js. */
 module.exports = (kern) => {
   const { POS_METHODS, app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
-          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, pay, ordersVanZaak } = kern;
+          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
@@ -34,36 +34,14 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
   let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
-    /* TWEE DRAGERS, EEN INNING. De gast toont zijn betaalcode uit de app: dat is
-       ofwel de code van zes tekens (voorgelezen of getypt), ofwel de ondertekende
-       RTG-code die sinds RTG Link in de QR staat (LINK.md; kern/pay/kassacode.js).
-
-       Het INNEN is bij allebei kern/pay/kassa.js -- bij de capability loopt het
-       alleen langs de laag die eerst de kaart liet zien en de kassa liet
-       bevestigen. Wat hier verschilt is dus de weg naar binnen, niet wat er met
-       het geld gebeurt; er is en blijft een plek waar een kassacode wordt
-       verzilverd (LAT.md regel 4).
-
-       De idempotentiesleutel komt bij de capability van de laag zelf en is aan
-       die ene code gebonden -- vandaar dat req.body.idem daar niet meegaat. */
-    const centen = Math.round(total * 100);
-    const code = String(req.body.payCode || '');
-    let p;
-    if (code.slice(0, 5) === 'RTG1.' && typeof kern.linkCapAanvaard === 'function') {
-      const r = await kern.linkCapAanvaard({ soort: 'supplier', code: req.supplier.code }, code, null,
-        { centen, oms: req.supplier.name });
-      /* GEEN STIL `|| {}` HIER. Zonder uitkomst zou `betaler` leeg blijven en
-         legde de kassa een bon aan die als betaald geldt zonder dat er iemand
-         bij hoort -- en dat valt pas op in de boekhouding. Een laag die ja zegt
-         zonder uitkomst is stuk, en dat hoort te klinken (LAT.md regel 5). */
-      p = r.error ? r : (r.uitkomst || { status: 500, error: 'De betaling gaf geen uitkomst terug.' });
-    } else {
-      p = await pay.kasInt({
-        supplierCode: req.supplier.code, code: req.body.payCode,
-        centen, oms: req.supplier.name,
-        idem: req.body.idem
-      });
-    }
+    /* TWEE DRAGERS, EEN INNING: de code van zes tekens (voorgelezen of getypt) of
+       de ondertekende RTG-code die sinds RTG Link in de QR staat. Welke het is,
+       hoeft deze kassa niet te weten -- kern/pay/kasinnen.js kent ze allebei en
+       int ze allebei langs kern/pay/kassa.js. */
+    const p = await kern.kasInnen({
+      supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      code: req.body.payCode, centen: Math.round(total * 100), idem: req.body.idem
+    });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak

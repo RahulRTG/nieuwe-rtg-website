@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3997 |
-| servermodules (`server/**/*.js`) | 2202 |
-| routebestanden (`server/routes/**`) | 456 |
-| kernmodules (`server/kern/**`) | 1343 |
+| servermodules (`server/**/*.js`) | 2205 |
+| routebestanden (`server/routes/**`) | 457 |
+| kernmodules (`server/kern/**`) | 1345 |
 | schermen (`public/**/*.html`) | 260 |
 | gedeelde browsermodules (`public/shared/*.js`) | 223 |
-| toetsbestanden (`test/*.test.js`) | 906 |
+| toetsbestanden (`test/*.test.js`) | 907 |
 | schermtoetsen (`test/*.e2e.js`) | 128 |
 
 ## 2. De weg van een verzoek
@@ -103,7 +103,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
-| `member` | 641 | 57 | 10 | 398 |
+| `member` | 641 | 58 | 10 | 399 |
 | `supplier` | 562 | 102 | 10 | 295 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -144,7 +144,7 @@ accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
 boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) findSupplier(10)
 rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) logActivity(8)
 noteFailedTry(7) kern(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6) talen(6)
-loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
+loginFails(5) sseToSupplier(5) pay(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 onboarding(5)
 ```
 

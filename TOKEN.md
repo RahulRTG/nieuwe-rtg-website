@@ -23,6 +23,8 @@ een token hier mag zijn, wat hij nooit mag worden, en wat elke stap kost.
 | **Walletbrug** | `kern/bank/walletbrug.js` | Het enige pad dat twee grootboeken tegelijk raakt, met handmatige terugdraai. |
 | **Munt-ontvangst** | `server/muntbetaal.js` + `kern/munten.js` | Crypto **erin**: BTC/ETH/USDC/USDT, gelockte koers met vervaldatum, HMAC-webhook, `volledig`-vlag. Staat standaard uit (`MUNT_AAN=1`). |
 | **Feestmunten** | `kern/wallet.js` | Een tweede, kleinere token: saldo per zaak, `€3,50` per munt, nooit onder nul. |
+| **RTG-punten** | `kern/ervaring/leden/punten.js` | Verdiend (1 punt per € 10), en verzilverbaar naar **tegoed met een vaste koers**: 100 punten = € 10, automatisch verrekend bij de volgende betaling. |
+| **Cadeaukaarten** | `routes/member/boeken.js`, `routes/supplier/kassa/` | Een kaart met saldo bij één zaak, in de app of aan de kassa gekocht, inwisselbaar aan diezelfde kassa. |
 | **Bevoegdheid** | `kern/bevoegdheid/lijst.js` | Wat RTG zelf mag, per handeling, met de rang die het vraagt. |
 
 ## 2. De bevoegdhedenlijst is de scheidslijn
@@ -66,14 +68,27 @@ alles. Een bestemming zou dus op elk betaalpad in het hele huis gecontroleerd
 moeten worden — en half doen zet een belofte op het scherm die de boeking niet
 waarmaakt.
 
-### 3.2 Punten zonder geldwaarde
+### 3.2 Punten — en de correctie op wat hier eerst stond
 
-Verdiend in plaats van gekocht, niet inwisselbaar voor geld, geen euro-koers.
-Valt buiten elk financieel toezicht en is daarmee de goedkoopste nieuwe vorm.
-Twee huisregels raken hem wel: geen verslavende engagement-patronen
-(`CLAUDE.md`), en de progressielaag stopt bij 18+ (`kern/spellen/grens.js`) —
-een puntensaldo dat een prestatie buiten het potje bewaart, hoort achter
-`progressieMag`.
+Hier stond dat punten "verdiend in plaats van gekocht, niet inwisselbaar voor
+geld, geen euro-koers" zijn en daarmee buiten elk financieel toezicht vallen, en
+dat dit de goedkoopste nieuwe vorm zou zijn. **Dat klopte niet, op twee
+manieren.** Er bestaan hier al RTG-punten, en die zijn wél inwisselbaar tegen
+een vaste koers: 100 punten worden € 10 tegoed, dat bij de volgende betaling
+automatisch wordt verrekend (`kern/ervaring/leden/punten.js`). Het is dus geen
+nieuwe vorm en het staat niet buiten toezicht — het is dezelfde soort aanspraak
+als het walletsaldo, alleen was hij nergens vastgelegd.
+
+Wat wel waar blijft: **punten zelf zijn geen geld.** Zolang je ze verdient en ze
+nergens in omgezet kunnen worden, is er geen koers en geen aanspraak. De grens
+ligt bij het VERZILVEREN, en daar begint alles wat par. 3.1 over gesloten tegoed
+zegt.
+
+Twee huisregels raken een puntenlaag hoe dan ook: geen verslavende
+engagement-patronen (`CLAUDE.md`), en de progressielaag stopt bij 18+
+(`kern/spellen/grens.js`) — een puntensaldo dat een prestatie buiten het potje
+bewaart, hoort achter `progressieMag`. Het huidige puntensaldo doet dat niet:
+het bewaart een BESTEDING en geen prestatie, en valt daarmee buiten die grens.
 
 ### 3.3 Echte e-money (1 RTG = € 1, inwisselbaar)
 
@@ -158,9 +173,35 @@ boeking (plus of min) wordt uit de rekeningnaam afgeleid: `/api/supplier/pay/ove
 geeft alleen rijen die deze partnerrekening raken, dus precies één van de twee
 kanten is een `partner:` — zo hoeft het scherm zijn eigen code niet te kennen.
 
+**De punten waren al geld, en dat stond nergens**
+(`kern/ervaring/leden/punten.js`, afgesplitst van `spaarpot.js`). Verzilverde
+punten zijn een bedrag in euro's dat het lid van RTG tegoed heeft, tegen een
+vaste koers. Het stond in **euro's als drijvende komma**, kende **geen plafond**
+en de schakelaar van `/api/punten` hing aan **geen enkel vermogen** uit de
+bevoegdhedenlijst. Er stond ook geen enkele toets op. Alle drie zijn gerepareerd:
+centen, een plafond (€ 500), en `vermogen: 'WALLET_SALDO'` op de
+functie-schakelaar, zodat de handeling aan hetzelfde vastgelegde besluit hangt
+als de wallet. Een bestaande installatie wordt bij de eerste lezing één keer
+omgerekend.
+
+**Een cadeaukaart in de app kostte niets.** `/api/giftcard/buy` maakte een kaart
+met saldo aan, meldde de zaak "Cadeaukaart verkocht", en inde niets — terwijl
+die kaart aan de kassa van diezelfde zaak inwisselbaar is
+(`/api/supplier/giftcard/redeem`) en in `kern/fiscaal` als verplichting op zijn
+balans komt. Een lid kon dus gratis een kaart van € 5.000 maken en die uitgeven;
+de zaak bleef met de schuld zitten. Kopen loopt nu via een nieuw pad
+`pay.partnerIn` (`kern/pay/partner.js`): lid → zaak, met autolaad en met de
+betaaldienstkosten net als aan de kassa. De kassa-variant
+(`/api/supplier/giftcard/sell`) blijft ongemoeid — daar staat de klant aan de
+balie en rekent de kassa af.
+
+Dat laatste bracht nog een fout aan het licht die de toets vond en ik niet:
+de betaling was idempotent, de KAART niet. Een dubbeltik schreef één keer af en
+muntte twee kaarten. De sleutel staat nu op de kaart.
+
 Getoetst in `test/paytegoed.test.js`, `test/paytegoed.e2e.js`,
-`test/zaakpay.e2e.js` en `test/zorgwallet.test.js`, elke bewering met een
-mutatie die is zien zakken. Eén grendel staat er bewust
+`test/zaakpay.e2e.js`, `test/punten.test.js` en `test/zorgwallet.test.js`, elke
+bewering met een mutatie die is zien zakken. Eén grendel staat er bewust
 zonder toets bij: `vanSoort` op de bon, dat een zaakcode scheidt van een
 codenaam. Het geval waarvoor hij bestaat (een zaakcode die toevallig gelijk is
 aan een codenaam) is met de proefinlog niet na te bootsen, en dat staat in de
@@ -185,7 +226,8 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 | 1 | Walletplafond, feestmunt via Pay, tegoed voor een ander en vanuit een zaak (kopen, verzilveren, vervallen, terugnemen) | gebouwd |
 | 2 | Tegoed op het scherm van het lid (`apps/pay.html`) | gebouwd |
 | 2b | De zaakkant op een scherm (`apps/zaakpay.html`): saldo, innen, uitbetalen én tegoed | gebouwd |
-| 3 | Punten zonder geldwaarde, achter `progressieMag`, met de anti-engagement-regel als ontwerpkader | — |
+| 3 | De bestaande punten kloppend: centen, een plafond, een vermogen, en toetsen. Plus de cadeaukaart die niet betaald werd | gebouwd |
+| 3b | Het punten-tegoed door het pay-grootboek laten lopen, zodat er één saldo is in plaats van twee (par. 7) | — |
 | 4 | Het besluit over de bank-uitgang (par. 7) en, als dat valt, de vergunningsroute | — |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |
 
@@ -193,7 +235,7 @@ Geen fase begint voordat de vorige zijn toetsen heeft (LAT.md).
 
 ## 7. De besluiten die openstaan
 
-Vier dingen kan software niet voor Rahul beslissen. Ze staan hier zodat ze niet
+Vijf dingen kan software niet voor Rahul beslissen. Ze staan hier zodat ze niet
 als weglating in de code zitten.
 
 1. **De bank-uitgang raakt de grond onder `WALLET_SALDO`.** Het besluit zegt dat
@@ -216,7 +258,17 @@ als weglating in de code zitten.
    oudere gouden teksten op dat scherm (de kascode, de statuslabels, het
    woordmerk) nog niet. Dat is een ronde over dat hele scherm, en die hoort
    bewust genomen te worden in plaats van als bijvangst.
-4. **Het bedrag van het plafond.** € 10.000 per wallet is een verdedigbare
-   keuze, geen wettelijk getal. Wie hem verhoogt, verzwakt de grond onder het
-   besluit; wie hem verlaagt onder € 5.000 breekt het autolaadpad (zie de
-   toelichting in `kern/pay/stand.js`).
+4. **Het punten-tegoed is een TWEEDE saldo naast RTG Pay.** Twee bedragen die
+   allebei geld van hetzelfde lid voorstellen, is precies waar
+   `kern/geldwereld.js` voor waarschuwt: ze kunnen uit elkaar lopen en er is er
+   maar één die dubbel boekhoudt. Het hoort door het pay-grootboek te lopen —
+   verzilveren wordt dan een boeking naar de wallet en de korting verdwijnt. Dat
+   omleggen raakt vijf betaalpaden en verandert wat het lid ziet (een korting
+   wordt saldo), dus het is een productbesluit en geen opruiming. **Mijn
+   aanbeveling: doen**, maar als eigen ronde.
+5. **De bedragen van de twee plafonds.** € 10.000 per wallet en € 500 aan
+   punten-tegoed zijn verdedigbare keuzes, geen wettelijke getallen. Wie het
+   walletplafond verhoogt, verzwakt de grond onder het besluit; wie het verlaagt
+   onder € 5.000 breekt het autolaadpad (zie `kern/pay/stand.js`). Het
+   puntenplafond hoort bij een besteding van € 50.000 en is dus ruim; lager
+   zetten raakt echte leden eerder dan je denkt.

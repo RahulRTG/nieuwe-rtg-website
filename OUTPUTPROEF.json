@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T00:40:43.453Z",
-  "commit": "cab5b39",
+  "op": "2026-08-20T00:47:47.633Z",
+  "commit": "5d3ad59",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,8 +9,8 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 3982,
-  "onbeslist": 27,
+  "bewezen": 3994,
+  "onbeslist": 15,
   "blind": 178,
   "ongemeten": 8
  },
@@ -5154,22 +5154,20 @@
    "reden": "er is over DEZE route gelogen en genootschap.test.js zakte daarop"
   },
   "POST /api/genootschap/roep-bijeen": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "genootschap.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/genootschap/antwoord": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
-    "genootschap.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/genootschap/afgelast": {
    "staat": "bewezen",
@@ -10204,68 +10202,68 @@
    "reden": "er is over DEZE route gelogen en wereldroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/graaf": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/lijn": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/beleid": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/beleid/zet": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/command": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/actielog": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/voorstel/bevestig": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/sociaal/object": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/member/block": {
    "staat": "bewezen",
@@ -10460,12 +10458,12 @@
    "reden": "er is over DEZE route gelogen en auth-rol.test.js zakte daarop"
   },
   "POST /api/sociaal/rahul": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
-    "auth-rol.test.js",
     "objectlaagroutes.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en objectlaagroutes.test.js zakte daarop"
   },
   "POST /api/member/sport/bord": {
    "staat": "bewezen",
@@ -24596,11 +24594,12 @@
    "reden": "er is over DEZE route gelogen en rollenmatrix.test.js zakte daarop"
   },
   "POST /api/office/routedossier": {
-   "staat": "onbeslist",
+   "staat": "bewezen",
+   "bron": "outputproef (gericht)",
    "toetsen": [
     "routedossier.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 4); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "er is over DEZE route gelogen en routedossier.test.js zakte daarop"
   },
   "POST /api/office/routedekking": {
    "staat": "bewezen",
@@ -55056,6 +55055,66 @@
    "toets": "auth-rol.test.js",
    "merkt": true,
    "op": "2026-08-20T00:40:43.379Z"
+  },
+  "POST /api/office/routedossier": {
+   "toets": "routedossier.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:12.111Z"
+  },
+  "POST /api/genootschap/antwoord": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:12.435Z"
+  },
+  "POST /api/genootschap/roep-bijeen": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:12.525Z"
+  },
+  "POST /api/sociaal/graaf": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:13.343Z"
+  },
+  "POST /api/sociaal/beleid": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:24.615Z"
+  },
+  "POST /api/sociaal/beleid/zet": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:24.719Z"
+  },
+  "POST /api/sociaal/command": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:25.431Z"
+  },
+  "POST /api/sociaal/actielog": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:36.530Z"
+  },
+  "POST /api/sociaal/voorstel/bevestig": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:36.879Z"
+  },
+  "POST /api/sociaal/object": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:37.606Z"
+  },
+  "POST /api/sociaal/lijn": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:37.696Z"
+  },
+  "POST /api/sociaal/rahul": {
+   "toets": "objectlaagroutes.test.js",
+   "merkt": true,
+   "op": "2026-08-20T00:47:47.580Z"
   }
  },
  "basislijn": {
@@ -55078,7 +55137,6 @@
   "laatste-twee-endpoints.test.js": "groen",
   "mailpost.test.js": "groen",
   "papieren.test.js": "groen",
-  "routedossier.test.js": "rood",
   "salon-curatie.test.js": "groen",
   "speldag.test.js": "groen",
   "spelsudoku.test.js": "groen",
@@ -55308,7 +55366,6 @@
   "rtgid.test.js": "groen",
   "rtmail-bestuur.test.js": "groen",
   "alpine.test.js": "groen",
-  "objectlaagroutes.test.js": "rood",
   "bezorging.test.js": "groen",
   "staff-inzet-mob.test.js": "groen",
   "bezorgvolgen.test.js": "groen",
@@ -55513,6 +55570,8 @@
   "bureau.test.js": "groen",
   "foundation.test.js": "groen",
   "commandlagen.test.js": "groen",
-  "auth-rol.test.js": "groen"
+  "auth-rol.test.js": "groen",
+  "routedossier.test.js": "groen",
+  "objectlaagroutes.test.js": "groen"
  }
 }

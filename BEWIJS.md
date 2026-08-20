@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1034 bestanden en 6822 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1035 bestanden en 6827 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1034 |
-| losse beweringen (`test(...)`) | 6822 |
+| toetsbestanden | 1035 |
+| losse beweringen (`test(...)`) | 6827 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 862 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 19 |
-| niets van beide | 95 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-906 bestanden, 6591 beweringen.
+907 bestanden, 6596 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -315,6 +315,7 @@ toets omvalt.
 | `idempotentie.test.js` | 6 | gezakt op `===->!==#0` | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
 | `idemproef.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `identiteit-opvraag.test.js` | 6 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
+| `idor.test.js` | 5 | -- | HET IDOR-OORDEEL, NAGETROKKEN. Een 2xx is een BEVINDING (kan publiek zijn), een 401/403/404 is het bewijs van scheiding, en een 400 zegt niets over eigenaarschap. |
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |
 | `incidentcontrole-route.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

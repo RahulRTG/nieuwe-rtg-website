@@ -99,9 +99,14 @@ const POSTEN = [
     uit: (r) => reden(r.rolproef, 'objectpoort'),
     waarom: 'huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de ' +
       'identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is ' +
-      'de identiteit nooit aan de beurt geweest.',
-    sluit: 'een IDOR-proef: twee leden met DEZELFDE rol, en de een probeert het object van de ' +
-      'ander. Dat is precies de foutklasse die de rolproef expliciet buiten zijn grens legt.' },
+      'de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een ' +
+      'bedrijfscode in het lijf.',
+    sluit: 'de IDOR-proef (scripts/idorproef.js, IDOR.json) bestaat nu en beantwoordt de vraag ' +
+      'voor de MEMBER-laag: twee echte leden, A oogst objecten, B probeert ze te bedienen. ' +
+      'Uitkomst: 117 routes bewezen-gescheiden, 0 lekken (de member-routes halen de eigenaar ' +
+      'uit req.session en niet uit het lijf, wat de klasse uitsluit). De WERKPLEK-variant -- ' +
+      'twee werkruimtes met een bedrijfscode -- hergebruikt dat fundament maar vraagt de ' +
+      'werkplek-auth (beheer-/lid-token per werkruimte); dat is de resterende stap voor deze 78.' },
 
   /* De deuren van het huis: elke lie-run spaart ze (RTG_LIEG_NIET), want een
      toets die niet meer kan inloggen zakt overal tegelijk en dan meet je de

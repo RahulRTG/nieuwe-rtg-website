@@ -693,8 +693,58 @@ algoritme.
 En er staat niets omheen: geen teller, geen "nog twee dagen", geen "plan nu".
 De zin noemt het dagdeel en houdt op (par. 4.1).
 
-**Fase 4 — de ontmoeting.** Meet Halfway met contextbewuste plekken in Vonk;
-Arrange It met De Rechterhand in Rendez-vous.
+**Fase 4 — gedaan: de ontmoeting**, in allebei, en juist hier gaan de twee apps
+zichtbaar uit elkaar.
+
+**Vonk — Meet Halfway** (`kern/vonk/halfweg.js` + `kiezen.js`). Rond hetzelfde
+midden staan nu drie plekken klaar in plaats van één, elk van een andere soort
+(koffie, een borrel, diner), gesorteerd op *gelijk* reizen — het verschil tussen
+de twee reistijden weegt zwaarder dan de som, want een plek om de hoek bij de een
+en een uur rijden voor de ander is geen halverwege. Beiden kiezen **blind**;
+dezelfde keuze is rond en de tafel verhuist erheen. De automatische tafel blijft
+de bodem: kiest niemand, dan staat er nog steeds iets.
+
+Er wordt bewust niet aangevuld tot drie met nóg een restaurant. Bij twee soorten
+in de buurt hoort een lid twee opties te zien, niet een derde die hetzelfde is.
+
+**En hier draait een default om.** Een lid kan eisen stellen aan de plek:
+rolstoeltoegankelijk, prikkelarm, halal, kosher, vegan, zonder alcohol. Die
+gelden voor allebei — wat de een nodig heeft, geldt voor de plek waar ze samen
+komen. En:
+
+> **Een zaak die niets heeft verklaard, voldoet niet.**
+
+Dat is het omgekeerde van de voorkeurstaal, waar een leeg veld juist geen
+tegenstelling is (par. 3.1). Het verschil is het gevolg: een partner die niets
+over kinderen zei kost u een gesprek, een zaak die niets over een drempel zei
+kost u de avond — en dat overkomt precies de mensen die het al moeilijker hebben.
+Bij mensen is twijfel een open punt, bij drempels een nee.
+
+*Eerlijk over vandaag:* vrijwel geen enkele zaak heeft dat veld ingevuld, want er
+is nog geen leveranciersscherm waar een ondernemer het opgeeft. Dat is een gat en
+geen ontwerp. Zolang het zo is levert een harde eis weinig op — en dat is de
+goede kant om fout te gaan. Het antwoord telt daarom hoevéél zaken op de eis
+afvielen, zodat het gat zichtbaar is in plaats van als lege lijst te verschijnen.
+
+Het budget wordt gerékend (mediaan van de menuprijzen die er al staan), niet aan
+een zaak gevraagd, en het staat nooit op een profiel.
+
+**Rendez-vous — Arrange It** (`kern/rendezvous-arrange.js`). De driedeling is hier
+letterlijk code geworden: `arrange()` stelt samen uit de aanwezigheidsoverlap en
+het gedeelde dagdeel, `akkoord()` moet twee keer door twee mensen, en pas dan
+verschijnt bij allebei een gelegenheid in hun eigen Rechterhand-dossier.
+
+**Er staat geen zaaknaam in het voorstel**, en dat is geen tekortkoming maar de
+merkregel uit `CLAUDE.md`: nooit een echt merk opvoeren als bevestigde partner,
+nooit doen alsof er geboekt is. Het voorstel beschrijft de *setting* — een diner,
+een borrel, een tentoonstelling met een glas erna — plus de stad, de dagen en het
+dagdeel. Welke zaak het wordt, regelt een mens. **Daar zit het verschil met Vonk:
+daar kiest de software een tafel, hier kiest De Rechterhand hem.**
+
+Twee dingen houden het eerlijk. Van setting wisselen zet de akkoorden terug — je
+keurt niet iets anders goed dan waar je ja op zei. En een voorstel vervalt zodra
+de grond eronder wegvalt: wist iemand zijn aanwezigheid, dan gaat het niet door
+over een weekend dat niet meer bestaat.
 
 **Fase 5 — de kring.** The Table, Moment en Encounter op de contactpin; en
 Together op de objectlaag.

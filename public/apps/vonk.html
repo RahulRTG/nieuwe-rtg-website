@@ -68,6 +68,10 @@
     border:1px solid var(--line);border-radius:8px;cursor:pointer;}
   .rooster input{width:auto;min-width:0;padding:0;}
   .wanneer{color:var(--gold);font-size:0.82rem;margin-top:0.4rem;}
+  .optie{border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;margin-top:0.5rem;}
+  .optie.mijn{border-color:var(--gold);}
+  .optie .soort{font-size:0.85rem;}
+  .optie .waar{font-size:0.75rem;color:var(--soft);margin-top:0.15rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -117,6 +121,13 @@
     <div class="rij"><button class="knop vol" id="bBewaar">Bewaar wanneer u kunt</button><span class="stil" id="bStatus"></span></div>
   </section>
 
+  <section aria-label="Wat de plek moet kunnen">
+    <h2>Wat de plek moet kunnen</h2>
+    <p class="stil">Voor als het tot een afspraak komt. Dit staat niet op uw profiel en niemand ziet het &mdash; het bepaalt alleen welke plekken Vonk voorstelt. Wat u hier als eis aankruist, geldt voor de plek waar u samen komt. <strong>Een zaak die er niets over heeft gezegd, telt als nee</strong>: liever geen voorstel dan een verrassing bij de deur.</p>
+    <div id="datewens"><p class="stil">Bewaar eerst uw profiel.</p></div>
+    <div class="rij"><button class="knop vol" id="dBewaar">Bewaar</button><span class="stil" id="dStatus"></span></div>
+  </section>
+
   <section aria-label="De dagselectie">
     <h2>Vandaag voor u</h2>
     <div id="selectie"><p class="stil">Nog geen selectie; bewaar eerst uw profiel.</p></div>
@@ -152,6 +163,44 @@
      een IS -- dag in de rij, dagdeel in de kolom -- en dat leest een schermlezer
      als zodanig voor. Elk vinkje draagt zijn hele naam ("donderdagavond"), zodat
      hij ook los van zijn rij te begrijpen is. */
+  /* De eisen aan de plek, het budget en de soort uitje. Uit de kaart van de
+     server (kern/vonk/halfweg.js), dus ook hier geen tweede lijst. */
+  let KAART = null;
+  const BUDGETLABEL = { laag: 'Liefst laag', midden: 'Middenklasse', hoog: 'Maakt niet uit qua prijs', egaal: 'Maakt niet uit' };
+  function tekenDatewens(w){
+    if (!KAART) return;
+    w = w || { eisen: [], budget: 'egaal', soorten: [] };
+    $('#datewens').innerHTML =
+      '<div class="veldnaam" id="lbl_eis">De plek moet</div>' +
+      '<div class="keuzes" role="group" aria-labelledby="lbl_eis">' +
+      KAART.eisen.map(e => '<label><input type="checkbox" data-eis="' + esc(e.id) + '"' +
+        ((w.eisen || []).includes(e.id) ? ' checked' : '') + '>' + esc(e.label) + '</label>').join('') + '</div>' +
+      '<div class="veldnaam" id="lbl_soort">Ik hou van</div>' +
+      '<div class="keuzes" role="group" aria-labelledby="lbl_soort">' +
+      KAART.soorten.map(x => '<label><input type="checkbox" data-soort="' + esc(x.id) + '"' +
+        ((w.soorten || []).includes(x.id) ? ' checked' : '') + '>' + esc(x.label) + '</label>').join('') + '</div>' +
+      '<label for="dBudget">Prijsklasse</label><select id="dBudget">' +
+      KAART.budgetten.map(b => '<option value="' + esc(b) + '"' + (b === w.budget ? ' selected' : '') + '>' +
+        esc(BUDGETLABEL[b] || b) + '</option>').join('') + '</select>';
+  }
+
+  // de drie plekken bij een match, met de blinde keuze
+  function tekenOpties(mid, hw){
+    if (!hw || !hw.opties.length) return '<div class="stil">Er staan geen plekken klaar; spreek zelf iets af in de chat.</div>';
+    const rond = hw.rond, beide = hw.beideGekozen;
+    return '<div class="waarom">' + (rond ? 'U koos allebei dezelfde plek.'
+      : beide ? 'U koos allebei; hieronder ziet u wat de ander koos.'
+      : hw.mijnKeuze ? 'Uw keuze staat genoteerd. U ziet die van de ander zodra hij gekozen heeft.'
+      : 'Kies er een. De ander ziet uw keuze pas als hij zelf ook gekozen heeft.') + '</div>' +
+      hw.opties.map(o => '<div class="optie' + (o.id === hw.mijnKeuze ? ' mijn' : '') + '">' +
+        '<div class="soort">' + esc(o.soortLabel) + ' &middot; ' + esc(o.supplierName) + '</div>' +
+        '<div class="waar">' + esc(o.plek || '') + ' &middot; ' + o.reisMinA + ' / ' + o.reisMinB + ' min reizen' +
+        (o.klasse ? ' &middot; ' + esc(o.klasse) : '') + '</div>' +
+        (beide && o.id === hw.keuzeAnder ? '<div class="waar">De ander koos deze.</div>' : '') +
+        '<div class="rij"><button class="knop' + (o.id === hw.mijnKeuze ? '' : ' vol') + '" data-kies="' + esc(mid) +
+        '" data-optie="' + esc(o.id) + '">' + (o.id === hw.mijnKeuze ? 'Uw keuze' : 'Kies deze') + '</button></div></div>').join('');
+  }
+
   function tekenRooster(mijn){
     if (!ROOSTER) return;
     const aan = new Set(mijn || []);
@@ -234,8 +283,10 @@
       }
       if (s.tabel) TABEL = s.tabel;
       if (s.rooster) ROOSTER = s.rooster;
+      if (s.tafelkaart) KAART = s.tafelkaart;
       tekenAssen(s.profiel);
       tekenRooster(s.profiel && s.profiel.beschikbaar);
+      tekenDatewens(s.profiel && s.profiel.datewens);
       $('#selectie').innerHTML = ((s.mensen || []).map(p =>
         '<div class="kaart"><div class="naam">' + esc(p.codenaam) + ', ' + p.leeftijd + '</div>' +
         '<div class="sub">' + esc(p.stad || 'stad onbekend') + (p.gemeen && p.gemeen.length ? ' · samen: ' + p.gemeen.map(esc).join(', ') : '') + '</div>' +
@@ -256,6 +307,8 @@
           ' · EUR ' + x.tafel.prijsPP + ' p.p. · status: ' + esc(x.status) + '</div>' : '<div class="sub">Spreek samen iets af in de chat.</div>') +
         (merken(x.kenmerken) ? '<div>' + merken(x.kenmerken) + '</div>' : '') +
         (x.wanneer && x.wanneer.samen ? '<div class="wanneer">' + esc(x.wanneer.tekst) + '</div>' : '') +
+        '<div class="rij"><button class="knop" data-halfweg="' + esc(x.id) + '">Kies de plek</button></div>' +
+        '<div id="hw-' + esc(x.id) + '"></div>' +
         (x.tafel && !x.ikBetaalde ? '<div class="rij"><button class="knop vol" data-betaal="' + esc(x.id) + '">Bevestig met EUR ' + x.tafel.prijsPP + '</button></div>' : '') +
         '<div class="chat">' + (x.berichten || []).map(b => '<div><span class="wie">' + esc(b.van) + '</span> ' + esc(b.tekst) + '</div>').join('') + '</div>' +
         '<div class="rij"><input data-tekst="' + esc(x.id) + '" maxlength="300" placeholder="Bericht" aria-label="Bericht aan ' + esc(x.met) + '">' +
@@ -275,6 +328,19 @@
     document.querySelectorAll('[data-stuur]').forEach(b => b.onclick = async () => {
       const inp = document.querySelector('[data-tekst="' + b.dataset.stuur + '"]');
       try { await api('bericht', { id: b.dataset.stuur, tekst: inp.value }); inp.value = ''; laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-halfweg]').forEach(b => b.onclick = async () => {
+      const doel = document.getElementById('hw-' + b.dataset.halfweg);
+      doel.innerHTML = '<p class="stil">Even kijken\u2026</p>';
+      try { const hw = await api('halfweg', { id: b.dataset.halfweg });
+        doel.innerHTML = tekenOpties(b.dataset.halfweg, hw); koppel(); }
+      catch (e) { doel.innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; } });
+    document.querySelectorAll('[data-kies]').forEach(b => b.onclick = async () => {
+      try { const r = await api('kies', { id: b.dataset.kies, optie: b.dataset.optie });
+        meld(r.rond ? 'U koos allebei dezelfde plek.' : r.beideGekozen ? 'U koos verschillend; u ziet nu allebei de keuzes.' : 'Genoteerd.');
+        const doel = document.getElementById('hw-' + b.dataset.kies);
+        const hw = await api('halfweg', { id: b.dataset.kies });
+        doel.innerHTML = tekenOpties(b.dataset.kies, hw); koppel();
+      } catch (e) { meld(e.message); } });
     document.querySelectorAll('[data-blok]').forEach(b => b.onclick = async () => {
       const reden = prompt('Waarom meldt u ' + b.dataset.blok + '? (RTG kijkt mee)');
       if (reden === null) return;
@@ -312,6 +378,14 @@
     if (!ROOSTER) { meld('Bewaar eerst uw profiel.'); return; }
     const beschikbaar = Array.from(document.querySelectorAll('[data-slot]')).filter(c => c.checked).map(c => c.dataset.slot);
     try { await api('profiel', { beschikbaar }); $('#bStatus').textContent = 'Bewaard.'; laad(); }
+    catch (e) { meld(e.message); }
+  });
+  $('#dBewaar').addEventListener('click', async () => {
+    if (!KAART) { meld('Bewaar eerst uw profiel.'); return; }
+    const eisen = Array.from(document.querySelectorAll('[data-eis]')).filter(c => c.checked).map(c => c.dataset.eis);
+    const soorten = Array.from(document.querySelectorAll('[data-soort]')).filter(c => c.checked).map(c => c.dataset.soort);
+    const budget = ($('#dBudget') || {}).value || 'egaal';
+    try { await api('profiel', { datewens: { eisen, soorten, budget } }); $('#dStatus').textContent = 'Bewaard.'; laad(); }
     catch (e) { meld(e.message); }
   });
   if (!tok) { meld('Log eerst in via de leden-app.'); return; }

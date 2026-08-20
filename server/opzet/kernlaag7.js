@@ -17,7 +17,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, bewerkCollectie, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, bewerkCollectie, crypto, db, etaMinutes, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -52,7 +52,7 @@ Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
    woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
 Object.assign(kern, require('../kern/vonk').maakVonk({
   db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
-  haversine, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
+  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
 }));
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en

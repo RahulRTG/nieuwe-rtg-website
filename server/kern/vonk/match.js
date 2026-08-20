@@ -6,7 +6,7 @@
    eigen matches, en blokkeren/melden. Krijgt de gedeelde ctx van kern/vonk/index.js. */
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine,
-    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, kenmerkenVan, wanneerMet } = ctx;
+    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, kenmerkenVan, wanneerMet, optiesVoor } = ctx;
 
   /* ---- like / voorbij; wederzijds = match + automatisch een tafel in het midden ---- */
   async function like(key, codenaam, aan) {
@@ -24,6 +24,10 @@ module.exports = (ctx) => {
     // wederzijds: de match, de chatlijn en de tafel in het midden
     const m = { id: id(), a: key, b: doel, at: nu(), berichten: [], betaald: {}, status: 'wacht-op-betaling' };
     m.tafel = tafelInHetMidden(d().profielen[key], d().profielen[doel]);
+    /* Meet Halfway (./halfweg + ./kiezen): drie plekken van verschillende soort
+       rond hetzelfde midden. De automatische tafel hierboven blijft de bodem --
+       kiest niemand, dan staat er nog steeds iets. */
+    m.halfweg = { ...(optiesVoor(d().profielen[key], d().profielen[doel]) || { opties: [], waarom: null }), keuzes: {} };
     d().matches.unshift(m);
     save();
     for (const wie of [key, doel]) {

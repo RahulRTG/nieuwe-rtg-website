@@ -313,3 +313,93 @@ test('beschikbaarheid is een gedeeld mechanisme, geen twee kopieen', async () =>
   const B = require('../server/kern/beschikbaar');
   assert.equal(B.zin(['do-avond'], ['do-avond']).tekst, 'Donderdagavond komt u beiden uit.');
 });
+
+/* ---- ARRANGE IT (kern/rendezvous-arrange.js, ONTMOETEN.md fase 4) ----
+   Rahul stelt samen, beiden keuren goed, De Rechterhand regelt. */
+
+const dagdeelBeide = ['do-avond'];
+
+// twee gematchte Lifestyle-leden die tegelijk in dezelfde stad zijn en samen kunnen
+async function paarKlaar() {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  const stad = 'Wenen-' + (teller++);
+  await rv('profiel/zet', { aan: true, over: 'A-' + stad, beschikbaar: dagdeelBeide,
+    aanwezig: [{ stad, van: dag(2), tot: dag(5) }] }, a);
+  await rv('profiel/zet', { aan: true, over: 'B-' + stad, beschikbaar: dagdeelBeide,
+    aanwezig: [{ stad, van: dag(3), tot: dag(6) }] }, b);
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'B-' + stad);
+  await rv('like', { id: zB.id }, a);
+  const kandB = await json(await rv('kandidaten', {}, b));
+  await rv('like', { id: kandB.kandidaten.find(k => k.likteMij && k.over === 'A-' + stad).id }, b);
+  const m = await json(await rv('matches', {}, a));
+  const rij = m.matches.find(x => x.codenaam === zB.codenaam);
+  return { a, b, stad, idVoorA: rij.id, idVoorB: (await json(await rv('matches', {}, b))).matches[0].id };
+}
+
+test('arrange it: het voorstel komt uit aanwezigheid en beschikbaarheid, zonder zaaknaam', async () => {
+  const { a, stad, idVoorA } = await paarKlaar();
+  const r = await json(await rv('arrange', { id: idVoorA }, a));
+  const v = r.voorstel;
+  assert.equal(v.stad, stad, 'de stad komt uit de overlap in aanwezigheid');
+  assert.equal(v.van, dag(3), 'en de dagen zijn de doorsnede van de twee vensters');
+  assert.equal(v.dagdeel, 'do-avond', 'het dagdeel komt uit de gedeelde beschikbaarheid');
+  assert.match(v.tekst, /donderdagavond/, 'de zin noemt het dagdeel');
+  // de merkregel: geen echte zaak opgevoerd als bevestigde partner
+  assert.ok(!/supplier|hotel|restaurant/i.test(JSON.stringify(v)), 'er staat geen zaak in het voorstel');
+  assert.equal(v.ikAkkoord, false);
+  assert.equal(v.anderAkkoord, false);
+  assert.ok(r.settings.length === 3, 'drie settings om uit te kiezen');
+});
+
+test('arrange it: een akkoord is niet genoeg; twee akkoorden gaan naar De Rechterhand', async () => {
+  const { a, b, idVoorA, idVoorB } = await paarKlaar();
+  await rv('arrange', { id: idVoorA }, a);
+  const een = await json(await rv('akkoord', { id: idVoorA, ja: true }, a));
+  assert.equal(een.voorstel.ikAkkoord, true);
+  assert.equal(een.voorstel.bijRechterhand, false, 'een kant is niet genoeg');
+
+  const twee = await json(await rv('akkoord', { id: idVoorB, ja: true }, b));
+  assert.equal(twee.voorstel.bijRechterhand, true, 'twee akkoorden: het gaat door');
+
+  // bij ALLEBEI staat de gelegenheid in het eigen dossier, en nergens staat "gereserveerd"
+  for (const tok of [a, b]) {
+    const t = await json(await raw('/member/rechterhand/table', {}, tok));
+    const e = (t.events || []).find(x => /Rendez-vous met/.test(x.naam));
+    assert.ok(e, 'de gelegenheid staat in het eigen Rechterhand-dossier');
+    assert.match(e.notitie, /De Rechterhand regelt de reservering en bevestigt/,
+      'en zegt dat een mens het regelt');
+    assert.ok(!/bevestigd|gereserveerd\b/.test(e.notitie.replace('bevestigt', '')),
+      'er wordt niet geclaimd dat er al iets vaststaat');
+  }
+});
+
+test('arrange it: van setting wisselen zet de akkoorden terug', async () => {
+  const { a, idVoorA } = await paarKlaar();
+  await rv('arrange', { id: idVoorA }, a);
+  await rv('akkoord', { id: idVoorA, ja: true }, a);
+  const gewisseld = await json(await rv('arrange', { id: idVoorA, setting: 'cultuur' }, a));
+  assert.equal(gewisseld.voorstel.setting, 'cultuur');
+  assert.equal(gewisseld.voorstel.ikAkkoord, false,
+    'u keurt niet iets anders goed dan waar u ja op zei');
+});
+
+test('arrange it: een akkoord kan terug zolang de ander nog niet akkoord is', async () => {
+  const { a, idVoorA } = await paarKlaar();
+  await rv('arrange', { id: idVoorA }, a);
+  await rv('akkoord', { id: idVoorA, ja: true }, a);
+  const terug = await json(await rv('akkoord', { id: idVoorA, ja: false }, a));
+  assert.equal(terug.voorstel.ikAkkoord, false);
+});
+
+test('arrange it: valt de grond onder het voorstel weg, dan vervalt het', async () => {
+  const { a, b, idVoorA, idVoorB } = await paarKlaar();
+  await rv('arrange', { id: idVoorA }, a);
+  await rv('akkoord', { id: idVoorA, ja: true }, a);
+  // B wist zijn aanwezigheid: de gedeelde stad bestaat niet meer
+  await rv('aanwezig/wis', {}, b);
+  const nu2 = await rv('akkoord', { id: idVoorB, ja: true }, b);
+  assert.equal(nu2.status, 409, 'een voorstel over een weekend dat niet meer bestaat, gaat niet door');
+  assert.match((await json(nu2)).error, /klopt niet meer/);
+});

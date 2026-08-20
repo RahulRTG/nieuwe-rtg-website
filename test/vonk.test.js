@@ -368,3 +368,118 @@ test('17. blind availability: geen overlap en geen invoer zijn twee verschillend
   // en er is geen enkel pad waarlangs een lijst naar buiten komt
   assert.deepEqual(Object.keys(B.zin(['do-avond'], ['do-avond'])).sort(), ['samen', 'tekst']);
 });
+
+/* ---- MEET HALFWAY (kern/vonk/halfweg.js + kiezen.js, ONTMOETEN.md fase 4) ----
+   Drie plekken van verschillende soort rond het midden, beiden kiezen blind. */
+
+// twee gematchte leden met een profiel, plus de drie plekken die klaarstaan
+async function paarMetOpties(extraA, extraB) {
+  const hier = nieuwePlek();
+  const a = await lidMetProfiel(extraA || {}, hier);
+  const b = await lidMetProfiel(extraB || {}, hier);
+  await api('/api/vonk/like', { codenaam: b.codenaam }, a.token);
+  const l = await api('/api/vonk/like', { codenaam: a.codenaam }, b.token);
+  assert.equal(l.body.match, true, 'wederzijds');
+  const mijn = await api('/api/vonk/mijn', {}, a.token);
+  const m = mijn.body.matches.find(x => x.met === b.codenaam);
+  return { a, b, mid: m.id, tafel: m.tafel };
+}
+
+test('18. meet halfway: drie plekken van verschillende soort, en de tafel blijft de bodem', async () => {
+  const { a, mid, tafel } = await paarMetOpties();
+  assert.ok(tafel && tafel.supplierName, 'de automatische tafel staat er nog steeds');
+  const hw = await api('/api/vonk/halfweg', { id: mid }, a.token);
+  assert.equal(hw.status, 200);
+  assert.ok(hw.body.opties.length >= 1 && hw.body.opties.length <= 3, 'hooguit drie plekken');
+  const soorten = hw.body.opties.map(o => o.soort);
+  assert.equal(new Set(soorten).size, soorten.length, 'elke plek is van een andere soort');
+  for (const o of hw.body.opties) {
+    assert.ok(o.reisMinA != null && o.reisMinB != null, 'met een reistijd voor allebei');
+    assert.ok(!('score' in o) && !('rate' in o), 'en zonder cijfer of interne marge');
+  }
+});
+
+test('19. meet halfway: blind -- tot beiden kozen ziet niemand iets van de ander', async () => {
+  const { a, b, mid } = await paarMetOpties();
+  const opties = (await api('/api/vonk/halfweg', { id: mid }, a.token)).body.opties;
+  assert.ok(opties.length, 'er staan plekken klaar');
+
+  const k1 = await api('/api/vonk/kies', { id: mid, optie: opties[0].id }, a.token);
+  assert.equal(k1.status, 200);
+  assert.equal(k1.body.beideGekozen, false);
+  assert.equal(k1.body.keuzeAnder, null, 'A ziet niets van B');
+
+  // en B ziet niet DAT A al koos
+  const hwB = await api('/api/vonk/halfweg', { id: mid }, b.token);
+  assert.equal(hwB.body.mijnKeuze, null);
+  assert.equal(hwB.body.beideGekozen, false);
+  assert.equal(hwB.body.keuzeAnder, null, 'B ziet niet eens dat A al gekozen heeft');
+});
+
+test('20. meet halfway: dezelfde keuze is rond, en de tafel verhuist', async () => {
+  const { a, b, mid, tafel } = await paarMetOpties();
+  const opties = (await api('/api/vonk/halfweg', { id: mid }, a.token)).body.opties;
+  const doel = opties.find(o => o.supplierCode !== tafel.supplierCode) || opties[0];
+  await api('/api/vonk/kies', { id: mid, optie: doel.id }, a.token);
+  const k2 = await api('/api/vonk/kies', { id: mid, optie: doel.id }, b.token);
+  assert.equal(k2.body.rond, true, 'dezelfde keuze: rond');
+  assert.equal(k2.body.tafel.supplierCode, doel.supplierCode, 'de tafel staat nu bij de gekozen zaak');
+  // en de betaalketen werkt er gewoon overheen
+  const mijn = await api('/api/vonk/mijn', {}, a.token);
+  const m = mijn.body.matches.find(x => x.id === mid);
+  assert.equal(m.tafel.supplierCode, doel.supplierCode);
+  assert.equal(m.tafel.prijsPP, 10, 'de prijs verandert niet mee');
+});
+
+test('21. meet halfway: verschillende keuze onthult beide keuzes, zonder duwtje', async () => {
+  const { a, b, mid } = await paarMetOpties();
+  const opties = (await api('/api/vonk/halfweg', { id: mid }, a.token)).body.opties;
+  if (opties.length < 2) return;   // met een plek valt er niets te verschillen
+  await api('/api/vonk/kies', { id: mid, optie: opties[0].id }, a.token);
+  const k2 = await api('/api/vonk/kies', { id: mid, optie: opties[1].id }, b.token);
+  assert.equal(k2.body.rond, false);
+  assert.equal(k2.body.keuzeAnder, opties[0].id, 'na twee keuzes mag je elkaars keuze zien');
+  const hwA = await api('/api/vonk/halfweg', { id: mid }, a.token);
+  assert.equal(hwA.body.keuzeAnder, opties[1].id);
+  // B gaat alsnog mee: rond
+  const k3 = await api('/api/vonk/kies', { id: mid, optie: opties[0].id }, b.token);
+  assert.equal(k3.body.rond, true, 'meegaan met een tik sluit het af');
+});
+
+test('22. meet halfway: een harde eis aan de plek weegt voor allebei, en onbekend is nee', async () => {
+  const H = require('../server/kern/vonk/halfweg');
+  const { haversine, etaMinutes } = require('../server/lib/geo');
+  const afstandM = (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng });
+  const zaken = {
+    stil: { code: 'stil', name: 'Stil', type: 'restaurant', loc: { lat: 52, lng: 4.5 }, tables: [1],
+      menu: [{ price: 12 }], geschikt: ['rolstoel'] },
+    onbekend: { code: 'onbekend', name: 'Onbekend', type: 'bar', loc: { lat: 52, lng: 4.5 }, tables: [1],
+      menu: [{ price: 12 }] }                                   // heeft niets verklaard
+  };
+  const a = { lat: 51.9, lng: 4.5, datewens: { eisen: ['rolstoel'] } };
+  const b = { lat: 52.1, lng: 4.5, datewens: {} };
+  const r = H.drieOpties({ a, b, suppliers: zaken, mid: { lat: 52, lng: 4.5 }, afstandM,
+    reisMin: m => etaMinutes(m, 'driving') });
+  assert.deepEqual(r.opties.map(o => o.supplierCode), ['stil'],
+    'alleen wie het zelf verklaarde telt; de eis van EEN geldt voor de plek van BEIDEN');
+  assert.equal(r.waarom.eis, 1, 'en het antwoord telt hoeveel er op de eis afvielen');
+});
+
+test('23. meet halfway: het budget begrenst, en staat nergens op een profiel', async () => {
+  const H = require('../server/kern/vonk/halfweg');
+  assert.equal(H.klasseVan({ menu: [{ price: 10 }, { price: 12 }] }), 'laag');
+  assert.equal(H.klasseVan({ menu: [{ price: 60 }, { price: 80 }] }), 'hoog');
+  assert.equal(H.klasseVan({ menu: [] }), null, 'zonder menu geen klasse, en dus geen gok');
+  assert.equal(H.budgetPlafond('laag', 'egaal'), 1, 'het strengste van de twee telt');
+  assert.equal(H.budgetPlafond('egaal', 'egaal'), null, '"maakt niet uit" legt niets op');
+
+  // en het budget van een lid lekt niet naar een kandidaatkaart
+  const hier = nieuwePlek();
+  const rijk = await lidMetProfiel({ datewens: { budget: 'hoog', eisen: ['halal'] } }, hier);
+  const kijker = await lidMetProfiel({}, hier);
+  const kaart = zieIn(await selectieVan(kijker.token), rijk.codenaam);
+  assert.ok(kaart, 'de kandidaat staat er');
+  assert.ok(!('datewens' in kaart), 'zijn eisen en budget staan er niet bij');
+  const eigen = (await selectieVan(rijk.token)).profiel;
+  assert.equal(eigen.datewens.budget, 'hoog', 'de eigenaar ziet ze wel');
+});

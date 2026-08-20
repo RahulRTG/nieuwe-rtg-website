@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3991 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3995 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3991 |
-| servermodules (`server/**/*.js`) | 2205 |
+| API-endpoints | 3995 |
+| servermodules (`server/**/*.js`) | 2208 |
 | routebestanden (`server/routes/**`) | 456 |
-| kernmodules (`server/kern/**`) | 1346 |
+| kernmodules (`server/kern/**`) | 1349 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 223 |
 | toetsbestanden (`test/*.test.js`) | 905 |
@@ -103,7 +103,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
-| `member` | 642 | 57 | 10 | 399 |
+| `member` | 644 | 57 | 10 | 401 |
 | `supplier` | 562 | 102 | 10 | 295 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -117,7 +117,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2257 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2259 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -125,13 +125,13 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1414 |
+| kern-namen die routes aanraken | 1418 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 191 |
-| daarvan door precies één domein | 1223 |
+| daarvan door precies één domein | 1227 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
-Dat derde getal is de opening: 86% van wat er in de gedeelde zak zit, wordt door
+Dat derde getal is de opening: 87% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat
 domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen zakken.
 

@@ -227,9 +227,38 @@ async function matches(){
     +samenRegel(m.samen)
     +(m.wanneer&&m.wanneer.samen?'<div class="samen">'+esc(m.wanneer.tekst)+'</div>':'')
     +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':((m.samen||[]).length?'':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>'))
-    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button></div>'
-    +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div></div>').join('');
+    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button> <button class="stilknop" data-arrange="'+m.id+'">Arrange it</button></div>'
+    +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div>'
+    +'<div id="arr-'+m.id+'"></div></div>').join('');
   $('#main').innerHTML=h;
+  /* Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt.
+     Er staat bewust geen zaaknaam in het voorstel -- alleen de setting, de stad,
+     de dagen en het dagdeel. Welke zaak het wordt, doet een mens. */
+  function arrangeHtml(id, r){
+    const v=r.voorstel;
+    return '<div class="kaart"><div class="lbl">Voorstel</div><div>'+esc(v.tekst)+'</div>'
+      +'<div class="note">'+(v.bijRechterhand
+        ? 'U bent er allebei uit. De Rechterhand regelt de reservering en bevestigt bij u; er staat nog niets vast.'
+        : v.ikAkkoord ? 'U bent akkoord. Zodra de ander dat ook is, gaat het naar De Rechterhand.'
+        : 'Bekijk het en geef akkoord als het u schikt.')+'</div>'
+      +(v.bijRechterhand?'':'<div class="h-mt40">'+(r.settings||[]).map(x=>
+        '<button class="stilknop" data-setting="'+esc(id)+'" data-s="'+esc(x.id)+'"'+(x.id===v.setting?' disabled':'')+'>'+esc(x.label)+'</button>').join(' ')+'</div>')
+      +(v.bijRechterhand?'':'<div class="h-mt40"><button class="knop" data-akkoord="'+esc(id)+'" data-ja="'+(v.ikAkkoord?'0':'1')+'">'
+        +(v.ikAkkoord?'Akkoord intrekken':'Akkoord')+'</button></div>')
+      +'</div>';
+  }
+  async function toonArrange(id, extra){
+    const doel=$('#arr-'+id); doel.innerHTML='<div class="note">Rahul stelt samen\u2026</div>';
+    try{ const r=await api('arrange',Object.assign({id},extra||{})); doel.innerHTML=arrangeHtml(id,r); koppelArrange(); }
+    catch(e){ doel.innerHTML='<div class="note">'+esc(e.message)+'</div>'; }
+  }
+  function koppelArrange(){
+    document.querySelectorAll('[data-setting]').forEach(b=> b.onclick=()=> toonArrange(b.dataset.setting,{setting:b.dataset.s}));
+    document.querySelectorAll('[data-akkoord]').forEach(b=> b.onclick=async()=>{
+      try{ await api('akkoord',{id:b.dataset.akkoord,ja:b.dataset.ja==='1'}); toonArrange(b.dataset.akkoord); }
+      catch(e){ meld(e.message); } });
+  }
+  document.querySelectorAll('[data-arrange]').forEach(b=> b.onclick=()=> toonArrange(b.dataset.arrange));
   document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });
 }
 laad();

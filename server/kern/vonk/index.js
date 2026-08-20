@@ -26,13 +26,14 @@ const { coord } = require('../util');
 const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 const W = require('./wensen');
 const B = require('../beschikbaar');
+const H = require('./halfweg');
 
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
 const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling bij de zaak
 
 function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan, keyVanCodenaam,
-  haversine, reserveerTafel, pay, notify, sseToCustomer, sseToOffice }) {
+  haversine, etaMinutes, reserveerTafel, pay, notify, sseToCustomer, sseToOffice }) {
   const id = () => 'vonk' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   function d() {
@@ -74,6 +75,9 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
        Gaat NOOIT mee in `publiek` -- alleen de doorsnede komt eruit, en pas na
        een wederzijdse match. */
     if (data.beschikbaar !== undefined) p.beschikbaar = B.schoonBeschikbaar(data.beschikbaar);
+    /* Wat de PLEK moet kunnen (./halfweg.js). Engine-only: gaat nooit mee in
+       `publiek`, en het budget al helemaal niet -- ONTMOETEN.md par. 3.6. */
+    if (data.datewens !== undefined) p.datewens = H.zetDatewens(p.datewens, data.datewens);
     p.kenmerken = W.zetKenmerken(p.kenmerken, data.kenmerken);
     p.wensen = W.zetWensen(p.wensen, data.wensen);
     p.zicht = W.zetZicht(p.zicht, data.zicht);
@@ -88,7 +92,7 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     stad: p.stad, interesses: p.interesses, kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
     ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
       maxKm: p.maxKm, actief: p.actief, wensen: p.wensen || {}, zicht: p.zicht || {},
-      beschikbaar: p.beschikbaar || [] } : {}) });
+      beschikbaar: p.beschikbaar || [], datewens: p.datewens || H.zetDatewens(null, {}) } : {}) });
 
   /* ---- de dagselectie: eindig en wederzijds passend ----
      pastBij dekt de drie eisen die ALTIJD hard zijn en die daarom niet in de
@@ -114,9 +118,20 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
        de wederzijdse match staat. Geeft een dagdeel of niets, nooit een lijst. */
     wanneerMet: (mij, ander) => B.zin((d().profielen[mij] || {}).beschikbaar,
       (d().profielen[ander] || {}).beschikbaar),
-    rooster: B.rooster };
+    rooster: B.rooster,
+    /* De drie plekken rond het midden. De aardrijkskunde blijft hier -- halfweg
+       rekent niet zelf aan afstanden maar krijgt ze aangeleverd. */
+    optiesVoor: (pa, pb) => {
+      if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pa.lng) || !isFinite(pb.lat) || !isFinite(pb.lng)) return null;
+      return H.drieOpties({ a: pa, b: pb, suppliers: db.data.suppliers,
+        mid: { lat: (pa.lat + pb.lat) / 2, lng: (pa.lng + pb.lng) / 2 },
+        afstandM: (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng }),
+        reisMin: m => etaMinutes(m, 'driving') });
+    },
+    tafelkaart: H.tafelkaart };
   const api = { vonkProfielZet: profielZet };
   Object.assign(api, require('./selectie')(ctx));
+  Object.assign(api, require('./kiezen')(ctx));
   Object.assign(api, require('./match')(ctx));
   return api;
 }

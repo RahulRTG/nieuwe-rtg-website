@@ -14,7 +14,7 @@
    losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
    waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
    elke ingang passeert. */
-module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan }) => {
+module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan, tableZet }) => {
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
@@ -176,5 +176,9 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
   }
 
   const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic });
-  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate, rvAanwezigWis };
+  // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
+  const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
+    matchesVan, tableZet, notify });
+  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate, rvAanwezigWis,
+    rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord };
 };

@@ -160,12 +160,26 @@ test('9. de bekende gaten staan als gat te boek, met een kanttekening', () => {
   assert.doesNotMatch(entree.bron, /partnervoorwaarden/,
     'de waarde hoort uit de kern te komen en niet uit het juridische document');
 
+  /* De prijsgarantie stond hier als GEBOUWD met "geen meldknop en geen
+     terugbetaalstroom". Allebei bestaan ze nu, dus de claim is meeverhuisd naar
+     AFGEDWONGEN -- en dat hoort zo: een claim die zwakker blijft staan dan wat
+     er is gebouwd, is net zo goed uit de pas als een die sterker staat. */
   const garantie = lijst.find(c => c.id === 'claim.member.price_guarantee');
-  assert.equal(garantie.dekking, claims.DEKKING.GEBOUWD, 'het plafond is er, de rechtzetting niet');
-  assert.match(garantie.kanttekening, /rechtgezet|terugbetaal/);
+  assert.equal(garantie.dekking, claims.DEKKING.AFGEDWONGEN,
+    'het plafond EN de rechtzetting zijn er');
+  assert.match(garantie.toets, /prijsmelding|ronde/);
 
+  /* Deze blijft GEBOUWD, en dat is het punt van de hele indeling: de verdeling,
+     het spoor en de betaalbaarstelling zijn afgedwongen, maar of het geld
+     aankomt hangt aan een IBAN die er niet is. */
   const sociaal = lijst.find(c => c.id === 'claim.social.share');
   assert.equal(sociaal.dekking, claims.DEKKING.GEBOUWD,
-    'de verdeling is afgedwongen, maar de uitbetaling wacht op RTF_IBAN -- ' +
     'een claim die op een lege omgevingsvariabele wacht, is niet afgedwongen');
+  assert.match(sociaal.kanttekening, /RTF_IBAN/);
+
+  /* En de claim die er niet was: dat verplichtingen worden OPGEPAKT. Drie lagen
+     legden bedragen vast en niets deed er iets mee. */
+  const ronde = lijst.find(c => c.id === 'claim.settlement.rounds');
+  assert.ok(ronde, 'er hoort een claim te staan over wat er met een verplichting gebeurt');
+  assert.equal(ronde.dekking, claims.DEKKING.AFGEDWONGEN);
 });

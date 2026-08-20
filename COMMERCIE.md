@@ -184,7 +184,7 @@ in zit, staat erbij.
 | # | Onderwerp | Staat |
 |---|---|---|
 | 1 | Commissieconflict weg | af — `commercie/vergoeding.js` |
-| 2 | Ledenkorting financieel echt | af (rekenkundig) — `commercie/subsidie.js`; de uitbetaling wacht op de betaal-naad |
+| 2 | Ledenkorting financieel echt | af — `commercie/subsidie.js` + `commercie/verrekening.js`; de ronde boekt het bedrag aan de zaak |
 | 3 | Betaaldienst met ledger en recovery | af — `commercie/fee.js`, inclusief herkansingsronde |
 | 4 | Contract Engine + price snapshots | af — `commercie/contract.js` |
 | 5 | Business Lite via capabilities | af — `commercie/capaciteiten.js`; de trede is uitgerold |
@@ -193,6 +193,34 @@ in zit, staat erbij.
 | 8 | Social allocation settlement | af — `commercie/allocatie.js`; uitbetaling wacht op `RTF_IBAN` |
 | 9 | Claims uit de kern | af — `commercie/claims.js` + `/api/claims` |
 | 10 | Release-gate | af — `claims.poort()` + `/api/office/claims/poort` |
+
+### 4c. De ronde: het werk dat wel gebouwd was en nooit werd gedaan
+
+Vier lagen legden verplichtingen vast en geen ervan werd door iets opgepakt.
+Dat is een eigen soort fout — geen ontbrekende functie maar een **functie zonder
+beller** — en die is stiller dan een ontbrekende, want de code ziet er compleet
+uit en de toetsen staan groen. Een `grep` op de aanroep buiten de eigen module
+gaf voor drie van de vier een dikke nul.
+
+`kern/commercie/ronde.js` draait elke vijf minuten (`RTG_COMMERCIE_RONDE_MS`) en
+is ook met de hand te trekken via `/api/office/commercie/ronde`:
+
+| Stap | Wat er gebeurt |
+|---|---|
+| `fees` | mislukte betaaldienstboekingen krijgen hun herkansing |
+| `contracten` | een verbintenis die binnen 45 dagen afloopt wordt VERLENGBAAR, met melding |
+| `tegoeden` | een AI-tegoed dat tegen zijn plafond loopt wordt één keer gemeld |
+| `verrekening` | ledenvoordeel naar de zaak, prijsverschil naar het lid, sociale afdracht betaalbaar |
+
+**Twee eigenschappen die de ronde bruikbaar maken.** Ze is *idempotent*: elke
+stap zoekt werk aan de hand van een stand en niet van een tijdstip, dus twee keer
+draaien betaalt niet twee keer. En ze *valt niet om op een deelstap*: elk
+onderdeel zit in zijn eigen try, en wat er misging staat in de uitslag in plaats
+van in een log dat niemand leest.
+
+**Wat de ronde niet doet: besluiten nemen.** Ze zet een contract op VERLENGBAAR
+maar verlengt hem niet; ze maakt een afdracht betaalbaar maar maakt hem niet
+over; ze meldt dat een tegoed op raakt maar koopt niets bij.
 
 ### Wat er bewust NIET in zit
 

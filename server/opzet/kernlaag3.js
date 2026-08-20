@@ -131,6 +131,55 @@ Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, k
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische
    voorraad-afboeking bij elke verkoop, telling/verspilling/levering met
    logboek, marges en het inkoopadvies. */
+/* DE COMMERCIELE RONDE (kern/commercie/ronde.js): het werk dat wel gebouwd was
+   en nooit werd gedaan. Vier lagen legden verplichtingen vast -- mislukte
+   betaaldienstboekingen, aflopende contracten, volle AI-tegoeden en drie soorten
+   verrekening -- en geen ervan werd door iets opgepakt. Een functie zonder
+   beller is stiller dan een ontbrekende functie: de code ziet er compleet uit.
+
+   Hij hangt hier omdat pay net gemount is: de ronde heeft een boekfunctie nodig
+   en die zit daar. De losse lagen worden LAAT gelezen (kern.* op het moment van
+   draaien), zodat de mount-volgorde van de rest niet uitmaakt. */
+Object.assign(kern, (() => {
+  const { maakVerrekening } = require('../kern/commercie/verrekening');
+  const { maakRonde } = require('../kern/commercie/ronde');
+  const prijsmeldingen = require('../kern/commercie/prijsmelding').maakPrijsmeldingen({ db, save, nu: () => Date.now() });
+  const allocatie = require('../kern/commercie/allocatie').maakAllocatie({ db, save, nu: () => Date.now() });
+  const tegoed = require('../kern/commercie/tegoed').maakTegoed({ db, save, nu: () => Date.now() });
+  const verrekening = maakVerrekening({ db, save,
+    boekAsync: (b) => kern.pay.boekAsync(b), prijsmeldingen, allocatie,
+    rekLid: kern.pay.rekLid, rekPartner: kern.pay.rekPartner, nu: () => Date.now() });
+  const ronde = maakRonde({
+    fees: kern.pay.fees, contracten: kern.aanmeldingen && kern.aanmeldingen.contracten,
+    tegoed, verrekening, allocatie,
+    boekAsync: (b) => kern.pay.boekAsync(b),
+    /* Meldingen gaan door het bestaande kanaal; faalt dat, dan mag de ronde niet
+       omvallen -- een melding is geen geld. */
+    melden: (m) => { try { if (typeof notify === 'function') notify(m.houder || 'kantoor', { icon: 'geld', title: 'RTG', body: m.tekst }); } catch (e) {} },
+    env: process.env, nu: () => Date.now() });
+  /* De tik. Zelfde patroon als de opdrachtenronde van de bank: een vaste
+     interval die alleen KIJKT, en die zichzelf niet in de weg zit als een ronde
+     langer duurt (elke ronde is idempotent). `unref` zodat een test-server niet
+     blijft hangen op deze timer.
+
+     Vijf minuten en geen minuut: hier staat geen geld vast dat iemand net heeft
+     weggestuurd -- dit zijn verplichtingen die hoe dan ook vandaag worden
+     voldaan. Een minuut zou vooral de motor bezighouden. */
+  const RONDE_MS = Number(process.env.RTG_COMMERCIE_RONDE_MS || 300000);
+  let bezig = false;
+  const timer = setInterval(() => {
+    if (bezig) return;                 // een ronde die uitloopt, krijgt geen tweede
+    bezig = true;
+    ronde.draai()
+      .catch(e => console.warn('[commercie] ronde mislukt:', e.message))
+      .finally(() => { bezig = false; });
+  }, RONDE_MS);
+  if (timer.unref) timer.unref();
+
+  return { commercieRonde: ronde, commercieVerrekening: verrekening,
+    commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen };
+})());
+
 Object.assign(kern, require('../kern/keuken')({ db, save, crypto, schoon, notifySupplier }));
 /* De verblijf-laag (kern/verblijf.js): echte verblijven met datums, het
    receptiebord en de check-in/check-out-keten; logies als kamerlast. */

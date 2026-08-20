@@ -238,7 +238,12 @@ function maakTegoed({ db, save, nu }) {
     };
   }
 
-  return { BELEID, BUNDELS, INBEGREPEN, mag, verbruik, koopBundel, zetBeleid, stand, rijVan };
+  /* Alle rijen, voor de ronde die waarschuwingen meldt. Geeft de rauwe rijen en
+     niet een kopie: de ronde zet `gemeldOp` erop, en een kopie zou dat stempel
+     kwijtraken -- en dan meldt hij elke ronde opnieuw hetzelfde. */
+  function alleRijen() { return Object.values(alles()); }
+
+  return { BELEID, BUNDELS, INBEGREPEN, mag, verbruik, koopBundel, zetBeleid, stand, rijVan, alleRijen };
 }
 
 module.exports = { maakTegoed, BELEID, BUNDELS, INBEGREPEN, inbegrepenVoor, WAARSCHUWING };

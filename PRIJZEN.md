@@ -194,15 +194,15 @@ dan worden de kosten stilzwijgend nul in plaats van dat de transactie het meldt.
 staat nu zichtbaar op HERKANSING in `kostenOpen`, maar er is niemand die hem
 oppakt — dat blijft mensenwerk tot die ronde er is.
 
-### 4.4 ~~Het ledenvoordeel wordt getoond maar door niemand betaald~~ — GROTENDEELS GESLOTEN
+### 4.4 ~~Het ledenvoordeel wordt getoond maar door niemand betaald~~ — GESLOTEN
 
 *Opgelost op de rekenkant: alle vier de bedragen worden vastgelegd met de
 invariant `lid + RTG === bruto === zaak` (`kern/commercie/subsidie.js`), en
 `betaalRekeningVoor` rapporteert niet langer `subtotaal + fooi` als betaald
 bedrag terwijl er twee kortingen af waren. `test/commercie.test.js` 5–9, vijf
-mutaties, vijf raak. **Wat nog open staat:** de verplichting staat op
-`te_verrekenen` — het daadwerkelijk overmaken wacht op de betaal-naad, net als
-de 30%-afdracht op `te_storten` staat zolang `RTF_IBAN` leeg is (§4.9). Wat er
+mutaties, vijf raak. En sinds de commerciële ronde (`kern/commercie/ronde.js`)
+wordt die verplichting ook opgepakt: RTG boekt het bedrag naar de zaak, en een
+opbouw die onderweg is aangepast wordt afgekeurd in plaats van uitbetaald. Wat er
 was:*
 
 De belofte is *"RTG legt bij, dus de zaak houdt het volle bedrag"*
@@ -278,13 +278,17 @@ De 30% splitst in 20% lokaal en 10% de stichting zelf. De enige plek waar
 voorwaarden noemen alleen de 30%. Wie "lokaal" is en waar dat geld landt, staat
 nergens; `RTF_IBAN` is één rekening.
 
-### 4.9 De 30% wordt geboekt maar niet betaald — **spoor gebouwd, uitbetaling wacht**
+### 4.9 De 30% wordt geboekt maar niet betaald — **alles gebouwd, wacht op een rekening**
 
 *Elke afdracht draagt nu bron, verdeling, regelversie, bestemmingen en vier
 tijdstempels, en een teruggedraaide bijdrage laat geen afdracht achter. Daarmee
 is de 30% aantoonbaar — wat MARKT.md eist zodra hij in marketing staat. De
-uitbetaling zelf wacht nog steeds op `RTF_IBAN`; de claim staat daarom als
-GEBOUWD en niet als AFGEDWONGEN (`/api/claims`).*
+ronde maakt een afdracht bovendien **betaalbaar** zodra `RTF_IBAN` er is, en het
+overmaken loopt daarna via `kern/fonds.js` en de betaalopdracht. Wat ontbreekt is
+dus geen code meer maar een bankrekening: zonder die variabele blijft de rij
+eerlijk op GERESERVEERD staan. De claim staat daarom als GEBOUWD en niet als
+AFGEDWONGEN — een bewering die op een lege omgevingsvariabele wacht, is niet
+afgedwongen (`/api/claims`).*
 
 Zonder `RTF_IBAN` blijft de afdracht op `te_storten` (TAKEN.md 2.6). MARKT.md
 waarschuwt dat de 30% een handelspraktijk wordt zodra hij in marketing staat —

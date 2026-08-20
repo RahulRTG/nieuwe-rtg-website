@@ -59,6 +59,22 @@ module.exports = (ctx) => {
   app.post('/api/claims', (req, res) => stuur(res, claimLijst()));
   app.post('/api/office/claims/poort', officeAuth, (req, res) => veilig(res, () =>
     ({ status: 200, ...claims.poort() })));
+
+  /* DE COMMERCIELE RONDE. Draait vanzelf (kern/opzet/kernlaag3.js), maar is ook
+     met de hand te trekken -- dat is het verschil tussen "hij hoort te draaien"
+     en "ik zie hem draaien". De uitslag zegt per stap wat er gebeurde EN wat er
+     nog openstaat; dat laatste getal bestond niet toen deze verplichtingen nog
+     door niemand werden opgepakt. */
+  app.post('/api/office/commercie/ronde', officeAuth, async (req, res) => {
+    try {
+      if (!kern || !kern.commercieRonde) return res.status(503).json({ error: 'De ronde is niet gemount.' });
+      res.json({ ok: true, uitslag: await kern.commercieRonde.draai() });
+    } catch (e) { console.error('[commercie-ronde]', e); res.status(500).json({ error: 'De ronde liep vast.' }); }
+  });
+  app.post('/api/office/commercie/openstaand', officeAuth, (req, res) => veilig(res, () =>
+    (kern && kern.commercieVerrekening
+      ? { status: 200, ok: true, ...kern.commercieVerrekening.openstaand() }
+      : { status: 503, error: 'De verrekening is niet gemount.' })));
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});

@@ -98,8 +98,11 @@ function claims() {
        'te_storten' -- en een claim die op een lege omgevingsvariabele wacht,
        hoort niet als afgedwongen te boek te staan. */
     dekking: DEKKING.GEBOUWD,
-    toets: 'test/allocatie.test.js',
-    kanttekening: 'De verdeling en het spoor zijn afgedwongen; de uitbetaling wacht op RTF_IBAN.'
+    toets: 'test/allocatie.test.js + test/ronde.test.js',
+    kanttekening: 'De verdeling, het spoor en de betaalbaarstelling zijn afgedwongen; ' +
+      'de ronde maakt een afdracht betaalbaar zodra RTF_IBAN er is. Zonder die rekening ' +
+      'gebeurt er niets, en daarom staat deze claim op GEBOUWD en niet op AFGEDWONGEN: ' +
+      'een bewering die op een lege omgevingsvariabele wacht, is niet afgedwongen.'
   });
 
   // --- de partnerpoort ---
@@ -181,13 +184,29 @@ function claims() {
   uit.push({
     id: 'claim.member.price_guarantee',
     onderwerp: 'Ledenprijsgarantie',
-    waarde: 'PLAFOND_AFGEDWONGEN_RECHTZETTING_NIET',
+    waarde: 'PLAFOND_EN_RECHTZETTING',
     tekst: 'een lid betaalt nooit meer dan de publieke prijs van de partner',
     bron: 'kern/util.js + routes/supplier/menukaart.js',
-    dekking: DEKKING.GEBOUWD,
-    toets: 'test/partner.test.js',
-    kanttekening: 'Het plafond wordt server-side afgekapt; de belofte "het verschil wordt rechtgezet" ' +
-      'heeft geen meldknop en geen terugbetaalstroom (PRIJZEN.md 4.11).'
+    /* Stond op GEBOUWD met "geen meldknop en geen terugbetaalstroom". Allebei
+       bestaan ze nu: kern/commercie/prijsmelding.js met zijn routes, en de
+       commerciele ronde die het verschil ook echt boekt. */
+    dekking: DEKKING.AFGEDWONGEN,
+    toets: 'test/partner.test.js + test/prijsmelding.test.js + test/ronde.test.js'
+  });
+
+  /* WAT ER MET EEN VASTGELEGDE VERPLICHTING GEBEURT. Deze claim bestond niet, en
+     dat was precies het gat: drie lagen legden bedragen vast en niets pakte ze
+     op. Een functie zonder beller is stiller dan een ontbrekende functie. */
+  uit.push({
+    id: 'claim.settlement.rounds',
+    onderwerp: 'Vastgelegde verplichtingen worden opgepakt',
+    waarde: 'RONDE_ELKE_5_MIN',
+    tekst: 'een vastgelegde verplichting blijft niet liggen: een terugkerende ronde boekt het ' +
+      'ledenvoordeel aan de zaak, zet een rechtgezet prijsverschil bij het lid terug, herkanst ' +
+      'mislukte betaaldienstboekingen en zet aflopende contracten op verlengbaar',
+    bron: 'kern/commercie/ronde.js + kern/commercie/verrekening.js',
+    dekking: DEKKING.AFGEDWONGEN,
+    toets: 'test/ronde.test.js + test/commercie-ronde.e2e.js'
   });
 
   return uit;

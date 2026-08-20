@@ -405,7 +405,7 @@ worden -- door de school, door ons, door een toezichthouder.
 | Er staat bij wie beslist, met naam | elke adviessoort noemt een aanspreekbare partij | **ja**, en nooit RTG of de AI (`test/schooladvies.test.js`) |
 | Een AI-tekst die iets vaststelt wordt gemeld | keuring op besluitende zinsdelen | **ja** -- de tekst wordt gemeld, niet stil bijgeschaafd |
 | Geen hulpvraag raakt zoek | SLA + opvolgbewijs | **ja** sinds 19 augustus 2026 (`test/opvolging.test.js`), met mutatie beproefd |
-| 114 talen | vertaaldekking + steekproef op kwaliteit | vertaallaag bestaat, dekking niet gemeten |
+| 114 talen | vertaaldekking, gerekend uit de tabel zelf | **dekking ja** (`test/taaldekking.test.js`): 114 talen in het register, 113 van de 113 doeltalen met alle 30 kernwoorden; **kwaliteit ongemeten** -- er is nog nooit een spreker langs deze tabel gelopen |
 | Elk endpoint heeft een scherm | registertoets | **ja**, 201 van 201 (gemeten 20 augustus 2026) |
 
 Wie een belofte toevoegt zonder meting, voegt geen belofte toe maar een risico.

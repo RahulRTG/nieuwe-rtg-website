@@ -20,6 +20,10 @@
    rustige plek. Dat is LAT-regel 3 op deze laag: een meter zonder invoer hoort
    niets te beweren.
 
+   WAT ER VAN DE PODIA BIJKOMT staat in ./podium.js: een set die zo opgaat
+   terwijl de boeking nog een voornemen is, een rider met open punten, een
+   soundcheck die begint.
+
    WAT ER VAN BUITEN BIJKOMT staat in ./signalen.js: onbezette beveiligingsposten
    en een door de vervoerder gemelde storing, gelezen bij BEVESTIGDE partners en
    alleen voor wat die partner zelf heeft vrijgegeven. Die twee lijsten worden
@@ -35,7 +39,7 @@
 const ERNST = { kritiek: 3, hoog: 2, aandacht: 1 };
 
 module.exports = (ctx) => {
-  const { editieVind, dagVind, bezetting, instroom, signalen } = ctx;
+  const { editieVind, dagVind, bezetting, instroom, signalen, podiumSignalen } = ctx;
 
   /* De horizon: hoe ver vooruit een uitzondering nog een uitzondering is. Een
      uur is de standaard omdat dat ongeveer de tijd is die een ingreep op een
@@ -102,6 +106,12 @@ module.exports = (ctx) => {
     /* Wat de domeinen van de partners melden, op dezelfde hoop. */
     const buiten = signalen(fid, eid, { datum: v.datum, tijd: v.tijd });
     if (!buiten.error) for (const s of buiten.signalen) uit.push(s);
+
+    /* En wat er op de podia van het schema afwijkt (./podium.js). Ook die gaan
+       op DEZELFDE hoop: een stage manager en een veiligheidscoordinator kijken
+       naar hetzelfde scherm, en een tweede lijst laat ze kiezen. */
+    const vloer = podiumSignalen(fid, eid, { dag: dag.id, tijd: v.tijd, vooruit: horizon });
+    if (!vloer.error) for (const s of vloer.signalen) uit.push(s);
 
     /* Het dringendste eerst: eerst de ernst, dan de tijd die er nog is. */
     uit.sort((a, b2) => (ERNST[b2.ernst] - ERNST[a.ernst]) || (a.over - b2.over));

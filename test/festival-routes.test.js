@@ -46,6 +46,11 @@
   19. De codenaam komt uit de sessie; het lichaam mag hem niet zetten.
   20. Het rooster maken is managerwerk; het lezen doet iedereen over zichzelf.
   21. Wie de dienst van is komt uit de sessie: je leest die van een collega niet.
+  22. Wie een boeking bevestigt komt uit de sessie -- een verslag van een
+      menselijke uitspraak is niets waard als de aanvrager de naam invult.
+  23. Het schema veranderen is managerwerk; een riderpunt afvinken doet de vloer.
+  24. Het podiumbeeld neemt dag en klok van de server.
+  25. De afrekening is een overzicht, en blijft bij de manager.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -421,6 +426,78 @@ test('21. wie de dienst van is komt uit de sessie', async () => {
   assert.equal(alsof.nu, null, 'de manager staat niet ingeroosterd, wat hij ook meestuurt');
 });
 
+test('22. wie een boeking bevestigt komt uit de sessie', async () => {
+  const podiumId = (await post('/api/festival/plek', { festival: fid, editie: eid,
+    naam: 'Hoofdpodium', soort: 'podium', ouder: terreinId, changeover: 30 }, manager)).plek.id;
+  const b = (await post('/api/festival/boeking', { festival: fid, editie: eid, dag: vandaagId,
+    podium: podiumId, artiest: 'Fred Again', van: '21:00', tot: '22:30' }, manager)).boeking;
+  assert.equal(b.stand, 'voornemen', 'een nieuwe boeking is een voornemen');
+
+  /* Bevestigen op andermans naam. Het lichaam zegt Nienke Vroomen -- een naam
+     die in dit huis niet bestaat, zodat de wacht niet toevallig aanslaat op de
+     manager zelf (dat ging eerder mis, zie mutatie 7 hierboven). */
+  const r = await post('/api/festival/boeking/stand', { festival: fid, editie: eid, id: b.id,
+    stand: 'bevestigd', hoe: 'getekend contract', door: 'Nienke Vroomen' }, manager);
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const managerNaam = roster.staff.find(x => x.role === 'manager').name;
+  assert.equal(r.boeking.bevestigd.door, managerNaam,
+    'het verslag draagt de naam van wie er zat, niet de naam die is ingetypt');
+  assert.equal(r.boeking.bevestigd.hoe, 'getekend contract');
+});
+
+test('23. het schema veranderen is managerwerk; afvinken doet de vloer', async () => {
+  const beeld = await post('/api/festival/podiumbeeld', { festival: fid, editie: eid }, deur);
+  const boeking = (await post('/api/festival/boekingen', { festival: fid, editie: eid,
+    dag: vandaagId }, deur)).boekingen[0];
+  assert.ok(beeld.ok && boeking, 'lezen mag de vloer: hij moet weten wie er opgaat');
+
+  assert.equal((await api('/api/festival/boeking', { festival: fid, editie: eid, dag: vandaagId,
+    artiest: 'Van de deur', van: '10:00', tot: '11:00' }, deur)).status, 403);
+  assert.equal((await api('/api/festival/rider', { festival: fid, editie: eid,
+    boeking: boeking.id, wat: 'Handdoeken' }, deur)).status, 403);
+
+  /* AFVINKEN MAG WEL. Wie de handdoeken neerlegt is niet de manager. Zijn naam
+     komt uit de sessie, net als bij de bevestiging hierboven. */
+  const item = (await post('/api/festival/rider', { festival: fid, editie: eid,
+    boeking: boeking.id, wat: 'Handdoeken' }, manager)).item;
+  const v = await post('/api/festival/rider/vink', { festival: fid, editie: eid,
+    boeking: boeking.id, item: item.id, door: 'Nienke Vroomen' }, deur);
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const deurNaam = roster.staff.find(x => x.role !== 'manager').name;
+  assert.equal(v.item.klaar, true);
+  assert.equal(v.item.door, deurNaam);
+});
+
+test('24. het podiumbeeld neemt dag en klok van de server', async () => {
+  /* Het lichaam wijst naar MORGEN. Zou de route dat aannemen, dan kijkt een
+     stage manager naar het programma van een dag die nog niet loopt terwijl
+     zijn eigen podium draait. Dezelfde regel als bij de scan (toets 5). */
+  const b = await post('/api/festival/podiumbeeld', { festival: fid, editie: eid,
+    dag: morgenId, tijd: '04:00' }, deur);
+  assert.equal(b.ok, true);
+  assert.equal(b.dag, vandaagId);
+  assert.ok(b.podia.some(p => p.naam === 'Hoofdpodium' && p.changeover === 30));
+});
+
+test('25. de afrekening is een overzicht en blijft bij de manager', async () => {
+  const boeking = (await post('/api/festival/boekingen', { festival: fid, editie: eid,
+    dag: vandaagId }, manager)).boekingen[0];
+  await post('/api/festival/boeking', { festival: fid, editie: eid, id: boeking.id,
+    dag: vandaagId, podium: boeking.podium, artiest: boeking.artiest,
+    van: boeking.van, tot: boeking.tot, gage: 250000, voorschot: 50000 }, manager);
+  await post('/api/festival/boeking/extra', { festival: fid, editie: eid,
+    boeking: boeking.id, wat: 'Extra techniek', centen: 30000 }, manager);
+
+  assert.equal((await api('/api/festival/boeking/afrekening', { festival: fid, editie: eid,
+    boeking: boeking.id }, deur)).status, 403, 'wat een artiest kost gaat de bar niet aan');
+
+  const a = await post('/api/festival/boeking/afrekening', { festival: fid, editie: eid,
+    boeking: boeking.id }, manager);
+  assert.equal(a.openstaand, 230000);
+  assert.equal(a.betaald, false);
+  assert.match(a.let_op, /niets geind en niets overgemaakt/);
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -501,4 +578,25 @@ test('21. wie de dienst van is komt uit de sessie', async () => {
       -> toets 19 zakte: lid B las de groep van lid A en kon hem eruit zetten.
          Dit is dezelfde fout als de klok en de zaakcode, en hier weegt hij het
          zwaarst: een groep wordt dan een lijst waar iedereen aan kan zitten.
+
+  15. In routes/festival/artiest.js `door` uit de body laten komen in plaats van
+      uit req.actor, bij /api/festival/boeking/stand.
+      -> toets 22 zakte: "bevestigd door Nienke Vroomen" stond in de boeking
+         terwijl Nienke niet bestaat. De KERN is hier volstrekt in orde -- die
+         eist een naam EN een hoe -- en toch is de bevestiging dan een verhaal.
+         Dit is de zesde keer in dit domein dat dezelfde mutatie raak is, en dat
+         is geen herhaling maar de reden dat het een regel is.
+
+  16. Dezelfde mutatie bij /api/festival/rider/vink.
+      -> toets 23 zakte: het riderpunt kwam op naam van iemand anders, en dat is
+         de naam waar je 's avonds naar teruggaat als het er niet blijkt te staan.
+
+  17. In routes/festival/artiest.js managerOnly bij /api/festival/boeking en
+      /api/festival/boeking/afrekening weggehaald.
+      -> toets 23 en 25 zakten: de bar veranderde het schema en las de gage.
+
+  18. In routes/festival/artiest.js dag en tijd van het podiumbeeld uit het
+      LICHAAM laten komen in plaats van uit de serverklok.
+      -> toets 24 zakte: het beeld toonde het programma van morgen terwijl het
+         eigen podium draaide. Zelfde fout als mutatie 3 en 6, andere deur.
    ========================================================================== */

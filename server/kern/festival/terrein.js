@@ -84,6 +84,12 @@ module.exports = (ctx) => {
     const rol = SOORTEN[soort];
 
     const besloten = d.besloten === true;
+    /* DE CHANGEOVER hoort bij de PLEK en niet bij de boeking: een mainstage
+       heeft een half uur nodig om om te bouwen en een akoestische hoek vijf
+       minuten. Zet je hem per set, dan staat dezelfde waarheid bij elke set
+       opnieuw en loopt hij bij de eerste wijziging uit de pas. */
+    const changeover = d.changeover == null || d.changeover === ''
+      ? 0 : Math.max(0, Math.min(240, parseInt(d.changeover, 10) || 0));
     const cap = Math.max(0, Math.min(1000000, parseInt(d.capaciteit, 10) || 0));
     let veilig = d.veiligeCapaciteit == null || d.veiligeCapaciteit === ''
       ? cap : Math.max(0, parseInt(d.veiligeCapaciteit, 10) || 0);
@@ -118,11 +124,11 @@ module.exports = (ctx) => {
          Dit moet VOOR het opslaan gebeuren, want daarna is de boom al stuk. */
       if (ouder && (ouder === p.id || plekIn(e, ouder, p.id)))
         return { status: 400, error: 'Een plek kan niet in zichzelf liggen.' };
-      Object.assign(p, { naam, soort, ouder, besloten, capaciteit: cap, veiligeCapaciteit: veilig });
+      Object.assign(p, { naam, soort, ouder, besloten, changeover, capaciteit: cap, veiligeCapaciteit: veilig });
       save();
       return { ok: true, plek: p };
     }
-    const p = { id: id(), naam, soort, ouder, besloten, capaciteit: cap, veiligeCapaciteit: veilig };
+    const p = { id: id(), naam, soort, ouder, besloten, changeover, capaciteit: cap, veiligeCapaciteit: veilig };
     if (Object.keys(e.plekken).length >= 2000) return { status: 400, error: 'Tot tweeduizend plekken per editie.' };
     e.plekken[p.id] = p;
     save();

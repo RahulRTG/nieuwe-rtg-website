@@ -444,8 +444,49 @@ hebben.
      echte behoefte, maar het is ook het sociale netwerk van de bezoekers; dat
      vraagt dezelfde tweezijdige toestemming als een partnerband en verdient een
      eigen besluit.
-6. **Artiest en podium.** Boeking, rider, changeover, settlement — met het
-   draaiboek dat er al is.
+6. **Artiest en podium.** ✅ Boeking, rider, changeover en afrekening.
+   `kern/festival/{artiest,rider,podium}.js`
+
+   **Correctie op wat hier eerder stond.** Dit punt beloofde „met het draaiboek
+   dat er al is”, en dat klopt niet. `kern/events/draaiboek.js` is een
+   *cateringrunsheet*: hij hangt aan een horeca-event, kent stations (keuken,
+   bar, bediening, party), een MEP-vlag en `daysBefore`. Daar zit geen podium,
+   geen artiest en geen ombouwtijd in, en er is niets aan te knopen zonder er
+   een tweede ding van te maken. Wat er wél uit meekwam is de *les* over
+   sorteren rond middernacht — en die woont sinds fase 1 beter in
+   `kern/festival/model.js`. Herbruik die je moet forceren is geen herbruik.
+
+   **Een nieuwe boeking is een voornemen.** Dat onderscheid is de hele reden dat
+   dit bestand een standenlijst heeft: een naam in een schema is een wens tot
+   iemand ja zegt. Bevestigen vraagt daarom twee dingen — wíé het vastlegt (uit
+   de sessie, nooit uit het verzoek) en **waaruit het blijkt** („getekend
+   contract”, „mail van 3 juni”). Zonder die bron weigert de kern. „Bevestigd”
+   zonder bron is geen afspraak maar een herinnering, en op de dag zelf is dat
+   het verschil tussen een programma en een gat.
+
+   **De ombouwtijd hoort bij het podium en niet bij de boeking.** Een podium
+   heeft een `changeover`, en twee sets die elkaar exact raken botsen dus op een
+   podium dat een half uur nodig heeft. Het scherm toont niet de tijd tot de
+   volgende set maar die tijd **minus de ombouw** — dat is het getal waarop
+   gehandeld wordt, en een tekort staat er als tekort.
+
+   **De rider is bewust géén control uit `gereed.js`.** Daar hoort bewijs bij dat
+   een tweede mens aftekent en dat verloopt; een gitaarcabinet staat er of staat
+   er niet. Afvinken mag dan ook iedereen die er staat — wie de handdoeken
+   neerlegt is niet de manager — maar zijn naam komt uit de sessie.
+
+   **De afrekening is een overzicht en geen betaling.** Er wordt niets geind en
+   niets overgemaakt; die zin staat *in* de uitkomst en niet alleen op het
+   scherm, want wie deze data via een andere weg leest hoort hem net zo goed te
+   zien (GELD.md: geld verlaat het huis nooit vanzelf).
+
+   **De afwijkingen komen op dezelfde hoop als de rest.** Een onbevestigde set
+   die binnen het uur opgaat is kritiek, open riderpunten worden hoog binnen het
+   half uur, een soundcheck die zo begint vraagt aandacht — en dat staat in
+   `uitzonderingen()` en niet in een eigen lijstje. Een stage manager en een
+   veiligheidscoördinator die naar twee schermen kijken, is precies wat deze
+   wereld niet is. Er wordt hier niets afgelast en niets omgeboekt: deze laag
+   stelt vast, ingrijpen doet de mens (par. 4).
 7. **Voorspelling.** Horeca-, personeels- en vervoersvraag uit programma en flow.
 8. **Geheugen.** Verwacht tegen werkelijk, per editie, als advies voor de volgende.
 

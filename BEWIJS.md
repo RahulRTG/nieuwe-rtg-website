@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1038 bestanden en 6966 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1039 bestanden en 6981 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1038 |
-| losse beweringen (`test(...)`) | 6966 |
+| toetsbestanden | 1039 |
+| losse beweringen (`test(...)`) | 6981 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 29 |
+| alleen in de kop *genoemd*, nog niet gemeten | 30 |
 | niets van beide | 95 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-912 bestanden, 6746 beweringen.
+913 bestanden, 6761 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -226,7 +226,8 @@ toets omvalt.
 | `festival-gereed.test.js` | 10 | genoemd | FESTIVAL READINESS: EEN GETAL DAT NIET GROEN TE PRATEN IS. WAAROM DIT BESTAAT Een Festival Readiness Score van 98,7% is een mooi getal en juist daarom gevaarlijk (FESTIVAL.md par. |
 | `festival-groep.test.js` | 11 | genoemd | DE GROEP: WAT ER NIET IN ZIT IS DE TOETS. WAAROM DIT BESTAAT Een festival beleef je met mensen, en dat is precies waarom een groep het gevaarlijkste stuk van deze wereld is. |
 | `festival-partner.test.js` | 9 | genoemd | DE PARTNERBAND EN DE SIGNALEN VAN BUITEN. WAAROM DIT BESTAAT De cockpit hoort te weten dat er twee beveiligingsposten onbezet zijn. |
-| `festival-routes.test.js` | 21 | genoemd | RTG FESTIVAL OVER ECHTE HTTP: de eigendomsgrens en de klok. WAAROM DIT NAAST test/festival.test.js BESTAAT Dat bestand is PUUR: het toetst de kern zonder server, en daar zitten de regels over rechten, tijd en telling in. |
+| `festival-podium.test.js` | 11 | genoemd | ARTIEST EN PODIUM: EEN VOORNEMEN IS GEEN PROGRAMMA. WAAROM DIT BESTAAT CLAUDE.md verbiedt met zoveel woorden te doen alsof een boeking verwerkt is. |
+| `festival-routes.test.js` | 25 | genoemd | RTG FESTIVAL OVER ECHTE HTTP: de eigendomsgrens en de klok. WAAROM DIT NAAST test/festival.test.js BESTAAT Dat bestand is PUUR: het toetst de kern zonder server, en daar zitten de regels over rechten, tijd en telling in. |
 | `festival-verkoop.test.js` | 14 | genoemd | FESTIVAL COMMERCE: VOORRAAD, BUNDELS, EN DE TWEE STAPPEN. WAAROM DIT BESTAAT Betalen duurt. |
 | `festival.test.js` | 20 | genoemd | RTG FESTIVAL: HET TERREIN, DE PAS EN DE VOORUITBLIK. WAAROM DIT BESTAAT Een festival was in dit huis een `activiteit` van een zaak, en dat model kon vier dingen niet (FESTIVAL.md par. |
 | `flits.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Flits: de rijhulp van het netwerk. Meldingen op codenaam met houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar ze... |

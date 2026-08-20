@@ -110,6 +110,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
       <button data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
       <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
       <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
+      <button data-blad="podium"><span class="rv-icoon">◍</span><span>Podium</span></button>
       <button data-blad="gereed"><span class="rv-icoon">⌸</span><span>Gereed</span></button>
       <button data-blad="kassa"><span class="rv-icoon">◈</span><span>Kassa</span></button>
     </nav>
@@ -182,6 +183,19 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
           <h1>De plekken en hun grenzen</h1>
           <p class="fp-stil">De veilige capaciteit staat naast de vergunde. Het verschil tussen die twee is de tijd die u heeft.</p>
           <div class="fp-lijst" id="terreinLijst"></div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladPodium" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">PODIUM</div>
+          <h1 id="podiumKop">Nog niets op.</h1>
+          <p class="fp-stil">Wie er nu op is, wie erna komt, en hoeveel tijd daar
+            werkelijk tussen zit -- de ombouwtijd van het podium is er al af.</p>
+          <div class="fp-lijst" id="podiumLijst"></div>
+          <h2 class="fp-h2">Open riderpunten</h2>
+          <div class="fp-lijst" id="podiumRider"></div>
+          <p class="fp-stil" id="podiumStil"></p>
         </div>
       </div>
 
@@ -262,6 +276,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
               <select class="veld" id="plekOuder" aria-label="Ligt in"></select>
               <input class="veld" id="plekCap" type="number" min="0" placeholder="Capaciteit" aria-label="Capaciteit">
               <input class="veld" id="plekVeilig" type="number" min="0" placeholder="Veilig" aria-label="Veilige capaciteit">
+              <input class="veld" id="plekOmbouw" type="number" min="0" max="240" placeholder="Ombouw min (podium)" aria-label="Ombouwtijd in minuten">
               <label class="fp-vink"><input type="checkbox" id="plekBesloten"> besloten</label>
               <button class="knop" type="button" id="plekZet">Plek erbij</button>
             </div>
@@ -290,6 +305,32 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
             </div>
             <div class="fp-lijst" id="dnLijst"></div>
 
+            <h2 class="fp-h2">Programma</h2>
+            <div class="fp-form">
+              <select class="veld" id="bkDag" aria-label="Op welke dag"></select>
+              <select class="veld" id="bkPodium" aria-label="Op welk podium"></select>
+              <input class="veld" id="bkArtiest" maxlength="80" placeholder="Artiest" aria-label="Artiest">
+              <input class="veld" id="bkVan" maxlength="5" placeholder="Van uu:mm" aria-label="Begintijd">
+              <input class="veld" id="bkTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Eindtijd">
+              <input class="veld" id="bkSound" maxlength="5" placeholder="Soundcheck uu:mm" aria-label="Soundcheck">
+              <input class="veld" id="bkGage" type="number" min="0" step="0.01" placeholder="Gage" aria-label="Gage">
+              <button class="knop" type="button" id="bkZet">Zet in het schema</button>
+            </div>
+            <div class="fp-form">
+              <label class="fp-label" for="bkHoe">Waaruit blijkt de bevestiging</label>
+              <input class="veld" id="bkHoe" maxlength="120" placeholder="Getekend contract, mail van 3 juni" autocomplete="off">
+            </div>
+            <p class="fp-stil">Een nieuwe boeking is een voornemen. Tik een voornemen aan om
+              hem te bevestigen; zonder bron gebeurt er niets, want "bevestigd" zonder
+              bron is geen afspraak maar een herinnering.</p>
+            <div class="fp-lijst" id="bkLijst"></div>
+
+            <div class="fp-form">
+              <select class="veld" id="bkRiderBoeking" aria-label="Bij welke boeking"></select>
+              <input class="veld" id="bkRiderWat" maxlength="120" placeholder="Wat moet er staan" aria-label="Riderpunt">
+              <button class="knop" type="button" id="bkRiderZet">Riderpunt erbij</button>
+            </div>
+
             <h2 class="fp-h2">Keuring</h2>
             <div class="fp-form">
               <button class="knop" type="button" id="ctlSeed">Zet de startlijst controls klaar</button>
@@ -316,9 +357,11 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 <script src="/apps/festival/dienst.js" defer></script>
 <script src="/apps/festival/poort.js" defer></script>
 <script src="/apps/festival/beeld.js" defer></script>
+<script src="/apps/festival/podium.js" defer></script>
 <script src="/apps/festival/gereed.js" defer></script>
 <script src="/apps/festival/kassa.js" defer></script>
 <script src="/apps/festival/inrichten.js" defer></script>
+<script src="/apps/festival/programma.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

@@ -111,6 +111,30 @@ test('Kantoor: "Waarom dit bedrag?" vouwt de aangifte open tot op de factuur',
     assert.ok(!/sluit niet aan/i.test(blok), 'geen valse melding dat de opbouw niet aansluit');
     assert.ok(!/niet bestond/i.test(blok), 'en geen vals vreemd tarief');
 
+    /* ---- de afsluiting van de periode (deel 12a3) ----
+       Hierboven is net een aangifte opgemaakt, dus het register en de aangifte
+       zeggen hetzelfde: deze periode staat op bewezen. Dat is het GOEDE geval,
+       en juist daarom toetst dit ook wat er dan NIET staat -- geen uitzondering
+       en geen ontbrekende post. Een kaart die bij "alles in orde" toch iets
+       roods laat zien, leert de lezer over kleur heen te kijken. */
+    await page.waitForSelector('#btwAfs', { timeout: 15000 });
+    await page.click('#btwAfs');
+    await page.waitForFunction(() => {
+      const k = document.querySelector('#btwAfs');
+      return !!(k && /Ontbrekend|Bewezen/.test(k.closest('.btw-blok').textContent));
+    }, null, { timeout: 15000 });
+
+    const afs = (await page.$eval('#btwAfs', e => e.closest('.btw-blok').textContent)).replace(/\s+/g, ' ');
+    assert.match(afs, /Bewezen/, 'de dekking staat er');
+    assert.match(afs, new RegExp(btwOpFactuur.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+      'en het is het bedrag van de eigen factuur');
+    assert.match(afs, /dekking, geen correctheid/i, 'de kaart belooft niet meer dan hij meet');
+    /* Niets roods als er niets aan de hand is. */
+    assert.ok(!/Uitzondering/.test(afs), 'geen valse uitzondering');
+    assert.ok(!/Ontbrekend/.test(afs), 'geen valse ontbrekende dekking');
+    // de balk is er, en draagt een tekstalternatief
+    assert.ok(await page.$('.afs-balk[aria-label]'), 'de dekkingsbalk heeft een aria-label');
+
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

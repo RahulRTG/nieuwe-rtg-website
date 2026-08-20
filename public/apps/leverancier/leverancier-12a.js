@@ -63,6 +63,7 @@
       /* De bewijsketen onder de aangifte (deel 12a2). Bewust ONDER het detail
          en niet ernaast: eerst wat er staat, dan waarom het er staat. */
       btwWaaromKaart(toon)+
+      btwAfsluiting(toon)+
       btwNaheffingen()+
       '</div>';
   }
@@ -123,7 +124,7 @@
         btwData = null; await laadBtw();
       } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
     }));
-    btwWaaromBedrading(el);   // deel 12a2; hijst over de bundel heen
+    btwWaaromBedrading(el); btwAfsluitingBedrading(el);   // deel 12a2; hijst over de bundel heen
     const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
       btwMsg = '';
       try {

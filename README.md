@@ -1248,6 +1248,20 @@ niets nagekeken" op het scherm hetzelfde als "alles is in orde".
 
 `POST /api/supplier/btw/preflight` `{id, kenmerk?}`.
 
+#### Beide op het scherm
+
+De afsluiting staat als kaart onder de btw-aangifte
+(`leverancier-12a3.js`, afgesplitst van de Waarom-kaart op de naad
+terugkijken/vooruitkijken). Een balk met drie stukken, en de bedragen erbij:
+99,96% leest als "af", terwijl de 0,04% ernaast juist het enige is dat werk
+vraagt. Alleen uitzondering en ontbrekend krijgen kleur; van de controles krijgt
+alleen wat níét sluit een accent. De schermtoets eist daarom ook wat er *niet*
+staat als alles klopt.
+
+De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?"
+— en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
+ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
+
 ### De ogenregel op één plek (`kern/ogen.js`)
 
 "Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en

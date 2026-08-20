@@ -638,6 +638,26 @@ staat erbij, want een routekaart die alleen afvinkt, is een routekaart die liegt
     "doorheen moeten" geldt vandaag voor één van de vijf soorten. Dat getal
     staat in het kantoor, zodat het zichtbaar is en niet aangenomen.
 
+### 6.2 Het spiegelbeeld: de Ghost Capability Gate
+
+Regel 2 zegt *geen capability zonder caller*, en §5.1 meet dat. De andere kant is
+even hard en werd nergens gesteld: **RTG mag geen afdwingbaar onderdeel hebben
+dat op geen enkele trede staat.** Zo'n capability is een spook — hij houdt mensen
+tegen (de code vraagt hem, de poort weigert) maar er is geen product waar hij bij
+hoort, dus niemand heeft hem gekocht en niemand kán hem krijgen. Dat is geen dode
+code die je opruimt als je toevallig langsloopt; het is een deur die dicht zit
+zonder dat iemand er een sleutel voor heeft laten maken.
+
+`scripts/capabilities.js` meet het nu in dezelfde run. Vandaag zijn er nul — en
+juist daarom hoort de meting te bestaan, want de dag dat er één komt, komt hij
+stil.
+
+De toets moest daarvoor wel zelf een spook máken. De eerste versie stelde alleen
+vast dat er vandaag geen zijn, en dat blijft groen als de meting helemaal niets
+doet: een mutatie liep er dwars doorheen. Nu voegt de toets tijdelijk een
+capability aan de tabel toe die nergens te koop is, en controleert dat hij hem
+vindt — en ruimt hem op in een `finally`, want die tabel is gedeeld.
+
 ### 6.1 Wat er na deze tien openstaat
 
 Uit de aantekeningen hierboven, op volgorde van waarde:

@@ -81,6 +81,9 @@ const caps = require('./capaciteiten');
 const routepoort = require('./routepoort');
 const { gebruiken } = require('./handhaving/tekst');
 const { routebewijs, tabelHeeftAanroeper, TABEL } = require('./handhaving/routebewijs');
+/* Het spiegelbeeld staat apart: deze meter telt wie er VRAAGT, die kijkt of er
+   iemand kan KOPEN. Zie ./handhaving/spoken.js. */
+const { maakSpoken } = require('./handhaving/spoken');
 
 /* De eigen module telt niet mee. Een capability die alleen in capaciteiten.js
    voorkomt, is een rij in een tabel en verder niets -- dat is precies de stand
@@ -151,6 +154,8 @@ function bewijsVanTabel(m, cap) {
    uit beleefdheid, maar omdat de toets die de stripper op de proef stelt bij de
    meting hoort en niet bij een tweede deur. */
 const tekst = require('./handhaving/tekst');
-module.exports = { meet, poort, routebewijs, EIGEN, TABEL,
+const spoken = maakSpoken(meet);
+
+module.exports = { meet, poort, routebewijs, spoken, EIGEN, TABEL,
   gebruiken: tekst.gebruiken, zonderCommentaar: tekst.zonderCommentaar,
   omhullendeAanroep: tekst.omhullendeAanroep };

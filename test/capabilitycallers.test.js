@@ -186,6 +186,52 @@ test('7c. de vaste contactpersoon kiest een baan en sluit geen deur', () => {
     'geen verzonnen naam: nooit claimen dat iets geregeld is wat niet geregeld is');
 });
 
+/* ---------------------------------------------------------- het spiegelbeeld */
+
+/* REGEL 2 IS "GEEN CAPABILITY ZONDER CALLER". De andere kant is even hard en
+   werd nergens gesteld: RTG mag geen afdwingbaar onderdeel hebben dat op geen
+   enkele trede staat. Zo'n capability is een SPOOK -- hij houdt mensen tegen,
+   maar er is geen product waar hij bij hoort, dus niemand kan hem kopen. */
+test('7d. een capability die wordt afgedwongen maar nergens te koop is, is een spook', () => {
+  /* Een verzonnen capability bestaat niet in de tabel, dus die kunnen we niet
+     nabootsen. Wat we WEL kunnen toetsen is de regel zelf, op de echte tabel:
+     elke capability die ergens wordt afgedwongen, hoort op minstens een trede te
+     staan. */
+  for (const cap of Object.keys(caps.CAPS)) {
+    const treden = caps.tredenMet(cap);
+    assert.ok(treden.length > 0,
+      cap + ' staat op geen enkele trede: niemand kan hem kopen, en toch bestaat hij');
+  }
+
+  const huis = [ECHTE_AANROEPER,
+    { pad: 'server/routes/x.js', bron: "caps.mag(pas, 'can_use_pos');" }];
+  assert.equal(handhaving.spoken(huis).aantal, 0,
+    'vandaag is er geen enkel spook -- en juist daarom hoort deze meting te bestaan, ' +
+    'want de dag dat er een komt, komt hij stil');
+
+  /* EN DAN MOET HIJ ER OOK EEN KUNNEN VINDEN. Zonder dit stuk toetst het
+     bovenstaande alleen dat er vandaag niets is, en dat blijft groen als de
+     meting helemaal niets doet -- een mutatie liep daar dwars doorheen. Dus
+     maken we er zelf een: een capability die wel wordt afgedwongen en op geen
+     enkele trede staat. */
+  const naam = 'can_do_spook_in_een_toets';
+  caps.CAPS[naam] = 'een onderdeel dat op geen enkele trede staat';
+  try {
+    const g = handhaving.spoken([ECHTE_AANROEPER,
+      { pad: 'server/routes/x.js', bron: "caps.mag(pas, '" + naam + "');" }]);
+    assert.equal(g.aantal, 1);
+    assert.equal(g.spoken[0].cap, naam);
+    assert.match(g.problemen[0], /geen enkele trede/);
+    assert.match(g.problemen[0], /toch houdt hij mensen tegen/);
+
+    // en een capability die NERGENS wordt afgedwongen is geen spook maar een naam
+    assert.equal(handhaving.spoken([ECHTE_AANROEPER]).aantal, 0,
+      'niet gekocht en niet afgedwongen: dan houdt hij ook niemand tegen');
+  } finally {
+    delete caps.CAPS[naam];      // de tabel is gedeeld; hem laten staan besmet elke toets hierna
+  }
+});
+
 /* ------------------------------------------------------- het echte huis */
 
 test('8. in dit huis heeft elke capability een caller', () => {
@@ -203,4 +249,8 @@ test('8. in dit huis heeft elke capability een caller', () => {
   const r = handhaving.poort(bestanden);
   assert.equal(r.aantal, Object.keys(caps.CAPS).length);
   assert.equal(r.ok, true, 'stil: ' + r.stil.join(', ') + '\n' + r.problemen.join('\n'));
+
+  /* En de andere kant: niets wordt afgedwongen zonder dat het te koop is. */
+  const g = handhaving.spoken(bestanden);
+  assert.equal(g.aantal, 0, g.problemen.join('\n'));
 });

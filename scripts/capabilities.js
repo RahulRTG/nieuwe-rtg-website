@@ -44,7 +44,8 @@ function bestanden() {
 function plek(p) { return p.pad + ':' + p.regel; }
 
 function toon() {
-  const r = handhaving.poort(bestanden());
+  const lijst = bestanden();
+  const r = handhaving.poort(lijst);
   console.log('');
   console.log('DE CALLER-METING -- ' + r.aantal + ' capabilities');
   console.log('');
@@ -69,12 +70,21 @@ function toon() {
   }
   console.log(r.ok ? 'Elke capability heeft een caller.'
     : 'STIL: ' + r.stil.length + ' van ' + r.aantal + ' -- ' + r.stil.join(', '));
-  return r;
+
+  /* HET SPIEGELBEELD. Een capability die wel wordt afgedwongen maar op geen
+     enkele trede staat, is een deur die dicht zit zonder dat iemand er een
+     sleutel voor heeft laten maken. */
+  const g = handhaving.spoken(lijst);
+  console.log(g.aantal
+    ? '\nSPOKEN: ' + g.aantal + ' -- ' + g.spoken.map(x => x.cap).join(', ')
+    : 'En geen enkele capability wordt afgedwongen zonder dat hij te koop is.');
+  for (const p of g.problemen) console.log('  - ' + p);
+  return { ...r, spoken: g };
 }
 
 const r = toon();
-if (process.argv.includes('--controle') && !r.ok) {
+if (process.argv.includes('--controle') && (!r.ok || r.spoken.aantal)) {
   console.error('');
-  for (const p of r.problemen) console.error('  - ' + p);
+  for (const p of r.problemen.concat(r.spoken.problemen)) console.error('  - ' + p);
   process.exit(1);
 }

@@ -98,7 +98,24 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     await page.fill('.rtg-scan-hand input', payload);
     await page.evaluate(() => { const f = document.querySelector('.rtg-scan-hand'); if (f) f.requestSubmit(); });
 
-    // 6) het menu van KIKUNOI opent
+    /* 6) EERST DE KAART, DAN PAS HET MENU. Hier stond alleen de regel hieronder:
+       scannen en het menu ging open. Sinds RTG Link (LINK.md stap 4) gaat elke
+       gescande code langs EEN deur, komt er een kaart met wie/wat/waarom/hoelang,
+       en gebeurt er pas iets als een mens erop drukt. Deze toets beschreef dus
+       het gedrag van ervoor, en zakte terecht -- alleen zag niemand dat, omdat
+       de volle e2e-ronde nooit was gedraaid.
+
+       De kaart hoort er eerst te staan, en dat wordt hier ook echt beproefd: een
+       toets die meteen op de knop drukt, zou net zo groen zijn als de kaart werd
+       overgeslagen. */
+    await page.waitForSelector('.rtg-bedoeling', { timeout: 10000 });
+    const kaartTekst = await page.evaluate(() => (document.querySelector('.rtg-bedoeling .blad') || {}).innerText || '');
+    assert.match(kaartTekst, /Menu openen/i, 'de kaart zegt wat er gaat gebeuren');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#menu-sheet.open')), false,
+      'kijken is geen daad: het menu gaat niet vanzelf open');
+
+    // en dan pas het menu van KIKUNOI
+    await page.click('.rtg-bedoeling button.doen');
     await page.waitForSelector('#menu-sheet.open', { timeout: 10000 });
     const naam = await page.textContent('#msName');
     assert.ok(naam && naam.trim().length > 0, 'de menukaart toont de naam van de zaak');

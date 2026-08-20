@@ -444,6 +444,16 @@ paden verhuizen er per stuk naartoe.
    de handinvoer van de scanoverlay, de kaart lezen, bevestigen, en dan pas is er
    geld bewogen of een verzoek verstuurd.
 
+   **En deze stap liet één toets achter die niemand zag zakken.**
+   `test/scan-tafel.e2e.js` beschreef de weg van ervóór: scannen, en het menu
+   ging open. Sinds de kaart ertussen staat, gebeurt dat niet meer vanzelf — dus
+   die toets stond rood vanaf de dag dat stap 4 landde. Hij kwam pas boven bij de
+   volle e2e-ronde op 20 augustus 2026 (254 toetsen, dit was de enige zakker), en
+   dat is precies waarvoor die ronde er is: een browsertoets die niemand draait,
+   bewaakt niets. Hij beproeft nu de nieuwe belofte, en scherper dan daarvoor:
+   eerst staat de kaart er en is het menu nog dicht, en pas na de druk gaat het
+   open.
+
    **En de omgekeerde richting kreeg een poort** (`test/link.test.js`, 20 augustus
    2026). De bestaande toetsen liepen van de intentie naar de route: bestaat hij,
    en staat de goede poort ervoor. Terug was ongedekt. `capability.aanvaarden`
@@ -535,6 +545,11 @@ afwerkte. Wat hier staat is nagelopen in de code, niet uit het hoofd.
   `npm run norm:vast` een aantal commits niet is gedraaid. De ratel doet precies
   wat hij moet doen; er heeft alleen niemand naar gekeken. Herstellen of de norm
   met reden verlagen is een besluit van de eigenaar, geen opruimklus onderweg.
+- **De volle e2e-ronde was nooit gedraaid.** Op 20 augustus 2026 wel: 254
+  toetsen, 253 groen, één zakker — en die zakker stond rood vanaf de dag dat
+  RTG Scan landde, omdat hij het gedrag van ervóór beschreef. Dat is de les, niet
+  de toets: een browsertoets die niemand draait, bewaakt niets. De ronde duurt
+  bijna een uur en hoort daarom bij een vaste kadans, niet bij goede bedoelingen.
 - **Het Zegel deelt de scanner maar niet de laag.** Dat is met opzet (par. 4,
   stap 1) en geen open punt — maar het betekent wel dat "één scanner" vandaag
   twee verificatiewegen achter zich heeft: de linkdeur voor RTG-codes, en de
